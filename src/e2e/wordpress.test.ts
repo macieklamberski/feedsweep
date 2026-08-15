@@ -9,6 +9,7 @@ describeForEachParser('WordPress', (parseHtml) => {
   // lazy-loader attribute stashes (defaultLazyIframeAttributes, defaultLazySrcAttributes).
   // The plugin facades are rebuilt by rebuildLyteEmbeds, rebuildRocketYoutubePreviews,
   // rebuildLazyLoadForVideos, rebuildEmbedPlusEmbeds and rebuildElementorVideoEmbeds.
+  // convertGalleries turns wp-block-gallery figures into gallery placeholders.
   // An oEmbed block whose provider call failed ships the bare url alone; linkifyUrls makes it a
   // link and unwrapWrappers drops the figure shell around it.
   // wp-embedded-content post embeds are in open PR #361; add that clause when it merges.
@@ -25,6 +26,43 @@ describeForEachParser('WordPress', (parseHtml) => {
     const expected = html`
       <p>Look:</p>
       <p> <a href="https://twitter.com/someone/status/1234567890123456789">https://twitter.com/someone/status/1234567890123456789</a> </p>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should convert a wordpress gallery and keep the placeholder through unwrapWrappers', async () => {
+    const value = html`
+      <figure class="wp-block-gallery has-nested-images columns-2 is-cropped">
+        <figure class="wp-block-image">
+          <a href="https://example.com/a.jpg"><img src="https://example.com/a-large.jpg" alt="Sunset"></a>
+          <figcaption>Day one</figcaption>
+        </figure>
+        <figure class="wp-block-image"><img src="https://example.com/b-large.jpg"></figure>
+        <figcaption class="blocks-gallery-caption">My trip</figcaption>
+      </figure>
+    `
+    const items = JSON.stringify([
+      {
+        url: 'https://example.com/a-large.jpg',
+        fullUrl: 'https://example.com/a.jpg',
+        alt: 'Sunset',
+        caption: 'Day one',
+      },
+      { url: 'https://example.com/b-large.jpg' },
+    ])
+    const expected = html`
+      <div
+        data-gallery-provider="wordpress"
+        data-gallery-title="My trip"
+        data-gallery-items='${items}'
+      >
+        <figure>
+          <a href="https://example.com/a.jpg"><img src="https://example.com/a-large.jpg" alt="Sunset"></a>
+          <figcaption>Day one</figcaption>
+        </figure>
+        <figure><img src="https://example.com/b-large.jpg"></figure>
+      </div>
     `
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
