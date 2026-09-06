@@ -181,6 +181,9 @@ export const defaultNonContentSelectors = [
   'form[action*="paypal.com/cgi-bin/webscr"]', // PayPal buy, cart or subscribe form, or a donate form naming no button.
   'img[src*="paypal.com/"][src*="/i/btn/"]:not(a img)', // The PayPal button image pasted without its form.
 
+  // Affiliate booking widgets, which render a map or a form to sell the reader a stay or a
+  // ticket and carry none of the post.
+  'iframe[src*="stay22.com/embed"]', // Stay22 hotel map.
   // Platform UI chrome and non-rendered scaffolding.
   // RedCircle's embed snippet ships a ten-pixel "Powered by RedCircle" line under the player.
   'p:has(> a.redcircle-link)',
