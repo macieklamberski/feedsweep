@@ -1,5 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
+import { decodeSegment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The token pairs a show with an episode across a `+`, e.g. `DiNRb69N+Dagp3z15`. Both halves are
@@ -12,17 +13,14 @@ const safeTokenRegex = /^[A-Za-z0-9_-]+\+[A-Za-z0-9_-]+$/
 // serves, so the publisher's choice is carried through instead of normalised to one of them.
 const playerVersions = new Set(['v2', 'v3'])
 
+// `fireside.fm/s/{token}/iframe` is the retired share route, naming the same token and no
+// version. It serves nothing today: all six carriers in the census 302 to
+// `share.fireside.fm/episode/{token}/iframe`, which answers 404, while the four tokens tried
+// answer 200 on both `player.fireside.fm/v2` and `/v3` (2026-09-06). With no version stated
+// there is no publisher choice to carry through, so it takes the one Fireside writes today.
+const currentPlayerVersion = 'v3'
+
 const firesideHosts = ['fireside.fm']
-
-const decodeSegment = (segment: string | undefined): string | undefined => {
-  if (!segment) {
-    return
-  }
-
-  try {
-    return decodeURIComponent(segment)
-  } catch {}
-}
 
 // Fireside's player is one fixed size: every iframe states `height="200"`. That is the whole
 // case for this resolver: the embed carries no metadata, no thumbnail and no canonical episode
@@ -35,7 +33,8 @@ type FiresidePlayer = { version: string; token: string }
 export const extractFiresideToken = (link: string): FiresidePlayer | undefined => {
   const segments = getPathSegments(link)
   const versioned = segments[0] === 'player' ? segments.slice(1) : segments
-  const [version, encodedToken] = versioned
+  const [version, encodedToken] =
+    segments[0] === 's' ? [currentPlayerVersion, segments[1]] : versioned
 
   if (!version || !playerVersions.has(version)) {
     return
