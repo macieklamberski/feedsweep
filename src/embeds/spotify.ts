@@ -133,5 +133,7 @@ export const spotifyEmbedResolver = createUrlEmbedResolver(spotifyHosts, spotify
 
 export const spotifyFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', strip: 'Spotify Embed:' },
+  // A copied YouTube snippet with the src swapped.
+  { provider, field: 'title', drop: 'YouTube video player' },
   { provider, field: 'description', drop: /^(?:album|episode|playlist|podcast|podcast episode)$/ },
 ]

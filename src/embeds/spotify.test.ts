@@ -678,3 +678,22 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toBeUndefined()
   })
 })
+
+describeForEachParser('spotifyEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, spotifyEmbedResolver)
+
+  it('should drop the YouTube label a copied snippet carries', async () => {
+    const value = html`
+      <iframe src="https://open.spotify.com/embed/track/03yOjwHoOPDlTUg0NRxN6t" title="YouTube video player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'spotify',
+      id: 'track/03yOjwHoOPDlTUg0NRxN6t',
+      src: 'https://open.spotify.com/embed/track/03yOjwHoOPDlTUg0NRxN6t',
+      url: 'https://open.spotify.com/track/03yOjwHoOPDlTUg0NRxN6t',
+      height: 152,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
