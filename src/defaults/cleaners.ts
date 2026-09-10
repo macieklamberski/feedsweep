@@ -13,6 +13,7 @@ import { instagramFieldCleaners } from '../embeds/instagram.js'
 import { ivooxFieldCleaners } from '../embeds/ivoox.js'
 import { kalturaFieldCleaners } from '../embeds/kaltura.js'
 import { libsynFieldCleaners } from '../embeds/libsyn.js'
+import { nytimesFieldCleaners } from '../embeds/nytimes.js'
 import { sketchfabFieldCleaners } from '../embeds/sketchfab.js'
 import { speakerdeckFieldCleaners } from '../embeds/speakerdeck.js'
 import { spotifyFieldCleaners } from '../embeds/spotify.js'
@@ -39,6 +40,7 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...ivooxFieldCleaners,
   ...kalturaFieldCleaners,
   ...libsynFieldCleaners,
+  ...nytimesFieldCleaners,
   ...sketchfabFieldCleaners,
   ...speakerdeckFieldCleaners,
   ...spotifyFieldCleaners,

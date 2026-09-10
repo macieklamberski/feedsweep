@@ -1,4 +1,8 @@
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner } from '../types.js'
+import { attr } from '../utils/dom.js'
+
+const provider = 'nytimes'
+
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -19,7 +23,10 @@ const playerRatio = '16/9'
 // The video page is `/video/{section}/{id}/{slug}.html`, and neither the section nor the slug is
 // in the embed, so no `url` is minted. The player discriminates in a browser only: a fabricated
 // id answers 200 with the same 695 byte shell and renders "Video Data Failed to Load".
-export const nytimesResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const nytimesResolveEmbed = (
+  url: string,
+  element?: Element,
+): EmbedResolverResult | undefined => {
   const parsed = parseUrlOnHosts(url, nytimesHosts)
   const id = parsed?.searchParams.get('videoId')
 
@@ -31,14 +38,18 @@ export const nytimesResolveEmbed = (url: string): EmbedResolverResult | undefine
     return
   }
 
-  // Every pasted iframe titles itself "New York Times Video - Embed Player".
   return {
-    provider: 'nytimes',
+    provider,
     id,
     src: `https://www.nytimes.com${playerPath}?videoId=${id}`,
     ratio: playerRatio,
+    title: attr(element, 'title'),
   }
 }
 
 // The Brightcove-era nytimes.com/bcvideo iframe player, which answers 400 for every id today.
 export const nytimesIframeEmbedResolver = createUrlEmbedResolver(nytimesHosts, nytimesResolveEmbed)
+
+export const nytimesFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'New York Times Video - Embed Player' },
+]
