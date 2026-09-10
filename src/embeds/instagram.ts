@@ -1,28 +1,15 @@
 import { isPlainObject, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { decodeOrKeep, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'instagram'
 
-// Instagram's embed dialog ships a post as `<blockquote class="instagram-media">` holding the
-// permalink, a skeleton of empty divs and an `embed.js` loader beside it. The loader never runs
-// in a reader, so the quote arrives as its own chrome: a "View this post on Instagram" line and
-// an "A post shared by" byline, with no picture and no player.
-//
-// The frame that loader builds is mintable from the permalink alone,
-// `instagram.com/{p|reel|tv}/{shortcode}/embed/[captioned/]`, which is also what the AMP
-// component builds from its shortcode and what a stored-after-render copy already points at.
-//
-// `instagr.am` is the short host the pre-2013 snippets and Jetpack's own matcher still accept.
+// `instagr.am` is the short host the pre-2013 snippets still carry.
 const instagramHosts = ['instagram.com', 'instagr.am']
 
-// The paths one post is addressed by: the post, the reel (singular and plural spellings) and
-// the retired IGTV route. They are not interchangeable: a live photo serves its picture at
-// `/p/{shortcode}/media/` and answers 404 at `/reel/{shortcode}/media/` (checked 2026-08-13),
-// so the path stays part of the id.
 // `audio` sits where a shortcode does, under `/reels/audio/{id}`, and names a sound, not a post.
 const nonShortcodeSegments = new Set(['audio'])
 
@@ -43,6 +30,7 @@ const sitePathSegments = new Set([
 ])
 
 // The account names the poster, not the post, so it is matched and dropped.
+// `tv` is the retired IGTV route and `reels` the plural spelling of the reel.
 const postPathRegex = /^\/(?:([A-Za-z0-9_.]+)\/)?(p|reel|reels|tv)\/([A-Za-z0-9_-]+)/
 const safeShortcodeRegex = /^[A-Za-z0-9_-]+$/
 
@@ -79,6 +67,7 @@ const composeEmbed = (
   captioned: boolean,
   extra?: Partial<EmbedResolverResult>,
 ): EmbedResolverResult => {
+  // The kind stays in the path: a photo's media answers 404 under `/reel/`.
   const path = `${post.kind}/${post.shortcode}`
 
   return {
@@ -95,18 +84,6 @@ const composeEmbed = (
 // itself declares a max-width and never a height, so the declared-size pass finds nothing on it.
 const wrapperSelector = 'figure[data-provider="instagram"]'
 
-const decodeAttribute = (value: string | undefined): string | undefined => {
-  if (!value) {
-    return
-  }
-
-  try {
-    return decodeURIComponent(value)
-  } catch {
-    return value
-  }
-}
-
 const readWrapper = (
   element: Element,
 ): { post?: Post; size: { width?: number; height?: number } } => {
@@ -120,7 +97,7 @@ const readWrapper = (
   const height = parsePixelSize(attr(figure, 'data-orig-height'))
 
   return {
-    post: readPostUrl(decodeAttribute(attr(figure, 'data-url'))),
+    post: readPostUrl(decodeOrKeep(attr(figure, 'data-url'))),
     // Stated together or not at all: a lone height would claim a fixed box the embed does
     // not have.
     size: width && height ? { width, height } : {},
@@ -177,13 +154,11 @@ const findByline = (element: Element): Element | undefined => {
   })
 }
 
-// The dialog used to write a byline that linked the account and dated the post: "A post shared
-// by {name} (@handle) on {date}", and to put the caption in a paragraph above it. The current
-// one writes neither: its only text is the skeleton's own chrome and an undated byline. So the
-// caption is read only where that byline marks the paragraph above it as the post's own text.
-// Taking it from the modern shape would publish "View this post on Instagram" as the caption.
 const readContent = (element: Element): Partial<EmbedResolverResult> => {
   const byline = findByline(element)
+  // Only beside a byline: the modern skeleton's first paragraph is its own chrome.
+  // The older dialog puts the caption in a paragraph above the byline "A post shared by {name}
+  // (@handle) on {date}", and the current one writes neither.
   const caption = byline ? find(element, 'p', (paragraph) => paragraph !== byline) : undefined
   const time = find(element, 'time')
   const quoted = text(element)
@@ -201,13 +176,10 @@ const readContent = (element: Element): Partial<EmbedResolverResult> => {
   }
 }
 
-// The blockquote in all its versions and wrappers, which is what the share dialog writes and
-// what every CMS re-wraps. The permalink attribute is the second handle on purpose: a sanitizer
-// that strips classes keeps data attributes, so some feeds carry the quote with the attributes
-// alone, and the attribute is Instagram's own namespace rather than a name anyone else picked.
+// Instagram's share dialog ships a post as a blockquote skeleton only its `embed.js` loader fills.
 export const instagramBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.instagram-media, blockquote[data-instgrm-permalink]',
-  (element): EmbedResolverResult | undefined => {
+  (element) => {
     const wrapper = readWrapper(element)
     const post = findPost(element) ?? wrapper.post
 
@@ -222,19 +194,17 @@ export const instagramBlockquoteEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// The AMP component names the post in an attribute and carries no text at all, so left alone it
-// reaches the reader inert: stripEmptyTags skips custom elements, whose emptiness is meaningful,
-// and no AMP runtime runs to build the frame. It names the media and not the path the media
-// lives at, and addresses every shortcode it is given through `/p/`.
+// AMP's `<amp-instagram>` names the post in an attribute and stays empty with no AMP runtime.
 export const instagramAmpEmbedResolver = createMarkupEmbedResolver(
   'amp-instagram[data-shortcode], amp-instagram[shortcode]',
-  (element): EmbedResolverResult | undefined => {
+  (element) => {
     const shortcode = attr(element, 'data-shortcode') ?? attr(element, 'shortcode')
 
     if (!shortcode || !safeShortcodeRegex.test(shortcode)) {
       return
     }
 
+    // The component names the media and not the path it lives at, so the frame goes through `/p/`.
     return composeEmbed({ kind: 'p', shortcode }, element.hasAttribute('data-captioned'))
   },
 )
@@ -248,28 +218,28 @@ type SubstackPostAttributes = {
   timestamp?: string | null
 }
 
-// The `title` is the post page's own title, and its shape changed with Substack's scraper. The
-// earliest payloads carry the bare caption, the current ones wrap it in
-// `{name} on Instagram: "{caption}"`, and the era between wrote only "A post shared by
-// {author}", which duplicates `author_name` and says nothing the byline does not, so that one
-// form is dropped instead of published as the post's text.
-const boilerplateTitleRegex = /^A post shared by\b/
+// The current og:title quotes the caption behind the poster's name, and the payload carries no
+// field holding the caption on its own.
+const wrappedCaptionRegex = / on Instagram: ["\u201c]/
 
-// Substack stamps the filename of every copy it rehosts. The stamp is the guard: the earliest
-// payloads passed Instagram's own CDN url through instead, which is signed and long expired,
-// and a dead thumbnail in a placeholder is worse than none.
+// Instagram's og:title, which the payload carries in place of a caption field.
+const readPayloadCaption = (title: string | undefined): string | undefined => {
+  if (!title || wrappedCaptionRegex.test(title)) {
+    return
+  }
+
+  return title
+}
+
+// Only a rehosted copy: the earliest payloads carry Instagram's signed CDN url, long expired.
 const readRehostedUrl = (url: string | null | undefined): string | undefined => {
   return url?.includes('__ss-rehost__') ? url : undefined
 }
 
-// Substack renders an Instagram post server-side and ships the wrapper div childless, with the
-// whole card as JSON in `data-attrs`: the shortcode, the post's page title, the author and a
-// thumbnail Substack rehosted to its own storage. Left alone the div is dropped as empty markup
-// and the post goes with it. Some feeds strip the class and keep the component name, so both
-// halves of the selector name the same div.
+// Substack ships an Instagram post as a childless div with the whole card as JSON in `data-attrs`.
 export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
   'div.instagram-embed-wrap[data-attrs], div[data-component-name="InstagramToDOM"]',
-  (element): EmbedResolverResult | undefined => {
+  (element) => {
     const attributes = jsonAttr<SubstackPostAttributes>(element, 'data-attrs')
     const shortcode = attributes?.instagram_id
 
@@ -282,7 +252,7 @@ export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
     // The payload names the media and not the path it lives at, so like the AMP component the
     // frame addresses the shortcode through `/p/`.
     return composeEmbed({ kind: 'p', shortcode }, false, {
-      description: title && !boilerplateTitleRegex.test(title) ? title : undefined,
+      description: readPayloadCaption(title),
       // The handle arrives bare in the older payloads and `@`-prefixed in the current ones.
       author: attributes.author_name ? atUsername(attributes.author_name) : undefined,
       avatar: readRehostedUrl(attributes.profile_pic_url),
@@ -292,10 +262,11 @@ export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// The frame `embed.js` builds, which Blogger-style exports store after the page rendered and
-// which iframe generators paste directly. Its query and hash (`cr`, `wp`, `rd`, `rp`) describe
-// the embedding page, not the player, so the url is rebuilt from the path instead of kept.
-export const instagramResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+// The frame `embed.js` builds, which exports store after render and iframe generators paste.
+// Its query and hash (`cr`, `wp`, `rd`, `rp`) describe the embedding page, not the player.
+// A post has no name: its words go to `description`, and the frame titles itself `Instagram`
+// or nothing.
+export const instagramResolveEmbed: ResolveEmbed = (url) => {
   const post = readPostUrl(url)
 
   if (!post) {
@@ -319,6 +290,11 @@ export const readInstagramHeight = (data: unknown): number | undefined => {
     ? readPixels(data.details.height)
     : undefined
 }
+
+export const instagramFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'description', drop: /^a post shared by\b.*$/ },
+  { provider, field: 'description', drop: 'Instagram' },
+]
 
 export const instagramRenderHint: EmbedRenderHint = {
   provider,

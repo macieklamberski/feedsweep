@@ -417,3 +417,34 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('issuuIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, issuuIframeEmbedResolver)
+
+  it('should drop the site name the snippet writes in place of the document name', async () => {
+    const value = html`
+      <iframe src="https://e.issuu.com/embed.html#1016421/47623369" title="issuu.com"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'issuu',
+      id: '1016421/47623369',
+      src: 'https://e.issuu.com/embed.html#1016421/47623369',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://e.issuu.com/embed.html#1016421/47623369" title="Cathedral News 07.06.26"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'issuu',
+      id: '1016421/47623369',
+      src: 'https://e.issuu.com/embed.html#1016421/47623369',
+      title: 'Cathedral News 07.06.26',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

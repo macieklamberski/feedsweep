@@ -267,3 +267,36 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('videopressIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, videopressIframeEmbedResolver)
+
+  it('should drop the label in the languages Jetpack ships it in', async () => {
+    const value = html`
+      <iframe src="https://videopress.com/embed/TxdSIdpO" title="Reproductor de vídeo VideoPress"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'videopress',
+      id: 'TxdSIdpO',
+      src: 'https://videopress.com/embed/TxdSIdpO',
+      url: 'https://videopress.com/v/TxdSIdpO',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://videopress.com/embed/TxdSIdpO" title="WordPress Category Hierarchy"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'videopress',
+      id: 'TxdSIdpO',
+      src: 'https://videopress.com/embed/TxdSIdpO',
+      url: 'https://videopress.com/v/TxdSIdpO',
+      title: 'WordPress Category Hierarchy',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -179,15 +179,15 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
         src: 'https://cdnapisec.kaltura.com/p/1660902/sp/166090200/embedIframeJs/uiconf_id/25717641/partner_id/1660902?iframeembed=true&playerId=kaltura_player&entry_id=1_1pavfxkg',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/1660902/thumbnail/entry_id/1_1pavfxkg/width/640',
-        title: 'Calendar Appointments (Exam Makeups)',
         width: 560,
         height: 395,
+        title: 'Calendar Appointments (Exam Makeups)',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the label KMS writes on every iframe', async () => {
+    it('should drop the label a generated iframe carries in place of the name', async () => {
       const value = html`
         <iframe
           title="Kaltura Player"

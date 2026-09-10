@@ -1,21 +1,17 @@
 import { parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
+
+const provider = 'ivoox'
+
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `playerivoox_ee_`, `_ep_` and `_em_` are three generations of the legacy episode player, and
-// `player_ej_` and `player_ek_` are two live generations of the current one. All of them name
-// the episode by the same numeric id.
-//
-// The letters are enumerated rather than matched as a shape, because they are not a sequence:
-// `player_el_` and `player_en_podcast_` both answer 404 while `ej`, `ek` and `es_podcast` serve
-// (probed 2026-08-15 with real ids). A `player_e[a-z]_` pattern would mint dead urls.
-//
-// The two trailing segments are the skin and the playlist page, and either may be written alone.
-// The skin picks the episode player's layout (`_1_1` serves a 30,277 byte bar against 60,108 for
-// `_6_1`), the page picks which episode a show's playlist opens on, and each is inert on the
-// other player, so both are carried through rather than rebuilt (probed 2026-09-07).
+// all of them name the episode by the same numeric id.
 const legacyPlayerRegex = /\/playerivoox_e[emp]_(\d+)_\d+\.html$/
+// Enumerated, not `e[a-z]`: `player_el_` answers 404 while `ej` and `ek` serve.
+// `player_ej_` and `player_ek_` are two live generations of the current player.
 const episodePlayerRegex = /\/player_e[jk]_(\d+)(?:_(\d+))?_(\d+)\.html$/
 
 // The show player, which carries every episode. Its id is the podcast's, a different id space
@@ -32,6 +28,7 @@ const playerHeight = 200
 export type IvooxSubject = {
   kind: 'episode' | 'show'
   id: string
+  // The skin picks the episode player's layout, the page which episode a show's playlist opens on.
   skin: string
   page: string
   player: string
@@ -59,13 +56,14 @@ export const extractIvooxSubject = (link: string): IvooxSubject | undefined => {
   const episode = parsed.pathname.match(episodePlayerRegex)
 
   if (episode?.[1]) {
-    // The generation the publisher chose is kept: `ek` serves, so rewriting it to `ej` would
-    // swap a working player for a different one on nothing but preference.
+    // The generation stays: `ek` serves, and rewriting it to `ej` swaps in a different player.
     const player = episode[0].startsWith('/player_ek_') ? 'ek' : 'ej'
 
     return { kind: 'episode', id: episode[1], skin: episode[2] ?? '1', page: episode[3], player }
   }
 
+  // The three generations share one id space: `ivoox.com/x_rf_{id}_1.html` redirects to the
+  // episode's own page for a legacy id and 404s for a fabricated one.
   const legacy = parsed.pathname.match(legacyPlayerRegex)
 
   return legacy?.[1]
@@ -73,32 +71,27 @@ export const extractIvooxSubject = (link: string): IvooxSubject | undefined => {
     : undefined
 }
 
-// The legacy player is gone: `playerivoox_ee_8292430_1.html` and `playerivoox_ep_1617339_1.html`
-// answer 404 with the same 80,237-byte "page does not exist" body, whichever generation and
-// whichever id, so rewriting is a repair and those embeds render nothing today. The three
-// generations share one id space, which is what lets the rewrite carry the id across:
-// `ivoox.com/x_rf_{id}_1.html` redirects to the episode's own slugged page for a real id and
-// 404s for a fabricated one, and it answered with the episode named in the same snippet for
-// fourteen of nineteen legacy ids probed 2026-09-06, across all three generations. The current
-// form is not verifiable the same way, since
-// `player_ej_` answers 200 to any id at all: it is a javascript shell that resolves the id on
-// load. What the rewrite rests on is the 404 and the shared id, not a status code off the
-// target.
-//
-// No thumbnail or title: iVoox publishes no key-free metadata endpoint for an episode id.
-export const ivooxResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+// iVoox's player iframes, whose legacy `playerivoox_` generation now answers 404 for every id.
+// `player_ej_` answers 200 to any id at all, a javascript shell that resolves the id on load.
+export const ivooxResolveEmbed: ResolveEmbed = (url, element) => {
   const subject = extractIvooxSubject(url)
 
   if (!subject) {
     return
   }
 
+  // No thumbnail: iVoox publishes no key-free metadata endpoint for an episode id.
   return {
-    provider: 'ivoox',
+    provider,
     id: subject.kind === 'show' ? `podcast/${subject.id}` : subject.id,
     src: `https://www.ivoox.com/player_${subject.player}_${subject.id}_${subject.skin}_${subject.page}.html`,
     height: playerHeight,
+    title: attr(element, 'title'),
   }
 }
 
 export const ivooxEmbedResolver = createUrlEmbedResolver(ivooxHosts, ivooxResolveEmbed)
+
+export const ivooxFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'YouTube video player' },
+]

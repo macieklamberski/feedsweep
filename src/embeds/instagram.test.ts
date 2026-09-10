@@ -301,6 +301,39 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
     })
   })
 
+  // The dialog writes the platform's name where the caption goes on a post that has none.
+  it('should state no description when the caption names only the platform', async () => {
+    const value = html`
+      <blockquote
+        class="instagram-media"
+        data-instgrm-permalink="https://www.instagram.com/p/BgPrjlfHcoB/"
+        data-instgrm-version="8"
+      >
+        <div>
+          <p>
+            <a href="https://www.instagram.com/p/BgPrjlfHcoB/" target="_blank">Instagram</a>
+          </p>
+          <p>
+            A post shared by
+            <a href="https://www.instagram.com/jervoisakl/" target="_blank">Jervois Steak House</a>
+            (@jervoisakl) on
+            <time datetime="2018-03-22T01:45:03+00:00">Mar 21, 2018 at 6:45pm PDT</time>
+          </p>
+        </div>
+      </blockquote>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/BgPrjlfHcoB',
+      src: 'https://www.instagram.com/p/BgPrjlfHcoB/embed/',
+      url: 'https://www.instagram.com/p/BgPrjlfHcoB/',
+      author: '@jervoisakl',
+      date: '2018-03-22T01:45:03+00:00',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   describe('the sanitized blockquote', () => {
     it('should resolve when every data attribute has been stripped', async () => {
       const value = html`
@@ -784,7 +817,7 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
   }
 
   describe('the current payload', () => {
-    it('should read the caption-bearing title, the author and the rehosted images', async () => {
+    it('should drop the wrapped title and keep the author and the rehosted images', async () => {
       const value = makeContainer({
         instagram_id: 'DZmgID9Eawg',
         title: 'BBC News on Instagram: "Pakistan\'s prime minister says a peace …',
@@ -804,12 +837,11 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
         id: 'p/DZmgID9Eawg',
         src: 'https://www.instagram.com/p/DZmgID9Eawg/embed/',
         url: 'https://www.instagram.com/p/DZmgID9Eawg/',
-        description: 'BBC News on Instagram: "Pakistan\'s prime minister says a peace …',
+        thumbnail:
+          'https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-snapshot-DZmgID9Eawg.jpg',
         author: '@bbcnews',
         avatar:
           'https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-profile-pic-DZmgID9Eawg.png',
-        thumbnail:
-          'https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-snapshot-DZmgID9Eawg.jpg',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -832,9 +864,73 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
         id: 'p/BsozzXrhcLu',
         src: 'https://www.instagram.com/p/BsozzXrhcLu/embed/',
         url: 'https://www.instagram.com/p/BsozzXrhcLu/',
-        author: '@zandercutt',
         thumbnail:
           'https://bucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com/public/images/__ss-rehost__IG-BsozzXrhcLu.jpg',
+        author: '@zandercutt',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop a title that names the platform and nothing else', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Instagram',
+        author_name: '',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the title that quotes the caption behind the poster', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Christine Mari on Instagram: "draw what u want #comics"',
+        author_name: 'christinemariart',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+        author: '@christinemariart',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the same title when the quotes are curly', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Orca The Sproodle on Instagram: \u201cLook, it\u2019s exhausting\u201d',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a caption that opens on the word Instagram', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Instagram keeps changing the feed and I am tired',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+        description: 'Instagram keeps changing the feed and I am tired',
       }
 
       expect(await extract(value)).toEqual(expected)

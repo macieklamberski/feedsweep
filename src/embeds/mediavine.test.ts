@@ -29,6 +29,24 @@ describeForEachParser('mediavineWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should read the name the carrier states', async () => {
+      const value = html`
+        <div
+          class="mv-video-target mv-video-id-t9z9zameefjmqvtghsvu"
+          data-video-id="t9z9zameefjmqvtghsvu"
+          title="How to fold a fitted sheet"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mediavine',
+        id: 't9z9zameefjmqvtghsvu',
+        src: 'https://embed.mediavine.com/videos/t9z9zameefjmqvtghsvu/iframe',
+        title: 'How to fold a fitted sheet',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should return undefined for an empty video id', async () => {
       const value = html`
         <div

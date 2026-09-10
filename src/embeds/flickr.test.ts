@@ -52,9 +52,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'bees/72157624341',
         src: 'https://embedr.flickr.com/photosets/72157624341?width=640&height=480',
         url: 'https://www.flickr.com/photos/bees/sets/72157624341',
-        author: 'bees',
         width: 640,
         height: 480,
+        author: 'bees',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -74,9 +74,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'bees/72157624341',
         src: 'https://embedr.flickr.com/photosets/72157624341?width=400&height=300',
         url: 'https://www.flickr.com/photos/bees/sets/72157624341',
-        author: 'bees',
         width: 400,
         height: 300,
+        author: 'bees',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -284,9 +284,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'photostreams/bees',
         src: 'https://www.flickr.com/photos/bees/player?width=400&height=300',
         url: 'https://www.flickr.com/photos/bees/',
-        author: 'bees',
         width: 400,
         height: 300,
+        author: 'bees',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -356,9 +356,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'bees/72157623516208778',
         src: 'https://embedr.flickr.com/photosets/72157623516208778?width=400&height=300',
         url: 'https://www.flickr.com/photos/bees/sets/72157623516208778',
-        author: 'bees',
         width: 400,
         height: 300,
+        author: 'bees',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -412,10 +412,148 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // A single photo page names no slideshow, and nothing here can mint a player for it.
-    it('should return undefined for a framed photo page', async () => {
+    // The photo page answers `x-frame-options: SAMEORIGIN` and names no `/player/` segment.
+    it('should return undefined for a photo page framed without the player segment', async () => {
       const value = html`
         <iframe src="https://www.flickr.com/photos/12345678@N00/4362718294/"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  // The player Flickr's own photo page opens, pasted as the iframe src. It sends no
+  // frame-blocking header.
+  describe('the single photo page player', () => {
+    it('should name the photo the page player addresses', async () => {
+      const value = html`
+        <iframe
+          src="https://www.flickr.com/photos/celesteh/15753890338/in/photostream/player/"
+          width="500"
+          height="97"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photos/celesteh/15753890338',
+        src: 'https://www.flickr.com/photos/celesteh/15753890338/in/photostream/player/',
+        url: 'https://www.flickr.com/photos/celesteh/15753890338/',
+        width: 500,
+        height: 97,
+        author: 'celesteh',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // The file url needs the secret beside the photo id.
+    it('should compose the photo file when the path carries the secret', async () => {
+      const value = html`
+        <iframe
+          src="https://www.flickr.com/photos/bees/2341623661/player/7c99f48bbf"
+          width="500"
+          height="375"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photos/bees/2341623661',
+        src: 'https://www.flickr.com/photos/bees/2341623661/player/7c99f48bbf',
+        url: 'https://www.flickr.com/photos/bees/2341623661/',
+        thumbnail: 'https://live.staticflickr.com/0/2341623661_7c99f48bbf_b.jpg',
+        width: 500,
+        height: 375,
+        author: 'bees',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the thumbnail when the player segment is not a secret', async () => {
+      const value = html`
+        <iframe
+          src="https://www.flickr.com/photos/bees/2341623661/player/7c99f48bbf%20"
+          width="500"
+          height="375"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photos/bees/2341623661',
+        src: 'https://www.flickr.com/photos/bees/2341623661/player/7c99f48bbf%20',
+        url: 'https://www.flickr.com/photos/bees/2341623661/',
+        width: 500,
+        height: 375,
+        author: 'bees',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state no size when the carrier declares none', async () => {
+      const value = html`
+        <iframe src="https://www.flickr.com/photos/bees/2341623661/player/"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photos/bees/2341623661',
+        src: 'https://www.flickr.com/photos/bees/2341623661/player/',
+        url: 'https://www.flickr.com/photos/bees/2341623661/',
+        author: 'bees',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should fill no author when the owner is an nsid', async () => {
+      const value = html`
+        <iframe
+          src="https://www.flickr.com/photos/12345678@N00/2341623661/in/set-72157624341/player/"
+          width="500"
+          height="375"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photos/12345678@N00/2341623661',
+        src: 'https://www.flickr.com/photos/12345678@N00/2341623661/in/set-72157624341/player/',
+        url: 'https://www.flickr.com/photos/12345678@N00/2341623661/',
+        width: 500,
+        height: 375,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  // The endpoint Flickr's embed script writes for a single photo. It names the photo alone, so
+  // the owner the page url needs is nowhere in the carrier and the short url stands in for it.
+  describe('the embedr single photo endpoint', () => {
+    it('should reach the photo through the short url when the carrier names no owner', async () => {
+      const value = html`
+        <iframe
+          src="https://embedr.flickr.com/photos/2341623661"
+          width="400"
+          height="300"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/4yVr8K',
+        src: 'https://embedr.flickr.com/photos/2341623661',
+        url: 'https://flic.kr/p/4yVr8K',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // A numeric segment in that position is a photo on embedr and an owner's photostream page on
+    // the main host, which refuses framing.
+    it('should return undefined for the same path on the main host', async () => {
+      const value = html`
+        <iframe src="https://www.flickr.com/photos/2341623661"></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -503,5 +641,26 @@ describeForEachParser('flickrResolveEmbed', (parseHtml) => {
     const element = parseHtml('<embed></embed>').querySelector('embed') as Element
 
     expect(flickrResolveEmbed('https://[', element)).toBeUndefined()
+  })
+})
+
+describeForEachParser('flickrEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, flickrEmbedResolver)
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://www.flickr.com/slideShow/index.gne?user_id=12345678@N04" title="Iceland, summer 2019"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'flickr',
+      id: 'photostreams/12345678@N04',
+      src: 'https://embedr.flickr.com/photostreams/12345678@N04?width=400&height=300',
+      url: 'https://www.flickr.com/photos/12345678@N04/',
+      width: 400,
+      height: 300,
+      title: 'Iceland, summer 2019',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

@@ -105,3 +105,36 @@ describeForEachParser('nytimesIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toBeUndefined()
   })
 })
+
+describeForEachParser('nytimesIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, nytimesIframeEmbedResolver)
+
+  it('should drop the label the pasted player writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://www.nytimes.com/video/players/offsite/index.html?videoId=1247464583973" title="New York Times Video - Embed Player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'nytimes',
+      id: '1247464583973',
+      src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=1247464583973',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://www.nytimes.com/video/players/offsite/index.html?videoId=1247464583973" title="A Few Cookies a Day to Keep the Pounds Away?"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'nytimes',
+      id: '1247464583973',
+      src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=1247464583973',
+      ratio: '16/9',
+      title: 'A Few Cookies a Day to Keep the Pounds Away?',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

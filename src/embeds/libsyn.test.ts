@@ -209,3 +209,36 @@ describeForEachParser('libsyn through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, libsynEmbedResolver)
+
+  it('should drop the label the player writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/" title="Libsyn Player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'libsyn',
+      id: 'episode/5508311',
+      src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
+      height: 90,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/" title="Episode 12: The Long Way Round"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'libsyn',
+      id: 'episode/5508311',
+      src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
+      height: 90,
+      title: 'Episode 12: The Long Way Round',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

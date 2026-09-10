@@ -110,8 +110,8 @@ describeForEachParser('telegramScriptEmbedResolver', (parseHtml) => {
         id: 'tochkapress/111424',
         src: 'https://t.me/tochkapress/111424?embed=1',
         url: 'https://t.me/tochkapress/111424',
-        author: '@tochkapress',
         width: 480,
+        author: '@tochkapress',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -131,8 +131,8 @@ describeForEachParser('telegramScriptEmbedResolver', (parseHtml) => {
         id: 'tochkapress/111424',
         src: 'https://t.me/tochkapress/111424?embed=1',
         url: 'https://t.me/tochkapress/111424',
-        author: '@tochkapress',
         width: 480,
+        author: '@tochkapress',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -275,8 +275,8 @@ describeForEachParser('telegramIframeEmbedResolver', (parseHtml) => {
         id: 'rvvoenkor/12345',
         src: 'https://t.me/rvvoenkor/12345?embed=1',
         url: 'https://t.me/rvvoenkor/12345',
-        author: '@rvvoenkor',
         height: 500,
+        author: '@rvvoenkor',
       }
 
       expect(await extract(value)).toEqual(expected)

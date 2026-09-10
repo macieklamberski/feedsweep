@@ -166,9 +166,9 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
         id: 'corp/lady/86/753',
         src: 'https://my.mail.ru/corp/lady/video/embed/86/753',
         url: 'https://my.mail.ru/corp/lady/video/86/753.html',
-        author: 'lady',
         width: 540,
         height: 328,
+        author: 'lady',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -215,9 +215,9 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
         id: 'mail/alinavrik59/142/143',
         src: 'https://my.mail.ru/mail/alinavrik59/video/embed/142/143',
         url: 'https://my.mail.ru/mail/alinavrik59/video/142/143.html',
-        author: 'alinavrik59',
         width: 626,
         height: 367,
+        author: 'alinavrik59',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -237,11 +237,29 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
         id: 'mail/anizm.com/4418/4427',
         src: 'https://my.mail.ru/mail/anizm.com/video/embed/4418/4427',
         url: 'https://my.mail.ru/mail/anizm.com/video/4418/4427.html',
-        author: 'anizm.com',
         height: 390,
+        author: 'anizm.com',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
+})
+
+describeForEachParser('mailruEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mailruEmbedResolver)
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://my.mail.ru/video/embed/253943806846567285" title="Прогулка по Невскому"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'mailru',
+      id: '253943806846567285',
+      src: 'https://my.mail.ru/video/embed/253943806846567285',
+      title: 'Прогулка по Невскому',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

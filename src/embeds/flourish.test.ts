@@ -311,3 +311,36 @@ describe('readFlourishHeight', () => {
     expect(readFlourishHeight('iframe.resize')).toBeUndefined()
   })
 })
+
+describeForEachParser('flourishIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, flourishIframeEmbedResolver)
+
+  it('should drop the label the share dialog writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://flo.uri.sh/visualisation/29541520/embed" title="Interactive or visual content"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'flourish',
+      id: 'visualisation/29541520',
+      src: 'https://flo.uri.sh/visualisation/29541520/embed',
+      url: 'https://public.flourish.studio/visualisation/29541520/',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://flo.uri.sh/visualisation/29541520/embed" title="Net quantities of nitazenes seized, by county"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'flourish',
+      id: 'visualisation/29541520',
+      src: 'https://flo.uri.sh/visualisation/29541520/embed',
+      url: 'https://public.flourish.studio/visualisation/29541520/',
+      title: 'Net quantities of nitazenes seized, by county',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
