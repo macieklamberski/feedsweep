@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
 import {
   audioFileRegex,
@@ -60,10 +60,7 @@ const declaresAudioPlayer = (element: Element): boolean => {
   return getEmbedSize(element, 0).height === audioPlayerHeight
 }
 
-export const archiveResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const archiveResolveEmbed: ResolveEmbed = (url, element) => {
   const identifier = extractArchiveIdentifier(url)
 
   if (!identifier) {
@@ -110,11 +107,8 @@ const namesAudioFile = (config: string): boolean => {
   })
 }
 
-export const archiveFlashResolveEmbed = (
-  src: string,
-  element: Element,
-): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(src, placeholderBaseUrl)
+export const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
     return

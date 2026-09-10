@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { decodeSegment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -40,7 +40,7 @@ export const extractFiresideToken = (link: string): FiresidePlayer | undefined =
   }
 }
 
-export const firesideResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const firesideResolveEmbed: ResolveEmbed = (url) => {
   const player = extractFiresideToken(url)
 
   if (!player) {

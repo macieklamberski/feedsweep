@@ -1,5 +1,5 @@
 import { isPlainObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest, readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -55,7 +55,7 @@ export const podigeeScriptEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-export const podigeeResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const podigeeResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, podigeeHosts)
 
   // An enclosure on the CDN, {n}-{hash}.mp3, reads as an episode and would lose its audio.

@@ -1,4 +1,4 @@
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -49,10 +49,7 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry, src: string): EmbedRe
   }
 }
 
-export const kalturaResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const kalturaResolveEmbed: ResolveEmbed = (url, element) => {
   const entry = readEntry(url)
 
   if (!entry) {

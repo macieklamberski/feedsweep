@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl, trimObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
@@ -39,10 +39,7 @@ export const extractSpreakerEmbed = (
 
 // Spreaker's player iframe ships no height attribute, so a reader reserves nothing for it.
 // Spreaker's oEmbed returns the title, the author and a thumbnail for the id tagged here.
-export const spreakerResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const spreakerResolveEmbed: ResolveEmbed = (url, element) => {
   const embed = extractSpreakerEmbed(url)
 
   if (!embed) {

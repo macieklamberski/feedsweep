@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -16,7 +16,7 @@ const playerKindRegex = /^[a-z]+$/
 const episodePlayerHeight = 190
 
 // stand.fm's player iframe, or a framed page url, which answers SAMEORIGIN and shows nothing.
-export const standfmResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const standfmResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
   const segments = parsed ? getPathSegments(parsed) : []
   const [kind, id] = segments[0] === 'embed' ? segments.slice(1) : segments

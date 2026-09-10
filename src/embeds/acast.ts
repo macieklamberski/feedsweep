@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
@@ -43,7 +43,7 @@ const extractAcastEmbed = (link: string): { show: string; episode?: string } | u
   return { show, episode }
 }
 
-const acastResolveEmbed = (url: string, element?: Element): EmbedResolverResult | undefined => {
+const acastResolveEmbed: ResolveEmbed = (url, element) => {
   const embed = extractAcastEmbed(url)
 
   if (!embed) {

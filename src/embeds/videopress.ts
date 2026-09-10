@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
 import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -31,11 +31,8 @@ const composeEmbed = (guid: string, query = ''): EmbedResolverResult => {
 
 // The poster, and the title where the carrier states none, live behind
 // `public-api.wordpress.com/rest/v1.1/videos/{guid}`, which answers with no key.
-const videopressResolveEmbed = (
-  link: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
-  const [route, guid] = getPathSegments(link)
+const videopressResolveEmbed: ResolveEmbed = (url, element) => {
+  const [route, guid] = getPathSegments(url)
 
   if (route !== 'embed' && route !== 'v') {
     return
@@ -48,7 +45,7 @@ const videopressResolveEmbed = (
   }
 
   return {
-    ...composeEmbed(safeGuid, pickUrlParams(link, videopressEmbedParams)),
+    ...composeEmbed(safeGuid, pickUrlParams(url, videopressEmbedParams)),
     title: attr(element, 'title'),
   }
 }
@@ -69,11 +66,8 @@ export const readVideopressEmbedSrc = (link: string): string | undefined => {
 
 const flashPlayerPathRegex = /\/player\.swf$/i
 
-const videopressFlashResolveEmbed = (
-  link: string,
-  element: Element,
-): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
+const videopressFlashResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
     return

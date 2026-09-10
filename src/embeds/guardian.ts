@@ -1,4 +1,4 @@
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -44,7 +44,7 @@ const readDate = (path: string): string | undefined => {
 // and 506 tall and is the whole page, so the height is 16:9 of the width with nothing around it.
 const playerRatio = '16/9'
 
-export const guardianResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const guardianResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, guardianHosts)
   const path = parsed?.pathname.match(playerPathRegex)?.[1]
 

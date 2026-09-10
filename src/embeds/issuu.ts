@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 
 const provider = 'issuu'
 
@@ -91,10 +91,7 @@ export const issuuWidgetEmbedResolver = createMarkupEmbedResolver(
 // The reader iframe, at `e.issuu.com/embed.html` or the document page pasted from the address bar.
 // The Flash viewer `static.issuu.com/webembed/…/IssuuReader.swf` names its document in a
 // `documentId` flashvar, a third id space neither url form accepts.
-export const issuuResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const issuuResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
 
   if (!parsed) {

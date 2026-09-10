@@ -1,5 +1,5 @@
 import { getPathSegments, isPlainObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -17,7 +17,7 @@ const formHeight = 900
 
 // Only `/embed/{slug}` is a form. The campaign page sits at `/{slug}` and is what the
 // placeholder links to; the blog and event routes name nothing embeddable.
-export const donorboxResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const donorboxResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, donorboxHosts)
 
   if (!parsed) {

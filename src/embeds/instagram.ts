@@ -1,5 +1,5 @@
 import { isPlainObject, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { decodeOrKeep, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
@@ -266,7 +266,7 @@ export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
 // Its query and hash (`cr`, `wp`, `rd`, `rp`) describe the embedding page, not the player.
 // A post has no name: its words go to `description`, and the frame titles itself `Instagram`
 // or nothing.
-export const instagramResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const instagramResolveEmbed: ResolveEmbed = (url) => {
   const post = readPostUrl(url)
 
   if (!post) {

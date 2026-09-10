@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
   composeQuery,
@@ -249,10 +249,7 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   }
 }
 
-export const youtubeResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const youtubeResolveEmbed: ResolveEmbed = (url, element) => {
   const target = resolveTarget(url)
 
   return target && { ...target, title: attr(element, 'title') }

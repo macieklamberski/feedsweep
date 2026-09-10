@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize } from '../utils/dom.js'
 
 const provider = 'libsyn'
@@ -54,10 +54,7 @@ export const extractLibsynEmbed = (
   }
 }
 
-export const libsynResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const libsynResolveEmbed: ResolveEmbed = (url, element) => {
   const embed = extractLibsynEmbed(url)
 
   if (!embed) {

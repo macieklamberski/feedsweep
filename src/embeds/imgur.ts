@@ -1,5 +1,5 @@
 import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
@@ -127,7 +127,7 @@ export const imgurBlockquoteEmbedResolver = createMarkupEmbedResolver(
 
 // The frame the embed script builds, kept by exports that stored the page after it rendered.
 // Its query (`pub`, `ref`, `context`, `analytics`, `w`) describes the embedding page.
-export const imgurResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const imgurResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !isHostOf(parsed, imgurPageHosts)) {

@@ -1,4 +1,4 @@
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -36,7 +36,7 @@ const readVideoId = (url: string): string | undefined => {
 }
 
 // Tencent Video's player iframe and the dead Flash TPout.swf carrier, both naming the video in vid.
-export const tencentResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const tencentResolveEmbed: ResolveEmbed = (url) => {
   const videoId = readVideoId(url)
 
   if (!videoId) {

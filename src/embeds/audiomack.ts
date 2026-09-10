@@ -1,5 +1,5 @@
 import { getPathSegments, toMap } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -49,10 +49,7 @@ const readTrack = (url: URL): Track | undefined => {
     : { artist: second, kind: third, slug: fourth, search: url.search }
 }
 
-export const audiomackResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const audiomackResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, audiomackHost)
   const track = parsed && readTrack(parsed)
 

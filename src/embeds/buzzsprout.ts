@@ -1,4 +1,4 @@
-import type { EmbedRenderHint, EmbedResolver, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolver, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -34,10 +34,7 @@ const composeEmbed = (podcastId: string, episodeId?: string): EmbedResolverResul
 }
 
 // Buzzsprout's player iframe, whose title names the episode.
-export const buzzsproutResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const buzzsproutResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, buzzsproutHosts)
 
   if (!parsed) {

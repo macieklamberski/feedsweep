@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -28,7 +28,7 @@ export const extractCaptivateEmbed = (link: string): { kind: string; id: string 
 }
 
 // Captivate's player iframe, a kind and a uuid, with no oEmbed to size it.
-export const captivateResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const captivateResolveEmbed: ResolveEmbed = (url) => {
   const embed = extractCaptivateEmbed(url)
 
   if (!embed) {

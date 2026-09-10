@@ -1,5 +1,5 @@
 import { parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -38,7 +38,7 @@ export const extractMegaphoneEmbed = (
 
 // No metadata and no thumbnail without an api key, so the height is the substance here, and
 // some iframes carry no height at all.
-export const megaphoneResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const megaphoneResolveEmbed: ResolveEmbed = (url) => {
   const embed = extractMegaphoneEmbed(url)
 
   if (!embed) {

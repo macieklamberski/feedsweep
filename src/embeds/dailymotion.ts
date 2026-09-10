@@ -1,5 +1,5 @@
 import { getPathSegments, type Nullish, parseUrl } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 
 const provider = 'dailymotion'
@@ -141,10 +141,7 @@ export const readDailymotionEmbedSrc = (link: string): string | undefined => {
 // Neither player reads `autoplay` off the query: autostart comes from the saved configuration.
 const dailymotionEmbedParams = ['start', 'playlist']
 
-export const dailymotionResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
   const videoId = extractDailymotionId(url)
 
   if (videoId) {

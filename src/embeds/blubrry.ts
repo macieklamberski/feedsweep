@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 const provider = 'blubrry'
@@ -40,10 +40,7 @@ export const extractBlubrryEmbed = (link: string): string | undefined => {
 }
 
 // Blubrry's player iframe, by episode id or by media url, with no oEmbed to size it.
-export const blubrryResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const blubrryResolveEmbed: ResolveEmbed = (url, element) => {
   const id = extractBlubrryEmbed(url)
 
   if (!id) {

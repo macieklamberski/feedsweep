@@ -1,4 +1,4 @@
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -41,7 +41,7 @@ const readEmbed = (
   return composeEmbed(safeIntegrationId, keepIfMatches(playlistId, safeIdRegex))
 }
 
-export const glomexResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const glomexResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, glomexHosts)
 
   if (!parsed || !playerPathRegex.test(parsed.pathname)) {

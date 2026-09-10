@@ -1,4 +1,4 @@
-import type { EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 const provider = 'nytimes'
@@ -23,10 +23,7 @@ const playerRatio = '16/9'
 // The video page is `/video/{section}/{id}/{slug}.html`, and neither the section nor the slug is
 // in the embed, so no `url` is minted. The player discriminates in a browser only: a fabricated
 // id answers 200 with the same 695 byte shell and renders "Video Data Failed to Load".
-export const nytimesResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const nytimesResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, nytimesHosts)
   const id = parsed?.searchParams.get('videoId')
 

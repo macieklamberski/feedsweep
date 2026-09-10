@@ -1,5 +1,5 @@
 import { getPathSegments, toMap } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -85,10 +85,7 @@ const readPathPair = (url: URL | undefined): [string, string] | undefined => {
 }
 
 // Spotify's player iframe, in the modern path form and the pre-2017 embed.spotify.com/?uri= form.
-export const spotifyResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, spotifyHosts)
 
   if (!parsed) {

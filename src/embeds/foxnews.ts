@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -30,7 +30,7 @@ const composeEmbed = (id: string): EmbedResolverResult => {
 
 // Both carriers name the video in a query parameter: `id` on the script, `video_id` on the
 // iframe. Everything else in the query is the snippet's size or the embedding page's referrer.
-export const foxnewsResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, foxnewsHosts)
   const id = parsed?.searchParams.get('video_id') ?? parsed?.searchParams.get('id')
   const [route, page] = parsed ? getPathSegments(parsed) : []

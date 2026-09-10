@@ -1,4 +1,4 @@
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { parsePixelSize } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -19,8 +19,8 @@ type WidgetConfig = {
   height?: number
 }
 
-const gettyImagesResolveEmbed = (link: string): EmbedResolverResult | undefined => {
-  const parsed = parseUrlOnHosts(link, gettyImagesHosts)
+const gettyImagesResolveEmbed: ResolveEmbed = (url) => {
+  const parsed = parseUrlOnHosts(url, gettyImagesHosts)
   const itemId = parsed?.pathname.match(embedPathRegex)?.[1]
 
   if (!itemId || !safeItemIdRegex.test(itemId)) {
@@ -33,7 +33,7 @@ const gettyImagesResolveEmbed = (link: string): EmbedResolverResult | undefined 
     // photographer, collection and a thumbnail with no key, and 404s on an invented id.
     id: itemId,
     // Kept whole: without its `et` and `sig` the player answers 400.
-    src: link,
+    src: url,
     url: `https://www.gettyimages.com/detail/${itemId}`,
   }
 }

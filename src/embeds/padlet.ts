@@ -1,4 +1,4 @@
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -14,7 +14,7 @@ const previewPathRegex = /^\/padlets\/([^/]+)\/embeds\/preview_embed\/?$/
 // repeats that; the preview form sizes itself `height: 100%` and so states nothing usable.
 const boardHeight = 608
 
-export const padletResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const padletResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, padletHosts)
   const boardId =
     parsed?.pathname.match(embedPathRegex)?.[1] ?? parsed?.pathname.match(previewPathRegex)?.[1]

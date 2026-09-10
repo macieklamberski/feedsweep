@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -43,11 +43,8 @@ const composeEmbed = (kind: Kind, id: string): EmbedResolverResult => {
   return result
 }
 
-export const rtveResolveEmbed = (
-  link: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
-  const parsed = parseUrlOnHosts(link, rtveHosts)
+export const rtveResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrlOnHosts(url, rtveHosts)
 
   if (!parsed) {
     return
@@ -72,11 +69,8 @@ export const rtveResolveEmbed = (
 // RTVE's player iframe, rtve.es/drmn/embed/{audio|video}/{id}/.
 export const rtveIframeEmbedResolver = createUrlEmbedResolver(rtveHosts, rtveResolveEmbed)
 
-export const rtveFlashResolveEmbed = (
-  link: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
+export const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
     return

@@ -1,4 +1,4 @@
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -82,10 +82,7 @@ const resolveTarget = (url: string, element?: Element): EmbedResolverResult | un
   return modern ? composeSubject(modern.slice(1).join('/')) : undefined
 }
 
-export const mailruResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const mailruResolveEmbed: ResolveEmbed = (url, element) => {
   const target = resolveTarget(url, element)
 
   return target && { ...target, title: attr(element, 'title') }

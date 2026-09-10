@@ -1,5 +1,5 @@
 import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize, text } from '../utils/dom.js'
 import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -245,10 +245,7 @@ export const codepenWidgetEmbedResolver = createMarkupEmbedResolver(
   readWidget,
 )
 
-export const codepenResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const codepenResolveEmbed: ResolveEmbed = (url, element) => {
   const target = parseTarget(url)
 
   if (target?.kind !== 'embed') {

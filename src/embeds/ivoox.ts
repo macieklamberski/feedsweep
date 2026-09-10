@@ -1,5 +1,5 @@
 import { parseUrl } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 const provider = 'ivoox'
@@ -73,10 +73,7 @@ export const extractIvooxSubject = (link: string): IvooxSubject | undefined => {
 
 // iVoox's player iframes, whose legacy `playerivoox_` generation now answers 404 for every id.
 // `player_ej_` answers 200 to any id at all, a javascript shell that resolves the id on load.
-export const ivooxResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const ivooxResolveEmbed: ResolveEmbed = (url, element) => {
   const subject = extractIvooxSubject(url)
 
   if (!subject) {

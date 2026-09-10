@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -34,7 +34,7 @@ const composeNewsEmbed = (article: string, pid: string): EmbedResolverResult => 
 
 // BBC's news, World Service and programmes clip players, pasted in a portrait box that pads them.
 // No page url is derivable: a news page needs its section slug, which the embed does not carry.
-export const bbcResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const bbcResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, bbcHosts)
 
   if (!parsed) {

@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl, trimObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   composeQuery,
@@ -184,10 +184,7 @@ const vimeoEmbedParams = ['t']
 // The `title` a share snippet writes is usually the video's own title, but sometimes a player
 // label. The labels are not filtered. They are localised into at least five languages and some
 // name a plugin, not the platform, so any list of them goes stale.
-export const vimeoResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
   const reference = readReference(url)
 
   if (!reference) {

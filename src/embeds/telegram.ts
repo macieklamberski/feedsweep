@@ -1,5 +1,5 @@
 import { getPathSegments, isPlainObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -58,7 +58,7 @@ export const telegramScriptEmbedResolver = createMarkupEmbedResolver(
 )
 
 // The post iframe that script builds, saved into the feed by a CMS that ran it first.
-export const telegramResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const telegramResolveEmbed: ResolveEmbed = (url) => {
   return readPost(getPathSegments(url).join('/'))
 }
 

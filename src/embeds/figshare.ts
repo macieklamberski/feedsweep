@@ -1,4 +1,4 @@
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -8,7 +8,7 @@ const widgetPathRegex = /^\/articles\/(\d+)\/embed\/?$/
 // The widget host answers the same shell for any article id. `api.figshare.com/v2/articles/{id}`
 // answers 200 with the title, the authors, the files and a poster for a real id and 404 for a
 // fabricated one, with no key.
-export const figshareResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const figshareResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, figshareHosts)
   const articleId = parsed?.pathname.match(widgetPathRegex)?.[1]
 

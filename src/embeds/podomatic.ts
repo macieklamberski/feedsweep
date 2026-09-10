@@ -1,5 +1,5 @@
 import { getPathSegments, toMap } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -76,7 +76,7 @@ const readPlayer = (url: URL): Player | undefined => {
   }
 }
 
-export const podomaticResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const podomaticResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, podomaticHost)
   const player = parsed && readPlayer(parsed)
 

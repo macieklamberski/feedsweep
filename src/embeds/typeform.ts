@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -65,10 +65,7 @@ export const typeformWidgetEmbedResolver = createMarkupEmbedResolver(
 // `form.typeform.com/to/<id>` is what the platform's oEmbed emits, and the per-account
 // `<user>.typeform.com/to/<id>` still serves the same form without redirecting, so both
 // reach here. The query is telemetry (`typeform-embed`, `typeform-medium`) and is dropped.
-export const typeformResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const typeformResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, typeformHosts)
 
   if (!parsed) {

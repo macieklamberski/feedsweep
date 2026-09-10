@@ -1,5 +1,5 @@
 import { getPathSegments, toMap } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -79,10 +79,7 @@ const readResource = (url: URL): Resource | undefined => {
   }
 }
 
-export const deezerResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const deezerResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, deezerHosts)
   const resource = parsed && readResource(parsed)
 

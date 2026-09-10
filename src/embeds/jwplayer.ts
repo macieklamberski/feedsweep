@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, findConfigScript, keepIfMatches } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -45,7 +45,7 @@ const composeJwplayerEmbed = (id: string, isPlaylist = false): EmbedResolverResu
   }
 }
 
-export const jwplayerResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const jwplayerResolveEmbed: ResolveEmbed = (url) => {
   const mediaId = extractJwplayerId(url)
 
   if (!mediaId) {

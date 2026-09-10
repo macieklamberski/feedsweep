@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
+import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -35,10 +35,7 @@ export const extractAudioboomPost = (
 
 // No metadata offline: Audioboom's oEmbed accepts only `audioboom.com` page urls, not the
 // `embeds.` player url the markup carries, so a title needs a lookup the enricher would do.
-export const audioboomResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const audioboomResolveEmbed: ResolveEmbed = (url, element) => {
   const post = extractAudioboomPost(url)
 
   if (!post) {

@@ -1,5 +1,5 @@
 import { getPathSegments, isPlainObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -147,10 +147,7 @@ export const redditWidgetEmbedResolver = createMarkupEmbedResolver(
   readWidget,
 )
 
-export const redditResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const redditResolveEmbed: ResolveEmbed = (url, element) => {
   const target = parseTarget(url)
 
   return target ? composeEmbed(target, { title: attr(element, 'title') }) : undefined

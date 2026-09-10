@@ -1,5 +1,5 @@
 import { type Nullish, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, parsePixelSize, text } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -131,7 +131,7 @@ const isWatchPage = (url: URL): boolean => {
 
 // A post has no name: its words go to `description`, and the frame titles itself
 // `fb:post Facebook Social Plugin`.
-export const facebookResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const facebookResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
 
   if (!parsed) {
