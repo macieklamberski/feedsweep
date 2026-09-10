@@ -1,4 +1,5 @@
 import { acastFieldCleaners } from '../embeds/acast.js'
+import { archiveFieldCleaners } from '../embeds/archive.js'
 import { audioboomFieldCleaners } from '../embeds/audioboom.js'
 import { blubrryFieldCleaners } from '../embeds/blubrry.js'
 import { codepenFieldCleaners } from '../embeds/codepen.js'
@@ -20,6 +21,7 @@ import type { FieldCleaner } from '../types.js'
 // beside the resolver that knows the platform.
 export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...acastFieldCleaners,
+  ...archiveFieldCleaners,
   ...audioboomFieldCleaners,
   ...blubrryFieldCleaners,
   ...codepenFieldCleaners,
