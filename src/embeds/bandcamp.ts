@@ -1,6 +1,9 @@
 import { getPathSegments, parseUrl, toMap, trimObject } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner } from '../types.js'
 import { attr, text } from '../utils/dom.js'
+
+const provider = 'bandcamp'
+
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -123,10 +126,10 @@ export const bandcampResolveEmbed = (
   const anchor = parseFallback(element)
   const url = attr(anchor, 'href')
   // Bandcamp writes the label as `{title} by {artist}`, and " by " appears inside real titles too.
-  const title = text(anchor)
+  const title = text(anchor) || attr(element, 'title')
 
   return {
-    provider: 'bandcamp',
+    provider,
     id: `${kind}/${id}`,
     src: isVideo
       ? `https://bandcamp.com/VideoEmbed?${kind}=${id}`
@@ -137,3 +140,7 @@ export const bandcampResolveEmbed = (
 
 // Bandcamp's player iframe, whose fallback anchor is the only place the release page appears.
 export const bandcampEmbedResolver = createUrlEmbedResolver(bandcampHosts, bandcampResolveEmbed)
+
+export const bandcampFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'YouTube video player' },
+]
