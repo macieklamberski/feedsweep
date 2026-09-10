@@ -62,7 +62,7 @@ const composeGroupPlayer = (groupId: string): string => {
 // Flickr's base58 alphabet for flic.kr short urls.
 const base58Alphabet = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
 
-// A set id exceeds 2^53, so the arithmetic is BigInt.
+// A set id exceeds 2^53.
 const encodeBase58 = (id: string): string => {
   let remaining = BigInt(id)
   let encoded = ''
@@ -87,7 +87,7 @@ const composeShortPhotoUrl = (photoId: string): string => {
 }
 
 // The server segment in a photo file path is a don't-care: `/0/` serves the same bytes as the
-// photo's own server, verified 2026-09-10.
+// photo's own server.
 const composePhotoThumbnail = (photoId: string, secret: string): string => {
   return `https://live.staticflickr.com/0/${photoId}_${secret}_b.jpg`
 }
@@ -137,7 +137,7 @@ const readLegacySubject = (parsed: URL): FlickrSubject => {
 }
 
 // Only the path alias is a name. The NSID spelling of the same owner names nobody a reader
-// could read, and the oEmbed answers `author_name` for both anyway.
+// could read.
 const readOwnerAlias = (owner: string | undefined): string | undefined => {
   return owner && !safeNsidRegex.test(owner) ? owner : undefined
 }
@@ -159,8 +159,8 @@ const readPhotoSubject = (parsed: URL): FlickrPhoto | undefined => {
   }
 }
 
-// Both carriers frame the photo, so the publisher's own url stays the src: at the box publishers
-// declare, embedr's chrome takes most of the frame where the page player fills it with the photo.
+// Both carriers frame the photo. At the box publishers declare, embedr's chrome takes most of
+// the frame.
 const composePhotoEmbed = (link: string, photo: FlickrPhoto): EmbedResolverResult => {
   const { photoId, owner } = photo
   const secret = keepIfMatches(photo.secret, safePhotoSecretRegex)
