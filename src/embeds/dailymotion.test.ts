@@ -14,6 +14,9 @@ const videoUrls = [
   'https://www.dailymotion.com/video/x7tgad0',
   'https://dai.ly/x7tgad0',
   'https://www.dailymotion.com/embed/video/x7tgad0',
+  // A page builder keeps the url inside a JSON payload that no url pass rewrites, so the
+  // protocol-relative spelling arrives exactly as the publisher wrote it.
+  '//www.dailymotion.com/video/x7tgad0',
   // Both forms the Flash player shipped.
   'http://www.dailymotion.com/swf/x7tgad0',
   'http://www.dailymotion.com/swf/video/x7tgad0',
@@ -37,6 +40,11 @@ const playlistUrls = [
   // The locale form loads an empty player, so the id is repaired onto the plain playlist route.
   'https://www.dailymotion.com/embed/fr/playlist/x6zqmk',
   'https://www.dailymotion.com/fr/playlist/x6zqmk',
+  // Share urls append a title slug here too, and every route spelling can carry one.
+  'https://www.dailymotion.com/playlist/x6zqmk_some-playlist',
+  'https://www.dailymotion.com/embed/playlist/x6zqmk_some-playlist',
+  'https://www.dailymotion.com/embed/fr/playlist/x6zqmk_some-playlist',
+  'https://geo.dailymotion.com/player.html?playlist=x6zqmk_some-playlist',
 ]
 
 // The kinds Dailymotion's embed route serves besides a video. Probed 2026-09-07: each of these
@@ -169,6 +177,15 @@ describe('dailymotionResolveEmbed', () => {
     expect(dailymotionResolveEmbed(value)).toEqual(expected)
   })
 
+  // The word only names a playlist where the route prefix ends. Scanning the whole path for it
+  // read this search page, whose query is the word itself, as the playlist `videos`, which
+  // `api.dailymotion.com/playlist/videos` answers 404 for.
+  it('should refuse the playlist word sitting deeper in the path', () => {
+    const value = 'https://www.dailymotion.com/search/playlist/videos'
+
+    expect(dailymotionResolveEmbed(value)).toBeUndefined()
+  })
+
   // Reading one of these as an id mints a player for whichever video happens to own the word:
   // `/embed/channel/{id}` yielded `channel` and pointed the placeholder at
   // `dailymotion.com/video/channel`.
@@ -239,7 +256,8 @@ describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
 })
 
 // The probe offers every enclosure a feed carries to the url resolvers, and Dailymotion serves
-// its own files under `/cdn/`, so the id test has to leave a media url alone.
+// its own files under `/cdn/`. What leaves the media url alone is the route-word rule rather than
+// the id test: `/cdn/` opens no route word, so no segment is read as an id at all.
 describeForEachParser('dailymotion through the pipeline', (parseHtml) => {
   const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
     return transformContent(value, {
@@ -264,5 +282,59 @@ describeForEachParser('dailymotion through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('dailymotionEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, dailymotionEmbedResolver)
+
+  it('should drop the label the snippet writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://www.dailymotion.com/embed/video/x7tgad0" title="Dailymotion Video Player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x7tgad0',
+      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      url: 'https://www.dailymotion.com/video/x7tgad0',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should strip the label the snippet writes before the name', async () => {
+    const value = html`
+      <iframe src="https://www.dailymotion.com/embed/video/x7tgad0" title="Dailymotion video player – Zona Tec"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x7tgad0',
+      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      url: 'https://www.dailymotion.com/video/x7tgad0',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
+      ratio: '16/9',
+      title: 'Zona Tec',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://www.dailymotion.com/embed/video/x7tgad0" title="Le Grand Débat"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x7tgad0',
+      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      url: 'https://www.dailymotion.com/video/x7tgad0',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
+      ratio: '16/9',
+      title: 'Le Grand Débat',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

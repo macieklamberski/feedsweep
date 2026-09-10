@@ -1,3 +1,4 @@
+import { composeEmbedUrl, readSrcMediaId, safeMediaIdRegex } from '../../embeds/wistia.js'
 import type { DomTransform } from '../../types.js'
 import { attr, parseRatio } from '../../utils/dom.js'
 import { createIframe } from '../../utils/widgets.js'
@@ -6,20 +7,12 @@ import { createIframe } from '../../utils/widgets.js'
 const wistiaIdPattern = /\bwistia_async_([A-Za-z0-9]+)/
 
 // The facade states its kind in a second class token beside the id. A channel is its own player,
-// so building the media route from a channel id yields a url that names no media.
+// so the media route built from a channel id names no media.
 const channelFacadePattern = /\bwistia_channel\b/
 
-// The script form names the media as a JSONP payload: `/embed/medias/{id}.jsonp`.
-const scriptMediaPattern = /\/embed\/medias\/([A-Za-z0-9]+)(?:\.jsonp)?/
-
-// The grammar `wistiaResolveEmbed` checks, so a facade and the iframe it becomes agree.
-const mediaIdRegex = /^[A-Za-z0-9]+$/
-
-// Three carriers, one player. The `wistia_async_{id}` div is the JS-API inline embed, the
-// `<wistia-player media-id>` custom element is Wistia's current form, and a bare
-// `<script src=".../embed/medias/{id}.jsonp">` is what remains when a feed keeps the loader
-// but drops the div. None of them renders anything without JS. A real `<iframe>` is matched
-// too, not to rebuild it but so a loader script beside it does not mint a second player.
+// The wistia_async_{id} div is the JS-API inline embed and <wistia-player media-id> the current
+// form. A bare medias/{id}.jsonp script remains when a feed keeps the loader but drops the div.
+// Dropping the iframe arm lets a loader script beside a real iframe mint a second player.
 const wistiaSelector = [
   '[class*="wistia_async_"]',
   'wistia-player[media-id]',
@@ -27,7 +20,8 @@ const wistiaSelector = [
   'iframe[src*="wistia"]',
 ].join(', ')
 
-// Both carry the media id in the src path.
+// Both carry the media id in the src path, which the platform module reads: the selector matches
+// them on a substring, so nothing before `readSrcMediaId` has looked at the host.
 const srcCarrierTags = new Set(['script', 'iframe'])
 
 const readMediaId = (element: Element): string | undefined => {
@@ -36,20 +30,14 @@ const readMediaId = (element: Element): string | undefined => {
   }
 
   if (srcCarrierTags.has(element.localName)) {
-    return attr(element, 'src')?.match(scriptMediaPattern)?.[1]
+    return readSrcMediaId(attr(element, 'src'))
   }
 
   return element.className.match(wistiaIdPattern)?.[1]
 }
 
-// Rebuilding a plain <iframe> from the id makes the embed render, and `wistiaEmbedResolver` then
-// reads that same url and gives it a provider and an id. No thumbnail either way, since Wistia's
-// poster needs the media JSON hop. The custom element's `aspect` is a bare decimal, so the ratio
-// survives into the rebuilt iframe.
-//
-// A lone `<script>` is rebuilt only when nothing else on the page already names that media.
-// Where a feed ships the loader beside the facade div (the common case), the div is the better
-// carrier and the script would otherwise mint a duplicate player.
+// Wistia's async div, <wistia-player> element and loader script all render nothing without JS.
+// Wistia's poster needs the media JSON hop, so none of them states a thumbnail.
 export const rebuildWistiaEmbeds: DomTransform = () => (document) => {
   const elements = Array.from(document.querySelectorAll(wistiaSelector))
 
@@ -69,7 +57,7 @@ export const rebuildWistiaEmbeds: DomTransform = () => (document) => {
 
     const mediaId = readMediaId(element)
 
-    if (!mediaId || !mediaIdRegex.test(mediaId)) {
+    if (!mediaId || !safeMediaIdRegex.test(mediaId)) {
       continue
     }
 
@@ -78,8 +66,9 @@ export const rebuildWistiaEmbeds: DomTransform = () => (document) => {
     }
 
     const route = channelFacadePattern.test(element.className ?? '') ? 'channel' : 'iframe'
-    const iframe = createIframe(document, `https://fast.wistia.net/embed/${route}/${mediaId}`)
+    const iframe = createIframe(document, composeEmbedUrl(route, mediaId))
 
+    // The custom element's aspect is a bare decimal.
     const ratio = parseRatio(attr(element, 'aspect') ?? '')
 
     // Written as the CSS property it is, not as width and height attributes: the facade states

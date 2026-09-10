@@ -62,7 +62,7 @@ describe('slideshareResolveEmbed', () => {
   })
 
   it('should ignore a key outside the url-safe alphabet', () => {
-    const value = 'https://www.slideshare.net/slideshow/embed_code/key/../evil'
+    const value = 'https://www.slideshare.net/slideshow/embed_code/key/6PCW.PGFw9SwsAY'
 
     expect(slideshareResolveEmbed(value)).toBeUndefined()
   })
@@ -108,9 +108,9 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
         url: 'http://www.slideshare.net/haraldf/business-quotes-for-2011',
-        title: 'Business Quotes for 2011',
         width: 425,
         height: 355,
+        title: 'Business Quotes for 2011',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -131,6 +131,31 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157123456',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157123456',
+        width: 425,
+        height: 355,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // The title measurement covered the iframe carrier, so the Flash one still takes its name
+    // from the caption alone.
+    it('should leave a title on the flash carrier unread', async () => {
+      const value = html`
+        <div id="__ss_6435157">
+          <embed
+            src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=quotes-phpapp01"
+            type="application/x-shockwave-flash"
+            title="Business Quotes for 2011"
+            width="425"
+            height="355"
+          ></embed>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '6435157',
+        src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
         width: 425,
         height: 355,
       }
@@ -248,6 +273,133 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // The 2011 snippet trails the wrapper with "View more presentations from {owner}", so the
+    // owner's page and the bare `slideshare.net/` link sit beside the deck's own anchor.
+    it('should read the owner out of the caption the snippet trails', async () => {
+      const value = html`
+        <div id="__ss_6435157">
+          <strong>
+            <a
+              href="http://www.slideshare.net/haraldf/business-quotes-for-2011"
+              title="Business Quotes for 2011"
+              >Business Quotes for 2011</a
+            >
+          </strong>
+          <object id="__sse6435157">
+            <embed
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=110103quotes"
+              type="application/x-shockwave-flash"
+            ></embed>
+          </object>
+          <div>
+            View more <a href="http://www.slideshare.net/">presentations</a> from
+            <a href="http://www.slideshare.net/haraldf">Harald Felgner</a>.
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '6435157',
+        src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+        url: 'http://www.slideshare.net/haraldf/business-quotes-for-2011',
+        title: 'Business Quotes for 2011',
+        author: 'Harald Felgner',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // The bare link names no deck, so the word it wraps is not this deck's name, and with no
+    // deck page beside it there is nothing the remaining link can be checked against: a handle
+    // and a route word are the same shape. `slideshare.net/langwitches/` reached a placeholder
+    // as `author="SlideShare"` this way.
+    it('should read nothing from a caption whose deck anchor is gone', async () => {
+      const value = html`
+        <div id="__ss_6435157">
+          <object id="__sse6435157">
+            <embed
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=110103quotes"
+              type="application/x-shockwave-flash"
+            ></embed>
+          </object>
+          <div>
+            View more <a href="http://www.slideshare.net/">presentations</a> from
+            <a href="http://www.slideshare.net/haraldf">Harald Felgner</a>.
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '6435157',
+        src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // The 2008 caption offers the reader the upload page in the sentence that names the deck,
+    // and `/upload` has exactly the shape of a handle.
+    it('should not read the upload route as the deck owner', async () => {
+      const value = html`
+        <div id="__ss_755576">
+          <object id="__sse755576">
+            <embed
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=cloud-computing-hadoop"
+              type="application/x-shockwave-flash"
+            ></embed>
+          </object>
+          <div>
+            View SlideShare
+            <a href="http://www.slideshare.net/darugar/cloud-computing-hadoop-presentation"
+              >presentation</a
+            >
+            or <a href="http://www.slideshare.net/upload?src=embed">Upload your own</a>. (tags:
+            <a href="http://www.slideshare.net/tag/pig">pig</a>)
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '755576',
+        src: 'https://www.slideshare.net/slideshow/embed_code/755576',
+        url: 'http://www.slideshare.net/darugar/cloud-computing-hadoop-presentation',
+        title: 'presentation',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // A wrapper carrying no caption of its own leaves the climb one level short of the post,
+    // where the first slideshare link is whichever deck was mentioned earlier.
+    it('should ignore a deck link that sits outside the wrapper', async () => {
+      const value = html`
+        <div>
+          <p>
+            <a
+              href="https://www.slideshare.net/someoneelse/a-different-deck"
+              title="A Different Deck"
+              >A Different Deck</a
+            >
+          </p>
+          <div id="__ss_6435157">
+            <object id="__sse6435157">
+              <embed
+                src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=110103quotes"
+                type="application/x-shockwave-flash"
+              ></embed>
+            </object>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '6435157',
+        src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read the id off the object when the outer div is gone', async () => {
       const value = html`
         <object id="__sse6435157">
@@ -341,6 +493,32 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should take the deck name off the carrier the current dialog writes', async () => {
+    const value = html`
+      <iframe
+        src="https://www.slideshare.net/slideshow/embed_code/key/hK2vDqTQ0Nz9Wm"
+        width="476"
+        height="400"
+        frameborder="0"
+        marginwidth="0"
+        marginheight="0"
+        scrolling="no"
+        title="Designing Accessible Forms"
+        allowfullscreen
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'slideshare',
+      id: 'hK2vDqTQ0Nz9Wm',
+      src: 'https://www.slideshare.net/slideshow/embed_code/key/hK2vDqTQ0Nz9Wm',
+      width: 476,
+      height: 400,
+      title: 'Designing Accessible Forms',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should ignore a slideshare url that names no deck', async () => {
     const value = '<iframe src="https://www.slideshare.net/haraldf"></iframe>'
 
@@ -363,7 +541,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
 
   it('should ignore a key outside the url-safe alphabet', async () => {
     const value = html`
-      <iframe src="https://www.slideshare.net/slideshow/embed_code/key/../evil"></iframe>
+      <iframe src="https://www.slideshare.net/slideshow/embed_code/key/6PCW.PGFw9SwsAY"></iframe>
     `
 
     expect(await extract(value)).toBeUndefined()
@@ -385,11 +563,401 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
 
     expect(await extract(value)).toBeUndefined()
   })
+
+  // The embed url names the deck by key or id alone, so everything a reader could read comes
+  // from the caption the share dialog ships with the iframe.
+  describe('the caption the share dialog ships beside the iframe', () => {
+    it('should take the deck page, its name and its owner from the caption', async () => {
+      const value = html`
+        <div>
+          <iframe
+            src="https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY"
+            width="427"
+            height="356"
+          ></iframe>
+          <div>
+            <strong>
+              <a
+                href="https://www.slideshare.net/haraldf/business-quotes-for-2011"
+                title="Business Quotes for 2011"
+                >Business Quotes for 2011</a
+              >
+            </strong>
+            from <strong><a href="https://www.slideshare.net/haraldf">Harald Felgner</a></strong>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '6PCWPGFw9SwsAY',
+        src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY',
+        url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
+        width: 427,
+        height: 356,
+        title: 'Business Quotes for 2011',
+        author: 'Harald Felgner',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // The generation between Flash and the current dialog kept the `__ss_{id}` wrapper and put
+    // an iframe where the object had been, so the caption surrounds the player instead.
+    it('should read the caption out of the wrapper the numeric snippet keeps', async () => {
+      const value = html`
+        <div id="__ss_10579166">
+          <strong>
+            <a
+              href="http://www.slideshare.net/null0x00/make-profit-with-uiredressing-attacks"
+              title="Make profit with UI-Redressing attacks."
+              >Make profit with UI-Redressing attacks.</a
+            >
+          </strong>
+          <iframe
+            src="http://www.slideshare.net/slideshow/embed_code/10579166"
+            width="425"
+            height="355"
+          ></iframe>
+          <div>
+            View more <a href="http://www.slideshare.net/">presentations</a> from
+            <a href="http://www.slideshare.net/null0x00">n|u - The Open Security Community</a>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '10579166',
+        src: 'https://www.slideshare.net/slideshow/embed_code/10579166',
+        url: 'http://www.slideshare.net/null0x00/make-profit-with-uiredressing-attacks',
+        width: 425,
+        height: 355,
+        title: 'Make profit with UI-Redressing attacks.',
+        author: 'n|u - The Open Security Community',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // A CMS that put the caption's `<div>` inside the paragraph the iframe ends leaves the
+    // parser to split the paragraph, so an empty half sits between the two.
+    it('should read past an empty block the parser left between the two', async () => {
+      const value = html`
+        <div>
+          <iframe src="https://www.slideshare.net/slideshow/embed_code/23660334"></iframe>
+          <p></p>
+          <div>
+            <strong>
+              <a
+                href="http://www.slideshare.net/commonplace0807/java-23660334"
+                title="Shibuya Java"
+                >Shibuya Java</a
+              >
+            </strong>
+            from <strong><a href="http://www.slideshare.net/commonplace0807">commonplace0807</a></strong>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '23660334',
+        src: 'https://www.slideshare.net/slideshow/embed_code/23660334',
+        url: 'http://www.slideshare.net/commonplace0807/java-23660334',
+        title: 'Shibuya Java',
+        author: 'commonplace0807',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Blogger and WordPress put the iframe at the end of a paragraph and the caption in the
+    // block after it, so the caption is the paragraph's sibling rather than the iframe's.
+    it('should read the caption that follows the paragraph the iframe ends', async () => {
+      const value = html`
+        <div>
+          <p>
+            Es geht nur mit Strategie.
+            <iframe src="https://de.slideshare.net/slideshow/embed_code/key/2nCJtB7MpHuSpf"></iframe>
+          </p>
+          <div>
+            <strong>
+              <a href="https://de.slideshare.net/BLM_Bayern/christian-sieh" title="Christian Sieh"
+                >Christian Sieh</a
+              >
+            </strong>
+            from <strong><a href="https://www.slideshare.net/BLM_Bayern">BLM Bayern</a></strong>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '2nCJtB7MpHuSpf',
+        src: 'https://www.slideshare.net/slideshow/embed_code/key/2nCJtB7MpHuSpf',
+        url: 'https://de.slideshare.net/BLM_Bayern/christian-sieh',
+        title: 'Christian Sieh',
+        author: 'BLM Bayern',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // A post that walks through several decks links the next one in the paragraph after this
+    // player, which is the same position the caption takes. Only the dialog's own shape, the
+    // deck's page beside its owner's, is read from that distance, and prose does not write it.
+    it('should not read a deck the paragraph after the player mentions', async () => {
+      const value = html`
+        <div>
+          <p>
+            <iframe
+              src="https://www.slideshare.net/slideshow/embed_code/key/hmqg4DDLz9bf1k"
+            ></iframe>
+          </p>
+          <ul>
+            <li>
+              Minter's 2016 presentation:
+              <a href="https://www.slideshare.net/mdial/new-tech-trends">New tech trends 2016</a>
+            </li>
+          </ul>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: 'hmqg4DDLz9bf1k',
+        src: 'https://www.slideshare.net/slideshow/embed_code/key/hmqg4DDLz9bf1k',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the caption name over the one the carrier states', async () => {
+      const value = html`
+        <div>
+          <iframe
+            src="https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY"
+            title="Business Quotes for 2011 by Harald Felgner"
+          ></iframe>
+          <div>
+            <strong>
+              <a
+                href="https://www.slideshare.net/haraldf/business-quotes-for-2011"
+                title="Business Quotes for 2011"
+                >Business Quotes for 2011</a
+              >
+            </strong>
+            from <strong><a href="https://www.slideshare.net/haraldf">Harald Felgner</a></strong>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '6PCWPGFw9SwsAY',
+        src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY',
+        url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
+        title: 'Business Quotes for 2011',
+        author: 'Harald Felgner',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
-// The enclosure probe offers every attachment a feed carries to this resolver, and SlideShare's
-// asset host is in its list, so the id shapes are what keep a file playable.
+// A post carrying one deck cannot tell a caption read from the deck's own snippet apart from one
+// read off the post, which is why this case runs whole: two decks, each with its own caption, in
+// the flat sequence Blogger writes.
 describeForEachParser('slideshare through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) =>
+    transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+
+  const placeholders = (value: string, parse: typeof parseHtml) =>
+    Array.from(parse(value).querySelectorAll('[data-embed-src]')).map((element) => ({
+      id: element.getAttribute('data-embed-id'),
+      url: element.getAttribute('data-embed-url'),
+      title: element.getAttribute('data-embed-title'),
+    }))
+
+  it('should caption each deck of a post from its own snippet', async () => {
+    const value = html`
+      <div>
+        <iframe
+          src="//www.slideshare.net/slideshow/embed_code/key/yL3QPf2q0urefj"
+        ></iframe>
+        <br />
+        <div style="margin-bottom: 5px;">
+          <strong>
+            <a
+              href="https://www.slideshare.net/ssuser9cf90a/story-of-lazarus"
+              title="Story of lazarus"
+              >Story of lazarus</a
+            >
+          </strong>
+          from <strong><a href="https://www.slideshare.net/ssuser9cf90a">Sofia Adamou</a></strong>
+        </div>
+        <iframe
+          src="//www.slideshare.net/slideshow/embed_code/key/ckeA90Dumf28Z6"
+        ></iframe>
+        <br />
+        <div style="margin-bottom: 5px;">
+          <strong>
+            <a
+              href="https://www.slideshare.net/ssuser9cf90a/drasthriothtes"
+              title="Drasthriothtes"
+              >Drasthriothtes</a
+            >
+          </strong>
+          from <strong><a href="https://www.slideshare.net/ssuser9cf90a">Sofia Adamou</a></strong>
+        </div>
+      </div>
+    `
+    const expected = [
+      {
+        id: 'yL3QPf2q0urefj',
+        url: 'https://www.slideshare.net/ssuser9cf90a/story-of-lazarus',
+        title: 'Story of lazarus',
+      },
+      {
+        id: 'ckeA90Dumf28Z6',
+        url: 'https://www.slideshare.net/ssuser9cf90a/drasthriothtes',
+        title: 'Drasthriothtes',
+      },
+    ]
+
+    expect(placeholders(await convert(value), parseHtml)).toEqual(expected)
+  })
+
+  it('should carry the deck name the carrier states into the placeholder', async () => {
+    const value = html`
+      <iframe
+        src="https://www.slideshare.net/slideshow/embed_code/key/hK2vDqTQ0Nz9Wm"
+        title="Designing Accessible Forms"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-title="Designing Accessible Forms"
+        data-embed-id="hK2vDqTQ0Nz9Wm"
+        data-embed-provider="slideshare"
+        data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/hK2vDqTQ0Nz9Wm"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  // The placeholder carries the deck's name and its owner, so a caption block left in the
+  // document renders both a second time as loose prose under the player.
+  it('should take the caption block it read with it', async () => {
+    const value = html`
+      <div>
+        <iframe
+          src="https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY"
+        ></iframe>
+        <div style="margin-bottom: 5px;">
+          <strong>
+            <a
+              href="https://www.slideshare.net/haraldf/business-quotes-for-2011"
+              title="Business Quotes for 2011"
+              >Business Quotes for 2011</a
+            >
+          </strong>
+          from <strong><a href="https://www.slideshare.net/haraldf">Harald Felgner</a></strong>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-author="Harald Felgner"
+        data-embed-title="Business Quotes for 2011"
+        data-embed-url="https://www.slideshare.net/haraldf/business-quotes-for-2011"
+        data-embed-id="6PCWPGFw9SwsAY"
+        data-embed-provider="slideshare"
+        data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  // A block naming the deck's page without its owner is a sentence about the deck as often as a
+  // caption, so its words stay where the publisher wrote them.
+  it('should leave a block that names no owner where it is', async () => {
+    const value = html`
+      <div>
+        <iframe
+          src="https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY"
+        ></iframe>
+        <div>
+          Slides for
+          <a href="https://www.slideshare.net/haraldf/business-quotes-for-2011"
+            >Business Quotes for 2011</a
+          >, worth a look.
+        </div>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-title="Business Quotes for 2011"
+        data-embed-url="https://www.slideshare.net/haraldf/business-quotes-for-2011"
+        data-embed-id="6PCWPGFw9SwsAY"
+        data-embed-provider="slideshare"
+        data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY"
+      ></div>
+      <p>
+        Slides for
+        <a href="https://www.slideshare.net/haraldf/business-quotes-for-2011"
+          >Business Quotes for 2011</a
+        >, worth a look.
+      </p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  // The pre-2015 wrapper holds the player, so it cannot be the block that goes: removing it would
+  // take the deck with it. Its caption is the one that still reads twice.
+  it('should keep the wrapper the pre-2015 snippet builds around the player', async () => {
+    const value = html`
+      <div id="__ss_10579166">
+        <strong>
+          <a
+            href="https://www.slideshare.net/null0x00/make-profit-with-uiredressing-attacks"
+            title="Make profit with UI-redressing attacks"
+            >Make profit with UI-redressing attacks</a
+          >
+        </strong>
+        from <strong><a href="https://www.slideshare.net/null0x00">Krzysztof Kotowicz</a></strong>
+        <iframe src="https://www.slideshare.net/slideshow/embed_code/10579166"></iframe>
+      </div>
+    `
+    const expected = html`
+      <p>
+        <strong>
+          <a
+            href="https://www.slideshare.net/null0x00/make-profit-with-uiredressing-attacks"
+            title="Make profit with UI-redressing attacks"
+            >Make profit with UI-redressing attacks</a
+          >
+        </strong>
+        from <strong><a href="https://www.slideshare.net/null0x00">Krzysztof Kotowicz</a></strong>
+      </p>
+      <div
+        data-embed-author="Krzysztof Kotowicz"
+        data-embed-title="Make profit with UI-redressing attacks"
+        data-embed-url="https://www.slideshare.net/null0x00/make-profit-with-uiredressing-attacks"
+        data-embed-id="10579166"
+        data-embed-provider="slideshare"
+        data-embed-src="https://www.slideshare.net/slideshow/embed_code/10579166"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  // The enclosure probe offers every attachment a feed carries to this resolver, and SlideShare's
+  // asset host is in its list, so the id shapes are what keep a file playable.
   it('should leave an audio enclosure on the asset host playable', async () => {
     const enclosures = [
       { url: 'https://cdn.slidesharecdn.com/embed_code/6435157.mp3', type: 'audio/mpeg' },
@@ -400,12 +968,6 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
       <p>Body</p>
     `
 
-    expect(
-      await transformContent('<p>Body</p>', {
-        parseHtmlFn: parseHtml,
-        baseUrl: 'https://example.com/post',
-        enclosures,
-      }),
-    ).toEqualHtml(expected)
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })

@@ -38,8 +38,8 @@ describe('codepenResolveEmbed', () => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
       }
 
       expect(codepenResolveEmbed(value)).toEqual(expected)
@@ -55,8 +55,8 @@ describe('codepenResolveEmbed', () => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?default-tab=css%2Cresult',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
       }
 
       expect(codepenResolveEmbed(value)).toEqual(expected)
@@ -72,8 +72,8 @@ describe('codepenResolveEmbed', () => {
         url: 'https://codepen.io/argyleink/pen/XJpKqXmAndThenSomeMoreCharactersStillGoing',
         thumbnail:
           'https://shots.codepen.io/argyleink/pen/XJpKqXmAndThenSomeMoreCharactersStillGoing-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
       }
 
       expect(codepenResolveEmbed(value)).toEqual(expected)
@@ -89,8 +89,8 @@ describe('codepenResolveEmbed', () => {
         url: 'https://codepen.io/argyleink-with-a-much-longer-handle/pen/XJpKqXm',
         thumbnail:
           'https://shots.codepen.io/argyleink-with-a-much-longer-handle/pen/XJpKqXm-512.jpg',
-        author: '@argyleink-with-a-much-longer-handle',
         height: 300,
+        author: '@argyleink-with-a-much-longer-handle',
       }
 
       expect(codepenResolveEmbed(value)).toEqual(expected)
@@ -109,8 +109,8 @@ describe('codepenResolveEmbed', () => {
         src: 'https://codepen.io/team/keyframers/embed/XJpKqXm',
         url: 'https://codepen.io/team/keyframers/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/keyframers/pen/XJpKqXm-512.jpg',
-        author: '@keyframers',
         height: 300,
+        author: '@keyframers',
       }
 
       expect(codepenResolveEmbed(value)).toEqual(expected)
@@ -204,9 +204,9 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?default-tabs=css%2Cresult&theme-id=default',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
-        title: 'Parallax Card',
         height: 437,
+        title: 'Parallax Card',
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -233,9 +233,9 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
-        title: 'Parallax Card',
         height: 300,
+        title: 'Parallax Card',
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -284,9 +284,9 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/keyframers/embed/XJpKqXm',
         url: 'https://codepen.io/team/keyframers/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/keyframers/pen/XJpKqXm-512.jpg',
-        author: '@keyframers',
-        title: 'A Team Pen',
         height: 300,
+        title: 'A Team Pen',
+        author: '@keyframers',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -313,9 +313,9 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/alice/embed/XJpKqXm',
         url: 'https://codepen.io/alice/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/alice/pen/XJpKqXm-512.jpg',
-        author: '@alice',
-        title: 'Parallax Card',
         height: 300,
+        title: 'Parallax Card',
+        author: '@alice',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -342,9 +342,37 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/keyframers/embed/XJpKqXm',
         url: 'https://codepen.io/team/keyframers/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/keyframers/pen/XJpKqXm-512.jpg',
-        author: '@keyframers',
-        title: 'A Team Pen',
         height: 300,
+        title: 'A Team Pen',
+        author: '@keyframers',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // The share dialog writes the same placeholder here as in the player's title attribute.
+    it('should drop a data-pen-title that names no pen', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-user="argyleink"
+          data-slug-hash="XJpKqXm"
+          data-pen-title="Untitled"
+        >
+          <span
+            >See the Pen <a href="https://codepen.io/argyleink/pen/XJpKqXm">Untitled</a> by Adam
+            Argyle on <a href="https://codepen.io">CodePen</a>.</span
+          >
+        </p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        height: 300,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -369,9 +397,9 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/chriscoyier/embed/gfdDu',
         url: 'https://codepen.io/chriscoyier/pen/gfdDu',
         thumbnail: 'https://shots.codepen.io/chriscoyier/pen/gfdDu-512.jpg',
-        author: '@chriscoyier',
-        title: 'A Legacy Pen',
         height: 300,
+        title: 'A Legacy Pen',
+        author: '@chriscoyier',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -401,9 +429,9 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/wesbos/embed/pFzlJ?default-tabs=result&theme-id=0',
         url: 'https://codepen.io/wesbos/pen/pFzlJ',
         thumbnail: 'https://shots.codepen.io/wesbos/pen/pFzlJ-512.jpg',
-        author: '@wesbos',
-        title: 'Flexbox Demo',
         height: 268,
+        title: 'Flexbox Demo',
+        author: '@wesbos',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -427,8 +455,8 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -455,8 +483,8 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?default-tabs=js%2Cresult&theme-id=dark',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -477,8 +505,8 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -505,9 +533,9 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
-        title: 'Parallax',
         height: 300,
+        title: 'Parallax',
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -528,8 +556,8 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 600,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -552,8 +580,8 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?token=eyJhbGci.eyJzdWIi.SflKxwRJ',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm?token=eyJhbGci.eyJzdWIi.SflKxwRJ',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -573,8 +601,8 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -661,8 +689,8 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -683,8 +711,8 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -755,9 +783,9 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?default-tab=js%2Cresult',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
-        title: 'Parallax Card',
         height: 400,
+        title: 'Parallax Card',
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -796,8 +824,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?height=600',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 600,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -817,8 +845,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?height=600',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 450,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -832,16 +860,33 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    // A carrier that states a width and no height must not be given one: 800 by the default
-    // height would describe a box the publisher never asked for.
-    it('should not pair the default with a width the carrier stated', async () => {
+    // A zero is a height nobody laid out, so the player takes the default as if it stated none.
+    it('should treat a height of zero as no height at all', async () => {
+      const value = '<iframe src="https://codepen.io/argyleink/embed/XJpKqXm?height=0"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm?height=0',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        height: 300,
+        author: '@argyleink',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // A carrier that states a width and no height neither takes the default nor gets paired with
+    // it: 800 by the default height would describe a box the publisher never asked for, and 800
+    // on its own is a number the reader lays nothing out from.
+    it('should keep the default height over a width the carrier stated', async () => {
       const value = '<iframe width="800" src="https://codepen.io/argyleink/embed/XJpKqXm"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'codepen',
@@ -849,8 +894,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        height: 300,
         author: '@argyleink',
-        width: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -872,8 +917,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -897,9 +942,9 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/preview/XJpKqXm?height=300&slug-hash=XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
-        title: 'Parallax Card',
         height: 300,
+        title: 'Parallax Card',
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -922,8 +967,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?theme-id=dark',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 331,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -965,8 +1010,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?token=eyJhbGci.eyJzdWIi.SflKxwRJ',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm?token=eyJhbGci.eyJzdWIi.SflKxwRJ',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 400,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -987,8 +1032,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?height=600&amp;key=abc123XYZ',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc123XYZ',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 400,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1007,8 +1052,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc123XYZ',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc123XYZ',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 400,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1031,8 +1076,47 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the CodePen Embed title that carries the slug', async () => {
+      const value = html`
+        <iframe
+          src="https://codepen.io/anon/embed/raxQQME"
+          title="CodePen Embed raxQQME"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'raxQQME',
+        src: 'https://codepen.io/anon/embed/raxQQME',
+        thumbnail: 'https://shots.codepen.io/anon/pen/raxQQME-512.jpg',
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a pen name that opens on the word CodePen', async () => {
+      const value = html`
+        <iframe
+          src="https://codepen.io/argyleink/embed/XJpKqXm"
+          title="CodePen tricks I keep forgetting"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        height: 300,
+        title: 'CodePen tricks I keep forgetting',
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1052,8 +1136,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        author: '@argyleink',
         height: 300,
+        author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1097,9 +1181,9 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
 
     it('should turn the block into a placeholder', async () => {
       const expected: Record<string, string> = {
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         provider: 'codepen',
         id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
         height: '437',
@@ -1128,13 +1212,13 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
         ></iframe>
       `
       const expected: Record<string, string> = {
-        src: 'https://codepen.io/argyleink/embed/preview/XJpKqXm?height=600',
         provider: 'codepen',
         id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/preview/XJpKqXm?height=600',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://assets.codepen.io/2869/internal/screenshots/pens/XJpKqXm.default.png',
-        author: '@argyleink',
         height: '600',
+        author: '@argyleink',
       }
 
       expect(await placeholder(value)).toEqual(expected)

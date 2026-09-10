@@ -203,7 +203,7 @@ describeForEachParser('Instagram', (parseHtml) => {
         data-embed-id="p/DZmgID9Eawg"
         data-embed-src="https://www.instagram.com/p/DZmgID9Eawg/embed/"
         data-embed-url="https://www.instagram.com/p/DZmgID9Eawg/"
-        data-embed-description="Some Bakery on Instagram: &quot;The caption, as the post page titles it.&quot;"
+       
         data-embed-author="@somebakery"
         data-embed-avatar="https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-profile-pic-DZmgID9Eawg.png"
         data-embed-thumbnail="https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-snapshot-DZmgID9Eawg.jpg"

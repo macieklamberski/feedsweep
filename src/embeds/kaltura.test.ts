@@ -90,9 +90,31 @@ describe('kalturaResolveEmbed', () => {
 
       expect(kalturaResolveEmbed(value)).toEqual(expected)
     })
+
+    // Whether Kaltura issues a counter past one digit was not settled, so nothing here bets on it.
+    it('should read an entry whose namespace counter is two digits', () => {
+      const value =
+        'https://cdnapisec.kaltura.com/p/2851211/embedPlaykitJs/uiconf_id/53021102?iframeembed=true&entry_id=12_rq4nfd7g'
+      const expected: EmbedResolverResult = {
+        provider: 'kaltura',
+        id: '2851211/12_rq4nfd7g',
+        src: 'https://cdnapisec.kaltura.com/p/2851211/embedPlaykitJs/uiconf_id/53021102?iframeembed=true&entry_id=12_rq4nfd7g',
+        thumbnail:
+          'https://cdnapisec.kaltura.com/p/2851211/thumbnail/entry_id/12_rq4nfd7g/width/640',
+      }
+
+      expect(kalturaResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
+    it('should ignore an entry id carrying no namespace counter', () => {
+      const value =
+        'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=rq4nfd7g'
+
+      expect(kalturaResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', () => {
       const value =
         'https://evil.test/cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/1?iframeembed=true&entry_id=1_w0bwzism'
@@ -157,15 +179,15 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
         src: 'https://cdnapisec.kaltura.com/p/1660902/sp/166090200/embedIframeJs/uiconf_id/25717641/partner_id/1660902?iframeembed=true&playerId=kaltura_player&entry_id=1_1pavfxkg',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/1660902/thumbnail/entry_id/1_1pavfxkg/width/640',
-        title: 'Calendar Appointments (Exam Makeups)',
         width: 560,
         height: 395,
+        title: 'Calendar Appointments (Exam Makeups)',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the label KMS writes on every iframe', async () => {
+    it('should drop the label a generated iframe carries in place of the name', async () => {
       const value = html`
         <iframe
           title="Kaltura Player"
