@@ -1,5 +1,5 @@
 import { isPlainObject, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
 import { attr, find, jsonAttr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { decodeOrKeep, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
@@ -218,17 +218,13 @@ type SubstackPostAttributes = {
   timestamp?: string | null
 }
 
-// The payload's title where the post carries no caption: Instagram's own og:title names the
-// poster, or names nothing but the platform.
-const boilerplateTitleRegex = /^(?:A post shared by\b|Instagram$)/
-
 // The current og:title quotes the caption behind the poster's name, and the payload carries no
 // field holding the caption on its own.
 const wrappedCaptionRegex = / on Instagram: ["\u201c]/
 
 // Instagram's og:title, which the payload carries in place of a caption field.
 const readPayloadCaption = (title: string | undefined): string | undefined => {
-  if (!title || boilerplateTitleRegex.test(title) || wrappedCaptionRegex.test(title)) {
+  if (!title || wrappedCaptionRegex.test(title)) {
     return
   }
 
@@ -292,6 +288,11 @@ export const readInstagramHeight = (data: unknown): number | undefined => {
     ? readPixels(data.details.height)
     : undefined
 }
+
+export const instagramFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'description', drop: /^a post shared by\b.*$/ },
+  { provider, field: 'description', drop: 'Instagram' },
+]
 
 export const instagramRenderHint: EmbedRenderHint = {
   provider,

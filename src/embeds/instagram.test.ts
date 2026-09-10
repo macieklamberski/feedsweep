@@ -301,6 +301,39 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
     })
   })
 
+  // The dialog writes the platform's name where the caption goes on a post that has none.
+  it('should state no description when the caption names only the platform', async () => {
+    const value = html`
+      <blockquote
+        class="instagram-media"
+        data-instgrm-permalink="https://www.instagram.com/p/BgPrjlfHcoB/"
+        data-instgrm-version="8"
+      >
+        <div>
+          <p>
+            <a href="https://www.instagram.com/p/BgPrjlfHcoB/" target="_blank">Instagram</a>
+          </p>
+          <p>
+            A post shared by
+            <a href="https://www.instagram.com/jervoisakl/" target="_blank">Jervois Steak House</a>
+            (@jervoisakl) on
+            <time datetime="2018-03-22T01:45:03+00:00">Mar 21, 2018 at 6:45pm PDT</time>
+          </p>
+        </div>
+      </blockquote>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/BgPrjlfHcoB',
+      src: 'https://www.instagram.com/p/BgPrjlfHcoB/embed/',
+      url: 'https://www.instagram.com/p/BgPrjlfHcoB/',
+      author: '@jervoisakl',
+      date: '2018-03-22T01:45:03+00:00',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   describe('the sanitized blockquote', () => {
     it('should resolve when every data attribute has been stripped', async () => {
       const value = html`
