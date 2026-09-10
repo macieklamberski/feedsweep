@@ -88,6 +88,29 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the display name out of a byline whose handle runs long', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p lang="en" dir="ltr">Tweet text here.</p>
+          <p>
+            &mdash; Display Name (@sixteencharacter)
+            <a href="https://twitter.com/sixteencharacter/status/123456789012345">May 12, 2020</a>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+        url: `https://x.com/sixteencharacter/status/${statusId}`,
+        description: 'Tweet text here.',
+        author: 'Display Name',
+        date: 'May 12, 2020',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should join every paragraph of a long tweet into the description', async () => {
       const value = html`
         <blockquote class="twitter-tweet">
@@ -765,11 +788,11 @@ describeForEachParser('twitterSubstackEmbedResolver', (parseHtml) => {
         id: '961570492162494464',
         src: 'https://platform.twitter.com/embed/Tweet.html?id=961570492162494464',
         url: 'https://x.com/notdetails/status/961570492162494464',
+        thumbnail: 'https://pbs.substack.com/media/DVgu7f1WsAAkNMr.jpg',
         description:
           "Hey, I'm open-sourcing the framework I put together to help me choose between job offers. I hope this helps someone 🤗 docs.google.com/spreadsheets/d…",
         author: 'Joel Califa',
         date: 'Thu Feb 08 12:00:45 +0000 2018',
-        thumbnail: 'https://pbs.substack.com/media/DVgu7f1WsAAkNMr.jpg',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -926,6 +949,47 @@ describeForEachParser('twitterSubstackEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should take a photo url that carries no scheme', async () => {
+      const value = makeSubstackTweet({
+        url: 'https://twitter.com/user/status/123456789012345',
+        full_text: 'Tweet text here.',
+        username: 'user',
+        name: 'Display Name',
+        photos: [{ img_url: '//pbs.substack.com/media/DVgu7f1WsAAkNMr.jpg' }],
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+        url: statusUrl,
+        thumbnail: '//pbs.substack.com/media/DVgu7f1WsAAkNMr.jpg',
+        description: 'Tweet text here.',
+        author: 'Display Name',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave a scheme-less photo url carrying a query for enrichment', async () => {
+      const value = makeSubstackTweet({
+        url: 'https://twitter.com/user/status/123456789012345',
+        full_text: 'Tweet text here.',
+        username: 'user',
+        name: 'Display Name',
+        photos: [{ img_url: '//pbs.twimg.com/media/DVgu7f1WsAAkNMr?format=jpg&name=large' }],
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+        url: statusUrl,
+        description: 'Tweet text here.',
+        author: 'Display Name',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('the quoted tweet the payload nests', () => {
@@ -1020,6 +1084,18 @@ describe('twitterResolveEmbed', () => {
 
   it('should return undefined for an invalid url', () => {
     expect(twitterResolveEmbed('not a url')).toBeUndefined()
+  })
+
+  it('should resolve a status page whose handle runs past fifteen characters', () => {
+    const value = `https://x.com/sixteencharacter/status/${statusId}`
+    const expected: EmbedResolverResult = {
+      provider: 'twitter',
+      id: statusId,
+      src: playerUrl,
+      url: `https://x.com/sixteencharacter/status/${statusId}`,
+    }
+
+    expect(twitterResolveEmbed(value)).toEqual(expected)
   })
 })
 

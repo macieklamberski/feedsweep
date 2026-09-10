@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { donorboxEmbedResolver, donorboxResolveEmbed } from './donorbox.js'
+import { donorboxEmbedResolver, donorboxResolveEmbed, readDonorboxHeight } from './donorbox.js'
 
 describe('donorboxResolveEmbed', () => {
   describe('happy paths', () => {
@@ -25,6 +25,20 @@ describe('donorboxResolveEmbed', () => {
         id: 'donation-form-248',
         src: 'https://donorbox.org/embed/donation-form-248?default_interval=m&amount=25',
         url: 'https://donorbox.org/donation-form-248',
+        height: 900,
+      }
+
+      expect(donorboxResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read a slug longer than the campaign names in circulation', () => {
+      const value =
+        'https://donorbox.org/embed/help-us-rebuild-the-old-town-library-roof-after-the-storm-and-keep-the-reading-room-open-to-every-family-in-the-county-this-winter'
+      const expected: EmbedResolverResult = {
+        provider: 'donorbox',
+        id: 'help-us-rebuild-the-old-town-library-roof-after-the-storm-and-keep-the-reading-room-open-to-every-family-in-the-county-this-winter',
+        src: 'https://donorbox.org/embed/help-us-rebuild-the-old-town-library-roof-after-the-storm-and-keep-the-reading-room-open-to-every-family-in-the-county-this-winter',
+        url: 'https://donorbox.org/help-us-rebuild-the-old-town-library-roof-after-the-storm-and-keep-the-reading-room-open-to-every-family-in-the-county-this-winter',
         height: 900,
       }
 
@@ -88,7 +102,7 @@ describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
           src="https://donorbox.org/embed/donation-form-248"
           name="donorbox"
           width="100%"
-          height="900px"
+          height="640px"
           frameborder="0"
           scrolling="no"
           seamless="seamless"
@@ -99,7 +113,7 @@ describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
         id: 'donation-form-248',
         src: 'https://donorbox.org/embed/donation-form-248',
         url: 'https://donorbox.org/donation-form-248',
-        height: 900,
+        height: 640,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -112,5 +126,24 @@ describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+describe('readDonorboxHeight', () => {
+  // What the form posts on its own and answers a resize request with, at 640 wide.
+  it('should read the height out of a form message', () => {
+    const value = {
+      from: 'dbox',
+      src: 'https://donorbox.org/embed/donation-form-248?language=en',
+      height: 572,
+    }
+
+    expect(readDonorboxHeight(value)).toBe(572)
+  })
+
+  it('should read nothing from another sender or an unrendered form', () => {
+    expect(readDonorboxHeight({ from: 'dbox', height: 0 })).toBeUndefined()
+    expect(readDonorboxHeight({ from: 'stripe', height: 572 })).toBeUndefined()
+    expect(readDonorboxHeight('dbox')).toBeUndefined()
   })
 })

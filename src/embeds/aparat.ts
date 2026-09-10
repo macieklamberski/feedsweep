@@ -1,59 +1,43 @@
-import type { EmbedResolver, EmbedResolverResult } from '../types.js'
+import type { EmbedResolver, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
-// A video hash is a short run of letters and digits, five or seven characters in the wild, so
-// the range is held open a little past both.
-const safeVideoHashRegex = /^[a-zA-Z0-9]{5,10}$/
-
-const aparatHost = 'aparat.com'
+const aparatHosts = ['aparat.com']
 const scriptPathRegex = /^\/embed\/([a-zA-Z0-9]+)$/
 const framePathRegex = /^\/video\/video\/embed\/videohash\/([a-zA-Z0-9]+)(?:\/vt\/frame)?\/?$/
 
-// Aparat is Iran's video platform and it embeds two ways. The dominant one is a WordPress-style
-// facade, a `<script src="aparat.com/embed/{hash}">` inside an empty div, usually with no
-// companion iframe anywhere. That script never runs in a reader and the div dies as an empty
-// tag, so today the video is deleted outright rather than degraded: the pipeline turns the
-// whole block into nothing. The other carrier is the player iframe itself.
-//
-// Both name the same player, so both resolve to the same placeholder.
-//
-// Checked live 2026-08-21: `etc/api/video/videohash/{hash}` answers 200 for a real hash and a
-// clean 404 for an invented one, with no key. It carries the title, the uploader, the duration
-// and a poster, so the enrichment key this resolver mints has a real endpoint behind it. The
-// poster is left to enrichment because its asset url is signed with a `secret=` parameter.
+// `aparat.com/etc/api/video/videohash/{hash}` answers with the title, the uploader, the duration
+// and a poster, with no key. The poster's asset url is signed with a `secret=` parameter.
 const composeEmbed = (videoHash: string): EmbedResolverResult => {
   return {
     provider: 'aparat',
     id: videoHash,
     src: `https://www.aparat.com/video/video/embed/videohash/${videoHash}/vt/frame`,
     url: `https://www.aparat.com/v/${videoHash}`,
-    // Most iframes that state a size are 16:9, so this is the platform's shape rather than a
-    // measurement of one player. It matters most on the script carrier, which states no size
-    // at all and is the more common carrier.
+    // Most iframes that state a size are 16:9, and the script carrier states no size at all.
     ratio: '16/9',
   }
 }
 
 const readVideoHash = (url: string | undefined, pathRegex: RegExp): string | undefined => {
-  const parsed = parseUrlOnHosts(url, aparatHost)
-  const videoHash = parsed?.pathname.match(pathRegex)?.[1]
-
-  return videoHash && safeVideoHashRegex.test(videoHash) ? videoHash : undefined
+  return parseUrlOnHosts(url, aparatHosts)?.pathname.match(pathRegex)?.[1]
 }
 
-const aparatResolveEmbed = (link: string): EmbedResolverResult | undefined => {
-  const videoHash = readVideoHash(link, framePathRegex)
+const aparatResolveEmbed: ResolveEmbed = (url, element) => {
+  const videoHash = readVideoHash(url, framePathRegex)
 
-  return videoHash ? composeEmbed(videoHash) : undefined
+  return videoHash ? { ...composeEmbed(videoHash), title: attr(element, 'title') } : undefined
 }
 
+// Aparat's player iframe.
 export const aparatIframeEmbedResolver: EmbedResolver = createUrlEmbedResolver(
-  [aparatHost],
+  aparatHosts,
   aparatResolveEmbed,
 )
 
+// Aparat's WordPress-style facade: a script inside an empty div that never runs in a reader.
+// Its src is `aparat.com/embed/{hash}`, usually with no companion iframe anywhere in the item.
 export const aparatScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="aparat.com/embed/"]',
   (element) => {

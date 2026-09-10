@@ -78,6 +78,19 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should resolve a urn whose id runs past thirty-two digits', async () => {
+      const value =
+        '<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:746494483590132531274649448359013253127"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'linkedin',
+        id: 'urn:li:share:746494483590132531274649448359013253127',
+        src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:746494483590132531274649448359013253127',
+        url: 'https://www.linkedin.com/feed/update/urn:li:share:746494483590132531274649448359013253127',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -133,10 +146,11 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
     })
   })
 
-  // The height is a property of the post, not of the player: at the single width 504 the corpus
-  // holds 302 distinct heights between 264 and 2098. The resolver therefore states none, and a
-  // carrier that states none too has to come back sizeless rather than with a default nobody
-  // measured. Pins the decision recorded in _corpus/linkedin.md.
+  // The height is a property of the post, not of the player: the frame is as tall as the update
+  // inside it, so no one number fits. The resolver therefore states none, and a carrier that
+  // states none too has to come back sizeless rather than with a default nobody measured. The
+  // spread that settled this was counted while the resolver was written and never recorded in the
+  // tree, so the decision stands on a judgement until someone counts it again.
   describe('the size the resolver refuses to invent', () => {
     it('should return no size when the carrier states none', async () => {
       const value =

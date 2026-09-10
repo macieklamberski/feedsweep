@@ -1,11 +1,33 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
   imgurResolveEmbed,
+  readImgurHeight,
 } from './imgur.js'
+
+// Imgur's own routes, none of which names a post to mint from.
+const sitePaths = [
+  'https://imgur.com/upload',
+  'https://imgur.com/about',
+  'https://imgur.com/signin',
+  'https://imgur.com/memegen',
+  'https://imgur.com/search?q=cats',
+  'https://imgur.com/new',
+  'https://imgur.com/tos',
+  'https://imgur.com/privacy',
+  'https://imgur.com/user/someone',
+  'https://imgur.com/r/funny/abc12345',
+  'https://imgur.com/t/cats',
+  'https://imgur.com/rules',
+  'https://imgur.com/contact',
+  'https://imgur.com/login',
+  'https://imgur.com/trending',
+  'https://imgur.com/download/abc12345',
+]
 
 describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, imgurBlockquoteEmbedResolver)
@@ -181,16 +203,163 @@ describe('imgurResolveEmbed', () => {
     expect(imgurResolveEmbed(value)).toEqual(expected)
   })
 
+  // What the share button writes today. The slug is the post's title and addresses nothing on
+  // its own; the id ending it is what the platform reads.
+  it('should read the id out of the slug a share link puts in front of it', () => {
+    const value = 'https://imgur.com/gallery/this-is-why-KVfuRXc'
+    const expected: EmbedResolverResult = {
+      provider: 'imgur',
+      id: 'a/KVfuRXc',
+      src: 'https://imgur.com/a/KVfuRXc/embed',
+      url: 'https://imgur.com/a/KVfuRXc',
+    }
+
+    expect(imgurResolveEmbed(value)).toEqual(expected)
+  })
+
+  // A tag is decoration in front of the same post one segment deeper, and the platform serves
+  // the page under a tag that does not exist, so the tag itself carries nothing.
+  it('should read a post the tag route carries', () => {
+    const value = 'https://imgur.com/t/aww/nom-nom-9xCXfv8'
+    const expected: EmbedResolverResult = {
+      provider: 'imgur',
+      id: 'a/9xCXfv8',
+      src: 'https://imgur.com/a/9xCXfv8/embed',
+      url: 'https://imgur.com/a/9xCXfv8',
+    }
+
+    expect(imgurResolveEmbed(value)).toEqual(expected)
+  })
+
+  // The accepted limit of reading the last word: a slug word can be id-shaped, and this one is
+  // read as the id. Imgur does not serve a slug without an id after it, so the shape only
+  // arrives hand-written, and the word addresses nothing rather than another post: `flights`,
+  // `pendant`, `submitted`, `parton` and `kittens` were all untaken album ids on 2026-09-08.
+  // Refusing a lowercase word instead would refuse the 10 real ids in 600 that carry no capital.
+  it('should read a slug word that is shaped like an id as one', () => {
+    const value = 'https://imgur.com/gallery/grounds-all-flights'
+    const expected: EmbedResolverResult = {
+      provider: 'imgur',
+      id: 'a/flights',
+      src: 'https://imgur.com/a/flights/embed',
+      url: 'https://imgur.com/a/flights',
+    }
+
+    expect(imgurResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should resolve an album page url, which the prefix already names as one', () => {
+    const value = 'https://imgur.com/a/16lVn5E'
+    const expected: EmbedResolverResult = {
+      provider: 'imgur',
+      id: 'a/16lVn5E',
+      src: 'https://imgur.com/a/16lVn5E/embed',
+      url: 'https://imgur.com/a/16lVn5E',
+    }
+
+    expect(imgurResolveEmbed(value)).toEqual(expected)
+  })
+
+  // A publisher pastes the post page as often as the frame, and both name the same post.
+  it('should read the post page url', () => {
+    const value = 'https://imgur.com/pVa2rXL'
+    const expected: EmbedResolverResult = {
+      provider: 'imgur',
+      id: 'pVa2rXL',
+      src: 'https://imgur.com/pVa2rXL/embed',
+      url: 'https://imgur.com/pVa2rXL',
+      thumbnail: 'https://i.imgur.com/pVa2rXLm.jpg',
+    }
+
+    expect(imgurResolveEmbed(value)).toEqual(expected)
+  })
+
+  // A word that reads like a site page is not one: `imgur.com/memes` is a post somebody uploaded.
+  // The site list is the routes the platform answered for and nothing wider.
+  it('should read a post page url whose id is an ordinary word', () => {
+    const value = 'https://imgur.com/memes'
+    const expected: EmbedResolverResult = {
+      provider: 'imgur',
+      id: 'memes',
+      src: 'https://imgur.com/memes/embed',
+      url: 'https://imgur.com/memes',
+      thumbnail: 'https://i.imgur.com/memesm.jpg',
+    }
+
+    expect(imgurResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should ignore an imgur url that names no post', () => {
     const value = 'https://imgur.com/'
 
     expect(imgurResolveEmbed(value)).toBeUndefined()
   })
 
+  describe('shapes that name no post', () => {
+    it.each(sitePaths)('should ignore the site path %s', (value) => {
+      expect(imgurResolveEmbed(value)).toBeUndefined()
+    })
+
+    it.each([
+      'https://imgur.com/gallery/hot',
+      'https://imgur.com/gallery/new',
+      'https://imgur.com/gallery/top',
+      'https://imgur.com/gallery/trending',
+    ])('should ignore %s, a gallery listing sitting where an album id would', (value) => {
+      expect(imgurResolveEmbed(value)).toBeUndefined()
+    })
+
+    // The hyphen is what says where the id starts, so a single word is read whole and a word
+    // longer than an id is not one.
+    it.each(['https://imgur.com/gallery/this-is-why', 'https://imgur.com/gallery/misadventures'])(
+      'should ignore %s, which ends in no id',
+      (value) => {
+        expect(imgurResolveEmbed(value)).toBeUndefined()
+      },
+    )
+  })
+
   it('should ignore another host carrying the post path', () => {
     const value = 'https://imgur.com.evil.test/pVa2rXL/embed'
 
     expect(imgurResolveEmbed(value)).toBeUndefined()
+  })
+
+  describe('the hosts a post page answers on', () => {
+    it('should read the mobile spelling of the post page', () => {
+      const value = 'https://m.imgur.com/pVa2rXL'
+      const expected: EmbedResolverResult = {
+        provider: 'imgur',
+        id: 'pVa2rXL',
+        src: 'https://imgur.com/pVa2rXL/embed',
+        url: 'https://imgur.com/pVa2rXL',
+        thumbnail: 'https://i.imgur.com/pVa2rXLm.jpg',
+      }
+
+      expect(imgurResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the www spelling of the post page', () => {
+      const value = 'https://www.imgur.com/pVa2rXL'
+      const expected: EmbedResolverResult = {
+        provider: 'imgur',
+        id: 'pVa2rXL',
+        src: 'https://imgur.com/pVa2rXL/embed',
+        url: 'https://imgur.com/pVa2rXL',
+        thumbnail: 'https://i.imgur.com/pVa2rXLm.jpg',
+      }
+
+      expect(imgurResolveEmbed(value)).toEqual(expected)
+    })
+
+    it.each([
+      'https://i.imgur.com/pVa2rXL',
+      'https://i.imgur.com/pVa2rXL.mp4',
+      'https://s.imgur.com/min/embed.js',
+      'https://i.stack.imgur.com/pVa2rXL.png',
+    ])('should ignore %s, which names a file rather than a post', (value) => {
+      expect(imgurResolveEmbed(value)).toBeUndefined()
+    })
   })
 })
 
@@ -224,5 +393,74 @@ describeForEachParser('imgurIframeEmbedResolver', (parseHtml) => {
     const value = '<iframe src="https://evil.test/pVa2rXL/embed"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
+  })
+})
+
+// The enclosure probe offers every attachment to every url resolver, so only a pipeline test
+// reaches the path where claiming a media url would cost a reader the file.
+describeForEachParser('imgur through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should claim a post page offered as an enclosure', async () => {
+    const enclosures = [{ url: 'https://imgur.com/pVa2rXL', type: 'text/html' }]
+
+    const expected = html`
+      <div
+        data-enclosure=""
+        data-embed-thumbnail="https://i.imgur.com/pVa2rXLm.jpg"
+        data-embed-url="https://imgur.com/pVa2rXL"
+        data-embed-id="pVa2rXL"
+        data-embed-provider="imgur"
+        data-embed-src="https://imgur.com/pVa2rXL/embed"
+      ></div>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+
+  it('should leave an extensionless media enclosure playable', async () => {
+    const enclosures = [{ url: 'https://i.imgur.com/pVa2rXL', type: 'video/mp4' }]
+
+    const expected = html`
+      <video data-enclosure="" controls src="https://i.imgur.com/pVa2rXL"></video>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describe('readImgurHeight', () => {
+  // What a post posts on load, at 640 wide, as the JSON string the embed document builds.
+  it('should read the height out of a resize message', () => {
+    const value = JSON.stringify({
+      message: 'resize_imgur',
+      href: 'https://imgur.com/pVa2rXL/embed',
+      height: 595,
+      width: 640,
+      context: true,
+    })
+
+    expect(readImgurHeight(value)).toBe(595)
+  })
+
+  it('should read nothing from another message or an unrendered post', () => {
+    const unrendered = JSON.stringify({ message: 'resize_imgur', height: 0 })
+    const other = JSON.stringify({ message: 'imgur_loaded', height: 595 })
+
+    expect(readImgurHeight(unrendered)).toBeUndefined()
+    expect(readImgurHeight(other)).toBeUndefined()
+  })
+
+  it('should read nothing from a payload that is not a JSON string', () => {
+    expect(readImgurHeight({ message: 'resize_imgur', height: 595 })).toBeUndefined()
+    expect(readImgurHeight('resize_imgur')).toBeUndefined()
   })
 })

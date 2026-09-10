@@ -424,7 +424,9 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
         provider: 'discourse',
         url: 'https://news.ycombinator.com/item?id=28680387',
         title: 'Story title',
+        author: 'poster',
         publisher: 'news.ycombinator.com',
+        date: '8:09 AM - 28 Sep 2021',
         icon: 'https://cdn.example.com/y18.svg',
       }
 
@@ -456,7 +458,9 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
         url: 'https://news.ycombinator.com/item?id=12759520',
         title: 'Story title',
         description: 'The text the poster wrote for the self-post.',
+        author: 'poster',
         publisher: 'news.ycombinator.com',
+        date: '11:30 AM - 21 Oct 2016',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -489,6 +493,45 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
           </header>
           <article class="onebox-body">
             <h3><a href="https://${host}/profile/user/post/1">Author name (@handle)</a></h3>
+            <p>Post text</p>
+          </article>
+        </aside>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    // `data-onebox-src` reaches the resolver as the feed wrote it, so the protocol-relative
+    // spelling is the one the host check has to answer for on its own.
+    it.each(socialPostHosts)(
+      'should not cite a generic onebox of a protocol-relative %s post',
+      async (host) => {
+        const value = html`
+          <aside class="onebox allowlistedgeneric" data-onebox-src="//${host}/profile/user/post/1">
+            <header class="source">
+              <a href="//${host}/profile/user/post/1" target="_blank" rel="noopener">${host}</a>
+            </header>
+            <article class="onebox-body">
+              <h3><a href="//${host}/profile/user/post/1">Author name (@handle)</a></h3>
+              <p>Post text</p>
+            </article>
+          </aside>
+        `
+
+        expect(await extract(value)).toBeUndefined()
+      },
+    )
+
+    // The title carries no fediverse handle, so the status url is the only signal left and it
+    // has to be parsed against a base to name an instance at all.
+    it('should not cite a generic onebox of a protocol-relative Mastodon status', async () => {
+      const value = html`
+        <aside class="onebox allowlistedgeneric" data-onebox-src="//mastodon.social/@Gargron/117060465546524768">
+          <header class="source">
+            <a href="//mastodon.social/@Gargron/117060465546524768" target="_blank" rel="noopener">mastodon.social</a>
+          </header>
+          <article class="onebox-body">
+            <h3><a href="//mastodon.social/@Gargron/117060465546524768">Eugen Rochko</a></h3>
             <p>Post text</p>
           </article>
         </aside>

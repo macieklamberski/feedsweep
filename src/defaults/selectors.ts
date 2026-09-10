@@ -161,6 +161,8 @@ export const defaultNonContentSelectors = [
   ':is(p, div)[data-gyg-href]:not(:has(*:not(a)))',
 
   // Platform UI chrome and non-rendered scaffolding.
+  // RedCircle's embed snippet ships a ten-pixel "Powered by RedCircle" line under the player.
+  'p:has(> a.redcircle-link)',
   '.image-link-expand', // Substack restack/zoom buttons next to images.
   'drupal-render-placeholder', // Drupal lazy-render markers for comments/forms/flag widgets.
   '.mcnPreviewText', // Mailchimp hidden email preheader text.

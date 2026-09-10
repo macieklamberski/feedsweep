@@ -1,20 +1,27 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
+
+const provider = 'blubrry'
+
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const safeIdRegex = /^\d+$/
 
+// PowerPress, Blubrry's WordPress plugin, renders the same player on the publisher's own domain
+// as `{site}/?powerpress_embed={postId}-{feed}`, with no Blubrry host in the url at all.
 const blubrryHosts = ['blubrry.com']
 
-// The player is 138 tall. Blubrry publishes no oEmbed, so this and the provider tag are what
-// the resolver adds.
-const playerHeight = 138
+// The player is 164 tall, one less than the 165 publishers write.
+// A fixed height on a fluid width, and still 164 inside a 100-tall frame.
+const playerHeight = 164
 
 // Two forms: `/id/{episodeId}/` names the episode, while `/?media_url={mp3}` names the file
 // directly. The media url is not promoted to a native <audio>: a provider's player iframe stays
 // an embed placeholder, and the raw file is only input for the enrichment hook.
 export const extractBlubrryEmbed = (link: string): string | undefined => {
-  const parsed = parseUrl(link, 'https://example.com')
+  const parsed = parseUrl(link, placeholderBaseUrl)
 
   if (!parsed) {
     return
@@ -28,13 +35,12 @@ export const extractBlubrryEmbed = (link: string): string | undefined => {
 
   const mediaUrl = parsed.searchParams.get('media_url')
 
+  // Not promoted to a native audio: a provider's player iframe stays an embed placeholder.
   return mediaUrl || undefined
 }
 
-// PowerPress, Blubrry's WordPress plugin, can render the same player on the publisher's own
-// domain (`{site}/?powerpress_embed={postId}-{feed}`) with no Blubrry host in the url at all.
-// Host matching cannot reach those, and they keep the generic placeholder.
-export const blubrryResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+// Blubrry's player iframe, by episode id or by media url, with no oEmbed to size it.
+export const blubrryResolveEmbed: ResolveEmbed = (url, element) => {
   const id = extractBlubrryEmbed(url)
 
   if (!id) {
@@ -44,17 +50,20 @@ export const blubrryResolveEmbed = (url: string): EmbedResolverResult | undefine
   const isEpisodeId = safeIdRegex.test(id)
 
   return {
-    provider: 'blubrry',
+    provider,
     id,
     src: isEpisodeId
       ? `https://player.blubrry.com/id/${id}/`
       : `https://player.blubrry.com/?media_url=${encodeURIComponent(id)}`,
     height: playerHeight,
+    title: attr(element, 'title'),
   }
 }
 
+// No render hint: the player listens for a bare number and `-1` flips the button to playing, but
+// the audio never starts from it.
 export const blubrryEmbedResolver = createUrlEmbedResolver(blubrryHosts, blubrryResolveEmbed)
 
-// No play request. The page listens for a bare number, `-1` clicks Play, and the button flips
-// to its playing state, but loaded in Chrome by a click the audio never started from it. Nothing
-// to send until it does.
+export const blubrryFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'Blubrry Podcast Player' },
+]
