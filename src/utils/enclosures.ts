@@ -82,6 +82,165 @@ const dedupeImageEnclosures = (
   return result
 }
 
+const getKindRank = (rendition: Enclosure): number => {
+  if (isVideoEnclosure(rendition)) {
+    return 3
+  }
+
+  if (isAudioEnclosure(rendition)) {
+    return 2
+  }
+
+  if (isImageEnclosure(rendition)) {
+    return 1
+  }
+
+  return 0
+}
+
+// What orders two renditions of one thing, most significant first. Kind leads because a group can
+// hold the video, its poster and a stream manifest, and the poster listed first would otherwise
+// render as the group. Area is the direct measure of the rest, and a ladder that states no
+// dimensions falls to bytes: a talk shipped at 64k, 180k, 320k and 450k is all one mp4 size on
+// paper, and the first listed is the worst copy the publisher offers. Every rendition of a group
+// runs the same length, so bytes stand in for quality the way bitrate would.
+const getRenditionRanks = (rendition: Enclosure): Array<number> => {
+  return [
+    getKindRank(rendition),
+    (rendition.width ?? 0) * (rendition.height ?? 0),
+    rendition.length ?? 0,
+  ]
+}
+
+const outranksRendition = (incoming: Enclosure, kept: Enclosure): boolean => {
+  const incomingRanks = getRenditionRanks(incoming)
+  const keptRanks = getRenditionRanks(kept)
+
+  for (const [index, rank] of incomingRanks.entries()) {
+    if (rank !== keptRanks[index]) {
+      return rank > keptRanks[index]
+    }
+  }
+
+  return false
+}
+
+// A media group is one thing in several renditions, so only one of them renders. The flag the
+// publisher set wins outright, whatever it points at. A group with nothing to load renders nothing.
+const pickGroupRendition = (renditions: ReadonlyArray<Enclosure>): Enclosure | undefined => {
+  const renderable = renditions.filter((rendition) => rendition.url ?? rendition.playerUrl)
+  const flagged = renderable.find((rendition) => rendition.isDefault)
+
+  if (flagged) {
+    return flagged
+  }
+
+  let picked = renderable[0]
+
+  for (const rendition of renderable) {
+    if (outranksRendition(rendition, picked)) {
+      picked = rendition
+    }
+  }
+
+  return picked
+}
+
+// An entry outside any group that names the same file as a group member is that member listed
+// again, so it joins the group: it keeps its own position and takes the member's fields.
+const foldEqualMembers = (
+  enclosures: ReadonlyArray<Enclosure>,
+  cleanUrlFn?: CleanUrlFn,
+): Array<Enclosure> => {
+  const members = new Map<string, Enclosure>()
+
+  for (const enclosure of enclosures) {
+    if (enclosure.groupIndex !== undefined && typeof enclosure.url === 'string') {
+      members.set(cleanUrl(enclosure.url, { cleanUrlFn }), enclosure)
+    }
+  }
+
+  if (!members.size) {
+    return [...enclosures]
+  }
+
+  const emitted = new Set<Enclosure>()
+  const folded: Array<Enclosure> = []
+
+  for (const enclosure of enclosures) {
+    if (enclosure.groupIndex !== undefined) {
+      if (!emitted.has(enclosure)) {
+        emitted.add(enclosure)
+        folded.push(enclosure)
+      }
+
+      continue
+    }
+
+    if (typeof enclosure.url !== 'string') {
+      folded.push(enclosure)
+      continue
+    }
+
+    const member = members.get(cleanUrl(enclosure.url, { cleanUrlFn }))
+
+    if (!member) {
+      folded.push(enclosure)
+      continue
+    }
+
+    if (!emitted.has(member)) {
+      emitted.add(member)
+      folded.push({ ...enclosure, ...member })
+    }
+  }
+
+  return folded
+}
+
+// Keeps one rendition per group, in the place the group's first member had. Enclosures outside
+// a group pass through as they are.
+const collapseGroups = (
+  enclosures: ReadonlyArray<Enclosure>,
+  cleanUrlFn?: CleanUrlFn,
+): Array<Enclosure> => {
+  const folded = foldEqualMembers(enclosures, cleanUrlFn)
+  const groups = new Map<number, Array<Enclosure>>()
+
+  for (const enclosure of folded) {
+    if (enclosure.groupIndex === undefined) {
+      continue
+    }
+
+    const renditions = groups.get(enclosure.groupIndex) ?? []
+    renditions.push(enclosure)
+    groups.set(enclosure.groupIndex, renditions)
+  }
+
+  const collapsed: Array<Enclosure> = []
+
+  for (const enclosure of folded) {
+    if (enclosure.groupIndex === undefined) {
+      collapsed.push(enclosure)
+      continue
+    }
+
+    const renditions = groups.get(enclosure.groupIndex)
+
+    if (renditions?.[0] !== enclosure) {
+      continue
+    }
+
+    const rendition = pickGroupRendition(renditions)
+
+    if (rendition) {
+      collapsed.push(rendition)
+    }
+  }
+
+  return collapsed
+}
+
 // Query param values that are themselves absolute URLs, e.g. the file URL inside
 // a player page like player.example.com/?media_url=<file>.
 const extractNestedUrls = (url: string): Array<string> => {
@@ -195,15 +354,16 @@ const mergePlayerEnclosures = (
   return result.filter((_, index) => !removed.has(index))
 }
 
-// Reads the enclosures and gets them into the shape injection works with: image variants
-// collapsed, player pages merged with their files.
+// Reads the enclosures and gets them into the shape injection works with: one rendition per
+// group, image variants collapsed, player pages merged with their files.
 export const prepareEnclosures = (
   enclosures: ReadonlyArray<Enclosure>,
   document: Document,
   context: TransformContext,
 ): Array<Enclosure> => {
   const resolved = enclosures.map((enclosure) => readEnclosure(enclosure, document, context))
-  const deduped = dedupeImageEnclosures(resolved, context.cleanUrlFn)
+  const collapsed = collapseGroups(resolved, context.cleanUrlFn)
+  const deduped = dedupeImageEnclosures(collapsed, context.cleanUrlFn)
 
   return mergePlayerEnclosures(deduped, context.cleanUrlFn)
 }
