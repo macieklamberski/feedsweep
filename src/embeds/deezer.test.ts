@@ -404,3 +404,38 @@ describeForEachParser('deezer through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('deezerEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, deezerEmbedResolver)
+
+  it('should drop the label the snippet writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://widget.deezer.com/widget/dark/track/3135556" title="deezer-widget"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'deezer',
+      id: 'track/3135556',
+      src: 'https://widget.deezer.com/widget/dark/track/3135556',
+      url: 'https://www.deezer.com/track/3135556',
+      height: 150,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://widget.deezer.com/widget/dark/track/3135556" title="Harder, Better, Faster, Stronger"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'deezer',
+      id: 'track/3135556',
+      src: 'https://widget.deezer.com/widget/dark/track/3135556',
+      url: 'https://www.deezer.com/track/3135556',
+      height: 150,
+      title: 'Harder, Better, Faster, Stronger',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

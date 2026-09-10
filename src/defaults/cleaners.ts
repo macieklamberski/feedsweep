@@ -2,6 +2,7 @@ import { acastFieldCleaners } from '../embeds/acast.js'
 import { blubrryFieldCleaners } from '../embeds/blubrry.js'
 import { codepenFieldCleaners } from '../embeds/codepen.js'
 import { dailymotionFieldCleaners } from '../embeds/dailymotion.js'
+import { deezerFieldCleaners } from '../embeds/deezer.js'
 import { instagramFieldCleaners } from '../embeds/instagram.js'
 import { kalturaFieldCleaners } from '../embeds/kaltura.js'
 import { libsynFieldCleaners } from '../embeds/libsyn.js'
@@ -18,6 +19,7 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...blubrryFieldCleaners,
   ...codepenFieldCleaners,
   ...dailymotionFieldCleaners,
+  ...deezerFieldCleaners,
   ...instagramFieldCleaners,
   ...kalturaFieldCleaners,
   ...libsynFieldCleaners,
