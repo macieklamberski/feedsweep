@@ -1,6 +1,6 @@
 import { isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
-import { flashVars, keepIfMatches } from '../utils/dom.js'
+import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver, getEmbedSize } from '../utils/widgets.js'
 
@@ -226,10 +226,7 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   }
 }
 
-export const flickrResolveEmbed = (
-  link: string,
-  element: Element,
-): EmbedResolverResult | undefined => {
+const resolveTarget = (link: string, element: Element): EmbedResolverResult | undefined => {
   const parsed = parseUrl(link, placeholderBaseUrl)
 
   if (!parsed) {
@@ -267,6 +264,15 @@ export const flickrResolveEmbed = (
 
   // The size always travels in the src: with no query every image renders at NaN.
   return { ...result, src: `${result.src}?width=${width}&height=${height}`, width, height }
+}
+
+export const flickrResolveEmbed = (
+  link: string,
+  element: Element,
+): EmbedResolverResult | undefined => {
+  const target = resolveTarget(link, element)
+
+  return target && { ...target, title: target.title ?? attr(element, 'title') }
 }
 
 // Flickr's slideshow swf, its legacy iframe, a framed album or stream page, and the two players

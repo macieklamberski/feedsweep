@@ -643,3 +643,24 @@ describeForEachParser('flickrResolveEmbed', (parseHtml) => {
     expect(flickrResolveEmbed('https://[', element)).toBeUndefined()
   })
 })
+
+describeForEachParser('flickrEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, flickrEmbedResolver)
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://www.flickr.com/slideShow/index.gne?user_id=12345678@N04" title="Iceland, summer 2019"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'flickr',
+      id: 'photostreams/12345678@N04',
+      src: 'https://embedr.flickr.com/photostreams/12345678@N04?width=400&height=300',
+      url: 'https://www.flickr.com/photos/12345678@N04/',
+      width: 400,
+      height: 300,
+      title: 'Iceland, summer 2019',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
