@@ -7,9 +7,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, sketchfabEmbedResolver)
 
   describe('happy paths', () => {
-    // The stated title is the model's real name here, and it is still not read: the same
-    // attribute carries the snippet's own label more often than it carries a name.
-    it('should resolve the share snippet without the title it states', async () => {
+    it('should read the name the share snippet states', async () => {
       const value = html`
         <iframe
           title="Borodyanka. Ukraine. War. Banksy."
@@ -34,6 +32,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
         width: 800,
         height: 600,
+        title: 'Borodyanka. Ukraine. War. Banksy.',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -179,6 +178,24 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
       url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
       width: 640,
       height: 480,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('sketchfabEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, sketchfabEmbedResolver)
+
+  it('should drop the label the share dialog writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed" title="A 3D model"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'sketchfab',
+      id: '00b8203bcdc2464bbac4b159be66e838',
+      src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
+      url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
     }
 
     expect(await extract(value)).toEqual(expected)

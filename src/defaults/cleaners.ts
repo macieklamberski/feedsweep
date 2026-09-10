@@ -6,6 +6,7 @@ import { deezerFieldCleaners } from '../embeds/deezer.js'
 import { instagramFieldCleaners } from '../embeds/instagram.js'
 import { kalturaFieldCleaners } from '../embeds/kaltura.js'
 import { libsynFieldCleaners } from '../embeds/libsyn.js'
+import { sketchfabFieldCleaners } from '../embeds/sketchfab.js'
 import { speakerdeckFieldCleaners } from '../embeds/speakerdeck.js'
 import { spotifyFieldCleaners } from '../embeds/spotify.js'
 import { youtubeFieldCleaners } from '../embeds/youtube.js'
@@ -23,6 +24,7 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...instagramFieldCleaners,
   ...kalturaFieldCleaners,
   ...libsynFieldCleaners,
+  ...sketchfabFieldCleaners,
   ...speakerdeckFieldCleaners,
   ...spotifyFieldCleaners,
   ...youtubeFieldCleaners,
