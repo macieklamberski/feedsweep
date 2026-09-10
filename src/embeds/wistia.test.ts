@@ -28,17 +28,35 @@ describe('extractWistiaEmbed', () => {
     expect(extractWistiaEmbed(value)).toEqual(expected)
   })
 
-  it('should extract id from an account media page', () => {
+  it('should extract id and page from an account media page', () => {
     const value = 'https://acme.wistia.com/medias/jjxva47kic'
-    const expected = { route: 'iframe', id: 'jjxva47kic' }
+    const expected = {
+      route: 'iframe',
+      id: 'jjxva47kic',
+      page: 'https://acme.wistia.com/medias/jjxva47kic',
+    }
 
     expect(extractWistiaEmbed(value)).toEqual(expected)
   })
 
-  it('should return undefined for an id of the wrong length', () => {
-    const value = 'https://fast.wistia.net/embed/iframe/short'
+  // The share parameter names nothing the page needs, and the page has to be one url whatever
+  // the carrier spelled, so the same media does not reach enrichment as two placeholders.
+  it('should drop the query from the page it reads', () => {
+    const value = 'https://acme.wistia.com/medias/jjxva47kic?wvideo=jjxva47kic'
+    const expected = {
+      route: 'iframe',
+      id: 'jjxva47kic',
+      page: 'https://acme.wistia.com/medias/jjxva47kic',
+    }
 
-    expect(extractWistiaEmbed(value)).toBeUndefined()
+    expect(extractWistiaEmbed(value)).toEqual(expected)
+  })
+
+  it('should read an id longer than the ten characters Wistia mints today', () => {
+    const value = 'https://fast.wistia.net/embed/iframe/2fg072pftb9'
+    const expected = { route: 'iframe', id: '2fg072pftb9' }
+
+    expect(extractWistiaEmbed(value)).toEqual(expected)
   })
 
   it('should return undefined for a wistia url naming no media', () => {
@@ -68,6 +86,20 @@ describe('extractWistiaEmbed', () => {
   // segment is not a channel and must not be interpolated into a player url.
   it('should return undefined for a slug-shaped channel segment', () => {
     const value = 'https://home.wistia.com/channels/talking-too-loud'
+
+    expect(extractWistiaEmbed(value)).toBeUndefined()
+  })
+
+  // The route is a path segment, so it can name a member every object inherits. That has to
+  // read as no route at all, the way any word the player does not serve does.
+  it('should return undefined for a route naming an inherited member', () => {
+    const value = 'https://fast.wistia.net/embed/constructor/sapab9p6qd'
+
+    expect(extractWistiaEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a route the player does not serve', () => {
+    const value = 'https://fast.wistia.net/embed/gallery/sapab9p6qd'
 
     expect(extractWistiaEmbed(value)).toBeUndefined()
   })
@@ -105,6 +137,19 @@ describe('wistiaResolveEmbed', () => {
     expect(wistiaResolveEmbed(value)).toEqual(expected)
   })
 
+  // Only the account page names the account, so it is the one carrier that can state a url.
+  it('should name the page an account media url already spells out', () => {
+    const value = 'https://acme.wistia.com/medias/2fg072pftb'
+    const expected: EmbedResolverResult = {
+      provider: 'wistia',
+      id: '2fg072pftb',
+      src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      url: 'https://acme.wistia.com/medias/2fg072pftb',
+    }
+
+    expect(wistiaResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should mint the player url from the id', () => {
     const value = 'https://fast.wistia.net/embed/iframe/2fg072pftb?seo=false'
     const expected: EmbedResolverResult = {
@@ -131,6 +176,25 @@ describeForEachParser('wistiaEmbedResolver', (parseHtml) => {
       provider: 'wistia',
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  // Wistia's embed snippet writes the media's name here with the word `Video` appended, and it
+  // is taken as written: nothing tells that suffix from a name ending in the same word.
+  it('should take the name out of the stated title', async () => {
+    const value = html`
+      <iframe
+        src="https://fast.wistia.net/embed/iframe/2fg072pftb"
+        title="Behind the scenes at the office Video"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'wistia',
+      id: '2fg072pftb',
+      src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      title: 'Behind the scenes at the office Video',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -173,5 +237,36 @@ describeForEachParser('wistia facades the rebuild pass materializes', (parseHtml
     `
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('wistiaEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, wistiaEmbedResolver)
+
+  it('should drop the label the share dialog writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://fast.wistia.net/embed/iframe/2fg072pftb" title="Wistia video player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'wistia',
+      id: '2fg072pftb',
+      src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://fast.wistia.net/embed/iframe/2fg072pftb" title="Calcific Tendonitis Video"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'wistia',
+      id: '2fg072pftb',
+      src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      title: 'Calcific Tendonitis Video',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

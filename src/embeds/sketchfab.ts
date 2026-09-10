@@ -1,7 +1,10 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'sketchfab'
 
 // A model uid is 32 hex characters, and it also ends the slugged page url
 // (`/3d-models/{slug}-{uid}`), which is how a pasted page link is read.
@@ -10,21 +13,13 @@ const sluggedUidRegex = /([0-9a-f]{32})$/i
 
 const sketchfabHosts = ['sketchfab.com']
 
-// The viewer is `sketchfab.com/models/{uid}/embed`, and it is what the two retired spellings
-// redirect to: `/embed/{uid}` for the viewer and `/show/{uid}` for the page. The page itself
-// lives at `/3d-models/{slug}-{uid}`. The slug is not derivable from the uid, so the minted url
-// is the unslugged `/models/{uid}`, which the site redirects to it. Checked live 2026-08-16:
-// the viewer answers 200 for a real uid and 404 for an invented one.
-//
-// The thumbnail sits under a per-model hash that the uid does not yield, so it is left to
-// enrichment. `sketchfab.com/oembed?url=…` answers with it and the title, with no key.
 const readModelUid = (parsed: URL): string | undefined => {
   const [route, second, third] = getPathSegments(parsed)
 
-  // A `/models/` path may be followed by `embed` and nothing else: a deeper segment names a
-  // page of the model's own, like its comments, rather than the model.
   const isModelRoute = route === 'models' && (third === undefined || third === 'embed')
 
+  // The viewer is `/models/{uid}/embed`, which the retired `/embed/{uid}` and `/show/{uid}`
+  // redirect to.
   if (isModelRoute || route === 'embed' || route === 'show') {
     return keepIfMatches(second, safeUidRegex)
   }
@@ -34,30 +29,37 @@ const readModelUid = (parsed: URL): string | undefined => {
   }
 }
 
-// The share snippet writes the model's title on the iframe. The oEmbed one writes it empty.
-const sketchfabResolveEmbed = (link: string, element: Element): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(link, 'https://example.com')
+// The carrier's title is not read: most state the snippet's own label, A 3D model, not the name.
+// The thumbnail sits under a per-model hash that the uid does not yield, and
+// `sketchfab.com/oembed?url=…` answers with it and the title, with no key.
+const sketchfabResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const uid = parsed ? readModelUid(parsed) : undefined
 
   if (!uid) {
     return
   }
 
-  const title = attr(element, 'title')
-
   return {
-    provider: 'sketchfab',
+    provider,
     id: uid,
     src: `https://sketchfab.com/models/${uid}/embed`,
+    // The slug is not derivable from the uid, and the site redirects the unslugged `/models/{uid}`
+    // to the `/3d-models/{slug}-{uid}` page.
     url: `https://sketchfab.com/models/${uid}`,
-    title,
+    title: attr(element, 'title'),
   }
 }
 
+// Sketchfab's viewer iframe, /models/{uid}/embed, its retired spellings and a pasted page link.
 export const sketchfabEmbedResolver = createUrlEmbedResolver(sketchfabHosts, sketchfabResolveEmbed)
+
+export const sketchfabFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'A 3D model' },
+]
 
 // Starts the viewer on the click that loads it; there is no audio to hold back.
 export const sketchfabRenderHint: EmbedRenderHint = {
-  provider: 'sketchfab',
+  provider,
   autoplayParams: { autostart: '1' },
 }

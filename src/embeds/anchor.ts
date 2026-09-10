@@ -1,5 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const safeSegmentRegex = /^[A-Za-z0-9._-]+$/
@@ -9,8 +10,10 @@ const safeSegmentRegex = /^[A-Za-z0-9._-]+$/
 // spotify.com hosts but rejects these paths, so they fall through to here.
 const anchorHosts = ['anchor.fm', 'podcasters.spotify.com', 'creators.spotify.com']
 
-// The anchor and podcasters players are 102 tall, the creators one 204.
-const playerHeights = { creators: 204, other: 102 }
+// Spotify's snippet writes 102, but the card is 100 and the two extra pixels render as white.
+// `anchor.fm` and `podcasters.spotify.com` both redirect to the `creators.spotify.com` player.
+// From 768 wide up the card is 161 tall, and the page fills any taller frame with white.
+const playerHeight = 100
 
 // `anchor.fm/{show}/embed/episodes/{slug}`,
 // `podcasters.spotify.com/pod/show/{show}/embed/episodes/{slug}`,
@@ -33,24 +36,23 @@ export const extractAnchorEpisode = (link: string): string | undefined => {
   return `${show}/${episode}`
 }
 
-// No offline metadata: the player carries none and Anchor's old oEmbed endpoint is gone, so
-// what this states is the provider, the episode and a height the markup often omits. The src
-// keeps its own host: the three generations are not known to be interchangeable, and minting
-// an unverified rewrite would risk a working embed.
-export const anchorResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const anchorResolveEmbed: ResolveEmbed = (url) => {
   const episode = extractAnchorEpisode(url)
-  const parsed = parseUrl(url, 'https://example.com')
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!episode || !parsed) {
     return
   }
 
+  // The player carries no metadata, and Anchor's old oEmbed endpoint is gone.
   return {
     provider: 'anchor',
     id: episode,
+    // The host is kept: the three generations are not known to be interchangeable.
     src: parsed.href,
-    height: parsed.hostname.startsWith('creators.') ? playerHeights.creators : playerHeights.other,
+    height: playerHeight,
   }
 }
 
+// Anchor's episode player iframe, on the anchor.fm host and the two Spotify hosts it became.
 export const anchorEmbedResolver = createUrlEmbedResolver(anchorHosts, anchorResolveEmbed)

@@ -73,7 +73,9 @@ export const defaultLazyIframeAttributes = [
   'data-opt-src', // Image/embed optimizers.
   // Invision Community forums defer embeds two ways: an iframe with no src at all, or one whose
   // src points at the forum's own blank interface page. FixLazyIframes treats that page as a
-  // placeholder so this attribute wins in both shapes.
+  // placeholder so this attribute wins in both shapes. convertWidgets mints the same name onto its
+  // own embed placeholders, and the two never collide: fixLazyIframes reads this list off <iframe>
+  // elements only, and a placeholder is a <div>.
   'data-embed-src', // Invision Community deferred embeds.
   // Avada's privacy-embed facade (data-privacy-type is a taxonomy: YouTube, Vimeo, …), NOT a
   // cookie banner: it defers a real video the author embedded. Recovering it yields a privacy-safe
@@ -125,4 +127,11 @@ export const defaultDeferredIframeSources: Array<DeferredIframeSource> = [
     selector: '[data-oembed-url]:not(:has(iframe, embed, object, video, audio))',
     attribute: 'data-oembed-url',
   },
+  // Advanced Responsive Video Embedder's lazyload mode replaces the player with a play button
+  // that holds the ready embed url and builds the iframe on click, so a reader is left with an
+  // empty widget: the button carries no image either, only an inline svg. 276 corpus feeds carry
+  // the attribute and 155 of them hold no YouTube player anywhere, and the destination is
+  // youtube-nocookie.com or youtube.com in 275 of the 276. The class is what qualifies it, since
+  // `data-iframe` is a name anyone could pick.
+  { selector: '.arve-play-btn[data-iframe]', attribute: 'data-iframe' },
 ]
