@@ -412,8 +412,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The photo page answers `x-frame-options: SAMEORIGIN`, so its own url cannot be the src,
-    // and it names no `/player/` segment, which is the frameable form.
+    // The photo page answers `x-frame-options: SAMEORIGIN` and names no `/player/` segment.
     it('should return undefined for a photo page framed without the player segment', async () => {
       const value = html`
         <iframe src="https://www.flickr.com/photos/12345678@N00/4362718294/"></iframe>
@@ -424,7 +423,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
   })
 
   // The player Flickr's own photo page opens, pasted as the iframe src. It sends no
-  // frame-blocking header, so the url the publisher wrote is already the src.
+  // frame-blocking header.
   describe('the single photo page player', () => {
     it('should name the photo the page player addresses', async () => {
       const value = html`
@@ -447,8 +446,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The secret is what the file url needs beside the photo id, and the server segment it also
-    // spells is a don't-care.
+    // The file url needs the secret beside the photo id.
     it('should compose the photo file when the path carries the secret', async () => {
       const value = html`
         <iframe
