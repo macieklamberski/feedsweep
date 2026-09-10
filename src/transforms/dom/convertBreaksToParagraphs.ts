@@ -9,6 +9,7 @@ import {
   isWhitespaceText,
 } from '../../utils/dom.js'
 
+// No figure, unlike wrapBareInlineInParagraphs: a <br> run inside one needs no paragraph.
 const processContainersSelector =
   'body, div, blockquote, td, li, article, section, main, header, footer, aside'
 
@@ -21,6 +22,7 @@ type Chunk = {
   hasBlock: boolean
 }
 
+// Prose split into paragraphs by runs of two or more <br>, which no stylesheet spaces as such.
 export const convertBreaksToParagraphs: DomTransform = () => {
   return (document) => {
     for (const container of document.querySelectorAll(processContainersSelector)) {

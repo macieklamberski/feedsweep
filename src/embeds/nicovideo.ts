@@ -1,48 +1,33 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
-// Video ids are a two-letter kind and a number, `sm9`, `nm12345`, `so67890`. A channel upload
-// is also addressed by a bare number, the thread id its watch page was minted under: the player
-// answers it 200 with the title like any other id and an invented one 500 (checked 2026-09-05).
+// A channel upload is addressed by a bare number, so the prefix is optional.
 const safeVideoIdRegex = /^(?:[a-z]{2})?\d+$/
 
-// `lv` names a live broadcast, which the video player answers 500 for. The shape gives nothing
-// away, since `lv` is two letters and a number like every other kind. The live host serves a
-// programme card rather than playback, and keeps serving it after the broadcast ends.
+// lv names a live broadcast, which the video player answers 500 for and the live host serves as a
+// programme card even after the broadcast ends.
 const liveIdRegex = /^lv\d+$/
 
 const nicovideoHosts = ['nicovideo.jp']
 
-// Three spellings, one video, and the legacy two are dead or dying.
-//
-// `ext.nicovideo.jp/thumb_watch/{id}` is a script that writes the player where it stands. It
-// never runs in a reader, and most feeds carrying it hold no nicovideo iframe beside it, so the
-// video is lost. Nicovideo answers it with a 302 to
-// `embed.nicovideo.jp/watch/{id}/script`, so the platform itself names the modern target and
-// the id carries across unchanged (checked 2026-08-12).
-//
-// `ext.nicovideo.jp/thumb/{id}` is the old iframe card, and it now answers 403 to any user
-// agent. Those embeds render nothing today, so rewriting them to the modern player repairs them
-// rather than merely relabelling.
-//
-// `embed.nicovideo.jp/watch/{id}` is what both become. It is one of the few player hosts where a
-// status code means something: a real id answers 200 with the video's title in the document, an
-// invented one answers 500.
+// Seiga and manga write ext.{site}.nicovideo.jp/thumb/{kind}{digits}, and news writes
+// news.nicovideo.jp/watch/nw{digits}.
+const nonVideoHosts = ['seiga.nicovideo.jp', 'manga.nicovideo.jp', 'news.nicovideo.jp']
+
 export const extractNicovideoId = (link: string): string | undefined => {
   // The script selector matches on a substring, so any host can spell `nicovideo.jp/thumb_watch`
   // inside its own path and reach this. The path shape alone must not mint a nicovideo url.
   const parsed = parseUrlOnHosts(link, nicovideoHosts)
 
-  if (!parsed) {
+  // Seiga, manga and news ids pass the video grammar, and the video player answers 500 for them.
+  if (!parsed || parseUrlOnHosts(link, nonVideoHosts)) {
     return
   }
 
   const segments = getPathSegments(parsed)
-  // `embed` is the live host's own route, `live.nicovideo.jp/embed/{id}`, so a broadcast already
-  // in embed form is read here rather than dropped.
   const marker = segments.findIndex((segment) => {
     return (
       segment === 'thumb_watch' || segment === 'thumb' || segment === 'watch' || segment === 'embed'
@@ -52,7 +37,7 @@ export const extractNicovideoId = (link: string): string | undefined => {
   return keepIfMatches(marker < 0 ? undefined : segments[marker + 1], safeVideoIdRegex)
 }
 
-export const nicovideoResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const nicovideoResolveEmbed: ResolveEmbed = (url) => {
   const videoId = extractNicovideoId(url)
 
   if (!videoId) {
@@ -70,6 +55,7 @@ export const nicovideoResolveEmbed = (url: string): EmbedResolverResult | undefi
     }
   }
 
+  // embed.nicovideo.jp/watch/{id} answers a real id 200 with the title and an invented one 500.
   return {
     provider: 'nicovideo',
     id: videoId,
@@ -78,12 +64,14 @@ export const nicovideoResolveEmbed = (url: string): EmbedResolverResult | undefi
   }
 }
 
-// The dead `ext.nicovideo.jp/thumb/{id}` card, and any modern player already in iframe form.
+// The legacy ext.nicovideo.jp/thumb/{id} iframe card, which now answers 403 to every user agent.
 export const nicovideoIframeEmbedResolver = createUrlEmbedResolver(
   nicovideoHosts,
   nicovideoResolveEmbed,
 )
 
+// Nicovideo's thumb_watch script writes the player where it stands, and a reader never runs it.
+// Nicovideo answers it with a 302 to embed.nicovideo.jp/watch/{id}/script.
 export const nicovideoScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="nicovideo.jp/thumb_watch"], script[src*="embed.nicovideo.jp/watch"]',
   (element) => {
@@ -94,13 +82,11 @@ export const nicovideoScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    // A player scales to the column rather than sitting in a fixed box, so both dimensions are
-    // carried when the script states them: the pair is what a reader scales by, and a lone
-    // height would claim a fixed box the player does not have.
-    const parsed = parseUrl(source, 'https://example.com')
+    const parsed = parseUrl(source, placeholderBaseUrl)
     const width = parsePixelSize(parsed?.searchParams.get('w'))
     const height = parsePixelSize(parsed?.searchParams.get('h'))
 
+    // A lone height would claim a fixed box the fluid player does not have.
     if (!width || !height) {
       return result
     }

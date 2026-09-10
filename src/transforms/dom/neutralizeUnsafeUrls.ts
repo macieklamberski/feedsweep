@@ -1,6 +1,7 @@
 import { parseSrcset, stringifySrcset } from 'srcset'
+import { toMap } from 'trousse'
 import type { DomTransform, IsSafeUrlFn, UrlRole } from '../../types.js'
-import { walkElements } from '../../utils/dom.js'
+import { svgHrefAttribute, walkElements } from '../../utils/dom.js'
 
 // Inert replacements that keep the element but render nothing: a same-page no-op for
 // links, the empty document for media (about:blank loads nothing and runs nothing).
@@ -9,16 +10,11 @@ const sentinels: Record<UrlRole, string> = {
   media: 'about:blank',
 }
 
-// Browsers strip leading C0 control characters and ASCII whitespace from a URL before reading
-// its scheme, so `\x01javascript:` and `java\tscript:` both resolve to `javascript:` and run.
-// `\s` catches the whitespace cases but misses the other C0 controls (`\x01`-`\x08`,
-// `\x0e`-`\x1f`), so strip the whole C0 range first. The floor must hold on its own: a DOM-only
-// pipeline has no stripControlChars upstream, so it can't depend on `\s` alone.
-//
-// Built via new RegExp so the control-char escapes live in strings instead of a regex literal.
+// A browser strips C0 controls before reading the scheme, so \x01javascript: runs.
+// Whitespace inside the scheme is dropped as well, so java\tscript: runs too.
 const urlIgnorableRanges = [
-  '\\s', // ASCII + Unicode whitespace.
-  '\\x00-\\x1F', // C0 controls (NUL etc.) that `\\s` misses.
+  '\\s', // ASCII and Unicode whitespace
+  '\\x00-\\x1F', // C0 controls
 ]
 const urlIgnorableCharsRegex = new RegExp(`[${urlIgnorableRanges.join('')}]+`, 'g')
 // The dangerous-scheme floor: schemes that execute or render markup. Always enforced,
@@ -85,7 +81,7 @@ const genericAttributeRoles: Array<[string, UrlRole]> = [
   ['data-cite-thumbnail', 'media'],
 ]
 // URL-carrying attributes specific to a tag.
-const tagAttributeRoles: Record<string, Array<[string, UrlRole]>> = {
+const tagAttributeRoles: ReadonlyMap<string, Array<[string, UrlRole]>> = toMap({
   img: [['src', 'media']],
   video: [
     ['src', 'media'],
@@ -97,19 +93,14 @@ const tagAttributeRoles: Record<string, Array<[string, UrlRole]>> = {
   iframe: [['src', 'media']],
   embed: [['src', 'media']],
   object: [['data', 'media']],
-}
+  form: [['action', 'link']],
+})
 const srcsetTags = new Set(['img', 'source'])
-// Anchors and SVG <image> carry their URL on href/xlink:href, matched by tag because the
-// colon in xlink:href is invalid in a CSS attribute selector.
-const hrefTagRoles: Record<string, UrlRole> = { a: 'link', image: 'media' }
+// The two tags carrying their URL on href, which is read per element below because SVG1 spells
+// it xlink:href.
+const hrefTagRoles: ReadonlyMap<string, UrlRole> = toMap({ a: 'link', image: 'media' })
 
-// Replaces unsafe URLs with an inert, role-appropriate sentinel while keeping the element.
-// Always enforces a dangerous-scheme floor (javascript:/vbscript:/data:text/html), plus the
-// caller's isSafeUrlFn policy when provided. Runs after URLs are resolved and embeds/cites are
-// placeholdered, and before proxyAssetUrls.
-//
-// One walk covers every attribute (see walkElements), instead of a querySelectorAll per
-// attribute: there are around 20 of them.
+// A javascript:, vbscript: or data:text/html url on any attribute a browser would follow.
 export const neutralizeUnsafeUrls: DomTransform = ({ isSafeUrlFn }) => {
   return (document) => {
     walkElements(document, (element) => {
@@ -123,7 +114,7 @@ export const neutralizeUnsafeUrls: DomTransform = ({ isSafeUrlFn }) => {
       }
 
       const name = element.localName
-      const tagAttributes = tagAttributeRoles[name]
+      const tagAttributes = tagAttributeRoles.get(name)
 
       if (tagAttributes !== undefined) {
         for (const [attribute, role] of tagAttributes) {
@@ -137,12 +128,10 @@ export const neutralizeUnsafeUrls: DomTransform = ({ isSafeUrlFn }) => {
         return
       }
 
-      // href wins over xlink:href when both are present.
-      const hrefRole = hrefTagRoles[name]
+      const hrefRole = hrefTagRoles.get(name)
 
       if (hrefRole !== undefined) {
-        const attribute = element.hasAttribute('href') ? 'href' : 'xlink:href'
-        neutralizeAttribute(element, attribute, hrefRole, isSafeUrlFn)
+        neutralizeAttribute(element, svgHrefAttribute(element), hrefRole, isSafeUrlFn)
       }
     })
   }

@@ -1,54 +1,40 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, parseRatio } from '../utils/dom.js'
+import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
-// Ids are lowercase hex, in two lengths. 32 chars is the current dashless UUID. 24 is the
-// legacy Mongo ObjectId Speaker Deck issued around 2011-2012, and those decks still play: the
-// player url answers 200 (verified live 2026-08-11).
-const deckIdRegex = /^[0-9a-f]{24}(?:[0-9a-f]{8})?$/
+// Ids are lowercase hex in two lengths: 32 for the current dashless UUID and 24 for the Mongo
+// ObjectId issued around 2011-2012, and those decks still play. `/player/` serves decks and
+// nothing else.
+const deckIdRegex = /^[0-9a-f]+$/
 
 // A few feeds fold the slide number into the id attribute itself.
 const slideSuffixRegex = /\?slide=(\d+)$/
 const safeSlideRegex = /^\d+$/
 
-// What a deck is when its own script does not say. Speaker Deck's snippet always carries the
-// ratio, so this is for the feeds that strip the attribute, and 16:9 is what decks mostly are
-// (Speaker Deck's own listings, 2026-08-09). Stated here rather than left to the consumer's
-// default, so the placeholder describes the deck whatever a reader assumes about a size-less
-// embed.
+// Speaker Deck's snippet always carries the ratio, and 16:9 is what decks mostly are.
 const defaultDeckRatio = '16/9'
-
-// The deck's title, which the player url does not carry. Speaker Deck's snippet writes the
-// four-character string `null` when the deck has no title, so that spelling is treated as
-// absent.
-const readTitle = (element: Element): string | undefined => {
-  const title = attr(element, 'title')
-
-  return title !== 'null' ? title : undefined
-}
 
 // One feed can embed the same deck at several slides. Without the slide those collapse into
 // identical placeholders, and the player url honours `?slide=`.
+// The public page needs the author and slug, which neither carrier names, so there is no `url`.
 const composeEmbed = (
   deckId: string,
   { slide, title }: { slide?: string; title?: string },
 ): EmbedResolverResult => {
-  const hasSlide = Boolean(slide && safeSlideRegex.test(slide))
+  const safeSlide = slide && safeSlideRegex.test(slide) ? slide : undefined
+  const query = composeQuery(safeSlide ? { slide: safeSlide } : undefined)
 
   return {
     provider: 'speakerdeck',
-    id: hasSlide ? `${deckId}/${slide}` : deckId,
-    src: `https://speakerdeck.com/player/${deckId}${hasSlide ? `?slide=${slide}` : ''}`,
+    id: safeSlide ? `${deckId}/${safeSlide}` : deckId,
+    src: `https://speakerdeck.com/player/${deckId}${query}`,
     title,
   }
 }
 
-// Speakerdeck ships a deck as a bare `<script class="speakerdeck-embed" data-id="{id}"
-// src="//speakerdeck.com/assets/embed.js">` that builds the player iframe at runtime, so a
-// reader shows nothing at all. The player page is mintable from the id alone (verified
-// live, 200). The deck's public page needs the author and slug, which the script does not
-// carry, so the placeholder has no `url`.
+// Speaker Deck ships a deck as a bare <script data-id> whose embed.js builds the player at runtime.
 export const speakerdeckScriptEmbedResolver = createMarkupEmbedResolver(
   'script.speakerdeck-embed[data-id]',
   (element) => {
@@ -70,13 +56,8 @@ export const speakerdeckScriptEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// The player the script above builds at runtime, saved into the feed by a CMS that ran the
-// script first. Same deck, same placeholder: only the carrier differs. A size on the element
-// wins over the default ratio, so the fallback only applies to a size-less embed.
-export const speakerdeckResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+// The player iframe that script builds, saved into the feed by a CMS that ran the script first.
+export const speakerdeckResolveEmbed: ResolveEmbed = (url, element) => {
   const segments = getPathSegments(url)
   const deckId = segments[0] === 'player' ? segments[1] : undefined
 
@@ -84,10 +65,10 @@ export const speakerdeckResolveEmbed = (
     return
   }
 
-  const slide = parseUrl(url, 'https://example.com')?.searchParams.get('slide') ?? undefined
+  const slide = parseUrl(url, placeholderBaseUrl)?.searchParams.get('slide') ?? undefined
 
   return {
-    ...composeEmbed(deckId, { slide, title: element ? readTitle(element) : undefined }),
+    ...composeEmbed(deckId, { slide, title: attr(element, 'title') }),
     ratio: defaultDeckRatio,
   }
 }
@@ -96,3 +77,7 @@ export const speakerdeckIframeEmbedResolver = createUrlEmbedResolver(
   ['speakerdeck.com'],
   speakerdeckResolveEmbed,
 )
+
+export const speakerdeckFieldCleaners: Array<FieldCleaner> = [
+  { provider: 'speakerdeck', field: 'title', drop: 'null' },
+]

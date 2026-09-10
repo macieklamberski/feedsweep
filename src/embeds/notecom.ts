@@ -4,6 +4,8 @@ import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'notecom'
+
 // A note id is `n` followed by lowercase hex, e.g. `nf938ce640465`.
 const safeNoteIdRegex = /^n[0-9a-f]+$/
 
@@ -11,11 +13,8 @@ const safeNoteIdRegex = /^n[0-9a-f]+$/
 // (checked 2026-08-15), so both are matched and only the current one is minted.
 const notecomHosts = ['note.com', 'note.mu']
 
-// The player the platform's own client builds, and the only note.com url a reader can frame.
-// It discriminates on body size rather than status: a real id answers 200 with a full body
-// while a fabricated one answers 200 with the identical empty shell (checked 2026-08-15). The
-// real body carries the note's title, its author and a link to the post, none of which is in
-// the feed markup, so those stay for enrichment.
+// The player answers 200 for any id: a full body carrying the title, the author and a post link for
+// a real one, an empty shell for a fabricated one.
 const composePlayer = (noteId: string): string => {
   return `https://note.com/embed/notes/${noteId}`
 }
@@ -33,41 +32,37 @@ const composeEmbed = (noteId: string, pageUrl?: string): EmbedResolverResult | u
   }
 
   return {
-    provider: 'notecom',
+    provider,
     id: noteId,
     src: composePlayer(noteId),
     url: composePostUrl(noteId, pageUrl),
   }
 }
 
-// The two note.com url shapes, both naming the id in their last segment: the canonical post
-// `note.com/{user}/n/{id}` and the player `note.com/embed/notes/{id}`. Which one a carrier holds
-// decides whether a canonical url can be stated, since only the post form names the user.
 type NoteUrl = { noteId: string; kind: 'post' | 'player' }
 
+// Each id is read at its position: off the end, a trailing slug would be handed over as the note.
+// The shapes are the post note.com/{user}/n/{id}, the same post under a publication as
+// biz.note.com/n/{id}, and the player note.com/embed/notes/{id}.
 const readNoteUrl = (link: string): NoteUrl | undefined => {
   const parsed = parseUrlOnHosts(link, notecomHosts)
   const segments = parsed ? getPathSegments(parsed) : []
-  const noteId = segments.at(-1)
 
-  if (!noteId) {
-    return
+  if (segments[1] === 'n' && segments[2]) {
+    return { noteId: segments[2], kind: 'post' }
   }
 
-  if (segments[1] === 'n' && segments.length > 2) {
-    return { noteId, kind: 'post' }
+  if (segments[0] === 'n' && segments.length === 2) {
+    return { noteId: segments[1], kind: 'post' }
   }
 
-  if (segments[0] === 'embed' && segments[1] === 'notes') {
-    return { noteId, kind: 'player' }
+  if (segments[0] === 'embed' && segments[1] === 'notes' && segments[2]) {
+    return { noteId: segments[2], kind: 'player' }
   }
 }
 
-// Two carriers, one resolver. The player is what the figure's script builds at runtime and what
-// a CMS that ran the script first saves into a feed, which would otherwise reach a provider-less
-// generic placeholder. The post url is what note.com's own embed figure names, and
-// `convertNoteEmbeds` frames it so this claims it there too, which is why the figure needs no
-// resolver of its own.
+// A note.com embed figure carries the post url, not the player, so a reader frames the article.
+// A CMS that ran the figure's script saves the player iframe itself into the feed.
 export const notecomIframeEmbedResolver = createUrlEmbedResolver(notecomHosts, (url) => {
   const target = readNoteUrl(url)
 
@@ -79,8 +74,7 @@ export const notecomIframeEmbedResolver = createUrlEmbedResolver(notecomHosts, (
   return composeEmbed(target.noteId, target.kind === 'post' ? url : undefined)
 })
 
-// The player reports its height as a string, `height::{player url}::{pixels}`, once the note has
-// rendered. The url in the middle can hold anything, so the number is read off the end.
+// The player's height message, `height::{player url}::{pixels}`.
 const heightMessageRegex = /^height::.*::(\d+(?:\.\d+)?)$/
 
 export const readNotecomHeight = (data: unknown): number | undefined => {
@@ -90,7 +84,7 @@ export const readNotecomHeight = (data: unknown): number | undefined => {
 }
 
 export const notecomRenderHint: EmbedRenderHint = {
-  provider: 'notecom',
+  provider,
   origin: 'https://note.com',
   readHeight: readNotecomHeight,
 }

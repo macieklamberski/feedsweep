@@ -1,19 +1,20 @@
+import type { Nullish } from 'trousse'
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
-import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { attr, flashVars, keepIfMatches, paramValue } from '../utils/dom.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
-// Brightcove builds its player page from four ids the in-page embed carries as attributes. The
-// account is usually one of them, but some plugins leave it only in the loader script's url, so
-// both places are read here instead of by whoever holds the element.
-//
-// The script lookup spans the whole document, so two players from two accounts would both take
-// the first account. In practice the rare feeds carrying a `data-video-id` element with no
-// `data-account` ship no loader script at all, so nothing has reached that branch.
+const provider = 'brightcove'
+
+const safeIdRegex = /^\d+$/
+// The minimum length is the only check on the id: `AQ~~` decodes to the number 1.
+// A real Brightcove id runs to ten digits and more.
 const brightcoveIdRegex = /^\d{5,}$/
 const accountScriptSelector = 'script[src*="players.brightcove.net"]'
 const accountScriptRegex = /players\.brightcove\.net\/(\d+)\//
 
+// Some plugins leave the account out of `data-account` and only in the loader script's url.
 const readPlayerAccount = (element: Element): string | undefined => {
   const stated = attr(element, 'data-account')
 
@@ -26,22 +27,53 @@ const readPlayerAccount = (element: Element): string | undefined => {
   return attr(loader, 'src')?.match(accountScriptRegex)?.[1]
 }
 
+// The account is in the `playerKey`: its middle comma-separated segment is the id as big-endian
+// bytes in a base64 alphabet using `-`, `_` and either `~` or `.` for `+`, `/` and `=`.
+const readPlayerKeyAccount = (key: Nullish<string>): string | undefined => {
+  const encoded = key?.split(',')[1]
+
+  if (!encoded) {
+    return
+  }
+
+  let bytes: string
+
+  try {
+    // The key's base64 pads with either `~` or `.`.
+    bytes = atob(
+      encoded.replaceAll('-', '+').replaceAll('_', '/').replaceAll('~', '=').replaceAll('.', '='),
+    )
+  } catch {
+    return
+  }
+
+  let account = 0n
+
+  for (const byte of bytes) {
+    account = account * 256n + BigInt(byte.charCodeAt(0))
+  }
+
+  // Any base64 that decodes at all yields a number here, so the floor is what separates a real
+  // account from a segment that is not one: `AQ~~` decodes to the single byte 1.
+  return keepIfMatches(String(account), brightcoveIdRegex)
+}
+
+// The playback API is `/playback/v1/accounts/{account}/videos/{video}`, so a video id alone names
+// nothing. A fabricated account 404s on the player host, and a wrong video id still serves a shell.
 const composePlayerUrl = (
   account: string,
   videoId: string,
   player = 'default',
   embed = 'default',
 ): string => {
-  return `https://players.brightcove.net/${account}/${player}_${embed}/index.html?videoId=${videoId}`
+  // Unescaped, `data-player="../../999999/stolen"` names another account's player.
+  const segment = `${encodeURIComponent(player)}_${encodeURIComponent(embed)}`
+
+  return `https://players.brightcove.net/${account}/${segment}/index.html?videoId=${videoId}`
 }
 
-// Brightcove's in-page embed is a bare `<video-js>` that its loader script turns into a player,
-// so a reader shows nothing: the element is empty and survives as an unknown tag. The older
-// syntax is a `<video class="video-js">` carrying the identical attributes, which renders as an
-// empty video element instead: every feed that ships the loader with no `<video-js>` and no
-// iframe is that form. Video.js is only the renderer here. The video is Brightcove's,
-// named by id, which is why this lives with the rest of Brightcove rather than with the generic
-// Video.js rebuild. Brightcove has no public watch page, so the placeholder carries no `url`.
+// Brightcove's in-page embed: a bare <video-js> or video element only its loader script fills.
+// Brightcove has no public watch page.
 export const brightcoveVideoJsEmbedResolver = createMarkupEmbedResolver(
   'video-js[data-video-id], video[data-video-id]',
   (element) => {
@@ -53,10 +85,8 @@ export const brightcoveVideoJsEmbedResolver = createMarkupEmbedResolver(
     }
 
     // Video.js is a library anyone can use, and `data-video-id` is not a name only Brightcove
-    // could have chosen, so the ids have to look like Brightcove's before this mints a
-    // Brightcove url from them. Both are long digit strings, the same test the other two
-    // resolvers here apply. In practice the inference is safe anyway: nearly every feed
-    // carrying this element also ships the `players.brightcove.net` loader script.
+    // could have chosen, so the id shape is all this carrier has to go on. The inference is safe
+    // in practice too: nearly every feed carrying the element also ships the loader script.
     const videoId = keepIfMatches(attr(element, 'data-video-id'), brightcoveIdRegex)
     const account = videoId
       ? keepIfMatches(readPlayerAccount(element), brightcoveIdRegex)
@@ -67,8 +97,8 @@ export const brightcoveVideoJsEmbedResolver = createMarkupEmbedResolver(
     }
 
     return {
-      provider: 'brightcove',
-      id: videoId,
+      provider,
+      id: `${account}/${videoId}`,
       src: composePlayerUrl(
         account,
         videoId,
@@ -79,18 +109,12 @@ export const brightcoveVideoJsEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// The Flash player split the same two ids across two places: the account sits in the url as
-// `publisherID`, and the video id in `flashVars`, either on the carrier itself or in a
-// sibling `<param>`. The federated player id in the path is not a modern player id, so the
-// minted url takes the account's default player, which is verified live: this shape answers
-// 200 while a bogus account 404s.
 const federatedPathRegex = /\/services\/viewer\/federated_/
 
-const brightcoveFlashResolveEmbed = (
-  src: string,
-  element: Element,
-): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(src, 'https://example.com')
+// The account sits in the url as `publisherID` and the video id in `flashVars`. The federated
+// player id in the path is not a modern player id.
+const brightcoveFlashResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !federatedPathRegex.test(parsed.pathname)) {
     return
@@ -98,16 +122,20 @@ const brightcoveFlashResolveEmbed = (
 
   const config = flashVars(element)
   const params = config ? new URLSearchParams(config) : undefined
-  // A few embeds put the whole flashVars set in the url query instead. A reference id
-  // (`ref:my-video`) names the video for the account's own API, not the player, so anything but
-  // a numeric id is left to the generic placeholder.
+  // `videoId` is the older spelling of `@videoPlayer`, and a few embeds put the flashVars set in
+  // the url query.
   const videoId = keepIfMatches(
-    params?.get('@videoPlayer') ?? parsed.searchParams.get('@videoPlayer'),
-    brightcoveIdRegex,
+    params?.get('@videoPlayer') ??
+      parsed.searchParams.get('@videoPlayer') ??
+      params?.get('videoId') ??
+      parsed.searchParams.get('videoId'),
+    safeIdRegex,
   )
   const account = keepIfMatches(
-    parsed.searchParams.get('publisherID') ?? params?.get('publisherID'),
-    brightcoveIdRegex,
+    parsed.searchParams.get('publisherID') ??
+      params?.get('publisherID') ??
+      readPlayerKeyAccount(params?.get('playerKey')),
+    safeIdRegex,
   )
 
   if (!videoId || !account) {
@@ -115,30 +143,47 @@ const brightcoveFlashResolveEmbed = (
   }
 
   return {
-    provider: 'brightcove',
-    id: videoId,
+    provider,
+    id: `${account}/${videoId}`,
     src: composePlayerUrl(account, videoId),
   }
 }
 
-// The legacy player lives on brightcove.com. The modern one below is on brightcove.net.
+// The Flash-era federated player on c.brightcove.com, whose hosts no longer resolve.
+// The legacy player lives on brightcove.com and the modern one on brightcove.net.
 export const brightcoveFlashEmbedResolver = createUrlEmbedResolver(
   ['brightcove.com'],
   brightcoveFlashResolveEmbed,
 )
 
-// The player page as an ordinary iframe, `players.brightcove.net/{account}/{player}_{embed}
-// /index.html?videoId={id}`. It is the most common Brightcove carrier, more common than the
-// `<video-js>` element, and unclaimed it falls through to the generic placeholder with no
-// provider and no id.
-//
-// The account and video id are read back out, not the url passed through whole, because
-// the pair is what an enricher would key on later, and because a player url carrying neither is
-// not a video worth naming.
+// The BrightcoveExperience object, configured by <param>s, whose loader host no longer resolves.
+// A snippet carrying a player but no `@videoPlayer` is a channel or playlist player.
+export const brightcoveExperienceEmbedResolver = createMarkupEmbedResolver(
+  'object.BrightcoveExperience',
+  (element) => {
+    const videoId = keepIfMatches(paramValue(element, '@videoplayer'), safeIdRegex)
+    const account = videoId
+      ? keepIfMatches(readPlayerKeyAccount(paramValue(element, 'playerkey')), safeIdRegex)
+      : undefined
+
+    if (!videoId || !account) {
+      return
+    }
+
+    return {
+      provider,
+      id: `${account}/${videoId}`,
+      src: composePlayerUrl(account, videoId),
+    }
+  },
+)
+
+// A {player}_{embed} segment.
 const playerPathRegex = /^([^_]+)_(.+)$/
 
-export const brightcoveResolveEmbed = (url: string): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(url, 'https://example.com')
+// The players.brightcove.net player page as an ordinary iframe.
+export const brightcoveResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed?.hostname.startsWith('players.')) {
     return
@@ -153,20 +198,21 @@ export const brightcoveResolveEmbed = (url: string): EmbedResolverResult | undef
 
   // `{player}_{embed}` is one segment holding two ids. A segment shaped otherwise is not a
   // player path.
-  if (!brightcoveIdRegex.test(account) || !playerPathRegex.test(player)) {
+  if (!safeIdRegex.test(account) || !playerPathRegex.test(player)) {
     return
   }
 
   // A reference id names the video for the account's own api, not the player, the same
   // exclusion the Flash form makes.
-  if (!brightcoveIdRegex.test(videoId)) {
+  if (!safeIdRegex.test(videoId)) {
     return
   }
 
   return {
-    provider: 'brightcove',
-    id: videoId,
+    provider,
+    id: `${account}/${videoId}`,
     src: `https://players.brightcove.net/${account}/${player}/index.html?videoId=${videoId}`,
+    title: attr(element, 'title'),
   }
 }
 
@@ -178,6 +224,7 @@ export const brightcoveIframeEmbedResolver = createUrlEmbedResolver(
 // Starts playback on the click that loads the player, which sets `playsinline` on its own.
 // Never `autoplay=muted` or `autoplay=any`, which mute.
 export const brightcoveRenderHint: EmbedRenderHint = {
-  provider: 'brightcove',
+  provider,
+  // Never `muted` or `any`, which mute.
   autoplayParams: { autoplay: 'true' },
 }

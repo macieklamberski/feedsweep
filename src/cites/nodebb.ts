@@ -2,21 +2,20 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text, textNode } from '../utils/dom.js'
 
-// NodeBB's bundled link-preview plugin (on by default since v3.1) rewrites a pasted link
-// into a Bootstrap card that it stores in the post HTML, so it survives into the feed body.
-// The wrapper shares the generic `card` class, so this keys on the co-occurring
-// `link-preview` class to avoid matching unrelated Bootstrap cards. The three anchors (image,
-// title, footer) all carry the same target url. The footer holds the site name as a bare
-// text node next to a `(domain)` span, so `textNode` gets the name without the domain.
+// NodeBB's link-preview plugin card: a Bootstrap card stored in the post HTML.
+// Core bundles the plugin since 4.7.0 but leaves it off, so only forums that turned it on emit it.
 export const nodebbCiteResolver: CiteResolver = {
   kind: 'cite',
-  selector: '.link-preview',
+  // Either class alone is one any theme can mint, so the pair is the match.
+  selector: '.card.link-preview',
   extract: (element) => {
     return buildCite({
       provider: 'nodebb',
+      // The image, title and footer anchors all carry the same target url.
       url: attr(find(element, '.card-title a'), 'href') ?? attr(find(element, 'a'), 'href'),
       title: text(element, '.card-title'),
       description: text(element, '.card-text'),
+      // text() would append the (domain) span to the site name.
       publisher: textNode(find(element, '.card-footer p')),
       icon: attr(find(element, '.card-footer img'), 'src'),
       thumbnail: attr(find(element, '.card-img-top'), 'src'),
