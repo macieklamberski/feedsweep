@@ -1,4 +1,5 @@
 import { acastFieldCleaners } from '../embeds/acast.js'
+import { audioboomFieldCleaners } from '../embeds/audioboom.js'
 import { blubrryFieldCleaners } from '../embeds/blubrry.js'
 import { codepenFieldCleaners } from '../embeds/codepen.js'
 import { dailymotionFieldCleaners } from '../embeds/dailymotion.js'
@@ -17,6 +18,7 @@ import type { FieldCleaner } from '../types.js'
 // beside the resolver that knows the platform.
 export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...acastFieldCleaners,
+  ...audioboomFieldCleaners,
   ...blubrryFieldCleaners,
   ...codepenFieldCleaners,
   ...dailymotionFieldCleaners,

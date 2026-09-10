@@ -3,6 +3,7 @@ import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
+  audioboomIframeEmbedResolver,
   audioboomResolveEmbed,
   audioboomWidgetEmbedResolver,
   extractAudioboomPost,
@@ -215,5 +216,38 @@ describeForEachParser('audioboom through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('audioboomIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, audioboomIframeEmbedResolver)
+
+  it('should drop the label the player writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://embeds.audioboom.com/posts/8292430/embed/v4" title="audioBoom player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'audioboom',
+      id: '8292430',
+      src: 'https://embeds.audioboom.com/posts/8292430/embed/v4',
+      height: 300,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://embeds.audioboom.com/posts/8292430/embed/v4" title="The Rest Is History: Rome"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'audioboom',
+      id: '8292430',
+      src: 'https://embeds.audioboom.com/posts/8292430/embed/v4',
+      height: 300,
+      title: 'The Rest Is History: Rome',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })
