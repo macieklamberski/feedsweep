@@ -1,3 +1,4 @@
+import { blubrryFieldCleaners } from '../embeds/blubrry.js'
 import { codepenFieldCleaners } from '../embeds/codepen.js'
 import { dailymotionFieldCleaners } from '../embeds/dailymotion.js'
 import { instagramFieldCleaners } from '../embeds/instagram.js'
@@ -12,6 +13,7 @@ import type { FieldCleaner } from '../types.js'
 // stripped once where every placeholder is prepared rather than in each resolver. Declared
 // beside the resolver that knows the platform.
 export const defaultFieldCleaners: Array<FieldCleaner> = [
+  ...blubrryFieldCleaners,
   ...codepenFieldCleaners,
   ...dailymotionFieldCleaners,
   ...instagramFieldCleaners,
