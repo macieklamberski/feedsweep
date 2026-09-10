@@ -11,6 +11,7 @@ import { getImageFingerprint, getSizeKeywordRank, getUrlSizeHint } from '../../u
 import {
   absoluteUrlRegex,
   cleanUrl,
+  flashFileRegex,
   isOnHosts,
   resolveOrDropUrl,
   resolveOrKeepUrl,
@@ -356,9 +357,15 @@ export const injectEnclosures: DomTransform = (context) => {
         document,
       )
 
+      // Only an enclosure no resolver claimed reaches the Flash checks, and a resolver rebuilds
+      // the console url of every platform it knows. What is left is a .swf, and no browser has
+      // run one since 2021: framing it shows an empty box, playing it plays nothing.
+      const framesFlash =
+        !resolved && !!enclosure.playerUrl && flashFileRegex.test(enclosure.playerUrl)
+
       // A resolver match, or an explicit player URL (embeddable by the Media RSS spec even
       // when no resolver claims it), produces an embed placeholder.
-      if (resolved || enclosure.playerUrl) {
+      if (resolved || (enclosure.playerUrl && !framesFlash)) {
         const metadata = mergeEnclosureMetadata(resolved, enclosure)
 
         // A resolver rebuilds the src from the parsed id. Without one the enclosure's own
@@ -369,15 +376,23 @@ export const injectEnclosures: DomTransform = (context) => {
         continue
       }
 
-      // Only an enclosure with no player page reaches here, so `embedSource` is the enclosure's
-      // own URL and `src` is the resolved form of it.
+      // The enclosure's own file is what is left to render, and a dropped Flash player means
+      // `src` is the console's url, not the file's.
+      const mediaSource = framesFlash ? resolveOrDropUrl(enclosure.url, context) : src
+
+      // A Flash file carries a medium or a type that would send it to the audio or video branch,
+      // where the reader gets a player pointed at bytes it cannot decode.
+      if (!mediaSource || (enclosure.url && flashFileRegex.test(enclosure.url))) {
+        continue
+      }
+
       if (isAudioEnclosure(enclosure)) {
-        created.push(createNativeMediaElement(document, 'audio', src, enclosure, context))
+        created.push(createNativeMediaElement(document, 'audio', mediaSource, enclosure, context))
         continue
       }
 
       if (isVideoEnclosure(enclosure)) {
-        created.push(createNativeMediaElement(document, 'video', src, enclosure, context))
+        created.push(createNativeMediaElement(document, 'video', mediaSource, enclosure, context))
         continue
       }
 
@@ -396,7 +411,7 @@ export const injectEnclosures: DomTransform = (context) => {
         continue
       }
 
-      const imageElement = injectImageEnclosure(document, enclosure, src)
+      const imageElement = injectImageEnclosure(document, enclosure, mediaSource)
       if (imageElement) {
         created.push(imageElement)
       }

@@ -1239,6 +1239,78 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
     expect(await transform(value, context)).toEqualHtml(expected)
   })
 
+  describe('flash enclosures', () => {
+    // The guard sits behind the resolver pass, so a console url on a platform feedsweep knows is
+    // still rebuilt into a working embed instead of being dropped as Flash.
+    it('should still repair a flash player url a resolver claims', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        {
+          url: 'https://example.com/clip.mp4',
+          type: 'video/mp4',
+          playerUrl: 'https://www.youtube.com/v/dQw4w9WgXcQ',
+        },
+      ])
+      const expected = html`
+        <div
+          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+          data-embed-provider="youtube"
+          data-embed-id="dQw4w9WgXcQ"
+          data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+          data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+          data-embed-ratio="16/9"
+          data-enclosure=""
+        ></div>
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should play the enclosure file when the player url is flash', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        {
+          url: 'https://example.com/clip.mp4',
+          type: 'video/mp4',
+          playerUrl: 'https://player.example.com/player.swf',
+        },
+      ])
+      const expected = html`
+        <video
+          src="https://example.com/clip.mp4"
+          controls
+          data-enclosure=""
+        ></video>
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should inject nothing for a flash file the feed calls a video', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([{ url: 'https://example.com/player.swf', medium: 'video' }])
+
+      expect(await transform(value, context)).toEqualHtml(value)
+    })
+
+    it('should be idempotent over a flash player url', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        {
+          url: 'https://example.com/clip.mp4',
+          type: 'video/mp4',
+          playerUrl: 'https://player.example.com/player.swf',
+        },
+      ])
+      const once = await transform(value, context)
+      const twice = await transform(once, context)
+
+      expect(twice).toEqualHtml(once)
+    })
+  })
+
   it('should be idempotent', async () => {
     const value = '<p>Episode notes</p>'
     const context = withEnclosures([
