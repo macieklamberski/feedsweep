@@ -239,3 +239,34 @@ describeForEachParser('wistia facades the rebuild pass materializes', (parseHtml
     expect(await transform(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('wistiaEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, wistiaEmbedResolver)
+
+  it('should drop the label the share dialog writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://fast.wistia.net/embed/iframe/2fg072pftb" title="Wistia video player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'wistia',
+      id: '2fg072pftb',
+      src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://fast.wistia.net/embed/iframe/2fg072pftb" title="Calcific Tendonitis Video"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'wistia',
+      id: '2fg072pftb',
+      src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      title: 'Calcific Tendonitis Video',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

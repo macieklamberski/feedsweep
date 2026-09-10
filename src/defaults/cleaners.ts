@@ -19,6 +19,7 @@ import { speakerdeckFieldCleaners } from '../embeds/speakerdeck.js'
 import { spotifyFieldCleaners } from '../embeds/spotify.js'
 import { videopressFieldCleaners } from '../embeds/videopress.js'
 import { vimeoFieldCleaners } from '../embeds/vimeo.js'
+import { wistiaFieldCleaners } from '../embeds/wistia.js'
 import { youtubeFieldCleaners } from '../embeds/youtube.js'
 import type { FieldCleaner } from '../types.js'
 
@@ -47,5 +48,6 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...spotifyFieldCleaners,
   ...videopressFieldCleaners,
   ...vimeoFieldCleaners,
+  ...wistiaFieldCleaners,
   ...youtubeFieldCleaners,
 ]
