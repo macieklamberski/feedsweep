@@ -1,5 +1,9 @@
 import { parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner } from '../types.js'
+import { attr } from '../utils/dom.js'
+
+const provider = 'ivoox'
+
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -69,20 +73,28 @@ export const extractIvooxSubject = (link: string): IvooxSubject | undefined => {
 
 // iVoox's player iframes, whose legacy `playerivoox_` generation now answers 404 for every id.
 // `player_ej_` answers 200 to any id at all, a javascript shell that resolves the id on load.
-export const ivooxResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const ivooxResolveEmbed = (
+  url: string,
+  element?: Element,
+): EmbedResolverResult | undefined => {
   const subject = extractIvooxSubject(url)
 
   if (!subject) {
     return
   }
 
-  // No thumbnail or title: iVoox publishes no key-free metadata endpoint for an episode id.
+  // No thumbnail: iVoox publishes no key-free metadata endpoint for an episode id.
   return {
-    provider: 'ivoox',
+    provider,
     id: subject.kind === 'show' ? `podcast/${subject.id}` : subject.id,
     src: `https://www.ivoox.com/player_${subject.player}_${subject.id}_${subject.skin}_${subject.page}.html`,
     height: playerHeight,
+    title: attr(element, 'title'),
   }
 }
 
 export const ivooxEmbedResolver = createUrlEmbedResolver(ivooxHosts, ivooxResolveEmbed)
+
+export const ivooxFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'YouTube video player' },
+]
