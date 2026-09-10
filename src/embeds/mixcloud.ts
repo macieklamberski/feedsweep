@@ -122,9 +122,9 @@ export const mixcloudResolveEmbed = (
     src: `https://www.mixcloud.com/widget/iframe/?${query}`,
     url: `https://www.mixcloud.com/${show}/`,
     // With the cover on, the artwork fills the frame, so only the coverless mini form is 60.
-    author,
     height:
       options.includes('mini') && options.includes('hide_cover') ? miniPlayerHeight : playerHeight,
+    author,
     ...trimObject({ title }, Boolean),
   }
 }

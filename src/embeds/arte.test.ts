@@ -25,9 +25,9 @@ describeForEachParser('arteEmbedResolver', (parseHtml) => {
         id: 'fr/095172-005-A',
         src: 'https://www.arte.tv/embeds/fr/095172-005-A',
         url: 'https://www.arte.tv/fr/videos/095172-005-A/',
-        title: 'Tracks 2022 - Marchand & Meffre',
         width: 640,
         height: 360,
+        title: 'Tracks 2022 - Marchand & Meffre',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -138,9 +138,9 @@ describeForEachParser('arteEmbedResolver', (parseHtml) => {
         id: 'es/051485-024-A',
         src: 'https://www.arte.tv/embeds/es/051485-024-A',
         url: 'https://www.arte.tv/es/videos/051485-024-A/',
-        title: '360° GEO: París, Blitz Motorcycle',
         width: 640,
         height: 360,
+        title: '360° GEO: París, Blitz Motorcycle',
       }
 
       expect(await extract(value)).toEqual(expected)

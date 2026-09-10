@@ -247,10 +247,10 @@ describeForEachParser('appleEmbedResolver', (parseHtml) => {
         id: 'podcast/1000664459889',
         src: 'https://embed.podcasts.apple.com/us/podcast/undertone/id1693303954?i=1000664459889',
         url: 'https://podcasts.apple.com/us/podcast/undertone/id1693303954?i=1000664459889',
+        thumbnail: 'https://substack-post-media.s3.amazonaws.com/public/images/podcast-episode.jpg',
         height: 175,
         title: 'Henry Oliver',
         publisher: 'Undertone',
-        thumbnail: 'https://substack-post-media.s3.amazonaws.com/public/images/podcast-episode.jpg',
         date: '2024-06-19T00:00:00Z',
         duration: 4178,
       }
@@ -287,10 +287,10 @@ describeForEachParser('appleEmbedResolver', (parseHtml) => {
         id: 'podcast/1513064579',
         src: 'https://embed.podcasts.apple.com/us/podcast/boardroom-governance/id1513064579',
         url: 'https://podcasts.apple.com/us/podcast/boardroom-governance/id1513064579',
+        thumbnail: 'https://substack-post-media.s3.amazonaws.com/public/images/podcast.jpg',
         height: 450,
         title: 'Boardroom Governance',
         author: 'Evan Epstein',
-        thumbnail: 'https://substack-post-media.s3.amazonaws.com/public/images/podcast.jpg',
         date: '2026-03-04T00:00:00Z',
         duration: 3406,
       }

@@ -226,8 +226,8 @@ describeForEachParser('codesandboxIframeEmbedResolver', (parseHtml) => {
         id: 'y722d',
         src: 'https://codesandbox.io/embed/lazy-loading-composable-state-y722d?fontsize=14&theme=dark',
         url: 'https://codesandbox.io/s/lazy-loading-composable-state-y722d',
-        title: 'Lazy loading composable state',
         height: 500,
+        title: 'Lazy loading composable state',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -320,9 +320,9 @@ describeForEachParser('codesandbox shapes the pipeline repairs first', (parseHtm
       ></iframe>
     `
     const expected: Record<string, string> = {
-      src: 'https://codesandbox.io/embed/x86xtf?codemirror=1&theme=light',
       provider: 'codesandbox',
       id: 'x86xtf',
+      src: 'https://codesandbox.io/embed/x86xtf?codemirror=1&theme=light',
       url: 'https://codesandbox.io/s/x86xtf',
       height: '500',
     }
@@ -340,9 +340,9 @@ describeForEachParser('codesandbox shapes the pipeline repairs first', (parseHtm
       ></iframe>
     `
     const expected: Record<string, string> = {
-      src: 'https://codesandbox.io/embed/9ii0rr',
       provider: 'codesandbox',
       id: '9ii0rr',
+      src: 'https://codesandbox.io/embed/9ii0rr',
       url: 'https://codesandbox.io/s/9ii0rr',
       height: '500',
     }

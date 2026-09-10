@@ -52,9 +52,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'bees/72157624341',
         src: 'https://embedr.flickr.com/photosets/72157624341?width=640&height=480',
         url: 'https://www.flickr.com/photos/bees/sets/72157624341',
-        author: 'bees',
         width: 640,
         height: 480,
+        author: 'bees',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -74,9 +74,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'bees/72157624341',
         src: 'https://embedr.flickr.com/photosets/72157624341?width=400&height=300',
         url: 'https://www.flickr.com/photos/bees/sets/72157624341',
-        author: 'bees',
         width: 400,
         height: 300,
+        author: 'bees',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -284,9 +284,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'photostreams/bees',
         src: 'https://www.flickr.com/photos/bees/player?width=400&height=300',
         url: 'https://www.flickr.com/photos/bees/',
-        author: 'bees',
         width: 400,
         height: 300,
+        author: 'bees',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -356,9 +356,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'bees/72157623516208778',
         src: 'https://embedr.flickr.com/photosets/72157623516208778?width=400&height=300',
         url: 'https://www.flickr.com/photos/bees/sets/72157623516208778',
-        author: 'bees',
         width: 400,
         height: 300,
+        author: 'bees',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -438,9 +438,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'photos/celesteh/15753890338',
         src: 'https://www.flickr.com/photos/celesteh/15753890338/in/photostream/player/',
         url: 'https://www.flickr.com/photos/celesteh/15753890338/',
-        author: 'celesteh',
         width: 500,
         height: 97,
+        author: 'celesteh',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -461,9 +461,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         src: 'https://www.flickr.com/photos/bees/2341623661/player/7c99f48bbf',
         url: 'https://www.flickr.com/photos/bees/2341623661/',
         thumbnail: 'https://live.staticflickr.com/0/2341623661_7c99f48bbf_b.jpg',
-        author: 'bees',
         width: 500,
         height: 375,
+        author: 'bees',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -482,9 +482,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'photos/bees/2341623661',
         src: 'https://www.flickr.com/photos/bees/2341623661/player/7c99f48bbf%20',
         url: 'https://www.flickr.com/photos/bees/2341623661/',
-        author: 'bees',
         width: 500,
         height: 375,
+        author: 'bees',
       }
 
       expect(await extract(value)).toEqual(expected)

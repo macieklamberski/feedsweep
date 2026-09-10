@@ -300,10 +300,10 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
         id: 'track/03yOjwHoOPDlTUg0NRxN6t',
         src: 'https://open.spotify.com/embed/track/03yOjwHoOPDlTUg0NRxN6t',
         url: 'https://open.spotify.com/track/03yOjwHoOPDlTUg0NRxN6t',
+        thumbnail: 'https://i.scdn.co/image/ab67616d0000b273',
         height: 152,
         title: 'Cemetry Gates',
         author: 'The Smiths',
-        thumbnail: 'https://i.scdn.co/image/ab67616d0000b273',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -332,10 +332,10 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
         id: 'show/5t2HrBMNFX4WtSTERcopCF',
         src: 'https://open.spotify.com/embed/show/5t2HrBMNFX4WtSTERcopCF',
         url: 'https://open.spotify.com/show/5t2HrBMNFX4WtSTERcopCF',
+        thumbnail: 'https://i.scdn.co/image/ab6765630000ba8a67fda8c427b5b687fc2e1122',
         height: 152,
         title: 'History Impossible',
         publisher: 'Alexander von Sternberg',
-        thumbnail: 'https://i.scdn.co/image/ab6765630000ba8a67fda8c427b5b687fc2e1122',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -362,10 +362,10 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
         id: 'episode/2UkLIeyl69vt0cVJcqLljy',
         src: 'https://open.spotify.com/embed/episode/2UkLIeyl69vt0cVJcqLljy',
         url: 'https://open.spotify.com/episode/2UkLIeyl69vt0cVJcqLljy',
+        thumbnail: 'https://i.scdn.co/image/ab6765630000ba8a9f41b6a60769dfb6bd6b41e7',
         height: 152,
         title: '2. Tim Ingold: Ecologies of Perception',
         publisher: 'Peter Holliday',
-        thumbnail: 'https://i.scdn.co/image/ab6765630000ba8a9f41b6a60769dfb6bd6b41e7',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -394,10 +394,10 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
         id: 'playlist/4NM9DCtK1XdJ177Bu6ov0Q',
         src: 'https://open.spotify.com/embed/playlist/4NM9DCtK1XdJ177Bu6ov0Q',
         url: 'https://open.spotify.com/playlist/4NM9DCtK1XdJ177Bu6ov0Q',
+        thumbnail: 'https://mosaic.scdn.co/640/ab67616d00001e023db0d2f9b81433439fe63ba9',
         height: 352,
         title: 'Click Beta 13',
         author: 'Dave Nadig',
-        thumbnail: 'https://mosaic.scdn.co/640/ab67616d00001e023db0d2f9b81433439fe63ba9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -426,11 +426,11 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
         id: 'playlist/3237XsfR0Cj19KeN4T3Rxr',
         src: 'https://open.spotify.com/embed/playlist/3237XsfR0Cj19KeN4T3Rxr',
         url: 'https://open.spotify.com/playlist/3237XsfR0Cj19KeN4T3Rxr',
+        thumbnail: 'https://i.scdn.co/image/ab67706c0000bebb3463194d462b129b0bbe5ee0',
         height: 352,
         title: 'He Is the Voice I Hear',
-        author: 'The Blessed Madonna',
         description: 'We Still Believe  by The Blessed Madonna',
-        thumbnail: 'https://i.scdn.co/image/ab67706c0000bebb3463194d462b129b0bbe5ee0',
+        author: 'The Blessed Madonna',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -484,10 +484,10 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
         id: 'show/1UpjOrXiDCANThT21viw4E',
         src: 'https://open.spotify.com/embed/show/1UpjOrXiDCANThT21viw4E',
         url: 'https://open.spotify.com/show/1UpjOrXiDCANThT21viw4E',
+        thumbnail: 'https://i.scdn.co/image/ab6765630000ba8afdd9d1a708b5dfd667da4f70',
         height: 152,
         title: 'Hello Monday with Jessi Hempel',
         publisher: 'LinkedIn',
-        thumbnail: 'https://i.scdn.co/image/ab6765630000ba8afdd9d1a708b5dfd667da4f70',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -638,9 +638,9 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
         id: 'track/03yOjwHoOPDlTUg0NRxN6t',
         src: 'https://open.spotify.com/embed/track/03yOjwHoOPDlTUg0NRxN6t',
         url: 'https://open.spotify.com/track/03yOjwHoOPDlTUg0NRxN6t',
+        thumbnail: '//i.scdn.co/image/ab67616d0000b273',
         height: 152,
         title: 'A track',
-        thumbnail: '//i.scdn.co/image/ab67616d0000b273',
       }
 
       expect(await extract(value)).toEqual(expected)

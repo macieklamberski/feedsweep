@@ -34,10 +34,10 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/',
-        publisher: 'r/Birdwatching',
+        height: 500,
         title: 'Birdwatching Rising Poster',
         author: 'u/sample_reader',
-        height: 500,
+        publisher: 'r/Birdwatching',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -57,9 +57,9 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/pics/comments/dq4m1v',
         src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
         url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
-        publisher: 'r/pics',
-        title: 'My dog',
         height: 740,
+        title: 'My dog',
+        publisher: 'r/pics',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -83,9 +83,9 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
-        publisher: 'r/Birdwatching',
         title: 'Birdwatching Rising Poster',
         author: 'u/sample_reader',
+        publisher: 'r/Birdwatching',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -109,8 +109,8 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
-        publisher: 'r/Birdwatching',
         author: 'u/sample_reader',
+        publisher: 'r/Birdwatching',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -134,10 +134,10 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'user/photo_poster/comments/hj7k2p',
         src: 'https://embed.reddit.com/user/photo_poster/comments/hj7k2p/',
         url: 'https://www.reddit.com/user/photo_poster/comments/hj7k2p/',
-        publisher: 'u/photo_poster',
+        height: 500,
         title: 'Everything in balance',
         author: 'u/photo_poster',
-        height: 500,
+        publisher: 'u/photo_poster',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -154,8 +154,8 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/pics/comments/dq4m1v',
         src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
         url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
-        publisher: 'r/pics',
         title: 'My dog',
+        publisher: 'r/pics',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -183,8 +183,8 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/pics/comments/dq4m1v',
         src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
         url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
-        publisher: 'r/pics',
         title: 'My dog',
+        publisher: 'r/pics',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -454,9 +454,9 @@ describeForEachParser('redditIframeEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/',
-        publisher: 'r/Birdwatching',
         width: 640,
         height: 500,
+        publisher: 'r/Birdwatching',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -476,8 +476,8 @@ describeForEachParser('redditIframeEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
-        publisher: 'r/Birdwatching',
         height: 316,
+        publisher: 'r/Birdwatching',
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -788,11 +788,11 @@ describeForEachParser('twitterSubstackEmbedResolver', (parseHtml) => {
         id: '961570492162494464',
         src: 'https://platform.twitter.com/embed/Tweet.html?id=961570492162494464',
         url: 'https://x.com/notdetails/status/961570492162494464',
+        thumbnail: 'https://pbs.substack.com/media/DVgu7f1WsAAkNMr.jpg',
         description:
           "Hey, I'm open-sourcing the framework I put together to help me choose between job offers. I hope this helps someone 🤗 docs.google.com/spreadsheets/d…",
         author: 'Joel Califa',
         date: 'Thu Feb 08 12:00:45 +0000 2018',
-        thumbnail: 'https://pbs.substack.com/media/DVgu7f1WsAAkNMr.jpg',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -963,9 +963,9 @@ describeForEachParser('twitterSubstackEmbedResolver', (parseHtml) => {
         id: statusId,
         src: playerUrl,
         url: statusUrl,
+        thumbnail: '//pbs.substack.com/media/DVgu7f1WsAAkNMr.jpg',
         description: 'Tweet text here.',
         author: 'Display Name',
-        thumbnail: '//pbs.substack.com/media/DVgu7f1WsAAkNMr.jpg',
       }
 
       expect(await extract(value)).toEqual(expected)

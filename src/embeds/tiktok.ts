@@ -165,8 +165,8 @@ const resolveAccount = (element: Element): EmbedResolverResult | undefined => {
     id: atUsername(handle),
     src: `https://www.tiktok.com/embed/@${handle}`,
     url: isCitedProfile ? cite : `https://www.tiktok.com/@${handle}`,
-    author: atUsername(handle),
     description: textNode(element),
+    author: atUsername(handle),
   }
 }
 

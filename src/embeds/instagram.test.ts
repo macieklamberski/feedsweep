@@ -837,11 +837,11 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
         id: 'p/DZmgID9Eawg',
         src: 'https://www.instagram.com/p/DZmgID9Eawg/embed/',
         url: 'https://www.instagram.com/p/DZmgID9Eawg/',
+        thumbnail:
+          'https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-snapshot-DZmgID9Eawg.jpg',
         author: '@bbcnews',
         avatar:
           'https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-profile-pic-DZmgID9Eawg.png',
-        thumbnail:
-          'https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-snapshot-DZmgID9Eawg.jpg',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -864,9 +864,9 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
         id: 'p/BsozzXrhcLu',
         src: 'https://www.instagram.com/p/BsozzXrhcLu/embed/',
         url: 'https://www.instagram.com/p/BsozzXrhcLu/',
-        author: '@zandercutt',
         thumbnail:
           'https://bucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com/public/images/__ss-rehost__IG-BsozzXrhcLu.jpg',
+        author: '@zandercutt',
       }
 
       expect(await extract(value)).toEqual(expected)

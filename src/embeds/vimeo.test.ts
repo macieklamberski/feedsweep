@@ -359,9 +359,9 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
         id: '76979871',
         src: 'https://player.vimeo.com/video/76979871',
         url: 'https://vimeo.com/76979871',
-        title: 'Scott M. Graffius - Speaker Reel',
         width: 640,
         height: 360,
+        title: 'Scott M. Graffius - Speaker Reel',
       }
 
       expect(await extract(value)).toEqual(expected)

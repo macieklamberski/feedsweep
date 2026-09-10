@@ -309,8 +309,8 @@ describeForEachParser('cnnIframeEmbedResolver carrier title', (parseHtml) => {
       src: 'https://fave.api.cnn.io/v1/fav/?video=politics/2020/11/07/biden-wins-election-vpx.cnn&customer=cnn&edition=domestic&env=prod',
       url: 'https://www.cnn.com/videos/politics/2020/11/07/biden-wins-election-vpx.cnn',
       ratio: '16/9',
-      date: '2020-11-07',
       title: 'Biden wins the election',
+      date: '2020-11-07',
     }
 
     expect(await extract(value)).toEqual(expected)
