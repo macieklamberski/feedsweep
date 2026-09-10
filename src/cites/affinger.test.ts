@@ -55,6 +55,28 @@ describeForEachParser('affingerCiteResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the name the carrier states when the card has no title element', async () => {
+      const value = html`
+        <a class="st-cardlink" href="https://example.com/page" title="Page title">
+          <div class="st-cardbox st-cardbox-ex">
+            <dl>
+              <dd>
+                <p class="st-cardbox-site"><span class="st-cardbox-host">example.com</span></p>
+              </dd>
+            </dl>
+          </div>
+        </a>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'affinger',
+        url: 'https://example.com/page',
+        title: 'Page title',
+        publisher: 'example.com',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should extract an unwrapped old-shortcode card', async () => {
       const value = html`
         <div class="kanren st-cardbox">

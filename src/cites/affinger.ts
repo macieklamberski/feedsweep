@@ -19,7 +19,7 @@ export const affingerCiteResolver: CiteResolver = {
       // the title anchor, the thumbnail under a class-less dt and the excerpt in a .smanone or
       // .smanone2 div.
       url: attr(element.closest('a'), 'href') ?? attr(find(element, '.st-cardbox-t a'), 'href'),
-      title: text(element, '.st-cardbox-t'),
+      title: text(element, '.st-cardbox-t') ?? attr(element, 'title'),
       caption: text(element, '.st-cardbox-label-text'),
       description:
         text(element, '.st-card-excerpt') ?? text(element, '.smanone > p, .smanone2 > p'),
