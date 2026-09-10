@@ -218,9 +218,9 @@ type SubstackPostAttributes = {
   timestamp?: string | null
 }
 
-// The earliest payloads carry the bare caption as the title, the current ones wrap it in
-// `{name} on Instagram: "{caption}"`, and the era between wrote only "A post shared by {author}".
-const boilerplateTitleRegex = /^A post shared by\b/
+// The payload's title where the post carries no caption: Instagram's own og:title names the
+// poster, or names nothing but the platform.
+const boilerplateTitleRegex = /^(?:A post shared by\b|Instagram$)/
 
 // Only a rehosted copy: the earliest payloads carry Instagram's signed CDN url, long expired.
 const readRehostedUrl = (url: string | null | undefined): string | undefined => {
