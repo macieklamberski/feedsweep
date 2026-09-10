@@ -165,7 +165,7 @@ Code blocks are highlighted only when they declare a language (`language-*` clas
 
 The `stringTransforms` and `domTransforms` options each fully replace the corresponding default phase when provided. The `heuristics` flag (default `false`) selects between two exported DOM pipelines: `defaultStandardDomTransforms` (the safe defaults) and `defaultAllDomTransforms` (standard plus `heuristicDomTransforms` spliced in after `injectEnclosures`). Setting `domTransforms` explicitly overrides `heuristics`. Every transform and pipeline is also exported individually from `feedsweep`, so you can compose any pipeline — list transforms explicitly, or spread `defaultStandardDomTransforms` / `heuristicDomTransforms` to extend or filter the defaults.
 
-The platforms feedsweep recognizes, the hosts it treats as trackers, the selectors it strips as non-content and the lazy-loading attributes it reads are all built in and not configurable. A platform or attribute that is missing belongs in the library: open an issue or a pull request.
+The platforms feedsweep recognizes, the hosts it treats as trackers, the selectors it strips as non-content, the lazy-loading attributes it reads and the player labels it strips from a title or description are all built in and not configurable. A platform or attribute that is missing belongs in the library: open an issue or a pull request.
 
 ## DOM library
 

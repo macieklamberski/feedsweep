@@ -1,6 +1,6 @@
 import type { DiscoverResolveUrlFn } from 'feedscout'
 
-import type { MaybePromise } from 'trousse'
+import type { MaybePromise, Pattern } from 'trousse'
 
 export type EnclosureThumbnail = {
   url: string
@@ -62,6 +62,20 @@ export type EmbedRenderHint = {
   // A social post has no height until it renders, so the frame posts one and the reader sizes
   // the box from it.
   readHeight?: (data: unknown) => number | undefined
+}
+
+// A label a platform's snippet writes where a real value belongs, named by the platform whose
+// label it is. Entries for one provider and field run in registry order, and a drop ends the run.
+// Both patterns match without regard to case: a string is compared lowercased, and a regex is
+// tested against the lowercased value, so it is written lowercase.
+export type FieldCleaner = {
+  provider: string
+  field: 'title' | 'description'
+  // The whole value is chrome, so the field is dropped. A regex is anchored at both ends.
+  drop?: Pattern
+  // A wrapper the platform puts around a real value. A string is a prefix, and a regex is
+  // whatever it matches, removed in place.
+  strip?: Pattern
 }
 
 // What the pipeline hands an enricher: the two attributes that name a placeholder's embed, and
@@ -189,6 +203,7 @@ export type TransformContext = {
   avatarImageHosts: Array<string>
   nonContentSelectors: Array<string>
   preservedPreClasses: Array<string>
+  fieldCleaners: Array<FieldCleaner>
   resolveUrlFn: ResolveUrlFn
   cleanUrlFn?: CleanUrlFn
   assetProxyFn?: AssetProxyFn

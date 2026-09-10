@@ -6,6 +6,7 @@ import {
   defaultAvatarImageHosts,
   defaultDeferredIframeSources,
   defaultEmojiImageHosts,
+  defaultFieldCleaners,
   defaultHighlightFn,
   defaultLazyIframeAttributes,
   defaultLazySrcAttributes,
@@ -20,6 +21,7 @@ import {
 } from './defaults.js'
 import { parseHtml as parseWithLinkedom } from './parsers/linkedom.js'
 import type { TransformContext } from './types.js'
+import { cleanResultFields } from './utils/widgets.js'
 
 // Test adapters are synchronous, unlike the public `ParseHtmlFn` which allows a
 // promise: a sync return keeps `parseHtml(html).querySelector(...)` typechecking.
@@ -32,6 +34,7 @@ export const baseContext: TransformContext = {
   avatarImageHosts: defaultAvatarImageHosts,
   nonContentSelectors: defaultNonContentSelectors,
   preservedPreClasses: defaultPreservedPreClasses,
+  fieldCleaners: defaultFieldCleaners,
   lazySrcAttributes: defaultLazySrcAttributes,
   lazySrcsetAttributes: defaultLazySrcsetAttributes,
   lazyIframeAttributes: defaultLazyIframeAttributes,
@@ -80,12 +83,14 @@ type AnyResolver<Result> = {
   extract: (element: Element) => MaybePromise<Result | undefined>
 }
 
-// Runs a resolver's extract on the element its selector claims in a fixture.
+// Runs a resolver's extract on the element its selector claims in a fixture, then the field
+// cleaners the pipeline runs on every result, so a fixture asserts what a placeholder carries.
 export const resolverExtractor = <Result>(parseHtml: ParseHtml, resolver: AnyResolver<Result>) => {
   return async (value: string): Promise<Result | undefined> => {
     const element = parseHtml(value).querySelector(resolver.selector)
+    const result = element ? await resolver.extract(element) : undefined
 
-    return element ? await resolver.extract(element) : undefined
+    return result && cleanResultFields(result, baseContext)
   }
 }
 

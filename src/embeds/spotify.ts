@@ -1,5 +1,5 @@
 import { getPathSegments, toMap } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -43,9 +43,6 @@ type SubstackItemAttributes = {
 const spotifyHosts = ['spotify.com']
 const spotifyImageHosts = ['scdn.co']
 
-// Substack writes its own word for the type where a description would go, and a show card
-// says `Podcast`.
-const typeLabels = new Set(['album', 'episode', 'playlist', 'podcast', 'podcast episode'])
 // The act under the title is the publisher Spotify's own show page prints: the show's own, and
 // for an episode the publisher of the show it ran in.
 const publisherTypes = new Set(['show', 'episode'])
@@ -59,7 +56,6 @@ const readSubstackItem = (element: Element, type: string): Partial<EmbedResolver
     return {}
   }
 
-  const description = attributes.description?.trim()
   const isPublisherType = publisherTypes.has(type)
   const act =
     type === 'playlist' ? attributes.subtitle?.replace(ownerPrefixRegex, '') : attributes.subtitle
@@ -68,8 +64,8 @@ const readSubstackItem = (element: Element, type: string): Partial<EmbedResolver
     title: attributes.title,
     author: isPublisherType ? undefined : act,
     publisher: isPublisherType ? attributes.subtitle : undefined,
-    description:
-      description && !typeLabels.has(description.toLowerCase()) ? description : undefined,
+    // Some payloads carry an empty description string.
+    description: attributes.description?.trim() || undefined,
     thumbnail: parseUrlOnHosts(attributes.image, spotifyImageHosts) ? attributes.image : undefined,
   }
 }
@@ -136,3 +132,11 @@ export const spotifyResolveEmbed = (
 }
 
 export const spotifyEmbedResolver = createUrlEmbedResolver(spotifyHosts, spotifyResolveEmbed)
+
+export const spotifyFieldCleaners: Array<FieldCleaner> = [
+  {
+    provider: 'spotify',
+    field: 'description',
+    drop: /^(?:album|episode|playlist|podcast|podcast episode)$/,
+  },
+]

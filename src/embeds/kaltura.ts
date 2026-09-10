@@ -1,4 +1,4 @@
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -20,9 +20,6 @@ const saasHosts = new Set(['kaltura.com', 'www.kaltura.com', 'cdnapi.kaltura.com
 // The parameters the auto-embed script takes for itself: the div it writes into and the box it
 // gives the iframe. The player options in `flashvars[…]` travel with the rebuilt url.
 const scriptOnlyParams = ['autoembed', 'playerId', 'cache_st', 'width', 'height']
-
-// Some generated Kaltura iframes carry this label where the entry's own name belongs.
-const boilerplateTitle = 'Kaltura Player'
 
 type Entry = {
   partner: string
@@ -62,10 +59,7 @@ export const kalturaResolveEmbed = (
     return
   }
 
-  const result = composeEmbed(entry, url)
-  const title = attr(element, 'title')
-
-  return title && title !== boilerplateTitle ? { ...result, title } : result
+  return { ...composeEmbed(entry, url), title: attr(element, 'title') }
 }
 
 // Kaltura's embedIframeJs and embedPlaykitJs iframes, which render and only lack a poster.
@@ -100,6 +94,10 @@ export const kalturaScriptEmbedResolver = createMarkupEmbedResolver(
     return width && height ? { ...result, width, height } : result
   },
 )
+
+export const kalturaFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'Kaltura Player' },
+]
 
 export const kalturaRenderHint: EmbedRenderHint = {
   provider,
