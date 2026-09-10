@@ -1,7 +1,7 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, uuidRegex } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, pickQueryParams, uuidRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The loader is served from `api.podcache.net` and the player it builds from `redcircle.com`, on
@@ -13,9 +13,7 @@ const redcircleHosts = ['redcircle.com', 'api.podcache.net']
 // which collapses to the minimum inside the `height: auto` mount the snippet ships.
 const playerHeights = { episode: 170, show: 320 }
 
-// The show player's own page is `embedded-show-webplayer`, not the `embedded-show-player` the
-// loader is fetched from: checked live 2026-09-06, the loader path answers a Next.js 404 on
-// redcircle.com while the webplayer path renders the playlist.
+// `embedded-show-webplayer` is the show player's real page: `embedded-show-player` answers 404.
 const routes = {
   'embedded-player': 'episode',
   'embedded-show-player': 'show',
@@ -54,8 +52,9 @@ const readSubject = (
   return { kind, show, episode }
 }
 
-// The query is kept because it is where the publisher's `theme=` lives.
-export const redcircleResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+const redcircleEmbedParams = ['theme']
+
+export const redcircleResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, redcircleHosts)
   const subject = parsed ? readSubject(getPathSegments(parsed)) : undefined
 
@@ -63,11 +62,13 @@ export const redcircleResolveEmbed = (url: string): EmbedResolverResult | undefi
     return
   }
 
+  const query = composeQuery(pickQueryParams(parsed.search, redcircleEmbedParams))
+
   if (subject.kind === 'show') {
     return {
       provider: 'redcircle',
       id: `show/${subject.show}`,
-      src: `https://redcircle.com/embedded-show-webplayer/${subject.show}${parsed.search}`,
+      src: `https://redcircle.com/embedded-show-webplayer/${subject.show}${query}`,
       url: `https://redcircle.com/shows/${subject.show}`,
       height: playerHeights.show,
     }
@@ -76,17 +77,15 @@ export const redcircleResolveEmbed = (url: string): EmbedResolverResult | undefi
   return {
     provider: 'redcircle',
     id: `episode/${subject.show}/${subject.episode}`,
-    src: `https://redcircle.com/embedded-player/sh/${subject.show}/ep/${subject.episode}${parsed.search}`,
+    src: `https://redcircle.com/embedded-player/sh/${subject.show}/ep/${subject.episode}${query}`,
     url: `https://redcircle.com/shows/${subject.show}/episodes/${subject.episode}`,
     height: playerHeights.episode,
   }
 }
 
-// RedCircle's embed code is a loader script on `api.podcache.net` beside an empty
-// `div.redcirclePlayer-{episode}` mount. The script is stripped and the mount is an empty div, so
-// nothing of the player survives. The loader's own path names the show and the episode, and the
-// iframe it would have built is that path on `redcircle.com`, which renders the player for a
-// real episode and a blank page for an invented one (Chrome, 2026-09-06).
+// RedCircle's embed code: a loader script on api.podcache.net beside an empty div only it fills.
+// The mount is div.redcirclePlayer-{episode}, and the player path on redcircle.com renders a blank
+// page for an invented episode.
 export const redcircleScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="podcache.net/embedded-"]',
   (element) => {

@@ -1,38 +1,10 @@
 import type { DomTransform } from '../../types.js'
 import { getElementDimensions, pixelDimensionLimit } from '../../utils/dom.js'
-import { getUrlDimensions, parseSrcset } from '../../utils/images.js'
+import { getUrlDimensions, widestSrcsetUrl } from '../../utils/images.js'
 import { setDimensions } from '../../utils/widgets.js'
 
-// Largest-width candidate URL in a srcset, so a src-less responsive image can still
-// have its dimensions read from a rendition URL. Falls back to the last candidate when
-// no w-descriptors are present (density-only srcset).
-const widestSrcsetUrl = (srcset: string | null): string | null => {
-  if (!srcset) {
-    return null
-  }
-
-  const entries = parseSrcset(srcset)
-
-  if (entries.length === 0) {
-    return null
-  }
-
-  let widest = entries[entries.length - 1]
-
-  for (const entry of entries) {
-    if ((entry.width ?? 0) > (widest.width ?? 0)) {
-      widest = entry
-    }
-  }
-
-  return widest.url
-}
-
-// Both dimensions, only when each is above the tracking-pixel threshold (a real
-// content image is never that small, and a promoted pixel-sized value would let
-// removeTrackingPixels read it as a tracker). getElementDimensions reads width/height
-// attributes then numeric `width:`/`height:` in inline style, so `max-*`/`auto`/`%`
-// never qualify.
+// A promoted pixel-sized value gets the image stripped by removeTrackingPixels.
+// A real content image is never that small.
 const promotableDimensions = (element: Element): { width: number; height: number } | undefined => {
   const { width, height } = getElementDimensions(element)
 
@@ -63,13 +35,7 @@ const pictureDimensions = (picture: Element): { width: number; height: number } 
   return promotableDimensions(picture)
 }
 
-// Backfills width/height attributes on media that lacks them, from (in order) the element's own
-// inline style, a size encoded in its src URL, or, for an <img> in a <picture>, the wrapping
-// picture/source. The width/height attributes drive the browser's `aspect-ratio: auto w/h`, so
-// space is reserved and the ratio survives under reader CSS like `img { height: auto }`.
-//
-// Runs after fixLazyImages, so a lazy image's real URL is already in src and is read like any
-// other, and before flattenPictureElements, so the picture/source carriers it reads still exist.
+// Media with no width and height loses its aspect ratio under reader CSS like height: auto.
 export const resolveMediaDimensions: DomTransform = () => {
   return (document) => {
     for (const element of document.querySelectorAll('img, video')) {

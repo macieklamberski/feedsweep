@@ -48,6 +48,9 @@ const videoUrls = [
   'https://m.youtube.com/watch?v=dQw4w9WgXcQ',
   'https://music.youtube.com/watch?v=dQw4w9WgXcQ',
   'https://youtube.com/watch?v=dQw4w9WgXcQ',
+  // A page builder keeps the url inside a JSON payload that no url pass rewrites, so the
+  // protocol-relative spelling arrives exactly as the publisher wrote it.
+  '//www.youtube.com/watch?v=dQw4w9WgXcQ',
   // The stray quote Steam news leaks into embed srcs.
   'https://www.youtube-nocookie.com/embed/"dQw4w9WgXcQ?fs=1&rel=0',
 ]
@@ -272,7 +275,7 @@ describe('youtubeResolveEmbed', () => {
   it.each(playlistUrls)('should resolve %s to the playlist embed, posterless', (value) => {
     const expected: EmbedResolverResult = {
       provider: 'youtube',
-      id: 'PLabc123',
+      id: 'playlist/PLabc123',
       src: 'https://www.youtube.com/embed/videoseries?list=PLabc123',
       url: 'https://www.youtube.com/playlist?list=PLabc123',
       ratio: '16/9',
@@ -285,7 +288,7 @@ describe('youtubeResolveEmbed', () => {
     const value = 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser'
     const expected: EmbedResolverResult = {
       provider: 'youtube',
-      id: 'SomeUser',
+      id: 'user/SomeUser',
       src: 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser',
       url: 'https://www.youtube.com/user/SomeUser',
       ratio: '16/9',
@@ -298,13 +301,27 @@ describe('youtubeResolveEmbed', () => {
     const value = 'https://www.youtube.com/embed/live_stream?channel=UCabc123'
     const expected: EmbedResolverResult = {
       provider: 'youtube',
-      id: 'UCabc123',
+      id: 'channel/UCabc123',
       src: 'https://www.youtube.com/embed/live_stream?channel=UCabc123',
       url: 'https://www.youtube.com/channel/UCabc123',
       ratio: '16/9',
     }
 
     expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  // One id is legal in all three collection spaces, and enrichment receives the provider and the
+  // id alone: unqualified, `PBS` names a playlist, a channel and a legacy username at once. The
+  // whole result of each kind is pinned by the three cases above, so this one asserts the keys.
+  it('should key the three collection kinds apart when one id is legal in all three', () => {
+    const values = [
+      'https://www.youtube.com/embed/videoseries?list=PBS',
+      'https://www.youtube.com/embed?listType=user_uploads&list=PBS',
+      'https://www.youtube.com/embed/live_stream?channel=PBS',
+    ]
+    const expected = ['playlist/PBS', 'user/PBS', 'channel/PBS']
+
+    expect(values.map((value) => youtubeResolveEmbed(value)?.id)).toEqual(expected)
   })
 
   it('should return undefined for a videoseries embed with no list', () => {
@@ -352,7 +369,7 @@ describe('youtubeResolveEmbed', () => {
       const value = 'http://www.youtube.com/p/7BE4DDAC0A0D31AF?hl=es_ES&fs=1'
       const expected: EmbedResolverResult = {
         provider: 'youtube',
-        id: 'PL7BE4DDAC0A0D31AF',
+        id: 'playlist/PL7BE4DDAC0A0D31AF',
         src: 'https://www.youtube.com/embed/videoseries?list=PL7BE4DDAC0A0D31AF',
         url: 'https://www.youtube.com/playlist?list=PL7BE4DDAC0A0D31AF',
         ratio: '16/9',
@@ -367,7 +384,7 @@ describe('youtubeResolveEmbed', () => {
       const value = 'http://www.youtube.com/p/B863A0EC10FE8F5B&hl=en&fs=1'
       const expected: EmbedResolverResult = {
         provider: 'youtube',
-        id: 'PLB863A0EC10FE8F5B',
+        id: 'playlist/PLB863A0EC10FE8F5B',
         src: 'https://www.youtube.com/embed/videoseries?list=PLB863A0EC10FE8F5B',
         url: 'https://www.youtube.com/playlist?list=PLB863A0EC10FE8F5B',
         ratio: '16/9',
@@ -532,6 +549,84 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  // YouTube's own oEmbed html, which is what a WordPress oEmbed cache stores and republishes.
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe
+        width="560"
+        height="315"
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        title="Kraftwerk - Autobahn (1974)"
+        frameborder="0"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+      title: 'Kraftwerk - Autobahn (1974)',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the numbered label a page with two players writes', async () => {
+    const value = html`
+      <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player 2"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should not take the player label the carrier states', async () => {
+    const value = html`
+      <iframe
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        title="YouTube video player"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the playlist carrier states', async () => {
+    const value = html`
+      <iframe
+        src="https://www.youtube.com/embed/videoseries?list=PLabc123"
+        title="Ambient works, 1992"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'playlist/PLabc123',
+      src: 'https://www.youtube.com/embed/videoseries?list=PLabc123',
+      url: 'https://www.youtube.com/playlist?list=PLabc123',
+      ratio: '16/9',
+      title: 'Ambient works, 1992',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should return undefined for non-youtube iframes', async () => {
     const value = '<iframe src="https://example.com/video"></iframe>'
 
@@ -563,7 +658,7 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
     `
     const expected: EmbedResolverResult = {
       provider: 'youtube',
-      id: 'PL7BE4DDAC0A0D31AF',
+      id: 'playlist/PL7BE4DDAC0A0D31AF',
       src: 'https://www.youtube.com/embed/videoseries?list=PL7BE4DDAC0A0D31AF',
       url: 'https://www.youtube.com/playlist?list=PL7BE4DDAC0A0D31AF',
       ratio: '16/9',
@@ -709,7 +804,7 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
       const value = '<amp-youtube data-live-channelid="UCuAXFkgsw1L7xaCfnd5JJOw"></amp-youtube>'
       const expected: EmbedResolverResult = {
         provider: 'youtube',
-        id: 'UCuAXFkgsw1L7xaCfnd5JJOw',
+        id: 'channel/UCuAXFkgsw1L7xaCfnd5JJOw',
         src: 'https://www.youtube.com/embed/live_stream?channel=UCuAXFkgsw1L7xaCfnd5JJOw',
         url: 'https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw',
         ratio: '16/9',

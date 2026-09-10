@@ -10,6 +10,9 @@ const videoUrls = [
   'https://player.vimeo.com/video/76979871',
   'https://vimeo.com/channels/staffpicks/76979871',
   'https://vimeo.com/groups/motion/videos/76979871',
+  // A page builder keeps the url inside a JSON payload that no url pass rewrites, so the
+  // protocol-relative spelling arrives exactly as the publisher wrote it.
+  '//vimeo.com/76979871',
   // The Flash player carried no id in the path at all, and shipped its options beside it.
   'http://vimeo.com/moogaloop.swf?clip_id=76979871',
   'http://vimeo.com/moogaloop.swf?clip_id=76979871&force_embed=1&server=vimeo.com&color=00adef',
@@ -356,17 +359,15 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
         id: '76979871',
         src: 'https://player.vimeo.com/video/76979871',
         url: 'https://vimeo.com/76979871',
-        title: 'Scott M. Graffius - Speaker Reel',
         width: 640,
         height: 360,
+        title: 'Scott M. Graffius - Speaker Reel',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The label is carried like any other stated title. Half of them are the real thing and the
-    // labels are localised into at least five languages, so filtering would be a list that ages.
-    it('should carry a player label as stated rather than judging it', async () => {
+    it('should drop the label the share snippet writes in place of the name', async () => {
       const value = html`
         <iframe
           src="https://player.vimeo.com/video/76979871"
@@ -378,10 +379,42 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
         id: '76979871',
         src: 'https://player.vimeo.com/video/76979871',
         url: 'https://vimeo.com/76979871',
-        title: 'Vimeo video player',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
+})
+
+describeForEachParser('vimeoEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, vimeoEmbedResolver)
+
+  it('should drop the label a Joomla plugin writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://player.vimeo.com/video/76979871" title="JoomlaWorks AllVideos Player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '76979871',
+      src: 'https://player.vimeo.com/video/76979871',
+      url: 'https://vimeo.com/76979871',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://player.vimeo.com/video/76979871" title="The Mountain"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '76979871',
+      src: 'https://player.vimeo.com/video/76979871',
+      url: 'https://vimeo.com/76979871',
+      title: 'The Mountain',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

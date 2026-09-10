@@ -256,6 +256,34 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    // `size=` admits any lowercase word, and two of them name members every object inherits.
+    // The preset table has to answer those the way it answers `tall3` above: with no height.
+    it('should state no height for a preset naming an inherited member', async () => {
+      const value = html`
+        <iframe src="https://bandcamp.com/EmbeddedPlayer/album=42/size=constructor/"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'album/42',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/size=constructor/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state no height for a preset naming the prototype itself', async () => {
+      const value = html`
+        <iframe src="https://bandcamp.com/EmbeddedPlayer/album=42/size=__proto__/"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'album/42',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/size=__proto__/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -272,5 +300,58 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    // The href is the placeholder's click target, and a foreign host can spell `bandcamp.com`
+    // anywhere in its path, so the release page is taken from the host and not from the string.
+    it('should refuse a fallback anchor naming Bandcamp inside a foreign path', async () => {
+      const value = html`
+        <iframe src="https://bandcamp.com/EmbeddedPlayer/album=42/size=large/" seamless>
+          <a href="https://evil.test/bandcamp.com/album/do-you-wanna-be-rich">
+            Do You Wanna Be Rich? by My Expansive Awareness
+          </a>
+        </iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'album/42',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/size=large/',
+        height: 470,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+describeForEachParser('bandcampEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, bandcampEmbedResolver)
+
+  it('should drop the YouTube label a copied snippet carries', async () => {
+    const value = html`
+      <iframe src="https://bandcamp.com/EmbeddedPlayer/track=42/size=tall/" title="YouTube video player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'bandcamp',
+      id: 'track/42',
+      src: 'https://bandcamp.com/EmbeddedPlayer/track=42/size=tall/',
+      height: 270,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states when the anchor is gone', async () => {
+    const value = html`
+      <iframe src="https://bandcamp.com/EmbeddedPlayer/track=42/size=tall/" title="River Shook by Shook Ones"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'bandcamp',
+      id: 'track/42',
+      src: 'https://bandcamp.com/EmbeddedPlayer/track=42/size=tall/',
+      height: 270,
+      title: 'River Shook by Shook Ones',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

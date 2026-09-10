@@ -22,6 +22,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         src: 'https://odysee.com/$/embed/@corbettreport:0/webb-repersoning:7',
         url: 'https://odysee.com/@corbettreport:0/webb-repersoning:7',
         ratio: '16/9',
+        author: '@corbettreport',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -43,12 +44,13 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         url: 'https://odysee.com/@OsasunaLibertad:9/Como-Proteger-a-los-Menores:9',
         width: 1200,
         height: 675,
+        author: '@OsasunaLibertad',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the title the carrier states', async () => {
+    it('should not read the title the carrier states', async () => {
       const value = html`
         <iframe
           src="https://odysee.com/$/embed/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0?r=GqtYDFe44PSjFLQNJr5pB38T7AKLg2Tu"
@@ -64,9 +66,9 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
         src: 'https://odysee.com/$/embed/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
         url: 'https://odysee.com/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
-        title: 'Spirit of Health 2015',
         width: 560,
         height: 315,
+        author: '@Impfschaden.info',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -218,6 +220,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@corbettreport',
         src: 'https://odysee.com/$/embed/@corbettreport',
         url: 'https://odysee.com/@corbettreport',
+        author: '@corbettreport',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -232,6 +235,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@corbettreport:0/webb-repersoning',
         src: 'https://odysee.com/$/embed/@corbettreport:0/webb-repersoning',
         url: 'https://odysee.com/@corbettreport:0/webb-repersoning',
+        author: '@corbettreport',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -248,6 +252,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@corbettreport/webb-repersoning',
         src: 'https://odysee.com/$/embed/@corbettreport/webb-repersoning',
         url: 'https://odysee.com/@corbettreport/webb-repersoning',
+        author: '@corbettreport',
       }
 
       expect(await extract(value)).toEqual(expected)

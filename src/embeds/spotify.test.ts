@@ -192,6 +192,24 @@ describe('spotifyResolveEmbed', () => {
       expect(spotifyResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should return undefined for a two-segment route that is not a type', () => {
+      const value = 'https://open.spotify.com/concert/38rJfCcp1DPmGqDbYE3xoR'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a type naming an inherited method', () => {
+      const value = 'https://open.spotify.com/embed/toString/4uLU6hMCjMI75M1A2tKUQC'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a type naming the prototype itself', () => {
+      const value = 'https://open.spotify.com/embed/__proto__/4uLU6hMCjMI75M1A2tKUQC'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should return undefined for a path naming a type and no id', () => {
       const value = 'https://open.spotify.com/embed/track'
 
@@ -282,10 +300,137 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
         id: 'track/03yOjwHoOPDlTUg0NRxN6t',
         src: 'https://open.spotify.com/embed/track/03yOjwHoOPDlTUg0NRxN6t',
         url: 'https://open.spotify.com/track/03yOjwHoOPDlTUg0NRxN6t',
+        thumbnail: 'https://i.scdn.co/image/ab67616d0000b273',
         height: 152,
         title: 'Cemetry Gates',
         author: 'The Smiths',
-        thumbnail: 'https://i.scdn.co/image/ab67616d0000b273',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // A personal name sits in this slot on about a third of real show cards and is still the
+    // publisher Spotify's own show page prints, so it does not make the field an author.
+    it('should carry a show card act as the publisher', async () => {
+      const showCardAttrs = jsonAttrValue({
+        image: 'https://i.scdn.co/image/ab6765630000ba8a67fda8c427b5b687fc2e1122',
+        title: 'History Impossible',
+        subtitle: 'Alexander von Sternberg',
+        description: 'Podcast',
+        url: 'https://open.spotify.com/show/5t2HrBMNFX4WtSTERcopCF',
+      })
+      const value = html`
+        <iframe
+          class="spotify-wrap podcast"
+          data-attrs="${showCardAttrs}"
+          src="https://open.spotify.com/embed/show/5t2HrBMNFX4WtSTERcopCF"
+          data-component-name="Spotify2ToDOM"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'show/5t2HrBMNFX4WtSTERcopCF',
+        src: 'https://open.spotify.com/embed/show/5t2HrBMNFX4WtSTERcopCF',
+        url: 'https://open.spotify.com/show/5t2HrBMNFX4WtSTERcopCF',
+        thumbnail: 'https://i.scdn.co/image/ab6765630000ba8a67fda8c427b5b687fc2e1122',
+        height: 152,
+        title: 'History Impossible',
+        publisher: 'Alexander von Sternberg',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should carry an episode card act as the publisher', async () => {
+      const episodeCardAttrs = jsonAttrValue({
+        image: 'https://i.scdn.co/image/ab6765630000ba8a9f41b6a60769dfb6bd6b41e7',
+        title: '2. Tim Ingold: Ecologies of Perception',
+        subtitle: 'Peter Holliday',
+        description: 'Episode',
+        url: 'https://open.spotify.com/episode/2UkLIeyl69vt0cVJcqLljy',
+      })
+      const value = html`
+        <iframe
+          class="spotify-wrap podcast"
+          data-attrs="${episodeCardAttrs}"
+          src="https://open.spotify.com/embed/episode/2UkLIeyl69vt0cVJcqLljy"
+          data-component-name="Spotify2ToDOM"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'episode/2UkLIeyl69vt0cVJcqLljy',
+        src: 'https://open.spotify.com/embed/episode/2UkLIeyl69vt0cVJcqLljy',
+        url: 'https://open.spotify.com/episode/2UkLIeyl69vt0cVJcqLljy',
+        thumbnail: 'https://i.scdn.co/image/ab6765630000ba8a9f41b6a60769dfb6bd6b41e7',
+        height: 152,
+        title: '2. Tim Ingold: Ecologies of Perception',
+        publisher: 'Peter Holliday',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Substack prefixes a playlist card's act with `By`, and Spotify's own player names that
+    // account bare.
+    it('should carry a playlist card act as the owner Spotify names', async () => {
+      const playlistCardAttrs = jsonAttrValue({
+        image: 'https://mosaic.scdn.co/640/ab67616d00001e023db0d2f9b81433439fe63ba9',
+        title: 'Click Beta 13',
+        subtitle: 'By Dave Nadig',
+        description: 'Playlist',
+        url: 'https://open.spotify.com/playlist/4NM9DCtK1XdJ177Bu6ov0Q',
+      })
+      const value = html`
+        <iframe
+          class="spotify-wrap playlist"
+          data-attrs="${playlistCardAttrs}"
+          src="https://open.spotify.com/embed/playlist/4NM9DCtK1XdJ177Bu6ov0Q"
+          data-component-name="Spotify2ToDOM"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'playlist/4NM9DCtK1XdJ177Bu6ov0Q',
+        src: 'https://open.spotify.com/embed/playlist/4NM9DCtK1XdJ177Bu6ov0Q',
+        url: 'https://open.spotify.com/playlist/4NM9DCtK1XdJ177Bu6ov0Q',
+        thumbnail: 'https://mosaic.scdn.co/640/ab67616d00001e023db0d2f9b81433439fe63ba9',
+        height: 352,
+        title: 'Click Beta 13',
+        author: 'Dave Nadig',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // A second playlist card shape names the opening track and its artist, with the playlist and
+    // its owner spelled out where a description goes.
+    it('should carry a playlist card act that states no prefix as it stands', async () => {
+      const trackShapedCardAttrs = jsonAttrValue({
+        image: 'https://i.scdn.co/image/ab67706c0000bebb3463194d462b129b0bbe5ee0',
+        title: 'He Is the Voice I Hear',
+        subtitle: 'The Blessed Madonna',
+        description: 'We Still Believe  by The Blessed Madonna',
+        url: 'https://open.spotify.com/playlist/3237XsfR0Cj19KeN4T3Rxr',
+      })
+      const value = html`
+        <iframe
+          class="spotify-wrap playlist"
+          data-attrs="${trackShapedCardAttrs}"
+          src="https://open.spotify.com/embed/playlist/3237XsfR0Cj19KeN4T3Rxr"
+          data-component-name="Spotify2ToDOM"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'playlist/3237XsfR0Cj19KeN4T3Rxr',
+        src: 'https://open.spotify.com/embed/playlist/3237XsfR0Cj19KeN4T3Rxr',
+        url: 'https://open.spotify.com/playlist/3237XsfR0Cj19KeN4T3Rxr',
+        thumbnail: 'https://i.scdn.co/image/ab67706c0000bebb3463194d462b129b0bbe5ee0',
+        height: 352,
+        title: 'He Is the Voice I Hear',
+        description: 'We Still Believe  by The Blessed Madonna',
+        author: 'The Blessed Madonna',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -294,25 +439,55 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
     // The card prints the type where a description would go, which the id already states.
     it('should state no description when the card holds only the type', async () => {
       const typeOnlyCardAttrs = jsonAttrValue({
-        title: 'An interview',
-        subtitle: 'A host',
+        title: 'Counterrevolution in Egypt (S. 15, Ep. 10)',
+        subtitle: 'Marc Lynch',
         description: 'Episode',
       })
       const value = html`
         <iframe
           class="spotify-wrap podcast"
           data-attrs="${typeOnlyCardAttrs}"
-          src="https://open.spotify.com/embed/episode/1taJsFyMEbsljV14QAt409"
+          src="https://open.spotify.com/embed/episode/4BZArSMbp2VXkvtemKg8wX"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'spotify',
-        id: 'episode/1taJsFyMEbsljV14QAt409',
-        src: 'https://open.spotify.com/embed/episode/1taJsFyMEbsljV14QAt409',
-        url: 'https://open.spotify.com/episode/1taJsFyMEbsljV14QAt409',
+        id: 'episode/4BZArSMbp2VXkvtemKg8wX',
+        src: 'https://open.spotify.com/embed/episode/4BZArSMbp2VXkvtemKg8wX',
+        url: 'https://open.spotify.com/episode/4BZArSMbp2VXkvtemKg8wX',
         height: 152,
-        title: 'An interview',
-        author: 'A host',
+        title: 'Counterrevolution in Egypt (S. 15, Ep. 10)',
+        publisher: 'Marc Lynch',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state no description when a show card holds only the type', async () => {
+      const showLabelCardAttrs = jsonAttrValue({
+        image: 'https://i.scdn.co/image/ab6765630000ba8afdd9d1a708b5dfd667da4f70',
+        title: 'Hello Monday with Jessi Hempel',
+        subtitle: 'LinkedIn',
+        description: 'Podcast',
+        url: 'https://open.spotify.com/show/1UpjOrXiDCANThT21viw4E',
+      })
+      const value = html`
+        <iframe
+          class="spotify-wrap podcast"
+          data-attrs="${showLabelCardAttrs}"
+          src="https://open.spotify.com/embed/show/1UpjOrXiDCANThT21viw4E"
+          data-component-name="Spotify2ToDOM"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'show/1UpjOrXiDCANThT21viw4E',
+        src: 'https://open.spotify.com/embed/show/1UpjOrXiDCANThT21viw4E',
+        url: 'https://open.spotify.com/show/1UpjOrXiDCANThT21viw4E',
+        thumbnail: 'https://i.scdn.co/image/ab6765630000ba8afdd9d1a708b5dfd667da4f70',
+        height: 152,
+        title: 'Hello Monday with Jessi Hempel',
+        publisher: 'LinkedIn',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -366,6 +541,31 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
         height: 152,
         title: 'Cemetry Gates',
         author: 'The Smiths',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // The card's title is the same string the snippet wrote into the frame, prefix included.
+    it('should strip the snippet prefix from a card title', async () => {
+      const prefixedTitleCardAttrs = jsonAttrValue({
+        title: 'Spotify Embed: Cemetry Gates',
+      })
+      const value = html`
+        <iframe
+          class="spotify-wrap"
+          data-attrs="${prefixedTitleCardAttrs}"
+          src="https://open.spotify.com/embed/track/03yOjwHoOPDlTUg0NRxN6t"
+          title="Spotify Embed: Cemetry Gates"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'track/03yOjwHoOPDlTUg0NRxN6t',
+        src: 'https://open.spotify.com/embed/track/03yOjwHoOPDlTUg0NRxN6t',
+        url: 'https://open.spotify.com/track/03yOjwHoOPDlTUg0NRxN6t',
+        height: 152,
+        title: 'Cemetry Gates',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -438,9 +638,9 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
         id: 'track/03yOjwHoOPDlTUg0NRxN6t',
         src: 'https://open.spotify.com/embed/track/03yOjwHoOPDlTUg0NRxN6t',
         url: 'https://open.spotify.com/track/03yOjwHoOPDlTUg0NRxN6t',
+        thumbnail: '//i.scdn.co/image/ab67616d0000b273',
         height: 152,
         title: 'A track',
-        thumbnail: '//i.scdn.co/image/ab67616d0000b273',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -476,5 +676,24 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
     const value = '<iframe src="https://example.com/embed/track/4cOdK2wGLETKBW3PvgPWqT"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
+  })
+})
+
+describeForEachParser('spotifyEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, spotifyEmbedResolver)
+
+  it('should drop the YouTube label a copied snippet carries', async () => {
+    const value = html`
+      <iframe src="https://open.spotify.com/embed/track/03yOjwHoOPDlTUg0NRxN6t" title="YouTube video player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'spotify',
+      id: 'track/03yOjwHoOPDlTUg0NRxN6t',
+      src: 'https://open.spotify.com/embed/track/03yOjwHoOPDlTUg0NRxN6t',
+      url: 'https://open.spotify.com/track/03yOjwHoOPDlTUg0NRxN6t',
+      height: 152,
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

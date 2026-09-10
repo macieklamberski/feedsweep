@@ -37,9 +37,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@cookingwithlynja/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
         url: 'https://www.tiktok.com/@cookingwithlynja/video/7001234567890123456',
+        height: 738,
         description: 'Midnight pasta #pasta',
         author: '@cookingwithlynja',
-        height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -63,9 +63,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@cookingwithlynja/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
         url: 'https://www.tiktok.com/@cookingwithlynja/video/7001234567890123456',
+        height: 738,
         description: 'Midnight pasta',
         author: '@cookingwithlynja',
-        height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -96,9 +96,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user/video/7000000000000000000',
         src: 'https://www.tiktok.com/embed/v2/7000000000000000000',
         url: 'https://www.tiktok.com/@user/video/7000000000000000000',
+        height: 738,
         description: 'caption text #tag',
         author: '@user',
-        height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -117,9 +117,10 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         provider: 'tiktok',
         id: '@cookingwithlynja/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
+        url: 'https://www.tiktok.com/@cookingwithlynja/video/7001234567890123456',
+        height: 738,
         description: 'Midnight pasta',
         author: '@cookingwithlynja',
-        height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -168,9 +169,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@cookingwithlynja/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
         url: 'https://www.tiktok.com/@cookingwithlynja/video/7001234567890123456',
+        height: 738,
         description: 'Midnight pasta #pasta',
         author: '@cookingwithlynja',
-        height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -323,8 +324,64 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user',
         src: 'https://www.tiktok.com/embed/@user',
         url: 'https://www.tiktok.com/@user',
-        author: '@user',
         description: 'caption text',
+        author: '@user',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  // The clip branch has measured the player better than the snippet a publisher pastes, so it
+  // outranks whatever box the blockquote states. The account branch states no size of its own,
+  // and a resolver stating none falls back to the carrier however the option is set, which is
+  // what keeps the option from producing a sizeless placeholder.
+  describe('a box the blockquote states over the player it holds', () => {
+    it('should state the player height over a pixel box on the blockquote', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          cite="https://www.tiktok.com/@user/video/7001234567890123456"
+          data-video-id="7001234567890123456"
+          style="width:605px;height:400px"
+        >
+          <section>
+            <a href="https://www.tiktok.com/@user">@user</a>
+            <p>Midnight pasta</p>
+          </section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@user/video/7001234567890123456',
+        src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
+        url: 'https://www.tiktok.com/@user/video/7001234567890123456',
+        height: 738,
+        description: 'Midnight pasta',
+        author: '@user',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should let the account shape keep the box the blockquote states', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          data-unique-id="user"
+          style="width:605px;height:400px"
+        >
+          <section></section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@user',
+        src: 'https://www.tiktok.com/embed/@user',
+        url: 'https://www.tiktok.com/@user',
+        width: 605,
+        height: 400,
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -371,6 +428,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         provider: 'tiktok',
         id: '@user/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
+        url: 'https://www.tiktok.com/@user/video/7001234567890123456',
         height: 738,
       }
 
@@ -439,8 +497,8 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         provider: 'tiktok',
         id: '7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
-        description: 'Midnight pasta',
         height: 738,
+        description: 'Midnight pasta',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -460,8 +518,8 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
         url: 'https://www.tiktok.com/@user/video/7001234567890123456',
-        author: '@user',
         height: 738,
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)

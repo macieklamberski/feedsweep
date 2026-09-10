@@ -33,6 +33,21 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
 
     it('should state the ratio for a frame that declares no size', async () => {
       const value = html`
+        <iframe loading="lazy" src="https://www.megatv.com/embed/?p=20202420374"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'megatv',
+        id: '20202420374',
+        src: 'https://www.megatv.com/embed/?p=20202420374',
+        url: 'https://www.megatv.com/?p=2420374',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read the title the carrier states', async () => {
+      const value = html`
         <iframe
           loading="lazy"
           title="Mega Γεγονότα"
@@ -44,7 +59,6 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
         id: '20202420374',
         src: 'https://www.megatv.com/embed/?p=20202420374',
         url: 'https://www.megatv.com/?p=2420374',
-        title: 'Mega Γεγονότα',
         ratio: '16/9',
       }
 
@@ -117,6 +131,21 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
         provider: 'megatv',
         id: '38626813',
         src: 'https://www.megatv.com/embed/?p=38626813',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // The prefix era began in October 2020 at post 151920, so a five-digit number behind the
+    // prefix belongs to some other id space, and the page it would mint is a real unrelated
+    // article.
+    it('should mint no page for a post id below the prefix era', async () => {
+      const value = '<iframe src="https://www.megatv.com/embed/?p=202037945"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'megatv',
+        id: '202037945',
+        src: 'https://www.megatv.com/embed/?p=202037945',
         ratio: '16/9',
       }
 
