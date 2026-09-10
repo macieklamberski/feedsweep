@@ -1,4 +1,4 @@
-import type { MediaResolver, MediaResolverResult } from '../types.js'
+import type { MediaResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 const mediaIdRegex = /^[A-Za-z0-9_-]+$/
@@ -12,7 +12,7 @@ const composeSourceUrl = (mediaId: string): string => {
 export const wechatMediaResolver: MediaResolver = {
   kind: 'media',
   selector: 'mpvoice[voice_encode_fileid]',
-  extract: (element): MediaResolverResult | undefined => {
+  extract: (element) => {
     // The element's src is a WeChat template page, not the audio.
     const mediaId = attr(element, 'voice_encode_fileid')
 

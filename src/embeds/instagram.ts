@@ -179,7 +179,7 @@ const readContent = (element: Element): Partial<EmbedResolverResult> => {
 // Instagram's share dialog ships a post as a blockquote skeleton only its `embed.js` loader fills.
 export const instagramBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.instagram-media, blockquote[data-instgrm-permalink]',
-  (element): EmbedResolverResult | undefined => {
+  (element) => {
     const wrapper = readWrapper(element)
     const post = findPost(element) ?? wrapper.post
 
@@ -197,7 +197,7 @@ export const instagramBlockquoteEmbedResolver = createMarkupEmbedResolver(
 // AMP's `<amp-instagram>` names the post in an attribute and stays empty with no AMP runtime.
 export const instagramAmpEmbedResolver = createMarkupEmbedResolver(
   'amp-instagram[data-shortcode], amp-instagram[shortcode]',
-  (element): EmbedResolverResult | undefined => {
+  (element) => {
     const shortcode = attr(element, 'data-shortcode') ?? attr(element, 'shortcode')
 
     if (!shortcode || !safeShortcodeRegex.test(shortcode)) {
@@ -239,7 +239,7 @@ const readRehostedUrl = (url: string | null | undefined): string | undefined => 
 // Substack ships an Instagram post as a childless div with the whole card as JSON in `data-attrs`.
 export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
   'div.instagram-embed-wrap[data-attrs], div[data-component-name="InstagramToDOM"]',
-  (element): EmbedResolverResult | undefined => {
+  (element) => {
     const attributes = jsonAttr<SubstackPostAttributes>(element, 'data-attrs')
     const shortcode = attributes?.instagram_id
 

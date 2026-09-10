@@ -1,5 +1,5 @@
 import { isAnyOf } from 'trousse'
-import type { MediaResolver, MediaResolverResult } from '../types.js'
+import type { MediaResolver } from '../types.js'
 import { findConfigScript } from '../utils/dom.js'
 
 // The script inlines the config as podlovePlayerCache.add([{data: {audio: [{url, mimeType}]}}]).
@@ -35,7 +35,7 @@ const parseConfig = (script: Element): PodloveConfig | undefined => {
 export const podloveMediaResolver: MediaResolver = {
   kind: 'media',
   selector: 'div.podlove-web-player',
-  extract: (element): MediaResolverResult | undefined => {
+  extract: (element) => {
     const script = findConfigScript(element)
     const config = script ? parseConfig(script) : undefined
     const data = config?.[0]?.data
