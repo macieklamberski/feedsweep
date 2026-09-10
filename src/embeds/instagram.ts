@@ -222,6 +222,19 @@ type SubstackPostAttributes = {
 // poster, or names nothing but the platform.
 const boilerplateTitleRegex = /^(?:A post shared by\b|Instagram$)/
 
+// The current og:title quotes the caption behind the poster's name, and the payload carries no
+// field holding the caption on its own.
+const wrappedCaptionRegex = / on Instagram: ["\u201c]/
+
+// Instagram's og:title, which the payload carries in place of a caption field.
+const readPayloadCaption = (title: string | undefined): string | undefined => {
+  if (!title || boilerplateTitleRegex.test(title) || wrappedCaptionRegex.test(title)) {
+    return
+  }
+
+  return title
+}
+
 // Only a rehosted copy: the earliest payloads carry Instagram's signed CDN url, long expired.
 const readRehostedUrl = (url: string | null | undefined): string | undefined => {
   return url?.includes('__ss-rehost__') ? url : undefined
@@ -243,7 +256,7 @@ export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
     // The payload names the media and not the path it lives at, so like the AMP component the
     // frame addresses the shortcode through `/p/`.
     return composeEmbed({ kind: 'p', shortcode }, false, {
-      description: title && !boilerplateTitleRegex.test(title) ? title : undefined,
+      description: readPayloadCaption(title),
       // The handle arrives bare in the older payloads and `@`-prefixed in the current ones.
       author: attributes.author_name ? atUsername(attributes.author_name) : undefined,
       avatar: readRehostedUrl(attributes.profile_pic_url),
