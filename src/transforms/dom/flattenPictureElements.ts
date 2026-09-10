@@ -1,35 +1,14 @@
+import { toMap } from 'trousse'
 import type { DomTransform } from '../../types.js'
-import { parseSrcset } from '../../utils/images.js'
+import { widestSrcsetUrl } from '../../utils/images.js'
 import { createImage } from '../../utils/widgets.js'
 
 // Prefer AVIF, then WebP. Other source types are not worth promoting over the
 // <img> fallback, which is already a widely-supported format.
-const formatRank: Record<string, number> = {
+const formatRank = toMap({
   'image/avif': 2,
   'image/webp': 1,
-}
-
-// Highest-resolution URL in a srcset, for the plain-src fallback that renderers
-// ignoring srcset will use. Returns undefined if the srcset is unparseable.
-const widestUrl = (srcset: string): string | undefined => {
-  const entries = parseSrcset(srcset)
-
-  if (entries.length === 0) {
-    return
-  }
-
-  // Seeded from the last entry, matching resolveMediaDimensions: a density-only srcset
-  // (1x, 1.5x, 2x) carries no width to compare, and those lists ascend, so the last
-  // candidate is the highest-resolution one.
-  const widest = entries.reduce(
-    (best, entry) => {
-      return (entry.width ?? 0) > (best.width ?? 0) ? entry : best
-    },
-    entries[entries.length - 1],
-  )
-
-  return widest.url || undefined
-}
+})
 
 // Best format-only <source>: has a srcset, has no media attribute (so
 // art-direction crops are skipped), preferring AVIF over WebP.
@@ -40,11 +19,12 @@ const pickModernSource = (picture: Element): Element | undefined => {
   for (const source of picture.querySelectorAll('source')) {
     const srcset = source.getAttribute('srcset')
 
-    if (source.hasAttribute('media') || !srcset || !widestUrl(srcset)) {
+    if (source.hasAttribute('media') || !srcset || !widestSrcsetUrl(srcset)) {
       continue
     }
 
-    const rank = formatRank[source.getAttribute('type')?.toLowerCase() ?? ''] ?? 0
+    const type = source.getAttribute('type')?.toLowerCase() ?? ''
+    const rank = formatRank.get(type) ?? 0
 
     if (rank > bestRank) {
       best = source
@@ -59,18 +39,13 @@ const firstSourceWithSrcset = (picture: Element): Element | undefined => {
   for (const source of picture.querySelectorAll('source')) {
     const srcset = source.getAttribute('srcset')
 
-    if (srcset && widestUrl(srcset)) {
+    if (srcset && widestSrcsetUrl(srcset)) {
       return source
     }
   }
 }
 
-// Collapse each <picture> to a single <img>. When a modern format-only <source>
-// (AVIF/WebP, no media query) is present, its srcset is promoted onto the img so
-// the lighter format survives. The publisher's WebP/AVIF is the whole point of
-// most feed <picture> elements. Art-direction sources (with media) are left to
-// the plain <img> fallback. A <picture> missing its <img> (invalid, but seen in
-// feeds) gets one synthesized from the best available source.
+// A <picture> whose AVIF or WebP lives only in a <source>, sometimes with no <img> fallback.
 export const flattenPictureElements: DomTransform = () => {
   return (document) => {
     const pictures = document.querySelectorAll('picture')
@@ -81,7 +56,7 @@ export const flattenPictureElements: DomTransform = () => {
 
       if (existing) {
         const srcset = modern?.getAttribute('srcset')
-        const url = srcset ? widestUrl(srcset) : undefined
+        const url = widestSrcsetUrl(srcset)
 
         if (srcset && url) {
           existing.setAttribute('src', url)
@@ -91,15 +66,14 @@ export const flattenPictureElements: DomTransform = () => {
         // Give a src-less img a fallback from its own srcset, for renderers
         // that need a plain src.
         if (!existing.getAttribute('src')) {
-          const ownUrl = widestUrl(existing.getAttribute('srcset') ?? '')
+          const ownUrl = widestSrcsetUrl(existing.getAttribute('srcset'))
 
           if (ownUrl) {
             existing.setAttribute('src', ownUrl)
           }
         }
 
-        // sizes="auto" collapses a lifted image to 0x0 in renderers using
-        // width:auto. Drop it, but keep a real sizes value intact.
+        // Left in place, sizes="auto" renders the lifted img at 0x0 under width:auto.
         if (existing.getAttribute('sizes') === 'auto') {
           existing.removeAttribute('sizes')
         }
@@ -110,7 +84,7 @@ export const flattenPictureElements: DomTransform = () => {
 
       const source = modern ?? firstSourceWithSrcset(picture)
       const srcset = source?.getAttribute('srcset')
-      const url = srcset ? widestUrl(srcset) : undefined
+      const url = widestSrcsetUrl(srcset)
 
       // No img and no usable source: a picture that renders nothing. Drop it.
       if (!srcset || !url) {

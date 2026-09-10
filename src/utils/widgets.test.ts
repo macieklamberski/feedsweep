@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'bun:test'
 import { baseContext, describeForEachParser, html } from '../tests.js'
-import type { CiteResolverResult, EmbedResolverResult, MediaResolverResult } from '../types.js'
+import type {
+  CiteResolverResult,
+  EmbedResolverResult,
+  MediaResolverResult,
+  TransformContext,
+} from '../types.js'
 import {
+  atUsername,
   createCitePlaceholder,
   createEmbedPlaceholder,
   createIframe,
@@ -11,6 +17,7 @@ import {
   createMediaElement,
   createPlaceholder,
   createUrlEmbedResolver,
+  getEmbedSize,
   normalizeEmbedFields,
   prepareCiteMetadata,
   prepareEmbedMetadata,
@@ -18,6 +25,10 @@ import {
   updateCitePlaceholder,
   updateEmbedPlaceholder,
 } from './widgets.js'
+
+// What a stub platform's snippet writes where the item's own fields belong.
+const playerLabelRegex = /^example player$/
+const typeLabelRegex = /^video$/
 
 describeForEachParser('createEmbedPlaceholder', (parseHtml) => {
   it('should leave the placeholder empty', () => {
@@ -347,6 +358,38 @@ describeForEachParser('updateCitePlaceholder', (parseHtml) => {
     } as Partial<CiteResolverResult>)
 
     expect(element.outerHTML).toEqualHtml('<div data-cite-title="Post title"></div>')
+  })
+})
+
+describe('atUsername', () => {
+  it('should add the sigil to a bare name', () => {
+    const value = 'durov'
+
+    expect(atUsername(value)).toBe('@durov')
+  })
+
+  it('should keep a name that already carries the sigil', () => {
+    const value = '@durov'
+
+    expect(atUsername(value)).toBe('@durov')
+  })
+
+  it('should collapse a repeated leading sigil', () => {
+    const value = '@@@durov'
+
+    expect(atUsername(value)).toBe('@durov')
+  })
+
+  it('should leave a full Mastodon handle unchanged', () => {
+    const value = '@Gargron@mastodon.social'
+
+    expect(atUsername(value)).toBe('@Gargron@mastodon.social')
+  })
+
+  it('should return the bare sigil for an empty name', () => {
+    const value = ''
+
+    expect(atUsername(value)).toBe('@')
   })
 })
 
@@ -877,18 +920,6 @@ describeForEachParser('preferResolverSize', (parseHtml) => {
         expect(build(withRatio, value)).toEqual(expected)
       })
 
-      it('should drop the resolver ratio when the carrier states a width alone', () => {
-        const value = html`
-          <div
-            class="player"
-            width="640"
-          ></div>
-        `
-        const expected: EmbedResolverResult = { ...base, width: 640 }
-
-        expect(build(withRatio, value)).toEqual(expected)
-      })
-
       it('should take the carrier pair whole when it states both', () => {
         const value = html`
           <div
@@ -999,10 +1030,36 @@ describeForEachParser('preferResolverSize', (parseHtml) => {
       })
     })
 
-    // A size is one measurement from one source. The carrier naming a width and nothing else does
-    // not get the resolver's height to complete it: 640 by 300 is a ratio no one stated.
-    describe('a size comes from one source', () => {
-      it('should not pair the resolver height with a width the carrier states', () => {
+    // A width on its own is the one thing a carrier can state that the reader cannot draw: it lays
+    // a box out from a pair, from a lone height or from a ratio, and from a width alone it lays out
+    // nothing. So a carrier stating one neither takes the size slot off a resolver that stated
+    // something drawable nor gets the resolver's other half to complete it, which would be 640 by
+    // 300, a ratio no one stated. With nothing else claiming a size it still stands, because there
+    // is then no box being traded away for it.
+    describe('a lone carrier width', () => {
+      it('should keep the resolver ratio the carrier width cannot replace', () => {
+        const value = html`
+          <div
+            class="player"
+            width="640"
+          ></div>
+        `
+
+        expect(build(withRatio, value)).toEqual(withRatio)
+      })
+
+      it('should keep the resolver height rather than pair it with the carrier width', () => {
+        const value = html`
+          <div
+            class="player"
+            width="640"
+          ></div>
+        `
+
+        expect(build(withHeight, value)).toEqual(withHeight)
+      })
+
+      it('should stand on its own when the resolver states no size', () => {
         const value = html`
           <div
             class="player"
@@ -1011,7 +1068,52 @@ describeForEachParser('preferResolverSize', (parseHtml) => {
         `
         const expected: EmbedResolverResult = { ...base, width: 640 }
 
+        expect(build(base, value)).toEqual(expected)
+      })
+    })
+
+    // AMP states an element's aspect ratio in the same two attributes a plain iframe states pixels
+    // in, so a carrier declaring `16` by `9` is declaring a shape. Read as pixels it would ask a
+    // reader to reserve sixteen of them.
+    describe('a pair too small to be a box', () => {
+      it('should read a small carrier pair as the shape it spells', () => {
+        const value = html`
+          <div
+            class="player"
+            width="16"
+            height="9"
+          ></div>
+        `
+        const expected: EmbedResolverResult = { ...base, ratio: '16/9' }
+
         expect(build(withHeight, value)).toEqual(expected)
+      })
+
+      it('should keep a pair above the ceiling as the box it is', () => {
+        const value = html`
+          <div
+            class="player"
+            width="100"
+            height="60"
+          ></div>
+        `
+        const expected: EmbedResolverResult = { ...base, width: 100, height: 60 }
+
+        expect(build(withRatio, value)).toEqual(expected)
+      })
+
+      // A fixed-height bar states a real width beside a small height, and that is a box.
+      it('should keep a small height beside a real width', () => {
+        const value = html`
+          <div
+            class="player"
+            width="350"
+            height="30"
+          ></div>
+        `
+        const expected: EmbedResolverResult = { ...base, width: 350, height: 30 }
+
+        expect(build(withRatio, value)).toEqual(expected)
       })
     })
 
@@ -1030,6 +1132,88 @@ describeForEachParser('preferResolverSize', (parseHtml) => {
         expect(build(withRatio, value)).toEqual(withRatio)
       })
     })
+
+    // A zero reserves nothing, so a carrier stating one has not claimed a size. It used to take
+    // the slot from the resolver and then write nothing into it, since every write side skips a
+    // falsy dimension, and the placeholder came out sizeless. Only this side needed the rule:
+    // normalizeEmbedFields drops a zero before updateEmbedPlaceholder asks the same question.
+    describe('a zero the carrier states as a dimension', () => {
+      it('should keep the resolver ratio over a zero width', () => {
+        const value = html`
+          <div
+            class="player"
+            width="0"
+          ></div>
+        `
+
+        expect(build(withRatio, value)).toEqual(withRatio)
+      })
+
+      it('should keep the resolver height over a zero pair', () => {
+        const value = html`
+          <div
+            class="player"
+            width="0"
+            height="0"
+          ></div>
+        `
+
+        expect(build(withHeight, value)).toEqual(withHeight)
+      })
+
+      it('should drop the zero from a pair the carrier states half of', () => {
+        const value = html`
+          <div
+            class="player"
+            width="0"
+            height="360"
+          ></div>
+        `
+        const expected: EmbedResolverResult = { ...base, height: 360 }
+
+        expect(build(withRatio, value)).toEqual(expected)
+      })
+    })
+  })
+})
+
+// What a carrier states about its own size, read straight rather than through the merge below it.
+// `getElementDimensions` reads a 0 through so removeTrackingPixels can find a 0 by 2 image, so a
+// zero reaches here and is dropped: a carrier stating one has claimed the other half and nothing
+// else. Only the width half of that shows up in the merged result, since a lone height and a lone
+// width are already treated differently there, so the height half is pinned at this layer or
+// nowhere. Flickr and archive.org both read this answer directly.
+describeForEachParser('getEmbedSize', (parseHtml) => {
+  const build = (markup: string) => {
+    const element = parseHtml(markup).querySelector('div.player')
+
+    return element ? getEmbedSize(element, 0) : undefined
+  }
+
+  it('should drop a zero width and keep the height the carrier states', () => {
+    const value = html`
+      <div
+        class="player"
+        width="0"
+        height="360"
+      ></div>
+    `
+    const expected = { height: 360 }
+
+    expect(build(value)).toEqual(expected)
+  })
+
+  it('should drop a zero height and keep the width the carrier states', () => {
+    const value = html`
+      <div
+        class="player"
+        width="640"
+        height="0"
+      ></div>
+    `
+    const expected = { width: 640 }
+
+    expect(build(value)).toEqual(expected)
   })
 })
 
@@ -1279,6 +1463,60 @@ describeForEachParser('createLinkedImage', (parseHtml) => {
 
 describe('prepareEmbedMetadata', () => {
   const baseUrl = 'https://blog.example.com/post'
+  const cleaning: TransformContext = {
+    ...baseContext,
+    fieldCleaners: [
+      { provider: 'example', field: 'title', drop: playerLabelRegex },
+      { provider: 'example', field: 'title', drop: 'Untitled' },
+      { provider: 'example', field: 'title', strip: 'Example: ' },
+      { provider: 'example', field: 'description', drop: typeLabelRegex },
+    ],
+  }
+
+  it('should drop a title a cleaner names as the player label', () => {
+    const value: Partial<EmbedResolverResult> = { provider: 'example', title: 'Example Player' }
+    const expected: Partial<EmbedResolverResult> = { provider: 'example' }
+
+    expect(prepareEmbedMetadata(value, cleaning)).toEqual(expected)
+  })
+
+  it('should drop a title a cleaner names as a string, whatever its case', () => {
+    const value: Partial<EmbedResolverResult> = { provider: 'example', title: 'UNTITLED' }
+    const expected: Partial<EmbedResolverResult> = { provider: 'example' }
+
+    expect(prepareEmbedMetadata(value, cleaning)).toEqual(expected)
+  })
+
+  it('should strip the prefix a cleaner names and keep the rest as written', () => {
+    const value: Partial<EmbedResolverResult> = { provider: 'example', title: 'example: Name' }
+    const expected: Partial<EmbedResolverResult> = { provider: 'example', title: 'Name' }
+
+    expect(prepareEmbedMetadata(value, cleaning)).toEqual(expected)
+  })
+
+  it('should drop a title the strip empties', () => {
+    const value: Partial<EmbedResolverResult> = { provider: 'example', title: 'Example: ' }
+    const expected: Partial<EmbedResolverResult> = { provider: 'example' }
+
+    expect(prepareEmbedMetadata(value, cleaning)).toEqual(expected)
+  })
+
+  it('should clean the description on its own entry', () => {
+    const value: Partial<EmbedResolverResult> = {
+      provider: 'example',
+      title: 'Name',
+      description: 'Video',
+    }
+    const expected: Partial<EmbedResolverResult> = { provider: 'example', title: 'Name' }
+
+    expect(prepareEmbedMetadata(value, cleaning)).toEqual(expected)
+  })
+
+  it('should leave another provider alone', () => {
+    const value: Partial<EmbedResolverResult> = { provider: 'other', title: 'Example Player' }
+
+    expect(prepareEmbedMetadata(value, cleaning)).toEqual(value)
+  })
 
   it('should resolve every url it carries against the base', () => {
     const value: Partial<EmbedResolverResult> = {
@@ -1418,6 +1656,17 @@ describe('prepareEmbedMetadata', () => {
 
 describe('prepareCiteMetadata', () => {
   const baseUrl = 'https://blog.example.com/post'
+
+  it('should drop a title a cleaner names as the card label', () => {
+    const cleaning: TransformContext = {
+      ...baseContext,
+      fieldCleaners: [{ provider: 'example', field: 'title', drop: 'Example Card' }],
+    }
+    const value: Partial<CiteResolverResult> = { provider: 'example', title: 'Example Card' }
+    const expected: Partial<CiteResolverResult> = { provider: 'example' }
+
+    expect(prepareCiteMetadata(value, cleaning)).toEqual(expected)
+  })
 
   it('should resolve every url it carries against the base', () => {
     const value: Partial<CiteResolverResult> = {

@@ -34,10 +34,10 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/',
-        publisher: 'r/Birdwatching',
+        height: 500,
         title: 'Birdwatching Rising Poster',
         author: 'u/sample_reader',
-        height: 500,
+        publisher: 'r/Birdwatching',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -57,9 +57,9 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/pics/comments/dq4m1v',
         src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
         url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
-        publisher: 'r/pics',
-        title: 'My dog',
         height: 740,
+        title: 'My dog',
+        publisher: 'r/pics',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -83,9 +83,9 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
-        publisher: 'r/Birdwatching',
         title: 'Birdwatching Rising Poster',
         author: 'u/sample_reader',
+        publisher: 'r/Birdwatching',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -109,8 +109,8 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
-        publisher: 'r/Birdwatching',
         author: 'u/sample_reader',
+        publisher: 'r/Birdwatching',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -134,10 +134,10 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'user/photo_poster/comments/hj7k2p',
         src: 'https://embed.reddit.com/user/photo_poster/comments/hj7k2p/',
         url: 'https://www.reddit.com/user/photo_poster/comments/hj7k2p/',
-        publisher: 'u/photo_poster',
+        height: 500,
         title: 'Everything in balance',
         author: 'u/photo_poster',
-        height: 500,
+        publisher: 'u/photo_poster',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -154,8 +154,8 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/pics/comments/dq4m1v',
         src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
         url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
-        publisher: 'r/pics',
         title: 'My dog',
+        publisher: 'r/pics',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -183,8 +183,8 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/pics/comments/dq4m1v',
         src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
         url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
-        publisher: 'r/pics',
         title: 'My dog',
+        publisher: 'r/pics',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -223,6 +223,27 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
           data-embed-created="2019-02-05T12:00:00.000Z"
         >
           <a href="https://www.reddit.com/r/AskSample/comments/mn5r3t/what_is_this/dxyz123/">comment</a>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/AskSample/comments/mn5r3t/comment/dxyz123',
+        src: 'https://embed.reddit.com/r/AskSample/comments/mn5r3t/comment/dxyz123/',
+        url: 'https://www.reddit.com/r/AskSample/comments/mn5r3t/comment/dxyz123/',
+        publisher: 'r/AskSample',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read the embed generation stamp as the post date', async () => {
+      const value = html`
+        <div
+          class="reddit-embed"
+          data-embed-created="2019-02-05T12:00:00.000Z"
+          data-embed-showedits="false"
+        >
+          <a href="https://www.reddit.com/r/AskSample/comments/mn5r3t/what_is_this/dxyz123/"></a>
         </div>
       `
       const expected: EmbedResolverResult = {
@@ -333,6 +354,35 @@ describe('redditResolveEmbed', () => {
     expect(redditResolveEmbed(value)).toEqual(expected)
   })
 
+  // Reddit's post counter started at one base36 character, so the oldest permalinks a feed still
+  // links to are two characters long.
+  it('should resolve a two-character post id', () => {
+    const value = 'https://www.reddit.com/r/Birdwatching/comments/mn/'
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'r/Birdwatching/comments/mn',
+      src: 'https://embed.reddit.com/r/Birdwatching/comments/mn/',
+      url: 'https://www.reddit.com/r/Birdwatching/comments/mn/',
+      publisher: 'r/Birdwatching',
+    }
+
+    expect(redditResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should resolve a subreddit name longer than Reddit lets anyone pick today', () => {
+    const value =
+      'https://www.reddit.com/r/aVeryLongSubredditNameLongerThanReddit/comments/1x9y8z7/heron/'
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'r/aVeryLongSubredditNameLongerThanReddit/comments/1x9y8z7',
+      src: 'https://embed.reddit.com/r/aVeryLongSubredditNameLongerThanReddit/comments/1x9y8z7/',
+      url: 'https://www.reddit.com/r/aVeryLongSubredditNameLongerThanReddit/comments/1x9y8z7/',
+      publisher: 'r/aVeryLongSubredditNameLongerThanReddit',
+    }
+
+    expect(redditResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should drop the query naming the embedding page', () => {
     const value =
       'https://www.redditmedia.com/r/Birdwatching/comments/1x9y8z7/?ref_source=embed&ref=share&embed=true'
@@ -404,9 +454,9 @@ describeForEachParser('redditIframeEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/',
-        publisher: 'r/Birdwatching',
         width: 640,
         height: 500,
+        publisher: 'r/Birdwatching',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -426,8 +476,8 @@ describeForEachParser('redditIframeEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
-        publisher: 'r/Birdwatching',
         height: 316,
+        publisher: 'r/Birdwatching',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -449,5 +499,25 @@ describe('readRedditHeight', () => {
   // The first resize arrives before the post is in.
   it('should read nothing out of the empty first resize', () => {
     expect(readRedditHeight({ type: 'resize.embed', data: 0 })).toBeUndefined()
+  })
+})
+
+describeForEachParser('redditIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, redditIframeEmbedResolver)
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://embed.reddit.com/r/pics/comments/dq4m1v/" title="My grandfather in his workshop, 1974"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'r/pics/comments/dq4m1v',
+      src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
+      url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
+      title: 'My grandfather in his workshop, 1974',
+      publisher: 'r/pics',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

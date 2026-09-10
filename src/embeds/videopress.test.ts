@@ -68,6 +68,18 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read a guid longer than the eight characters minted so far', async () => {
+      const value = '<iframe src="https://videopress.com/embed/bDC13L49x"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'videopress',
+        id: 'bDC13L49x',
+        src: 'https://videopress.com/embed/bDC13L49x',
+        url: 'https://videopress.com/v/bDC13L49x',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should resolve the page url a page builder frames as the player', async () => {
       const value = '<iframe src="https://videopress.com/v/FLEAXUMB"></iframe>'
       const expected: EmbedResolverResult = {
@@ -82,7 +94,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a guid that is not eight letters and digits', async () => {
+    it('should ignore a guid holding a separator', async () => {
       const value = '<iframe src="https://videopress.com/embed/FLEAXUMB-extra"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
@@ -253,5 +265,38 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+describeForEachParser('videopressIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, videopressIframeEmbedResolver)
+
+  it('should drop the label in the languages Jetpack ships it in', async () => {
+    const value = html`
+      <iframe src="https://videopress.com/embed/TxdSIdpO" title="Reproductor de vídeo VideoPress"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'videopress',
+      id: 'TxdSIdpO',
+      src: 'https://videopress.com/embed/TxdSIdpO',
+      url: 'https://videopress.com/v/TxdSIdpO',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://videopress.com/embed/TxdSIdpO" title="WordPress Category Hierarchy"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'videopress',
+      id: 'TxdSIdpO',
+      src: 'https://videopress.com/embed/TxdSIdpO',
+      url: 'https://videopress.com/v/TxdSIdpO',
+      title: 'WordPress Category Hierarchy',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })
