@@ -28,7 +28,7 @@ export const mediavineWidgetEmbedResolver = createMarkupEmbedResolver(
       provider: 'mediavine',
       id: videoId,
       src: composeEmbedUrl(videoId),
-      ...trimObject({ ratio }, Boolean),
+      ...trimObject({ ratio, title: attr(element, 'title') }, Boolean),
     }
   },
 )

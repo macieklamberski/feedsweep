@@ -1,6 +1,9 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
-import { keepIfMatches } from '../utils/dom.js'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import { attr, keepIfMatches } from '../utils/dom.js'
+
+const provider = 'blogger'
+
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The alphabet is the whole guard: the prefix and the length are Google's to change.
@@ -23,7 +26,7 @@ export const extractBloggerToken = (link: string): string | undefined => {
 // Blogger's own hosted video: an iframe on blogger.com/video.g with no poster and no page to open.
 // The poster is a css background on `i9.ytimg.com/vi_blogger/{internalId}/1.jpg`, and that id is
 // in neither the token nor the feed. A live, a deleted and an invented token all answer 200.
-export const bloggerResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const bloggerResolveEmbed: ResolveEmbed = (url, element) => {
   const token = extractBloggerToken(url)
 
   if (!token) {
@@ -31,10 +34,15 @@ export const bloggerResolveEmbed = (url: string): EmbedResolverResult | undefine
   }
 
   return {
-    provider: 'blogger',
+    provider,
     id: token,
     src: `https://www.blogger.com/video.g?token=${token}`,
+    title: attr(element, 'title'),
   }
 }
 
 export const bloggerEmbedResolver = createUrlEmbedResolver(bloggerHosts, bloggerResolveEmbed)
+
+export const bloggerFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'YouTube video player' },
+]

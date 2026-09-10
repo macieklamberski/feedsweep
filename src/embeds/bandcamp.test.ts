@@ -322,3 +322,36 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('bandcampEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, bandcampEmbedResolver)
+
+  it('should drop the YouTube label a copied snippet carries', async () => {
+    const value = html`
+      <iframe src="https://bandcamp.com/EmbeddedPlayer/track=42/size=tall/" title="YouTube video player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'bandcamp',
+      id: 'track/42',
+      src: 'https://bandcamp.com/EmbeddedPlayer/track=42/size=tall/',
+      height: 270,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states when the anchor is gone', async () => {
+    const value = html`
+      <iframe src="https://bandcamp.com/EmbeddedPlayer/track=42/size=tall/" title="River Shook by Shook Ones"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'bandcamp',
+      id: 'track/42',
+      src: 'https://bandcamp.com/EmbeddedPlayer/track=42/size=tall/',
+      height: 270,
+      title: 'River Shook by Shook Ones',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

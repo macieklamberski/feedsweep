@@ -1,11 +1,13 @@
-import { type MaybePromise, trimObject } from 'trousse'
+import { isAnyOf, type MaybePromise, type Pattern, startsWithAnyOf, trimObject } from 'trousse'
 import type {
   CiteResolverResult,
   EmbedResolver,
   EmbedResolverResult,
+  FieldCleaner,
   MediaResolver,
   MediaResolverResult,
   ParseDateFn,
+  ResolveEmbed,
   TransformContext,
   WidgetResolver,
   WidgetResolverResult,
@@ -161,7 +163,7 @@ export const setDimensions = (
 // An iframe's `title` is the one field a publisher's snippet states that the url does not carry.
 export const createUrlEmbedResolver = (
   hosts: Array<string>,
-  extract: (url: string, element: Element) => EmbedResolverResult | undefined,
+  extract: ResolveEmbed,
   options: ResolverOptions = {},
 ): EmbedResolver => {
   return {
@@ -330,13 +332,63 @@ export const updateEmbedPlaceholder = (
   updatePlaceholder(element, 'embed', fields)
 }
 
+type CleanableResult = { provider?: string; title?: string; description?: string }
+
+// The wrapper removed from the front of a value. A regex runs against the value as written, so
+// one that ignores case says so itself.
+const stripWrapper = (value: string, pattern: Pattern): string => {
+  if (typeof pattern === 'string') {
+    return startsWithAnyOf(value, [pattern]) ? value.slice(pattern.length) : value
+  }
+
+  return value.replace(pattern, '')
+}
+
+// A field the platform's snippet may have filled with its own label rather than the item's.
+const cleanField = (
+  result: CleanableResult,
+  field: FieldCleaner['field'],
+  context: TransformContext,
+): string | undefined => {
+  let value = result[field]
+
+  for (const cleaner of context.fieldCleaners) {
+    if (!value || cleaner.provider !== result.provider || cleaner.field !== field) {
+      continue
+    }
+
+    if (cleaner.drop && isAnyOf(value, [cleaner.drop])) {
+      return
+    }
+
+    if (cleaner.strip) {
+      value = stripWrapper(value, cleaner.strip).trim() || undefined
+    }
+  }
+
+  return value
+}
+
+// Both fields a cleaner reaches, on any result keyed by a provider. A result with no provider,
+// a media result, passes through as it is.
+export const cleanResultFields = <Result extends CleanableResult>(
+  result: Result,
+  context: TransformContext,
+): Result => {
+  return {
+    ...result,
+    title: cleanField(result, 'title', context),
+    description: cleanField(result, 'description', context),
+  }
+}
+
 // The src is never cleaned: a player src carries query the platform needs.
 export const prepareEmbedMetadata = (
   metadata: Partial<EmbedResolverResult>,
   context: TransformContext,
 ): Partial<EmbedResolverResult> => {
   return {
-    ...metadata,
+    ...cleanResultFields(metadata, context),
     src: resolveOrDropUrl(metadata.src, context),
     url: cleanUrl(resolveOrDropUrl(metadata.url, context), context),
     thumbnail: resolveOrKeepUrl(metadata.thumbnail, context),
@@ -382,7 +434,7 @@ export const prepareCiteMetadata = (
   context: TransformContext,
 ): Partial<CiteResolverResult> => {
   return {
-    ...metadata,
+    ...cleanResultFields(metadata, context),
     url: cleanUrl(resolveOrKeepUrl(metadata.url, context), context),
     icon: resolveOrKeepUrl(metadata.icon, context),
     thumbnail: resolveOrKeepUrl(metadata.thumbnail, context),

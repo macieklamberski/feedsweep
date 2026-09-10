@@ -1,5 +1,8 @@
 import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+
+const provider = 'issuu'
+
 import { attr } from '../utils/dom.js'
 import { composeQuery, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -23,7 +26,7 @@ const composeConfigEmbed = (configId: string | undefined): EmbedResolverResult |
   }
 
   return {
-    provider: 'issuu',
+    provider,
     id: configId,
     src: `https://e.issuu.com/embed.html#${configId}`,
   }
@@ -48,7 +51,7 @@ const composeDocumentEmbed = (
   const query = composeQuery({ u: publisher, d: documentName, ...safePage })
 
   return {
-    provider: 'issuu',
+    provider,
     id: `${publisher}/${documentName}`,
     src: `https://e.issuu.com/embed.html${query}`,
     url: `https://issuu.com/${publisher}/docs/${documentName}`,
@@ -88,10 +91,7 @@ export const issuuWidgetEmbedResolver = createMarkupEmbedResolver(
 // The reader iframe, at `e.issuu.com/embed.html` or the document page pasted from the address bar.
 // The Flash viewer `static.issuu.com/webembed/…/IssuuReader.swf` names its document in a
 // `documentId` flashvar, a third id space neither url form accepts.
-export const issuuResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const issuuResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
 
   if (!parsed) {
@@ -120,3 +120,7 @@ export const issuuResolveEmbed = (
 }
 
 export const issuuIframeEmbedResolver = createUrlEmbedResolver(issuuHosts, issuuResolveEmbed)
+
+export const issuuFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'issuu.com' },
+]

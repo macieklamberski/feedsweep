@@ -165,8 +165,8 @@ const resolveAccount = (element: Element): EmbedResolverResult | undefined => {
     id: atUsername(handle),
     src: `https://www.tiktok.com/embed/@${handle}`,
     url: isCitedProfile ? cite : `https://www.tiktok.com/@${handle}`,
-    author: atUsername(handle),
     description: textNode(element),
+    author: atUsername(handle),
   }
 }
 
@@ -180,6 +180,7 @@ export const tiktokBlockquoteEmbedResolver = createMarkupEmbedResolver(
 )
 
 // A pasted TikTok player iframe, or a frame of the watch page, which refuses framing.
+// A post has no name: its words go to `description`, and the frame's title is not read.
 export const tiktokIframeEmbedResolver = createUrlEmbedResolver(
   tiktokHosts,
   (src) => {

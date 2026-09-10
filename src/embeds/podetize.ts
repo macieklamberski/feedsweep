@@ -1,4 +1,4 @@
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -30,7 +30,7 @@ const composeEmbed = (id: string, isEpisodeMode: boolean): EmbedResolverResult =
   }
 }
 
-export const podetizeResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const podetizeResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, podetizeHosts)
   const id = parsed?.searchParams.get('id')
 

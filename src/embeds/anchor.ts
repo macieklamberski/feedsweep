@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -36,7 +36,7 @@ export const extractAnchorEpisode = (link: string): string | undefined => {
   return `${show}/${episode}`
 }
 
-export const anchorResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const anchorResolveEmbed: ResolveEmbed = (url) => {
   const episode = extractAnchorEpisode(url)
   const parsed = parseUrl(url, placeholderBaseUrl)
 

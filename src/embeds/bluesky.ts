@@ -1,4 +1,4 @@
-import { getPathSegments, isPlainObject } from 'trousse'
+import { getPathSegments, isPlainObject, type Nullish } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find, isBlockElement, isBr, isElement, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -212,8 +212,8 @@ export const blueskyBlockquoteEmbedResolver = createMarkupEmbedResolver(
 // Substack renders every Bluesky embed as an iframe inside its own wrapper, and that wrapper
 // carries the whole post as JSON: the text, the author, their avatar, the timestamp and the
 // media. None of it survives the generic iframe path, and none of it needs a network call.
-const readSubstackPost = (element: Element): Partial<EmbedResolverResult> => {
-  const wrapper = element.closest('[data-component-name="BlueskyCreateBlueskyEmbed"]')
+const readSubstackPost = (element: Nullish<Element>): Partial<EmbedResolverResult> => {
+  const wrapper = element?.closest('[data-component-name="BlueskyCreateBlueskyEmbed"]')
   const attributes = jsonAttr<SubstackPostAttributes>(wrapper, 'data-attrs')
 
   if (!attributes) {
@@ -234,6 +234,7 @@ const readSubstackPost = (element: Element): Partial<EmbedResolverResult> => {
 }
 
 // The embed.bsky.app player iframe, saved by a CMS that ran the script or pasted by hand.
+// A post has no name: its words go to `description`, and the frame's title is not read.
 export const blueskyIframeEmbedResolver = createUrlEmbedResolver(blueskyHosts, (url, element) => {
   const post = extractBlueskyPostFromUrl(url)
 

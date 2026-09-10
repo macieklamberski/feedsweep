@@ -247,10 +247,10 @@ describeForEachParser('appleEmbedResolver', (parseHtml) => {
         id: 'podcast/1000664459889',
         src: 'https://embed.podcasts.apple.com/us/podcast/undertone/id1693303954?i=1000664459889',
         url: 'https://podcasts.apple.com/us/podcast/undertone/id1693303954?i=1000664459889',
+        thumbnail: 'https://substack-post-media.s3.amazonaws.com/public/images/podcast-episode.jpg',
         height: 175,
         title: 'Henry Oliver',
         publisher: 'Undertone',
-        thumbnail: 'https://substack-post-media.s3.amazonaws.com/public/images/podcast-episode.jpg',
         date: '2024-06-19T00:00:00Z',
         duration: 4178,
       }
@@ -287,10 +287,10 @@ describeForEachParser('appleEmbedResolver', (parseHtml) => {
         id: 'podcast/1513064579',
         src: 'https://embed.podcasts.apple.com/us/podcast/boardroom-governance/id1513064579',
         url: 'https://podcasts.apple.com/us/podcast/boardroom-governance/id1513064579',
+        thumbnail: 'https://substack-post-media.s3.amazonaws.com/public/images/podcast.jpg',
         height: 450,
         title: 'Boardroom Governance',
         author: 'Evan Epstein',
-        thumbnail: 'https://substack-post-media.s3.amazonaws.com/public/images/podcast.jpg',
         date: '2026-03-04T00:00:00Z',
         duration: 3406,
       }
@@ -403,5 +403,55 @@ describeForEachParser('appleEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
+})
+
+describeForEachParser('appleEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, appleEmbedResolver)
+
+  it('should drop the label the share dialog writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://embed.podcasts.apple.com/gb/podcast/exploaded/id1887512662" title="Media player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'applepodcasts',
+      id: 'podcast/1887512662',
+      src: 'https://embed.podcasts.apple.com/gb/podcast/exploaded/id1887512662',
+      url: 'https://podcasts.apple.com/gb/podcast/exploaded/id1887512662',
+      height: 450,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the label in the language the share dialog wrote it in', async () => {
+    const value = html`
+      <iframe src="https://embed.music.apple.com/us/album/thriller/1440857781" title="メディアプレイヤー"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'applemusic',
+      id: 'album/1440857781',
+      src: 'https://embed.music.apple.com/us/album/thriller/1440857781',
+      url: 'https://music.apple.com/us/album/thriller/1440857781',
+      height: 450,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://embed.music.apple.com/us/album/thriller/1440857781" title="Thriller"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'applemusic',
+      id: 'album/1440857781',
+      src: 'https://embed.music.apple.com/us/album/thriller/1440857781',
+      url: 'https://music.apple.com/us/album/thriller/1440857781',
+      height: 450,
+      title: 'Thriller',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

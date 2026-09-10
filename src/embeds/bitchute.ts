@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -8,8 +8,8 @@ const safeVideoIdRegex = /^[a-zA-Z0-9]+$/
 
 const bitchuteHosts = ['bitchute.com']
 
-const bitchuteResolveEmbed = (link: string, element: Element): EmbedResolverResult | undefined => {
-  const [route, id] = getPathSegments(link)
+const bitchuteResolveEmbed: ResolveEmbed = (url, element) => {
+  const [route, id] = getPathSegments(url)
 
   // The route word tells a video from a channel or a profile.
   if (route !== 'embed' && route !== 'video') {

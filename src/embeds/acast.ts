@@ -1,5 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -42,7 +43,7 @@ const extractAcastEmbed = (link: string): { show: string; episode?: string } | u
   return { show, episode }
 }
 
-const acastResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+const acastResolveEmbed: ResolveEmbed = (url, element) => {
   const embed = extractAcastEmbed(url)
 
   if (!embed) {
@@ -56,6 +57,7 @@ const acastResolveEmbed = (url: string): EmbedResolverResult | undefined => {
     id: path,
     src: `https://embed.acast.com/${path}`,
     height: playerHeight,
+    title: attr(element, 'title'),
   }
 }
 
@@ -64,6 +66,10 @@ export const acastEmbedResolver = createUrlEmbedResolver(acastHosts, acastResolv
   // Carriers state 110 and 120 for players that no longer exist, and the current one is 190.
   preferResolverSize: true,
 })
+
+export const acastFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'Embed Player' },
+]
 
 // The player takes no query to start; it speaks player.js.
 export const acastRenderHint: EmbedRenderHint = {

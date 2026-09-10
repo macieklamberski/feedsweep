@@ -1,5 +1,5 @@
 import { getPathSegments, isPlainObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -96,8 +96,8 @@ const composeEmbed = (
     id: target.path,
     src: `https://embed.reddit.com/${target.path}/`,
     url: `https://www.reddit.com/${target.path}/`,
-    publisher: target.publisher,
     ...extra,
+    publisher: target.publisher,
   }
 }
 
@@ -147,10 +147,10 @@ export const redditWidgetEmbedResolver = createMarkupEmbedResolver(
   readWidget,
 )
 
-export const redditResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const redditResolveEmbed: ResolveEmbed = (url, element) => {
   const target = parseTarget(url)
 
-  return target ? composeEmbed(target) : undefined
+  return target ? composeEmbed(target, { title: attr(element, 'title') }) : undefined
 }
 
 // The embed.reddit.com frame the loader builds, kept by exports that stored the rendered page.

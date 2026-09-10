@@ -1,6 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
-import { flashVar, keepIfMatches } from '../utils/dom.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
 import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -29,11 +29,10 @@ const composeEmbed = (guid: string, query = ''): EmbedResolverResult => {
   }
 }
 
-// The carrier's title is Jetpack's player label, VideoPress Video Player, not the video's name.
-// The title and the poster live behind `public-api.wordpress.com/rest/v1.1/videos/{guid}`, which
-// answers with no key.
-const videopressResolveEmbed = (link: string): EmbedResolverResult | undefined => {
-  const [route, guid] = getPathSegments(link)
+// The poster, and the title where the carrier states none, live behind
+// `public-api.wordpress.com/rest/v1.1/videos/{guid}`, which answers with no key.
+const videopressResolveEmbed: ResolveEmbed = (url, element) => {
+  const [route, guid] = getPathSegments(url)
 
   if (route !== 'embed' && route !== 'v') {
     return
@@ -45,7 +44,10 @@ const videopressResolveEmbed = (link: string): EmbedResolverResult | undefined =
     return
   }
 
-  return composeEmbed(safeGuid, pickUrlParams(link, videopressEmbedParams))
+  return {
+    ...composeEmbed(safeGuid, pickUrlParams(url, videopressEmbedParams)),
+    title: attr(element, 'title'),
+  }
 }
 
 // A VideoPress player iframe, or a frame of its /v/ page, which serves the same player.
@@ -64,11 +66,8 @@ export const readVideopressEmbedSrc = (link: string): string | undefined => {
 
 const flashPlayerPathRegex = /\/player\.swf$/i
 
-const videopressFlashResolveEmbed = (
-  link: string,
-  element: Element,
-): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
+const videopressFlashResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
     return
@@ -93,6 +92,16 @@ export const videopressFlashEmbedResolver = createUrlEmbedResolver(
   videopressHosts,
   videopressFlashResolveEmbed,
 )
+
+export const videopressFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'VideoPress Video Player' },
+  { provider, field: 'title', drop: 'VideoPress-Video-Player' },
+  { provider, field: 'title', drop: 'Lecteur vidéo VideoPress' },
+  { provider, field: 'title', drop: 'Reproductor de vídeo VideoPress' },
+  { provider, field: 'title', drop: 'Lettore video VideoPress' },
+  { provider, field: 'title', drop: 'VideoPress videospeler' },
+  { provider, field: 'title', drop: 'VideoPress-videospelare' },
+]
 
 // Starts playback on the click that loads the player. The player's routes read the boolean
 // keys `1`, `true` and empty, and alias `autoplay` to this spelling.

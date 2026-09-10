@@ -1,5 +1,5 @@
 import { getPathSegments, trimObject } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -16,10 +16,7 @@ export const extractGeniallyViewId = (link: string): string | undefined => {
 }
 
 // Genially's presentation iframe, on the retired `view.genial.ly` host as often as the current one.
-export const geniallyResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const geniallyResolveEmbed: ResolveEmbed = (url, element) => {
   const viewId = extractGeniallyViewId(url)
 
   if (!viewId) {

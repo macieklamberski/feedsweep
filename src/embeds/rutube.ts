@@ -1,4 +1,4 @@
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -32,10 +32,7 @@ const composeEmbed = (videoId: string, link: string): EmbedResolverResult => {
   }
 }
 
-export const rutubeResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const rutubeResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, rutubeHosts)
 
   if (!parsed) {

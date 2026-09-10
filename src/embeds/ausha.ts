@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -18,7 +18,7 @@ const verticalHeight = 501
 const widgetHosts = ['widget.ausha.co']
 const playerHosts = ['player.ausha.co']
 
-export const aushaResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const aushaResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, aushaHost)
 
   if (!parsed) {

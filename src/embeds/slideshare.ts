@@ -1,5 +1,5 @@
 import { getPathSegments, type Nullish, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, keepIfMatches, text } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -30,8 +30,8 @@ const composeEmbed = (deck: string, fields?: Partial<EmbedResolverResult>): Embe
   }
 }
 
-export const slideshareResolveEmbed = (link: string): EmbedResolverResult | undefined => {
-  const parsed = parseUrlOnHosts(link, slideshareHosts)
+export const slideshareResolveEmbed: ResolveEmbed = (url) => {
+  const parsed = parseUrlOnHosts(url, slideshareHosts)
 
   if (!parsed) {
     return
@@ -136,9 +136,13 @@ const findCaption = (element: Element, wrapper: Nullish<Element>): Nullish<Eleme
 }
 
 const consumeCaption = (
-  element: Element,
+  element: Nullish<Element>,
   wrapper: Nullish<Element>,
 ): Partial<EmbedResolverResult> => {
+  if (!element) {
+    return {}
+  }
+
   const caption = findCaption(element, wrapper)
   const fields = readCaption(caption)
 
@@ -152,12 +156,12 @@ const consumeCaption = (
 
 // Neither player carries the numeric id: the swf query names the deck by a document key from a
 // different id space, and the iframe url by an embed key.
-const readWrapper = (element: Element): { deck?: string; wrapper?: Element } => {
+const readWrapper = (element: Nullish<Element>): { deck?: string; wrapper?: Element } => {
   let deck: string | undefined
   let wrapper: Element | undefined
 
   // The outermost match wins: the caption sits on the __ss_ div, not the __sse object inside.
-  for (let node: Element | null = element; node; node = node.parentElement) {
+  for (let node: Nullish<Element> = element; node; node = node.parentElement) {
     const id = attr(node, 'id')?.match(wrapperIdRegex)?.[1]
 
     if (id) {
@@ -171,11 +175,8 @@ const readWrapper = (element: Element): { deck?: string; wrapper?: Element } => 
 
 // The embed url names the deck and nothing else, so its page, its name and its owner come from
 // the caption the snippet ships with the iframe, the same one the Flash repair reads.
-const slideshareResolveIframeEmbed = (
-  link: string,
-  element: Element,
-): EmbedResolverResult | undefined => {
-  const resolved = slideshareResolveEmbed(link)
+const slideshareResolveIframeEmbed: ResolveEmbed = (url, element) => {
+  const resolved = slideshareResolveEmbed(url)
 
   if (!resolved) {
     return
@@ -197,11 +198,8 @@ export const slideshareIframeEmbedResolver = createUrlEmbedResolver(
 // Flash died in 2020 and these embeds have rendered nothing since, but the markup is still in
 // old posts and their feeds. The numeric id in the wrapper is the same id the modern embed
 // route accepts, so the dead player can be replaced by one that works.
-export const slideshareFlashResolveEmbed = (
-  src: string,
-  element: Element,
-): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(src, placeholderBaseUrl)
+export const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
     return

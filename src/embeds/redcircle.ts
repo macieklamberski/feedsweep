@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, parseUrlOnHosts, pickQueryParams, uuidRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -54,7 +54,7 @@ const readSubject = (
 
 const redcircleEmbedParams = ['theme']
 
-export const redcircleResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const redcircleResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, redcircleHosts)
   const subject = parsed ? readSubject(getPathSegments(parsed)) : undefined
 

@@ -1,5 +1,5 @@
 import { getPathSegments, trimObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -64,10 +64,7 @@ const readFlashTalk = (
 }
 
 // TED's embed.ted.com iframe, and the dead Flash player that names the talk only in its flashVars.
-export const tedResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const tedResolveEmbed: ResolveEmbed = (url, element) => {
   const slug = extractTedTalk(url)
   const talk = slug ? { slug } : readFlashTalk(url, element)
 

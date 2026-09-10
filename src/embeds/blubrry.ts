@@ -1,5 +1,9 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
+
+const provider = 'blubrry'
+
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -36,7 +40,7 @@ export const extractBlubrryEmbed = (link: string): string | undefined => {
 }
 
 // Blubrry's player iframe, by episode id or by media url, with no oEmbed to size it.
-export const blubrryResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const blubrryResolveEmbed: ResolveEmbed = (url, element) => {
   const id = extractBlubrryEmbed(url)
 
   if (!id) {
@@ -46,15 +50,20 @@ export const blubrryResolveEmbed = (url: string): EmbedResolverResult | undefine
   const isEpisodeId = safeIdRegex.test(id)
 
   return {
-    provider: 'blubrry',
+    provider,
     id,
     src: isEpisodeId
       ? `https://player.blubrry.com/id/${id}/`
       : `https://player.blubrry.com/?media_url=${encodeURIComponent(id)}`,
     height: playerHeight,
+    title: attr(element, 'title'),
   }
 }
 
 // No render hint: the player listens for a bare number and `-1` flips the button to playing, but
 // the audio never starts from it.
 export const blubrryEmbedResolver = createUrlEmbedResolver(blubrryHosts, blubrryResolveEmbed)
+
+export const blubrryFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'Blubrry Podcast Player' },
+]

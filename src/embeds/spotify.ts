@@ -1,5 +1,5 @@
 import { getPathSegments, toMap } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -27,8 +27,6 @@ const pathPrefixRegex = /^(?:embed|embed-podcast|intl-[a-z]{2})$/
 // The pre-2017 snippet framed `embed.spotify.com/?uri=spotify:{type}:{id}`, and that host still
 // serves a player.
 const legacyUriRegex = /^spotify:(?:.*:)?([a-z]+):([a-zA-Z0-9]+)$/
-// The snippet writes the title as `Spotify Embed: {name}`.
-const titlePrefixRegex = /^Spotify Embed:\s*/
 // Substack writes `By {owner}` where a playlist card's act goes, and Spotify names that same
 // account bare on its own player.
 const ownerPrefixRegex = /^By /
@@ -40,12 +38,10 @@ type SubstackItemAttributes = {
   description?: string
 }
 
+const provider = 'spotify'
 const spotifyHosts = ['spotify.com']
 const spotifyImageHosts = ['scdn.co']
 
-// Substack writes its own word for the type where a description would go, and a show card
-// says `Podcast`.
-const typeLabels = new Set(['album', 'episode', 'playlist', 'podcast', 'podcast episode'])
 // The act under the title is the publisher Spotify's own show page prints: the show's own, and
 // for an episode the publisher of the show it ran in.
 const publisherTypes = new Set(['show', 'episode'])
@@ -59,7 +55,6 @@ const readSubstackItem = (element: Element, type: string): Partial<EmbedResolver
     return {}
   }
 
-  const description = attributes.description?.trim()
   const isPublisherType = publisherTypes.has(type)
   const act =
     type === 'playlist' ? attributes.subtitle?.replace(ownerPrefixRegex, '') : attributes.subtitle
@@ -68,8 +63,8 @@ const readSubstackItem = (element: Element, type: string): Partial<EmbedResolver
     title: attributes.title,
     author: isPublisherType ? undefined : act,
     publisher: isPublisherType ? attributes.subtitle : undefined,
-    description:
-      description && !typeLabels.has(description.toLowerCase()) ? description : undefined,
+    // Some payloads carry an empty description string.
+    description: attributes.description?.trim() || undefined,
     thumbnail: parseUrlOnHosts(attributes.image, spotifyImageHosts) ? attributes.image : undefined,
   }
 }
@@ -90,10 +85,7 @@ const readPathPair = (url: URL | undefined): [string, string] | undefined => {
 }
 
 // Spotify's player iframe, in the modern path form and the pre-2017 embed.spotify.com/?uri= form.
-export const spotifyResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, spotifyHosts)
 
   if (!parsed) {
@@ -118,21 +110,27 @@ export const spotifyResolveEmbed = (
   }
 
   const card = element ? readSubstackItem(element, type) : {}
-  const stated = attr(element, 'title')?.replace(titlePrefixRegex, '').trim()
 
   return {
-    provider: 'spotify',
+    provider,
     id: `${type}/${id}`,
     src: `https://open.spotify.com/embed/${type}/${id}`,
     url: `https://open.spotify.com/${type}/${id}`,
+    thumbnail: card.thumbnail,
     height: spotifyHeights.get(type),
     // Some payloads carry an empty title string, and ?? would let it shadow the stated one.
-    title: card.title?.trim() || stated,
+    title: card.title?.trim() || attr(element, 'title'),
+    description: card.description,
     author: card.author,
     publisher: card.publisher,
-    description: card.description,
-    thumbnail: card.thumbnail,
   }
 }
 
 export const spotifyEmbedResolver = createUrlEmbedResolver(spotifyHosts, spotifyResolveEmbed)
+
+export const spotifyFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', strip: 'Spotify Embed:' },
+  // A copied YouTube snippet with the src swapped.
+  { provider, field: 'title', drop: 'YouTube video player' },
+  { provider, field: 'description', drop: /^(?:album|episode|playlist|podcast|podcast episode)$/ },
+]

@@ -180,8 +180,8 @@ describeForEachParser('stackblitzIframeEmbedResolver', (parseHtml) => {
         id: 'angular-ivy-snow',
         src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&file=src%2Fmain.tsx',
         url: 'https://stackblitz.com/edit/angular-ivy-snow',
-        title: 'Angular Ivy Snow',
         height: 500,
+        title: 'Angular Ivy Snow',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -280,9 +280,9 @@ describeForEachParser('stackblitz shapes the pipeline repairs first', (parseHtml
       ></iframe>
     `
     const expected: Record<string, string> = {
-      src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1',
       provider: 'stackblitz',
       id: 'angular-ivy-snow',
+      src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1',
       url: 'https://stackblitz.com/edit/angular-ivy-snow',
       height: '500',
     }

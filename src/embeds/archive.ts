@@ -1,6 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
-import { flashVars, keepIfMatches } from '../utils/dom.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
 import {
   audioFileRegex,
   composeQuery,
@@ -60,10 +60,7 @@ const declaresAudioPlayer = (element: Element): boolean => {
   return getEmbedSize(element, 0).height === audioPlayerHeight
 }
 
-export const archiveResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const archiveResolveEmbed: ResolveEmbed = (url, element) => {
   const identifier = extractArchiveIdentifier(url)
 
   if (!identifier) {
@@ -81,7 +78,7 @@ export const archiveResolveEmbed = (
     ...pickQueryParams(strayParams, archiveEmbedParams),
   })
 
-  const result = composeEmbedResult(identifier, query)
+  const result = { ...composeEmbedResult(identifier, query), title: attr(element, 'title') }
 
   // Height alone: a width beside it reads as a ratio, and the box grows while the bar stays 30.
   return element && declaresAudioPlayer(element) ? { ...result, height: audioPlayerHeight } : result
@@ -110,11 +107,8 @@ const namesAudioFile = (config: string): boolean => {
   })
 }
 
-export const archiveFlashResolveEmbed = (
-  src: string,
-  element: Element,
-): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(src, placeholderBaseUrl)
+export const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
     return
@@ -140,6 +134,13 @@ export const archiveFlashEmbedResolver = createUrlEmbedResolver(
   archiveFlashResolveEmbed,
   { preferResolverSize: true },
 )
+
+export const archiveFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'Embedded digital audio resource' },
+  { provider, field: 'title', drop: 'Archive.org' },
+  // A copied YouTube snippet with the src swapped.
+  { provider, field: 'title', drop: 'YouTube video player' },
+]
 
 // Starts playback on the click that loads the player, for video and audio items alike.
 export const archiveRenderHint: EmbedRenderHint = {

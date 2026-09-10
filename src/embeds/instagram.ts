@@ -1,5 +1,5 @@
 import { isPlainObject, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { decodeOrKeep, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
@@ -179,7 +179,7 @@ const readContent = (element: Element): Partial<EmbedResolverResult> => {
 // Instagram's share dialog ships a post as a blockquote skeleton only its `embed.js` loader fills.
 export const instagramBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.instagram-media, blockquote[data-instgrm-permalink]',
-  (element): EmbedResolverResult | undefined => {
+  (element) => {
     const wrapper = readWrapper(element)
     const post = findPost(element) ?? wrapper.post
 
@@ -197,7 +197,7 @@ export const instagramBlockquoteEmbedResolver = createMarkupEmbedResolver(
 // AMP's `<amp-instagram>` names the post in an attribute and stays empty with no AMP runtime.
 export const instagramAmpEmbedResolver = createMarkupEmbedResolver(
   'amp-instagram[data-shortcode], amp-instagram[shortcode]',
-  (element): EmbedResolverResult | undefined => {
+  (element) => {
     const shortcode = attr(element, 'data-shortcode') ?? attr(element, 'shortcode')
 
     if (!shortcode || !safeShortcodeRegex.test(shortcode)) {
@@ -218,17 +218,13 @@ type SubstackPostAttributes = {
   timestamp?: string | null
 }
 
-// The payload's title where the post carries no caption: Instagram's own og:title names the
-// poster, or names nothing but the platform.
-const boilerplateTitleRegex = /^(?:A post shared by\b|Instagram$)/
-
 // The current og:title quotes the caption behind the poster's name, and the payload carries no
 // field holding the caption on its own.
 const wrappedCaptionRegex = / on Instagram: ["\u201c]/
 
 // Instagram's og:title, which the payload carries in place of a caption field.
 const readPayloadCaption = (title: string | undefined): string | undefined => {
-  if (!title || boilerplateTitleRegex.test(title) || wrappedCaptionRegex.test(title)) {
+  if (!title || wrappedCaptionRegex.test(title)) {
     return
   }
 
@@ -243,7 +239,7 @@ const readRehostedUrl = (url: string | null | undefined): string | undefined => 
 // Substack ships an Instagram post as a childless div with the whole card as JSON in `data-attrs`.
 export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
   'div.instagram-embed-wrap[data-attrs], div[data-component-name="InstagramToDOM"]',
-  (element): EmbedResolverResult | undefined => {
+  (element) => {
     const attributes = jsonAttr<SubstackPostAttributes>(element, 'data-attrs')
     const shortcode = attributes?.instagram_id
 
@@ -268,7 +264,9 @@ export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
 
 // The frame `embed.js` builds, which exports store after render and iframe generators paste.
 // Its query and hash (`cr`, `wp`, `rd`, `rp`) describe the embedding page, not the player.
-export const instagramResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+// A post has no name: its words go to `description`, and the frame titles itself `Instagram`
+// or nothing.
+export const instagramResolveEmbed: ResolveEmbed = (url) => {
   const post = readPostUrl(url)
 
   if (!post) {
@@ -292,6 +290,11 @@ export const readInstagramHeight = (data: unknown): number | undefined => {
     ? readPixels(data.details.height)
     : undefined
 }
+
+export const instagramFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'description', drop: /^a post shared by\b.*$/ },
+  { provider, field: 'description', drop: 'Instagram' },
+]
 
 export const instagramRenderHint: EmbedRenderHint = {
   provider,

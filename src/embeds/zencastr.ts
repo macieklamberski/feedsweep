@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -15,7 +15,7 @@ const zencastrHosts = ['zencastr.com', 'zen.ai']
 // to `1/1`, which is what Zencastr's recorder writes.
 const playerRatio = '1/1'
 
-export const zencastrResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const zencastrResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, zencastrHosts)
   const [route, id, ...rest] = parsed ? getPathSegments(parsed) : []
 

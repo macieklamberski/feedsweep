@@ -1,5 +1,5 @@
 import { getPathSegments, isHostOf, isPlainObject, parseUrl, trimObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
@@ -75,10 +75,7 @@ const parseTarget = (value: string | undefined): CodesandboxTarget | undefined =
   return { slug, id, pagePath: isProject ? `p/${second}/${slug}` : `s/${slug}` }
 }
 
-export const codesandboxResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const codesandboxResolveEmbed: ResolveEmbed = (url, element) => {
   const target = parseTarget(url)
 
   if (!target) {

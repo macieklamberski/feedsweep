@@ -10,7 +10,7 @@ export const ghostMediaResolver: MediaResolver = {
   kind: 'media',
   // Matching the card instead of its player container would drop the figcaption and cover image.
   selector: '.kg-video-card .kg-video-container, .kg-audio-card .kg-audio-player-container',
-  extract: (element): MediaResolverResult | undefined => {
+  extract: (element) => {
     if (element.classList.contains('kg-video-container')) {
       const video = element.querySelector('video[src]')
       const source = attr(video, 'src')

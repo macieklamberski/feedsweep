@@ -1,6 +1,6 @@
-import { isHostOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
-import { flashVars, keepIfMatches } from '../utils/dom.js'
+import { isHostOf, type Nullish, parseUrl } from 'trousse'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver, getEmbedSize } from '../utils/widgets.js'
 
@@ -119,7 +119,7 @@ const readPageSubject = (page: string): FlickrSubject | undefined => {
 
 // The swf carrier names its subject in the flashvars beside it: the page path first, and the
 // bare `user_id` for the few snippets that carry nothing else.
-const readFlashSubject = (element: Element): FlickrSubject => {
+const readFlashSubject = (element: Nullish<Element>): FlickrSubject => {
   const config = new URLSearchParams(flashVars(element) ?? '')
   const page = config.get('page_show_url') ?? ''
 
@@ -226,9 +226,9 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   }
 }
 
-export const flickrResolveEmbed = (
+const resolveTarget = (
   link: string,
-  element: Element,
+  element: Nullish<Element>,
 ): EmbedResolverResult | undefined => {
   const parsed = parseUrl(link, placeholderBaseUrl)
 
@@ -258,15 +258,21 @@ export const flickrResolveEmbed = (
     return
   }
 
-  const declared = getEmbedSize(element, 0)
+  const declared = element ? getEmbedSize(element, 0) : undefined
   // Both halves or neither: given one half, the endpoint uses its default for the other as is.
   const { width, height } =
-    declared.width && declared.height
+    declared?.width && declared?.height
       ? { width: declared.width, height: declared.height }
       : dialogSize
 
   // The size always travels in the src: with no query every image renders at NaN.
   return { ...result, src: `${result.src}?width=${width}&height=${height}`, width, height }
+}
+
+export const flickrResolveEmbed: ResolveEmbed = (url, element) => {
+  const target = resolveTarget(url, element)
+
+  return target && { ...target, title: target.title ?? attr(element, 'title') }
 }
 
 // Flickr's slideshow swf, its legacy iframe, a framed album or stream page, and the two players

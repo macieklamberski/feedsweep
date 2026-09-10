@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
 import { decodeSegment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -9,8 +9,9 @@ const safeUrnRegex = /^urn:li:[a-zA-Z]+:\d+$/
 
 const linkedinHosts = ['linkedin.com']
 
-const linkedinResolveEmbed = (link: string): EmbedResolverResult | undefined => {
-  const [route, section, action, urn] = getPathSegments(link)
+// A post has no name, and the frame titles itself `Embedded post` in the reader's language.
+const linkedinResolveEmbed: ResolveEmbed = (url) => {
+  const [route, section, action, urn] = getPathSegments(url)
 
   if (route !== 'embed' || section !== 'feed' || action !== 'update') {
     return
@@ -30,7 +31,7 @@ const linkedinResolveEmbed = (link: string): EmbedResolverResult | undefined => 
     provider: 'linkedin',
     id: postUrn,
     // Kept as written: `collapsed` and `compact` pick the layout the stated height belongs to.
-    src: link,
+    src: url,
     // The activity urn is assigned server-side, so a share urn cannot be rewritten to it.
     url: `https://www.linkedin.com/feed/update/${postUrn}`,
   }

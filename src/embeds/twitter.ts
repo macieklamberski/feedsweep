@@ -1,5 +1,5 @@
 import { isPlainObject, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { isOnHosts, placeholderBaseUrl } from '../utils/urls.js'
@@ -241,7 +241,9 @@ export const twitterSubstackEmbedResolver = createMarkupEmbedResolver(
 // the same `id` query, and both occur in real feeds.
 const playerPaths = new Set(['/embed/Tweet.html', '/embed/index.html'])
 
-export const twitterResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+// A post has no name: its words go to `description`, and the frame titles itself `Twitter Tweet`
+// or `X Post`.
+export const twitterResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
   const id = parsed && playerPaths.has(parsed.pathname) ? parsed.searchParams.get('id') : undefined
 

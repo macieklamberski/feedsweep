@@ -21,8 +21,8 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@corbettreport:0/webb-repersoning:7',
         src: 'https://odysee.com/$/embed/@corbettreport:0/webb-repersoning:7',
         url: 'https://odysee.com/@corbettreport:0/webb-repersoning:7',
-        author: '@corbettreport',
         ratio: '16/9',
+        author: '@corbettreport',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -42,9 +42,9 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@OsasunaLibertad:9/Como-Proteger-a-los-Menores:9',
         src: 'https://odysee.com/$/embed/@OsasunaLibertad:9/Como-Proteger-a-los-Menores:9',
         url: 'https://odysee.com/@OsasunaLibertad:9/Como-Proteger-a-los-Menores:9',
-        author: '@OsasunaLibertad',
         width: 1200,
         height: 675,
+        author: '@OsasunaLibertad',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -66,9 +66,9 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
         src: 'https://odysee.com/$/embed/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
         url: 'https://odysee.com/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
-        author: '@Impfschaden.info',
         width: 560,
         height: 315,
+        author: '@Impfschaden.info',
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl, trimObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -38,10 +38,7 @@ export const extractOmnyClip = (link: string): string | undefined => {
 // video, and t a position in the episode.
 const omnyEmbedParams = ['media', 'size', 'style', 't']
 
-export const omnyResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const omnyResolveEmbed: ResolveEmbed = (url, element) => {
   const clip = extractOmnyClip(url)
 
   if (!clip) {

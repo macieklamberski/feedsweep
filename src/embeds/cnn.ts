@@ -1,4 +1,4 @@
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -51,7 +51,7 @@ const resolveVideoId = (value: string | null | undefined): EmbedResolverResult |
   return id && videoIdRegex.test(id) ? composeEmbed(id) : undefined
 }
 
-export const cnnResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   const parsed = parseUrlOnHosts(url, cnnHosts)
 
   if (parsed?.pathname === '/v1/fav/') {
@@ -67,6 +67,12 @@ export const cnnResolveEmbed = (url: string): EmbedResolverResult | undefined =>
   }
 }
 
+export const cnnResolveEmbed: ResolveEmbed = (url, element) => {
+  const target = resolveTarget(url)
+
+  return target && { ...target, title: attr(element, 'title') }
+}
+
 // CNN's player iframe: the fave one still serves, the 2014 and 2008 ones load nothing today.
 export const cnnIframeEmbedResolver = createUrlEmbedResolver(cnnHosts, cnnResolveEmbed)
 
@@ -75,10 +81,7 @@ export const cnnIframeEmbedResolver = createUrlEmbedResolver(cnnHosts, cnnResolv
 // `flashVars` on none, but the player read both so both are read here.
 const flashPlayerPathRegex = /^\/cnn\/\.element\/apps\/cvp\/.*\.swf$/
 
-export const cnnFlashResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const cnnFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, cdnHosts)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {

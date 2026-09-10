@@ -1,5 +1,5 @@
 import { parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -52,8 +52,8 @@ const readClaimPath = (parsed: URL): string | undefined => {
   return claims.join('/')
 }
 
-const odyseeResolveEmbed = (link: string): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
+const odyseeResolveEmbed: ResolveEmbed = (url) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const claimPath = parsed ? readClaimPath(parsed) : undefined
 
   if (!claimPath) {

@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -35,7 +35,7 @@ export const extractAudioboomPost = (
 
 // No metadata offline: Audioboom's oEmbed accepts only `audioboom.com` page urls, not the
 // `embeds.` player url the markup carries, so a title needs a lookup the enricher would do.
-export const audioboomResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const audioboomResolveEmbed: ResolveEmbed = (url, element) => {
   const post = extractAudioboomPost(url)
 
   if (!post) {
@@ -50,6 +50,7 @@ export const audioboomResolveEmbed = (url: string): EmbedResolverResult | undefi
       ? `https://embeds.audioboom.com/posts/${post.id}/embed/v4`
       : `https://embeds.audioboom.com/posts/${post.id}/embed`,
     height: post.isCurrent ? playerHeights.v4 : playerHeights.legacy,
+    title: attr(element, 'title'),
   }
 }
 
@@ -69,6 +70,10 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
     return parsed && audioboomResolveEmbed(parsed.href)
   },
 )
+
+export const audioboomFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'Audioboom player' },
+]
 
 // Starts playback on the click that loads the player: the v4 player reads `autoplay` off its
 // query and starts from 0 once the audio node is ready. Undocumented, read from its chunks.

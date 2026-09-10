@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'bun:test'
 import { baseContext, describeForEachParser, html } from '../tests.js'
-import type { CiteResolverResult, EmbedResolverResult, MediaResolverResult } from '../types.js'
+import type {
+  CiteResolverResult,
+  EmbedResolverResult,
+  MediaResolverResult,
+  TransformContext,
+} from '../types.js'
 import {
   atUsername,
   createCitePlaceholder,
@@ -20,6 +25,10 @@ import {
   updateCitePlaceholder,
   updateEmbedPlaceholder,
 } from './widgets.js'
+
+// What a stub platform's snippet writes where the item's own fields belong.
+const playerLabelRegex = /^example player$/
+const typeLabelRegex = /^video$/
 
 describeForEachParser('createEmbedPlaceholder', (parseHtml) => {
   it('should leave the placeholder empty', () => {
@@ -1454,6 +1463,60 @@ describeForEachParser('createLinkedImage', (parseHtml) => {
 
 describe('prepareEmbedMetadata', () => {
   const baseUrl = 'https://blog.example.com/post'
+  const cleaning: TransformContext = {
+    ...baseContext,
+    fieldCleaners: [
+      { provider: 'example', field: 'title', drop: playerLabelRegex },
+      { provider: 'example', field: 'title', drop: 'Untitled' },
+      { provider: 'example', field: 'title', strip: 'Example: ' },
+      { provider: 'example', field: 'description', drop: typeLabelRegex },
+    ],
+  }
+
+  it('should drop a title a cleaner names as the player label', () => {
+    const value: Partial<EmbedResolverResult> = { provider: 'example', title: 'Example Player' }
+    const expected: Partial<EmbedResolverResult> = { provider: 'example' }
+
+    expect(prepareEmbedMetadata(value, cleaning)).toEqual(expected)
+  })
+
+  it('should drop a title a cleaner names as a string, whatever its case', () => {
+    const value: Partial<EmbedResolverResult> = { provider: 'example', title: 'UNTITLED' }
+    const expected: Partial<EmbedResolverResult> = { provider: 'example' }
+
+    expect(prepareEmbedMetadata(value, cleaning)).toEqual(expected)
+  })
+
+  it('should strip the prefix a cleaner names and keep the rest as written', () => {
+    const value: Partial<EmbedResolverResult> = { provider: 'example', title: 'example: Name' }
+    const expected: Partial<EmbedResolverResult> = { provider: 'example', title: 'Name' }
+
+    expect(prepareEmbedMetadata(value, cleaning)).toEqual(expected)
+  })
+
+  it('should drop a title the strip empties', () => {
+    const value: Partial<EmbedResolverResult> = { provider: 'example', title: 'Example: ' }
+    const expected: Partial<EmbedResolverResult> = { provider: 'example' }
+
+    expect(prepareEmbedMetadata(value, cleaning)).toEqual(expected)
+  })
+
+  it('should clean the description on its own entry', () => {
+    const value: Partial<EmbedResolverResult> = {
+      provider: 'example',
+      title: 'Name',
+      description: 'Video',
+    }
+    const expected: Partial<EmbedResolverResult> = { provider: 'example', title: 'Name' }
+
+    expect(prepareEmbedMetadata(value, cleaning)).toEqual(expected)
+  })
+
+  it('should leave another provider alone', () => {
+    const value: Partial<EmbedResolverResult> = { provider: 'other', title: 'Example Player' }
+
+    expect(prepareEmbedMetadata(value, cleaning)).toEqual(value)
+  })
 
   it('should resolve every url it carries against the base', () => {
     const value: Partial<EmbedResolverResult> = {
@@ -1593,6 +1656,17 @@ describe('prepareEmbedMetadata', () => {
 
 describe('prepareCiteMetadata', () => {
   const baseUrl = 'https://blog.example.com/post'
+
+  it('should drop a title a cleaner names as the card label', () => {
+    const cleaning: TransformContext = {
+      ...baseContext,
+      fieldCleaners: [{ provider: 'example', field: 'title', drop: 'Example Card' }],
+    }
+    const value: Partial<CiteResolverResult> = { provider: 'example', title: 'Example Card' }
+    const expected: Partial<CiteResolverResult> = { provider: 'example' }
+
+    expect(prepareCiteMetadata(value, cleaning)).toEqual(expected)
+  })
 
   it('should resolve every url it carries against the base', () => {
     const value: Partial<CiteResolverResult> = {

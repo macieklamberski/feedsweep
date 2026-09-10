@@ -1,4 +1,4 @@
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -36,7 +36,7 @@ const readVideoId = (url: string): string | undefined => {
   return keepIfMatches(videoId, safeVideoIdRegex)
 }
 
-export const youkuResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const youkuResolveEmbed: ResolveEmbed = (url) => {
   const videoId = readVideoId(url)
 
   if (!videoId) {

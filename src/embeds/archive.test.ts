@@ -520,3 +520,38 @@ describeForEachParser('archive flash embed through the pipeline', (parseHtml) =>
     expect(result).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('archiveIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, archiveIframeEmbedResolver)
+
+  it('should drop the label the share dialog writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://archive.org/embed/TheGoodOldGasMask" title="Embedded digital audio resource"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'TheGoodOldGasMask',
+      src: 'https://archive.org/embed/TheGoodOldGasMask',
+      url: 'https://archive.org/details/TheGoodOldGasMask',
+      thumbnail: 'https://archive.org/services/img/TheGoodOldGasMask',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://archive.org/embed/TheGoodOldGasMask" title="The Good Old Gas Mask"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'TheGoodOldGasMask',
+      src: 'https://archive.org/embed/TheGoodOldGasMask',
+      url: 'https://archive.org/details/TheGoodOldGasMask',
+      thumbnail: 'https://archive.org/services/img/TheGoodOldGasMask',
+      title: 'The Good Old Gas Mask',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

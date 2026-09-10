@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, parseRatio } from '../utils/dom.js'
 import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -15,16 +15,6 @@ const safeSlideRegex = /^\d+$/
 
 // Speaker Deck's snippet always carries the ratio, and 16:9 is what decks mostly are.
 const defaultDeckRatio = '16/9'
-
-// The deck's title, which the player url does not carry. Speaker Deck's snippet writes the
-// four-character string `null` when the deck has no title, so that spelling is treated as
-// absent.
-const readTitle = (element: Element): string | undefined => {
-  const title = attr(element, 'title')
-
-  // Speaker Deck's snippet writes the string "null" for a deck with no title.
-  return title !== 'null' ? title : undefined
-}
 
 // One feed can embed the same deck at several slides. Without the slide those collapse into
 // identical placeholders, and the player url honours `?slide=`.
@@ -67,10 +57,7 @@ export const speakerdeckScriptEmbedResolver = createMarkupEmbedResolver(
 )
 
 // The player iframe that script builds, saved into the feed by a CMS that ran the script first.
-export const speakerdeckResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const speakerdeckResolveEmbed: ResolveEmbed = (url, element) => {
   const segments = getPathSegments(url)
   const deckId = segments[0] === 'player' ? segments[1] : undefined
 
@@ -81,7 +68,7 @@ export const speakerdeckResolveEmbed = (
   const slide = parseUrl(url, placeholderBaseUrl)?.searchParams.get('slide') ?? undefined
 
   return {
-    ...composeEmbed(deckId, { slide, title: element ? readTitle(element) : undefined }),
+    ...composeEmbed(deckId, { slide, title: attr(element, 'title') }),
     ratio: defaultDeckRatio,
   }
 }
@@ -90,3 +77,7 @@ export const speakerdeckIframeEmbedResolver = createUrlEmbedResolver(
   ['speakerdeck.com'],
   speakerdeckResolveEmbed,
 )
+
+export const speakerdeckFieldCleaners: Array<FieldCleaner> = [
+  { provider: 'speakerdeck', field: 'title', drop: 'null' },
+]

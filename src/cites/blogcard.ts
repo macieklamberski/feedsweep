@@ -23,7 +23,7 @@ export const blogCardCiteResolver: CiteResolver = {
       provider: 'blogcard',
       url: cardUrl(element),
       // blog-card-title is the only field class every card carries.
-      title: text(element, '.blog-card-title'),
+      title: text(element, '.blog-card-title') ?? attr(element, 'title'),
       description: text(element, '.blog-card-excerpt, .blog-card-text'),
       publisher: text(element, '.blog-card-site, .blog-card-site-title'),
       // A theme-formatted date following the site's own settings, not ISO. Passed through

@@ -1,4 +1,4 @@
-import type { MediaResolver, MediaResolverResult } from '../types.js'
+import type { MediaResolver } from '../types.js'
 import { jsonAttr } from '../utils/dom.js'
 import { uuidRegex } from '../utils/urls.js'
 
@@ -17,7 +17,7 @@ type MediaAttrs = {
 export const substackMediaResolver: MediaResolver = {
   kind: 'media',
   selector: '.native-video-embed, .native-audio-embed',
-  extract: (element): MediaResolverResult | undefined => {
+  extract: (element) => {
     const attrs = jsonAttr<MediaAttrs>(element, 'data-attrs')
     const mediaUploadId = attrs?.mediaUploadId
 

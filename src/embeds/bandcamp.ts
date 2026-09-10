@@ -1,6 +1,9 @@
-import { getPathSegments, parseUrl, toMap, trimObject } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import { getPathSegments, type Nullish, parseUrl, toMap, trimObject } from 'trousse'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
+
+const provider = 'bandcamp'
+
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -80,7 +83,11 @@ export const extractBandcampRelease = (link: string): string | undefined => {
 
 const bandcampHosts = ['bandcamp.com']
 
-const parseFallback = (element: Element): Element | undefined => {
+const parseFallback = (element: Nullish<Element>): Element | undefined => {
+  if (!element) {
+    return
+  }
+
   // Re-parsed because jsdom keeps iframe content as text, where querySelector finds no anchor.
   // linkedom exposes it as child elements, and `innerHTML` is the view the two parsers agree on.
   const holder = element.ownerDocument.createElement('div')
@@ -91,12 +98,9 @@ const parseFallback = (element: Element): Element | undefined => {
   )
 }
 
-export const bandcampResolveEmbed = (
-  src: string,
-  element: Element,
-): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(src, placeholderBaseUrl)
-  const releases = readReleases(src)
+export const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
+  const releases = readReleases(url)
   const release = releases.find(([kind]) => kind === 'track') ?? releases[0]
 
   if (!parsed || !release) {
@@ -121,19 +125,23 @@ export const bandcampResolveEmbed = (
   const presetKey = preset === 'tall' ? tallKey : preset
   const height = presetHeights.get(presetKey ?? '')
   const anchor = parseFallback(element)
-  const url = attr(anchor, 'href')
+  const pageUrl = attr(anchor, 'href')
   // Bandcamp writes the label as `{title} by {artist}`, and " by " appears inside real titles too.
-  const title = text(anchor)
+  const title = text(anchor) || attr(element, 'title')
 
   return {
-    provider: 'bandcamp',
+    provider,
     id: `${kind}/${id}`,
     src: isVideo
       ? `https://bandcamp.com/VideoEmbed?${kind}=${id}`
       : `https://bandcamp.com/EmbeddedPlayer/${selection}${size}`,
-    ...trimObject({ height, url, title }, Boolean),
+    ...trimObject({ height, url: pageUrl, title }, Boolean),
   }
 }
 
 // Bandcamp's player iframe, whose fallback anchor is the only place the release page appears.
 export const bandcampEmbedResolver = createUrlEmbedResolver(bandcampHosts, bandcampResolveEmbed)
+
+export const bandcampFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'YouTube video player' },
+]

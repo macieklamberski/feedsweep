@@ -1,5 +1,5 @@
-import { getPathSegments, parseUrl, trimObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import { getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, text } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -137,8 +137,8 @@ type SubstackTrackAttributes = {
 
 // Substack renders a track as an iframe inside its own wrapper, whose `data-attrs` JSON carries
 // the title, the description, the artwork, the artist and the track page as `targetUrl`.
-const readSubstackTrack = (element: Element): Partial<EmbedResolverResult> | undefined => {
-  const wrapper = element.closest('[data-component-name="SoundcloudToDOM"]')
+const readSubstackTrack = (element: Nullish<Element>): Partial<EmbedResolverResult> | undefined => {
+  const wrapper = element?.closest('[data-component-name="SoundcloudToDOM"]')
   const attributes = jsonAttr<SubstackTrackAttributes>(wrapper, 'data-attrs')
 
   if (!attributes) {
@@ -159,18 +159,15 @@ const readSubstackTrack = (element: Element): Partial<EmbedResolverResult> | und
 }
 
 // SoundCloud's widget iframe, the dead Flash player and a framed track page answering SAMEORIGIN.
-export const soundcloudResolveEmbed = (
-  src: string,
-  element: Element,
-): EmbedResolverResult | undefined => {
+export const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
   // The factory has already matched the host, which means the url parsed, so there is no
   // unparseable case left to guard here.
-  const parsed = parseUrl(src, placeholderBaseUrl)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const params = parsed?.searchParams
   const inner = params?.get('url')
   const reference = inner?.match(referenceRegex)
   const streamTrackId = parsed?.pathname.match(streamPathRegex)?.[1]
-  const result: EmbedResolverResult = { provider, src }
+  const result: EmbedResolverResult = { provider, src: url }
 
   if (reference) {
     result.id = `${reference[1]}/${reference[2]}`
@@ -185,7 +182,7 @@ export const soundcloudResolveEmbed = (
   // widget's `url=` or as the whole src. A page states its kind in the path, which is enough to
   // size the player and to give the placeholder a url a reader can follow.
   const page =
-    reference || streamTrackId ? undefined : parseUrlOnHosts(inner ?? src, soundcloudHosts)
+    reference || streamTrackId ? undefined : parseUrlOnHosts(inner ?? url, soundcloudHosts)
   const shortLink = page && shortLinkHostRegex.test(page.hostname) ? page : undefined
   const pageSegments = page && pageHostRegex.test(page.hostname) ? getPathSegments(page) : []
   const secretToken = pageSegments.find((segment) => secretTokenRegex.test(segment))
@@ -235,7 +232,7 @@ export const soundcloudResolveEmbed = (
   // Both anchors are permalinks, so they are matched on the page hosts: a substring of the href
   // takes `evil.test/soundcloud.com/b` for the track page, and two of those write the author,
   // the title and the url before the block is deleted.
-  const sibling = element.nextElementSibling
+  const sibling = element?.nextElementSibling
   const anchors = Array.from(sibling?.querySelectorAll('a[href]') ?? []).filter((anchor) => {
     const page = parseUrlOnHosts(attr(anchor, 'href'), soundcloudHosts)
 
@@ -259,6 +256,12 @@ export const soundcloudEmbedResolver = createUrlEmbedResolver(
   soundcloudHosts,
   soundcloudResolveEmbed,
 )
+
+export const soundcloudFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'soundcloud' },
+  // A copied YouTube snippet with the src swapped.
+  { provider, field: 'title', drop: 'YouTube video player' },
+]
 
 // Starts playback on the click that loads the widget.
 export const soundcloudRenderHint: EmbedRenderHint = {

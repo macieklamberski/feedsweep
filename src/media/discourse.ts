@@ -7,7 +7,7 @@ import { videoFileRegex } from '../utils/urls.js'
 export const discourseMediaResolver: MediaResolver = {
   kind: 'media',
   selector: '.video-placeholder-container[data-video-src]',
-  extract: (element): MediaResolverResult | undefined => {
+  extract: (element) => {
     const source = attr(element, 'data-video-src')
 
     if (!source || !videoFileRegex.test(source)) {

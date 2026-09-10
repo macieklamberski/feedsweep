@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const safeIdRegex = /^[0-9a-z]+$/i
@@ -45,7 +45,7 @@ export const extractTransistorEmbed = (link: string): Subject | undefined => {
   return safeIdRegex.test(subject) ? { kind: 'e', id: subject } : undefined
 }
 
-export const transistorResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const transistorResolveEmbed: ResolveEmbed = (url) => {
   const embed = extractTransistorEmbed(url)
 
   if (!embed) {

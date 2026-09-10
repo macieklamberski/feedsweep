@@ -1,5 +1,6 @@
 import { getPathSegments, toMap } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -78,7 +79,7 @@ const readResource = (url: URL): Resource | undefined => {
   }
 }
 
-export const deezerResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const deezerResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, deezerHosts)
   const resource = parsed && readResource(parsed)
 
@@ -97,11 +98,16 @@ export const deezerResolveEmbed = (url: string): EmbedResolverResult | undefined
     src: `https://widget.deezer.com/widget/${theme}/${type}/${id}`,
     url: `https://www.deezer.com/${type}/${id}`,
     height: deezerHeights.get(type),
+    title: attr(element, 'title'),
   }
 }
 
 // Deezer's widget iframe, plus the plugin player and the Flash swfs, which play nothing today.
 export const deezerEmbedResolver = createUrlEmbedResolver(deezerHosts, deezerResolveEmbed)
+
+export const deezerFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'deezer-widget' },
+]
 
 // The widget tests `autoplay === "1"`, so `autoplay=true` matches nothing.
 export const deezerRenderHint: EmbedRenderHint = {

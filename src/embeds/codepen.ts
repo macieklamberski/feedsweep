@@ -1,8 +1,10 @@
 import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize, text } from '../utils/dom.js'
 import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'codepen'
 
 // Listed exactly, not by subdomain: blog.codepen.io and cdpn.io name no pen.
 const codepenHosts = ['codepen.io', 'www.codepen.io']
@@ -12,9 +14,6 @@ const slugRegex = /^[A-Za-z0-9]+$/
 const userRegex = /^[A-Za-z0-9_-]+$/
 const playerParamRegex = /^[A-Za-z0-9,_-]{1,64}$/
 const leadingAtRegex = /^@/
-// The snippet names itself where the pen has no name: "CodePen Embed {slug}" on an anonymous
-// pen, and "CodePen by {user}" on the older byline form.
-const carrierTitleRegex = /^codepen (?:embed|by)\b/i
 
 // `key` is what the share dialog appends to a private pen, and `token` the JWT a signed-token
 // embed carries. A JWT is dotted base64url and long, every character of it url-safe.
@@ -33,9 +32,6 @@ const anonymousUser = 'anon'
 
 // CodePen's snippet ships `data-height="300"` and calls every attribute but slug and user optional.
 const defaultPenHeight = 300
-
-// Titles the snippet writes when the pen has none. They name the carrier, not the pen.
-const placeholderTitles = new Set(['untitled', 'codepen'])
 
 type CodepenTarget = {
   kind: 'pen' | 'embed'
@@ -66,16 +62,6 @@ const readUser = (value: string | undefined): string | undefined => {
   const name = value?.trim().replace(leadingAtRegex, '')
 
   return name && name !== anonymousUser && userRegex.test(name) ? name : undefined
-}
-
-const readTitle = (element: Element | undefined): string | undefined => {
-  const title = attr(element, 'title')
-
-  if (!title || placeholderTitles.has(title.toLowerCase()) || carrierTitleRegex.test(title)) {
-    return
-  }
-
-  return title
 }
 
 const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
@@ -163,7 +149,7 @@ const composeEmbed = (
   const owner = target.user ?? anonymousUser
 
   return {
-    provider: 'codepen',
+    provider,
     id: target.slug,
     src: `https://codepen.io/${owner}/embed/${target.slug}${composePenQuery(target, true)}`,
     // The public page is the one address the author's name really selects: an embed built with
@@ -259,19 +245,14 @@ export const codepenWidgetEmbedResolver = createMarkupEmbedResolver(
   readWidget,
 )
 
-export const codepenResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const codepenResolveEmbed: ResolveEmbed = (url, element) => {
   const target = parseTarget(url)
 
   if (target?.kind !== 'embed') {
     return
   }
 
-  const title = readTitle(element)
-
-  return composeEmbed(target, { src: url, title })
+  return composeEmbed(target, { src: url, title: attr(element, 'title') })
 }
 
 // CodePen's player iframe, written by hand or left behind by a CMS that ran ei.js on export.
@@ -279,3 +260,9 @@ export const codepenIframeEmbedResolver = createUrlEmbedResolver(
   ['codepen.io'],
   codepenResolveEmbed,
 )
+
+export const codepenFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: /^codepen (?:embed|by)\b.*$/ },
+  { provider, field: 'title', drop: 'CodePen' },
+  { provider, field: 'title', drop: 'Untitled' },
+]

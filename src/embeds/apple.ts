@@ -1,6 +1,6 @@
-import { getPathSegments, toMap } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
-import { jsonAttr, keepIfMatches } from '../utils/dom.js'
+import { getPathSegments, type Nullish, toMap } from 'trousse'
+import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import { attr, jsonAttr, keepIfMatches } from '../utils/dom.js'
 import { isOnHosts, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -37,7 +37,7 @@ const appleHeights = toMap({
   'music-video': undefined,
 })
 
-export const appleResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const appleResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, appleHosts)
 
   if (!parsed) {
@@ -94,8 +94,8 @@ const readDuration = (attributes: SubstackPodcastAttributes): number | undefined
 
 // The component name is on the container while `data-attrs` sits on the iframe inside it. The
 // payload's `targetUrl` is the same page this resolver composes, with an affiliate token added.
-const readSubstackPodcast = (element: Element): Partial<EmbedResolverResult> => {
-  if (!element.closest('[data-component-name="ApplePodcastToDom"]')) {
+const readSubstackPodcast = (element: Nullish<Element>): Partial<EmbedResolverResult> => {
+  if (!element?.closest('[data-component-name="ApplePodcastToDom"]')) {
     return {}
   }
 
@@ -124,6 +124,15 @@ const readSubstackPodcast = (element: Element): Partial<EmbedResolverResult> => 
 // Apple's music and podcast player iframe. Substack wraps it in a card carrying JSON metadata.
 export const appleEmbedResolver = createUrlEmbedResolver(appleHosts, (url, element) => {
   const result = appleResolveEmbed(url)
+  const card = readSubstackPodcast(element)
 
-  return result && { ...result, ...readSubstackPodcast(element) }
+  return result && { ...result, ...card, title: card.title ?? attr(element, 'title') }
 })
+
+export const appleFieldCleaners: Array<FieldCleaner> = [
+  { provider: 'applepodcasts', field: 'title', drop: 'Media player' },
+  // A copied YouTube snippet with the src swapped.
+  { provider: 'applepodcasts', field: 'title', drop: 'YouTube video player' },
+  { provider: 'applemusic', field: 'title', drop: 'Media player' },
+  { provider: 'applemusic', field: 'title', drop: 'メディアプレイヤー' },
+]

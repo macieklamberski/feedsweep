@@ -1,5 +1,5 @@
 import { getPathSegments, toMap } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -62,10 +62,7 @@ export const readSrcMediaId = (src: string | undefined): string | undefined => {
 }
 
 // No thumbnail: the poster needs Wistia's media JSON hop.
-export const wistiaResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const wistiaResolveEmbed: ResolveEmbed = (url, element) => {
   const embed = extractWistiaEmbed(url)
 
   if (!embed) {
@@ -86,6 +83,10 @@ export const wistiaResolveEmbed = (
 
 // A Wistia media, channel or playlist player iframe, or a frame of the login-gated channel page.
 export const wistiaEmbedResolver = createUrlEmbedResolver(wistiaHosts, wistiaResolveEmbed)
+
+export const wistiaFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'Wistia video player' },
+]
 
 // Starts playback on the click that loads the player: the iframe copies every query entry into
 // its embed options. Never `silentAutoPlay=true`, which forces a muted start.

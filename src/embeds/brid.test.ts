@@ -46,8 +46,8 @@ describeForEachParser('bridEmbedResolver', (parseHtml) => {
         provider: 'brid',
         id: '23442/820211',
         src: 'https://services.brid.tv/services/iframe/video/820211/23442',
-        title: 'FEAR STREET PART 2 1978  Official Trailer',
         ratio: '16/9',
+        title: 'FEAR STREET PART 2 1978  Official Trailer',
       }
 
       expect(await extract(value)).toEqual(expected)

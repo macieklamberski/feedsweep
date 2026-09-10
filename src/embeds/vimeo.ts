@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl, trimObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   composeQuery,
@@ -184,10 +184,7 @@ const vimeoEmbedParams = ['t']
 // The `title` a share snippet writes is usually the video's own title, but sometimes a player
 // label. The labels are not filtered. They are localised into at least five languages and some
 // name a plugin, not the platform, so any list of them goes stale.
-export const vimeoResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
   const reference = readReference(url)
 
   if (!reference) {
@@ -216,6 +213,12 @@ export const vimeoResolveEmbed = (
 
 // A Vimeo player iframe, a frame of a video or showcase page, or the Flash moogaloop player.
 export const vimeoEmbedResolver = createUrlEmbedResolver(vimeoHosts, vimeoResolveEmbed)
+
+export const vimeoFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: /^vimeo[ -](?:video player|video|player)(?: \d+)?$/ },
+  // The AllVideos Joomla plugin.
+  { provider, field: 'title', drop: 'JoomlaWorks AllVideos Player' },
+]
 
 // `dnt=1` turns off Vimeo's viewer tracking: no cookies and no analytics. `autoplay=1` starts
 // playback on the click that loads the player. Never `background=1`, which mutes the video and

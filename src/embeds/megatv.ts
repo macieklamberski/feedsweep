@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -12,8 +12,8 @@ const safeEmbedIdRegex = /^\d+$/
 // Mega switched to it at post 151920 in October 2020, and earlier articles carry eight-digit ids.
 const prefixedPostIdRegex = /^2020(\d{6,})$/
 
-const megatvResolveEmbed = (link: string): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
+const megatvResolveEmbed: ResolveEmbed = (url) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || getPathSegments(parsed).join('/') !== 'embed') {
     return

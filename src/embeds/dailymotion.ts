@@ -1,6 +1,9 @@
 import { getPathSegments, type Nullish, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
-import { keepIfMatches } from '../utils/dom.js'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import { attr, keepIfMatches } from '../utils/dom.js'
+
+const provider = 'dailymotion'
+
 import {
   parseUrlOnHosts,
   pickUrlParams,
@@ -138,17 +141,18 @@ export const readDailymotionEmbedSrc = (link: string): string | undefined => {
 // Neither player reads `autoplay` off the query: autostart comes from the saved configuration.
 const dailymotionEmbedParams = ['start', 'playlist']
 
-export const dailymotionResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
   const videoId = extractDailymotionId(url)
 
   if (videoId) {
     return {
-      provider: 'dailymotion',
+      provider,
       id: videoId,
       src: composeEmbedUrl('video', videoId, pickUrlParams(url, dailymotionEmbedParams)),
       url: `https://www.dailymotion.com/video/${videoId}`,
       thumbnail: `https://www.dailymotion.com/thumbnail/video/${videoId}`,
       ratio: '16/9',
+      title: attr(element, 'title'),
     }
   }
 
@@ -159,10 +163,11 @@ export const dailymotionResolveEmbed = (url: string): EmbedResolverResult | unde
     // an enrichment pass is the provider and the id alone. No thumbnail comes with it:
     // `/thumbnail/playlist/{id}` answers 404, and the video endpoint answers about a video.
     return {
-      provider: 'dailymotion',
+      provider,
       id: `playlist/${playlistId}`,
       src: composeEmbedUrl('playlist', playlistId),
       url: `https://www.dailymotion.com/playlist/${playlistId}`,
+      title: attr(element, 'title'),
     }
   }
 }
@@ -172,3 +177,10 @@ export const dailymotionEmbedResolver = createUrlEmbedResolver(
   dailymotionHosts,
   dailymotionResolveEmbed,
 )
+
+export const dailymotionFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'Dailymotion Video Player' },
+  { provider, field: 'title', drop: 'Lecteur vidéo Dailymotion' },
+  { provider, field: 'title', drop: 'Powered by Dailymotion' },
+  { provider, field: 'title', strip: 'Dailymotion video player – ' },
+]

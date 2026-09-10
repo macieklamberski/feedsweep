@@ -679,3 +679,21 @@ describeForEachParser('brightcove experience through the pipeline', (parseHtml) 
     expect(result).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('brightcoveIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, brightcoveIframeEmbedResolver)
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://players.brightcove.net/1234567890/default_default/index.html?videoId=6001" title="Q3 earnings call"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'brightcove',
+      id: '1234567890/6001',
+      src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=6001',
+      title: 'Q3 earnings call',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

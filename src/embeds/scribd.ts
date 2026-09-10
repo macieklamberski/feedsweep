@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar, keepIfMatches, parseRatio } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -44,11 +44,8 @@ const readDocumentId = (parsed: URL): string | undefined => {
 // The modern player, `scribd.com/embeds/{id}/content`. `/doc/{id}` is the pre-2018 spelling of
 // the same document and its embed lived at `/embeds/{id}` with no `/content` suffix. Both
 // address the id space this composes from.
-export const scribdResolveEmbed = (
-  link: string,
-  element: Element,
-): EmbedResolverResult | undefined => {
-  const parsed = parseUrlOnHosts(link, scribdHosts)
+export const scribdResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrlOnHosts(url, scribdHosts)
 
   if (!parsed) {
     return
@@ -75,11 +72,8 @@ export const scribdIframeEmbedResolver = createUrlEmbedResolver(scribdHosts, scr
   preferResolverSize: true,
 })
 
-export const scribdFlashResolveEmbed = (
-  link: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
+export const scribdFlashResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
     return

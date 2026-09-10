@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -32,7 +32,7 @@ export const extractSimplecastEpisode = (
   }
 }
 
-export const simplecastResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const simplecastResolveEmbed: ResolveEmbed = (url) => {
   const episode = extractSimplecastEpisode(url)
 
   if (!episode) {

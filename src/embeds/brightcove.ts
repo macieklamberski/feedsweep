@@ -1,6 +1,6 @@
 import type { Nullish } from 'trousse'
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches, paramValue } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -113,11 +113,8 @@ const federatedPathRegex = /\/services\/viewer\/federated_/
 
 // The account sits in the url as `publisherID` and the video id in `flashVars`. The federated
 // player id in the path is not a modern player id.
-const brightcoveFlashResolveEmbed = (
-  src: string,
-  element: Element,
-): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(src, placeholderBaseUrl)
+const brightcoveFlashResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !federatedPathRegex.test(parsed.pathname)) {
     return
@@ -185,7 +182,7 @@ export const brightcoveExperienceEmbedResolver = createMarkupEmbedResolver(
 const playerPathRegex = /^([^_]+)_(.+)$/
 
 // The players.brightcove.net player page as an ordinary iframe.
-export const brightcoveResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const brightcoveResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed?.hostname.startsWith('players.')) {
@@ -215,6 +212,7 @@ export const brightcoveResolveEmbed = (url: string): EmbedResolverResult | undef
     provider,
     id: `${account}/${videoId}`,
     src: `https://players.brightcove.net/${account}/${player}/index.html?videoId=${videoId}`,
+    title: attr(element, 'title'),
   }
 }
 

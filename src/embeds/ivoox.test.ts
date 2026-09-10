@@ -373,3 +373,36 @@ describeForEachParser('ivoox flash carriers through the pipeline', (parseHtml) =
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('ivooxEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, ivooxEmbedResolver)
+
+  it('should drop the YouTube label a copied snippet carries', async () => {
+    const value = html`
+      <iframe src="https://www.ivoox.com/player_ek_178634916_4_1.html" title="YouTube video player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'ivoox',
+      id: '178634916',
+      src: 'https://www.ivoox.com/player_ek_178634916_4_1.html',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://www.ivoox.com/player_ek_178634916_4_1.html" title="Episodio 12: La vuelta"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'ivoox',
+      id: '178634916',
+      src: 'https://www.ivoox.com/player_ek_178634916_4_1.html',
+      height: 200,
+      title: 'Episodio 12: La vuelta',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

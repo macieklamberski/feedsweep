@@ -132,3 +132,34 @@ describeForEachParser('bloggerEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('bloggerEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, bloggerEmbedResolver)
+
+  it('should drop the YouTube label a copied snippet carries', async () => {
+    const value = html`
+      <iframe src="https://www.blogger.com/video.g?token=AD6v5dz1" title="YouTube video player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'blogger',
+      id: 'AD6v5dz1',
+      src: 'https://www.blogger.com/video.g?token=AD6v5dz1',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://www.blogger.com/video.g?token=AD6v5dz1" title="Garden tour, June"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'blogger',
+      id: 'AD6v5dz1',
+      src: 'https://www.blogger.com/video.g?token=AD6v5dz1',
+      title: 'Garden tour, June',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

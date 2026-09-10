@@ -37,9 +37,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@cookingwithlynja/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
         url: 'https://www.tiktok.com/@cookingwithlynja/video/7001234567890123456',
+        height: 738,
         description: 'Midnight pasta #pasta',
         author: '@cookingwithlynja',
-        height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -63,9 +63,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@cookingwithlynja/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
         url: 'https://www.tiktok.com/@cookingwithlynja/video/7001234567890123456',
+        height: 738,
         description: 'Midnight pasta',
         author: '@cookingwithlynja',
-        height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -96,9 +96,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user/video/7000000000000000000',
         src: 'https://www.tiktok.com/embed/v2/7000000000000000000',
         url: 'https://www.tiktok.com/@user/video/7000000000000000000',
+        height: 738,
         description: 'caption text #tag',
         author: '@user',
-        height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -118,9 +118,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@cookingwithlynja/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
         url: 'https://www.tiktok.com/@cookingwithlynja/video/7001234567890123456',
+        height: 738,
         description: 'Midnight pasta',
         author: '@cookingwithlynja',
-        height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -169,9 +169,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@cookingwithlynja/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
         url: 'https://www.tiktok.com/@cookingwithlynja/video/7001234567890123456',
+        height: 738,
         description: 'Midnight pasta #pasta',
         author: '@cookingwithlynja',
-        height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -324,8 +324,8 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user',
         src: 'https://www.tiktok.com/embed/@user',
         url: 'https://www.tiktok.com/@user',
-        author: '@user',
         description: 'caption text',
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -356,9 +356,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
         url: 'https://www.tiktok.com/@user/video/7001234567890123456',
+        height: 738,
         description: 'Midnight pasta',
         author: '@user',
-        height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -379,9 +379,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user',
         src: 'https://www.tiktok.com/embed/@user',
         url: 'https://www.tiktok.com/@user',
-        author: '@user',
         width: 605,
         height: 400,
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -497,8 +497,8 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         provider: 'tiktok',
         id: '7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
-        description: 'Midnight pasta',
         height: 738,
+        description: 'Midnight pasta',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -518,8 +518,8 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
         url: 'https://www.tiktok.com/@user/video/7001234567890123456',
-        author: '@user',
         height: 738,
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -45,7 +45,7 @@ const readFlashId = (url: URL): string | undefined => {
   }
 }
 
-export const reverbnationResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const reverbnationResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, reverbnationHosts)
 
   if (!parsed) {

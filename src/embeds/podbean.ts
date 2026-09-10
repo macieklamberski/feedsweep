@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl, trimObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
@@ -37,10 +37,7 @@ export const extractPodbeanId = (link: string): string | undefined => {
   return keepIfMatches(id, safeIdRegex)
 }
 
-export const podbeanResolveEmbed = (
-  url: string,
-  element?: Element,
-): EmbedResolverResult | undefined => {
+export const podbeanResolveEmbed: ResolveEmbed = (url, element) => {
   const id = extractPodbeanId(url)
 
   if (!id) {

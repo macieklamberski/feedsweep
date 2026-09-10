@@ -51,9 +51,9 @@ describeForEachParser('bitchuteEmbedResolver', (parseHtml) => {
         id: '0fRr8eQ5hvv8',
         src: 'https://www.bitchute.com/embed/0fRr8eQ5hvv8/',
         url: 'https://www.bitchute.com/video/0fRr8eQ5hvv8/',
-        title: 'The Currency Act of 1764 The British Law That Started the Revolution',
         width: 459,
         height: 344,
+        title: 'The Currency Act of 1764 The British Law That Started the Revolution',
       }
 
       expect(await extract(value)).toEqual(expected)

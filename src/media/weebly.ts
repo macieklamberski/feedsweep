@@ -1,4 +1,4 @@
-import type { MediaResolver, MediaResolverResult } from '../types.js'
+import type { MediaResolver } from '../types.js'
 import { imageFileRegex } from '../utils/urls.js'
 
 // The upload path is /uploads/b/{user}-{pathId}/{name}, which only the poster url carries.
@@ -15,7 +15,7 @@ const liveIframeSelector = 'iframe[src]:not([src="about:blank"])'
 export const weeblyMediaResolver: MediaResolver = {
   kind: 'media',
   selector: '.wsite-video-wrapper',
-  extract: (element): MediaResolverResult | undefined => {
+  extract: (element) => {
     // A wrapper holding a live player is a third-party embed that replacing would destroy.
     if (element.querySelector(resolvedSelector) || element.querySelector(liveIframeSelector)) {
       return

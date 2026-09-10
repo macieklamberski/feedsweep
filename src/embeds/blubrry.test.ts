@@ -189,3 +189,36 @@ describeForEachParser('blubrry through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('blubrryEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, blubrryEmbedResolver)
+
+  it('should drop the label the player writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://player.blubrry.com/id/153989314/" title="Blubrry Podcast Player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: '153989314',
+      src: 'https://player.blubrry.com/id/153989314/',
+      height: 164,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://player.blubrry.com/id/153989314/" title="Discerning Hearts: Episode 4"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: '153989314',
+      src: 'https://player.blubrry.com/id/153989314/',
+      height: 164,
+      title: 'Discerning Hearts: Episode 4',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -1,5 +1,5 @@
 import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -65,7 +65,7 @@ export const flourishWidgetEmbedResolver = createMarkupEmbedResolver(
 
 // The pasted player iframe, the form that reaches a feed when the publisher skipped the script.
 // The WordPress oEmbed wrapper points at the same url with a `#?secret=` fragment appended.
-export const flourishResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const flourishResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
 
   if (!parsed || !isHostOf(parsed, flourishHosts)) {
@@ -74,7 +74,9 @@ export const flourishResolveEmbed = (url: string): EmbedResolverResult | undefin
 
   const segments = getPathSegments(parsed)
 
-  return segments[2] === 'embed' ? composeEmbed(segments[0], segments[1]) : undefined
+  const embed = segments[2] === 'embed' ? composeEmbed(segments[0], segments[1]) : undefined
+
+  return embed && { ...embed, title: attr(element, 'title') }
 }
 
 export const flourishIframeEmbedResolver = createUrlEmbedResolver(
@@ -97,6 +99,10 @@ export const readFlourishHeight = (data: unknown): number | undefined => {
     }
   } catch {}
 }
+
+export const flourishFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'Interactive or visual content' },
+]
 
 // No `autoplayParams`: a story's `#play-on-load` is a fragment, not a query parameter.
 export const flourishRenderHint: EmbedRenderHint = {

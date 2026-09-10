@@ -231,10 +231,10 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
         id: 'tracks/2088634614',
         src: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F2088634614',
         url: 'https://soundcloud.com/kaliuchis/its-just-us',
+        thumbnail: 'https://i1.sndcdn.com/artworks-t500x500.jpg',
         height: 166,
         title: "It's Just Us by Kali Uchis",
         description: 'A single',
-        thumbnail: 'https://i1.sndcdn.com/artworks-t500x500.jpg',
         author: 'Kali Uchis',
       }
 
@@ -261,9 +261,9 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
         provider: 'soundcloud',
         id: 'tracks/12345',
         src: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F12345',
+        thumbnail: 'https://i1.sndcdn.com/artworks-Xy2ab-t500x500.jpg',
         height: 166,
         title: 'Real Track Name',
-        thumbnail: 'https://i1.sndcdn.com/artworks-Xy2ab-t500x500.jpg',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -290,9 +290,9 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
         provider: 'soundcloud',
         id: 'tracks/12345',
         src: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F12345',
+        thumbnail: 'https://i1.sndcdn.com/artworks-Xy2ab-t500x500.jpg',
         height: 166,
         title: 'Real Track Name',
-        thumbnail: 'https://i1.sndcdn.com/artworks-Xy2ab-t500x500.jpg',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -344,9 +344,9 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
         provider: 'soundcloud',
         id: 'tracks/948032941',
         src: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F948032941',
+        thumbnail: 'https://i1.sndcdn.com/artworks-j4ziiQ-t500x500.jpg',
         height: 166,
         title: 'Youth Is A Fugitive',
-        thumbnail: 'https://i1.sndcdn.com/artworks-j4ziiQ-t500x500.jpg',
         author: 'Fonograf Editions',
       }
 
@@ -574,8 +574,8 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
-        src: 'https://w.soundcloud.com/player/?url=https%3A//api-v2.soundcloud.com/tracks/293',
         id: 'tracks/293',
+        src: 'https://w.soundcloud.com/player/?url=https%3A//api-v2.soundcloud.com/tracks/293',
         height: 166,
       }
 
@@ -769,5 +769,38 @@ describeForEachParser('soundcloud through the pipeline', (parseHtml) => {
     const enclosures = [{ url: 'https://soundcloud.com/press/kit.pdf', type: 'application/pdf' }]
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml('<p>Body</p>')
+  })
+})
+
+describeForEachParser('soundcloudEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, soundcloudEmbedResolver)
+
+  it('should drop the platform name the snippet writes in place of the track name', async () => {
+    const value = html`
+      <iframe src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fanjunadeep%2Fedition-586" title="SoundCloud"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'soundcloud',
+      src: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fanjunadeep%2Fedition-586',
+      url: 'https://soundcloud.com/anjunadeep/edition-586',
+      height: 166,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fanjunadeep%2Fedition-586" title="Anjunadeep Edition 586"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'soundcloud',
+      src: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fanjunadeep%2Fedition-586',
+      url: 'https://soundcloud.com/anjunadeep/edition-586',
+      height: 166,
+      title: 'Anjunadeep Edition 586',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })
