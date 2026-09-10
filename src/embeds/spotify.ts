@@ -27,8 +27,6 @@ const pathPrefixRegex = /^(?:embed|embed-podcast|intl-[a-z]{2})$/
 // The pre-2017 snippet framed `embed.spotify.com/?uri=spotify:{type}:{id}`, and that host still
 // serves a player.
 const legacyUriRegex = /^spotify:(?:.*:)?([a-z]+):([a-zA-Z0-9]+)$/
-// The snippet writes the title as `Spotify Embed: {name}`.
-const titlePrefixRegex = /^Spotify Embed:\s*/
 // Substack writes `By {owner}` where a playlist card's act goes, and Spotify names that same
 // account bare on its own player.
 const ownerPrefixRegex = /^By /
@@ -40,6 +38,7 @@ type SubstackItemAttributes = {
   description?: string
 }
 
+const provider = 'spotify'
 const spotifyHosts = ['spotify.com']
 const spotifyImageHosts = ['scdn.co']
 
@@ -114,29 +113,25 @@ export const spotifyResolveEmbed = (
   }
 
   const card = element ? readSubstackItem(element, type) : {}
-  const stated = attr(element, 'title')?.replace(titlePrefixRegex, '').trim()
 
   return {
-    provider: 'spotify',
+    provider,
     id: `${type}/${id}`,
     src: `https://open.spotify.com/embed/${type}/${id}`,
     url: `https://open.spotify.com/${type}/${id}`,
+    thumbnail: card.thumbnail,
     height: spotifyHeights.get(type),
     // Some payloads carry an empty title string, and ?? would let it shadow the stated one.
-    title: card.title?.trim() || stated,
+    title: card.title?.trim() || attr(element, 'title'),
+    description: card.description,
     author: card.author,
     publisher: card.publisher,
-    description: card.description,
-    thumbnail: card.thumbnail,
   }
 }
 
 export const spotifyEmbedResolver = createUrlEmbedResolver(spotifyHosts, spotifyResolveEmbed)
 
 export const spotifyFieldCleaners: Array<FieldCleaner> = [
-  {
-    provider: 'spotify',
-    field: 'description',
-    drop: /^(?:album|episode|playlist|podcast|podcast episode)$/,
-  },
+  { provider, field: 'title', strip: 'Spotify Embed:' },
+  { provider, field: 'description', drop: /^(?:album|episode|playlist|podcast|podcast episode)$/ },
 ]

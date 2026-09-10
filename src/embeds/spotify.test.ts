@@ -546,6 +546,31 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // The card's title is the same string the snippet wrote into the frame, prefix included.
+    it('should strip the snippet prefix from a card title', async () => {
+      const prefixedTitleCardAttrs = jsonAttrValue({
+        title: 'Spotify Embed: Cemetry Gates',
+      })
+      const value = html`
+        <iframe
+          class="spotify-wrap"
+          data-attrs="${prefixedTitleCardAttrs}"
+          src="https://open.spotify.com/embed/track/03yOjwHoOPDlTUg0NRxN6t"
+          title="Spotify Embed: Cemetry Gates"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'track/03yOjwHoOPDlTUg0NRxN6t',
+        src: 'https://open.spotify.com/embed/track/03yOjwHoOPDlTUg0NRxN6t',
+        url: 'https://open.spotify.com/track/03yOjwHoOPDlTUg0NRxN6t',
+        height: 152,
+        title: 'Cemetry Gates',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should treat a whitespace-only card title as blank', async () => {
       const whitespaceTitleCardAttrs = jsonAttrValue({
         title: '   ',
