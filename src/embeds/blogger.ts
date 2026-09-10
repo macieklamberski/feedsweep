@@ -1,25 +1,16 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
-import { keepIfMatches } from '../utils/dom.js'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import { attr, keepIfMatches } from '../utils/dom.js'
+
+const provider = 'blogger'
+
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// The token is opaque and url-safe base64, so anything outside that alphabet is not one and is
-// left to the generic iframe path instead of being interpolated into a url. Real tokens run far
-// longer than the floor, which sits well below them because the prefix and the size are Google's
-// to change; it only has to keep out a truncated fragment. That matters because `video.g?token=A`
-// answers 200 and renders nothing, so the player looks minted and is not.
-const safeTokenRegex = /^[\w-]{20,}$/
+// The alphabet is the whole guard: the prefix and the length are Google's to change.
+const safeTokenRegex = /^[\w-]+$/
 
 const bloggerHosts = ['blogger.com']
 
-// Blogger's own hosted video, `iframe.b-hbp-video.b-uploaded` pointing at
-// `blogger.com/video.g?token={token}`.
-//
-// There is no poster to derive and no page to open. The player paints its poster as a css
-// background image on `i9.ytimg.com/vi_blogger/{internalId}/1.jpg`, and that internal id is in
-// neither the token nor the feed, so reaching it means running the player page. Liveness is
-// just as invisible: a live token, a deleted video and an invented one all answer 200 with a
-// near-identical javascript shell, checked 2026-08-13.
 export const extractBloggerToken = (link: string): string | undefined => {
   const parsed = parseUrl(link)
 
@@ -32,8 +23,10 @@ export const extractBloggerToken = (link: string): string | undefined => {
   return keepIfMatches(token, safeTokenRegex)
 }
 
-// The iframe renders on its own, so this states provider and id and nothing else.
-export const bloggerResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+// Blogger's own hosted video: an iframe on blogger.com/video.g with no poster and no page to open.
+// The poster is a css background on `i9.ytimg.com/vi_blogger/{internalId}/1.jpg`, and that id is
+// in neither the token nor the feed. A live, a deleted and an invented token all answer 200.
+export const bloggerResolveEmbed: ResolveEmbed = (url, element) => {
   const token = extractBloggerToken(url)
 
   if (!token) {
@@ -41,10 +34,15 @@ export const bloggerResolveEmbed = (url: string): EmbedResolverResult | undefine
   }
 
   return {
-    provider: 'blogger',
+    provider,
     id: token,
     src: `https://www.blogger.com/video.g?token=${token}`,
+    title: attr(element, 'title'),
   }
 }
 
 export const bloggerEmbedResolver = createUrlEmbedResolver(bloggerHosts, bloggerResolveEmbed)
+
+export const bloggerFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'YouTube video player' },
+]

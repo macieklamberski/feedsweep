@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
@@ -131,5 +132,74 @@ describeForEachParser('buzzsproutIframeEmbedResolver', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should take the episode name off the stated title', async () => {
+    const value = html`
+      <iframe
+        src="https://www.buzzsprout.com/1735722/episodes/8166676-mahler-symphony?client_source=small_player&iframe=true"
+        title="How Producers Keep Live Events on Track"
+        scrolling="no"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'buzzsprout',
+      id: '1735722/8166676',
+      src: 'https://www.buzzsprout.com/1735722/8166676?iframe=true',
+      url: 'https://www.buzzsprout.com/1735722/8166676',
+      height: 200,
+      title: 'How Producers Keep Live Events on Track',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+// The url resolver is offered every enclosure a feed carries, and Buzzsprout serves the episode
+// audio on the same host as the episode page, one extension apart.
+describeForEachParser('buzzsprout through the pipeline', (parseHtml) => {
+  const convert = (enclosures: Array<{ url: string; type: string }>) => {
+    return transformContent('<p>Body</p>', {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a buzzsprout audio enclosure playable', async () => {
+    const enclosures = [
+      { url: 'https://www.buzzsprout.com/231452/9876543-my-episode-title.mp3', type: 'audio/mpeg' },
+    ]
+
+    const expected = html`
+      <audio
+        data-enclosure=""
+        controls
+        src="https://www.buzzsprout.com/231452/9876543-my-episode-title.mp3"
+      ></audio>
+      <p>Body</p>
+    `
+
+    expect(await convert(enclosures)).toEqualHtml(expected)
+  })
+
+  it('should leave the episodes spelling of the enclosure playable too', async () => {
+    const enclosures = [
+      {
+        url: 'https://www.buzzsprout.com/231452/episodes/9876543-my-episode-title.mp3',
+        type: 'audio/mpeg',
+      },
+    ]
+
+    const expected = html`
+      <audio
+        data-enclosure=""
+        controls
+        src="https://www.buzzsprout.com/231452/episodes/9876543-my-episode-title.mp3"
+      ></audio>
+      <p>Body</p>
+    `
+
+    expect(await convert(enclosures)).toEqualHtml(expected)
   })
 })

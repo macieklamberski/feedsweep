@@ -8,6 +8,7 @@ import {
   parseSrcset,
   pickLargerImageUrl,
   sizeKeywordLiterals,
+  widestSrcsetUrl,
 } from './images.js'
 
 describe('parseSrcset', () => {
@@ -44,6 +45,40 @@ describe('countSrcsetCandidates', () => {
 
     expect(countSrcsetCandidates(value)).toBeGreaterThan(parseSrcset(value).length)
     expect(parseSrcset(value)).toHaveLength(1)
+  })
+})
+
+describe('widestSrcsetUrl', () => {
+  it('should take the candidate with the largest width descriptor', () => {
+    const value =
+      'https://example.com/small.jpg 320w, https://example.com/big.jpg 1280w, https://example.com/mid.jpg 640w'
+
+    expect(widestSrcsetUrl(value)).toBe('https://example.com/big.jpg')
+  })
+
+  // A density-only list states no width to compare, and those lists ascend, so the seed is
+  // the answer rather than a starting point.
+  it('should take the last candidate when only densities are stated', () => {
+    const value =
+      'https://example.com/1x.jpg 1x, https://example.com/2x.jpg 2x, https://example.com/3x.jpg 3x'
+
+    expect(widestSrcsetUrl(value)).toBe('https://example.com/3x.jpg')
+  })
+
+  it('should prefer a stated width over a later density-only candidate', () => {
+    const value = 'https://example.com/wide.jpg 1280w, https://example.com/dense.jpg 2x'
+
+    expect(widestSrcsetUrl(value)).toBe('https://example.com/wide.jpg')
+  })
+
+  it('should return undefined when every candidate is a bare descriptor', () => {
+    const value = '768w, 225w'
+
+    expect(widestSrcsetUrl(value)).toBeUndefined()
+  })
+
+  it.each([[''], [null], [undefined]])('should return undefined for %p', (value) => {
+    expect(widestSrcsetUrl(value)).toBeUndefined()
   })
 })
 
@@ -555,6 +590,18 @@ describe('getSizeKeywordRank', () => {
 
     expect(relative).toBe(absolute)
     expect(relative).toBeGreaterThan(0)
+  })
+
+  // A path segment is whatever the publisher wrote, and `constructor` and `__proto__` name
+  // members every object inherits. Both have to rank the way any unknown segment ranks.
+  it('should rank a segment naming an inherited member as it ranks an unknown one', () => {
+    const inherited = getSizeKeywordRank('https://example.com/photos/constructor/abc.jpg')
+    const prototype = getSizeKeywordRank('https://example.com/photos/__proto__/abc.jpg')
+    const unknown = getSizeKeywordRank('https://example.com/photos/sunset/abc.jpg')
+
+    expect(inherited).toBe(unknown)
+    expect(prototype).toBe(unknown)
+    expect(unknown).toBe(0)
   })
 
   it('should return 0 for a keyword carrying a dimension suffix', () => {

@@ -1,7 +1,10 @@
-import { getPathSegments } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
-import { keepIfMatches } from '../utils/dom.js'
+import { getPathSegments, trimObject } from 'trousse'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'ted'
 
 // Talk slugs are the speaker and title joined by underscores, e.g. `ethan_zuckerman`.
 const safeSlugRegex = /^[a-z0-9_]+$/i
@@ -24,27 +27,64 @@ export const extractTedTalk = (link: string): string | undefined => {
   return keepIfMatches(slug, safeSlugRegex)
 }
 
-// Feeds carry a short slug (`ethan_zuckerman`) and TED redirects it to the full one
-// (`ethan_zuckerman_listening_to_global_voices`), which cannot be derived offline, so one
-// redirect is unavoidable. `/embed/{slug}` reaches the canonical player in a single hop while
-// the `/talks/` path in the markup takes two, both checked 2026-08-11.
-//
-// The canonical talk page is derivable from the slug, which is what a reader gets to click.
-// The thumbnail is not derivable: TED's oEmbed returns `thumbnail_url` (verified live in the
-// platform research) but it is a lookup, so it belongs to the enrichment hook, which needs
-// exactly the provider and id tagged here.
-export const tedResolveEmbed = (url: string): EmbedResolverResult | undefined => {
-  const slug = extractTedTalk(url)
+// The Flash player's url is the same file for every talk, so the carrier names nothing on its
+// own and the talk is only in the flashVars, inside the ad targeting keys:
+// `adKeys=talk={slug};year=2010;theme=…`. The player is dead, so these embeds render nothing.
+const flashPlayerPathRegex = /\/assets\/player\/swf\/embedplayer\.swf$/i
+// The talk key in the flashVars adKeys value, spelled talk={slug};year={year}.
+const adKeysTalkRegex = /(?:^|;)talk=([a-z0-9_]+)/i
 
-  if (!slug) {
+// TED cut the talk key off at this length, so a slug this long is usually a prefix of the real
+// one but not always.
+const truncatedSlugLength = 55
+
+const readFlashTalk = (
+  url: string,
+  element: Element | undefined,
+): { slug: string; thumbnail?: string } | undefined => {
+  const parsed = parseUrlOnHosts(url, tedHosts)
+
+  if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
     return
   }
 
+  const config = new URLSearchParams(flashVars(element) ?? '')
+  const slug = keepIfMatches(config.get('adKeys')?.match(adKeysTalkRegex)?.[1], safeSlugRegex)
+
+  // A slug at the cap is a truncated key, and most of them lead to a talk page that 404s.
+  if (!slug || slug.length >= truncatedSlugLength) {
+    return
+  }
+
+  // The snippet states its own poster in `su`, on `images.ted.com`, and those files still serve
+  // with no signature and no expiry.
+  const poster = config.get('su') ?? undefined
+
+  return { slug, thumbnail: parseUrlOnHosts(poster, tedHosts) ? poster : undefined }
+}
+
+// TED's embed.ted.com iframe, and the dead Flash player that names the talk only in its flashVars.
+export const tedResolveEmbed: ResolveEmbed = (url, element) => {
+  const slug = extractTedTalk(url)
+  const talk = slug ? { slug } : readFlashTalk(url, element)
+
+  if (!talk) {
+    return
+  }
+
+  const title = attr(element, 'title')
+
+  // The thumbnail is not derivable from the slug: TED's oEmbed returns `thumbnail_url`, so an
+  // iframe carrier leaves it to enrichment. Only the Flash carrier states one, in its own config.
   return {
-    provider: 'ted',
-    id: slug,
-    src: `https://embed.ted.com/embed/${slug}`,
-    url: `https://www.ted.com/talks/${slug}`,
+    provider,
+    id: talk.slug,
+    // Feeds carry a short slug (`ethan_zuckerman`) and TED redirects it to the full one, which
+    // cannot be derived offline. `/embed/{slug}` reaches the canonical player in a single hop
+    // while the `/talks/` path in the markup takes two.
+    src: `https://embed.ted.com/embed/${talk.slug}`,
+    url: `https://www.ted.com/talks/${talk.slug}`,
+    ...trimObject({ thumbnail: talk.thumbnail, title }, Boolean),
   }
 }
 
@@ -54,6 +94,6 @@ export const tedEmbedResolver = createUrlEmbedResolver(tedHosts, tedResolveEmbed
 // query. It reaches the player only when the url does not redirect, since the embed's 308 from
 // a legacy talk slug to the canonical one drops the query.
 export const tedRenderHint: EmbedRenderHint = {
-  provider: 'ted',
+  provider,
   autoplayParams: { autoplay: 'true' },
 }
