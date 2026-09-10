@@ -405,3 +405,53 @@ describeForEachParser('appleEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('appleEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, appleEmbedResolver)
+
+  it('should drop the label the share dialog writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://embed.podcasts.apple.com/gb/podcast/exploaded/id1887512662" title="Media player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'applepodcasts',
+      id: 'podcast/1887512662',
+      src: 'https://embed.podcasts.apple.com/gb/podcast/exploaded/id1887512662',
+      url: 'https://podcasts.apple.com/gb/podcast/exploaded/id1887512662',
+      height: 450,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the label in the language the share dialog wrote it in', async () => {
+    const value = html`
+      <iframe src="https://embed.music.apple.com/us/album/thriller/1440857781" title="メディアプレイヤー"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'applemusic',
+      id: 'album/1440857781',
+      src: 'https://embed.music.apple.com/us/album/thriller/1440857781',
+      url: 'https://music.apple.com/us/album/thriller/1440857781',
+      height: 450,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://embed.music.apple.com/us/album/thriller/1440857781" title="Thriller"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'applemusic',
+      id: 'album/1440857781',
+      src: 'https://embed.music.apple.com/us/album/thriller/1440857781',
+      url: 'https://music.apple.com/us/album/thriller/1440857781',
+      height: 450,
+      title: 'Thriller',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
