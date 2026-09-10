@@ -501,3 +501,23 @@ describe('readRedditHeight', () => {
     expect(readRedditHeight({ type: 'resize.embed', data: 0 })).toBeUndefined()
   })
 })
+
+describeForEachParser('redditIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, redditIframeEmbedResolver)
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://embed.reddit.com/r/pics/comments/dq4m1v/" title="My grandfather in his workshop, 1974"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'r/pics/comments/dq4m1v',
+      src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
+      url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
+      title: 'My grandfather in his workshop, 1974',
+      publisher: 'r/pics',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

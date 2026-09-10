@@ -96,8 +96,8 @@ const composeEmbed = (
     id: target.path,
     src: `https://embed.reddit.com/${target.path}/`,
     url: `https://www.reddit.com/${target.path}/`,
-    publisher: target.publisher,
     ...extra,
+    publisher: target.publisher,
   }
 }
 
@@ -147,10 +147,13 @@ export const redditWidgetEmbedResolver = createMarkupEmbedResolver(
   readWidget,
 )
 
-export const redditResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const redditResolveEmbed = (
+  url: string,
+  element?: Element,
+): EmbedResolverResult | undefined => {
   const target = parseTarget(url)
 
-  return target ? composeEmbed(target) : undefined
+  return target ? composeEmbed(target, { title: attr(element, 'title') }) : undefined
 }
 
 // The embed.reddit.com frame the loader builds, kept by exports that stored the rendered page.
