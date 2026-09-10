@@ -9,6 +9,7 @@ const safeUrnRegex = /^urn:li:[a-zA-Z]+:\d+$/
 
 const linkedinHosts = ['linkedin.com']
 
+// A post has no name, and the frame titles itself `Embedded post` in the reader's language.
 const linkedinResolveEmbed = (link: string): EmbedResolverResult | undefined => {
   const [route, section, action, urn] = getPathSegments(link)
 

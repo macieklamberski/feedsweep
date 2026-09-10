@@ -241,6 +241,8 @@ export const twitterSubstackEmbedResolver = createMarkupEmbedResolver(
 // the same `id` query, and both occur in real feeds.
 const playerPaths = new Set(['/embed/Tweet.html', '/embed/index.html'])
 
+// A post has no name: its words go to `description`, and the frame titles itself `Twitter Tweet`
+// or `X Post`.
 export const twitterResolveEmbed = (url: string): EmbedResolverResult | undefined => {
   const parsed = parseUrl(url)
   const id = parsed && playerPaths.has(parsed.pathname) ? parsed.searchParams.get('id') : undefined

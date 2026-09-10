@@ -234,6 +234,7 @@ const readSubstackPost = (element: Element): Partial<EmbedResolverResult> => {
 }
 
 // The embed.bsky.app player iframe, saved by a CMS that ran the script or pasted by hand.
+// A post has no name: its words go to `description`, and the frame's title is not read.
 export const blueskyIframeEmbedResolver = createUrlEmbedResolver(blueskyHosts, (url, element) => {
   const post = extractBlueskyPostFromUrl(url)
 

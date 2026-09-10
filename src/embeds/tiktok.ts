@@ -180,6 +180,7 @@ export const tiktokBlockquoteEmbedResolver = createMarkupEmbedResolver(
 )
 
 // A pasted TikTok player iframe, or a frame of the watch page, which refuses framing.
+// A post has no name: its words go to `description`, and the frame's title is not read.
 export const tiktokIframeEmbedResolver = createUrlEmbedResolver(
   tiktokHosts,
   (src) => {

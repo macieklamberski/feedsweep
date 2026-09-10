@@ -264,6 +264,8 @@ export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
 
 // The frame `embed.js` builds, which exports store after render and iframe generators paste.
 // Its query and hash (`cr`, `wp`, `rd`, `rp`) describe the embedding page, not the player.
+// A post has no name: its words go to `description`, and the frame titles itself `Instagram`
+// or nothing.
 export const instagramResolveEmbed = (url: string): EmbedResolverResult | undefined => {
   const post = readPostUrl(url)
 

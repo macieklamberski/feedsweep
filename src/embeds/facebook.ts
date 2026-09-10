@@ -129,6 +129,8 @@ const isWatchPage = (url: URL): boolean => {
   return watchPathRegex.test(url.pathname) && safeWatchIdRegex.test(url.searchParams.get('v') ?? '')
 }
 
+// A post has no name: its words go to `description`, and the frame titles itself
+// `fb:post Facebook Social Plugin`.
 export const facebookResolveEmbed = (url: string): EmbedResolverResult | undefined => {
   const parsed = parseUrl(url)
 
