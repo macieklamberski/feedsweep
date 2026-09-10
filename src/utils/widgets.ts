@@ -7,6 +7,7 @@ import type {
   MediaResolver,
   MediaResolverResult,
   ParseDateFn,
+  ResolveEmbed,
   TransformContext,
   WidgetResolver,
   WidgetResolverResult,
@@ -162,7 +163,7 @@ export const setDimensions = (
 // An iframe's `title` is the one field a publisher's snippet states that the url does not carry.
 export const createUrlEmbedResolver = (
   hosts: Array<string>,
-  extract: (url: string, element: Element) => EmbedResolverResult | undefined,
+  extract: ResolveEmbed,
   options: ResolverOptions = {},
 ): EmbedResolver => {
   return {

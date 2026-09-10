@@ -42,6 +42,8 @@ export type EmbedResolverResult = {
   duration?: number
 }
 
+export type ResolveEmbed = (url: string, element?: Element) => EmbedResolverResult | undefined
+
 export type EmbedRenderHint = {
   provider: string
   // The origin the player's messages arrive from, for a reader to check `event.origin` against.
