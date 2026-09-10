@@ -2,6 +2,7 @@ import { codepenFieldCleaners } from '../embeds/codepen.js'
 import { dailymotionFieldCleaners } from '../embeds/dailymotion.js'
 import { instagramFieldCleaners } from '../embeds/instagram.js'
 import { kalturaFieldCleaners } from '../embeds/kaltura.js'
+import { libsynFieldCleaners } from '../embeds/libsyn.js'
 import { speakerdeckFieldCleaners } from '../embeds/speakerdeck.js'
 import { spotifyFieldCleaners } from '../embeds/spotify.js'
 import { youtubeFieldCleaners } from '../embeds/youtube.js'
@@ -15,6 +16,7 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...dailymotionFieldCleaners,
   ...instagramFieldCleaners,
   ...kalturaFieldCleaners,
+  ...libsynFieldCleaners,
   ...speakerdeckFieldCleaners,
   ...spotifyFieldCleaners,
   ...youtubeFieldCleaners,

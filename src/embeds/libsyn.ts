@@ -1,6 +1,9 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
-import { parsePixelSize } from '../utils/dom.js'
+import type { EmbedResolverResult, FieldCleaner } from '../types.js'
+import { attr, parsePixelSize } from '../utils/dom.js'
+
+const provider = 'libsyn'
+
 import { isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -51,7 +54,10 @@ export const extractLibsynEmbed = (
   }
 }
 
-export const libsynResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const libsynResolveEmbed = (
+  url: string,
+  element?: Element,
+): EmbedResolverResult | undefined => {
   const embed = extractLibsynEmbed(url)
 
   if (!embed) {
@@ -64,13 +70,21 @@ export const libsynResolveEmbed = (url: string): EmbedResolverResult | undefined
   // `?item_id={id}` and an HTML page to `?url={player url}`, and artwork needs an authenticated
   // api call.
   return {
-    provider: 'libsyn',
+    provider,
     id: `${embed.kind}/${embed.id}`,
     src: `https://play.libsyn.com/embed/${embed.kind}/id/${embed.id}/${height}`,
     height: embed.height,
+    title: attr(element, 'title'),
   }
 }
 
 // Libsyn's player iframe, whose old html5-player.libsyn.com host answers 500 for older episodes.
 // `play.libsyn.com` serves all of them.
 export const libsynEmbedResolver = createUrlEmbedResolver(libsynHosts, libsynResolveEmbed)
+
+export const libsynFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'Embed Player' },
+  { provider, field: 'title', drop: 'Libsyn Player' },
+  // A copied YouTube snippet with the src swapped.
+  { provider, field: 'title', drop: 'YouTube video player' },
+]
