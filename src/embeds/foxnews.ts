@@ -1,8 +1,10 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'foxnews'
 
 const safeIdRegex = /^\d+$/
 
@@ -18,7 +20,7 @@ const playerRatio = '16/9'
 // invented one.
 const composeEmbed = (id: string): EmbedResolverResult => {
   return {
-    provider: 'foxnews',
+    provider,
     id,
     src: `https://video.foxnews.com/v/video-embed.html?video_id=${id}`,
     url: `https://www.foxnews.com/video/${id}`,
@@ -28,7 +30,7 @@ const composeEmbed = (id: string): EmbedResolverResult => {
 
 // Both carriers name the video in a query parameter: `id` on the script, `video_id` on the
 // iframe. Everything else in the query is the snippet's size or the embedding page's referrer.
-export const foxnewsResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, foxnewsHosts)
   const id = parsed?.searchParams.get('video_id') ?? parsed?.searchParams.get('id')
   const [route, page] = parsed ? getPathSegments(parsed) : []
@@ -40,9 +42,7 @@ export const foxnewsResolveEmbed = (url: string): EmbedResolverResult | undefine
   return id && safeIdRegex.test(id) ? composeEmbed(id) : undefined
 }
 
-// Fox's old share snippet is `embed.js?id=…&w=…&h=…` beside a `<noscript>` link to the video
-// site. The script no longer exists (404), so even on the page it was pasted into nothing plays,
-// while the video itself still serves from the embed page the id names.
+// Fox's old share snippet is an `embed.js` script tag whose loader is gone, so nothing plays.
 export const foxnewsScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="video.foxnews.com/v/embed.js"]',
   (element) => {
@@ -51,3 +51,10 @@ export const foxnewsScriptEmbedResolver = createMarkupEmbedResolver(
 )
 
 export const foxnewsIframeEmbedResolver = createUrlEmbedResolver(foxnewsHosts, foxnewsResolveEmbed)
+
+export const foxnewsRenderHint: EmbedRenderHint = {
+  provider,
+  // The player reads the literal `true` and ignores every other value.
+  // The player starts unmuted, and muted is a separate rule the bare `autoplay` does not carry.
+  autoplayParams: { autoplay: 'true' },
+}

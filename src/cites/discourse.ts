@@ -1,23 +1,24 @@
-import { isHostOf } from 'trousse'
+import { parseUrl } from 'trousse'
 import { parseMastodonStatus } from '../embeds/mastodon.js'
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, isElement, text } from '../utils/dom.js'
+import { isOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 
 // When the linked article has a date, the generic onebox appends it to the source anchor's
 // text ("Whonix – 13 Jan 23") behind this spaced en dash.
 const publisherDateSeparator = ' – '
 
+// The pull request and commit engines render a comment with the author in a bare span, not under
+// .user, and the heading repeating it as `Comment by USER - ` before the real title.
 const stripCommentPrefix = (title: string | undefined, author: string): string | undefined => {
   const prefix = `Comment by ${author} - `
 
   return title?.startsWith(prefix) ? title.slice(prefix.length) : title
 }
 
-// The GitHub onebox splits its body preview around a "…" show-more expander: the text
-// before it is visible and the `.excerpt.hidden` span holds the rest of the same sentence.
-// Reading the paragraph's textContent whole would inject the ellipsis mid-word, so the
-// expander is skipped and the halves rejoined.
+// The GitHub onebox splits its preview around a show-more "…" whose hidden span holds the rest
+// of the sentence, so reading the paragraph whole injects the ellipsis mid-sentence.
 const githubDescription = (paragraph: Element): string | undefined => {
   let result = ''
 
@@ -32,34 +33,25 @@ const githubDescription = (paragraph: Element): string | undefined => {
   return result.trim() || undefined
 }
 
-// Onebox engines whose cards are not link previews, so a cite would misrepresent what the
-// author linked. Their markup passes through untouched. Only engines that render as
-// `aside.onebox` need listing: the other social engines (TikTok, Reddit, Facebook,
-// Twitch) emit bare iframes, and Mastodon links go through the generic engine.
+// Engines whose cards are not link previews. TikTok, Reddit, Facebook and Twitch emit bare
+// iframes, not aside.onebox, and Mastodon links go through the generic engine.
 export const omittedOneboxClasses = [
-  'twitterstatus', // A social post: the heading is the author and the body the post text.
-  'threadsstatus', // The same social-post shape as twitterstatus.
-  'instagram', // Legacy social-post asides; since 2021 the engine emits a bare iframe.
-  'pdf', // A file card: the title is the filename and the only paragraph its size.
-  'googlemeet', // A join-call card: every field is a fixed label or the meeting code.
+  'twitterstatus', // A social post: the heading is the author and the body the post text
+  'threadsstatus', // The same social-post shape as twitterstatus
+  'instagram', // Legacy social-post asides; since 2021 the engine emits a bare iframe
+  'pdf', // A file card: the title is the filename and the only paragraph its size
+  'googlemeet', // A join-call card: every field is a fixed label or the meeting code
 ]
 
-// Social platforms without their own onebox engine: their posts arrive as generic asides
-// whose og title is the author's name, so they are recognized by the cited host instead of
-// the engine class.
+// Hosts with no onebox engine of their own: their posts arrive as generic asides whose og title
+// is the author's name.
 export const socialPostHosts = ['bsky.app', 'threads.net', 'threads.com']
 
-// Mastodon posts cannot be told apart by host (any domain can be an instance). Two other
-// signals mark them: the status url shape, read by the same parse the embed resolver uses so
-// the two cannot disagree about what a status is, and the page titling itself "Display Name
+// Any domain can be a Mastodon instance. A status page titles itself "Display Name
 // (@user@instance)", which the generic onebox renders as its heading.
 const fediverseHandleRegex = /@[\w.-]+@[\w-]+(?:\.[\w-]+)+/
 
-// Discourse forums expand a pasted link into a "onebox" card. The engine that built the
-// card varies (a generic one covers most feeds, the rest are per-site engines like github
-// or wikipedia), and each engine renders its own body markup, so this
-// keys on the wrapper and the fields the generic shape shares rather than on the engine
-// subclass. The canonical URL sits on the wrapper, so no inner anchor is needed.
+// Discourse's onebox: a pasted link expanded into an aside of divs the forum's CSS lays out.
 export const discourseCiteResolver: CiteResolver = {
   kind: 'cite',
   selector: `aside.onebox${omittedOneboxClasses.map((name) => `:not(.${name})`).join('')}`,
@@ -73,7 +65,10 @@ export const discourseCiteResolver: CiteResolver = {
     // Engines differ on the heading level they use for the title.
     const title = text(body, 'h3, h4')
 
-    if (url && (isHostOf(url, socialPostHosts) || parseMastodonStatus(url))) {
+    // data-onebox-src arrives unrewritten, so a protocol-relative url names no host without a base.
+    const cited = url ? parseUrl(url, placeholderBaseUrl) : undefined
+
+    if (cited && (isOnHosts(cited, socialPostHosts) || parseMastodonStatus(cited.href))) {
       return
     }
 
@@ -102,10 +97,6 @@ export const discourseCiteResolver: CiteResolver = {
       description = text(find(body, 'p', (paragraph) => !find(paragraph, 'a.author')))
     }
 
-    // The pull request and commit engines render a comment as a second shape: the author sits in
-    // a bare `span` instead of under `.user`, and the heading repeats it as `Comment by USER - `
-    // in front of the real title. Reading the span recovers the author, and dropping the prefix
-    // leaves the title stating only the title.
     const githubAuthor =
       text(element, '.github-info .user a') ?? text(element, '.github-info span a')
 
@@ -113,14 +104,25 @@ export const discourseCiteResolver: CiteResolver = {
     // `.date` div.
     const dateAnchors = Array.from(body?.querySelectorAll('.date a') ?? [])
 
+    // The submitter and the item's time, from the stats paragraph the description skips. No
+    // other engine's body carries either anchor, and the timestamp is the site's own
+    // formatting ("8:09 AM - 28 Sep 2021").
+    const hackernewsAuthor = text(find(body, 'a.author'))
+    const hackernewsDate = text(find(body, 'a.timestamp'))
+
     return buildCite({
       provider: 'discourse',
       url,
       title: githubAuthor ? stripCommentPrefix(title, githubAuthor) : title,
       description,
-      author: githubAuthor ?? text(dateAnchors[0]),
+      author: githubAuthor ?? text(dateAnchors[0]) ?? hackernewsAuthor,
       publisher,
-      date: date ?? attr(githubDate, 'data-date') ?? text(githubDate) ?? text(dateAnchors[1]),
+      date:
+        date ??
+        attr(githubDate, 'data-date') ??
+        text(githubDate) ??
+        text(dateAnchors[1]) ??
+        hackernewsDate,
       // GitHub oneboxes render no site icon. The inline author avatar stands in for it.
       icon:
         attr(find(element, 'img.site-icon'), 'src') ??

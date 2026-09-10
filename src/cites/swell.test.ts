@@ -37,8 +37,8 @@ describeForEachParser('swellCiteResolver', (parseHtml) => {
         provider: 'swell',
         url: 'https://example.com/?page_id=1240',
         title: 'Post title',
-        caption: 'Recommended reading',
         description: 'Preview text',
+        caption: 'Recommended reading',
         thumbnail: 'https://example.com/thumb.jpg',
       }
 

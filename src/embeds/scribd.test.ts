@@ -74,8 +74,8 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
         id: '526446879',
         src: 'https://www.scribd.com/embeds/526446879/content',
         url: 'https://www.scribd.com/document/526446879',
-        title: 'Vermont Cynic Drug Issue 2026',
         height: 500,
+        title: 'Vermont Cynic Drug Issue 2026',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -148,7 +148,7 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should return undefined for a document id that is not numeric', async () => {
-      const value = '<iframe src="https://www.scribd.com/embeds/../evil/content"></iframe>'
+      const value = '<iframe src="https://www.scribd.com/document/my-document-slug"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

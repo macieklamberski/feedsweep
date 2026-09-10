@@ -188,3 +188,36 @@ describeForEachParser('acastEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('acastEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, acastEmbedResolver)
+
+  it('should drop the label the player writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://embed.acast.com/homebrewshow/homebrew-6" title="Embed Player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'acast',
+      id: 'homebrewshow/homebrew-6',
+      src: 'https://embed.acast.com/homebrewshow/homebrew-6',
+      height: 190,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://embed.acast.com/homebrewshow/homebrew-6" title="Homebrew 6: The Yeast"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'acast',
+      id: 'homebrewshow/homebrew-6',
+      src: 'https://embed.acast.com/homebrewshow/homebrew-6',
+      height: 190,
+      title: 'Homebrew 6: The Yeast',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -79,6 +79,26 @@ describeForEachParser('blogCardCiteResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should read the name the carrier states when the card has no title element', async () => {
+      const value = html`
+        <div class="blog-card" title="Page title">
+          <div class="blog-card-body">
+            <p class="blog-card-text">Preview text</p>
+            <div class="blog-card-site-title"><a href="https://example.com">Example Blog</a></div>
+          </div>
+        </div>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'blogcard',
+        url: 'https://example.com',
+        title: 'Page title',
+        description: 'Preview text',
+        publisher: 'Example Blog',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // Most cards carry a Hatena bookmark button whose href wraps the target url. Reading the
     // first anchor in the card instead of the title's own would point the cite at b.hatena.ne.jp.
     it('should not take the url from the Hatena bookmark button', async () => {
