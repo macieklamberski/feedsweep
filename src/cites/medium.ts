@@ -20,11 +20,11 @@ export const mediumCiteResolver: CiteResolver = {
       url: attr(anchor, 'href'),
       title: text(anchor, 'strong'),
       description: text(anchor, 'em'),
-      // The image anchor is often empty: Medium adds mixtapeImage--empty and no background.
-      thumbnail: styles.bgImage(find(element, '.mixtapeImage')),
       // The host trails the description as a bare text node with no element of its own, so
       // it is read from text nodes only.
       publisher: textNode(anchor),
+      // The image anchor is often empty: Medium adds mixtapeImage--empty and no background.
+      thumbnail: styles.bgImage(find(element, '.mixtapeImage')),
     })
   },
 }

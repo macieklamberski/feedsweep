@@ -20,9 +20,9 @@ export const affingerCiteResolver: CiteResolver = {
       // .smanone2 div.
       url: attr(element.closest('a'), 'href') ?? attr(find(element, '.st-cardbox-t a'), 'href'),
       title: text(element, '.st-cardbox-t') ?? attr(element, 'title'),
-      caption: text(element, '.st-cardbox-label-text'),
       description:
         text(element, '.st-card-excerpt') ?? text(element, '.smanone > p, .smanone2 > p'),
+      caption: text(element, '.st-cardbox-label-text'),
       publisher: text(element, '.st-cardbox-host'),
       icon: imageSrc(find(element, '.st-cardbox-favicon img')),
       thumbnail: imageSrc(find(element, '.st-card-img img') ?? find(element, 'dt img')),

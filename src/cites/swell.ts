@@ -21,8 +21,8 @@ export const swellCiteResolver: CiteResolver = {
       provider: 'swell',
       url: attr(link, 'href'),
       title: text(link),
-      caption: isExternal ? undefined : caption,
       description: text(element, '.p-blogCard__excerpt'),
+      caption: isExternal ? undefined : caption,
       // The stock label names no site, so an external card still showing it has no publisher.
       publisher: isExternal && caption !== defaultCaptionLabel ? caption : undefined,
       thumbnail: attr(find(element, '.p-blogCard__thumb img'), 'src'),
