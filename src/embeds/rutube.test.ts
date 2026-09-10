@@ -191,9 +191,9 @@ describeForEachParser('rutubeEmbedResolver', (parseHtml) => {
         id: 'c4eafc923fb615b68fb3e13d9995d3aa',
         src: 'https://rutube.ru/play/embed/c4eafc923fb615b68fb3e13d9995d3aa',
         url: 'https://rutube.ru/video/c4eafc923fb615b68fb3e13d9995d3aa/',
-        title: 'Склад Radaway в Москве',
         width: 461,
         height: 819,
+        title: 'Склад Radaway в Москве',
       }
 
       expect(await extract(value)).toEqual(expected)

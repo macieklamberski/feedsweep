@@ -359,9 +359,9 @@ describeForEachParser('speakerdeckIframeEmbedResolver', (parseHtml) => {
       provider: 'speakerdeck',
       id: '40746bbd65b944eb848e90ab1be552c0',
       src: 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0',
-      title: 'Designing for the unexpected',
       width: 710,
       height: 399,
+      title: 'Designing for the unexpected',
     }
 
     expect(await extract(value)).toEqual(expected)

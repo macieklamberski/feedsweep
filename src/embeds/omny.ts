@@ -1,12 +1,17 @@
-import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import { getPathSegments, parseUrl, trimObject } from 'trousse'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
+import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'omny'
 
 const safeSegmentRegex = /^[A-Za-z0-9._-]+$/
 
 const omnyHosts = ['omny.fm']
 
-// The height most iframes state, and Omny's own oEmbed agrees.
+// Carriers state 180 with and without style=cover and Omny's oEmbed agrees, but neither shape was
+// measured in a browser.
 const playerHeight = 180
 
 // `/shows/{show}/{clip}/embed` is a clip and `/shows/{show}/playlists/{slug}/embed` a playlist.
@@ -28,31 +33,37 @@ export const extractOmnyClip = (link: string): string | undefined => {
   return path.join('/')
 }
 
-// Omny publishes a registry oEmbed, so tagging provider and id is what lets the enricher fetch
-// a title and artwork later. Offline this states the height the markup often omits.
-export const omnyResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+// A publisher's autoplay is left out: minted here it would start playback for every consumer.
+// style and size pick the player's shape, media the audio rendering of a show that also serves
+// video, and t a position in the episode.
+const omnyEmbedParams = ['media', 'size', 'style', 't']
+
+export const omnyResolveEmbed: ResolveEmbed = (url, element) => {
   const clip = extractOmnyClip(url)
 
   if (!clip) {
     return
   }
 
-  // The query is carried through. `style=cover` and `size=` change the player's shape, so
-  // rebuilding a bare url would hand the publisher a different embed than the one they chose.
-  const query = parseUrl(url, 'https://example.com')?.search ?? ''
+  const query = composeQuery(
+    pickQueryParams(parseUrl(url, placeholderBaseUrl)?.search ?? '', omnyEmbedParams),
+  )
+  const title = attr(element, 'title')
 
   return {
-    provider: 'omny',
+    provider,
     id: clip,
     src: `https://omny.fm/shows/${clip}/embed${query}`,
     height: playerHeight,
+    ...trimObject({ title }, Boolean),
   }
 }
 
+// The omny.fm/shows/{show}/{clip}/embed player iframe, often pasted without a height.
 export const omnyEmbedResolver = createUrlEmbedResolver(omnyHosts, omnyResolveEmbed)
 
 // Starts playback on the click that loads the player.
 export const omnyRenderHint: EmbedRenderHint = {
-  provider: 'omny',
+  provider,
   autoplayParams: { autoplay: '1' },
 }

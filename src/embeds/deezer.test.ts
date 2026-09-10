@@ -84,6 +84,18 @@ describe('deezerResolveEmbed', () => {
 
       expect(deezerResolveEmbed(value)).toBeUndefined()
     })
+
+    it('should refuse a type naming an inherited method', () => {
+      const value = 'https://widget.deezer.com/widget/dark/toString/3135556'
+
+      expect(deezerResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a type naming the prototype itself', () => {
+      const value = 'https://widget.deezer.com/widget/dark/__proto__/3135556'
+
+      expect(deezerResolveEmbed(value)).toBeUndefined()
+    })
   })
 
   describe('Variant #1: the current widget frame', () => {
@@ -390,5 +402,40 @@ describeForEachParser('deezer through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('deezerEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, deezerEmbedResolver)
+
+  it('should drop the label the snippet writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://widget.deezer.com/widget/dark/track/3135556" title="deezer-widget"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'deezer',
+      id: 'track/3135556',
+      src: 'https://widget.deezer.com/widget/dark/track/3135556',
+      url: 'https://www.deezer.com/track/3135556',
+      height: 150,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://widget.deezer.com/widget/dark/track/3135556" title="Harder, Better, Faster, Stronger"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'deezer',
+      id: 'track/3135556',
+      src: 'https://widget.deezer.com/widget/dark/track/3135556',
+      url: 'https://www.deezer.com/track/3135556',
+      height: 150,
+      title: 'Harder, Better, Faster, Stronger',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

@@ -14,6 +14,7 @@ describe('audiomackResolveEmbed', () => {
         src: 'https://audiomack.com/embed/larrynorman/song/burn-2',
         url: 'https://audiomack.com/larrynorman/song/burn-2',
         height: 252,
+        author: 'larrynorman',
       }
 
       expect(audiomackResolveEmbed(value)).toEqual(expected)
@@ -27,6 +28,7 @@ describe('audiomackResolveEmbed', () => {
         src: 'https://audiomack.com/embed/chuuwee/album/cool-world',
         url: 'https://audiomack.com/chuuwee/album/cool-world',
         height: 400,
+        author: 'chuuwee',
       }
 
       expect(audiomackResolveEmbed(value)).toEqual(expected)
@@ -60,6 +62,18 @@ describe('audiomackResolveEmbed', () => {
       expect(audiomackResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should refuse a kind naming an inherited method', () => {
+      const value = 'https://audiomack.com/embed/larrynorman/toString/burn-2'
+
+      expect(audiomackResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a kind naming the prototype itself', () => {
+      const value = 'https://audiomack.com/embed/larrynorman/__proto__/burn-2'
+
+      expect(audiomackResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should refuse an embed path with no slug', () => {
       const value = 'https://audiomack.com/embed/larrynorman/song'
 
@@ -82,6 +96,7 @@ describe('audiomackResolveEmbed', () => {
         src: 'https://audiomack.com/embed/larrynorman/song/burn-2',
         url: 'https://audiomack.com/larrynorman/song/burn-2',
         height: 252,
+        author: 'larrynorman',
       }
 
       expect(audiomackResolveEmbed(value)).toEqual(expected)
@@ -95,6 +110,23 @@ describe('audiomackResolveEmbed', () => {
         src: 'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory?background=1',
         url: 'https://audiomack.com/mlgmusiz/song/new-year-new-glory',
         height: 252,
+        author: 'mlgmusiz',
+      }
+
+      expect(audiomackResolveEmbed(value)).toEqual(expected)
+    })
+
+    // Which order the path is in is decided by whether the second segment is a kind, so a handle
+    // that happens to spell an inherited method has to read as the artist it is, not as a kind.
+    it('should read a handle spelling an inherited method as the artist', () => {
+      const value = 'https://audiomack.com/embed/toString/song/burn-2'
+      const expected: EmbedResolverResult = {
+        provider: 'audiomack',
+        id: 'toString/song/burn-2',
+        src: 'https://audiomack.com/embed/toString/song/burn-2',
+        url: 'https://audiomack.com/toString/song/burn-2',
+        height: 252,
+        author: 'toString',
       }
 
       expect(audiomackResolveEmbed(value)).toEqual(expected)
@@ -108,6 +140,7 @@ describe('audiomackResolveEmbed', () => {
         src: 'https://audiomack.com/embed/team-bigga-rankin/playlist/paper',
         url: 'https://audiomack.com/team-bigga-rankin/playlist/paper',
         height: 400,
+        author: 'team-bigga-rankin',
       }
 
       expect(audiomackResolveEmbed(value)).toEqual(expected)
@@ -123,6 +156,7 @@ describe('audiomackResolveEmbed', () => {
         src: 'https://audiomack.com/embed/hhs1987/song/pound-cake-freestyle-2',
         url: 'https://audiomack.com/hhs1987/song/pound-cake-freestyle-2',
         height: 252,
+        author: 'hhs1987',
       }
 
       expect(audiomackResolveEmbed(value)).toEqual(expected)
@@ -136,6 +170,7 @@ describe('audiomackResolveEmbed', () => {
         src: 'https://audiomack.com/embed/chuuwee/album/cool-world',
         url: 'https://audiomack.com/chuuwee/album/cool-world',
         height: 400,
+        author: 'chuuwee',
       }
 
       expect(audiomackResolveEmbed(value)).toEqual(expected)
@@ -149,6 +184,7 @@ describe('audiomackResolveEmbed', () => {
         src: 'https://audiomack.com/embed/costill8nine/song/happy-dirty',
         url: 'https://audiomack.com/costill8nine/song/happy-dirty',
         height: 252,
+        author: 'costill8nine',
       }
 
       expect(audiomackResolveEmbed(value)).toEqual(expected)
@@ -163,6 +199,7 @@ describe('audiomackResolveEmbed', () => {
         src: 'https://audiomack.com/embed/creative-soul-music-group-1/album/satisfaction-ep',
         url: 'https://audiomack.com/creative-soul-music-group-1/album/satisfaction-ep',
         height: 400,
+        author: 'creative-soul-music-group-1',
       }
 
       expect(audiomackResolveEmbed(value)).toEqual(expected)
@@ -176,6 +213,7 @@ describe('audiomackResolveEmbed', () => {
         src: 'https://audiomack.com/embed/jhoss/song/til-the-morn',
         url: 'https://audiomack.com/jhoss/song/til-the-morn',
         height: 252,
+        author: 'jhoss',
       }
 
       expect(audiomackResolveEmbed(value)).toEqual(expected)
@@ -196,6 +234,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
         src: 'https://audiomack.com/embed/larrynorman/song/burn-2?background=1',
         url: 'https://audiomack.com/larrynorman/song/burn-2',
         height: 252,
+        author: 'larrynorman',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -211,6 +250,27 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
         src: 'https://audiomack.com/embed/billnass/song/hallo',
         url: 'https://audiomack.com/billnass/song/hallo',
         height: 252,
+        author: 'billnass',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should take the title the player frame states', async () => {
+      const value = html`
+        <iframe
+          src="https://audiomack.com/embed/theransomreport/song/episode-i"
+          title="Episode I with Rodney Coursey"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'audiomack',
+        id: 'theransomreport/song/episode-i',
+        src: 'https://audiomack.com/embed/theransomreport/song/episode-i',
+        url: 'https://audiomack.com/theransomreport/song/episode-i',
+        height: 252,
+        title: 'Episode I with Rodney Coursey',
+        author: 'theransomreport',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -242,6 +302,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
         url: 'https://audiomack.com/chuuwee/album/cool-world',
         width: 649,
         height: 1200,
+        author: 'chuuwee',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -269,6 +330,7 @@ describeForEachParser('audiomack through the pipeline', (parseHtml) => {
         data-embed-src="https://audiomack.com/embed/chuuwee/album/cool-world"
         data-embed-url="https://audiomack.com/chuuwee/album/cool-world"
         data-embed-height="400"
+        data-embed-author="chuuwee"
       ></div>
     `
 

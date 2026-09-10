@@ -29,9 +29,9 @@ describeForEachParser('typeformWidgetEmbedResolver', (parseHtml) => {
         id: '01HCZ4DNW8JM6PEGNTQWF2PW87',
         src: 'https://form.typeform.com/to/01HCZ4DNW8JM6PEGNTQWF2PW87',
         url: 'https://form.typeform.com/to/01HCZ4DNW8JM6PEGNTQWF2PW87',
-        title: 'User Satisfaction Survey',
         // The snippet's inline style states the height. Its width is a percentage, not pixels.
         height: 500,
+        title: 'User Satisfaction Survey',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -276,5 +276,24 @@ describeForEachParser('typeform through the pipeline', (parseHtml) => {
         enclosures,
       }),
     ).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('typeformIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, typeformIframeEmbedResolver)
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://form.typeform.com/to/AbCdEf12" title="Reader survey 2026"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'typeform',
+      id: 'AbCdEf12',
+      src: 'https://form.typeform.com/to/AbCdEf12',
+      url: 'https://form.typeform.com/to/AbCdEf12',
+      title: 'Reader survey 2026',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

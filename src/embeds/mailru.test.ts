@@ -34,6 +34,7 @@ describe('mailruResolveEmbed', () => {
         id: 'corp/lady/86/753',
         src: 'https://my.mail.ru/corp/lady/video/embed/86/753',
         url: 'https://my.mail.ru/corp/lady/video/86/753.html',
+        author: 'lady',
       }
 
       expect(mailruResolveEmbed(value)).toEqual(expected)
@@ -46,6 +47,7 @@ describe('mailruResolveEmbed', () => {
         id: 'mail/eduspb.com/_myvideo/248',
         src: 'https://my.mail.ru/mail/eduspb.com/video/embed/_myvideo/248',
         url: 'https://my.mail.ru/mail/eduspb.com/video/_myvideo/248.html',
+        author: 'eduspb.com',
       }
 
       expect(mailruResolveEmbed(value)).toEqual(expected)
@@ -58,6 +60,7 @@ describe('mailruResolveEmbed', () => {
         id: 'mail/shels_1991/20/885',
         src: 'https://my.mail.ru/mail/shels_1991/video/embed/20/885',
         url: 'https://my.mail.ru/mail/shels_1991/video/20/885.html',
+        author: 'shels_1991',
       }
 
       expect(mailruResolveEmbed(value)).toEqual(expected)
@@ -71,6 +74,7 @@ describe('mailruResolveEmbed', () => {
         id: 'mail/anizm.com/4418/4427',
         src: 'https://my.mail.ru/mail/anizm.com/video/embed/4418/4427',
         url: 'https://my.mail.ru/mail/anizm.com/video/4418/4427.html',
+        author: 'anizm.com',
       }
 
       expect(mailruResolveEmbed(value)).toEqual(expected)
@@ -164,6 +168,7 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
         url: 'https://my.mail.ru/corp/lady/video/86/753.html',
         width: 540,
         height: 328,
+        author: 'lady',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -212,6 +217,7 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
         url: 'https://my.mail.ru/mail/alinavrik59/video/142/143.html',
         width: 626,
         height: 367,
+        author: 'alinavrik59',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -232,9 +238,28 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
         src: 'https://my.mail.ru/mail/anizm.com/video/embed/4418/4427',
         url: 'https://my.mail.ru/mail/anizm.com/video/4418/4427.html',
         height: 390,
+        author: 'anizm.com',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
+})
+
+describeForEachParser('mailruEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mailruEmbedResolver)
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://my.mail.ru/video/embed/253943806846567285" title="Прогулка по Невскому"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'mailru',
+      id: '253943806846567285',
+      src: 'https://my.mail.ru/video/embed/253943806846567285',
+      title: 'Прогулка по Невскому',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })
