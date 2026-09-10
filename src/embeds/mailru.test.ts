@@ -245,3 +245,21 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('mailruEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mailruEmbedResolver)
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://my.mail.ru/video/embed/253943806846567285" title="Прогулка по Невскому"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'mailru',
+      id: '253943806846567285',
+      src: 'https://my.mail.ru/video/embed/253943806846567285',
+      title: 'Прогулка по Невскому',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
