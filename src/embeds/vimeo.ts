@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl, trimObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   composeQuery,
@@ -216,6 +216,12 @@ export const vimeoResolveEmbed = (
 
 // A Vimeo player iframe, a frame of a video or showcase page, or the Flash moogaloop player.
 export const vimeoEmbedResolver = createUrlEmbedResolver(vimeoHosts, vimeoResolveEmbed)
+
+export const vimeoFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: /^vimeo[ -](?:video player|video|player)(?: \d+)?$/ },
+  // The AllVideos Joomla plugin.
+  { provider, field: 'title', drop: 'JoomlaWorks AllVideos Player' },
+]
 
 // `dnt=1` turns off Vimeo's viewer tracking: no cookies and no analytics. `autoplay=1` starts
 // playback on the click that loads the player. Never `background=1`, which mutes the video and

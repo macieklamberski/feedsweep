@@ -18,6 +18,7 @@ import { sketchfabFieldCleaners } from '../embeds/sketchfab.js'
 import { speakerdeckFieldCleaners } from '../embeds/speakerdeck.js'
 import { spotifyFieldCleaners } from '../embeds/spotify.js'
 import { videopressFieldCleaners } from '../embeds/videopress.js'
+import { vimeoFieldCleaners } from '../embeds/vimeo.js'
 import { youtubeFieldCleaners } from '../embeds/youtube.js'
 import type { FieldCleaner } from '../types.js'
 
@@ -45,5 +46,6 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...speakerdeckFieldCleaners,
   ...spotifyFieldCleaners,
   ...videopressFieldCleaners,
+  ...vimeoFieldCleaners,
   ...youtubeFieldCleaners,
 ]
