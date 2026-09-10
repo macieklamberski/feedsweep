@@ -2,6 +2,7 @@ import { acastFieldCleaners } from '../embeds/acast.js'
 import { appleFieldCleaners } from '../embeds/apple.js'
 import { archiveFieldCleaners } from '../embeds/archive.js'
 import { audioboomFieldCleaners } from '../embeds/audioboom.js'
+import { bloggerFieldCleaners } from '../embeds/blogger.js'
 import { blubrryFieldCleaners } from '../embeds/blubrry.js'
 import { codepenFieldCleaners } from '../embeds/codepen.js'
 import { dailymotionFieldCleaners } from '../embeds/dailymotion.js'
@@ -26,6 +27,7 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...appleFieldCleaners,
   ...archiveFieldCleaners,
   ...audioboomFieldCleaners,
+  ...bloggerFieldCleaners,
   ...blubrryFieldCleaners,
   ...codepenFieldCleaners,
   ...dailymotionFieldCleaners,
