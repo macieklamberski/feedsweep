@@ -1,6 +1,5 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
-import { attr } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -53,7 +52,7 @@ const readClaimPath = (parsed: URL): string | undefined => {
   return claims.join('/')
 }
 
-const odyseeResolveEmbed = (link: string, element: Element): EmbedResolverResult | undefined => {
+const odyseeResolveEmbed = (link: string): EmbedResolverResult | undefined => {
   const parsed = parseUrl(link, placeholderBaseUrl)
   const claimPath = parsed ? readClaimPath(parsed) : undefined
 
@@ -61,7 +60,6 @@ const odyseeResolveEmbed = (link: string, element: Element): EmbedResolverResult
     return
   }
 
-  const title = attr(element, 'title')
   // The channel is the first claim when the path names one, and the `@` is what marks it.
   // The claim id after the colon only disambiguates the name, so it is not part of the name.
   const [channel] = claimPath.split('/')
@@ -75,7 +73,6 @@ const odyseeResolveEmbed = (link: string, element: Element): EmbedResolverResult
     src: `https://odysee.com/$/embed/${claimPath}`,
     url: `https://odysee.com/${claimPath}`,
     author,
-    title,
   }
 }
 
