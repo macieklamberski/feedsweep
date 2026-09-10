@@ -185,7 +185,10 @@ export const brightcoveExperienceEmbedResolver = createMarkupEmbedResolver(
 const playerPathRegex = /^([^_]+)_(.+)$/
 
 // The players.brightcove.net player page as an ordinary iframe.
-export const brightcoveResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const brightcoveResolveEmbed = (
+  url: string,
+  element?: Element,
+): EmbedResolverResult | undefined => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed?.hostname.startsWith('players.')) {
@@ -215,6 +218,7 @@ export const brightcoveResolveEmbed = (url: string): EmbedResolverResult | undef
     provider,
     id: `${account}/${videoId}`,
     src: `https://players.brightcove.net/${account}/${player}/index.html?videoId=${videoId}`,
+    title: attr(element, 'title'),
   }
 }
 
