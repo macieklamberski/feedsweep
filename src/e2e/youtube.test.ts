@@ -55,9 +55,8 @@ describeForEachParser('YouTube', (parseHtml) => {
   })
 
   // The snippet YouTube's own oEmbed returns, which is what a WordPress oEmbed cache stores and
-  // republishes into the feed. The stated title reaches no placeholder attribute, because the
-  // same attribute carries the player's label on a comparable share of carriers.
-  it('should not carry a title an oEmbed snippet states onto the placeholder', async () => {
+  // republishes into the feed.
+  it('should carry a title an oEmbed snippet states onto the placeholder', async () => {
     const value = html`
       <iframe
         width="560"
@@ -76,6 +75,7 @@ describeForEachParser('YouTube', (parseHtml) => {
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
+        data-embed-title="Kraftwerk - Autobahn (1974)"
       ></div>
     `
 

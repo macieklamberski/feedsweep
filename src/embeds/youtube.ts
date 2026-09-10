@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
   composeQuery,
@@ -210,7 +210,7 @@ const resolveCollectionEmbed = (
 }
 
 // The carrier's title is not read: it is the player's own localised label as often as a name.
-export const youtubeResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   const parsed = parseUrl(url, placeholderBaseUrl)
   const segments = parsed ? getPathSegments(parsed) : []
 
@@ -247,6 +247,15 @@ export const youtubeResolveEmbed = (url: string): EmbedResolverResult | undefine
     thumbnail: composeThumbnailUrl(videoId),
     ratio: playerRatio,
   }
+}
+
+export const youtubeResolveEmbed = (
+  url: string,
+  element?: Element,
+): EmbedResolverResult | undefined => {
+  const target = resolveTarget(url)
+
+  return target && { ...target, title: attr(element, 'title') }
 }
 
 // A YouTube player iframe, a frame of a watch, shorts or playlist page, or the Flash player.
@@ -299,6 +308,16 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
   },
   { preferResolverSize: true },
 )
+
+export const youtubeFieldCleaners: Array<FieldCleaner> = [
+  {
+    provider,
+    field: 'title',
+    drop: /^(?:embedded )?youtube (?:video player|video|player|short)(?: \d+)?$/,
+  },
+  // The AllVideos Joomla plugin.
+  { provider, field: 'title', drop: 'JoomlaWorks AllVideos Player' },
+]
 
 // What a reader appends to start playback on the click that loads the player.
 export const youtubeRenderHint: EmbedRenderHint = {

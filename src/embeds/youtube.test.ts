@@ -550,9 +550,7 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
   })
 
   // YouTube's own oEmbed html, which is what a WordPress oEmbed cache stores and republishes.
-  // The stated title is the video's real name here, and it is still not read: the same attribute
-  // carries the player's label on a comparable share of carriers and nothing tells them apart.
-  it('should not take a title the carrier states, even a real one', async () => {
+  it('should read the name the carrier states', async () => {
     const value = html`
       <iframe
         width="560"
@@ -561,6 +559,23 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
         title="Kraftwerk - Autobahn (1974)"
         frameborder="0"
       ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+      title: 'Kraftwerk - Autobahn (1974)',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the numbered label a page with two players writes', async () => {
+    const value = html`
+      <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player 2"></iframe>
     `
     const expected: EmbedResolverResult = {
       provider: 'youtube',
@@ -593,8 +608,7 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  // A playlist embed goes through the same branch, so it drops the stated title too.
-  it('should not take a title the playlist carrier states', async () => {
+  it('should read the name the playlist carrier states', async () => {
     const value = html`
       <iframe
         src="https://www.youtube.com/embed/videoseries?list=PLabc123"
@@ -607,6 +621,7 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
       src: 'https://www.youtube.com/embed/videoseries?list=PLabc123',
       url: 'https://www.youtube.com/playlist?list=PLabc123',
       ratio: '16/9',
+      title: 'Ambient works, 1992',
     }
 
     expect(await extract(value)).toEqual(expected)
