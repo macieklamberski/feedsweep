@@ -784,7 +784,7 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
   }
 
   describe('the current payload', () => {
-    it('should read the caption-bearing title, the author and the rehosted images', async () => {
+    it('should drop the wrapped title and keep the author and the rehosted images', async () => {
       const value = makeContainer({
         instagram_id: 'DZmgID9Eawg',
         title: 'BBC News on Instagram: "Pakistan\'s prime minister says a peace …',
@@ -804,7 +804,6 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
         id: 'p/DZmgID9Eawg',
         src: 'https://www.instagram.com/p/DZmgID9Eawg/embed/',
         url: 'https://www.instagram.com/p/DZmgID9Eawg/',
-        description: 'BBC News on Instagram: "Pakistan\'s prime minister says a peace …',
         author: '@bbcnews',
         avatar:
           'https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-profile-pic-DZmgID9Eawg.png',
@@ -845,6 +844,38 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
         instagram_id: 'DY11vsxO5c7',
         title: 'Instagram',
         author_name: '',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the title that quotes the caption behind the poster', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Christine Mari on Instagram: "draw what u want #comics"',
+        author_name: 'christinemariart',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+        author: '@christinemariart',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the same title when the quotes are curly', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Orca The Sproodle on Instagram: \u201cLook, it\u2019s exhausting\u201d',
       })
       const expected: EmbedResolverResult = {
         provider: 'instagram',
