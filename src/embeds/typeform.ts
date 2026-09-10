@@ -65,7 +65,10 @@ export const typeformWidgetEmbedResolver = createMarkupEmbedResolver(
 // `form.typeform.com/to/<id>` is what the platform's oEmbed emits, and the per-account
 // `<user>.typeform.com/to/<id>` still serves the same form without redirecting, so both
 // reach here. The query is telemetry (`typeform-embed`, `typeform-medium`) and is dropped.
-export const typeformResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+export const typeformResolveEmbed = (
+  url: string,
+  element?: Element,
+): EmbedResolverResult | undefined => {
   const parsed = parseUrlOnHosts(url, typeformHosts)
 
   if (!parsed) {
@@ -74,7 +77,9 @@ export const typeformResolveEmbed = (url: string): EmbedResolverResult | undefin
 
   const segments = getPathSegments(parsed)
 
-  return segments[0] === 'to' && segments[1] ? composeEmbed(segments[1]) : undefined
+  return segments[0] === 'to' && segments[1]
+    ? composeEmbed(segments[1], attr(element, 'title'))
+    : undefined
 }
 
 // A Typeform form iframe, on form.typeform.com or a per-account subdomain.

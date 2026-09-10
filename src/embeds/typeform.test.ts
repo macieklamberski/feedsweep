@@ -278,3 +278,22 @@ describeForEachParser('typeform through the pipeline', (parseHtml) => {
     ).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('typeformIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, typeformIframeEmbedResolver)
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://form.typeform.com/to/AbCdEf12" title="Reader survey 2026"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'typeform',
+      id: 'AbCdEf12',
+      src: 'https://form.typeform.com/to/AbCdEf12',
+      url: 'https://form.typeform.com/to/AbCdEf12',
+      title: 'Reader survey 2026',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
