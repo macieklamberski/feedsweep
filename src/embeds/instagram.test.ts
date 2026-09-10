@@ -839,6 +839,38 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should drop a title that names the platform and nothing else', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Instagram',
+        author_name: '',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a caption that opens on the word Instagram', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Instagram keeps changing the feed and I am tired',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+        description: 'Instagram keeps changing the feed and I am tired',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('the earliest payload', () => {
