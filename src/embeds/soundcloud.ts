@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl, trimObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner } from '../types.js'
 import { attr, jsonAttr, text } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -259,6 +259,12 @@ export const soundcloudEmbedResolver = createUrlEmbedResolver(
   soundcloudHosts,
   soundcloudResolveEmbed,
 )
+
+export const soundcloudFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'soundcloud' },
+  // A copied YouTube snippet with the src swapped.
+  { provider, field: 'title', drop: 'YouTube video player' },
+]
 
 // Starts playback on the click that loads the widget.
 export const soundcloudRenderHint: EmbedRenderHint = {

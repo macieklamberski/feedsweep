@@ -16,6 +16,7 @@ import { kalturaFieldCleaners } from '../embeds/kaltura.js'
 import { libsynFieldCleaners } from '../embeds/libsyn.js'
 import { nytimesFieldCleaners } from '../embeds/nytimes.js'
 import { sketchfabFieldCleaners } from '../embeds/sketchfab.js'
+import { soundcloudFieldCleaners } from '../embeds/soundcloud.js'
 import { speakerdeckFieldCleaners } from '../embeds/speakerdeck.js'
 import { spotifyFieldCleaners } from '../embeds/spotify.js'
 import { videopressFieldCleaners } from '../embeds/videopress.js'
@@ -46,6 +47,7 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...libsynFieldCleaners,
   ...nytimesFieldCleaners,
   ...sketchfabFieldCleaners,
+  ...soundcloudFieldCleaners,
   ...speakerdeckFieldCleaners,
   ...spotifyFieldCleaners,
   ...videopressFieldCleaners,

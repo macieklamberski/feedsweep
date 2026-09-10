@@ -771,3 +771,36 @@ describeForEachParser('soundcloud through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml('<p>Body</p>')
   })
 })
+
+describeForEachParser('soundcloudEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, soundcloudEmbedResolver)
+
+  it('should drop the platform name the snippet writes in place of the track name', async () => {
+    const value = html`
+      <iframe src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fanjunadeep%2Fedition-586" title="SoundCloud"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'soundcloud',
+      src: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fanjunadeep%2Fedition-586',
+      url: 'https://soundcloud.com/anjunadeep/edition-586',
+      height: 166,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fanjunadeep%2Fedition-586" title="Anjunadeep Edition 586"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'soundcloud',
+      src: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fanjunadeep%2Fedition-586',
+      url: 'https://soundcloud.com/anjunadeep/edition-586',
+      height: 166,
+      title: 'Anjunadeep Edition 586',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
