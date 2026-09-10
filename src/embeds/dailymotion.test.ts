@@ -284,3 +284,57 @@ describeForEachParser('dailymotion through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('dailymotionEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, dailymotionEmbedResolver)
+
+  it('should drop the label the snippet writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://www.dailymotion.com/embed/video/x7tgad0" title="Dailymotion Video Player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x7tgad0',
+      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      url: 'https://www.dailymotion.com/video/x7tgad0',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should strip the label the snippet writes before the name', async () => {
+    const value = html`
+      <iframe src="https://www.dailymotion.com/embed/video/x7tgad0" title="Dailymotion video player – Zona Tec"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x7tgad0',
+      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      url: 'https://www.dailymotion.com/video/x7tgad0',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
+      ratio: '16/9',
+      title: 'Zona Tec',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://www.dailymotion.com/embed/video/x7tgad0" title="Le Grand Débat"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x7tgad0',
+      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      url: 'https://www.dailymotion.com/video/x7tgad0',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
+      ratio: '16/9',
+      title: 'Le Grand Débat',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

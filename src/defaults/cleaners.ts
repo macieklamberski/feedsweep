@@ -1,4 +1,5 @@
 import { codepenFieldCleaners } from '../embeds/codepen.js'
+import { dailymotionFieldCleaners } from '../embeds/dailymotion.js'
 import { instagramFieldCleaners } from '../embeds/instagram.js'
 import { kalturaFieldCleaners } from '../embeds/kaltura.js'
 import { speakerdeckFieldCleaners } from '../embeds/speakerdeck.js'
@@ -11,6 +12,7 @@ import type { FieldCleaner } from '../types.js'
 // beside the resolver that knows the platform.
 export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...codepenFieldCleaners,
+  ...dailymotionFieldCleaners,
   ...instagramFieldCleaners,
   ...kalturaFieldCleaners,
   ...speakerdeckFieldCleaners,
