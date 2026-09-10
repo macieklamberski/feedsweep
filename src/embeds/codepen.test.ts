@@ -1055,6 +1055,45 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should drop the CodePen Embed title that carries the slug', async () => {
+      const value = html`
+        <iframe
+          src="https://codepen.io/anon/embed/raxQQME"
+          title="CodePen Embed raxQQME"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'raxQQME',
+        src: 'https://codepen.io/anon/embed/raxQQME',
+        thumbnail: 'https://shots.codepen.io/anon/pen/raxQQME-512.jpg',
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a pen name that opens on the word CodePen', async () => {
+      const value = html`
+        <iframe
+          src="https://codepen.io/argyleink/embed/XJpKqXm"
+          title="CodePen tricks I keep forgetting"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        title: 'CodePen tricks I keep forgetting',
+        author: '@argyleink',
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // These name the carrier rather than the pen, so a placeholder is better off without them.
     it('should drop the generic CodePen Embed title', async () => {
       const value = html`

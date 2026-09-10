@@ -12,8 +12,9 @@ const slugRegex = /^[A-Za-z0-9]+$/
 const userRegex = /^[A-Za-z0-9_-]+$/
 const playerParamRegex = /^[A-Za-z0-9,_-]{1,64}$/
 const leadingAtRegex = /^@/
-// The player names itself in the title when the pen has none, as "CodePen by {user}".
-const carrierTitleRegex = /^codepen by /i
+// The snippet names itself where the pen has no name: "CodePen Embed {slug}" on an anonymous
+// pen, and "CodePen by {user}" on the older byline form.
+const carrierTitleRegex = /^codepen (?:embed|by)\b/i
 
 // `key` is what the share dialog appends to a private pen, and `token` the JWT a signed-token
 // embed carries. A JWT is dotted base64url and long, every character of it url-safe.
@@ -33,9 +34,8 @@ const anonymousUser = 'anon'
 // CodePen's snippet ships `data-height="300"` and calls every attribute but slug and user optional.
 const defaultPenHeight = 300
 
-// Titles the snippet writes when the pen has none. They name the carrier, not the pen,
-// so they are worse than no title at all.
-const placeholderTitles = new Set(['codepen embed', 'untitled', 'codepen'])
+// Titles the snippet writes when the pen has none. They name the carrier, not the pen.
+const placeholderTitles = new Set(['untitled', 'codepen'])
 
 type CodepenTarget = {
   kind: 'pen' | 'embed'
