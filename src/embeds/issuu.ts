@@ -1,5 +1,8 @@
 import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner } from '../types.js'
+
+const provider = 'issuu'
+
 import { attr } from '../utils/dom.js'
 import { composeQuery, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -23,7 +26,7 @@ const composeConfigEmbed = (configId: string | undefined): EmbedResolverResult |
   }
 
   return {
-    provider: 'issuu',
+    provider,
     id: configId,
     src: `https://e.issuu.com/embed.html#${configId}`,
   }
@@ -48,7 +51,7 @@ const composeDocumentEmbed = (
   const query = composeQuery({ u: publisher, d: documentName, ...safePage })
 
   return {
-    provider: 'issuu',
+    provider,
     id: `${publisher}/${documentName}`,
     src: `https://e.issuu.com/embed.html${query}`,
     url: `https://issuu.com/${publisher}/docs/${documentName}`,
@@ -120,3 +123,7 @@ export const issuuResolveEmbed = (
 }
 
 export const issuuIframeEmbedResolver = createUrlEmbedResolver(issuuHosts, issuuResolveEmbed)
+
+export const issuuFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'issuu.com' },
+]

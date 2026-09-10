@@ -10,6 +10,7 @@ import { dailymotionFieldCleaners } from '../embeds/dailymotion.js'
 import { deezerFieldCleaners } from '../embeds/deezer.js'
 import { flourishFieldCleaners } from '../embeds/flourish.js'
 import { instagramFieldCleaners } from '../embeds/instagram.js'
+import { issuuFieldCleaners } from '../embeds/issuu.js'
 import { ivooxFieldCleaners } from '../embeds/ivoox.js'
 import { kalturaFieldCleaners } from '../embeds/kaltura.js'
 import { libsynFieldCleaners } from '../embeds/libsyn.js'
@@ -39,6 +40,7 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...deezerFieldCleaners,
   ...flourishFieldCleaners,
   ...instagramFieldCleaners,
+  ...issuuFieldCleaners,
   ...ivooxFieldCleaners,
   ...kalturaFieldCleaners,
   ...libsynFieldCleaners,
