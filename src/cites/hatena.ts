@@ -2,44 +2,58 @@ import { parseUrl } from 'trousse'
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 
-// Hatena Blog renders a pasted link as an iframe pointing at its card renderer, followed by
-// a `<cite>` holding the real link. Both sit inside one paragraph, and the paragraph is what
-// this matches: matching the iframe alone would convert the card but leave the citation behind
-// as a stray domain link, and hand the card to the generic embed path, which emits a placeholder
-// pointing at the card renderer rather than a viewable embed.
-//
-// Replacing the whole paragraph drops any prose the author wrote beside the card. That case is
-// rare, and kept anyway.
-//
-// The card renderer's host is matched beside the class because the class is not dependable:
-// `embed-card` is the common spelling, and the rest ship `hatenablogcard`,
-// `wp-embedded-content`, a theme's own class, or nothing at all.
+const cardHost = 'hatenablog-parts.com'
+
+// The iframe's class is not dependable: embed-card is the common spelling, and the rest ship
+// hatenablogcard, wp-embedded-content, a theme's own class, or nothing at all.
 const cardIframeSelector = [
   'iframe.embed-card',
   'iframe.hatenablogcard',
-  'iframe[src*="hatenablog-parts.com/embed"]',
+  `iframe[src*="${cardHost}/embed"]`,
 ].join(', ')
 
+// Matching the iframe alone leaves the <cite> behind as a stray domain link.
 const cardParagraphSelector = cardIframeSelector
   .split(', ')
   .map((selector) => `p:has(> ${selector})`)
   .join(', ')
 
+// A host list misses this: a blog on a custom domain serves its own card from that domain.
+// The self-served card is at {blog}.hatenablog.com/embed/{entry}, and the citation beside it
+// names the same host.
+const isSelfHosted = (source: string, citationHref: string | undefined): boolean => {
+  const citation = citationHref ? parseUrl(citationHref, placeholderBaseUrl) : undefined
+
+  return citation !== undefined && parseUrl(source, placeholderBaseUrl)?.host === citation.host
+}
+
+// Hatena Blog's link card: an iframe at its card renderer, with a <cite> holding the real link.
 export const hatenaCiteResolver: CiteResolver = {
   kind: 'cite',
   selector: cardParagraphSelector,
   extract: (element) => {
     const iframe = find(element, cardIframeSelector)
-    const citationLink = find(element, 'cite.hatena-citation a')
+    const source = attr(iframe, 'src')
 
-    const embedUrl = attr(iframe, 'src')
-    const embeddedUrl = parseUrl(embedUrl ?? '', 'https://example.invalid')?.searchParams.get('url')
+    if (!source) {
+      return
+    }
+
+    const citationLink = find(element, 'cite.hatena-citation a')
+    const citationHref = attr(citationLink, 'href')
+    const cardUrl = parseUrlOnHosts(source, cardHost)
+
+    // A foreign player carrying the class would become a cite and be deleted with its paragraph.
+    if (!cardUrl && !isSelfHosted(source, citationHref)) {
+      return
+    }
 
     return buildCite({
       provider: 'hatena',
       // The citation's href comes first: it is the plain target, so it needs no decoding.
-      url: attr(citationLink, 'href') ?? embeddedUrl,
+      url: citationHref ?? cardUrl?.searchParams.get('url'),
       title: attr(iframe, 'title'),
       publisher: text(citationLink),
     })

@@ -578,6 +578,19 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should refuse a record key that is a dot segment', async () => {
+      const value = html`
+        <blockquote
+          class="bluesky-embed"
+          data-bluesky-uri="at://did:plc:9hz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/.."
+        >
+          <p lang="en">The record key would climb out of the collection.</p>
+        </blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return nothing for a blockquote naming no post at all', async () => {
       const value = html`
         <blockquote class="bluesky-embed">
@@ -646,12 +659,12 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:plc:bhz4agnyzcrsvpnprxrbjrpa/3mbq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:plc:bhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mbq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:bhz4agnyzcrsvpnprxrbjrpa/post/3mbq7aeuwbg42',
+        thumbnail:
+          'https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:bhz4agnyzcrsvpnprxrbjrpa/bafkreithumb@jpeg',
         description: 'The wrapper carries the post twice over.',
         author: 'Newsletter Author (@author.example)',
         avatar:
           'https://cdn.bsky.app/img/avatar/plain/did:plc:bhz4agnyzcrsvpnprxrbjrpa/bafkreiavatar@jpeg',
-        thumbnail:
-          'https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:bhz4agnyzcrsvpnprxrbjrpa/bafkreithumb@jpeg',
         date: '2025-12-13T14:15:16.017Z',
       }
 
@@ -685,10 +698,10 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:plc:bhz4agnyzcrsvpnprxrbjrpa/3mbq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:plc:bhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mbq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:bhz4agnyzcrsvpnprxrbjrpa/post/3mbq7aeuwbg42',
+        thumbnail: '//cdn.bsky.app/img/feed_thumbnail/plain/did:plc:bhz4/bafkreithumb@jpeg',
         description: 'The wrapper states its media without a scheme.',
         author: '@author.example',
         avatar: '//cdn.bsky.app/img/avatar/plain/did:plc:bhz4/bafkreiavatar@jpeg',
-        thumbnail: '//cdn.bsky.app/img/feed_thumbnail/plain/did:plc:bhz4/bafkreithumb@jpeg',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -719,10 +732,10 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:plc:chz4agnyzcrsvpnprxrbjrpa/3mcq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:plc:chz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mcq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:chz4agnyzcrsvpnprxrbjrpa/post/3mcq7aeuwbg42',
-        description: 'A post with a clip.',
-        author: 'Video Author (@video.example)',
         thumbnail:
           'https://video.bsky.app/watch/did:plc:chz4agnyzcrsvpnprxrbjrpa/bafkreivideo/thumbnail.jpg',
+        description: 'A post with a clip.',
+        author: 'Video Author (@video.example)',
         date: '2026-01-14T15:16:17.018Z',
       }
 

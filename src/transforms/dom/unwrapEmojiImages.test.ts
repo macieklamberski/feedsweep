@@ -768,6 +768,9 @@ describeForEachParser('unwrapEmojiImages', (parseHtml) => {
       ['smiley-embarrassed', 'Smiley Embarrassed', '😳'],
       ['smiley-indifferent', 'Smiley Indifferent', '😐'],
       ['heart', 'Cœur', '❤️'],
+      ['cat-happy', 'Chat heureux', '😺'],
+      ['cat-very-happy', 'Chat très heureux', '😸'],
+      ['cat-lol', 'Chat MDR', '😹'],
     ]
 
     it.each(faceCases)('should replace the %s face', async (name, alt, expected) => {
@@ -786,8 +789,9 @@ describeForEachParser('unwrapEmojiImages', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
     })
 
-    // The set also draws each expression on a cat, a man, a woman and a robot. Unicode has cat
-    // faces but not a winking or tongue-out one, so swapping these would change the expression.
+    // The set also draws each expression on a cat, a man, a woman and a robot. Unicode's cat
+    // faces cover the three smiles but not a winking or tongue-out one, so swapping those would
+    // change the expression.
     const keptCases: Array<[string, string]> = [
       ['cat', '16x16_cat-wink'],
       ['woman', '16x16_woman-happy'],
@@ -1250,6 +1254,18 @@ describeForEachParser('unwrapEmojiImages', (parseHtml) => {
 
       expect(keys).toEqual(keys.map((key) => key.toLowerCase()))
     })
+
+    // An alt is free text, and `constructor` names a member every object inherits, so the table
+    // has to refuse it the way it refuses any other word it does not carry.
+    it('should keep a smilie whose alt names an inherited member', async () => {
+      const value = html`
+        <p>
+          <img src="https://example.com/smilies/happy.png" class="smilie" alt="constructor">
+        </p>
+      `
+
+      expect(await transformKeeping(value)).toEqualHtml(value)
+    })
   })
 
   describe('platform filename tables', () => {
@@ -1293,6 +1309,18 @@ describeForEachParser('unwrapEmojiImages', (parseHtml) => {
 
     it('should merge the shipped platforms without conflict', () => {
       expect(() => mergeEmojiNames(emojiPlatforms)).not.toThrow()
+    })
+
+    // The stem is whatever the file is called, and `constructor` names a member every object
+    // inherits, so the merged table has to refuse it the way it refuses any unmapped name.
+    it('should keep a smilie whose filename names an inherited member', async () => {
+      const value = html`
+        <p>
+          <img src="https://example.com/smilies/constructor.png" class="smilie" alt=":sk21_d1:">
+        </p>
+      `
+
+      expect(await transformKeeping(value)).toEqualHtml(value)
     })
   })
 

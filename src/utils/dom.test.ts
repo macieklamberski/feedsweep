@@ -4,15 +4,18 @@ import {
   attr,
   find,
   findConfigScript,
+  flashVar,
   flashVars,
   formatRatio,
   getElementDimensions,
+  getStylePairRatio,
   getWrapperRatio,
   hasAncestorWithTagName,
   hasZeroOpacity,
   isElementHidden,
   isEmptyElement,
   keepIfMatches,
+  paramValue,
   parsePixelSize,
   parseRatio,
   removeWithEmptyWrappers,
@@ -20,6 +23,76 @@ import {
   textNode,
   walkElements,
 } from './dom.js'
+
+describeForEachParser('getStylePairRatio', (parseHtml) => {
+  it('should read a small unitless pair as the shape it spells', () => {
+    const document = parseHtml('<div style="width: 16; height: 9;"></div>')
+    const element = queryElement(document, 'div')
+
+    expect(getStylePairRatio(element)).toBe('16/9')
+  })
+
+  // Above the ceiling the same spelling is a forgotten unit on a real box, which
+  // getElementDimensions already reads as pixels.
+  it('should refuse a large pair', () => {
+    const document = parseHtml('<div style="width: 540; height: 300;"></div>')
+    const element = queryElement(document, 'div')
+
+    expect(getStylePairRatio(element)).toBeUndefined()
+  })
+
+  // The unit changes nothing: no player is nine pixels tall either way, so the pair is a shape
+  // however it is spelled.
+  it('should read a small pair that carries its unit as the same shape', () => {
+    const document = parseHtml('<div style="width: 16px; height: 9px;"></div>')
+    const element = queryElement(document, 'div')
+
+    expect(getStylePairRatio(element)).toBe('16/9')
+  })
+
+  // What the ceiling actually admits, and why nothing is lost by it: every small pair on a carrier
+  // in the corpus is a social button, and each is stripped as non-content before a size is asked
+  // for. Facebook's is 88x21, Google's 90x20 and 32x20, Twitter's 61x20.
+  it('should read a social button box as a shape', () => {
+    const document = parseHtml('<iframe style="width: 88px; height: 21px;"></iframe>')
+    const element = queryElement(document, 'iframe')
+
+    expect(getStylePairRatio(element)).toBe('88/21')
+  })
+
+  // A fixed-height bar states a real width beside a small height, so both halves have to be under
+  // the ceiling. archive.org's audio player is 350x30.
+  it('should refuse a pair where only the height is small', () => {
+    const document = parseHtml('<iframe style="width: 350px; height: 30px;"></iframe>')
+    const element = queryElement(document, 'iframe')
+
+    expect(getStylePairRatio(element)).toBeUndefined()
+  })
+
+  // Zero is the one length CSS takes bare, and a zero pair is a decorative div rather than a
+  // carrier.
+  it('should refuse a zero pair', () => {
+    const document = parseHtml('<div style="width: 0; height: 0; border-top: 2px solid red"></div>')
+    const element = queryElement(document, 'div')
+
+    expect(getStylePairRatio(element)).toBeUndefined()
+  })
+
+  it('should refuse a lone unitless length', () => {
+    const document = parseHtml('<div style="height: 9;"></div>')
+    const element = queryElement(document, 'div')
+
+    expect(getStylePairRatio(element)).toBeUndefined()
+  })
+
+  // A dimension attribute is a box the browser did apply, and dimensions outrank a ratio.
+  it('should refuse where the element states a dimension attribute', () => {
+    const document = parseHtml('<iframe width="640" style="width: 16; height: 9;"></iframe>')
+    const element = queryElement(document, 'iframe')
+
+    expect(getStylePairRatio(element)).toBeUndefined()
+  })
+})
 
 describeForEachParser('getElementDimensions', (parseHtml) => {
   it('should return both dimensions from attributes', () => {
@@ -127,6 +200,19 @@ describeForEachParser('getElementDimensions', (parseHtml) => {
     const image = queryElement(document, 'img')
 
     expect(getElementDimensions(image)).toEqual({ width: undefined, height: undefined })
+  })
+
+  // A feed writes the attribute, so the read has to stay linear in its length. This input took
+  // 6.8 seconds before the unit was bounded and takes 2 milliseconds now, so the threshold sits
+  // an order of magnitude above the fast path and an order below the slow one: a loaded machine
+  // moves it nowhere near either side.
+  it('should read a long unit-like attribute in linear time', () => {
+    const document = parseHtml(`<img width="${'a'.repeat(120000)}1">`)
+    const image = queryElement(document, 'img')
+    const start = performance.now()
+
+    expect(getElementDimensions(image)).toEqual({ width: undefined, height: undefined })
+    expect(performance.now() - start).toBeLessThan(500)
   })
 })
 
@@ -267,6 +353,18 @@ describeForEachParser('getWrapperRatio reading only the element itself', (parseH
     const iframe = queryElement(document, 'iframe')
 
     expect(getWrapperRatio(iframe, 0)).toBe('16/9')
+  })
+
+  // A feed writes the attribute, so the read has to stay linear in its length. This input took
+  // 2 seconds before the keyword was dropped by token and takes 3 milliseconds now, so the
+  // threshold sits well clear of both and a loaded machine cannot flip it.
+  it('should read a ratio holding a long run of spaces in linear time', () => {
+    const document = parseHtml(`<iframe style="aspect-ratio: 16${' '.repeat(120000)}9"></iframe>`)
+    const iframe = queryElement(document, 'iframe')
+    const start = performance.now()
+
+    expect(getWrapperRatio(iframe, 0)).toBeUndefined()
+    expect(performance.now() - start).toBeLessThan(500)
   })
 
   it('should read a wp-embed-aspect class from the element itself', () => {
@@ -955,6 +1053,119 @@ describeForEachParser('flashVars', (parseHtml) => {
 
   it('should return undefined for a nullish element', () => {
     expect(flashVars(undefined)).toBeUndefined()
+  })
+})
+
+describeForEachParser('flashVar', (parseHtml) => {
+  it('should read the named value out of the config', () => {
+    const document = parseHtml('<embed src="player.swf" flashvars="config=1&id=2">')
+    const element = queryElement(document, 'embed')
+
+    expect(flashVar(element, 'id')).toBe('2')
+  })
+
+  it('should return undefined when the config names something else', () => {
+    const document = parseHtml('<embed src="player.swf" flashvars="config=1">')
+    const element = queryElement(document, 'embed')
+
+    expect(flashVar(element, 'id')).toBeUndefined()
+  })
+
+  it('should return undefined for a nullish element', () => {
+    expect(flashVar(undefined, 'id')).toBeUndefined()
+  })
+})
+
+// `flashVars` exercises this helper with one name only, so the branches its other two callers
+// rest on are pinned here rather than through whichever caller happens to reach them.
+describeForEachParser('paramValue', (parseHtml) => {
+  it('should read the value of the named param', () => {
+    const document = parseHtml(html`
+      <object>
+        <param name="playerkey" value="AQ~~,abc,def" />
+      </object>
+    `)
+    const element = queryElement(document, 'object')
+
+    expect(paramValue(element, 'playerkey')).toBe('AQ~~,abc,def')
+  })
+
+  // The name is matched lowercased, so a caller passing anything else never matches. Brightcove
+  // writes `@videoplayer` and `playerKey`, and both reach here as the lowercase spelling.
+  it('should match the param name whatever the markup casing', () => {
+    const document = parseHtml(html`
+      <object>
+        <param name="PlayerKey" value="AQ~~,abc,def" />
+      </object>
+    `)
+    const element = queryElement(document, 'object')
+
+    expect(paramValue(element, 'playerkey')).toBe('AQ~~,abc,def')
+  })
+
+  it('should return undefined when the caller states the name in another casing', () => {
+    const document = parseHtml(html`
+      <object>
+        <param name="playerkey" value="AQ~~,abc,def" />
+      </object>
+    `)
+    const element = queryElement(document, 'object')
+
+    expect(paramValue(element, 'playerKey')).toBeUndefined()
+  })
+
+  it('should pick the named param out of several', () => {
+    const document = parseHtml(html`
+      <object>
+        <param name="movie" value="player.swf" />
+        <param name="@videoplayer" value="6098765432" />
+        <param name="wmode" value="transparent" />
+      </object>
+    `)
+    const element = queryElement(document, 'object')
+
+    expect(paramValue(element, '@videoplayer')).toBe('6098765432')
+  })
+
+  // The search is over descendants, not children, because the Flash-era wrappers nest a player
+  // inside a second `<object>` for the browsers that needed it.
+  it('should read a param nested below the root', () => {
+    const document = parseHtml(html`
+      <object>
+        <object>
+          <param name="flashvars" value="config=1" />
+        </object>
+      </object>
+    `)
+    const element = queryElement(document, 'object')
+
+    expect(paramValue(element, 'flashvars')).toBe('config=1')
+  })
+
+  it('should return undefined for a param that states no value', () => {
+    const document = parseHtml(html`
+      <object>
+        <param name="playerkey" />
+      </object>
+    `)
+    const element = queryElement(document, 'object')
+
+    expect(paramValue(element, 'playerkey')).toBeUndefined()
+  })
+
+  it('should return undefined when no param carries the name', () => {
+    const document = parseHtml(html`
+      <object>
+        <param name="movie" value="player.swf" />
+      </object>
+    `)
+    const element = queryElement(document, 'object')
+
+    expect(paramValue(element, 'playerkey')).toBeUndefined()
+  })
+
+  it('should return undefined for no root', () => {
+    expect(paramValue(undefined, 'playerkey')).toBeUndefined()
   })
 })
 

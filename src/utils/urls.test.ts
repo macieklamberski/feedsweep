@@ -2,6 +2,8 @@ import { describe, expect, it } from 'bun:test'
 import { baseContext } from '../tests.js'
 import {
   cleanUrl,
+  composeQuery,
+  decodeOrKeep,
   decodeSegment,
   parseUrlOnHosts,
   pickQueryParams,
@@ -204,6 +206,35 @@ describe('decodeSegment', () => {
   })
 })
 
+describe('decodeOrKeep', () => {
+  it('should decode a percent-encoded value', () => {
+    const value = 'FEAR%20STREET%20PART%202'
+    const expected = 'FEAR STREET PART 2'
+
+    expect(decodeOrKeep(value)).toBe(expected)
+  })
+
+  it('should leave a plain value unchanged', () => {
+    const value = 'FEAR STREET PART 2'
+
+    expect(decodeOrKeep(value)).toBe(value)
+  })
+
+  it('should keep a value whose escape is malformed', () => {
+    const value = 'FEAR%STREET'
+
+    expect(decodeOrKeep(value)).toBe(value)
+  })
+
+  it('should return undefined for undefined', () => {
+    expect(decodeOrKeep(undefined)).toBeUndefined()
+  })
+
+  it('should return undefined for an empty string', () => {
+    expect(decodeOrKeep('')).toBeUndefined()
+  })
+})
+
 describe('splitStrayParams', () => {
   it('should split the id from the tail at the first ampersand', () => {
     const value = 'mhrk1978&playlist=1&autoplay=1'
@@ -265,6 +296,47 @@ describe('pickQueryParams', () => {
   })
 })
 
+describe('composeQuery', () => {
+  it('should return an empty string for an empty record', () => {
+    expect(composeQuery({})).toBe('')
+  })
+
+  it('should return an empty string when nothing is passed', () => {
+    expect(composeQuery()).toBe('')
+  })
+
+  it('should prefix a single parameter with a question mark', () => {
+    const value = { start: '90' }
+    const expected = '?start=90'
+
+    expect(composeQuery(value)).toBe(expected)
+  })
+
+  it('should join several parameters in the order given', () => {
+    const value = { start: '90', list: 'PLabc', index: '4' }
+    const expected = '?start=90&list=PLabc&index=4'
+
+    expect(composeQuery(value)).toBe(expected)
+  })
+
+  it('should encode a value that needs it', () => {
+    const value = { clipt: 'a+b/c' }
+    const expected = '?clipt=a%2Bb%2Fc'
+
+    expect(composeQuery(value)).toBe(expected)
+  })
+
+  // `pickQueryParams` drops an empty value, so this only arrives from a caller that built the
+  // record itself. The pair is still stated, since the platform's player may read the parameter's
+  // presence rather than its value.
+  it('should state a parameter whose value is empty', () => {
+    const value = { theme: '' }
+    const expected = '?theme='
+
+    expect(composeQuery(value)).toBe(expected)
+  })
+})
+
 describe('pickUrlParams', () => {
   it('should keep only the named parameters, in the order given', () => {
     const value = 'https://example.com/e/x?utm_source=feed&index=4&list=PLabc&start=90'
@@ -290,6 +362,10 @@ describe('pickUrlParams', () => {
 
   it('should return an empty string for an unparseable url', () => {
     expect(pickUrlParams('not a url', ['start'])).toBe('')
+  })
+
+  it('should return an empty string for a protocol-relative url', () => {
+    expect(pickUrlParams('//example.com/e/x?start=90', ['start'])).toBe('')
   })
 
   it('should encode a value that needs it', () => {

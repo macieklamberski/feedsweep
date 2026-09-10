@@ -1,18 +1,9 @@
 import { isAnyOf } from 'trousse'
-import type { MediaResolver, MediaResolverResult } from '../types.js'
+import type { MediaResolver } from '../types.js'
 import { findConfigScript } from '../utils/dom.js'
 
-// Podlove Publisher ships the episode as a `<div class="podlove-web-player">` holding nothing
-// but custom elements (`<tab-chapters>`, `<icon>`, `<subscribe-button>`), with a sibling
-// `<script>` that builds the player on load. None of it renders in a reader, so the episode is
-// lost outright. The script body carries the whole config inline, not a url to fetch,
-// which is what makes this recoverable without a network hop:
-//
-//   podlovePlayerCache.add([{"url":"…","data":{"audio":[{"url":"…mp3","mimeType":"audio/mpeg"}],
-//                                              "poster":"…","title":"…","chapters":[…]}}])
-//
-// The other spelling, `podlovePlayer('#el', 'https://…/wp-json/…')`, names a config endpoint
-// with no inlined data. That one needs a fetch and is deliberately left to the generic pass.
+// The script inlines the config as podlovePlayerCache.add([{data: {audio: [{url, mimeType}]}}]).
+// The other spelling, podlovePlayer('#el', 'https://…/wp-json/…'), inlines no config.
 const configRegex = /podlovePlayerCache\.add\(\s*(\[[\s\S]*?\])\s*\)/
 
 // Podlove offers the same episode in several formats and the order is the publisher's, not a
@@ -20,11 +11,11 @@ const configRegex = /podlovePlayerCache\.add\(\s*(\[[\s\S]*?\])\s*\)/
 // some readers a file they cannot play while an mp3 sat second in the same array.
 const preferredMimeTypes = ['audio/mpeg', 'audio/mp3', 'audio/mp4']
 
+// The config also carries episode and show posters, which an <audio> has no attribute for.
 type PodloveConfig = Array<{
   data?: {
     audio?: Array<{ url?: string; mimeType?: string }>
-    poster?: string
-    show?: { poster?: string }
+    title?: string
   }
 }>
 
@@ -40,10 +31,11 @@ const parseConfig = (script: Element): PodloveConfig | undefined => {
   } catch {}
 }
 
+// Podlove Publisher ships an episode as custom elements a sibling script builds into a player.
 export const podloveMediaResolver: MediaResolver = {
   kind: 'media',
   selector: 'div.podlove-web-player',
-  extract: (element): MediaResolverResult | undefined => {
+  extract: (element) => {
     const script = findConfigScript(element)
     const config = script ? parseConfig(script) : undefined
     const data = config?.[0]?.data
@@ -56,6 +48,7 @@ export const podloveMediaResolver: MediaResolver = {
       (audio): audio is { url: string; mimeType: string } =>
         audio.url !== undefined && audio.mimeType?.startsWith('audio/') === true,
     )
+    // The config's order is the publisher's, not a ranking, and Safari plays neither ogg nor opus.
     const file = files?.find((audio) => isAnyOf(audio.mimeType, preferredMimeTypes)) ?? files?.[0]
     const source = file?.url
 
@@ -63,14 +56,10 @@ export const podloveMediaResolver: MediaResolver = {
       return
     }
 
-    // Both urls travel as the config wrote them. convertWidgets resolves whatever a resolver
-    // returns, which is what gives a protocol-relative or feed-relative config the same
-    // treatment as one written in markup, and it drops the media when the src resolves to
-    // nothing at all.
     return {
       tag: 'audio',
       src: source,
-      poster: data.poster ?? data.show?.poster,
+      title: data.title,
     }
   },
 }

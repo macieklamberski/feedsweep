@@ -1,18 +1,16 @@
-import { isNonEmptyString, isNumber, startsWithAnyOf } from 'trousse'
+import { isNonEmptyString, isNumber } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { jsonAttr } from '../../utils/dom.js'
+import { isUrlShaped } from '../../utils/urls.js'
 
-// Substack ships an inline @-mention as an empty <span class="mention-wrap"> whose person
-// or publication lives only in the data-attrs JSON, so the name vanishes mid-sentence in a
-// reader. Rebuild the anchor: a publication mention carries its url in the payload, a user
-// mention carries url: null and its numeric id mints a profile url that Substack redirects
-// to the canonical handle.
 type MentionAttrs = {
   name?: string
   id?: number
   url?: string | null
 }
 
+// Substack ships an @-mention as an empty span whose name lives only in its data-attrs JSON.
+// A user mention carries url: null, and the profile url its id mints redirects to the handle.
 export const fixSubstackMentions: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll('span.mention-wrap')) {
     const attrs = jsonAttr<MentionAttrs>(element, 'data-attrs')
@@ -23,9 +21,9 @@ export const fixSubstackMentions: DomTransform = () => (document) => {
 
     let url: string | undefined
 
-    // A payload url must be http(s) before it may become the href. The id lands in a url
-    // template, so anything that is not the positive integer Substack emits is dropped.
-    if (isNonEmptyString(attrs.url) && startsWithAnyOf(attrs.url, ['http://', 'https://'])) {
+    // The id lands in a url template, so anything that is not the positive integer Substack
+    // emits is dropped.
+    if (isNonEmptyString(attrs.url) && isUrlShaped(attrs.url)) {
       url = attrs.url
     } else if (isNumber(attrs.id) && Number.isInteger(attrs.id) && attrs.id > 0) {
       url = `https://substack.com/profile/${attrs.id}`
