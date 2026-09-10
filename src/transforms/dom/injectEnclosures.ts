@@ -13,7 +13,7 @@ import {
   prepareEnclosures,
 } from '../../utils/enclosures.js'
 import { getImageFingerprint } from '../../utils/images.js'
-import { flashFileRegex, resolveOrDropUrl, resolveOrKeepUrl } from '../../utils/urls.js'
+import { cleanUrl, flashFileRegex, resolveOrDropUrl, resolveOrKeepUrl } from '../../utils/urls.js'
 import {
   createEmbedPlaceholder,
   createImage,
@@ -215,21 +215,36 @@ export const injectEnclosures: DomTransform = (context) => {
       }
     }
 
-    // Content that already carries a marked element with the same source (typically
-    // a previous run of this transform over the same item) already shows that
-    // enclosure, so injecting it again would stack a visible duplicate.
-    const existingSources = new Set<string>()
+    // A source already on the page, put there by a previous run or by an earlier entry in this
+    // one, would show up twice. A feed naming one file twice does it, and so does an item whose
+    // enclosures all inherit the same media:embed. Sources compare cleaned, so a tracking
+    // parameter does not make two copies of one file look like two files.
+    const injectedSources = new Set<string>()
 
     for (const element of document.querySelectorAll(`[${enclosureMarker}]`)) {
       const source = getInjectedSource(element)
 
       if (source) {
-        existingSources.add(source)
+        injectedSources.add(cleanUrl(source, { cleanUrlFn: context.cleanUrlFn }))
       }
     }
 
     const injected = created.filter((element) => {
-      return !existingSources.has(getInjectedSource(element) ?? '')
+      const source = getInjectedSource(element)
+
+      if (!source) {
+        return true
+      }
+
+      const key = cleanUrl(source, { cleanUrlFn: context.cleanUrlFn })
+
+      if (injectedSources.has(key)) {
+        return false
+      }
+
+      injectedSources.add(key)
+
+      return true
     })
 
     // Tag each injected element so the optional stripDuplicateEnclosures pass can
