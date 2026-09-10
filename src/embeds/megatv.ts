@@ -1,6 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
-import { attr } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -13,7 +12,7 @@ const safeEmbedIdRegex = /^\d+$/
 // Mega switched to it at post 151920 in October 2020, and earlier articles carry eight-digit ids.
 const prefixedPostIdRegex = /^2020(\d{6,})$/
 
-const megatvResolveEmbed = (link: string, element: Element): EmbedResolverResult | undefined => {
+const megatvResolveEmbed = (link: string): EmbedResolverResult | undefined => {
   const parsed = parseUrl(link, placeholderBaseUrl)
 
   if (!parsed || getPathSegments(parsed).join('/') !== 'embed') {
@@ -38,7 +37,6 @@ const megatvResolveEmbed = (link: string, element: Element): EmbedResolverResult
     id,
     src: `https://www.megatv.com/embed/?p=${id}`,
     url: post ? `https://www.megatv.com/?p=${post}` : undefined,
-    title: attr(element, 'title'),
     // The player is Video.js in fluid mode, and the share dialog boxes it 560 by 315.
     ratio: '16/9',
   }

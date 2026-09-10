@@ -50,7 +50,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the title the carrier states', async () => {
+    it('should not read the title the carrier states', async () => {
       const value = html`
         <iframe
           src="https://odysee.com/$/embed/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0?r=GqtYDFe44PSjFLQNJr5pB38T7AKLg2Tu"
@@ -67,7 +67,6 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         src: 'https://odysee.com/$/embed/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
         url: 'https://odysee.com/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
         author: '@Impfschaden.info',
-        title: 'Spirit of Health 2015',
         width: 560,
         height: 315,
       }

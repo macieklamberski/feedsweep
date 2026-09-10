@@ -33,6 +33,21 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
 
     it('should state the ratio for a frame that declares no size', async () => {
       const value = html`
+        <iframe loading="lazy" src="https://www.megatv.com/embed/?p=20202420374"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'megatv',
+        id: '20202420374',
+        src: 'https://www.megatv.com/embed/?p=20202420374',
+        url: 'https://www.megatv.com/?p=2420374',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read the title the carrier states', async () => {
+      const value = html`
         <iframe
           loading="lazy"
           title="Mega Γεγονότα"
@@ -44,7 +59,6 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
         id: '20202420374',
         src: 'https://www.megatv.com/embed/?p=20202420374',
         url: 'https://www.megatv.com/?p=2420374',
-        title: 'Mega Γεγονότα',
         ratio: '16/9',
       }
 
