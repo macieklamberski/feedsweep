@@ -295,3 +295,24 @@ describeForEachParser('cnnScriptEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('cnnIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, cnnIframeEmbedResolver)
+
+  it('should read the name the carrier states', async () => {
+    const value = html`
+      <iframe src="https://fave.api.cnn.io/v1/fav/?video=politics/2020/11/07/biden-wins-election-vpx.cnn&customer=cnn&edition=domestic&env=prod" title="Biden wins the election"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'cnn',
+      id: 'politics/2020/11/07/biden-wins-election-vpx.cnn',
+      src: 'https://fave.api.cnn.io/v1/fav/?video=politics/2020/11/07/biden-wins-election-vpx.cnn&customer=cnn&edition=domestic&env=prod',
+      url: 'https://www.cnn.com/videos/politics/2020/11/07/biden-wins-election-vpx.cnn',
+      ratio: '16/9',
+      date: '2020-11-07',
+      title: 'Biden wins the election',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -51,7 +51,7 @@ const resolveVideoId = (value: string | null | undefined): EmbedResolverResult |
   return id && videoIdRegex.test(id) ? composeEmbed(id) : undefined
 }
 
-export const cnnResolveEmbed = (url: string): EmbedResolverResult | undefined => {
+const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   const parsed = parseUrlOnHosts(url, cnnHosts)
 
   if (parsed?.pathname === '/v1/fav/') {
@@ -65,6 +65,15 @@ export const cnnResolveEmbed = (url: string): EmbedResolverResult | undefined =>
   if (parsed?.pathname === '/video/savp/evp/') {
     return resolveVideoId(parsed.searchParams.get('vid'))
   }
+}
+
+export const cnnResolveEmbed = (
+  url: string,
+  element?: Element,
+): EmbedResolverResult | undefined => {
+  const target = resolveTarget(url)
+
+  return target && { ...target, title: attr(element, 'title') }
 }
 
 // CNN's player iframe: the fave one still serves, the 2014 and 2008 ones load nothing today.
