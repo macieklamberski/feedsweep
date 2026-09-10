@@ -350,6 +350,34 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // The share dialog writes the same placeholder here as in the player's title attribute.
+    it('should drop a data-pen-title that names no pen', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-user="argyleink"
+          data-slug-hash="XJpKqXm"
+          data-pen-title="Untitled"
+        >
+          <span
+            >See the Pen <a href="https://codepen.io/argyleink/pen/XJpKqXm">Untitled</a> by Adam
+            Argyle on <a href="https://codepen.io">CodePen</a>.</span
+          >
+        </p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        author: '@argyleink',
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should take the title from the pen link when data-pen-title is missing', async () => {
       const value = html`
         <p
