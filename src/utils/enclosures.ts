@@ -4,16 +4,22 @@ import { getImageFingerprint, getSizeKeywordRank, getUrlSizeHint } from './image
 import { absoluteUrlRegex, cleanUrl, isOnHosts, resolveOrKeepUrl } from './urls.js'
 import { getEmbedSize } from './widgets.js'
 
-export const isAudioEnclosure = (enclosure: Enclosure): boolean => {
-  return enclosure.medium === 'audio' || !!enclosure.type?.startsWith('audio/')
-}
+const kindTypePrefixes = ['audio/', 'video/', 'image/'] as const
 
-export const isVideoEnclosure = (enclosure: Enclosure): boolean => {
-  return enclosure.medium === 'video' || !!enclosure.type?.startsWith('video/')
-}
+// PeerTube ships an audio-only rendition as `type="audio/mp4"` under `medium="video"`, so the
+// type decides whenever it names a kind. A type naming none, `text/html` or a stream manifest,
+// leaves the medium to answer.
+export const isEnclosureKind = (
+  enclosure: Enclosure,
+  kind: 'audio' | 'video' | 'image',
+): boolean => {
+  const typed = kindTypePrefixes.find((prefix) => enclosure.type?.startsWith(prefix))
 
-export const isImageEnclosure = (enclosure: Enclosure): boolean => {
-  return enclosure.medium === 'image' || !!enclosure.type?.startsWith('image/')
+  if (typed) {
+    return typed === `${kind}/`
+  }
+
+  return enclosure.medium === kind
 }
 
 export const isAvatarEnclosure = (url: string, avatarHosts: ReadonlyArray<string>): boolean => {
@@ -60,7 +66,7 @@ const dedupeImageEnclosures = (
   const result: Array<Enclosure> = []
 
   for (const enclosure of enclosures) {
-    if (typeof enclosure.url !== 'string' || !isImageEnclosure(enclosure)) {
+    if (typeof enclosure.url !== 'string' || !isEnclosureKind(enclosure, 'image')) {
       result.push(enclosure)
       continue
     }
@@ -83,31 +89,39 @@ const dedupeImageEnclosures = (
 }
 
 const getKindRank = (rendition: Enclosure): number => {
-  if (isVideoEnclosure(rendition)) {
+  if (isEnclosureKind(rendition, 'video')) {
     return 3
   }
 
-  if (isAudioEnclosure(rendition)) {
+  if (isEnclosureKind(rendition, 'audio')) {
     return 2
   }
 
-  if (isImageEnclosure(rendition)) {
+  if (isEnclosureKind(rendition, 'image')) {
     return 1
   }
 
   return 0
 }
 
-// What orders two renditions of one thing, most significant first. Kind leads because a group can
-// hold the video, its poster and a stream manifest, and the poster listed first would otherwise
-// render as the group. Area is the direct measure of the rest, and a ladder that states no
-// dimensions falls to bytes: a talk shipped at 64k, 180k, 320k and 450k is all one mp4 size on
-// paper, and the first listed is the worst copy the publisher offers. Every rendition of a group
-// runs the same length, so bytes stand in for quality the way bitrate would.
+// PeerTube and every `podcast:alternateEnclosure` state a height and no width, so an area that
+// multiplies the two is zero for the whole ladder.
+const getRenditionArea = (rendition: Enclosure): number => {
+  const width = rendition.width ?? rendition.height ?? 0
+  const height = rendition.height ?? rendition.width ?? 0
+
+  return width * height
+}
+
+// What orders two renditions of one thing, most significant first. A group can hold the video,
+// its poster, an audio-only copy and a stream manifest, so kind outranks the publisher's default
+// flag and the flag settles the rest. A ladder that states no dimensions falls to bytes, and
+// every rendition of a group runs the same length.
 const getRenditionRanks = (rendition: Enclosure): Array<number> => {
   return [
     getKindRank(rendition),
-    (rendition.width ?? 0) * (rendition.height ?? 0),
+    rendition.isDefault ? 1 : 0,
+    getRenditionArea(rendition),
     rendition.length ?? 0,
   ]
 }
@@ -125,15 +139,10 @@ const outranksRendition = (incoming: Enclosure, kept: Enclosure): boolean => {
   return false
 }
 
-// A media group is one thing in several renditions, so only one of them renders. The flag the
-// publisher set wins outright, whatever it points at. A group with nothing to load renders nothing.
+// A media group is one thing in several renditions, so only one of them renders. A group with
+// nothing to load renders nothing.
 const pickGroupRendition = (renditions: ReadonlyArray<Enclosure>): Enclosure | undefined => {
   const renderable = renditions.filter((rendition) => rendition.url ?? rendition.playerUrl)
-  const flagged = renderable.find((rendition) => rendition.isDefault)
-
-  if (flagged) {
-    return flagged
-  }
 
   let picked = renderable[0]
 

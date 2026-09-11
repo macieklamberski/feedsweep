@@ -5,13 +5,7 @@ import type {
   TransformContext,
   WidgetResolver,
 } from '../../types.js'
-import {
-  isAudioEnclosure,
-  isAvatarEnclosure,
-  isImageEnclosure,
-  isVideoEnclosure,
-  prepareEnclosures,
-} from '../../utils/enclosures.js'
+import { isAvatarEnclosure, isEnclosureKind, prepareEnclosures } from '../../utils/enclosures.js'
 import { getImageFingerprint } from '../../utils/images.js'
 import { cleanUrl, flashFileRegex, resolveOrDropUrl, resolveOrKeepUrl } from '../../utils/urls.js'
 import {
@@ -80,7 +74,7 @@ const injectImageEnclosure = (
   enclosure: Enclosure,
   src: string,
 ): HTMLElement | undefined => {
-  if (!isImageEnclosure(enclosure)) {
+  if (!isEnclosureKind(enclosure, 'image')) {
     return
   }
 
@@ -184,12 +178,12 @@ export const injectEnclosures: DomTransform = (context) => {
         continue
       }
 
-      if (isAudioEnclosure(enclosure)) {
+      if (isEnclosureKind(enclosure, 'audio')) {
         created.push(createNativeMediaElement(document, 'audio', mediaSource, enclosure, context))
         continue
       }
 
-      if (isVideoEnclosure(enclosure)) {
+      if (isEnclosureKind(enclosure, 'video')) {
         created.push(createNativeMediaElement(document, 'video', mediaSource, enclosure, context))
         continue
       }
@@ -197,7 +191,7 @@ export const injectEnclosures: DomTransform = (context) => {
       // WordPress attaches the author's gravatar as a per-item media:content image, and Substack
       // fills the enclosure of a post with no cover with the publication logo.
       if (
-        isImageEnclosure(enclosure) &&
+        isEnclosureKind(enclosure, 'image') &&
         (isAvatarEnclosure(embedSource, context.avatarImageHosts) ||
           feedImageFingerprints.has(getImageFingerprint(embedSource, context.cleanUrlFn)))
       ) {
