@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { baseContext, describeForEachParser } from '../tests.js'
 import type { Enclosure, TransformContext } from '../types.js'
-import { prepareEnclosures } from './enclosures.js'
+import { isEnclosureKind, prepareEnclosures } from './enclosures.js'
 
 describeForEachParser('prepareEnclosures', (parseHtml) => {
   const prepare = (
@@ -144,14 +144,12 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
         {
           url: 'https://example.com/clip-360.mp4',
           type: 'video/mp4',
-          width: 640,
           height: 360,
           groupIndex: 0,
         },
         {
           url: 'https://example.com/clip-720.mp4',
           type: 'video/mp4',
-          width: 1280,
           height: 720,
           isDefault: true,
           groupIndex: 0,
@@ -159,7 +157,6 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
         {
           url: 'https://example.com/clip-1080.mp4',
           type: 'video/mp4',
-          width: 1920,
           height: 1080,
           groupIndex: 0,
         },
@@ -169,26 +166,135 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
       expect(prepareUrls(enclosures)).toEqual(expected)
     })
 
-    it('should pick the largest rendition of a group without a default', () => {
+    it('should pick the video over an audio rendition the group flags as default', () => {
       const enclosures: Array<Enclosure> = [
         {
-          url: 'https://example.com/clip-360.mp4',
-          type: 'video/mp4',
-          width: 640,
-          height: 360,
+          url: 'https://example.com/clip-audio.mp4',
+          type: 'audio/mp4',
+          medium: 'video',
+          height: 0,
+          length: 246638730,
+          isDefault: true,
           groupIndex: 0,
         },
         {
           url: 'https://example.com/clip-1080.mp4',
           type: 'video/mp4',
-          width: 1920,
+          medium: 'video',
+          height: 1080,
+          length: 2057945466,
+          groupIndex: 0,
+        },
+        {
+          url: 'https://example.com/clip-144.mp4',
+          type: 'video/mp4',
+          medium: 'video',
+          height: 144,
+          length: 196993669,
+          groupIndex: 0,
+        },
+      ]
+      const expected = ['https://example.com/clip-1080.mp4']
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
+    it('should pick the flagged rendition over a larger one of the same kind', () => {
+      const enclosures: Array<Enclosure> = [
+        {
+          url: 'https://example.com/clip-1080.mp4',
+          type: 'video/mp4',
           height: 1080,
           groupIndex: 0,
         },
         {
           url: 'https://example.com/clip-720.mp4',
           type: 'video/mp4',
+          height: 720,
+          isDefault: true,
+          groupIndex: 0,
+        },
+      ]
+      const expected = ['https://example.com/clip-720.mp4']
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
+    it('should pick the largest rendition of a group that states both dimensions', () => {
+      const enclosures: Array<Enclosure> = [
+        {
+          url: 'https://example.com/clip-portrait.mp4',
+          type: 'video/mp4',
+          width: 608,
+          height: 1080,
+          groupIndex: 0,
+        },
+        {
+          url: 'https://example.com/clip-landscape.mp4',
+          type: 'video/mp4',
           width: 1280,
+          height: 720,
+          groupIndex: 0,
+        },
+      ]
+      const expected = ['https://example.com/clip-landscape.mp4']
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
+    it('should pick the tallest rendition of a group that states no width', () => {
+      const enclosures: Array<Enclosure> = [
+        {
+          url: 'https://example.com/clip-1080.mp4',
+          type: 'video/mp4',
+          height: 1080,
+          groupIndex: 0,
+        },
+        { url: 'https://example.com/clip-360.mp4', type: 'video/mp4', height: 360, groupIndex: 0 },
+      ]
+      const expected = ['https://example.com/clip-1080.mp4']
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
+    it('should keep the flagged audio of a group that carries no video', () => {
+      const enclosures: Array<Enclosure> = [
+        {
+          url: 'https://example.com/ep-320.mp3',
+          type: 'audio/mpeg',
+          length: 40000000,
+          groupIndex: 0,
+        },
+        {
+          url: 'https://example.com/ep-64.mp3',
+          type: 'audio/mpeg',
+          length: 8000000,
+          isDefault: true,
+          groupIndex: 0,
+        },
+      ]
+      const expected = ['https://example.com/ep-64.mp3']
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
+    it('should pick the largest rendition of a group without a default', () => {
+      const enclosures: Array<Enclosure> = [
+        {
+          url: 'https://example.com/clip-360.mp4',
+          type: 'video/mp4',
+          height: 360,
+          groupIndex: 0,
+        },
+        {
+          url: 'https://example.com/clip-1080.mp4',
+          type: 'video/mp4',
+          height: 1080,
+          groupIndex: 0,
+        },
+        {
+          url: 'https://example.com/clip-720.mp4',
+          type: 'video/mp4',
           height: 720,
           groupIndex: 0,
         },
@@ -232,14 +338,12 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
         {
           url: 'https://example.com/poster.jpg',
           medium: 'image',
-          width: 1920,
           height: 1080,
           groupIndex: 0,
         },
         {
           url: 'https://example.com/clip.mp4',
           type: 'video/mp4',
-          width: 640,
           height: 360,
           groupIndex: 0,
         },
@@ -254,7 +358,6 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
         {
           url: 'https://example.com/cover.jpg',
           medium: 'image',
-          width: 1400,
           height: 1400,
           groupIndex: 0,
         },
@@ -369,7 +472,7 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
           groupIndex: 0,
         },
       ]
-      const expected = ['https://example.com/clip-720.mp4', 'https://example.com/episode.mp3']
+      const expected = ['https://example.com/clip-1080.mp4', 'https://example.com/episode.mp3']
 
       expect(prepareUrls(enclosures)).toEqual(expected)
     })
@@ -499,5 +602,45 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
 
       expect(prepare(enclosures, context)).toEqual(expected)
     })
+  })
+})
+
+describe('isEnclosureKind', () => {
+  it('should read the kind from the type when the medium disagrees', () => {
+    const enclosure: Enclosure = { type: 'audio/mp4', medium: 'video' }
+
+    expect(isEnclosureKind(enclosure, 'audio')).toBe(true)
+    expect(isEnclosureKind(enclosure, 'video')).toBe(false)
+  })
+
+  it('should read the kind from the type when the medium disagrees the other way', () => {
+    const enclosure: Enclosure = { type: 'video/mp4', medium: 'audio' }
+
+    expect(isEnclosureKind(enclosure, 'video')).toBe(true)
+    expect(isEnclosureKind(enclosure, 'audio')).toBe(false)
+  })
+
+  it('should read the kind from the medium when the type names none', () => {
+    expect(isEnclosureKind({ type: 'application/x-mpegURL', medium: 'video' }, 'video')).toBe(true)
+    expect(isEnclosureKind({ type: 'text/html', medium: 'video' }, 'video')).toBe(true)
+    expect(isEnclosureKind({ type: 'application/octet-stream', medium: 'audio' }, 'audio')).toBe(
+      true,
+    )
+  })
+
+  it('should read the kind from the medium when the enclosure states no type', () => {
+    expect(isEnclosureKind({ medium: 'image' }, 'image')).toBe(true)
+    expect(isEnclosureKind({ medium: 'image' }, 'video')).toBe(false)
+  })
+
+  it('should read the kind from the type when the enclosure states no medium', () => {
+    expect(isEnclosureKind({ type: 'image/jpeg' }, 'image')).toBe(true)
+    expect(isEnclosureKind({ type: 'audio/mpeg' }, 'audio')).toBe(true)
+  })
+
+  it('should report no kind when the enclosure states neither', () => {
+    expect(isEnclosureKind({}, 'audio')).toBe(false)
+    expect(isEnclosureKind({}, 'video')).toBe(false)
+    expect(isEnclosureKind({}, 'image')).toBe(false)
   })
 })
