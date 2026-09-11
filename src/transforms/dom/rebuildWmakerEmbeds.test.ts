@@ -98,6 +98,20 @@ describeForEachParser('rebuildWmakerEmbeds', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    // A zero reserves no space, so it is not a box the publisher declared.
+    it('should not carry a zero dimension onto the player', async () => {
+      const value = html`
+        <object
+          data="https://www.hospitalia.fr/v/633ed090acc56dbee0aea06de3d69c00e8757bba"
+          width="0"
+          height="372"
+        ></object>
+      `
+      const expected = '<iframe src="https://www.hospitalia.fr/embed/4183/" height="372"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   it('should be idempotent', async () => {
