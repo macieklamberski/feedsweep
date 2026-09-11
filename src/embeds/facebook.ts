@@ -2,7 +2,11 @@ import { type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, parsePixelSize, text } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readS9eFragment,
+} from '../utils/widgets.js'
 
 // `fb.watch` is the short-link host the mobile app hands out, found inside both widget divs.
 // Posts live on the apex and on `web.`, `m.` and `business.` alike.
@@ -183,6 +187,43 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
 export const facebookIframeEmbedResolver = createUrlEmbedResolver(
   facebookHosts,
   facebookResolveEmbed,
+)
+
+// The helper frame's fragment spells the content four ways: `{page}/posts/{id}` or
+// `{page}/videos/{id}`, `{page}/{id}`, a numeric id behind a kind letter or word such as `p{id}`
+// or `video{id}`, and a bare numeric id. Each spelling captures page, kind and id in that order.
+const s9eFragmentRegexes = [
+  /^([.\w]+)\/([prv])\w*\/(\w+)$/,
+  /^([.\w]+)\/()(\w+)$/,
+  /^()([prv])(?:ideo|ost)?(\d+)$/,
+  /^()()(\d+)$/,
+]
+
+// A bare id names no page, and the helper frames it under a placeholder page name, which
+// Facebook's plugin resolves to the post all the same.
+const s9ePlaceholderPage = 'Bob'
+
+// `v` for a video and `r` for a reel play on the watch page; `p` and no kind are a post.
+const s9eWatchKinds = new Set(['v', 'r'])
+
+// A forum's s9e MediaEmbed helper frame, naming a post or a video in its url fragment.
+export const facebookS9eEmbedResolver = createMarkupEmbedResolver(
+  'iframe[data-s9e-mediaembed="facebook"]',
+  (element) => {
+    const fragment = readS9eFragment(element) ?? ''
+    const match = s9eFragmentRegexes.map((regex) => regex.exec(fragment)).find(Boolean)
+
+    if (!match) {
+      return
+    }
+
+    const [, page, kind, id] = match
+    const href = s9eWatchKinds.has(kind)
+      ? `https://www.facebook.com/watch/?v=${id}`
+      : `https://www.facebook.com/${page || s9ePlaceholderPage}/posts/${id}`
+
+    return facebookResolveEmbed(href)
+  },
 )
 
 // The embed dialog's fallback blockquote, kept by the publisher without its widget div.

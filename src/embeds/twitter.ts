@@ -3,7 +3,11 @@ import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../type
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { isOnHosts, placeholderBaseUrl } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readS9eFragment,
+} from '../utils/widgets.js'
 
 const provider = 'twitter'
 
@@ -262,6 +266,18 @@ export const twitterResolveEmbed: ResolveEmbed = (url) => {
 export const twitterIframeEmbedResolver = createUrlEmbedResolver(
   ['twitter.com', 'x.com'],
   twitterResolveEmbed,
+)
+
+// A forum's s9e MediaEmbed helper frame, naming the status id in its url fragment.
+export const twitterS9eEmbedResolver = createMarkupEmbedResolver(
+  'iframe[data-s9e-mediaembed="twitter"]',
+  (element) => {
+    const id = readS9eFragment(element)
+
+    return id
+      ? twitterResolveEmbed(`https://platform.twitter.com/embed/Tweet.html?id=${id}`)
+      : undefined
+  },
 )
 
 // The player reports its rendered height in a JSON-RPC envelope, unprompted, once the frame is

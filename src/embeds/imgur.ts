@@ -3,7 +3,11 @@ import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../type
 import { attr, find, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readS9eFragment,
+} from '../utils/widgets.js'
 
 const provider = 'imgur'
 
@@ -156,6 +160,21 @@ export const imgurResolveEmbed: ResolveEmbed = (url) => {
 }
 
 export const imgurIframeEmbedResolver = createUrlEmbedResolver(imgurHosts, imgurResolveEmbed)
+
+// The helper frame's fragment is the post's path, `{id}`, `a/{id}` or `gallery/{id}`.
+const s9eGalleryRegex = /^gallery\//
+
+// A forum's s9e MediaEmbed helper frame, naming the post or album in its url fragment.
+export const imgurS9eEmbedResolver = createMarkupEmbedResolver(
+  'iframe[data-s9e-mediaembed="imgur"]',
+  (element) => {
+    const fragment = readS9eFragment(element)
+
+    return fragment
+      ? imgurResolveEmbed(`https://imgur.com/${fragment.replace(s9eGalleryRegex, 'a/')}`)
+      : undefined
+  },
+)
 
 // The embed posts its rendered height on load, unasked, as a JSON string carrying
 // `message: 'resize_imgur'`. An album is served by an older template that posts nothing, and the

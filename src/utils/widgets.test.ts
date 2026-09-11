@@ -21,6 +21,7 @@ import {
   normalizeEmbedFields,
   prepareCiteMetadata,
   prepareEmbedMetadata,
+  readS9eFragment,
   setDimensions,
   updateCitePlaceholder,
   updateEmbedPlaceholder,
@@ -358,6 +359,34 @@ describeForEachParser('updateCitePlaceholder', (parseHtml) => {
     } as Partial<CiteResolverResult>)
 
     expect(element.outerHTML).toEqualHtml('<div data-cite-title="Post title"></div>')
+  })
+})
+
+describeForEachParser('readS9eFragment', (parseHtml) => {
+  const read = (value: string) => {
+    const element = parseHtml(value).querySelector('iframe')
+
+    return element ? readS9eFragment(element) : undefined
+  }
+
+  it('should read the first fragment of a helper frame', () => {
+    const value =
+      '<iframe src="https://s9e.github.io/iframe/2/twitter.min.html#123#theme=auto"></iframe>'
+
+    expect(read(value)).toBe('123')
+  })
+
+  it('should return undefined for a frame on any other host', () => {
+    const value =
+      '<iframe src="https://evil.test/s9e.github.io/iframe/2/twitter.min.html#123"></iframe>'
+
+    expect(read(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a helper frame naming nothing', () => {
+    const value = '<iframe src="https://s9e.github.io/iframe/2/twitter.min.html"></iframe>'
+
+    expect(read(value)).toBeUndefined()
   })
 })
 

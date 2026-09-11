@@ -3,7 +3,12 @@ import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find, isBlockElement, isBr, isElement, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  atUsername,
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readS9eFragment,
+} from '../utils/widgets.js'
 
 const provider = 'bluesky'
 
@@ -251,7 +256,7 @@ export const blueskyS9eEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     // `…/bluesky.min.html#at://{authority}/app.bsky.feed.post/{rkey}#embed.bsky.app`: the
     // helper page takes the AT URI first and its own provider marker second.
-    const post = extractBlueskyPost(attr(element, 'src')?.split('#')[1] ?? '')
+    const post = extractBlueskyPost(readS9eFragment(element) ?? '')
 
     if (!post) {
       return

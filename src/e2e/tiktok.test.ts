@@ -164,4 +164,25 @@ describeForEachParser('TikTok', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  // A forum's s9e helper frame names the clip in its fragment, and tiktokS9eEmbedResolver reads
+  // it into the same player placeholder a pasted frame gives.
+  it('should convert the s9e helper frame into the player placeholder', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="tiktok"
+        src="https://s9e.github.io/iframe/2/tiktok.min.html#7000000000000000001"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="tiktok"
+        data-embed-id="7000000000000000001"
+        data-embed-src="https://www.tiktok.com/embed/v2/7000000000000000001"
+        data-embed-height="738"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })
