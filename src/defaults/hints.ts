@@ -19,6 +19,7 @@ import { mailruRenderHint } from '../embeds/mailru.js'
 import { mastodonRenderHint } from '../embeds/mastodon.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
+import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
 import { omnyRenderHint } from '../embeds/omny.js'
 import { peertubeRenderHint } from '../embeds/peertube.js'
 import { podbeanRenderHint } from '../embeds/podbean.js'
@@ -63,6 +64,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   mastodonRenderHint,
   mixcloudRenderHint,
   notecomRenderHint,
+  odnoklassnikiRenderHint,
   omnyRenderHint,
   peertubeRenderHint,
   podbeanRenderHint,
