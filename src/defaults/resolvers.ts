@@ -86,6 +86,7 @@ import { firesideEmbedResolver } from '../embeds/fireside.js'
 import { flickrEmbedResolver } from '../embeds/flickr.js'
 import { flourishIframeEmbedResolver, flourishWidgetEmbedResolver } from '../embeds/flourish.js'
 import { foxnewsIframeEmbedResolver, foxnewsScriptEmbedResolver } from '../embeds/foxnews.js'
+import { garminEmbedResolver } from '../embeds/garmin.js'
 import { geniallyEmbedResolver } from '../embeds/genially.js'
 import { gettyImagesEmbedResolver } from '../embeds/gettyimages.js'
 import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds/glomex.js'
@@ -267,6 +268,7 @@ const embedResolvers: Array<EmbedResolver> = [
   flourishIframeEmbedResolver,
   foxnewsScriptEmbedResolver,
   foxnewsIframeEmbedResolver,
+  garminEmbedResolver,
   geniallyEmbedResolver,
   gettyImagesEmbedResolver,
   glomexIframeEmbedResolver,
