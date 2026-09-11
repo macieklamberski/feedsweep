@@ -163,6 +163,7 @@ import { nprFlashEmbedResolver, nprIframeEmbedResolver } from '../embeds/npr.js'
 import { nytimesIframeEmbedResolver } from '../embeds/nytimes.js'
 import { odnoklassnikiEmbedResolver } from '../embeds/odnoklassniki.js'
 import { odyseeEmbedResolver } from '../embeds/odysee.js'
+import { officeEmbedResolver } from '../embeds/office.js'
 import { omnyEmbedResolver } from '../embeds/omny.js'
 import { padletEmbedResolver } from '../embeds/padlet.js'
 import { pastebinIframeEmbedResolver, pastebinScriptEmbedResolver } from '../embeds/pastebin.js'
@@ -466,6 +467,7 @@ const embedResolvers: Array<EmbedResolver> = [
   nytimesIframeEmbedResolver,
   odnoklassnikiEmbedResolver,
   odyseeEmbedResolver,
+  officeEmbedResolver,
   omnyEmbedResolver,
   padletEmbedResolver,
   pastebinIframeEmbedResolver,
