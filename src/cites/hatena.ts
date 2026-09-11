@@ -14,8 +14,6 @@ const cardIframeSelector = [
   `iframe[src*="${cardHost}/embed"]`,
 ].join(', ')
 
-const citationSelector = 'cite.hatena-citation'
-
 // A host list misses this: a blog on a custom domain serves its own card from that domain.
 // The self-served card is at {blog}.hatenablog.com/embed/{entry}, and the citation beside it
 // names the same host.
@@ -26,9 +24,7 @@ const isSelfHosted = (source: string, citationHref: string | undefined): boolean
 }
 
 // Hatena Blog's link card: an iframe at its card renderer, with a <cite> holding the real link.
-// The iframe is the element replaced, so prose the author wrote around it in the same paragraph
-// stays. The <cite> that follows it is read here and removed with it, or it would be left behind
-// as a stray domain link.
+// The iframe is the element replaced, so prose the author wrote beside it in its paragraph stays.
 export const hatenaCiteResolver: CiteResolver = {
   kind: 'cite',
   selector: cardIframeSelector,
@@ -40,7 +36,7 @@ export const hatenaCiteResolver: CiteResolver = {
     }
 
     const sibling = element.nextElementSibling
-    const citation = sibling?.matches(citationSelector) ? sibling : undefined
+    const citation = sibling?.matches('cite.hatena-citation') ? sibling : undefined
     const citationLink = find(citation, 'a')
     const citationHref = attr(citationLink, 'href')
     const cardUrl = parseUrlOnHosts(source, cardHost)
@@ -58,6 +54,7 @@ export const hatenaCiteResolver: CiteResolver = {
       publisher: text(citationLink),
     })
 
+    // Left in place, the citation would stay behind as a stray domain link.
     if (result) {
       citation?.remove()
     }

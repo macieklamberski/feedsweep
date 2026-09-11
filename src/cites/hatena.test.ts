@@ -314,7 +314,7 @@ describeForEachParser('hatenaCiteResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should not match a paragraph without an embed card', async () => {
+    it('should not match a citation standing without a card', async () => {
       const value = html`
         <p>
           <cite class="hatena-citation">
@@ -337,7 +337,8 @@ describeForEachParser('hatena cards beside the prose they sit in', (parseHtml) =
 
   it('should keep the prose written beside the card', async () => {
     const value = html`
-      <p>Read this first: <iframe
+      <p>Read this first:
+        <iframe
           src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fentry"
           title="Page title"
           class="embed-card embed-webcard"
