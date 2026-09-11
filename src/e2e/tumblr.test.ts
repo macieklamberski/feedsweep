@@ -97,4 +97,34 @@ describeForEachParser('Tumblr', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  it('should convert a post embed into a placeholder and drop its loader', async () => {
+    const value = html`
+      <div class="embed-tumblr">
+        <div
+          class="tumblr-post"
+          data-href="https://embed.tumblr.com/embed/post/t:AbCdEfGhIjKlMnOpQrStUv/123456789012345678/v2"
+          data-did="f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8"
+        >
+          <a href="https://www.tumblr.com/exampleblog/123456789012345678"
+            >https://www.tumblr.com/exampleblog/123456789012345678</a
+          >
+        </div>
+        <script
+          async
+          src="https://assets.tumblr.com/post.js?_v=2e3257777411face7e6785c8941f968f"
+        ></script>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="tumblr"
+        data-embed-id="t:AbCdEfGhIjKlMnOpQrStUv/123456789012345678"
+        data-embed-src="https://embed.tumblr.com/embed/post/t:AbCdEfGhIjKlMnOpQrStUv/123456789012345678/v2"
+        data-embed-url="https://www.tumblr.com/exampleblog/123456789012345678"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })
