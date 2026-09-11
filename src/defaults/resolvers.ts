@@ -169,6 +169,7 @@ import { youkuEmbedResolver } from '../embeds/youku.js'
 import { youtubeAmpEmbedResolver, youtubeIframeEmbedResolver } from '../embeds/youtube.js'
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
 import { discourseMediaResolver } from '../media/discourse.js'
+import { flashMp3PlayerMediaResolver } from '../media/flashmp3player.js'
 import { ghostMediaResolver } from '../media/ghost.js'
 import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
@@ -328,6 +329,7 @@ const embedResolvers: Array<EmbedResolver> = [
 // resolver gets the carrier first.
 const mediaResolvers: Array<MediaResolver> = [
   discourseMediaResolver,
+  flashMp3PlayerMediaResolver,
   ghostMediaResolver,
   podloveMediaResolver,
   substackMediaResolver,
