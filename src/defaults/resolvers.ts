@@ -63,6 +63,7 @@ import {
   buzzsproutScriptEmbedResolver,
 } from '../embeds/buzzsprout.js'
 import { captivateEmbedResolver } from '../embeds/captivate.js'
+import { channel9EmbedResolver } from '../embeds/channel9.js'
 import { cnbcIframeEmbedResolver } from '../embeds/cnbc.js'
 import {
   cnnFlashEmbedResolver,
@@ -318,6 +319,7 @@ const embedResolvers: Array<EmbedResolver> = [
   mailruEmbedResolver,
   tencentEmbedResolver,
   wikimediaEmbedResolver,
+  channel9EmbedResolver,
 ]
 
 const mediaResolvers: Array<MediaResolver> = [
