@@ -247,6 +247,7 @@ import {
   youtubeFc2EmbedResolver,
   youtubeIframeEmbedResolver,
 } from '../embeds/youtube.js'
+import { yumpuEmbedResolver } from '../embeds/yumpu.js'
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
 import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
@@ -554,6 +555,7 @@ const embedResolvers: Array<EmbedResolver> = [
   youtubeIframeEmbedResolver,
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
+  yumpuEmbedResolver,
   zencastrBlockquoteEmbedResolver,
   zencastrIframeEmbedResolver,
   // Last, outside the alphabet: keyed on a path shape rather than a host, so every resolver
