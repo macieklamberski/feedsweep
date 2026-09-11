@@ -151,6 +151,7 @@ import { telegramIframeEmbedResolver, telegramScriptEmbedResolver } from '../emb
 import { tencentEmbedResolver } from '../embeds/tencent.js'
 import { tiktokBlockquoteEmbedResolver, tiktokIframeEmbedResolver } from '../embeds/tiktok.js'
 import { transistorEmbedResolver } from '../embeds/transistor.js'
+import { tuneinEmbedResolver } from '../embeds/tunein.js'
 import {
   twitterAmpEmbedResolver,
   twitterBlockquoteEmbedResolver,
@@ -302,6 +303,7 @@ const embedResolvers: Array<EmbedResolver> = [
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
   transistorEmbedResolver,
+  tuneinEmbedResolver,
   twitterBlockquoteEmbedResolver,
   twitterAmpEmbedResolver,
   twitterSubstackEmbedResolver,
