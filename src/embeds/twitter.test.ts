@@ -8,6 +8,7 @@ import {
   twitterBlockquoteEmbedResolver,
   twitterIframeEmbedResolver,
   twitterResolveEmbed,
+  twitterS9eEmbedResolver,
   twitterSubstackEmbedResolver,
 } from './twitter.js'
 
@@ -1360,5 +1361,71 @@ describe('readTwitterHeight', () => {
     }
 
     expect(readTwitterHeight(value)).toBeUndefined()
+  })
+})
+
+describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, twitterS9eEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the status id out of the helper frame', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="twitter"
+          data-s9e-mediaembed-api="2"
+          style="height:350px;width:550px"
+          src="https://s9e.github.io/iframe/2/twitter.min.html#2073030328415858798#theme=auto"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: '2073030328415858798',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=2073030328415858798',
+        width: 550,
+        height: 350,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the first helper generation the same way', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="twitter"
+          src="https://s9e.github.io/iframe/twitter.min.html#1022299781106819073"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: '1022299781106819073',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=1022299781106819073',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should leave the platform player carrying the attribute to the url resolver', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="twitter"
+          src="https://platform.twitter.com/embed/Tweet.html?id=1022299781106819073"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a fragment that is not a status id', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="twitter"
+          src="https://s9e.github.io/iframe/2/twitter.min.html#not-a-status"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })

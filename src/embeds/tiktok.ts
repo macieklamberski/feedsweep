@@ -1,9 +1,14 @@
 import { parseUrl } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, keepIfMatches, parsePixelSize, text, textNode } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
-import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  atUsername,
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readS9eFragment,
+} from '../utils/widgets.js'
 
 const tiktokHosts = ['tiktok.com']
 
@@ -179,37 +184,52 @@ export const tiktokBlockquoteEmbedResolver = createMarkupEmbedResolver(
   { preferResolverSize: true },
 )
 
-// A pasted TikTok player iframe, or a frame of the watch page, which refuses framing.
 // A post has no name: its words go to `description`, and the frame's title is not read.
-export const tiktokIframeEmbedResolver = createUrlEmbedResolver(
-  tiktokHosts,
-  (src) => {
-    const parsed = parseUrl(src, placeholderBaseUrl)
-    const playerId = parsed?.pathname.match(playerPathRegex)?.[1]
+export const tiktokResolveEmbed: ResolveEmbed = (src) => {
+  const parsed = parseUrl(src, placeholderBaseUrl)
+  const playerId = parsed?.pathname.match(playerPathRegex)?.[1]
 
-    if (playerId) {
-      return {
-        provider: 'tiktok',
-        id: playerId,
-        src,
-        height: playerHeight,
-      }
-    }
-
-    const { handle, videoId } = readWatchUrl(src)
-
-    if (!videoId) {
-      return
-    }
-
+  if (playerId) {
     return {
       provider: 'tiktok',
-      id: handle ? `@${handle}/video/${videoId}` : videoId,
-      src: `https://www.tiktok.com/embed/v2/${videoId}`,
-      url: src,
+      id: playerId,
+      src,
       height: playerHeight,
     }
-  },
+  }
+
+  const { handle, videoId } = readWatchUrl(src)
+
+  if (!videoId) {
+    return
+  }
+
+  return {
+    provider: 'tiktok',
+    id: handle ? `@${handle}/video/${videoId}` : videoId,
+    src: `https://www.tiktok.com/embed/v2/${videoId}`,
+    url: src,
+    height: playerHeight,
+  }
+}
+
+// A pasted TikTok player iframe, or a frame of the watch page, which refuses framing.
+export const tiktokIframeEmbedResolver = createUrlEmbedResolver(
+  tiktokHosts,
+  tiktokResolveEmbed,
   // The pasted snippets state a landscape box, 560x400 in the wild, on a player taller than wide.
+  { preferResolverSize: true },
+)
+
+// A forum's s9e MediaEmbed helper frame, naming the clip id in its url fragment.
+export const tiktokS9eEmbedResolver = createMarkupEmbedResolver(
+  'iframe[data-s9e-mediaembed="tiktok"]',
+  (element) => {
+    const videoId = readS9eFragment(element)
+
+    return videoId && safeVideoIdRegex.test(videoId)
+      ? tiktokResolveEmbed(`https://www.tiktok.com/embed/v2/${videoId}`)
+      : undefined
+  },
   { preferResolverSize: true },
 )
