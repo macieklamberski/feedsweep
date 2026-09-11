@@ -33,6 +33,11 @@ import { tumblrCiteResolver } from '../cites/tumblr.js'
 import { wordpressCiteResolver } from '../cites/wordpress.js'
 import { xenforoCiteResolver } from '../cites/xenforo.js'
 import { acastEmbedResolver } from '../embeds/acast.js'
+import {
+  amebaImagePageEmbedResolver,
+  amebaMoviePlayerEmbedResolver,
+  amebaReblogCardEmbedResolver,
+} from '../embeds/ameba.js'
 import { anchorEmbedResolver } from '../embeds/anchor.js'
 import { aparatIframeEmbedResolver, aparatScriptEmbedResolver } from '../embeds/aparat.js'
 import { appleEmbedResolver } from '../embeds/apple.js'
@@ -325,6 +330,9 @@ import type {
 // element can't be re-matched, so a broader selector leaves the alphabet and moves below.
 const embedResolvers: Array<EmbedResolver> = [
   acastEmbedResolver,
+  amebaImagePageEmbedResolver,
+  amebaMoviePlayerEmbedResolver,
+  amebaReblogCardEmbedResolver,
   anchorEmbedResolver,
   aparatIframeEmbedResolver,
   aparatScriptEmbedResolver,
