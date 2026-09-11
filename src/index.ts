@@ -124,6 +124,7 @@ export { rebuildDeferredIframes } from './transforms/dom/rebuildDeferredIframes.
 export { rebuildElementorVideoEmbeds } from './transforms/dom/rebuildElementorVideoEmbeds.js'
 export { rebuildEmbedlyEmbeds } from './transforms/dom/rebuildEmbedlyEmbeds.js'
 export { rebuildEmbedPlusEmbeds } from './transforms/dom/rebuildEmbedPlusEmbeds.js'
+export { rebuildExternalVideoEmbeds } from './transforms/dom/rebuildExternalVideoEmbeds.js'
 export { rebuildGettyImagesEmbeds } from './transforms/dom/rebuildGettyImagesEmbeds.js'
 export { rebuildLazyLoadForVideos } from './transforms/dom/rebuildLazyLoadForVideos.js'
 export { rebuildLazyYtEmbeds } from './transforms/dom/rebuildLazyYtEmbeds.js'
