@@ -73,6 +73,7 @@ import { codepenIframeEmbedResolver, codepenWidgetEmbedResolver } from '../embed
 import { codesandboxIframeEmbedResolver } from '../embeds/codesandbox.js'
 import { dailymotionEmbedResolver } from '../embeds/dailymotion.js'
 import { deezerEmbedResolver } from '../embeds/deezer.js'
+import { documentcloudEmbedResolver } from '../embeds/documentcloud.js'
 import { donorboxEmbedResolver } from '../embeds/donorbox.js'
 import {
   facebookAmpEmbedResolver,
@@ -219,6 +220,7 @@ const embedResolvers: Array<EmbedResolver> = [
   codesandboxIframeEmbedResolver,
   dailymotionEmbedResolver,
   deezerEmbedResolver,
+  documentcloudEmbedResolver,
   donorboxEmbedResolver,
   facebookWidgetEmbedResolver,
   facebookIframeEmbedResolver,
