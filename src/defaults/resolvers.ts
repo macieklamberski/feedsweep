@@ -81,6 +81,7 @@ import {
   facebookWidgetEmbedResolver,
   facebookXfbmlEmbedResolver,
 } from '../embeds/facebook.js'
+import { figmaDirectEmbedResolver, figmaWrappedEmbedResolver } from '../embeds/figma.js'
 import { figshareEmbedResolver } from '../embeds/figshare.js'
 import { firesideEmbedResolver } from '../embeds/fireside.js'
 import { flickrEmbedResolver } from '../embeds/flickr.js'
@@ -225,6 +226,8 @@ const embedResolvers: Array<EmbedResolver> = [
   facebookBlockquoteEmbedResolver,
   facebookXfbmlEmbedResolver,
   facebookAmpEmbedResolver,
+  figmaWrappedEmbedResolver,
+  figmaDirectEmbedResolver,
   figshareEmbedResolver,
   firesideEmbedResolver,
   flickrEmbedResolver,
