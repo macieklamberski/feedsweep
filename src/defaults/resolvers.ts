@@ -162,6 +162,7 @@ import {
   videopressIframeEmbedResolver,
 } from '../embeds/videopress.js'
 import { vimeoEmbedResolver } from '../embeds/vimeo.js'
+import { wikimediaEmbedResolver } from '../embeds/wikimedia.js'
 import { wistiaEmbedResolver } from '../embeds/wistia.js'
 import { youkuEmbedResolver } from '../embeds/youku.js'
 import { youtubeAmpEmbedResolver, youtubeIframeEmbedResolver } from '../embeds/youtube.js'
@@ -172,6 +173,7 @@ import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
 import { wechatMediaResolver } from '../media/wechat.js'
 import { weeblyMediaResolver } from '../media/weebly.js'
+import { wikimediaMediaResolver } from '../media/wikimedia.js'
 import type { CiteResolver, EmbedResolver, MediaResolver, WidgetResolver } from '../types.js'
 
 // Order matters when selectors overlap: each resolver runs in array order and
@@ -315,9 +317,11 @@ const embedResolvers: Array<EmbedResolver> = [
   zencastrIframeEmbedResolver,
   mailruEmbedResolver,
   tencentEmbedResolver,
+  wikimediaEmbedResolver,
 ]
 
 const mediaResolvers: Array<MediaResolver> = [
+  wikimediaMediaResolver,
   substackMediaResolver,
   weeblyMediaResolver,
   wechatMediaResolver,

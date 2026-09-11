@@ -4,6 +4,7 @@ import {
   audioFileRegex,
   cleanUrl,
   flashFileRegex,
+  isMediaWikiFilePage,
   resolveOrDropUrl,
   resolveOrKeepUrl,
   videoFileRegex,
@@ -22,6 +23,10 @@ import {
 const playableSelector = [...playableElements].join(', ')
 
 const getMediaTag = (url: string): MediaResolverResult['tag'] | undefined => {
+  if (isMediaWikiFilePage(url)) {
+    return
+  }
+
   if (videoFileRegex.test(url)) {
     return 'video'
   }

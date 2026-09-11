@@ -10,6 +10,7 @@ type CleanContext = Pick<TransformContext, 'cleanUrlFn'>
 export const placeholderBaseUrl = 'https://example.com'
 
 const urlShapeRegex = /[:/.]/
+const queryOrHashRegex = /[?#]/
 
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
@@ -43,6 +44,26 @@ export const isFileName = (value: string): boolean => {
     videoFileRegex.test(value) ||
     imageFileRegex.test(value)
   )
+}
+
+// A MediaWiki file page sits at `/wiki/File:Clip.webm`, so its path ends in the media's own
+// extension while the response is HTML. Feeds carry the colon percent-encoded too, and the
+// `/w/index.php?title=File:Clip.webm` spelling moves the namespace into the query.
+const filePagePathRegex = /\/wiki\/[^/?#]*(?::|%3A)[^/?#]*$/i
+const scriptPathRegex = /\/index\.php$/
+const titleParamRegex = /[?&]title=[^&#]*(?::|%3A)/i
+const filePageNameRegex = /\/wiki\/[^/?#]*?(?::|%3A)([^/?#]+)$/i
+
+export const isMediaWikiFilePage = (value: string): boolean => {
+  const path = value.split(queryOrHashRegex)[0]
+
+  return filePagePathRegex.test(path) || (scriptPathRegex.test(path) && titleParamRegex.test(value))
+}
+
+// The name as the wiki spells it, percent-encoding intact, which is the form `Special:FilePath`
+// and the API both take. Only the `/wiki/` spelling, since no feed carries the other on a frame.
+export const parseMediaWikiFileName = (value: string): string | undefined => {
+  return value.split(queryOrHashRegex)[0].match(filePageNameRegex)?.[1]
 }
 
 // Exact on purpose: Simplecast tells a current id from a legacy eight-hex one by this shape.
