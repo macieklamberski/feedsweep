@@ -1115,6 +1115,109 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    // MediaWiki serves `/wiki/File:Clip.webm` as HTML, and feeds carry the colon percent-encoded.
+    it('should not play a MediaWiki file page as a video element', async () => {
+      const value = html`
+        <iframe
+          src="https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes"
+          width="640"
+          height="360"
+        ></iframe>
+      `
+      const expected = html`
+        <div
+          data-embed-height="360"
+          data-embed-width="640"
+          data-embed-src="https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes"
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should not play a MediaWiki file page as an audio element', async () => {
+      const value =
+        '<iframe src="https://en.wikipedia.org/wiki/File:Song.ogg?embedplayer=yes"></iframe>'
+      const expected = html`
+        <div data-embed-src="https://en.wikipedia.org/wiki/File:Song.ogg?embedplayer=yes"></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should not play a MediaWiki file page spelled with a percent-encoded colon', async () => {
+      const value =
+        '<iframe src="https://commons.wikimedia.org/wiki/File%3ASinging.ogg?embedplayer=yes"></iframe>'
+      const expected = html`
+        <div
+          data-embed-src="https://commons.wikimedia.org/wiki/File%3ASinging.ogg?embedplayer=yes"
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should not play a MediaWiki file page named by a title parameter', async () => {
+      const value =
+        '<iframe src="https://commons.wikimedia.org/w/index.php?title=File:Clip.webm"></iframe>'
+      const expected = html`
+        <div data-embed-src="https://commons.wikimedia.org/w/index.php?title=File:Clip.webm"></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should not play a MediaWiki file page carrying a localized namespace', async () => {
+      const value =
+        '<iframe src="https://de.wikipedia.org/wiki/Datei:Beispiel.webm?embedplayer=yes"></iframe>'
+      const expected = html`
+        <div
+          data-embed-src="https://de.wikipedia.org/wiki/Datei:Beispiel.webm?embedplayer=yes"
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should still play a media file carrying a query string', async () => {
+      const value = '<iframe src="https://cdn.example.com/clip.webm?token=abc"></iframe>'
+      const expected = html`<video src="https://cdn.example.com/clip.webm?token=abc" controls=""></video>`
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should still play a media file whose name carries a colon', async () => {
+      const value = '<iframe src="https://cdn.example.com/rec/2026-09-11T10:30:00.mp4"></iframe>'
+      const expected = html`
+        <video src="https://cdn.example.com/rec/2026-09-11T10:30:00.mp4" controls=""></video>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should still play a media file whose title parameter carries a colon', async () => {
+      const value =
+        '<iframe src="https://cdn.example.com/clip.mp4?title=Chapter+1:+Intro"></iframe>'
+      const expected = html`
+        <video src="https://cdn.example.com/clip.mp4?title=Chapter+1:+Intro" controls=""></video>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should still play a media file served from an index.php route', async () => {
+      const value =
+        '<iframe src="https://cdn.example.com/player/index.php?title=My+Show&amp;file=clip.mp4"></iframe>'
+      const expected = html`
+        <video
+          src="https://cdn.example.com/player/index.php?title=My+Show&amp;file=clip.mp4"
+          controls=""
+        ></video>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should play an iframe framing an aac file as an audio element', async () => {
       const value = '<iframe src="https://cdn.example.com/ep.aac"></iframe>'
       const expected = html`
@@ -1220,6 +1323,13 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
 
     it('should skip a value that names an image', async () => {
       const value = '<div data-src="https://x.example/photo.jpg"></div>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should skip a parked MediaWiki file page', async () => {
+      const value =
+        '<div data-src="https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes"></div>'
 
       expect(await transform(value)).toEqualHtml(value)
     })
