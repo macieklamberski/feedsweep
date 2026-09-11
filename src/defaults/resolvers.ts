@@ -120,6 +120,7 @@ import { nytimesIframeEmbedResolver } from '../embeds/nytimes.js'
 import { odyseeEmbedResolver } from '../embeds/odysee.js'
 import { omnyEmbedResolver } from '../embeds/omny.js'
 import { padletEmbedResolver } from '../embeds/padlet.js'
+import { pbsEmbedResolver } from '../embeds/pbs.js'
 import { podbeanEmbedResolver } from '../embeds/podbean.js'
 import { podetizeIframeEmbedResolver, podetizeScriptEmbedResolver } from '../embeds/podetize.js'
 import { podigeeIframeEmbedResolver, podigeeScriptEmbedResolver } from '../embeds/podigee.js'
@@ -233,6 +234,7 @@ const embedResolvers: Array<EmbedResolver> = [
   mediavineWidgetEmbedResolver,
   mediavineScriptEmbedResolver,
   mixcloudEmbedResolver,
+  pbsEmbedResolver,
   podbeanEmbedResolver,
   megaphoneEmbedResolver,
   podetizeScriptEmbedResolver,
