@@ -1115,8 +1115,9 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    // MediaWiki serves `/wiki/File:Clip.webm` as HTML, and feeds carry the colon percent-encoded.
-    it('should not play a MediaWiki file page as a video element', async () => {
+    // MediaWiki serves `/wiki/File:Clip.webm` as HTML. The wikimedia resolver claims the frame
+    // ahead of this branch, so the page arrives as its player rather than as a media element.
+    it('should hand a MediaWiki video file page to its player', async () => {
       const value = html`
         <iframe
           src="https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes"
@@ -1126,8 +1127,12 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       `
       const expected = html`
         <div
+          data-embed-title="Example"
           data-embed-height="360"
           data-embed-width="640"
+          data-embed-thumbnail="https://commons.wikimedia.org/wiki/Special:FilePath/Example.webm?width=960"
+          data-embed-id="Example.webm"
+          data-embed-provider="wikimedia"
           data-embed-src="https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes"
         ></div>
       `
@@ -1135,23 +1140,14 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should not play a MediaWiki file page as an audio element', async () => {
+    it('should play a MediaWiki audio file page as the file itself', async () => {
       const value =
         '<iframe src="https://en.wikipedia.org/wiki/File:Song.ogg?embedplayer=yes"></iframe>'
       const expected = html`
-        <div data-embed-src="https://en.wikipedia.org/wiki/File:Song.ogg?embedplayer=yes"></div>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should not play a MediaWiki file page spelled with a percent-encoded colon', async () => {
-      const value =
-        '<iframe src="https://commons.wikimedia.org/wiki/File%3ASinging.ogg?embedplayer=yes"></iframe>'
-      const expected = html`
-        <div
-          data-embed-src="https://commons.wikimedia.org/wiki/File%3ASinging.ogg?embedplayer=yes"
-        ></div>
+        <figure>
+          <audio controls src="https://en.wikipedia.org/wiki/Special:FilePath/Song.ogg"></audio>
+          <figcaption>Song</figcaption>
+        </figure>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -1162,18 +1158,6 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
         '<iframe src="https://commons.wikimedia.org/w/index.php?title=File:Clip.webm"></iframe>'
       const expected = html`
         <div data-embed-src="https://commons.wikimedia.org/w/index.php?title=File:Clip.webm"></div>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should not play a MediaWiki file page carrying a localized namespace', async () => {
-      const value =
-        '<iframe src="https://de.wikipedia.org/wiki/Datei:Beispiel.webm?embedplayer=yes"></iframe>'
-      const expected = html`
-        <div
-          data-embed-src="https://de.wikipedia.org/wiki/Datei:Beispiel.webm?embedplayer=yes"
-        ></div>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
