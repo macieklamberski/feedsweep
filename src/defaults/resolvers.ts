@@ -110,6 +110,7 @@ import {
   fc2IframeEmbedResolver,
   fc2PlayerScriptEmbedResolver,
 } from '../embeds/fc2.js'
+import { figmaEmbedResolver } from '../embeds/figma.js'
 import { figshareEmbedResolver } from '../embeds/figshare.js'
 import { firesideEmbedResolver } from '../embeds/fireside.js'
 import { flickrEmbedResolver } from '../embeds/flickr.js'
@@ -445,6 +446,7 @@ const embedResolvers: Array<EmbedResolver> = [
   fc2BlogScriptEmbedResolver,
   fc2IframeEmbedResolver,
   fc2FlashEmbedResolver,
+  figmaEmbedResolver,
   figshareEmbedResolver,
   firesideEmbedResolver,
   flickrEmbedResolver,
