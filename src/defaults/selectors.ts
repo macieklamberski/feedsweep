@@ -31,6 +31,19 @@ export const defaultNonContentSelectors = [
   'amp-sticky-ad', // AMP sticky bottom ad bar.
   'amp-sticky-ad-top-padding', // AMP runtime spacer holding room for the sticky ad bar.
 
+  // Affiliate product widgets. Each carries the publisher's own affiliate id and advertises a
+  // product the item is not about.
+  // Amazon Associates names its ad unit by route, `/e/cm` on the legacy one and `/widgets/q` on
+  // the current, and a dozen regional hosts serve both, so the route carries the discrimination
+  // and the host is matched loosely. Neither is tag-qualified: both arrive on every carrier.
+  '[src*="amazon"][src*="/e/cm"]',
+  '[src*="amazon"][src*="/widgets/q"]',
+  'object[data*="amazon"][data*="/widgets/q"]',
+  'iframe[src*="ad.duga.jp/"]', // DUGA affiliate banner frame.
+  // ShopSense product grid. Its loader survives where a wrapper held it, so both carriers go.
+  'iframe[src*="shopsensewidget.shopstyle.com"]',
+  'script[src*="shopsensewidget.shopstyle.com"]',
+
   // Tracking beacons, which render nothing at all.
   'amp-pixel', // AMP tracking pixel.
   'amp-analytics', // AMP analytics element, a JSON config for its runtime.
@@ -93,6 +106,16 @@ export const defaultNonContentSelectors = [
   // class despite the plugin's name.
   '.ssbp-wrap', // Simple Share Buttons Adder share bar.
   '.swp_social_panel', // Social Warfare share panel.
+  'div.ya-share2', // Yandex share2 button row, whose data-image otherwise arrives as content.
+  'div.zemanta-pixie', // Zemanta "Reblog this post" badge: a dead attribution link and its pixel.
+  'a[href*="digg.com/submit"]', // Digg submit button, and the badge image nested inside it.
+  'img[src*="digg.com/img/badges"]', // The same badge pasted without its anchor.
+  'iframe[src*="plusone.google.com"]', // Google+ +1 button, whose endpoint closed with the service.
+  'img[src*="w.sharethis.com/"]', // ShareThis chicklet icons, the button row's pre-widget form.
+  // Hatena Bookmark's add button. A bookmark comment carries an author's real text on a
+  // blockquote of its own, so neither entry is widened to the class prefix.
+  'a.hatena-bookmark-button',
+  'iframe.hatena-bookmark-button-frame',
 
   // Related-posts widgets.
   '.yarpp-related', // YARPP related-posts widget (WordPress).
@@ -140,6 +163,14 @@ export const defaultNonContentSelectors = [
   // Gleam competition mount. The loader would replace it with the entry form; without it the
   // anchor survives as a bare link named after the competition.
   'a.e-widget',
+
+  // Ticketing, donation and membership widgets, which are chrome around a transaction rather
+  // than anything the item is about.
+  'iframe[src*="eventbrite.com/tickets-external"]', // Eventbrite checkout frame.
+  'iframe[src*="eventbrite.com/countdown-widget"]', // Eventbrite countdown widget.
+  'iframe[src*="patronite.pl/widget/"]', // Patronite membership widget.
+  'form[action*="paypal.com/cgi-bin/webscr"]', // PayPal donate and buy button form.
+  'img[src*="paypal.com/"][src*="/i/btn/"]', // The PayPal button image pasted without its form.
 
   // Platform UI chrome and non-rendered scaffolding.
   // RedCircle's embed snippet ships a ten-pixel "Powered by RedCircle" line under the player.

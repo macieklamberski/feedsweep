@@ -45,6 +45,20 @@ const specimens: Record<string, string | [string, string]> = {
     '<amp-sticky-ad layout="nodisplay"><amp-ad width="320" height="50" type="doubleclick" data-slot="/4119129/sticky"></amp-ad></amp-sticky-ad>',
   'amp-sticky-ad-top-padding':
     '<amp-sticky-ad-top-padding class="amp-sticky-ad-top-padding"></amp-sticky-ad-top-padding>',
+  '[src*="amazon"][src*="/e/cm"]':
+    '<iframe src="https://rcm.amazon.com/e/cm?t=tag-20&o=1&p=8&l=as1&asins=B00451B7WU&f=ifr" style="width:120px;height:240px;" scrolling="no" frameborder="0"></iframe>',
+  '[src*="amazon"][src*="/widgets/q"]':
+    '<iframe src="//ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&OneJS=1&Operation=GetAdHtml&asins=B00451B7WU" width="120" height="240"></iframe>',
+  'object[data*="amazon"][data*="/widgets/q"]':
+    '<object data="//ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&asins=B00451B7WU" width="120" height="240"></object>',
+  'iframe[src*="ad.duga.jp/"]':
+    '<iframe src="https://ad.duga.jp/dynamic/1002/34/?mode=1" width="440" height="195" scrolling="no"><a href="https://example.com/1002-01">DUGA</a></iframe>',
+  'iframe[src*="shopsensewidget.shopstyle.com"]':
+    '<iframe src="//shopsensewidget.shopstyle.com/#/?options=%7B%22widgetId%22%3A%225bad8374%22%2C%22pid%22%3A%22uid0000-00000000-00%22%7D" width="460" height="402"></iframe>',
+  'script[src*="shopsensewidget.shopstyle.com"]': [
+    '<div class="shopsense-widget" data-options="%7B%22widgetId%22%3A%225dac5d8d%22%7D"><script id="shopsensewidget-script" src="//shopsensewidget.shopstyle.com/widget-script.js?cb=1571575698116"></script></div>',
+    '<div class="shopsense-widget" data-options="%7B%22widgetId%22%3A%225dac5d8d%22%7D"></div>',
+  ],
   'amp-pixel':
     '<amp-pixel src="https://www16.a8.net/0.gif?a8=abcdef" layout="nodisplay"></amp-pixel>',
   'amp-analytics':
@@ -58,6 +72,16 @@ const specimens: Record<string, string | [string, string]> = {
   '[data-component-name="ButtonCreateButton"]:has(> a[href*="action=share"])':
     '<p class="button-wrapper" data-component-name="ButtonCreateButton"><a class="button primary" href="https://example.com/p/post?action=share"><span>Share</span></a></p>',
   '[class*="social-share"]': '<div class="social-share"><a href="/x">X</a></div>',
+  'iframe[src*="eventbrite.com/tickets-external"]':
+    '<iframe src="https://www.eventbrite.com/tickets-external?eid=2112794425&ref=etckt" frameborder="0" width="100%" height="192"></iframe>',
+  'iframe[src*="eventbrite.com/countdown-widget"]':
+    '<iframe src="//www.eventbrite.com/countdown-widget?eid=20577825831" width="195" height="295" frameborder="0"></iframe>',
+  'iframe[src*="patronite.pl/widget/"]':
+    '<iframe src="https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8" width="300" height="450" frameborder="0" scrolling="no"></iframe>',
+  'form[action*="paypal.com/cgi-bin/webscr"]':
+    '<form action="https://www.paypal.com/cgi-bin/webscr" method="post"><input type="hidden" name="cmd" value="_donations"><input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit" alt="Donate"></form>',
+  'img[src*="paypal.com/"][src*="/i/btn/"]':
+    '<img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate with PayPal">',
   'p:has(> a.redcircle-link)':
     '<p style="font-size: 10px; color: gray;">Powered by <a class="redcircle-link" href="https://example.com/?utm_source=rc_embedded_player">RedCircle</a></p>',
   '[class*="share-buttons"]': '<div class="share-buttons"><a href="/fb">Facebook</a></div>',
@@ -99,6 +123,22 @@ const specimens: Record<string, string | [string, string]> = {
     '<div class="ssba-classic-2 ssba ssbp-wrap alignleft ssbp--theme-1"><div style="text-align:left"><span class="ssba-share-text">Share this</span><a data-site="facebook" class="ssba_facebook_share ssba_share_link" href="https://example.com/share/facebook">Facebook</a></div></div>',
   '.swp_social_panel':
     '<div class="swp_social_panel swp_horizontal_panel swp_flat_fresh" data-min-width="1100"><div class="nc_tweetContainer swp_share_button"><a class="nc_tweet swp_share_link" href="https://example.com/share/facebook"><span class="swp_share">Share</span></a></div></div>',
+  'div.ya-share2':
+    '<div class="ya-share2" data-services="vkontakte,odnoklassniki,twitter,telegram" data-image="https://example.com/logo.png" data-title=""></div>',
+  'div.zemanta-pixie':
+    '<div style="margin-top: 10px; height: 15px;" class="zemanta-pixie"><a class="zemanta-pixie-a" href="https://example.com/zemified/da212ae4/" title="Reblog this post"><img class="zemanta-pixie-img" src="https://example.com/reblog_e.png?x-id=da212ae4" alt="Reblog this post"></a></div>',
+  'a[href*="digg.com/submit"]':
+    '<a href="https://digg.com/submit?url=https%3A%2F%2Fexample.com%2Fa&title=A+post"><img src="https://digg.com/img/badges/100x20-digg-button.png" alt="Digg"></a>',
+  'img[src*="digg.com/img/badges"]':
+    '<img src="https://digg.com/img/badges/100x20-digg-button.png" alt="Digg this">',
+  'iframe[src*="plusone.google.com"]':
+    '<iframe allowtransparency="true" frameborder="0" scrolling="no" src="https://plusone.google.com/_/+1/fastbutton?bsv&size=medium&hl=en-US&url=https%3A%2F%2Fexample.com%2Fa"></iframe>',
+  'img[src*="w.sharethis.com/"]':
+    '<img src="https://w.sharethis.com/images/facebook_32.png" alt="Share on Facebook">',
+  'a.hatena-bookmark-button':
+    '<a href="https://example.com/entry/https://example.com/a" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" title="Add to Hatena Bookmark"><img src="https://example.com/entry-button/button-only@2x.png" alt="Add to Hatena Bookmark" width="20" height="20"></a>',
+  'iframe.hatena-bookmark-button-frame':
+    '<iframe src="https://example.com/bc/bcbutton?url=https%3A%2F%2Fexample.com%2Fa" class="hatena-bookmark-button-frame" width="150" height="28" frameborder="0" scrolling="no"></iframe>',
   '.yarpp-related':
     '<div class="yarpp yarpp-related yarpp-template-list"><h3>Related</h3><ol><li><a href="/a">A</a></li></ol></div>',
   '.jp-relatedposts':
@@ -394,6 +434,19 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
   })
 
   describe('scoped selectors', () => {
+    // A bookmark comment is a quoted post with the reader's own words in it, not the add button,
+    // so the button entries are matched on their own classes and never on the shared prefix.
+    it('should keep a Hatena bookmark comment beside the button', async () => {
+      const value = html`
+        <blockquote class="hatena-bookmark-comment">
+          <p>Interesting point about the new release.</p>
+          <p><cite><a href="https://example.com/entry/1/comment/reader">example.com</a></cite></p>
+        </blockquote>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     // The same wrapper with its player intact is a working embed, not chrome. Only the shells
     // whose iframe the feed generator removed are stripped.
     it('should keep an s9e wrapper whose player survived', async () => {
