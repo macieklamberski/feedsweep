@@ -63,6 +63,10 @@ import {
   buzzsproutScriptEmbedResolver,
 } from '../embeds/buzzsprout.js'
 import { captivateEmbedResolver } from '../embeds/captivate.js'
+import {
+  cloudflarestreamIframeEmbedResolver,
+  cloudflarestreamScriptEmbedResolver,
+} from '../embeds/cloudflarestream.js'
 import { cnbcIframeEmbedResolver } from '../embeds/cnbc.js'
 import {
   cnnFlashEmbedResolver,
@@ -210,6 +214,8 @@ const embedResolvers: Array<EmbedResolver> = [
   buzzsproutIframeEmbedResolver,
   buzzsproutScriptEmbedResolver,
   captivateEmbedResolver,
+  cloudflarestreamIframeEmbedResolver,
+  cloudflarestreamScriptEmbedResolver,
   cnbcIframeEmbedResolver,
   cnnScriptEmbedResolver,
   cnnFlashEmbedResolver,
