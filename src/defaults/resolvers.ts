@@ -199,6 +199,7 @@ import {
   telegramScriptEmbedResolver,
 } from '../embeds/telegram.js'
 import { tencentEmbedResolver } from '../embeds/tencent.js'
+import { tenorIframeEmbedResolver, tenorWidgetEmbedResolver } from '../embeds/tenor.js'
 import {
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
@@ -493,6 +494,8 @@ const embedResolvers: Array<EmbedResolver> = [
   telegramIframeEmbedResolver,
   telegramS9eEmbedResolver,
   tencentEmbedResolver,
+  tenorWidgetEmbedResolver,
+  tenorIframeEmbedResolver,
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
   tiktokS9eEmbedResolver,
