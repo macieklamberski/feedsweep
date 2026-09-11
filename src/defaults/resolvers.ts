@@ -128,6 +128,7 @@ import { podomaticEmbedResolver } from '../embeds/podomatic.js'
 import { redcircleIframeEmbedResolver, redcircleScriptEmbedResolver } from '../embeds/redcircle.js'
 import { redditIframeEmbedResolver, redditWidgetEmbedResolver } from '../embeds/reddit.js'
 import { reverbnationEmbedResolver } from '../embeds/reverbnation.js'
+import { ridewithgpsEmbedResolver } from '../embeds/ridewithgps.js'
 import { rtveFlashEmbedResolver, rtveIframeEmbedResolver } from '../embeds/rtve.js'
 import { rutubeEmbedResolver } from '../embeds/rutube.js'
 import { scribdFlashEmbedResolver, scribdIframeEmbedResolver } from '../embeds/scribd.js'
@@ -278,6 +279,7 @@ const embedResolvers: Array<EmbedResolver> = [
   redditWidgetEmbedResolver,
   redditIframeEmbedResolver,
   reverbnationEmbedResolver,
+  ridewithgpsEmbedResolver,
   rtveIframeEmbedResolver,
   rtveFlashEmbedResolver,
   rutubeEmbedResolver,
