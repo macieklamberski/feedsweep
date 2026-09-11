@@ -170,6 +170,7 @@ import { youtubeAmpEmbedResolver, youtubeIframeEmbedResolver } from '../embeds/y
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { ghostMediaResolver } from '../media/ghost.js'
+import { odeoMediaResolver } from '../media/odeo.js'
 import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
 import { wechatMediaResolver } from '../media/wechat.js'
@@ -329,6 +330,7 @@ const embedResolvers: Array<EmbedResolver> = [
 const mediaResolvers: Array<MediaResolver> = [
   discourseMediaResolver,
   ghostMediaResolver,
+  odeoMediaResolver,
   podloveMediaResolver,
   substackMediaResolver,
   wechatMediaResolver,
