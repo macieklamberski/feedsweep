@@ -171,6 +171,7 @@ import { nicovideoIframeEmbedResolver, nicovideoScriptEmbedResolver } from '../e
 import { notecomIframeEmbedResolver } from '../embeds/notecom.js'
 import { nprFlashEmbedResolver, nprIframeEmbedResolver } from '../embeds/npr.js'
 import { nytimesIframeEmbedResolver } from '../embeds/nytimes.js'
+import { observableEmbedResolver } from '../embeds/observable.js'
 import { odnoklassnikiEmbedResolver } from '../embeds/odnoklassniki.js'
 import { odyseeEmbedResolver } from '../embeds/odysee.js'
 import { officeEmbedResolver } from '../embeds/office.js'
@@ -501,6 +502,7 @@ const embedResolvers: Array<EmbedResolver> = [
   nprFlashEmbedResolver,
   nprIframeEmbedResolver,
   nytimesIframeEmbedResolver,
+  observableEmbedResolver,
   odnoklassnikiEmbedResolver,
   odyseeEmbedResolver,
   officeEmbedResolver,
