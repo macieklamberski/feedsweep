@@ -163,6 +163,7 @@ import {
   videopressIframeEmbedResolver,
 } from '../embeds/videopress.js'
 import { vimeoEmbedResolver } from '../embeds/vimeo.js'
+import { vkEmbedResolver } from '../embeds/vk.js'
 import { wikimediaEmbedResolver } from '../embeds/wikimedia.js'
 import { wistiaEmbedResolver } from '../embeds/wistia.js'
 import { youkuEmbedResolver } from '../embeds/youku.js'
@@ -311,6 +312,7 @@ const embedResolvers: Array<EmbedResolver> = [
   videopressIframeEmbedResolver,
   videopressFlashEmbedResolver,
   vimeoEmbedResolver,
+  vkEmbedResolver,
   wistiaEmbedResolver,
   youkuEmbedResolver,
   youtubeIframeEmbedResolver,
