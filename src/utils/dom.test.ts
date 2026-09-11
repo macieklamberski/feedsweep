@@ -505,6 +505,24 @@ describeForEachParser('getWrapperRatio', (parseHtml) => {
     expect(getWrapperRatio(iframe)).toBe('100/50')
   })
 
+  it('should read a padding-top hack beside a zero padding-bottom', () => {
+    const document = parseHtml(
+      '<div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0;"><iframe></iframe></div>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getWrapperRatio(iframe)).toBe('100/56.25')
+  })
+
+  it('should read a padding-top hack beside a zero-percent padding-bottom', () => {
+    const document = parseHtml(
+      '<div style="padding-top: 75%; padding-bottom: 0%"><iframe></iframe></div>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getWrapperRatio(iframe)).toBe('100/75')
+  })
+
   it('should return undefined when no ancestor carries an aspect signal', () => {
     const document = parseHtml('<p><iframe></iframe></p>')
     const iframe = queryElement(document, 'iframe')
