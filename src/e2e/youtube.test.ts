@@ -5,7 +5,8 @@ import { describeForEachParser, html } from '../tests.js'
 describeForEachParser('YouTube', (parseHtml) => {
   // The widest spread. youtubeIframeEmbedResolver and youtubeAmpEmbedResolver claim the
   // carriers and amp-youtube elements (youtubeHosts includes youtube.googleapis.com, the
-  // Flash-era host Blogger feeds still ship). Each plugin facade has its own rebuild:
+  // Flash-era host Blogger feeds still ship), and youtubeFc2EmbedResolver claims the FC2 blog
+  // player shell. Each plugin facade has its own rebuild:
   // rebuildLazyYtEmbeds, rebuildLyteEmbeds, rebuildRocketYoutubePreviews,
   // rebuildLiteVideoEmbeds, rebuildEmbedPlusEmbeds, rebuildElementorVideoEmbeds and
   // rebuildLazyLoadForVideos. surfaceParkedMarkup recovers iframes parked percent-encoded
@@ -291,5 +292,48 @@ describeForEachParser('YouTube', (parseHtml) => {
     const expected = '<p>Location 📍</p>'
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should resolve the FC2 blog player shell into the YouTube video it wraps', async () => {
+    const value = html`
+      <iframe
+        src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?autoplay=1&id=NBwJR7X3krE&width=640&height=360&title=Soyoichi"
+        width="640"
+        height="360"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen=""
+        data-id="NBwJR7X3krE"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="youtube"
+        data-embed-id="NBwJR7X3krE"
+        data-embed-src="https://www.youtube.com/embed/NBwJR7X3krE"
+        data-embed-url="https://www.youtube.com/watch?v=NBwJR7X3krE"
+        data-embed-thumbnail="https://i.ytimg.com/vi/NBwJR7X3krE/hqdefault.jpg"
+        data-embed-ratio="16/9"
+        data-embed-title="Soyoichi"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // static.fc2.com also serves FC2's images and scripts, and every enclosure is offered to the
+  // shell resolver on its way to becoming a native element.
+  it('should leave a static.fc2.com image enclosure an image', async () => {
+    const enclosures = [
+      { url: 'https://static.fc2.com/image/portal/social/blog_logo200x200.gif', type: 'image/gif' },
+    ]
+    const expected = html`
+      <img data-enclosure="" src="https://static.fc2.com/image/portal/social/blog_logo200x200.gif">
+      <p>Body</p>
+    `
+
+    expect(
+      await transformContent('<p>Body</p>', { parseHtmlFn: parseHtml, enclosures }),
+    ).toEqualHtml(expected)
   })
 })

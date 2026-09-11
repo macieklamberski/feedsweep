@@ -221,6 +221,20 @@ const composeUploadsEmbed = (user: string): EmbedResolverResult => {
   }
 }
 
+const composeVideoEmbed = (
+  videoId: string,
+  params?: Record<string, string>,
+): EmbedResolverResult => {
+  return {
+    provider,
+    id: videoId,
+    src: composeEmbedUrl(videoId, params),
+    url: `https://www.youtube.com/watch?v=${videoId}`,
+    thumbnail: composeThumbnailUrl(videoId),
+    ratio: playerRatio,
+  }
+}
+
 const composeChannelEmbed = (channel: string): EmbedResolverResult => {
   return {
     provider,
@@ -290,14 +304,7 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
     return
   }
 
-  return {
-    provider,
-    id: videoId,
-    src: composeEmbedUrl(videoId, readEmbedParams(url)),
-    url: `https://www.youtube.com/watch?v=${videoId}`,
-    thumbnail: composeThumbnailUrl(videoId),
-    ratio: playerRatio,
-  }
+  return composeVideoEmbed(videoId, readEmbedParams(url))
 }
 
 export const youtubeResolveEmbed: ResolveEmbed = (url, element) => {
@@ -305,6 +312,37 @@ export const youtubeResolveEmbed: ResolveEmbed = (url, element) => {
 
   return target && { ...target, title: attr(element, 'title') }
 }
+
+// FC2's blog player shell on static.fc2.com, a page that builds only the YouTube player its query
+// `id` names. The generic iframe placeholder for it carries no provider and no poster.
+export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
+  ['static.fc2.com'],
+  (url, element) => {
+    const parsed = parseUrl(url)
+
+    if (parsed?.pathname !== '/misc/blog/view/ext_youtube_player.html') {
+      return
+    }
+
+    // FC2's iframe snippet also carries the id as `data-id`, which the shell never reads.
+    const videoId = [parsed.searchParams.get('id'), attr(element, 'data-id')].find(
+      (candidate) => candidate && isVideoId(candidate),
+    )
+
+    if (!videoId) {
+      return
+    }
+
+    const title = parsed.searchParams.get('title')
+
+    return {
+      ...composeVideoEmbed(videoId),
+      // The shell draws no title when the query `title` is the string "undefined".
+      title: title && title !== 'undefined' ? title : undefined,
+    }
+  },
+  { preferResolverSize: true },
+)
 
 // A YouTube player iframe, a frame of a watch, shorts or playlist page, or the Flash player.
 export const youtubeIframeEmbedResolver = createUrlEmbedResolver(
@@ -343,14 +381,7 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
       }
     }
 
-    return {
-      provider,
-      id: videoId,
-      src: composeEmbedUrl(videoId, params),
-      url: `https://www.youtube.com/watch?v=${videoId}`,
-      thumbnail: composeThumbnailUrl(videoId),
-      ratio: playerRatio,
-    }
+    return composeVideoEmbed(videoId, params)
   },
   { preferResolverSize: true },
 )
