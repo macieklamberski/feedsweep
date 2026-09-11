@@ -130,6 +130,7 @@ import { redditIframeEmbedResolver, redditWidgetEmbedResolver } from '../embeds/
 import { reverbnationEmbedResolver } from '../embeds/reverbnation.js'
 import { rtveFlashEmbedResolver, rtveIframeEmbedResolver } from '../embeds/rtve.js'
 import { rutubeEmbedResolver } from '../embeds/rutube.js'
+import { scratchEmbedResolver } from '../embeds/scratch.js'
 import { scribdFlashEmbedResolver, scribdIframeEmbedResolver } from '../embeds/scribd.js'
 import { simplecastEmbedResolver } from '../embeds/simplecast.js'
 import { sketchfabEmbedResolver } from '../embeds/sketchfab.js'
@@ -281,6 +282,7 @@ const embedResolvers: Array<EmbedResolver> = [
   rtveIframeEmbedResolver,
   rtveFlashEmbedResolver,
   rutubeEmbedResolver,
+  scratchEmbedResolver,
   scribdFlashEmbedResolver,
   scribdIframeEmbedResolver,
   simplecastEmbedResolver,
