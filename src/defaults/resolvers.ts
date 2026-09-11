@@ -151,6 +151,7 @@ import { mediavineScriptEmbedResolver, mediavineWidgetEmbedResolver } from '../e
 import { megaphoneEmbedResolver } from '../embeds/megaphone.js'
 import { megatvEmbedResolver } from '../embeds/megatv.js'
 import { mixcloudEmbedResolver } from '../embeds/mixcloud.js'
+import { neteaseEmbedResolver } from '../embeds/netease.js'
 import { nicovideoIframeEmbedResolver, nicovideoScriptEmbedResolver } from '../embeds/nicovideo.js'
 import { notecomIframeEmbedResolver } from '../embeds/notecom.js'
 import { nprFlashEmbedResolver, nprIframeEmbedResolver } from '../embeds/npr.js'
@@ -447,6 +448,7 @@ const embedResolvers: Array<EmbedResolver> = [
   megaphoneEmbedResolver,
   megatvEmbedResolver,
   mixcloudEmbedResolver,
+  neteaseEmbedResolver,
   nicovideoScriptEmbedResolver,
   nicovideoIframeEmbedResolver,
   notecomIframeEmbedResolver,
