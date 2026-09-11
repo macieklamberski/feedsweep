@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { CiteResolverResult } from '../types.js'
 import { hatenaCiteResolver } from './hatena.js'
@@ -98,6 +99,25 @@ describeForEachParser('hatenaCiteResolver', (parseHtml) => {
         url: 'https://example.com/entry',
         title: 'Page title',
         publisher: 'example.com',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // A card pasted outside Hatena's own editor stands on its own, with no paragraph and no
+    // citation around it.
+    it('should extract a card standing outside a paragraph', async () => {
+      const value = html`
+        <iframe
+          src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fentry"
+          title="Page title"
+          loading="lazy"
+        ></iframe>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'hatena',
+        url: 'https://example.com/entry',
+        title: 'Page title',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -305,5 +325,85 @@ describeForEachParser('hatenaCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+// The iframe is what the cite replaces, so the paragraph around it keeps whatever else the author
+// wrote there, and the citation that follows the card goes with it.
+describeForEachParser('hatena cards beside the prose they sit in', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should keep the prose written beside the card', async () => {
+    const value = html`
+      <p>Read this first: <iframe
+          src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fentry"
+          title="Page title"
+          class="embed-card embed-webcard"
+        ></iframe>
+        <cite class="hatena-citation">
+          <a href="https://example.com/entry">example.com</a>
+        </cite>
+      </p>
+    `
+    const expected = html`
+      <p>Read this first: </p>
+      <div
+        data-cite-title="Page title"
+        data-cite-url="https://example.com/entry"
+        data-cite-publisher="example.com"
+        data-cite-provider="hatena"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should drop the citation with the card it follows', async () => {
+    const value = html`
+      <p>Intro.</p>
+      <iframe
+        src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fentry"
+        title="Page title"
+      ></iframe>
+      <cite class="hatena-citation">
+        <a href="https://example.com/entry">example.com</a>
+      </cite>
+    `
+    const expected = html`
+      <p>Intro.</p>
+      <div
+        data-cite-title="Page title"
+        data-cite-url="https://example.com/entry"
+        data-cite-publisher="example.com"
+        data-cite-provider="hatena"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should leave the citation beside a player it does not claim', async () => {
+    const value = html`
+      <p>
+        <iframe
+          src="https://cdn.other.test/player?url=https%3A%2F%2Fexample.com%2Fvideo"
+          title="A video"
+          class="embed-card"
+        ></iframe>
+        <cite class="hatena-citation">
+          <a href="https://example.com/entry">example.com</a>
+        </cite>
+      </p>
+    `
+    const expected = html`
+      <div data-embed-src="https://cdn.other.test/player?url=https%3A%2F%2Fexample.com%2Fvideo"></div>
+      <p>
+        <cite class="hatena-citation"><a href="https://example.com/entry">example.com</a></cite>
+      </p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
