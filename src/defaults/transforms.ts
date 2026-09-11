@@ -48,6 +48,7 @@ import { rebuildLyteEmbeds } from '../transforms/dom/rebuildLyteEmbeds.js'
 import { rebuildRocketYoutubePreviews } from '../transforms/dom/rebuildRocketYoutubePreviews.js'
 import { rebuildVideoJsEmbeds } from '../transforms/dom/rebuildVideoJsEmbeds.js'
 import { rebuildWistiaEmbeds } from '../transforms/dom/rebuildWistiaEmbeds.js'
+import { rebuildWmakerEmbeds } from '../transforms/dom/rebuildWmakerEmbeds.js'
 import { removeTrackingPixels } from '../transforms/dom/removeTrackingPixels.js'
 import { replacePreLineBreaks } from '../transforms/dom/replacePreLineBreaks.js'
 import { resolveMediaDimensions } from '../transforms/dom/resolveMediaDimensions.js'
@@ -114,6 +115,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   rebuildLyteEmbeds,
   rebuildRocketYoutubePreviews,
   rebuildVideoJsEmbeds,
+  rebuildWmakerEmbeds,
   rebuildWistiaEmbeds,
   rebuildLazyLoadForVideos,
   rebuildLazyYtEmbeds,
