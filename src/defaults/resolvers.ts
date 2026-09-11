@@ -145,6 +145,7 @@ import { megatvEmbedResolver } from '../embeds/megatv.js'
 import { mixcloudEmbedResolver } from '../embeds/mixcloud.js'
 import { nicovideoIframeEmbedResolver, nicovideoScriptEmbedResolver } from '../embeds/nicovideo.js'
 import { notecomIframeEmbedResolver } from '../embeds/notecom.js'
+import { nprFlashEmbedResolver, nprIframeEmbedResolver } from '../embeds/npr.js'
 import { nytimesIframeEmbedResolver } from '../embeds/nytimes.js'
 import { odnoklassnikiEmbedResolver } from '../embeds/odnoklassniki.js'
 import { odyseeEmbedResolver } from '../embeds/odysee.js'
@@ -432,6 +433,8 @@ const embedResolvers: Array<EmbedResolver> = [
   nicovideoScriptEmbedResolver,
   nicovideoIframeEmbedResolver,
   notecomIframeEmbedResolver,
+  nprFlashEmbedResolver,
+  nprIframeEmbedResolver,
   nytimesIframeEmbedResolver,
   odnoklassnikiEmbedResolver,
   odyseeEmbedResolver,
