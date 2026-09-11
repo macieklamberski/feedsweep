@@ -155,6 +155,7 @@ import { tencentEmbedResolver } from '../embeds/tencent.js'
 import { tiktokBlockquoteEmbedResolver, tiktokIframeEmbedResolver } from '../embeds/tiktok.js'
 import { transistorEmbedResolver } from '../embeds/transistor.js'
 import { tumblrIframeEmbedResolver, tumblrPostEmbedResolver } from '../embeds/tumblr.js'
+import { tuneinEmbedResolver } from '../embeds/tunein.js'
 import {
   twitterAmpEmbedResolver,
   twitterBlockquoteEmbedResolver,
@@ -405,6 +406,7 @@ const embedResolvers: Array<EmbedResolver> = [
   transistorEmbedResolver,
   tumblrIframeEmbedResolver,
   tumblrPostEmbedResolver,
+  tuneinEmbedResolver,
   twitterBlockquoteEmbedResolver,
   twitterAmpEmbedResolver,
   twitterSubstackEmbedResolver,
