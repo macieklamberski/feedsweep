@@ -72,6 +72,7 @@ import { calameoEmbedResolver } from '../embeds/calameo.js'
 import { canvaIframeEmbedResolver, canvaWidgetEmbedResolver } from '../embeds/canva.js'
 import { captivateEmbedResolver } from '../embeds/captivate.js'
 import { ccmaEmbedResolver } from '../embeds/ccma.js'
+import { channel9EmbedResolver } from '../embeds/channel9.js'
 import { cnbcIframeEmbedResolver } from '../embeds/cnbc.js'
 import {
   cnnFlashEmbedResolver,
@@ -401,6 +402,7 @@ const embedResolvers: Array<EmbedResolver> = [
   canvaWidgetEmbedResolver,
   captivateEmbedResolver,
   ccmaEmbedResolver,
+  channel9EmbedResolver,
   cnbcIframeEmbedResolver,
   cnnScriptEmbedResolver,
   cnnFlashEmbedResolver,
