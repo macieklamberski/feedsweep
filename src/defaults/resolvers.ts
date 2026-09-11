@@ -167,6 +167,7 @@ import { officeEmbedResolver } from '../embeds/office.js'
 import { omnyEmbedResolver } from '../embeds/omny.js'
 import { padletEmbedResolver } from '../embeds/padlet.js'
 import { pastebinIframeEmbedResolver, pastebinScriptEmbedResolver } from '../embeds/pastebin.js'
+import { pbsEmbedResolver } from '../embeds/pbs.js'
 import { peertubeEmbedResolver } from '../embeds/peertube.js'
 import { pixivIframeEmbedResolver, pixivScriptEmbedResolver } from '../embeds/pixiv.js'
 import { podbeanEmbedResolver } from '../embeds/podbean.js'
@@ -472,6 +473,7 @@ const embedResolvers: Array<EmbedResolver> = [
   padletEmbedResolver,
   pastebinIframeEmbedResolver,
   pastebinScriptEmbedResolver,
+  pbsEmbedResolver,
   pixivIframeEmbedResolver,
   pixivScriptEmbedResolver,
   podbeanEmbedResolver,
