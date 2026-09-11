@@ -74,6 +74,11 @@ import {
 } from '../embeds/cnn.js'
 import { codepenIframeEmbedResolver, codepenWidgetEmbedResolver } from '../embeds/codepen.js'
 import { codesandboxIframeEmbedResolver } from '../embeds/codesandbox.js'
+import {
+  crowdsignalFlashEmbedResolver,
+  crowdsignalIframeEmbedResolver,
+  crowdsignalScriptEmbedResolver,
+} from '../embeds/crowdsignal.js'
 import { dailymotionEmbedResolver } from '../embeds/dailymotion.js'
 import { deezerEmbedResolver } from '../embeds/deezer.js'
 import { donorboxEmbedResolver } from '../embeds/donorbox.js'
@@ -345,6 +350,9 @@ const embedResolvers: Array<EmbedResolver> = [
   codepenWidgetEmbedResolver,
   codepenIframeEmbedResolver,
   codesandboxIframeEmbedResolver,
+  crowdsignalFlashEmbedResolver,
+  crowdsignalIframeEmbedResolver,
+  crowdsignalScriptEmbedResolver,
   dailymotionEmbedResolver,
   deezerEmbedResolver,
   donorboxEmbedResolver,
