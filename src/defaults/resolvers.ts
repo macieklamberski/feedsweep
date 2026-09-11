@@ -117,6 +117,7 @@ import { mixcloudEmbedResolver } from '../embeds/mixcloud.js'
 import { nicovideoIframeEmbedResolver, nicovideoScriptEmbedResolver } from '../embeds/nicovideo.js'
 import { notecomIframeEmbedResolver } from '../embeds/notecom.js'
 import { nytimesIframeEmbedResolver } from '../embeds/nytimes.js'
+import { odnoklassnikiEmbedResolver } from '../embeds/odnoklassniki.js'
 import { odyseeEmbedResolver } from '../embeds/odysee.js'
 import { omnyEmbedResolver } from '../embeds/omny.js'
 import { padletEmbedResolver } from '../embeds/padlet.js'
@@ -264,6 +265,7 @@ const embedResolvers: Array<EmbedResolver> = [
   nicovideoIframeEmbedResolver,
   notecomIframeEmbedResolver,
   nytimesIframeEmbedResolver,
+  odnoklassnikiEmbedResolver,
   odyseeEmbedResolver,
   omnyEmbedResolver,
   padletEmbedResolver,
