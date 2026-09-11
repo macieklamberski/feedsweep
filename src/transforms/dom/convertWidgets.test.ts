@@ -653,17 +653,55 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     })
   })
 
-  // Flash has been unplayable in every browser since 2021, so a placeholder pointing at a
-  // `.swf` is a click-to-load button for a file that can never run, and minting it would also
-  // discard the object's fallback content. The carrier is left alone instead: a browser
-  // renders an object's fallback children when it cannot run the object, and an allowlist
-  // sanitizer that drops the shell keeps them the same way. The Flash resolvers run first and
-  // still claim what they can repair.
+  // No browser runs a `.swf` since 2021. An object keeps the fallback children a browser shows
+  // in its place, a bare embed has none, and the Flash resolvers run first either way.
   describe('dead Flash carriers', () => {
-    it('should not frame an <embed> pointing at a .swf', async () => {
-      const value = '<embed src="https://example.com/player.swf">'
+    it('should drop a bare <embed> pointing at a .swf', async () => {
+      const value = html`
+        <p>Before</p>
+        <embed src="https://example.com/player.swf" />
+        <p>After</p>
+      `
       const expected = html`
-        <embed src="https://example.com/player.swf"></embed>
+        <p>Before</p>
+        <p>After</p>
+      `
+
+      expect(await transform(value, withNoResolvers)).toEqualHtml(expected)
+    })
+
+    it('should keep an <embed> nested in an object shell', async () => {
+      const value = html`
+        <object
+          width="400"
+          height="300"
+        >
+          <param
+            name="movie"
+            value="https://example.com/player.swf"
+          />
+          <embed
+            src="https://example.com/player.swf"
+            width="400"
+            height="300"
+          />
+        </object>
+      `
+      const expected = html`
+        <object
+          width="400"
+          height="300"
+        >
+          <param
+            value="https://example.com/player.swf"
+            name="movie"
+          ></param>
+          <embed
+            src="https://example.com/player.swf"
+            width="400"
+            height="300"
+          ></embed>
+        </object>
       `
 
       expect(await transform(value, withNoResolvers)).toEqualHtml(expected)
