@@ -118,6 +118,7 @@ import { nicovideoIframeEmbedResolver, nicovideoScriptEmbedResolver } from '../e
 import { notecomIframeEmbedResolver } from '../embeds/notecom.js'
 import { nytimesIframeEmbedResolver } from '../embeds/nytimes.js'
 import { odyseeEmbedResolver } from '../embeds/odysee.js'
+import { officeEmbedResolver } from '../embeds/office.js'
 import { omnyEmbedResolver } from '../embeds/omny.js'
 import { padletEmbedResolver } from '../embeds/padlet.js'
 import { podbeanEmbedResolver } from '../embeds/podbean.js'
@@ -293,6 +294,7 @@ const embedResolvers: Array<EmbedResolver> = [
   audioboomWidgetEmbedResolver,
   notecomIframeEmbedResolver,
   nytimesIframeEmbedResolver,
+  officeEmbedResolver,
   omnyEmbedResolver,
   padletEmbedResolver,
   odyseeEmbedResolver,
