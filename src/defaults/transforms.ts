@@ -4,6 +4,7 @@ import { assignVideoPosters } from '../transforms/dom/assignVideoPosters.js'
 import { canonicalizeAlignment } from '../transforms/dom/canonicalizeAlignment.js'
 import { cleanAnchorUrls } from '../transforms/dom/cleanAnchorUrls.js'
 import { convertAmpNativeElements } from '../transforms/dom/convertAmpNativeElements.js'
+import { convertAsciinemaEmbeds } from '../transforms/dom/convertAsciinemaEmbeds.js'
 import { convertBreaksToParagraphs } from '../transforms/dom/convertBreaksToParagraphs.js'
 import { convertCiteCards } from '../transforms/dom/convertCiteCards.js'
 import { convertDatawrapperEmbeds } from '../transforms/dom/convertDatawrapperEmbeds.js'
@@ -162,6 +163,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // linked static <img> of the chart's published PNG render. Runs in this normalize
   // cluster so the emitted <img> is dimensioned and proxied by the image transforms below.
   convertDatawrapperEmbeds,
+  convertAsciinemaEmbeds,
   convertGiphyEmbeds,
   convertSmartframeEmbeds,
   unwrapDoublyNestedLists,
