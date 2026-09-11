@@ -91,6 +91,7 @@ import { gettyImagesEmbedResolver } from '../embeds/gettyimages.js'
 import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds/glomex.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
 import { imgurBlockquoteEmbedResolver, imgurIframeEmbedResolver } from '../embeds/imgur.js'
+import { infogramEmbedResolver } from '../embeds/infogram.js'
 import {
   instagramAmpEmbedResolver,
   instagramBlockquoteEmbedResolver,
@@ -207,6 +208,7 @@ const embedResolvers: Array<EmbedResolver> = [
   deezerEmbedResolver,
   donorboxEmbedResolver,
   guardianEmbedResolver,
+  infogramEmbedResolver,
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
   issuuWidgetEmbedResolver,
