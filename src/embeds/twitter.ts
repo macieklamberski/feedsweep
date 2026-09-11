@@ -3,7 +3,11 @@ import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../type
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createS9eEmbedResolver,
+  createUrlEmbedResolver,
+} from '../utils/widgets.js'
 
 const provider = 'twitter'
 
@@ -263,6 +267,11 @@ export const twitterIframeEmbedResolver = createUrlEmbedResolver(
   ['twitter.com', 'x.com'],
   twitterResolveEmbed,
 )
+
+// A forum's s9e MediaEmbed helper frame, naming the status id in its url fragment.
+export const twitterS9eEmbedResolver = createS9eEmbedResolver('twitter', digitsRegex, (id) => {
+  return twitterResolveEmbed(`https://platform.twitter.com/embed/Tweet.html?id=${id}`)
+})
 
 // The player reports its rendered height in a JSON-RPC envelope, unprompted, once the frame is
 // in view, and again when a reader expands a truncated post. The other calls in the same

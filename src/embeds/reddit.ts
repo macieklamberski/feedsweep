@@ -3,7 +3,11 @@ import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../type
 import { attr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createS9eEmbedResolver,
+  createUrlEmbedResolver,
+} from '../utils/widgets.js'
 
 const provider = 'reddit'
 
@@ -155,6 +159,12 @@ export const redditResolveEmbed: ResolveEmbed = (url, element) => {
 // The embed.reddit.com frame the loader builds, kept by exports that stored the rendered page.
 // redditmedia.com redirects to embed.reddit.com path for path.
 export const redditIframeEmbedResolver = createUrlEmbedResolver(redditHosts, redditResolveEmbed)
+
+// A forum's s9e MediaEmbed helper frame, naming the post as `{subreddit}/comments/{id}` in its
+// url fragment.
+export const redditS9eEmbedResolver = createS9eEmbedResolver('reddit', /^[\w/]+$/, (fragment) => {
+  return redditResolveEmbed(`https://www.reddit.com/r/${fragment}`)
+})
 
 // The player reports its height under a `resize.embed` type, first as 0 and then as the rendered
 // value once the post is in, so the first message reads as nothing.

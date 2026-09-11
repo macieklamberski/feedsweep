@@ -6,6 +6,7 @@ import {
   instagramBlockquoteEmbedResolver,
   instagramIframeEmbedResolver,
   instagramResolveEmbed,
+  instagramS9eEmbedResolver,
   instagramSubstackEmbedResolver,
   readInstagramHeight,
 } from './instagram.js'
@@ -612,6 +613,53 @@ describeForEachParser('instagramIframeEmbedResolver', (parseHtml) => {
     it('should return undefined for another host carrying the post path', async () => {
       const value = html`
         <iframe src="https://evil.test/www.instagram.com/p/CaUsPbUquKV/embed/"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+describeForEachParser('instagramS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, instagramS9eEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the shortcode out of the helper frame', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="instagram"
+          src="https://s9e.github.io/iframe/2/instagram.min.html#CdT-yWXBsI7#theme=auto"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/CdT-yWXBsI7',
+        src: 'https://www.instagram.com/p/CdT-yWXBsI7/embed/',
+        url: 'https://www.instagram.com/p/CdT-yWXBsI7/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host naming the helper in its path', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="instagram"
+          src="https://evil.test/s9e.github.io/iframe/2/instagram.min.html#CdT-yWXBsI7"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a fragment stepping out of the post path', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="instagram"
+          src="https://s9e.github.io/iframe/2/instagram.min.html#x/../../reel/CdWN1jeOWr0"
+        ></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()
