@@ -149,6 +149,7 @@ import { standfmEmbedResolver } from '../embeds/standfm.js'
 import { tedEmbedResolver } from '../embeds/ted.js'
 import { telegramIframeEmbedResolver, telegramScriptEmbedResolver } from '../embeds/telegram.js'
 import { tencentEmbedResolver } from '../embeds/tencent.js'
+import { tenorIframeEmbedResolver, tenorWidgetEmbedResolver } from '../embeds/tenor.js'
 import { tiktokBlockquoteEmbedResolver, tiktokIframeEmbedResolver } from '../embeds/tiktok.js'
 import { transistorEmbedResolver } from '../embeds/transistor.js'
 import {
@@ -299,6 +300,8 @@ const embedResolvers: Array<EmbedResolver> = [
   telegramScriptEmbedResolver,
   telegramIframeEmbedResolver,
   tencentEmbedResolver,
+  tenorWidgetEmbedResolver,
+  tenorIframeEmbedResolver,
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
   transistorEmbedResolver,
