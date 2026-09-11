@@ -97,6 +97,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `neutralizeUnsafeUrls` | Replace dangerous-scheme URLs (and any the `isSafeUrlFn` option rejects) with an inert sentinel, keeping the element |
 | `proxyAssetUrls` | Rewrite media URLs through a caller-supplied proxy, keeping each original in `data-proxied-<attr>` |
 | `resolveRelativeUrls` | Resolve relative URLs to absolute against the base URL |
+| `fixConcatenatedUrls` | Strip the site origin a CMS concatenated onto a protocol-relative URL, so the frame reaches the host the author wrote |
 | `shortenSamePageLinkFragments` | Shorten absolute in-page links back to bare `#fragment` hrefs |
 | `unwrapWrappers` | Remove redundant outer `<div>` / `<article>` / `<section>` wrappers |
 | `unwrapDoublyNestedLists` | Unwrap a list that only wraps a single same-type list |
