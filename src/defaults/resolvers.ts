@@ -120,6 +120,7 @@ import { nytimesIframeEmbedResolver } from '../embeds/nytimes.js'
 import { odyseeEmbedResolver } from '../embeds/odysee.js'
 import { omnyEmbedResolver } from '../embeds/omny.js'
 import { padletEmbedResolver } from '../embeds/padlet.js'
+import { pastebinIframeEmbedResolver, pastebinScriptEmbedResolver } from '../embeds/pastebin.js'
 import { peertubeEmbedResolver } from '../embeds/peertube.js'
 import { podbeanEmbedResolver } from '../embeds/podbean.js'
 import { podetizeIframeEmbedResolver, podetizeScriptEmbedResolver } from '../embeds/podetize.js'
@@ -267,6 +268,8 @@ const embedResolvers: Array<EmbedResolver> = [
   odyseeEmbedResolver,
   omnyEmbedResolver,
   padletEmbedResolver,
+  pastebinScriptEmbedResolver,
+  pastebinIframeEmbedResolver,
   podbeanEmbedResolver,
   podetizeScriptEmbedResolver,
   podetizeIframeEmbedResolver,
