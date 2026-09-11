@@ -14,11 +14,7 @@ const cardIframeSelector = [
   `iframe[src*="${cardHost}/embed"]`,
 ].join(', ')
 
-// Matching the iframe alone leaves the <cite> behind as a stray domain link.
-const cardParagraphSelector = cardIframeSelector
-  .split(', ')
-  .map((selector) => `p:has(> ${selector})`)
-  .join(', ')
+const citationSelector = 'cite.hatena-citation'
 
 // A host list misses this: a blog on a custom domain serves its own card from that domain.
 // The self-served card is at {blog}.hatenablog.com/embed/{entry}, and the citation beside it
@@ -30,32 +26,42 @@ const isSelfHosted = (source: string, citationHref: string | undefined): boolean
 }
 
 // Hatena Blog's link card: an iframe at its card renderer, with a <cite> holding the real link.
+// The iframe is the element replaced, so prose the author wrote around it in the same paragraph
+// stays. The <cite> that follows it is read here and removed with it, or it would be left behind
+// as a stray domain link.
 export const hatenaCiteResolver: CiteResolver = {
   kind: 'cite',
-  selector: cardParagraphSelector,
+  selector: cardIframeSelector,
   extract: (element) => {
-    const iframe = find(element, cardIframeSelector)
-    const source = attr(iframe, 'src')
+    const source = attr(element, 'src')
 
     if (!source) {
       return
     }
 
-    const citationLink = find(element, 'cite.hatena-citation a')
+    const sibling = element.nextElementSibling
+    const citation = sibling?.matches(citationSelector) ? sibling : undefined
+    const citationLink = find(citation, 'a')
     const citationHref = attr(citationLink, 'href')
     const cardUrl = parseUrlOnHosts(source, cardHost)
 
-    // A foreign player carrying the class would become a cite and be deleted with its paragraph.
+    // A foreign player carrying the class would become a cite.
     if (!cardUrl && !isSelfHosted(source, citationHref)) {
       return
     }
 
-    return buildCite({
+    const result = buildCite({
       provider: 'hatena',
       // The citation's href comes first: it is the plain target, so it needs no decoding.
       url: citationHref ?? cardUrl?.searchParams.get('url'),
-      title: attr(iframe, 'title'),
+      title: attr(element, 'title'),
       publisher: text(citationLink),
     })
+
+    if (result) {
+      citation?.remove()
+    }
+
+    return result
   },
 }
