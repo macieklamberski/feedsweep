@@ -84,6 +84,7 @@ import {
 import { figshareEmbedResolver } from '../embeds/figshare.js'
 import { firesideEmbedResolver } from '../embeds/fireside.js'
 import { flickrEmbedResolver } from '../embeds/flickr.js'
+import { fliphtml5EmbedResolver } from '../embeds/fliphtml5.js'
 import { flourishIframeEmbedResolver, flourishWidgetEmbedResolver } from '../embeds/flourish.js'
 import { foxnewsIframeEmbedResolver, foxnewsScriptEmbedResolver } from '../embeds/foxnews.js'
 import { geniallyEmbedResolver } from '../embeds/genially.js'
@@ -263,6 +264,7 @@ const embedResolvers: Array<EmbedResolver> = [
   firesideEmbedResolver,
   figshareEmbedResolver,
   flickrEmbedResolver,
+  fliphtml5EmbedResolver,
   flourishWidgetEmbedResolver,
   flourishIframeEmbedResolver,
   foxnewsScriptEmbedResolver,
