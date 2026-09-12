@@ -32,7 +32,11 @@ import { tistoryCiteResolver } from '../cites/tistory.js'
 import { tumblrCiteResolver } from '../cites/tumblr.js'
 import { xenforoCiteResolver } from '../cites/xenforo.js'
 import { acastEmbedResolver } from '../embeds/acast.js'
-import { amebaEmbedResolver, amebaReblogCardEmbedResolver } from '../embeds/ameba.js'
+import {
+  amebaEmbedResolver,
+  amebaImagePageEmbedResolver,
+  amebaReblogCardEmbedResolver,
+} from '../embeds/ameba.js'
 import { anchorEmbedResolver } from '../embeds/anchor.js'
 import { aparatIframeEmbedResolver, aparatScriptEmbedResolver } from '../embeds/aparat.js'
 import { appleEmbedResolver } from '../embeds/apple.js'
@@ -274,6 +278,7 @@ const embedResolvers: Array<EmbedResolver> = [
   glomexElementEmbedResolver,
   acastEmbedResolver,
   amebaEmbedResolver,
+  amebaImagePageEmbedResolver,
   amebaReblogCardEmbedResolver,
   anchorEmbedResolver,
   aparatIframeEmbedResolver,

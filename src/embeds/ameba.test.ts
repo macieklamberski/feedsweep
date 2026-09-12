@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { amebaEmbedResolver, amebaReblogCardEmbedResolver, amebaResolveEmbed } from './ameba.js'
+import {
+  amebaEmbedResolver,
+  amebaImagePageEmbedResolver,
+  amebaReblogCardEmbedResolver,
+  amebaResolveEmbed,
+} from './ameba.js'
 
 describe('amebaResolveEmbed', () => {
   describe('happy paths', () => {
@@ -199,6 +204,53 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
           class="ogpCard_root"
           src="https://ml.ameblo.jp/embed/"
         ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+describeForEachParser('amebaImagePageEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, amebaImagePageEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should compose the image page from the carrier path', async () => {
+      const value = html`
+        <iframe
+          src="https://ameblo.jp/p/embed/sd-milk/image-12806733695-15295885078.html"
+          title="☆塩崎太智 の記事内画像 | M!LKオフィシャルブログ Powered by Ameba"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ameba',
+        id: 'sd-milk/image-12806733695-15295885078',
+        src: 'https://ameblo.jp/p/embed/sd-milk/image-12806733695-15295885078.html',
+        url: 'https://ameblo.jp/sd-milk/image-12806733695-15295885078.html',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host serving the image page path', async () => {
+      const value = '<iframe src="https://evil.test/p/embed/sd-milk/image-1-2.html"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a blog id carrying an encoded path separator', async () => {
+      const value = html`
+        <iframe src="https://ameblo.jp/p/embed/sd%2Fmilk/image-1-2.html"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an embed route that names no image', async () => {
+      const value = html`
+        <iframe src="https://ameblo.jp/p/embed/sd-milk/entry-12806733695.html"></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()
