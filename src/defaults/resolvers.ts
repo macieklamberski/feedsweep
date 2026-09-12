@@ -124,6 +124,7 @@ import { podbeanEmbedResolver } from '../embeds/podbean.js'
 import { podetizeIframeEmbedResolver, podetizeScriptEmbedResolver } from '../embeds/podetize.js'
 import { podigeeIframeEmbedResolver, podigeeScriptEmbedResolver } from '../embeds/podigee.js'
 import { podomaticEmbedResolver } from '../embeds/podomatic.js'
+import { preziEmbedResolver } from '../embeds/prezi.js'
 import { redcircleIframeEmbedResolver, redcircleScriptEmbedResolver } from '../embeds/redcircle.js'
 import { redditIframeEmbedResolver, redditWidgetEmbedResolver } from '../embeds/reddit.js'
 import { reverbnationEmbedResolver } from '../embeds/reverbnation.js'
@@ -195,6 +196,7 @@ const embedResolvers: Array<EmbedResolver> = [
   videopressIframeEmbedResolver,
   videopressFlashEmbedResolver,
   wistiaEmbedResolver,
+  preziEmbedResolver,
   captivateEmbedResolver,
   cnnScriptEmbedResolver,
   cnnFlashEmbedResolver,
