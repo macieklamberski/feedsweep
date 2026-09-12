@@ -11,6 +11,7 @@ const amebloHosts = ['ameblo.jp']
 // and a bound read off them would refuse the next generation.
 const safeVideoIdRegex = /^[A-Za-z0-9]+$/
 const reblogCardPathRegex = /^\/s\/embed\/reblog-card\/([^/]+)\/entry-([^/]+)\.html$/
+const imagePagePathRegex = /^\/p\/embed\/([^/]+)\/image-(\d+)-(\d+)\.html$/
 const safeBlogIdRegex = /^[A-Za-z0-9_-]+$/
 const safeEntryIdRegex = /^\d+$/
 
@@ -62,6 +63,32 @@ export const amebaReblogCardEmbedResolver = createUrlEmbedResolver(amebloHosts, 
   if (!id) {
     return
   }
+
+  return {
+    provider: 'ameba',
+    id,
+    src: url,
+    url: `https://${amebloHosts[0]}/${id}.html`,
+  }
+})
+
+// Ameba's in-article image page, `ameblo.jp/p/embed/{amebaId}/image-{entryId}-{imageId}.html`,
+// the iframe for one image inside a post. The image file's url carries an upload date and two
+// hashed path segments the carrier does not name, so no thumbnail is minted.
+export const amebaImagePageEmbedResolver = createUrlEmbedResolver(amebloHosts, (url) => {
+  const match = imagePagePathRegex.exec(parseUrl(url, placeholderBaseUrl)?.pathname ?? '')
+
+  if (!match) {
+    return
+  }
+
+  const blogId = keepIfMatches(match[1], safeBlogIdRegex)
+
+  if (!blogId) {
+    return
+  }
+
+  const id = `${blogId}/image-${match[2]}-${match[3]}`
 
   return {
     provider: 'ameba',
