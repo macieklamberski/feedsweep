@@ -16,6 +16,7 @@ import { decodeDoubleEncodedTags } from '../transforms/dom/decodeDoubleEncodedTa
 import { demoteHeadings } from '../transforms/dom/demoteHeadings.js'
 import { enrichCitePlaceholders } from '../transforms/dom/enrichCitePlaceholders.js'
 import { enrichEmbedPlaceholders } from '../transforms/dom/enrichEmbedPlaceholders.js'
+import { fixConcatenatedUrls } from '../transforms/dom/fixConcatenatedUrls.js'
 import { fixLazyAudios } from '../transforms/dom/fixLazyAudios.js'
 import { fixLazyIframes } from '../transforms/dom/fixLazyIframes.js'
 import { fixLazyImages } from '../transforms/dom/fixLazyImages.js'
@@ -191,6 +192,9 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   hoistFigcaptionFromAnchor,
   stripNonContentElements,
   resolveRelativeUrls,
+  // Runs after resolveRelativeUrls so a real protocol-relative url already carries its scheme
+  // and only the concatenated shape is left to read as a path.
+  fixConcatenatedUrls,
   cleanAnchorUrls,
   // Runs after resolveRelativeUrls/cleanAnchorUrls so hrefs are absolute and cleaned,
   // and before normalizeAnchoredHeadings so heading permalinks are already bare
