@@ -560,6 +560,112 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
     })
   })
 
+  // Flickr's video swf, which no browser has run since 2021. Its flashvars name the photo and
+  // the photo's secret and no page path at all, so the bare id addresses embedr's photo endpoint
+  // and the pair composes the photo file with no network.
+  describe('the video player object and embed pair', () => {
+    it('should map the dead video player onto the photo the flashvars name', async () => {
+      const value = html`
+        <object
+          type="application/x-shockwave-flash"
+          width="400"
+          height="225"
+          data="https://www.flickr.com/apps/video/stewart.swf?v=49235"
+        >
+          <param
+            name="flashvars"
+            value="intl_lang=en-us&amp;photo_secret=3dfa305404&amp;photo_id=2448291368"
+          />
+          <param name="movie" value="https://www.flickr.com/apps/video/stewart.swf?v=49235" />
+          <embed
+            type="application/x-shockwave-flash"
+            src="https://www.flickr.com/apps/video/stewart.swf?v=49235"
+            flashvars="intl_lang=en-us&amp;photo_secret=3dfa305404&amp;photo_id=2448291368"
+            width="400"
+            height="225"
+          />
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/4Jm8J9',
+        src: 'https://embedr.flickr.com/photos/2448291368?width=400&height=225',
+        url: 'https://flic.kr/p/4Jm8J9',
+        thumbnail: 'https://live.staticflickr.com/0/2448291368_3dfa305404_b.jpg',
+        width: 400,
+        height: 225,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the config off an embed that carries it itself', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="https://www.flickr.com/apps/video/stewart.swf?v=49235"
+          flashvars="intl_lang=en-us&amp;photo_secret=dc023f5a36&amp;photo_id=4419661264&amp;flickr_show_info_box=true"
+          width="560"
+          height="420"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/7JxVjh',
+        src: 'https://embedr.flickr.com/photos/4419661264?width=560&height=420',
+        url: 'https://flic.kr/p/7JxVjh',
+        thumbnail: 'https://live.staticflickr.com/0/4419661264_dc023f5a36_b.jpg',
+        width: 560,
+        height: 420,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // The photo file is named `{id}_{secret}`, so the id alone composes nothing.
+    it('should drop the thumbnail when the flashvars name no secret', async () => {
+      const value = html`
+        <embed
+          src="https://www.flickr.com/apps/video/stewart.swf?v=49235"
+          flashvars="intl_lang=en-us&amp;photo_id=2448291368"
+          width="400"
+          height="225"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/4Jm8J9',
+        src: 'https://embedr.flickr.com/photos/2448291368?width=400&height=225',
+        url: 'https://flic.kr/p/4Jm8J9',
+        width: 400,
+        height: 225,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // The photo endpoint renders `width: NaNpx` given no size, the same as the album endpoint.
+    it('should fall back to the dialog size when the carrier states none', async () => {
+      const value = html`
+        <embed
+          src="https://www.flickr.com/apps/video/stewart.swf"
+          flashvars="photo_secret=3dfa305404&amp;photo_id=2448291368"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/4Jm8J9',
+        src: 'https://embedr.flickr.com/photos/2448291368?width=400&height=300',
+        url: 'https://flic.kr/p/4Jm8J9',
+        thumbnail: 'https://live.staticflickr.com/0/2448291368_3dfa305404_b.jpg',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   describe('sad paths', () => {
     it('should return undefined when the config names no set', async () => {
       const value = html`
@@ -578,11 +684,25 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a flickr app that is not the slideshow', async () => {
+    // The video swf names a photo and only a photo. No corpus carrier of it spells a page path,
+    // and reading one would address an album through a player that never played one.
+    it('should return undefined for a video carrier naming a page path and no photo', async () => {
       const value = html`
         <embed
           src="https://www.flickr.com/apps/video/stewart.swf"
           flashvars="page_show_url=%2Fphotos%2Fbees%2Fsets%2F72157624341%2Fshow%2F"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    // The photo id is minted into the endpoint and encoded as a number for the short url.
+    it('should return undefined for a photo id that is not a number', async () => {
+      const value = html`
+        <embed
+          src="https://www.flickr.com/apps/video/stewart.swf"
+          flashvars="photo_secret=3dfa305404&amp;photo_id=2448291368%2F..%2Fpricing"
         />
       `
 

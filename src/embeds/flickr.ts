@@ -1,6 +1,6 @@
 import { isHostOf, type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
+import { attr, flashVar, flashVars, keepIfMatches } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver, getEmbedSize } from '../utils/widgets.js'
 
@@ -9,6 +9,7 @@ const embedrHost = 'embedr.flickr.com'
 
 // The swf url names only the player, with a `?v=` cache-buster identical on every slideshow.
 const flashPlayerPathRegex = /^\/apps\/slideshow\//i
+const flashVideoPathRegex = /^\/apps\/video\/stewart\.swf$/i
 const legacyPlayerPathRegex = /^\/slideshow\/index\.gne$/i
 
 const setPathRegex = /^\/photos\/([\w.@-]+)\/sets\/(\d+)/
@@ -17,7 +18,7 @@ const groupPathRegex = /^\/groups\/(\d+@N\d\d)\/pool\/show\/?$/
 const photoPathRegex = /^\/photos\/([\w.@-]+)\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
 const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/
 
-const safeSetIdRegex = /^\d+$/
+const safeNumericIdRegex = /^\d+$/
 
 // The secret lands in the photo file's name, so a dot or a separator in it would name
 // another path.
@@ -57,6 +58,10 @@ const composeAliasStreamPlayer = (owner: string): string => {
 
 const composeGroupPlayer = (groupId: string): string => {
   return `https://embedr.flickr.com/groups/${groupId}`
+}
+
+const composePhotoPlayer = (photoId: string): string => {
+  return `https://embedr.flickr.com/photos/${photoId}`
 }
 
 // Flickr's base58 alphabet for flic.kr short urls.
@@ -126,6 +131,18 @@ const readFlashSubject = (element: Nullish<Element>): FlickrSubject => {
   return readPageSubject(page) ?? { owner: config.get('user_id') ?? undefined }
 }
 
+// The video swf names its photo in the flashvars and nothing else: no page path and no owner,
+// so the photo id is all there is to address the player with.
+const readFlashPhoto = (element: Nullish<Element>): FlickrPhoto | undefined => {
+  const photoId = keepIfMatches(flashVar(element, 'photo_id'), safeNumericIdRegex)
+
+  if (!photoId) {
+    return
+  }
+
+  return { photoId, secret: flashVar(element, 'photo_secret') }
+}
+
 // The iframe carrier names its subject in its own query. A set is preferred where several
 // appear, being the narrowest of the three.
 const readLegacySubject = (parsed: URL): FlickrSubject => {
@@ -161,7 +178,7 @@ const readPhotoSubject = (parsed: URL): FlickrPhoto | undefined => {
 
 // Both carriers frame the photo. At the box publishers declare, embedr's chrome takes most of
 // the frame.
-const composePhotoEmbed = (link: string, photo: FlickrPhoto): EmbedResolverResult => {
+const composePhotoEmbed = (src: string, photo: FlickrPhoto): EmbedResolverResult => {
   const { photoId, owner } = photo
   const secret = keepIfMatches(photo.secret, safePhotoSecretRegex)
 
@@ -169,7 +186,7 @@ const composePhotoEmbed = (link: string, photo: FlickrPhoto): EmbedResolverResul
     provider: 'flickr',
     // The photo's key-free oEmbed answers on the page url and on the short url alike.
     id: owner ? `photos/${owner}/${photoId}` : `p/${encodeBase58(photoId)}`,
-    src: link,
+    src,
     url: owner
       ? `https://www.flickr.com/photos/${owner}/${photoId}/`
       : composeShortPhotoUrl(photoId),
@@ -182,7 +199,7 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   const owner = keepIfMatches(subject.owner, safeOwnerRegex)
   const author = readOwnerAlias(owner)
 
-  if (subject.setId && safeSetIdRegex.test(subject.setId)) {
+  if (subject.setId && safeNumericIdRegex.test(subject.setId)) {
     // The album page path starts with the owner, and `/sets/{id}` is kept as the markup spells
     // it: the path is still served and does not redirect to `/albums/` (both 200, 2026-08-14).
     return owner
@@ -226,6 +243,31 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   }
 }
 
+// What a carrier naming a dead player resolves to: the two swf players, the legacy iframe and
+// the album or stream page framed directly.
+const composePlayerEmbed = (
+  parsed: URL,
+  element: Nullish<Element>,
+): EmbedResolverResult | undefined => {
+  if (flashVideoPathRegex.test(parsed.pathname)) {
+    const photo = readFlashPhoto(element)
+
+    return photo && composePhotoEmbed(composePhotoPlayer(photo.photoId), photo)
+  }
+
+  if (flashPlayerPathRegex.test(parsed.pathname)) {
+    return composeEmbed(readFlashSubject(element))
+  }
+
+  if (legacyPlayerPathRegex.test(parsed.pathname)) {
+    return composeEmbed(readLegacySubject(parsed))
+  }
+
+  const subject = readPageSubject(parsed.pathname)
+
+  return subject && composeEmbed(subject)
+}
+
 const resolveTarget = (
   link: string,
   element: Nullish<Element>,
@@ -242,17 +284,7 @@ const resolveTarget = (
     return composePhotoEmbed(link, photo)
   }
 
-  let subject: FlickrSubject | undefined
-
-  if (flashPlayerPathRegex.test(parsed.pathname)) {
-    subject = readFlashSubject(element)
-  } else if (legacyPlayerPathRegex.test(parsed.pathname)) {
-    subject = readLegacySubject(parsed)
-  } else {
-    subject = readPageSubject(parsed.pathname)
-  }
-
-  const result = subject && composeEmbed(subject)
+  const result = composePlayerEmbed(parsed, element)
 
   if (!result) {
     return
@@ -275,8 +307,8 @@ export const flickrResolveEmbed: ResolveEmbed = (url, element) => {
   return target && { ...target, title: target.title ?? attr(element, 'title') }
 }
 
-// Flickr's slideshow swf, its legacy iframe, a framed album or stream page, and the two players
-// for a single photo. Only `/player/` and `embedr.flickr.com` are served without
+// Flickr's slideshow swf, its video swf, the legacy iframe, a framed album or stream page, and
+// the two players for a single photo. Only `/player/` and `embedr.flickr.com` are served without
 // `x-frame-options: SAMEORIGIN`, so the rest name a frame that renders empty.
 export const flickrEmbedResolver = createUrlEmbedResolver(flickrHosts, flickrResolveEmbed, {
   // The carrier's size is already folded into the src, and it is what the endpoint renders at.
