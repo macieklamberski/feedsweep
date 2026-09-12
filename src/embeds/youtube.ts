@@ -255,6 +255,31 @@ export const youtubeResolveEmbed: ResolveEmbed = (url, element) => {
   return target && { ...target, title: attr(element, 'title') }
 }
 
+const fc2ShellPath = '/misc/blog/view/ext_youtube_player.html'
+
+// FC2's blog player shell, an html page that only builds the YouTube player its query names. The
+// query carries the video's own title, and its `autoplay` is the shell's setting, not the video's.
+// The shell writes the id twice, and either copy can be the malformed one.
+
+export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
+  ['static.fc2.com'],
+  (url, element) => {
+    const parsed = parseUrl(url)
+
+    if (!parsed || parsed.pathname !== fc2ShellPath) {
+      return
+    }
+
+    const videoId = [parsed.searchParams.get('id'), attr(element, 'data-id')].find(
+      (candidate) => candidate && isVideoId(candidate),
+    )
+    const target = videoId ? resolveTarget(`https://www.youtube.com/watch?v=${videoId}`) : undefined
+
+    return target && { ...target, title: parsed.searchParams.get('title') || undefined }
+  },
+  { preferResolverSize: true },
+)
+
 // A YouTube player iframe, a frame of a watch, shorts or playlist page, or the Flash player.
 export const youtubeIframeEmbedResolver = createUrlEmbedResolver(
   youtubeHosts,
