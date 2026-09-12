@@ -89,6 +89,7 @@ import { foxnewsIframeEmbedResolver, foxnewsScriptEmbedResolver } from '../embed
 import { geniallyEmbedResolver } from '../embeds/genially.js'
 import { gettyImagesEmbedResolver } from '../embeds/gettyimages.js'
 import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds/glomex.js'
+import { googlebooksEmbedResolver } from '../embeds/googlebooks.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
 import { imgurBlockquoteEmbedResolver, imgurIframeEmbedResolver } from '../embeds/imgur.js'
 import {
@@ -318,6 +319,7 @@ const embedResolvers: Array<EmbedResolver> = [
   mailruEmbedResolver,
   tencentEmbedResolver,
   wikimediaEmbedResolver,
+  googlebooksEmbedResolver,
 ]
 
 const mediaResolvers: Array<MediaResolver> = [
