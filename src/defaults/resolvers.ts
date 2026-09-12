@@ -114,6 +114,7 @@ import { mediavineScriptEmbedResolver, mediavineWidgetEmbedResolver } from '../e
 import { megaphoneEmbedResolver } from '../embeds/megaphone.js'
 import { megatvEmbedResolver } from '../embeds/megatv.js'
 import { mixcloudEmbedResolver } from '../embeds/mixcloud.js'
+import { neteaseEmbedResolver } from '../embeds/netease.js'
 import { nicovideoIframeEmbedResolver, nicovideoScriptEmbedResolver } from '../embeds/nicovideo.js'
 import { notecomIframeEmbedResolver } from '../embeds/notecom.js'
 import { nytimesIframeEmbedResolver } from '../embeds/nytimes.js'
@@ -233,6 +234,7 @@ const embedResolvers: Array<EmbedResolver> = [
   mediavineWidgetEmbedResolver,
   mediavineScriptEmbedResolver,
   mixcloudEmbedResolver,
+  neteaseEmbedResolver,
   podbeanEmbedResolver,
   megaphoneEmbedResolver,
   podetizeScriptEmbedResolver,
