@@ -1013,4 +1013,36 @@ describeForEachParser('transformContent', (parseHtml) => {
 
     expect(result).toBe(expected)
   })
+
+  // convertWidgets re-resolves an already absolute src, so a hostname label spelling a prefix
+  // of "http" reaches feedcanon's scheme repair. The label and the scheme must both survive.
+  it('should keep a hostname label that spells a prefix of the url scheme', async () => {
+    const value = html`
+      <p><iframe src="https://tp.srgssr.ch/x"></iframe></p>
+      <p><iframe src="https://ps.w.org/x"></iframe></p>
+      <p><iframe src="https://tps.org/x"></iframe></p>
+    `
+    const expected = html`
+      <div data-embed-src="https://tp.srgssr.ch/x"></div>
+      <div data-embed-src="https://ps.w.org/x"></div>
+      <div data-embed-src="https://tps.org/x"></div>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
+  it('should repair a misspelled url scheme', async () => {
+    const value = '<p><iframe src="ttps://example.com/typo"></iframe></p>'
+    const expected = '<div data-embed-src="https://example.com/typo"></div>'
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toBe(expected)
+  })
 })
