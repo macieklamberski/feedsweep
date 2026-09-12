@@ -54,7 +54,7 @@
     "svg-tag-names": "^3.0.1"
   },
   "peerDependencies": {
-    "feedcanon": "^2.0.0-rc.1",
+    "feedcanon": "^2.0.0-rc.4",
     "feedscout": "^2.0.0-rc.3",
     "linkedom": "^0.18.12"
   },
@@ -64,14 +64,14 @@
     }
   },
   "devDependencies": {
-    "@types/bun": "^1.4.0",
+    "@types/bun": "^1.4.2",
     "@types/jsdom": "^30.0.0",
-    "feedcanon": "^2.0.0-rc.3",
+    "feedcanon": "^2.0.0-rc.4",
     "feedscout": "^2.0.0-rc.3",
     "jsdom": "^30.0.1",
     "kvalita": "^1.21.0",
     "linkedom": "^0.18.13",
     "trousse": "^2.1.0",
-    "tsdown": "^0.22.14"
+    "tsdown": "^0.23.0"
   }
 }
