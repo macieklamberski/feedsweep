@@ -90,6 +90,7 @@ import { geniallyEmbedResolver } from '../embeds/genially.js'
 import { gettyImagesEmbedResolver } from '../embeds/gettyimages.js'
 import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds/glomex.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
+import { heyzineEmbedResolver } from '../embeds/heyzine.js'
 import { imgurBlockquoteEmbedResolver, imgurIframeEmbedResolver } from '../embeds/imgur.js'
 import {
   instagramAmpEmbedResolver,
@@ -209,6 +210,7 @@ const embedResolvers: Array<EmbedResolver> = [
   guardianEmbedResolver,
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
+  heyzineEmbedResolver,
   issuuWidgetEmbedResolver,
   issuuIframeEmbedResolver,
   ivooxEmbedResolver,
