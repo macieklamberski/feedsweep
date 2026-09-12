@@ -6,6 +6,7 @@ import {
   instagramBlockquoteEmbedResolver,
   instagramIframeEmbedResolver,
   instagramResolveEmbed,
+  instagramS9eEmbedResolver,
   instagramSubstackEmbedResolver,
   readInstagramHeight,
 } from './instagram.js'
@@ -1025,5 +1026,41 @@ describe('readInstagramHeight', () => {
 
     expect(readInstagramHeight({ details: {}, type: 'LOADING' })).toBeUndefined()
     expect(readInstagramHeight(mounted)).toBeUndefined()
+  })
+})
+
+describeForEachParser('instagramS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, instagramS9eEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the shortcode out of the helper frame', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="instagram"
+          src="https://s9e.github.io/iframe/2/instagram.min.html#CdT-yWXBsI7#theme=auto"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/CdT-yWXBsI7',
+        src: 'https://www.instagram.com/p/CdT-yWXBsI7/embed/',
+        url: 'https://www.instagram.com/p/CdT-yWXBsI7/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should leave the platform frame carrying the attribute to the url resolver', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="instagram"
+          src="https://www.instagram.com/p/CdT-yWXBsI7/embed/"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })

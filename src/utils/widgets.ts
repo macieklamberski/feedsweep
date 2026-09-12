@@ -19,7 +19,7 @@ import {
   getStylePairRatio,
   getWrapperRatio,
 } from './dom.js'
-import { cleanUrl, isOnHosts, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
+import { cleanUrl, isOnHosts, parseUrlOnHosts, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
 
 const parseOrKeepDate = (
   date: string | undefined,
@@ -35,6 +35,16 @@ const leadingAtRegex = /^@+/
 // `@` that separates its instance. On a platform that writes bare names it invents a handle.
 export const atUsername = (name: string): string => {
   return `@${name.replace(leadingAtRegex, '')}`
+}
+
+const s9eHelperHost = 's9e.github.io'
+
+// A forum's s9e MediaEmbed helper frame, `s9e.github.io/iframe/2/{platform}.min.html#{id}`, names
+// the content in its first url fragment and the helper's own settings in a second one.
+export const readS9eFragment = (element: Element): string | undefined => {
+  const src = element.getAttribute('src') ?? ''
+
+  return parseUrlOnHosts(src, s9eHelperHost) ? src.split('#')[1] : undefined
 }
 
 const embedCarriers: Record<string, string> = {
