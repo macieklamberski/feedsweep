@@ -144,9 +144,10 @@ const result = transformContent(html, {
   // Extra URL safety policy (e.g. SSRF/allowlist); return `false` to neutralize. A dangerous-scheme floor always applies.
   isSafeUrlFn: (url, type) => isSafe(url, type),
   // Populate embed placeholder metadata from a remote source (e.g. YouTube oEmbed). Called once
-  // per document with every embed; answer positionally, one entry per embed in the same order,
+  // per document with every embed, each carrying its provider and id plus the page url and player
+  // src when the placeholder has them; answer positionally, one entry per embed in the same order,
   // undefined where nothing was found.
-  enrichEmbedFn: (embeds) => Promise.all(embeds.map(({ provider, id }) => fetchMetadata(provider, id))),
+  enrichEmbedFn: (embeds) => Promise.all(embeds.map(({ provider, id, url }) => fetchMetadata(provider, id, url))),
   // Normalize a cite card's site-formatted display date (e.g. "2018.10.14"); return
   // undefined to keep the raw string verbatim.
   parseDateFn: (raw) => parseDate(raw),
