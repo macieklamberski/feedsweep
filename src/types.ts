@@ -86,7 +86,7 @@ export type FieldCleaner = {
 // What the pipeline hands an enricher: the two attributes that name a placeholder's embed, and
 // nothing else. The id must be enough to rebuild the platform's endpoint on its own, which is why
 // TikTok's carries the handle beside the video id.
-export type EmbedRef = { provider: string; id: string }
+export type EmbedRef = { provider: string; id: string; url?: string; src?: string }
 
 // Positional: one entry per embed sent, in the same order, undefined where nothing was found.
 export type EnrichEmbedFn = (

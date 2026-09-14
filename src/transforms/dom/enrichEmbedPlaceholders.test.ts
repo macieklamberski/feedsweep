@@ -1,6 +1,6 @@
 import { expect, it } from 'bun:test'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
-import type { EmbedResolverResult, EnrichEmbedFn, TransformContext } from '../../types.js'
+import type { EmbedRef, EmbedResolverResult, EnrichEmbedFn, TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { enrichEmbedPlaceholders } from './enrichEmbedPlaceholders.js'
 
@@ -52,6 +52,33 @@ describeForEachParser('enrichEmbedPlaceholders', (parseHtml) => {
     expect(calls[0]).toEqual([
       { provider: 'youtube', id: 'abc' },
       { provider: 'vimeo', id: '123' },
+    ])
+  })
+
+  it('should pass the placeholder url and src along with provider and id', async () => {
+    const value = html`
+      <div
+        data-embed-provider="vimeo"
+        data-embed-id="123"
+        data-embed-url="https://vimeo.com/123"
+        data-embed-src="https://player.vimeo.com/video/123"
+      ></div>
+    `
+    const calls: Array<Array<EmbedRef>> = []
+    const fn: EnrichEmbedFn = (embeds) => {
+      calls.push(embeds)
+      return []
+    }
+
+    await transform(value, withFn(fn))
+
+    expect(calls[0]).toEqual([
+      {
+        provider: 'vimeo',
+        id: '123',
+        url: 'https://vimeo.com/123',
+        src: 'https://player.vimeo.com/video/123',
+      },
     ])
   })
 
