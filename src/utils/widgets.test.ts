@@ -1008,6 +1008,63 @@ describeForEachParser('preferResolverSize', (parseHtml) => {
       })
     })
 
+    describe('a percentage carrier hands the shape to its wrapper', () => {
+      it('should take the wrapper ratio over the resolver ratio', () => {
+        const value = html`
+          <div style="padding-bottom: 75%">
+            <div
+              class="player"
+              style="width: 100%; height: 100%"
+            ></div>
+          </div>
+        `
+        const expected: EmbedResolverResult = { ...base, ratio: '100/75' }
+
+        expect(build(withRatio, value)).toEqual(expected)
+      })
+
+      it('should take the wrapper ratio over the resolver height', () => {
+        const value = html`
+          <div style="padding-bottom: 75%">
+            <div
+              class="player"
+              width="100%"
+              height="100%"
+            ></div>
+          </div>
+        `
+        const expected: EmbedResolverResult = { ...base, ratio: '100/75' }
+
+        expect(build(withHeight, value)).toEqual(expected)
+      })
+
+      it('should keep the carrier height when only the width is a percentage', () => {
+        const value = html`
+          <div style="padding-bottom: 75%">
+            <div
+              class="player"
+              width="100%"
+              height="880"
+            ></div>
+          </div>
+        `
+        const expected: EmbedResolverResult = { ...base, height: 880 }
+
+        expect(build(withRatio, value)).toEqual(expected)
+      })
+
+      it('should keep the resolver size when a percentage carrier has no wrapper', () => {
+        const value = html`
+          <div
+            class="player"
+            style="width: 100%; height: 100%"
+          ></div>
+        `
+
+        expect(build(withRatio, value)).toEqual(withRatio)
+      })
+    })
+
     // The wrapper is the weakest source, so it speaks only when nobody else did: the resolver
     // stated no size and the carrier declares nothing on itself. That is the everyday responsive
     // embed, a sizeless video iframe inside a theme's padding-bottom wrapper.

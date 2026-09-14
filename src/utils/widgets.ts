@@ -18,6 +18,7 @@ import {
   getPairRatio,
   getStylePairRatio,
   getWrapperRatio,
+  isPercentageSized,
 } from './dom.js'
 import { cleanUrl, isOnHosts, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
 
@@ -102,7 +103,8 @@ const decideSize = (
   }
 
   // Ancestors are read only with no resolver size: a theme's 16:9 wrapper once beat a 9:16 player.
-  const wrapperDepth = hasSize(result) ? 0 : undefined
+  // BR's player is `100%` by `100%` inside a ratio box the publisher sized.
+  const wrapperDepth = hasSize(result) && !isPercentageSized(element) ? 0 : undefined
   const declared = getEmbedSize(element, wrapperDepth)
 
   // A lone width reserves no space, so it never outranks a resolver's ratio or height.
