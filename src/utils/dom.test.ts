@@ -14,6 +14,7 @@ import {
   hasZeroOpacity,
   isElementHidden,
   isEmptyElement,
+  isPercentageSized,
   keepIfMatches,
   paramValue,
   parsePixelSize,
@@ -23,6 +24,105 @@ import {
   textNode,
   walkElements,
 } from './dom.js'
+
+describeForEachParser('isPercentageSized', (parseHtml) => {
+  it('should read a percentage pair the style states', () => {
+    const document = parseHtml('<iframe style="width: 100%; height: 100%;"></iframe>')
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(true)
+  })
+
+  it('should read a percentage pair the attributes state', () => {
+    const document = parseHtml(html`
+      <iframe
+        width="100%"
+        height="100%"
+      ></iframe>
+    `)
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(true)
+  })
+
+  it('should read a fractional percentage pair', () => {
+    const document = parseHtml('<iframe style="width: 33.3%; height: 66.6%;"></iframe>')
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(true)
+  })
+
+  it('should refuse a percentage width beside a pixel height', () => {
+    const document = parseHtml(html`
+      <iframe
+        width="100%"
+        height="880"
+      ></iframe>
+    `)
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(false)
+  })
+
+  it('should refuse a percentage width beside a pixel height the style states', () => {
+    const document = parseHtml('<iframe style="width: 100%; height: 400px;"></iframe>')
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(false)
+  })
+
+  it('should refuse a pixel pair', () => {
+    const document = parseHtml(html`
+      <iframe
+        width="560"
+        height="315"
+      ></iframe>
+    `)
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(false)
+  })
+
+  it('should refuse an element stating no dimensions', () => {
+    const document = parseHtml('<iframe class="ead-iframe"></iframe>')
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(false)
+  })
+
+  it('should refuse a lone percentage height', () => {
+    const document = parseHtml('<iframe style="height: 100%;"></iframe>')
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(false)
+  })
+
+  it('should read the style percentage over a pixel attribute', () => {
+    const document = parseHtml(html`
+      <iframe
+        width="500"
+        height="300"
+        style="width: 100%; height: 100%;"
+      ></iframe>
+    `)
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(true)
+  })
+
+  it('should read the style pixels over a percentage attribute', () => {
+    const document = parseHtml(html`
+      <iframe
+        width="100%"
+        height="100%"
+        style="width: 500px; height: 300px;"
+      ></iframe>
+    `)
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(false)
+  })
+})
 
 describeForEachParser('getStylePairRatio', (parseHtml) => {
   it('should read a small unitless pair as the shape it spells', () => {
