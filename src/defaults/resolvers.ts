@@ -99,6 +99,7 @@ import {
 } from '../embeds/instagram.js'
 import { issuuIframeEmbedResolver, issuuWidgetEmbedResolver } from '../embeds/issuu.js'
 import { ivooxEmbedResolver } from '../embeds/ivoox.js'
+import { jotformIframeEmbedResolver, jotformScriptEmbedResolver } from '../embeds/jotform.js'
 import {
   jwplayerAmpEmbedResolver,
   jwplayerIframeEmbedResolver,
@@ -190,6 +191,8 @@ const embedResolvers: Array<EmbedResolver> = [
   tedEmbedResolver,
   typeformWidgetEmbedResolver,
   typeformIframeEmbedResolver,
+  jotformScriptEmbedResolver,
+  jotformIframeEmbedResolver,
   transistorEmbedResolver,
   vimeoEmbedResolver,
   videopressIframeEmbedResolver,
