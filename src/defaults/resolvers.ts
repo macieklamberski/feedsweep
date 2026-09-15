@@ -62,6 +62,7 @@ import {
   buzzsproutIframeEmbedResolver,
   buzzsproutScriptEmbedResolver,
 } from '../embeds/buzzsprout.js'
+import { calameoEmbedResolver } from '../embeds/calameo.js'
 import { captivateEmbedResolver } from '../embeds/captivate.js'
 import { cnbcIframeEmbedResolver } from '../embeds/cnbc.js'
 import {
@@ -195,6 +196,7 @@ const embedResolvers: Array<EmbedResolver> = [
   videopressIframeEmbedResolver,
   videopressFlashEmbedResolver,
   wistiaEmbedResolver,
+  calameoEmbedResolver,
   captivateEmbedResolver,
   cnnScriptEmbedResolver,
   cnnFlashEmbedResolver,
