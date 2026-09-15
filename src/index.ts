@@ -99,6 +99,7 @@ export { decodeDoubleEncodedTags } from './transforms/dom/decodeDoubleEncodedTag
 export { demoteHeadings } from './transforms/dom/demoteHeadings.js'
 export { enrichCitePlaceholders } from './transforms/dom/enrichCitePlaceholders.js'
 export { enrichEmbedPlaceholders } from './transforms/dom/enrichEmbedPlaceholders.js'
+export { fixConcatenatedUrls } from './transforms/dom/fixConcatenatedUrls.js'
 export { fixLazyAudios } from './transforms/dom/fixLazyAudios.js'
 export { fixLazyIframes } from './transforms/dom/fixLazyIframes.js'
 export { fixLazyImages } from './transforms/dom/fixLazyImages.js'
