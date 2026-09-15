@@ -143,6 +143,7 @@ import {
 } from '../embeds/speakerdeck.js'
 import { spotifyEmbedResolver } from '../embeds/spotify.js'
 import { spreakerAnchorEmbedResolver, spreakerIframeEmbedResolver } from '../embeds/spreaker.js'
+import { srgplayEmbedResolver } from '../embeds/srgplay.js'
 import { stackblitzIframeEmbedResolver } from '../embeds/stackblitz.js'
 import { standfmEmbedResolver } from '../embeds/standfm.js'
 import { tedEmbedResolver } from '../embeds/ted.js'
@@ -318,6 +319,7 @@ const embedResolvers: Array<EmbedResolver> = [
   mailruEmbedResolver,
   tencentEmbedResolver,
   wikimediaEmbedResolver,
+  srgplayEmbedResolver,
 ]
 
 const mediaResolvers: Array<MediaResolver> = [
