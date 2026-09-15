@@ -312,4 +312,25 @@ describeForEachParser('Facebook', (parseHtml) => {
       '<div data-embed-src="https://www.facebook.com/watch"></div>',
     )
   })
+
+  // A forum's s9e helper frame names a post in its fragment, and facebookS9eEmbedResolver reads
+  // it into the same plugin placeholder a pasted post gives.
+  it('should convert the s9e helper frame into the plugin placeholder', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="facebook"
+        src="https://s9e.github.io/iframe/2/facebook.min.html#example/posts/10150000000000001"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="facebook"
+        data-embed-id="https://www.facebook.com/example/posts/10150000000000001"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fexample%2Fposts%2F10150000000000001"
+        data-embed-url="https://www.facebook.com/example/posts/10150000000000001"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })

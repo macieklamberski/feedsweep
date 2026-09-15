@@ -2,7 +2,11 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { tiktokBlockquoteEmbedResolver, tiktokIframeEmbedResolver } from './tiktok.js'
+import {
+  tiktokBlockquoteEmbedResolver,
+  tiktokIframeEmbedResolver,
+  tiktokS9eEmbedResolver,
+} from './tiktok.js'
 
 // One test per shape the corpus survey found, so a shape nobody handles is visible here as a
 // missing test. Each asserts the whole result, since the point is that every shape maps to the
@@ -848,6 +852,42 @@ describeForEachParser('tiktokIframeEmbedResolver', (parseHtml) => {
       })
 
       expect(result).toEqualHtml(expected)
+    })
+  })
+})
+
+describeForEachParser('tiktokS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, tiktokS9eEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the clip id out of the helper frame', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="tiktok"
+          src="https://s9e.github.io/iframe/2/tiktok.min.html#7331735634815601922"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '7331735634815601922',
+        src: 'https://www.tiktok.com/embed/v2/7331735634815601922',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a fragment that is not a clip id', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="tiktok"
+          src="https://s9e.github.io/iframe/2/tiktok.min.html#@handle"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
   })
 })

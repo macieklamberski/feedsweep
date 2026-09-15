@@ -7,6 +7,7 @@ import {
   facebookBlockquoteEmbedResolver,
   facebookIframeEmbedResolver,
   facebookResolveEmbed,
+  facebookS9eEmbedResolver,
   facebookWidgetEmbedResolver,
   facebookXfbmlEmbedResolver,
 } from './facebook.js'
@@ -856,5 +857,120 @@ describeForEachParser('facebook through the pipeline', (parseHtml) => {
     const expected = '<p>Article text.</p>'
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, facebookS9eEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should frame a bare post id under the placeholder page', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/2/facebook.min.html#1699244425543753"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/Bob/posts/1699244425543753',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FBob%2Fposts%2F1699244425543753',
+        url: 'https://www.facebook.com/Bob/posts/1699244425543753',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a post id behind its kind prefix', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/2/facebook.min.html#p783697877354329"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/Bob/posts/783697877354329',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FBob%2Fposts%2F783697877354329',
+        url: 'https://www.facebook.com/Bob/posts/783697877354329',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should send a video id to the watch page', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/facebook.min.html#video506931837457674"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/watch/?v=506931837457674',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D506931837457674',
+        url: 'https://www.facebook.com/watch/?v=506931837457674',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the page a post fragment names', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/2/facebook.min.html#batterymooch/posts/2091705384452370"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/batterymooch/posts/2091705384452370',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fbatterymooch%2Fposts%2F2091705384452370',
+        url: 'https://www.facebook.com/batterymooch/posts/2091705384452370',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should send a page video fragment to the watch page', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/2/facebook.min.html#supercars/videos/1574979536826284#theme=auto"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/watch/?v=1574979536826284',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1574979536826284',
+        url: 'https://www.facebook.com/watch/?v=1574979536826284',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should leave the plugin frame carrying the attribute to the url resolver', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fexample%2Fposts%2F1"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a fragment carrying a separator in its id', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/2/facebook.min.html#page/posts/1/../../evil"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })

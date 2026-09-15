@@ -374,4 +374,25 @@ describeForEachParser('Instagram', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  // A forum's s9e helper frame names the shortcode in its fragment, and instagramS9eEmbedResolver
+  // reads it into the same frame a pasted permalink gives.
+  it('should convert the s9e helper frame into the post placeholder', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="instagram"
+        src="https://s9e.github.io/iframe/2/instagram.min.html#CdWN1jeOWr0#theme=auto"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="instagram"
+        data-embed-id="p/CdWN1jeOWr0"
+        data-embed-src="https://www.instagram.com/p/CdWN1jeOWr0/embed/"
+        data-embed-url="https://www.instagram.com/p/CdWN1jeOWr0/"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })
