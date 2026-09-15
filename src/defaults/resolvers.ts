@@ -106,6 +106,7 @@ import {
   jwplayerSetupEmbedResolver,
 } from '../embeds/jwplayer.js'
 import { kalturaIframeEmbedResolver, kalturaScriptEmbedResolver } from '../embeds/kaltura.js'
+import { komootEmbedResolver } from '../embeds/komoot.js'
 import { libsynEmbedResolver } from '../embeds/libsyn.js'
 import { linkedinEmbedResolver } from '../embeds/linkedin.js'
 import { mailruEmbedResolver } from '../embeds/mailru.js'
@@ -182,6 +183,7 @@ import type { CiteResolver, EmbedResolver, MediaResolver, WidgetResolver } from 
 const embedResolvers: Array<EmbedResolver> = [
   youtubeIframeEmbedResolver,
   youkuEmbedResolver,
+  komootEmbedResolver,
   youtubeAmpEmbedResolver,
   twitterBlockquoteEmbedResolver,
   twitterAmpEmbedResolver,
