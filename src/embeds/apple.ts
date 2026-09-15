@@ -129,6 +129,36 @@ export const appleEmbedResolver = createUrlEmbedResolver(appleHosts, (url, eleme
   return result && { ...result, ...card, title: card.title ?? attr(element, 'title') }
 })
 
+// The retired Apple Music Marketing Tools host. Every id on it, real or not, redirects to the
+// same marketing page, so the frame shows no player for anybody.
+const appleToolsHosts = ['tools.applemusic.com']
+
+const toolsPathRegex = /^\/+embed\/v1\/([a-z-]+)\/([^/]+)\/?$/
+
+// The tool wrote the storefront as `country` and the modern player takes it as a leading path
+// segment. The storefront-less route answers the same player shell, so a missing or malformed
+// `country` drops the segment instead of refusing the whole repair.
+const composeModernUrl = (url: string): string | undefined => {
+  const parsed = parseUrlOnHosts(url, appleToolsHosts)
+  const [, kind, pathId] = parsed?.pathname.match(toolsPathRegex) ?? []
+
+  if (!parsed || !kind || !pathId) {
+    return
+  }
+
+  const country = parsed.searchParams.get('country')?.toLowerCase()
+  const storefront = keepIfMatches(country, storefrontRegex)
+
+  return `https://music.apple.com/${storefront ? `${storefront}/` : ''}${kind}/${pathId}`
+}
+
+// The same album, playlist or song as the modern player, reached through the retired tool's url.
+export const appleToolsEmbedResolver = createUrlEmbedResolver(appleToolsHosts, (url) => {
+  const modernUrl = composeModernUrl(url)
+
+  return modernUrl ? appleResolveEmbed(modernUrl) : undefined
+})
+
 export const appleFieldCleaners: Array<FieldCleaner> = [
   { provider: 'applepodcasts', field: 'title', drop: 'Media player' },
   // A copied YouTube snippet with the src swapped.
