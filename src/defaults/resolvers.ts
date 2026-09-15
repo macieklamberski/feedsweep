@@ -164,6 +164,7 @@ import {
 import { vimeoEmbedResolver } from '../embeds/vimeo.js'
 import { wikimediaEmbedResolver } from '../embeds/wikimedia.js'
 import { wistiaEmbedResolver } from '../embeds/wistia.js'
+import { yandexMapsScriptEmbedResolver } from '../embeds/yandexmaps.js'
 import { youkuEmbedResolver } from '../embeds/youku.js'
 import { youtubeAmpEmbedResolver, youtubeIframeEmbedResolver } from '../embeds/youtube.js'
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
@@ -318,6 +319,7 @@ const embedResolvers: Array<EmbedResolver> = [
   mailruEmbedResolver,
   tencentEmbedResolver,
   wikimediaEmbedResolver,
+  yandexMapsScriptEmbedResolver,
 ]
 
 const mediaResolvers: Array<MediaResolver> = [
