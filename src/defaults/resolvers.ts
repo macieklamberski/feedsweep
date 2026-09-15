@@ -168,6 +168,7 @@ import { youkuEmbedResolver } from '../embeds/youku.js'
 import { youtubeAmpEmbedResolver, youtubeIframeEmbedResolver } from '../embeds/youtube.js'
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
 import { discourseMediaResolver } from '../media/discourse.js'
+import { flashMp3PlayerMediaResolver } from '../media/flashmp3player.js'
 import { ghostMediaResolver } from '../media/ghost.js'
 import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
@@ -328,6 +329,7 @@ const mediaResolvers: Array<MediaResolver> = [
   ghostMediaResolver,
   discourseMediaResolver,
   podloveMediaResolver,
+  flashMp3PlayerMediaResolver,
 ]
 
 // Order matters here too: a resolver replaces the element it matches, so a later one never
