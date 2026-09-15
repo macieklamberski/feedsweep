@@ -51,6 +51,7 @@ import {
   blueskyPostElementEmbedResolver,
   blueskyS9eEmbedResolver,
 } from '../embeds/bluesky.js'
+import { brEmbedResolver } from '../embeds/br.js'
 import { bridEmbedResolver } from '../embeds/brid.js'
 import {
   brightcoveExperienceEmbedResolver,
@@ -318,6 +319,7 @@ const embedResolvers: Array<EmbedResolver> = [
   mailruEmbedResolver,
   tencentEmbedResolver,
   wikimediaEmbedResolver,
+  brEmbedResolver,
 ]
 
 const mediaResolvers: Array<MediaResolver> = [
