@@ -169,6 +169,7 @@ import { youtubeAmpEmbedResolver, youtubeIframeEmbedResolver } from '../embeds/y
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { ghostMediaResolver } from '../media/ghost.js'
+import { odeoMediaResolver } from '../media/odeo.js'
 import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
 import { wechatMediaResolver } from '../media/wechat.js'
@@ -328,6 +329,7 @@ const mediaResolvers: Array<MediaResolver> = [
   ghostMediaResolver,
   discourseMediaResolver,
   podloveMediaResolver,
+  odeoMediaResolver,
 ]
 
 // Order matters here too: a resolver replaces the element it matches, so a later one never
