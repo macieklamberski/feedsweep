@@ -150,6 +150,7 @@ import { telegramIframeEmbedResolver, telegramScriptEmbedResolver } from '../emb
 import { tencentEmbedResolver } from '../embeds/tencent.js'
 import { tiktokBlockquoteEmbedResolver, tiktokIframeEmbedResolver } from '../embeds/tiktok.js'
 import { transistorEmbedResolver } from '../embeds/transistor.js'
+import { tumblrIframeEmbedResolver, tumblrPostEmbedResolver } from '../embeds/tumblr.js'
 import {
   twitterAmpEmbedResolver,
   twitterBlockquoteEmbedResolver,
@@ -257,6 +258,8 @@ const embedResolvers: Array<EmbedResolver> = [
   sketchfabEmbedResolver,
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
+  tumblrIframeEmbedResolver,
+  tumblrPostEmbedResolver,
   soundcloudEmbedResolver,
   speakerdeckScriptEmbedResolver,
   speakerdeckIframeEmbedResolver,
