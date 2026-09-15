@@ -13,6 +13,7 @@ import { donorboxRenderHint } from '../embeds/donorbox.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
 import { foxnewsRenderHint } from '../embeds/foxnews.js'
 import { imgurRenderHint } from '../embeds/imgur.js'
+import { inaRenderHint } from '../embeds/ina.js'
 import { instagramRenderHint } from '../embeds/instagram.js'
 import { kalturaRenderHint } from '../embeds/kaltura.js'
 import { mailruRenderHint } from '../embeds/mailru.js'
@@ -56,6 +57,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   foxnewsRenderHint,
   donorboxRenderHint,
   imgurRenderHint,
+  inaRenderHint,
   instagramRenderHint,
   kalturaRenderHint,
   mailruRenderHint,
