@@ -10,6 +10,7 @@ import {
   videoFileRegex,
 } from '../../utils/urls.js'
 import {
+  createCaptionedFigure,
   createEmbedPlaceholder,
   createMediaElement,
   embedCarrierSelector,
@@ -73,9 +74,8 @@ const carrierOrShell = (element: Element): Element => {
   return others.length ? element : parent
 }
 
-// A native <audio> or <video> has nowhere of its own to put a human-readable title, so one is hung
-// in a <figcaption> beside the player. Ghost's video card already lands inside a figure carrying
-// the author's own caption, which is the case the ancestor check leaves alone.
+// Ghost's video card already lands inside a figure carrying the author's own caption, which is
+// the case the ancestor check leaves alone.
 const captionMedia = (
   document: Document,
   media: HTMLElement,
@@ -88,13 +88,7 @@ const captionMedia = (
     return media
   }
 
-  const figure = document.createElement('figure')
-  const caption = document.createElement('figcaption')
-
-  caption.textContent = text
-  figure.append(media, caption)
-
-  return figure
+  return createCaptionedFigure(document, media, text)
 }
 
 // Embed carriers as shipped: third-party iframes, dead Flash objects, media urls parked in data-*.
