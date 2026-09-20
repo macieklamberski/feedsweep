@@ -249,6 +249,21 @@ export const createImage = (document: Document, fields: ImageFields): HTMLElemen
   return image
 }
 
+// An <img>, an <audio> and a <video> have nowhere of their own to show a human-readable caption.
+export const createCaptionedFigure = (
+  document: Document,
+  element: HTMLElement,
+  caption: string,
+): HTMLElement => {
+  const figure = document.createElement('figure')
+  const figcaption = document.createElement('figcaption')
+
+  figcaption.textContent = caption
+  figure.append(element, figcaption)
+
+  return figure
+}
+
 // A platform that publishes a canonical static render of something it would otherwise show in a
 // player: Datawrapper's chart png, Giphy's gif. The render goes inline where a reader sees it at
 // once, and the interactive version stays one click away on the platform's own page.
