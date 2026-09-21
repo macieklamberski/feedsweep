@@ -475,6 +475,28 @@ const readStyleLength = (value: string | undefined): number | undefined => {
   return digits === undefined ? undefined : Number(digits)
 }
 
+const percentageLengthRegex = /^\s*[\d.]+%\s*$/
+
+// A browser applies `style="width:100%"` over a `width="500"` presentation attribute.
+const isPercentageLength = (
+  element: Element,
+  declarations: styles.Declarations,
+  name: string,
+): boolean => {
+  const value = declarations[name] ?? element.getAttribute(name)
+
+  return value !== null && value !== undefined && percentageLengthRegex.test(value)
+}
+
+export const isPercentageSized = (element: Element): boolean => {
+  const declarations = styles.declarations(element)
+
+  return (
+    isPercentageLength(element, declarations, 'width') &&
+    isPercentageLength(element, declarations, 'height')
+  )
+}
+
 // The inline-style spelling of the pair above. Read only where the element states no
 // `width`/`height` attribute of its own, since those are the more direct claim and getEmbedSize
 // puts them through the same rule.
