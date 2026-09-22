@@ -73,6 +73,7 @@ const neutralizeSrcset = (element: Element, isSafeUrlFn: IsSafeUrlFn | undefined
 const genericAttributeRoles: Array<[string, UrlRole]> = [
   ['data-embed-url', 'link'],
   ['data-cite-url', 'link'],
+  ['data-file-url', 'link'],
   ['formaction', 'link'],
   ['data-embed-src', 'media'],
   ['data-embed-thumbnail', 'media'],

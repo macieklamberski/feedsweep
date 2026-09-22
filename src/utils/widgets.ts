@@ -458,6 +458,31 @@ export const createCitePlaceholder = (
   return createPlaceholder(document, 'cite', normalizeCiteFields(result))
 }
 
+export type FileFields = {
+  url: string
+  name: string
+  type?: string
+  size?: number
+}
+
+// A file the reader downloads, never frames. The reader draws the card from the data fields, and
+// the link inside is what shows where it does not.
+export const createFilePlaceholder = (document: Document, fields: FileFields): HTMLElement => {
+  const element = createPlaceholder(document, 'file', {
+    url: fields.url,
+    name: fields.name,
+    type: fields.type,
+    size: fields.size ? String(fields.size) : undefined,
+  })
+  const link = document.createElement('a')
+  link.setAttribute('href', fields.url)
+  link.setAttribute('download', '')
+  link.textContent = fields.name
+  element.append(link)
+
+  return element
+}
+
 // The pass both placeholder kinds run for enrichment: read a ref off every placeholder in the
 // document, hand the whole set to the caller's enricher in one call, and write the answers back by
 // position. A slot the enricher left undefined leaves its placeholder as the resolver built it.

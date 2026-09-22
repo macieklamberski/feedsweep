@@ -243,14 +243,16 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(expected)
     })
 
-    it('should neutralize unsafe embed and cite target urls with the link sentinel', async () => {
+    it('should neutralize unsafe embed, cite and file target urls with the link sentinel', async () => {
       const value = html`
         <div data-embed-url="javascript:alert(1)"></div>
         <div data-cite-url="javascript:alert(1)"></div>
+        <div data-file-url="javascript:alert(1)"></div>
       `
       const expected = html`
         <div data-embed-url="#unsafe-link"></div>
         <div data-cite-url="#unsafe-link"></div>
+        <div data-file-url="#unsafe-link"></div>
       `
 
       expect(await transform(value)).toEqualHtml(expected)

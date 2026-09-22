@@ -1,3 +1,4 @@
+import { parseUrl } from 'trousse'
 import type {
   DomTransform,
   EmbedResolverResult,
@@ -10,6 +11,7 @@ import { getImageFingerprint } from '../../utils/images.js'
 import { cleanUrl, flashFileRegex, resolveOrDropUrl, resolveOrKeepUrl } from '../../utils/urls.js'
 import {
   createEmbedPlaceholder,
+  createFilePlaceholder,
   createImage,
   createMediaElement,
   isEmbedOrMediaResolver,
@@ -102,9 +104,34 @@ const mergeEnclosureMetadata = (
 }
 
 // The attribute the injected element carries its source in: `src` on native audio, video,
-// and img elements, `data-embed-src` on embed placeholders.
+// and img elements, `data-embed-src` on embed placeholders, `data-file-url` on file placeholders.
 const getInjectedSource = (element: Element): string | null => {
-  return element.getAttribute('src') ?? element.getAttribute('data-embed-src')
+  return (
+    element.getAttribute('src') ??
+    element.getAttribute('data-embed-src') ??
+    element.getAttribute('data-file-url')
+  )
+}
+
+// A file with no title is named by the last segment of its path, or by its host when the path
+// has none.
+const getFileName = (enclosure: Enclosure, url: string): string => {
+  if (enclosure.title) {
+    return enclosure.title
+  }
+
+  const parsed = parseUrl(url)
+  const segment = parsed?.pathname.split('/').filter(Boolean).pop()
+
+  if (!segment) {
+    return parsed?.hostname ?? url
+  }
+
+  try {
+    return decodeURIComponent(segment)
+  } catch {}
+
+  return segment
 }
 
 // An enclosure rides outside the item body, so the content alone never shows its media.
@@ -121,6 +148,7 @@ export const injectEnclosures: DomTransform = (context) => {
 
   return async (document) => {
     const created: Array<HTMLElement> = []
+    const files: Array<HTMLElement> = []
 
     const hasContentImage = !!document.querySelector('img[src], picture, [data-embed-thumbnail]')
 
@@ -188,12 +216,25 @@ export const injectEnclosures: DomTransform = (context) => {
         continue
       }
 
+      // Whatever is neither playable nor a picture is a file to download: a document, an archive,
+      // a torrent, a file of unknown type.
+      if (!isEnclosureKind(enclosure, 'image')) {
+        files.push(
+          createFilePlaceholder(document, {
+            url: mediaSource,
+            name: getFileName(enclosure, mediaSource),
+            type: enclosure.type ?? enclosure.medium,
+            size: enclosure.length,
+          }),
+        )
+        continue
+      }
+
       // WordPress attaches the author's gravatar as a per-item media:content image, and Substack
       // fills the enclosure of a post with no cover with the publication logo.
       if (
-        isEnclosureKind(enclosure, 'image') &&
-        (isAvatarEnclosure(embedSource, context.avatarImageHosts) ||
-          feedImageFingerprints.has(getImageFingerprint(embedSource, context.cleanUrlFn)))
+        isAvatarEnclosure(embedSource, context.avatarImageHosts) ||
+        feedImageFingerprints.has(getImageFingerprint(embedSource, context.cleanUrlFn))
       ) {
         continue
       }
@@ -223,7 +264,7 @@ export const injectEnclosures: DomTransform = (context) => {
       }
     }
 
-    const injected = created.filter((element) => {
+    const isNewSource = (element: HTMLElement): boolean => {
       const source = getInjectedSource(element)
 
       if (!source) {
@@ -239,11 +280,14 @@ export const injectEnclosures: DomTransform = (context) => {
       injectedSources.add(key)
 
       return true
-    })
+    }
+
+    const injected = created.filter(isNewSource)
+    const injectedFiles = files.filter(isNewSource)
 
     // Tag each injected element so the optional stripDuplicateEnclosures pass can
     // recognize it as injected media, not the item's own content.
-    for (const element of injected) {
+    for (const element of [...injected, ...injectedFiles]) {
       element.setAttribute(enclosureMarker, '')
     }
 
@@ -251,5 +295,9 @@ export const injectEnclosures: DomTransform = (context) => {
     for (let index = injected.length - 1; index >= 0; index--) {
       document.body.prepend(injected[index])
     }
+
+    // Players open the item, files close it: a download is what the reader reaches for after
+    // reading, not before.
+    document.body.append(...injectedFiles)
   }
 }

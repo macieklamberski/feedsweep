@@ -763,12 +763,20 @@ describeForEachParser('soundcloud through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 
-  // Nothing renders a document, so the reader gets the body alone. That is the point: a placeholder
-  // promising a track for a press kit is worse than the attachment going unrendered.
+  // A placeholder promising a track for a press kit is worse than a plain download link.
   it('should not turn a document enclosure into a player', async () => {
     const enclosures = [{ url: 'https://soundcloud.com/press/kit.pdf', type: 'application/pdf' }]
+    const expected = html`
+      <p>Body</p>
+      <div
+        data-file-url="https://soundcloud.com/press/kit.pdf"
+        data-file-name="kit.pdf"
+        data-file-type="application/pdf"
+        data-enclosure=""
+      ><a href="https://soundcloud.com/press/kit.pdf" download="">kit.pdf</a></div>
+    `
 
-    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml('<p>Body</p>')
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
 
