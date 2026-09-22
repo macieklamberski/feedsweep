@@ -678,7 +678,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
         data-file-url="https://example.com/file.bin"
         data-file-name="file.bin"
         data-enclosure=""
-      ><a href="https://example.com/file.bin" download="">file.bin</a></div>
+      ></div>
     `
 
     expect(await transform(value, context)).toEqualHtml(expected)
@@ -1164,7 +1164,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           data-file-type="application/pdf"
           data-file-size="204800"
           data-enclosure=""
-        ><a href="https://example.com/files/report.pdf" download="">Annual report</a></div>
+      ></div>
       `
 
       expect(await transform(value, context)).toEqualHtml(expected)
@@ -1182,7 +1182,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           data-file-name="minutes 2026.pdf"
           data-file-type="application/pdf"
           data-enclosure=""
-        ><a href="https://example.com/files/minutes%202026.pdf" download="">minutes 2026.pdf</a></div>
+      ></div>
       `
 
       expect(await transform(value, context)).toEqualHtml(expected)
@@ -1200,7 +1200,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           data-file-name="files.example.com"
           data-file-type="application/zip"
           data-enclosure=""
-        ><a href="https://files.example.com/" download="">files.example.com</a></div>
+      ></div>
       `
 
       expect(await transform(value, context)).toEqualHtml(expected)
@@ -1218,7 +1218,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           data-file-name="clip-1080.torrent"
           data-file-type="application/x-bittorrent"
           data-enclosure=""
-        ><a href="https://example.com/clip-1080.torrent" download="">clip-1080.torrent</a></div>
+      ></div>
       `
 
       expect(await transform(value, context)).toEqualHtml(expected)
@@ -1242,7 +1242,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           data-file-type="application/x-apple-diskimage"
           data-file-size="52428800"
           data-enclosure=""
-        ><a href="https://example.com/releases/app-2.4.dmg" download="">app-2.4.dmg</a></div>
+      ></div>
       `
 
       expect(await transform(value, context)).toEqualHtml(expected)
@@ -1260,7 +1260,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           data-file-name="download"
           data-file-type="application/octet-stream"
           data-enclosure=""
-        ><a href="https://example.com/download?id=42" download="">download</a></div>
+      ></div>
       `
 
       expect(await transform(value, context)).toEqualHtml(expected)
@@ -1285,13 +1285,13 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           data-file-name="slides.pdf"
           data-file-type="application/pdf"
           data-enclosure=""
-        ><a href="https://example.com/slides.pdf" download="">slides.pdf</a></div>
+      ></div>
         <div
           data-file-url="https://example.com/sources.zip"
           data-file-name="sources.zip"
           data-file-type="application/zip"
           data-enclosure=""
-        ><a href="https://example.com/sources.zip" download="">sources.zip</a></div>
+      ></div>
       `
 
       expect(await transform(value, context)).toEqualHtml(expected)
@@ -1310,7 +1310,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           data-file-name="slides.pdf"
           data-file-type="application/pdf"
           data-enclosure=""
-        ><a href="https://example.com/slides.pdf" download="">slides.pdf</a></div>
+      ></div>
       `
 
       expect(await transform(value, context)).toEqualHtml(expected)
@@ -1336,7 +1336,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           data-file-name="slides.pdf"
           data-file-type="application/pdf"
           data-enclosure=""
-        ><a href="https://example.com/slides.pdf" download="">slides.pdf</a></div>
+      ></div>
       `
 
       expect(await transform(value, context)).toEqualHtml(expected)

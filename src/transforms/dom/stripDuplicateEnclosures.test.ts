@@ -17,7 +17,7 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
         data-file-url="https://example.com/slides.pdf"
         data-file-name="slides.pdf"
         data-enclosure=""
-      ><a href="https://example.com/slides.pdf" download="">slides.pdf</a></div>
+      ></div>
     `
     const expected = html`
       <p>Content</p>
@@ -25,7 +25,7 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
       <div
         data-file-url="https://example.com/slides.pdf"
         data-file-name="slides.pdf"
-      ><a href="https://example.com/slides.pdf" download="">slides.pdf</a></div>
+      ></div>
     `
 
     expect(await transform(value)).toEqualHtml(expected)

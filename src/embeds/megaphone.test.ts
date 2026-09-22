@@ -253,7 +253,7 @@ describeForEachParser('megaphone through the pipeline', (parseHtml) => {
         data-file-name="transcript.pdf"
         data-file-type="application/pdf"
         data-enclosure=""
-      ><a href="https://dcs.megaphone.fm/transcript.pdf?e=AUDD4761726018" download="">transcript.pdf</a></div>
+      ></div>
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)

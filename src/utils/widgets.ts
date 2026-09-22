@@ -465,22 +465,14 @@ export type FileFields = {
   size?: number
 }
 
-// A file the reader downloads, never frames. The reader draws the card from the data fields, and
-// the link inside is what shows where it does not.
+// A file the reader downloads, never frames.
 export const createFilePlaceholder = (document: Document, fields: FileFields): HTMLElement => {
-  const element = createPlaceholder(document, 'file', {
+  return createPlaceholder(document, 'file', {
     url: fields.url,
     name: fields.name,
     type: fields.type,
     size: fields.size ? String(fields.size) : undefined,
   })
-  const link = document.createElement('a')
-  link.setAttribute('href', fields.url)
-  link.setAttribute('download', '')
-  link.textContent = fields.name
-  element.append(link)
-
-  return element
 }
 
 // The pass both placeholder kinds run for enrichment: read a ref off every placeholder in the

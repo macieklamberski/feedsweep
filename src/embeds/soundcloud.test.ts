@@ -773,7 +773,7 @@ describeForEachParser('soundcloud through the pipeline', (parseHtml) => {
         data-file-name="kit.pdf"
         data-file-type="application/pdf"
         data-enclosure=""
-      ><a href="https://soundcloud.com/press/kit.pdf" download="">kit.pdf</a></div>
+      ></div>
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
