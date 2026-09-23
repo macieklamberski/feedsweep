@@ -182,6 +182,7 @@ import { jugemEmojiResolver } from '../emojis/jugem.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
 import { maxEmojiResolver } from '../emojis/max.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
+import { seesaaEmojiResolver } from '../emojis/seesaa.js'
 import { slackEmojiResolver } from '../emojis/slack.js'
 import { smiliesEmojiResolver } from '../emojis/smilies.js'
 import { telegramEmojiResolver } from '../emojis/telegram.js'
@@ -428,6 +429,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   mastodonEmojiResolver,
   weiboEmojiResolver,
   amebaEmojiResolver,
+  seesaaEmojiResolver,
   exblogEmojiResolver,
   cocologEmojiResolver,
   jugemEmojiResolver,
