@@ -183,6 +183,7 @@ import { smiliesEmojiResolver } from '../emojis/smilies.js'
 import { telegramEmojiResolver } from '../emojis/telegram.js'
 import { twemojiEmojiResolver } from '../emojis/twemoji.js'
 import { vanillaEmojiResolver } from '../emojis/vanilla.js'
+import { vkEmojiResolver } from '../emojis/vk.js'
 import { weiboEmojiResolver } from '../emojis/weibo.js'
 import { wordpressEmojiResolver } from '../emojis/wordpress.js'
 import { discourseMediaResolver } from '../media/discourse.js'
@@ -418,6 +419,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   githubImageEmojiResolver,
   slackEmojiResolver,
   notoEmojiResolver,
+  vkEmojiResolver,
   mastodonEmojiResolver,
   weiboEmojiResolver,
   amebaEmojiResolver,
