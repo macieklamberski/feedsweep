@@ -267,7 +267,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       love: '😍',
       redface: '😳',
       innocent: '😇',
-      devil: '😈',
+      devil: '👿',
       yell: '😡',
       // happy: means :BOL, ;D, XD, :) and ^_^ on different boards, so it cannot be resolved
       // from the filename alone.
