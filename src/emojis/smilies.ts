@@ -87,7 +87,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       kiss: '😘',
       cry: '😢',
       evil: '😈',
-      laugh: '😄',
+      laugh: '🤣',
       angel: '😇',
       // afro, azn, police: drawn characters with no Unicode counterpart.
     },
@@ -144,18 +144,18 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       eek: '😲',
       sad: '🙁',
       smile: '🙂',
-      smile2: '😃',
+      smile2: '😁',
       doubt: '😕',
       doubt2: '😕',
       confused: '😕',
       biggrin: '😁',
       razz: '😛',
-      surprised: '😮',
+      surprised: '😲',
       silenced: '🤐',
       neutral: '😐',
       wink: '😉',
       facepalm: '🤦',
-      fun: '😄',
+      fun: '🤣',
       question: '❓',
       exclaim: '❗',
       lol: '🤣',
@@ -195,7 +195,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
     names: {
       normal: '😐', // Its config binds this to `:-|`
       unhappy: '🙁', // And this to `:(`
-      haha: '😄',
+      haha: '🤣',
       // anger, shame: each sits between two glyphs already used for near-synonyms.
       // grmpf, grrr, hero, ko, safe, still, whistle: no Unicode counterpart.
     },
@@ -205,11 +205,11 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
     names: {
       '16x16_smiley-happy': '🙂',
       '16x16_smiley-wink': '😉',
-      '16x16_smiley-very-happy': '😃',
+      '16x16_smiley-very-happy': '😁',
       '16x16_smiley-tongue': '😛',
       '16x16_smiley-sad': '🙁',
       '16x16_smiley-surprised': '😲',
-      '16x16_smiley-lol': '😆',
+      '16x16_smiley-lol': '🤣',
       '16x16_smiley-embarrassed': '😳',
       '16x16_smiley-indifferent': '😐',
       '16x16_heart': '❤️',
@@ -224,7 +224,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
     name: 'CKEditor, FCKeditor and TinyMCE',
     names: {
       regular_smile: '🙂',
-      teeth_smile: '😃',
+      teeth_smile: '😁',
       wink_smile: '😉',
       sad_smile: '🙁',
       cry_smile: '😭',
@@ -259,7 +259,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
     name: 'observed in feeds, engine not identified',
     names: {
       clap: '👏', // Boards add it to several engines' sets; 293 feeds, always applause
-      laughing: '😄',
+      laughing: '🤣',
       ohmy: '😲',
       dizzy: '😵‍💫',
       thumbup: '👍',

@@ -573,11 +573,11 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     const faceCases: Array<[string, string, string]> = [
       ['smiley-happy', 'Smiley heureux', '🙂'],
       ['smiley-wink', "Smiley clignant de l'œil", '😉'],
-      ['smiley-very-happy', 'Smiley très heureux', '😃'],
+      ['smiley-very-happy', 'Smiley très heureux', '😁'],
       ['smiley-tongue', 'Emotikon: Język', '😛'],
       ['smiley-sad', 'Emotikon: Smutny', '🙁'],
       ['smiley-surprised', 'Emotikon: Zaskoczony', '😲'],
-      ['smiley-lol', 'Smiley LOL', '😆'],
+      ['smiley-lol', 'Smiley LOL', '🤣'],
       ['smiley-embarrassed', 'Smiley Embarrassed', '😳'],
       ['smiley-indifferent', 'Smiley Indifferent', '😐'],
       ['heart', 'Cœur', '❤️'],
