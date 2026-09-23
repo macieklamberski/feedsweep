@@ -1188,6 +1188,24 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(expected)
     })
 
+    it('should keep a segment that is not valid percent encoding as written', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        { url: 'https://example.com/files/report%zz.pdf', type: 'application/pdf' },
+      ])
+      const expected = html`
+        <p>Content</p>
+        <div
+          data-file-url="https://example.com/files/report%zz.pdf"
+          data-file-name="report%zz.pdf"
+          data-file-type="application/pdf"
+          data-enclosure=""
+      ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
     it('should name a file whose url has no path by its host', async () => {
       const value = '<p>Content</p>'
       const context = withEnclosures([
