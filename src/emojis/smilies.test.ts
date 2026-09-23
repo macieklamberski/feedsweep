@@ -27,7 +27,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-      const expected = '<p>Eigenwerbung... 😃</p>'
+      const expected = '<p>Eigenwerbung... 😁</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -67,7 +67,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     // nothing, so the smilie class plus a mapped alt is what rescues it.
     it('should replace a sprite smilie that has no data-shortname', async () => {
       const value = `<p><img src="${spriteSource}" class="smilie smilie--sprite" alt=":D"></p>`
-      const expected = '<p>😃</p>'
+      const expected = '<p>😁</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -224,7 +224,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     // image cannot load anywhere. Text beats a broken picture, unlike every case above.
     it('should replace a smilie whose path is the raw placeholder', async () => {
       const value = `<p><img src="{SMILIES_PATH}/teeth_smile.gif" alt=":D" title="Very Happy"></p>`
-      const expected = '<p>😃</p>'
+      const expected = '<p>😁</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -578,7 +578,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       ['smiley-sad', 'Emotikon: Smutny', '🙁'],
       ['smiley-surprised', 'Emotikon: Zaskoczony', '😲'],
       ['smiley-lol', 'Smiley LOL', '😆'],
-      ['smiley-embarrassed', 'Smiley Embarrassed', '😳'],
+      ['smiley-embarrassed', 'Smiley Embarrassed', '🫣'],
       ['smiley-indifferent', 'Smiley Indifferent', '😐'],
       ['heart', 'Cœur', '❤️'],
       ['cat-happy', 'Chat heureux', '😺'],
