@@ -174,6 +174,7 @@ import { bitrixEmojiResolver } from '../emojis/bitrix.js'
 import { facebookEmojiResolver } from '../emojis/facebook.js'
 import { genericEmojiResolver } from '../emojis/generic.js'
 import { githubEmojiResolver } from '../emojis/github.js'
+import { gitlabEmojiResolver } from '../emojis/gitlab.js'
 import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
 import { slackEmojiResolver } from '../emojis/slack.js'
@@ -402,6 +403,7 @@ export const defaultWidgetResolvers: Array<WidgetResolver> = [
 // mark: an image on a CDN host can still carry a forum class whose table resolves it.
 export const defaultEmojiResolvers: Array<EmojiResolver> = [
   telegramEmojiResolver,
+  gitlabEmojiResolver,
   smiliesEmojiResolver,
   // Ahead of WordPress, whose WordPress.com host serves Twemoji files named by codepoint.
   twemojiEmojiResolver,
