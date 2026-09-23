@@ -56,8 +56,37 @@ describeForEachParser('joypixelsEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('EmojiOne', () => {
+    it('should decode the filename when the alt is empty', async () => {
+      const value = html`
+        <p>
+          <img src="https://cdn.jsdelivr.net/emojione/assets/png/1f337.png?v=2.2.7" alt="">
+        </p>
+      `
+      const expected = '<p>🌷</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // Mastodon's class, which EmojiOne's own toImage writes too.
+    it('should decode the filename of an image carrying the emojione class', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emojione"
+            alt=""
+            src="https://cdn.jsdelivr.net/emojione/assets/svg/1f602.svg"
+          >
+        </p>
+      `
+      const expected = '<p>😂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('hosts', () => {
-    const hosts = ['cdn.jsdelivr.net/joypixels/assets/']
+    const hosts = ['cdn.jsdelivr.net/joypixels/assets/', 'cdn.jsdelivr.net/emojione/']
 
     it.each(hosts)('should replace an emoji image from %s', async (host) => {
       const value = `<p>Hi <img src="https://${host}1f642.png" alt="🙂"></p>`
