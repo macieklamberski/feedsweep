@@ -399,6 +399,54 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('smiles directory', () => {
+    it('should replace a phpBB smilie served from a renamed directory', async () => {
+      const value = '<p><img src="https://example.com/smiles/icon_smile.gif" alt="Smile"></p>'
+      const expected = '<p>🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a uCoz smilie whose alt is a shortcode', async () => {
+      const value = html`
+        <p>
+          <img
+            rel="usm"
+            src="https://example.com/smiles/smile.gif"
+            align="absmiddle"
+            alt=":)"
+          >
+        </p>
+      `
+      const expected = '<p>🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // A board's own art, numbered or named in-house, with nothing a table can map.
+    it('should leave a smilie with no known name untouched', async () => {
+      const value = '<p><img src="https://example.com/smiles/ag.gif" alt="Amd Green"></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // The alt is a truncated shortcode the board made up, and the stock filename wins over it.
+    it('should resolve by the filename when the alt is an unknown shortcode', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/smiles/confused.gif"
+            align="top"
+            alt=":questio"
+          >
+        </p>
+      `
+      const expected = '<p>😕</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('engines with a single distinguishing case', () => {
     // Each entry is markup as the engine actually emits it into feed content, so the awkward
     // parts are deliberate: MyBB's alt is an English name, vBulletin's is empty, FCKeditor

@@ -294,6 +294,7 @@ const directories = [
   // wp-includes and plugin icon sets sit under it, and the theme directory above differs per board.
   '/smilies/',
   '/smileys/', // SMF, DokuWiki's lib/images/smileys/, Drupal
+  '/smiles/', // uCoz, and boards that serve phpBB's set from a renamed directory
   '/smiley/', // CKEditor, FCKeditor and TinyMCE; ProBoards serves the same set from here
   '/emotes/', // e107
   '/emoticons/', // Serendipity's stock template set and emoticate plugin, IPS, Kunena
