@@ -8,6 +8,7 @@ import type {
 } from '../types.js'
 import {
   atUsername,
+  createCaptionedFigure,
   createCitePlaceholder,
   createEmbedPlaceholder,
   createIframe,
@@ -1471,6 +1472,36 @@ describeForEachParser('createImage', (parseHtml) => {
     const expected = '<img src="https://cdn.example.com/photo.jpg" />'
 
     expect(build(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('createCaptionedFigure', (parseHtml) => {
+  it('should hang the caption in a figcaption after the element', () => {
+    const document = parseHtml('')
+    const image = createImage(document, { src: 'https://cdn.example.com/photo.jpg' })
+    const figure = createCaptionedFigure(document, image, 'The harbour at dawn.')
+    const expected = html`
+      <figure>
+        <img src="https://cdn.example.com/photo.jpg" />
+        <figcaption>The harbour at dawn.</figcaption>
+      </figure>
+    `
+
+    expect(figure.outerHTML).toEqualHtml(expected)
+  })
+
+  it('should write markup in the caption as text', () => {
+    const document = parseHtml('')
+    const image = createImage(document, { src: 'https://cdn.example.com/photo.jpg' })
+    const figure = createCaptionedFigure(document, image, '<b>Bold</b>')
+    const expected = html`
+      <figure>
+        <img src="https://cdn.example.com/photo.jpg" />
+        <figcaption>&lt;b&gt;Bold&lt;/b&gt;</figcaption>
+      </figure>
+    `
+
+    expect(figure.outerHTML).toEqualHtml(expected)
   })
 })
 

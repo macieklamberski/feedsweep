@@ -88,6 +88,25 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should remove the figure of a captioned enclosure image it moves to the poster', async () => {
+    const value = html`
+      <figure>
+        <img src="https://example.com/poster.png" data-enclosure="">
+        <figcaption>The harbour at dawn.</figcaption>
+      </figure>
+      <video>
+        <source src="https://example.com/clip.mp4">
+      </video>
+    `
+    const expected = html`
+      <video poster="https://example.com/poster.png">
+        <source src="https://example.com/clip.mp4">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should set the poster on a native video and remove the enclosure image', async () => {
     const value = html`
       <img src="https://example.com/poster.png" data-enclosure="">
