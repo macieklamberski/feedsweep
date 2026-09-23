@@ -18,6 +18,13 @@ const bitrixShortcodes = toMap({
   '|fl|': '🚩', // С флажком, with a flag
   '|of|': '🧑‍✈️', // Офицер, officer
   '|sai|': '🧑‍✈️', // Моряк, sailor
+  '=t': '😛', // Показываю язык, sticking out tongue
+  ':/:': '😒', // Нахмурен, frowning
+  '|ax|': '🌹', // Цветок, a flower, drawn as a rose
+  '|hea|': '❤️', // Сердце, heart
+  '|te|': '🤐', // Лучше молчать, better to keep quiet
+  '|und3|': '🤿', // Подводник 3, submariner in a diving helmet
+  '|he|': '🆘', // SOS
   // :S:, Трубка: winks while smoking a pipe, and no emoji has a pipe.
 })
 
