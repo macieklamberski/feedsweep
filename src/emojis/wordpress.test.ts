@@ -129,6 +129,25 @@ describeForEachParser('wordpressEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('WordPress core emoji (s.w.org host)', () => {
+    // A "?" alt is WordPress failing to encode the emoji it meant. The filename still names the
+    // codepoint.
+    it('should decode the filename of an image with a "?" fallback alt', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://s.w.org/images/core/emoji/2.4/72x72/1f642.png"
+            class="size_orig"
+            alt="?"
+          >
+        </p>
+      `
+      const expected = '<p>🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('WordPress.com (wpcom-smileys Twemoji)', () => {
     it('should replace WordPress.com wpcom-smileys image', async () => {
       const value = html`

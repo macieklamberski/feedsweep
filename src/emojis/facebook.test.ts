@@ -21,6 +21,20 @@ describeForEachParser('facebookEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should decode the filename when the alt is empty', async () => {
+      const value = html`
+        <p>
+          <img
+            alt=""
+            src="https://static.xx.fbcdn.net/images/emoji.php/v9/t4c/1/16/1f642.png"
+          >
+        </p>
+      `
+      const expected = '<p>🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('hosts', () => {
