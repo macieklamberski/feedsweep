@@ -81,7 +81,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       huh: '😕',
       rolleyes: '🙄',
       tongue: '😛',
-      embarrassed: '🫣',
+      embarrassed: '😳',
       lipsrsealed: '🤐',
       undecided: '🫤',
       kiss: '😘',
@@ -210,7 +210,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       '16x16_smiley-sad': '🙁',
       '16x16_smiley-surprised': '😲',
       '16x16_smiley-lol': '😆',
-      '16x16_smiley-embarrassed': '🫣',
+      '16x16_smiley-embarrassed': '😳',
       '16x16_smiley-indifferent': '😐',
       '16x16_heart': '❤️',
       '16x16_cat-happy': '😺',
@@ -236,8 +236,8 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       devil_smile: '😈',
       tongue_smile: '😛',
       tounge_smile: '😛', // Misspelled upstream, and four times rarer than the corrected name
-      embaressed_smile: '🫣', // Same
-      embarrassed_smile: '🫣',
+      embaressed_smile: '😳', // Same
+      embarrassed_smile: '😳',
       broken_heart: '💔',
       envelope: '✉️',
       kiss: '😘',

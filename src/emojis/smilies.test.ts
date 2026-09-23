@@ -578,7 +578,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       ['smiley-sad', 'Emotikon: Smutny', '🙁'],
       ['smiley-surprised', 'Emotikon: Zaskoczony', '😲'],
       ['smiley-lol', 'Smiley LOL', '😆'],
-      ['smiley-embarrassed', 'Smiley Embarrassed', '🫣'],
+      ['smiley-embarrassed', 'Smiley Embarrassed', '😳'],
       ['smiley-indifferent', 'Smiley Indifferent', '😐'],
       ['heart', 'Cœur', '❤️'],
       ['cat-happy', 'Chat heureux', '😺'],
