@@ -415,8 +415,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   telegramEmojiResolver,
   gitlabEmojiResolver,
   githubElementEmojiResolver,
-  // Ahead of smilies, whose /smiles/ directory would read a board's own codes through the
-  // shared table.
+  // Ahead of smilies, whose /smiles/ directory would read a Bitrix file by its filename first.
   bitrixEmojiResolver,
   smiliesEmojiResolver,
   // Ahead of WordPress, whose WordPress.com host serves Twemoji files named by codepoint.
