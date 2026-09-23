@@ -173,7 +173,7 @@ import { artstationEmojiResolver } from '../emojis/artstation.js'
 import { bitrixEmojiResolver } from '../emojis/bitrix.js'
 import { facebookEmojiResolver } from '../emojis/facebook.js'
 import { genericEmojiResolver } from '../emojis/generic.js'
-import { githubEmojiResolver } from '../emojis/github.js'
+import { githubElementEmojiResolver, githubImageEmojiResolver } from '../emojis/github.js'
 import { gitlabEmojiResolver } from '../emojis/gitlab.js'
 import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
@@ -404,6 +404,7 @@ export const defaultWidgetResolvers: Array<WidgetResolver> = [
 export const defaultEmojiResolvers: Array<EmojiResolver> = [
   telegramEmojiResolver,
   gitlabEmojiResolver,
+  githubElementEmojiResolver,
   smiliesEmojiResolver,
   // Ahead of WordPress, whose WordPress.com host serves Twemoji files named by codepoint.
   twemojiEmojiResolver,
@@ -413,7 +414,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   bitrixEmojiResolver,
   joypixelsEmojiResolver,
   facebookEmojiResolver,
-  githubEmojiResolver,
+  githubImageEmojiResolver,
   slackEmojiResolver,
   mastodonEmojiResolver,
   weiboEmojiResolver,

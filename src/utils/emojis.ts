@@ -82,7 +82,7 @@ export const rendersNothing = (src: string): boolean => {
   return src.startsWith('data:') && src.length <= 256
 }
 
-const getFileStem = (src: string): string => {
+export const getFileStem = (src: string): string => {
   const path = src.split(queryOrHashRegex)[0]
   const name = path.slice(path.lastIndexOf('/') + 1)
   const extension = name.lastIndexOf('.')
@@ -95,7 +95,7 @@ const getFileStem = (src: string): string => {
 const codepointNameRegex = /^[0-9a-f]{4,5}(?:[-_][0-9a-f]{4,5})*$/
 const codepointSeparatorRegex = /[-_]/
 
-const glyphFromCodepoints = (stem: string): string | undefined => {
+export const glyphFromCodepoints = (stem: string): string | undefined => {
   if (!codepointNameRegex.test(stem)) {
     return
   }
@@ -166,5 +166,30 @@ export const resolveEmojiImage = (
 
   if (match.isStrong) {
     return { custom: true }
+  }
+}
+
+// An element wrapping the glyph, named by a gemoji shortcode. A sanitizer dropping unknown
+// elements would take the glyph with it, so one that resolves to nothing still leaves text.
+export const resolveEmojiElement = (
+  element: Element,
+  { glyph, shortcode }: { glyph?: string; shortcode?: string },
+): EmojiResolverResult | undefined => {
+  const text = element.textContent ?? ''
+
+  if (isEmojiShaped(text)) {
+    return { glyph: text }
+  }
+
+  const resolved = glyph ?? glyphFromShortcode(shortcode)
+
+  if (resolved) {
+    return { glyph: resolved }
+  }
+
+  const fallback = text || shortcode
+
+  if (fallback) {
+    return { text: fallback }
   }
 }
