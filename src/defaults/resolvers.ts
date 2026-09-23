@@ -172,6 +172,7 @@ import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
 import { bitrixEmojiResolver } from '../emojis/bitrix.js'
 import { cocologEmojiResolver } from '../emojis/cocolog.js'
+import { exblogEmojiResolver } from '../emojis/exblog.js'
 import { facebookEmojiResolver } from '../emojis/facebook.js'
 import { genericEmojiResolver } from '../emojis/generic.js'
 import { githubElementEmojiResolver, githubImageEmojiResolver } from '../emojis/github.js'
@@ -427,6 +428,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   mastodonEmojiResolver,
   weiboEmojiResolver,
   amebaEmojiResolver,
+  exblogEmojiResolver,
   cocologEmojiResolver,
   jugemEmojiResolver,
   // Last, since the class is shared by engines whose own signals say more.
