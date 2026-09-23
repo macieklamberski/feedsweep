@@ -323,7 +323,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
     it('should resolve from the filename when the alt is empty', async () => {
       const value = '<p><img src="https://example.com/forum/img/smilies/big_smile.png" alt=""></p>'
-      const expected = '<p>😃</p>'
+      const expected = '<p>😁</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -343,7 +343,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           <img src="https://example.com/img/smilies/big_smile.png" alt="fou" width="15">
         </p>
       `
-      const expected = '<p>😃</p>'
+      const expected = '<p>😁</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -382,7 +382,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
         '🙂',
       ],
       ['Drupal smileys module', 'http://example.com/misc/smileys/smile.png', '🙂'],
-      ['blog smileys directory', 'http://example.com/images/smileys/big_smile.gif', '😃'],
+      ['blog smileys directory', 'http://example.com/images/smileys/big_smile.gif', '😁'],
       ['Kunena emoticons directory', 'http://example.com/media/kunena/emoticons/unsure.png', '😕'],
     ]
 
@@ -577,7 +577,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       ['smiley-tongue', 'Emotikon: Język', '😛'],
       ['smiley-sad', 'Emotikon: Smutny', '🙁'],
       ['smiley-surprised', 'Emotikon: Zaskoczony', '😲'],
-      ['smiley-lol', 'Smiley LOL', '😄'],
+      ['smiley-lol', 'Smiley LOL', '😆'],
       ['smiley-embarrassed', 'Smiley Embarrassed', '😳'],
       ['smiley-indifferent', 'Smiley Indifferent', '😐'],
       ['heart', 'Cœur', '❤️'],
