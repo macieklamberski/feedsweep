@@ -68,7 +68,7 @@
     "@types/jsdom": "^30.0.0",
     "feedcanon": "^2.0.0",
     "feedscout": "^2.0.0",
-    "jsdom": "^30.1.0",
+    "jsdom": "^30.1.1",
     "kvalita": "^1.22.0",
     "linkedom": "^0.18.13",
     "trousse": "^2.1.0",
