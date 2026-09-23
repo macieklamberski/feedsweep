@@ -105,7 +105,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       sad: '🙁',
       angel: '😇',
       angry: '😠',
-      blush: '🤭',
+      blush: '😊',
       confused: '😕',
       exclamation: '❗',
       heart: '❤️',
