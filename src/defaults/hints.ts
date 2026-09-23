@@ -20,6 +20,7 @@ import { mastodonRenderHint } from '../embeds/mastodon.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
 import { omnyRenderHint } from '../embeds/omny.js'
+import { peertubeRenderHint } from '../embeds/peertube.js'
 import { podbeanRenderHint } from '../embeds/podbean.js'
 import { podigeeRenderHint } from '../embeds/podigee.js'
 import { redditRenderHint } from '../embeds/reddit.js'
@@ -63,6 +64,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   mixcloudRenderHint,
   notecomRenderHint,
   omnyRenderHint,
+  peertubeRenderHint,
   podbeanRenderHint,
   podigeeRenderHint,
   redditRenderHint,

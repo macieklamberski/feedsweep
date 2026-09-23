@@ -120,6 +120,7 @@ import { nytimesIframeEmbedResolver } from '../embeds/nytimes.js'
 import { odyseeEmbedResolver } from '../embeds/odysee.js'
 import { omnyEmbedResolver } from '../embeds/omny.js'
 import { padletEmbedResolver } from '../embeds/padlet.js'
+import { peertubeEmbedResolver } from '../embeds/peertube.js'
 import { podbeanEmbedResolver } from '../embeds/podbean.js'
 import { podetizeIframeEmbedResolver, podetizeScriptEmbedResolver } from '../embeds/podetize.js'
 import { podigeeIframeEmbedResolver, podigeeScriptEmbedResolver } from '../embeds/podigee.js'
@@ -318,6 +319,9 @@ const embedResolvers: Array<EmbedResolver> = [
   mailruEmbedResolver,
   tencentEmbedResolver,
   wikimediaEmbedResolver,
+  // Last: the only selector here keyed on a path shape rather than a host, so every resolver
+  // naming a host gets the carrier first.
+  peertubeEmbedResolver,
 ]
 
 const mediaResolvers: Array<MediaResolver> = [
