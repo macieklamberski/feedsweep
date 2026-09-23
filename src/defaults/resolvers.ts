@@ -171,6 +171,7 @@ import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '..
 import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
 import { bitrixEmojiResolver } from '../emojis/bitrix.js'
+import { cocologEmojiResolver } from '../emojis/cocolog.js'
 import { facebookEmojiResolver } from '../emojis/facebook.js'
 import { genericEmojiResolver } from '../emojis/generic.js'
 import { githubElementEmojiResolver, githubImageEmojiResolver } from '../emojis/github.js'
@@ -426,6 +427,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   mastodonEmojiResolver,
   weiboEmojiResolver,
   amebaEmojiResolver,
+  cocologEmojiResolver,
   jugemEmojiResolver,
   // Last, since the class is shared by engines whose own signals say more.
   genericEmojiResolver,
