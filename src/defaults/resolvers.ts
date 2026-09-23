@@ -170,6 +170,7 @@ import { youtubeAmpEmbedResolver, youtubeIframeEmbedResolver } from '../embeds/y
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
 import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
+import { bitrixEmojiResolver } from '../emojis/bitrix.js'
 import { facebookEmojiResolver } from '../emojis/facebook.js'
 import { genericEmojiResolver } from '../emojis/generic.js'
 import { githubEmojiResolver } from '../emojis/github.js'
@@ -407,6 +408,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   wordpressEmojiResolver,
   vanillaEmojiResolver,
   artstationEmojiResolver,
+  bitrixEmojiResolver,
   joypixelsEmojiResolver,
   facebookEmojiResolver,
   githubEmojiResolver,

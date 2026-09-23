@@ -14,6 +14,8 @@ export type EmojiImageMatch = {
   isStrong: boolean
   // Absent for a set whose filename is never read.
   names?: Map<string, string>
+  // Read by the resolver from where its set keeps the meaning, and second only to the alt.
+  glyph?: string
 }
 
 const emojiSequenceParts = [
@@ -37,6 +39,10 @@ export const isEmojiShaped = (text: string): boolean => {
 }
 
 const shortcodes = toMap(vocabularies.shortcodes)
+
+export const glyphFromShortcode = (token: string | undefined): string | undefined => {
+  return token ? shortcodes.get(token.toLowerCase()) : undefined
+}
 
 // The table for a set that names every file by its codepoint, which leaves no names to look up.
 export const noEmojiNames = new Map<string, string>()
@@ -107,7 +113,7 @@ const glyphFromVocabularies = (
   src: string,
   names: Map<string, string>,
 ): string | undefined => {
-  const byShortcode = token ? shortcodes.get(token.toLowerCase()) : undefined
+  const byShortcode = glyphFromShortcode(token)
 
   if (byShortcode) {
     return byShortcode
@@ -140,6 +146,10 @@ export const resolveEmojiImage = (
   // same either way.
   if (alt && isEmojiShaped(alt)) {
     return { glyph: alt }
+  }
+
+  if (match.glyph) {
+    return { glyph: match.glyph }
   }
 
   const glyph = match.names ? glyphFromVocabularies(shortname ?? alt, src, match.names) : undefined
