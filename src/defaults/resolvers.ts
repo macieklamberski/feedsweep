@@ -415,13 +415,15 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   telegramEmojiResolver,
   gitlabEmojiResolver,
   githubElementEmojiResolver,
+  // Ahead of smilies, whose /smiles/ directory would read a board's own codes through the
+  // shared table.
+  bitrixEmojiResolver,
   smiliesEmojiResolver,
   // Ahead of WordPress, whose WordPress.com host serves Twemoji files named by codepoint.
   twemojiEmojiResolver,
   wordpressEmojiResolver,
   vanillaEmojiResolver,
   artstationEmojiResolver,
-  bitrixEmojiResolver,
   joypixelsEmojiResolver,
   facebookEmojiResolver,
   githubImageEmojiResolver,
