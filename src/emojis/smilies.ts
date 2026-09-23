@@ -265,7 +265,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       thumbup: '👍',
       thumbdown: '👎',
       love: '😍',
-      redface: '😳',
+      redface: '🤭',
       innocent: '😇',
       devil: '👿',
       yell: '😡',
