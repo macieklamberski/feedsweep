@@ -669,11 +669,19 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
     })
   })
 
-  it('should skip enclosures without type or medium', async () => {
+  it('should inject an enclosure without type or medium as a file', async () => {
     const value = '<p>Content</p>'
     const context = withEnclosures([{ url: 'https://example.com/file.bin' }])
+    const expected = html`
+      <p>Content</p>
+      <div
+        data-file-url="https://example.com/file.bin"
+        data-file-name="file.bin"
+        data-enclosure=""
+      ></div>
+    `
 
-    expect(await transform(value, context)).toEqualHtml(value)
+    expect(await transform(value, context)).toEqualHtml(expected)
   })
 
   it('should inject multiple enclosures', async () => {
@@ -787,7 +795,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
     expect(await transform(value, context)).toEqualHtml(expected)
   })
 
-  it('should skip enclosure with unrecognized type and no resolver match', async () => {
+  it('should skip a flash file enclosure', async () => {
     const value = '<p>Content</p>'
     const context = withEnclosures([
       { url: 'https://example.com/widget.swf', type: 'application/x-shockwave-flash' },
@@ -1134,6 +1142,221 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       `
 
       expect(await transform(value, context)).toEqualHtml(expected)
+    })
+  })
+
+  describe('file enclosures', () => {
+    it('should inject a document after the content with its name, type and size', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        {
+          url: 'https://example.com/files/report.pdf',
+          type: 'application/pdf',
+          title: 'Annual report',
+          length: 204800,
+        },
+      ])
+      const expected = html`
+        <p>Content</p>
+        <div
+          data-file-url="https://example.com/files/report.pdf"
+          data-file-name="Annual report"
+          data-file-type="application/pdf"
+          data-file-size="204800"
+          data-enclosure=""
+      ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should name a file without a title by its decoded path segment', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        { url: 'https://example.com/files/minutes%202026.pdf', type: 'application/pdf' },
+      ])
+      const expected = html`
+        <p>Content</p>
+        <div
+          data-file-url="https://example.com/files/minutes%202026.pdf"
+          data-file-name="minutes 2026.pdf"
+          data-file-type="application/pdf"
+          data-enclosure=""
+      ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should name a file whose url has no path by its host', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        { url: 'https://files.example.com/', type: 'application/zip' },
+      ])
+      const expected = html`
+        <p>Content</p>
+        <div
+          data-file-url="https://files.example.com/"
+          data-file-name="files.example.com"
+          data-file-type="application/zip"
+          data-enclosure=""
+      ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should inject a torrent as a file', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        { url: 'https://example.com/clip-1080.torrent', type: 'application/x-bittorrent' },
+      ])
+      const expected = html`
+        <p>Content</p>
+        <div
+          data-file-url="https://example.com/clip-1080.torrent"
+          data-file-name="clip-1080.torrent"
+          data-file-type="application/x-bittorrent"
+          data-enclosure=""
+      ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should inject an executable as a file', async () => {
+      const value = '<p>Release notes</p>'
+      const context = withEnclosures([
+        {
+          url: 'https://example.com/releases/app-2.4.dmg',
+          type: 'application/x-apple-diskimage',
+          medium: 'executable',
+          length: 52428800,
+        },
+      ])
+      const expected = html`
+        <p>Release notes</p>
+        <div
+          data-file-url="https://example.com/releases/app-2.4.dmg"
+          data-file-name="app-2.4.dmg"
+          data-file-type="application/x-apple-diskimage"
+          data-file-size="52428800"
+          data-enclosure=""
+      ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should inject a file of unknown type', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        { url: 'https://example.com/download?id=42', type: 'application/octet-stream' },
+      ])
+      const expected = html`
+        <p>Content</p>
+        <div
+          data-file-url="https://example.com/download?id=42"
+          data-file-name="download"
+          data-file-type="application/octet-stream"
+          data-enclosure=""
+      ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should put players before the content and files after it, each in feed order', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        { url: 'https://example.com/slides.pdf', type: 'application/pdf' },
+        { url: 'https://example.com/episode.mp3', type: 'audio/mpeg' },
+        { url: 'https://example.com/sources.zip', type: 'application/zip' },
+      ])
+      const expected = html`
+        <audio
+          src="https://example.com/episode.mp3"
+          controls
+          data-enclosure=""
+        ></audio>
+        <p>Content</p>
+        <div
+          data-file-url="https://example.com/slides.pdf"
+          data-file-name="slides.pdf"
+          data-file-type="application/pdf"
+          data-enclosure=""
+      ></div>
+        <div
+          data-file-url="https://example.com/sources.zip"
+          data-file-name="sources.zip"
+          data-file-type="application/zip"
+          data-enclosure=""
+      ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should inject a file when the content has an image', async () => {
+      const value = '<p>Content</p><img src="https://example.com/inline.jpg">'
+      const context = withEnclosures([
+        { url: 'https://example.com/slides.pdf', type: 'application/pdf' },
+      ])
+      const expected = html`
+        <p>Content</p>
+        <img src="https://example.com/inline.jpg">
+        <div
+          data-file-url="https://example.com/slides.pdf"
+          data-file-name="slides.pdf"
+          data-file-type="application/pdf"
+          data-enclosure=""
+      ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should not turn an image left out for the content image into a file', async () => {
+      const value = '<p>Content</p><img src="https://example.com/inline.jpg">'
+      const context = withEnclosures([{ url: 'https://example.com/cover.jpg', type: 'image/jpeg' }])
+
+      expect(await transform(value, context)).toEqualHtml(value)
+    })
+
+    it('should inject a file named twice once', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        { url: 'https://example.com/slides.pdf', type: 'application/pdf' },
+        { url: 'https://example.com/slides.pdf', type: 'application/pdf', length: 1024 },
+      ])
+      const expected = html`
+        <p>Content</p>
+        <div
+          data-file-url="https://example.com/slides.pdf"
+          data-file-name="slides.pdf"
+          data-file-type="application/pdf"
+          data-enclosure=""
+      ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should skip a file with an unsafe url', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([{ url: 'javascript:alert(1)', type: 'application/pdf' }])
+
+      expect(await transform(value, context)).toEqualHtml(value)
+    })
+
+    it('should not inject a file again on a repeat run', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        { url: 'https://example.com/slides.pdf', type: 'application/pdf' },
+      ])
+      const once = await transform(value, context)
+
+      expect(await transform(once, context)).toEqualHtml(once)
     })
   })
 

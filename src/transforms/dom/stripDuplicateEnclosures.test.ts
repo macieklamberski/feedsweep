@@ -9,6 +9,28 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
     return applyDomTransforms(parseHtml(value), [stripDuplicateEnclosures(context)])
   }
 
+  it('should keep a file placeholder next to content media with an empty src', async () => {
+    const value = html`
+      <p>Content</p>
+      <img src="">
+      <div
+        data-file-url="https://example.com/slides.pdf"
+        data-file-name="slides.pdf"
+        data-enclosure=""
+      ></div>
+    `
+    const expected = html`
+      <p>Content</p>
+      <img src="">
+      <div
+        data-file-url="https://example.com/slides.pdf"
+        data-file-name="slides.pdf"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   describe('image enclosures', () => {
     it('should remove a marked image that exactly matches a content image', async () => {
       const value = html`

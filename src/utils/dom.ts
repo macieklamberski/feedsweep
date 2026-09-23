@@ -307,7 +307,7 @@ export const batchSelectors = (selectors: ReadonlyArray<string>): Array<string> 
   return batches.map((batch) => batch.join(','))
 }
 
-export const generatedWrapperTypes = ['embed', 'cite', 'table', 'pre'] as const
+export const generatedWrapperTypes = ['embed', 'cite', 'file', 'table', 'pre'] as const
 
 export type GeneratedWrapperType = (typeof generatedWrapperTypes)[number]
 
@@ -317,7 +317,11 @@ export const isGeneratedWrapper = (element: Element): boolean => {
   return element.getAttributeNames().some((name) => startsWithAnyOf(name, generatedWrapperPrefixes))
 }
 
-export const placeholderSelectors = ['[data-embed-provider]', '[data-cite-provider]']
+export const placeholderSelectors = [
+  '[data-embed-provider]',
+  '[data-cite-provider]',
+  '[data-file-url]',
+]
 
 // A player url or embed attribute states `200`, or `200px` where the publisher wrote the unit.
 // Not shared with dimensionAttribute: removeTrackingPixels needs 0, 1 and 2 to parse there.

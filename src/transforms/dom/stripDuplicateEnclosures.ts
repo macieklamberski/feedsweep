@@ -46,7 +46,10 @@ export const stripDuplicateEnclosures: DomTransform = (context) => (document) =>
   }
 
   for (const element of injected) {
-    if (contentKeys.has(buildMediaKey(element, context.cleanUrlFn))) {
+    const key = buildMediaKey(element, context.cleanUrlFn)
+
+    // A file placeholder carries neither `src` nor `data-embed-src`, so it has no key to match.
+    if (key && contentKeys.has(key)) {
       removeWithEmptyWrappers(element)
       continue
     }

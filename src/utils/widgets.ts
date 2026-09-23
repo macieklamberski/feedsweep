@@ -458,6 +458,23 @@ export const createCitePlaceholder = (
   return createPlaceholder(document, 'cite', normalizeCiteFields(result))
 }
 
+export type FileFields = {
+  url: string
+  name: string
+  type?: string
+  size?: number
+}
+
+// A file the reader downloads, never frames.
+export const createFilePlaceholder = (document: Document, fields: FileFields): HTMLElement => {
+  return createPlaceholder(document, 'file', {
+    url: fields.url,
+    name: fields.name,
+    type: fields.type,
+    size: fields.size ? String(fields.size) : undefined,
+  })
+}
+
 // The pass both placeholder kinds run for enrichment: read a ref off every placeholder in the
 // document, hand the whole set to the caller's enricher in one call, and write the answers back by
 // position. A slot the enricher left undefined leaves its placeholder as the resolver built it.

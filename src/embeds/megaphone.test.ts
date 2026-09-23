@@ -241,13 +241,21 @@ describeForEachParser('megaphone through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 
-  // Nothing renders a document, so the reader gets the body alone. That is the point: a placeholder
-  // promising a player for a transcript is worse than the attachment going unrendered.
+  // A placeholder promising a player for a transcript is worse than a plain download link.
   it('should not turn a megaphone document enclosure into a player', async () => {
     const enclosures = [
       { url: 'https://dcs.megaphone.fm/transcript.pdf?e=AUDD4761726018', type: 'application/pdf' },
     ]
+    const expected = html`
+      <p>Body</p>
+      <div
+        data-file-url="https://dcs.megaphone.fm/transcript.pdf?e=AUDD4761726018"
+        data-file-name="transcript.pdf"
+        data-file-type="application/pdf"
+        data-enclosure=""
+      ></div>
+    `
 
-    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml('<p>Body</p>')
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
