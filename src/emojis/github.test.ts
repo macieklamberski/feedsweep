@@ -18,6 +18,20 @@ describeForEachParser('githubEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should decode the filename when the alt is a shortcode', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://github.githubassets.com/images/icons/emoji/unicode/1f680.png"
+            alt=":rocket:"
+          >
+        </p>
+      `
+      const expected = '<p>🚀</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('hosts', () => {

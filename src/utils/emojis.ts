@@ -12,7 +12,7 @@ export type EmojiImageMatch = {
   // A class, host, attribute or sprite. An image matched only by its directory is left
   // untouched when it fails to resolve, so a banner in `/smilies/` is never marked.
   isStrong: boolean
-  // Absent for a set recognized only by its host, whose filename is never read.
+  // Absent for a set whose filename is never read.
   names?: Map<string, string>
 }
 
@@ -37,6 +37,9 @@ export const isEmojiShaped = (text: string): boolean => {
 }
 
 const shortcodes = toMap(vocabularies.shortcodes)
+
+// The table for a set that names every file by its codepoint, which leaves no names to look up.
+export const noEmojiNames = new Map<string, string>()
 
 // Left on an emoji image that keeps its picture, so the reader can size it like text and keep
 // it out of thumbnail selection. Presence is the whole signal.

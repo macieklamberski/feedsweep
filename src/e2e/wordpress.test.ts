@@ -112,4 +112,23 @@ describeForEachParser('WordPress', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  // A "?" alt is WordPress failing to encode the emoji it meant, and the file is named by the
+  // codepoint.
+  it('should replace a core emoji image whose alt is "?" by its filename', async () => {
+    const value = html`
+      <p>Thanks
+        <img
+          draggable="false"
+          role="img"
+          class="emoji"
+          alt="?"
+          src="https://s.w.org/images/core/emoji/2.4/72x72/1f642.png"
+        >
+      </p>
+    `
+    const expected = '<p>Thanks 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })

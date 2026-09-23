@@ -85,9 +85,9 @@ describeForEachParser('convertEmojis', (parseHtml) => {
         '<img data-emoji="" data-emoticon="" src="/uploads/emoticons/yahoo.png" alt=":yahoo:">',
       ],
       [
-        'emoji CDN image with no usable alt',
-        '<img src="https://s.w.org/images/core/emoji/14/72x72/1f642.png" alt="?">',
-        '<img data-emoji="" src="https://s.w.org/images/core/emoji/14/72x72/1f642.png" alt="?">',
+        'GitHub custom emoji with no Unicode counterpart',
+        '<img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt=":octocat:">',
+        '<img data-emoji="" src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt=":octocat:">',
       ],
       [
         'Ameba built-in char image',
@@ -252,22 +252,6 @@ describeForEachParser('convertEmojis', (parseHtml) => {
 
     it('should never emit a "?" fallback alt as text', async () => {
       const value = '<p><img src="smilies/broken.png" alt="?" class="wp-smiley"></p>'
-
-      expect(await transformKeeping(value)).toEqualHtml(value)
-    })
-
-    // A "?" alt is WordPress failing to encode the emoji it meant. The filename still names the
-    // codepoint, but decoding it is not worth its cost, so the image is left as it is.
-    it('should leave an image with a "?" fallback alt alone', async () => {
-      const value = html`
-        <p>
-          <img
-            src="https://s.w.org/images/core/emoji/2.4/72x72/1f642.png"
-            class="size_orig"
-            alt="?"
-          >
-        </p>
-      `
 
       expect(await transformKeeping(value)).toEqualHtml(value)
     })

@@ -35,9 +35,7 @@ describeForEachParser('joypixelsEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    // A host match alone does not make the vocabulary known, so a CDN image never reaches the
-    // filename table and the codepoint route with it.
-    it('should leave a host-matched image with no usable alt alone', async () => {
+    it('should decode the filename when the alt is empty', async () => {
       const value = html`
         <p>
           <img
@@ -46,8 +44,9 @@ describeForEachParser('joypixelsEmojiResolver', (parseHtml) => {
           >
         </p>
       `
+      const expected = '<p>🇺🇸</p>'
 
-      expect(await transformKeeping(value)).toEqualHtml(value)
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should leave an unhosted image with a codepoint filename untouched', async () => {

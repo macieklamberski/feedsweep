@@ -1,5 +1,5 @@
 import type { EmojiResolver } from '../types.js'
-import { resolveEmojiImage } from '../utils/emojis.js'
+import { noEmojiNames, resolveEmojiImage } from '../utils/emojis.js'
 
 const hosts = [
   'githubassets.com/images/icons/emoji/', // GitHub README scrapings.
@@ -11,6 +11,6 @@ export const githubEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: hosts.map((host) => `img[src*="${host}" i]`).join(', '),
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, names: noEmojiNames })
   },
 }

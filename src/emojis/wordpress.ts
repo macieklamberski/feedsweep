@@ -1,5 +1,5 @@
 import type { EmojiResolver } from '../types.js'
-import { resolveEmojiImage } from '../utils/emojis.js'
+import { noEmojiNames, resolveEmojiImage } from '../utils/emojis.js'
 import { smiliesEmojiNames } from './smilies.js'
 
 const classSelector = 'img[class~="wp-smiley" i]'
@@ -15,7 +15,7 @@ export const wordpressEmojiResolver: EmojiResolver = {
   selector: [classSelector, ...hosts.map((host) => `img[src*="${host}" i]`)].join(', '),
   extract: (element) => {
     // Its smilie filenames are in the forum tables, since they are served from `/smilies/` too.
-    const names = element.matches(classSelector) ? smiliesEmojiNames : undefined
+    const names = element.matches(classSelector) ? smiliesEmojiNames : noEmojiNames
 
     return resolveEmojiImage(element, { isStrong: true, names })
   },
