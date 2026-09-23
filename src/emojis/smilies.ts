@@ -131,7 +131,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       wink: '😉',
       hmm: '🤔',
       tongue: '😛',
-      lol: '😄',
+      lol: '🤣',
       mad: '😠',
       roll: '🙄',
       cool: '😎',
@@ -158,7 +158,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       fun: '😄',
       question: '❓',
       exclaim: '❗',
-      lol: '😄',
+      lol: '🤣',
       // fixme, deleteme: editorial workflow markers shipped alongside the smilies, not emoji.
     },
   },
