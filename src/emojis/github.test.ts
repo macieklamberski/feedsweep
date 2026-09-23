@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, emojiConverters, html } from '../tests.js'
 
-describeForEachParser('githubEmojiResolver', (parseHtml) => {
+describeForEachParser('githubImageEmojiResolver', (parseHtml) => {
   const { transform } = emojiConverters(parseHtml)
 
   describe('GitHub (gemoji README scrapings)', () => {
@@ -43,5 +43,74 @@ describeForEachParser('githubEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+  })
+})
+
+describeForEachParser('githubElementEmojiResolver', (parseHtml) => {
+  const { transform } = emojiConverters(parseHtml)
+
+  it('should replace the element with the glyph it holds', async () => {
+    const value = html`
+      <p>Works
+        <g-emoji
+          class="g-emoji"
+          alias="+1"
+          fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png"
+        >👍</g-emoji>
+      </p>
+    `
+    const expected = '<p>Works 👍</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should decode fallback-src when the glyph is garbled', async () => {
+    const value = html`
+      <p>
+        <g-emoji
+          class="g-emoji"
+          alias="loud_sound"
+          fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f50a.png"
+        >读</g-emoji>
+      </p>
+    `
+    const expected = '<p>🔊</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should decode fallback-src when the element is empty', async () => {
+    const value = html`
+      <p>
+        <g-emoji
+          class="g-emoji"
+          alias="x"
+          fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/274c.png"
+        ></g-emoji>
+      </p>
+    `
+    const expected = '<p>❌</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace an empty element by its alias when the table carries it', async () => {
+    const value = '<p><g-emoji class="g-emoji" alias="wink"></g-emoji></p>'
+    const expected = '<p>😉</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should mark the alias of an empty element as fallback text', async () => {
+    const value = '<p><g-emoji class="g-emoji" alias="shipit"></g-emoji></p>'
+    const expected = '<p><span data-emoji="">:shipit:</span></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave an element with neither text nor an alias untouched', async () => {
+    const value = '<p>a <g-emoji class="g-emoji"></g-emoji> b</p>'
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 })
