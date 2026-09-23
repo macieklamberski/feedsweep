@@ -175,6 +175,7 @@ import { genericEmojiResolver } from '../emojis/generic.js'
 import { githubEmojiResolver } from '../emojis/github.js'
 import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
+import { slackEmojiResolver } from '../emojis/slack.js'
 import { smiliesEmojiResolver } from '../emojis/smilies.js'
 import { telegramEmojiResolver } from '../emojis/telegram.js'
 import { twemojiEmojiResolver } from '../emojis/twemoji.js'
@@ -409,6 +410,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   joypixelsEmojiResolver,
   facebookEmojiResolver,
   githubEmojiResolver,
+  slackEmojiResolver,
   mastodonEmojiResolver,
   weiboEmojiResolver,
   amebaEmojiResolver,
