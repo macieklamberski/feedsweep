@@ -7,7 +7,7 @@ describeForEachParser('Facebook', (parseHtml) => {
   // SDK widget div, facebookXfbmlEmbedResolver the pre-SDK `<fb:post>` tag,
   // facebookAmpEmbedResolver the AMP element, facebookIframeEmbedResolver the plugin url itself
   // and facebookBlockquoteEmbedResolver the dialog's fallback blockquote when the publisher kept
-  // only that. defaultEmojiImageHosts turns the emoji images a pasted post ships into their
+  // only that. facebookEmojiResolver turns the emoji images a pasted post ships into their
   // characters. A comment thread is page chrome, so `.fb-comments` is in
   // defaultNonContentSelectors and the AMP and plugin-url forms of it are refused; the like
   // button and the page timeline are refused for the same reason and disappear as empty tags.

@@ -1,19 +1,17 @@
-export type EmojiPlatform = {
-  name: string
-  classes?: Array<string | RegExp>
-  attributes?: Array<string>
-  paths?: Array<string>
-  names?: Record<string, string>
-}
+import { toMap } from 'trousse'
+import type { EmojiResolver } from '../types.js'
+import { attr } from '../utils/dom.js'
+import {
+  type EmojiNameTable,
+  mergeEmojiNames,
+  rendersNothing,
+  resolveEmojiImage,
+} from '../utils/emojis.js'
 
-// Each platform lists the filenames its own distribution ships, and `smile.png` is shipped by four.
-export const emojiPlatforms: Array<EmojiPlatform> = [
+// Each engine lists the filenames its own distribution ships, and `smile.png` is shipped by four.
+export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
   {
     name: 'WordPress',
-    classes: ['wp-smiley'],
-    paths: [
-      '/smilies/', // Both wp-includes and plugin icon sets sit under this directory
-    ],
     names: {
       icon_smile: '🙂',
       icon_wink: '😉',
@@ -40,10 +38,6 @@ export const emojiPlatforms: Array<EmojiPlatform> = [
   },
   {
     name: 'phpBB',
-    classes: ['smilies'],
-    paths: [
-      '/smilies/', // Cannot be narrowed: the theme directory above it differs per board
-    ],
     names: {
       icon_e_smile: '🙂',
       icon_e_wink: '😉',
@@ -75,8 +69,6 @@ export const emojiPlatforms: Array<EmojiPlatform> = [
   },
   {
     name: 'SMF',
-    classes: ['smiley'],
-    paths: ['/smileys/'],
     names: {
       smiley: '🙂',
       wink: '😉',
@@ -102,10 +94,6 @@ export const emojiPlatforms: Array<EmojiPlatform> = [
   },
   {
     name: 'MyBB',
-    classes: ['smilie'],
-    paths: [
-      '/smilies/', // Served from images/smilies/, but themes move it
-    ],
     names: {
       smile: '🙂',
       wink: '😉',
@@ -134,9 +122,6 @@ export const emojiPlatforms: Array<EmojiPlatform> = [
   },
   {
     name: 'FluxBB and PunBB',
-    paths: [
-      '/img/smilies/', // Fixed at the install root, so the narrow form is safe here
-    ],
     names: {
       smile: '🙂',
       neutral: '😐',
@@ -154,10 +139,6 @@ export const emojiPlatforms: Array<EmojiPlatform> = [
   },
   {
     name: 'DokuWiki',
-    classes: ['smiley'],
-    paths: [
-      '/smileys/', // Served from lib/images/smileys/
-    ],
     names: {
       cool: '😎',
       eek: '😲',
@@ -183,8 +164,6 @@ export const emojiPlatforms: Array<EmojiPlatform> = [
   },
   {
     name: 'e107',
-    classes: ['e-emoticon'],
-    paths: ['/emotes/'],
     names: {
       alien: '👽',
       amazed: '😲',
@@ -213,9 +192,6 @@ export const emojiPlatforms: Array<EmojiPlatform> = [
   },
   {
     name: 'Serendipity',
-    paths: [
-      '/emoticons/', // Both the stock template set and the emoticate plugin serve from here
-    ],
     names: {
       normal: '😐', // Its config binds this to `:-|`
       unhappy: '🙁', // And this to `:(`
@@ -226,9 +202,6 @@ export const emojiPlatforms: Array<EmojiPlatform> = [
   },
   {
     name: 'Khoros and Lithium',
-    paths: [
-      '/i/smilies/', // Fixed across boards, so it narrows where the theme-relative ones cannot
-    ],
     names: {
       '16x16_smiley-happy': '🙂',
       '16x16_smiley-wink': '😉',
@@ -249,9 +222,6 @@ export const emojiPlatforms: Array<EmojiPlatform> = [
   },
   {
     name: 'CKEditor, FCKeditor and TinyMCE',
-    paths: [
-      '/smiley/', // ProBoards serves the same set from here
-    ],
     names: {
       regular_smile: '🙂',
       teeth_smile: '😃',
@@ -277,69 +247,10 @@ export const emojiPlatforms: Array<EmojiPlatform> = [
     },
   },
   {
-    name: 'Invision Power Board and IPS',
-    classes: ['bbc_emoticon'],
-    attributes: ['data-emoticon'],
-    paths: [
-      '/emoticons/',
-      '/style_emoticons/', // IPB 2 and 3, which the plural form above misses
-    ],
-  },
-  {
-    name: 'XenForo',
-    paths: [
-      '/smilies/', // Cannot be narrowed either: styles/<theme>/xenforo/smilies/
-    ],
-    classes: [
-      'smilie',
-      /^mcesmilie/, // 1.x numbers them, as in `mceSmilieSprite mceSmilie7`
-    ],
-  },
-  {
-    name: 'Vanilla',
-    paths: [
-      '/resources/emoji/', // The only signal, since Vanilla's class is the generic `emoji`
-    ],
-    names: {
-      'simple-smile': '🙂',
-      'tongue-out': '😛',
-      'money-mouth': '🤑',
-    },
-  },
-  {
-    name: 'ArtStation',
-    paths: [
-      '/mailer/emoji/', // Also only the generic class, with a stock name in the filename
-    ],
-  },
-  {
-    name: 'Twemoji',
-    classes: [
-      'twemoji', // Homeland and pymdownx; twemoji.parse itself defaults to the generic `emoji`
-    ],
-    paths: [
-      'twemoji', // Every mirror names the set somewhere in the url, and files are codepoints
-      'twimg.com/emoji/', // Twitter's own copy, whose pastes carry translated alts
-    ],
-  },
-  {
-    name: 'Simple:Press',
-    paths: [
-      'forum-smileys/', // No leading slash before the directory
-    ],
-  },
-  {
     name: 'Serendipity, Drupal and Kunena',
-    paths: ['/emoticons/', '/smileys/'],
     names: {
       unsure: '😕', // Kunena's, seen at /media/kunena/emoticons/unsure.png
     },
-  },
-  {
-    name: 'phpBB template variable left unsubstituted',
-    paths: [
-      'SMILIES_PATH', // Raw or percent-encoded, since the braces may arrive escaped
-    ],
   },
   {
     // Filenames observed in real feeds whose engine was never pinned down. Kept apart from the
@@ -363,3 +274,49 @@ export const emojiPlatforms: Array<EmojiPlatform> = [
     },
   },
 ]
+
+export const smiliesEmojiNames = toMap(mergeEmojiNames(smiliesEmojiNameTables))
+
+const markerSelectors = [
+  'img[class~="smilies" i]', // phpBB
+  'img[class~="smiley" i]', // SMF, DokuWiki
+  'img[class~="smilie" i]', // MyBB, XenForo
+  'img[class^="mcesmilie" i]', // XenForo 1.x numbers them, as in `mceSmilieSprite mceSmilie7`
+  'img[class*=" mcesmilie" i]',
+  'img[class~="e-emoticon" i]', // e107
+  'img[class~="bbc_emoticon" i]', // Invision Power Board and IPS
+  'img[data-emoticon]', // Invision Power Board and IPS
+]
+const markerSelector = markerSelectors.join(', ')
+
+const directories = [
+  // WordPress, phpBB, MyBB, XenForo, FluxBB, PunBB and Khoros. Cannot be narrowed: both
+  // wp-includes and plugin icon sets sit under it, and the theme directory above differs per board.
+  '/smilies/',
+  '/smileys/', // SMF, DokuWiki's lib/images/smileys/, Drupal
+  '/smiley/', // CKEditor, FCKeditor and TinyMCE; ProBoards serves the same set from here
+  '/emotes/', // e107
+  '/emoticons/', // Serendipity's stock template set and emoticate plugin, IPS, Kunena
+  '/style_emoticons/', // IPB 2 and 3, which the plural form above misses
+  'forum-smileys/', // Simple:Press, with no leading slash before the directory
+  'SMILIES_PATH', // phpBB's template variable left unsubstituted, raw or percent-encoded
+]
+const directorySelector = directories.map((path) => `img[src*="${path}" i]`).join(', ')
+
+// Forum smilie images and CSS-sprite emoji, which render oversized or as nothing without site CSS.
+export const smiliesEmojiResolver: EmojiResolver = {
+  kind: 'emoji',
+  selector: `${markerSelector}, ${directorySelector}, img[data-shortname]`,
+  extract: (element) => {
+    // XenForo paints its sprite sheet behind a 1x1 transparent GIF named by data-shortname.
+    const src = element.getAttribute('src') ?? ''
+    const isSprite = !!attr(element, 'data-shortname') && rendersNothing(src)
+    const isStrong = isSprite || element.matches(markerSelector)
+
+    if (!isStrong && !element.matches(directorySelector)) {
+      return
+    }
+
+    return resolveEmojiImage(element, { isStrong, names: smiliesEmojiNames })
+  },
+}
