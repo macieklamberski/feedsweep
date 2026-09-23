@@ -37,15 +37,50 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  // Site-specific sets add codes like `|of|` for an officer, with no Unicode counterpart.
-  it('should mark a smilie whose shortcode is not in the table', async () => {
+  it('should replace a smilie by a code the board added', async () => {
     const value = html`
       <p>
         <img
-          src="https://example.com/upload/main/smiles/5/600.gif"
-          data-code="|of|"
-          alt="|of|"
-          title="Офицер"
+          src="https://example.com/upload/main/smiles/5/11.gif"
+          data-code="|do|"
+          alt="|do|"
+          title="Умираю от смеха"
+          class="bx-smile"
+        >
+      </p>
+    `
+    const expected = '<p>🤣</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  // The shared table reads `=)` as a plain smile, and these boards draw it laughing.
+  it('should prefer the board meaning of a code the shared table also carries', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://example.com/upload/main/smiles/5/ag.gif"
+          data-code="=)"
+          alt="=)"
+          title="Хохочу"
+          class="bx-smile"
+        >
+      </p>
+    `
+    const expected = '<p>😁</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  // A pipe-smoking face, and no emoji has a pipe.
+  it('should mark a smilie whose code has no counterpart', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://example.com/upload/main/smiles/5/180.gif"
+          data-code=":S:"
+          alt=":S:"
+          title="Трубка"
           class="bx-smile"
         >
       </p>
@@ -54,10 +89,10 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
       <p>
         <img
           data-emoji=""
-          src="https://example.com/upload/main/smiles/5/600.gif"
-          data-code="|of|"
-          alt="|of|"
-          title="Офицер"
+          src="https://example.com/upload/main/smiles/5/180.gif"
+          data-code=":S:"
+          alt=":S:"
+          title="Трубка"
           class="bx-smile"
         >
       </p>
