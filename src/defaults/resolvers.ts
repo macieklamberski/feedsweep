@@ -186,6 +186,7 @@ import { notoEmojiResolver } from '../emojis/noto.js'
 import { seesaaEmojiResolver } from '../emojis/seesaa.js'
 import { slackEmojiResolver } from '../emojis/slack.js'
 import { smiliesEmojiResolver } from '../emojis/smilies.js'
+import { tapatalkEmojiResolver } from '../emojis/tapatalk.js'
 import { telegramEmojiResolver } from '../emojis/telegram.js'
 import { twemojiEmojiResolver } from '../emojis/twemoji.js'
 import { vanillaEmojiResolver } from '../emojis/vanilla.js'
@@ -430,6 +431,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   mastodonEmojiResolver,
   weiboEmojiResolver,
   amebaEmojiResolver,
+  tapatalkEmojiResolver,
   livedoorEmojiResolver,
   seesaaEmojiResolver,
   exblogEmojiResolver,
