@@ -3,15 +3,14 @@ import type { EmojiResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { glyphFromShortcode, resolveEmojiImage } from '../utils/emojis.js'
 
-// Codes Bitrix boards add to the stock set, keyed in lower case. Looked up before the shared
-// table, since these boards draw `=)` as a laughing face, not a plain smile.
+// Codes FLOT.com and FlotProm.ru add to their Bitrix sets, keyed in lower case.
 const bitrixShortcodes = toMap({
-  '=)': '😁', // Хохочу, laughing hard
   'h-)': '😎', // В очках, in sunglasses
   '8-o': '😲', // Шокирован, shocked
   ':oz:': '😵‍💫', // Головокружение, dizzy
   ':q:': '🥲', // Улыбаюсь и плачу, smiling and crying
-  ':smoke:': '🚬', // Сижу курю, sitting and smoking
+  ':l:': '😅', // Виноват, my bad
+  ':smoke:': '🚬', // Сижу курю, sitting and smoking, from hi-fi.ru's set
   '|do|': '🤣', // Умираю от смеха, dying of laughter
   '|ap|': '👏', // Аплодирую, applauding
   '|agr|': '🙂‍↕️', // Согласен, agree, drawn nodding

@@ -54,24 +54,6 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  // The shared table reads `=)` as a plain smile, and these boards draw it laughing.
-  it('should prefer the board meaning of a code the shared table also carries', async () => {
-    const value = html`
-      <p>
-        <img
-          src="https://example.com/upload/main/smiles/5/ag.gif"
-          data-code="=)"
-          alt="=)"
-          title="Хохочу"
-          class="bx-smile"
-        >
-      </p>
-    `
-    const expected = '<p>😁</p>'
-
-    expect(await transform(value)).toEqualHtml(expected)
-  })
-
   // A pipe-smoking face, and no emoji has a pipe.
   it('should mark a smilie whose code has no counterpart', async () => {
     const value = html`
