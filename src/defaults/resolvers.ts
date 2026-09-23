@@ -172,6 +172,7 @@ import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
 import { bitrixEmojiResolver } from '../emojis/bitrix.js'
 import { cocologEmojiResolver } from '../emojis/cocolog.js'
+import { discordEmojiResolver } from '../emojis/discord.js'
 import { exblogEmojiResolver } from '../emojis/exblog.js'
 import { facebookEmojiResolver } from '../emojis/facebook.js'
 import { genericEmojiResolver } from '../emojis/generic.js'
@@ -431,6 +432,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   mastodonEmojiResolver,
   weiboEmojiResolver,
   amebaEmojiResolver,
+  discordEmojiResolver,
   tapatalkEmojiResolver,
   livedoorEmojiResolver,
   seesaaEmojiResolver,
