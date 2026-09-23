@@ -5,7 +5,7 @@ import type { MaybePromise } from 'trousse'
 import {
   defaultAvatarImageHosts,
   defaultDeferredIframeSources,
-  defaultEmojiImageHosts,
+  defaultEmojiResolvers,
   defaultFieldCleaners,
   defaultHighlightFn,
   defaultLazyIframeAttributes,
@@ -20,7 +20,9 @@ import {
   defaultWidgetResolvers,
 } from './defaults.js'
 import { parseHtml as parseWithLinkedom } from './parsers/linkedom.js'
+import { convertEmojis } from './transforms/dom/convertEmojis.js'
 import type { TransformContext } from './types.js'
+import { applyDomTransforms } from './utils/transforms.js'
 import { cleanResultFields } from './utils/widgets.js'
 
 // Test adapters are synchronous, unlike the public `ParseHtmlFn` which allows a
@@ -30,7 +32,7 @@ type ParseHtml = (html: string) => Document
 export const baseContext: TransformContext = {
   widgetResolvers: defaultWidgetResolvers,
   mediaSrcAttributes: defaultMediaSrcAttributes,
-  emojiImageHosts: defaultEmojiImageHosts,
+  emojiResolvers: defaultEmojiResolvers,
   avatarImageHosts: defaultAvatarImageHosts,
   nonContentSelectors: defaultNonContentSelectors,
   preservedPreClasses: defaultPreservedPreClasses,
@@ -92,6 +94,22 @@ export const resolverExtractor = <Result>(parseHtml: ParseHtml, resolver: AnyRes
 
     return result && cleanResultFields(result, baseContext)
   }
+}
+
+// Runs markup through convertEmojis with the default resolvers, since which resolver claims an
+// image depends on the ones registered ahead of it.
+export const emojiConverters = (parseHtml: ParseHtml) => {
+  const transform = (value: string): Promise<string> => {
+    return applyDomTransforms(parseHtml(value), [convertEmojis(baseContext)])
+  }
+
+  // An emoji image that keeps its picture is also marked. The marker has its own tests in
+  // convertEmojis, so it is dropped here to keep each case about the reason the image was kept.
+  const transformKeeping = async (value: string): Promise<string> => {
+    return (await transform(value)).replaceAll(' data-emoji=""', '')
+  }
+
+  return { transform, transformKeeping }
 }
 
 // The value side of jsonAttr: a payload with its quotes entity-encoded, or a string as written.

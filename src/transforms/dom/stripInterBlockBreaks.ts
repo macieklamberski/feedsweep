@@ -1,6 +1,6 @@
 import type { DomTransform } from '../../types.js'
 import { isBlockElement, isBr, isElement, isMediaElement, isSkippable } from '../../utils/dom.js'
-import { emojiImageAttribute } from './unwrapEmojiImages.js'
+import { emojiImageAttribute } from '../../utils/emojis.js'
 
 // An emoji image sits inside the line like text, so the <br> after it is a break the author meant.
 const isEmojiImage = (node: Node): boolean => {

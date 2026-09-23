@@ -168,6 +168,19 @@ import { wistiaEmbedResolver } from '../embeds/wistia.js'
 import { youkuEmbedResolver } from '../embeds/youku.js'
 import { youtubeAmpEmbedResolver, youtubeIframeEmbedResolver } from '../embeds/youtube.js'
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
+import { amebaEmojiResolver } from '../emojis/ameba.js'
+import { artstationEmojiResolver } from '../emojis/artstation.js'
+import { facebookEmojiResolver } from '../emojis/facebook.js'
+import { genericEmojiResolver } from '../emojis/generic.js'
+import { githubEmojiResolver } from '../emojis/github.js'
+import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
+import { mastodonEmojiResolver } from '../emojis/mastodon.js'
+import { smiliesEmojiResolver } from '../emojis/smilies.js'
+import { telegramEmojiResolver } from '../emojis/telegram.js'
+import { twemojiEmojiResolver } from '../emojis/twemoji.js'
+import { vanillaEmojiResolver } from '../emojis/vanilla.js'
+import { weiboEmojiResolver } from '../emojis/weibo.js'
+import { wordpressEmojiResolver } from '../emojis/wordpress.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { ghostMediaResolver } from '../media/ghost.js'
 import { podloveMediaResolver } from '../media/podlove.js'
@@ -175,7 +188,13 @@ import { substackMediaResolver } from '../media/substack.js'
 import { wechatMediaResolver } from '../media/wechat.js'
 import { weeblyMediaResolver } from '../media/weebly.js'
 import { wikimediaMediaResolver } from '../media/wikimedia.js'
-import type { CiteResolver, EmbedResolver, MediaResolver, WidgetResolver } from '../types.js'
+import type {
+  CiteResolver,
+  EmbedResolver,
+  EmojiResolver,
+  MediaResolver,
+  WidgetResolver,
+} from '../types.js'
 
 // Alphabetical by platform, so a new resolver lands on its own line instead of at the tail.
 // Order still matters when selectors overlap: each resolver runs in array order and a claimed
@@ -375,4 +394,24 @@ export const defaultWidgetResolvers: Array<WidgetResolver> = [
   ...embedResolvers,
   ...mediaResolvers,
   ...citeResolvers,
+]
+
+// First claim wins, so every resolver that reads a filename sits ahead of the ones that only
+// mark: an image on a CDN host can still carry a forum class whose table resolves it.
+export const defaultEmojiResolvers: Array<EmojiResolver> = [
+  telegramEmojiResolver,
+  smiliesEmojiResolver,
+  // Ahead of WordPress, whose WordPress.com host serves Twemoji files named by codepoint.
+  twemojiEmojiResolver,
+  wordpressEmojiResolver,
+  vanillaEmojiResolver,
+  artstationEmojiResolver,
+  joypixelsEmojiResolver,
+  facebookEmojiResolver,
+  githubEmojiResolver,
+  mastodonEmojiResolver,
+  weiboEmojiResolver,
+  amebaEmojiResolver,
+  // Last, since the class is shared by engines whose own signals say more.
+  genericEmojiResolver,
 ]
