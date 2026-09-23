@@ -293,7 +293,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           <img data-emoticon="" src="https://example.com/uploads/emoticons/biggrin@2x.png" alt="">
         </p>
       `
-      const expected = '<p>😃</p>'
+      const expected = '<p>😁</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
