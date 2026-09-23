@@ -2,6 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, queryElement } from '../tests.js'
 import {
   attr,
+  batchSelectors,
   find,
   findConfigScript,
   flashVar,
@@ -1331,5 +1332,34 @@ describe('keepIfMatches', () => {
     expect(keepIfMatches('', safeIdRegex)).toBeUndefined()
     expect(keepIfMatches(null, safeIdRegex)).toBeUndefined()
     expect(keepIfMatches(undefined, safeIdRegex)).toBeUndefined()
+  })
+})
+
+describe('batchSelectors', () => {
+  it('should return one batch when the selectors fit', () => {
+    const value = ['.ad', 'iframe[src*="example.com"]', '#sidebar']
+
+    expect(batchSelectors(value)).toEqual(['.ad,iframe[src*="example.com"],#sidebar'])
+  })
+
+  // The selector engine jsdom uses refuses anything over 2048 characters.
+  it('should split selectors that would exceed the engine limit', () => {
+    const value = Array.from({ length: 40 }, (_, index) => `.${'a'.repeat(60)}${index}`)
+    const batches = batchSelectors(value)
+
+    expect(batches.length).toBeGreaterThan(1)
+    expect(Math.max(...batches.map((batch) => batch.length))).toBeLessThanOrEqual(2048)
+    expect(batches.join(',').split(',')).toEqual(value)
+  })
+
+  it('should keep a selector longer than the limit in a batch of its own', () => {
+    const value = [`.${'a'.repeat(2100)}`, '.ad']
+    const batches = batchSelectors(value)
+
+    expect(batches).toEqual([`.${'a'.repeat(2100)}`, '.ad'])
+  })
+
+  it('should return no batches for no selectors', () => {
+    expect(batchSelectors([])).toEqual([])
   })
 })

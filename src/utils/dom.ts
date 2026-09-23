@@ -286,6 +286,27 @@ export const hasAncestorWithTagName = (node: Node, tagSet: Set<string>, stopAt?:
   return false
 }
 
+// The selector engine jsdom uses refuses anything over 2048 characters, and the default
+// non-content list is longer than that, so a caller queries one batch at a time.
+const maxSelectorLength = 2000
+
+export const batchSelectors = (selectors: ReadonlyArray<string>): Array<string> => {
+  const batches: Array<Array<string>> = []
+  let length = maxSelectorLength
+
+  for (const selector of selectors) {
+    if (length + selector.length + 1 > maxSelectorLength) {
+      batches.push([])
+      length = 0
+    }
+
+    batches[batches.length - 1].push(selector)
+    length += selector.length + 1
+  }
+
+  return batches.map((batch) => batch.join(','))
+}
+
 export const generatedWrapperTypes = ['embed', 'cite', 'table', 'pre'] as const
 
 export type GeneratedWrapperType = (typeof generatedWrapperTypes)[number]
