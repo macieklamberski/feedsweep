@@ -190,6 +190,8 @@ const specimens: Record<string, string | [string, string]> = {
     '<drupal-render-placeholder callback="comment.lazy_builders:renderLinks" arguments="0=node:1"></drupal-render-placeholder>',
   '.mcnPreviewText': '<span class="mcnPreviewText" style="display:none">Preview text</span>',
   '.tmblr-alt-text-helper': '<span class="tmblr-alt-text-helper">ALT</span>',
+  'iframe.wp-embedded-content[src*="/embed/"]':
+    '<iframe class="wp-embedded-content" src="https://example.com/post/embed/#?secret=abc" sandbox="allow-scripts" security="restricted"></iframe>',
   'img[src*="steamcommunity.com"][src*="placeholder"]':
     '<img src="https://cdn.steamcommunity.com/news/placeholder_video.gif">',
   'script[consent-original-src-_]':
@@ -293,6 +295,16 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
 
     it('should keep a read-more wrapper that holds real content (anchor-scoped)', async () => {
       const value = '<div class="read-more-section"><p>Body</p></div>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // WordPress stamps `wp-embedded-content` on the frame it renders for any oEmbed provider,
+    // not only for another WordPress post. Only the `/embed/` handshake url renders nothing, so
+    // only that is stripped: an outside provider's frame has to survive for its cite resolver.
+    it('should keep a wp-embedded-content frame that is not the handshake url', async () => {
+      const value =
+        '<iframe class="wp-embedded-content" src="https://www.nytimes.com/svc/oembed/html/?url=https%3A%2F%2Fwww.nytimes.com%2Fstory.html"></iframe>'
 
       expect(await transform(value)).toEqualHtml(value)
     })
