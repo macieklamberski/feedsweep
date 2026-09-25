@@ -178,6 +178,7 @@ import { facebookEmojiResolver } from '../emojis/facebook.js'
 import { genericEmojiResolver } from '../emojis/generic.js'
 import { githubElementEmojiResolver, githubImageEmojiResolver } from '../emojis/github.js'
 import { gitlabEmojiResolver } from '../emojis/gitlab.js'
+import { gmailEmojiResolver } from '../emojis/gmail.js'
 import { jiveEmojiResolver } from '../emojis/jive.js'
 import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
 import { jugemEmojiResolver } from '../emojis/jugem.js'
@@ -432,6 +433,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   githubImageEmojiResolver,
   slackEmojiResolver,
   notoEmojiResolver,
+  gmailEmojiResolver,
   vkEmojiResolver,
   maxEmojiResolver,
   mastodonEmojiResolver,
