@@ -324,49 +324,51 @@ const embedResolvers: Array<EmbedResolver> = [
   peertubeEmbedResolver,
 ]
 
+// Alphabetical by platform. Wikimedia's bare `iframe` selector sits last so a host-keyed
+// resolver gets the carrier first.
 const mediaResolvers: Array<MediaResolver> = [
-  wikimediaMediaResolver,
-  substackMediaResolver,
-  weeblyMediaResolver,
-  wechatMediaResolver,
-  ghostMediaResolver,
   discourseMediaResolver,
+  ghostMediaResolver,
   podloveMediaResolver,
+  substackMediaResolver,
+  wechatMediaResolver,
+  weeblyMediaResolver,
+  wikimediaMediaResolver,
 ]
 
-// Order matters here too: a resolver replaces the element it matches, so a later one never
-// sees it. No two selectors below overlap today, so nothing depends on the current order. Keep
-// the more specific one first if that ever changes.
+// Alphabetical by platform. A resolver replaces the element it matches, so a later one never
+// sees it, and a broader selector leaves the alphabet and moves below.
 const citeResolvers: Array<CiteResolver> = [
+  affingerCiteResolver,
+  amebaCiteResolver,
+  blogCardCiteResolver,
+  buddybossCiteResolver,
+  buddypressCiteResolver,
+  cocoonCiteResolver,
+  devtoLinkCiteResolver,
+  devtoPostCiteResolver,
+  devtoLegacyPostCiteResolver,
+  discourseCiteResolver,
+  embedlyCiteResolver,
   ghostCiteResolver,
+  hatenaCiteResolver,
+  mediumCiteResolver,
+  nodebbCiteResolver,
+  notecomCiteResolver,
+  nytimesCiteResolver,
+  paragraphCiteResolver,
+  pzlinkcardCiteResolver,
   substackOwnPostCiteResolver,
   substackCrossPostCiteResolver,
   substackPostEmbedCiteResolver,
   substackPublicationCiteResolver,
-  cocoonCiteResolver,
-  blogCardCiteResolver,
-  discourseCiteResolver,
   swellCiteResolver,
-  xenforoCiteResolver,
-  microformatsCiteResolver,
-  amebaCiteResolver,
-  tistoryCiteResolver,
   tcdCiteResolver,
-  hatenaCiteResolver,
-  devtoLinkCiteResolver,
-  nodebbCiteResolver,
-  buddybossCiteResolver,
-  buddypressCiteResolver,
-  pzlinkcardCiteResolver,
-  notecomCiteResolver,
-  nytimesCiteResolver,
+  tistoryCiteResolver,
   tumblrCiteResolver,
-  embedlyCiteResolver,
-  paragraphCiteResolver,
-  devtoPostCiteResolver,
-  devtoLegacyPostCiteResolver,
-  affingerCiteResolver,
-  mediumCiteResolver,
+  xenforoCiteResolver,
+  // Last, outside the alphabet: `.h-cite` is generic markup any card may also carry.
+  microformatsCiteResolver,
 ]
 
 export const defaultWidgetResolvers: Array<WidgetResolver> = [
