@@ -163,6 +163,11 @@ export const defaultNonContentSelectors = [
   // Gleam competition mount. The loader would replace it with the entry form; without it the
   // anchor survives as a bare link named after the competition.
   'a.e-widget',
+  // Goodreads giveaway widget: a static card with the cover, the title, the closing date and an
+  // "Enter Giveaway" button, wrapped in a div whose id the script targets. The card is the
+  // widget's own fallback and is also pasted on its own without the wrapper.
+  '[id^="goodreadsGiveawayWidget"]',
+  '.goodreadsGiveawayWidget',
 
   // Ticketing, donation and membership widgets, which are chrome around a transaction rather
   // than anything the item is about.
