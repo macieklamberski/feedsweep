@@ -78,6 +78,7 @@ import {
   facebookAmpEmbedResolver,
   facebookBlockquoteEmbedResolver,
   facebookIframeEmbedResolver,
+  facebookS9eEmbedResolver,
   facebookWidgetEmbedResolver,
   facebookXfbmlEmbedResolver,
 } from '../embeds/facebook.js'
@@ -90,11 +91,16 @@ import { geniallyEmbedResolver } from '../embeds/genially.js'
 import { gettyImagesEmbedResolver } from '../embeds/gettyimages.js'
 import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds/glomex.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
-import { imgurBlockquoteEmbedResolver, imgurIframeEmbedResolver } from '../embeds/imgur.js'
+import {
+  imgurBlockquoteEmbedResolver,
+  imgurIframeEmbedResolver,
+  imgurS9eEmbedResolver,
+} from '../embeds/imgur.js'
 import {
   instagramAmpEmbedResolver,
   instagramBlockquoteEmbedResolver,
   instagramIframeEmbedResolver,
+  instagramS9eEmbedResolver,
   instagramSubstackEmbedResolver,
 } from '../embeds/instagram.js'
 import { issuuIframeEmbedResolver, issuuWidgetEmbedResolver } from '../embeds/issuu.js'
@@ -126,7 +132,11 @@ import { podetizeIframeEmbedResolver, podetizeScriptEmbedResolver } from '../emb
 import { podigeeIframeEmbedResolver, podigeeScriptEmbedResolver } from '../embeds/podigee.js'
 import { podomaticEmbedResolver } from '../embeds/podomatic.js'
 import { redcircleIframeEmbedResolver, redcircleScriptEmbedResolver } from '../embeds/redcircle.js'
-import { redditIframeEmbedResolver, redditWidgetEmbedResolver } from '../embeds/reddit.js'
+import {
+  redditIframeEmbedResolver,
+  redditS9eEmbedResolver,
+  redditWidgetEmbedResolver,
+} from '../embeds/reddit.js'
 import { reverbnationEmbedResolver } from '../embeds/reverbnation.js'
 import { rtveFlashEmbedResolver, rtveIframeEmbedResolver } from '../embeds/rtve.js'
 import { rutubeEmbedResolver } from '../embeds/rutube.js'
@@ -147,14 +157,23 @@ import { spreakerAnchorEmbedResolver, spreakerIframeEmbedResolver } from '../emb
 import { stackblitzIframeEmbedResolver } from '../embeds/stackblitz.js'
 import { standfmEmbedResolver } from '../embeds/standfm.js'
 import { tedEmbedResolver } from '../embeds/ted.js'
-import { telegramIframeEmbedResolver, telegramScriptEmbedResolver } from '../embeds/telegram.js'
+import {
+  telegramIframeEmbedResolver,
+  telegramS9eEmbedResolver,
+  telegramScriptEmbedResolver,
+} from '../embeds/telegram.js'
 import { tencentEmbedResolver } from '../embeds/tencent.js'
-import { tiktokBlockquoteEmbedResolver, tiktokIframeEmbedResolver } from '../embeds/tiktok.js'
+import {
+  tiktokBlockquoteEmbedResolver,
+  tiktokIframeEmbedResolver,
+  tiktokS9eEmbedResolver,
+} from '../embeds/tiktok.js'
 import { transistorEmbedResolver } from '../embeds/transistor.js'
 import {
   twitterAmpEmbedResolver,
   twitterBlockquoteEmbedResolver,
   twitterIframeEmbedResolver,
+  twitterS9eEmbedResolver,
   twitterSubstackEmbedResolver,
 } from '../embeds/twitter.js'
 import { typeformIframeEmbedResolver, typeformWidgetEmbedResolver } from '../embeds/typeform.js'
@@ -222,6 +241,7 @@ const embedResolvers: Array<EmbedResolver> = [
   donorboxEmbedResolver,
   facebookWidgetEmbedResolver,
   facebookIframeEmbedResolver,
+  facebookS9eEmbedResolver,
   facebookBlockquoteEmbedResolver,
   facebookXfbmlEmbedResolver,
   facebookAmpEmbedResolver,
@@ -239,10 +259,12 @@ const embedResolvers: Array<EmbedResolver> = [
   guardianEmbedResolver,
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
+  imgurS9eEmbedResolver,
   instagramBlockquoteEmbedResolver,
   instagramAmpEmbedResolver,
   instagramSubstackEmbedResolver,
   instagramIframeEmbedResolver,
+  instagramS9eEmbedResolver,
   issuuWidgetEmbedResolver,
   issuuIframeEmbedResolver,
   ivooxEmbedResolver,
@@ -277,6 +299,7 @@ const embedResolvers: Array<EmbedResolver> = [
   redcircleIframeEmbedResolver,
   redditWidgetEmbedResolver,
   redditIframeEmbedResolver,
+  redditS9eEmbedResolver,
   reverbnationEmbedResolver,
   rtveIframeEmbedResolver,
   rtveFlashEmbedResolver,
@@ -298,14 +321,17 @@ const embedResolvers: Array<EmbedResolver> = [
   tedEmbedResolver,
   telegramScriptEmbedResolver,
   telegramIframeEmbedResolver,
+  telegramS9eEmbedResolver,
   tencentEmbedResolver,
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
+  tiktokS9eEmbedResolver,
   transistorEmbedResolver,
   twitterBlockquoteEmbedResolver,
   twitterAmpEmbedResolver,
   twitterSubstackEmbedResolver,
   twitterIframeEmbedResolver,
+  twitterS9eEmbedResolver,
   typeformWidgetEmbedResolver,
   typeformIframeEmbedResolver,
   videopressIframeEmbedResolver,
