@@ -155,4 +155,21 @@ describeForEachParser('WordPress', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  // Core binds :evil: to icon_evil.gif, an angry devil, and the alt is read before the filename.
+  it('should replace an :evil: smiley with the angry devil its file draws', async () => {
+    const value = html`
+      <p>Grr
+        <img
+          src="https://example.com/wp-includes/images/smilies/icon_evil.gif"
+          alt=":evil:"
+          class="wp-smiley"
+          style="height: 1em; max-height: 1em;"
+        >
+      </p>
+    `
+    const expected = '<p>Grr 👿</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })
