@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { getPathSegments, isHttpUrl, parseUrl } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { pickUrlParams } from '../utils/urls.js'
@@ -10,9 +10,6 @@ type PeertubeVideo = {
   origin: string
   id: string
 }
-
-// A javascript: url parses with a matching pathname, and its origin is the string null.
-const embeddableProtocols = ['https:', 'http:']
 
 // The two spellings PeerTube writes a video id in: the uuid, and the 22-character short form its
 // short-uuid translator produces over the flickrBase58 alphabet, which holds no 0, O, I or l.
@@ -45,7 +42,8 @@ const readPathId = (segments: Array<string>): string | undefined => {
 const parseVideo = (link: string): PeertubeVideo | undefined => {
   const url = parseUrl(link)
 
-  if (!url || !isAnyOf(url.protocol, embeddableProtocols)) {
+  // A javascript: url parses with a matching pathname, and its origin is the string null.
+  if (!url || !isHttpUrl(url)) {
     return
   }
 

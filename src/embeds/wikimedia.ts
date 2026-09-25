@@ -1,8 +1,7 @@
-import { parseUrl } from 'trousse'
+import { decodeSegment, parseUrl } from 'trousse'
 import type { EmbedResolver, EmbedResolverResult } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
-  decodeOrKeep,
   isMediaWikiFilePage,
   parseMediaWikiFileName,
   placeholderBaseUrl,
@@ -23,7 +22,9 @@ const posterWidth = 960
 
 // Commons spells a name `Amy_Johnson_England_to_Australia_Solo_Flight,_1930.webm`.
 export const composeFileTitle = (fileName: string): string | undefined => {
-  return decodeOrKeep(fileName)?.replace(extensionRegex, '').replace(underscoreRegex, ' ')
+  return (decodeSegment(fileName) ?? fileName)
+    .replace(extensionRegex, '')
+    .replace(underscoreRegex, ' ')
 }
 
 // `Special:FilePath/{name}` redirects to the file itself, keyed on the name alone, with no

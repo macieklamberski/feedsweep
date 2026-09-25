@@ -1,8 +1,8 @@
-import { isPlainObject, parseUrl } from 'trousse'
+import { isHostOrSubdomainOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { isOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'twitter'
@@ -27,7 +27,7 @@ const tweetHosts = [
 const nitterHostRegex = /(^|\.)nitter\./
 
 const isTweetUrl = (url: URL): boolean => {
-  const isKnownHost = isOnHosts(url, tweetHosts)
+  const isKnownHost = isHostOrSubdomainOf(url, tweetHosts)
 
   return isKnownHost || nitterHostRegex.test(url.hostname)
 }

@@ -1,7 +1,6 @@
-import { getPathSegments } from 'trousse'
+import { decodeSegment, getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { decodeSegment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The urn LinkedIn writes into the embed path. Feeds carry `share`, `ugcPost` and `activity`.
