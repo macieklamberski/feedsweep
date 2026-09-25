@@ -16,6 +16,7 @@ import { decodeDoubleEncodedTags } from '../transforms/dom/decodeDoubleEncodedTa
 import { demoteHeadings } from '../transforms/dom/demoteHeadings.js'
 import { enrichCitePlaceholders } from '../transforms/dom/enrichCitePlaceholders.js'
 import { enrichEmbedPlaceholders } from '../transforms/dom/enrichEmbedPlaceholders.js'
+import { fixDropboxMediaUrls } from '../transforms/dom/fixDropboxMediaUrls.js'
 import { fixLazyAudios } from '../transforms/dom/fixLazyAudios.js'
 import { fixLazyIframes } from '../transforms/dom/fixLazyIframes.js'
 import { fixLazyImages } from '../transforms/dom/fixLazyImages.js'
@@ -245,6 +246,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   fixLazyIframes,
   convertWidgets,
   injectEnclosures,
+  // Runs after injectEnclosures, and so after the heuristic stripDuplicateEnclosures folded in
+  // beside it, which matches an injected enclosure against the body on the exact src. Before
+  // neutralizeUnsafeUrls and proxyAssetUrls, so the repaired url is the one they see.
+  fixDropboxMediaUrls,
   // Fills embed placeholder metadata via the caller's enrichEmbedFn. No-ops when that
   // option is unset. Runs after placeholders exist and before neutralize/proxy so any
   // enriched URLs are still neutralized and proxied.
