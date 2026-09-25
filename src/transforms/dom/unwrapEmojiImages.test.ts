@@ -1295,7 +1295,9 @@ describeForEachParser('unwrapEmojiImages', (parseHtml) => {
         { name: 'two', names: { happy: '😄' } },
       ]
 
-      expect(() => mergeEmojiNames(conflicting)).toThrow(conflictingNameRegex)
+      const throwing = () => mergeEmojiNames(conflicting)
+
+      expect(throwing).toThrow(conflictingNameRegex)
     })
 
     it('should accept the same filename when the platforms agree', () => {
