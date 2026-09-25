@@ -13,6 +13,8 @@ const scribdFlashHosts = [...scribdHosts, 'scribdassets.com']
 
 const safeDocumentIdRegex = /^\d+$/
 
+const documentIdMarkers = ['embeds', 'document', 'doc']
+
 const flashPlayerPathRegex = /\/scribdviewer\.swf$/i
 
 // The snippet states `height="500"` whatever the document's real shape is, which is why
@@ -33,9 +35,7 @@ const composeEmbed = (document: string): EmbedResolverResult => {
 
 const readDocumentId = (parsed: URL): string | undefined => {
   const segments = getPathSegments(parsed)
-  const marker = segments.findIndex((segment) => {
-    return segment === 'embeds' || segment === 'document' || segment === 'doc'
-  })
+  const marker = segments.findIndex((segment) => documentIdMarkers.includes(segment))
   const document = marker < 0 ? undefined : segments[marker + 1]
 
   return keepIfMatches(document, safeDocumentIdRegex)

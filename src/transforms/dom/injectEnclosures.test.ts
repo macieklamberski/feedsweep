@@ -1000,7 +1000,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
   // Untrusted feed data doesn't honor the required-`url` type.
   it('should skip an enclosure without a url instead of throwing', async () => {
     const value = '<p>Episode notes</p>'
-    const result = await transform(value, withEnclosures([{ type: 'image/png' } as Enclosure]))
+    const result = await transform(value, withEnclosures([{ type: 'image/png' }]))
 
     expect(result).toEqualHtml(value)
   })
@@ -1008,7 +1008,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
   it('should skip a malformed enclosure while still injecting valid ones', async () => {
     const value = '<p>Episode notes</p>'
     const context = withEnclosures([
-      { type: 'image/png' } as Enclosure,
+      { type: 'image/png' },
       { url: 'https://example.com/episode.mp3', type: 'audio/mpeg' },
     ])
     const expected = html`

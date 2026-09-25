@@ -47,10 +47,13 @@ const sitePathSegments = new Set([
   'watch',
 ])
 
+// `/ondemand/{name}/{id}` and `/channels/{name}/{id}` name the video in the third segment.
+const namedCollectionPaths = ['ondemand', 'channels']
+
 // An event names its videos under `/videos/`, but its bare and `/embed` forms are the common ones
 // and both would read as a video here.
 const readCollectionVideoId = (segments: Array<string>): string | undefined => {
-  if (segments[0] === 'showcase' || segments[0] === 'album') {
+  if (showcasePaths.has(segments[0])) {
     return segments[2] === 'video' ? segments[3] : undefined
   }
 
@@ -58,7 +61,7 @@ const readCollectionVideoId = (segments: Array<string>): string | undefined => {
     return segments[2] === 'videos' ? segments[3] : undefined
   }
 
-  if (segments[0] === 'ondemand' || segments[0] === 'channels') {
+  if (namedCollectionPaths.includes(segments[0])) {
     return segments.length === 3 ? segments[2] : undefined
   }
 }

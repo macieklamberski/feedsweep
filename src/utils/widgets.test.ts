@@ -350,12 +350,13 @@ describeForEachParser('updateCitePlaceholder', (parseHtml) => {
   it('should ignore keys that are not cite fields', () => {
     const document = parseHtml('')
     const element = document.createElement('div')
-
-    updateCitePlaceholder(element, {
+    const value = {
       title: 'Post title',
       media_key: '0b043233:b33b79b8',
       'invalid name': 'value',
-    } as Partial<CiteResolverResult>)
+    }
+
+    updateCitePlaceholder(element, value)
 
     expect(element.outerHTML).toEqualHtml('<div data-cite-title="Post title"></div>')
   })

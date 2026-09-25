@@ -6,7 +6,7 @@ import { createIframe } from '../../utils/widgets.js'
 
 // `start` carries a whole-second offset. Guard it so only digits reach the URL and a
 // crafted value can't inject extra query params.
-const startSecondsPattern = /^\d+$/
+const startSecondsRegex = /^\d+$/
 
 type EmbedSource = {
   params: ReadonlyArray<string>
@@ -40,7 +40,7 @@ export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
     const params = pickQueryParams(element.getAttribute('params') ?? '', source.params)
     const start = element.getAttribute('start')
 
-    if (start && startSecondsPattern.test(start)) {
+    if (start && startSecondsRegex.test(start)) {
       params.start = start
     }
 

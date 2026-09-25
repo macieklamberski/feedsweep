@@ -17,6 +17,8 @@ const nicovideoHosts = ['nicovideo.jp']
 // news.nicovideo.jp/watch/nw{digits}.
 const nonVideoHosts = ['seiga.nicovideo.jp', 'manga.nicovideo.jp', 'news.nicovideo.jp']
 
+const videoIdMarkers = ['thumb_watch', 'thumb', 'watch', 'embed']
+
 export const extractNicovideoId = (link: string): string | undefined => {
   // The script selector matches on a substring, so any host can spell `nicovideo.jp/thumb_watch`
   // inside its own path and reach this. The path shape alone must not mint a nicovideo url.
@@ -28,11 +30,7 @@ export const extractNicovideoId = (link: string): string | undefined => {
   }
 
   const segments = getPathSegments(parsed)
-  const marker = segments.findIndex((segment) => {
-    return (
-      segment === 'thumb_watch' || segment === 'thumb' || segment === 'watch' || segment === 'embed'
-    )
-  })
+  const marker = segments.findIndex((segment) => videoIdMarkers.includes(segment))
 
   return keepIfMatches(marker < 0 ? undefined : segments[marker + 1], safeVideoIdRegex)
 }

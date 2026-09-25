@@ -300,23 +300,30 @@ describe('imgurResolveEmbed', () => {
       expect(imgurResolveEmbed(value)).toBeUndefined()
     })
 
-    it.each([
+    const galleryListingUrls: Array<string> = [
       'https://imgur.com/gallery/hot',
       'https://imgur.com/gallery/new',
       'https://imgur.com/gallery/top',
       'https://imgur.com/gallery/trending',
-    ])('should ignore %s, a gallery listing sitting where an album id would', (value) => {
-      expect(imgurResolveEmbed(value)).toBeUndefined()
-    })
+    ]
 
-    // The hyphen is what says where the id starts, so a single word is read whole and a word
-    // longer than an id is not one.
-    it.each(['https://imgur.com/gallery/this-is-why', 'https://imgur.com/gallery/misadventures'])(
-      'should ignore %s, which ends in no id',
+    it.each(galleryListingUrls)(
+      'should ignore %s, a gallery listing sitting where an album id would',
       (value) => {
         expect(imgurResolveEmbed(value)).toBeUndefined()
       },
     )
+
+    // The hyphen is what says where the id starts, so a single word is read whole and a word
+    // longer than an id is not one.
+    const idlessGalleryUrls: Array<string> = [
+      'https://imgur.com/gallery/this-is-why',
+      'https://imgur.com/gallery/misadventures',
+    ]
+
+    it.each(idlessGalleryUrls)('should ignore %s, which ends in no id', (value) => {
+      expect(imgurResolveEmbed(value)).toBeUndefined()
+    })
   })
 
   it('should ignore another host carrying the post path', () => {
@@ -352,12 +359,14 @@ describe('imgurResolveEmbed', () => {
       expect(imgurResolveEmbed(value)).toEqual(expected)
     })
 
-    it.each([
+    const fileUrls: Array<string> = [
       'https://i.imgur.com/pVa2rXL',
       'https://i.imgur.com/pVa2rXL.mp4',
       'https://s.imgur.com/min/embed.js',
       'https://i.stack.imgur.com/pVa2rXL.png',
-    ])('should ignore %s, which names a file rather than a post', (value) => {
+    ]
+
+    it.each(fileUrls)('should ignore %s, which names a file rather than a post', (value) => {
       expect(imgurResolveEmbed(value)).toBeUndefined()
     })
   })

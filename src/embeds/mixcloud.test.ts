@@ -40,7 +40,7 @@ describe('extractMixcloudShow', () => {
 
   // Each of these takes the shape of a show and is a page of the site instead. The show above
   // is the control: it has the same two-segment shape and still reads.
-  it.each([
+  const sitePageUrls: Array<string> = [
     'https://www.mixcloud.com/discover/house/',
     'https://www.mixcloud.com/genres/house/',
     'https://www.mixcloud.com/categories/house/',
@@ -60,7 +60,9 @@ describe('extractMixcloudShow', () => {
     'https://www.mixcloud.com/photogmusic/select/',
     'https://www.mixcloud.com/photogmusic/subscribe/',
     'https://www.mixcloud.com/photogmusic/dashboard/',
-  ])('should return undefined for the site page %s', (value) => {
+  ]
+
+  it.each(sitePageUrls)('should return undefined for the site page %s', (value) => {
     expect(extractMixcloudShow(value)).toBeUndefined()
   })
 
@@ -132,11 +134,13 @@ describe('extractMixcloudShow', () => {
 
   // The audio, the artwork and their subdomains are all on the host list, and each file path
   // carries the two segments a show does, so nothing but the file name tells them apart.
-  it.each([
+  const fileUrls: Array<string> = [
     'https://audio.mixcloud.com/x/y.m4a',
     'https://stream.mixcloud.com/c/set.mp3',
     'https://thumbnailer.mixcloud.com/unsafe/cover.jpg',
-  ])('should return undefined for the file %s', (value) => {
+  ]
+
+  it.each(fileUrls)('should return undefined for the file %s', (value) => {
     expect(extractMixcloudShow(value)).toBeUndefined()
   })
 })

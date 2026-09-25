@@ -51,7 +51,7 @@ export const stackblitzResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const title = attr(element, 'title') || undefined
+  const title = attr(element, 'title')
   const project = `https://stackblitz.com/edit/${target.id}`
 
   return {

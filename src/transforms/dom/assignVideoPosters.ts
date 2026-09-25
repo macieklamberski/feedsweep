@@ -8,7 +8,7 @@ import { enclosureMarker } from './injectEnclosures.js'
 // A YouTube thumbnail URL carries the video id in a `/vi/{id}/` segment, e.g.
 // https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg. extractVideoId only reads
 // watch/embed/short URLs, so the poster side needs its own match.
-const thumbnailIdPattern = /\/vi\/([a-zA-Z0-9_-]{11})\//
+const thumbnailIdRegex = /\/vi\/([a-zA-Z0-9_-]{11})\//
 
 // A player without a resolver, like JW Player, carries no data-embed-provider to match on.
 const videoHostFragments = [
@@ -24,7 +24,7 @@ const videoHostFragments = [
   'streamable.com', // Streamable
   'v.redd.it', // Reddit-hosted video
 ]
-const videoHostPattern = new RegExp(videoHostFragments.map(escapeRegex).join('|'), 'i')
+const videoHostRegex = new RegExp(videoHostFragments.map(escapeRegex).join('|'), 'i')
 
 // Map each embedded video's id to its element (placeholders carry data-embed-*, a
 // raw iframe carries src) so an id-matched poster image can be moved onto it.
@@ -67,7 +67,7 @@ const findVideoElement = (document: Document): Element | undefined => {
 
   for (const element of document.querySelectorAll('[data-embed-src], iframe[src]')) {
     const src = element.getAttribute('data-embed-src') ?? element.getAttribute('src') ?? ''
-    if (videoHostPattern.test(src)) {
+    if (videoHostRegex.test(src)) {
       return element
     }
   }
@@ -99,7 +99,7 @@ export const assignVideoPosters: DomTransform = () => (document) => {
   const embedsByVideoId = collectEmbedsByVideoId(document)
   if (embedsByVideoId.size > 0) {
     for (const image of document.querySelectorAll('img[src]')) {
-      const id = image.getAttribute('src')?.match(thumbnailIdPattern)?.[1]
+      const id = image.getAttribute('src')?.match(thumbnailIdRegex)?.[1]
       const embed = id ? embedsByVideoId.get(id) : undefined
       if (!embed) {
         continue

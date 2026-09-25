@@ -127,7 +127,7 @@ export const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
   const anchor = parseFallback(element)
   const pageUrl = attr(anchor, 'href')
   // Bandcamp writes the label as `{title} by {artist}`, and " by " appears inside real titles too.
-  const title = text(anchor) || attr(element, 'title')
+  const title = text(anchor) ?? attr(element, 'title')
 
   return {
     provider,

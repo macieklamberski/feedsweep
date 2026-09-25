@@ -8,6 +8,8 @@ const importantRegex = /!\s*important\s*$/i
 // An unterminated comment runs to the end of the attribute, the way a browser closes it.
 const commentRegex = /\/\*.*?(?:\*\/|$)/gs
 
+const quoteCharacters = ['"', "'"]
+
 // A shorthand sets every longhand it covers, so `background-image:url(a);background:red` paints
 // no image at all. Reading both names without this would answer with the url the shorthand threw
 // away. Only the longhands this package reads are listed, since nothing else is asked for.
@@ -73,7 +75,7 @@ const parseStyles = (style: string): Declarations => {
       continue
     }
 
-    if (character === '"' || character === "'") {
+    if (quoteCharacters.includes(character)) {
       quote = character
       continue
     }

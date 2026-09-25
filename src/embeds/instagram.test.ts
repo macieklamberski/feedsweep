@@ -135,11 +135,13 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
 
     // A sound page, not a post: the kind would read as a reel and the literal `audio` as the
     // shortcode. Instagram spells it under both the singular and the plural.
-    it.each([
+    const soundPageEmbedUrls: Array<string> = [
       'https://www.instagram.com/reels/audio/1234567890/',
       'https://www.instagram.com/reel/audio/1234567890/',
       'https://www.instagram.com/reels/audio',
-    ])('should not read the sound page %s as a post', async (url) => {
+    ]
+
+    it.each(soundPageEmbedUrls)('should not read the sound page %s as a post', async (url) => {
       const value = html`
         <blockquote
           class="instagram-media"
@@ -701,11 +703,13 @@ describe('instagramResolveEmbed', () => {
   // `audio` sits where a shortcode does but names the sound a reel used, not a post. Instagram
   // spells the route under both the singular and the plural, and either reads as a post without
   // the exclusion.
-  it.each([
+  const soundPageUrls: Array<string> = [
     'https://www.instagram.com/reels/audio/123456789/',
     'https://www.instagram.com/reel/audio/123456789/',
     'https://www.instagram.com/reels/audio',
-  ])('should return undefined for the sound page %s', (value) => {
+  ]
+
+  it.each(soundPageUrls)('should return undefined for the sound page %s', (value) => {
     expect(instagramResolveEmbed(value)).toBeUndefined()
   })
 
@@ -725,13 +729,15 @@ describe('instagramResolveEmbed', () => {
 
   // Instagram's own routes take the same shape as a handle, and the share route names a
   // different id space: reading its token as a shortcode would mint a frame that cannot load.
-  it.each([
+  const reservedRouteUrls: Array<string> = [
     'https://www.instagram.com/share/p/BAJ0RmC0Vq/',
     'https://www.instagram.com/share/reel/BAJ0RmC0Vq/',
     'https://www.instagram.com/explore/p/CaUsPbUquKV/',
     'https://www.instagram.com/stories/p/CaUsPbUquKV/',
     'https://www.instagram.com/accounts/p/CaUsPbUquKV/',
-  ])('should return undefined for %s', (value) => {
+  ]
+
+  it.each(reservedRouteUrls)('should return undefined for %s', (value) => {
     expect(instagramResolveEmbed(value)).toBeUndefined()
   })
 

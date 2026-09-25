@@ -308,7 +308,7 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
     // Stands in for a result with every field populated. The point is to fill each field the mint
     // path knows, not to be a valid result, so the declared field types are asserted away.
     const markerFields = <Type>(names: Array<string>): Type => {
-      return Object.fromEntries(names.map((name) => [name, 'not-a-url'])) as unknown as Type
+      return Object.fromEntries(names.map((name) => [name, 'not-a-url'])) as Type
     }
 
     const unchecked = async (document: Document, placeholder: Element): Promise<Array<string>> => {

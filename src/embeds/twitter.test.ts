@@ -1127,13 +1127,15 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
   // card frame are dead, answering a stub or a 404, so the id in them is worth more than
   // the url they point at. `i` stands in for the handle, which Twitter itself redirects.
   describe('the internal paths that carry a status and no handle', () => {
-    it.each([
+    const playerUrls: Array<string> = [
       'https://twitter.com/i/videos/tweet/123456789012345',
       'https://twitter.com/i/videos/123456789012345',
       'https://twitter.com/i/cards/tfw/v1/123456789012345',
       'https://x.com/i/web/status/123456789012345',
       'https://x.com/statuses/123456789012345',
-    ])('should mint the player from %s', async (url) => {
+    ]
+
+    it.each(playerUrls)('should mint the player from %s', async (url) => {
       const value = html`<iframe src="${url}"></iframe>`
       const expected: EmbedResolverResult = {
         provider: 'twitter',

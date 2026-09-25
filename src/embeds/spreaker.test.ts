@@ -348,14 +348,16 @@ describeForEachParser('spreakerAnchorEmbedResolver', (parseHtml) => {
   // sampled drops the name silently, and any two quote characters in the sentence bind a wrong
   // one. `data-title` states it without parsing, and Spreaker's oEmbed states it for the rest.
   describe('the localized call to action', () => {
-    it.each([
+    const quotedTitleLabels: Array<[string, string]> = [
       ['Spanish, straight quotes', 'Escucha"FREEROCK #433 270418 INCOGNITO" en Spreaker.'],
       [
         'English, curly quotes',
         'Listen to \u201C306. Italy Ancestry Research Tips\u201D on Spreaker.',
       ],
       ['a name quoting something itself', 'Listen to "The "best" episode" on Spreaker.'],
-    ])('should state no title for %s', async (_, text) => {
+    ]
+
+    it.each(quotedTitleLabels)('should state no title for %s', async (_, text) => {
       const value = `<a class="spreaker-player" data-resource="episode_id=42">${text}</a>`
       const expected: EmbedResolverResult = {
         provider: 'spreaker',

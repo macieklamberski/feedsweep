@@ -19,6 +19,9 @@ const idRegex = /^[A-Za-z0-9]+$/
 // request.
 const reservedSlugSegments = new Set(['github', 'github.com', 'fork', 'new'])
 
+const projectKinds = ['sandbox', 'devbox']
+const playerRoutes = ['embed', 's']
+
 // A height, not a ratio: the editor fills any box, and an unsized frame renders 150 tall.
 // The share dialog writes 500.
 const defaultSandboxHeight = 500
@@ -52,8 +55,8 @@ const parseTarget = (value: string | undefined): CodesandboxTarget | undefined =
   // `/embed/{slug}` is the embed renderer and `/s/{slug}` the legacy user url, which CodeSandbox
   // rewrites to the renderer when it is framed. `/p/sandbox/` and `/p/devbox/` are the DevBox-era
   // routes, which take `?embed=1` on the page's own address.
-  const isProject = first === 'p' && (second === 'sandbox' || second === 'devbox')
-  const isPlayer = first === 'embed' || first === 's'
+  const isProject = first === 'p' && projectKinds.includes(second)
+  const isPlayer = playerRoutes.includes(first)
   let slug: string | undefined
 
   if (isProject) {
@@ -85,7 +88,7 @@ export const codesandboxResolveEmbed: ResolveEmbed = (url, element) => {
   // The sandbox's own name, which is what the share dialog writes and what a rendered DEV.to or
   // Hashnode embed carries. `title` on the carrier is the only place a sandbox names itself
   // offline.
-  const title = attr(element, 'title') || undefined
+  const title = attr(element, 'title')
 
   return {
     provider,

@@ -380,11 +380,13 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
 
     // The enclosure probe offers every attachment a feed carries to each url resolver, so a
     // document name that is a filename would take the place of a playable or downloadable file.
-    it.each([
+    const filenameDocumentFrames: Array<string> = [
       '<iframe src="https://issuu.com/pub/docs/report.pdf"></iframe>',
       '<iframe src="https://issuu.com/pub/docs/episode.mp3"></iframe>',
       '<iframe src="https://issuu.com/pub/docs/cover.jpg"></iframe>',
-    ])('should return undefined for %s', async (value) => {
+    ]
+
+    it.each(filenameDocumentFrames)('should return undefined for %s', async (value) => {
       expect(await extract(value)).toBeUndefined()
     })
 
