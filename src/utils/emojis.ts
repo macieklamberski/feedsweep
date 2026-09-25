@@ -77,8 +77,15 @@ const queryOrHashRegex = /[?#]/
 const namePrefixRegex = /^(?:default_|face-|smiley-|sf-|1[56]x1[56]_)/
 const nameVariantRegex = /@[0-9]+x$/
 
+// XenForo 1.x paints its smilie sprite behind this transparent file.
+const spacerPath = 'xenforo/clear.png'
+
 // A 1x1 sprite GIF data URI is under 256 bytes, and a real inlined PNG is not.
 export const rendersNothing = (src: string): boolean => {
+  if (src.endsWith(spacerPath)) {
+    return true
+  }
+
   return src.startsWith('data:') && src.length <= 256
 }
 
