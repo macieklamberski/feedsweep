@@ -6,7 +6,7 @@ const classSelector = 'img[class~="wp-smiley" i]'
 
 const hosts = [
   's.w.org/images/core/emoji/', // WordPress core wp-emoji-release output.
-  's0.wp.com/wp-content/mu-plugins/wpcom-smileys/', // WordPress.com Twemoji assets.
+  'wp.com/wp-content/mu-plugins/wpcom-smileys/', // WordPress.com smileys, from s0, s1 and s2.
 ]
 
 // WordPress core's smilies and emoji, and the WordPress.com copies of them.

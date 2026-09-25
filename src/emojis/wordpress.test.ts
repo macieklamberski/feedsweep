@@ -165,7 +165,12 @@ describeForEachParser('wordpressEmojiResolver', (parseHtml) => {
   })
 
   describe('hosts', () => {
-    const hosts = ['s.w.org/images/core/emoji/', 's0.wp.com/wp-content/mu-plugins/wpcom-smileys/']
+    const hosts = [
+      's.w.org/images/core/emoji/',
+      's0.wp.com/wp-content/mu-plugins/wpcom-smileys/',
+      's1.wp.com/wp-content/mu-plugins/wpcom-smileys/',
+      's2.wp.com/wp-content/mu-plugins/wpcom-smileys/',
+    ]
 
     it.each(hosts)('should replace an emoji image from %s', async (host) => {
       const value = `<p>Hi <img src="https://${host}1f642.png" alt="🙂"></p>`
