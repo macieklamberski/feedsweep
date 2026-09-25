@@ -106,6 +106,13 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(result).toMatch(lineBreakAfterBraceRegex)
   })
 
+  it('should decode a fragment whose tags and entities are both doubled', async () => {
+    const value = '<div>&amp;lt;p&amp;gt;Tom&amp;lt;/p&amp;gt;</div>'
+    const expected = '<p>Tom</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toBe(expected)
+  })
+
   it('should decode a multi-line double-escaped description in full', async () => {
     // A double-escaping feed generator ships whole HTML as entity text spread across
     // lines. paragraphizePlainText must pass it through so decodeDoubleEncodedTags gets

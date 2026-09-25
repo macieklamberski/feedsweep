@@ -1,10 +1,6 @@
 import type { DomTransform } from '../../types.js'
-import { hasAncestorWithTagName, isText, NodeFilter } from '../../utils/dom.js'
+import { hasAncestorWithTagName, isText, NodeFilter, opaqueElements } from '../../utils/dom.js'
 import { isEscapedHtmlFragment } from '../../utils/html.js'
-
-// Real elements whose entity-escaped contents are intentional text (a tutorial showing
-// `<img>`), so their descendants are left untouched.
-const opaqueTags = new Set(['code', 'pre', 'script', 'style', 'textarea', 'noscript'])
 
 // HTML a feed generator entity-escaped twice, so its tags ship as visible text.
 export const decodeDoubleEncodedTags: DomTransform = () => {
@@ -19,7 +15,7 @@ export const decodeDoubleEncodedTags: DomTransform = () => {
         continue
       }
 
-      if (hasAncestorWithTagName(node, opaqueTags)) {
+      if (hasAncestorWithTagName(node, opaqueElements)) {
         continue
       }
 

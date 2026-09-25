@@ -147,6 +147,18 @@ describeForEachParser('decodeDoubleEncodedTags', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should not decode an escaped fragment inside a real kbd element', async () => {
+      const value = '<kbd>&lt;b&gt;bold&lt;/b&gt;</kbd>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should not decode an escaped fragment inside a real samp element', async () => {
+      const value = '<samp>&lt;b&gt;bold&lt;/b&gt;</samp>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should decode outside a code element but not inside it', async () => {
       const value = '<p>&lt;b&gt;bold&lt;/b&gt;</p><code>&lt;b&gt;code&lt;/b&gt;</code>'
 

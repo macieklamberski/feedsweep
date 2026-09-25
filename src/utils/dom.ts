@@ -258,6 +258,18 @@ export const isMediaElement = (node: Node): boolean => {
 // No img or picture here: a poster beside a parked media url would otherwise count as a player.
 export const playableElements = new Set(['audio', 'embed', 'iframe', 'object', 'source', 'video'])
 
+// Elements whose entity-escaped contents are intentional text, such as a tutorial showing `<img>`.
+export const opaqueElements = new Set([
+  'code',
+  'kbd',
+  'noscript',
+  'pre',
+  'samp',
+  'script',
+  'style',
+  'textarea',
+])
+
 export const collectTextNodes = (
   root: Node,
   shouldPruneElement: (element: Element) => boolean,
