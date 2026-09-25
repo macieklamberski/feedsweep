@@ -192,7 +192,7 @@ import { slackEmojiResolver } from '../emojis/slack.js'
 import { smiliesEmojiResolver } from '../emojis/smilies.js'
 import { tapatalkEmojiResolver } from '../emojis/tapatalk.js'
 import { teamsEmojiResolver } from '../emojis/teams.js'
-import { telegramEmojiResolver } from '../emojis/telegram.js'
+import { telegramEmojiResolver, telegramImageEmojiResolver } from '../emojis/telegram.js'
 import { twemojiEmojiResolver } from '../emojis/twemoji.js'
 import { vanillaEmojiResolver } from '../emojis/vanilla.js'
 import { vkEmojiResolver } from '../emojis/vk.js'
@@ -435,6 +435,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   slackEmojiResolver,
   notoEmojiResolver,
   gmailEmojiResolver,
+  telegramImageEmojiResolver,
   vkEmojiResolver,
   maxEmojiResolver,
   mastodonEmojiResolver,
