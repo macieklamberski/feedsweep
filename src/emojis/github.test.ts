@@ -135,6 +135,40 @@ describeForEachParser('githubElementEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  describe('tone', () => {
+    it('should apply the skin tone to the glyph', async () => {
+      const value = '<p><g-emoji class="g-emoji" alias="+1" tone="3">👍</g-emoji></p>'
+      const expected = '<p>👍🏽</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should put the skin tone in place of the variation selector', async () => {
+      const value = '<p><g-emoji class="g-emoji" alias="point_up" tone="1">☝️</g-emoji></p>'
+      const expected = '<p>☝🏻</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should apply several tones to the people of a sequence in turn', async () => {
+      const value = html`
+        <p>
+          <g-emoji class="g-emoji" alias="couple_with_heart_woman_man" tone="1 5">👩‍❤️‍👨</g-emoji>
+        </p>
+      `
+      const expected = '<p>👩🏻‍❤️‍👨🏿</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should clear the skin tone when the tone is 0', async () => {
+      const value = '<p><g-emoji class="g-emoji" alias="+1" tone="0">👍🏽</g-emoji></p>'
+      const expected = '<p>👍</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   it('should leave an element with neither text nor an alias untouched', async () => {
     const value = '<p>a <g-emoji class="g-emoji"></g-emoji> b</p>'
 
