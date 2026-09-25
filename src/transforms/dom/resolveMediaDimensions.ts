@@ -56,8 +56,13 @@ export const resolveMediaDimensions: DomTransform = () => {
 
       let dimensions = promotableDimensions(element)
 
-      dimensions ??= getUrlDimensions(element.getAttribute('src'))
-      dimensions ??= getUrlDimensions(widestSrcsetUrl(element.getAttribute('srcset')))
+      if (!dimensions) {
+        dimensions = getUrlDimensions(element.getAttribute('src'))
+      }
+
+      if (!dimensions) {
+        dimensions = getUrlDimensions(widestSrcsetUrl(element.getAttribute('srcset')))
+      }
 
       if (
         !dimensions &&
