@@ -59,6 +59,20 @@ describeForEachParser('convertEmojis', (parseHtml) => {
 
       expect(await transformWith(value, [])).toEqualHtml(value)
     })
+
+    // jsdom's selector engine refuses a selector over 2048 characters, which the registered
+    // selectors pass once joined.
+    it('should match an image when the joined selectors pass the engine limit', async () => {
+      const longSelector = `img[alt="${'x'.repeat(1100)}"]`
+      const resolvers: Array<EmojiResolver> = [
+        { ...passingResolver, selector: longSelector },
+        { ...winkResolver, selector: `${longSelector}, img` },
+      ]
+      const value = '<p><img src="/a.png"></p>'
+      const expected = '<p>😉</p>'
+
+      expect(await transformWith(value, resolvers)).toEqualHtml(expected)
+    })
   })
 
   describe('data-emoji marker', () => {
