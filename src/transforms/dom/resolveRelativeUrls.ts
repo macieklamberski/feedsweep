@@ -64,7 +64,7 @@ type UrlAttribute = {
 // Absolutising a fragment-only href breaks in-article scrolling: a cite names no scroll target.
 const urlAttributes: Array<UrlAttribute> = [
   { selector: '[src]', attribute: 'src' },
-  { selector: 'a[href]:not([href^="#"])', attribute: 'href' },
+  { selector: 'a[href]:not([href^="#"]), area[href]:not([href^="#"])', attribute: 'href' },
   { selector: 'video[poster]', attribute: 'poster' },
   { selector: 'object[data]', attribute: 'data' },
   { selector: 'blockquote[cite], q[cite], ins[cite], del[cite]', attribute: 'cite' },

@@ -18,6 +18,19 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should resolve relative href on image map areas', async () => {
+    const value = '<map name="m"><area href="/page" alt="x"></map>'
+    const expected = '<map name="m"><area href="https://example.com/page" alt="x"></map>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a fragment-only href on an image map area', async () => {
+    const value = '<map name="m"><area href="#section" alt="x"></map>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should resolve through the configured resolveUrlFn', async () => {
     const context: TransformContext = {
       ...baseContext,
