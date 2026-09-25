@@ -29,7 +29,7 @@ describeForEachParser('fixLazyImages', (parseHtml) => {
 
   it('should extract image from noscript when sibling is lazy placeholder', async () => {
     const value = html`
-      <img data-src="lazy.jpg">
+      <img data-src="real.jpg">
       <noscript>
         <img src="real.jpg">
       </noscript>
@@ -41,12 +41,71 @@ describeForEachParser('fixLazyImages', (parseHtml) => {
 
   it('should normalize attribute case on images extracted from noscript', async () => {
     const value = html`
-      <img data-src="lazy.jpg">
+      <img data-src="real.jpg">
       <noscript>
         <IMG SRC="real.jpg">
       </noscript>
     `
     const expected = '<img src="real.jpg">'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should extract image from noscript when sibling has only a data: placeholder', async () => {
+    const value = html`
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">
+      <noscript>
+        <img src="real.jpg">
+      </noscript>
+    `
+    const expected = '<img src="real.jpg">'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should extract image from noscript when it holds another size of the sibling image', async () => {
+    const value = html`
+      <img data-src="https://example.com/photo-300x200.jpg">
+      <noscript>
+        <img src="https://example.com/photo.jpg">
+      </noscript>
+    `
+    const expected = '<img src="https://example.com/photo.jpg">'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should not extract noscript when it holds a different image than the sibling', async () => {
+    const value = html`
+      <img src="https://example.com/photo.jpg">
+      <noscript>
+        <img
+          src="https://example.com/pixel.gif"
+          width="1"
+          height="1"
+        >
+      </noscript>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should not extract noscript when a lazy sibling names a different image', async () => {
+    const value = html`
+      <img data-src="https://example.com/photo.jpg">
+      <noscript>
+        <img src="https://example.com/pixel.gif">
+      </noscript>
+    `
+    const expected = html`
+      <img
+        data-src="https://example.com/photo.jpg"
+        src="https://example.com/photo.jpg"
+      >
+      <noscript>
+        <img src="https://example.com/pixel.gif">
+      </noscript>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })
