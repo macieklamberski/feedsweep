@@ -10,5 +10,11 @@ describeForEachParser('genericEmojiResolver', (parseHtml) => {
 
       expect(await transformKeeping(value)).toEqualHtml(value)
     })
+
+    it('should leave a gemoji shortcode-alt with class="emoji" untouched', async () => {
+      const value = '<p><img class="emoji" alt=":tophat:"></p>'
+
+      expect(await transformKeeping(value)).toEqualHtml(value)
+    })
   })
 })
