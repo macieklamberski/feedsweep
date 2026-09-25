@@ -50,6 +50,13 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should neutralize a javascript: image map area to the link sentinel', async () => {
+      const value = '<map name="m"><area href="javascript:alert(1)" alt="x"></map>'
+      const expected = '<map name="m"><area href="#unsafe-link" alt="x"></map>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should neutralize a javascript: image to the media sentinel', async () => {
       const value = '<img src="javascript:alert(1)">'
       const expected = '<img src="about:blank">'
