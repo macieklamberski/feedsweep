@@ -253,13 +253,15 @@ describeForEachParser('enrichCitePlaceholders', (parseHtml) => {
     expect(await transform(value, withFn(fn))).toEqualHtml(expected)
   })
 
-  it('should propagate an exception thrown by enrichCiteFn', async () => {
+  it('should propagate an exception thrown by enrichCiteFn', () => {
     const value = '<div data-cite-provider="tumblr" data-cite-url="https://example.com/post"></div>'
     const fn: EnrichCiteFn = () => {
       throw new Error('boom')
     }
 
-    await expect(transform(value, withFn(fn))).rejects.toThrow('boom')
+    const throwing = () => transform(value, withFn(fn))
+
+    expect(throwing()).rejects.toThrow('boom')
   })
 
   // The answer is positional, so nothing found for a placeholder is an undefined in its slot.
