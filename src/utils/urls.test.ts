@@ -3,8 +3,6 @@ import { baseContext } from '../tests.js'
 import {
   cleanUrl,
   composeQuery,
-  decodeOrKeep,
-  decodeSegment,
   parseUrlOnHosts,
   pickQueryParams,
   pickUrlParams,
@@ -178,60 +176,6 @@ describe('cleanUrl', () => {
 
     expect(cleanUrl(undefined, { ...baseContext, cleanUrlFn })).toBeUndefined()
     expect(called).toBe(false)
-  })
-})
-
-describe('decodeSegment', () => {
-  it('should decode a percent-encoded segment', () => {
-    const value = 'urn%3Ali%3Ashare%3A6626097641602281472'
-    const expected = 'urn:li:share:6626097641602281472'
-
-    expect(decodeSegment(value)).toBe(expected)
-  })
-
-  it('should leave a plain segment unchanged', () => {
-    const value = 'urn:li:share:6626097641602281472'
-
-    expect(decodeSegment(value)).toBe(value)
-  })
-
-  it('should return undefined for a malformed escape', () => {
-    const value = '%E0%A4%A'
-
-    expect(decodeSegment(value)).toBeUndefined()
-  })
-
-  it('should return undefined for undefined', () => {
-    expect(decodeSegment(undefined)).toBeUndefined()
-  })
-})
-
-describe('decodeOrKeep', () => {
-  it('should decode a percent-encoded value', () => {
-    const value = 'FEAR%20STREET%20PART%202'
-    const expected = 'FEAR STREET PART 2'
-
-    expect(decodeOrKeep(value)).toBe(expected)
-  })
-
-  it('should leave a plain value unchanged', () => {
-    const value = 'FEAR STREET PART 2'
-
-    expect(decodeOrKeep(value)).toBe(value)
-  })
-
-  it('should keep a value whose escape is malformed', () => {
-    const value = 'FEAR%STREET'
-
-    expect(decodeOrKeep(value)).toBe(value)
-  })
-
-  it('should return undefined for undefined', () => {
-    expect(decodeOrKeep(undefined)).toBeUndefined()
-  })
-
-  it('should return undefined for an empty string', () => {
-    expect(decodeOrKeep('')).toBeUndefined()
   })
 })
 

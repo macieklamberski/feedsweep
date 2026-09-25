@@ -1,4 +1,11 @@
-import { isAnyOf, type MaybePromise, type Pattern, startsWithAnyOf, trimObject } from 'trousse'
+import {
+  isAnyOf,
+  isHostOrSubdomainOf,
+  type MaybePromise,
+  type Pattern,
+  startsWithAnyOf,
+  trimObject,
+} from 'trousse'
 import type {
   CiteResolverResult,
   EmbedResolver,
@@ -20,7 +27,7 @@ import {
   getWrapperRatio,
   isPercentageSized,
 } from './dom.js'
-import { cleanUrl, isOnHosts, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
+import { cleanUrl, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
 
 const parseOrKeepDate = (
   date: string | undefined,
@@ -174,7 +181,7 @@ export const createUrlEmbedResolver = (
     extract: (element) => {
       const src = readCarrierUrl(element)
 
-      if (!isOnHosts(src, hosts)) {
+      if (!isHostOrSubdomainOf(src, hosts)) {
         return
       }
 

@@ -1,7 +1,7 @@
-import { parseUrl } from 'trousse'
+import { isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { CleanUrlFn, Enclosure, TransformContext } from '../types.js'
 import { getImageFingerprint, getSizeKeywordRank, getUrlSizeHint } from './images.js'
-import { absoluteUrlRegex, cleanUrl, isOnHosts, resolveOrKeepUrl } from './urls.js'
+import { absoluteUrlRegex, cleanUrl, resolveOrKeepUrl } from './urls.js'
 import { getEmbedSize } from './widgets.js'
 
 const kindTypePrefixes = ['audio/', 'video/', 'image/'] as const
@@ -23,7 +23,7 @@ export const isEnclosureKind = (
 }
 
 export const isAvatarEnclosure = (url: string, avatarHosts: ReadonlyArray<string>): boolean => {
-  return isOnHosts(url, avatarHosts)
+  return isHostOrSubdomainOf(url, avatarHosts)
 }
 
 const isPreferredVariant = (incoming: Enclosure, kept: Enclosure): boolean => {

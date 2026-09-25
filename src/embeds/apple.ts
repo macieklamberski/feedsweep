@@ -1,7 +1,7 @@
-import { getPathSegments, type Nullish, toMap } from 'trousse'
+import { getPathSegments, isHostOrSubdomainOf, type Nullish, toMap } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, keepIfMatches } from '../utils/dom.js'
-import { isOnHosts, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // Music and podcasts embed through the same player, served from `embed.music.apple.com` and
@@ -52,7 +52,7 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const isPodcast = isOnHosts(parsed, applePodcastsHosts)
+  const isPodcast = isHostOrSubdomainOf(parsed, applePodcastsHosts)
   const host = isPodcast ? 'podcasts.apple.com' : 'music.apple.com'
   const trackId = keepIfMatches(parsed.searchParams.get('i'), trackIdRegex)
   const id = trackId ?? pathId.replace(podcastIdPrefixRegex, '')

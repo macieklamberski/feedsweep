@@ -1,8 +1,8 @@
-import { isPlainObject, parseUrl } from 'trousse'
+import { decodeSegment, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { decodeOrKeep, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'instagram'
@@ -93,11 +93,12 @@ const readWrapper = (
     return { size: {} }
   }
 
+  const dataUrl = attr(figure, 'data-url')
   const width = parsePixelSize(attr(figure, 'data-orig-width'))
   const height = parsePixelSize(attr(figure, 'data-orig-height'))
 
   return {
-    post: readPostUrl(decodeOrKeep(attr(figure, 'data-url'))),
+    post: readPostUrl(decodeSegment(dataUrl) ?? dataUrl),
     // Stated together or not at all: a lone height would claim a fixed box the embed does
     // not have.
     size: width && height ? { width, height } : {},

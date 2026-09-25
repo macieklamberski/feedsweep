@@ -1,9 +1,9 @@
 import { addMissingProtocol, normalizeUrl, resolveUrl } from 'feedcanon'
 import { parseSrcset as parseRawSrcset } from 'srcset'
-import { getPathSegments, parseUrl, toMap } from 'trousse'
+import { decodeSegment, getPathSegments, parseUrl, toMap } from 'trousse'
 import type { CleanUrlFn } from '../types.js'
 import { pixelDimensionLimit } from './dom.js'
-import { decodeOrKeep, placeholderBaseUrl } from './urls.js'
+import { placeholderBaseUrl } from './urls.js'
 
 // The parser reads a bare `225w` with no url as that candidate's url, and a proxy 404s on it.
 // A Jetpack bug ships `…768w, 225w, 563w` with only the first url present.
@@ -60,14 +60,14 @@ const sizeKeywordLeaf = new RegExp(`^(?:${sizeKeywordLiterals.join('|')})(\\.[a-
 // The capture is (or resolves to) a URL: absolute, protocol-relative, or relative
 // to the proxy's own origin (a Cloudflare relative path, Next.js, wsrv).
 const resolvedSource = (capture: string, proxy: URL): string | undefined => {
-  const source = decodeOrKeep(capture)
+  const source = decodeSegment(capture) ?? capture
 
   return source && resolveUrl(source, proxy.origin)
 }
 
 // The capture is a bare host+path with the scheme stripped (Photon): re-add it.
 const bareHostSource = (capture: string): string | undefined => {
-  const source = decodeOrKeep(capture)
+  const source = decodeSegment(capture) ?? capture
 
   return source && addMissingProtocol(source)
 }
