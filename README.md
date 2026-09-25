@@ -72,6 +72,8 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildLiteVideoEmbeds` | Rebuild a real `<iframe>` from a `lite-youtube` / `lite-vimeo` web component's `videoid`, carrying over `start` and `videotitle` |
 | `rebuildLyteEmbeds` | Rebuild a real `<iframe>` from a WP YouTube Lyte facade (`WYL_`/`lyte_` id) |
 | `rebuildRocketYoutubePreviews` | Rebuild a real `<iframe>` from a WP Rocket YouTube preview facade (`.rll-youtube-player[data-id]`), carrying over `data-query` |
+| `rebuildVideoJsEmbeds` | Rebuild a native `<video>` from a Video.js `<video-js>` element, reading the source from a `<source>` child or the `data-setup` JSON |
+| `rebuildWmakerEmbeds` | Rebuild a real `<iframe>` from a WMaker item's dead Flash player, pointing it at the modern embed page named by the article id in the item's permalink |
 | `rebuildWistiaEmbeds` | Rebuild a real `<iframe>` from a Wistia JS-API inline embed facade (`wistia_async_{id}` class) |
 | `rebuildLazyLoadForVideos` | Rebuild a real `<iframe>` from a "Lazy Load for Videos" facade (`a.preview-lazyload`), recovering the YouTube/Vimeo id from `data-video-uri` or `href` and carrying over `data-video-title` |
 | `rebuildLazyYtEmbeds` | Rebuild a real `<iframe>` from a lazy YouTube facade parking the id in a data attribute (`data-youtube-id`, `data-youtube`, `.youtube-embed`, `.youtube-player`) |
@@ -86,6 +88,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `convertNoteEmbeds` | Convert note.com's empty embed figures (`figure[embedded-service][data-src]`): media services become plain iframes for the widget pass, own-post embeds become plain links |
 | `convertAmpNativeElements` | Convert AMP custom elements with a native equivalent (`amp-img`, `amp-anim`, `amp-video`, `amp-audio`, `amp-iframe`) into that element |
 | `convertDatawrapperEmbeds` | Convert Datawrapper chart embeds (iframe, script/noscript, and link forms) into a static image linking to the interactive chart |
+| `convertGiphyEmbeds` | Convert a Giphy gif shipped as an iframe (`giphy.com/embed/{id}`, `media.giphy.com`, `giphy.com/gifs/{id}`) into an `<img>` of the gif, linked to its Giphy page |
 | `convertSmartframeEmbeds` | Convert SmartFrame's `<smartframe-embed>` element into the picture it names as a static image |
 | `convertWidgets` | Convert recognized widgets: embeds become `data-embed-*` placeholders, platform-hosted media becomes a real `<video>`/`<audio>` (from an id template, a media-file src, or a URL parked in a lazy media attribute) |
 | `assignVideoPosters` | _Heuristic (opt-in):_ move a redundant video-poster image (inline or an enclosure) onto the embed as its poster, then drop the standalone image |
@@ -124,7 +127,7 @@ An embed placeholder states how big it is in one of two ways, never both. Where 
 ## Options
 
 ```typescript
-import { fixLazyImages, resolveRelativeUrls, transformContent } from 'feedsweep'
+import { fixLazyImages, resolveRelativeUrls, stripControlChars, transformContent } from 'feedsweep'
 import { parseHtml } from 'feedsweep/linkedom'
 import { cleanUrl } from 'urlpurify'
 
@@ -133,6 +136,10 @@ const result = transformContent(html, {
   parseHtmlFn: parseHtml,
   // Base URL for resolving relative URLs.
   baseUrl: 'https://example.com/post/1',
+  // Other URLs of the same item, such as its guid. An in-page link written against one of them shortens to a fragment.
+  sameSiteUrls: ['https://example.com/?p=1'],
+  // Resolve a relative URL against the base URL (defaults to standard URL resolution).
+  resolveUrlFn: (url, baseUrl) => resolve(url, baseUrl),
   // Rewrite anchor hrefs: unwrap redirects and strip tracking params.
   cleanUrlFn: cleanUrl,
   // Feed item enclosures (audio/video/image), injected into the content.
@@ -148,23 +155,29 @@ const result = transformContent(html, {
   // src when the placeholder has them; answer positionally, one entry per embed in the same order,
   // undefined where nothing was found.
   enrichEmbedFn: (embeds) => Promise.all(embeds.map(({ provider, id, url }) => fetchMetadata(provider, id, url))),
+  // Populate cite placeholder fields the card markup does not carry. Positional, like enrichEmbedFn.
+  enrichCiteFn: (cites) => Promise.all(cites.map(({ provider, url }) => fetchCite(provider, url))),
   // Normalize a cite card's site-formatted display date (e.g. "2018.10.14"); return
   // undefined to keep the raw string verbatim.
   parseDateFn: (raw) => parseDate(raw),
   // Swap the code highlighter (defaults to highlight.js; may be async).
   highlightFn: (text, language) => myHighlighter.highlight(text, language),
+  // The item's title. A body that opens with a heading repeating it loses that heading.
+  articleTitle: 'Post title',
   // Opt into the heuristic transforms. Ignored if a custom domTransforms is set.
   heuristics: true,
+  // Run a custom string transform pipeline before parsing (omit to use defaults).
+  stringTransforms: [stripControlChars],
   // Run a custom DOM transform pipeline (omit to use defaults).
   domTransforms: [fixLazyImages, resolveRelativeUrls],
 })
 ```
 
-All caller-provided functions (`parseHtmlFn`, `resolveUrlFn`, `cleanUrlFn`, `assetProxyFn`, `isSafeUrlFn`, `enrichEmbedFn`, `parseDateFn`, `highlightFn`) must not throw — an exception is not caught and rejects the `transformContent` promise.
+All caller-provided functions (`parseHtmlFn`, `resolveUrlFn`, `cleanUrlFn`, `assetProxyFn`, `isSafeUrlFn`, `enrichEmbedFn`, `enrichCiteFn`, `parseDateFn`, `highlightFn`) must not throw — an exception is not caught and rejects the `transformContent` promise.
 
 Code blocks are highlighted only when they declare a language (`language-*` class, `data-language`, Pandoc/Rouge/Expressive Code/etc.); unlabeled blocks are left plain rather than guessed at. The default highlighter is highlight.js (exported as `defaultHighlightFn` / `hljsHighlightFn`); replace it with `highlightFn`.
 
-The `stringTransforms` and `domTransforms` options each fully replace the corresponding default phase when provided. The `heuristics` flag (default `false`) selects between two exported DOM pipelines: `defaultStandardDomTransforms` (the safe defaults) and `defaultAllDomTransforms` (standard plus `heuristicDomTransforms` spliced in after `injectEnclosures`). Setting `domTransforms` explicitly overrides `heuristics`. Every transform and pipeline is also exported individually from `feedsweep`, so you can compose any pipeline — list transforms explicitly, or spread `defaultStandardDomTransforms` / `heuristicDomTransforms` to extend or filter the defaults.
+The `stringTransforms` and `domTransforms` options each fully replace the corresponding default phase when provided. The default string phase is exported as `defaultStringTransforms`. The `heuristics` flag (default `false`) selects between two exported DOM pipelines: `defaultStandardDomTransforms` (the safe defaults) and `defaultAllDomTransforms` (standard plus `heuristicDomTransforms` spliced in after `injectEnclosures`). Setting `domTransforms` explicitly overrides `heuristics`. Every transform and pipeline is also exported individually from `feedsweep`, so you can compose any pipeline — list transforms explicitly, or spread `defaultStandardDomTransforms` / `heuristicDomTransforms` to extend or filter the defaults.
 
 The platforms feedsweep recognizes, the hosts it treats as trackers, the selectors it strips as non-content, the lazy-loading attributes it reads and the player labels it strips from a title or description are all built in and not configurable. A platform or attribute that is missing belongs in the library: open an issue or a pull request.
 
