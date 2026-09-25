@@ -80,6 +80,7 @@ export {
   defaultHighlightFn,
   defaultResolveUrlFn,
   defaultStandardDomTransforms,
+  defaultStringTransforms,
   heuristicDomTransforms,
 } from './defaults.js'
 export { hljsHighlightFn } from './highlighters/hljs.js'
@@ -123,6 +124,7 @@ export { rebuildDeferredIframes } from './transforms/dom/rebuildDeferredIframes.
 export { rebuildElementorVideoEmbeds } from './transforms/dom/rebuildElementorVideoEmbeds.js'
 export { rebuildEmbedlyEmbeds } from './transforms/dom/rebuildEmbedlyEmbeds.js'
 export { rebuildEmbedPlusEmbeds } from './transforms/dom/rebuildEmbedPlusEmbeds.js'
+export { rebuildGettyImagesEmbeds } from './transforms/dom/rebuildGettyImagesEmbeds.js'
 export { rebuildLazyLoadForVideos } from './transforms/dom/rebuildLazyLoadForVideos.js'
 export { rebuildLazyYtEmbeds } from './transforms/dom/rebuildLazyYtEmbeds.js'
 export { rebuildLiteVideoEmbeds } from './transforms/dom/rebuildLiteVideoEmbeds.js'
@@ -130,6 +132,7 @@ export { rebuildLyteEmbeds } from './transforms/dom/rebuildLyteEmbeds.js'
 export { rebuildRocketYoutubePreviews } from './transforms/dom/rebuildRocketYoutubePreviews.js'
 export { rebuildVideoJsEmbeds } from './transforms/dom/rebuildVideoJsEmbeds.js'
 export { rebuildWistiaEmbeds } from './transforms/dom/rebuildWistiaEmbeds.js'
+export { rebuildWmakerEmbeds } from './transforms/dom/rebuildWmakerEmbeds.js'
 export { removeTrackingPixels } from './transforms/dom/removeTrackingPixels.js'
 export { replacePreLineBreaks } from './transforms/dom/replacePreLineBreaks.js'
 export { resolveMediaDimensions } from './transforms/dom/resolveMediaDimensions.js'
