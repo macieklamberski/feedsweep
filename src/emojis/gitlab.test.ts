@@ -26,6 +26,13 @@ describeForEachParser('gitlabEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should replace an empty element by a gemoji name the table misses', async () => {
+    const value = '<p><gl-emoji data-name="rocket"></gl-emoji></p>'
+    const expected = '<p>🚀</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should mark the name of an empty element as fallback text', async () => {
     const value = '<p><gl-emoji data-name="tanuki"></gl-emoji></p>'
     const expected = '<p><span data-emoji="">:tanuki:</span></p>'

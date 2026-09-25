@@ -1,6 +1,7 @@
 import type { EmojiResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { resolveEmojiElement } from '../utils/emojis.js'
+import { glyphFromEmojiName } from '../utils/gemoji.js'
 
 // GitLab's emoji element, holding the glyph with its gemoji name in data-name.
 export const gitlabEmojiResolver: EmojiResolver = {
@@ -17,6 +18,6 @@ export const gitlabEmojiResolver: EmojiResolver = {
       return { image: fallbackSrc, alt: shortcode }
     }
 
-    return resolveEmojiElement(element, { shortcode })
+    return resolveEmojiElement(element, { glyph: glyphFromEmojiName(name), shortcode })
   },
 }
