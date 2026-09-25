@@ -162,6 +162,36 @@ describeForEachParser('normalizeAnchoredHeadings', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should keep the title when the link wraps only part of the heading', async () => {
+      const value = html`
+        <h2 id="getting-started">
+          <a href="#getting-started">Getting started</a> <em>(beta)</em>
+        </h2>
+      `
+      const expected = html`
+        <h2>
+          <a id="getting-started" href="#getting-started"></a>Getting started <em>(beta)</em>
+        </h2>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should drop a #fragment glyph span from a link that wraps part of the heading', async () => {
+      const value = html`
+        <h2 id="utility">
+          <a href="#utility">Utility<span class="anchor">#utility</span></a> <em>(beta)</em>
+        </h2>
+      `
+      const expected = html`
+        <h2>
+          <a id="utility" href="#utility"></a>Utility <em>(beta)</em>
+        </h2>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should drop an inline #fragment glyph span and keep the title', async () => {
       const value = html`
         <h2 id="utility">
