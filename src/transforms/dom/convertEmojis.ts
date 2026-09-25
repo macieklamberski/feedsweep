@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { walkElements } from '../../utils/dom.js'
+import { batchSelectors, walkElements } from '../../utils/dom.js'
 import { emojiImageAttribute } from '../../utils/emojis.js'
 
 const wrapFallbackText = (document: Document, text: string): Element => {
@@ -14,15 +14,15 @@ const wrapFallbackText = (document: Document, text: string): Element => {
 // Emoji images and wrappers, which render oversized or as nothing without the site's CSS.
 export const convertEmojis: DomTransform = (context) => {
   const { emojiResolvers } = context
-  const selector = emojiResolvers.map((resolver) => resolver.selector).join(', ')
+  const selectors = batchSelectors(emojiResolvers.map((resolver) => resolver.selector))
 
   return (document) => {
-    if (!selector) {
+    if (!selectors.length) {
       return
     }
 
     walkElements(document, (element) => {
-      if (!element.matches(selector)) {
+      if (!selectors.some((batch) => element.matches(batch))) {
         return
       }
 
