@@ -23,24 +23,27 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
     },
     "./defaults": {
-      "types": "./dist/defaults.d.ts",
-      "default": "./dist/defaults.js"
+      "types": "./dist/defaults.d.mts",
+      "default": "./dist/defaults.mjs"
     },
     "./linkedom": {
-      "types": "./dist/parsers/linkedom.d.ts",
-      "default": "./dist/parsers/linkedom.js"
+      "types": "./dist/parsers/linkedom.d.mts",
+      "default": "./dist/parsers/linkedom.mjs"
     }
   },
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "prepare": "lefthook install",
-    "build": "tsdown src/index.ts src/defaults.ts src/parsers/linkedom.ts --format esm --dts --clean --unbundle --no-fixed-extension",
+    "build": "tsdown src/index.ts src/defaults.ts src/parsers/linkedom.ts --format esm --dts --clean --unbundle",
     "test": "bun test",
     "test:linkedom": "DOM_LIBRARY=linkedom bun test",
     "test:jsdom": "DOM_LIBRARY=jsdom bun test"
@@ -54,8 +57,8 @@
     "svg-tag-names": "^3.0.1"
   },
   "peerDependencies": {
-    "feedcanon": "^2.0.0",
-    "feedscout": "^2.0.0",
+    "feedcanon": "^2.0.1",
+    "feedscout": "^2.0.1",
     "linkedom": "^0.18.12"
   },
   "peerDependenciesMeta": {
@@ -66,8 +69,8 @@
   "devDependencies": {
     "@types/bun": "^1.4.2",
     "@types/jsdom": "^30.0.0",
-    "feedcanon": "^2.0.0",
-    "feedscout": "^2.0.0",
+    "feedcanon": "^2.0.1",
+    "feedscout": "^2.0.1",
     "jsdom": "^30.1.1",
     "kvalita": "^1.23.0",
     "linkedom": "^0.18.13",
