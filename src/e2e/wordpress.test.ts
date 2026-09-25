@@ -131,4 +131,28 @@ describeForEachParser('WordPress', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  // WordPress.com serves its smileys from s1 and s2 too, and one outside the Twemoji folder has
+  // no glyph, so it keeps its picture.
+  it('should mark a WordPress.com smiley served from s1', async () => {
+    const value = html`
+      <p>Ha
+        <img
+          src="https://s1.wp.com/wp-content/mu-plugins/wpcom-smileys/rolling-on-the-floor-laughing.png"
+          alt=""
+        >
+      </p>
+    `
+    const expected = html`
+      <p>Ha
+        <img
+          data-emoji=""
+          src="https://s1.wp.com/wp-content/mu-plugins/wpcom-smileys/rolling-on-the-floor-laughing.png"
+          alt=""
+        >
+      </p>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })
