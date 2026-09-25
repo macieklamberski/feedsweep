@@ -25,6 +25,11 @@ const bitrixShortcodes = toMap({
   '|te|': '🤐', // Лучше молчать, better to keep quiet
   '|und3|': '🤿', // Подводник 3, submariner in a diving helmet
   '|he|': '🆘', // SOS
+  ':facepalm:': '🤦',
+  ':{}': '😘',
+  ':-{}': '😘',
+  ':~(': '😢',
+  ':-/': '😕',
   // :S:, Трубка: winks while smoking a pipe, and no emoji has a pipe.
 })
 
