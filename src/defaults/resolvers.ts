@@ -129,6 +129,7 @@ import { googlebooksEmbedResolver } from '../embeds/googlebooks.js'
 import { googledriveEmbedResolver } from '../embeds/googledrive.js'
 import { googleslidesEmbedResolver } from '../embeds/googleslides.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
+import { helloassoEmbedResolver } from '../embeds/helloasso.js'
 import { heyzineEmbedResolver } from '../embeds/heyzine.js'
 import {
   imgurBlockquoteEmbedResolver,
@@ -467,6 +468,7 @@ const embedResolvers: Array<EmbedResolver> = [
   googledriveEmbedResolver,
   googleslidesEmbedResolver,
   guardianEmbedResolver,
+  helloassoEmbedResolver,
   heyzineEmbedResolver,
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
