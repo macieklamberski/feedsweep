@@ -91,8 +91,10 @@ export const getFileStem = (src: string): string => {
 }
 
 // Five hex digits tops out at 0xFFFFF, so fromCodePoint never sees a value that throws.
-// WoltLab names its whole default set by codepoint.
-const codepointNameRegex = /^[0-9a-f]{4,5}(?:[-_][0-9a-f]{4,5})*$/
+// WoltLab names its whole default set by codepoint. Twemoji drops the leading zeros, so two digits
+// are read too, only for the emoji below 0x100: © and ®, and a keycap on #, * or a digit.
+const codepointNameRegex =
+  /^(?:[0-9a-f]{4,5}(?:[-_][0-9a-f]{4,5})*|a[9e](?:[-_]fe0f)?|(?:2[3a]|3[0-9])(?:[-_]fe0f)?[-_]20e3)$/
 const codepointSeparatorRegex = /[-_]/
 
 export const glyphFromCodepoints = (stem: string): string | undefined => {
