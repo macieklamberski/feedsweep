@@ -38,7 +38,7 @@ describeForEachParser('facebookEmojiResolver', (parseHtml) => {
   })
 
   describe('hosts', () => {
-    const hosts = ['fbcdn.net/images/emoji.php/']
+    const hosts = ['fbcdn.net/images/emoji.php/', 'www.facebook.com/images/emoji.php/']
 
     it.each(hosts)('should replace an emoji image from %s', async (host) => {
       const value = `<p>Hi <img src="https://${host}1f642.png" alt="🙂"></p>`

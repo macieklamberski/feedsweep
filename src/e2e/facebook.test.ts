@@ -297,6 +297,22 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should replace a Facebook emoji image served from the main host', async () => {
+    const value = html`
+      <p>See you there
+        <img
+          alt=""
+          class="img"
+          src="https://www.facebook.com/images/emoji.php/v9/f57/1/16/1f609.png"
+          width="16"
+        >
+      </p>
+    `
+    const expected = '<p>See you there 😉</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // Facebook refuses to be framed, so a carrier holding the page itself reaches a reader as a
   // blank frame. The plugin takes the page as its href, which is the repair the widget div and
   // the fallback blockquote already perform from their own attributes.
