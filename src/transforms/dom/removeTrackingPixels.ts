@@ -52,6 +52,14 @@ const isPixelSized = (dimensions: { width?: number; height?: number }): boolean 
   return isPixelDimension(dimensions.width) || isPixelDimension(dimensions.height)
 }
 
+// A stated size above a pixel is content whatever serves it: newsletter platforms on the host
+// list serve their posts' images from subdomains of the host that serves their beacons.
+const isContentSized = (dimensions: { width?: number; height?: number }): boolean => {
+  const { width = 0, height = 0 } = dimensions
+
+  return width > pixelDimensionLimit || height > pixelDimensionLimit
+}
+
 // gif stays out of the raster list: it is the dominant spacer and pixel format.
 // Tracking pixels ship as GIF or script beacons.
 const rasterExtensionRegex = /\.(?:jpe?g|png|webp|avif)(?:$|[?#])/i
@@ -101,7 +109,7 @@ export const removeTrackingPixels: DomTransform = (context) => {
         continue
       }
 
-      if (hasUrlChecks) {
+      if (hasUrlChecks && !isContentSized(dimensions)) {
         const src = image.getAttribute('src')
 
         if (src && isTrackingUrl(src, hosts, pathRegex)) {
