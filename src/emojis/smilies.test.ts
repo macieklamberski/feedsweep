@@ -749,6 +749,84 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
       expect(await transformKeeping(value)).toEqualHtml(value)
     })
+
+    // SMF binds `;D` to grin.gif, and the alt is read before the filename.
+    it('should replace ;D with a grin', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/Smileys/default/grin.gif"
+            alt=";D"
+            title="Grin"
+            class="smiley"
+          >
+        </p>
+      `
+      const expected = '<p>😁</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // A board's own set binds `;-D` to its wink, which the filename names.
+    it('should resolve ;-D by the filename', async () => {
+      const value = html`
+        <p>
+          <img src="https://example.com/board/smileys/cutemoticons/wink.png" alt=";-D">
+        </p>
+      `
+      const expected = '<p>😉</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace :evil: with the angry devil its icon_evil file draws', async () => {
+      const value = html`
+        <p>
+          <img
+            class="smilies"
+            src="https://example.com/images/smilies/icon_evil.gif"
+            alt=":evil:"
+            title="Evil or Very Mad"
+          >
+        </p>
+      `
+      const expected = '<p>👿</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // `:x` is mad on phpBB and WordPress, and `:-X` is sealed lips on SMF, so only the filename
+    // says which face it is.
+    it('should resolve :x by the filename', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/images/smiles/icon_mad.gif"
+            alt=":x"
+            title="Mad"
+          >
+        </p>
+      `
+      const expected = '<p>😠</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should resolve :-X by the filename', async () => {
+      const value = html`
+        <p>
+          <img
+            class="smilies"
+            src="https://example.com/images/smilies/lipsrsealed.gif"
+            alt=":-X"
+            title="Lips Sealed"
+          >
+        </p>
+      `
+      const expected = '<p>🤐</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('platform filename tables', () => {
