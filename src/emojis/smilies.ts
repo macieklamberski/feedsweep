@@ -244,6 +244,12 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       lightbulb: '💡',
       thumbs_up: '👍',
       thumbs_down: '👎',
+      // TinyMCE 3's names, after its `smiley-` prefix. Vanilla ships the tongue and money faces.
+      sealed: '🤐',
+      embarassed: '😳', // Misspelled upstream
+      'tongue-out': '😛',
+      'money-mouth': '🤑',
+      // foot-in-mouth: no Unicode counterpart.
     },
   },
   {
@@ -302,6 +308,8 @@ const directories = [
   '/emoticons/', // Serendipity's stock template set and emoticate plugin, IPS, Kunena
   '/style_emoticons/', // IPB 2 and 3, which the plural form above misses
   'forum-smileys/', // Simple:Press, with no leading slash before the directory
+  '/smiley_icons/', // FUDforum
+  '/plugins/emotions/img/', // TinyMCE 3
   'SMILIES_PATH', // phpBB's template variable left unsubstituted, raw or percent-encoded
 ]
 const directorySelector = directories.map((path) => `img[src*="${path}" i]`).join(', ')
