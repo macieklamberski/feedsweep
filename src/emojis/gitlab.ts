@@ -8,7 +8,15 @@ export const gitlabEmojiResolver: EmojiResolver = {
   selector: 'gl-emoji',
   extract: (element) => {
     const name = attr(element, 'data-name')
+    const shortcode = name ? `:${name}:` : undefined
+    const fallbackSrc = attr(element, 'data-fallback-src')
 
-    return resolveEmojiElement(element, { shortcode: name ? `:${name}:` : undefined })
+    // A custom emoji has no glyph, only the picture in fallback-src. GitLab leaves the element
+    // empty or wraps its own image of it, alt included.
+    if (fallbackSrc && attr(element, 'data-unicode-version') === 'custom') {
+      return { image: fallbackSrc, alt: shortcode }
+    }
+
+    return resolveEmojiElement(element, { shortcode })
   },
 }

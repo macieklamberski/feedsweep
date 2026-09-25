@@ -1,4 +1,4 @@
-import { expect, it } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, emojiConverters, html } from '../tests.js'
 
 describeForEachParser('gitlabEmojiResolver', (parseHtml) => {
@@ -38,6 +38,63 @@ describeForEachParser('gitlabEmojiResolver', (parseHtml) => {
     const expected = '<p><span data-emoji="">[tanuki]</span></p>'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  describe('custom emoji', () => {
+    it('should replace an empty element with a marked image of fallback-src', async () => {
+      const value = html`
+        <p>
+          <gl-emoji
+            title="partyparrot"
+            data-name="partyparrot"
+            data-fallback-src="https://example.com/uploads/-/system/custom_emoji/1/partyparrot.gif"
+            data-unicode-version="custom"
+          ></gl-emoji>
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            src="https://example.com/uploads/-/system/custom_emoji/1/partyparrot.gif"
+            alt=":partyparrot:"
+            data-emoji=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace the image GitLab wraps with a marked image of fallback-src', async () => {
+      const value = html`
+        <p>
+          <gl-emoji
+            title="partyparrot"
+            data-name="partyparrot"
+            data-fallback-src="https://example.com/uploads/-/system/custom_emoji/1/partyparrot.gif"
+            data-unicode-version="custom"
+          ><img
+            class="emoji"
+            src="https://example.com/uploads/-/system/custom_emoji/1/partyparrot.gif"
+            alt=":partyparrot:"
+            title=":partyparrot:"
+            height="20"
+            align="absmiddle"
+          ></gl-emoji>
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            src="https://example.com/uploads/-/system/custom_emoji/1/partyparrot.gif"
+            alt=":partyparrot:"
+            data-emoji=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   it('should leave an element with neither text nor a name untouched', async () => {
