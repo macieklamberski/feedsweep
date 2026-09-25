@@ -7,6 +7,7 @@ import {
   extractVideoId,
   isVideoId,
   youtubeAmpEmbedResolver,
+  youtubeFc2EmbedResolver,
   youtubeIframeEmbedResolver,
   youtubeResolveEmbed,
 } from './youtube.js'
@@ -830,6 +831,80 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+describeForEachParser('youtubeFc2EmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, youtubeFc2EmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the video and its title out of the shell query', async () => {
+      const value = html`
+        <iframe
+          src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?autoplay=1&id=dQw4w9WgXcQ&width=560&height=315&title=A%20video"
+          data-id="dQw4w9WgXcQ"
+          width="560"
+          height="315"
+          allowfullscreen
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'dQw4w9WgXcQ',
+        src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+        ratio: '16/9',
+        title: 'A video',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should take the id attribute when the query names a route word', async () => {
+      const value = html`
+        <iframe
+          src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?id=playlist"
+          data-id="dQw4w9WgXcQ"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'dQw4w9WgXcQ',
+        src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore another page on the asset host', async () => {
+      const value = html`
+        <iframe src="https://static.fc2.com/misc/blog/view/other.html?id=dQw4w9WgXcQ"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a path going on past the shell', async () => {
+      const value = html`
+        <iframe src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html/x?id=dQw4w9WgXcQ"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a shell naming no video', async () => {
+      const value = html`
+        <iframe src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?id=playlist"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
   })
 })
