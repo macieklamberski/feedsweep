@@ -74,7 +74,7 @@ export const mergeEmojiNames = (tables: Array<EmojiNameTable>): Record<string, s
 // Applied to a filename in turn: the query and hash split, then the stock-file, icon-set and
 // resolution markers that are not part of the name.
 const queryOrHashRegex = /[?#]/
-const namePrefixRegex = /^(?:default_|face-|smiley-|sf-)/
+const namePrefixRegex = /^(?:default_|face-|smiley-|sf-|1[56]x1[56]_)/
 const nameVariantRegex = /@[0-9]+x$/
 
 // A 1x1 sprite GIF data URI is under 256 bytes, and a real inlined PNG is not.

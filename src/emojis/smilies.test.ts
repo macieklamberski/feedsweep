@@ -619,6 +619,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       ['smiley-very-happy', 'Smiley très heureux', '😁'],
       ['smiley-tongue', 'Emotikon: Język', '😛'],
       ['smiley-sad', 'Emotikon: Smutny', '🙁'],
+      ['smiley-mad', 'Smiley Mad', '😠'],
       ['smiley-surprised', 'Emotikon: Zaskoczony', '😲'],
       ['smiley-lol', 'Smiley LOL', '🤣'],
       ['smiley-embarrassed', 'Smiley Embarrassed', '😳'],
@@ -689,6 +690,126 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       `
 
       expect(await transformKeeping(value)).toEqualHtml(value)
+    })
+
+    it('should mark a face with no counterpart by its emoticon- class', async () => {
+      const value = html`
+        <p>
+          <img
+            id="womanwink"
+            class="emoticon emoticon-womanwink"
+            src="https://example.com/i/smilies/16x16_woman-wink.png"
+            alt="Woman Wink"
+            title="Woman Wink"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            id="womanwink"
+            class="emoticon emoticon-womanwink"
+            src="https://example.com/i/smilies/16x16_woman-wink.png"
+            alt="Woman Wink"
+            title="Woman Wink"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // Windows Live Writer's own emoticons, which have no name table.
+    it('should leave a Windows Live Writer emoticon untouched', async () => {
+      const value = html`
+        <p>
+          <img
+            class="wlEmoticon wlEmoticon-winkingsmile"
+            alt="Winking smile"
+            src="https://example.com/wp-content/uploads/2019/03/1212.wlEmoticon-winkingsmile_63772F9B.png"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // Vodafone's copy of the set is sized 15x15.
+    it('should replace a face from the 15x15 set', async () => {
+      const value = html`
+        <p>
+          <img
+            id="smileywink"
+            class="emoticon emoticon-smileywink"
+            src="https://example.com/html/@929CB104E9842E64CFFA4DDBA9219E92/images/emoticons/15x15_smiley-wink.gif"
+            alt=""
+            title=""
+          >
+        </p>
+      `
+      const expected = '<p>😉</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a Samsung emoji by the codepoint in its numbered filename', async () => {
+      const value = html`
+        <p>
+          <img
+            class="lia-deferred-image lia-image-emoji"
+            src="https://example.com/html/@1BBE730D66F6AF8A8EB16B462DAF441D/images/smilies/2.winking-face_1f609.png"
+            alt=":winking-face:"
+            title=":winking-face:"
+          >
+        </p>
+      `
+      const expected = '<p>😉</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a Samsung emoji with a skin tone by its full sequence', async () => {
+      const value = html`
+        <p>
+          <img
+            class="lia-deferred-image lia-image-emoji"
+            src="https://example.com/html/@684C5748BA1AA2FD7E2E3E73F2D23AAF/images/smilies/10.thumbs-up-sign_emoji-modifier-fitzpatrick-type-1-2_1f44d-1f3fb_1f3fb.png"
+            alt=":thumbs-up-sign-emoji-modifier-fitzpatrick-type:"
+            title=":thumbs-up-sign-emoji-modifier-fitzpatrick-type:"
+          >
+        </p>
+      `
+      const expected = '<p>👍🏻</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // Samsung's own smiling face is filed under the codepoint of 🃏.
+    it('should mark the Samsung smiling face without decoding its filename', async () => {
+      const value = html`
+        <p>
+          <img
+            class="lia-deferred-image lia-image-emoji"
+            src="https://example.com/html/@758C9CF82B69C1E7230907A98BEAE742/images/smilies/1.samsung_1f0cf.png"
+            alt=":smiling-face:"
+            title=":smiling-face:"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="lia-deferred-image lia-image-emoji"
+            src="https://example.com/html/@758C9CF82B69C1E7230907A98BEAE742/images/smilies/1.samsung_1f0cf.png"
+            alt=":smiling-face:"
+            title=":smiling-face:"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should be idempotent', async () => {
