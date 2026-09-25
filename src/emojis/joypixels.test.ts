@@ -85,8 +85,29 @@ describeForEachParser('joypixelsEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('JoyPixels 5 and later', () => {
+    it('should decode the filename of an image carrying the joypixels class', async () => {
+      const value = html`
+        <p>
+          <img
+            class="joypixels"
+            alt=""
+            src="https://example.com/emoji/1f4aa.png"
+          >
+        </p>
+      `
+      const expected = '<p>💪</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('hosts', () => {
-    const hosts = ['cdn.jsdelivr.net/joypixels/assets/', 'cdn.jsdelivr.net/emojione/']
+    const hosts = [
+      'cdn.jsdelivr.net/joypixels/assets/',
+      'cdn.jsdelivr.net/emojione/',
+      'cdnjs.cloudflare.com/ajax/libs/emojione/',
+    ]
 
     it.each(hosts)('should replace an emoji image from %s', async (host) => {
       const value = `<p>Hi <img src="https://${host}1f642.png" alt="🙂"></p>`
