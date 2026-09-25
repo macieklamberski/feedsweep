@@ -102,6 +102,22 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should replace an unmapped 1.x sprite with its literal alt', async () => {
+      const value = html`
+        <p>
+          <img
+            src="styles/default/xenforo/clear.png"
+            class="mceSmilieSprite mceSmilie553"
+            alt=":upyeah:"
+            title="UpYeah    :upyeah:"
+          >
+        </p>
+      `
+      const expected = '<p><span data-emoji="">:upyeah:</span></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     // The theme directory differs per board, so the `smilies` directory is what identifies a
     // self-hosted set. Converting these matches how phpBB's are already treated.
     it('should replace a self-hosted XenForo smilie from its theme directory', async () => {
