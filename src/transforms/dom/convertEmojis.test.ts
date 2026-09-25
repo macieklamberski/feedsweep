@@ -185,6 +185,42 @@ describeForEachParser('convertEmojis', (parseHtml) => {
     })
   })
 
+  describe('image result', () => {
+    const imageResolver: EmojiResolver = {
+      kind: 'emoji',
+      selector: 'gl-emoji',
+      extract: (element) => {
+        return {
+          image: element.getAttribute('data-fallback-src') ?? '',
+          alt: ':partyparrot:',
+        }
+      },
+    }
+
+    it('should replace the element with a marked image of the url', async () => {
+      const value = '<p><gl-emoji data-fallback-src="https://example.com/p.gif"></gl-emoji></p>'
+      const expected =
+        '<p><img src="https://example.com/p.gif" alt=":partyparrot:" data-emoji=""></p>'
+
+      expect(await transformWith(value, [imageResolver])).toEqualHtml(expected)
+    })
+
+    it('should resolve a relative url against the base url', async () => {
+      const value = '<p><gl-emoji data-fallback-src="/uploads/p.gif"></gl-emoji></p>'
+      const expected =
+        '<p><img src="https://example.com/uploads/p.gif" alt=":partyparrot:" data-emoji=""></p>'
+      const context = {
+        ...baseContext,
+        baseUrl: 'https://example.com/feed',
+        emojiResolvers: [imageResolver],
+      }
+
+      expect(await applyDomTransforms(parseHtml(value), [convertEmojis(context)])).toEqualHtml(
+        expected,
+      )
+    })
+  })
+
   describe('alt-shape guard', () => {
     it('should preserve multi-codepoint alt (ZWJ sequence)', async () => {
       const value = '<p><img alt="👨‍👩‍👧" class="wp-smiley"></p>'
