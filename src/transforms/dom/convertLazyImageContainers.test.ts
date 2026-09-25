@@ -23,6 +23,61 @@ describeForEachParser('convertLazyImageContainers', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should prepend the img to a div that holds content and keep that content', async () => {
+    const value = html`
+      <div data-src="https://example.com/bg.jpg">
+        <p>Important text</p>
+      </div>
+    `
+    const expected = html`
+      <div data-src="https://example.com/bg.jpg">
+        <img src="https://example.com/bg.jpg">
+        <p>Important text</p>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep the figcaption of a figure container', async () => {
+    const value = html`
+      <figure data-src="https://example.com/photo.jpg">
+        <figcaption>Caption</figcaption>
+      </figure>
+    `
+    const expected = html`
+      <figure data-src="https://example.com/photo.jpg">
+        <img src="https://example.com/photo.jpg">
+        <figcaption>Caption</figcaption>
+      </figure>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep bare text inside the container', async () => {
+    const value = html`
+      <div data-src="https://example.com/photo.jpg">
+        Caption
+      </div>
+    `
+    const expected = html`
+      <div data-src="https://example.com/photo.jpg">
+        <img src="https://example.com/photo.jpg">
+        Caption
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a container that holds only whitespace', async () => {
+    const value = '<div data-src="https://example.com/photo.jpg">\n  </div>'
+    const expected = '<img src="https://example.com/photo.jpg">'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should keep an image-shaped src with a query string', async () => {
     const value = '<div data-src="https://example.com/photo.jpg?w=600"></div>'
     const expected = '<img src="https://example.com/photo.jpg?w=600">'
@@ -70,6 +125,18 @@ describeForEachParser('convertLazyImageContainers', (parseHtml) => {
 
   it('should be idempotent', async () => {
     const value = '<div data-src="https://example.com/photo.jpg"></div>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent on a container that holds content', async () => {
+    const value = html`
+      <div data-src="https://example.com/photo.jpg">
+        <p>Text</p>
+      </div>
+    `
     const once = await transform(value)
     const twice = await transform(once)
 
