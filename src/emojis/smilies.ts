@@ -298,10 +298,17 @@ const markerSelectors = [
   'img[class~="e-emoticon" i]', // e107
   'img[class~="bbc_emoticon" i]', // Invision Power Board and IPS
   'img[data-emoticon]', // Invision Power Board and IPS
+  'img[class~="ipsemoji" i]', // IPS 4
   'img[class~="lia-image-emoji" i]', // Khoros
   // Khoros, as in `emoticon emoticon-smileywink`. Case-sensitive, since Windows Live Writer's
   // `wlEmoticon-smile` has no name table.
   'img[class*="emoticon-"]',
+  'img[class~="bbcode_smiley" i]', // Kunena, NBBC
+  'img[class~="spsmiley" i]', // Simple:Press
+  'img[class~="smiley-content" i]', // Drupal Smileys
+  'img[class~="wpml_ico" i]', // WP Monalisa
+  'img[class~="bb-smiley" i]', // EasyDiscuss
+  'img[smilieid]', // Discuz, vBulletin 5
 ]
 const markerSelector = markerSelectors.join(', ')
 

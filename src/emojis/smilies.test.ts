@@ -584,6 +584,158 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('marker classes', () => {
+    it('should mark an unmapped Kunena smilie by its bbcode_smiley class', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/media/kunena/emoticons/w00t.png"
+            alt=":woohoo:"
+            class="bbcode_smiley"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/media/kunena/emoticons/w00t.png"
+            alt=":woohoo:"
+            class="bbcode_smiley"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark an unmapped Simple:Press smilie by its spSmiley class', async () => {
+      const value = html`
+        <p>
+          <img
+            class="spSmiley"
+            alt="rip"
+            src="https://example.com/wp-content/sp-resources/forum-smileys/rip_zpsec10ede9.gif"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="spSmiley"
+            alt="rip"
+            src="https://example.com/wp-content/sp-resources/forum-smileys/rip_zpsec10ede9.gif"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark an unmapped Drupal smilie by its smiley-content class', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/modules/smileys/packs/Roving/flat.png"
+            alt="Stare"
+            class="smiley-content"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/modules/smileys/packs/Roving/flat.png"
+            alt="Stare"
+            class="smiley-content"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark an unmapped WP Monalisa smilie by its wpml_ico class', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/wp-content/plugins/wp-monalisa/icons/smiley_emoticons_nicken.gif"
+            alt=":ja:"
+            class="wpml_ico"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/wp-content/plugins/wp-monalisa/icons/smiley_emoticons_nicken.gif"
+            alt=":ja:"
+            class="wpml_ico"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark an unmapped Discuz smilie by its smilieid attribute', async () => {
+      const value = html`
+        <p>
+          <img
+            alt=""
+            src="https://example.com/images/smilies/default/run.gif"
+            smilieid="52"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            alt=""
+            src="https://example.com/images/smilies/default/run.gif"
+            smilieid="52"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace an EasyDiscuss smilie by its bb-smiley class', async () => {
+      const value = html`
+        <p>
+          <img
+            alt=":)"
+            class="bb-smiley"
+            src="https://example.com/media/com_easydiscuss/images/markitup/emoticon-smile.png"
+          >
+        </p>
+      `
+      const expected = '<p>🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace an IPS 4 emoji by its ipsEmoji class', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/uploads/emoji/1f602.png"
+            class="ipsEmoji"
+            alt="😂"
+          >
+        </p>
+      `
+      const expected = '<p>😂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('WoltLab (codepoint filenames under /smilies/)', () => {
     // The file is named after the codepoint, so only the alt says what the picture is.
     const shortcodeCases: Array<[string, string, string]> = [
