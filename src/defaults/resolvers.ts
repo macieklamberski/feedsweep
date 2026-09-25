@@ -121,6 +121,7 @@ import { odyseeEmbedResolver } from '../embeds/odysee.js'
 import { omnyEmbedResolver } from '../embeds/omny.js'
 import { padletEmbedResolver } from '../embeds/padlet.js'
 import { peertubeEmbedResolver } from '../embeds/peertube.js'
+import { pixivScriptEmbedResolver } from '../embeds/pixiv.js'
 import { podbeanEmbedResolver } from '../embeds/podbean.js'
 import { podetizeIframeEmbedResolver, podetizeScriptEmbedResolver } from '../embeds/podetize.js'
 import { podigeeIframeEmbedResolver, podigeeScriptEmbedResolver } from '../embeds/podigee.js'
@@ -267,6 +268,7 @@ const embedResolvers: Array<EmbedResolver> = [
   odyseeEmbedResolver,
   omnyEmbedResolver,
   padletEmbedResolver,
+  pixivScriptEmbedResolver,
   podbeanEmbedResolver,
   podetizeScriptEmbedResolver,
   podetizeIframeEmbedResolver,
