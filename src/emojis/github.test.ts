@@ -34,8 +34,28 @@ describeForEachParser('githubImageEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('gemoji names', () => {
+    it('should replace an image whose file is named by a gemoji name', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://assets-cdn.github.com/images/icons/emoji/arrow_up.png"
+            alt=":arrow_up:"
+          >
+        </p>
+      `
+      const expected = '<p>⬆️</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('hosts', () => {
-    const hosts = ['githubassets.com/images/icons/emoji/', 'assets.github.com/images/icons/emoji/']
+    const hosts = [
+      'githubassets.com/images/icons/emoji/',
+      'assets.github.com/images/icons/emoji/',
+      'assets-cdn.github.com/images/icons/emoji/',
+    ]
 
     it.each(hosts)('should replace an emoji image from %s', async (host) => {
       const value = `<p>Hi <img src="https://${host}1f642.png" alt="🙂"></p>`
@@ -97,6 +117,13 @@ describeForEachParser('githubElementEmojiResolver', (parseHtml) => {
   it('should replace an empty element by its alias when the table carries it', async () => {
     const value = '<p><g-emoji class="g-emoji" alias="wink"></g-emoji></p>'
     const expected = '<p>😉</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace an empty element by a gemoji alias the table misses', async () => {
+    const value = '<p><g-emoji class="g-emoji" alias="tophat"></g-emoji></p>'
+    const expected = '<p>🎩</p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
