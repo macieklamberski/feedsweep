@@ -384,6 +384,12 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       ['Drupal smileys module', 'http://example.com/misc/smileys/smile.png', '🙂'],
       ['blog smileys directory', 'http://example.com/images/smileys/big_smile.gif', '😁'],
       ['Kunena emoticons directory', 'http://example.com/media/kunena/emoticons/unsure.png', '😕'],
+      ['FUDforum', 'http://example.com/forum/images/smiley_icons/icon_wink.gif', '😉'],
+      [
+        'TinyMCE 3',
+        'http://example.com/editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-smile.gif',
+        '🙂',
+      ],
     ]
 
     it.each(pathCases)('should replace a %s smilie', async (_engine, source, expected) => {
@@ -396,6 +402,43 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       const value = '<p><img src="http://example.com/smilies/yahoo_laughloud.gif" alt=":))"></p>'
 
       expect(await transformKeeping(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('TinyMCE 3 (/plugins/emotions/img/ names)', () => {
+    const nameCases: Array<[string, string]> = [
+      ['sealed', '🤐'],
+      ['embarassed', '😳'],
+      ['tongue-out', '😛'],
+      ['money-mouth', '🤑'],
+    ]
+
+    it.each(nameCases)('should replace the %s face', async (name, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-${name}.gif"
+            class="flag"
+            alt=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    it('should leave the foot-in-mouth face untouched', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-foot-in-mouth.gif"
+            class="flag"
+            alt="Foot in mouth"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
     })
   })
 

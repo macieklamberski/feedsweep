@@ -13,12 +13,10 @@ export const vanillaEmojiNameTable: EmojiNameTable = {
   name: 'Vanilla',
   names: {
     'simple-smile': '🙂',
-    'tongue-out': '😛',
-    'money-mouth': '🤑',
   },
 }
 
-// Vanilla ships the stock forum names alongside the three of its own.
+// Vanilla ships the stock forum names alongside its own.
 const names = toMap(mergeEmojiNames([...smiliesEmojiNameTables, vanillaEmojiNameTable]))
 
 // Vanilla's emoji. The directory is the only signal, since Vanilla's class is the generic `emoji`.
