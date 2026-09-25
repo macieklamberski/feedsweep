@@ -142,9 +142,12 @@ export const normalizeAnchoredHeadings: DomTransform = ({ baseUrl, resolveUrlFn 
           continue
         }
 
+        // A generator-class anchor beside the title carries a label like "link", not heading
+        // text. Any other qualifying anchor holds the title itself, so its text stays.
         const wrapsHeading = (heading.textContent ?? '').trim() === visible
+        const isLabelledMarker = hasKnownClass && !wrapsHeading
 
-        if (!isSymbolOnly && wrapsHeading) {
+        if (!isSymbolOnly && !isLabelledMarker) {
           while (anchor.firstChild) {
             const child = anchor.firstChild
 
