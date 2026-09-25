@@ -1,4 +1,4 @@
-import { isHostOf, isSubdomainOf, parseUrl } from 'trousse'
+import { isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { ResolveUrlFn, TransformContext } from '../types.js'
 
 // Each helper names the slice of the context it actually reads, so a caller holding only a
@@ -82,42 +82,14 @@ export const isUrlShaped = (value: string): boolean => {
   return urlShapeRegex.test(value)
 }
 
-// A url sits on one of the hosts when it is that host exactly or a subdomain of it. The pair is
-// the whole question every host-keyed resolver asks, and half of it silently claims too little.
-export const isOnHosts = (url: string | URL, hosts: string | ReadonlyArray<string>): boolean => {
-  return isHostOf(url, hosts) || isSubdomainOf(url, hosts)
-}
-
 export const parseUrlOnHosts = (
   url: string | undefined,
   hosts: string | ReadonlyArray<string>,
 ): URL | undefined => {
   const parsed = url ? parseUrl(url, placeholderBaseUrl) : undefined
 
-  if (parsed && isOnHosts(parsed, hosts)) {
+  if (parsed && isHostOrSubdomainOf(parsed, hosts)) {
     return parsed
-  }
-}
-
-// A path segment arrives percent-encoded, unlike a query value, which `searchParams` decodes.
-export const decodeSegment = (segment: string | undefined): string | undefined => {
-  try {
-    return segment === undefined ? undefined : decodeURIComponent(segment)
-  } catch {}
-}
-
-// Decodes a percent-encoded value, handing back the raw text when the escape is malformed, for a
-// field the undecoded form still reads as. A falsy value returns undefined, since
-// decodeURIComponent answers the string "undefined" for a missing one.
-export const decodeOrKeep = (value: string | undefined): string | undefined => {
-  if (!value) {
-    return
-  }
-
-  try {
-    return decodeURIComponent(value)
-  } catch {
-    return value
   }
 }
 
