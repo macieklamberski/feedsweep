@@ -1145,6 +1145,41 @@ describeForEachParser('flashVars', (parseHtml) => {
     expect(flashVars(element)).toBeUndefined()
   })
 
+  it('should read the param of an object carrier', () => {
+    const document = parseHtml(html`
+      <object data="player.swf">
+        <param name="flashvars" value="config=own" />
+      </object>
+    `)
+    const element = queryElement(document, 'object')
+
+    expect(flashVars(element)).toBe('config=own')
+  })
+
+  it('should not read the param of a neighbouring object', () => {
+    const document = parseHtml(html`
+      <p>
+        <object data="first.swf"><param name="flashvars" value="config=first" /></object>
+        <object data="second.swf"></object>
+      </p>
+    `)
+    const element = document.querySelectorAll('object')[1]
+
+    expect(flashVars(element)).toBeUndefined()
+  })
+
+  it('should not read an object param from a bare embed beside it', () => {
+    const document = parseHtml(html`
+      <p>
+        <object data="first.swf"><param name="flashvars" value="config=first" /></object>
+        <embed src="second.swf">
+      </p>
+    `)
+    const element = queryElement(document, 'embed')
+
+    expect(flashVars(element)).toBeUndefined()
+  })
+
   it('should return undefined when nothing carries the config', () => {
     const document = parseHtml('<embed src="player.swf">')
     const element = queryElement(document, 'embed')
