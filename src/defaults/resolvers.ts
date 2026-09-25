@@ -173,7 +173,11 @@ import { ghostMediaResolver } from '../media/ghost.js'
 import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
 import { wechatMediaResolver } from '../media/wechat.js'
-import { weeblyMediaResolver } from '../media/weebly.js'
+import {
+  weeblyFlashMediaResolver,
+  weeblyIframeMediaResolver,
+  weeblyMediaResolver,
+} from '../media/weebly.js'
 import { wikimediaMediaResolver } from '../media/wikimedia.js'
 import type { CiteResolver, EmbedResolver, MediaResolver, WidgetResolver } from '../types.js'
 
@@ -333,6 +337,8 @@ const mediaResolvers: Array<MediaResolver> = [
   substackMediaResolver,
   wechatMediaResolver,
   weeblyMediaResolver,
+  weeblyIframeMediaResolver,
+  weeblyFlashMediaResolver,
   wikimediaMediaResolver,
 ]
 
