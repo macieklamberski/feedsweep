@@ -125,11 +125,25 @@ export const keepIfMatches = (value: Nullish<string>, regex: RegExp): string | u
   return value && regex.test(value) ? value : undefined
 }
 
-// A `.swf` carrier names what it plays in flashvars, an attribute on `<embed>` and a sibling
+// The `<object>` whose params configure a carrier: the carrier itself, or the object an `<embed>`
+// fallback sits in. Any wider search reads a neighbouring player's params.
+const paramOwner = (element: Nullish<Element>): Element | undefined => {
+  if (element?.localName === 'object') {
+    return element
+  }
+
+  const parent = element?.parentElement
+
+  if (parent?.localName === 'object') {
+    return parent
+  }
+}
+
+// A `.swf` carrier names what it plays in flashvars, an attribute on `<embed>` and a
 // `<param name="flashvars">` under `<object>`. Brightcove and Flickr write it as a query string,
 // Archive as a config blob.
 export const flashVars = (element: Nullish<Element>): string | undefined => {
-  return attr(element, 'flashvars') ?? paramValue(element?.parentElement, 'flashvars')
+  return attr(element, 'flashvars') ?? paramValue(paramOwner(element), 'flashvars')
 }
 
 // One named value out of that configuration, for a carrier that names a single thing.
