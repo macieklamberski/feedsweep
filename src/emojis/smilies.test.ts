@@ -827,6 +827,43 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    // The stock codes of SMF, WordPress and phpBB, on a board whose files are numbered.
+    const aliasCases: Array<[string, string]> = [
+      ['&gt;:(', '😠'],
+      ['???', '😕'],
+      ['::)', '🙄'],
+      [':-[', '😳'],
+      [':-\\', '🫤'],
+      [':-*', '😘'],
+      ['&gt;:D', '😈'],
+      ['O:-)', '😇'],
+      [':smile:', '🙂'],
+      [':sad:', '🙁'],
+      [':razz:', '😛'],
+      [':???:', '😕'],
+      [':neutral:', '😐'],
+      [':-?', '😕'],
+      [':-o', '😲'],
+      [':-|', '😐'],
+      ['8-O', '😲'],
+      [':ugeek:', '🤓'],
+      [':rofl:', '🤣'],
+    ]
+
+    it.each(aliasCases)('should replace the %s code', async (code, expected) => {
+      const value = html`
+        <p>
+          <img
+            class="smilies"
+            src="https://example.com/images/smilies/8.gif"
+            alt="${code}"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
   })
 
   describe('platform filename tables', () => {
@@ -845,6 +882,17 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
         expect(name).toBe(name.toLowerCase())
       },
     )
+
+    it.each(['rofl', 'rotfl'])('should replace the %s file', async (name) => {
+      const value = html`
+        <p>
+          <img class="smilies" src="https://example.com/images/smilies/${name}.gif" alt="">
+        </p>
+      `
+      const expected = '<p>🤣</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
 
     it('should merge the shipped platforms without conflict', () => {
       expect(() => mergeEmojiNames(smiliesEmojiNameTables)).not.toThrow()
