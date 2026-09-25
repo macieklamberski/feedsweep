@@ -82,4 +82,29 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  // Codes from Bitrix's stock set that the shared table does not carry.
+  const stockCodeCases: Array<[string, string]> = [
+    [':facepalm:', '🤦'],
+    [':{}', '😘'],
+    [':-{}', '😘'],
+    [':~(', '😢'],
+    [':-/', '😕'],
+  ]
+
+  it.each(stockCodeCases)('should replace the stock %s code', async (code, expected) => {
+    const value = html`
+      <p>
+        <img
+          src="https://example.com/upload/main/smiles/5/070.gif"
+          data-code="${code}"
+          data-definition="SD"
+          alt="${code}"
+          class="bx-smile"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+  })
 })
