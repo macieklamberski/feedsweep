@@ -187,6 +187,7 @@ import { livedoorEmojiResolver } from '../emojis/livedoor.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
 import { maxEmojiResolver } from '../emojis/max.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
+import { sapoEmojiResolver } from '../emojis/sapo.js'
 import { seesaaEmojiResolver } from '../emojis/seesaa.js'
 import { slackEmojiResolver } from '../emojis/slack.js'
 import { smiliesEmojiResolver } from '../emojis/smilies.js'
@@ -446,6 +447,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   tapatalkEmojiResolver,
   livedoorEmojiResolver,
   seesaaEmojiResolver,
+  sapoEmojiResolver,
   exblogEmojiResolver,
   cocologEmojiResolver,
   jugemEmojiResolver,
