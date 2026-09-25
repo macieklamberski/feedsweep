@@ -3,6 +3,8 @@ import type { EmojiResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
   type EmojiNameTable,
+  getFileStem,
+  glyphFromCodepoints,
   mergeEmojiNames,
   rendersNothing,
   resolveEmojiImage,
@@ -201,22 +203,24 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
     },
   },
   {
+    // Keyed without the `16x16_` size prefix, which Vodafone's copy of the set ships as `15x15_`.
     name: 'Khoros and Lithium',
     names: {
-      '16x16_smiley-happy': '🙂',
-      '16x16_smiley-wink': '😉',
-      '16x16_smiley-very-happy': '😁',
-      '16x16_smiley-tongue': '😛',
-      '16x16_smiley-sad': '🙁',
-      '16x16_smiley-surprised': '😲',
-      '16x16_smiley-lol': '🤣',
-      '16x16_smiley-embarrassed': '😳',
-      '16x16_smiley-indifferent': '😐',
-      '16x16_heart': '❤️',
-      '16x16_cat-happy': '😺',
-      '16x16_cat-very-happy': '😸',
-      '16x16_cat-lol': '😹',
-      // 16x16_cat-wink, -tongue, -embarrassed: Unicode's cat faces stop at the three smiles above.
+      'smiley-happy': '🙂',
+      'smiley-wink': '😉',
+      'smiley-very-happy': '😁',
+      'smiley-tongue': '😛',
+      'smiley-sad': '🙁',
+      'smiley-mad': '😠',
+      'smiley-surprised': '😲',
+      'smiley-lol': '🤣',
+      'smiley-embarrassed': '😳',
+      'smiley-indifferent': '😐',
+      heart: '❤️',
+      'cat-happy': '😺',
+      'cat-very-happy': '😸',
+      'cat-lol': '😹',
+      // cat-wink, -tongue, -embarrassed: Unicode's cat faces stop at the three smiles above.
       // _woman-*, _man-*, _robot-*: no such faces at all.
     },
   },
@@ -294,6 +298,10 @@ const markerSelectors = [
   'img[class~="e-emoticon" i]', // e107
   'img[class~="bbc_emoticon" i]', // Invision Power Board and IPS
   'img[data-emoticon]', // Invision Power Board and IPS
+  'img[class~="lia-image-emoji" i]', // Khoros
+  // Khoros, as in `emoticon emoticon-smileywink`. Case-sensitive, since Windows Live Writer's
+  // `wlEmoticon-smile` has no name table.
+  'img[class*="emoticon-"]',
 ]
 const markerSelector = markerSelectors.join(', ')
 
@@ -314,6 +322,28 @@ const directories = [
 ]
 const directorySelector = directories.map((path) => `img[src*="${path}" i]`).join(', ')
 
+// Samsung's Khoros set files each face as `<n>.<name>_<codepoints>`, as in `2.winking-face_1f609`,
+// and a skin tone appends the modifier's name and codepoint after the full sequence.
+const numberedNameRegex = /^[0-9]+\.([a-z-]+)_/
+
+const glyphFromNumberedName = (src: string): string | undefined => {
+  const stem = getFileStem(src).toLowerCase()
+  const name = stem.match(numberedNameRegex)?.[1]
+
+  // Samsung's own smiling face is filed under the codepoint of 🃏.
+  if (!name || name === 'samsung') {
+    return
+  }
+
+  for (const part of stem.split('_')) {
+    const glyph = glyphFromCodepoints(part)
+
+    if (glyph) {
+      return glyph
+    }
+  }
+}
+
 // Forum smilie images and CSS-sprite emoji, which render oversized or as nothing without site CSS.
 export const smiliesEmojiResolver: EmojiResolver = {
   kind: 'emoji',
@@ -328,6 +358,10 @@ export const smiliesEmojiResolver: EmojiResolver = {
       return
     }
 
-    return resolveEmojiImage(element, { isStrong, names: smiliesEmojiNames })
+    return resolveEmojiImage(element, {
+      isStrong,
+      names: smiliesEmojiNames,
+      glyph: glyphFromNumberedName(src),
+    })
   },
 }
