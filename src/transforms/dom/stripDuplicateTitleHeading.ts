@@ -1,4 +1,5 @@
 import type { DomTransform } from '../../types.js'
+import { isElement, isNonWhitespaceText, NodeFilter } from '../../utils/dom.js'
 
 const headingSelector = 'h1, h2, h3, h4, h5, h6'
 const mediaSelector = 'img, picture, video, audio, iframe, svg'
@@ -29,20 +30,29 @@ export const stripDuplicateTitleHeading: DomTransform = (context) => {
   }
 
   return (document) => {
-    let heading: Element | null = document.querySelector(headingSelector)
-    let text = normalize(heading?.textContent ?? '')
+    const walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+    )
+    let heading: Element | undefined
+    let text = ''
 
-    // Fall back to a full sweep only when the first heading is empty (rare).
-    if (heading && !text) {
-      heading = null
-
-      for (const candidate of document.querySelectorAll(headingSelector)) {
-        text = normalize(candidate.textContent ?? '')
+    // Text or media before the heading means the body does not open with it. An empty heading
+    // is passed over: an orphan closing tag makes the parser inject one before the body.
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (isElement(node) && node.matches(headingSelector)) {
+        text = normalize(node.textContent ?? '')
 
         if (text) {
-          heading = candidate
+          heading = node
           break
         }
+
+        continue
+      }
+
+      if (isNonWhitespaceText(node) || (isElement(node) && node.matches(mediaSelector))) {
+        break
       }
     }
 
