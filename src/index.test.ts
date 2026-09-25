@@ -510,7 +510,10 @@ describeForEachParser('transformContent', (parseHtml) => {
   it('should dimension an image surfaced from a noscript fallback', async () => {
     const value = html`
       <p>
-        <img src="https://example.com/placeholder.gif">
+        <img
+          src="https://example.com/placeholder.gif"
+          data-src="https://example.com/real-1024x768.jpg"
+        >
         <noscript>
           <img src="https://example.com/real-1024x768.jpg">
         </noscript>
