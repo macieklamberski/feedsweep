@@ -170,6 +170,7 @@ type CleanUrl = {
 }
 
 export const cleanUrl: CleanUrl = ((url, context: CleanContext) => {
+  // biome-ignore lint/nursery/useNullishCoalescing: An empty cleaned url keeps the input url.
   return url ? context.cleanUrlFn?.(url) || url : undefined
 }) as CleanUrl
 

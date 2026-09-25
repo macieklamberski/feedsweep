@@ -105,6 +105,7 @@ const readSubstackPodcast = (element: Nullish<Element>): Partial<EmbedResolverRe
     return {}
   }
 
+  // biome-ignore-start lint/nursery/useNullishCoalescing: An empty payload string reads as absent.
   return {
     title: attributes.title || undefined,
     // A show card states the show's own title here, so only an episode has a publication to name.
@@ -119,6 +120,7 @@ const readSubstackPodcast = (element: Nullish<Element>): Partial<EmbedResolverRe
     date: attributes.releaseDate || undefined,
     duration: readDuration(attributes),
   }
+  // biome-ignore-end lint/nursery/useNullishCoalescing: Closes the range above.
 }
 
 // Apple's music and podcast player iframe. Substack wraps it in a card carrying JSON metadata.

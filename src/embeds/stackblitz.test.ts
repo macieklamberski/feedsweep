@@ -150,12 +150,14 @@ describe('stackblitzResolveEmbed', () => {
 
     // A slug carries dots, so a filename passes the slug test. The enclosure probe reads this same
     // url shape, so a media file on the host would otherwise take the place of a playable element.
-    it.each([
+    const fileNameUrls: Array<string> = [
       'https://stackblitz.com/edit/angular-ivy-snow.mp3',
       'https://stackblitz.com/edit/angular-ivy-snow.mp4',
       'https://stackblitz.com/edit/angular-ivy-snow.pdf',
       'https://stackblitz.com/edit/angular-ivy-snow.jpg',
-    ])('should refuse the file name %s', (value) => {
+    ]
+
+    it.each(fileNameUrls)('should refuse the file name %s', (value) => {
       expect(stackblitzResolveEmbed(value)).toBeUndefined()
     })
   })

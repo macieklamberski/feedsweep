@@ -63,12 +63,14 @@ describe('extractMegaphoneEmbed', () => {
   // The refusal covers every file the reader can already show and not only the playable ones. A
   // picture or a document carrying one of these parameters pays the price audio does: the
   // attachment becomes a click-to-load player box and the file itself never renders.
-  it.each([
+  const fileUrls: Array<string> = [
     'https://dcs.megaphone.fm/ART9963319425.jpg?e=AUDD4761726018',
     'https://traffic.megaphone.fm/cover.png?p=NSM7546490835',
     'https://dcs.megaphone.fm/transcript.pdf?e=AUDD4761726018',
     'https://dcs.megaphone.fm/shownotes.docx?e=AUDD4761726018',
-  ])('should not read a publisher parameter off a file url (%s)', (url) => {
+  ]
+
+  it.each(fileUrls)('should not read a publisher parameter off a file url (%s)', (url) => {
     expect(extractMegaphoneEmbed(url)).toBeUndefined()
   })
 
@@ -81,7 +83,12 @@ describe('extractMegaphoneEmbed', () => {
 
   // The prefix is the publisher's own name, so it has no length anyone controls. Both of these
   // are real episodes, confirmed against Megaphone's oEmbed, and a cap at eleven refused them.
-  it.each(['NEXOJORNALLTDA1003659364', 'ADSMOVILESPAASL1044003821'])(
+  const longPublisherPrefixIds: Array<string> = [
+    'NEXOJORNALLTDA1003659364',
+    'ADSMOVILESPAASL1044003821',
+  ]
+
+  it.each(longPublisherPrefixIds)(
     'should read an episode id with a long publisher prefix (%s)',
     (id) => {
       const value = `https://playlist.megaphone.fm/?e=${id}`

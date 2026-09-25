@@ -112,14 +112,16 @@ describeForEachParser('peertubeEmbedResolver', (parseHtml) => {
   // Every host the 2026-09-03 corpus sample found on one of the three paths without being
   // PeerTube, with the id it carries. None puts a video id straight after the route.
   describe('sites serving the same paths', () => {
-    it.each([
+    const lookalikePathUrls: Array<string> = [
       'https://marvel.com/videos/watch/5016',
       'https://www.europe1.fr/videos/embed/941392',
       'https://tv.libertaddigital.com/videos/embed/3-x9q1btk.html',
       'https://www.bing.com/videos/watch/video/a-clip-slug/8e0e7a18',
       'https://fortune.com/videos/watch/a-clip-slug/1f300b16-b7bb-4d26-88c5-be7fc19ddd56',
       'https://videoapi.my.mail.ru/videos/embed/mail/someone/_myvideo/10.html',
-    ])('should return undefined for %s', async (source) => {
+    ]
+
+    it.each(lookalikePathUrls)('should return undefined for %s', async (source) => {
       const value = `<iframe src="${source}"></iframe>`
 
       expect(await extract(value)).toBeUndefined()

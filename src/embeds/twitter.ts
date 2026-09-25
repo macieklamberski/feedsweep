@@ -105,6 +105,7 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
 const readAuthor = (bylineText: string | undefined): string | undefined => {
   const byline = bylineText?.match(bylineRegex)
 
+  // biome-ignore lint/nursery/useNullishCoalescing: A byline left empty reads as absent.
   return byline ? byline[1] || undefined : bylineText || undefined
 }
 

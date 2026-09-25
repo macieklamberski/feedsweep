@@ -395,18 +395,25 @@ describeForEachParser('unwrapEmojiImages', (parseHtml) => {
 
     // The parent of the smilies directory is the theme name and differs per board, so these
     // are all the same set under different skins.
-    it.each([
+    const themeSmiliePaths: Array<string> = [
       '/themes/default/smilies/smile.png',
       '/dc2themes/mrvb6_sobre/smilies/smile.png',
       '/plxeditor/smilies/smile.png',
       '/style/BlueSky/smilies/smile.png',
-    ])('should replace a smilie served from the theme directory %s', async (path) => {
-      const value = `<p><img src="https://example.com${path}" alt=":)" class="smiley"></p>`
+    ]
 
-      expect(await transform(value)).toEqualHtml('<p>🙂</p>')
-    })
+    it.each(themeSmiliePaths)(
+      'should replace a smilie served from the theme directory %s',
+      async (path) => {
+        const value = `<p><img src="https://example.com${path}" alt=":)" class="smiley"></p>`
 
-    it.each(['smiley', 'smilie', 'mceSmilie'])(
+        expect(await transform(value)).toEqualHtml('<p>🙂</p>')
+      },
+    )
+
+    const singularSmilieClasses: Array<string> = ['smiley', 'smilie', 'mceSmilie']
+
+    it.each(singularSmilieClasses)(
       'should recognize the singular %s class other engines use',
       async (className) => {
         const value = `<p><img src="/x/smilies/wink.png" alt=";)" class="${className}"></p>`
@@ -1361,7 +1368,9 @@ describeForEachParser('unwrapEmojiImages', (parseHtml) => {
 
     // These are real alts from localized boards. The old guard accepted anything non-ASCII
     // without ASCII letters, so each was injected into the text in place of its image.
-    it.each(['壞笑', 'улыбка', '笑顔', 'χαμόγελο'])(
+    const localizedWords: Array<string> = ['壞笑', 'улыбка', '笑顔', 'χαμόγελο']
+
+    it.each(localizedWords)(
       'should leave image untouched when alt is the localized word %s',
       async (alt) => {
         const value = `<p><img src="emoji.png" alt="${alt}" class="wp-smiley"></p>`
@@ -1372,7 +1381,9 @@ describeForEachParser('unwrapEmojiImages', (parseHtml) => {
 
     // A subdivision flag is a base flag plus tag characters spelling the region code, so the
     // guard has to accept a class of character that appears in nothing else.
-    it.each(['🏴󠁧󠁢󠁳󠁣󠁴󠁿', '🏴󠁧󠁢󠁥󠁮󠁧󠁿', '🏴󠁧󠁢󠁷󠁬󠁳󠁿'])(
+    const subdivisionFlags: Array<string> = ['🏴󠁧󠁢󠁳󠁣󠁴󠁿', '🏴󠁧󠁢󠁥󠁮󠁧󠁿', '🏴󠁧󠁢󠁷󠁬󠁳󠁿']
+
+    it.each(subdivisionFlags)(
       'should replace image when alt is the subdivision flag %s',
       async (flag) => {
         const value = `<p><img class="wp-smiley" src="/f.png" alt="${flag}"></p>`

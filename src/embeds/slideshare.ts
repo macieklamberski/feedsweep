@@ -48,12 +48,13 @@ export const slideshareResolveEmbed: ResolveEmbed = (url) => {
   // one it replaced. The key form is left as it stands. The numeric one is already canonical.
   const isKeyed = segments[marker + 1] === 'key'
   const deck = isKeyed ? segments[marker + 2] : segments[marker + 1]
+  const safeDeckRegex = isKeyed ? safeDeckKeyRegex : safeDeckIdRegex
 
   if (!deck) {
     return
   }
 
-  if (!(isKeyed ? safeDeckKeyRegex : safeDeckIdRegex).test(deck)) {
+  if (!safeDeckRegex.test(deck)) {
     return
   }
 

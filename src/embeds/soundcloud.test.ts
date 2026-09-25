@@ -391,16 +391,21 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
 
     // A permalink carries no dot, so any extension a browser can play names a file rather than a
     // handle. The two-segment ones would otherwise read as a track and mint a widget around audio.
-    it.each([
+    const playableMediaUrls: Array<string> = [
       'https://feeds.soundcloud.com/stream/nameless-episode.oga',
       'https://soundcloud.com/downloads/session.webm',
       'https://soundcloud.com/artist/preview.mov',
       'https://soundcloud.com/artist/clip.ogv',
-    ])('should not claim a media file the browser can play itself (%s)', async (url) => {
-      const value = `<iframe src="${url}"></iframe>`
+    ]
 
-      expect(await extract(value)).toBeUndefined()
-    })
+    it.each(playableMediaUrls)(
+      'should not claim a media file the browser can play itself (%s)',
+      async (url) => {
+        const value = `<iframe src="${url}"></iframe>`
+
+        expect(await extract(value)).toBeUndefined()
+      },
+    )
   })
 
   // A permalink admits letters, digits, dashes and underscores and no dot, so a path ending in a
@@ -408,17 +413,22 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
   // because a player would replace them; these are refused because there is no track behind them
   // to play, and a widget minted around one hides the picture and frames a page that is not there.
   describe('files that are not media but are still files', () => {
-    it.each([
+    const pictureAndDocumentUrls: Array<string> = [
       'https://soundcloud.com/artist/artwork.jpg',
       'https://soundcloud.com/artist/cover.png',
       'https://soundcloud.com/artist/sets/photos.webp',
       'https://soundcloud.com/press/kit.pdf',
       'https://soundcloud.com/artist/transcript.docx',
-    ])('should not claim a picture or a document (%s)', async (url) => {
-      const value = `<iframe src="${url}"></iframe>`
+    ]
 
-      expect(await extract(value)).toBeUndefined()
-    })
+    it.each(pictureAndDocumentUrls)(
+      'should not claim a picture or a document (%s)',
+      async (url) => {
+        const value = `<iframe src="${url}"></iframe>`
+
+        expect(await extract(value)).toBeUndefined()
+      },
+    )
   })
 
   // soundcloud.com answers `x-frame-options: SAMEORIGIN`, so a carrier naming a page renders
@@ -505,7 +515,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
 
     // A second segment that is one of the user's own tabs names the profile, so the page is the
     // user and the player is the 450-tall one rather than the 166-tall track bar.
-    it.each([
+    const userTabSegments: Array<string> = [
       'albums',
       'comments',
       'favorites',
@@ -517,22 +527,27 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       'reposts',
       'spotlight',
       'tracks',
-    ])('should read a user tab as the profile it belongs to (/%s)', async (segment) => {
-      const url = `https://soundcloud.com/anjunadeep/${segment}`
-      const value = `<iframe src="${url}"></iframe>`
-      const expected: EmbedResolverResult = {
-        provider: 'soundcloud',
-        src: `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}`,
-        url,
-        height: 450,
-      }
+    ]
 
-      expect(await extract(value)).toEqual(expected)
-    })
+    it.each(userTabSegments)(
+      'should read a user tab as the profile it belongs to (/%s)',
+      async (segment) => {
+        const url = `https://soundcloud.com/anjunadeep/${segment}`
+        const value = `<iframe src="${url}"></iframe>`
+        const expected: EmbedResolverResult = {
+          provider: 'soundcloud',
+          src: `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}`,
+          url,
+          height: 450,
+        }
+
+        expect(await extract(value)).toEqual(expected)
+      },
+    )
 
     // These first segments are SoundCloud's own sections, so none of them is a permalink and
     // none names a single item to size or to link to.
-    it.each([
+    const siteSectionUrls: Array<string> = [
       'https://soundcloud.com/tags/jazz',
       'https://soundcloud.com/discover',
       'https://soundcloud.com/search?q=jazz',
@@ -549,7 +564,9 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       'https://soundcloud.com/settings',
       'https://soundcloud.com/signin',
       'https://soundcloud.com/stations',
-    ])('should not read a site section as user content (%s)', async (url) => {
+    ]
+
+    it.each(siteSectionUrls)('should not read a site section as user content (%s)', async (url) => {
       const value = `<iframe src="${url}"></iframe>`
       const expected: EmbedResolverResult = { provider: 'soundcloud', src: url }
 

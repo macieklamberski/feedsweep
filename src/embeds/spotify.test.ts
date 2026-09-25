@@ -85,12 +85,14 @@ describe('spotifyResolveEmbed', () => {
 
     // The parameter also carries an ordinary open.spotify.com url. It is read by the same path
     // reader as the carrier, so every spelling the carrier's path has, it has too.
-    it.each([
+    const trackUrls: Array<string> = [
       'https://open.spotify.com/track/2ikQOoW9SMmgec0xdU94B0',
       'https://open.spotify.com/intl-de/track/2ikQOoW9SMmgec0xdU94B0',
       'https://open.spotify.com/embed/track/2ikQOoW9SMmgec0xdU94B0',
       'https://OPEN.SPOTIFY.COM/track/2ikQOoW9SMmgec0xdU94B0',
-    ])('should resolve a uri parameter holding the url %s', (uri) => {
+    ]
+
+    it.each(trackUrls)('should resolve a uri parameter holding the url %s', (uri) => {
       const value = `https://open.spotify.com/embed?uri=${encodeURIComponent(uri)}`
       const expected: EmbedResolverResult = {
         provider: 'spotify',

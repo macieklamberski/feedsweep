@@ -7,13 +7,13 @@ import { placeholderBaseUrl } from './urls.js'
 
 // The parser reads a bare `225w` with no url as that candidate's url, and a proxy 404s on it.
 // A Jetpack bug ships `…768w, 225w, 563w` with only the first url present.
-const descriptorOnlyUrl = /^\d+(?:\.\d+)?[wx]$/i
+const descriptorOnlyUrlRegex = /^\d+(?:\.\d+)?[wx]$/i
 // The lenient parser can leave a trailing comma on a malformed candidate's url.
-const trailingComma = /,$/
+const trailingCommaRegex = /,$/
 
 export const parseSrcset = (srcset: string): ReturnType<typeof parseRawSrcset> => {
   return parseRawSrcset(srcset).filter((candidate) => {
-    return !descriptorOnlyUrl.test(candidate.url.replace(trailingComma, ''))
+    return !descriptorOnlyUrlRegex.test(candidate.url.replace(trailingCommaRegex, ''))
   })
 }
 
@@ -55,7 +55,10 @@ const sizeKeywordRanks = toMap({
   preview: 0, // Dedups but never wins: full-size on some hosts
 })
 export const sizeKeywordLiterals = [...sizeKeywordRanks.keys()]
-const sizeKeywordLeaf = new RegExp(`^(?:${sizeKeywordLiterals.join('|')})(\\.[a-z0-9]+)?$`, 'i')
+const sizeKeywordLeafRegex = new RegExp(
+  `^(?:${sizeKeywordLiterals.join('|')})(\\.[a-z0-9]+)?$`,
+  'i',
+)
 
 // The capture is (or resolves to) a URL: absolute, protocol-relative, or relative
 // to the proxy's own origin (a Cloudflare relative path, Next.js, wsrv).
@@ -149,12 +152,12 @@ const pathTransforms: Array<PathTransform> = [
 
 // phpBB's `download/file.php?id=` and Wikidot's `avatar.php?userid=` name the image in the query.
 const scriptExtensionLiterals = ['php', 'aspx', 'ashx', 'axd', 'cgi']
-const scriptLeaf = new RegExp(`\\.(?:${scriptExtensionLiterals.join('|')})$`, 'i')
+const scriptLeafRegex = new RegExp(`\\.(?:${scriptExtensionLiterals.join('|')})$`, 'i')
 
 // A leaf that is only a dimension: `640x360`, `wide__148x84`.
-const dimensionLeaf = /^(.*__)?\d{1,5}x\d{1,5}(\.[a-z0-9]+)?$/i
+const dimensionLeafRegex = /^(.*__)?\d{1,5}x\d{1,5}(\.[a-z0-9]+)?$/i
 // A scaled copy's suffix: `photo-800x450.jpg`, `photo_800x450.jpg`. WordPress writes the hyphen.
-const dimensionSuffix = /[-_]\d{1,5}x\d{1,5}(\.[a-z0-9]+)$/i
+const dimensionSuffixRegex = /[-_]\d{1,5}x\d{1,5}(\.[a-z0-9]+)$/i
 
 // A proxy url can wrap another, a Cloudinary fetch of a Cloudinary upload.
 const unwrapProxiedImage = (url: string): string => {
@@ -225,16 +228,16 @@ export const getImageFingerprint = (rawUrl: string, cleanUrlFn?: CleanUrlFn): st
     const leaf = segments[lastIndex]
 
     // Dropping the query here collapses every image a script endpoint serves into one key.
-    if (scriptLeaf.test(leaf)) {
+    if (scriptLeafRegex.test(leaf)) {
       return `${parsed.host}/${segments.join('/')}${parsed.search}`
     }
 
     // The leaf drops need a parent path, or `/large.jpg` and `/small.jpg` collapse into one key.
-    if (segments.length > 1 && dimensionLeaf.test(leaf)) {
+    if (segments.length > 1 && dimensionLeafRegex.test(leaf)) {
       segments.pop()
-    } else if (dimensionSuffix.test(leaf)) {
-      segments[lastIndex] = leaf.replace(dimensionSuffix, '$1')
-    } else if (segments.length > 1 && sizeKeywordLeaf.test(leaf)) {
+    } else if (dimensionSuffixRegex.test(leaf)) {
+      segments[lastIndex] = leaf.replace(dimensionSuffixRegex, '$1')
+    } else if (segments.length > 1 && sizeKeywordLeafRegex.test(leaf)) {
       segments.pop()
     }
   }

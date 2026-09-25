@@ -190,10 +190,12 @@ export const createUrlEmbedResolver = (
   }
 }
 
+const playerResolverKinds: Array<WidgetResolver['kind']> = ['embed', 'media']
+
 export const isEmbedOrMediaResolver = (
   resolver: WidgetResolver,
 ): resolver is EmbedResolver | MediaResolver => {
-  return resolver.kind === 'embed' || resolver.kind === 'media'
+  return playerResolverKinds.includes(resolver.kind)
 }
 
 export const isMediaResult = (result: WidgetResolverResult): result is MediaResolverResult => {
