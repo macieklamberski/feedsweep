@@ -313,6 +313,16 @@ export const emojiPlatforms: Array<EmojiPlatform> = [
     ],
   },
   {
+    name: 'Twemoji',
+    classes: [
+      'twemoji', // Homeland and pymdownx; twemoji.parse itself defaults to the generic `emoji`
+    ],
+    paths: [
+      'twemoji', // Every mirror names the set somewhere in the url, and files are codepoints
+      'twimg.com/emoji/', // Twitter's own copy, whose pastes carry translated alts
+    ],
+  },
+  {
     name: 'Simple:Press',
     paths: [
       'forum-smileys/', // No leading slash before the directory

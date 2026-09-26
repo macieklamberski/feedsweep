@@ -57,7 +57,7 @@ export const defaultEmojiImageHosts = [
   'cdn.jsdelivr.net/gh/twitter/twemoji', // Twemoji via jsDelivr, used by IPS and others.
   'cdn.jsdelivr.net/joypixels/assets/', // JoyPixels CDN, incl. XenForo emoji mode.
   'twemoji.maxcdn.com/', // Twemoji's retired CDN, still linked from older posts.
-  'abs.twimg.com/emoji/', // Twitter / X embedded tweets.
+  'twimg.com/emoji/', // Twitter / X embedded tweets, from abs and abs-0.
   'githubassets.com/images/icons/emoji/', // GitHub README scrapings.
   'assets.github.com/images/icons/emoji/', // GitHub's pre-2018 asset host; seen in archived feeds.
 ]
