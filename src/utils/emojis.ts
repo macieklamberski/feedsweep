@@ -116,21 +116,16 @@ export const glyphFromCodepoints = (stem: string): string | undefined => {
   return isEmojiShaped(glyph) ? glyph : undefined
 }
 
-// The filename is the second key because it is what survives an empty alt.
+// A codepoint filename names the exact picture and a shortcode only its meaning: WoltLab binds
+// `:evil:` to 1f608, which is 😈. A filename word comes last, as what survives an empty alt.
 const glyphFromVocabularies = (
   token: string | undefined,
   src: string,
   names: Map<string, string>,
 ): string | undefined => {
-  const byShortcode = glyphFromShortcode(token)
-
-  if (byShortcode) {
-    return byShortcode
-  }
-
   // Base64 can contain `/`, so a stem taken from a data URI can match a real name by accident.
   if (src.startsWith('data:')) {
-    return
+    return glyphFromShortcode(token)
   }
 
   const stem = getFileStem(src)
@@ -138,7 +133,7 @@ const glyphFromVocabularies = (
     .replace(namePrefixRegex, '')
     .replace(nameVariantRegex, '')
 
-  return names.get(stem) ?? glyphFromCodepoints(stem)
+  return glyphFromCodepoints(stem) ?? glyphFromShortcode(token) ?? names.get(stem)
 }
 
 // The title attribute is prose on every platform, never a glyph, so it is not read.

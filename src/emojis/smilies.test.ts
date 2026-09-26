@@ -753,7 +753,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
   })
 
   describe('WoltLab (codepoint filenames under /smilies/)', () => {
-    // The file is named after the codepoint, so only the alt says what the picture is.
+    // The file is named after the codepoint, which names the picture more exactly than the alt.
     const shortcodeCases: Array<[string, string, string]> = [
       [':thumbup:', '1f44d', '👍'],
       [':saint:', '1f607', '😇'],
@@ -777,6 +777,24 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
         expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
       },
     )
+
+    // WoltLab binds `:evil:` to the grinning devil, where the shared table reads the angry one.
+    it('should replace a smilie by its codepoint filename over its shortcode alt', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/images/smilies/emojione/1f608.png"
+            alt=":evil:"
+            title=":evil:"
+            class="smiley"
+            height="23"
+          >
+        </p>
+      `
+      const expected = '<p>😈</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('Khoros / Lithium (/i/smilies/ stock faces)', () => {
