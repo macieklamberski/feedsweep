@@ -123,7 +123,7 @@ describeForEachParser('facebookClassicEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave the emoticon to its sibling holding the code as text', async () => {
+  it('should replace the emoticon and its sibling holding the code with the glyph', async () => {
     const value = html`
       <p>Ok<span
           class="emoticon_text"
@@ -131,6 +131,97 @@ describeForEachParser('facebookClassicEmojiResolver', (parseHtml) => {
         >:)</span><span
           class="emoticon emoticon_smile"
           title=":)"
+        ></span></p>
+    `
+    const expected = '<p>Ok🙂</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a sibling code padded with non-breaking spaces', async () => {
+    const value = html`
+      <p>Ok<span
+          class="emoticon_text"
+          aria-hidden="true"
+        >&nbsp;;)&nbsp;</span><span
+          class="emoticon emoticon_wink"
+          title=";)"
+        ></span></p>
+    `
+    const expected = '<p>Ok😉</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace the emoticon and its sibling holding a localized label with the glyph', async () => {
+    const value = html`
+      <p>Ok<span
+          class="emoticon_text"
+          aria-hidden="true"
+        >winkhymiö</span><span
+          class="emoticon emoticon_wink"
+          title=";)"
+        ></span></p>
+    `
+    const expected = '<p>Ok😉</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a sibling holding another code untouched', async () => {
+    const value = html`
+      <p>Ok<span
+          class="emoticon_text"
+          aria-hidden="true"
+        >:(</span><span class="emoticon emoticon_smile" title=":)"></span></p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a sibling holding prose untouched', async () => {
+    const value = html`
+      <p><span
+          class="emoticon_text"
+        >er jeg å fornøyd med :D</span><span class="emoticon emoticon_grin" title=":D"></span></p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a sibling longer than a label untouched', async () => {
+    const value = html`
+      <p><span
+          class="emoticon_text"
+        >We could not stop to smile at the whole thing</span><span
+          class="emoticon emoticon_smile"
+          title=":)"
+        ></span></p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a fallback span that text separates from the emoticon', async () => {
+    const value = html`
+      <p><span class="emoticon_text">:)</span> Ok<span
+          class="emoticon emoticon_smile"
+          title=":)"
+        ></span></p>
+    `
+    const expected = '<p><span class="emoticon_text">:)</span> Ok🙂</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a sibling holding a code no table resolves untouched', async () => {
+    const value = html`
+      <p>Ok<span
+          class="emoticon_text"
+          aria-hidden="true"
+        >&lt;(")</span><span
+          class="emoticon emoticon_penguin"
+          title="&lt;(&quot;)"
         ></span></p>
     `
 
