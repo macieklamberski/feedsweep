@@ -220,6 +220,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       'cat-happy': '😺',
       'cat-very-happy': '😸',
       'cat-lol': '😹',
+      'smiley-frustrated': '😣',
       // cat-wink, -tongue, -embarrassed: Unicode's cat faces stop at the three smiles above.
       // _woman-*, _man-*, _robot-*: no such faces at all.
     },

@@ -1160,6 +1160,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       ['cat-happy', 'Chat heureux', '😺'],
       ['cat-very-happy', 'Chat très heureux', '😸'],
       ['cat-lol', 'Chat MDR', '😹'],
+      ['smiley-frustrated', 'Smiley frustré', '😣'],
     ]
 
     it.each(faceCases)('should replace the %s face', async (name, alt, expected) => {
@@ -1189,21 +1190,6 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
     it.each(keptCases)('should leave the %s variant with its picture', async (_species, name) => {
       const value = `<p><img class="emoticon" src="https://example.com/i/smilies/${name}.png" alt="Wink"></p>`
-
-      expect(await transformKeeping(value)).toEqualHtml(value)
-    })
-
-    // Between annoyed, weary and pouting there is no single face this one obviously means.
-    it('should leave the frustrated face with its picture', async () => {
-      const value = html`
-        <p>
-          <img
-            class="emoticon emoticon-smileyfrustrated"
-            src="https://example.com/i/smilies/16x16_smiley-frustrated.png"
-            alt="Smiley frustré"
-          >
-        </p>
-      `
 
       expect(await transformKeeping(value)).toEqualHtml(value)
     })
