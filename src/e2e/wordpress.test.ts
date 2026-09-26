@@ -189,4 +189,28 @@ describeForEachParser('WordPress', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  it('should mark a pictogram from the TypePad Emoji for TinyMCE plugin', async () => {
+    const value = html`
+      <p>Sunny
+        <img
+          src="https://example.com/wp-content/plugins/typepad-emoji-for-tinymce/icons/01/sun.gif"
+          width="16"
+          height="16"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>Sunny
+        <img
+          data-emoji=""
+          src="https://example.com/wp-content/plugins/typepad-emoji-for-tinymce/icons/01/sun.gif"
+          width="16"
+          height="16"
+        >
+      </p>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })

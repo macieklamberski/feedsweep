@@ -35,4 +35,28 @@ describeForEachParser('cocologEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should mark a TypePad pictogram from the WordPress plugin', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://example.com/wp-content/plugins/typepad-emoji-for-tinymce/icons/06/heart02.gif"
+          width="16"
+          height="16"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://example.com/wp-content/plugins/typepad-emoji-for-tinymce/icons/06/heart02.gif"
+          width="16"
+          height="16"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
 })
