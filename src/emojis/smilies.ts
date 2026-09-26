@@ -400,6 +400,12 @@ const nbbcEmojiNames = toMap({
   lookleft: '👀',
 })
 
+// XenForo 2's shortnames that other engines draw as another face: `o_O` is skeptical on WP
+// Monalisa and a wow face on Menéame, and XenForo draws it dizzy.
+const xenforoShortnames = toMap({
+  o_o: '😵‍💫',
+})
+
 const glyphFromEngineName = (src: string): string | undefined => {
   // A XenForo sprite's base64 can contain `/`, leaving a stem that matches a name by accident.
   if (src.startsWith('data:')) {
@@ -445,7 +451,8 @@ export const smiliesEmojiResolver: EmojiResolver = {
   extract: (element) => {
     // XenForo paints its sprite sheet behind a 1x1 transparent GIF named by data-shortname.
     const src = element.getAttribute('src') ?? ''
-    const isSprite = !!attr(element, 'data-shortname') && rendersNothing(src)
+    const shortname = attr(element, 'data-shortname')?.toLowerCase()
+    const isSprite = !!shortname && rendersNothing(src)
     const isStrong = isSprite || element.matches(markerSelector)
 
     if (!isStrong && !element.matches(directorySelector)) {
@@ -457,7 +464,7 @@ export const smiliesEmojiResolver: EmojiResolver = {
     return resolveEmojiImage(element, {
       isStrong,
       names: smiliesEmojiNames,
-      glyph: engineGlyph,
+      glyph: engineGlyph ?? xenforoShortnames.get(shortname ?? ''),
     })
   },
 }
