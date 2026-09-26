@@ -464,9 +464,13 @@ const glyphFromNumberedName = (src: string): string | undefined => {
   const stem = getFileStem(src).toLowerCase()
   const name = stem.match(numberedNameRegex)?.[1]
 
-  // Samsung's own smiling face is filed under the codepoint of 🃏.
-  if (!name || name === 'samsung') {
+  if (!name) {
     return
+  }
+
+  // Samsung's own smiling face is filed under the codepoint of 🃏.
+  if (name === 'samsung') {
+    return '😀'
   }
 
   for (const part of stem.split('_')) {
