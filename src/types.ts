@@ -164,6 +164,18 @@ export type WidgetResolver = EmbedResolver | MediaResolver | CiteResolver
 
 export type WidgetResolverResult = EmbedResolverResult | MediaResolverResult | CiteResolverResult
 
+export type EmojiResolverResult =
+  | { glyph: string } // Replaced by the text
+  | { text: string } // Fallback text, wrapped in a span carrying data-emoji
+  | { custom: true } // Keeps the picture, gains data-emoji
+
+// Undefined is a weak match with no answer, which leaves the element to the next resolver.
+export type EmojiResolver = {
+  kind: 'emoji'
+  selector: string
+  extract: (element: Element) => EmojiResolverResult | undefined
+}
+
 export type CleanUrlFn = (url: string) => string
 
 // The role a URL plays in the output, so safety policy and neutralization can differ:
@@ -204,7 +216,7 @@ export type TransformContext = {
   deferredIframeSources: Array<DeferredIframeSource>
   trackingHosts: Array<string>
   trackingPathSegments: Array<string>
-  emojiImageHosts: Array<string>
+  emojiResolvers: Array<EmojiResolver>
   avatarImageHosts: Array<string>
   nonContentSelectors: Array<string>
   preservedPreClasses: Array<string>
