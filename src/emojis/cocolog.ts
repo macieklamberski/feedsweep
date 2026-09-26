@@ -7,6 +7,7 @@ export const cocologEmojiResolver: EmojiResolver = {
   selector: [
     'img[src*="emojies.cocolog-nifty.com/emoticon/" i]', // Cocolog
     'img[src*="/.shared/images/emoticon/" i]', // TypePad, which Cocolog runs on, from any of its hosts
+    'img[src*="/wp-content/plugins/typepad-emoji-for-tinymce/icons/" i]', // TypePad's set in WordPress
   ].join(', '),
   extract: (element) => {
     return resolveEmojiImage(element, { isStrong: true })
