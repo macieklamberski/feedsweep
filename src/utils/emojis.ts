@@ -103,6 +103,7 @@ export const getFileStem = (src: string): string => {
 const codepointNameRegex =
   /^(?:[0-9a-f]{4,5}(?:[-_][0-9a-f]{4,5})*|a[9e](?:[-_]fe0f)?|(?:2[3a]|3[0-9])(?:[-_]fe0f)?[-_]20e3)$/
 const codepointSeparatorRegex = /[-_]/
+const textDefaultRegex = /^(?!\p{Emoji_Presentation})\p{Extended_Pictographic}$/u
 
 export const glyphFromCodepoints = (stem: string): string | undefined => {
   if (!codepointNameRegex.test(stem)) {
@@ -113,7 +114,12 @@ export const glyphFromCodepoints = (stem: string): string | undefined => {
   const glyph = String.fromCodePoint(...codepoints)
 
   // A hex-shaped stem like `2000` or `dead` decodes to a space or a lone surrogate.
-  return isEmojiShaped(glyph) ? glyph : undefined
+  if (!isEmojiShaped(glyph)) {
+    return
+  }
+
+  // A lone ☺, © or ❤ renders as a text symbol unless U+FE0F asks for the emoji picture.
+  return textDefaultRegex.test(glyph) ? `${glyph}️` : glyph
 }
 
 // A codepoint filename names the exact picture and a shortcode only its meaning: WoltLab binds

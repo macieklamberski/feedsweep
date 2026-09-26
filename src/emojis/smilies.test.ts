@@ -1021,8 +1021,8 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     const codepointCases: Array<[string, string]> = [
       ['1f618', '😘'],
       ['1f62d', '😭'],
-      ['2639', '☹'],
-      ['263a', '☺'],
+      ['2639', '☹️'],
+      ['263a', '☺️'],
       ['1f1fa-1f1f8', '🇺🇸'],
     ]
 

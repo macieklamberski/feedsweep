@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { mergeEmojiNames } from './emojis.js'
+import { glyphFromCodepoints, mergeEmojiNames } from './emojis.js'
 import vocabularies from './emojis.json' with { type: 'json' }
 
 const asciiLetterRegex = /[a-zA-Z]/
@@ -44,5 +44,26 @@ describe('mergeEmojiNames', () => {
     ]
 
     expect(mergeEmojiNames(agreeing)).toEqual({ smile: '🙂' })
+  })
+})
+
+describe('glyphFromCodepoints', () => {
+  const textDefaultCases: Array<[string, string]> = [
+    ['263a', '☺️'],
+    ['2639', '☹️'],
+    ['a9', '©️'],
+    ['2764', '❤️'],
+  ]
+
+  it.each(textDefaultCases)('should show the text-default codepoint %s as emoji', (stem, glyph) => {
+    expect(glyphFromCodepoints(stem)).toBe(glyph)
+  })
+
+  it('should keep a codepoint that already shows as emoji as it is', () => {
+    expect(glyphFromCodepoints('1f618')).toBe('😘')
+  })
+
+  it('should not add a second selector to a filename that carries one', () => {
+    expect(glyphFromCodepoints('2764-fe0f')).toBe('❤️')
   })
 })

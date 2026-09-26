@@ -57,8 +57,8 @@ describeForEachParser('twemojiEmojiResolver', (parseHtml) => {
 
     // Twemoji drops the leading zeros from the codepoints below 0x100.
     const shortNameCases: Array<[string, string]> = [
-      ['a9', '©'],
-      ['ae', '®'],
+      ['a9', '©️'],
+      ['ae', '®️'],
       ['23-20e3', '#⃣'],
       ['2a-fe0f-20e3', '*️⃣'],
       ['31_20e3', '1⃣'],
