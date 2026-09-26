@@ -74,6 +74,14 @@ describeForEachParser('vkEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should mark an image whose filename carries more than code units', async () => {
+      const value = '<p><img alt="" src="https://vk.com/images/emoji/D83DDE0A_2x.png"></p>'
+      const expected =
+        '<p><img data-emoji="" alt="" src="https://vk.com/images/emoji/D83DDE0A_2x.png"></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     // The sprite is a blank GIF painted by VK's CSS, so it shows nothing in a reader.
     it('should replace a sprite image by its alt', async () => {
       const value = html`

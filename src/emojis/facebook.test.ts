@@ -250,4 +250,11 @@ describeForEachParser('facebookClassicEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(value)
   })
+
+  // Outlook prefixes every class in forwarded markup with `x_`.
+  it('should leave a span whose emoticon class is part of another class untouched', async () => {
+    const value = '<p>Hi <span class="x_emoticon_smile" title=":)"></span></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
 })
