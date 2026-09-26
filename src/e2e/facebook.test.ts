@@ -313,6 +313,23 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  // A post pasted from the classic site paints its emoticons from a sprite sheet the feed does
+  // not load, leaving empty spans that would be deleted as empty tags.
+  it('should replace a classic Facebook emoticon with its character', async () => {
+    const value = html`
+      <p>We are back
+        <span
+          class="emoticon emoticon_smile"
+          style="background-image: url(https://static.example.com/rsrc.php/v2/yO/r/rfFO0dqI-dD.png); display: inline-block; height: 16px; width: 16px;"
+          title=":)"
+        ></span>
+      </p>
+    `
+    const expected = '<p>We are back 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // Facebook refuses to be framed, so a carrier holding the page itself reaches a reader as a
   // blank frame. The plugin takes the page as its href, which is the repair the widget div and
   // the fallback blockquote already perform from their own attributes.

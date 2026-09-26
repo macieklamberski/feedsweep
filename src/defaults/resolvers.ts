@@ -174,7 +174,7 @@ import { bitrixEmojiResolver } from '../emojis/bitrix.js'
 import { cocologEmojiResolver } from '../emojis/cocolog.js'
 import { discordEmojiResolver } from '../emojis/discord.js'
 import { exblogEmojiResolver } from '../emojis/exblog.js'
-import { facebookEmojiResolver } from '../emojis/facebook.js'
+import { facebookClassicEmojiResolver, facebookEmojiResolver } from '../emojis/facebook.js'
 import { genericEmojiResolver } from '../emojis/generic.js'
 import { githubElementEmojiResolver, githubImageEmojiResolver } from '../emojis/github.js'
 import { gitlabEmojiResolver } from '../emojis/gitlab.js'
@@ -423,6 +423,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   githubElementEmojiResolver,
   khorosEmojiResolver,
   jiveEmojiResolver,
+  facebookClassicEmojiResolver,
   // Ahead of smilies, whose /smiles/ directory would read a Bitrix file by its filename first.
   bitrixEmojiResolver,
   // Ahead of smilies, whose forum names draw Liferay's smile.gif as 🙂.
