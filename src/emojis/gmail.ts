@@ -11,6 +11,7 @@ export const gmailEmojiResolver: EmojiResolver = {
   selector: [
     'img[src*="ssl.gstatic.com/mail/emoji/" i]', // The Noto set, named like emoji_u1f601
     'img[src*="mail.google.com/mail/e/" i]', // The legacy set. The rest of /mail/ is attachments
+    'img[src*="youtube.com/s/gaming/emoji/" i]', // YouTube's chat emoji, the same Noto files
     'img[goomoji]',
     'img[data-goomoji]',
   ].join(', '),
