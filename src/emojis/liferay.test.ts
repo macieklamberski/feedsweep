@@ -63,6 +63,20 @@ describeForEachParser('liferayEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should leave a name the forum tables carry to the smilies resolver', async () => {
+    const value = html`
+      <p>
+        <img
+          alt="emoticon"
+          src="https://example.com/o/classic-theme/images/emoticons/wink.gif"
+        >
+      </p>
+    `
+    const expected = '<p>😉</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should leave an emoticon-labelled image outside an emoticons directory untouched', async () => {
     const value = '<p><img alt="emoticon" src="https://example.com/images/smile.gif"></p>'
 
