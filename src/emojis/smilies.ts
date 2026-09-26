@@ -263,6 +263,21 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
     },
   },
   {
+    name: 'Invision Power Board and Kunena',
+    names: {
+      wub: '😍',
+      blink: '😯',
+      wacko: '🤪',
+      ph34r: '🥷',
+      w00t: '🤩',
+      whistling: '😗',
+      doh: '🤦',
+      dry: '😒',
+      mellow: '😑',
+      sleep: '😴',
+    },
+  },
+  {
     // Filenames observed in real feeds whose engine was never pinned down. Kept apart from the
     // lists above so those stay verifiable against a distribution, and this stays honest about
     // being unattributed.
