@@ -38,6 +38,21 @@ describeForEachParser('gmailEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should decode a YouTube chat emoji with an empty alt', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://www.youtube.com/s/gaming/emoji/7ff574f2/emoji_u1f9d8_200d_2640.png"
+          class="yt-core-image yt-core-attributed-string__image-element"
+          alt=""
+        >
+      </p>
+    `
+    const expected = '<p>🧘‍♀</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   // The legacy code is Gmail's own numbering, not a codepoint, so the picture is all there is.
   it('should mark a legacy emoji named by its Gmail code', async () => {
     const value = html`

@@ -250,4 +250,22 @@ describeForEachParser('YouTube', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  // A description copied from YouTube carries its emoji as images of YouTube's chat set.
+  it('should replace a YouTube chat emoji image with its character', async () => {
+    const value = html`
+      <p>Location
+        <img
+          height="23"
+          width="23"
+          src="https://www.youtube.com/s/gaming/emoji/7ff574f2/emoji_u1f4cd.png"
+          class="yt-core-image yt-core-attributed-string__image-element"
+          alt=""
+        >
+      </p>
+    `
+    const expected = '<p>Location 📍</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })
