@@ -414,6 +414,17 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
     })
 
+    it('should replace the Serendipity whistle smilie', async () => {
+      const value = html`
+        <p>
+          <img src="http://example.com/templates/default/img/emoticons/whistle.png" alt="">
+        </p>
+      `
+      const expected = '<p>😗</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should replace a site-custom smilie by its :)) alt', async () => {
       const value = '<p><img src="http://example.com/smilies/yahoo_laughloud.gif" alt=":))"></p>'
       const expected = '<p>🤣</p>'
