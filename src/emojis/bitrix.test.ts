@@ -92,6 +92,28 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
     [':-/', '😕'],
   ]
 
+  // Bitrix draws `>:-<` on the same file as `:evil:`.
+  const sharedCodeCases: Array<[string, string, string]> = [
+    [':like:', 'bx_smile_like', '👍'],
+    ['&gt;:-&lt;', 'bx_smile_evil', '😠'],
+  ]
+
+  it.each(sharedCodeCases)('should replace the stock %s code', async (code, file, expected) => {
+    const value = html`
+      <p>
+        <img
+          src="https://example.com/bitrix/images/main/smiles/3/${file}.png"
+          data-code="${code}"
+          data-definition="SD"
+          alt="${code}"
+          class="bx-smile"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+  })
+
   it.each(stockCodeCases)('should replace the stock %s code', async (code, expected) => {
     const value = html`
       <p>
