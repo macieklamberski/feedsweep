@@ -27,7 +27,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-      const expected = '<p>Eigenwerbung... 😃</p>'
+      const expected = '<p>Eigenwerbung... 😁</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -67,7 +67,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     // nothing, so the smilie class plus a mapped alt is what rescues it.
     it('should replace a sprite smilie that has no data-shortname', async () => {
       const value = `<p><img src="${spriteSource}" class="smilie smilie--sprite" alt=":D"></p>`
-      const expected = '<p>😃</p>'
+      const expected = '<p>😁</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -98,6 +98,22 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
         </p>
       `
       const expected = '<p>😛</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace an unmapped 1.x sprite with its literal alt', async () => {
+      const value = html`
+        <p>
+          <img
+            src="styles/default/xenforo/clear.png"
+            class="mceSmilieSprite mceSmilie553"
+            alt=":upyeah:"
+            title="UpYeah    :upyeah:"
+          >
+        </p>
+      `
+      const expected = '<p><span data-emoji="">:upyeah:</span></p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -224,7 +240,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     // image cannot load anywhere. Text beats a broken picture, unlike every case above.
     it('should replace a smilie whose path is the raw placeholder', async () => {
       const value = `<p><img src="{SMILIES_PATH}/teeth_smile.gif" alt=":D" title="Very Happy"></p>`
-      const expected = '<p>😃</p>'
+      const expected = '<p>😁</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -293,7 +309,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           <img data-emoticon="" src="https://example.com/uploads/emoticons/biggrin@2x.png" alt="">
         </p>
       `
-      const expected = '<p>😃</p>'
+      const expected = '<p>😁</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -323,7 +339,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
     it('should resolve from the filename when the alt is empty', async () => {
       const value = '<p><img src="https://example.com/forum/img/smilies/big_smile.png" alt=""></p>'
-      const expected = '<p>😃</p>'
+      const expected = '<p>😁</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -343,7 +359,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           <img src="https://example.com/img/smilies/big_smile.png" alt="fou" width="15">
         </p>
       `
-      const expected = '<p>😃</p>'
+      const expected = '<p>😁</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -382,8 +398,14 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
         '🙂',
       ],
       ['Drupal smileys module', 'http://example.com/misc/smileys/smile.png', '🙂'],
-      ['blog smileys directory', 'http://example.com/images/smileys/big_smile.gif', '😃'],
+      ['blog smileys directory', 'http://example.com/images/smileys/big_smile.gif', '😁'],
       ['Kunena emoticons directory', 'http://example.com/media/kunena/emoticons/unsure.png', '😕'],
+      ['FUDforum', 'http://example.com/forum/images/smiley_icons/icon_wink.gif', '😉'],
+      [
+        'TinyMCE 3',
+        'http://example.com/editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-smile.gif',
+        '🙂',
+      ],
     ]
 
     it.each(pathCases)('should replace a %s smilie', async (_engine, source, expected) => {
@@ -392,10 +414,114 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
     })
 
-    it('should leave a site-custom smilie set untouched', async () => {
-      const value = '<p><img src="http://example.com/smilies/yahoo_laughloud.gif" alt=":))"></p>'
+    it('should replace the Serendipity whistle smilie', async () => {
+      const value = html`
+        <p>
+          <img src="http://example.com/templates/default/img/emoticons/whistle.png" alt="">
+        </p>
+      `
+      const expected = '<p>😗</p>'
 
-      expect(await transformKeeping(value)).toEqualHtml(value)
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a site-custom smilie by its :)) alt', async () => {
+      const value = '<p><img src="http://example.com/smilies/yahoo_laughloud.gif" alt=":))"></p>'
+      const expected = '<p>🤣</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a site-custom smilie by its <3 alt', async () => {
+      const value = '<p><img src="http://example.com/smilies/yahoo_love.gif" alt="&lt;3"></p>'
+      const expected = '<p>❤️</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('TinyMCE 3 (/plugins/emotions/img/ names)', () => {
+    const nameCases: Array<[string, string]> = [
+      ['sealed', '🤐'],
+      ['embarassed', '😳'],
+      ['tongue-out', '😛'],
+      ['money-mouth', '🤑'],
+    ]
+
+    it.each(nameCases)('should replace the %s face', async (name, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-${name}.gif"
+            class="flag"
+            alt=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    it('should leave the foot-in-mouth face untouched', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-foot-in-mouth.gif"
+            class="flag"
+            alt="Foot in mouth"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('smiles directory', () => {
+    it('should replace a phpBB smilie served from a renamed directory', async () => {
+      const value = '<p><img src="https://example.com/smiles/icon_smile.gif" alt="Smile"></p>'
+      const expected = '<p>🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a uCoz smilie whose alt is a shortcode', async () => {
+      const value = html`
+        <p>
+          <img
+            rel="usm"
+            src="https://example.com/smiles/smile.gif"
+            align="absmiddle"
+            alt=":)"
+          >
+        </p>
+      `
+      const expected = '<p>🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // A board's own art, numbered or named in-house, with nothing a table can map.
+    it('should leave a smilie with no known name untouched', async () => {
+      const value = '<p><img src="https://example.com/smiles/ag.gif" alt="Amd Green"></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // The alt is a truncated shortcode the board made up, and the stock filename wins over it.
+    it('should resolve by the filename when the alt is an unknown shortcode', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/smiles/confused.gif"
+            align="top"
+            alt=":questio"
+          >
+        </p>
+      `
+      const expected = '<p>😕</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
   })
 
@@ -493,8 +619,160 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('marker classes', () => {
+    it('should mark an unmapped Kunena smilie by its bbcode_smiley class', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/media/kunena/emoticons/y32b4.png"
+            alt=":y32b4:"
+            class="bbcode_smiley"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/media/kunena/emoticons/y32b4.png"
+            alt=":y32b4:"
+            class="bbcode_smiley"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark an unmapped Simple:Press smilie by its spSmiley class', async () => {
+      const value = html`
+        <p>
+          <img
+            class="spSmiley"
+            alt="rip"
+            src="https://example.com/wp-content/sp-resources/forum-smileys/rip_zpsec10ede9.gif"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="spSmiley"
+            alt="rip"
+            src="https://example.com/wp-content/sp-resources/forum-smileys/rip_zpsec10ede9.gif"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark an unmapped Drupal smilie by its smiley-content class', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/modules/smileys/packs/Roving/flat.png"
+            alt="Stare"
+            class="smiley-content"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/modules/smileys/packs/Roving/flat.png"
+            alt="Stare"
+            class="smiley-content"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark an unmapped WP Monalisa smilie by its wpml_ico class', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/wp-content/plugins/wp-monalisa/icons/smiley_emoticons_nicken.gif"
+            alt=":ja:"
+            class="wpml_ico"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/wp-content/plugins/wp-monalisa/icons/smiley_emoticons_nicken.gif"
+            alt=":ja:"
+            class="wpml_ico"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark an unmapped Discuz smilie by its smilieid attribute', async () => {
+      const value = html`
+        <p>
+          <img
+            alt=""
+            src="https://example.com/images/smilies/default/run.gif"
+            smilieid="52"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            alt=""
+            src="https://example.com/images/smilies/default/run.gif"
+            smilieid="52"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace an EasyDiscuss smilie by its bb-smiley class', async () => {
+      const value = html`
+        <p>
+          <img
+            alt=":)"
+            class="bb-smiley"
+            src="https://example.com/media/com_easydiscuss/images/markitup/emoticon-smile.png"
+          >
+        </p>
+      `
+      const expected = '<p>🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace an IPS 4 emoji by its ipsEmoji class', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/uploads/emoji/1f602.png"
+            class="ipsEmoji"
+            alt="😂"
+          >
+        </p>
+      `
+      const expected = '<p>😂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('WoltLab (codepoint filenames under /smilies/)', () => {
-    // The file is named after the codepoint, so only the alt says what the picture is.
+    // The file is named after the codepoint, which names the picture more exactly than the alt.
     const shortcodeCases: Array<[string, string, string]> = [
       [':thumbup:', '1f44d', '👍'],
       [':saint:', '1f607', '😇'],
@@ -518,6 +796,362 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
         expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
       },
     )
+
+    // WoltLab binds `:evil:` to the grinning devil, where the shared table reads the angry one.
+    it('should replace a smilie by its codepoint filename over its shortcode alt', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/images/smilies/emojione/1f608.png"
+            alt=":evil:"
+            title=":evil:"
+            class="smiley"
+            height="23"
+          >
+        </p>
+      `
+      const expected = '<p>😈</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // WoltLab numbers a board's own uploads, which Web Wiz's `smileyN` table must not read.
+    it('should mark an uploaded smileyN smilie', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/wcf/images/smilies/smiley34.gif"
+            alt=":spitze:"
+            title="spitze"
+            class="smiley"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/wcf/images/smilies/smiley34.gif"
+            alt=":spitze:"
+            title="spitze"
+            class="smiley"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('Web Wiz Forums (numbered files under /smileys/)', () => {
+    const faceCases: Array<[string, string, string]> = [
+      ['smiley1', 'Smile', '🙂'],
+      ['smiley2', 'Wink', '😉'],
+      ['smiley3', 'Shocked', '😲'],
+      ['smiley4', 'Big smile', '😁'],
+      ['smiley5', 'Confused', '😕'],
+      ['smiley6', 'Unhappy', '🙁'],
+      ['smiley7', 'Angry', '😡'],
+      ['smiley8', 'Clown', '🤡'],
+      ['smiley9', 'Embarrassed', '😳'],
+      ['smiley10', 'Star', '⭐'],
+      ['smiley11', 'Dead', '😵'],
+      ['smiley12', 'Sleepy', '😴'],
+      ['smiley13', 'Disapprove', '🤨'],
+      ['smiley14', 'Approve', '🙂‍↕️'],
+      ['smiley15', 'Evil Smile', '😈'],
+      ['smiley16', 'Cool', '😎'],
+      ['smiley17', 'Tongue', '😛'],
+      ['smiley18', 'Ouch', '🤕'],
+      ['smiley19', 'Cry', '😢'],
+      ['smiley20', 'Thumbs Up', '👍'],
+      ['smiley21', 'Thumbs Down', '👎'],
+      ['smiley22', 'Stern Smile', '😐'],
+      ['smiley23', 'Geek', '🤓'],
+      ['smiley24', 'Ermm', '🫤'],
+      ['smiley25', 'Question', '❓'],
+      ['smiley26', 'Pinch', '😣'],
+      ['smiley27', 'Heart', '❤️'],
+      ['smiley28', 'Broken Heart', '💔'],
+      ['smiley29', 'Wacko', '🤪'],
+      ['smiley30', 'Pig', '🐷'],
+      ['smiley31', 'Hug', '🤗'],
+      ['smiley32', 'Clap', '👏'],
+      ['smiley33', 'Ying Yang', '☯️'],
+      ['smiley34', 'Nuke', '☢️'],
+      ['smiley35', 'Censored', '🤬'],
+      ['smiley36', 'LOL', '🤣'],
+      ['smiley37', 'Exclamation', '⚠️'],
+      ['smiley38', 'Lamp', '💡'],
+      ['smiley39', 'Sick', '🤢'],
+      ['smiley40', 'Party', '🥳'],
+      ['smiley41', 'Beer', '🍻'],
+      ['smiley42', 'Handshake', '🤝'],
+    ]
+
+    it.each(faceCases)('should replace the %s face', async (name, alt, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/forum/smileys/${name}.gif"
+            border="0"
+            alt="${alt}"
+            title="${alt}"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+  })
+
+  describe('Invision Power Board and Kunena', () => {
+    // Alts that boards wrote in place of the stock code, so only the filename names the face.
+    const nameCases: Array<[string, string, string]> = [
+      ['wub', 'wub.gif', '😍'],
+      ['blink', '8|', '😯'],
+      ['wacko', ':wasko:', '🤪'],
+      ['ph34r', 'ph34r.gif', '🥷'],
+      ['w00t', ':woohoo:', '🤩'],
+      ['whistling', ':siffle:', '😗'],
+      ['doh', ':default_doh:', '🤦'],
+      ['dry', 'dry.gif', '😒'],
+      ['mellow', 'mellow.gif', '😑'],
+      ['sleep', ':zzz:', '😴'],
+    ]
+
+    it.each(nameCases)('should replace the %s face', async (name, alt, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/style_emoticons/default/${name}.gif"
+            class="bbc_emoticon"
+            alt="${alt}"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    const codeCases: Array<[string, string]> = [
+      [':wub:', '😍'],
+      [':blink:', '😯'],
+      [':wacko:', '🤪'],
+      [':ph34r:', '🥷'],
+      [':whistle:', '😗'],
+      [':mellow:', '😑'],
+      [':huh:', '😕'],
+      [':angry:', '😠'],
+    ]
+
+    it.each(codeCases)('should replace the %s code', async (code, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/uploads/emoticons/smily_8.gif"
+            alt="${code}"
+            data-emoticon=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    // IPB binds `-_-` to sleep.gif, and the code is read before the filename.
+    it('should replace a sleep smilie by its -_- code', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/uploads/emoticons/default_sleep.png"
+            alt="-_-"
+            data-emoticon=""
+          >
+        </p>
+      `
+      const expected = '<p>😑</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('XenForo 2 (sprite shortnames)', () => {
+    const shortnameCases: Array<[string, string, string]> = [
+      [':cautious:', 'Cautious', '😒'],
+      [':censored:', 'Censored', '🤐'],
+      [':sneaky:', 'Sneaky', '😏'],
+      [':whistle:', 'Whistling', '😗'],
+      [':giggle:', 'Giggle', '🤭'],
+      [':devilish:', 'Devil', '😈'],
+      ['o_O', 'Er... what?', '😵‍💫'],
+    ]
+
+    it.each(shortnameCases)('should replace the %s smilie', async (shortname, title, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            class="smilie smilie--sprite smilie--sprite9"
+            alt="${shortname}"
+            title="${title}    ${shortname}"
+            loading="lazy"
+            data-shortname="${shortname}"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    // phpBB boards bind `O_o` to faces of their own, and only XenForo's is drawn dizzy.
+    it('should mark an O_o smilie outside XenForo', async () => {
+      const value = html`
+        <p>
+          <img
+            class="smilies"
+            src="https://example.com/images/smilies/icon_goofy.gif"
+            alt="O_o"
+            title="Flipando"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="smilies"
+            src="https://example.com/images/smilies/icon_goofy.gif"
+            alt="O_o"
+            title="Flipando"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('NBBC (bbcode_smiley class, /smileys/ names)', () => {
+    // NBBC writes its code as the alt, and these four mean another face in the shared table.
+    const faceCases: Array<[string, string, string]> = [
+      ['worry', ':s', '😟'],
+      ['bigeyes', '8)', '😳'],
+      ['bigwink', ';D', '😜'],
+      ['lookleft', '&lt;_&lt;', '👀'],
+    ]
+
+    it.each(faceCases)('should replace the %s face', async (name, code, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/nbbc/smileys/${name}.gif"
+            width="15"
+            height="15"
+            alt="${code}"
+            title="${code}"
+            class="bbcode_smiley"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    const codeCases: Array<[string, string]> = [
+      ['&gt;;)', '😏'],
+      ['O:)', '😇'],
+      ['^_^', '😊'],
+      ['^^;', '😅'],
+      ['&gt;_&gt;', '👀'],
+      ['&lt;g&gt;', '😁'],
+      ['o.O', '🤨'],
+    ]
+
+    it.each(codeCases)('should replace the %s code on a renamed file', async (code, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/nbbc/smileys/custom/8.gif"
+            alt="${code}"
+            class="bbcode_smiley"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    // A base64 payload can end in a slash and an NBBC name.
+    it('should not read an NBBC name out of a sprite payload', async () => {
+      const value = html`
+        <p>
+          <img
+            src="data:image/gif;base64,AAA/worry"
+            data-shortname=":totally_custom:"
+          >
+        </p>
+      `
+      const expected = '<p><span data-emoji="">:totally_custom:</span></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('Discuz! (static/image/smiley/ names)', () => {
+    const faceCases: Array<[string, string]> = [
+      ['huffy', '😡'],
+      ['titter', '🤭'],
+      ['sweat', '😓'],
+      ['loveliness', '🥰'],
+      ['funk', '😨'],
+      ['curse', '🤬'],
+      ['shutup', '🤐'],
+      ['hug', '🤗'],
+      ['victory', '✌️'],
+      ['time', '🕒'],
+      ['handshake', '🤝'],
+      ['call', '📞'],
+    ]
+
+    it.each(faceCases)('should replace the %s face', async (name, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/static/image/smiley/default/${name}.gif"
+            smilieid="14"
+            border="0"
+            alt=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    it('should mark a phpBB smilie that shares a Discuz name', async () => {
+      const value = html`
+        <p>
+          <img
+            class="smilies"
+            src="https://example.com/images/smilies/time.gif"
+            alt=""
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="smilies"
+            src="https://example.com/images/smilies/time.gif"
+            alt=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('Khoros / Lithium (/i/smilies/ stock faces)', () => {
@@ -525,17 +1159,19 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     const faceCases: Array<[string, string, string]> = [
       ['smiley-happy', 'Smiley heureux', '🙂'],
       ['smiley-wink', "Smiley clignant de l'œil", '😉'],
-      ['smiley-very-happy', 'Smiley très heureux', '😃'],
+      ['smiley-very-happy', 'Smiley très heureux', '😁'],
       ['smiley-tongue', 'Emotikon: Język', '😛'],
       ['smiley-sad', 'Emotikon: Smutny', '🙁'],
+      ['smiley-mad', 'Smiley Mad', '😠'],
       ['smiley-surprised', 'Emotikon: Zaskoczony', '😲'],
-      ['smiley-lol', 'Smiley LOL', '😄'],
+      ['smiley-lol', 'Smiley LOL', '🤣'],
       ['smiley-embarrassed', 'Smiley Embarrassed', '😳'],
       ['smiley-indifferent', 'Smiley Indifferent', '😐'],
       ['heart', 'Cœur', '❤️'],
       ['cat-happy', 'Chat heureux', '😺'],
       ['cat-very-happy', 'Chat très heureux', '😸'],
       ['cat-lol', 'Chat MDR', '😹'],
+      ['smiley-frustrated', 'Smiley frustré', '😣'],
     ]
 
     it.each(faceCases)('should replace the %s face', async (name, alt, expected) => {
@@ -569,21 +1205,6 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transformKeeping(value)).toEqualHtml(value)
     })
 
-    // Between annoyed, weary and pouting there is no single face this one obviously means.
-    it('should leave the frustrated face with its picture', async () => {
-      const value = html`
-        <p>
-          <img
-            class="emoticon emoticon-smileyfrustrated"
-            src="https://example.com/i/smilies/16x16_smiley-frustrated.png"
-            alt="Smiley frustré"
-          >
-        </p>
-      `
-
-      expect(await transformKeeping(value)).toEqualHtml(value)
-    })
-
     // Some boards replace the stock art with a licensed set whose files are numbered, leaving
     // nothing in the markup that names the picture.
     it('should leave a board-specific replacement set with its picture', async () => {
@@ -598,6 +1219,116 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       `
 
       expect(await transformKeeping(value)).toEqualHtml(value)
+    })
+
+    it('should mark a face with no counterpart by its emoticon- class', async () => {
+      const value = html`
+        <p>
+          <img
+            id="womanwink"
+            class="emoticon emoticon-womanwink"
+            src="https://example.com/i/smilies/16x16_woman-wink.png"
+            alt="Woman Wink"
+            title="Woman Wink"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            id="womanwink"
+            class="emoticon emoticon-womanwink"
+            src="https://example.com/i/smilies/16x16_woman-wink.png"
+            alt="Woman Wink"
+            title="Woman Wink"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // Windows Live Writer's own emoticons, which have no name table.
+    it('should leave a Windows Live Writer emoticon untouched', async () => {
+      const value = html`
+        <p>
+          <img
+            class="wlEmoticon wlEmoticon-winkingsmile"
+            alt="Winking smile"
+            src="https://example.com/wp-content/uploads/2019/03/1212.wlEmoticon-winkingsmile_63772F9B.png"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // Vodafone's copy of the set is sized 15x15.
+    it('should replace a face from the 15x15 set', async () => {
+      const value = html`
+        <p>
+          <img
+            id="smileywink"
+            class="emoticon emoticon-smileywink"
+            src="https://example.com/html/@929CB104E9842E64CFFA4DDBA9219E92/images/emoticons/15x15_smiley-wink.gif"
+            alt=""
+            title=""
+          >
+        </p>
+      `
+      const expected = '<p>😉</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a Samsung emoji by the codepoint in its numbered filename', async () => {
+      const value = html`
+        <p>
+          <img
+            class="lia-deferred-image lia-image-emoji"
+            src="https://example.com/html/@1BBE730D66F6AF8A8EB16B462DAF441D/images/smilies/2.winking-face_1f609.png"
+            alt=":winking-face:"
+            title=":winking-face:"
+          >
+        </p>
+      `
+      const expected = '<p>😉</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a Samsung emoji with a skin tone by its full sequence', async () => {
+      const value = html`
+        <p>
+          <img
+            class="lia-deferred-image lia-image-emoji"
+            src="https://example.com/html/@684C5748BA1AA2FD7E2E3E73F2D23AAF/images/smilies/10.thumbs-up-sign_emoji-modifier-fitzpatrick-type-1-2_1f44d-1f3fb_1f3fb.png"
+            alt=":thumbs-up-sign-emoji-modifier-fitzpatrick-type:"
+            title=":thumbs-up-sign-emoji-modifier-fitzpatrick-type:"
+          >
+        </p>
+      `
+      const expected = '<p>👍🏻</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // Samsung's own smiling face is filed under the codepoint of 🃏.
+    it('should replace the Samsung smiling face without decoding its filename', async () => {
+      const value = html`
+        <p>
+          <img
+            class="lia-deferred-image lia-image-emoji"
+            src="https://example.com/html/@758C9CF82B69C1E7230907A98BEAE742/images/smilies/1.samsung_1f0cf.png"
+            alt=":smiling-face:"
+            title=":smiling-face:"
+          >
+        </p>
+      `
+      const expected = '<p>😀</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should be idempotent', async () => {
@@ -623,8 +1354,8 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     const codepointCases: Array<[string, string]> = [
       ['1f618', '😘'],
       ['1f62d', '😭'],
-      ['2639', '☹'],
-      ['263a', '☺'],
+      ['2639', '☹️'],
+      ['263a', '☺️'],
       ['1f1fa-1f1f8', '🇺🇸'],
     ]
 
@@ -701,6 +1432,121 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
       expect(await transformKeeping(value)).toEqualHtml(value)
     })
+
+    // SMF binds `;D` to grin.gif, and the alt is read before the filename.
+    it('should replace ;D with a grin', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/Smileys/default/grin.gif"
+            alt=";D"
+            title="Grin"
+            class="smiley"
+          >
+        </p>
+      `
+      const expected = '<p>😁</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // A board's own set binds `;-D` to its wink, which the filename names.
+    it('should resolve ;-D by the filename', async () => {
+      const value = html`
+        <p>
+          <img src="https://example.com/board/smileys/cutemoticons/wink.png" alt=";-D">
+        </p>
+      `
+      const expected = '<p>😉</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace :evil: with the angry devil its icon_evil file draws', async () => {
+      const value = html`
+        <p>
+          <img
+            class="smilies"
+            src="https://example.com/images/smilies/icon_evil.gif"
+            alt=":evil:"
+            title="Evil or Very Mad"
+          >
+        </p>
+      `
+      const expected = '<p>👿</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // `:x` is mad on phpBB and WordPress, and `:-X` is sealed lips on SMF, so only the filename
+    // says which face it is.
+    it('should resolve :x by the filename', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/images/smiles/icon_mad.gif"
+            alt=":x"
+            title="Mad"
+          >
+        </p>
+      `
+      const expected = '<p>😠</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should resolve :-X by the filename', async () => {
+      const value = html`
+        <p>
+          <img
+            class="smilies"
+            src="https://example.com/images/smilies/lipsrsealed.gif"
+            alt=":-X"
+            title="Lips Sealed"
+          >
+        </p>
+      `
+      const expected = '<p>🤐</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // The stock codes of SMF, WordPress and phpBB, on a board whose files are numbered.
+    const aliasCases: Array<[string, string]> = [
+      ['&gt;:(', '😠'],
+      ['???', '😕'],
+      ['::)', '🙄'],
+      [':-[', '😳'],
+      [':-\\', '🫤'],
+      [':-*', '😘'],
+      ['&gt;:D', '😈'],
+      ['O:-)', '😇'],
+      [':smile:', '🙂'],
+      [':sad:', '🙁'],
+      [':razz:', '😛'],
+      [':???:', '😕'],
+      [':neutral:', '😐'],
+      [':-?', '😕'],
+      [':-o', '😲'],
+      [':-|', '😐'],
+      ['8-O', '😲'],
+      [':ugeek:', '🤓'],
+      [':rofl:', '🤣'],
+    ]
+
+    it.each(aliasCases)('should replace the %s code', async (code, expected) => {
+      const value = html`
+        <p>
+          <img
+            class="smilies"
+            src="https://example.com/images/smilies/8.gif"
+            alt="${code}"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
   })
 
   describe('platform filename tables', () => {
@@ -719,6 +1565,50 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
         expect(name).toBe(name.toLowerCase())
       },
     )
+
+    // Names boards add to several engines' sets, each with an alt the board made up.
+    const observedCases: Array<[string, string, string]> = [
+      ['yes', ':y', '🙂‍↕️'],
+      ['ok', ':okay:', '👍'],
+      ['good', ':good', '👍'],
+      ['hi', '-hi-', '👋'],
+      ['bye', ':Bye', '👋'],
+      ['crying', ':crying:', '😭'],
+      ['santa', ':Mikołaj:', '🎅'],
+      ['popcorn', ':popcorn:', '🍿'],
+      ['beer', ':ber:', '🍻'],
+      ['thumbsup', '[doppel-daumen]', '👍'],
+      ['crazy', ':craz:', '🤪'],
+      ['cheers', ':95:', '🥂'],
+      ['bravo', ')))', '👏'],
+    ]
+
+    it.each(observedCases)('should replace the %s file', async (name, alt, expected) => {
+      const value = html`
+        <p>
+          <img
+            class="smilies"
+            src="https://example.com/images/smilies/${name}.gif"
+            alt="${alt}"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    const roflNames: Array<string> = ['rofl', 'rotfl']
+
+    it.each(roflNames)('should replace the %s file', async (name) => {
+      const value = html`
+        <p>
+          <img class="smilies" src="https://example.com/images/smilies/${name}.gif" alt="">
+        </p>
+      `
+      const expected = '<p>🤣</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
 
     it('should merge the shipped platforms without conflict', () => {
       expect(() => mergeEmojiNames(smiliesEmojiNameTables)).not.toThrow()

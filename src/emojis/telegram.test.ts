@@ -80,3 +80,40 @@ describeForEachParser('telegramEmojiResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('telegramImageEmojiResolver', (parseHtml) => {
+  const { transform } = emojiConverters(parseHtml)
+
+  it('should decode the filename when Web A writes "?" as the alt', async () => {
+    const value = '<p><img src="https://web.telegram.org/a/img-apple-64/1f600.png" alt="?"></p>'
+    const expected = '<p>😀</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should decode a Web K keycap filename', async () => {
+    const value = html`
+      <p>
+        <img src="https://web.telegram.org/k/assets/img/emoji/0023-20e3.png" alt="">
+      </p>
+    `
+    const expected = '<p>#⃣</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  describe('hosts', () => {
+    const hosts = [
+      'web.telegram.org/a/img-apple-64/',
+      'web.telegram.org/a/img-apple-160/',
+      'web.telegram.org/k/assets/img/emoji/',
+    ]
+
+    it.each(hosts)('should replace an emoji image from %s', async (host) => {
+      const value = `<p>Hi <img src="https://${host}1f642.png" alt="🙂"></p>`
+      const expected = '<p>Hi 🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+})

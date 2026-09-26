@@ -55,6 +55,27 @@ describeForEachParser('twemojiEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    // Twemoji drops the leading zeros from the codepoints below 0x100.
+    const shortNameCases: Array<[string, string]> = [
+      ['a9', '©️'],
+      ['ae', '®️'],
+      ['23-20e3', '#⃣'],
+      ['2a-fe0f-20e3', '*️⃣'],
+      ['31_20e3', '1⃣'],
+    ]
+
+    it.each(shortNameCases)('should decode the two-digit filename %s', async (stem, glyph) => {
+      const value = `<p><img src="https://example.com/twemoji/72x72/${stem}.png" alt=""></p>`
+
+      expect(await transform(value)).toEqualHtml(`<p>${glyph}</p>`)
+    })
+
+    it('should leave a two-digit filename that is no emoji untouched', async () => {
+      const value = '<p><img src="https://example.com/twemoji/72x72/12.png" alt=""></p>'
+
+      expect(await transformKeeping(value)).toEqualHtml(value)
+    })
+
     it('should replace an emoji whose alt was translated', async () => {
       const value = html`
         <p>

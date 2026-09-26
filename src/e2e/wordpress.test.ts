@@ -112,4 +112,105 @@ describeForEachParser('WordPress', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  // A "?" alt is WordPress failing to encode the emoji it meant, and the file is named by the
+  // codepoint.
+  it('should replace a core emoji image whose alt is "?" by its filename', async () => {
+    const value = html`
+      <p>Thanks
+        <img
+          draggable="false"
+          role="img"
+          class="emoji"
+          alt="?"
+          src="https://s.w.org/images/core/emoji/2.4/72x72/1f642.png"
+        >
+      </p>
+    `
+    const expected = '<p>Thanks 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // WordPress.com serves its smileys from s1 and s2 too, and one outside the Twemoji folder has
+  // no glyph, so it keeps its picture.
+  it('should mark a WordPress.com smiley served from s1', async () => {
+    const value = html`
+      <p>Ha
+        <img
+          src="https://s1.wp.com/wp-content/mu-plugins/wpcom-smileys/rolling-on-the-floor-laughing.png"
+          alt=""
+        >
+      </p>
+    `
+    const expected = html`
+      <p>Ha
+        <img
+          data-emoji=""
+          src="https://s1.wp.com/wp-content/mu-plugins/wpcom-smileys/rolling-on-the-floor-laughing.png"
+          alt=""
+        >
+      </p>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // Core binds :evil: to icon_evil.gif, an angry devil, and the alt is read before the filename.
+  it('should replace an :evil: smiley with the angry devil its file draws', async () => {
+    const value = html`
+      <p>Grr
+        <img
+          src="https://example.com/wp-includes/images/smilies/icon_evil.gif"
+          alt=":evil:"
+          class="wp-smiley"
+          style="height: 1em; max-height: 1em;"
+        >
+      </p>
+    `
+    const expected = '<p>Grr 👿</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should replace a WP Emoji One image with its character', async () => {
+    const value = html`
+      <p>Party
+        <img
+          decoding="async"
+          style="margin-left: 3px; margin-right: 3px; vertical-align: middle;"
+          src="https://example.com/wp-content/plugins/wp-emoji-one/icons/1F389.png"
+          width="16"
+          height="16"
+        >
+      </p>
+    `
+    const expected = '<p>Party 🎉</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should mark a pictogram from the TypePad Emoji for TinyMCE plugin', async () => {
+    const value = html`
+      <p>Sunny
+        <img
+          src="https://example.com/wp-content/plugins/typepad-emoji-for-tinymce/icons/01/sun.gif"
+          width="16"
+          height="16"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>Sunny
+        <img
+          data-emoji=""
+          src="https://example.com/wp-content/plugins/typepad-emoji-for-tinymce/icons/01/sun.gif"
+          width="16"
+          height="16"
+        >
+      </p>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })

@@ -12,8 +12,10 @@ export type EmojiImageMatch = {
   // A class, host, attribute or sprite. An image matched only by its directory is left
   // untouched when it fails to resolve, so a banner in `/smilies/` is never marked.
   isStrong: boolean
-  // Absent for a set recognized only by its host, whose filename is never read.
+  // Absent for a set whose filename is never read.
   names?: Map<string, string>
+  // Read by the resolver from where its set keeps the meaning, and second only to the alt.
+  glyph?: string
 }
 
 const emojiSequenceParts = [
@@ -37,6 +39,13 @@ export const isEmojiShaped = (text: string): boolean => {
 }
 
 const shortcodes = toMap(vocabularies.shortcodes)
+
+export const glyphFromShortcode = (token: string | undefined): string | undefined => {
+  return token ? shortcodes.get(token.toLowerCase()) : undefined
+}
+
+// The table for a set that names every file by its codepoint, which leaves no names to look up.
+export const noEmojiNames = new Map<string, string>()
 
 // Left on an emoji image that keeps its picture, so the reader can size it like text and keep
 // it out of thumbnail selection. Presence is the whole signal.
@@ -65,15 +74,22 @@ export const mergeEmojiNames = (tables: Array<EmojiNameTable>): Record<string, s
 // Applied to a filename in turn: the query and hash split, then the stock-file, icon-set and
 // resolution markers that are not part of the name.
 const queryOrHashRegex = /[?#]/
-const namePrefixRegex = /^(?:default_|face-|smiley-|sf-)/
+const namePrefixRegex = /^(?:default_|face-|smiley-|sf-|1[56]x1[56]_)/
 const nameVariantRegex = /@[0-9]+x$/
+
+// XenForo 1.x paints its smilie sprite behind this transparent file.
+const spacerPath = 'xenforo/clear.png'
 
 // A 1x1 sprite GIF data URI is under 256 bytes, and a real inlined PNG is not.
 export const rendersNothing = (src: string): boolean => {
+  if (src.endsWith(spacerPath)) {
+    return true
+  }
+
   return src.startsWith('data:') && src.length <= 256
 }
 
-const getFileStem = (src: string): string => {
+export const getFileStem = (src: string): string => {
   const path = src.split(queryOrHashRegex)[0]
   const name = path.slice(path.lastIndexOf('/') + 1)
   const extension = name.lastIndexOf('.')
@@ -82,11 +98,14 @@ const getFileStem = (src: string): string => {
 }
 
 // Five hex digits tops out at 0xFFFFF, so fromCodePoint never sees a value that throws.
-// WoltLab names its whole default set by codepoint.
-const codepointNameRegex = /^[0-9a-f]{4,5}(?:[-_][0-9a-f]{4,5})*$/
+// WoltLab names its whole default set by codepoint. Twemoji drops the leading zeros, so two digits
+// are read too, only for the emoji below 0x100: © and ®, and a keycap on #, * or a digit.
+const codepointNameRegex =
+  /^(?:[0-9a-f]{4,5}(?:[-_][0-9a-f]{4,5})*|a[9e](?:[-_]fe0f)?|(?:2[3a]|3[0-9])(?:[-_]fe0f)?[-_]20e3)$/
 const codepointSeparatorRegex = /[-_]/
+const textDefaultRegex = /^(?!\p{Emoji_Presentation})\p{Extended_Pictographic}$/u
 
-const glyphFromCodepoints = (stem: string): string | undefined => {
+export const glyphFromCodepoints = (stem: string): string | undefined => {
   if (!codepointNameRegex.test(stem)) {
     return
   }
@@ -95,24 +114,24 @@ const glyphFromCodepoints = (stem: string): string | undefined => {
   const glyph = String.fromCodePoint(...codepoints)
 
   // A hex-shaped stem like `2000` or `dead` decodes to a space or a lone surrogate.
-  return isEmojiShaped(glyph) ? glyph : undefined
+  if (!isEmojiShaped(glyph)) {
+    return
+  }
+
+  // A lone ☺, © or ❤ renders as a text symbol unless U+FE0F asks for the emoji picture.
+  return textDefaultRegex.test(glyph) ? `${glyph}️` : glyph
 }
 
-// The filename is the second key because it is what survives an empty alt.
+// A codepoint filename names the exact picture and a shortcode only its meaning: WoltLab binds
+// `:evil:` to 1f608, which is 😈. A filename word comes last, as what survives an empty alt.
 const glyphFromVocabularies = (
   token: string | undefined,
   src: string,
   names: Map<string, string>,
 ): string | undefined => {
-  const byShortcode = token ? shortcodes.get(token.toLowerCase()) : undefined
-
-  if (byShortcode) {
-    return byShortcode
-  }
-
   // Base64 can contain `/`, so a stem taken from a data URI can match a real name by accident.
   if (src.startsWith('data:')) {
-    return
+    return glyphFromShortcode(token)
   }
 
   const stem = getFileStem(src)
@@ -120,7 +139,7 @@ const glyphFromVocabularies = (
     .replace(namePrefixRegex, '')
     .replace(nameVariantRegex, '')
 
-  return names.get(stem) ?? glyphFromCodepoints(stem)
+  return glyphFromCodepoints(stem) ?? glyphFromShortcode(token) ?? names.get(stem)
 }
 
 // The title attribute is prose on every platform, never a glyph, so it is not read.
@@ -139,6 +158,10 @@ export const resolveEmojiImage = (
     return { glyph: alt }
   }
 
+  if (match.glyph) {
+    return { glyph: match.glyph }
+  }
+
   const glyph = match.names ? glyphFromVocabularies(shortname ?? alt, src, match.names) : undefined
 
   if (glyph) {
@@ -153,5 +176,30 @@ export const resolveEmojiImage = (
 
   if (match.isStrong) {
     return { custom: true }
+  }
+}
+
+// An element wrapping the glyph, named by a gemoji shortcode. A sanitizer dropping unknown
+// elements would take the glyph with it, so one that resolves to nothing still leaves text.
+export const resolveEmojiElement = (
+  element: Element,
+  { glyph, shortcode }: { glyph?: string; shortcode?: string },
+): EmojiResolverResult | undefined => {
+  const text = element.textContent ?? ''
+
+  if (isEmojiShaped(text)) {
+    return { glyph: text }
+  }
+
+  const resolved = glyph ?? glyphFromShortcode(shortcode)
+
+  if (resolved) {
+    return { glyph: resolved }
+  }
+
+  const fallback = text || shortcode
+
+  if (fallback) {
+    return { text: fallback }
   }
 }

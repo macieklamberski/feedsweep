@@ -170,17 +170,39 @@ import { youtubeAmpEmbedResolver, youtubeIframeEmbedResolver } from '../embeds/y
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
 import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
-import { facebookEmojiResolver } from '../emojis/facebook.js'
+import { bitrixEmojiResolver } from '../emojis/bitrix.js'
+import { cocologEmojiResolver } from '../emojis/cocolog.js'
+import { discordEmojiResolver } from '../emojis/discord.js'
+import { exblogEmojiResolver } from '../emojis/exblog.js'
+import { facebookClassicEmojiResolver, facebookEmojiResolver } from '../emojis/facebook.js'
+import { froalaElementEmojiResolver, froalaImageEmojiResolver } from '../emojis/froala.js'
 import { genericEmojiResolver } from '../emojis/generic.js'
-import { githubEmojiResolver } from '../emojis/github.js'
+import { githubElementEmojiResolver, githubImageEmojiResolver } from '../emojis/github.js'
+import { gitlabEmojiResolver } from '../emojis/gitlab.js'
+import { gmailEmojiResolver } from '../emojis/gmail.js'
+import { jiveEmojiResolver } from '../emojis/jive.js'
 import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
+import { jugemEmojiResolver } from '../emojis/jugem.js'
+import { khorosEmojiResolver } from '../emojis/khoros.js'
+import { liferayEmojiResolver } from '../emojis/liferay.js'
+import { livedoorEmojiResolver } from '../emojis/livedoor.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
+import { maxEmojiResolver } from '../emojis/max.js'
+import { notoEmojiResolver } from '../emojis/noto.js'
+import { punbbEmojiResolver } from '../emojis/punbb.js'
+import { sapoEmojiResolver } from '../emojis/sapo.js'
+import { seesaaEmojiResolver } from '../emojis/seesaa.js'
+import { slackEmojiResolver } from '../emojis/slack.js'
 import { smiliesEmojiResolver } from '../emojis/smilies.js'
-import { telegramEmojiResolver } from '../emojis/telegram.js'
+import { tapatalkEmojiResolver } from '../emojis/tapatalk.js'
+import { teamsEmojiResolver } from '../emojis/teams.js'
+import { telegramEmojiResolver, telegramImageEmojiResolver } from '../emojis/telegram.js'
 import { twemojiEmojiResolver } from '../emojis/twemoji.js'
 import { vanillaEmojiResolver } from '../emojis/vanilla.js'
+import { vkEmojiResolver } from '../emojis/vk.js'
 import { weiboEmojiResolver } from '../emojis/weibo.js'
 import { wordpressEmojiResolver } from '../emojis/wordpress.js'
+import { yahooEmojiResolver } from '../emojis/yahoo.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { ghostMediaResolver } from '../media/ghost.js'
 import { podloveMediaResolver } from '../media/podlove.js'
@@ -400,7 +422,20 @@ export const defaultWidgetResolvers: Array<WidgetResolver> = [
 // mark: an image on a CDN host can still carry a forum class whose table resolves it.
 export const defaultEmojiResolvers: Array<EmojiResolver> = [
   telegramEmojiResolver,
+  gitlabEmojiResolver,
+  githubElementEmojiResolver,
+  khorosEmojiResolver,
+  jiveEmojiResolver,
+  facebookClassicEmojiResolver,
+  froalaElementEmojiResolver,
+  // Ahead of smilies, whose /smiles/ directory would read a Bitrix file by its filename first.
+  bitrixEmojiResolver,
+  // Ahead of smilies, whose forum names draw Liferay's smile.gif as 🙂.
+  liferayEmojiResolver,
   smiliesEmojiResolver,
+  punbbEmojiResolver,
+  yahooEmojiResolver,
+  froalaImageEmojiResolver,
   // Ahead of WordPress, whose WordPress.com host serves Twemoji files named by codepoint.
   twemojiEmojiResolver,
   wordpressEmojiResolver,
@@ -408,10 +443,25 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   artstationEmojiResolver,
   joypixelsEmojiResolver,
   facebookEmojiResolver,
-  githubEmojiResolver,
+  githubImageEmojiResolver,
+  slackEmojiResolver,
+  notoEmojiResolver,
+  gmailEmojiResolver,
+  telegramImageEmojiResolver,
+  vkEmojiResolver,
+  maxEmojiResolver,
   mastodonEmojiResolver,
   weiboEmojiResolver,
   amebaEmojiResolver,
+  teamsEmojiResolver,
+  discordEmojiResolver,
+  tapatalkEmojiResolver,
+  livedoorEmojiResolver,
+  seesaaEmojiResolver,
+  sapoEmojiResolver,
+  exblogEmojiResolver,
+  cocologEmojiResolver,
+  jugemEmojiResolver,
   // Last, since the class is shared by engines whose own signals say more.
   genericEmojiResolver,
 ]
