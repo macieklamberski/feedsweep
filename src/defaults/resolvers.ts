@@ -183,6 +183,7 @@ import { jiveEmojiResolver } from '../emojis/jive.js'
 import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
 import { jugemEmojiResolver } from '../emojis/jugem.js'
 import { khorosEmojiResolver } from '../emojis/khoros.js'
+import { liferayEmojiResolver } from '../emojis/liferay.js'
 import { livedoorEmojiResolver } from '../emojis/livedoor.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
 import { maxEmojiResolver } from '../emojis/max.js'
@@ -424,6 +425,8 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   jiveEmojiResolver,
   // Ahead of smilies, whose /smiles/ directory would read a Bitrix file by its filename first.
   bitrixEmojiResolver,
+  // Ahead of smilies, whose forum names draw Liferay's smile.gif as 🙂.
+  liferayEmojiResolver,
   smiliesEmojiResolver,
   // Ahead of WordPress, whose WordPress.com host serves Twemoji files named by codepoint.
   twemojiEmojiResolver,
