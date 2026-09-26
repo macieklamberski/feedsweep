@@ -164,13 +164,12 @@ export const defaultNonContentSelectors = [
   // anchor survives as a bare link named after the competition.
   'a.e-widget',
 
-  // Ticketing, donation and membership widgets, which are chrome around a transaction rather
-  // than anything the item is about.
+  // Ticketing and payment widgets, which are chrome around a transaction rather than anything
+  // the item is about.
   'iframe[src*="eventbrite.com/tickets-external"]', // Eventbrite checkout frame.
   'iframe[src*="eventbrite.com/countdown-widget"]', // Eventbrite countdown widget.
-  'iframe[src*="patronite.pl/widget/"]', // Patronite membership widget.
-  'form[action*="paypal.com/cgi-bin/webscr"]', // PayPal donate and buy button form.
-  'img[src*="paypal.com/"][src*="/i/btn/"]', // The PayPal button image pasted without its form.
+  'form[action*="paypal.com/cgi-bin/webscr"]', // PayPal buy, cart or subscribe form, or a donate form naming no button.
+  'img[src*="paypal.com/"][src*="/i/btn/"]:not(a img)', // The PayPal button image pasted without its form.
 
   // Platform UI chrome and non-rendered scaffolding.
   // RedCircle's embed snippet ships a ten-pixel "Powered by RedCircle" line under the player.
