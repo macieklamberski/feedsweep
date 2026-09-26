@@ -198,8 +198,9 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       normal: '😐', // Its config binds this to `:-|`
       unhappy: '🙁', // And this to `:(`
       haha: '🤣',
+      whistle: '😗',
       // anger, shame: each sits between two glyphs already used for near-synonyms.
-      // grmpf, grrr, hero, ko, safe, still, whistle: no Unicode counterpart.
+      // grmpf, grrr, hero, ko, safe, still: no Unicode counterpart.
     },
   },
   {
