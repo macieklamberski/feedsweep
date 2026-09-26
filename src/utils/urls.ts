@@ -1,4 +1,12 @@
-import { isHostOrSubdomainOf, parseUrl } from 'trousse'
+import {
+  audioExtensions,
+  documentExtensions,
+  flashExtensions,
+  imageExtensions,
+  isHostOrSubdomainOf,
+  parseUrl,
+  videoExtensions,
+} from 'trousse'
 import type { ResolveUrlFn, TransformContext } from '../types.js'
 
 // Each helper names the slice of the context it actually reads, so a caller holding only a
@@ -23,9 +31,15 @@ export const audioFileRegex = /\.(aac|mp3|m4a|ogg|oga|wav|flac|opus)(\?|#|$)/i
 // A file no browser can play. Flash was blocked everywhere in January 2021, and hosts still
 // serve the `.swf` bytes, so a URL that reaches this is one that answers 200 and renders
 // nothing whatever a reader does with it.
-export const flashFileRegex = /\.swf(\?|#|$)/i
+export const flashFileRegex = new RegExp(`\\.(${flashExtensions.join('|')})(\\?|#|$)`, 'i')
 
-export const documentFileRegex = /\.(pdf|epub|docx?|pptx?|xlsx?)(\?|#|$)/i
+const fileExtensions = [
+  ...audioExtensions,
+  ...videoExtensions,
+  ...imageExtensions,
+  ...documentExtensions,
+]
+const fileRegex = new RegExp(`\\.(${fileExtensions.join('|')})(\\?|#|$)`, 'i')
 
 // Whether a url names audio or video the reader can play as it stands. A podcast host serves the
 // episode file from the same domain as its player, so a media url that skips this check reads as
@@ -34,16 +48,11 @@ export const isMediaFile = (value: string): boolean => {
   return audioFileRegex.test(value) || videoFileRegex.test(value)
 }
 
-// Whether a value names a file of any kind the reader can already show. The enclosure probe offers
-// every attachment a feed carries to every resolver, so a platform whose id shape admits a dot
-// would otherwise mint a player for an `.mp3` and take the place of a playable element.
+// Whether a value names an audio, video, image or document file. The enclosure probe offers every
+// attachment a feed carries to every resolver, so a platform whose id shape admits a dot would
+// otherwise mint a player for an `.mp3` and take the place of a playable element.
 export const isFileName = (value: string): boolean => {
-  return (
-    documentFileRegex.test(value) ||
-    audioFileRegex.test(value) ||
-    videoFileRegex.test(value) ||
-    imageFileRegex.test(value)
-  )
+  return fileRegex.test(value)
 }
 
 // A MediaWiki file page sits at `/wiki/File:Clip.webm`, so its path ends in the media's own
