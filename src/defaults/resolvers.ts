@@ -189,6 +189,7 @@ import { livedoorEmojiResolver } from '../emojis/livedoor.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
 import { maxEmojiResolver } from '../emojis/max.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
+import { punbbEmojiResolver } from '../emojis/punbb.js'
 import { sapoEmojiResolver } from '../emojis/sapo.js'
 import { seesaaEmojiResolver } from '../emojis/seesaa.js'
 import { slackEmojiResolver } from '../emojis/slack.js'
@@ -431,6 +432,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   // Ahead of smilies, whose forum names draw Liferay's smile.gif as 🙂.
   liferayEmojiResolver,
   smiliesEmojiResolver,
+  punbbEmojiResolver,
   froalaImageEmojiResolver,
   // Ahead of WordPress, whose WordPress.com host serves Twemoji files named by codepoint.
   twemojiEmojiResolver,
