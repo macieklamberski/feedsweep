@@ -420,6 +420,13 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should replace a site-custom smilie by its <3 alt', async () => {
+      const value = '<p><img src="http://example.com/smilies/yahoo_love.gif" alt="&lt;3"></p>'
+      const expected = '<p>❤️</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('TinyMCE 3 (/plugins/emotions/img/ names)', () => {
