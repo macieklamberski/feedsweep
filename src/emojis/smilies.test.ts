@@ -1597,7 +1597,9 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
     })
 
-    it.each(['rofl', 'rotfl'])('should replace the %s file', async (name) => {
+    const roflNames: Array<string> = ['rofl', 'rotfl']
+
+    it.each(roflNames)('should replace the %s file', async (name) => {
       const value = html`
         <p>
           <img class="smilies" src="https://example.com/images/smilies/${name}.gif" alt="">
