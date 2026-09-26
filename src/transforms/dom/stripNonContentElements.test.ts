@@ -76,11 +76,9 @@ const specimens: Record<string, string | [string, string]> = {
     '<iframe src="https://www.eventbrite.com/tickets-external?eid=2112794425&ref=etckt" frameborder="0" width="100%" height="192"></iframe>',
   'iframe[src*="eventbrite.com/countdown-widget"]':
     '<iframe src="//www.eventbrite.com/countdown-widget?eid=20577825831" width="195" height="295" frameborder="0"></iframe>',
-  'iframe[src*="patronite.pl/widget/"]':
-    '<iframe src="https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8" width="300" height="450" frameborder="0" scrolling="no"></iframe>',
   'form[action*="paypal.com/cgi-bin/webscr"]':
     '<form action="https://www.paypal.com/cgi-bin/webscr" method="post"><input type="hidden" name="cmd" value="_donations"><input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit" alt="Donate"></form>',
-  'img[src*="paypal.com/"][src*="/i/btn/"]':
+  'img[src*="paypal.com/"][src*="/i/btn/"]:not(a img)':
     '<img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate with PayPal">',
   'p:has(> a.redcircle-link)':
     '<p style="font-size: 10px; color: gray;">Powered by <a class="redcircle-link" href="https://example.com/?utm_source=rc_embedded_player">RedCircle</a></p>',
@@ -456,6 +454,16 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
             <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>
           </span>
         </span>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a PayPal button image that links to its target', async () => {
+      const value = html`
+        <a href="https://www.paypal.com/donate/?hosted_button_id=2BXZQLFUKNZ3Y">
+          <img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate">
+        </a>
       `
 
       expect(await transform(value)).toEqualHtml(value)

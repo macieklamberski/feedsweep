@@ -83,6 +83,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildGettyImagesEmbeds` | Rebuild a real `<iframe>` from a Getty Images `gie` widget facade, composing the player URL from the inline config the loader script never runs |
 | `rebuildDeferredIframes` | Rebuild a real `<iframe>` from a URL parked in a `<div>` attribute (Pym.js `data-pym-src`, @newswire/frames `data-frame-src`) |
 | `linkifyGistEmbeds` | Replace a GitHub Gist script embed or `<amp-gist>` with a link to the gist |
+| `linkifyPaypalDonateForms` | Replace a PayPal donate button form with its button image linked to PayPal's donate page |
 | `fixSubstackMentions` | Rebuild a Substack @-mention (empty `span.mention-wrap`) into an inline `<a>@name</a>` link, so the name survives instead of vanishing mid-sentence |
 | `fixSubstackImageLinks` | Remint the `<img>` inside an emptied Substack lightbox anchor (`a.image-link` whose image child was stripped) from the anchor's own image href |
 | `convertNoteEmbeds` | Convert note.com's empty embed figures (`figure[embedded-service][data-src]`): media services become plain iframes for the widget pass, own-post embeds become plain links |
