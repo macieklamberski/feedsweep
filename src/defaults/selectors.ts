@@ -149,6 +149,13 @@ export const defaultNonContentSelectors = [
   // Affiliate booking widgets, which render a map or a form to sell the reader a stay or a
   // ticket and carry none of the post.
   'iframe[src*="stay22.com/embed"]', // Stay22 hotel map.
+  // GetYourGuide activity and availability widgets. The mount is an empty paragraph or div the
+  // partner script fills, or one holding only a "Powered by GetYourGuide" credit anchor, which is
+  // every shape but two of the 376 mounts sampled. The other two are a publisher pasting the
+  // widget's whole attribute set onto their own markup, a heading and a div wrapping a
+  // hand-written list of tours, so the mount is claimed only where it carries nothing but that
+  // anchor.
+  ':is(p, div)[data-gyg-href]:not(:has(*:not(a)))',
 
   // Platform UI chrome and non-rendered scaffolding.
   // RedCircle's embed snippet ships a ten-pixel "Powered by RedCircle" line under the player.
