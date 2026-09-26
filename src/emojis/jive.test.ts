@@ -1,4 +1,4 @@
-import { expect, it } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, emojiConverters, html } from '../tests.js'
 
 describeForEachParser('jiveEmojiResolver', (parseHtml) => {
@@ -50,5 +50,31 @@ describeForEachParser('jiveEmojiResolver', (parseHtml) => {
     const expected = '<p><span data-emoji="">:happy:</span></p>'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  describe('rendered emoticon span', () => {
+    it('should replace the span by the name in its class', async () => {
+      const value = html`
+        <p>It is missing
+          <span
+            aria-label="Sad"
+            class="emoticon_sad emoticon-inline"
+            style="height:16px;width:16px;"
+          ></span>
+        </p>
+      `
+      const expected = '<p>It is missing 🙁</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // The Facebook classic resolver also selects an `emoticon_<name>` span, and would leave the
+    // bare name as text.
+    it('should mark a name no table carries as fallback text', async () => {
+      const value = '<p><span class="emoticon-inline emoticon_happy"></span></p>'
+      const expected = '<p><span data-emoji="">:happy:</span></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 })
