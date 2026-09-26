@@ -1579,6 +1579,37 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       },
     )
 
+    // Names boards add to several engines' sets, each with an alt the board made up.
+    const observedCases: Array<[string, string, string]> = [
+      ['yes', ':y', '🙂‍↕️'],
+      ['ok', ':okay:', '👍'],
+      ['good', ':good', '👍'],
+      ['hi', '-hi-', '👋'],
+      ['bye', ':Bye', '👋'],
+      ['crying', ':crying:', '😭'],
+      ['santa', ':Mikołaj:', '🎅'],
+      ['popcorn', ':popcorn:', '🍿'],
+      ['beer', ':ber:', '🍻'],
+      ['thumbsup', '[doppel-daumen]', '👍'],
+      ['crazy', ':craz:', '🤪'],
+      ['cheers', ':95:', '🥂'],
+      ['bravo', ')))', '👏'],
+    ]
+
+    it.each(observedCases)('should replace the %s file', async (name, alt, expected) => {
+      const value = html`
+        <p>
+          <img
+            class="smilies"
+            src="https://example.com/images/smilies/${name}.gif"
+            alt="${alt}"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
     it.each(['rofl', 'rotfl'])('should replace the %s file', async (name) => {
       const value = html`
         <p>
