@@ -1087,6 +1087,62 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('Discuz! (static/image/smiley/ names)', () => {
+    const faceCases: Array<[string, string]> = [
+      ['huffy', '😡'],
+      ['titter', '🤭'],
+      ['sweat', '😓'],
+      ['loveliness', '🥰'],
+      ['funk', '😨'],
+      ['curse', '🤬'],
+      ['shutup', '🤐'],
+      ['hug', '🤗'],
+      ['victory', '✌️'],
+      ['time', '🕒'],
+      ['handshake', '🤝'],
+      ['call', '📞'],
+    ]
+
+    it.each(faceCases)('should replace the %s face', async (name, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/static/image/smiley/default/${name}.gif"
+            smilieid="14"
+            border="0"
+            alt=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    it('should mark a phpBB smilie that shares a Discuz name', async () => {
+      const value = html`
+        <p>
+          <img
+            class="smilies"
+            src="https://example.com/images/smilies/time.gif"
+            alt=""
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="smilies"
+            src="https://example.com/images/smilies/time.gif"
+            alt=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('Khoros / Lithium (/i/smilies/ stock faces)', () => {
     // The alt and title are translated per board, so the stock filename is the only stable key.
     const faceCases: Array<[string, string, string]> = [

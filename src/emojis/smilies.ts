@@ -391,6 +391,22 @@ const webWizEmojiNames = toMap({
   smiley42: '🤝',
 })
 
+// Discuz! X's names, some as generic as `time` and `call`, so read only from its own directory.
+const discuzEmojiNames = toMap({
+  huffy: '😡',
+  titter: '🤭',
+  sweat: '😓',
+  loveliness: '🥰',
+  funk: '😨',
+  curse: '🤬',
+  shutup: '🤐',
+  hug: '🤗',
+  victory: '✌️',
+  time: '🕒',
+  handshake: '🤝',
+  call: '📞',
+})
+
 // NBBC's names for the codes the shared table draws as another face: `8)`, `;D`, `:s` and `<_<`.
 // Read ahead of the alt, since NBBC writes the code there.
 const nbbcEmojiNames = toMap({
@@ -417,6 +433,10 @@ const glyphFromEngineName = (src: string): string | undefined => {
 
   if (path.includes('/smileys/') && webWizEmojiNames.has(stem)) {
     return webWizEmojiNames.get(stem)
+  }
+
+  if (path.includes('static/image/smiley/') && discuzEmojiNames.has(stem)) {
+    return discuzEmojiNames.get(stem)
   }
 
   return nbbcEmojiNames.get(stem)
