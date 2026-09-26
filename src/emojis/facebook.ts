@@ -1,5 +1,5 @@
 import type { EmojiResolver } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, isElement } from '../utils/dom.js'
 import {
   glyphFromShortcode,
   noEmojiNames,
@@ -49,6 +49,8 @@ const classicCodes: Record<string, string> = {
 
 const classicClassRegex = /(?:^|\s)emoticon_([a-z0-9]+)(?:\s|$)/
 const textClassSelector = 'span[class~="emoticon_text"]'
+// Pasted posts also wrap whole paragraphs of prose in the fallback class.
+const maxFallbackLength = 40
 
 // Facebook's classic emoticon, an empty span painted from a sprite sheet the feed does not load,
 // with the code in its title. The class also rides on spans pasted around whole paragraphs.
@@ -70,14 +72,31 @@ export const facebookClassicEmojiResolver: EmojiResolver = {
       return
     }
 
-    // The code or its label is already text in the sibling Facebook hid from sighted readers.
-    const previous = element.previousElementSibling
-
-    if (previous?.matches(textClassSelector) && previous.textContent?.trim()) {
-      return
-    }
-
     const glyph = glyphFromShortcode(title) ?? glyphFromShortcode(code)
+
+    // The sibling Facebook hid from sighted readers holds the code, or a label naming the
+    // emoticon like `smile emoticon` or `winkhymiö`.
+    const previous = element.previousSibling
+    const fallback =
+      isElement(previous) && previous.matches(textClassSelector) ? previous.textContent?.trim() : ''
+
+    if (previous && fallback) {
+      if (!glyph || fallback.length > maxFallbackLength) {
+        return
+      }
+
+      // Prose pasted into the class, like `er jeg å fornøyd med :D`, is neither.
+      const isCode = glyphFromShortcode(fallback) === glyph
+      const isLabel = fallback.toLowerCase().includes(name)
+
+      if (!isCode && !isLabel) {
+        return
+      }
+
+      previous.remove()
+
+      return { glyph }
+    }
 
     return resolveEmojiElement(element, { glyph, shortcode: title ?? code ?? name })
   },
