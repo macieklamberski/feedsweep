@@ -414,10 +414,11 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
     })
 
-    it('should leave a site-custom smilie set untouched', async () => {
+    it('should replace a site-custom smilie by its :)) alt', async () => {
       const value = '<p><img src="http://example.com/smilies/yahoo_laughloud.gif" alt=":))"></p>'
+      const expected = '<p>🤣</p>'
 
-      expect(await transformKeeping(value)).toEqualHtml(value)
+      expect(await transform(value)).toEqualHtml(expected)
     })
   })
 
