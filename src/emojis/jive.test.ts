@@ -36,18 +36,43 @@ describeForEachParser('jiveEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  // Jive's stock names that neither the shortcode table nor gemoji carries.
+  const jiveNameCases: Array<[string, string]> = [
+    ['happy', '🙂'],
+    ['silly', '😛'],
+    ['laugh', '🤣'],
+    ['shocked', '😲'],
+    ['plain', '😐'],
+    ['mischief', '😏'],
+  ]
+
+  it.each(jiveNameCases)('should replace the macro by the Jive name %s', async (name, glyph) => {
+    const value = html`
+      <p>
+        <span
+          __jive_emoticon_name="${name}"
+          __jive_macro_name="emoticon"
+          class="jive_macro jive_emote"
+          src="https://example.com/4.5.4/images/emoticons/${name}.gif"
+        ></span>
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(`<p>${glyph}</p>`)
+  })
+
   it('should mark a Jive name no table carries as fallback text', async () => {
     const value = html`
       <p>
         <span
-          __jive_emoticon_name="happy"
+          __jive_emoticon_name="info"
           __jive_macro_name="emoticon"
           class="jive_macro jive_emote"
-          src="https://example.com/4.5.4/images/emoticons/happy.gif"
+          src="https://example.com/4.5.4/images/emoticons/info.gif"
         ></span>
       </p>
     `
-    const expected = '<p><span data-emoji="">:happy:</span></p>'
+    const expected = '<p><span data-emoji="">:info:</span></p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
@@ -68,11 +93,17 @@ describeForEachParser('jiveEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it.each(jiveNameCases)('should replace the span by the Jive name %s', async (name, glyph) => {
+      const value = `<p><span class="emoticon-inline emoticon_${name}"></span></p>`
+
+      expect(await transform(value)).toEqualHtml(`<p>${glyph}</p>`)
+    })
+
     // The Facebook classic resolver also selects an `emoticon_<name>` span, and would leave the
     // bare name as text.
     it('should mark a name no table carries as fallback text', async () => {
-      const value = '<p><span class="emoticon-inline emoticon_happy"></span></p>'
-      const expected = '<p><span data-emoji="">:happy:</span></p>'
+      const value = '<p><span class="emoticon-inline emoticon_info"></span></p>'
+      const expected = '<p><span data-emoji="">:info:</span></p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
