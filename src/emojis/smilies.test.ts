@@ -613,8 +613,8 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       const value = html`
         <p>
           <img
-            src="https://example.com/media/kunena/emoticons/w00t.png"
-            alt=":woohoo:"
+            src="https://example.com/media/kunena/emoticons/y32b4.png"
+            alt=":y32b4:"
             class="bbcode_smiley"
           >
         </p>
@@ -623,8 +623,8 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
         <p>
           <img
             data-emoji=""
-            src="https://example.com/media/kunena/emoticons/w00t.png"
-            alt=":woohoo:"
+            src="https://example.com/media/kunena/emoticons/y32b4.png"
+            alt=":y32b4:"
             class="bbcode_smiley"
           >
         </p>
@@ -891,6 +891,77 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       `
 
       expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+  })
+
+  describe('Invision Power Board and Kunena', () => {
+    // Alts that boards wrote in place of the stock code, so only the filename names the face.
+    const nameCases: Array<[string, string, string]> = [
+      ['wub', 'wub.gif', '😍'],
+      ['blink', '8|', '😯'],
+      ['wacko', ':wasko:', '🤪'],
+      ['ph34r', 'ph34r.gif', '🥷'],
+      ['w00t', ':woohoo:', '🤩'],
+      ['whistling', ':siffle:', '😗'],
+      ['doh', ':default_doh:', '🤦'],
+      ['dry', 'dry.gif', '😒'],
+      ['mellow', 'mellow.gif', '😑'],
+      ['sleep', ':zzz:', '😴'],
+    ]
+
+    it.each(nameCases)('should replace the %s face', async (name, alt, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/style_emoticons/default/${name}.gif"
+            class="bbc_emoticon"
+            alt="${alt}"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    const codeCases: Array<[string, string]> = [
+      [':wub:', '😍'],
+      [':blink:', '😯'],
+      [':wacko:', '🤪'],
+      [':ph34r:', '🥷'],
+      [':whistle:', '😗'],
+      [':mellow:', '😑'],
+      [':huh:', '😕'],
+      [':angry:', '😠'],
+    ]
+
+    it.each(codeCases)('should replace the %s code', async (code, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/uploads/emoticons/smily_8.gif"
+            alt="${code}"
+            data-emoticon=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    // IPB binds `-_-` to sleep.gif, and the code is read before the filename.
+    it('should replace a sleep smilie by its -_- code', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/uploads/emoticons/default_sleep.png"
+            alt="-_-"
+            data-emoticon=""
+          >
+        </p>
+      `
+      const expected = '<p>😑</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
   })
 
