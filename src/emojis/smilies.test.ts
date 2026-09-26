@@ -805,6 +805,72 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('NBBC (bbcode_smiley class, /smileys/ names)', () => {
+    // NBBC writes its code as the alt, and these four mean another face in the shared table.
+    const faceCases: Array<[string, string, string]> = [
+      ['worry', ':s', '😟'],
+      ['bigeyes', '8)', '😳'],
+      ['bigwink', ';D', '😜'],
+      ['lookleft', '&lt;_&lt;', '👀'],
+    ]
+
+    it.each(faceCases)('should replace the %s face', async (name, code, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/nbbc/smileys/${name}.gif"
+            width="15"
+            height="15"
+            alt="${code}"
+            title="${code}"
+            class="bbcode_smiley"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    const codeCases: Array<[string, string]> = [
+      ['&gt;;)', '😏'],
+      ['O:)', '😇'],
+      ['^_^', '😊'],
+      ['^^;', '😅'],
+      ['&gt;_&gt;', '👀'],
+      ['&lt;g&gt;', '😁'],
+      ['o.O', '🤨'],
+    ]
+
+    it.each(codeCases)('should replace the %s code on a renamed file', async (code, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/nbbc/smileys/custom/8.gif"
+            alt="${code}"
+            class="bbcode_smiley"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    // A base64 payload can end in a slash and an NBBC name.
+    it('should not read an NBBC name out of a sprite payload', async () => {
+      const value = html`
+        <p>
+          <img
+            src="data:image/gif;base64,AAA/worry"
+            data-shortname=":totally_custom:"
+          >
+        </p>
+      `
+      const expected = '<p><span data-emoji="">:totally_custom:</span></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('Khoros / Lithium (/i/smilies/ stock faces)', () => {
     // The alt and title are translated per board, so the stock filename is the only stable key.
     const faceCases: Array<[string, string, string]> = [

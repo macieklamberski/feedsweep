@@ -329,6 +329,27 @@ const directories = [
 ]
 const directorySelector = directories.map((path) => `img[src*="${path}" i]`).join(', ')
 
+// NBBC's names for the codes the shared table draws as another face: `8)`, `;D`, `:s` and `<_<`.
+// Read ahead of the alt, since NBBC writes the code there.
+const nbbcEmojiNames = toMap({
+  bigwink: '😜',
+  bigeyes: '😳',
+  worry: '😟',
+  lookleft: '👀',
+})
+
+const glyphFromEngineName = (src: string): string | undefined => {
+  // A XenForo sprite's base64 can contain `/`, leaving a stem that matches a name by accident.
+  if (src.startsWith('data:')) {
+    return
+  }
+
+  const path = src.toLowerCase()
+  const stem = getFileStem(path)
+
+  return nbbcEmojiNames.get(stem)
+}
+
 // Samsung's Khoros set files each face as `<n>.<name>_<codepoints>`, as in `2.winking-face_1f609`,
 // and a skin tone appends the modifier's name and codepoint after the full sequence.
 const numberedNameRegex = /^[0-9]+\.([a-z-]+)_/
@@ -365,10 +386,12 @@ export const smiliesEmojiResolver: EmojiResolver = {
       return
     }
 
+    const engineGlyph = glyphFromNumberedName(src) ?? glyphFromEngineName(src)
+
     return resolveEmojiImage(element, {
       isStrong,
       names: smiliesEmojiNames,
-      glyph: glyphFromNumberedName(src),
+      glyph: engineGlyph,
     })
   },
 }
