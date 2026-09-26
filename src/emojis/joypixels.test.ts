@@ -85,6 +85,24 @@ describeForEachParser('joypixelsEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('WP Emoji One plugin', () => {
+    it('should decode an uppercase codepoint filename', async () => {
+      const value = html`
+        <p>
+          <img
+            style="margin-left: 3px; margin-right: 3px; vertical-align: middle;"
+            src="https://example.com/wp-content/plugins/wp-emoji-one/icons/1F609.png"
+            width="16"
+            height="16"
+          >
+        </p>
+      `
+      const expected = '<p>😉</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('JoyPixels 5 and later', () => {
     it('should decode the filename of an image carrying the joypixels class', async () => {
       const value = html`

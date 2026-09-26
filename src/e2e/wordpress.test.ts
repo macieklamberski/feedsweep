@@ -172,4 +172,21 @@ describeForEachParser('WordPress', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  it('should replace a WP Emoji One image with its character', async () => {
+    const value = html`
+      <p>Party
+        <img
+          decoding="async"
+          style="margin-left: 3px; margin-right: 3px; vertical-align: middle;"
+          src="https://example.com/wp-content/plugins/wp-emoji-one/icons/1F389.png"
+          width="16"
+          height="16"
+        >
+      </p>
+    `
+    const expected = '<p>Party 🎉</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })
