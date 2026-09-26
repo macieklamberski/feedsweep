@@ -965,6 +965,62 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('XenForo 2 (sprite shortnames)', () => {
+    const shortnameCases: Array<[string, string, string]> = [
+      [':cautious:', 'Cautious', '😒'],
+      [':censored:', 'Censored', '🤐'],
+      [':sneaky:', 'Sneaky', '😏'],
+      [':whistle:', 'Whistling', '😗'],
+      [':giggle:', 'Giggle', '🤭'],
+      [':devilish:', 'Devil', '😈'],
+      ['o_O', 'Er... what?', '😵‍💫'],
+    ]
+
+    it.each(shortnameCases)('should replace the %s smilie', async (shortname, title, expected) => {
+      const value = html`
+        <p>
+          <img
+            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            class="smilie smilie--sprite smilie--sprite9"
+            alt="${shortname}"
+            title="${title}    ${shortname}"
+            loading="lazy"
+            data-shortname="${shortname}"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    // phpBB boards bind `O_o` to faces of their own, and only XenForo's is drawn dizzy.
+    it('should mark an O_o smilie outside XenForo', async () => {
+      const value = html`
+        <p>
+          <img
+            class="smilies"
+            src="https://example.com/images/smilies/icon_goofy.gif"
+            alt="O_o"
+            title="Flipando"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="smilies"
+            src="https://example.com/images/smilies/icon_goofy.gif"
+            alt="O_o"
+            title="Flipando"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('NBBC (bbcode_smiley class, /smileys/ names)', () => {
     // NBBC writes its code as the alt, and these four mean another face in the shared table.
     const faceCases: Array<[string, string, string]> = [
