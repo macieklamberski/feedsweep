@@ -329,6 +329,53 @@ const directories = [
 ]
 const directorySelector = directories.map((path) => `img[src*="${path}" i]`).join(', ')
 
+// Web Wiz Forums numbers its files. WoltLab ships other drawings under the same names in
+// `/smilies/`, so these are read only from Web Wiz's `/smileys/`.
+const webWizEmojiNames = toMap({
+  smiley1: '🙂',
+  smiley2: '😉',
+  smiley3: '😲',
+  smiley4: '😁',
+  smiley5: '😕',
+  smiley6: '🙁',
+  smiley7: '😡',
+  smiley8: '🤡',
+  smiley9: '😳',
+  smiley10: '⭐',
+  smiley11: '😵',
+  smiley12: '😴',
+  smiley13: '🤨',
+  smiley14: '🙂‍↕️',
+  smiley15: '😈',
+  smiley16: '😎',
+  smiley17: '😛',
+  smiley18: '🤕',
+  smiley19: '😢',
+  smiley20: '👍',
+  smiley21: '👎',
+  smiley22: '😐',
+  smiley23: '🤓',
+  smiley24: '🫤',
+  smiley25: '❓',
+  smiley26: '😣',
+  smiley27: '❤️',
+  smiley28: '💔',
+  smiley29: '🤪',
+  smiley30: '🐷',
+  smiley31: '🤗',
+  smiley32: '👏',
+  smiley33: '☯️',
+  smiley34: '☢️',
+  smiley35: '🤬',
+  smiley36: '🤣',
+  smiley37: '⚠️',
+  smiley38: '💡',
+  smiley39: '🤢',
+  smiley40: '🥳',
+  smiley41: '🍻',
+  smiley42: '🤝',
+})
+
 // NBBC's names for the codes the shared table draws as another face: `8)`, `;D`, `:s` and `<_<`.
 // Read ahead of the alt, since NBBC writes the code there.
 const nbbcEmojiNames = toMap({
@@ -346,6 +393,10 @@ const glyphFromEngineName = (src: string): string | undefined => {
 
   const path = src.toLowerCase()
   const stem = getFileStem(path)
+
+  if (path.includes('/smileys/') && webWizEmojiNames.has(stem)) {
+    return webWizEmojiNames.get(stem)
+  }
 
   return nbbcEmojiNames.get(stem)
 }
