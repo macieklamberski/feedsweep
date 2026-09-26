@@ -3,13 +3,20 @@ import { attr } from '../utils/dom.js'
 import { resolveEmojiElement } from '../utils/emojis.js'
 import { glyphFromEmojiName } from '../utils/gemoji.js'
 
-// Jive's emoticon macro, an empty span whose picture the site's CSS draws from the name. Jive's
-// own names are not a published set, so only one the shortcode table or gemoji knows resolves.
+const nameClassRegex = /(?:^|\s)emoticon_([a-z0-9]+)(?:\s|$)/
+
+// Jive's emoticon, an empty span whose picture the site's CSS draws from the name: the macro
+// carries it in an attribute, the rendered form in an `emoticon_<name>` class. Jive's own names
+// are not a published set, so only one the shortcode table or gemoji knows resolves.
 export const jiveEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: 'span[__jive_emoticon_name]',
+  selector: [
+    'span[__jive_emoticon_name]',
+    'span[class~="emoticon-inline"][class*="emoticon_"]',
+  ].join(', '),
   extract: (element) => {
-    const name = attr(element, '__jive_emoticon_name')
+    const name =
+      attr(element, '__jive_emoticon_name') ?? attr(element, 'class')?.match(nameClassRegex)?.[1]
 
     return resolveEmojiElement(element, {
       glyph: glyphFromEmojiName(name),
