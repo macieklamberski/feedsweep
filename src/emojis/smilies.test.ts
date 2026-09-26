@@ -1304,7 +1304,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
 
     // Samsung's own smiling face is filed under the codepoint of 🃏.
-    it('should mark the Samsung smiling face without decoding its filename', async () => {
+    it('should replace the Samsung smiling face without decoding its filename', async () => {
       const value = html`
         <p>
           <img
@@ -1315,17 +1315,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-      const expected = html`
-        <p>
-          <img
-            data-emoji=""
-            class="lia-deferred-image lia-image-emoji"
-            src="https://example.com/html/@758C9CF82B69C1E7230907A98BEAE742/images/smilies/1.samsung_1f0cf.png"
-            alt=":smiling-face:"
-            title=":smiling-face:"
-          >
-        </p>
-      `
+      const expected = '<p>😀</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
