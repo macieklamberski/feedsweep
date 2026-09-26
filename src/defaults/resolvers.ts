@@ -175,6 +175,7 @@ import { cocologEmojiResolver } from '../emojis/cocolog.js'
 import { discordEmojiResolver } from '../emojis/discord.js'
 import { exblogEmojiResolver } from '../emojis/exblog.js'
 import { facebookClassicEmojiResolver, facebookEmojiResolver } from '../emojis/facebook.js'
+import { froalaElementEmojiResolver, froalaImageEmojiResolver } from '../emojis/froala.js'
 import { genericEmojiResolver } from '../emojis/generic.js'
 import { githubElementEmojiResolver, githubImageEmojiResolver } from '../emojis/github.js'
 import { gitlabEmojiResolver } from '../emojis/gitlab.js'
@@ -424,11 +425,13 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   khorosEmojiResolver,
   jiveEmojiResolver,
   facebookClassicEmojiResolver,
+  froalaElementEmojiResolver,
   // Ahead of smilies, whose /smiles/ directory would read a Bitrix file by its filename first.
   bitrixEmojiResolver,
   // Ahead of smilies, whose forum names draw Liferay's smile.gif as 🙂.
   liferayEmojiResolver,
   smiliesEmojiResolver,
+  froalaImageEmojiResolver,
   // Ahead of WordPress, whose WordPress.com host serves Twemoji files named by codepoint.
   twemojiEmojiResolver,
   wordpressEmojiResolver,
