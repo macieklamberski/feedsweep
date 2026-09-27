@@ -28,10 +28,16 @@ describeForEachParser('yahooJapanEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should mark an emoji named by its carrier code', async () => {
-      const value = '<p><img src="https://i.yimg.jp/images/mail/emoji/15/ew_icon_a257.gif"></p>'
-      const expected =
-        '<p><img src="https://i.yimg.jp/images/mail/emoji/15/ew_icon_a257.gif" data-emoji=""></p>'
+    const carrierCases: Array<[string, string]> = [
+      ['ew_icon_a257', '😃'],
+      ['ew_icon_s366', '😢'],
+      ['ew_icon_d151', '💡'],
+      ['ew_icon_d1022', '😌'],
+    ]
+
+    it.each(carrierCases)('should replace %s by its carrier number', async (stem, glyph) => {
+      const value = `<p><img src="https://i.yimg.jp/images/mail/emoji/15/${stem}.gif"></p>`
+      const expected = `<p>${glyph}</p>`
 
       expect(await transform(value)).toEqualHtml(expected)
     })
