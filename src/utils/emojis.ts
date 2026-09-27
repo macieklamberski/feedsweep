@@ -147,6 +147,25 @@ export const glyphFromCodepoints = (stem: string): string | undefined => {
   return textDefaultRegex.test(glyph) ? `${glyph}️` : glyph
 }
 
+const bytePairRegex = /../g
+const utf8Decoder = new TextDecoder('utf-8', { fatal: true })
+
+// A filename spelling its glyph's UTF-8 bytes in hex, as VK and Telegram name theirs.
+export const glyphFromUtf8Hex = (stem: string): string | undefined => {
+  const pairs = stem.match(bytePairRegex) ?? []
+  const bytes = Uint8Array.from(pairs, (pair) => Number.parseInt(pair, 16))
+
+  try {
+    const glyph = utf8Decoder.decode(bytes)
+
+    if (!isEmojiShaped(glyph)) {
+      return
+    }
+
+    return glyph
+  } catch {}
+}
+
 const codepointTextRegex = /^[0-9a-f]{2,5}(?:[-_][0-9a-f]{2,5})*$/
 const variationRegex = /️/g
 
