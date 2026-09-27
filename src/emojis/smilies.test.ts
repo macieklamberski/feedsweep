@@ -1736,6 +1736,29 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    const engineNameSources: Array<string> = [
+      'https://illiweb.com/fa/i/smiles/icon_cheers.png',
+      'https://example.com/media/kunena/emoticons/cheerful.png',
+      'https://example.com/uploads/emoticons/default_yahoo.gif',
+      'https://example.com/public/style_emoticons/default/drool.gif',
+      'https://example.com/styles/default/xenforo/smilies/banghead.gif',
+      'https://example.com/Smileys/default/thumb.gif',
+      'https://example.com/images/smilies/gruebel.gif',
+    ]
+
+    it.each(engineNameSources)('should mark the name a board added at %s', async (src) => {
+      const value = `<p><img src="${src}" alt=""></p>`
+      const expected = `<p><img data-emoji="" src="${src}" alt=""></p>`
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a Forumotion name outside its host untouched', async () => {
+      const value = '<p><img src="https://example.com/images/smiles/herz.png" alt=""></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
   })
 
   describe('platform filename tables', () => {

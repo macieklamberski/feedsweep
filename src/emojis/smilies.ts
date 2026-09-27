@@ -272,6 +272,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       lightbulb: '💡',
       thumbs_up: '👍',
       thumbs_down: '👎',
+      whatchutalkingabout_smile: false, // The MSN set's indecision face
       // TinyMCE 3's names, after its `smiley-` prefix. Vanilla ships the tongue and money faces.
       sealed: '🤐',
       embarassed: '😳', // Misspelled upstream
@@ -445,10 +446,181 @@ const discuzEmojiNames = toMap<EmojiGlyph>({
   call: false,
 })
 
+// Forumotion's shared set, served from its own host for every board it runs.
+const forumotionEmojiNames = toMap<EmojiGlyph>({
+  icon_cheers: false,
+  icon_bounce: false,
+  icon_flower: false,
+  affraid: false,
+  herz: false,
+  icon_rr: false,
+  icon_santa: false,
+  fresse: false,
+  icon_sunny: false,
+  star3: false,
+  icon_study: false,
+  suspect: false,
+  icon_king: false,
+  icon_scratch: false,
+  icon_basketball: false,
+  icon_pale: false,
+  icon_pirat: false,
+  icon_tongue: false,
+  icon_rabbit: false,
+  icon_cyclops: false,
+  drunken_smilie: false,
+  icon_geek: false,
+  icon_farao: false,
+  icon_albino: false,
+  icon_jokercolor: false,
+})
+
+// Kunena's names past the stock set, and the numbered files boards upload beside it.
+const kunenaEmojiNames = toMap<EmojiGlyph>({
+  cheerful: false,
+  silly: false,
+  ermm: false,
+  sideways: false,
+  kissing: false,
+  pinch: false,
+  '9': false,
+  '10': false,
+  '1': false,
+  '3': false,
+  '2': false,
+  '4': false,
+  '20': false,
+  yahoo: false,
+})
+
+// Invision boards' names past the stock set, under `uploads/emoticons` and IPB 2's
+// `style_emoticons`.
+const invisionEmojiNames = toMap<EmojiGlyph>({
+  yahoo: false,
+  help: false,
+  happy: false,
+  drinks: false,
+  excl: false,
+  clapping: false,
+  cray: false,
+  friends: false,
+  acute: false,
+  dance: false,
+  shok: false,
+  wave: false,
+  sorry: false,
+  unknw: false,
+  hug: false,
+  give_rose: false,
+  blush2: false,
+  shifty: false,
+  banana: false,
+  wallbash: false,
+  pardon: false,
+  salute: false,
+  wall: false,
+  thinking: false,
+  'untitled-1': false,
+  drunk: false,
+  no: false,
+  flowers: false,
+  ninja: false,
+  party: false,
+  nono: false,
+  worshippy: false,
+  victory: false,
+  search: false,
+  peace: false,
+  read: false,
+  fool: false,
+  respect: false,
+  sorcerer: false,
+  wow: false,
+  bday: false,
+  glare: false,
+  drool: false,
+  coolspeak: false,
+  console: false,
+  peacefingers: false,
+})
+
+// XenForo boards' additions to the stock set.
+const xenforoEmojiNames = toMap<EmojiGlyph>({
+  happy: false,
+  wave: false,
+  banghead: false,
+  angelic: false,
+  woot: false,
+  dance: false,
+  welcome: false,
+  '1': false,
+})
+
+// SMF boards' additions to the stock set.
+const smfEmojiNames = toMap<EmojiGlyph>({
+  thumb: false,
+  think: false,
+  flowers: false,
+  banghead: false,
+  notworthy: false,
+  drinks: false,
+})
+
+// WoltLab and phpBB boards' additions, both served from `images/smilies/`.
+const boardEmojiNames = toMap<EmojiGlyph>({
+  smiley34: false,
+  danke: false,
+  smiley40: false,
+  smiley5: false,
+  smiley37: false,
+  smiley35: false,
+  gruebel: false,
+  happy: false,
+  pleased: false,
+  pinch: false,
+  smiley41: false,
+  smiley47: false,
+  pardon: false,
+  smiley39: false,
+  dance: false,
+  smiley44: false,
+  cursing: false,
+  respekt: false,
+  smiley36: false,
+  dash: false,
+  smiley49: false,
+  '3b63d1616c5dfcf29f8a7a031aaa7cad': false, // JForum's stock set, named by hash
+  applaus: false,
+  party: false,
+  smiley38: false,
+  pillepalle: false,
+  '8': false,
+  '14': false,
+  squint: false,
+  '8a80c6485cd926be453217d59a84a888': false, // JForum's stock set, named by hash
+  '283a16da79f3aa23fe1025c96295f04f': false, // JForum's stock set, named by hash
+  top: false,
+  hammer: false,
+  '4': false,
+  bier: false,
+  help: false,
+  '9d71f0541cff0a302a0309c5079e8dee': false, // JForum's stock set, named by hash
+  b2eb59423fbf5fa39342041237025880: false, // JForum's stock set, named by hash
+  smiley50: false,
+  welcome: false,
+})
+
 // Names each engine ships under its own directory, where other engines ship other drawings.
 const engineEmojiNames: Array<[string, Map<string, EmojiGlyph>]> = [
   ['/smileys/', webWizEmojiNames],
   ['static/image/smiley/', discuzEmojiNames],
+  ['illiweb.com/fa/i/smiles/', forumotionEmojiNames],
+  ['/media/kunena/emoticons/', kunenaEmojiNames],
+  ['/uploads/emoticons/', invisionEmojiNames],
+  ['/style_emoticons/', invisionEmojiNames],
+  ['/xenforo/smilies/', xenforoEmojiNames],
+  ['/smileys/', smfEmojiNames],
+  ['/images/smilies/', boardEmojiNames],
 ]
 
 // NBBC's names for the codes the shared table draws as another face: `8)`, `;D`, `:s` and `<_<`.
