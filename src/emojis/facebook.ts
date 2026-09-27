@@ -14,6 +14,7 @@ import { bgImage } from '../utils/styles.js'
 const hosts = [
   'fbcdn.net/images/emoji.php/', // The static CDN
   'www.facebook.com/images/emoji.php/', // The same files from the main host, in older pastes
+  'static.cdninstagram.com/images/emoji.php/', // The same files from Instagram's static host
 ]
 
 // The emoji images a pasted Facebook post ships.
@@ -27,7 +28,7 @@ export const facebookEmojiResolver: EmojiResolver = {
 
 const emojiPath = '/images/emoji.php/'
 // The CDN serves from subdomains like `static.xx.fbcdn.net`, older pastes from the main host.
-const emojiHosts = ['fbcdn.net', 'www.facebook.com']
+const emojiHosts = ['fbcdn.net', 'www.facebook.com', 'fbstatic-a.akamaihd.net']
 // The host is read up to the path, not parsed, since pasted styles mangle the scheme, as in
 // `https: //static.xx.fbcdn.net/…`.
 const emojiHostRegex = /\/\/([a-z0-9.-]+)\/images\/emoji\.php\//i

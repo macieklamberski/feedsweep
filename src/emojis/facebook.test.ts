@@ -47,6 +47,13 @@ describeForEachParser('facebookEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
   })
+
+  it('should replace an emoji from the Instagram static host by its codepoint filename', async () => {
+    const value =
+      '<p><img src="https://static.cdninstagram.com/images/emoji.php/v9/t8/1/16/2694.png" width="16"></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>⚔️</p>')
+  })
 })
 
 describeForEachParser('facebookElementEmojiResolver', (parseHtml) => {
@@ -212,6 +219,13 @@ describeForEachParser('facebookElementEmojiResolver', (parseHtml) => {
     const expected = '<p><span data-testid="emoji">😀</span></p>'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace an i painted from the older akamaihd host by its codepoint filename', async () => {
+    const value =
+      '<p>Hi <i style="background-image: url(https://fbstatic-a.akamaihd.net/images/emoji.php/v9/f4c/1/16/1f600.png)"></i></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>Hi 😀</p>')
   })
 })
 
@@ -519,6 +533,10 @@ describeForEachParser('facebookClassicEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(value)
   })
+})
+
+describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
+  const { transform } = emojiConverters(parseHtml)
 
   describe('label wrappers', () => {
     const labelCases: Array<[string, string]> = [
