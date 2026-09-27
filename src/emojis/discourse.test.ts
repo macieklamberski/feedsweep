@@ -114,26 +114,76 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should mark a name Discourse and gemoji draw as different glyphs', async () => {
+  const discourseNameCases: Array<[string, string]> = [
+    ['relaxed', '😌'],
+    ['frowning', '☹️'],
+    ['bow', '🙇‍♂️'],
+    ['policeman', '👮'],
+    ['guardsman', '💂'],
+    ['bride_with_veil', '👰'],
+    ['massage', '💆‍♀️'],
+    ['runner', '🏃‍♂️'],
+    ['dancing_women', '👯'],
+    ['rowboat', '🚣‍♂️'],
+    ['swimmer', '🏊‍♂️'],
+    ['bicyclist', '🚴‍♂️'],
+    ['mountain_bicyclist', '🚵‍♂️'],
+    ['kiss', '💏'],
+    ['couplekiss', '👩‍❤️‍💋‍👨'],
+    ['couple_with_heart', '👩‍❤️‍👨'],
+    ['feet', '👣'],
+    ['dog', '🐕'],
+    ['cat', '🐈'],
+    ['tiger', '🐅'],
+    ['horse', '🐎'],
+    ['cow', '🐄'],
+    ['pig', '🐖'],
+    ['camel', '🐪'],
+    ['mouse', '🐁'],
+    ['rabbit', '🐇'],
+    ['whale', '🐋'],
+    ['whale2', '🐳'],
+    ['parasol_on_ground', '🏖️'],
+    ['post_office', '🏤'],
+    ['train', '🚆'],
+    ['boat', '🛥️'],
+    ['satellite', '🛰️'],
+    ['moon', '🌑'],
+    ['umbrella', '☂️'],
+    ['snowman', '☃️'],
+    ['sunglasses', '🕶️'],
+    ['pencil', '✏️'],
+    ['calendar', '📅'],
+    ['sa', '🈶'],
+    ['japan', '🇯🇵'],
+  ]
+
+  it.each(discourseNameCases)('should replace %s as Discourse draws it', async (name, glyph) => {
     const value = html`
       <p>
         <img
-          src="https://forum.example.com/images/emoji/twitter/dog.png?v=12"
+          src="https://forum.example.com/images/emoji/twitter/${name}.png?v=12"
           class="emoji"
-          alt=":dog:"
+          alt=":${name}:"
         >
       </p>
     `
-    const expected = html`
+    const expected = `<p>${glyph}</p>`
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should add the skin tone to a name Discourse draws as another glyph', async () => {
+    const value = html`
       <p>
         <img
-          data-emoji=""
-          src="https://forum.example.com/images/emoji/twitter/dog.png?v=12"
+          src="https://forum.example.com/images/emoji/twitter/runner/4.png?v=12"
           class="emoji"
-          alt=":dog:"
+          alt=":runner:t4:"
         >
       </p>
     `
+    const expected = '<p>🏃🏽‍♂️</p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
