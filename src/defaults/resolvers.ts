@@ -216,6 +216,7 @@ import { notoEmojiResolver } from '../emojis/noto.js'
 import { pixnetEmojiResolver } from '../emojis/pixnet.js'
 import { punbbEmojiResolver } from '../emojis/punbb.js'
 import { rakutenEmojiResolver } from '../emojis/rakuten.js'
+import { rcmsEmojiResolver } from '../emojis/rcms.js'
 import { rhymixEmojiResolver } from '../emojis/rhymix.js'
 import { sapoEmojiResolver } from '../emojis/sapo.js'
 import { seesaaEmojiResolver } from '../emojis/seesaa.js'
@@ -535,6 +536,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   moodleEmojiResolver,
   boardgamegeekEmojiResolver,
   rhymixEmojiResolver,
+  rcmsEmojiResolver,
   jeuxvideoEmojiResolver,
   rakutenEmojiResolver,
   mixiEmojiResolver,
