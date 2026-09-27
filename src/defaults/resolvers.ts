@@ -170,17 +170,67 @@ import { youtubeAmpEmbedResolver, youtubeIframeEmbedResolver } from '../embeds/y
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
 import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
-import { facebookEmojiResolver } from '../emojis/facebook.js'
-import { genericEmojiResolver } from '../emojis/generic.js'
-import { githubEmojiResolver } from '../emojis/github.js'
+import { bitrixEmojiResolver } from '../emojis/bitrix.js'
+import { boardgamegeekEmojiResolver } from '../emojis/boardgamegeek.js'
+import { cocologEmojiResolver } from '../emojis/cocolog.js'
+import { discordEmojiResolver } from '../emojis/discord.js'
+import { discourseEmojiResolver } from '../emojis/discourse.js'
+import { discuzEmojiResolver } from '../emojis/discuz.js'
+import { dropboxEmojiResolver } from '../emojis/dropbox.js'
+import { drupalEmojiResolver } from '../emojis/drupal.js'
+import { e107EmojiResolver } from '../emojis/e107.js'
+import { easydiscussEmojiResolver } from '../emojis/easydiscuss.js'
+import { exblogEmojiResolver } from '../emojis/exblog.js'
+import {
+  facebookClassicEmojiResolver,
+  facebookElementEmojiResolver,
+  facebookEmojiResolver,
+} from '../emojis/facebook.js'
+import { fc2EmojiResolver } from '../emojis/fc2.js'
+import { forumotionEmojiResolver } from '../emojis/forumotion.js'
+import { froalaElementEmojiResolver, froalaImageEmojiResolver } from '../emojis/froala.js'
+import { fudforumEmojiResolver } from '../emojis/fudforum.js'
+import { genericCharacterEmojiResolver, genericEmojiResolver } from '../emojis/generic.js'
+import { githubElementEmojiResolver, githubImageEmojiResolver } from '../emojis/github.js'
+import { gitlabEmojiResolver } from '../emojis/gitlab.js'
+import { gmailEmojiResolver } from '../emojis/gmail.js'
+import { invisionEmojiResolver } from '../emojis/invision.js'
+import { jforumEmojiResolver } from '../emojis/jforum.js'
+import { jiveEmojiResolver } from '../emojis/jive.js'
 import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
+import { jugemEmojiResolver } from '../emojis/jugem.js'
+import { khorosEmojiResolver, khorosImageEmojiResolver } from '../emojis/khoros.js'
+import { kunenaEmojiResolver } from '../emojis/kunena.js'
+import { liferayEmojiResolver } from '../emojis/liferay.js'
+import { livedoorEmojiResolver } from '../emojis/livedoor.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
-import { smiliesEmojiResolver } from '../emojis/smilies.js'
-import { telegramEmojiResolver } from '../emojis/telegram.js'
+import { maxEmojiResolver } from '../emojis/max.js'
+import { monalisaEmojiResolver } from '../emojis/monalisa.js'
+import { moodleEmojiResolver } from '../emojis/moodle.js'
+import { nbbcEmojiResolver } from '../emojis/nbbc.js'
+import { notoEmojiResolver } from '../emojis/noto.js'
+import { punbbEmojiResolver } from '../emojis/punbb.js'
+import { rhymixEmojiResolver } from '../emojis/rhymix.js'
+import { sapoEmojiResolver } from '../emojis/sapo.js'
+import { seesaaEmojiResolver } from '../emojis/seesaa.js'
+import { simplePressEmojiResolver } from '../emojis/simplepress.js'
+import { slackEmojiResolver } from '../emojis/slack.js'
+import { smfEmojiResolver } from '../emojis/smf.js'
+import { smiliesEmojiResolver, smiliesEmoticonEmojiResolver } from '../emojis/smilies.js'
+import { tapatalkEmojiResolver } from '../emojis/tapatalk.js'
+import { teamsEmojiResolver } from '../emojis/teams.js'
+import { telegramEmojiResolver, telegramImageEmojiResolver } from '../emojis/telegram.js'
+import { tinymceEmojiResolver } from '../emojis/tinymce.js'
 import { twemojiEmojiResolver } from '../emojis/twemoji.js'
+import { ucozEmojiResolver } from '../emojis/ucoz.js'
 import { vanillaEmojiResolver } from '../emojis/vanilla.js'
+import { vkEmojiResolver } from '../emojis/vk.js'
+import { webWizEmojiResolver } from '../emojis/webwiz.js'
 import { weiboEmojiResolver } from '../emojis/weibo.js'
 import { wordpressEmojiResolver } from '../emojis/wordpress.js'
+import { xenforoEmojiResolver } from '../emojis/xenforo.js'
+import { yahooEmojiResolver } from '../emojis/yahoo.js'
+import { yahooJapanEmojiResolver } from '../emojis/yahoojapan.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { ghostMediaResolver } from '../media/ghost.js'
 import { podloveMediaResolver } from '../media/podlove.js'
@@ -400,7 +450,43 @@ export const defaultWidgetResolvers: Array<WidgetResolver> = [
 // mark: an image on a CDN host can still carry a forum class whose table resolves it.
 export const defaultEmojiResolvers: Array<EmojiResolver> = [
   telegramEmojiResolver,
+  gitlabEmojiResolver,
+  githubElementEmojiResolver,
+  khorosEmojiResolver,
+  jiveEmojiResolver,
+  facebookClassicEmojiResolver,
+  facebookElementEmojiResolver,
+  froalaElementEmojiResolver,
+  // Ahead of smilies, whose /smiles/ directory would read a Bitrix file by its filename first.
+  bitrixEmojiResolver,
+  // Ahead of smilies, whose forum names draw Liferay's smile.gif as 🙂.
+  liferayEmojiResolver,
+  khorosImageEmojiResolver,
+  webWizEmojiResolver,
+  discuzEmojiResolver,
+  forumotionEmojiResolver,
+  kunenaEmojiResolver,
+  invisionEmojiResolver,
+  xenforoEmojiResolver,
+  smfEmojiResolver,
+  nbbcEmojiResolver,
+  simplePressEmojiResolver,
+  drupalEmojiResolver,
+  monalisaEmojiResolver,
+  easydiscussEmojiResolver,
+  tinymceEmojiResolver,
+  fudforumEmojiResolver,
+  e107EmojiResolver,
+  jforumEmojiResolver,
+  ucozEmojiResolver,
   smiliesEmojiResolver,
+  punbbEmojiResolver,
+  yahooEmojiResolver,
+  yahooJapanEmojiResolver,
+  froalaImageEmojiResolver,
+  // Ahead of Twemoji, whose loose `twemoji` url match also takes Discourse's `twemoji` set, drawn
+  // under Discourse's own names.
+  discourseEmojiResolver,
   // Ahead of WordPress, whose WordPress.com host serves Twemoji files named by codepoint.
   twemojiEmojiResolver,
   wordpressEmojiResolver,
@@ -408,10 +494,33 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   artstationEmojiResolver,
   joypixelsEmojiResolver,
   facebookEmojiResolver,
-  githubEmojiResolver,
+  githubImageEmojiResolver,
+  slackEmojiResolver,
+  notoEmojiResolver,
+  dropboxEmojiResolver,
+  gmailEmojiResolver,
+  telegramImageEmojiResolver,
+  vkEmojiResolver,
+  maxEmojiResolver,
   mastodonEmojiResolver,
   weiboEmojiResolver,
   amebaEmojiResolver,
+  teamsEmojiResolver,
+  discordEmojiResolver,
+  tapatalkEmojiResolver,
+  livedoorEmojiResolver,
+  seesaaEmojiResolver,
+  sapoEmojiResolver,
+  exblogEmojiResolver,
+  cocologEmojiResolver,
+  jugemEmojiResolver,
+  fc2EmojiResolver,
+  moodleEmojiResolver,
+  boardgamegeekEmojiResolver,
+  rhymixEmojiResolver,
+  genericCharacterEmojiResolver,
+  // After every engine, since TypePad, Yahoo and others put the emoticon class on their own sets.
+  smiliesEmoticonEmojiResolver,
   // Last, since the class is shared by engines whose own signals say more.
   genericEmojiResolver,
 ]

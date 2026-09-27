@@ -1,12 +1,16 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, getElementDimensions } from '../utils/dom.js'
 import {
+  type EmojiGlyph,
   type EmojiNameTable,
+  getNameStem,
+  getShortcode,
   mergeEmojiNames,
-  rendersNothing,
+  noEmojiNames,
   resolveEmojiImage,
 } from '../utils/emojis.js'
+import { kolobokEmojiNames } from './punbb.js'
 
 // Each engine lists the filenames its own distribution ships, and `smile.png` is shipped by four.
 export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
@@ -15,25 +19,25 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
     names: {
       icon_smile: '🙂',
       icon_wink: '😉',
-      icon_biggrin: '😃',
+      icon_biggrin: '😁',
       icon_sad: '🙁',
-      icon_razz: '😛',
+      icon_razz: false,
       icon_cool: '😎',
-      icon_lol: '😄',
+      icon_lol: '🤣',
       icon_cry: '😢',
       icon_mad: '😠',
       icon_confused: '😕',
       icon_rolleyes: '🙄',
-      icon_eek: '😲',
+      icon_eek: false,
       icon_surprised: '😲',
       icon_neutral: '😐',
-      icon_redface: '😳',
-      icon_evil: '😈',
-      icon_twisted: '😈',
+      icon_redface: false,
+      icon_evil: false, // An angry devil here, a grinning one on other engines
+      icon_twisted: false,
       icon_idea: '💡',
       icon_exclaim: '❗',
       icon_question: '❓',
-      // icon_mrgreen: the green is the whole joke, so there is nothing to convert it to.
+      icon_mrgreen: false, // The green is the whole joke, so there is nothing to convert it to
     },
   },
   {
@@ -41,30 +45,30 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
     names: {
       icon_e_smile: '🙂',
       icon_e_wink: '😉',
-      icon_e_biggrin: '😃',
+      icon_e_biggrin: '😁',
       icon_e_sad: '🙁',
       icon_e_tongue: '😛',
       icon_e_cool: '😎',
       icon_e_confused: '😕',
       icon_e_surprised: '😲',
-      icon_e_geek: '🤓',
-      icon_e_ugeek: '🤓',
+      icon_e_geek: false,
+      icon_e_ugeek: false,
       icon_cool: '😎',
-      icon_lol: '😄',
+      icon_lol: '🤣',
       icon_mad: '😠',
-      icon_razz: '😛',
-      icon_redface: '😳',
+      icon_razz: false,
+      icon_redface: false,
       icon_cry: '😢',
-      icon_evil: '😈',
-      icon_twisted: '😈',
+      icon_evil: false,
+      icon_twisted: false,
       icon_rolleyes: '🙄',
-      icon_eek: '😲',
+      icon_eek: false,
       icon_exclaim: '❗',
       icon_question: '❓',
       icon_idea: '💡',
       icon_arrow: '➡️',
       icon_neutral: '😐',
-      // icon_mrgreen: as above.
+      icon_mrgreen: false,
     },
   },
   {
@@ -76,20 +80,23 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       grin: '😁',
       angry: '😠',
       sad: '🙁',
-      shocked: '😱',
+      shocked: '😲',
       cool: '😎',
-      huh: '😕',
+      huh: false,
       rolleyes: '🙄',
       tongue: '😛',
       embarrassed: '😳',
       lipsrsealed: '🤐',
-      undecided: '😕',
+      undecided: false,
       kiss: '😘',
       cry: '😢',
-      evil: '😈',
-      laugh: '😄',
+      evil: false,
+      laugh: '🤣',
       angel: '😇',
-      // afro, azn, police: drawn characters with no Unicode counterpart.
+      // Drawn characters with no Unicode counterpart.
+      afro: false,
+      azn: false,
+      police: false,
     },
   },
   {
@@ -98,26 +105,27 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       smile: '🙂',
       wink: '😉',
       cool: '😎',
-      biggrin: '😃',
+      biggrin: '😁',
       tongue: '😛',
       rolleyes: '🙄',
-      shy: '😊',
+      shy: false,
       sad: '🙁',
       angel: '😇',
       angry: '😠',
-      blush: '😊',
+      blush: false,
       confused: '😕',
       exclamation: '❗',
       heart: '❤️',
-      huh: '😕',
+      huh: false,
       lightbulb: '💡',
       sleepy: '😴',
-      undecided: '😕',
+      undecided: false,
       cry: '😢',
-      sick: '🤢',
+      sick: false,
       arrow: '➡️',
-      // at, my: MyBB-specific oddities with nothing to convert to.
-      // dodgy: a shifty look, between 😏 and 😒 with no clear winner.
+      at: false, // MyBB-specific oddities with nothing to convert to
+      my: false,
+      dodgy: false, // A shifty look, between 😏 and 😒 with no clear winner
     },
   },
   {
@@ -126,12 +134,12 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       smile: '🙂',
       neutral: '😐',
       sad: '🙁',
-      big_smile: '😃',
+      big_smile: '😁',
       yikes: '😱',
       wink: '😉',
-      hmm: '🤔',
+      hmm: false,
       tongue: '😛',
-      lol: '😄',
+      lol: '🤣',
       mad: '😠',
       roll: '🙄',
       cool: '😎',
@@ -141,24 +149,24 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
     name: 'DokuWiki',
     names: {
       cool: '😎',
-      eek: '😲',
+      eek: false,
       sad: '🙁',
       smile: '🙂',
-      smile2: '🙂',
-      doubt: '😕',
-      doubt2: '😕',
+      smile2: false, // A second smile, whose name does not say which
+      doubt: false,
+      doubt2: false,
       confused: '😕',
-      biggrin: '😃',
-      razz: '😛',
+      biggrin: '😁',
+      razz: false,
       surprised: '😲',
       silenced: '🤐',
       neutral: '😐',
       wink: '😉',
       facepalm: '🤦',
-      fun: '😄',
+      fun: false,
       question: '❓',
       exclaim: '❗',
-      lol: '😄',
+      lol: '🤣',
       // fixme, deleteme: editorial workflow markers shipped alongside the smilies, not emoji.
     },
   },
@@ -183,57 +191,51 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       rolleyes: '🙄',
       sad: '🙁',
       shades: '😎',
-      shy: '😊',
+      shy: false,
       smile: '🙂',
       tongue: '😛',
       wink: '😉',
-      // dead, dodge, gah, ill, mistrust, special: no unambiguous counterpart.
+      // No unambiguous counterpart.
+      dead: false,
+      dodge: false,
+      gah: false,
+      ill: false,
+      mistrust: false,
+      special: false,
     },
   },
   {
     name: 'Serendipity',
     names: {
-      normal: '😐', // Its config binds this to `:-|`
+      normal: false, // Its config binds this to `:-|`
       unhappy: '🙁', // And this to `:(`
-      haha: '😄',
-      // anger, shame: each sits between two glyphs already used for near-synonyms.
-      // grmpf, grrr, hero, ko, safe, still, whistle: no Unicode counterpart.
-    },
-  },
-  {
-    name: 'Khoros and Lithium',
-    names: {
-      '16x16_smiley-happy': '🙂',
-      '16x16_smiley-wink': '😉',
-      '16x16_smiley-very-happy': '😃',
-      '16x16_smiley-tongue': '😛',
-      '16x16_smiley-sad': '🙁',
-      '16x16_smiley-surprised': '😲',
-      '16x16_smiley-lol': '😄',
-      '16x16_smiley-embarrassed': '😳',
-      '16x16_smiley-indifferent': '😐',
-      '16x16_heart': '❤️',
-      '16x16_cat-happy': '😺',
-      '16x16_cat-very-happy': '😸',
-      '16x16_cat-lol': '😹',
-      // 16x16_cat-wink, -tongue, -embarrassed: Unicode's cat faces stop at the three smiles above.
-      // _woman-*, _man-*, _robot-*: no such faces at all.
+      haha: '🤣',
+      whistle: false,
+      shame: false, // Sits between two glyphs already used for near-synonyms
+      anger: false, // The same
+      // No Unicode counterpart.
+      grmpf: false,
+      grrr: false,
+      hero: false,
+      ko: false,
+      safe: false,
+      still: false,
     },
   },
   {
     name: 'CKEditor, FCKeditor and TinyMCE',
     names: {
       regular_smile: '🙂',
-      teeth_smile: '😃',
+      teeth_smile: '😁',
       wink_smile: '😉',
       sad_smile: '🙁',
-      cry_smile: '😢',
+      cry_smile: '😭',
       angry_smile: '😠',
-      confused_smile: '😕',
+      confused_smile: false,
       omg_smile: '😲',
       shades_smile: '😎',
       angel_smile: '😇',
-      devil_smile: '😈',
+      devil_smile: false,
       tongue_smile: '😛',
       tounge_smile: '😛', // Misspelled upstream, and four times rarer than the corrected name
       embaressed_smile: '😳', // Same
@@ -244,13 +246,39 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       lightbulb: '💡',
       thumbs_up: '👍',
       thumbs_down: '👎',
+      whatchutalkingabout_smile: false, // The MSN set's indecision face
+      // TinyMCE 3's names, after its `smiley-` prefix. Vanilla ships the tongue and money faces.
+      sealed: '🤐',
+      embarassed: '😳', // Misspelled upstream
+      'tongue-out': '😛',
+      'money-mouth': '🤑',
+      'foot-in-mouth': false, // No Unicode counterpart
     },
   },
   {
     name: 'Serendipity, Drupal and Kunena',
     names: {
-      unsure: '😕', // Kunena's, seen at /media/kunena/emoticons/unsure.png
+      unsure: false, // Kunena's, seen at /media/kunena/emoticons/unsure.png
     },
+  },
+  {
+    name: 'Invision Power Board and Kunena',
+    names: {
+      wub: false,
+      blink: false,
+      wacko: false,
+      ph34r: false,
+      w00t: false,
+      whistling: false,
+      doh: false,
+      dry: false,
+      mellow: false,
+      sleep: '😴',
+    },
+  },
+  {
+    name: 'Kolobok',
+    names: Object.fromEntries(kolobokEmojiNames),
   },
   {
     // Filenames observed in real feeds whose engine was never pinned down. Kept apart from the
@@ -258,19 +286,35 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
     // being unattributed.
     name: 'observed in feeds, engine not identified',
     names: {
-      clap: '👏', // Boards add it to several engines' sets; 293 feeds, always applause
-      laughing: '😄',
-      ohmy: '😲',
-      dizzy: '😵',
-      thumbup: '👍',
-      thumbdown: '👎',
-      love: '😍',
-      redface: '😳',
-      innocent: '😇',
-      devil: '😈',
-      yell: '😡',
-      // happy: means :BOL, ;D, XD, :) and ^_^ on different boards, so it cannot be resolved
-      // from the filename alone.
+      // Each board draws its own picture for these.
+      clap: false,
+      thumbup: false,
+      thumbdown: false,
+      thumbsup: false,
+      redface: false,
+      innocent: false,
+      crying: false,
+      santa: false,
+      popcorn: false,
+      laughing: false,
+      ohmy: false,
+      dizzy: false,
+      love: false,
+      devil: false,
+      yell: false,
+      rofl: false,
+      rotfl: false,
+      yes: false,
+      ok: false,
+      good: false,
+      hi: false,
+      bye: false,
+      beer: false,
+      crazy: false,
+      cheers: false,
+      bravo: false,
+      mrgreen: false,
+      happy: false, // Means :BOL, ;D, XD, :) and ^_^ on different boards
     },
   },
 ]
@@ -281,11 +325,6 @@ const markerSelectors = [
   'img[class~="smilies" i]', // phpBB
   'img[class~="smiley" i]', // SMF, DokuWiki
   'img[class~="smilie" i]', // MyBB, XenForo
-  'img[class^="mcesmilie" i]', // XenForo 1.x numbers them, as in `mceSmilieSprite mceSmilie7`
-  'img[class*=" mcesmilie" i]',
-  'img[class~="e-emoticon" i]', // e107
-  'img[class~="bbc_emoticon" i]', // Invision Power Board and IPS
-  'img[data-emoticon]', // Invision Power Board and IPS
 ]
 const markerSelector = markerSelectors.join(', ')
 
@@ -294,29 +333,123 @@ const directories = [
   // wp-includes and plugin icon sets sit under it, and the theme directory above differs per board.
   '/smilies/',
   '/smileys/', // SMF, DokuWiki's lib/images/smileys/, Drupal
+  '/smiles/', // uCoz, and boards that serve phpBB's set from a renamed directory
   '/smiley/', // CKEditor, FCKeditor and TinyMCE; ProBoards serves the same set from here
-  '/emotes/', // e107
   '/emoticons/', // Serendipity's stock template set and emoticate plugin, IPS, Kunena
-  '/style_emoticons/', // IPB 2 and 3, which the plural form above misses
-  'forum-smileys/', // Simple:Press, with no leading slash before the directory
   'SMILIES_PATH', // phpBB's template variable left unsubstituted, raw or percent-encoded
 ]
 const directorySelector = directories.map((path) => `img[src*="${path}" i]`).join(', ')
 
-// Forum smilie images and CSS-sprite emoji, which render oversized or as nothing without site CSS.
+// The images carrying a class several forum engines share or sitting in a directory they share.
+export const smilieSelector = `${markerSelector}, ${directorySelector}`
+
+// An engine's own names, read only under the directory it serves them from, since other engines
+// ship other drawings under the same names.
+export const getDirectoryGlyph = (
+  src: string,
+  directory: string,
+  names: Map<string, EmojiGlyph>,
+): EmojiGlyph | undefined => {
+  // A XenForo sprite's base64 can contain `/`, leaving a stem that matches a name by accident.
+  if (src.startsWith('data:')) {
+    return
+  }
+
+  const path = src.toLowerCase()
+
+  if (!path.includes(directory)) {
+    return
+  }
+
+  return names.get(getNameStem(path))
+}
+
+// WoltLab and phpBB boards' additions, both served from `images/smilies/`. Nothing in the markup
+// tells the two engines apart, so the names stay here, while JForum's hashed names under the same
+// directory have a resolver of their own.
+const boardEmojiNames = toMap<EmojiGlyph>({
+  smiley34: false,
+  danke: false,
+  smiley40: false,
+  smiley5: false,
+  smiley37: false,
+  smiley35: false,
+  gruebel: false,
+  happy: false,
+  pleased: false,
+  pinch: false,
+  smiley41: false,
+  smiley47: false,
+  pardon: false,
+  smiley39: false,
+  dance: false,
+  smiley44: false,
+  cursing: false,
+  respekt: false,
+  smiley36: false,
+  dash: false,
+  smiley49: false,
+  applaus: false,
+  party: false,
+  smiley38: false,
+  pillepalle: false,
+  '8': false,
+  '14': false,
+  squint: false,
+  top: false,
+  hammer: false,
+  '4': false,
+  bier: false,
+  help: false,
+  smiley50: false,
+  welcome: false,
+})
+
+// Forum smilie images, which render oversized without the site's CSS. An engine with names or
+// signals of its own has a resolver of its own ahead of this one.
 export const smiliesEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: `${markerSelector}, ${directorySelector}, img[data-shortname]`,
+  selector: smilieSelector,
   extract: (element) => {
-    // XenForo paints its sprite sheet behind a 1x1 transparent GIF named by data-shortname.
     const src = element.getAttribute('src') ?? ''
-    const isSprite = !!attr(element, 'data-shortname') && rendersNothing(src)
-    const isStrong = isSprite || element.matches(markerSelector)
+    const isStrong = element.matches(markerSelector)
 
     if (!isStrong && !element.matches(directorySelector)) {
       return
     }
 
-    return resolveEmojiImage(element, { isStrong, names: smiliesEmojiNames })
+    return resolveEmojiImage(element, {
+      isStrong,
+      names: smiliesEmojiNames,
+      glyph: getDirectoryGlyph(src, '/images/smilies/', boardEmojiNames),
+    })
+  },
+}
+
+// An alt shaped like a code an author types: a known code, a `:name:`, a `(name)` or `[name]` as
+// Plurk and Skype write them, or an ASCII face.
+const shortcodeAltRegex = /^(?::[^\s:]+:|\([\w -]+\)|\[[\w -]+\])$/
+const asciiEmoticonRegex = /^[>O]?[:;=8][-'^o]?[()[\]DPpOo*|\\/$@3Xx]{1,3}$/
+
+// Images a site's own smilie set or album marks with the whole-word emoticon class, as Steam,
+// TypePad, Moodle and Plurk do. Reaction GIFs and photos share the class, so an image without a
+// declared size needs a second hint before it is marked.
+export const smiliesEmoticonEmojiResolver: EmojiResolver = {
+  kind: 'emoji',
+  selector: 'img[class~="emoticon"]',
+  extract: (element) => {
+    const { width = 0, height = 0 } = getElementDimensions(element)
+    const size = Math.max(width, height)
+
+    if (size > 48) {
+      return
+    }
+
+    const alt = attr(element, 'alt') ?? ''
+    const hasEmoticonAlt =
+      getShortcode(alt) !== undefined || shortcodeAltRegex.test(alt) || asciiEmoticonRegex.test(alt)
+    const isStrong = size > 0 || element.matches(directorySelector) || hasEmoticonAlt
+
+    return resolveEmojiImage(element, { isStrong, names: noEmojiNames })
   },
 }

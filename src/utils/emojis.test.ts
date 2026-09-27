@@ -1,27 +1,8 @@
 import { describe, expect, it } from 'bun:test'
-import { mergeEmojiNames } from './emojis.js'
-import vocabularies from './emojis.json' with { type: 'json' }
+import { type EmojiNameTable, glyphFromCodepoints, mergeEmojiNames } from './emojis.js'
 
-const asciiLetterRegex = /[a-zA-Z]/
 const conflictingNameRegex = /happy/
-
-describe('shortcode table', () => {
-  const shortcodeEntries = Object.entries(vocabularies.shortcodes)
-
-  // Iterates the real table, so every entry is exercised and a new entry is covered
-  // automatically. A value carrying ASCII letters would inject a word into the document,
-  // and an empty one would strand the wrapper it sat in for stripEmptyTags to delete.
-  it.each(shortcodeEntries)('should map %s to a bare glyph', (_shortcode, glyph) => {
-    expect(glyph).not.toBe('')
-    expect(glyph).not.toMatch(asciiLetterRegex)
-  })
-
-  it('should key every entry in lower case so lookups can normalize', () => {
-    const keys = Object.keys(vocabularies.shortcodes)
-
-    expect(keys).toEqual(keys.map((key) => key.toLowerCase()))
-  })
-})
+const capitalNameRegex = /lower case/
 
 describe('mergeEmojiNames', () => {
   // A filename two platforms disagree on cannot be resolved without knowing the engine, which
@@ -37,6 +18,35 @@ describe('mergeEmojiNames', () => {
     expect(throwing).toThrow(conflictingNameRegex)
   })
 
+  // Lookups lower-case the filename, so an entry keyed with a capital letter would never match.
+  it('should reject a name with a capital letter', () => {
+    const tables = [{ name: 'one', names: { Smile: '🙂' } }]
+
+    const throwing = () => mergeEmojiNames(tables)
+
+    expect(throwing).toThrow(capitalNameRegex)
+  })
+
+  it('should reject a filename one platform maps to false and another to a glyph', () => {
+    const conflicting: Array<EmojiNameTable> = [
+      { name: 'one', names: { happy: false } },
+      { name: 'two', names: { happy: '🙂' } },
+    ]
+
+    const throwing = () => mergeEmojiNames(conflicting)
+
+    expect(throwing).toThrow(conflictingNameRegex)
+  })
+
+  it('should accept a filename both platforms map to false', () => {
+    const agreeing: Array<EmojiNameTable> = [
+      { name: 'one', names: { happy: false } },
+      { name: 'two', names: { happy: false } },
+    ]
+
+    expect(mergeEmojiNames(agreeing)).toEqual({ happy: false })
+  })
+
   it('should accept the same filename when the platforms agree', () => {
     const agreeing = [
       { name: 'one', names: { smile: '🙂' } },
@@ -44,5 +54,26 @@ describe('mergeEmojiNames', () => {
     ]
 
     expect(mergeEmojiNames(agreeing)).toEqual({ smile: '🙂' })
+  })
+})
+
+describe('glyphFromCodepoints', () => {
+  const textDefaultCases: Array<[string, string]> = [
+    ['263a', '☺️'],
+    ['2639', '☹️'],
+    ['a9', '©️'],
+    ['2764', '❤️'],
+  ]
+
+  it.each(textDefaultCases)('should show the text-default codepoint %s as emoji', (stem, glyph) => {
+    expect(glyphFromCodepoints(stem)).toBe(glyph)
+  })
+
+  it('should keep a codepoint that already shows as emoji as it is', () => {
+    expect(glyphFromCodepoints('1f618')).toBe('😘')
+  })
+
+  it('should not add a second selector to a filename that carries one', () => {
+    expect(glyphFromCodepoints('2764-fe0f')).toBe('❤️')
   })
 })

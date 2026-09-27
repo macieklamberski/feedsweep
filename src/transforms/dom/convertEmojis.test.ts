@@ -59,6 +59,20 @@ describeForEachParser('convertEmojis', (parseHtml) => {
 
       expect(await transformWith(value, [])).toEqualHtml(value)
     })
+
+    // jsdom's selector engine refuses a selector over 2048 characters, which the registered
+    // selectors pass once joined.
+    it('should match an image when the joined selectors pass the engine limit', async () => {
+      const longSelector = `img[alt="${'x'.repeat(1100)}"]`
+      const resolvers: Array<EmojiResolver> = [
+        { ...passingResolver, selector: longSelector },
+        { ...winkResolver, selector: `${longSelector}, img` },
+      ]
+      const value = '<p><img src="/a.png"></p>'
+      const expected = '<p>😉</p>'
+
+      expect(await transformWith(value, resolvers)).toEqualHtml(expected)
+    })
   })
 
   describe('data-emoji marker', () => {
@@ -85,9 +99,9 @@ describeForEachParser('convertEmojis', (parseHtml) => {
         '<img data-emoji="" data-emoticon="" src="/uploads/emoticons/yahoo.png" alt=":yahoo:">',
       ],
       [
-        'emoji CDN image with no usable alt',
-        '<img src="https://s.w.org/images/core/emoji/14/72x72/1f642.png" alt="?">',
-        '<img data-emoji="" src="https://s.w.org/images/core/emoji/14/72x72/1f642.png" alt="?">',
+        'GitHub custom emoji with no Unicode counterpart',
+        '<img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt=":octocat:">',
+        '<img data-emoji="" src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt=":octocat:">',
       ],
       [
         'Ameba built-in char image',
@@ -171,6 +185,42 @@ describeForEachParser('convertEmojis', (parseHtml) => {
     })
   })
 
+  describe('image result', () => {
+    const imageResolver: EmojiResolver = {
+      kind: 'emoji',
+      selector: 'gl-emoji',
+      extract: (element) => {
+        return {
+          image: element.getAttribute('data-fallback-src') ?? '',
+          alt: ':partyparrot:',
+        }
+      },
+    }
+
+    it('should replace the element with a marked image of the url', async () => {
+      const value = '<p><gl-emoji data-fallback-src="https://example.com/p.gif"></gl-emoji></p>'
+      const expected =
+        '<p><img src="https://example.com/p.gif" alt=":partyparrot:" data-emoji=""></p>'
+
+      expect(await transformWith(value, [imageResolver])).toEqualHtml(expected)
+    })
+
+    it('should resolve a relative url against the base url', async () => {
+      const value = '<p><gl-emoji data-fallback-src="/uploads/p.gif"></gl-emoji></p>'
+      const expected =
+        '<p><img src="https://example.com/uploads/p.gif" alt=":partyparrot:" data-emoji=""></p>'
+      const context = {
+        ...baseContext,
+        baseUrl: 'https://example.com/feed',
+        emojiResolvers: [imageResolver],
+      }
+
+      expect(await applyDomTransforms(parseHtml(value), [convertEmojis(context)])).toEqualHtml(
+        expected,
+      )
+    })
+  })
+
   describe('alt-shape guard', () => {
     it('should preserve multi-codepoint alt (ZWJ sequence)', async () => {
       const value = '<p><img alt="👨‍👩‍👧" class="wp-smiley"></p>'
@@ -195,9 +245,9 @@ describeForEachParser('convertEmojis', (parseHtml) => {
 
     // These are real alts from localized boards. The old guard accepted anything non-ASCII
     // without ASCII letters, so each was injected into the text in place of its image.
-    const localizedWords: Array<string> = ['壞笑', 'улыбка', '笑顔', 'χαμόγελο']
+    const localizedWordCases: Array<string> = ['壞笑', 'улыбка', '笑顔', 'χαμόγελο']
 
-    it.each(localizedWords)(
+    it.each(localizedWordCases)(
       'should leave image untouched when alt is the localized word %s',
       async (alt) => {
         const value = `<p><img src="emoji.png" alt="${alt}" class="wp-smiley"></p>`
@@ -208,9 +258,9 @@ describeForEachParser('convertEmojis', (parseHtml) => {
 
     // A subdivision flag is a base flag plus tag characters spelling the region code, so the
     // guard has to accept a class of character that appears in nothing else.
-    const subdivisionFlags: Array<string> = ['🏴󠁧󠁢󠁳󠁣󠁴󠁿', '🏴󠁧󠁢󠁥󠁮󠁧󠁿', '🏴󠁧󠁢󠁷󠁬󠁳󠁿']
+    const subdivisionFlagCases: Array<string> = ['🏴󠁧󠁢󠁳󠁣󠁴󠁿', '🏴󠁧󠁢󠁥󠁮󠁧󠁿', '🏴󠁧󠁢󠁷󠁬󠁳󠁿']
 
-    it.each(subdivisionFlags)(
+    it.each(subdivisionFlagCases)(
       'should replace image when alt is the subdivision flag %s',
       async (flag) => {
         const value = `<p><img class="wp-smiley" src="/f.png" alt="${flag}"></p>`
@@ -252,22 +302,6 @@ describeForEachParser('convertEmojis', (parseHtml) => {
 
     it('should never emit a "?" fallback alt as text', async () => {
       const value = '<p><img src="smilies/broken.png" alt="?" class="wp-smiley"></p>'
-
-      expect(await transformKeeping(value)).toEqualHtml(value)
-    })
-
-    // A "?" alt is WordPress failing to encode the emoji it meant. The filename still names the
-    // codepoint, but decoding it is not worth its cost, so the image is left as it is.
-    it('should leave an image with a "?" fallback alt alone', async () => {
-      const value = html`
-        <p>
-          <img
-            src="https://s.w.org/images/core/emoji/2.4/72x72/1f642.png"
-            class="size_orig"
-            alt="?"
-          >
-        </p>
-      `
 
       expect(await transformKeeping(value)).toEqualHtml(value)
     })

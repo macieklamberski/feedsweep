@@ -168,6 +168,7 @@ export type EmojiResolverResult =
   | { glyph: string } // Replaced by the text
   | { text: string } // Fallback text, wrapped in a span carrying data-emoji
   | { custom: true } // Keeps the picture, gains data-emoji
+  | { image: string; alt?: string } // Becomes an image of that url, carrying data-emoji
 
 // Undefined is a weak match with no answer, which leaves the element to the next resolver.
 export type EmojiResolver = {

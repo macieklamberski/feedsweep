@@ -129,6 +129,25 @@ describeForEachParser('wordpressEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('WordPress core emoji (s.w.org host)', () => {
+    // A "?" alt is WordPress failing to encode the emoji it meant. The filename still names the
+    // codepoint.
+    it('should decode the filename of an image with a "?" fallback alt', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://s.w.org/images/core/emoji/2.4/72x72/1f642.png"
+            class="size_orig"
+            alt="?"
+          >
+        </p>
+      `
+      const expected = '<p>🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('WordPress.com (wpcom-smileys Twemoji)', () => {
     it('should replace WordPress.com wpcom-smileys image', async () => {
       const value = html`
@@ -145,10 +164,71 @@ describeForEachParser('wordpressEmojiResolver', (parseHtml) => {
     })
   })
 
-  describe('hosts', () => {
-    const hosts = ['s.w.org/images/core/emoji/', 's0.wp.com/wp-content/mu-plugins/wpcom-smileys/']
+  describe('non-emoji characters', () => {
+    it('should replace a punctuation mark with its alt', async () => {
+      const value = html`
+        <p>It<img
+            src="https://s.w.org/images/core/emoji/72x72/2019.png"
+            alt="’"
+            class="wp-smiley"
+            style="height: 1em; max-height: 1em;"
+          >s here</p>
+      `
+      const expected = '<p>It’s here</p>'
 
-    it.each(hosts)('should replace an emoji image from %s', async (host) => {
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a lone skin tone with its alt', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://s.w.org/images/core/emoji/2.2.1/72x72/1f3fb.png"
+            alt="🏻"
+            class="wp-smiley"
+            style="height: 1em; max-height: 1em;"
+          >
+        </p>
+      `
+      const expected = '<p>🏻</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark an image whose alt differs from its filename', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://s.w.org/images/core/emoji/72x72/2019.png"
+            alt="'"
+            class="wp-smiley"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://s.w.org/images/core/emoji/72x72/2019.png"
+            alt="'"
+            class="wp-smiley"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('hosts', () => {
+    const hostCases = [
+      's.w.org/images/core/emoji/',
+      's0.wp.com/wp-content/mu-plugins/wpcom-smileys/',
+      's1.wp.com/wp-content/mu-plugins/wpcom-smileys/',
+      's2.wp.com/wp-content/mu-plugins/wpcom-smileys/',
+    ]
+
+    it.each(hostCases)('should replace an emoji image from %s', async (host) => {
       const value = `<p>Hi <img src="https://${host}1f642.png" alt="🙂"></p>`
       const expected = '<p>Hi 🙂</p>'
 

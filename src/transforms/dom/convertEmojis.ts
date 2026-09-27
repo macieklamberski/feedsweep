@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { walkElements } from '../../utils/dom.js'
+import { batchSelectors, walkElements } from '../../utils/dom.js'
 import { emojiImageAttribute } from '../../utils/emojis.js'
 
 const wrapFallbackText = (document: Document, text: string): Element => {
@@ -11,18 +11,32 @@ const wrapFallbackText = (document: Document, text: string): Element => {
   return span
 }
 
+const createEmojiImage = (document: Document, src: string, alt: string | undefined): Element => {
+  const image = document.createElement('img')
+
+  image.setAttribute('src', src)
+
+  if (alt) {
+    image.setAttribute('alt', alt)
+  }
+
+  image.setAttribute(emojiImageAttribute, '')
+
+  return image
+}
+
 // Emoji images and wrappers, which render oversized or as nothing without the site's CSS.
 export const convertEmojis: DomTransform = (context) => {
-  const { emojiResolvers } = context
-  const selector = emojiResolvers.map((resolver) => resolver.selector).join(', ')
+  const { emojiResolvers, resolveUrlFn, baseUrl } = context
+  const selectors = batchSelectors(emojiResolvers.map((resolver) => resolver.selector))
 
   return (document) => {
-    if (!selector) {
+    if (!selectors.length) {
       return
     }
 
     walkElements(document, (element) => {
-      if (!element.matches(selector)) {
+      if (!selectors.some((batch) => element.matches(batch))) {
         return
       }
 
@@ -45,6 +59,13 @@ export const convertEmojis: DomTransform = (context) => {
 
         if ('text' in result) {
           element.replaceWith(wrapFallbackText(document, result.text))
+          return
+        }
+
+        // The url comes from an attribute resolveRelativeUrls does not read.
+        if ('image' in result) {
+          const src = resolveUrlFn(result.image, baseUrl) ?? result.image
+          element.replaceWith(createEmojiImage(document, src, result.alt))
           return
         }
 

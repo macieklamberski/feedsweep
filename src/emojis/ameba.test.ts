@@ -27,6 +27,25 @@ describeForEachParser('amebaEmojiResolver', (parseHtml) => {
       expect(await transformKeeping(value)).toEqualHtml(value)
     })
 
+    it('should mark a built-in char image served from the older host', async () => {
+      const value = html`
+        <p>
+          <img src="https://stat.ameba.jp/blog/ucs/img/char/char2/002.gif" alt="ニコニコ">
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://stat.ameba.jp/blog/ucs/img/char/char2/002.gif"
+            alt="ニコニコ"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should leave an author-uploaded emoji with its picture', async () => {
       const value = html`
         <p>
