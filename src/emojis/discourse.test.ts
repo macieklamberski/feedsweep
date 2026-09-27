@@ -188,13 +188,34 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  const aliasCases: Array<[string, string]> = [
+    ['slight_smile', '🙂'],
+    ['xray', '🩻'],
+    ['umbrella2', '☂️'],
+  ]
+
+  it.each(aliasCases)('should replace the Discourse alias %s', async (alias, glyph) => {
+    const value = html`
+      <p>
+        <img
+          src="https://forum.example.com/images/emoji/twitter/${alias}.png?v=12"
+          class="emoji"
+          alt=":${alias}:"
+        >
+      </p>
+    `
+    const expected = `<p>${glyph}</p>`
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should mark an unknown name', async () => {
     const value = html`
       <p>
         <img
-          src="https://forum.example.com/images/emoji/twitter/slight_smile.png?v=12"
+          src="https://forum.example.com/images/emoji/twitter/party_parrot.png?v=12"
           class="emoji"
-          alt=":slight_smile:"
+          alt=":party_parrot:"
         >
       </p>
     `
@@ -202,9 +223,9 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
       <p>
         <img
           data-emoji=""
-          src="https://forum.example.com/images/emoji/twitter/slight_smile.png?v=12"
+          src="https://forum.example.com/images/emoji/twitter/party_parrot.png?v=12"
           class="emoji"
-          alt=":slight_smile:"
+          alt=":party_parrot:"
         >
       </p>
     `
