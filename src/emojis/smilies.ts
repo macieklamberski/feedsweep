@@ -426,16 +426,6 @@ export const smiliesEmojiResolver: EmojiResolver = {
 const shortcodeAltRegex = /^(?::[^\s:]+:|\([\w -]+\)|\[[\w -]+\])$/
 const asciiEmoticonRegex = /^[>O]?[:;=8][-'^o]?[()[\]DPpOo*|\\/$@3Xx]{1,3}$/
 
-const hasEmoticonAlt = (alt: string | undefined): boolean => {
-  if (!alt) {
-    return false
-  }
-
-  return (
-    getShortcode(alt) !== undefined || shortcodeAltRegex.test(alt) || asciiEmoticonRegex.test(alt)
-  )
-}
-
 // Images a site's own smilie set or album marks with the whole-word emoticon class, as Steam,
 // TypePad, Moodle and Plurk do. Reaction GIFs and photos share the class, so an image without a
 // declared size needs a second hint before it is marked.
@@ -450,8 +440,10 @@ export const smiliesEmoticonEmojiResolver: EmojiResolver = {
       return
     }
 
-    const isStrong =
-      size > 0 || element.matches(directorySelector) || hasEmoticonAlt(attr(element, 'alt'))
+    const alt = attr(element, 'alt') ?? ''
+    const hasEmoticonAlt =
+      getShortcode(alt) !== undefined || shortcodeAltRegex.test(alt) || asciiEmoticonRegex.test(alt)
+    const isStrong = size > 0 || element.matches(directorySelector) || hasEmoticonAlt
 
     return resolveEmojiImage(element, { isStrong, names: noEmojiNames })
   },
