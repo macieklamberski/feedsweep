@@ -449,21 +449,31 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
     // A board's own art, numbered or named in-house, with nothing a table can map.
     it('should leave a smilie with no known name untouched', async () => {
-      const value = '<p><img src="https://example.com/smiles/ag.gif" alt="Amd Green"></p>'
+      const value = '<p><img src="https://example.com/smiles/diver1.gif" alt="diver"></p>'
 
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should not read a board image named ae.gif as the codepoint of ®', async () => {
+    it('should mark a Kolobok smilie whose name looks like the codepoint of ®', async () => {
       const value = '<p><img src="https://example.com/smiles/ae.gif" alt="Amd Razzing"></p>'
+      const expected =
+        '<p><img data-emoji="" src="https://example.com/smiles/ae.gif" alt="Amd Razzing"></p>'
 
-      expect(await transform(value)).toEqualHtml(value)
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should leave a board image named like the codepoint of © untouched', async () => {
       const value = '<p><img src="https://example.com/board/emoticons/a9.jpg" alt=":a9:"></p>'
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should mark a Kolobok smilie by its two-letter name', async () => {
+      const value = '<p><img src="https://example.com/smiles/ag.gif" alt="Amd Green"></p>'
+      const expected =
+        '<p><img data-emoji="" src="https://example.com/smiles/ag.gif" alt="Amd Green"></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     // The alt is a truncated shortcode the board made up, and the stock filename wins over it.

@@ -11,14 +11,25 @@ describeForEachParser('punbbEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a Kolobok code alt untouched', async () => {
+  it('should mark a Kolobok image without a shortcode alt', async () => {
     const value = '<p><img src="https://example.com/extensions/pan_smiles/img/ab.gif" alt="ab"></p>'
+    const expected =
+      '<p><img data-emoji="" src="https://example.com/extensions/pan_smiles/img/ab.gif" alt="ab"></p>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a Kolobok file named like a codepoint untouched', async () => {
+  it('should mark a Kolobok file named like a hex code', async () => {
     const value = '<p><img src="https://example.com/extensions/k_smiles/img/ae.gif" alt="ae"></p>'
+    const expected =
+      '<p><img data-emoji="" src="https://example.com/extensions/k_smiles/img/ae.gif" alt="ae"></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a pack image with an unknown name untouched', async () => {
+    const value =
+      '<p><img src="https://example.com/extensions/pan_smiles/img/kozak.gif" alt=""></p>'
 
     expect(await transform(value)).toEqualHtml(value)
   })

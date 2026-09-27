@@ -10,6 +10,7 @@ import {
   noEmojiNames,
   resolveEmojiImage,
 } from '../utils/emojis.js'
+import { kolobokEmojiNames } from './punbb.js'
 
 // Each engine lists the filenames its own distribution ships, and `smile.png` is shipped by four.
 export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
@@ -274,6 +275,10 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       mellow: false,
       sleep: '😴',
     },
+  },
+  {
+    name: 'Kolobok',
+    names: Object.fromEntries(kolobokEmojiNames),
   },
   {
     // Filenames observed in real feeds whose engine was never pinned down. Kept apart from the
