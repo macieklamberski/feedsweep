@@ -957,6 +957,30 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should mark a face linked relative to the forum root', async () => {
+      const value = html`
+        <p>
+          <img
+            src="smileys/smiley2.gif"
+            border="0"
+            alt="Wink"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="smileys/smiley2.gif"
+            border="0"
+            alt="Wink"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('Invision Power Board and Kunena', () => {

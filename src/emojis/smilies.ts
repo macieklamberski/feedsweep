@@ -373,6 +373,7 @@ const directories = [
   // wp-includes and plugin icon sets sit under it, and the theme directory above differs per board.
   '/smilies/',
   '/smileys/', // SMF, DokuWiki's lib/images/smileys/, Drupal
+  'smileys/smiley', // Web Wiz Forums, often relative with no leading slash
   '/smiles/', // uCoz, and boards that serve phpBB's set from a renamed directory
   '/smiley/', // CKEditor, FCKeditor and TinyMCE; ProBoards serves the same set from here
   '/emotes/', // e107
@@ -614,7 +615,7 @@ const boardEmojiNames = toMap<EmojiGlyph>({
 
 // Names each engine ships under its own directory, where other engines ship other drawings.
 const engineEmojiNames: Array<[string, Map<string, EmojiGlyph>]> = [
-  ['/smileys/', webWizEmojiNames],
+  ['smileys/', webWizEmojiNames], // Relative on boards that link it from the forum root
   ['static/image/smiley/', discuzEmojiNames],
   ['illiweb.com/fa/i/smiles/', forumotionEmojiNames],
   ['/media/kunena/emoticons/', kunenaEmojiNames],
