@@ -174,6 +174,7 @@ import { bitrixEmojiResolver } from '../emojis/bitrix.js'
 import { cocologEmojiResolver } from '../emojis/cocolog.js'
 import { discordEmojiResolver } from '../emojis/discord.js'
 import { discourseEmojiResolver } from '../emojis/discourse.js'
+import { dropboxEmojiResolver } from '../emojis/dropbox.js'
 import { exblogEmojiResolver } from '../emojis/exblog.js'
 import {
   facebookClassicEmojiResolver,
@@ -453,6 +454,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   githubImageEmojiResolver,
   slackEmojiResolver,
   notoEmojiResolver,
+  dropboxEmojiResolver,
   gmailEmojiResolver,
   telegramImageEmojiResolver,
   vkEmojiResolver,
