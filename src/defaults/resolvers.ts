@@ -176,6 +176,8 @@ import { discordEmojiResolver } from '../emojis/discord.js'
 import { discourseEmojiResolver } from '../emojis/discourse.js'
 import { discuzEmojiResolver } from '../emojis/discuz.js'
 import { dropboxEmojiResolver } from '../emojis/dropbox.js'
+import { drupalEmojiResolver } from '../emojis/drupal.js'
+import { easydiscussEmojiResolver } from '../emojis/easydiscuss.js'
 import { exblogEmojiResolver } from '../emojis/exblog.js'
 import {
   facebookClassicEmojiResolver,
@@ -199,11 +201,13 @@ import { liferayEmojiResolver } from '../emojis/liferay.js'
 import { livedoorEmojiResolver } from '../emojis/livedoor.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
 import { maxEmojiResolver } from '../emojis/max.js'
+import { monalisaEmojiResolver } from '../emojis/monalisa.js'
 import { nbbcEmojiResolver } from '../emojis/nbbc.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
 import { punbbEmojiResolver } from '../emojis/punbb.js'
 import { sapoEmojiResolver } from '../emojis/sapo.js'
 import { seesaaEmojiResolver } from '../emojis/seesaa.js'
+import { simplePressEmojiResolver } from '../emojis/simplepress.js'
 import { slackEmojiResolver } from '../emojis/slack.js'
 import { smfEmojiResolver } from '../emojis/smf.js'
 import { smiliesEmojiResolver } from '../emojis/smilies.js'
@@ -457,6 +461,10 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   xenforoEmojiResolver,
   smfEmojiResolver,
   nbbcEmojiResolver,
+  simplePressEmojiResolver,
+  drupalEmojiResolver,
+  monalisaEmojiResolver,
+  easydiscussEmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,
   yahooEmojiResolver,

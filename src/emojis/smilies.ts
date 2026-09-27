@@ -344,10 +344,6 @@ const markerSelectors = [
   'img[class~="smiley" i]', // SMF, DokuWiki
   'img[class~="smilie" i]', // MyBB, XenForo
   'img[class~="e-emoticon" i]', // e107
-  'img[class~="spsmiley" i]', // Simple:Press
-  'img[class~="smiley-content" i]', // Drupal Smileys
-  'img[class~="wpml_ico" i]', // WP Monalisa
-  'img[class~="bb-smiley" i]', // EasyDiscuss
 ]
 const markerSelector = markerSelectors.join(', ')
 
@@ -360,7 +356,6 @@ const directories = [
   '/smiley/', // CKEditor, FCKeditor and TinyMCE; ProBoards serves the same set from here
   '/emotes/', // e107
   '/emoticons/', // Serendipity's stock template set and emoticate plugin, IPS, Kunena
-  'forum-smileys/', // Simple:Press, with no leading slash before the directory
   '/smiley_icons/', // FUDforum
   '/plugins/emotions/img/', // TinyMCE 3
   'SMILIES_PATH', // phpBB's template variable left unsubstituted, raw or percent-encoded
