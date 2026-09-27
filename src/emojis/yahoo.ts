@@ -103,11 +103,15 @@ const yahooEmoticons = toMap<EmojiGlyph>({
 
 const selectors = [
   'img[src*="yimg.com/" i][src*="/i/mesg/emoticons" i]', // Messenger's emoticons, on every host
+  'img[src*="yimg.jp/i/jp/mesg/emoticons" i]', // Messenger's emoticons, on the Japanese host
+  'img[src*="yimg.com/pu/emoticon/" i]', // Messenger's emoticons, on the forum host
+  'img[src*="yimg.com/ok/u/assets/img/emoticons/" i]', // Mail's emoticons, as `emo<n>.gif`
   'img[src*="yimg.com/nq/yemoji_assets/" i]', // Yahoo's own emoji, named by codepoint
+  'img[src*="yimg.jp/images/mail/emoji/" i]', // Yahoo Japan Mail's emoji, most named by codepoint
 ]
 
-// Yahoo Messenger's emoticons, as blogs pasted them straight from its image hosts. The directory
-// is Yahoo's own, so every number keeps its picture.
+// Yahoo's emoticons and emoji, as blogs and mail pasted them straight from its image hosts. Each
+// emoticon is Yahoo's own drawing, and converts only through a universal code alt.
 export const yahooEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: selectors.join(', '),
