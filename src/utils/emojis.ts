@@ -96,6 +96,7 @@ const shortcodes = toMap(mergeEmojiNames([{ name: 'shortcodes', names: emojiShor
 // Applied to a filename in turn: the query and hash split, then the stock-file, icon-set and
 // resolution markers that are not part of the name.
 export const queryOrHashRegex = /[?#]/
+const proxiedFileRegex = /#(https?:\/\/.+)$/
 const namePrefixRegex = /^(?:default_|face-|smiley-|sf-)/
 const nameVariantRegex = /@[0-9]+x$/
 
@@ -105,7 +106,10 @@ export const rendersNothing = (src: string): boolean => {
 }
 
 export const getFileStem = (src: string): string => {
-  const path = src.split(queryOrHashRegex)[0]
+  // A Google image proxy keeps the real file after the hash, as in
+  // `…=s0-d-e1-ft#https://…/1f4cc.png`.
+  const proxied = src.match(proxiedFileRegex)?.[1]
+  const path = (proxied ?? src).split(queryOrHashRegex)[0]
   const name = path.slice(path.lastIndexOf('/') + 1)
   const extension = name.lastIndexOf('.')
 

@@ -48,6 +48,19 @@ describeForEachParser('facebookEmojiResolver', (parseHtml) => {
     })
   })
 
+  it('should replace an emoji behind a Google image proxy by its codepoint filename', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://ci4.googleusercontent.com/proxy/abc=s0-d-e1-ft#https://static.xx.fbcdn.net/images/emoji.php/v9/tac/1/16/1f4cc.png"
+          alt=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml('<p>📌</p>')
+  })
+
   it('should replace an emoji from the Instagram static host by its codepoint filename', async () => {
     const value =
       '<p><img src="https://static.cdninstagram.com/images/emoji.php/v9/t8/1/16/2694.png" width="16"></p>'
