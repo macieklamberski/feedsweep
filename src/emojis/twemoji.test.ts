@@ -95,6 +95,38 @@ describeForEachParser('twemojiEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('non-emoji characters', () => {
+    it('should replace the question mark a broken encoding left with its alt', async () => {
+      const value = html`
+        <p>Really
+          <img
+            src="https://twemoji.maxcdn.com/2/72x72/3f.png"
+            class="ipsEmoji"
+            alt="?"
+          >
+        </p>
+      `
+      const expected = '<p>Really ?</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should drop the variation selector from the alt', async () => {
+      const value = html`
+        <p>Really
+          <img
+            src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/3f.png"
+            class="ipsEmoji"
+            alt="?️"
+          >
+        </p>
+      `
+      const expected = '<p>Really ?</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('Twitter / X (embedded tweets)', () => {
     it('should replace Twitter/X emoji image', async () => {
       const value = '<p><img src="https://abs.twimg.com/emoji/v2/72x72/1f600.png" alt="😀"></p>'

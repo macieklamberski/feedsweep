@@ -136,6 +136,20 @@ export const glyphFromCodepoints = (stem: string): string | undefined => {
   return textDefaultRegex.test(glyph) ? `${glyph}️` : glyph
 }
 
+const codepointTextRegex = /^[0-9a-f]{2,5}(?:[-_][0-9a-f]{2,5})*$/
+const variationRegex = /️/g
+
+// The characters a hex filename spells, emoji or not, capped at 0xFFFFF like the regex above.
+const getCodepointText = (stem: string): string | undefined => {
+  if (!codepointTextRegex.test(stem)) {
+    return
+  }
+
+  const codepoints = stem.split(codepointSeparatorRegex).map((part) => Number.parseInt(part, 16))
+
+  return String.fromCodePoint(...codepoints)
+}
+
 // A codepoint filename names the exact picture and a shortcode only its meaning: WoltLab binds
 // `:evil:` to 1f608, which is 😈. A filename word comes last, as what survives an empty alt or a
 // code each engine draws as its own face.
@@ -190,6 +204,14 @@ export const resolveEmojiImage = (
 
   if (glyph) {
     return { glyph }
+  }
+
+  // A filename spelling out the alt's own codepoints, like `2019.png` for ’ or `3f.png` for a `?`
+  // left by broken encoding, names a character with no emoji picture.
+  const character = alt?.replace(variationRegex, '')
+
+  if (character && getCodepointText(getFileStem(src).toLowerCase()) === character) {
+    return { glyph: character }
   }
 
   const text = rendersNothing(src) ? (shortname ?? alt) : undefined
