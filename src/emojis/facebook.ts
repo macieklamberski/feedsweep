@@ -89,8 +89,10 @@ const classicNames = Object.keys(classicCodes)
 // Only Facebook's own names, since other widgets name classes like `emoticon_box` the same way.
 const classicClassRegex = new RegExp(`(?:^|\\s)emoticon_(${classicNames.join('|')})(?:\\s|$)`)
 const textClassSelector = 'span[class~="emoticon_text"]'
-// Pasted posts also wrap whole paragraphs of prose in the fallback class.
-const maxFallbackLength = 40
+
+// The words around the name in the label Facebook wrote for screen readers, in the languages
+// seen in pasted posts: `smile emoticon`, `winkhymiö`, `Emotikon grin`, `Uttrykksikonet heart`.
+const labelPrefixes = 'emoticon|emotikon|emoticón|émoticône|uttrykksikonet'
 
 // Facebook's classic emoticon, an empty span painted from a sprite sheet the feed does not load,
 // with the code in its title. The class also rides on spans pasted around whole paragraphs.
@@ -122,13 +124,18 @@ export const facebookClassicEmojiResolver: EmojiResolver = {
       isElement(previous) && previous.matches(textClassSelector) ? previous.textContent?.trim() : ''
 
     if (previous && fallback) {
-      if (!glyph || fallback.length > maxFallbackLength) {
+      if (!glyph) {
         return
       }
 
-      // Prose pasted into the class, like `er jeg å fornøyd med :D`, is neither.
+      // Prose pasted into the class, like `er jeg å fornøyd med :D` or `Big heart for you`, is
+      // neither.
       const isCode = glyphFromShortcode(fallback) === glyph
-      const isLabel = fallback.toLowerCase().includes(name)
+      const labelRegex = new RegExp(
+        `^(?:${name} emoticon|${name}hymiö|(?:${labelPrefixes}) ${name})$`,
+        'i',
+      )
+      const isLabel = labelRegex.test(fallback)
 
       if (!isCode && !isLabel) {
         return

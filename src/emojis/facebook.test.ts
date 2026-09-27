@@ -356,6 +356,62 @@ describeForEachParser('facebookClassicEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should leave a sibling holding short prose that names the emoticon untouched', async () => {
+    const value = html`
+      <p><span
+          class="emoticon_text"
+        >Big heart for you</span><span
+          class="emoticon emoticon_heart"
+          title="&lt;3"
+        ></span></p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a sibling holding short prose that starts with the name untouched', async () => {
+    const value = html`
+      <p><span
+          class="emoticon_text"
+        >I smile a lot</span><span
+          class="emoticon emoticon_smile"
+          title=":)"
+        ></span></p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should replace the emoticon and its sibling holding an English label', async () => {
+    const value = html`
+      <p>Ok<span
+          class="emoticon_text"
+          aria-hidden="true"
+        >smile emoticon</span><span
+          class="emoticon emoticon_smile"
+          title=":)"
+        ></span></p>
+    `
+    const expected = '<p>Ok🙂</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace the emoticon and its sibling holding a label with the name last', async () => {
+    const value = html`
+      <p>Ok<span
+          class="emoticon_text"
+          aria-hidden="true"
+        >Uttrykksikonet heart</span><span
+          class="emoticon emoticon_heart"
+          title="&lt;3"
+        ></span></p>
+    `
+    const expected = '<p>Ok❤️</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should leave a sibling longer than a label untouched', async () => {
     const value = html`
       <p><span
