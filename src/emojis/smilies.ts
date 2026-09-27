@@ -407,7 +407,6 @@ const boardEmojiNames = toMap<EmojiGlyph>({
   smiley36: false,
   dash: false,
   smiley49: false,
-  '3b63d1616c5dfcf29f8a7a031aaa7cad': false, // JForum's stock set, named by hash
   applaus: false,
   party: false,
   smiley38: false,
@@ -415,15 +414,11 @@ const boardEmojiNames = toMap<EmojiGlyph>({
   '8': false,
   '14': false,
   squint: false,
-  '8a80c6485cd926be453217d59a84a888': false, // JForum's stock set, named by hash
-  '283a16da79f3aa23fe1025c96295f04f': false, // JForum's stock set, named by hash
   top: false,
   hammer: false,
   '4': false,
   bier: false,
   help: false,
-  '9d71f0541cff0a302a0309c5079e8dee': false, // JForum's stock set, named by hash
-  b2eb59423fbf5fa39342041237025880: false, // JForum's stock set, named by hash
   smiley50: false,
   welcome: false,
 })

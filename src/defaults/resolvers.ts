@@ -194,6 +194,7 @@ import { githubElementEmojiResolver, githubImageEmojiResolver } from '../emojis/
 import { gitlabEmojiResolver } from '../emojis/gitlab.js'
 import { gmailEmojiResolver } from '../emojis/gmail.js'
 import { invisionEmojiResolver } from '../emojis/invision.js'
+import { jforumEmojiResolver } from '../emojis/jforum.js'
 import { jiveEmojiResolver } from '../emojis/jive.js'
 import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
 import { jugemEmojiResolver } from '../emojis/jugem.js'
@@ -472,6 +473,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   tinymceEmojiResolver,
   fudforumEmojiResolver,
   e107EmojiResolver,
+  jforumEmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,
   yahooEmojiResolver,
