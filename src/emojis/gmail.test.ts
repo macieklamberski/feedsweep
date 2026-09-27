@@ -105,4 +105,11 @@ describeForEachParser('gmailEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(value)
   })
+
+  it('should replace a Google Chat emoji by its codepoint filename', async () => {
+    const value =
+      '<p><img src="https://ssl.gstatic.com/chat/emoji/6/emoji_u1f3b6.png" alt="" data-emo=""></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>🎶</p>')
+  })
 })
