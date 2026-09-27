@@ -39,11 +39,11 @@ export const facebookElementEmojiResolver: EmojiResolver = {
 
     const text = element.textContent?.trim()
 
-    if (text && !isEmojiShaped(text)) {
-      return
-    }
-
     if (text) {
+      if (!isEmojiShaped(text)) {
+        return
+      }
+
       return { glyph: text }
     }
 
