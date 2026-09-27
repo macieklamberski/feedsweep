@@ -435,38 +435,6 @@ const boardEmojiNames = toMap<EmojiGlyph>({
   welcome: false,
 })
 
-// Names each engine ships under its own directory, where other engines ship other drawings.
-const engineEmojiNames: Array<[string, Map<string, EmojiGlyph>]> = [
-  ['/images/smilies/', boardEmojiNames],
-]
-
-// NBBC's names for the codes the shared table draws as another face: `8)`, `;D`, `:s` and `<_<`.
-// Read ahead of the alt, since NBBC writes the code there.
-const nbbcEmojiNames = toMap<EmojiGlyph>({
-  bigwink: false,
-  bigeyes: false,
-  worry: false,
-  lookleft: false,
-})
-
-const getEngineGlyph = (src: string): EmojiGlyph | undefined => {
-  // A XenForo sprite's base64 can contain `/`, leaving a stem that matches a name by accident.
-  if (src.startsWith('data:')) {
-    return
-  }
-
-  const path = src.toLowerCase()
-  const stem = getNameStem(path)
-
-  for (const [directory, names] of engineEmojiNames) {
-    if (path.includes(directory) && names.has(stem)) {
-      return names.get(stem)
-    }
-  }
-
-  return nbbcEmojiNames.get(stem)
-}
-
 // Forum smilie images, which render oversized without the site's CSS. An engine with names or
 // signals of its own has a resolver of its own ahead of this one.
 export const smiliesEmojiResolver: EmojiResolver = {
@@ -483,7 +451,7 @@ export const smiliesEmojiResolver: EmojiResolver = {
     return resolveEmojiImage(element, {
       isStrong,
       names: smiliesEmojiNames,
-      glyph: getEngineGlyph(src),
+      glyph: getDirectoryGlyph(src, '/images/smilies/', boardEmojiNames),
     })
   },
 }

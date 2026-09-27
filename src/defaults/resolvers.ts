@@ -199,6 +199,7 @@ import { liferayEmojiResolver } from '../emojis/liferay.js'
 import { livedoorEmojiResolver } from '../emojis/livedoor.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
 import { maxEmojiResolver } from '../emojis/max.js'
+import { nbbcEmojiResolver } from '../emojis/nbbc.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
 import { punbbEmojiResolver } from '../emojis/punbb.js'
 import { sapoEmojiResolver } from '../emojis/sapo.js'
@@ -455,6 +456,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   invisionEmojiResolver,
   xenforoEmojiResolver,
   smfEmojiResolver,
+  nbbcEmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,
   yahooEmojiResolver,
