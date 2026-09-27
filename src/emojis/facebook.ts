@@ -166,3 +166,30 @@ export const facebookClassicEmojiResolver: EmojiResolver = {
     return resolveEmojiElement(element, { glyph, shortcode: title ?? code ?? name })
   },
 }
+
+// The classic name inside a label Facebook translated around it, like `„smile“-Emoticon`,
+// `Смайлик «smile»` or `smilehymiö`.
+const labelNameRegex = new RegExp(`(?:^|[^a-z])(${classicNames.join('|')})(?:hymiö|[^a-z]|$)`, 'i')
+
+// A later chat markup of the classic emoticon: an empty span or `i` painted by Facebook's CSS,
+// named only by the screen-reader label in its title.
+export const facebookLabelEmojiResolver: EmojiResolver = {
+  kind: 'emoji',
+  selector: 'span[class~="_47e3"][title], i[class~="_1gwo"][title], i[class~="_lew"][title]',
+  extract: (element) => {
+    // The class also rides on spans pasted around prose.
+    if (element.textContent?.trim() || element.firstElementChild) {
+      return
+    }
+
+    const name = attr(element, 'title')?.match(labelNameRegex)?.[1].toLowerCase()
+
+    if (!name) {
+      return
+    }
+
+    const code = classicCodes[name]
+
+    return resolveEmojiElement(element, { glyph: glyphFromShortcode(code), shortcode: code })
+  },
+}

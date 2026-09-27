@@ -519,4 +519,45 @@ describeForEachParser('facebookClassicEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(value)
   })
+
+  describe('label wrappers', () => {
+    const labelCases: Array<[string, string]> = [
+      ['smile emoticon', '🙂'],
+      ['„wink“-Emoticon', '😉'],
+      ['Смайлик «heart»', '❤️'],
+      ['smilehymiö', '🙂'],
+      ['émoticône grin', '😁'],
+    ]
+
+    it.each(labelCases)('should replace an empty wrapper titled %s', async (title, glyph) => {
+      const value = `<p>Hi <span class="_47e3 _5mfr" title="${title}"></span></p>`
+
+      expect(await transform(value)).toEqualHtml(`<p>Hi ${glyph}</p>`)
+    })
+
+    it('should replace an empty i wrapper by its label', async () => {
+      const value = '<p>Hi <i class="_1gwo" title="heart emoticon"></i></p>'
+
+      expect(await transform(value)).toEqualHtml('<p>Hi ❤️</p>')
+    })
+
+    it('should keep a name without a universal code as its code', async () => {
+      const value = '<p>Hi <span class="_47e3" title="like emoticon"></span></p>'
+
+      expect(await transform(value)).toEqualHtml('<p>Hi <span data-emoji="">(y)</span></p>')
+    })
+
+    it('should leave a wrapper around prose untouched', async () => {
+      const value =
+        '<p><span class="_47e3 _5mfr" title="smile emoticon">Would you like help</span></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose label names no classic emoticon untouched', async () => {
+      const value = '<p><span class="_47e3" title="sticker"></span></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
 })

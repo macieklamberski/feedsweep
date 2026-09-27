@@ -186,6 +186,7 @@ import {
   facebookClassicEmojiResolver,
   facebookElementEmojiResolver,
   facebookEmojiResolver,
+  facebookLabelEmojiResolver,
 } from '../emojis/facebook.js'
 import { fc2EmojiResolver } from '../emojis/fc2.js'
 import { forumotionEmojiResolver } from '../emojis/forumotion.js'
@@ -458,6 +459,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   khorosEmojiResolver,
   jiveEmojiResolver,
   facebookClassicEmojiResolver,
+  facebookLabelEmojiResolver,
   facebookElementEmojiResolver,
   froalaElementEmojiResolver,
   // Ahead of smilies, whose /smiles/ directory would read a Bitrix file by its filename first.
