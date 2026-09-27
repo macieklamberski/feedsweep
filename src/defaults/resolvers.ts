@@ -204,6 +204,7 @@ import { punbbEmojiResolver } from '../emojis/punbb.js'
 import { sapoEmojiResolver } from '../emojis/sapo.js'
 import { seesaaEmojiResolver } from '../emojis/seesaa.js'
 import { slackEmojiResolver } from '../emojis/slack.js'
+import { smfEmojiResolver } from '../emojis/smf.js'
 import { smiliesEmojiResolver } from '../emojis/smilies.js'
 import { tapatalkEmojiResolver } from '../emojis/tapatalk.js'
 import { teamsEmojiResolver } from '../emojis/teams.js'
@@ -453,6 +454,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   kunenaEmojiResolver,
   invisionEmojiResolver,
   xenforoEmojiResolver,
+  smfEmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,
   yahooEmojiResolver,

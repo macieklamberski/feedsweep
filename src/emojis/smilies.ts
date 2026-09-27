@@ -391,16 +391,6 @@ export const getDirectoryGlyph = (
   return names.get(getNameStem(path))
 }
 
-// SMF boards' additions to the stock set.
-const smfEmojiNames = toMap<EmojiGlyph>({
-  thumb: false,
-  think: false,
-  flowers: false,
-  banghead: false,
-  notworthy: false,
-  drinks: false,
-})
-
 // WoltLab and phpBB boards' additions, both served from `images/smilies/`.
 const boardEmojiNames = toMap<EmojiGlyph>({
   smiley34: false,
@@ -447,7 +437,6 @@ const boardEmojiNames = toMap<EmojiGlyph>({
 
 // Names each engine ships under its own directory, where other engines ship other drawings.
 const engineEmojiNames: Array<[string, Map<string, EmojiGlyph>]> = [
-  ['/smileys/', smfEmojiNames],
   ['/images/smilies/', boardEmojiNames],
 ]
 
