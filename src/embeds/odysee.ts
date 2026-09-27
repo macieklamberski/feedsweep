@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { decodeSegment, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -12,12 +12,10 @@ const odyseeHosts = ['odysee.com', 'lbry.tv', 'open.lbry.com']
 const claimRegex = /^@?(?!\.+(?::|$))[^\s/?#<>"'\\:]+(?::[0-9a-f]+)?$/i
 
 const readClaimPath = (parsed: URL): string | undefined => {
-  let pathname: string
-
   // The current share code percent-encodes the whole path, $ and / included.
-  try {
-    pathname = decodeURIComponent(parsed.pathname)
-  } catch {
+  const pathname = decodeSegment(parsed.pathname)
+
+  if (pathname === undefined) {
     return
   }
 

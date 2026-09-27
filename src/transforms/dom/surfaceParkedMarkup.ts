@@ -1,3 +1,4 @@
+import { decodeSegment } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { isUrlShaped } from '../../utils/urls.js'
 
@@ -27,11 +28,9 @@ export const surfaceParkedMarkup: DomTransform = () => (document) => {
       continue
     }
 
-    let markup: string
+    const markup = decodeSegment(encoded)
 
-    try {
-      markup = decodeURIComponent(encoded)
-    } catch {
+    if (markup === undefined) {
       continue
     }
 

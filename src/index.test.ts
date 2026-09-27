@@ -1018,7 +1018,7 @@ describeForEachParser('transformContent', (parseHtml) => {
   })
 
   // convertWidgets re-resolves an already absolute src, so a hostname label spelling a prefix
-  // of "http" reaches feedcanon's scheme repair. The label and the scheme must both survive.
+  // of "http" reaches trousse's scheme repair. The label and the scheme must both survive.
   it('should keep a hostname label that spells a prefix of the url scheme', async () => {
     const value = html`
       <p><iframe src="https://tp.srgssr.ch/x"></iframe></p>

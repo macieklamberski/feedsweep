@@ -1,4 +1,4 @@
-import { resolveUrl } from 'feedcanon'
+import { resolveUrl } from 'trousse'
 import { hljsHighlightFn } from '../highlighters/hljs.js'
 import { assignVideoPosters } from '../transforms/dom/assignVideoPosters.js'
 import { canonicalizeAlignment } from '../transforms/dom/canonicalizeAlignment.js'
