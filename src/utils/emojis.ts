@@ -45,8 +45,6 @@ export const isEmojiShaped = (text: string): boolean => {
   return emojiSequenceRegex.test(text) && emojiPictureRegex.test(text)
 }
 
-const shortcodes = toMap(emojiShortcodes)
-
 export const getShortcode = (token: string | undefined): EmojiGlyph | undefined => {
   if (!token) {
     return
@@ -75,6 +73,11 @@ export const mergeEmojiNames = (tables: Array<EmojiNameTable>): Record<string, E
 
   for (const table of tables) {
     for (const [name, glyph] of Object.entries(table.names)) {
+      // Lookups lower-case the name, so a key with a capital letter would never match.
+      if (name !== name.toLowerCase()) {
+        throw new Error(`Emoji name "${name}" on ${table.name} must be lower case`)
+      }
+
       if (Object.hasOwn(merged, name) && merged[name] !== glyph) {
         throw new Error(
           `Emoji name "${name}" is ${merged[name]} and ${glyph} on different platforms`,
@@ -87,6 +90,8 @@ export const mergeEmojiNames = (tables: Array<EmojiNameTable>): Record<string, E
 
   return merged
 }
+
+const shortcodes = toMap(mergeEmojiNames([{ name: 'shortcodes', names: emojiShortcodes }]))
 
 // Applied to a filename in turn: the query and hash split, then the stock-file, icon-set and
 // resolution markers that are not part of the name.

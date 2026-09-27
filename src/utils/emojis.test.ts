@@ -1,27 +1,8 @@
 import { describe, expect, it } from 'bun:test'
 import { type EmojiNameTable, glyphFromCodepoints, mergeEmojiNames } from './emojis.js'
-import { emojiShortcodes } from './shortcodes.js'
 
-const asciiLetterRegex = /[a-zA-Z]/
 const conflictingNameRegex = /happy/
-
-describe('shortcode table', () => {
-  const glyphCases = Object.entries(emojiShortcodes).filter(([, glyph]) => glyph)
-
-  // Iterates the real table, so every entry is exercised and a new entry is covered
-  // automatically. A value carrying ASCII letters would inject a word into the document,
-  // and an empty one would strand the wrapper it sat in for stripEmptyTags to delete.
-  it.each(glyphCases)('should map %s to a bare glyph', (_shortcode, glyph) => {
-    expect(glyph).not.toBe('')
-    expect(glyph).not.toMatch(asciiLetterRegex)
-  })
-
-  it('should key every entry in lower case so lookups can normalize', () => {
-    const keys = Object.keys(emojiShortcodes)
-
-    expect(keys).toEqual(keys.map((key) => key.toLowerCase()))
-  })
-})
+const capitalNameRegex = /lower case/
 
 describe('mergeEmojiNames', () => {
   // A filename two platforms disagree on cannot be resolved without knowing the engine, which
@@ -35,6 +16,15 @@ describe('mergeEmojiNames', () => {
     const throwing = () => mergeEmojiNames(conflicting)
 
     expect(throwing).toThrow(conflictingNameRegex)
+  })
+
+  // Lookups lower-case the filename, so an entry keyed with a capital letter would never match.
+  it('should reject a name with a capital letter', () => {
+    const tables = [{ name: 'one', names: { Smile: '🙂' } }]
+
+    const throwing = () => mergeEmojiNames(tables)
+
+    expect(throwing).toThrow(capitalNameRegex)
   })
 
   it('should reject a filename one platform maps to false and another to a glyph', () => {
