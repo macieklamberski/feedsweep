@@ -212,7 +212,7 @@ import { seesaaEmojiResolver } from '../emojis/seesaa.js'
 import { simplePressEmojiResolver } from '../emojis/simplepress.js'
 import { slackEmojiResolver } from '../emojis/slack.js'
 import { smfEmojiResolver } from '../emojis/smf.js'
-import { smiliesEmojiResolver } from '../emojis/smilies.js'
+import { smiliesEmojiResolver, smiliesEmoticonEmojiResolver } from '../emojis/smilies.js'
 import { tapatalkEmojiResolver } from '../emojis/tapatalk.js'
 import { teamsEmojiResolver } from '../emojis/teams.js'
 import { telegramEmojiResolver, telegramImageEmojiResolver } from '../emojis/telegram.js'
@@ -507,6 +507,8 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   fc2EmojiResolver,
   discourseEmojiResolver,
   genericCharacterEmojiResolver,
+  // After every engine, since TypePad, Yahoo and others put the emoticon class on their own sets.
+  smiliesEmoticonEmojiResolver,
   // Last, since the class is shared by engines whose own signals say more.
   genericEmojiResolver,
 ]

@@ -1,10 +1,12 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
+import { getElementDimensions } from '../utils/dom.js'
 import {
   type EmojiGlyph,
   type EmojiNameTable,
   getNameStem,
   mergeEmojiNames,
+  noEmojiNames,
   resolveEmojiImage,
 } from '../utils/emojis.js'
 
@@ -444,5 +446,21 @@ export const smiliesEmojiResolver: EmojiResolver = {
       names: smiliesEmojiNames,
       glyph: getDirectoryGlyph(src, '/images/smilies/', boardEmojiNames),
     })
+  },
+}
+
+// Images a site's own smilie set or album marks with the whole-word emoticon class, as Steam,
+// TypePad, Moodle and Plurk do. Reaction GIFs share the class and must keep their size.
+export const smiliesEmoticonEmojiResolver: EmojiResolver = {
+  kind: 'emoji',
+  selector: 'img[class~="emoticon"]',
+  extract: (element) => {
+    const { width = 0, height = 0 } = getElementDimensions(element)
+
+    if (Math.max(width, height) > 48) {
+      return
+    }
+
+    return resolveEmojiImage(element, { isStrong: true, names: noEmojiNames })
   },
 }

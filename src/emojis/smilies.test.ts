@@ -244,6 +244,112 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('emoticon class', () => {
+    it('should mark an emoticon with no declared size', async () => {
+      const value = '<p><img class="emoticon" src="https://example.com/albums/hug.gif"></p>'
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="emoticon"
+            src="https://example.com/albums/hug.gif"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark an emoticon declared at 48 pixels', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emoticon"
+            src="https://example.com/emoticons/hug_w48_h48.gif"
+            width="48"
+            height="48"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="emoticon"
+            src="https://example.com/emoticons/hug_w48_h48.gif"
+            width="48"
+            height="48"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    const largeCases: Array<[string, string, string]> = [
+      ['49 by 49', '49', '49'],
+      ['259 by 111', '259', '111'],
+    ]
+
+    it.each(largeCases)('should leave a %s emoticon untouched', async (_size, width, height) => {
+      const value = html`
+        <p>
+          <img
+            class="emoticon"
+            src="https://example.com/reactions/facepalm.gif"
+            width="${width}"
+            height="${height}"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave an emoticon sized over 48 pixels by its style untouched', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emoticon"
+            src="https://example.com/reactions/facepalm.gif"
+            style="width: 120px; height: 90px"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a Windows Live Writer emoticon untouched', async () => {
+      const value = html`
+        <p>
+          <img
+            class="wlEmoticon wlEmoticon-smile"
+            src="https://example.com/wp-content/uploads/wlEmoticon-smile.png"
+            alt="Smile"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should replace an emoticon by its emoji alt', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emoticon"
+            src="https://example.com/albums/hug.gif"
+            alt="😀"
+          >
+        </p>
+      `
+      const expected = '<p>😀</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('smiles directory', () => {
     it('should replace a phpBB smilie served from a renamed directory', async () => {
       const value = '<p><img src="https://example.com/smiles/icon_smile.gif" alt="Smile"></p>'
