@@ -225,6 +225,7 @@ import { weiboEmojiResolver } from '../emojis/weibo.js'
 import { wordpressEmojiResolver } from '../emojis/wordpress.js'
 import { xenforoEmojiResolver } from '../emojis/xenforo.js'
 import { yahooEmojiResolver } from '../emojis/yahoo.js'
+import { yahooJapanEmojiResolver } from '../emojis/yahoojapan.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { ghostMediaResolver } from '../media/ghost.js'
 import { podloveMediaResolver } from '../media/podlove.js'
@@ -474,6 +475,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   smiliesEmojiResolver,
   punbbEmojiResolver,
   yahooEmojiResolver,
+  yahooJapanEmojiResolver,
   froalaImageEmojiResolver,
   // Ahead of WordPress, whose WordPress.com host serves Twemoji files named by codepoint.
   twemojiEmojiResolver,
