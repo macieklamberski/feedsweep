@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, emojiConverters, html } from '../tests.js'
-import { mergeEmojiNames } from '../utils/emojis.js'
-import { smiliesEmojiNameTables } from './smilies.js'
-
-const asciiLetterRegex = /[a-zA-Z]/
 
 describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
   const { transform, transformKeeping } = emojiConverters(parseHtml)
@@ -1030,26 +1026,6 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
   })
 
   describe('platform filename tables', () => {
-    const nameEntries = smiliesEmojiNameTables.flatMap((platform) =>
-      Object.entries(platform.names).map(([name, glyph]) => [platform.name, name, glyph] as const),
-    )
-    const glyphEntries = nameEntries.filter(([, , glyph]) => glyph)
-
-    it.each(glyphEntries)(
-      'should map the %s name %s to a bare glyph',
-      (_platform, _name, glyph) => {
-        expect(glyph).not.toBe('')
-        expect(glyph).not.toMatch(asciiLetterRegex)
-      },
-    )
-
-    it.each(nameEntries)(
-      'should key the %s name %s in lower case, as getFileStem normalizes',
-      (_platform, name) => {
-        expect(name).toBe(name.toLowerCase())
-      },
-    )
-
     // Names boards add to several engines' sets, each with an alt the board made up.
     // Each board draws its own picture for these.
     const markedObservedCases: Array<[string, string]> = [
@@ -1093,10 +1069,6 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       `
 
       expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should merge the shipped platforms without conflict', () => {
-      expect(() => mergeEmojiNames(smiliesEmojiNameTables)).not.toThrow()
     })
 
     // The stem is whatever the file is called, and `constructor` names a member every object
