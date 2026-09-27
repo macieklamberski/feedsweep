@@ -454,6 +454,18 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should not read a board image named ae.gif as the codepoint of ®', async () => {
+      const value = '<p><img src="https://example.com/smiles/ae.gif" alt="Amd Razzing"></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a board image named like the codepoint of © untouched', async () => {
+      const value = '<p><img src="https://example.com/board/emoticons/a9.jpg" alt=":a9:"></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     // The alt is a truncated shortcode the board made up, and the stock filename wins over it.
     it('should resolve by the filename when the alt is an unknown shortcode', async () => {
       const value = html`

@@ -123,6 +123,7 @@ export const getNameStem = (src: string): string => {
 const codepointNameRegex =
   /^(?:[0-9a-f]{4,5}(?:[-_][0-9a-f]{4,5})*|a[9e](?:[-_]fe0f)?|(?:2[3a]|3[0-9])(?:[-_]fe0f)?[-_]20e3)$/
 const codepointSeparatorRegex = /[-_]/
+const shortCodepointRegex = /^a[9e](?:[-_]fe0f)?$/
 const textDefaultRegex = /^(?!\p{Emoji_Presentation})\p{Extended_Pictographic}$/u
 
 export const glyphFromCodepoints = (stem: string): string | undefined => {
@@ -210,7 +211,10 @@ const getVocabularyGlyph = (
     return getShortcode(token)
   }
 
-  const codepointGlyph = glyphFromCodepoints(stem)
+  // A two-digit stem is a codepoint only in a set named by codepoint. Forum packs ship `ae.gif` as
+  // a Kolobok face and `a9.jpg` as a board's own art.
+  const isShortStem = shortCodepointRegex.test(stem)
+  const codepointGlyph = isShortStem && names.size ? undefined : glyphFromCodepoints(stem)
 
   if (codepointGlyph) {
     return codepointGlyph
