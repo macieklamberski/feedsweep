@@ -207,6 +207,7 @@ import { khorosEmojiResolver, khorosImageEmojiResolver } from '../emojis/khoros.
 import { kunenaEmojiResolver } from '../emojis/kunena.js'
 import { liferayEmojiResolver } from '../emojis/liferay.js'
 import { livedoorEmojiResolver } from '../emojis/livedoor.js'
+import { liveinternetEmojiResolver } from '../emojis/liveinternet.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
 import { maxEmojiResolver } from '../emojis/max.js'
 import { mixiEmojiResolver } from '../emojis/mixi.js'
@@ -537,6 +538,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   moodleEmojiResolver,
   boardgamegeekEmojiResolver,
   rhymixEmojiResolver,
+  liveinternetEmojiResolver,
   greensmiliesEmojiResolver,
   rcmsEmojiResolver,
   jeuxvideoEmojiResolver,
