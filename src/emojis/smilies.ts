@@ -356,8 +356,6 @@ const directories = [
   '/smiley/', // CKEditor, FCKeditor and TinyMCE; ProBoards serves the same set from here
   '/emotes/', // e107
   '/emoticons/', // Serendipity's stock template set and emoticate plugin, IPS, Kunena
-  '/smiley_icons/', // FUDforum
-  '/plugins/emotions/img/', // TinyMCE 3
   'SMILIES_PATH', // phpBB's template variable left unsubstituted, raw or percent-encoded
 ]
 const directorySelector = directories.map((path) => `img[src*="${path}" i]`).join(', ')

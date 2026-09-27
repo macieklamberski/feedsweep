@@ -187,6 +187,7 @@ import {
 import { fc2EmojiResolver } from '../emojis/fc2.js'
 import { forumotionEmojiResolver } from '../emojis/forumotion.js'
 import { froalaElementEmojiResolver, froalaImageEmojiResolver } from '../emojis/froala.js'
+import { fudforumEmojiResolver } from '../emojis/fudforum.js'
 import { genericCharacterEmojiResolver, genericEmojiResolver } from '../emojis/generic.js'
 import { githubElementEmojiResolver, githubImageEmojiResolver } from '../emojis/github.js'
 import { gitlabEmojiResolver } from '../emojis/gitlab.js'
@@ -214,6 +215,7 @@ import { smiliesEmojiResolver } from '../emojis/smilies.js'
 import { tapatalkEmojiResolver } from '../emojis/tapatalk.js'
 import { teamsEmojiResolver } from '../emojis/teams.js'
 import { telegramEmojiResolver, telegramImageEmojiResolver } from '../emojis/telegram.js'
+import { tinymceEmojiResolver } from '../emojis/tinymce.js'
 import { twemojiEmojiResolver } from '../emojis/twemoji.js'
 import { vanillaEmojiResolver } from '../emojis/vanilla.js'
 import { vkEmojiResolver } from '../emojis/vk.js'
@@ -465,6 +467,8 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   drupalEmojiResolver,
   monalisaEmojiResolver,
   easydiscussEmojiResolver,
+  tinymceEmojiResolver,
+  fudforumEmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,
   yahooEmojiResolver,
