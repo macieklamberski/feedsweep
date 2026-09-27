@@ -1,11 +1,33 @@
 import type { EmojiResolver } from '../types.js'
+import { glyphFromCarrierEmoji } from '../utils/carrierEmoji.js'
 import { attr } from '../utils/dom.js'
-import { getFileStem, glyphFromCodepoints, resolveEmojiImage } from '../utils/emojis.js'
+import {
+  type EmojiGlyph,
+  getFileStem,
+  glyphFromCodepoints,
+  resolveEmojiImage,
+} from '../utils/emojis.js'
 
 const notoFilePrefixRegex = /^emoji_u/
+// Google's own id, bare like `1B6` or after the drawing set it picks, like `ezweb_ne_jp/B61`.
+const legacyIdRegex = /(?:^|[./])([0-9a-f]{3})$/i
+
+const getGlyph = (element: Element): EmojiGlyph | undefined => {
+  const code = attr(element, 'data-goomoji') ?? attr(element, 'goomoji')
+  const src = element.getAttribute('src') ?? ''
+  const [, legacyId] = (code ?? src).match(legacyIdRegex) ?? []
+
+  if (legacyId) {
+    return glyphFromCarrierEmoji('google', Number.parseInt(legacyId, 16))
+  }
+
+  const stem = getFileStem(src).replace(notoFilePrefixRegex, '')
+
+  return glyphFromCodepoints((code ?? stem).toLowerCase())
+}
 
 // Gmail's emoji, as a mail sent on to a feed carries them, with the codepoint in `goomoji`. The
-// legacy set names files by Gmail's own code, like `1B6`, which is no codepoint, so it is marked.
+// legacy set names files by Google's own emoji id instead, which emoji4unicode maps to Unicode.
 export const gmailEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: [
@@ -16,10 +38,6 @@ export const gmailEmojiResolver: EmojiResolver = {
     'img[data-goomoji]',
   ].join(', '),
   extract: (element) => {
-    const code = attr(element, 'data-goomoji') ?? attr(element, 'goomoji')
-    const stem = getFileStem(element.getAttribute('src') ?? '').replace(notoFilePrefixRegex, '')
-    const glyph = glyphFromCodepoints((code ?? stem).toLowerCase())
-
-    return resolveEmojiImage(element, { isStrong: true, glyph })
+    return resolveEmojiImage(element, { isStrong: true, glyph: getGlyph(element) })
   },
 }

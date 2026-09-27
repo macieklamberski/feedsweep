@@ -53,8 +53,7 @@ describeForEachParser('gmailEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  // The legacy code is Gmail's own numbering, not a codepoint, so the picture is all there is.
-  it('should mark a legacy emoji named by its Gmail code', async () => {
+  it('should replace a legacy emoji by its Google id', async () => {
     const value = html`
       <p>
         <img
@@ -65,17 +64,34 @@ describeForEachParser('gmailEmojiResolver', (parseHtml) => {
         >
       </p>
     `
-    const expected = html`
+    const expected = '<p>💃</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  const legacySrcCases: Array<[string, string]> = [
+    ['https://mail.google.com/mail/e/B60', '✨'],
+    ['https://mail.google.com/mail/e/ezweb_ne_jp/B61', '✴️'],
+    ['https://mail.google.com/mail/e/gtalk.1B2', '👿'],
+  ]
+
+  it.each(legacySrcCases)('should replace the legacy emoji at %s', async (src, glyph) => {
+    const value = `<p><img src="${src}"></p>`
+    const expected = `<p>${glyph}</p>`
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a legacy Google id in goomoji off another host', async () => {
+    const value = html`
       <p>
         <img
-          data-emoji=""
-          src="https://mail.google.com/mail/e/1B6"
-          data-goomoji="1B6"
-          goomoji="1B6"
-          alt="[?]"
+          src="https://example.com/proxy/e.png"
+          goomoji="softbank_ne_jp.B94"
         >
       </p>
     `
+    const expected = '<p>✌️</p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
