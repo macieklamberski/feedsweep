@@ -223,6 +223,7 @@ import { okEmojiResolver } from '../emojis/ok.js'
 import { pivotxEmojiResolver } from '../emojis/pivotx.js'
 import { pixnetEmojiResolver } from '../emojis/pixnet.js'
 import { punbbEmojiResolver } from '../emojis/punbb.js'
+import { quillEmojiResolver } from '../emojis/quill.js'
 import { rakutenEmojiResolver } from '../emojis/rakuten.js'
 import { rcmsEmojiResolver } from '../emojis/rcms.js'
 import { rhymixEmojiResolver } from '../emojis/rhymix.js'
@@ -485,6 +486,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   whatsappEmojiResolver,
   wordpressElementEmojiResolver,
   mozillaEmojiResolver,
+  quillEmojiResolver,
   lexicalEmojiResolver,
   tiptapEmojiResolver,
   froalaElementEmojiResolver,
