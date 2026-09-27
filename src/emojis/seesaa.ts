@@ -7,6 +7,8 @@ export const seesaaEmojiResolver: EmojiResolver = {
   selector: [
     'img[src*="blog.seesaa.jp/images_g/" i]',
     'img[src*="blog.seesaa.jp/images_e/" i]',
+    'img[src*="blog.seesaa.jp/images_w/emoji/" i]', // Another numbered set, under its emoji folder
+    'img[src*="blog.seesaa.jp/images_o/" i]', // An older numbered set
   ].join(', '),
   extract: (element) => {
     return resolveEmojiImage(element, { isStrong: true })

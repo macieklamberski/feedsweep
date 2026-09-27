@@ -17,4 +17,15 @@ describeForEachParser('seesaaEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  const folderCases: Array<string> = [
+    'http://blog.seesaa.jp/images_w/emoji/i_36.gif',
+    'http://blog.seesaa.jp/images_o/1139.gif',
+  ]
+
+  it.each(folderCases)('should mark the pictogram at %s', async (src) => {
+    const value = `<p><img src="${src}" alt=""></p>`
+
+    expect(await transform(value)).toEqualHtml(`<p><img src="${src}" alt="" data-emoji=""></p>`)
+  })
 })
