@@ -8,6 +8,7 @@ export const sapoEmojiResolver: EmojiResolver = {
   selector: [
     'img[src*="/plugins/sapoemoticons/img/EMOTICON_" i]',
     'img[src*="/plugins/sapoemotions/img/EMOTICON_" i]',
+    'img[src*="/fckeditor/editor/images/smiley/sapo/EMOTICON_" i]', // The older editor
   ].join(', '),
   extract: (element) => {
     return resolveEmojiImage(element, { isStrong: true })

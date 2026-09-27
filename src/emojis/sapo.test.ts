@@ -50,6 +50,41 @@ describeForEachParser('sapoEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should mark an emoticon from the older editor', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://blogs.example.com/stc/fckeditor/editor/images/smiley/sapo/EMOTICON_CONFUSED.png"
+          alt=""
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://blogs.example.com/stc/fckeditor/editor/images/smiley/sapo/EMOTICON_CONFUSED.png"
+          alt=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a mood icon from the older editor untouched', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://blogs.example.com/stc/fckeditor/editor/images/smiley/sapo/MOOD_SAPO_TIRED.png"
+          alt=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   // The plugin folder also holds the editor's own interface icons.
   it('should leave an interface icon from the plugin folder untouched', async () => {
     const value = html`
