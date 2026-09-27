@@ -165,8 +165,9 @@ const getVocabularyGlyph = (
   return names.get(stem) ?? code
 }
 
+// An image converts whenever one hint names its picture exactly: an emoji alt, a codepoint or
+// byte filename, a universal code or a stock name. A false or unknown hint never blocks one.
 // The title attribute is prose on every platform, never a glyph, so it is not read.
-// XenForo's is `Big grin    :D`, phpBB's the English `Smile`, Khoros' localized.
 export const resolveEmojiImage = (
   element: Element,
   match: EmojiImageMatch,

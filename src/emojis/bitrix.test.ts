@@ -66,6 +66,22 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
   })
 
   // A pipe-smoking face, and no emoji has a pipe.
+  it('should replace a smilie by a universal alt beside a false data-code', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://example.com/upload/main/smiles/5/11.gif"
+          data-code="|do|"
+          alt=":D"
+          class="bx-smile"
+        >
+      </p>
+    `
+    const expected = '<p>😁</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should mark a smilie whose code has no counterpart', async () => {
     const value = html`
       <p>

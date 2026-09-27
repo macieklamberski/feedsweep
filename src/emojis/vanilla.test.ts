@@ -55,6 +55,21 @@ describeForEachParser('vanillaEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should replace a gemoji file by its name when its alt is a false code', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/resources/emoji/sunglasses.png"
+            title="B)"
+            alt="B)"
+          >
+        </p>
+      `
+      const expected = '<p>😎</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should mark ok, which the forum names know to have no glyph, over gemoji', async () => {
       const value = html`
         <p>

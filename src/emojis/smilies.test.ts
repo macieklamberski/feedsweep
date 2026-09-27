@@ -1721,14 +1721,44 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
   })
 
-  describe('names known to have no glyph', () => {
-    it('should resolve a stock file by its filename when its alt is a code engines draw differently', async () => {
+  describe('an exact hint beside a false one', () => {
+    it('should replace a file named for no glyph by its universal code', async () => {
+      const value = '<p><img src="https://example.com/images/smilies/happy.gif" alt=":)"></p>'
+      const expected = '<p>🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a file named for no glyph by its emoji alt', async () => {
+      const value = '<p><img src="https://example.com/images/smilies/icon_evil.gif" alt="😈"></p>'
+      const expected = '<p>😈</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a codepoint file by its filename when its alt is a false code', async () => {
+      const value = '<p><img src="https://example.com/images/smilies/1f608.png" alt=":evil:"></p>'
+      const expected = '<p>😈</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace an engine drawing by its universal code', async () => {
+      const value = '<p><img src="https://example.com/forum/smileys/smiley4.gif" alt=":D"></p>'
+      const expected = '<p>😁</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a stock file by its filename when its alt is a false code', async () => {
       const value = '<p><img src="https://example.com/smiles/yikes.gif" alt=":shock:"></p>'
       const expected = '<p>😱</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+  })
 
+  describe('names known to have no glyph', () => {
     it('should mark a file named for no glyph under a smilie directory alone', async () => {
       const value = '<p><img src="https://example.com/images/smilies/icon_evil.gif" alt=""></p>'
       const expected =

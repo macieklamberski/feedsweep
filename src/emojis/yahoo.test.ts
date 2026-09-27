@@ -66,6 +66,15 @@ describeForEachParser('yahooEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('exact hints', () => {
+    it('should replace a number by its universal code alt', async () => {
+      const value = '<p><img alt=":)" src="https://s.yimg.com/lq/i/mesg/emoticons7/1.gif"></p>'
+      const expected = '<p>🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('kept pictures', () => {
     // Chatterbox, which the review kept as a picture.
     it('should mark a number decided to keep its picture', async () => {

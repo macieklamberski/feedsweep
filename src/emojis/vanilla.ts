@@ -28,14 +28,18 @@ export const vanillaEmojiResolver: EmojiResolver = {
   extract: (element) => {
     const resolved = resolveEmojiImage(element, { isStrong: false, names })
 
-    if (resolved) {
+    if (resolved && !('custom' in resolved)) {
       return resolved
     }
 
-    const glyph = glyphFromEmojiName(getFileStem(element.getAttribute('src') ?? ''))
+    // A forum name known to have no glyph is not read as a gemoji name.
+    const stem = getFileStem(element.getAttribute('src') ?? '')
+    const glyph = names.has(stem.toLowerCase()) ? undefined : glyphFromEmojiName(stem)
 
     if (glyph) {
       return { glyph }
     }
+
+    return resolved
   },
 }

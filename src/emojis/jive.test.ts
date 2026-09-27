@@ -54,6 +54,21 @@ describeForEachParser('jiveEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(`<p><span data-emoji="">:${name}:</span></p>`)
   })
 
+  it('should replace a Jive name drawn as its own face by the glyph it holds', async () => {
+    const value = html`
+      <p>
+        <span
+          __jive_emoticon_name="happy"
+          __jive_macro_name="emoticon"
+          class="jive_macro jive_emote"
+        >🙂</span>
+      </p>
+    `
+    const expected = '<p>🙂</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should mark a Jive name no table carries as fallback text', async () => {
     const value = html`
       <p>

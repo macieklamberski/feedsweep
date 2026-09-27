@@ -37,13 +37,32 @@ const getCode = (code: string | undefined): EmojiGlyph | undefined => {
   return bitrixShortcodes.get(code?.toLowerCase() ?? '') ?? getShortcode(code)
 }
 
+// The code in data-code or the alt, whichever has a glyph.
+const getGlyph = (codes: Array<string | undefined>): EmojiGlyph | undefined => {
+  let known: EmojiGlyph | undefined
+
+  for (const code of codes) {
+    const glyph = getCode(code)
+
+    if (glyph) {
+      return glyph
+    }
+
+    if (glyph === false) {
+      known = false
+    }
+  }
+
+  return known
+}
+
 // Bitrix forum and blog smilies, which carry the shortcode the author typed in data-code. Their
 // files are numbered or named per site, so the shortcode is the only stable key.
 export const bitrixEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[class~="bx-smile" i]',
   extract: (element) => {
-    const glyph = getCode(attr(element, 'data-code')) ?? getCode(attr(element, 'alt'))
+    const glyph = getGlyph([attr(element, 'data-code'), attr(element, 'alt')])
 
     return resolveEmojiImage(element, { isStrong: true, glyph })
   },
