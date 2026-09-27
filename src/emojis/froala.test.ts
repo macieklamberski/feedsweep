@@ -53,6 +53,30 @@ describeForEachParser('froalaImageEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should mark a builder pictogram in the CKEditor folder', async () => {
+    const value =
+      '<p><img alt="" src="https://example.com/ckeditor/plugins/smiley/new/e_133.gif"></p>'
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          alt=""
+          src="https://example.com/ckeditor/plugins/smiley/new/e_133.gif"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a CKEditor stock name in the builder folder', async () => {
+    const value =
+      '<p><img alt="" src="https://example.com/ckeditor/plugins/smiley/new/wink_smile.gif"></p>'
+    const expected = '<p>😉</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
 })
 
 describeForEachParser('froalaElementEmojiResolver', (parseHtml) => {

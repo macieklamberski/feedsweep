@@ -3,11 +3,17 @@ import { getFileStem, glyphFromCodepoints, resolveEmojiImage } from '../utils/em
 import { bgImage } from '../utils/styles.js'
 import { smiliesEmojiNames } from './smilies.js'
 
-// Froala's emoticon images, as Japanese site builders bundle them. The folder mixes the
-// CKEditor stock set, codepoint files and the builder's own pictograms like `item140.svg`.
+const directories = [
+  '/cke_smiley/', // Froala
+  '/ckeditor/plugins/smiley/new/', // CKEditor
+]
+
+// Froala's and CKEditor's emoticon images, as Japanese site builders bundle them. The folder
+// mixes the CKEditor stock set, codepoint files and the builder's own pictograms like
+// `item140.svg`.
 export const froalaImageEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: 'img[src*="/cke_smiley/" i]',
+  selector: directories.map((directory) => `img[src*="${directory}" i]`).join(', '),
   extract: (element) => {
     return resolveEmojiImage(element, { isStrong: true, names: smiliesEmojiNames })
   },
