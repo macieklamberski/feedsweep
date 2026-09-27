@@ -174,6 +174,7 @@ import { bitrixEmojiResolver } from '../emojis/bitrix.js'
 import { boardgamegeekEmojiResolver } from '../emojis/boardgamegeek.js'
 import { btblogEmojiResolver } from '../emojis/btblog.js'
 import { cocologEmojiResolver } from '../emojis/cocolog.js'
+import { cuteeditorEmojiResolver } from '../emojis/cuteeditor.js'
 import { discordEmojiResolver } from '../emojis/discord.js'
 import { discourseEmojiResolver } from '../emojis/discourse.js'
 import { discuzEmojiResolver } from '../emojis/discuz.js'
@@ -539,6 +540,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   moodleEmojiResolver,
   boardgamegeekEmojiResolver,
   rhymixEmojiResolver,
+  cuteeditorEmojiResolver,
   shinobiEmojiResolver,
   liveinternetEmojiResolver,
   greensmiliesEmojiResolver,
