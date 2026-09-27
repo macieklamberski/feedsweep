@@ -51,8 +51,19 @@ const getGemojiNames = (): Map<string, string> => {
   return names
 }
 
-// A gemoji or CLDR emoji name, bare or in colons. The shared shortcode table is read first, so
-// a name it already maps keeps the glyph every other engine draws for it.
+// A gemoji or CLDR emoji name, bare or in colons, for an engine that names files by them.
+export const glyphFromGemojiName = (name: string | undefined): string | undefined => {
+  const key = name?.replace(colonsRegex, '').toLowerCase()
+
+  if (!key) {
+    return
+  }
+
+  return getGemojiNames().get(key)
+}
+
+// The same, with the shared shortcode table read first, so a name it already maps keeps the
+// glyph every other engine draws for it.
 export const glyphFromEmojiName = (name: string | undefined): string | undefined => {
   const key = name?.replace(colonsRegex, '').toLowerCase()
 
@@ -60,5 +71,5 @@ export const glyphFromEmojiName = (name: string | undefined): string | undefined
     return
   }
 
-  return glyphFromShortcode(`:${key}:`) ?? getGemojiNames().get(key)
+  return glyphFromShortcode(`:${key}:`) ?? glyphFromGemojiName(key)
 }

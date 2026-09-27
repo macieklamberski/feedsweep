@@ -1,9 +1,8 @@
 import type { EmojiResolver } from '../types.js'
 import { getFileStem, glyphFromCodepoints, resolveEmojiImage } from '../utils/emojis.js'
 
-// The class Discourse, Vanilla, NodeBB and newer WordPress share. It is read for a glyph alt or a
-// codepoint filename and never for a shortcode, since Discourse's own shortcode namespace is not
-// the table's.
+// The class Vanilla, NodeBB, newer WordPress and Discourse's custom uploads share. It is read for a
+// glyph alt or a codepoint filename and never for a shortcode, since each engine names its own.
 export const genericEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[class~="emoji" i]',

@@ -173,6 +173,7 @@ import { artstationEmojiResolver } from '../emojis/artstation.js'
 import { bitrixEmojiResolver } from '../emojis/bitrix.js'
 import { cocologEmojiResolver } from '../emojis/cocolog.js'
 import { discordEmojiResolver } from '../emojis/discord.js'
+import { discourseEmojiResolver } from '../emojis/discourse.js'
 import { exblogEmojiResolver } from '../emojis/exblog.js'
 import {
   facebookClassicEmojiResolver,
@@ -469,6 +470,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   cocologEmojiResolver,
   jugemEmojiResolver,
   fc2EmojiResolver,
+  discourseEmojiResolver,
   // Last, since the class is shared by engines whose own signals say more.
   genericEmojiResolver,
 ]
