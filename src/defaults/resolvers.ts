@@ -222,6 +222,7 @@ import { rcmsEmojiResolver } from '../emojis/rcms.js'
 import { rhymixEmojiResolver } from '../emojis/rhymix.js'
 import { sapoEmojiResolver } from '../emojis/sapo.js'
 import { seesaaEmojiResolver } from '../emojis/seesaa.js'
+import { shinobiEmojiResolver } from '../emojis/shinobi.js'
 import { simplePressEmojiResolver } from '../emojis/simplepress.js'
 import { slackEmojiResolver } from '../emojis/slack.js'
 import { smfEmojiResolver } from '../emojis/smf.js'
@@ -538,6 +539,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   moodleEmojiResolver,
   boardgamegeekEmojiResolver,
   rhymixEmojiResolver,
+  shinobiEmojiResolver,
   liveinternetEmojiResolver,
   greensmiliesEmojiResolver,
   rcmsEmojiResolver,
