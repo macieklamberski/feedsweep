@@ -6,6 +6,8 @@ const bytePairRegex = /../g
 const keycapStemRegex = /^[0-9]e283a3$/i
 const utf16HexRegex = /^(?:[0-9a-f]{4})+$/i
 const utf16UnitRegex = /.{4}/g
+// Both sets serve the same file at double density under a `_2x` suffix.
+const retinaSuffixRegex = /_2x$/i
 
 const utf8Decoder = new TextDecoder('utf-8', { fatal: true })
 
@@ -62,7 +64,7 @@ export const vkEmojiResolver: EmojiResolver = {
     'img[class~="emoji_css" i]', // The older set's sprite
   ].join(', '),
   extract: (element) => {
-    const stem = getFileStem(element.getAttribute('src') ?? '')
+    const stem = getFileStem(element.getAttribute('src') ?? '').replace(retinaSuffixRegex, '')
     const glyph = element.matches(utf8Selector)
       ? glyphFromUtf8Hex(stem)
       : glyphFromUtf16Hex(attr(element, 'emoji') ?? stem)

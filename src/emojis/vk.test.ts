@@ -47,6 +47,13 @@ describeForEachParser('vkEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should decode the double-density file by the bytes before its suffix', async () => {
+    const value = '<p><img alt="?" src="https://vk.com/emoji/e/f09f9882_2x.png"></p>'
+    const expected = '<p>😂</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should replace an emoji from the .ru domain', async () => {
     const value = '<p><img alt="" src="https://vk.ru/emoji/e/e29c85.png"></p>'
     const expected = '<p>✅</p>'
@@ -81,10 +88,9 @@ describeForEachParser('vkEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should mark an image whose filename carries more than code units', async () => {
+    it('should decode the double-density file', async () => {
       const value = '<p><img alt="" src="https://vk.com/images/emoji/D83DDE0A_2x.png"></p>'
-      const expected =
-        '<p><img data-emoji="" alt="" src="https://vk.com/images/emoji/D83DDE0A_2x.png"></p>'
+      const expected = '<p>😊</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
