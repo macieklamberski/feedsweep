@@ -235,4 +235,11 @@ describeForEachParser('wordpressEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
   })
+
+  it('should leave a photo that took the class from emoji markup in its alt untouched', async () => {
+    const value =
+      '<p><img src="https://example.com/wp-content/plugins/instagram-feed/img/placeholder.png" alt="<img src=&quot;https://s.w.org/images/core/emoji/15.0.3/72x72/1f5f3.png&quot; alt=&quot;🗳&quot;" class="wp-smiley"></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
 })

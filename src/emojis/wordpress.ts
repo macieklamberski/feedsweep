@@ -14,6 +14,12 @@ export const wordpressEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: [classSelector, ...hosts.map((host) => `img[src*="${host}" i]`)].join(', '),
   extract: (element) => {
+    // A broken paste nests an emoji's markup inside another image's alt, which hands the class to
+    // a real picture, often an Instagram photo.
+    if (element.getAttribute('alt')?.trimStart().startsWith('<img')) {
+      return
+    }
+
     // Its smilie filenames are in the forum tables, since they are served from `/smilies/` too.
     const names = element.matches(classSelector) ? smiliesEmojiNames : noEmojiNames
 
