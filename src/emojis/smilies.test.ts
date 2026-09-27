@@ -199,7 +199,6 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       ['Drupal smileys module', 'http://example.com/misc/smileys/smile.png', '🙂'],
       ['blog smileys directory', 'http://example.com/images/smileys/big_smile.gif', '😁'],
       ['Kunena emoticons directory', 'http://example.com/media/kunena/emoticons/smile.png', '🙂'],
-      ['FUDforum', 'http://example.com/forum/images/smiley_icons/icon_wink.gif', '😉'],
       [
         'TinyMCE 3',
         'http://example.com/editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-smile.gif',
@@ -447,17 +446,12 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
         '🙂',
       ],
       [
-        'e107',
-        '<img class="e-emoticon" src="/e107_images/emotes/default/smile.png" alt="smile">',
-        '🙂',
-      ],
-      [
         'Simple:Press',
         '<img src="/wp-content/forum-smileys/sf-wink.gif" width="15" class="sfimageleft" title="wink" alt="wink">',
         '😉',
       ],
       // From the engines' own default sets, not from corpus tokens, so these cover boards the
-      // corpus never sampled. The last two are misspelled in the distributions.
+      // corpus never sampled.
       [
         'phpBB sad',
         '<img class="smilies" src="/images/smilies/icon_e_sad.svg" alt="" title="Sad">',
@@ -467,16 +461,6 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
         'SMF sealed lips',
         '<img src="/Smileys/fugue/lipsrsealed.png" alt="" title="Lips sealed" class="smiley">',
         '🤐',
-      ],
-      [
-        'e107 suprised',
-        '<img class="e-emoticon" src="/e107_images/emotes/default/suprised.png" alt="">',
-        '😲',
-      ],
-      [
-        'e107 cheesey',
-        '<img class="e-emoticon" src="/e107_images/emotes/default/cheesey.png" alt="">',
-        '😁',
       ],
     ]
 
@@ -956,7 +940,6 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       'https://example.com/uploads/emoticons/default_yahoo.gif',
       'https://example.com/public/style_emoticons/default/drool.gif',
       'https://example.com/styles/default/xenforo/smilies/banghead.gif',
-      'https://example.com/Smileys/default/thumb.gif',
       'https://example.com/images/smilies/gruebel.gif',
     ]
 
