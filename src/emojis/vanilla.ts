@@ -1,16 +1,23 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
-import { getFileStem, mergeEmojiNames, resolveEmojiImage } from '../utils/emojis.js'
+import {
+  type EmojiNameTable,
+  getFileStem,
+  mergeEmojiNames,
+  resolveEmojiImage,
+} from '../utils/emojis.js'
 import { glyphFromGemojiName } from '../utils/gemoji.js'
 import { smiliesEmojiNameTables } from './smilies.js'
 
-// Vanilla ships the stock forum names alongside its own `simple-smile`.
-const names = toMap(
-  mergeEmojiNames([
-    ...smiliesEmojiNameTables,
-    { name: 'Vanilla', names: { 'simple-smile': '🙂' } },
-  ]),
-)
+const vanillaEmojiNameTable: EmojiNameTable = {
+  name: 'Vanilla',
+  names: {
+    'simple-smile': '🙂',
+  },
+}
+
+// Vanilla ships the stock forum names alongside its own.
+const names = toMap(mergeEmojiNames([...smiliesEmojiNameTables, vanillaEmojiNameTable]))
 
 // Vanilla's emoji. The directory is the only signal, since Vanilla's class is the generic `emoji`.
 // Vanilla names its files by gemoji name, which is exact even where a forum engine draws a file of
