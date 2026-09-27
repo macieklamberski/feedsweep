@@ -1,6 +1,13 @@
-import { addMissingProtocol, normalizeUrl, resolveUrl } from 'feedcanon'
 import { parseSrcset as parseRawSrcset } from 'srcset'
-import { decodeSegment, getPathSegments, parseUrl, toMap } from 'trousse'
+import {
+  addMissingProtocol,
+  decodeSegment,
+  getPathSegments,
+  normalizeUrl,
+  parseUrl,
+  resolveUrl,
+  toMap,
+} from 'trousse'
 import type { CleanUrlFn } from '../types.js'
 import { pixelDimensionLimit } from './dom.js'
 import { placeholderBaseUrl } from './urls.js'

@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type {
   DomTransform,
   EmbedResolverResult,
@@ -121,17 +121,13 @@ const getFileName = (enclosure: Enclosure, url: string): string => {
   }
 
   const parsed = parseUrl(url)
-  const segment = parsed?.pathname.split('/').filter(Boolean).pop()
+  const segment = getPathSegments(url).pop()
 
   if (!segment) {
     return parsed?.hostname ?? url
   }
 
-  try {
-    return decodeURIComponent(segment)
-  } catch {}
-
-  return segment
+  return decodeSegment(segment) ?? segment
 }
 
 // An enclosure rides outside the item body, so the content alone never shows its media.
