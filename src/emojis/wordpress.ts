@@ -1,5 +1,11 @@
 import type { EmojiResolver } from '../types.js'
-import { noEmojiNames, resolveEmojiImage } from '../utils/emojis.js'
+import { attr } from '../utils/dom.js'
+import {
+  glyphFromShortcode,
+  noEmojiNames,
+  resolveEmojiElement,
+  resolveEmojiImage,
+} from '../utils/emojis.js'
 import { smiliesEmojiNames } from './smilies.js'
 
 const classSelector = 'img[class~="wp-smiley" i]'
@@ -24,5 +30,25 @@ export const wordpressEmojiResolver: EmojiResolver = {
     const names = element.matches(classSelector) ? smiliesEmojiNames : noEmojiNames
 
     return resolveEmojiImage(element, { isStrong: true, names })
+  },
+}
+
+// WordPress.com's text smiley, a span painted by its CSS with the typed code in the title. Empty,
+// it renders as nothing, and some copies hold a word from the class, like `wink`.
+export const wordpressElementEmojiResolver: EmojiResolver = {
+  kind: 'emoji',
+  selector: 'span[class~="wp-smiley" i]',
+  extract: (element) => {
+    const title = attr(element, 'title')
+    const text = element.textContent?.trim() ?? ''
+
+    // A code or a word, never prose.
+    if (text.length > 20 || element.firstElementChild) {
+      return
+    }
+
+    const glyph = glyphFromShortcode(title) ?? glyphFromShortcode(text)
+
+    return resolveEmojiElement(element, { glyph, shortcode: title })
   },
 }

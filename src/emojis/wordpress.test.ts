@@ -243,3 +243,31 @@ describeForEachParser('wordpressEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 })
+
+describeForEachParser('wordpressElementEmojiResolver', (parseHtml) => {
+  const { transform } = emojiConverters(parseHtml)
+
+  const spanCases: Array<[string, string]> = [
+    ['<span class="wp-smiley wp-emoji wp-emoji-smile" title=":)"></span>', '🙂'],
+    ["<span class='wp-smiley emoji emoji-smile' title=':-)'>:-)</span>", '🙂'],
+    ['<span class="wp-smiley wp-emoji wp-emoji-wink" title=";)">wink</span>', '😉'],
+  ]
+
+  it.each(spanCases)('should replace %s', async (span, glyph) => {
+    expect(await transform(`<p>Hi ${span}</p>`)).toEqualHtml(`<p>Hi ${glyph}</p>`)
+  })
+
+  it('should keep a code without a universal glyph as text', async () => {
+    const value =
+      '<p>Hi <span class="wp-smiley wp-emoji wp-emoji-mrgreen" title=":mrgreen:"></span></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>Hi <span data-emoji="">:mrgreen:</span></p>')
+  })
+
+  it('should leave a span holding prose untouched', async () => {
+    const value =
+      '<p><span class="wp-smiley" title=":)">This whole sentence is not a smiley</span></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+})
