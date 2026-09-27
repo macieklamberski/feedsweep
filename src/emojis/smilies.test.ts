@@ -59,14 +59,14 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
     // The parent of the smilies directory is the theme name and differs per board, so these
     // are all the same set under different skins.
-    const themeSmiliePaths: Array<string> = [
+    const themeSmiliePathCases: Array<string> = [
       '/themes/default/smilies/smile.png',
       '/dc2themes/mrvb6_sobre/smilies/smile.png',
       '/plxeditor/smilies/smile.png',
       '/style/BlueSky/smilies/smile.png',
     ]
 
-    it.each(themeSmiliePaths)(
+    it.each(themeSmiliePathCases)(
       'should replace a smilie served from the theme directory %s',
       async (path) => {
         const value = `<p><img src="https://example.com${path}" alt=":)" class="smiley"></p>`
@@ -75,9 +75,9 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       },
     )
 
-    const singularSmilieClasses: Array<string> = ['smiley', 'smilie', 'mceSmilie']
+    const singularSmilieClassCases: Array<string> = ['smiley', 'smilie', 'mceSmilie']
 
-    it.each(singularSmilieClasses)(
+    it.each(singularSmilieClassCases)(
       'should recognize the singular %s class other engines use',
       async (className) => {
         const value = `<p><img src="/x/smilies/wink.png" alt=";)" class="${className}"></p>`
@@ -674,7 +674,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    const markedCodes: Array<string> = [
+    const markedCodeCases: Array<string> = [
       ':angry:',
       ':wub:',
       ':blink:',
@@ -685,7 +685,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       ':huh:',
     ]
 
-    it.each(markedCodes)('should mark the %s code', async (code) => {
+    it.each(markedCodeCases)('should mark the %s code', async (code) => {
       const value = html`
         <p>
           <img
@@ -923,7 +923,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
 
     // Stock codes each engine draws as its own face.
-    const markedAliases: Array<string> = [
+    const markedAliasCases: Array<string> = [
       ':-*',
       'O:-)',
       ':razz:',
@@ -941,7 +941,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       ':ugeek:',
     ]
 
-    it.each(markedAliases)('should mark the %s code', async (code) => {
+    it.each(markedAliasCases)('should mark the %s code', async (code) => {
       const value = html`
         <p>
           <img
@@ -1012,7 +1012,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    const engineNameSources: Array<string> = [
+    const engineNameSourceCases: Array<string> = [
       'https://illiweb.com/fa/i/smiles/icon_cheers.png',
       'https://example.com/media/kunena/emoticons/cheerful.png',
       'https://example.com/uploads/emoticons/default_yahoo.gif',
@@ -1021,7 +1021,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       'https://example.com/images/smilies/gruebel.gif',
     ]
 
-    it.each(engineNameSources)('should mark the name a board added at %s', async (src) => {
+    it.each(engineNameSourceCases)('should mark the name a board added at %s', async (src) => {
       const value = `<p><img src="${src}" alt=""></p>`
       const expected = `<p><img data-emoji="" src="${src}" alt=""></p>`
 

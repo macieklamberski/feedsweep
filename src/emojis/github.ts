@@ -56,7 +56,7 @@ const applyTones = (glyph: string, tone: string): string => {
     const tail = rest[0] === variationSelector ? rest.slice(1) : rest
 
     // The selector asks for the picture form, which a modifier already implies.
-    return modifier ? base + modifier + tail.join('') : part
+    return modifier ? `${base}${modifier}${tail.join('')}` : part
   })
 
   return tinted.join(zeroWidthJoiner)

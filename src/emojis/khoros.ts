@@ -26,8 +26,13 @@ export const khorosEmojiResolver: EmojiResolver = {
     const title = attr(element, 'title')
     const id = attr(element, 'id')?.replace(idPrefixRegex, '').replace(hyphenRegex, '_')
     const glyph = glyphFromGemojiName(title) ?? glyphFromGemojiName(id)
+    let shortcode = title
 
-    return resolveEmojiElement(element, { glyph, shortcode: title ?? (id ? `:${id}:` : undefined) })
+    if (!shortcode && id) {
+      shortcode = `:${id}:`
+    }
+
+    return resolveEmojiElement(element, { glyph, shortcode })
   },
 }
 

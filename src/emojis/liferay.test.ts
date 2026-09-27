@@ -5,7 +5,7 @@ describeForEachParser('liferayEmojiResolver', (parseHtml) => {
   const { transform } = emojiConverters(parseHtml)
 
   // Liferay draws each of these as its own face, so they keep their pictures.
-  const markedNames: Array<string> = [
+  const markedNameCases: Array<string> = [
     'happy',
     'smile',
     'big_grin',
@@ -22,7 +22,7 @@ describeForEachParser('liferayEmojiResolver', (parseHtml) => {
     'ninja',
   ]
 
-  it.each(markedNames)('should mark the %s emoticon', async (name) => {
+  it.each(markedNameCases)('should mark the %s emoticon', async (name) => {
     const value = html`
       <p>
         <img

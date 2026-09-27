@@ -121,13 +121,13 @@ describeForEachParser('joypixelsEmojiResolver', (parseHtml) => {
   })
 
   describe('hosts', () => {
-    const hosts = [
+    const hostCases = [
       'cdn.jsdelivr.net/joypixels/assets/',
       'cdn.jsdelivr.net/emojione/',
       'cdnjs.cloudflare.com/ajax/libs/emojione/',
     ]
 
-    it.each(hosts)('should replace an emoji image from %s', async (host) => {
+    it.each(hostCases)('should replace an emoji image from %s', async (host) => {
       const value = `<p>Hi <img src="https://${host}1f642.png" alt="🙂"></p>`
       const expected = '<p>Hi 🙂</p>'
 

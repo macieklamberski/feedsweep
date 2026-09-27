@@ -37,10 +37,12 @@ describeForEachParser('jiveEmojiResolver', (parseHtml) => {
   })
 
   // Jive's stock names that Jive draws as its own faces.
-  const jiveNames: Array<string> = ['happy', 'silly', 'laugh', 'shocked', 'plain', 'mischief']
+  const jiveNameCases: Array<string> = ['happy', 'silly', 'laugh', 'shocked', 'plain', 'mischief']
 
-  it.each(jiveNames)('should mark the macro of the Jive name %s as fallback text', async (name) => {
-    const value = html`
+  it.each(jiveNameCases)(
+    'should mark the macro of the Jive name %s as fallback text',
+    async (name) => {
+      const value = html`
       <p>
         <span
           __jive_emoticon_name="${name}"
@@ -51,8 +53,9 @@ describeForEachParser('jiveEmojiResolver', (parseHtml) => {
       </p>
     `
 
-    expect(await transform(value)).toEqualHtml(`<p><span data-emoji="">:${name}:</span></p>`)
-  })
+      expect(await transform(value)).toEqualHtml(`<p><span data-emoji="">:${name}:</span></p>`)
+    },
+  )
 
   it('should replace a Jive name drawn as its own face by the glyph it holds', async () => {
     const value = html`
@@ -101,7 +104,7 @@ describeForEachParser('jiveEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it.each(jiveNames)(
+    it.each(jiveNameCases)(
       'should mark the span of the Jive name %s as fallback text',
       async (name) => {
         const value = `<p><span class="emoticon-inline emoticon_${name}"></span></p>`

@@ -5,7 +5,7 @@ describeForEachParser('discuzEmojiResolver', (parseHtml) => {
   const { transform } = emojiConverters(parseHtml)
 
   describe('Discuz! (static/image/smiley/ names)', () => {
-    const faceNames: Array<string> = [
+    const faceNameCases: Array<string> = [
       'huffy',
       'titter',
       'sweat',
@@ -20,7 +20,7 @@ describeForEachParser('discuzEmojiResolver', (parseHtml) => {
       'call',
     ]
 
-    it.each(faceNames)('should mark the %s face', async (name) => {
+    it.each(faceNameCases)('should mark the %s face', async (name) => {
       const value = html`
         <p>
           <img

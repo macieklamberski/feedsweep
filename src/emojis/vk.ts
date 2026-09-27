@@ -22,7 +22,11 @@ const glyphFromUtf8Hex = (stem: string): string | undefined => {
   try {
     const glyph = utf8Decoder.decode(bytes)
 
-    return isEmojiShaped(glyph) ? glyph : undefined
+    if (!isEmojiShaped(glyph)) {
+      return
+    }
+
+    return glyph
   } catch {}
 }
 
@@ -36,7 +40,11 @@ const glyphFromUtf16Hex = (code: string): string | undefined => {
   const glyph = String.fromCharCode(...units)
 
   // A lone surrogate is not emoji-shaped, so a truncated pair is refused here.
-  return isEmojiShaped(glyph) ? glyph : undefined
+  if (!isEmojiShaped(glyph)) {
+    return
+  }
+
+  return glyph
 }
 
 const utf8Selector = [

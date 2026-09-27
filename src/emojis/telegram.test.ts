@@ -103,13 +103,13 @@ describeForEachParser('telegramImageEmojiResolver', (parseHtml) => {
   })
 
   describe('hosts', () => {
-    const hosts = [
+    const hostCases = [
       'web.telegram.org/a/img-apple-64/',
       'web.telegram.org/a/img-apple-160/',
       'web.telegram.org/k/assets/img/emoji/',
     ]
 
-    it.each(hosts)('should replace an emoji image from %s', async (host) => {
+    it.each(hostCases)('should replace an emoji image from %s', async (host) => {
       const value = `<p>Hi <img src="https://${host}1f642.png" alt="🙂"></p>`
       const expected = '<p>Hi 🙂</p>'
 

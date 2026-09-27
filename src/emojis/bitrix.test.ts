@@ -111,7 +111,7 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
   })
 
   // Codes from Bitrix's stock set that the shared table does not carry.
-  const stockCodes: Array<string> = [':facepalm:', ':{}', ':-{}', ':~(', ':-/']
+  const stockCodeCases: Array<string> = [':facepalm:', ':{}', ':-{}', ':~(', ':-/']
 
   // Bitrix draws `>:-<` on the same file as `:evil:`.
   const sharedCodeCases: Array<[string, string]> = [
@@ -147,7 +147,7 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it.each(stockCodes)('should mark the stock %s code', async (code) => {
+  it.each(stockCodeCases)('should mark the stock %s code', async (code) => {
     const value = html`
       <p>
         <img

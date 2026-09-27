@@ -48,7 +48,11 @@ export const isEmojiShaped = (text: string): boolean => {
 const shortcodes = toMap(emojiShortcodes)
 
 export const getShortcode = (token: string | undefined): EmojiGlyph | undefined => {
-  return token ? shortcodes.get(token.toLowerCase()) : undefined
+  if (!token) {
+    return
+  }
+
+  return shortcodes.get(token.toLowerCase())
 }
 
 export const glyphFromShortcode = (token: string | undefined): string | undefined => {
@@ -153,9 +157,13 @@ const getCodepointText = (stem: string): string | undefined => {
 const getVocabularyGlyph = (
   token: string | undefined,
   src: string,
-  names: Map<string, EmojiGlyph>,
+  names: Map<string, EmojiGlyph> | undefined,
   stem = getNameStem(src),
 ): EmojiGlyph | undefined => {
+  if (!names) {
+    return
+  }
+
   // Base64 can contain `/`, so a stem taken from a data URI can match a real name by accident.
   if (src.startsWith('data:')) {
     return getShortcode(token)
@@ -197,9 +205,7 @@ export const resolveEmojiImage = (
     return { glyph: match.glyph }
   }
 
-  const glyph = match.names
-    ? getVocabularyGlyph(shortname ?? alt, src, match.names, match.stem)
-    : undefined
+  const glyph = getVocabularyGlyph(shortname ?? alt, src, match.names, match.stem)
 
   if (glyph) {
     return { glyph }

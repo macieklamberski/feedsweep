@@ -64,9 +64,9 @@ describeForEachParser('moodleEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  const legacyPaths: Array<string> = ['/pix/s/smiley.gif', '/theme/autumn/pix/s/wink.gif']
+  const legacyPathCases: Array<string> = ['/pix/s/smiley.gif', '/theme/autumn/pix/s/wink.gif']
 
-  it.each(legacyPaths)('should mark an emoticon linked as a plain file at %s', async (path) => {
+  it.each(legacyPathCases)('should mark an emoticon linked as a plain file at %s', async (path) => {
     const value = `<p><img alt="" src="https://moodle.example.com${path}"></p>`
     const expected = `<p><img alt="" src="https://moodle.example.com${path}" data-emoji=""></p>`
 

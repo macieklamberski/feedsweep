@@ -137,9 +137,13 @@ describeForEachParser('twemojiEmojiResolver', (parseHtml) => {
   })
 
   describe('hosts', () => {
-    const hosts = ['cdn.jsdelivr.net/gh/twitter/twemoji', 'twemoji.maxcdn.com/', 'twimg.com/emoji/']
+    const hostCases = [
+      'cdn.jsdelivr.net/gh/twitter/twemoji',
+      'twemoji.maxcdn.com/',
+      'twimg.com/emoji/',
+    ]
 
-    it.each(hosts)('should replace an emoji image from %s', async (host) => {
+    it.each(hostCases)('should replace an emoji image from %s', async (host) => {
       const value = `<p>Hi <img src="https://${host}1f642.png" alt="🙂"></p>`
       const expected = '<p>Hi 🙂</p>'
 

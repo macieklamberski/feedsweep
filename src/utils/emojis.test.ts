@@ -6,12 +6,12 @@ const asciiLetterRegex = /[a-zA-Z]/
 const conflictingNameRegex = /happy/
 
 describe('shortcode table', () => {
-  const glyphEntries = Object.entries(emojiShortcodes).filter(([, glyph]) => glyph)
+  const glyphCases = Object.entries(emojiShortcodes).filter(([, glyph]) => glyph)
 
   // Iterates the real table, so every entry is exercised and a new entry is covered
   // automatically. A value carrying ASCII letters would inject a word into the document,
   // and an empty one would strand the wrapper it sat in for stripEmptyTags to delete.
-  it.each(glyphEntries)('should map %s to a bare glyph', (_shortcode, glyph) => {
+  it.each(glyphCases)('should map %s to a bare glyph', (_shortcode, glyph) => {
     expect(glyph).not.toBe('')
     expect(glyph).not.toMatch(asciiLetterRegex)
   })

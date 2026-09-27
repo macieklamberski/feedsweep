@@ -52,7 +52,7 @@ describeForEachParser('nbbcEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    const markedCodes: Array<string> = [
+    const markedCodeCases: Array<string> = [
       '&gt;;)',
       'O:)',
       '^_^',
@@ -62,7 +62,7 @@ describeForEachParser('nbbcEmojiResolver', (parseHtml) => {
       'o.O',
     ]
 
-    it.each(markedCodes)('should mark the %s code on a renamed file', async (code) => {
+    it.each(markedCodeCases)('should mark the %s code on a renamed file', async (code) => {
       const value = html`
         <p>
           <img

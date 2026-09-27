@@ -18,8 +18,13 @@ export const nbbcEmojiResolver: EmojiResolver = {
   selector: smilieSelector,
   extract: (element) => {
     const src = element.getAttribute('src') ?? ''
+
     // A sprite's base64 can contain `/`, leaving a stem that matches a name by accident.
-    const glyph = src.startsWith('data:') ? undefined : nbbcEmojiNames.get(getNameStem(src))
+    if (src.startsWith('data:')) {
+      return
+    }
+
+    const glyph = nbbcEmojiNames.get(getNameStem(src))
 
     if (glyph === undefined) {
       return
