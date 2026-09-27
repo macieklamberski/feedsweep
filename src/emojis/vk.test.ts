@@ -47,6 +47,13 @@ describeForEachParser('vkEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should mark an image whose bytes spell a character with no emoji picture', async () => {
+    const value = '<p><img alt="" src="https://vk.com/emoji/e/41.png"></p>'
+    const expected = '<p><img data-emoji="" alt="" src="https://vk.com/emoji/e/41.png"></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should decode the double-density file by the bytes before its suffix', async () => {
     const value = '<p><img alt="?" src="https://vk.com/emoji/e/f09f9882_2x.png"></p>'
     const expected = '<p>😂</p>'
@@ -91,6 +98,14 @@ describeForEachParser('vkEmojiResolver', (parseHtml) => {
     it('should decode the double-density file', async () => {
       const value = '<p><img alt="" src="https://vk.com/images/emoji/D83DDE0A_2x.png"></p>'
       const expected = '<p>😊</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark a file whose name carries an unknown suffix', async () => {
+      const value = '<p><img alt="" src="https://vk.com/images/emoji/D83DDE0A_3x.png"></p>'
+      const expected =
+        '<p><img data-emoji="" alt="" src="https://vk.com/images/emoji/D83DDE0A_3x.png"></p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
