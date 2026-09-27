@@ -50,4 +50,26 @@ describeForEachParser('tinymceEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
   })
+
+  describe('older copies (/plugins/emotions/images/)', () => {
+    it('should replace a stock face', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/wp-includes/js/tinymce/plugins/emotions/images/smiley-smile.gif"
+            alt="Sourire"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml('<p>🙂</p>')
+    })
+
+    it('should leave a board file with an unknown name untouched', async () => {
+      const value =
+        '<p><img src="https://example.com/tinymce/plugins/emotions/images/b2.gif" alt="emoticone"></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
 })
