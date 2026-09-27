@@ -77,9 +77,17 @@ const classicCodes: Record<string, string> = {
   colonthree: ':3',
   kiki: '^_^',
   like: '(y)',
+  robot: ':|]',
+  shark: '(^^^)',
+  penguin: '<(")',
+  putnam: ':putnam:',
+  42: ':42:',
+  poop: ':poop:',
 }
 
-const classicClassRegex = /(?:^|\s)emoticon_([a-z0-9]+)(?:\s|$)/
+const classicNames = Object.keys(classicCodes)
+// Only Facebook's own names, since other widgets name classes like `emoticon_box` the same way.
+const classicClassRegex = new RegExp(`(?:^|\\s)emoticon_(${classicNames.join('|')})(?:\\s|$)`)
 const textClassSelector = 'span[class~="emoticon_text"]'
 // Pasted posts also wrap whole paragraphs of prose in the fallback class.
 const maxFallbackLength = 40
@@ -88,11 +96,12 @@ const maxFallbackLength = 40
 // with the code in its title. The class also rides on spans pasted around whole paragraphs.
 export const facebookClassicEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: `span[class*="emoticon_"]:not(${textClassSelector})`,
+  selector: classicNames.map((name) => `span[class~="emoticon_${name}"]`).join(', '),
   extract: (element) => {
     const name = attr(element, 'class')?.match(classicClassRegex)?.[1]
 
-    if (!name) {
+    // The class also rides on wrappers around pictures, which replacing would delete.
+    if (!name || element.querySelector(':not(span)')) {
       return
     }
 

@@ -255,11 +255,39 @@ describeForEachParser('facebookClassicEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should keep an unmapped name as fallback text', async () => {
-    const value = '<p><span class="emoticon emoticon_shocked"></span></p>'
-    const expected = '<p><span data-emoji="">shocked</span></p>'
+  it('should keep a code no glyph maps as fallback text', async () => {
+    const value = '<p><span class="emoticon emoticon_robot"></span></p>'
+    const expected = '<p><span data-emoji="">:|]</span></p>'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a span whose class names no Facebook emoticon untouched', async () => {
+    const value = '<p><span class="emoticon_wrapper"></span></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a wrapper around a picture untouched', async () => {
+    const value = html`
+      <p><span class="emoticon_box"><img
+          src="https://example.com/photo.jpg"
+          alt="A photo"
+        ></span></p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave an emoticon class wrapping a picture untouched', async () => {
+    const value = html`
+      <p><span class="emoticon emoticon_smile"><img
+          src="https://example.com/photo.jpg"
+          alt="A photo"
+        ></span></p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 
   it('should replace the emoticon and its sibling holding the code with the glyph', async () => {
