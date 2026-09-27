@@ -171,6 +171,7 @@ import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '..
 import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
 import { bitrixEmojiResolver } from '../emojis/bitrix.js'
+import { boardgamegeekEmojiResolver } from '../emojis/boardgamegeek.js'
 import { cocologEmojiResolver } from '../emojis/cocolog.js'
 import { discordEmojiResolver } from '../emojis/discord.js'
 import { discourseEmojiResolver } from '../emojis/discourse.js'
@@ -510,6 +511,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   fc2EmojiResolver,
   discourseEmojiResolver,
   moodleEmojiResolver,
+  boardgamegeekEmojiResolver,
   genericCharacterEmojiResolver,
   // After every engine, since TypePad, Yahoo and others put the emoticon class on their own sets.
   smiliesEmoticonEmojiResolver,
