@@ -205,6 +205,7 @@ import { livedoorEmojiResolver } from '../emojis/livedoor.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
 import { maxEmojiResolver } from '../emojis/max.js'
 import { monalisaEmojiResolver } from '../emojis/monalisa.js'
+import { moodleEmojiResolver } from '../emojis/moodle.js'
 import { nbbcEmojiResolver } from '../emojis/nbbc.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
 import { punbbEmojiResolver } from '../emojis/punbb.js'
@@ -508,6 +509,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   jugemEmojiResolver,
   fc2EmojiResolver,
   discourseEmojiResolver,
+  moodleEmojiResolver,
   genericCharacterEmojiResolver,
   // After every engine, since TypePad, Yahoo and others put the emoticon class on their own sets.
   smiliesEmoticonEmojiResolver,
