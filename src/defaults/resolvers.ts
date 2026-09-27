@@ -198,6 +198,7 @@ import { githubElementEmojiResolver, githubImageEmojiResolver } from '../emojis/
 import { gitlabEmojiResolver } from '../emojis/gitlab.js'
 import { gmailEmojiResolver } from '../emojis/gmail.js'
 import { greensmiliesEmojiResolver } from '../emojis/greensmilies.js'
+import { homepagingEmojiResolver } from '../emojis/homepaging.js'
 import { invisionEmojiResolver } from '../emojis/invision.js'
 import { jeuxvideoEmojiResolver } from '../emojis/jeuxvideo.js'
 import { jforumEmojiResolver } from '../emojis/jforum.js'
@@ -524,6 +525,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   dropboxEmojiResolver,
   gmailEmojiResolver,
   okEmojiResolver,
+  homepagingEmojiResolver,
   telegramImageEmojiResolver,
   vkEmojiResolver,
   maxEmojiResolver,
