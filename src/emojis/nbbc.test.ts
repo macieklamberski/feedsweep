@@ -43,6 +43,15 @@ describeForEachParser('nbbcEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    // Without the class and a code alt, the file name alone says which face it is.
+    it('should mark a face whose image lost its class', async () => {
+      const value = '<p><img src="https://example.com/nbbc/smileys/bigeyes.gif" alt=""></p>'
+      const expected =
+        '<p><img data-emoji="" src="https://example.com/nbbc/smileys/bigeyes.gif" alt=""></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     const markedCodes: Array<string> = [
       '&gt;;)',
       'O:)',
