@@ -21,8 +21,11 @@ export const wordpressEmojiResolver: EmojiResolver = {
   selector: [classSelector, ...hosts.map((host) => `img[src*="${host}" i]`)].join(', '),
   extract: (element) => {
     // A broken paste nests an emoji's markup inside another image's alt, which hands the class to
-    // a real picture, often an Instagram photo.
-    if (element.getAttribute('alt')?.trimStart().startsWith('<img')) {
+    // a real picture, often an Instagram photo. An outer file that is an emoji itself stays one.
+    const src = element.getAttribute('src')?.toLowerCase() ?? ''
+    const isEmojiFile = hosts.some((host) => src.includes(host))
+
+    if (!isEmojiFile && element.getAttribute('alt')?.trimStart().startsWith('<img')) {
       return
     }
 
