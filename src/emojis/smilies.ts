@@ -4,9 +4,7 @@ import { attr } from '../utils/dom.js'
 import {
   type EmojiGlyph,
   type EmojiNameTable,
-  getFileStem,
   getNameStem,
-  glyphFromCodepoints,
   mergeEmojiNames,
   rendersNothing,
   resolveEmojiImage,
@@ -355,10 +353,6 @@ const markerSelectors = [
   // fixLazyImages promotes to src before convertEmojis runs.
   'img[data-emoticon]', // Invision Power Board and IPS
   'img[class~="ipsemoji" i]', // IPS 4
-  'img[class~="lia-image-emoji" i]', // Khoros
-  // Khoros, as in `emoticon emoticon-smileywink`. Case-sensitive, since Windows Live Writer's
-  // `wlEmoticon-smile` has no name table.
-  'img[class*="emoticon-"]',
   'img[class~="bbcode_smiley" i]', // Kunena, NBBC
   'img[class~="spsmiley" i]', // Simple:Press
   'img[class~="smiley-content" i]', // Drupal Smileys
@@ -385,10 +379,8 @@ const directories = [
 ]
 const directorySelector = directories.map((path) => `img[src*="${path}" i]`).join(', ')
 
-// Whether an image carries a class several forum engines share or sits in a directory they share.
-export const isSmilie = (element: Element): boolean => {
-  return element.matches(`${markerSelector}, ${directorySelector}`)
-}
+// The images carrying a class several forum engines share or sitting in a directory they share.
+export const smilieSelector = `${markerSelector}, ${directorySelector}`
 
 // An engine's own names, read only under the directory it serves them from, since other engines
 // ship other drawings under the same names.
@@ -636,32 +628,6 @@ const getEngineGlyph = (src: string): EmojiGlyph | undefined => {
   return nbbcEmojiNames.get(stem)
 }
 
-// Samsung's Khoros set files each face as `<n>.<name>_<codepoints>`, as in `2.winking-face_1f609`,
-// and a skin tone appends the modifier's name and codepoint after the full sequence.
-const numberedNameRegex = /^[0-9]+\.([a-z-]+)_/
-
-const getNumberedGlyph = (src: string): EmojiGlyph | undefined => {
-  const stem = getFileStem(src).toLowerCase()
-  const name = stem.match(numberedNameRegex)?.[1]
-
-  if (!name) {
-    return
-  }
-
-  // Samsung's own smiling face is filed under the codepoint of 🃏.
-  if (name === 'samsung') {
-    return false
-  }
-
-  for (const part of stem.split('_')) {
-    const glyph = glyphFromCodepoints(part)
-
-    if (glyph) {
-      return glyph
-    }
-  }
-}
-
 // Forum smilie images and CSS-sprite emoji, which render oversized or as nothing without site CSS.
 export const smiliesEmojiResolver: EmojiResolver = {
   kind: 'emoji',
@@ -677,7 +643,7 @@ export const smiliesEmojiResolver: EmojiResolver = {
       return
     }
 
-    const engineGlyph = getNumberedGlyph(src) ?? getEngineGlyph(src)
+    const engineGlyph = getEngineGlyph(src)
 
     return resolveEmojiImage(element, {
       isStrong,

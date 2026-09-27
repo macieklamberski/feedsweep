@@ -190,7 +190,7 @@ import { gmailEmojiResolver } from '../emojis/gmail.js'
 import { jiveEmojiResolver } from '../emojis/jive.js'
 import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
 import { jugemEmojiResolver } from '../emojis/jugem.js'
-import { khorosEmojiResolver } from '../emojis/khoros.js'
+import { khorosEmojiResolver, khorosImageEmojiResolver } from '../emojis/khoros.js'
 import { liferayEmojiResolver } from '../emojis/liferay.js'
 import { livedoorEmojiResolver } from '../emojis/livedoor.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
@@ -441,6 +441,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   bitrixEmojiResolver,
   // Ahead of smilies, whose forum names draw Liferay's smile.gif as 🙂.
   liferayEmojiResolver,
+  khorosImageEmojiResolver,
   webWizEmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,
