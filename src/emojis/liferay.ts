@@ -28,12 +28,11 @@ export const liferayEmojiResolver: EmojiResolver = {
   selector: 'img[alt="emoticon"][src*="/emoticons/"]',
   extract: (element) => {
     const stem = getFileStem(element.getAttribute('src') ?? '').toLowerCase()
-    const glyph = liferayEmojiNames.get(stem)
-
-    if (glyph === undefined) {
+    // Every name here is drawn as Liferay's own face, so a known one is only marked.
+    if (!liferayEmojiNames.has(stem)) {
       return
     }
 
-    return glyph ? { glyph } : { custom: true }
+    return { custom: true }
   },
 }
