@@ -1,12 +1,10 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
-import { attr } from '../utils/dom.js'
 import {
   type EmojiGlyph,
   type EmojiNameTable,
   getNameStem,
   mergeEmojiNames,
-  rendersNothing,
   resolveEmojiImage,
 } from '../utils/emojis.js'
 
@@ -345,8 +343,6 @@ const markerSelectors = [
   'img[class~="smilies" i]', // phpBB
   'img[class~="smiley" i]', // SMF, DokuWiki
   'img[class~="smilie" i]', // MyBB, XenForo
-  'img[class^="mcesmilie" i]', // XenForo 1.x numbers them, as in `mceSmilieSprite mceSmilie7`
-  'img[class*=" mcesmilie" i]',
   'img[class~="e-emoticon" i]', // e107
   'img[class~="spsmiley" i]', // Simple:Press
   'img[class~="smiley-content" i]', // Drupal Smileys
@@ -394,18 +390,6 @@ export const getDirectoryGlyph = (
 
   return names.get(getNameStem(path))
 }
-
-// XenForo boards' additions to the stock set.
-const xenforoEmojiNames = toMap<EmojiGlyph>({
-  happy: false,
-  wave: false,
-  banghead: false,
-  angelic: false,
-  woot: false,
-  dance: false,
-  welcome: false,
-  '1': false,
-})
 
 // SMF boards' additions to the stock set.
 const smfEmojiNames = toMap<EmojiGlyph>({
@@ -463,7 +447,6 @@ const boardEmojiNames = toMap<EmojiGlyph>({
 
 // Names each engine ships under its own directory, where other engines ship other drawings.
 const engineEmojiNames: Array<[string, Map<string, EmojiGlyph>]> = [
-  ['/xenforo/smilies/', xenforoEmojiNames],
   ['/smileys/', smfEmojiNames],
   ['/images/smilies/', boardEmojiNames],
 ]
@@ -475,12 +458,6 @@ const nbbcEmojiNames = toMap<EmojiGlyph>({
   bigeyes: false,
   worry: false,
   lookleft: false,
-})
-
-// XenForo 2's shortnames that other engines draw as another face: `o_O` is skeptical on WP
-// Monalisa and a wow face on Menéame, and XenForo draws it dizzy.
-const xenforoShortnames = toMap<EmojiGlyph>({
-  o_o: false,
 })
 
 const getEngineGlyph = (src: string): EmojiGlyph | undefined => {
@@ -501,27 +478,23 @@ const getEngineGlyph = (src: string): EmojiGlyph | undefined => {
   return nbbcEmojiNames.get(stem)
 }
 
-// Forum smilie images and CSS-sprite emoji, which render oversized or as nothing without site CSS.
+// Forum smilie images, which render oversized without the site's CSS. An engine with names or
+// signals of its own has a resolver of its own ahead of this one.
 export const smiliesEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: `${markerSelector}, ${directorySelector}, img[data-shortname]`,
+  selector: smilieSelector,
   extract: (element) => {
-    // XenForo paints its sprite sheet behind a 1x1 transparent GIF named by data-shortname.
     const src = element.getAttribute('src') ?? ''
-    const shortname = attr(element, 'data-shortname')?.toLowerCase()
-    const isSprite = !!shortname && rendersNothing(src)
-    const isStrong = isSprite || element.matches(markerSelector)
+    const isStrong = element.matches(markerSelector)
 
     if (!isStrong && !element.matches(directorySelector)) {
       return
     }
 
-    const engineGlyph = getEngineGlyph(src)
-
     return resolveEmojiImage(element, {
       isStrong,
       names: smiliesEmojiNames,
-      glyph: engineGlyph ?? xenforoShortnames.get(shortname ?? ''),
+      glyph: getEngineGlyph(src),
     })
   },
 }

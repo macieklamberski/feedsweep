@@ -214,6 +214,7 @@ import { vkEmojiResolver } from '../emojis/vk.js'
 import { webWizEmojiResolver } from '../emojis/webwiz.js'
 import { weiboEmojiResolver } from '../emojis/weibo.js'
 import { wordpressEmojiResolver } from '../emojis/wordpress.js'
+import { xenforoEmojiResolver } from '../emojis/xenforo.js'
 import { yahooEmojiResolver } from '../emojis/yahoo.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { ghostMediaResolver } from '../media/ghost.js'
@@ -451,6 +452,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   forumotionEmojiResolver,
   kunenaEmojiResolver,
   invisionEmojiResolver,
+  xenforoEmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,
   yahooEmojiResolver,
