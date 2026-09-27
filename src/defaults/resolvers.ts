@@ -207,6 +207,7 @@ import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
 import { jugemEmojiResolver } from '../emojis/jugem.js'
 import { khorosEmojiResolver, khorosImageEmojiResolver } from '../emojis/khoros.js'
 import { kunenaEmojiResolver } from '../emojis/kunena.js'
+import { lexicalEmojiResolver } from '../emojis/lexical.js'
 import { liferayEmojiResolver } from '../emojis/liferay.js'
 import { livedoorEmojiResolver } from '../emojis/livedoor.js'
 import { liveinternetEmojiResolver } from '../emojis/liveinternet.js'
@@ -484,6 +485,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   whatsappEmojiResolver,
   wordpressElementEmojiResolver,
   mozillaEmojiResolver,
+  lexicalEmojiResolver,
   tiptapEmojiResolver,
   froalaElementEmojiResolver,
   // Ahead of smilies, whose /smiles/ directory would read a Bitrix file by its filename first.
