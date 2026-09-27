@@ -24,12 +24,6 @@ const xenforoEmojiNames = toMap<EmojiGlyph>({
   '1': false,
 })
 
-// XenForo 2's shortnames that other engines draw as another face: `o_O` is skeptical on WP
-// Monalisa and a wow face on Menéame, and XenForo draws it dizzy.
-const xenforoShortnames = toMap<EmojiGlyph>({
-  o_o: false,
-})
-
 // XenForo's smilies, and the CSS sprites it paints behind a blank image named by data-shortname,
 // which render as nothing without the site's CSS.
 export const xenforoEmojiResolver: EmojiResolver = {
@@ -37,7 +31,7 @@ export const xenforoEmojiResolver: EmojiResolver = {
   selector: `${markerSelector}, img[data-shortname], img[src*="${directory}" i]`,
   extract: (element) => {
     const src = element.getAttribute('src') ?? ''
-    const shortname = attr(element, 'data-shortname')?.toLowerCase()
+    const shortname = attr(element, 'data-shortname')
     const isBlank = src.endsWith(spacerPath)
     const isSprite = !!shortname && (isBlank || rendersNothing(src))
     const isStrong = isSprite || element.matches(markerSelector)
@@ -46,8 +40,7 @@ export const xenforoEmojiResolver: EmojiResolver = {
       return
     }
 
-    const glyph =
-      getDirectoryGlyph(src, directory, xenforoEmojiNames) ?? xenforoShortnames.get(shortname ?? '')
+    const glyph = getDirectoryGlyph(src, directory, xenforoEmojiNames)
 
     return resolveEmojiImage(element, { isStrong, names: smiliesEmojiNames, glyph, isBlank })
   },
