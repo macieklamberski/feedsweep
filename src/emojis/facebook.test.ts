@@ -49,6 +49,145 @@ describeForEachParser('facebookEmojiResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('facebookElementEmojiResolver', (parseHtml) => {
+  const { transform, transformKeeping } = emojiConverters(parseHtml)
+
+  it('should decode the codepoint filename of a painted span', async () => {
+    const value = html`
+      <p>Congrats
+        <span
+          class="_6qdm"
+          style="background-image: url(&quot;https://static.xx.fbcdn.net/images/emoji.php/v9/fe5/1.5/16/1f389.png&quot;); height: 16px; width: 16px;"
+        ></span>
+      </p>
+    `
+    const expected = '<p>Congrats 🎉</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should decode a joined sequence on a span marked as an emoji', async () => {
+    const value = html`
+      <p>
+        <span
+          class="x1xsqp64 xiy17q3 x1o6pynw x19co3pv xdj266r xjn30re xat24cr x1hb08if x2b8uid"
+          data-emoji-size="20"
+          data-testid="emoji"
+          style="background-image: url(&quot;https://static.xx.fbcdn.net/images/emoji.php/v9/t24/2/20/1f64b_200d_2642.png&quot;); background-size: 20px 20px;"
+        ></span>
+      </p>
+    `
+    const expected = '<p>🙋‍♂</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should decode a keycap', async () => {
+    const value = html`
+      <p>
+        <span
+          data-testid="emoji"
+          style="background-image: url(&quot;https://static.xx.fbcdn.net/images/emoji.php/v9/tf6/1/16/35_20e3.png&quot;); background-size: 16px 16px;"
+        ></span>
+      </p>
+    `
+    const expected = '<p>5⃣</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should decode a painted i element from the main host', async () => {
+    const value = html`
+      <p>
+        <i
+          class="_3kkw _4-k1"
+          style="background-image: url(https://www.facebook.com/images/emoji.php/v5/u87/1/16/1f340.png);"
+        ></i>
+      </p>
+    `
+    const expected = '<p>🍀</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a span holding its own glyph as text', async () => {
+    const value = html`
+      <p>
+        <span
+          class="_6qdm"
+          style="height: 16px; width: 16px; background-image: url('https://static.xx.fbcdn.net/images/emoji.php/v9/tb9/1/16/1f919.png')"
+        >🤙</span>
+      </p>
+    `
+    const expected = '<p>🤙</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep the picture as an image when the filename names no emoji', async () => {
+    const value = html`
+      <p>
+        <span
+          class="_6qdm"
+          style="background-image: url(https://static.xx.fbcdn.net/images/emoji.php/v9/t1/1/16/2019.png);"
+        ></span>
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          src="https://static.xx.fbcdn.net/images/emoji.php/v9/t1/1/16/2019.png"
+          data-emoji=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a span holding text other than an emoji untouched', async () => {
+    const value = html`
+      <p>
+        <span
+          data-testid="emoji"
+          style="background-image: url(&quot;https://static.xx.fbcdn.net/images/emoji.php/v9/t4c/1/16/1f642.png&quot;);"
+        >....</span>
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a background from another host untouched', async () => {
+    const value = html`
+      <p>
+        <span
+          class="_6qdm"
+          style="background-image: url(https://example.com/images/emoji.php/v9/t1/1/16/1f642.png);"
+        ></span>
+      </p>
+    `
+
+    expect(await transformKeeping(value)).toEqualHtml(value)
+  })
+
+  it('should leave an emoji span with no background to the image it wraps', async () => {
+    const value = html`
+      <p>
+        <span data-testid="emoji">
+          <img
+            src="https://static.xx.fbcdn.net/images/emoji.php/v9/t4/1/16/1f600.png"
+            alt="😀"
+          >
+        </span>
+      </p>
+    `
+    const expected = '<p><span data-testid="emoji">😀</span></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})
+
 describeForEachParser('facebookClassicEmojiResolver', (parseHtml) => {
   const { transform } = emojiConverters(parseHtml)
 

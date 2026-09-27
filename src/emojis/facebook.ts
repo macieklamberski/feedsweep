@@ -1,11 +1,15 @@
 import type { EmojiResolver } from '../types.js'
 import { attr, isElement } from '../utils/dom.js'
 import {
+  getFileStem,
+  glyphFromCodepoints,
   glyphFromShortcode,
+  isEmojiShaped,
   noEmojiNames,
   resolveEmojiElement,
   resolveEmojiImage,
 } from '../utils/emojis.js'
+import { bgImage } from '../utils/styles.js'
 
 const hosts = [
   'fbcdn.net/images/emoji.php/', // The static CDN
@@ -18,6 +22,34 @@ export const facebookEmojiResolver: EmojiResolver = {
   selector: hosts.map((host) => `img[src*="${host}" i]`).join(', '),
   extract: (element) => {
     return resolveEmojiImage(element, { isStrong: true, names: noEmojiNames })
+  },
+}
+
+// A pasted post's emoji as an empty span or `i` painted with the same file as its background,
+// which renders blank once the site's CSS is gone.
+export const facebookElementEmojiResolver: EmojiResolver = {
+  kind: 'emoji',
+  selector: 'span[style*="/images/emoji.php/" i], i[style*="/images/emoji.php/" i]',
+  extract: (element) => {
+    const url = bgImage(element)
+
+    if (!url || !hosts.some((host) => url.toLowerCase().includes(host))) {
+      return
+    }
+
+    const text = element.textContent?.trim()
+
+    if (text && !isEmojiShaped(text)) {
+      return
+    }
+
+    if (text) {
+      return { glyph: text }
+    }
+
+    const glyph = glyphFromCodepoints(getFileStem(url).toLowerCase())
+
+    return glyph ? { glyph } : { image: url }
   },
 }
 

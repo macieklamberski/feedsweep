@@ -313,6 +313,20 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should replace a Facebook emoji painted as a span background', async () => {
+    const value = html`
+      <p>Congrats
+        <span
+          class="_6qdm"
+          style="background-image: url(&quot;https://static.xx.fbcdn.net/images/emoji.php/v9/fe5/1.5/16/1f389.png&quot;); height: 16px; width: 16px;"
+        ></span>
+        to the team.</p>
+    `
+    const expected = '<p>Congrats 🎉 to the team.</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // A post pasted from the classic site paints its emoticons from a sprite sheet the feed does
   // not load, leaving empty spans that would be deleted as empty tags.
   it('should replace a classic Facebook emoticon with its character', async () => {
