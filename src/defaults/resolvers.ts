@@ -215,6 +215,7 @@ import { maxEmojiResolver } from '../emojis/max.js'
 import { mixiEmojiResolver } from '../emojis/mixi.js'
 import { monalisaEmojiResolver } from '../emojis/monalisa.js'
 import { moodleEmojiResolver } from '../emojis/moodle.js'
+import { mozillaEmojiResolver } from '../emojis/mozilla.js'
 import { nbbcEmojiResolver } from '../emojis/nbbc.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
 import { okEmojiResolver } from '../emojis/ok.js'
@@ -481,6 +482,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   telegramElementEmojiResolver,
   whatsappEmojiResolver,
   wordpressElementEmojiResolver,
+  mozillaEmojiResolver,
   froalaElementEmojiResolver,
   // Ahead of smilies, whose /smiles/ directory would read a Bitrix file by its filename first.
   bitrixEmojiResolver,
