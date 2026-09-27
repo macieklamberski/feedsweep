@@ -216,6 +216,7 @@ import { monalisaEmojiResolver } from '../emojis/monalisa.js'
 import { moodleEmojiResolver } from '../emojis/moodle.js'
 import { nbbcEmojiResolver } from '../emojis/nbbc.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
+import { pivotxEmojiResolver } from '../emojis/pivotx.js'
 import { pixnetEmojiResolver } from '../emojis/pixnet.js'
 import { punbbEmojiResolver } from '../emojis/punbb.js'
 import { rakutenEmojiResolver } from '../emojis/rakuten.js'
@@ -540,6 +541,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   moodleEmojiResolver,
   boardgamegeekEmojiResolver,
   rhymixEmojiResolver,
+  pivotxEmojiResolver,
   cuteeditorEmojiResolver,
   shinobiEmojiResolver,
   liveinternetEmojiResolver,
