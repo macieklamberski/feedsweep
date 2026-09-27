@@ -272,6 +272,12 @@ export const cocologEmojiResolver: EmojiResolver = {
     'img[src*="/wp-content/plugins/typepad-emoji-for-tinymce/icons/" i]', // TypePad's set in WordPress
     'img[src*="/plugins/EmoticonButton/images/emoticons/" i]', // The same set in Movable Type
     'img[src*="/plugins/MTEntryFlex/fckeditor/editor/images/smiley/typepad/" i]', // Movable Type
+    'img[src*="/plugins/mobilepictogram/images/" i]', // Movable Type's CKEditor pictograms
+    // TypePad's partner blogs, under a versioned directory like `/.shared-asp09:v3.5/`.
+    'img[src*="/.shared-" i][src*="/images/emoticon/" i]',
+    'img[src*="/_administrator/editor/FCKeditor/editor/images/emoji/" i]', // cloud-line's CMS
+    'img[src*="/plugins/WP-Emoji2" i][src*="/images/" i]', // The WP-Emoji2 plugin for WordPress
+    'img[src*="/plugins/WP-Emoji/images/" i]',
     assetSelector, // TypePad
   ].join(', '),
   extract: (element) => {

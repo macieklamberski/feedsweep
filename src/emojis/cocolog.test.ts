@@ -167,4 +167,18 @@ describeForEachParser('cocologEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(value)
   })
+
+  const copyCases: Array<string> = [
+    'https://example.com/mt-static/plugins/CKEditor/ckeditor/plugins/mobilepictogram/images/smile.gif',
+    'https://example.com/.shared-asp09:v3.5/images/emoticon/art.gif',
+    'https://example.com/6mdojo/_administrator/editor/FCKeditor/editor/images/emoji/sign03.gif',
+    'https://example.com/wp/wp-content/plugins/WP-Emoji2-master/images/building.gif',
+    'https://example.com/wp-content/plugins/WP-Emoji/images/shine.gif',
+  ]
+
+  it.each(copyCases)('should mark the pictogram at %s', async (src) => {
+    const value = `<p><img src="${src}" alt=""></p>`
+
+    expect(await transform(value)).toEqualHtml(`<p><img src="${src}" alt="" data-emoji=""></p>`)
+  })
 })
