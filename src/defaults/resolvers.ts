@@ -172,6 +172,7 @@ import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
 import { bitrixEmojiResolver } from '../emojis/bitrix.js'
 import { boardgamegeekEmojiResolver } from '../emojis/boardgamegeek.js'
+import { btblogEmojiResolver } from '../emojis/btblog.js'
 import { cocologEmojiResolver } from '../emojis/cocolog.js'
 import { discordEmojiResolver } from '../emojis/discord.js'
 import { discourseEmojiResolver } from '../emojis/discourse.js'
@@ -519,6 +520,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   moodleEmojiResolver,
   boardgamegeekEmojiResolver,
   rhymixEmojiResolver,
+  btblogEmojiResolver,
   pixnetEmojiResolver,
   genericCharacterEmojiResolver,
   // After every engine, since TypePad, Yahoo and others put the emoticon class on their own sets.
