@@ -25,15 +25,27 @@ export const facebookEmojiResolver: EmojiResolver = {
   },
 }
 
+const emojiPath = '/images/emoji.php/'
+// The CDN serves from subdomains like `static.xx.fbcdn.net`, older pastes from the main host.
+const emojiHosts = ['fbcdn.net', 'www.facebook.com']
+// The host is read up to the path, not parsed, since pasted styles mangle the scheme, as in
+// `https: //static.xx.fbcdn.net/…`.
+const emojiHostRegex = /\/\/([a-z0-9.-]+)\/images\/emoji\.php\//i
+
 // A pasted post's emoji as an empty span or `i` painted with the same file as its background,
 // which renders blank once the site's CSS is gone.
 export const facebookElementEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: 'span[style*="/images/emoji.php/" i], i[style*="/images/emoji.php/" i]',
+  selector: `span[style*="${emojiPath}" i], i[style*="${emojiPath}" i]`,
   extract: (element) => {
     const url = bgImage(element)
+    const host = url?.match(emojiHostRegex)?.[1].toLowerCase()
 
-    if (!url || !hosts.some((host) => url.toLowerCase().includes(host))) {
+    if (!url || !host) {
+      return
+    }
+
+    if (!emojiHosts.some((emojiHost) => host === emojiHost || host.endsWith(`.${emojiHost}`))) {
       return
     }
 

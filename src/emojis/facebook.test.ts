@@ -171,6 +171,33 @@ describeForEachParser('facebookElementEmojiResolver', (parseHtml) => {
     expect(await transformKeeping(value)).toEqualHtml(value)
   })
 
+  it('should decode a background whose pasted style split the scheme', async () => {
+    const value = html`
+      <p>
+        <span
+          class="_6qdm"
+          style="background-image: url(&quot; https: //static.xx.fbcdn.net/images/emoji.php/v9/f57/1/16/1f609.png&quot; );"
+        ></span>
+      </p>
+    `
+    const expected = '<p>😉</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a background whose path only names the CDN untouched', async () => {
+    const value = html`
+      <p>
+        <span
+          class="_6qdm"
+          style="background-image: url(https://example.com/fbcdn.net/images/emoji.php/v9/t1/1/16/1f642.png);"
+        ></span>
+      </p>
+    `
+
+    expect(await transformKeeping(value)).toEqualHtml(value)
+  })
+
   it('should leave an emoji span with no background to the image it wraps', async () => {
     const value = html`
       <p>
