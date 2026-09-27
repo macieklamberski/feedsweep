@@ -402,35 +402,6 @@ export const getDirectoryGlyph = (
   return names.get(getNameStem(path))
 }
 
-// Forumotion's shared set, served from its own host for every board it runs.
-const forumotionEmojiNames = toMap<EmojiGlyph>({
-  icon_cheers: false,
-  icon_bounce: false,
-  icon_flower: false,
-  affraid: false,
-  herz: false,
-  icon_rr: false,
-  icon_santa: false,
-  fresse: false,
-  icon_sunny: false,
-  star3: false,
-  icon_study: false,
-  suspect: false,
-  icon_king: false,
-  icon_scratch: false,
-  icon_basketball: false,
-  icon_pale: false,
-  icon_pirat: false,
-  icon_tongue: false,
-  icon_rabbit: false,
-  icon_cyclops: false,
-  drunken_smilie: false,
-  icon_geek: false,
-  icon_farao: false,
-  icon_albino: false,
-  icon_jokercolor: false,
-})
-
 // Kunena's names past the stock set, and the numbered files boards upload beside it.
 const kunenaEmojiNames = toMap<EmojiGlyph>({
   cheerful: false,
@@ -568,7 +539,6 @@ const boardEmojiNames = toMap<EmojiGlyph>({
 
 // Names each engine ships under its own directory, where other engines ship other drawings.
 const engineEmojiNames: Array<[string, Map<string, EmojiGlyph>]> = [
-  ['illiweb.com/fa/i/smiles/', forumotionEmojiNames],
   ['/media/kunena/emoticons/', kunenaEmojiNames],
   ['/uploads/emoticons/', invisionEmojiNames],
   ['/style_emoticons/', invisionEmojiNames],

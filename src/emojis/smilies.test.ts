@@ -1421,12 +1421,6 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
-
-    it('should leave a Forumotion name outside its host untouched', async () => {
-      const value = '<p><img src="https://example.com/images/smiles/herz.png" alt=""></p>'
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
   })
 
   describe('platform filename tables', () => {
