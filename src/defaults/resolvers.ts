@@ -182,7 +182,7 @@ import {
 } from '../emojis/facebook.js'
 import { fc2EmojiResolver } from '../emojis/fc2.js'
 import { froalaElementEmojiResolver, froalaImageEmojiResolver } from '../emojis/froala.js'
-import { genericEmojiResolver } from '../emojis/generic.js'
+import { genericCharacterEmojiResolver, genericEmojiResolver } from '../emojis/generic.js'
 import { githubElementEmojiResolver, githubImageEmojiResolver } from '../emojis/github.js'
 import { gitlabEmojiResolver } from '../emojis/gitlab.js'
 import { gmailEmojiResolver } from '../emojis/gmail.js'
@@ -471,6 +471,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   jugemEmojiResolver,
   fc2EmojiResolver,
   discourseEmojiResolver,
+  genericCharacterEmojiResolver,
   // Last, since the class is shared by engines whose own signals say more.
   genericEmojiResolver,
 ]

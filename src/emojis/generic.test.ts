@@ -79,3 +79,35 @@ describeForEachParser('genericEmojiResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('genericCharacterEmojiResolver', (parseHtml) => {
+  const { transform, transformKeeping } = emojiConverters(parseHtml)
+
+  it('should replace an image with no src by the character it holds', async () => {
+    const value = '<p>Hi <img class="emoji emoji1f64b" data-c="🙋"></p>'
+    const expected = '<p>Hi 🙋</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should decode the codepoint class when the character is missing', async () => {
+    const value = '<p>Hi <img class="emoji emoji2600-fe0f" data-c=""></p>'
+    const expected = '<p>Hi ☀️</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave an image with a src to the generic resolver', async () => {
+    const value = html`
+      <p>
+        <img
+          class="emoji emoji1f64b"
+          data-c="x"
+          src="https://example.com/assets/emoji/party_parrot.gif"
+        >
+      </p>
+    `
+
+    expect(await transformKeeping(value)).toEqualHtml(value)
+  })
+})
