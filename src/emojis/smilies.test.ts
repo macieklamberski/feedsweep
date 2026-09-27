@@ -227,6 +227,21 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should mark the Serendipity anger smilie', async () => {
+      const value = html`
+        <p>
+          <img src="http://example.com/templates/default/img/emoticons/anger.png" alt="">
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img data-emoji="" src="http://example.com/templates/default/img/emoticons/anger.png" alt="">
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should mark a site-custom smilie by its :)) alt', async () => {
       const value = '<p><img src="http://example.com/smilies/yahoo_laughloud.gif" alt=":))"></p>'
       const expected =

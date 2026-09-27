@@ -211,7 +211,7 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
       haha: '🤣',
       whistle: false,
       shame: false, // Sits between two glyphs already used for near-synonyms
-      // anger: the same, and a false entry would stop Vanilla's gemoji anger.png becoming 💢.
+      anger: false, // The same
       // No Unicode counterpart.
       grmpf: false,
       grrr: false,

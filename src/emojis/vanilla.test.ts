@@ -32,6 +32,7 @@ describeForEachParser('vanillaEmojiResolver', (parseHtml) => {
       ['sleepy', '😪'],
       ['smile', '😄'],
       ['smiley', '😃'],
+      ['anger', '💢'],
     ]
 
     it.each(gemojiNameCases)('should replace %s by its gemoji name', async (name, glyph) => {
