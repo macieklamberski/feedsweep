@@ -353,7 +353,6 @@ const markerSelectors = [
   // fixLazyImages promotes to src before convertEmojis runs.
   'img[data-emoticon]', // Invision Power Board and IPS
   'img[class~="ipsemoji" i]', // IPS 4
-  'img[class~="bbcode_smiley" i]', // Kunena, NBBC
   'img[class~="spsmiley" i]', // Simple:Press
   'img[class~="smiley-content" i]', // Drupal Smileys
   'img[class~="wpml_ico" i]', // WP Monalisa
@@ -401,24 +400,6 @@ export const getDirectoryGlyph = (
 
   return names.get(getNameStem(path))
 }
-
-// Kunena's names past the stock set, and the numbered files boards upload beside it.
-const kunenaEmojiNames = toMap<EmojiGlyph>({
-  cheerful: false,
-  silly: false,
-  ermm: false,
-  sideways: false,
-  kissing: false,
-  pinch: false,
-  '9': false,
-  '10': false,
-  '1': false,
-  '3': false,
-  '2': false,
-  '4': false,
-  '20': false,
-  yahoo: false,
-})
 
 // Invision boards' names past the stock set, under `uploads/emoticons` and IPB 2's
 // `style_emoticons`.
@@ -539,7 +520,6 @@ const boardEmojiNames = toMap<EmojiGlyph>({
 
 // Names each engine ships under its own directory, where other engines ship other drawings.
 const engineEmojiNames: Array<[string, Map<string, EmojiGlyph>]> = [
-  ['/media/kunena/emoticons/', kunenaEmojiNames],
   ['/uploads/emoticons/', invisionEmojiNames],
   ['/style_emoticons/', invisionEmojiNames],
   ['/xenforo/smilies/', xenforoEmojiNames],
