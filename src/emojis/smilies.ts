@@ -351,6 +351,8 @@ const markerSelectors = [
   'img[class*=" mcesmilie" i]',
   'img[class~="e-emoticon" i]', // e107
   'img[class~="bbc_emoticon" i]', // Invision Power Board and IPS
+  // Invision lazy-loads emoticons behind a spacer src with the file in data-src, which
+  // fixLazyImages promotes to src before convertEmojis runs.
   'img[data-emoticon]', // Invision Power Board and IPS
   'img[class~="ipsemoji" i]', // IPS 4
   'img[class~="lia-image-emoji" i]', // Khoros

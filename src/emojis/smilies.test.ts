@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, emojiConverters, html } from '../tests.js'
 import { mergeEmojiNames } from '../utils/emojis.js'
 import { smiliesEmojiNameTables } from './smilies.js'
@@ -322,6 +323,39 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       `
 
       expect(await transformKeeping(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('IPS / Invision lazy emoticon (spacer.png src + data-src)', () => {
+    it('should replace an emoticon whose alt is a shortcode', async () => {
+      const value = html`
+        <p>Thanks
+          <img
+            alt=":)"
+            src="https://example.com/forum/applications/core/interface/js/spacer.png"
+            data-src="https://example.com/forum/uploads/emoticons/fpn_smile.png"
+          >
+        </p>
+      `
+      const expected = '<p>Thanks 🙂</p>'
+
+      expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+    })
+
+    it('should resolve a stock filename behind a data-emoticon marker', async () => {
+      const value = html`
+        <p>Thanks
+          <img
+            alt=""
+            data-emoticon=""
+            src="https://example.com/applications/core/interface/js/spacer.png"
+            data-src="https://example.com/uploads/emoticons/default_wink.png"
+          >
+        </p>
+      `
+      const expected = '<p>Thanks 😉</p>'
+
+      expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
     })
   })
 
