@@ -358,7 +358,6 @@ const markerSelectors = [
   'img[class~="smiley-content" i]', // Drupal Smileys
   'img[class~="wpml_ico" i]', // WP Monalisa
   'img[class~="bb-smiley" i]', // EasyDiscuss
-  'img[smilieid]', // Discuz, vBulletin 5
 ]
 const markerSelector = markerSelectors.join(', ')
 
@@ -402,22 +401,6 @@ export const getDirectoryGlyph = (
 
   return names.get(getNameStem(path))
 }
-
-// Discuz! X's names, some as generic as `time` and `call`, so read only from its own directory.
-const discuzEmojiNames = toMap<EmojiGlyph>({
-  huffy: false,
-  titter: false,
-  sweat: false,
-  loveliness: false,
-  funk: false,
-  curse: false,
-  shutup: false,
-  hug: false,
-  victory: false,
-  time: false,
-  handshake: false,
-  call: false,
-})
 
 // Forumotion's shared set, served from its own host for every board it runs.
 const forumotionEmojiNames = toMap<EmojiGlyph>({
@@ -585,7 +568,6 @@ const boardEmojiNames = toMap<EmojiGlyph>({
 
 // Names each engine ships under its own directory, where other engines ship other drawings.
 const engineEmojiNames: Array<[string, Map<string, EmojiGlyph>]> = [
-  ['static/image/smiley/', discuzEmojiNames],
   ['illiweb.com/fa/i/smiles/', forumotionEmojiNames],
   ['/media/kunena/emoticons/', kunenaEmojiNames],
   ['/uploads/emoticons/', invisionEmojiNames],

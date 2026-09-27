@@ -174,6 +174,7 @@ import { bitrixEmojiResolver } from '../emojis/bitrix.js'
 import { cocologEmojiResolver } from '../emojis/cocolog.js'
 import { discordEmojiResolver } from '../emojis/discord.js'
 import { discourseEmojiResolver } from '../emojis/discourse.js'
+import { discuzEmojiResolver } from '../emojis/discuz.js'
 import { dropboxEmojiResolver } from '../emojis/dropbox.js'
 import { exblogEmojiResolver } from '../emojis/exblog.js'
 import {
@@ -443,6 +444,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   liferayEmojiResolver,
   khorosImageEmojiResolver,
   webWizEmojiResolver,
+  discuzEmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,
   yahooEmojiResolver,
