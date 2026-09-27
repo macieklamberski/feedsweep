@@ -155,6 +155,8 @@ const toneModifierRegex = /[\u{1f3fb}-\u{1f3ff}]/gu
 const modifierBaseRegex = /^\p{Emoji_Modifier_Base}/u
 const zeroWidthJoiner = '\u200d'
 const variationSelector = '\ufe0f'
+// 🤝 joins the two people of `people holding hands`, and only they take a tone.
+const handshake = '\u{1f91d}'
 
 // Tones 1 to 5 are the skin tone modifiers U+1F3FB to U+1F3FF. One tone colours every person in
 // the sequence, several colour them in turn, and 0 clears the tone.
@@ -168,7 +170,7 @@ export const applyTones = (glyph: string, tone: string): string => {
   let personIndex = 0
 
   const tinted = parts.map((part) => {
-    if (!modifierBaseRegex.test(part)) {
+    if (!modifierBaseRegex.test(part) || (parts.length > 1 && part === handshake)) {
       return part
     }
 

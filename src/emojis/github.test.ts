@@ -188,6 +188,17 @@ describeForEachParser('githubElementEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should skip the handshake between two people when applying tones in turn', async () => {
+      const value = html`
+        <p>
+          <g-emoji class="g-emoji" alias="people_holding_hands" tone="1 5">🧑‍🤝‍🧑</g-emoji>
+        </p>
+      `
+      const expected = '<p>🧑🏻‍🤝‍🧑🏿</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should clear the skin tone when the tone is 0', async () => {
       const value = '<p><g-emoji class="g-emoji" alias="+1" tone="0">👍🏽</g-emoji></p>'
       const expected = '<p>👍</p>'

@@ -130,6 +130,21 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should leave the handshake between two people untoned', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://forum.example.com/images/emoji/twitter/people_holding_hands/6.png?v=12"
+          class="emoji"
+          alt=":people_holding_hands:t6:"
+        >
+      </p>
+    `
+    const expected = '<p>🧑🏿‍🤝‍🧑🏿</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should put the skin tone in place of a variation selector', async () => {
     const value = html`
       <p>
