@@ -1,8 +1,8 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { type EmojiGlyph, resolveEmojiElement } from '../utils/emojis.js'
-import { glyphFromEmojiName } from '../utils/gemoji.js'
+import { type EmojiGlyph, glyphFromShortcode, resolveEmojiElement } from '../utils/emojis.js'
+import { glyphFromGemojiName } from '../utils/gemoji.js'
 
 const nameClassRegex = /(?:^|\s)emoticon_([a-z0-9]+)(?:\s|$)/
 
@@ -28,11 +28,12 @@ export const jiveEmojiResolver: EmojiResolver = {
   extract: (element) => {
     const name =
       attr(element, '__jive_emoticon_name') ?? attr(element, 'class')?.match(nameClassRegex)?.[1]
-    const jiveGlyph = jiveEmojiNames.get(name?.toLowerCase() ?? '')
+    const key = name?.toLowerCase() ?? ''
 
-    // A name Jive draws as its own face is not read as a gemoji name.
+    // A name Jive draws as its own face is not read as a gemoji name, and a name the shared
+    // shortcode table maps keeps the glyph every other engine draws for it.
     return resolveEmojiElement(element, {
-      glyph: jiveGlyph ?? glyphFromEmojiName(name),
+      glyph: jiveEmojiNames.get(key) ?? glyphFromShortcode(`:${key}:`) ?? glyphFromGemojiName(key),
       shortcode: name ? `:${name}:` : undefined,
     })
   },

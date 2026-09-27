@@ -1,5 +1,4 @@
 import { gemoji } from 'gemoji'
-import { glyphFromShortcode } from './emojis.js'
 
 const colonsRegex = /^:|:$/g
 const combiningMarkRegex = /\p{M}/gu
@@ -56,12 +55,4 @@ export const glyphFromGemojiName = (name: string | undefined): string | undefine
   const key = name?.replace(colonsRegex, '').toLowerCase() ?? ''
 
   return getGemojiNames().get(key)
-}
-
-// The same, with the shared shortcode table read first, so a name it already maps keeps the
-// glyph every other engine draws for it.
-export const glyphFromEmojiName = (name: string | undefined): string | undefined => {
-  const key = name?.replace(colonsRegex, '').toLowerCase() ?? ''
-
-  return glyphFromShortcode(`:${key}:`) ?? glyphFromGemojiName(key)
 }
