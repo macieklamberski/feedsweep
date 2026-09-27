@@ -70,7 +70,7 @@ describeForEachParser('vanillaEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should mark ok, which the forum names know to have no glyph, over gemoji', async () => {
+    it('should replace ok by its gemoji name, which a forum engine draws as its own face', async () => {
       const value = html`
         <p>
           <img
@@ -80,16 +80,7 @@ describeForEachParser('vanillaEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-      const expected = html`
-        <p>
-          <img
-            data-emoji=""
-            class="emoji"
-            src="https://example.com/resources/emoji/ok.png"
-            alt=":ok:"
-          >
-        </p>
-      `
+      const expected = '<p>🆗</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })

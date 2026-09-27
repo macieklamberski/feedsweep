@@ -32,9 +32,9 @@ export const vanillaEmojiResolver: EmojiResolver = {
       return resolved
     }
 
-    // A forum name known to have no glyph is not read as a gemoji name.
-    const stem = getFileStem(element.getAttribute('src') ?? '')
-    const glyph = names.has(stem.toLowerCase()) ? undefined : glyphFromEmojiName(stem)
+    // Vanilla names these files by gemoji name itself, so the name is exact even where a forum
+    // engine draws a file of the same name as its own face.
+    const glyph = glyphFromEmojiName(getFileStem(element.getAttribute('src') ?? ''))
 
     if (glyph) {
       return { glyph }
