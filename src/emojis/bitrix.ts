@@ -1,10 +1,10 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { glyphFromShortcode, resolveEmojiImage } from '../utils/emojis.js'
+import { type EmojiGlyph, getShortcode, resolveEmojiImage } from '../utils/emojis.js'
 
 // Codes FLOT.com and FlotProm.ru add to their Bitrix sets, keyed in lower case.
-const bitrixShortcodes = toMap({
+const bitrixShortcodes = toMap<EmojiGlyph>({
   'h-)': '😎', // В очках, in sunglasses
   '8-o': '😲', // Шокирован, shocked
   ':oz:': '😵‍💫', // Головокружение, dizzy
@@ -33,8 +33,8 @@ const bitrixShortcodes = toMap({
   // :S:, Трубка: winks while smoking a pipe, and no emoji has a pipe.
 })
 
-const glyphFromCode = (code: string | undefined): string | undefined => {
-  return bitrixShortcodes.get(code?.toLowerCase() ?? '') ?? glyphFromShortcode(code)
+const getCode = (code: string | undefined): EmojiGlyph | undefined => {
+  return bitrixShortcodes.get(code?.toLowerCase() ?? '') ?? getShortcode(code)
 }
 
 // Bitrix forum and blog smilies, which carry the shortcode the author typed in data-code. Their
@@ -43,7 +43,7 @@ export const bitrixEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[class~="bx-smile" i]',
   extract: (element) => {
-    const glyph = glyphFromCode(attr(element, 'data-code')) ?? glyphFromCode(attr(element, 'alt'))
+    const glyph = getCode(attr(element, 'data-code')) ?? getCode(attr(element, 'alt'))
 
     return resolveEmojiImage(element, { isStrong: true, glyph })
   },

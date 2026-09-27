@@ -1,5 +1,7 @@
+import type { EmojiGlyph } from './emojis.js'
+
 // The codes authors type, keyed in lower case.
-export const emojiShortcodes: Record<string, string> = {
+export const emojiShortcodes: Record<string, EmojiGlyph> = {
   ':)': '🙂',
   ':-)': '🙂',
   ':(': '🙁',

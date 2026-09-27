@@ -1,10 +1,10 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
-import { getFileStem } from '../utils/emojis.js'
+import { type EmojiGlyph, getFileStem } from '../utils/emojis.js'
 
 // Liferay's names the forum tables lack or draw differently. Liferay binds smile.gif to `:D`,
 // where every forum engine's smile is 🙂.
-const liferayEmojiNames = toMap({
+const liferayEmojiNames = toMap<EmojiGlyph>({
   happy: '🙂',
   smile: '😀',
   big_grin: '😁',
@@ -30,10 +30,10 @@ export const liferayEmojiResolver: EmojiResolver = {
     const stem = getFileStem(element.getAttribute('src') ?? '').toLowerCase()
     const glyph = liferayEmojiNames.get(stem)
 
-    if (!glyph) {
+    if (glyph === undefined) {
       return
     }
 
-    return { glyph }
+    return glyph ? { glyph } : { custom: true }
   },
 }

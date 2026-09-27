@@ -1,10 +1,10 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
-import { getFileStem, noEmojiNames, resolveEmojiImage } from '../utils/emojis.js'
+import { type EmojiGlyph, getFileStem, noEmojiNames, resolveEmojiImage } from '../utils/emojis.js'
 
 // Yahoo Messenger's emoticons by file number, with the code and the name Yahoo gave each. The
 // codes are not read: `:x`, `:-?`, `:-$` and `:-@` mean other things on other engines.
-const yahooEmoticons = toMap({
+const yahooEmoticons = toMap<EmojiGlyph>({
   1: '🙂', // :) happy
   2: '🙁', // :( sad
   3: '😉', // ;) winking

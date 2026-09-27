@@ -3,9 +3,12 @@ import type { EmojiResolverResult } from '../types.js'
 import { attr } from './dom.js'
 import { emojiShortcodes } from './shortcodes.js'
 
+// A glyph, or false for a known name whose picture differs per engine, which is only marked.
+export type EmojiGlyph = string | false
+
 export type EmojiNameTable = {
   name: string
-  names: Record<string, string>
+  names: Record<string, EmojiGlyph>
 }
 
 export type EmojiImageMatch = {
@@ -13,9 +16,9 @@ export type EmojiImageMatch = {
   // untouched when it fails to resolve, so a banner in `/smilies/` is never marked.
   isStrong: boolean
   // Absent for a set whose filename is never read.
-  names?: Map<string, string>
+  names?: Map<string, EmojiGlyph>
   // Read by the resolver from where its set keeps the meaning, and second only to the alt.
-  glyph?: string
+  glyph?: EmojiGlyph
 }
 
 const emojiSequenceParts = [
@@ -40,12 +43,18 @@ export const isEmojiShaped = (text: string): boolean => {
 
 const shortcodes = toMap(emojiShortcodes)
 
-export const glyphFromShortcode = (token: string | undefined): string | undefined => {
+export const getShortcode = (token: string | undefined): EmojiGlyph | undefined => {
   return token ? shortcodes.get(token.toLowerCase()) : undefined
 }
 
+export const glyphFromShortcode = (token: string | undefined): string | undefined => {
+  const glyph = getShortcode(token)
+
+  return glyph === false ? undefined : glyph
+}
+
 // The table for a set that names every file by its codepoint, which leaves no names to look up.
-export const noEmojiNames = new Map<string, string>()
+export const noEmojiNames = new Map<string, EmojiGlyph>()
 
 // Left on an emoji image that keeps its picture, so the reader can size it like text and keep
 // it out of thumbnail selection. Presence is the whole signal.
@@ -53,12 +62,12 @@ export const emojiImageAttribute = 'data-emoji'
 
 // One name table across several engines, refusing a filename two engines draw differently,
 // since nothing in the markup says which engine produced a given image.
-export const mergeEmojiNames = (tables: Array<EmojiNameTable>): Record<string, string> => {
-  const merged: Record<string, string> = {}
+export const mergeEmojiNames = (tables: Array<EmojiNameTable>): Record<string, EmojiGlyph> => {
+  const merged: Record<string, EmojiGlyph> = {}
 
   for (const table of tables) {
     for (const [name, glyph] of Object.entries(table.names)) {
-      if (merged[name] && merged[name] !== glyph) {
+      if (Object.hasOwn(merged, name) && merged[name] !== glyph) {
         throw new Error(
           `Emoji name "${name}" is ${merged[name]} and ${glyph} on different platforms`,
         )
@@ -97,6 +106,11 @@ export const getFileStem = (src: string): string => {
   return extension === -1 ? name : name.slice(0, extension)
 }
 
+// A filename as the name tables key it.
+export const getNameStem = (src: string): string => {
+  return getFileStem(src).toLowerCase().replace(namePrefixRegex, '').replace(nameVariantRegex, '')
+}
+
 // Five hex digits tops out at 0xFFFFF, so fromCodePoint never sees a value that throws.
 // WoltLab names its whole default set by codepoint. Twemoji drops the leading zeros, so two digits
 // are read too, only for the emoji below 0x100: © and ®, and a keycap on #, * or a digit.
@@ -123,23 +137,32 @@ export const glyphFromCodepoints = (stem: string): string | undefined => {
 }
 
 // A codepoint filename names the exact picture and a shortcode only its meaning: WoltLab binds
-// `:evil:` to 1f608, which is 😈. A filename word comes last, as what survives an empty alt.
-const glyphFromVocabularies = (
+// `:evil:` to 1f608, which is 😈. A filename word comes last, as what survives an empty alt or a
+// code each engine draws as its own face.
+const getVocabularyGlyph = (
   token: string | undefined,
   src: string,
-  names: Map<string, string>,
-): string | undefined => {
+  names: Map<string, EmojiGlyph>,
+): EmojiGlyph | undefined => {
   // Base64 can contain `/`, so a stem taken from a data URI can match a real name by accident.
   if (src.startsWith('data:')) {
-    return glyphFromShortcode(token)
+    return getShortcode(token)
   }
 
-  const stem = getFileStem(src)
-    .toLowerCase()
-    .replace(namePrefixRegex, '')
-    .replace(nameVariantRegex, '')
+  const stem = getNameStem(src)
+  const codepointGlyph = glyphFromCodepoints(stem)
 
-  return glyphFromCodepoints(stem) ?? glyphFromShortcode(token) ?? names.get(stem)
+  if (codepointGlyph) {
+    return codepointGlyph
+  }
+
+  const code = getShortcode(token)
+
+  if (code) {
+    return code
+  }
+
+  return names.get(stem) ?? code
 }
 
 // The title attribute is prose on every platform, never a glyph, so it is not read.
@@ -162,7 +185,7 @@ export const resolveEmojiImage = (
     return { glyph: match.glyph }
   }
 
-  const glyph = match.names ? glyphFromVocabularies(shortname ?? alt, src, match.names) : undefined
+  const glyph = match.names ? getVocabularyGlyph(shortname ?? alt, src, match.names) : undefined
 
   if (glyph) {
     return { glyph }
@@ -174,7 +197,8 @@ export const resolveEmojiImage = (
     return { text }
   }
 
-  if (match.isStrong) {
+  // A known name recognizes the image even where the match alone is too weak to.
+  if (match.isStrong || match.glyph === false || glyph === false) {
     return { custom: true }
   }
 }
@@ -183,7 +207,7 @@ export const resolveEmojiImage = (
 // elements would take the glyph with it, so one that resolves to nothing still leaves text.
 export const resolveEmojiElement = (
   element: Element,
-  { glyph, shortcode }: { glyph?: string; shortcode?: string },
+  { glyph, shortcode }: { glyph?: EmojiGlyph; shortcode?: string },
 ): EmojiResolverResult | undefined => {
   const text = element.textContent ?? ''
 
@@ -191,7 +215,7 @@ export const resolveEmojiElement = (
     return { glyph: text }
   }
 
-  const resolved = glyph ?? glyphFromShortcode(shortcode)
+  const resolved = glyph === false ? undefined : (glyph ?? glyphFromShortcode(shortcode))
 
   if (resolved) {
     return { glyph: resolved }

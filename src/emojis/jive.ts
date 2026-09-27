@@ -1,13 +1,13 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { resolveEmojiElement } from '../utils/emojis.js'
+import { type EmojiGlyph, resolveEmojiElement } from '../utils/emojis.js'
 import { glyphFromEmojiName } from '../utils/gemoji.js'
 
 const nameClassRegex = /(?:^|\s)emoticon_([a-z0-9]+)(?:\s|$)/
 
 // Jive's stock names that neither the shortcode table nor gemoji carries.
-const jiveEmojiNames = toMap({
+const jiveEmojiNames = toMap<EmojiGlyph>({
   happy: '🙂',
   silly: '😛',
   laugh: '🤣',
@@ -28,9 +28,11 @@ export const jiveEmojiResolver: EmojiResolver = {
   extract: (element) => {
     const name =
       attr(element, '__jive_emoticon_name') ?? attr(element, 'class')?.match(nameClassRegex)?.[1]
+    const jiveGlyph = jiveEmojiNames.get(name?.toLowerCase() ?? '')
 
+    // A name Jive draws as its own face is not read as a gemoji name.
     return resolveEmojiElement(element, {
-      glyph: jiveEmojiNames.get(name?.toLowerCase() ?? '') ?? glyphFromEmojiName(name),
+      glyph: jiveGlyph ?? glyphFromEmojiName(name),
       shortcode: name ? `:${name}:` : undefined,
     })
   },

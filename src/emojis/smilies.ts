@@ -2,8 +2,10 @@ import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
+  type EmojiGlyph,
   type EmojiNameTable,
   getFileStem,
+  getNameStem,
   glyphFromCodepoints,
   mergeEmojiNames,
   rendersNothing,
@@ -361,7 +363,7 @@ const directorySelector = directories.map((path) => `img[src*="${path}" i]`).joi
 
 // Web Wiz Forums numbers its files. WoltLab ships other drawings under the same names in
 // `/smilies/`, so these are read only from Web Wiz's `/smileys/`.
-const webWizEmojiNames = toMap({
+const webWizEmojiNames = toMap<EmojiGlyph>({
   smiley1: '🙂',
   smiley2: '😉',
   smiley3: '😲',
@@ -407,7 +409,7 @@ const webWizEmojiNames = toMap({
 })
 
 // Discuz! X's names, some as generic as `time` and `call`, so read only from its own directory.
-const discuzEmojiNames = toMap({
+const discuzEmojiNames = toMap<EmojiGlyph>({
   huffy: '😡',
   titter: '🤭',
   sweat: '😓',
@@ -422,9 +424,15 @@ const discuzEmojiNames = toMap({
   call: '📞',
 })
 
+// Names each engine ships under its own directory, where other engines ship other drawings.
+const engineEmojiNames: Array<[string, Map<string, EmojiGlyph>]> = [
+  ['/smileys/', webWizEmojiNames],
+  ['static/image/smiley/', discuzEmojiNames],
+]
+
 // NBBC's names for the codes the shared table draws as another face: `8)`, `;D`, `:s` and `<_<`.
 // Read ahead of the alt, since NBBC writes the code there.
-const nbbcEmojiNames = toMap({
+const nbbcEmojiNames = toMap<EmojiGlyph>({
   bigwink: '😜',
   bigeyes: '😳',
   worry: '😟',
@@ -433,25 +441,23 @@ const nbbcEmojiNames = toMap({
 
 // XenForo 2's shortnames that other engines draw as another face: `o_O` is skeptical on WP
 // Monalisa and a wow face on Menéame, and XenForo draws it dizzy.
-const xenforoShortnames = toMap({
+const xenforoShortnames = toMap<EmojiGlyph>({
   o_o: '😵‍💫',
 })
 
-const glyphFromEngineName = (src: string): string | undefined => {
+const getEngineGlyph = (src: string): EmojiGlyph | undefined => {
   // A XenForo sprite's base64 can contain `/`, leaving a stem that matches a name by accident.
   if (src.startsWith('data:')) {
     return
   }
 
   const path = src.toLowerCase()
-  const stem = getFileStem(path)
+  const stem = getNameStem(path)
 
-  if (path.includes('/smileys/') && webWizEmojiNames.has(stem)) {
-    return webWizEmojiNames.get(stem)
-  }
-
-  if (path.includes('static/image/smiley/') && discuzEmojiNames.has(stem)) {
-    return discuzEmojiNames.get(stem)
+  for (const [directory, names] of engineEmojiNames) {
+    if (path.includes(directory) && names.has(stem)) {
+      return names.get(stem)
+    }
   }
 
   return nbbcEmojiNames.get(stem)
@@ -461,7 +467,7 @@ const glyphFromEngineName = (src: string): string | undefined => {
 // and a skin tone appends the modifier's name and codepoint after the full sequence.
 const numberedNameRegex = /^[0-9]+\.([a-z-]+)_/
 
-const glyphFromNumberedName = (src: string): string | undefined => {
+const getNumberedGlyph = (src: string): EmojiGlyph | undefined => {
   const stem = getFileStem(src).toLowerCase()
   const name = stem.match(numberedNameRegex)?.[1]
 
@@ -498,7 +504,7 @@ export const smiliesEmojiResolver: EmojiResolver = {
       return
     }
 
-    const engineGlyph = glyphFromNumberedName(src) ?? glyphFromEngineName(src)
+    const engineGlyph = getNumberedGlyph(src) ?? getEngineGlyph(src)
 
     return resolveEmojiImage(element, {
       isStrong,
