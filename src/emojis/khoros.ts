@@ -7,7 +7,7 @@ import {
   resolveEmojiElement,
   resolveEmojiImage,
 } from '../utils/emojis.js'
-import { glyphFromEmojiName } from '../utils/gemoji.js'
+import { glyphFromGemojiName } from '../utils/gemoji.js'
 import { smilieSelector, smiliesEmojiNames } from './smilies.js'
 
 const idPrefixRegex = /^lia_/
@@ -21,7 +21,7 @@ export const khorosEmojiResolver: EmojiResolver = {
   extract: (element) => {
     const title = attr(element, 'title')
     const id = attr(element, 'id')?.replace(idPrefixRegex, '').replace(hyphenRegex, '_')
-    const glyph = glyphFromEmojiName(title) ?? glyphFromEmojiName(id)
+    const glyph = glyphFromGemojiName(title) ?? glyphFromGemojiName(id)
 
     return resolveEmojiElement(element, { glyph, shortcode: title ?? (id ? `:${id}:` : undefined) })
   },

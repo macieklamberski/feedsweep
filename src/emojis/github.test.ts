@@ -48,6 +48,26 @@ describeForEachParser('githubImageEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    // The alt repeats the gemoji name, and the shortcode table draws these as other faces.
+    const sharedNameCases: Array<[string, string]> = [
+      ['smile', '😄'],
+      ['cool', '🆒'],
+    ]
+
+    it.each(sharedNameCases)('should replace %s by its gemoji glyph', async (name, glyph) => {
+      const value = html`
+        <p>
+          <img
+            src="https://github.githubassets.com/images/icons/emoji/${name}.png?v8"
+            alt=":${name}:"
+          >
+        </p>
+      `
+      const expected = `<p>${glyph}</p>`
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('hosts', () => {
@@ -124,6 +144,13 @@ describeForEachParser('githubElementEmojiResolver', (parseHtml) => {
   it('should replace an empty element by a gemoji alias the table misses', async () => {
     const value = '<p><g-emoji class="g-emoji" alias="tophat"></g-emoji></p>'
     const expected = '<p>🎩</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace an empty element by the gemoji glyph of an alias the shortcode table draws apart', async () => {
+    const value = '<p><g-emoji class="g-emoji" alias="smile"></g-emoji></p>'
+    const expected = '<p>😄</p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })

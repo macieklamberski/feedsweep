@@ -19,6 +19,13 @@ describeForEachParser('khorosEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should replace the element by the gemoji glyph of a name the shortcode table draws apart', async () => {
+    const value = '<p><LI-EMOJI id="lia_smile" title=":smile:"></LI-EMOJI></p>'
+    const expected = '<p>😄</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should mark the title of an element no name resolves as fallback text', async () => {
     const value = '<p><LI-EMOJI id="lia_kudo" title=":kudo:"></LI-EMOJI></p>'
     const expected = '<p><span data-emoji="">:kudo:</span></p>'

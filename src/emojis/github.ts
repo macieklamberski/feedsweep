@@ -3,11 +3,10 @@ import { attr } from '../utils/dom.js'
 import {
   getFileStem,
   glyphFromCodepoints,
-  noEmojiNames,
   resolveEmojiElement,
   resolveEmojiImage,
 } from '../utils/emojis.js'
-import { glyphFromEmojiName } from '../utils/gemoji.js'
+import { glyphFromGemojiName } from '../utils/gemoji.js'
 
 const hosts = [
   'githubassets.com/images/icons/emoji/', // GitHub README scrapings.
@@ -20,16 +19,12 @@ export const githubImageEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: hosts.map((host) => `img[src*="${host}" i]`).join(', '),
   extract: (element) => {
-    const resolved = resolveEmojiImage(element, { isStrong: false, names: noEmojiNames })
+    // A file outside `unicode/` is named by its gemoji name, like `arrow_up.png`, and the alt
+    // repeats that name, so neither is read as a code an author typed.
+    const stem = getFileStem(element.getAttribute('src') ?? '')
+    const glyph = glyphFromCodepoints(stem) ?? glyphFromGemojiName(stem)
 
-    if (resolved) {
-      return resolved
-    }
-
-    // A file outside `unicode/` is named by its gemoji name, like `arrow_up.png`.
-    const glyph = glyphFromEmojiName(getFileStem(element.getAttribute('src') ?? ''))
-
-    return glyph ? { glyph } : { custom: true }
+    return resolveEmojiImage(element, { isStrong: true, glyph })
   },
 }
 
@@ -80,7 +75,7 @@ export const githubElementEmojiResolver: EmojiResolver = {
     const tone = attr(element, 'tone')
     const shortcode = alias ? `:${alias}:` : undefined
     const result = resolveEmojiElement(element, {
-      glyph: glyph ?? glyphFromEmojiName(alias),
+      glyph: glyph ?? glyphFromGemojiName(alias),
       shortcode,
     })
 

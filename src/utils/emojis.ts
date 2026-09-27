@@ -238,10 +238,9 @@ export const resolveEmojiElement = (
     return { glyph: text }
   }
 
-  const resolved = glyph === false ? undefined : (glyph ?? glyphFromShortcode(shortcode))
-
-  if (resolved) {
-    return { glyph: resolved }
+  // The shortcode is the engine's own name, never a code an author typed.
+  if (glyph) {
+    return { glyph }
   }
 
   const fallback = text || shortcode

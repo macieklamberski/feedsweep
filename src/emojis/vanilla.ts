@@ -6,7 +6,7 @@ import {
   mergeEmojiNames,
   resolveEmojiImage,
 } from '../utils/emojis.js'
-import { glyphFromEmojiName } from '../utils/gemoji.js'
+import { glyphFromGemojiName } from '../utils/gemoji.js'
 import { smiliesEmojiNameTables } from './smilies.js'
 
 export const vanillaEmojiNameTable: EmojiNameTable = {
@@ -34,7 +34,7 @@ export const vanillaEmojiResolver: EmojiResolver = {
 
     // Vanilla names these files by gemoji name itself, so the name is exact even where a forum
     // engine draws a file of the same name as its own face.
-    const glyph = glyphFromEmojiName(getFileStem(element.getAttribute('src') ?? ''))
+    const glyph = glyphFromGemojiName(getFileStem(element.getAttribute('src') ?? ''))
 
     if (glyph) {
       return { glyph }
