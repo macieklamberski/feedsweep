@@ -482,6 +482,9 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   yahooEmojiResolver,
   yahooJapanEmojiResolver,
   froalaImageEmojiResolver,
+  // Ahead of Twemoji, whose loose `twemoji` url match also takes Discourse's `twemoji` set, drawn
+  // under Discourse's own names.
+  discourseEmojiResolver,
   // Ahead of WordPress, whose WordPress.com host serves Twemoji files named by codepoint.
   twemojiEmojiResolver,
   wordpressEmojiResolver,
@@ -510,7 +513,6 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   cocologEmojiResolver,
   jugemEmojiResolver,
   fc2EmojiResolver,
-  discourseEmojiResolver,
   moodleEmojiResolver,
   boardgamegeekEmojiResolver,
   rhymixEmojiResolver,
