@@ -22,4 +22,11 @@ describeForEachParser('whatsappEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(value)
   })
+
+  it('should leave a span painted with another file untouched', async () => {
+    const value =
+      '<p><span style="background-image: url(https://example.com/a.png); --source: web.whatsapp.com/emoji/"></span></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
 })

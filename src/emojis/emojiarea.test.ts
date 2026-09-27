@@ -16,4 +16,10 @@ describeForEachParser('emojiareaEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml('<p>Hi 👇</p>')
   })
+
+  it('should leave a painted span holding prose untouched', async () => {
+    const value = '<p><span class="emoji emoji-spritesheet-1" title="sunny">A sunny day</span></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
 })

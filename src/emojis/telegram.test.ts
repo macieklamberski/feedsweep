@@ -141,4 +141,25 @@ describeForEachParser('telegramElementEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should keep the glyph a painted element already holds', async () => {
+    const value =
+      '<p><i class="emoji" style="background-image:url(\'//telegram.org/img/emoji/40/F09F918D.png\')">👍</i></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>👍</p>')
+  })
+
+  it('should leave a painted element holding prose untouched', async () => {
+    const value =
+      '<p><i class="emoji" style="background-image:url(\'//telegram.org/img/emoji/40/F09F918D.png\')">Hello</i></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave an element painted with another file untouched', async () => {
+    const value =
+      '<p><i style="background-image: url(https://example.com/a.png); --source: telegram.org/img/emoji/"></i></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
 })
