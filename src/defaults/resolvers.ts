@@ -209,6 +209,7 @@ import { monalisaEmojiResolver } from '../emojis/monalisa.js'
 import { moodleEmojiResolver } from '../emojis/moodle.js'
 import { nbbcEmojiResolver } from '../emojis/nbbc.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
+import { pixnetEmojiResolver } from '../emojis/pixnet.js'
 import { punbbEmojiResolver } from '../emojis/punbb.js'
 import { rhymixEmojiResolver } from '../emojis/rhymix.js'
 import { sapoEmojiResolver } from '../emojis/sapo.js'
@@ -518,6 +519,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   moodleEmojiResolver,
   boardgamegeekEmojiResolver,
   rhymixEmojiResolver,
+  pixnetEmojiResolver,
   genericCharacterEmojiResolver,
   // After every engine, since TypePad, Yahoo and others put the emoticon class on their own sets.
   smiliesEmoticonEmojiResolver,
