@@ -33,7 +33,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
 
     it('should match the shortname case-insensitively', async () => {
-      const value = `<p><img src="${spriteSource}" data-shortname=":ROFLMAO:" alt=":ROFLMAO:"></p>`
+      const value = `<p><img src="${spriteSource}" data-shortname=":ROFL:" alt=":ROFL:"></p>`
       const expected = '<p>🤣</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -52,13 +52,13 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
         <p>
           <img
             src="${spriteSource}"
-            data-shortname=":confused:"
-            alt=":confused:"
-            title="Confused    :confused:"
+            data-shortname=":cool:"
+            alt=":cool:"
+            title="Cool    :cool:"
           >
         </p>
       `
-      const expected = '<p>😕</p>'
+      const expected = '<p>😎</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -191,7 +191,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should leave an unmapped smilie with its working image', async () => {
+    it('should leave the mrgreen smilie, which has no glyph, with its working image', async () => {
       const value = html`
         <p>
           <img class="smilies" src="/images/smilies/icon_mrgreen.gif" alt=":mrgreen:">
@@ -347,8 +347,8 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     // Forums translate the alt but keep the stock English filename, so a localized board
     // resolves through the filename and the table needs no translations of its own.
     it('should replace a smilie whose alt is localized but filename is not', async () => {
-      const value = '<p><img src="https://example.com/forum/img/smilies/love.gif" alt="Hjärta"></p>'
-      const expected = '<p>😍</p>'
+      const value = '<p><img src="https://example.com/forum/img/smilies/cool.png" alt="Häftig"></p>'
+      const expected = '<p>😎</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -399,7 +399,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       ],
       ['Drupal smileys module', 'http://example.com/misc/smileys/smile.png', '🙂'],
       ['blog smileys directory', 'http://example.com/images/smileys/big_smile.gif', '😁'],
-      ['Kunena emoticons directory', 'http://example.com/media/kunena/emoticons/unsure.png', '😕'],
+      ['Kunena emoticons directory', 'http://example.com/media/kunena/emoticons/smile.png', '🙂'],
       ['FUDforum', 'http://example.com/forum/images/smiley_icons/icon_wink.gif', '😉'],
       [
         'TinyMCE 3',
@@ -414,20 +414,25 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
     })
 
-    it('should replace the Serendipity whistle smilie', async () => {
+    it('should mark the Serendipity whistle smilie', async () => {
       const value = html`
         <p>
           <img src="http://example.com/templates/default/img/emoticons/whistle.png" alt="">
         </p>
       `
-      const expected = '<p>😗</p>'
+      const expected = html`
+        <p>
+          <img data-emoji="" src="http://example.com/templates/default/img/emoticons/whistle.png" alt="">
+        </p>
+      `
 
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should replace a site-custom smilie by its :)) alt', async () => {
+    it('should mark a site-custom smilie by its :)) alt', async () => {
       const value = '<p><img src="http://example.com/smilies/yahoo_laughloud.gif" alt=":))"></p>'
-      const expected = '<p>🤣</p>'
+      const expected =
+        '<p><img data-emoji="" src="http://example.com/smilies/yahoo_laughloud.gif" alt=":))"></p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -462,7 +467,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
     })
 
-    it('should leave the foot-in-mouth face untouched', async () => {
+    it('should mark the foot-in-mouth face', async () => {
       const value = html`
         <p>
           <img
@@ -472,8 +477,18 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-foot-in-mouth.gif"
+            class="flag"
+            alt="Foot in mouth"
+          >
+        </p>
+      `
 
-      expect(await transform(value)).toEqualHtml(value)
+      expect(await transform(value)).toEqualHtml(expected)
     })
   })
 
@@ -586,9 +601,9 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       // From the engines' own default sets, not from corpus tokens, so these cover boards the
       // corpus never sampled. The last two are misspelled in the distributions.
       [
-        'phpBB geek',
-        '<img class="smilies" src="/images/smilies/icon_e_geek.svg" alt="" title="Geek">',
-        '🤓',
+        'phpBB sad',
+        '<img class="smilies" src="/images/smilies/icon_e_sad.svg" alt="" title="Sad">',
+        '🙁',
       ],
       [
         'SMF sealed lips',
@@ -604,13 +619,6 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
         'e107 cheesey',
         '<img class="e-emoticon" src="/e107_images/emotes/default/cheesey.png" alt="">',
         '😁',
-      ],
-      // Boards add clap.gif to several engines' sets. The shortcode alt already resolved. This
-      // is the localized-title case where only the filename says what the picture is.
-      [
-        'community-added clap',
-        '<img class="smiley" src="https://example.com/images/smilies/clap.gif" alt="" title="Beifall">',
-        '👏',
       ],
     ]
 
@@ -844,52 +852,53 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
   })
 
   describe('Web Wiz Forums (numbered files under /smileys/)', () => {
-    const faceCases: Array<[string, string, string]> = [
-      ['smiley1', 'Smile', '🙂'],
-      ['smiley2', 'Wink', '😉'],
-      ['smiley3', 'Shocked', '😲'],
-      ['smiley4', 'Big smile', '😁'],
-      ['smiley5', 'Confused', '😕'],
-      ['smiley6', 'Unhappy', '🙁'],
-      ['smiley7', 'Angry', '😡'],
-      ['smiley8', 'Clown', '🤡'],
-      ['smiley9', 'Embarrassed', '😳'],
-      ['smiley10', 'Star', '⭐'],
-      ['smiley11', 'Dead', '😵'],
-      ['smiley12', 'Sleepy', '😴'],
-      ['smiley13', 'Disapprove', '🤨'],
-      ['smiley14', 'Approve', '🙂‍↕️'],
-      ['smiley15', 'Evil Smile', '😈'],
-      ['smiley16', 'Cool', '😎'],
-      ['smiley17', 'Tongue', '😛'],
-      ['smiley18', 'Ouch', '🤕'],
-      ['smiley19', 'Cry', '😢'],
-      ['smiley20', 'Thumbs Up', '👍'],
-      ['smiley21', 'Thumbs Down', '👎'],
-      ['smiley22', 'Stern Smile', '😐'],
-      ['smiley23', 'Geek', '🤓'],
-      ['smiley24', 'Ermm', '🫤'],
-      ['smiley25', 'Question', '❓'],
-      ['smiley26', 'Pinch', '😣'],
-      ['smiley27', 'Heart', '❤️'],
-      ['smiley28', 'Broken Heart', '💔'],
-      ['smiley29', 'Wacko', '🤪'],
-      ['smiley30', 'Pig', '🐷'],
-      ['smiley31', 'Hug', '🤗'],
-      ['smiley32', 'Clap', '👏'],
-      ['smiley33', 'Ying Yang', '☯️'],
-      ['smiley34', 'Nuke', '☢️'],
-      ['smiley35', 'Censored', '🤬'],
-      ['smiley36', 'LOL', '🤣'],
-      ['smiley37', 'Exclamation', '⚠️'],
-      ['smiley38', 'Lamp', '💡'],
-      ['smiley39', 'Sick', '🤢'],
-      ['smiley40', 'Party', '🥳'],
-      ['smiley41', 'Beer', '🍻'],
-      ['smiley42', 'Handshake', '🤝'],
+    // Web Wiz's own drawings, known by number under its directory alone.
+    const faceCases: Array<[string, string]> = [
+      ['smiley1', 'Smile'],
+      ['smiley2', 'Wink'],
+      ['smiley3', 'Shocked'],
+      ['smiley4', 'Big smile'],
+      ['smiley5', 'Confused'],
+      ['smiley6', 'Unhappy'],
+      ['smiley7', 'Angry'],
+      ['smiley8', 'Clown'],
+      ['smiley9', 'Embarrassed'],
+      ['smiley10', 'Star'],
+      ['smiley11', 'Dead'],
+      ['smiley12', 'Sleepy'],
+      ['smiley13', 'Disapprove'],
+      ['smiley14', 'Approve'],
+      ['smiley15', 'Evil Smile'],
+      ['smiley16', 'Cool'],
+      ['smiley17', 'Tongue'],
+      ['smiley18', 'Ouch'],
+      ['smiley19', 'Cry'],
+      ['smiley20', 'Thumbs Up'],
+      ['smiley21', 'Thumbs Down'],
+      ['smiley22', 'Stern Smile'],
+      ['smiley23', 'Geek'],
+      ['smiley24', 'Ermm'],
+      ['smiley25', 'Question'],
+      ['smiley26', 'Pinch'],
+      ['smiley27', 'Heart'],
+      ['smiley28', 'Broken Heart'],
+      ['smiley29', 'Wacko'],
+      ['smiley30', 'Pig'],
+      ['smiley31', 'Hug'],
+      ['smiley32', 'Clap'],
+      ['smiley33', 'Ying Yang'],
+      ['smiley34', 'Nuke'],
+      ['smiley35', 'Censored'],
+      ['smiley36', 'LOL'],
+      ['smiley37', 'Exclamation'],
+      ['smiley38', 'Lamp'],
+      ['smiley39', 'Sick'],
+      ['smiley40', 'Party'],
+      ['smiley41', 'Beer'],
+      ['smiley42', 'Handshake'],
     ]
 
-    it.each(faceCases)('should replace the %s face', async (name, alt, expected) => {
+    it.each(faceCases)('should mark the %s face', async (name, alt) => {
       const value = html`
         <p>
           <img
@@ -900,25 +909,25 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/forum/smileys/${name}.gif"
+            border="0"
+            alt="${alt}"
+            title="${alt}"
+          >
+        </p>
+      `
 
-      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+      expect(await transform(value)).toEqualHtml(expected)
     })
   })
 
   describe('Invision Power Board and Kunena', () => {
     // Alts that boards wrote in place of the stock code, so only the filename names the face.
-    const nameCases: Array<[string, string, string]> = [
-      ['wub', 'wub.gif', '😍'],
-      ['blink', '8|', '😯'],
-      ['wacko', ':wasko:', '🤪'],
-      ['ph34r', 'ph34r.gif', '🥷'],
-      ['w00t', ':woohoo:', '🤩'],
-      ['whistling', ':siffle:', '😗'],
-      ['doh', ':default_doh:', '🤦'],
-      ['dry', 'dry.gif', '😒'],
-      ['mellow', 'mellow.gif', '😑'],
-      ['sleep', ':zzz:', '😴'],
-    ]
+    const nameCases: Array<[string, string, string]> = [['sleep', ':zzz:', '😴']]
 
     it.each(nameCases)('should replace the %s face', async (name, alt, expected) => {
       const value = html`
@@ -934,18 +943,55 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
     })
 
-    const codeCases: Array<[string, string]> = [
-      [':wub:', '😍'],
-      [':blink:', '😯'],
-      [':wacko:', '🤪'],
-      [':ph34r:', '🥷'],
-      [':whistle:', '😗'],
-      [':mellow:', '😑'],
-      [':huh:', '😕'],
-      [':angry:', '😠'],
+    // Faces whose names say nothing a glyph could, like `ph34r` for a ninja.
+    const markedNameCases: Array<[string, string]> = [
+      ['whistling', ':siffle:'],
+      ['wub', 'wub.gif'],
+      ['blink', '8|'],
+      ['wacko', ':wasko:'],
+      ['ph34r', 'ph34r.gif'],
+      ['w00t', ':woohoo:'],
+      ['doh', ':default_doh:'],
+      ['dry', 'dry.gif'],
+      ['mellow', 'mellow.gif'],
     ]
 
-    it.each(codeCases)('should replace the %s code', async (code, expected) => {
+    it.each(markedNameCases)('should mark the %s face', async (name, alt) => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/style_emoticons/default/${name}.gif"
+            class="bbc_emoticon"
+            alt="${alt}"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/style_emoticons/default/${name}.gif"
+            class="bbc_emoticon"
+            alt="${alt}"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    const markedCodes: Array<string> = [
+      ':angry:',
+      ':wub:',
+      ':blink:',
+      ':wacko:',
+      ':ph34r:',
+      ':whistle:',
+      ':mellow:',
+      ':huh:',
+    ]
+
+    it.each(markedCodes)('should mark the %s code', async (code) => {
       const value = html`
         <p>
           <img
@@ -955,12 +1001,22 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/uploads/emoticons/smily_8.gif"
+            alt="${code}"
+            data-emoticon=""
+          >
+        </p>
+      `
 
-      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
-    // IPB binds `-_-` to sleep.gif, and the code is read before the filename.
-    it('should replace a sleep smilie by its -_- code', async () => {
+    // IPB binds `-_-` to sleep.gif, and Facebook to a squint, so the filename names the face.
+    it('should resolve a sleep smilie by its filename over its -_- code', async () => {
       const value = html`
         <p>
           <img
@@ -970,25 +1026,29 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-      const expected = '<p>😑</p>'
+      const expected = '<p>😴</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
   })
 
   describe('XenForo 2 (sprite shortnames)', () => {
-    const shortnameCases: Array<[string, string, string]> = [
-      [':cautious:', 'Cautious', '😒'],
-      [':censored:', 'Censored', '🤐'],
-      [':sneaky:', 'Sneaky', '😏'],
-      [':whistle:', 'Whistling', '😗'],
-      [':giggle:', 'Giggle', '🤭'],
-      [':devilish:', 'Devil', '😈'],
-      ['o_O', 'Er... what?', '😵‍💫'],
+    // Codes each engine draws as its own face. The sprite renders nothing, so the code stays as
+    // text.
+    const shortnameCases: Array<[string, string]> = [
+      [':cautious:', 'Cautious'],
+      [':censored:', 'Censored'],
+      [':sneaky:', 'Sneaky'],
+      [':whistle:', 'Whistling'],
+      [':giggle:', 'Giggle'],
+      [':devilish:', 'Devil'],
+      ['o_O', 'Er... what?'],
     ]
 
-    it.each(shortnameCases)('should replace the %s smilie', async (shortname, title, expected) => {
-      const value = html`
+    it.each(shortnameCases)(
+      'should keep the %s smilie as its shortname',
+      async (shortname, title) => {
+        const value = html`
         <p>
           <img
             src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
@@ -1000,9 +1060,11 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
+        const expected = `<p><span data-emoji="">${shortname}</span></p>`
 
-      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
-    })
+        expect(await transform(value)).toEqualHtml(expected)
+      },
+    )
 
     // phpBB boards bind `O_o` to faces of their own, and only XenForo's is drawn dizzy.
     it('should mark an O_o smilie outside XenForo', async () => {
@@ -1034,14 +1096,14 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
   describe('NBBC (bbcode_smiley class, /smileys/ names)', () => {
     // NBBC writes its code as the alt, and these four mean another face in the shared table.
-    const faceCases: Array<[string, string, string]> = [
-      ['worry', ':s', '😟'],
-      ['bigeyes', '8)', '😳'],
-      ['bigwink', ';D', '😜'],
-      ['lookleft', '&lt;_&lt;', '👀'],
+    const faceCases: Array<[string, string]> = [
+      ['worry', ':s'],
+      ['bigeyes', '8)'],
+      ['bigwink', ';D'],
+      ['lookleft', '&lt;_&lt;'],
     ]
 
-    it.each(faceCases)('should replace the %s face', async (name, code, expected) => {
+    it.each(faceCases)('should mark the %s face', async (name, code) => {
       const value = html`
         <p>
           <img
@@ -1054,21 +1116,34 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/nbbc/smileys/${name}.gif"
+            width="15"
+            height="15"
+            alt="${code}"
+            title="${code}"
+            class="bbcode_smiley"
+          >
+        </p>
+      `
 
-      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
-    const codeCases: Array<[string, string]> = [
-      ['&gt;;)', '😏'],
-      ['O:)', '😇'],
-      ['^_^', '😊'],
-      ['^^;', '😅'],
-      ['&gt;_&gt;', '👀'],
-      ['&lt;g&gt;', '😁'],
-      ['o.O', '🤨'],
+    const markedCodes: Array<string> = [
+      '&gt;;)',
+      'O:)',
+      '^_^',
+      '^^;',
+      '&gt;_&gt;',
+      '&lt;g&gt;',
+      'o.O',
     ]
 
-    it.each(codeCases)('should replace the %s code on a renamed file', async (code, expected) => {
+    it.each(markedCodes)('should mark the %s code on a renamed file', async (code) => {
       const value = html`
         <p>
           <img
@@ -1078,8 +1153,18 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/nbbc/smileys/custom/8.gif"
+            alt="${code}"
+            class="bbcode_smiley"
+          >
+        </p>
+      `
 
-      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     // A base64 payload can end in a slash and an NBBC name.
@@ -1099,22 +1184,22 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
   })
 
   describe('Discuz! (static/image/smiley/ names)', () => {
-    const faceCases: Array<[string, string]> = [
-      ['huffy', '😡'],
-      ['titter', '🤭'],
-      ['sweat', '😓'],
-      ['loveliness', '🥰'],
-      ['funk', '😨'],
-      ['curse', '🤬'],
-      ['shutup', '🤐'],
-      ['hug', '🤗'],
-      ['victory', '✌️'],
-      ['time', '🕒'],
-      ['handshake', '🤝'],
-      ['call', '📞'],
+    const faceNames: Array<string> = [
+      'huffy',
+      'titter',
+      'sweat',
+      'loveliness',
+      'funk',
+      'curse',
+      'shutup',
+      'hug',
+      'victory',
+      'time',
+      'handshake',
+      'call',
     ]
 
-    it.each(faceCases)('should replace the %s face', async (name, expected) => {
+    it.each(faceNames)('should mark the %s face', async (name) => {
       const value = html`
         <p>
           <img
@@ -1125,8 +1210,19 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/static/image/smiley/default/${name}.gif"
+            smilieid="14"
+            border="0"
+            alt=""
+          >
+        </p>
+      `
 
-      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should mark a phpBB smilie that shares a Discuz name', async () => {
@@ -1171,7 +1267,6 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       ['cat-happy', 'Chat heureux', '😺'],
       ['cat-very-happy', 'Chat très heureux', '😸'],
       ['cat-lol', 'Chat MDR', '😹'],
-      ['smiley-frustrated', 'Smiley frustré', '😣'],
     ]
 
     it.each(faceCases)('should replace the %s face', async (name, alt, expected) => {
@@ -1188,6 +1283,34 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       `
 
       expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    })
+
+    it('should mark the smiley-frustrated face', async () => {
+      const value = html`
+        <p>
+          <img
+            id="smiley-frustrated"
+            class="emoticon emoticon-smiley-frustrated"
+            src="https://example.com/i/smilies/16x16_smiley-frustrated.png"
+            alt="Smiley frustré"
+            title="Smiley frustré"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            id="smiley-frustrated"
+            class="emoticon emoticon-smiley-frustrated"
+            src="https://example.com/i/smilies/16x16_smiley-frustrated.png"
+            alt="Smiley frustré"
+            title="Smiley frustré"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     // The set also draws each expression on a cat, a man, a woman and a robot. Unicode's cat
@@ -1315,7 +1438,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
 
     // Samsung's own smiling face is filed under the codepoint of 🃏.
-    it('should replace the Samsung smiling face without decoding its filename', async () => {
+    it('should mark the Samsung smiling face without decoding its filename', async () => {
       const value = html`
         <p>
           <img
@@ -1326,7 +1449,17 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-      const expected = '<p>😀</p>'
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="lia-deferred-image lia-image-emoji"
+            src="https://example.com/html/@758C9CF82B69C1E7230907A98BEAE742/images/smilies/1.samsung_1f0cf.png"
+            alt=":smiling-face:"
+            title=":smiling-face:"
+          >
+        </p>
+      `
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -1433,8 +1566,8 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transformKeeping(value)).toEqualHtml(value)
     })
 
-    // SMF binds `;D` to grin.gif, and the alt is read before the filename.
-    it('should replace ;D with a grin', async () => {
+    // SMF binds `;D` to grin.gif and NBBC to a big wink, so the filename names the face.
+    it('should resolve ;D by the grin filename', async () => {
       const value = html`
         <p>
           <img
@@ -1462,7 +1595,8 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should replace :evil: with the angry devil its icon_evil file draws', async () => {
+    // phpBB draws an angry devil and WoltLab a grinning one.
+    it('should mark :evil: on the icon_evil file', async () => {
       const value = html`
         <p>
           <img
@@ -1473,7 +1607,17 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-      const expected = '<p>👿</p>'
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="smilies"
+            src="https://example.com/images/smilies/icon_evil.gif"
+            alt=":evil:"
+            title="Evil or Very Mad"
+          >
+        </p>
+      `
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -1513,24 +1657,9 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
     // The stock codes of SMF, WordPress and phpBB, on a board whose files are numbered.
     const aliasCases: Array<[string, string]> = [
-      ['&gt;:(', '😠'],
-      ['???', '😕'],
-      ['::)', '🙄'],
-      [':-[', '😳'],
-      [':-\\', '🫤'],
-      [':-*', '😘'],
-      ['&gt;:D', '😈'],
-      ['O:-)', '😇'],
       [':smile:', '🙂'],
       [':sad:', '🙁'],
-      [':razz:', '😛'],
-      [':???:', '😕'],
-      [':neutral:', '😐'],
-      [':-?', '😕'],
       [':-o', '😲'],
-      [':-|', '😐'],
-      ['8-O', '😲'],
-      [':ugeek:', '🤓'],
       [':rofl:', '🤣'],
     ]
 
@@ -1547,17 +1676,81 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
     })
+
+    // Stock codes each engine draws as its own face.
+    const markedAliases: Array<string> = [
+      ':-*',
+      'O:-)',
+      ':razz:',
+      ':neutral:',
+      ':-|',
+      '&gt;:(',
+      '???',
+      '::)',
+      ':-[',
+      ':-\\',
+      '&gt;:D',
+      ':???:',
+      ':-?',
+      '8-O',
+      ':ugeek:',
+    ]
+
+    it.each(markedAliases)('should mark the %s code', async (code) => {
+      const value = html`
+        <p>
+          <img
+            class="smilies"
+            src="https://example.com/images/smilies/8.gif"
+            alt="${code}"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="smilies"
+            src="https://example.com/images/smilies/8.gif"
+            alt="${code}"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('names known to have no glyph', () => {
+    it('should resolve a stock file by its filename when its alt is a code engines draw differently', async () => {
+      const value = '<p><img src="https://example.com/smiles/yikes.gif" alt=":shock:"></p>'
+      const expected = '<p>😱</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark a file named for no glyph under a smilie directory alone', async () => {
+      const value = '<p><img src="https://example.com/images/smilies/icon_evil.gif" alt=""></p>'
+      const expected =
+        '<p><img data-emoji="" src="https://example.com/images/smilies/icon_evil.gif" alt=""></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('platform filename tables', () => {
     const nameEntries = smiliesEmojiNameTables.flatMap((platform) =>
       Object.entries(platform.names).map(([name, glyph]) => [platform.name, name, glyph] as const),
     )
+    const glyphEntries = nameEntries.filter(([, , glyph]) => glyph)
 
-    it.each(nameEntries)('should map the %s name %s to a bare glyph', (_platform, _name, glyph) => {
-      expect(glyph).not.toBe('')
-      expect(glyph).not.toMatch(asciiLetterRegex)
-    })
+    it.each(glyphEntries)(
+      'should map the %s name %s to a bare glyph',
+      (_platform, _name, glyph) => {
+        expect(glyph).not.toBe('')
+        expect(glyph).not.toMatch(asciiLetterRegex)
+      },
+    )
 
     it.each(nameEntries)(
       'should key the %s name %s in lower case, as getFileStem normalizes',
@@ -1567,23 +1760,27 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     )
 
     // Names boards add to several engines' sets, each with an alt the board made up.
-    const observedCases: Array<[string, string, string]> = [
-      ['yes', ':y', '🙂‍↕️'],
-      ['ok', ':okay:', '👍'],
-      ['good', ':good', '👍'],
-      ['hi', '-hi-', '👋'],
-      ['bye', ':Bye', '👋'],
-      ['crying', ':crying:', '😭'],
-      ['santa', ':Mikołaj:', '🎅'],
-      ['popcorn', ':popcorn:', '🍿'],
-      ['beer', ':ber:', '🍻'],
-      ['thumbsup', '[doppel-daumen]', '👍'],
-      ['crazy', ':craz:', '🤪'],
-      ['cheers', ':95:', '🥂'],
-      ['bravo', ')))', '👏'],
+    // Each board draws its own picture for these.
+    const markedObservedCases: Array<[string, string]> = [
+      ['crying', ':crying:'],
+      ['santa', ':Mikołaj:'],
+      ['popcorn', ':popcorn:'],
+      ['thumbsup', '[doppel-daumen]'],
+      ['clap', ''],
+      ['yes', ':y'],
+      ['ok', ':okay:'],
+      ['good', ':good'],
+      ['hi', '-hi-'],
+      ['bye', ':Bye'],
+      ['beer', ':ber:'],
+      ['crazy', ':craz:'],
+      ['cheers', ':95:'],
+      ['bravo', ')))'],
+      ['rofl', ''],
+      ['rotfl', ''],
     ]
 
-    it.each(observedCases)('should replace the %s file', async (name, alt, expected) => {
+    it.each(markedObservedCases)('should mark the %s file', async (name, alt) => {
       const value = html`
         <p>
           <img
@@ -1593,19 +1790,16 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-
-      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
-    })
-
-    const roflNames: Array<string> = ['rofl', 'rotfl']
-
-    it.each(roflNames)('should replace the %s file', async (name) => {
-      const value = html`
+      const expected = html`
         <p>
-          <img class="smilies" src="https://example.com/images/smilies/${name}.gif" alt="">
+          <img
+            data-emoji=""
+            class="smilies"
+            src="https://example.com/images/smilies/${name}.gif"
+            alt="${alt}"
+          >
         </p>
       `
-      const expected = '<p>🤣</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })

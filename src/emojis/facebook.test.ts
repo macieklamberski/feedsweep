@@ -102,9 +102,9 @@ describeForEachParser('facebookClassicEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should replace the kiki emoticon by its code', async () => {
+  it('should keep the kiki emoticon as its code, which engines draw as different faces', async () => {
     const value = '<p><span class="emoticon emoticon_kiki" title="^_^"></span></p>'
-    const expected = '<p>😊</p>'
+    const expected = '<p><span data-emoji="">^_^</span></p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })

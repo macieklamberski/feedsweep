@@ -4,24 +4,25 @@ import { describeForEachParser, emojiConverters, html } from '../tests.js'
 describeForEachParser('liferayEmojiResolver', (parseHtml) => {
   const { transform } = emojiConverters(parseHtml)
 
-  const nameCases: Array<[string, string]> = [
-    ['happy', '🙂'],
-    ['smile', '😀'],
-    ['big_grin', '😁'],
-    ['oh_my', '😲'],
-    ['bashful', '😊'],
-    ['smug', '😏'],
-    ['roll_eyes', '🙄'],
-    ['suspicious', '🤨'],
-    ['in_love', '😍'],
-    ['bored', '🥱'],
-    ['closed_eyes', '😌'],
-    ['cold', '🥶'],
-    ['glare', '😠'],
-    ['ninja', '🥷'],
+  // Liferay draws each of these as its own face, so they keep their pictures.
+  const markedNames: Array<string> = [
+    'happy',
+    'smile',
+    'big_grin',
+    'oh_my',
+    'bashful',
+    'smug',
+    'roll_eyes',
+    'suspicious',
+    'in_love',
+    'bored',
+    'closed_eyes',
+    'cold',
+    'glare',
+    'ninja',
   ]
 
-  it.each(nameCases)('should replace the %s emoticon', async (name, expected) => {
+  it.each(markedNames)('should mark the %s emoticon', async (name) => {
     const value = html`
       <p>
         <img
@@ -30,11 +31,20 @@ describeForEachParser('liferayEmojiResolver', (parseHtml) => {
         >
       </p>
     `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          alt="emoticon"
+          src="https://example.com/o/classic-theme/images/emoticons/${name}.gif"
+        >
+      </p>
+    `
 
-    expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should replace an emoticon under a Liferay 6 theme directory', async () => {
+  it('should mark an emoticon under a Liferay 6 theme directory', async () => {
     const value = html`
       <p>
         <img
@@ -43,7 +53,15 @@ describeForEachParser('liferayEmojiResolver', (parseHtml) => {
         >
       </p>
     `
-    const expected = '<p>😀</p>'
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          alt="emoticon"
+          src="https://example.com/html/themes/classic/images/emoticons/smile.gif"
+        >
+      </p>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })

@@ -3,22 +3,22 @@ import type { EmojiResolver } from '../types.js'
 import { type EmojiGlyph, getFileStem } from '../utils/emojis.js'
 
 // Liferay's names the forum tables lack or draw differently. Liferay binds smile.gif to `:D`,
-// where every forum engine's smile is 🙂.
+// where every forum engine's smile is 🙂, and draws the rest as its own faces.
 const liferayEmojiNames = toMap<EmojiGlyph>({
-  happy: '🙂',
-  smile: '😀',
-  big_grin: '😁',
-  oh_my: '😲',
-  bashful: '😊',
-  smug: '😏',
-  roll_eyes: '🙄',
-  suspicious: '🤨',
-  in_love: '😍',
-  bored: '🥱',
-  closed_eyes: '😌',
-  cold: '🥶',
-  glare: '😠',
-  ninja: '🥷',
+  happy: false,
+  smile: false,
+  big_grin: false,
+  oh_my: false,
+  bashful: false,
+  smug: false,
+  roll_eyes: false,
+  suspicious: false,
+  in_love: false,
+  bored: false,
+  closed_eyes: false,
+  cold: false,
+  glare: false,
+  ninja: false,
 })
 
 // Liferay's message board emoticons, which carry `alt="emoticon"` and no class. The rest of its

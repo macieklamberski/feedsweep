@@ -8,12 +8,12 @@ const nameClassRegex = /(?:^|\s)emoticon_([a-z0-9]+)(?:\s|$)/
 
 // Jive's stock names that neither the shortcode table nor gemoji carries.
 const jiveEmojiNames = toMap<EmojiGlyph>({
-  happy: '🙂',
-  silly: '😛',
-  laugh: '🤣',
-  shocked: '😲',
-  plain: '😐',
-  mischief: '😏',
+  happy: false,
+  silly: false,
+  laugh: false,
+  shocked: false,
+  plain: false,
+  mischief: false,
 })
 
 // Jive's emoticon, an empty span whose picture the site's CSS draws from the name: the macro

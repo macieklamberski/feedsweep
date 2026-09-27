@@ -37,7 +37,7 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should replace a smilie by a code the board added', async () => {
+  it('should mark a smilie by a code the board added', async () => {
     const value = html`
       <p>
         <img
@@ -49,7 +49,18 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
         >
       </p>
     `
-    const expected = '<p>🤣</p>'
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://example.com/upload/main/smiles/5/11.gif"
+          data-code="|do|"
+          alt="|do|"
+          title="Умираю от смеха"
+          class="bx-smile"
+        >
+      </p>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })
@@ -84,21 +95,15 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
   })
 
   // Codes from Bitrix's stock set that the shared table does not carry.
-  const stockCodeCases: Array<[string, string]> = [
-    [':facepalm:', '🤦'],
-    [':{}', '😘'],
-    [':-{}', '😘'],
-    [':~(', '😢'],
-    [':-/', '😕'],
-  ]
+  const stockCodes: Array<string> = [':facepalm:', ':{}', ':-{}', ':~(', ':-/']
 
   // Bitrix draws `>:-<` on the same file as `:evil:`.
-  const sharedCodeCases: Array<[string, string, string]> = [
-    [':like:', 'bx_smile_like', '👍'],
-    ['&gt;:-&lt;', 'bx_smile_evil', '😠'],
+  const sharedCodeCases: Array<[string, string]> = [
+    [':like:', 'bx_smile_like'],
+    ['&gt;:-&lt;', 'bx_smile_evil'],
   ]
 
-  it.each(sharedCodeCases)('should replace the stock %s code', async (code, file, expected) => {
+  it.each(sharedCodeCases)('should mark the stock %s code', async (code, file) => {
     const value = html`
       <p>
         <img
@@ -110,11 +115,23 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
         >
       </p>
     `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://example.com/bitrix/images/main/smiles/3/${file}.png"
+          data-code="${code}"
+          data-definition="SD"
+          alt="${code}"
+          class="bx-smile"
+        >
+      </p>
+    `
 
-    expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it.each(stockCodeCases)('should replace the stock %s code', async (code, expected) => {
+  it.each(stockCodes)('should mark the stock %s code', async (code) => {
     const value = html`
       <p>
         <img
@@ -126,7 +143,19 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
         >
       </p>
     `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://example.com/upload/main/smiles/5/070.gif"
+          data-code="${code}"
+          data-definition="SD"
+          alt="${code}"
+          class="bx-smile"
+        >
+      </p>
+    `
 
-    expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 })

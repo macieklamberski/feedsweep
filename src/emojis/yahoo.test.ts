@@ -13,9 +13,9 @@ describeForEachParser('yahooEmojiResolver', (parseHtml) => {
       'http://us.i1.yimg.com/us.yimg.com/i/mesg/emoticons6/1.gif',
     ]
 
-    it.each(hostCases)('should replace the emoticon at %s', async (src) => {
+    it.each(hostCases)('should mark the emoticon at %s', async (src) => {
       const value = `<p>Hello <img border="0" src="${src}"></p>`
-      const expected = '<p>Hello 🙂</p>'
+      const expected = `<p>Hello <img data-emoji="" border="0" src="${src}"></p>`
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -28,23 +28,22 @@ describeForEachParser('yahooEmojiResolver', (parseHtml) => {
   })
 
   describe('file numbers', () => {
-    // Codes another engine reads as a different emoticon, and numbers whose decided glyph differs
-    // from what the code means elsewhere.
-    const numberCases: Array<[number, string, string]> = [
-      [5, ';;)', '😉'],
-      [6, '&gt;:D&lt;', '🤗'],
-      [8, ':x', '🥰'],
-      [9, ':"&gt;', '😳'],
-      [14, 'X(', '😡'],
-      [24, '=))', '🤣'],
-      [32, ':-$', '🤫'],
-      [39, ':-?', '🤔'],
-      [108, ':o3', '🥺'],
-      [109, 'X_X', '🫣'],
-      [113, ':-bd', '👍'],
+    // Codes another engine reads as a different emoticon, on Yahoo's own drawings.
+    const numberCases: Array<[number, string]> = [
+      [5, ';;)'],
+      [6, '&gt;:D&lt;'],
+      [8, ':x'],
+      [9, ':"&gt;'],
+      [14, 'X('],
+      [24, '=))'],
+      [32, ':-$'],
+      [39, ':-?'],
+      [108, ':o3'],
+      [109, 'X_X'],
+      [113, ':-bd'],
     ]
 
-    it.each(numberCases)('should replace number %d over its %s alt', async (number, alt, glyph) => {
+    it.each(numberCases)('should mark number %d with its %s alt', async (number, alt) => {
       const value = html`
         <p>
           <img
@@ -53,8 +52,17 @@ describeForEachParser('yahooEmojiResolver', (parseHtml) => {
           >
         </p>
       `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            alt="${alt}"
+            src="http://us.i1.yimg.com/us.yimg.com/i/mesg/emoticons7/${number}.gif"
+          >
+        </p>
+      `
 
-      expect(await transform(value)).toEqualHtml(`<p>${glyph}</p>`)
+      expect(await transform(value)).toEqualHtml(expected)
     })
   })
 

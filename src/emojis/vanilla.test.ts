@@ -55,6 +55,30 @@ describeForEachParser('vanillaEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should mark ok, which the forum names know to have no glyph, over gemoji', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emoji"
+            src="https://example.com/resources/emoji/ok.png"
+            alt=":ok:"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="emoji"
+            src="https://example.com/resources/emoji/ok.png"
+            alt=":ok:"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should mark trollface, which has no Unicode glyph', async () => {
       const value = html`
         <p>

@@ -36,17 +36,10 @@ describeForEachParser('jiveEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  // Jive's stock names that neither the shortcode table nor gemoji carries.
-  const jiveNameCases: Array<[string, string]> = [
-    ['happy', '🙂'],
-    ['silly', '😛'],
-    ['laugh', '🤣'],
-    ['shocked', '😲'],
-    ['plain', '😐'],
-    ['mischief', '😏'],
-  ]
+  // Jive's stock names that Jive draws as its own faces.
+  const jiveNames: Array<string> = ['happy', 'silly', 'laugh', 'shocked', 'plain', 'mischief']
 
-  it.each(jiveNameCases)('should replace the macro by the Jive name %s', async (name, glyph) => {
+  it.each(jiveNames)('should mark the macro of the Jive name %s as fallback text', async (name) => {
     const value = html`
       <p>
         <span
@@ -58,7 +51,7 @@ describeForEachParser('jiveEmojiResolver', (parseHtml) => {
       </p>
     `
 
-    expect(await transform(value)).toEqualHtml(`<p>${glyph}</p>`)
+    expect(await transform(value)).toEqualHtml(`<p><span data-emoji="">:${name}:</span></p>`)
   })
 
   it('should mark a Jive name no table carries as fallback text', async () => {
@@ -93,11 +86,14 @@ describeForEachParser('jiveEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it.each(jiveNameCases)('should replace the span by the Jive name %s', async (name, glyph) => {
-      const value = `<p><span class="emoticon-inline emoticon_${name}"></span></p>`
+    it.each(jiveNames)(
+      'should mark the span of the Jive name %s as fallback text',
+      async (name) => {
+        const value = `<p><span class="emoticon-inline emoticon_${name}"></span></p>`
 
-      expect(await transform(value)).toEqualHtml(`<p>${glyph}</p>`)
-    })
+        expect(await transform(value)).toEqualHtml(`<p><span data-emoji="">:${name}:</span></p>`)
+      },
+    )
 
     // The Facebook classic resolver also selects an `emoticon_<name>` span, and would leave the
     // bare name as text.
