@@ -1,45 +1,26 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
-import {
-  type EmojiNameTable,
-  getFileStem,
-  mergeEmojiNames,
-  resolveEmojiImage,
-} from '../utils/emojis.js'
+import { getFileStem, mergeEmojiNames, resolveEmojiImage } from '../utils/emojis.js'
 import { glyphFromGemojiName } from '../utils/gemoji.js'
 import { smiliesEmojiNameTables } from './smilies.js'
 
-export const vanillaEmojiNameTable: EmojiNameTable = {
-  name: 'Vanilla',
-  names: {
-    'simple-smile': '🙂',
-  },
-}
-
-// Vanilla ships the stock forum names alongside its own.
-const names = toMap(mergeEmojiNames([...smiliesEmojiNameTables, vanillaEmojiNameTable]))
+// Vanilla ships the stock forum names alongside its own `simple-smile`.
+const names = toMap(
+  mergeEmojiNames([
+    ...smiliesEmojiNameTables,
+    { name: 'Vanilla', names: { 'simple-smile': '🙂' } },
+  ]),
+)
 
 // Vanilla's emoji. The directory is the only signal, since Vanilla's class is the generic `emoji`.
-// The rest of its set is named by gemoji name, read only after the forum names, which draw
-// `kiss`, `sleepy`, `smile` and `smiley` differently.
+// Vanilla names its files by gemoji name, which is exact even where a forum engine draws a file of
+// the same name as its own face, so the forum names only cover what gemoji does not know.
 export const vanillaEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[src*="/resources/emoji/" i]',
   extract: (element) => {
-    const resolved = resolveEmojiImage(element, { isStrong: false, names })
-
-    if (resolved && !('custom' in resolved)) {
-      return resolved
-    }
-
-    // Vanilla names these files by gemoji name itself, so the name is exact even where a forum
-    // engine draws a file of the same name as its own face.
     const glyph = glyphFromGemojiName(getFileStem(element.getAttribute('src') ?? ''))
 
-    if (glyph) {
-      return { glyph }
-    }
-
-    return resolved
+    return resolveEmojiImage(element, { isStrong: false, names, glyph })
   },
 }
