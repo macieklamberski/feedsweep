@@ -1,5 +1,5 @@
 import type { EmojiResolver } from '../types.js'
-import { attr, isElement } from '../utils/dom.js'
+import { attr, isElement, isWhitespaceText } from '../utils/dom.js'
 import {
   getFileStem,
   glyphFromCodepoints,
@@ -119,7 +119,12 @@ export const facebookClassicEmojiResolver: EmojiResolver = {
 
     // The sibling Facebook hid from sighted readers holds the code, or a label naming the
     // emoticon like `smile emoticon` or `winkhymiö`.
-    const previous = element.previousSibling
+    let previous = element.previousSibling
+
+    while (previous && isWhitespaceText(previous)) {
+      previous = previous.previousSibling
+    }
+
     const fallback =
       isElement(previous) && previous.matches(textClassSelector) ? previous.textContent?.trim() : ''
 

@@ -305,6 +305,18 @@ describeForEachParser('facebookClassicEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should replace the emoticon and its sibling separated by whitespace', async () => {
+    const value = html`
+      <p>Ok <span class="emoticon_text" aria-hidden="true">:)</span> <span
+          class="emoticon emoticon_smile"
+          title=":)"
+        ></span></p>
+    `
+    const expected = '<p>Ok  🙂</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should replace a sibling code padded with non-breaking spaces', async () => {
     const value = html`
       <p>Ok<span
