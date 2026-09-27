@@ -343,7 +343,6 @@ const markerSelectors = [
   'img[class~="smilies" i]', // phpBB
   'img[class~="smiley" i]', // SMF, DokuWiki
   'img[class~="smilie" i]', // MyBB, XenForo
-  'img[class~="e-emoticon" i]', // e107
 ]
 const markerSelector = markerSelectors.join(', ')
 
@@ -354,7 +353,6 @@ const directories = [
   '/smileys/', // SMF, DokuWiki's lib/images/smileys/, Drupal
   '/smiles/', // uCoz, and boards that serve phpBB's set from a renamed directory
   '/smiley/', // CKEditor, FCKeditor and TinyMCE; ProBoards serves the same set from here
-  '/emotes/', // e107
   '/emoticons/', // Serendipity's stock template set and emoticate plugin, IPS, Kunena
   'SMILIES_PATH', // phpBB's template variable left unsubstituted, raw or percent-encoded
 ]

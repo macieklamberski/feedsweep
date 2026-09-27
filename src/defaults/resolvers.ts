@@ -177,6 +177,7 @@ import { discourseEmojiResolver } from '../emojis/discourse.js'
 import { discuzEmojiResolver } from '../emojis/discuz.js'
 import { dropboxEmojiResolver } from '../emojis/dropbox.js'
 import { drupalEmojiResolver } from '../emojis/drupal.js'
+import { e107EmojiResolver } from '../emojis/e107.js'
 import { easydiscussEmojiResolver } from '../emojis/easydiscuss.js'
 import { exblogEmojiResolver } from '../emojis/exblog.js'
 import {
@@ -469,6 +470,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   easydiscussEmojiResolver,
   tinymceEmojiResolver,
   fudforumEmojiResolver,
+  e107EmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,
   yahooEmojiResolver,
