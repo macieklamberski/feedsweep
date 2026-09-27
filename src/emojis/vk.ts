@@ -3,6 +3,7 @@ import { attr } from '../utils/dom.js'
 import { getFileStem, isEmojiShaped, resolveEmojiImage } from '../utils/emojis.js'
 
 const bytePairRegex = /../g
+const keycapStemRegex = /^[0-9]e283a3$/i
 const utf16HexRegex = /^(?:[0-9a-f]{4})+$/i
 const utf16UnitRegex = /.{4}/g
 
@@ -10,6 +11,11 @@ const utf8Decoder = new TextDecoder('utf-8', { fatal: true })
 
 // VK names each file by the UTF-8 bytes of its glyph in hex, so f09f92a5 is 💥.
 const glyphFromUtf8Hex = (stem: string): string | undefined => {
+  // A keycap keeps its digit as written before the bytes of U+20E3, as in `1e283a3` for 1️⃣.
+  if (keycapStemRegex.test(stem)) {
+    return `${stem[0]}️⃣`
+  }
+
   const pairs = stem.match(bytePairRegex) ?? []
   const bytes = Uint8Array.from(pairs, (pair) => Number.parseInt(pair, 16))
 

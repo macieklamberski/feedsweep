@@ -33,6 +33,13 @@ describeForEachParser('vkEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should decode a keycap named by its digit and the bytes of the keycap mark', async () => {
+    const value = '<p><img alt="" src="https://vk.com/emoji/e/1e283a3.png"></p>'
+    const expected = '<p>1️⃣</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should mark an image whose filename is not valid UTF-8', async () => {
     const value = '<p><img alt="" src="https://vk.com/emoji/e/f09f.png"></p>'
     const expected = '<p><img data-emoji="" alt="" src="https://vk.com/emoji/e/f09f.png"></p>'
