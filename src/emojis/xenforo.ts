@@ -28,13 +28,14 @@ const xenforoEmojiNames = toMap<EmojiGlyph>({
 // which render as nothing without the site's CSS.
 export const xenforoEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: `${markerSelector}, img[data-shortname], img[src*="${directory}" i]`,
+  selector: `${markerSelector}, img[data-shortname], img[src*="${directory}" i], img[src*="${spacerPath}" i]`,
   extract: (element) => {
     const src = element.getAttribute('src') ?? ''
     const shortname = attr(element, 'data-shortname')
     const isBlank = src.endsWith(spacerPath)
     const isSprite = !!shortname && (isBlank || rendersNothing(src))
-    const isStrong = isSprite || element.matches(markerSelector)
+    // Some feeds drop the class, and the spacer alone still names the engine.
+    const isStrong = isSprite || isBlank || element.matches(markerSelector)
 
     if (!isStrong && !element.matches(smilieSelector)) {
       return
