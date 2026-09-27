@@ -105,4 +105,42 @@ describeForEachParser('cocologEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should mark a TypePad pictogram served as an uploaded asset', async () => {
+    const value = html`
+      <p>
+        <img
+          alt="fuji"
+          class="emoticon fuji  at-xid-6a0120a641efc6970b0133ecfbb9d8970b"
+          src="https://example.typepad.jp/.a/6a0120a641efc6970b0133ecfbb9d8970b-pi"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          alt="fuji"
+          class="emoticon fuji  at-xid-6a0120a641efc6970b0133ecfbb9d8970b"
+          src="https://example.typepad.jp/.a/6a0120a641efc6970b0133ecfbb9d8970b-pi"
+          data-emoji=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave an uploaded asset with no pictogram name untouched', async () => {
+    const value = html`
+      <p>
+        <img
+          alt="photo"
+          class="emoticon photo  at-xid-6a0120a641efc6970b0133ecfbb9d8970b"
+          src="https://example.typepad.jp/.a/6a0120a641efc6970b0133ecfbb9d8970b-pi"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
 })
