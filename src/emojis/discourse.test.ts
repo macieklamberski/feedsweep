@@ -115,6 +115,21 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should put the skin tone on every person in a joined sequence', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://forum.example.com/images/emoji/twitter/couple_with_heart_woman_man/6.png?v=12"
+          class="emoji"
+          alt=":couple_with_heart_woman_man:t6:"
+        >
+      </p>
+    `
+    const expected = '<p>👩🏿‍❤️‍👨🏿</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should put the skin tone in place of a variation selector', async () => {
     const value = html`
       <p>

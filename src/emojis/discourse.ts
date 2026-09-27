@@ -1,6 +1,6 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
-import { getFileStem, resolveEmojiImage } from '../utils/emojis.js'
+import { applyTones, getFileStem, resolveEmojiImage } from '../utils/emojis.js'
 import { glyphFromGemojiName } from '../utils/gemoji.js'
 
 // The emoji sets a Discourse site can pick, each served from `/images/emoji/<set>/`. A custom
@@ -851,7 +851,6 @@ const discourseAliases = toMap<string>({
 const queryOrHashRegex = /[?#]/
 // A toned file is named by its Fitzpatrick type, 2 to 6, inside a folder named for the emoji.
 const toneRegex = /^[2-6]$/
-const firstModifier = 0x1f3fb // U+1F3FB, Fitzpatrick type 1-2
 
 const getNameGlyph = (name: string): string | undefined => {
   return discourseNames.get(name) ?? glyphFromGemojiName(name)
@@ -869,12 +868,8 @@ const getGlyph = (src: string): string | undefined => {
     return glyph
   }
 
-  // The modifier follows the first codepoint and replaces a variation selector there.
-  const [first, ...rest] = [...glyph]
-  const tail = rest[0] === '️' ? rest.slice(1) : rest
-  const modifier = String.fromCodePoint(firstModifier + Number(stem) - 2)
-
-  return [first, modifier, ...tail].join('')
+  // Type 2 is the first modifier, which applyTones numbers 1, and every person takes the tone.
+  return applyTones(glyph, `${Number(stem) - 1}`)
 }
 
 // Discourse's stock emoji, named by the shortcode Discourse writes, a gemoji name or its own.
