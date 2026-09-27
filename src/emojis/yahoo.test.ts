@@ -139,7 +139,7 @@ describeForEachParser('yahooEmojiResolver', (parseHtml) => {
   })
 
   it('should leave a Messenger image outside the emoticon directory untouched', async () => {
-    const value = '<p><img src="http://mail.yimg.com/us.yimg.com/i/mesg/tsmileys2/03.gif"></p>'
+    const value = '<p><img src="http://mail.yimg.com/us.yimg.com/i/mesg/icons/buzz.gif"></p>'
 
     expect(await transform(value)).toEqualHtml(value)
   })
@@ -150,5 +150,25 @@ describeForEachParser('yahooEmojiResolver', (parseHtml) => {
     const expected = '<p>😀</p>'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  const folderCases: Array<string> = [
+    'http://us.i1.yimg.com/us.yimg.com/i/mesg/tsmileys2/40.gif',
+    'http://us.i1.yimg.com/us.yimg.com/i/us/msg/emoticons/1.gif',
+    'https://l.yimg.com/op/blog/images/emoticon/1.gif',
+    'https://tw.yimg.com/f/i/tw/blog/smiley/1.gif',
+  ]
+
+  it.each(folderCases)('should mark an emoticon from %s', async (src) => {
+    const value = `<p><img src="${src}"></p>`
+
+    expect(await transform(value)).toEqualHtml(`<p><img src="${src}" data-emoji=""></p>`)
+  })
+
+  it('should replace an emoticon from the smaller set by its universal code alt', async () => {
+    const value =
+      '<p><img src="http://us.i1.yimg.com/us.yimg.com/i/mesg/tsmileys2/01.gif" alt=":)"></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>🙂</p>')
   })
 })

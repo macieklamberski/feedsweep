@@ -103,6 +103,10 @@ const yahooEmoticons = toMap<EmojiGlyph>({
 
 const selectors = [
   'img[src*="yimg.com/" i][src*="/i/mesg/emoticons" i]', // Messenger's emoticons, on every host
+  'img[src*="yimg.com/" i][src*="/i/mesg/tsmileys2/" i]', // Messenger's smaller set
+  'img[src*="yimg.com/" i][src*="/i/us/msg/emoticons/" i]', // Mail's older copy of Messenger's set
+  'img[src*="yimg.com/" i][src*="/op/blog/images/emoticon/" i]', // Yahoo Taiwan's blog
+  'img[src*="yimg.com/" i][src*="/f/i/tw/blog/smiley/" i]', // The same blog's older folder
   'img[src*="yimg.com/pu/emoticon/" i]', // Messenger's emoticons, on the forum host
   'img[src*="yimg.com/ok/u/assets/img/emoticons/" i]', // Mail's emoticons, as `emo<n>.gif`
   'img[src*="yimg.com/nq/yemoji_assets/" i]', // Yahoo's own emoji, named by codepoint
