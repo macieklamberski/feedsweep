@@ -1,6 +1,6 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
-import { applyTones, getFileStem, resolveEmojiImage } from '../utils/emojis.js'
+import { applyTones, getFileStem, queryOrHashRegex, resolveEmojiImage } from '../utils/emojis.js'
 import { glyphFromGemojiName } from '../utils/gemoji.js'
 
 // The emoji sets a Discourse site can pick, each served from `/images/emoji/<set>/`. A custom
@@ -848,7 +848,6 @@ const discourseAliases = toMap<string>({
   flag_gb: 'united_kingdom',
 })
 
-const queryOrHashRegex = /[?#]/
 // A toned file is named by its Fitzpatrick type, 2 to 6, inside a folder named for the emoji.
 const toneRegex = /^[2-6]$/
 

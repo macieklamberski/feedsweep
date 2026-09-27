@@ -90,7 +90,7 @@ export const mergeEmojiNames = (tables: Array<EmojiNameTable>): Record<string, E
 
 // Applied to a filename in turn: the query and hash split, then the stock-file, icon-set and
 // resolution markers that are not part of the name.
-const queryOrHashRegex = /[?#]/
+export const queryOrHashRegex = /[?#]/
 const namePrefixRegex = /^(?:default_|face-|smiley-|sf-)/
 const nameVariantRegex = /@[0-9]+x$/
 
