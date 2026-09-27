@@ -235,6 +235,7 @@ import { vanillaEmojiResolver } from '../emojis/vanilla.js'
 import { vkEmojiResolver } from '../emojis/vk.js'
 import { webWizEmojiResolver } from '../emojis/webwiz.js'
 import { weiboEmojiResolver } from '../emojis/weibo.js'
+import { whatsappEmojiResolver } from '../emojis/whatsapp.js'
 import { wordpressEmojiResolver } from '../emojis/wordpress.js'
 import { xenforoEmojiResolver } from '../emojis/xenforo.js'
 import { yahooEmojiResolver } from '../emojis/yahoo.js'
@@ -467,6 +468,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   facebookElementEmojiResolver,
   twemojiElementEmojiResolver,
   telegramElementEmojiResolver,
+  whatsappEmojiResolver,
   froalaElementEmojiResolver,
   // Ahead of smilies, whose /smiles/ directory would read a Bitrix file by its filename first.
   bitrixEmojiResolver,
