@@ -240,6 +240,7 @@ import {
   telegramImageEmojiResolver,
 } from '../emojis/telegram.js'
 import { tinymceEmojiResolver } from '../emojis/tinymce.js'
+import { tiptapEmojiResolver } from '../emojis/tiptap.js'
 import { tistoryEmojiResolver } from '../emojis/tistory.js'
 import { twemojiElementEmojiResolver, twemojiEmojiResolver } from '../emojis/twemoji.js'
 import { ucozEmojiResolver } from '../emojis/ucoz.js'
@@ -483,6 +484,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   whatsappEmojiResolver,
   wordpressElementEmojiResolver,
   mozillaEmojiResolver,
+  tiptapEmojiResolver,
   froalaElementEmojiResolver,
   // Ahead of smilies, whose /smiles/ directory would read a Bitrix file by its filename first.
   bitrixEmojiResolver,
