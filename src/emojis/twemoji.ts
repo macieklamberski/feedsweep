@@ -5,6 +5,7 @@ const hosts = [
   'cdn.jsdelivr.net/gh/twitter/twemoji', // Twemoji via jsDelivr, used by IPS and others.
   'twemoji.maxcdn.com/', // Twemoji's retired CDN, still linked from older posts.
   'twimg.com/emoji/', // Twitter / X embedded tweets, from abs and abs-0. Pastes carry translated alts.
+  'pic.sopili.net/pub/emoji/twitter/', // A Twemoji mirror on sopili.net, pasted with no alt
 ]
 const markerSelector = [
   'img[class~="twemoji" i]', // Homeland and pymdownx; twemoji.parse itself defaults to the generic `emoji`

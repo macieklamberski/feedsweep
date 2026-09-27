@@ -149,5 +149,12 @@ describeForEachParser('twemojiEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should replace an emoji from the sopili mirror by its codepoint filename', async () => {
+      const value =
+        '<p><img src="https://pic.sopili.net/pub/emoji/twitter/2/72x72/1f914.png" width="20" height="20"></p>'
+
+      expect(await transform(value)).toEqualHtml('<p>🤔</p>')
+    })
   })
 })
