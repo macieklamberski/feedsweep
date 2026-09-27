@@ -874,7 +874,14 @@ const getGlyph = (src: string): string | undefined => {
 // Discourse's stock emoji, named by the shortcode Discourse writes, a gemoji name or its own.
 export const discourseEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: sets.map((set) => `img[class~="emoji" i][src*="/images/emoji/${set}/" i]`).join(', '),
+  selector: sets
+    .flatMap((set) => {
+      return [
+        `img[class~="emoji" i][src*="/images/emoji/${set}/" i]`,
+        `img[src*="emoji.discourse-cdn.com/${set}/" i]`, // Discourse's own CDN, on hosted sites
+      ]
+    })
+    .join(', '),
   extract: (element) => {
     const glyph = getGlyph(element.getAttribute('src') ?? '')
 
