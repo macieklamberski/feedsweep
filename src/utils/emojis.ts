@@ -21,6 +21,8 @@ export type EmojiImageMatch = {
   glyph?: EmojiGlyph
   // A file the engine paints its sprite behind, which renders nothing on its own.
   isBlank?: boolean
+  // The filename as the engine's table keys it, where the engine adds a marker of its own.
+  stem?: string
 }
 
 const emojiSequenceParts = [
@@ -85,7 +87,7 @@ export const mergeEmojiNames = (tables: Array<EmojiNameTable>): Record<string, E
 // Applied to a filename in turn: the query and hash split, then the stock-file, icon-set and
 // resolution markers that are not part of the name.
 const queryOrHashRegex = /[?#]/
-const namePrefixRegex = /^(?:default_|face-|smiley-|sf-|1[56]x1[56]_)/
+const namePrefixRegex = /^(?:default_|face-|smiley-|sf-)/
 const nameVariantRegex = /@[0-9]+x$/
 
 // A 1x1 sprite GIF data URI is under 256 bytes, and a real inlined PNG is not.
@@ -152,13 +154,13 @@ const getVocabularyGlyph = (
   token: string | undefined,
   src: string,
   names: Map<string, EmojiGlyph>,
+  stem = getNameStem(src),
 ): EmojiGlyph | undefined => {
   // Base64 can contain `/`, so a stem taken from a data URI can match a real name by accident.
   if (src.startsWith('data:')) {
     return getShortcode(token)
   }
 
-  const stem = getNameStem(src)
   const codepointGlyph = glyphFromCodepoints(stem)
 
   if (codepointGlyph) {
@@ -195,7 +197,9 @@ export const resolveEmojiImage = (
     return { glyph: match.glyph }
   }
 
-  const glyph = match.names ? getVocabularyGlyph(shortname ?? alt, src, match.names) : undefined
+  const glyph = match.names
+    ? getVocabularyGlyph(shortname ?? alt, src, match.names, match.stem)
+    : undefined
 
   if (glyph) {
     return { glyph }

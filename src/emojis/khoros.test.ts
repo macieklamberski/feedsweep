@@ -181,6 +181,20 @@ describeForEachParser('khorosImageEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should replace a face that lost its class by the name behind its size prefix', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/i/smilies/16x16_smiley-sad.png"
+            alt="Smiley triste"
+          >
+        </p>
+      `
+      const expected = '<p>🙁</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     // Vodafone's copy of the set is sized 15x15.
     it('should replace a face from the 15x15 set', async () => {
       const value = html`

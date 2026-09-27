@@ -1,14 +1,18 @@
+import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
   type EmojiGlyph,
+  type EmojiNameTable,
   getFileStem,
+  getNameStem,
   glyphFromCodepoints,
+  mergeEmojiNames,
   resolveEmojiElement,
   resolveEmojiImage,
 } from '../utils/emojis.js'
 import { glyphFromGemojiName } from '../utils/gemoji.js'
-import { smilieSelector, smiliesEmojiNames } from './smilies.js'
+import { smilieSelector, smiliesEmojiNames, smiliesEmojiNameTables } from './smilies.js'
 
 const idPrefixRegex = /^lia_/
 const hyphenRegex = /-/g
@@ -33,6 +37,38 @@ const markerSelector = [
   // `wlEmoticon-smile` has no name table.
   'img[class*="emoticon-"]',
 ].join(', ')
+
+// Khoros files its stock faces with a size prefix, as in `16x16_smiley-happy.png`, which
+// Vodafone's copy of the set writes as `15x15_`.
+const sizePrefixRegex = /^1[56]x1[56]_/
+
+// Keyed without the size prefix.
+const khorosEmojiNameTable: EmojiNameTable = {
+  name: 'Khoros and Lithium',
+  names: {
+    'smiley-happy': '🙂',
+    'smiley-wink': '😉',
+    'smiley-very-happy': '😁',
+    'smiley-tongue': '😛',
+    'smiley-sad': '🙁',
+    'smiley-mad': '😠',
+    'smiley-surprised': '😲',
+    'smiley-lol': '🤣',
+    'smiley-embarrassed': '😳',
+    'smiley-indifferent': '😐',
+    heart: '❤️',
+    'cat-happy': '😺',
+    'cat-very-happy': '😸',
+    'cat-lol': '😹',
+    'smiley-frustrated': false,
+    // Unicode's cat faces stop at the three smiles above.
+    'cat-wink': false,
+    'cat-tongue': false,
+    'cat-embarrassed': false,
+    // _woman-*, _man-*, _robot-*: no such faces at all.
+  },
+}
+const names = toMap(mergeEmojiNames([...smiliesEmojiNameTables, khorosEmojiNameTable]))
 
 // Samsung's Khoros set files each face as `<n>.<name>_<codepoints>`, as in `2.winking-face_1f609`,
 // and a skin tone appends the modifier's name and codepoint after the full sequence.
@@ -60,18 +96,25 @@ const getNumberedGlyph = (src: string): EmojiGlyph | undefined => {
   }
 }
 
-// Khoros' emoji images: the stock faces its classes mark, and Samsung's set named by codepoint
-// under any smilie directory.
+// Khoros' emoji images: the stock faces its classes or its names mark, and Samsung's set named by
+// codepoint, under any smilie directory.
 export const khorosImageEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: `${markerSelector}, ${smilieSelector}`,
   extract: (element) => {
-    const glyph = getNumberedGlyph(element.getAttribute('src') ?? '')
+    const src = element.getAttribute('src') ?? ''
+    const nameStem = getNameStem(src)
+    const stem = nameStem.replace(sizePrefixRegex, '')
+    const glyph = getNumberedGlyph(src)
+    // A face only Khoros names, or one behind its size prefix, which no other resolver reads.
+    const isKhorosName =
+      Object.hasOwn(khorosEmojiNameTable.names, stem) &&
+      (stem !== nameStem || !smiliesEmojiNames.has(stem))
 
-    if (!element.matches(markerSelector) && glyph === undefined) {
+    if (!element.matches(markerSelector) && glyph === undefined && !isKhorosName) {
       return
     }
 
-    return resolveEmojiImage(element, { isStrong: true, names: smiliesEmojiNames, glyph })
+    return resolveEmojiImage(element, { isStrong: true, names, glyph, stem })
   },
 }

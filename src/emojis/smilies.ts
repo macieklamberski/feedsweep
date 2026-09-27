@@ -222,32 +222,6 @@ export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
     },
   },
   {
-    // Keyed without the `16x16_` size prefix, which Vodafone's copy of the set ships as `15x15_`.
-    name: 'Khoros and Lithium',
-    names: {
-      'smiley-happy': '🙂',
-      'smiley-wink': '😉',
-      'smiley-very-happy': '😁',
-      'smiley-tongue': '😛',
-      'smiley-sad': '🙁',
-      'smiley-mad': '😠',
-      'smiley-surprised': '😲',
-      'smiley-lol': '🤣',
-      'smiley-embarrassed': '😳',
-      'smiley-indifferent': '😐',
-      heart: '❤️',
-      'cat-happy': '😺',
-      'cat-very-happy': '😸',
-      'cat-lol': '😹',
-      'smiley-frustrated': false,
-      // Unicode's cat faces stop at the three smiles above.
-      'cat-wink': false,
-      'cat-tongue': false,
-      'cat-embarrassed': false,
-      // _woman-*, _man-*, _robot-*: no such faces at all.
-    },
-  },
-  {
     name: 'CKEditor, FCKeditor and TinyMCE',
     names: {
       regular_smile: '🙂',
