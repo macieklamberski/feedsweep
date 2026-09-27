@@ -192,6 +192,8 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
     ['slight_smile', '🙂'],
     ['xray', '🩻'],
     ['umbrella2', '☂️'],
+    ['ballot_box_with_ballot', '🗳️'],
+    ['us', '🇺🇸'],
   ]
 
   it.each(aliasCases)('should replace the Discourse alias %s', async (alias, glyph) => {
