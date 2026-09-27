@@ -207,6 +207,7 @@ import { telegramEmojiResolver, telegramImageEmojiResolver } from '../emojis/tel
 import { twemojiEmojiResolver } from '../emojis/twemoji.js'
 import { vanillaEmojiResolver } from '../emojis/vanilla.js'
 import { vkEmojiResolver } from '../emojis/vk.js'
+import { webWizEmojiResolver } from '../emojis/webwiz.js'
 import { weiboEmojiResolver } from '../emojis/weibo.js'
 import { wordpressEmojiResolver } from '../emojis/wordpress.js'
 import { yahooEmojiResolver } from '../emojis/yahoo.js'
@@ -440,6 +441,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   bitrixEmojiResolver,
   // Ahead of smilies, whose forum names draw Liferay's smile.gif as 🙂.
   liferayEmojiResolver,
+  webWizEmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,
   yahooEmojiResolver,

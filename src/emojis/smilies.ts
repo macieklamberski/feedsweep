@@ -373,7 +373,6 @@ const directories = [
   // wp-includes and plugin icon sets sit under it, and the theme directory above differs per board.
   '/smilies/',
   '/smileys/', // SMF, DokuWiki's lib/images/smileys/, Drupal
-  'smileys/smiley', // Web Wiz Forums, often relative with no leading slash
   '/smiles/', // uCoz, and boards that serve phpBB's set from a renamed directory
   '/smiley/', // CKEditor, FCKeditor and TinyMCE; ProBoards serves the same set from here
   '/emotes/', // e107
@@ -386,52 +385,31 @@ const directories = [
 ]
 const directorySelector = directories.map((path) => `img[src*="${path}" i]`).join(', ')
 
-// Web Wiz Forums numbers its files. WoltLab ships other drawings under the same names in
-// `/smilies/`, so these are read only from Web Wiz's `/smileys/`.
-const webWizEmojiNames = toMap<EmojiGlyph>({
-  smiley1: false,
-  smiley2: false,
-  smiley3: false,
-  smiley4: false,
-  smiley5: false,
-  smiley6: false,
-  smiley7: false,
-  smiley8: false,
-  smiley9: false,
-  smiley10: false,
-  smiley11: false,
-  smiley12: false,
-  smiley13: false,
-  smiley14: false,
-  smiley15: false,
-  smiley16: false,
-  smiley17: false,
-  smiley18: false,
-  smiley19: false,
-  smiley20: false,
-  smiley21: false,
-  smiley22: false,
-  smiley23: false,
-  smiley24: false,
-  smiley25: false,
-  smiley26: false,
-  smiley27: false,
-  smiley28: false,
-  smiley29: false,
-  smiley30: false,
-  smiley31: false,
-  smiley32: false,
-  smiley33: false,
-  smiley34: false,
-  smiley35: false,
-  smiley36: false,
-  smiley37: false,
-  smiley38: false,
-  smiley39: false,
-  smiley40: false,
-  smiley41: false,
-  smiley42: false,
-})
+// Whether an image carries a class several forum engines share or sits in a directory they share.
+export const isSmilie = (element: Element): boolean => {
+  return element.matches(`${markerSelector}, ${directorySelector}`)
+}
+
+// An engine's own names, read only under the directory it serves them from, since other engines
+// ship other drawings under the same names.
+export const getDirectoryGlyph = (
+  src: string,
+  directory: string,
+  names: Map<string, EmojiGlyph>,
+): EmojiGlyph | undefined => {
+  // A XenForo sprite's base64 can contain `/`, leaving a stem that matches a name by accident.
+  if (src.startsWith('data:')) {
+    return
+  }
+
+  const path = src.toLowerCase()
+
+  if (!path.includes(directory)) {
+    return
+  }
+
+  return names.get(getNameStem(path))
+}
 
 // Discuz! X's names, some as generic as `time` and `call`, so read only from its own directory.
 const discuzEmojiNames = toMap<EmojiGlyph>({
@@ -615,7 +593,6 @@ const boardEmojiNames = toMap<EmojiGlyph>({
 
 // Names each engine ships under its own directory, where other engines ship other drawings.
 const engineEmojiNames: Array<[string, Map<string, EmojiGlyph>]> = [
-  ['smileys/', webWizEmojiNames], // Relative on boards that link it from the forum root
   ['static/image/smiley/', discuzEmojiNames],
   ['illiweb.com/fa/i/smiles/', forumotionEmojiNames],
   ['/media/kunena/emoticons/', kunenaEmojiNames],
