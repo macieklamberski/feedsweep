@@ -60,7 +60,12 @@ const getGlyph = (codes: Array<string | undefined>): EmojiGlyph | undefined => {
 // files are numbered or named per site, so the shortcode is the only stable key.
 export const bitrixEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: 'img[class~="bx-smile" i]',
+  selector: [
+    'img[class~="bx-smile" i]',
+    // The same smilies pasted without the class, from the forum's and the blog's folders.
+    'img[src*="/bitrix/images/forum/smile/" i]',
+    'img[src*="/bitrix/images/blog/smile/" i]',
+  ].join(', '),
   extract: (element) => {
     const glyph = getGlyph([attr(element, 'data-code'), attr(element, 'alt')])
 
