@@ -8,8 +8,10 @@ export const ucozEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: [
     'img[rel="usm" i]',
-    'img[src*="src.ucoz.net/sm/" i]', // The smilie sets uCoz serves every board from
-    'img[src*="src.ucoz.ru/sm/" i]',
+    'img[src*=".ucoz.net/sm/" i]', // The smilie sets uCoz serves every board from, on src and sN hosts
+    'img[src*=".ucoz.ru/sm/" i]',
+    'img[src*=".uweb.ru/sm/" i]',
+    'img[src*="/.s/sm/" i]', // The same sets as a site's local copy
   ].join(', '),
   extract: (element) => {
     return resolveEmojiImage(element, { isStrong: true, names: smiliesEmojiNames })

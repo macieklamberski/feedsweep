@@ -78,4 +78,16 @@ describeForEachParser('ucozEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should replace a smilie from a numbered uCoz host', async () => {
+    const value = '<p><img src="http://s34.ucoz.net/sm/1/smile.gif" border="0" alt="smile"></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>🙂</p>')
+  })
+
+  it('should replace a smilie from a site copy of the uCoz sets', async () => {
+    const value = '<p><img src="https://example.com/.s/sm/2/smile.gif" border="0" alt="smile"></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>🙂</p>')
+  })
 })
