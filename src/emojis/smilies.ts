@@ -1,10 +1,11 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
-import { getElementDimensions } from '../utils/dom.js'
+import { attr, getElementDimensions } from '../utils/dom.js'
 import {
   type EmojiGlyph,
   type EmojiNameTable,
   getNameStem,
+  getShortcode,
   mergeEmojiNames,
   noEmojiNames,
   resolveEmojiImage,
@@ -444,18 +445,46 @@ export const smiliesEmojiResolver: EmojiResolver = {
   },
 }
 
+// An alt shaped like a code an author types: a known code, a `:name:`, a `(name)` or `[name]` as
+// Plurk and Skype write them, or an ASCII face.
+const shortcodeAltRegex = /^(?::[^\s:]+:|\([\w -]+\)|\[[\w -]+\])$/
+const asciiEmoticonRegex = /^[>O]?[:;=8][-'^o]?[()[\]DPpOo*|\\/$@3Xx]{1,3}$/
+
+// Hosts another resolver claims only on one path, while the same set sits on others.
+const emoticonHosts = [
+  'cocolog-nifty.com', // Cocolog, whose set also sits under /.shared-cocolog/ and /.shared-pleasy/
+]
+const emoticonHostSelector = emoticonHosts.map((host) => `img[src*="${host}/" i]`).join(', ')
+
+const hasEmoticonAlt = (alt: string | undefined): boolean => {
+  if (!alt) {
+    return false
+  }
+
+  return (
+    getShortcode(alt) !== undefined || shortcodeAltRegex.test(alt) || asciiEmoticonRegex.test(alt)
+  )
+}
+
 // Images a site's own smilie set or album marks with the whole-word emoticon class, as Steam,
-// TypePad, Moodle and Plurk do. Reaction GIFs share the class and must keep their size.
+// TypePad, Moodle and Plurk do. Reaction GIFs and photos share the class, so an image without a
+// declared size needs a second hint before it is marked.
 export const smiliesEmoticonEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[class~="emoticon"]',
   extract: (element) => {
     const { width = 0, height = 0 } = getElementDimensions(element)
+    const size = Math.max(width, height)
 
-    if (Math.max(width, height) > 48) {
+    if (size > 48) {
       return
     }
 
-    return resolveEmojiImage(element, { isStrong: true, names: noEmojiNames })
+    const isStrong =
+      size > 0 ||
+      element.matches(`${directorySelector}, ${emoticonHostSelector}`) ||
+      hasEmoticonAlt(attr(element, 'alt'))
+
+    return resolveEmojiImage(element, { isStrong, names: noEmojiNames })
   },
 }

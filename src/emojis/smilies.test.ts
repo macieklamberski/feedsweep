@@ -244,14 +244,83 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
   })
 
   describe('emoticon class', () => {
-    it('should mark an emoticon with no declared size', async () => {
-      const value = '<p><img class="emoticon" src="https://example.com/albums/hug.gif"></p>'
+    const codeAltCases: Array<string> = [':eheh:', '(LOL)', '[emo155]', ':-))']
+
+    it.each(codeAltCases)(
+      'should mark an emoticon with no declared size by its %s alt',
+      async (alt) => {
+        const value = html`
+          <p>
+            <img
+              class="emoticon"
+              src="https://example.com/albums/hug.gif"
+              alt="${alt}"
+            >
+          </p>
+        `
+        const expected = html`
+          <p>
+            <img
+              data-emoji=""
+              class="emoticon"
+              src="https://example.com/albums/hug.gif"
+              alt="${alt}"
+            >
+          </p>
+        `
+
+        expect(await transform(value)).toEqualHtml(expected)
+      },
+    )
+
+    const hintSourceCases: Array<[string, string]> = [
+      ['a smilie directory', 'https://example.com/smilies/custom/hug.gif'],
+      ['a Cocolog host', 'https://app.cocolog-nifty.com/.shared-cocolog/images/emoticon/hug.gif'],
+    ]
+
+    it.each(hintSourceCases)(
+      'should mark an emoticon with no declared size in %s',
+      async (_hint, src) => {
+        const value = `<p><img class="emoticon" src="${src}" alt=""></p>`
+        const expected = `<p><img data-emoji="" class="emoticon" src="${src}" alt=""></p>`
+
+        expect(await transform(value)).toEqualHtml(expected)
+      },
+    )
+
+    it('should leave an emoticon with no declared size and no other hint untouched', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emoticon"
+            src="https://example.com/photos/beach-party.jpg"
+            alt="beach party"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should mark an emoticon declared at 20 pixels with no other hint', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emoticon"
+            src="https://example.com/albums/hug.gif"
+            width="20"
+            height="20"
+          >
+        </p>
+      `
       const expected = html`
         <p>
           <img
             data-emoji=""
             class="emoticon"
             src="https://example.com/albums/hug.gif"
+            width="20"
+            height="20"
           >
         </p>
       `
