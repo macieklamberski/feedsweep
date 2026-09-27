@@ -222,6 +222,7 @@ import { teamsEmojiResolver } from '../emojis/teams.js'
 import { telegramEmojiResolver, telegramImageEmojiResolver } from '../emojis/telegram.js'
 import { tinymceEmojiResolver } from '../emojis/tinymce.js'
 import { twemojiEmojiResolver } from '../emojis/twemoji.js'
+import { ucozEmojiResolver } from '../emojis/ucoz.js'
 import { vanillaEmojiResolver } from '../emojis/vanilla.js'
 import { vkEmojiResolver } from '../emojis/vk.js'
 import { webWizEmojiResolver } from '../emojis/webwiz.js'
@@ -477,6 +478,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   fudforumEmojiResolver,
   e107EmojiResolver,
   jforumEmojiResolver,
+  ucozEmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,
   yahooEmojiResolver,
