@@ -197,6 +197,7 @@ import { githubElementEmojiResolver, githubImageEmojiResolver } from '../emojis/
 import { gitlabEmojiResolver } from '../emojis/gitlab.js'
 import { gmailEmojiResolver } from '../emojis/gmail.js'
 import { invisionEmojiResolver } from '../emojis/invision.js'
+import { jeuxvideoEmojiResolver } from '../emojis/jeuxvideo.js'
 import { jforumEmojiResolver } from '../emojis/jforum.js'
 import { jiveEmojiResolver } from '../emojis/jive.js'
 import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
@@ -534,6 +535,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   moodleEmojiResolver,
   boardgamegeekEmojiResolver,
   rhymixEmojiResolver,
+  jeuxvideoEmojiResolver,
   rakutenEmojiResolver,
   mixiEmojiResolver,
   tistoryEmojiResolver,
