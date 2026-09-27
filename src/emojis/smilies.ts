@@ -359,7 +359,9 @@ export const getDirectoryGlyph = (
   return names.get(getNameStem(path))
 }
 
-// WoltLab and phpBB boards' additions, both served from `images/smilies/`.
+// WoltLab and phpBB boards' additions, both served from `images/smilies/`. Nothing in the markup
+// tells the two engines apart, so the names stay here, while JForum's hashed names under the same
+// directory have a resolver of their own.
 const boardEmojiNames = toMap<EmojiGlyph>({
   smiley34: false,
   danke: false,
