@@ -8,6 +8,8 @@ export const cocologEmojiResolver: EmojiResolver = {
     'img[src*="emojies.cocolog-nifty.com/emoticon/" i]', // Cocolog
     'img[src*="/.shared/images/emoticon/" i]', // TypePad, which Cocolog runs on, from any of its hosts
     'img[src*="/wp-content/plugins/typepad-emoji-for-tinymce/icons/" i]', // TypePad's set in WordPress
+    'img[src*="/plugins/EmoticonButton/images/emoticons/" i]', // The same set in Movable Type
+    'img[src*="/plugins/MTEntryFlex/fckeditor/editor/images/smiley/typepad/" i]', // Movable Type
   ].join(', '),
   extract: (element) => {
     return resolveEmojiImage(element, { isStrong: true })

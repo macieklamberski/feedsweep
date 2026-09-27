@@ -59,4 +59,50 @@ describeForEachParser('cocologEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should mark a pictogram from the Movable Type EmoticonButton plugin', async () => {
+    const value = html`
+      <p>
+        <img
+          class="emoticon happy01"
+          src="https://example.com/mt-static/plugins/EmoticonButton/images/emoticons/happy01.gif"
+          alt="happy01"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          class="emoticon happy01"
+          src="https://example.com/mt-static/plugins/EmoticonButton/images/emoticons/happy01.gif"
+          alt="happy01"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should mark a pictogram from the Movable Type MTEntryFlex plugin', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://example.com/mt-static/plugins/MTEntryFlex/fckeditor/editor/images/smiley/typepad/virgo.gif"
+          alt=""
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://example.com/mt-static/plugins/MTEntryFlex/fckeditor/editor/images/smiley/typepad/virgo.gif"
+          alt=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
 })
