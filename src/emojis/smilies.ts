@@ -348,11 +348,6 @@ const markerSelectors = [
   'img[class^="mcesmilie" i]', // XenForo 1.x numbers them, as in `mceSmilieSprite mceSmilie7`
   'img[class*=" mcesmilie" i]',
   'img[class~="e-emoticon" i]', // e107
-  'img[class~="bbc_emoticon" i]', // Invision Power Board and IPS
-  // Invision lazy-loads emoticons behind a spacer src with the file in data-src, which
-  // fixLazyImages promotes to src before convertEmojis runs.
-  'img[data-emoticon]', // Invision Power Board and IPS
-  'img[class~="ipsemoji" i]', // IPS 4
   'img[class~="spsmiley" i]', // Simple:Press
   'img[class~="smiley-content" i]', // Drupal Smileys
   'img[class~="wpml_ico" i]', // WP Monalisa
@@ -369,7 +364,6 @@ const directories = [
   '/smiley/', // CKEditor, FCKeditor and TinyMCE; ProBoards serves the same set from here
   '/emotes/', // e107
   '/emoticons/', // Serendipity's stock template set and emoticate plugin, IPS, Kunena
-  '/style_emoticons/', // IPB 2 and 3, which the plural form above misses
   'forum-smileys/', // Simple:Press, with no leading slash before the directory
   '/smiley_icons/', // FUDforum
   '/plugins/emotions/img/', // TinyMCE 3
@@ -400,57 +394,6 @@ export const getDirectoryGlyph = (
 
   return names.get(getNameStem(path))
 }
-
-// Invision boards' names past the stock set, under `uploads/emoticons` and IPB 2's
-// `style_emoticons`.
-const invisionEmojiNames = toMap<EmojiGlyph>({
-  yahoo: false,
-  help: false,
-  happy: false,
-  drinks: false,
-  excl: false,
-  clapping: false,
-  cray: false,
-  friends: false,
-  acute: false,
-  dance: false,
-  shok: false,
-  wave: false,
-  sorry: false,
-  unknw: false,
-  hug: false,
-  give_rose: false,
-  blush2: false,
-  shifty: false,
-  banana: false,
-  wallbash: false,
-  pardon: false,
-  salute: false,
-  wall: false,
-  thinking: false,
-  'untitled-1': false,
-  drunk: false,
-  no: false,
-  flowers: false,
-  ninja: false,
-  party: false,
-  nono: false,
-  worshippy: false,
-  victory: false,
-  search: false,
-  peace: false,
-  read: false,
-  fool: false,
-  respect: false,
-  sorcerer: false,
-  wow: false,
-  bday: false,
-  glare: false,
-  drool: false,
-  coolspeak: false,
-  console: false,
-  peacefingers: false,
-})
 
 // XenForo boards' additions to the stock set.
 const xenforoEmojiNames = toMap<EmojiGlyph>({
@@ -520,8 +463,6 @@ const boardEmojiNames = toMap<EmojiGlyph>({
 
 // Names each engine ships under its own directory, where other engines ship other drawings.
 const engineEmojiNames: Array<[string, Map<string, EmojiGlyph>]> = [
-  ['/uploads/emoticons/', invisionEmojiNames],
-  ['/style_emoticons/', invisionEmojiNames],
   ['/xenforo/smilies/', xenforoEmojiNames],
   ['/smileys/', smfEmojiNames],
   ['/images/smilies/', boardEmojiNames],
