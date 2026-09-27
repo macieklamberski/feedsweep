@@ -266,6 +266,8 @@ export const cocologEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: [
     'img[src*="emojies.cocolog-nifty.com/emoticon/" i]', // Cocolog
+    // Cocolog's copies of the set under `/.shared-cocolog/` and `/.shared-pleasy/`.
+    'img[class~="emoticon"][src*="cocolog-nifty.com/.shared-" i]',
     'img[src*="/.shared/images/emoticon/" i]', // TypePad, which Cocolog runs on, from any of its hosts
     'img[src*="/wp-content/plugins/typepad-emoji-for-tinymce/icons/" i]', // TypePad's set in WordPress
     'img[src*="/plugins/EmoticonButton/images/emoticons/" i]', // The same set in Movable Type

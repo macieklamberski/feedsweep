@@ -450,12 +450,6 @@ export const smiliesEmojiResolver: EmojiResolver = {
 const shortcodeAltRegex = /^(?::[^\s:]+:|\([\w -]+\)|\[[\w -]+\])$/
 const asciiEmoticonRegex = /^[>O]?[:;=8][-'^o]?[()[\]DPpOo*|\\/$@3Xx]{1,3}$/
 
-// Hosts another resolver claims only on one path, while the same set sits on others.
-const emoticonHosts = [
-  'cocolog-nifty.com', // Cocolog, whose set also sits under /.shared-cocolog/ and /.shared-pleasy/
-]
-const emoticonHostSelector = emoticonHosts.map((host) => `img[src*="${host}/" i]`).join(', ')
-
 const hasEmoticonAlt = (alt: string | undefined): boolean => {
   if (!alt) {
     return false
@@ -481,9 +475,7 @@ export const smiliesEmoticonEmojiResolver: EmojiResolver = {
     }
 
     const isStrong =
-      size > 0 ||
-      element.matches(`${directorySelector}, ${emoticonHostSelector}`) ||
-      hasEmoticonAlt(attr(element, 'alt'))
+      size > 0 || element.matches(directorySelector) || hasEmoticonAlt(attr(element, 'alt'))
 
     return resolveEmojiImage(element, { isStrong, names: noEmojiNames })
   },

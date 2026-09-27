@@ -273,20 +273,14 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       },
     )
 
-    const hintSourceCases: Array<[string, string]> = [
-      ['a smilie directory', 'https://example.com/smilies/custom/hug.gif'],
-      ['a Cocolog host', 'https://app.cocolog-nifty.com/.shared-cocolog/images/emoticon/hug.gif'],
-    ]
+    it('should mark an emoticon with no declared size in a smilie directory', async () => {
+      const value =
+        '<p><img class="emoticon" src="https://example.com/smilies/custom/hug.gif" alt=""></p>'
+      const expected =
+        '<p><img data-emoji="" class="emoticon" src="https://example.com/smilies/custom/hug.gif" alt=""></p>'
 
-    it.each(hintSourceCases)(
-      'should mark an emoticon with no declared size in %s',
-      async (_hint, src) => {
-        const value = `<p><img class="emoticon" src="${src}" alt=""></p>`
-        const expected = `<p><img data-emoji="" class="emoticon" src="${src}" alt=""></p>`
-
-        expect(await transform(value)).toEqualHtml(expected)
-      },
-    )
+      expect(await transform(value)).toEqualHtml(expected)
+    })
 
     it('should leave an emoticon with no declared size and no other hint untouched', async () => {
       const value = html`

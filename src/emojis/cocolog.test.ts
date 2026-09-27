@@ -12,6 +12,30 @@ describeForEachParser('cocologEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should mark a pictogram with the emoticon class from a Cocolog copy of the set', async () => {
+    const value = html`
+      <p>
+        <img
+          class="emoticon"
+          src="https://app.cocolog-nifty.com/.shared-cocolog/images/emoticon/hug.gif"
+          alt=""
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          class="emoticon"
+          src="https://app.cocolog-nifty.com/.shared-cocolog/images/emoticon/hug.gif"
+          alt=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should mark a TypePad pictogram from another host', async () => {
     const value = html`
       <p>
