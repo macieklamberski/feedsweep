@@ -156,6 +156,8 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
     ['calendar', '📅'],
     ['sa', '🈶'],
     ['japan', '🇯🇵'],
+    ['piñata', '🪅'],
+    ['united_states', '🇺🇸'],
   ]
 
   it.each(discourseNameCases)('should replace %s as Discourse draws it', async (name, glyph) => {
@@ -194,6 +196,7 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
     ['umbrella2', '☂️'],
     ['ballot_box_with_ballot', '🗳️'],
     ['us', '🇺🇸'],
+    ['flag_us', '🇺🇸'],
   ]
 
   it.each(aliasCases)('should replace the Discourse alias %s', async (alias, glyph) => {

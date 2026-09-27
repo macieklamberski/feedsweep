@@ -18,7 +18,7 @@ const sets = [
   'win10',
 ]
 
-// Names Discourse draws as another glyph than gemoji.
+// Names Discourse draws as another glyph than gemoji, or that gemoji does not know.
 // See: https://github.com/discourse/discourse-emojis/blob/29ebe49dee08fcb921e2530ed7718e3236f802a7/dist/emojis.json.
 const discourseNames = toMap<string>({
   frowning: '☹️',
@@ -42,6 +42,33 @@ const discourseNames = toMap<string>({
   sunglasses: '🕶️',
   pencil: '✏️',
   japan: '🇯🇵',
+  // Names gemoji does not know.
+  frowning_with_open_mouth: '😦',
+  blonde_man: '👱‍♂️',
+  in_hole: '⛳',
+  yoyo: '🪀',
+  piñata: '🪅',
+  ten: '🔟',
+  åland_islands: '🇦🇽',
+  cocos_keeling_islands: '🇨🇨',
+  côte_d_ivoire: '🇨🇮',
+  china: '🇨🇳',
+  curaçao: '🇨🇼',
+  czechia: '🇨🇿',
+  germany: '🇩🇪',
+  spain: '🇪🇸',
+  france: '🇫🇷',
+  united_kingdom: '🇬🇧',
+  hong_kong_sar_china: '🇭🇰',
+  italy: '🇮🇹',
+  south_korea: '🇰🇷',
+  north_macedonia: '🇲🇰',
+  myanmar_burma: '🇲🇲',
+  macao_sar_china: '🇲🇴',
+  russia: '🇷🇺',
+  eswatini: '🇸🇿',
+  türkiye: '🇹🇷',
+  united_states: '🇺🇸',
 })
 
 // Discourse's own aliases, each to the Discourse name it draws.
@@ -836,8 +863,7 @@ const getGlyph = (src: string): string | undefined => {
   const stem = getFileStem(path)
   const isToned = toneRegex.test(stem)
   const name = isToned ? getFileStem(path.slice(0, path.lastIndexOf('/'))) : stem
-  // Some Discourse names are unknown to gemoji, such as united_states for the alias us.
-  const glyph = getNameGlyph(discourseAliases.get(name) ?? name) ?? glyphFromGemojiName(name)
+  const glyph = getNameGlyph(discourseAliases.get(name) ?? name)
 
   if (!glyph || !isToned) {
     return glyph
