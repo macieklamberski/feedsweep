@@ -223,6 +223,7 @@ import { tapatalkEmojiResolver } from '../emojis/tapatalk.js'
 import { teamsEmojiResolver } from '../emojis/teams.js'
 import { telegramEmojiResolver, telegramImageEmojiResolver } from '../emojis/telegram.js'
 import { tinymceEmojiResolver } from '../emojis/tinymce.js'
+import { tistoryEmojiResolver } from '../emojis/tistory.js'
 import { twemojiEmojiResolver } from '../emojis/twemoji.js'
 import { ucozEmojiResolver } from '../emojis/ucoz.js'
 import { vanillaEmojiResolver } from '../emojis/vanilla.js'
@@ -520,6 +521,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   moodleEmojiResolver,
   boardgamegeekEmojiResolver,
   rhymixEmojiResolver,
+  tistoryEmojiResolver,
   btblogEmojiResolver,
   pixnetEmojiResolver,
   genericCharacterEmojiResolver,
