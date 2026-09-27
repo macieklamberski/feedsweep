@@ -19,6 +19,8 @@ export type EmojiImageMatch = {
   names?: Map<string, EmojiGlyph>
   // Read by the resolver from where its set keeps the meaning, and second only to the alt.
   glyph?: EmojiGlyph
+  // A file the engine paints its sprite behind, which renders nothing on its own.
+  isBlank?: boolean
 }
 
 const emojiSequenceParts = [
@@ -86,15 +88,8 @@ const queryOrHashRegex = /[?#]/
 const namePrefixRegex = /^(?:default_|face-|smiley-|sf-|1[56]x1[56]_)/
 const nameVariantRegex = /@[0-9]+x$/
 
-// XenForo 1.x paints its smilie sprite behind this transparent file.
-const spacerPath = 'xenforo/clear.png'
-
 // A 1x1 sprite GIF data URI is under 256 bytes, and a real inlined PNG is not.
 export const rendersNothing = (src: string): boolean => {
-  if (src.endsWith(spacerPath)) {
-    return true
-  }
-
   return src.startsWith('data:') && src.length <= 256
 }
 
@@ -214,9 +209,9 @@ export const resolveEmojiImage = (
     return { glyph: character }
   }
 
-  const text = rendersNothing(src) ? (shortname ?? alt) : undefined
+  const text = shortname ?? alt
 
-  if (text) {
+  if (text && (match.isBlank || rendersNothing(src))) {
     return { text }
   }
 

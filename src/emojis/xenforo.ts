@@ -5,6 +5,8 @@ import { type EmojiGlyph, rendersNothing, resolveEmojiImage } from '../utils/emo
 import { getDirectoryGlyph, smilieSelector, smiliesEmojiNames } from './smilies.js'
 
 const directory = '/xenforo/smilies/'
+// XenForo 1.x paints its smilie sprite behind this transparent file.
+const spacerPath = 'xenforo/clear.png'
 const markerSelector = [
   'img[class^="mcesmilie" i]', // XenForo 1.x numbers them, as in `mceSmilieSprite mceSmilie7`
   'img[class*=" mcesmilie" i]',
@@ -36,7 +38,8 @@ export const xenforoEmojiResolver: EmojiResolver = {
   extract: (element) => {
     const src = element.getAttribute('src') ?? ''
     const shortname = attr(element, 'data-shortname')?.toLowerCase()
-    const isSprite = !!shortname && rendersNothing(src)
+    const isBlank = src.endsWith(spacerPath)
+    const isSprite = !!shortname && (isBlank || rendersNothing(src))
     const isStrong = isSprite || element.matches(markerSelector)
 
     if (!isStrong && !element.matches(smilieSelector)) {
@@ -46,6 +49,6 @@ export const xenforoEmojiResolver: EmojiResolver = {
     const glyph =
       getDirectoryGlyph(src, directory, xenforoEmojiNames) ?? xenforoShortnames.get(shortname ?? '')
 
-    return resolveEmojiImage(element, { isStrong, names: smiliesEmojiNames, glyph })
+    return resolveEmojiImage(element, { isStrong, names: smiliesEmojiNames, glyph, isBlank })
   },
 }
