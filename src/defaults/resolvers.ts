@@ -182,6 +182,7 @@ import { dropboxEmojiResolver } from '../emojis/dropbox.js'
 import { drupalEmojiResolver } from '../emojis/drupal.js'
 import { e107EmojiResolver } from '../emojis/e107.js'
 import { easydiscussEmojiResolver } from '../emojis/easydiscuss.js'
+import { emojiareaEmojiResolver } from '../emojis/emojiarea.js'
 import { exblogEmojiResolver } from '../emojis/exblog.js'
 import {
   facebookClassicEmojiResolver,
@@ -486,6 +487,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   whatsappEmojiResolver,
   wordpressElementEmojiResolver,
   mozillaEmojiResolver,
+  emojiareaEmojiResolver,
   quillEmojiResolver,
   lexicalEmojiResolver,
   tiptapEmojiResolver,
