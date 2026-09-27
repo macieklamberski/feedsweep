@@ -222,7 +222,11 @@ import { smfEmojiResolver } from '../emojis/smf.js'
 import { smiliesEmojiResolver, smiliesEmoticonEmojiResolver } from '../emojis/smilies.js'
 import { tapatalkEmojiResolver } from '../emojis/tapatalk.js'
 import { teamsEmojiResolver } from '../emojis/teams.js'
-import { telegramEmojiResolver, telegramImageEmojiResolver } from '../emojis/telegram.js'
+import {
+  telegramElementEmojiResolver,
+  telegramEmojiResolver,
+  telegramImageEmojiResolver,
+} from '../emojis/telegram.js'
 import { tinymceEmojiResolver } from '../emojis/tinymce.js'
 import { tistoryEmojiResolver } from '../emojis/tistory.js'
 import { twemojiElementEmojiResolver, twemojiEmojiResolver } from '../emojis/twemoji.js'
@@ -462,6 +466,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   facebookLabelEmojiResolver,
   facebookElementEmojiResolver,
   twemojiElementEmojiResolver,
+  telegramElementEmojiResolver,
   froalaElementEmojiResolver,
   // Ahead of smilies, whose /smiles/ directory would read a Bitrix file by its filename first.
   bitrixEmojiResolver,

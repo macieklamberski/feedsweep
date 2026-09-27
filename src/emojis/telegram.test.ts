@@ -116,4 +116,29 @@ describeForEachParser('telegramImageEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
   })
+
+  it('should replace a Telegram Web Z emoji by its codepoint filename', async () => {
+    const value = '<p><img src="https://web.telegram.org/z/img-apple-64/1f525.png" alt=""></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>🔥</p>')
+  })
+})
+
+describeForEachParser('telegramElementEmojiResolver', (parseHtml) => {
+  const { transform } = emojiConverters(parseHtml)
+
+  it('should replace an i painted with a UTF-8 named file by its glyph', async () => {
+    const value =
+      '<p>Ok <i class="emoji" style="background-image:url(\'//telegram.org/img/emoji/40/F09F918D.png\')"></i></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>Ok 👍</p>')
+  })
+
+  it('should keep the painted file as a marked image when its name decodes to nothing', async () => {
+    const value =
+      '<p><i class="emoji" style="background-image:url(\'https://telegram.org/img/emoji/40/logo.png\')"></i></p>'
+    const expected = '<p><img src="https://telegram.org/img/emoji/40/logo.png" data-emoji=""></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
 })
