@@ -2,7 +2,7 @@ import {
   defaultAllDomTransforms,
   defaultAvatarImageHosts,
   defaultDeferredIframeSources,
-  defaultEmojiImageHosts,
+  defaultEmojiResolvers,
   defaultFieldCleaners,
   defaultHighlightFn,
   defaultLazyIframeAttributes,
@@ -38,7 +38,7 @@ export const transformContent = async (
     deferredIframeSources: defaultDeferredIframeSources,
     trackingHosts: defaultTrackingHosts,
     trackingPathSegments: defaultTrackingPathSegments,
-    emojiImageHosts: defaultEmojiImageHosts,
+    emojiResolvers: defaultEmojiResolvers,
     avatarImageHosts: defaultAvatarImageHosts,
     nonContentSelectors: defaultNonContentSelectors,
     preservedPreClasses: defaultPreservedPreClasses,
@@ -91,6 +91,7 @@ export { convertAmpNativeElements } from './transforms/dom/convertAmpNativeEleme
 export { convertBreaksToParagraphs } from './transforms/dom/convertBreaksToParagraphs.js'
 export { convertCiteCards } from './transforms/dom/convertCiteCards.js'
 export { convertDatawrapperEmbeds } from './transforms/dom/convertDatawrapperEmbeds.js'
+export { convertEmojis } from './transforms/dom/convertEmojis.js'
 export { convertGiphyEmbeds } from './transforms/dom/convertGiphyEmbeds.js'
 export { convertLazyImageContainers } from './transforms/dom/convertLazyImageContainers.js'
 export { convertNoteEmbeds } from './transforms/dom/convertNoteEmbeds.js'
@@ -158,7 +159,6 @@ export { surfaceTemplateEmbeds } from './transforms/dom/surfaceTemplateEmbeds.js
 export { trimPreWhitespace } from './transforms/dom/trimPreWhitespace.js'
 export { unwrapDoublyNestedLists } from './transforms/dom/unwrapDoublyNestedLists.js'
 export { unwrapDrupalOembedIframes } from './transforms/dom/unwrapDrupalOembedIframes.js'
-export { unwrapEmojiImages } from './transforms/dom/unwrapEmojiImages.js'
 export { unwrapHeadingBold } from './transforms/dom/unwrapHeadingBold.js'
 export { unwrapNestedCodeWrappers } from './transforms/dom/unwrapNestedCodeWrappers.js'
 export { unwrapWrappers } from './transforms/dom/unwrapWrappers.js'

@@ -7,6 +7,7 @@ import { convertAmpNativeElements } from '../transforms/dom/convertAmpNativeElem
 import { convertBreaksToParagraphs } from '../transforms/dom/convertBreaksToParagraphs.js'
 import { convertCiteCards } from '../transforms/dom/convertCiteCards.js'
 import { convertDatawrapperEmbeds } from '../transforms/dom/convertDatawrapperEmbeds.js'
+import { convertEmojis } from '../transforms/dom/convertEmojis.js'
 import { convertGiphyEmbeds } from '../transforms/dom/convertGiphyEmbeds.js'
 import { convertLazyImageContainers } from '../transforms/dom/convertLazyImageContainers.js'
 import { convertNoteEmbeds } from '../transforms/dom/convertNoteEmbeds.js'
@@ -74,7 +75,6 @@ import { surfaceTemplateEmbeds } from '../transforms/dom/surfaceTemplateEmbeds.j
 import { trimPreWhitespace } from '../transforms/dom/trimPreWhitespace.js'
 import { unwrapDoublyNestedLists } from '../transforms/dom/unwrapDoublyNestedLists.js'
 import { unwrapDrupalOembedIframes } from '../transforms/dom/unwrapDrupalOembedIframes.js'
-import { unwrapEmojiImages } from '../transforms/dom/unwrapEmojiImages.js'
 import { unwrapHeadingBold } from '../transforms/dom/unwrapHeadingBold.js'
 import { unwrapNestedCodeWrappers } from '../transforms/dom/unwrapNestedCodeWrappers.js'
 import { unwrapWrappers } from '../transforms/dom/unwrapWrappers.js'
@@ -211,7 +211,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Runs after stripDuplicateTitleHeading: a removed title <h1> must not demote the body's
   // own headings.
   demoteHeadings,
-  unwrapEmojiImages,
+  convertEmojis,
   // Empties lone-backslash paragraphs (`<p>\</p>`); runs before stripEmptyTags so
   // the now-empty paragraphs are removed by it.
   stripMarkdownEscapeBackslashes,
@@ -229,7 +229,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   highlightCode,
   wrapBareInlineInParagraphs,
   stripLeadingIndentation,
-  // Runs after unwrapEmojiImages so a custom emoji already carries data-emoji: without it
+  // Runs after convertEmojis so a custom emoji already carries data-emoji: without it
   // the emoji reads as a block-displayed image and the <br> after it is taken as redundant.
   stripInterBlockBreaks,
   stripBoundaryBreaks,

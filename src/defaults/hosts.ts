@@ -50,18 +50,6 @@ export const defaultTrackingHosts = [
 
 export const defaultTrackingPathSegments = ['pixel', 'beacon', 'count', 'impression']
 
-export const defaultEmojiImageHosts = [
-  's.w.org/images/core/emoji/', // WordPress core wp-emoji-release output.
-  's0.wp.com/wp-content/mu-plugins/wpcom-smileys/', // WordPress.com Twemoji assets.
-  'fbcdn.net/images/emoji.php/', // Facebook embedded posts.
-  'cdn.jsdelivr.net/gh/twitter/twemoji', // Twemoji via jsDelivr, used by IPS and others.
-  'cdn.jsdelivr.net/joypixels/assets/', // JoyPixels CDN, incl. XenForo emoji mode.
-  'twemoji.maxcdn.com/', // Twemoji's retired CDN, still linked from older posts.
-  'twimg.com/emoji/', // Twitter / X embedded tweets, from abs and abs-0.
-  'githubassets.com/images/icons/emoji/', // GitHub README scrapings.
-  'assets.github.com/images/icons/emoji/', // GitHub's pre-2018 asset host; seen in archived feeds.
-]
-
 // Hosts that only ever serve author avatars. WordPress / WP.com attaches the
 // author's gravatar as a per-item media:content image, so an otherwise imageless
 // post would inject the author's face as its lead image. Matched by host and
