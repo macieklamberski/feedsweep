@@ -64,6 +64,21 @@ describeForEachParser('moodleEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  const legacyPaths: Array<string> = ['/pix/s/smiley.gif', '/theme/autumn/pix/s/wink.gif']
+
+  it.each(legacyPaths)('should mark an emoticon linked as a plain file at %s', async (path) => {
+    const value = `<p><img alt="" src="https://moodle.example.com${path}"></p>`
+    const expected = `<p><img alt="" src="https://moodle.example.com${path}" data-emoji=""></p>`
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a plain-file icon outside the emoticon folder untouched', async () => {
+    const value = '<p><img alt="" src="https://moodle.example.com/pix/i/edit.gif"></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should leave an icon outside the emoticon folder untouched', async () => {
     const value = html`
       <p>
