@@ -1,7 +1,7 @@
 import { toMap } from 'trousse'
 import type { EmojiResolverResult } from '../types.js'
 import { attr } from './dom.js'
-import vocabularies from './emojis.json' with { type: 'json' }
+import { emojiShortcodes } from './shortcodes.js'
 
 export type EmojiNameTable = {
   name: string
@@ -38,7 +38,7 @@ export const isEmojiShaped = (text: string): boolean => {
   return emojiSequenceRegex.test(text) && emojiPictureRegex.test(text)
 }
 
-const shortcodes = toMap(vocabularies.shortcodes)
+const shortcodes = toMap(emojiShortcodes)
 
 export const glyphFromShortcode = (token: string | undefined): string | undefined => {
   return token ? shortcodes.get(token.toLowerCase()) : undefined

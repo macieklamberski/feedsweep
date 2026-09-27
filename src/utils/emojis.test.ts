@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'bun:test'
 import { glyphFromCodepoints, mergeEmojiNames } from './emojis.js'
-import vocabularies from './emojis.json' with { type: 'json' }
+import { emojiShortcodes } from './shortcodes.js'
 
 const asciiLetterRegex = /[a-zA-Z]/
 const conflictingNameRegex = /happy/
 
 describe('shortcode table', () => {
-  const shortcodeEntries = Object.entries(vocabularies.shortcodes)
+  const shortcodeEntries = Object.entries(emojiShortcodes)
 
   // Iterates the real table, so every entry is exercised and a new entry is covered
   // automatically. A value carrying ASCII letters would inject a word into the document,
@@ -17,7 +17,7 @@ describe('shortcode table', () => {
   })
 
   it('should key every entry in lower case so lookups can normalize', () => {
-    const keys = Object.keys(vocabularies.shortcodes)
+    const keys = Object.keys(emojiShortcodes)
 
     expect(keys).toEqual(keys.map((key) => key.toLowerCase()))
   })
