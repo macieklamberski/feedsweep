@@ -1,4 +1,8 @@
 export const defaultNonContentSelectors = [
+  // The frame half of a WordPress post embed, whose blockquote `wordpressCiteResolver` converts.
+  // WordPress stamps the class on every oEmbed provider's frame, so only a frame paired with a
+  // blockquote is stripped.
+  'blockquote.wp-embedded-content + iframe.wp-embedded-content',
   // Subscribe and newsletter signup forms.
   '[data-component-name="SubscribeWidget"]', // Substack inline subscribe widget.
   '.subscription-widget-wrap-editor', // Substack paywall / subscribe CTA.
