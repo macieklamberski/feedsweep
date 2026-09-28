@@ -1,5 +1,3 @@
-import type { DiscoverResolveUrlFn } from 'feedscout'
-
 import type { MaybePromise, Pattern } from 'trousse'
 
 export type EnclosureThumbnail = {
@@ -25,7 +23,7 @@ export type Enclosure = {
   groupIndex?: number
 }
 
-export type ResolveUrlFn = DiscoverResolveUrlFn
+export type ResolveUrlFn = (url: string, baseUrl: string | undefined) => string | undefined
 
 export type EmbedResolverResult = {
   provider: string
