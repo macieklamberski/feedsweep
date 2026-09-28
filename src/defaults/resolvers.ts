@@ -117,6 +117,7 @@ import { garminEmbedResolver } from '../embeds/garmin.js'
 import { geniallyEmbedResolver } from '../embeds/genially.js'
 import { gettyImagesEmbedResolver } from '../embeds/gettyimages.js'
 import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds/glomex.js'
+import { googlebooksEmbedResolver } from '../embeds/googlebooks.js'
 import { googledriveEmbedResolver } from '../embeds/googledrive.js'
 import { googleslidesEmbedResolver } from '../embeds/googleslides.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
@@ -434,6 +435,7 @@ const embedResolvers: Array<EmbedResolver> = [
   gettyImagesEmbedResolver,
   glomexIframeEmbedResolver,
   glomexElementEmbedResolver,
+  googlebooksEmbedResolver,
   googledriveEmbedResolver,
   googleslidesEmbedResolver,
   guardianEmbedResolver,
