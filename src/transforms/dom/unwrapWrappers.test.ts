@@ -61,6 +61,36 @@ describeForEachParser('unwrapWrappers', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should move dir and lang onto the children of an unwrapped wrapper', async () => {
+    const value = html`
+      <div
+        dir="rtl"
+        lang="he"
+      >
+        <p>שלום</p>
+        <p lang="en">Hello</p>
+      </div>
+    `
+    const expected = html`
+      <p
+        dir="rtl"
+        lang="he"
+      >שלום</p>
+      <p
+        lang="en"
+        dir="rtl"
+      >Hello</p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a dir wrapper holding bare text', async () => {
+    const value = '<div dir="rtl">שלום</div>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should unwrap wrapper with attribute values containing > characters', async () => {
     // Tailwind-style arbitrary-value selectors carry a `>` inside the class
     // attribute, which linkedom parses as one unit.
