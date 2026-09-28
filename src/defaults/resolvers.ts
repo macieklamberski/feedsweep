@@ -40,7 +40,7 @@ import {
 } from '../embeds/ameba.js'
 import { anchorEmbedResolver } from '../embeds/anchor.js'
 import { aparatIframeEmbedResolver, aparatScriptEmbedResolver } from '../embeds/aparat.js'
-import { appleEmbedResolver } from '../embeds/apple.js'
+import { appleEmbedResolver, appleToolsEmbedResolver } from '../embeds/apple.js'
 import { archiveFlashEmbedResolver, archiveIframeEmbedResolver } from '../embeds/archive.js'
 import { arteEmbedResolver } from '../embeds/arte.js'
 import { audioboomIframeEmbedResolver, audioboomWidgetEmbedResolver } from '../embeds/audioboom.js'
@@ -360,6 +360,7 @@ const embedResolvers: Array<EmbedResolver> = [
   aparatIframeEmbedResolver,
   aparatScriptEmbedResolver,
   appleEmbedResolver,
+  appleToolsEmbedResolver,
   archiveIframeEmbedResolver,
   archiveFlashEmbedResolver,
   arteEmbedResolver,

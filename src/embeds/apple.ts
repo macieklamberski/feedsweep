@@ -1,7 +1,7 @@
-import { getPathSegments, isHostOrSubdomainOf, type Nullish, toMap } from 'trousse'
+import { getPathSegments, isHostOrSubdomainOf, type Nullish, parseUrl, toMap } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, keepIfMatches } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // Music and podcasts embed through the same player, served from `embed.music.apple.com` and
@@ -125,6 +125,37 @@ export const appleEmbedResolver = createUrlEmbedResolver(appleHosts, (url, eleme
 
   return result && { ...result, ...card, title: card.title ?? attr(element, 'title') }
 })
+
+// The retired Apple Music Marketing Tools host. Every id on it, real or not, redirects to the
+// same marketing page, so the frame shows no player for anybody.
+const appleToolsHosts = ['tools.applemusic.com']
+
+const toolsPathRegex = /^\/embed\/v1\/([a-z-]+)\/([^/]+)$/
+
+// The same album, playlist or song as the modern player, reached through the retired tool's url.
+// The tool wrote the storefront as `country`. A missing or malformed `country` drops the segment,
+// and Apple serves a storefront-less url from the US store.
+export const appleToolsEmbedResolver = createUrlEmbedResolver(
+  appleToolsHosts,
+  (url) => {
+    const parsed = parseUrl(url, placeholderBaseUrl)
+    const match = parsed?.pathname.match(toolsPathRegex)
+
+    if (!match) {
+      return
+    }
+
+    const [, kind, pathId] = match
+
+    const country = parsed?.searchParams.get('country')?.toLowerCase()
+    const storefront = keepIfMatches(country, storefrontRegex)
+    const modernUrl = `https://music.apple.com/${storefront ? `${storefront}/` : ''}${kind}/${pathId}`
+
+    return appleResolveEmbed(modernUrl)
+  },
+  // The tool's snippet states 110 for a song and 500 for an album, sized for its retired player.
+  { preferResolverSize: true },
+)
 
 export const appleFieldCleaners: Array<FieldCleaner> = [
   { provider: 'applepodcasts', field: 'title', drop: 'Media player' },
