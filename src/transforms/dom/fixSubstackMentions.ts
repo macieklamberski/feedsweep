@@ -2,6 +2,7 @@ import { isNonEmptyString, isNumber } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { jsonAttr } from '../../utils/dom.js'
 import { isUrlShaped } from '../../utils/urls.js'
+import { createLink } from '../../utils/widgets.js'
 
 type MentionAttrs = {
   name?: string
@@ -30,10 +31,7 @@ export const fixSubstackMentions: DomTransform = () => (document) => {
     }
 
     if (url) {
-      const anchor = document.createElement('a')
-      anchor.setAttribute('href', url)
-      anchor.textContent = `@${attrs.name}`
-      element.replaceWith(anchor)
+      element.replaceWith(createLink(document, url, `@${attrs.name}`))
     } else {
       element.replaceWith(document.createTextNode(`@${attrs.name}`))
     }
