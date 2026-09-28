@@ -797,6 +797,28 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toBe(expected)
   })
 
+  // A widget resolver reads the anchors of a noscript fallback, so links minted out of its
+  // escaped text would give it urls as the title and the author.
+  it('should not linkify the escaped text of a noscript fallback', async () => {
+    const value = html`
+      <p>before</p>
+      <script
+        charset="utf-8"
+        src="http://source.pixiv.net/source/embed.js"
+        data-id="21083839_8595a4d2c55cbfd73b6d1bcd386bde6e"
+        data-size="medium"
+        data-border="on"
+      ></script>
+      <noscript>&lt;p&gt;&lt;a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=21083839" target="_blank"&gt;博麗神社&lt;/a&gt; by &lt;a href="http://www.pixiv.net/member.php?id=35490" target="_blank"&gt;kirero【二日目へ-22】&lt;/a&gt; on &lt;a href="http://www.pixiv.net/" target="_blank"&gt;pixiv&lt;/a&gt;&lt;/p&gt;</noscript>
+    `
+    const expected = html`
+      <p>before</p>
+      <p><noscript>&lt;p&gt;&lt;a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=21083839" target="_blank"&gt;博麗神社&lt;/a&gt; by &lt;a href="http://www.pixiv.net/member.php?id=35490" target="_blank"&gt;kirero【二日目へ-22】&lt;/a&gt; on &lt;a href="http://www.pixiv.net/" target="_blank"&gt;pixiv&lt;/a&gt;&lt;/p&gt;</noscript></p>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   it('should mark a line-leading timestamp', async () => {
     const value = '<p>01:21 - Intro</p>'
     const expected = '<p><span data-timestamp="81">01:21</span> - Intro</p>'
