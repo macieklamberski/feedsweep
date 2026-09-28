@@ -244,6 +244,10 @@ import { vkEmbedResolver } from '../embeds/vk.js'
 import { wikimediaEmbedResolver } from '../embeds/wikimedia.js'
 import { wistiaEmbedResolver } from '../embeds/wistia.js'
 import { wordwallEmbedResolver } from '../embeds/wordwall.js'
+import {
+  yandexMapsIframeEmbedResolver,
+  yandexMapsScriptEmbedResolver,
+} from '../embeds/yandexmaps.js'
 import { youkuEmbedResolver } from '../embeds/youku.js'
 import {
   youtubeAmpEmbedResolver,
@@ -557,6 +561,8 @@ const embedResolvers: Array<EmbedResolver> = [
   vkEmbedResolver,
   wistiaEmbedResolver,
   wordwallEmbedResolver,
+  yandexMapsIframeEmbedResolver,
+  yandexMapsScriptEmbedResolver,
   youkuEmbedResolver,
   youtubeIframeEmbedResolver,
   youtubeAmpEmbedResolver,
