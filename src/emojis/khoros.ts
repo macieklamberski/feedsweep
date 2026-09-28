@@ -39,8 +39,8 @@ export const khorosEmojiResolver: EmojiResolver = {
 const markerSelector = [
   'img[class~="lia-image-emoji" i]',
   // As in `emoticon emoticon-smileywink`. Case-sensitive, since Windows Live Writer's
-  // `wlEmoticon-smile` has no name table.
-  'img[class*="emoticon-"]',
+  // `wlEmoticon-smile` has no name table. The `emoticon` class keeps Exblog's `emoticon-img` out.
+  'img.emoticon[class*="emoticon-"]',
 ].join(', ')
 
 // Khoros files its stock faces with a size prefix, as in `16x16_smiley-happy.png`, which
