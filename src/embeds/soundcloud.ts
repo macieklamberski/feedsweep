@@ -159,7 +159,7 @@ const readSubstackTrack = (element: Nullish<Element>): Partial<EmbedResolverResu
 }
 
 // SoundCloud's widget iframe, the dead Flash player and a framed track page answering SAMEORIGIN.
-export const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
+const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
   // The factory has already matched the host, which means the url parsed, so there is no
   // unparseable case left to guard here.
   const parsed = parseUrl(url, placeholderBaseUrl)

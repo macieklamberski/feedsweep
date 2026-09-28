@@ -41,7 +41,7 @@ const readEmbed = (
   return composeEmbed(safeIntegrationId, keepIfMatches(playlistId, safeIdRegex))
 }
 
-export const glomexResolveEmbed: ResolveEmbed = (url) => {
+const glomexResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, glomexHosts)
 
   if (!parsed || !playerPathRegex.test(parsed.pathname)) {

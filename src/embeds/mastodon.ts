@@ -58,7 +58,7 @@ export const mastodonEmbedResolver = createMarkupEmbedResolver(
   // Publishers ship the status iframe without its class, so the bare src arm stays.
   // aside.mastodon-embed is a hand-typed quote carrying the post's body text, and
   // div.mastodon-embed only wraps the iframe.
-  'iframe.mastodon-embed[src], iframe[src$="/embed"], blockquote.mastodon-embed',
+  'iframe.mastodon-embed[src], iframe[src$="/embed"], iframe[src$="/embed/"], blockquote.mastodon-embed',
   (element) => {
     const status = [
       attr(element, 'src'),

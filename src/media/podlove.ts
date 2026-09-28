@@ -48,7 +48,6 @@ export const podloveMediaResolver: MediaResolver = {
       (audio): audio is { url: string; mimeType: string } =>
         audio.url !== undefined && audio.mimeType?.startsWith('audio/') === true,
     )
-    // The config's order is the publisher's, not a ranking, and Safari plays neither ogg nor opus.
     const file = files?.find((audio) => isAnyOf(audio.mimeType, preferredMimeTypes)) ?? files?.[0]
     const source = file?.url
 

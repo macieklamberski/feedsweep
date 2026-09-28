@@ -69,7 +69,7 @@ export const rtveResolveEmbed: ResolveEmbed = (url, element) => {
 // RTVE's player iframe, rtve.es/drmn/embed/{audio|video}/{id}/.
 export const rtveIframeEmbedResolver = createUrlEmbedResolver(rtveHosts, rtveResolveEmbed)
 
-export const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
+const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
