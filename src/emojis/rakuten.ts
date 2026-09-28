@@ -1,7 +1,12 @@
 import type { EmojiResolver } from '../types.js'
-import { resolveEmojiImage } from '../utils/emojis.js'
+import { attr } from '../utils/dom.js'
+import { queryOrHashRegex } from '../utils/emojis.js'
 
-// Rakuten Blog's pictograms, with a description in the alt. They are Rakuten's own drawings.
+// The old host answers 404 for every file, and the current one answers only over https.
+const currentDirectory = 'https://plaza.jp.rakuten-static.com/img/user/emoji/'
+
+// Rakuten Blog's pictograms, with a description in the alt. They are Rakuten's own drawings,
+// served again from the current host.
 export const rakutenEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: [
@@ -9,6 +14,9 @@ export const rakutenEmojiResolver: EmojiResolver = {
     'img[src*="plaza.jp.rakuten-static.com/img/user/emoji/" i]',
   ].join(', '),
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    const path = (element.getAttribute('src') ?? '').split(queryOrHashRegex)[0]
+    const file = path.slice(path.lastIndexOf('/') + 1)
+
+    return { image: `${currentDirectory}${file}`, alt: attr(element, 'alt') }
   },
 }
