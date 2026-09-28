@@ -540,6 +540,34 @@ describeForEachParser('facebookClassicEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should replace the emoticon and remove the hidden code after it', async () => {
+    const value = html`
+      <p>
+        <span title="smile emoticon">
+          <span class="emoticon emoticon_smile"></span>
+          <span class="_4mcd">:)</span>
+        </span>
+      </p>
+    `
+    const expected = '<p><span title="smile emoticon">🙂</span></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a hidden span after the emoticon that holds another code', async () => {
+    const value = html`
+      <p>
+        <span>
+          <span class="emoticon emoticon_smile"></span>
+          <span class="_4mcd">:D</span>
+        </span>
+      </p>
+    `
+    const expected = '<p><span>🙂<span class="_4mcd">:D</span></span></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   // Outlook prefixes every class in forwarded markup with `x_`.
   it('should leave a span whose emoticon class is part of another class untouched', async () => {
     const value = '<p>Hi <span class="x_emoticon_smile" title=":)"></span></p>'
@@ -583,6 +611,54 @@ describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
         '<p><span class="_47e3 _5mfr" title="smile emoticon">Would you like help</span></p>'
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+
+    const imageWrapperCases: Array<[string, string, string]> = [
+      ['a label', ' title="heart emoticon"', '<3'],
+      ['no label', '', '❤'],
+    ]
+
+    it.each(imageWrapperCases)(
+      'should replace a wrapper with %s around an image and its hidden text',
+      async (_, title, hiddenText) => {
+        const value = html`
+          <p>
+            <span class="_47e3 _5mfr"${title}>
+              <img src="https://static.xx.fbcdn.net/images/emoji.php/v9/f6c/1/16/2764.png" alt="">
+              <span class="_7oe">${hiddenText}</span>
+            </span>
+          </p>
+        `
+
+        expect(await transform(value)).toEqualHtml('<p>❤️</p>')
+      },
+    )
+
+    it('should keep a wrapper holding prose beside the image', async () => {
+      const value = html`
+        <p>
+          <span class="_47e3">Hi
+            <img src="https://static.xx.fbcdn.net/images/emoji.php/v9/f6c/1/16/2764.png" alt="">
+          </span>
+        </p>
+      `
+      const expected = '<p><span class="_47e3">Hi ❤️</span></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a wrapper holding another span beside the image', async () => {
+      const value = html`
+        <p>
+          <span class="_47e3">
+            <img src="https://static.xx.fbcdn.net/images/emoji.php/v9/f6c/1/16/2764.png" alt="">
+            <span>Hi</span>
+          </span>
+        </p>
+      `
+      const expected = '<p><span class="_47e3">❤️<span>Hi</span></span></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should leave a wrapper whose label names no classic emoticon untouched', async () => {

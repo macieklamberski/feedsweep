@@ -102,6 +102,7 @@ const classicNames = Object.keys(classicCodes)
 // Only Facebook's own names, since other widgets name classes like `emoticon_box` the same way.
 const classicClassRegex = new RegExp(`(?:^|\\s)emoticon_(${classicNames.join('|')})(?:\\s|$)`)
 const textClassSelector = 'span[class~="emoticon_text"]'
+const hiddenCodeSelector = 'span[class~="_4mcd"]'
 
 // The words around the name in the label Facebook wrote for screen readers, in the languages
 // seen in pasted posts: `smile emoticon`, `winkhymiö`, `Emotikon grin`, `Uttrykksikonet heart`.
@@ -164,6 +165,13 @@ export const facebookClassicEmojiResolver: EmojiResolver = {
       return { glyph }
     }
 
+    // A later paste puts the hidden code after the emoticon instead.
+    const next = element.nextElementSibling
+
+    if (glyph && next?.matches(hiddenCodeSelector) && next.textContent?.trim() === code) {
+      next.remove()
+    }
+
     return resolveEmojiElement(element, { glyph, shortcode: title ?? code ?? name })
   },
 }
@@ -172,12 +180,29 @@ export const facebookClassicEmojiResolver: EmojiResolver = {
 // `Смайлик «smile»` or `smilehymiö`.
 const labelNameRegex = new RegExp(`(?:^|[^a-z])(${classicNames.join('|')})(?:hymiö|[^a-z]|$)`, 'i')
 
+// The span Facebook hid from sighted readers beside an emoji image, holding its code or glyph.
+const hiddenTextSelector = 'span[class~="_7oe"]'
+
 // A later chat markup of the classic emoticon: an empty span or `i` painted by Facebook's CSS,
-// named only by the screen-reader label in its title.
+// named only by the screen-reader label in its title. A post's wrapper holds the emoji image
+// instead, beside the hidden span, which shows once the site's CSS is gone.
 export const facebookLabelEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: 'span[class~="_47e3"][title], i[class~="_1gwo"][title], i[class~="_lew"][title]',
+  selector: 'span[class~="_47e3"], i[class~="_1gwo"][title], i[class~="_lew"][title]',
   extract: (element) => {
+    const [image, hidden, ...rest] = Array.from(element.children)
+    const isImageWrapper =
+      image?.matches('img') &&
+      (!hidden || hidden.matches(hiddenTextSelector)) &&
+      !rest.length &&
+      element.textContent?.trim() === (hidden?.textContent?.trim() ?? '')
+
+    if (isImageWrapper) {
+      const result = facebookEmojiResolver.extract(image)
+
+      return result && 'glyph' in result ? result : undefined
+    }
+
     // The class also rides on spans pasted around prose.
     if (element.textContent?.trim() || element.firstElementChild) {
       return
