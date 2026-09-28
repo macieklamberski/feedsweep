@@ -443,11 +443,17 @@ const elementRatioSources: Array<(element: Element) => string | undefined> = [
   },
 
   // The legacy inline padding hack (`padding-bottom:56.25%`): the percent is the
-  // inverse of the ratio, bounded to keep a stray value from encoding nonsense.
+  // inverse of the ratio, bounded to keep a stray value from encoding nonsense. A wrapper that
+  // pads the top zeroes the bottom (`0`, `0%`, `0px`), so only a zero bottom yields to the top.
   (element) => {
     const declarations = styles.declarations(element)
-    const padding =
-      declarations['padding-bottom'] ?? declarations['padding-top'] ?? shorthandBottom(declarations)
+    let bottom = declarations['padding-bottom']
+
+    if (bottom && Number.parseFloat(bottom) === 0) {
+      bottom = undefined
+    }
+
+    const padding = bottom ?? declarations['padding-top'] ?? shorthandBottom(declarations)
     const percent = Number(padding?.match(paddingPercentRegex)?.[1])
 
     if (percent > 0 && percent < 1000) {
