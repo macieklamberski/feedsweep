@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { tumblrIframeEmbedResolver, tumblrPostEmbedResolver } from './tumblr.js'
+import { readTumblrHeight, tumblrIframeEmbedResolver, tumblrPostEmbedResolver } from './tumblr.js'
 
 describeForEachParser('tumblrIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, tumblrIframeEmbedResolver)
@@ -226,5 +226,42 @@ describeForEachParser('tumblrPostEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
+})
+
+describe('readTumblrHeight', () => {
+  // What the post frame posts at 300 wide, as the JSON string its script builds.
+  it('should read the height out of a size change', () => {
+    const value = JSON.stringify({ method: 'tumblr-post:sizeChange', args: [669] })
+
+    expect(readTumblrHeight(value)).toBe(669)
+  })
+
+  it('should read nothing from another method', () => {
+    const value = JSON.stringify({ method: 'tumblr-post:_method_callback_responder', args: [669] })
+
+    expect(readTumblrHeight(value)).toBeUndefined()
+  })
+
+  it('should read nothing from a zero height', () => {
+    const value = JSON.stringify({ method: 'tumblr-post:sizeChange', args: [0] })
+
+    expect(readTumblrHeight(value)).toBeUndefined()
+  })
+
+  it('should read nothing from a height that is not a number', () => {
+    const value = JSON.stringify({ method: 'tumblr-post:sizeChange', args: ['tall'] })
+
+    expect(readTumblrHeight(value)).toBeUndefined()
+  })
+
+  it('should read nothing when the arguments are not a list', () => {
+    const value = JSON.stringify({ method: 'tumblr-post:sizeChange', args: '669' })
+
+    expect(readTumblrHeight(value)).toBeUndefined()
+  })
+
+  it('should read nothing from a string that is not JSON', () => {
+    expect(readTumblrHeight('tumblr-post:sizeChange')).toBeUndefined()
   })
 })

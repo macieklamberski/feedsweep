@@ -1,6 +1,7 @@
-import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import { getPathSegments, isPlainObject } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
+import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -61,3 +62,29 @@ export const tumblrPostEmbedResolver = createMarkupEmbedResolver(
     return { ...result, url: postUrl?.href }
   },
 )
+
+// The frame posts its height unasked, as a JSON string whose `args` holds the body's scroll
+// height, on load and again whenever its body resizes.
+export const readTumblrHeight = (data: unknown): number | undefined => {
+  if (typeof data !== 'string') {
+    return
+  }
+
+  try {
+    const message: unknown = JSON.parse(data)
+
+    if (
+      isPlainObject(message) &&
+      message.method === 'tumblr-post:sizeChange' &&
+      Array.isArray(message.args)
+    ) {
+      return readPixels(message.args[0])
+    }
+  } catch {}
+}
+
+export const tumblrRenderHint: EmbedRenderHint = {
+  provider,
+  origin: 'https://embed.tumblr.com',
+  readHeight: readTumblrHeight,
+}
