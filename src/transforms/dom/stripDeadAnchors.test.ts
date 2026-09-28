@@ -51,6 +51,26 @@ describeForEachParser('stripDeadAnchors', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should unwrap anchor with javascript: scheme split by a tab', async () => {
+    const value = '<p><a href="java&#x09;script:void(0)">action</a></p>'
+    const expected = '<p>action</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should unwrap anchor with javascript: scheme after a control character', async () => {
+    const value = '<p><a href="&#x01;javascript:void(0)">action</a></p>'
+    const expected = '<p>action</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should preserve anchor with relative href that reads as javascript without its space', async () => {
+    const value = '<p><a href="java script.html">guide</a></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should preserve anchor with fragment href pointing to a section', async () => {
     const value = '<p><a href="#section">jump</a></p>'
 

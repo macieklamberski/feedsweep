@@ -23,6 +23,19 @@ const queryOrHashRegex = /[?#]/
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
 
+// A browser strips C0 controls before reading the scheme, so \x01javascript: runs.
+// Whitespace inside the scheme is dropped as well, so java\tscript: runs too.
+const urlIgnorableRanges = [
+  '\\s', // ASCII and Unicode whitespace
+  '\\x00-\\x1F', // C0 controls
+]
+const urlIgnorableCharsRegex = new RegExp(`[${urlIgnorableRanges.join('')}]+`, 'g')
+
+// The url as a browser reads its scheme, for testing it against a scheme regex.
+export const stripUrlIgnorableChars = (url: string): string => {
+  return url.replace(urlIgnorableCharsRegex, '')
+}
+
 // No m3u8 or mpd: only Safari plays them natively, so promoting one breaks the player elsewhere.
 export const imageFileRegex = /\.(avif|gif|jpe?g|png|svg|webp)(\?|#|$)/i
 export const videoFileRegex = /\.(mp4|m4v|webm|mov|ogv)(\?|#|$)/i
