@@ -371,7 +371,9 @@ const dimensionAttribute = (element: Element, name: string): number | undefined 
 const imageDimensionsRegex = /^\s*([0-9]+)\s*x\s*([0-9]+)\s*$/i
 
 export const getElementDimensions = (element: Element): { width?: number; height?: number } => {
-  const width = dimensionAttribute(element, 'width')
+  // `width: 1px; min-width: 100%` fills the container, so the stated width names no size.
+  const isContainerWide = styles.declarations(element)['min-width'] === '100%'
+  const width = isContainerWide ? undefined : dimensionAttribute(element, 'width')
   const height = dimensionAttribute(element, 'height')
 
   if (width !== undefined && height !== undefined) {
@@ -379,9 +381,10 @@ export const getElementDimensions = (element: Element): { width?: number; height
   }
 
   const dimensions = imageDimensionsRegex.exec(element.getAttribute('data-image-dimensions') ?? '')
+  const styleWidth = isContainerWide ? undefined : styles.pixels(element, 'width')
 
   return {
-    width: width ?? coerceNumber(dimensions?.[1]) ?? coerceNumber(styles.pixels(element, 'width')),
+    width: width ?? coerceNumber(dimensions?.[1]) ?? coerceNumber(styleWidth),
     height:
       height ?? coerceNumber(dimensions?.[2]) ?? coerceNumber(styles.pixels(element, 'height')),
   }

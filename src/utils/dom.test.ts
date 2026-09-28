@@ -217,6 +217,31 @@ describeForEachParser('getElementDimensions', (parseHtml) => {
     expect(getElementDimensions(image)).toEqual({ width: 50, height: 25 })
   })
 
+  it('should drop a width that a container-wide min-width overrides', () => {
+    const document = parseHtml(
+      '<iframe style="width: 1px; min-width: 100%; height: 700px; border: none;"></iframe>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(iframe)).toEqual({ width: undefined, height: 700 })
+  })
+
+  it('should drop a width attribute that a container-wide min-width overrides', () => {
+    const document = parseHtml('<iframe width="1" height="700" style="min-width: 100%"></iframe>')
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(iframe)).toEqual({ width: undefined, height: 700 })
+  })
+
+  it('should keep a width beside a min-width narrower than the container', () => {
+    const document = parseHtml(
+      '<iframe style="width: 640px; min-width: 50%; height: 360px"></iframe>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(iframe)).toEqual({ width: 640, height: 360 })
+  })
+
   it('should fall back to style when attribute is non-numeric', () => {
     const document = parseHtml('<img width="auto" style="width: 200px">')
     const image = queryElement(document, 'img')
