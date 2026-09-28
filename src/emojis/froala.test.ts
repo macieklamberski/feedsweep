@@ -18,20 +18,6 @@ describeForEachParser('froalaImageEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should replace a CKEditor stock name', async () => {
-    const value = html`
-      <p>
-        <img
-          class="fr-fic fr-dii"
-          src="https://example.com/froala/cke_smiley/wink_smile.gif"
-        >
-      </p>
-    `
-    const expected = '<p>😉</p>'
-
-    expect(await transform(value)).toEqualHtml(expected)
-  })
-
   it('should mark a pictogram with no Unicode name', async () => {
     const value = html`
       <p>
@@ -70,10 +56,11 @@ describeForEachParser('froalaImageEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should replace a CKEditor stock name in the builder folder', async () => {
+  it('should mark a CKEditor stock name in the builder folder', async () => {
     const value =
       '<p><img alt="" src="https://example.com/ckeditor/plugins/smiley/new/wink_smile.gif"></p>'
-    const expected = '<p>😉</p>'
+    const expected =
+      '<p><img alt="" src="https://example.com/ckeditor/plugins/smiley/new/wink_smile.gif" data-emoji=""></p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })

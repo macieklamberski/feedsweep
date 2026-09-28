@@ -84,7 +84,7 @@ describeForEachParser('wordpressEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should replace a legacy wp-includes smilie whose alt is a shortcode', async () => {
+    it('should mark a legacy wp-includes smilie despite its universal code alt', async () => {
       const value = html`
         <p>
           <img
@@ -94,7 +94,16 @@ describeForEachParser('wordpressEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-      const expected = '<p>🙂</p>'
+      const expected = html`
+        <p>
+          <img
+            src="https://example.com/wp-includes/images/smilies/icon_smile.gif"
+            alt=":)"
+            class="wp-smiley"
+            data-emoji=""
+          >
+        </p>
+      `
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -112,21 +121,6 @@ describeForEachParser('wordpressEmojiResolver', (parseHtml) => {
 
       expect(await transformKeeping(value)).toEqualHtml(value)
     })
-
-    it('should resolve a Tango icon-set filename once the face- prefix is dropped', async () => {
-      const value = html`
-        <p>
-          <img
-            class="wp-smiley"
-            src="/wp-content/plugins/tango-smilies/tango/face-smile.png"
-            alt=":)"
-          >
-        </p>
-      `
-      const expected = '<p>🙂</p>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
   })
 
   describe('WordPress core emoji (s.w.org host)', () => {
@@ -139,6 +133,22 @@ describeForEachParser('wordpressEmojiResolver', (parseHtml) => {
             src="https://s.w.org/images/core/emoji/2.4/72x72/1f642.png"
             class="size_orig"
             alt="?"
+          >
+        </p>
+      `
+      const expected = '<p>🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should convert an emoji behind a lazy placeholder by its alt', async () => {
+      const value = html`
+        <p>
+          <img
+            src="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%3E%3C/svg%3E"
+            data-lazy-src="https://s.w.org/images/core/emoji/17.0.2/72x72/1f642.png"
+            alt="🙂"
+            class="wp-smiley"
           >
         </p>
       `

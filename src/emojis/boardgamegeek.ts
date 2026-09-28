@@ -24,6 +24,11 @@ export const boardgamegeekEmojiResolver: EmojiResolver = {
       return
     }
 
-    return resolveEmojiImage(element, { isStrong: false, names: noEmojiNames, glyph })
+    return resolveEmojiImage(element, {
+      isStrong: false,
+      names: noEmojiNames,
+      glyph,
+      keepsPictures: true,
+    })
   },
 }
