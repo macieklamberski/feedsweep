@@ -160,6 +160,32 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
+  it('should carry the per-embed params onto the placeholder', async () => {
+    const paramsResolver: EmbedResolver = {
+      kind: 'embed',
+      selector: 'iframe[src*="example.com"]',
+      extract: (element) => ({
+        provider: 'example',
+        src: element.getAttribute('src') ?? '',
+        params: { l: 'german' },
+      }),
+    }
+    const customContext: TransformContext = {
+      ...baseContext,
+      widgetResolvers: [paramsResolver],
+    }
+    const value = '<iframe src="https://example.com/player/xyz"></iframe>'
+    const expected = html`
+      <div
+        data-embed-provider="example"
+        data-embed-src="https://example.com/player/xyz"
+        data-embed-params="l=german"
+      ></div>
+    `
+
+    expect(await transform(value, customContext)).toEqualHtml(expected)
+  })
+
   it('should fall back to resolver metadata dimensions when the iframe has none', async () => {
     const sizedResolver: EmbedResolver = {
       kind: 'embed',
