@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const cnbcHosts = ['cnbc.com']
@@ -10,8 +10,6 @@ const playerHost = 'player.cnbc.com'
 // characters it may hold. Not for a width: the `byGuid` slot and the three-segment route already
 // say which is which, and a band would only refuse the next account CNBC opens.
 const safeGuidRegex = /^\d+$/
-// No width: a band would refuse the next account CNBC opens.
-const safePathTokenRegex = /^[A-Za-z0-9_-]+$/
 
 // The JW player runs in aspect mode with a 56.25% spacer and its title band inside the picture.
 // CNBC's own snippet states 560 by 349, which leaves 34 pixels blank at that width.
@@ -29,7 +27,8 @@ export const cnbcResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  if (!safePathTokenRegex.test(account) || !safePathTokenRegex.test(player)) {
+  // No width: a band would refuse the next account CNBC opens.
+  if (!urlSafeTokenRegex.test(account) || !urlSafeTokenRegex.test(player)) {
     return
   }
 

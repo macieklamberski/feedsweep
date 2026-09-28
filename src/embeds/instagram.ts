@@ -2,7 +2,7 @@ import { decodeSegment, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
 import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'instagram'
@@ -32,7 +32,6 @@ const sitePathSegments = new Set([
 // The account names the poster, not the post, so it is matched and dropped.
 // `tv` is the retired IGTV route and `reels` the plural spelling of the reel.
 const postPathRegex = /^\/(?:([A-Za-z0-9_.]+)\/)?(p|reel|reels|tv)\/([A-Za-z0-9_-]+)/
-const safeShortcodeRegex = /^[A-Za-z0-9_-]+$/
 
 type Post = { kind: string; shortcode: string }
 
@@ -201,7 +200,7 @@ export const instagramAmpEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     const shortcode = attr(element, 'data-shortcode') ?? attr(element, 'shortcode')
 
-    if (!shortcode || !safeShortcodeRegex.test(shortcode)) {
+    if (!shortcode || !urlSafeTokenRegex.test(shortcode)) {
       return
     }
 
@@ -244,7 +243,7 @@ export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
     const attributes = jsonAttr<SubstackPostAttributes>(element, 'data-attrs')
     const shortcode = attributes?.instagram_id
 
-    if (!shortcode || !safeShortcodeRegex.test(shortcode)) {
+    if (!shortcode || !urlSafeTokenRegex.test(shortcode)) {
       return
     }
 

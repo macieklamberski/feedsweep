@@ -1,15 +1,12 @@
 import { getPathSegments, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'donorbox'
 
 const donorboxHosts = ['donorbox.org']
-
-// A campaign slug as Donorbox writes it: one run of word characters and hyphens.
-const slugRegex = /^[\w-]+$/
 
 // 900 is what the later steps need, where the first step measures 733.
 // Donorbox's own snippet reserves 900, and the form does not grow with its container.
@@ -26,7 +23,8 @@ export const donorboxResolveEmbed: ResolveEmbed = (url) => {
 
   const [kind, slug, ...rest] = getPathSegments(parsed)
 
-  if (kind !== 'embed' || !slug || rest.length > 0 || !slugRegex.test(slug)) {
+  // A campaign slug as Donorbox writes it: one run of word characters and hyphens.
+  if (kind !== 'embed' || !slug || rest.length > 0 || !urlSafeTokenRegex.test(slug)) {
     return
   }
 

@@ -1,7 +1,7 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const audiomackHost = 'audiomack.com'
@@ -12,9 +12,6 @@ const audiomackHeights = toMap({
   playlist: 400,
   song: 252,
 })
-
-// An artist handle and a slug, both of them lowercase words joined by hyphens or underscores.
-const safeSlugRegex = /^[\w-]+$/
 
 // The retired players 404 today, and the route word is the only place they record the kind.
 const retiredRoutes = toMap({
@@ -59,7 +56,8 @@ export const audiomackResolveEmbed: ResolveEmbed = (url, element) => {
 
   const { artist, kind, slug, search } = track
 
-  if (!safeSlugRegex.test(artist) || !safeSlugRegex.test(slug)) {
+  // An artist handle and a slug, both of them lowercase words joined by hyphens or underscores.
+  if (!urlSafeTokenRegex.test(artist) || !urlSafeTokenRegex.test(slug)) {
     return
   }
 
