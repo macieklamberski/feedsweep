@@ -29,6 +29,9 @@ export type EmbedResolverResult = {
   provider: string
   id?: string
   src: string
+  // Settings the publisher chose for this one embed that a reader may override, such as the
+  // language of a widget's labels. They stay off `src`, so a reader can apply its own instead.
+  params?: Record<string, string>
   url?: string
   thumbnail?: string
   width?: number

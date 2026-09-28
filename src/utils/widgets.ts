@@ -312,8 +312,11 @@ export const createPlaceholder = <Type extends object>(
 export const normalizeEmbedFields = (
   metadata: Partial<EmbedResolverResult>,
 ): Record<string, string | undefined> => {
+  const params = new URLSearchParams(metadata.params).toString()
+
   return {
     src: metadata.src,
+    params: params || undefined,
     provider: metadata.provider,
     id: metadata.id,
     url: metadata.url,
