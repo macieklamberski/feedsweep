@@ -6,10 +6,19 @@ import {
   composeThumbnailUrl,
   extractVideoId,
   isVideoId,
+  readYoutubeEmbedSrc,
   youtubeAmpEmbedResolver,
   youtubeIframeEmbedResolver,
   youtubeResolveEmbed,
 } from './youtube.js'
+
+const watchOffsetCases: Array<[string, string]> = [
+  ['90', '90'],
+  ['90s', '90'],
+  ['1m30s', '90'],
+  ['1h2m3s', '3723'],
+  ['1:02:03', '3723'],
+]
 
 // Every url spelling that names a single video, current and legacy. All extract the same id,
 // so a deleted row is a format that silently lost support.
@@ -134,6 +143,31 @@ describe('extractVideoId', () => {
   })
 })
 
+describe('readYoutubeEmbedSrc', () => {
+  describe('happy paths', () => {
+    it('should carry the share link offset into the player url', () => {
+      const value = 'https://youtu.be/QeVsMPBbBhY?si=DzWjantVNcWOd7kn&t=260'
+      const expected = 'https://www.youtube.com/embed/QeVsMPBbBhY?start=260'
+
+      expect(readYoutubeEmbedSrc(value)).toBe(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a youtube url that names no video', () => {
+      const value = 'https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw'
+
+      expect(readYoutubeEmbedSrc(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying a video path', () => {
+      const value = 'https://evil.test/watch?v=QeVsMPBbBhY'
+
+      expect(readYoutubeEmbedSrc(value)).toBeUndefined()
+    })
+  })
+})
+
 describe('youtubeResolveEmbed', () => {
   it('should resolve youtube watch url', () => {
     const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
@@ -171,6 +205,125 @@ describe('youtubeResolveEmbed', () => {
       src: 'https://www.youtube.com/embed/dQw4w9WgXcQ?start=90',
       url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should carry a share link offset over as the start', () => {
+    const value = 'https://youtu.be/dQw4w9WgXcQ?t=42'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ?start=42',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it.each(watchOffsetCases)('should read the offset t=%s as %s seconds', (t, start) => {
+    const value = `https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=${t}`
+    const expected = `https://www.youtube.com/embed/dQw4w9WgXcQ?start=${start}`
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should let a stated start win over the watch link offset', () => {
+    const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&start=10&t=42'
+    const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ?start=10'
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should ignore a watch link offset that is not a duration', () => {
+    const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=abc'
+    const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should ignore a watch link offset with a trailing word', () => {
+    const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=90x'
+    const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should ignore a watch link offset with a leading word', () => {
+    const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=x90'
+    const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should ignore a clock offset with a trailing word', () => {
+    const value = 'https://www.youtube.com/embed/vy9FEjsBVvY#t=24:09x'
+    const expected = 'https://www.youtube.com/embed/vy9FEjsBVvY'
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should ignore a clock offset with a leading word', () => {
+    const value = 'https://www.youtube.com/embed/vy9FEjsBVvY#t=x24:09'
+    const expected = 'https://www.youtube.com/embed/vy9FEjsBVvY'
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should carry the offset the Flash-era path spelling leaves after the id', () => {
+    const value = 'http://www.youtube.com/embed/OgiAa5Xi6ok&t=6s'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'OgiAa5Xi6ok',
+      src: 'https://www.youtube.com/embed/OgiAa5Xi6ok?start=6',
+      url: 'https://www.youtube.com/watch?v=OgiAa5Xi6ok',
+      thumbnail: 'https://i.ytimg.com/vi/OgiAa5Xi6ok/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should carry a fragment offset over as the start', () => {
+    const value = 'https://www.youtube.com/embed/1sJnSoSb_SE#t=220'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: '1sJnSoSb_SE',
+      src: 'https://www.youtube.com/embed/1sJnSoSb_SE?start=220',
+      url: 'https://www.youtube.com/watch?v=1sJnSoSb_SE',
+      thumbnail: 'https://i.ytimg.com/vi/1sJnSoSb_SE/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a fragment offset spelled in minutes and seconds', () => {
+    const value = 'http://www.youtube.com/embed/7gkKkXopPB8#t=54m11s'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: '7gkKkXopPB8',
+      src: 'https://www.youtube.com/embed/7gkKkXopPB8?start=3251',
+      url: 'https://www.youtube.com/watch?v=7gkKkXopPB8',
+      thumbnail: 'https://i.ytimg.com/vi/7gkKkXopPB8/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a fragment offset spelled as a clock', () => {
+    const value = 'https://www.youtube.com/embed/vy9FEjsBVvY#t=24:09'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'vy9FEjsBVvY',
+      src: 'https://www.youtube.com/embed/vy9FEjsBVvY?start=1449',
+      url: 'https://www.youtube.com/watch?v=vy9FEjsBVvY',
+      thumbnail: 'https://i.ytimg.com/vi/vy9FEjsBVvY/hqdefault.jpg',
       ratio: '16/9',
     }
 

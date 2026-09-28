@@ -142,6 +142,21 @@ export const composeQuery = (params?: Record<string, string>): string => {
   return query ? `?${query}` : ''
 }
 
+// The publisher's query with only the parameters a player reads left in it. Each pair stays as
+// written, so a repeated name and a bracketed one such as `pwc[size]` reach the player unchanged.
+export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): string => {
+  const pairs = url.search
+    .slice(1)
+    .split('&')
+    .filter((pair) => {
+      const [name] = [...new URLSearchParams(pair).keys()]
+
+      return !!name && isKept(name)
+    })
+
+  return pairs.length > 0 ? `?${pairs.join('&')}` : ''
+}
+
 // The query string an embed resolver carries over when it rebuilds a src from the video id:
 // only the parameters that change what plays. Returns it ready to append, so a src with
 // nothing worth keeping stays bare.
