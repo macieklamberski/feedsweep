@@ -118,6 +118,7 @@ import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds
 import { googledriveEmbedResolver } from '../embeds/googledrive.js'
 import { googleslidesEmbedResolver } from '../embeds/googleslides.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
+import { heyzineEmbedResolver } from '../embeds/heyzine.js'
 import {
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
@@ -427,6 +428,7 @@ const embedResolvers: Array<EmbedResolver> = [
   googledriveEmbedResolver,
   googleslidesEmbedResolver,
   guardianEmbedResolver,
+  heyzineEmbedResolver,
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
   imgurS9eEmbedResolver,
