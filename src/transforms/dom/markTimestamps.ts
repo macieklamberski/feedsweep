@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { collectTextNodes } from '../../utils/dom.js'
+import { collectTextNodes, isBlockElement, isBr, isElement, isText } from '../../utils/dom.js'
 
 const timestampIgnoreTags = new Set(['a', 'pre', 'code', 'kbd', 'samp', 'var', 'script', 'style'])
 
@@ -14,6 +14,8 @@ const lineBoundaryTimestampRegex = new RegExp(
 )
 
 const numericPartRegex = /^\d+$/
+const leadingSpacesRegex = /^[ \t]+/
+const trailingSpacesRegex = /[ \t]+$/
 
 // The seconds a MM:SS or HH:MM:SS timestamp names, or undefined when a part is out of range.
 // Minutes are unbounded in the MM:SS form, so 90:00 is valid.
@@ -51,6 +53,57 @@ const shouldSkipElement = (element: Element): boolean => {
   )
 }
 
+// Whether the text node's edge on one side is a line edge: nothing but spaces or tabs stand
+// between it and a block boundary, a `<br>` or a newline. Inline elements are read through, so
+// `<b>noon</b> 12:30` is mid-line although the text node starts right after the `<b>`.
+const isLineEdge = (node: Node, forward: boolean): boolean => {
+  let current = node
+
+  while (true) {
+    const adjacent = forward ? current.nextSibling : current.previousSibling
+
+    if (!adjacent) {
+      const parent = current.parentNode
+
+      if (!isElement(parent) || isBlockElement(parent) || parent.localName === 'body') {
+        return true
+      }
+
+      current = parent
+      continue
+    }
+
+    let sibling: Node = adjacent
+
+    while (isElement(sibling) && !isBlockElement(sibling) && !isBr(sibling)) {
+      const child = forward ? sibling.firstChild : sibling.lastChild
+
+      if (!child) {
+        break
+      }
+
+      sibling = child
+    }
+
+    if (isBlockElement(sibling) || isBr(sibling)) {
+      return true
+    }
+
+    if (isText(sibling)) {
+      const text = sibling.textContent ?? ''
+      const edge = forward
+        ? text.replace(leadingSpacesRegex, '')
+        : text.replace(trailingSpacesRegex, '')
+
+      if (edge) {
+        return forward ? edge.startsWith('\n') : edge.endsWith('\n')
+      }
+    }
+
+    current = sibling
+  }
+}
+
 // A chapter list of MM:SS timestamps, plain text a reader cannot seek a player to.
 export const markTimestamps: DomTransform = () => {
   return (document) => {
@@ -65,12 +118,17 @@ export const markTimestamps: DomTransform = () => {
         continue
       }
 
+      // A letter on a side that is not a line edge keeps `^` or `$` from matching there.
+      const head = isLineEdge(node, false) ? '' : 'x'
+      const tail = isLineEdge(node, true) ? '' : 'x'
+      const line = `${head}${text}${tail}`
+
       // Split the text node into alternating text + span parts.
       // E.g. "00:00 - Intro" becomes [<span>, " - Intro"].
       const parts: Array<Node> = []
       let lastIndex = 0
 
-      for (const match of text.matchAll(lineBoundaryTimestampRegex)) {
+      for (const match of line.matchAll(lineBoundaryTimestampRegex)) {
         const token = match[1] ?? match[2]
 
         if (!token) {
@@ -84,7 +142,7 @@ export const markTimestamps: DomTransform = () => {
         }
 
         // match.index sits before the consumed whitespace prefix, not at the token.
-        const tokenStart = (match.index ?? 0) + match[0].length - token.length
+        const tokenStart = (match.index ?? 0) + match[0].length - token.length - head.length
 
         if (tokenStart > lastIndex) {
           parts.push(document.createTextNode(text.slice(lastIndex, tokenStart)))

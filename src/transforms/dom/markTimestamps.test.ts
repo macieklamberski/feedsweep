@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { parseHtml } from '../../parsers/linkedom.js'
-import { baseContext, describeForEachParser } from '../../tests.js'
+import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { markTimestamps, parseTimestampSeconds } from './markTimestamps.js'
@@ -158,6 +158,50 @@ describeForEachParser('markTimestamps', (parseHtml) => {
     const value = '<p>We met at 12:30 today</p>'
 
     expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should not wrap a timestamp that follows an inline element mid-line', async () => {
+    const value = '<p><b>noon</b> 12:30 sharp.</p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should not wrap a timestamp that precedes an inline element mid-line', async () => {
+    const value = '<p>Read John 3:16<b>, it matters</b></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should wrap a line-ending timestamp after an inline element', async () => {
+    const value = '<p><b>Intro</b> 0:00</p>'
+    const expected = '<p><b>Intro</b> <span data-timestamp="0">0:00</span></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should wrap timestamps inside inline elements on br-split lines', async () => {
+    const value = '<p><b>0:00</b> Intro<br><b>1:00</b> Outro</p>'
+    const expected =
+      '<p><b><span data-timestamp="0">0:00</span></b> Intro<br><b><span data-timestamp="60">1:00</span></b> Outro</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should wrap timestamps at the edges of list items', async () => {
+    const value = html`
+      <ul>
+        <li><a href="#intro">Intro</a> 0:00</li>
+        <li>1:21 <i>Outro</i></li>
+      </ul>
+    `
+    const expected = html`
+      <ul>
+        <li><a href="#intro">Intro</a> <span data-timestamp="0">0:00</span></li>
+        <li><span data-timestamp="81">1:21</span> <i>Outro</i></li>
+      </ul>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should not wrap an out-of-range seconds value', async () => {
