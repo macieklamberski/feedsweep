@@ -187,6 +187,10 @@ const specimens: Record<string, string | [string, string]> = {
     '<a class="rafl" href="https://example.com/rafl/display/70b9a02412/" id="rc-70b9a02412" rel="nofollow">a Rafflecopter giveaway</a>',
   'a.e-widget':
     '<a class="e-widget no-button" href="https://example.com/3wKIE/win-100-amazon-gift-card" rel="nofollow">Win $100 Amazon Gift Card</a>',
+  '[id^="goodreadsGiveawayWidget"]':
+    '<div id="goodreadsGiveawayWidget182419"><div class="goodreadsGiveawayWidget"><h2><a href="https://example.com/">Goodreads</a> Book Giveaway</h2><div style="float: left;"><a href="https://example.com/book/show/29745568"><img alt="Benjamin McTish and The Hidden Caverns of Bristonbel by June M. Pace" src="https://example.com/books/1459384569l/29745568.jpg" width="100"></a></div><div class="giveaway_details">Giveaway ends May 13, 2016.<br>See the <a href="https://example.com/giveaway/show/182419">giveaway details</a> at Goodreads.</div><a class="goodreadsGiveawayWidgetEnterLink" href="https://example.com/giveaway/enter_choose_address/182419">Enter Giveaway</a></div></div>',
+  '.goodreadsGiveawayWidget':
+    '<div class="goodreadsGiveawayWidget" style="max-width: 350px; margin: 10px auto; padding: 10px 15px;"><h2><a href="https://example.com/">Goodreads</a> Book Giveaway</h2><div style="float: left;"><a href="https://example.com/book/show/36704145"><img src="https://example.com/books/1517005563l/36704145.jpg" alt="A Kiss, a Dance and a Diamond by Helen Lacey" width="100"></a></div><div class="giveaway_details"><p>Giveaway ends April 30, 2018.</p></div><p><a class="goodreadsGiveawayWidgetEnterLink" href="https://example.com/giveaway/enter_choose_address/268862">Enter Giveaway</a></p></div>',
   '.image-link-expand': '<div class="image-link-expand"><button><svg></svg></button></div>',
   'drupal-render-placeholder':
     '<drupal-render-placeholder callback="comment.lazy_builders:renderLinks" arguments="0=node:1"></drupal-render-placeholder>',
