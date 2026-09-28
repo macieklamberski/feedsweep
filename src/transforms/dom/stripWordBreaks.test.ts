@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { baseContext, describeForEachParser } from '../../tests.js'
+import { baseContext, describeForEachParser, queryElement } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { stripWordBreaks } from './stripWordBreaks.js'
@@ -22,6 +22,14 @@ describeForEachParser('stripWordBreaks', (parseHtml) => {
       const expected = '<p>https://youtu.be/HnLpU5vd5rI</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave the url in a single text node', async () => {
+      const document = parseHtml('<p>https://youtu.be/<wbr>HnLpU5vd5rI</p>')
+
+      await applyDomTransforms(document, [stripWordBreaks(baseContext)])
+
+      expect(queryElement(document, 'p').childNodes.length).toBe(1)
     })
 
     it('should remove several wbrs from one url', async () => {

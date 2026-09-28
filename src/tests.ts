@@ -2,23 +2,7 @@ import { describe, expect } from 'bun:test'
 import { JSDOM } from 'jsdom'
 import { parseHTML } from 'linkedom'
 import type { MaybePromise } from 'trousse'
-import {
-  defaultAvatarImageHosts,
-  defaultDeferredIframeSources,
-  defaultEmojiResolvers,
-  defaultFieldCleaners,
-  defaultHighlightFn,
-  defaultLazyIframeAttributes,
-  defaultLazySrcAttributes,
-  defaultLazySrcsetAttributes,
-  defaultMediaSrcAttributes,
-  defaultNonContentSelectors,
-  defaultPreservedPreClasses,
-  defaultResolveUrlFn,
-  defaultTrackingHosts,
-  defaultTrackingPathSegments,
-  defaultWidgetResolvers,
-} from './defaults.js'
+import { defaultContext } from './defaults/context.js'
 import { parseHtml as parseWithLinkedom } from './parsers/linkedom.js'
 import { convertEmojis } from './transforms/dom/convertEmojis.js'
 import type { TransformContext } from './types.js'
@@ -29,24 +13,7 @@ import { cleanResultFields } from './utils/widgets.js'
 // promise: a sync return keeps `parseHtml(html).querySelector(...)` typechecking.
 type ParseHtml = (html: string) => Document
 
-export const baseContext: TransformContext = {
-  widgetResolvers: defaultWidgetResolvers,
-  mediaSrcAttributes: defaultMediaSrcAttributes,
-  emojiResolvers: defaultEmojiResolvers,
-  avatarImageHosts: defaultAvatarImageHosts,
-  nonContentSelectors: defaultNonContentSelectors,
-  preservedPreClasses: defaultPreservedPreClasses,
-  fieldCleaners: defaultFieldCleaners,
-  lazySrcAttributes: defaultLazySrcAttributes,
-  lazySrcsetAttributes: defaultLazySrcsetAttributes,
-  lazyIframeAttributes: defaultLazyIframeAttributes,
-  deferredIframeSources: defaultDeferredIframeSources,
-  trackingHosts: defaultTrackingHosts,
-  trackingPathSegments: defaultTrackingPathSegments,
-
-  resolveUrlFn: defaultResolveUrlFn,
-  highlightFn: defaultHighlightFn,
-}
+export const baseContext: TransformContext = defaultContext
 
 const parseWithJsdom: ParseHtml = (html) => {
   return new JSDOM(`<!doctype html><body>${html}</body>`).window.document
@@ -90,9 +57,18 @@ type AnyResolver<Result> = {
 export const resolverExtractor = <Result>(parseHtml: ParseHtml, resolver: AnyResolver<Result>) => {
   return async (value: string): Promise<Result | undefined> => {
     const element = parseHtml(value).querySelector(resolver.selector)
-    const result = element ? await resolver.extract(element) : undefined
 
-    return result && cleanResultFields(result, baseContext)
+    if (!element) {
+      return
+    }
+
+    const result = await resolver.extract(element)
+
+    if (!result) {
+      return
+    }
+
+    return cleanResultFields(result, baseContext)
   }
 }
 

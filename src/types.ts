@@ -76,9 +76,8 @@ export type FieldCleaner = {
   field: 'title' | 'description'
   // The whole value is chrome, so the field is dropped. A regex is anchored at both ends.
   drop?: Pattern
-  // A wrapper the platform puts around a real value. A string is a prefix, and a regex is
-  // whatever it matches, removed in place.
-  strip?: Pattern
+  // A prefix the platform puts in front of a real value, matched whatever its case.
+  strip?: string
 }
 
 // What the pipeline hands an enricher. The url is what a platform's oEmbed endpoint is keyed by,

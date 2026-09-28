@@ -20,7 +20,7 @@ import {
   readCarrierUrl,
 } from '../../utils/widgets.js'
 
-const playableSelector = [...playableElements].join(', ')
+const playableSelector = playableElements.join(', ')
 
 const getMediaTag = (url: string): MediaResolverResult['tag'] | undefined => {
   if (isMediaWikiFilePage(url)) {

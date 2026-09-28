@@ -218,8 +218,10 @@ export const isEmptyElement = (element: Element): boolean => {
   return element.children.length === 0 && !hasText(element)
 }
 
-// Remove an element along with any wrapper (a/figure) it leaves empty, so a
-// removed image doesn't leave a dangling link or empty figure behind.
+const removableWrappers = ['a', 'figure']
+
+// Remove an element along with any wrapper it leaves empty, so a removed image doesn't leave a
+// dangling link or empty figure behind.
 export const removeWithEmptyWrappers = (element: Element): void => {
   let current: Element | null = element
 
@@ -227,7 +229,7 @@ export const removeWithEmptyWrappers = (element: Element): void => {
     const parent: Element | null = current.parentElement
     current.remove()
 
-    if (!parent || (parent.tagName !== 'A' && parent.tagName !== 'FIGURE')) {
+    if (!parent || !removableWrappers.includes(parent.localName)) {
       break
     }
 
@@ -256,7 +258,7 @@ export const isMediaElement = (node: Node): boolean => {
 }
 
 // No img or picture here: a poster beside a parked media url would otherwise count as a player.
-export const playableElements = new Set(['audio', 'embed', 'iframe', 'object', 'source', 'video'])
+export const playableElements = ['audio', 'embed', 'iframe', 'object', 'source', 'video']
 
 export const collectTextNodes = (
   root: Node,
@@ -362,8 +364,15 @@ export const parsePixelSize = (value: Nullish<string>): number | undefined => {
 // Nothing is matched ahead of the unit: an unbounded run there is quadratic on a long attribute.
 const trailingUnitRegex = /[a-z]{1,6}\s*$/i
 
+// A browser ignores a negative size. Zero stays: removeTrackingPixels reads a 0x0 image.
 const dimensionAttribute = (element: Element, name: string): number | undefined => {
-  return coerceNumber(element.getAttribute(name)?.replace(trailingUnitRegex, ''))
+  const size = coerceNumber(element.getAttribute(name)?.replace(trailingUnitRegex, ''))
+
+  if (size === undefined || size < 0) {
+    return
+  }
+
+  return size
 }
 
 // Squarespace stamps `data-image-dimensions="2500x1695"`, and on its gallery `img.thumb-image`

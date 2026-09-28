@@ -181,8 +181,18 @@ type CleanUrl = {
 }
 
 export const cleanUrl: CleanUrl = ((url, context: CleanContext) => {
-  // biome-ignore lint/nursery/useNullishCoalescing: An empty cleaned url keeps the input url.
-  return url ? context.cleanUrlFn?.(url) || url : undefined
+  if (!url) {
+    return
+  }
+
+  const cleaned = context.cleanUrlFn?.(url)
+
+  // An empty cleaned url keeps the input url.
+  if (!cleaned) {
+    return url
+  }
+
+  return cleaned
 }) as CleanUrl
 
 export const isSamePage = (
