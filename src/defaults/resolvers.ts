@@ -209,7 +209,11 @@ import { vkEmbedResolver } from '../embeds/vk.js'
 import { wikimediaEmbedResolver } from '../embeds/wikimedia.js'
 import { wistiaEmbedResolver } from '../embeds/wistia.js'
 import { youkuEmbedResolver } from '../embeds/youku.js'
-import { youtubeAmpEmbedResolver, youtubeIframeEmbedResolver } from '../embeds/youtube.js'
+import {
+  youtubeAmpEmbedResolver,
+  youtubeFc2EmbedResolver,
+  youtubeIframeEmbedResolver,
+} from '../embeds/youtube.js'
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
 import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
@@ -482,6 +486,7 @@ const embedResolvers: Array<EmbedResolver> = [
   youkuEmbedResolver,
   youtubeIframeEmbedResolver,
   youtubeAmpEmbedResolver,
+  youtubeFc2EmbedResolver,
   zencastrBlockquoteEmbedResolver,
   zencastrIframeEmbedResolver,
   // Last, outside the alphabet: keyed on a path shape rather than a host, so every resolver
