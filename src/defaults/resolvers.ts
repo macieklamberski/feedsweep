@@ -90,6 +90,7 @@ import { geniallyEmbedResolver } from '../embeds/genially.js'
 import { gettyImagesEmbedResolver } from '../embeds/gettyimages.js'
 import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds/glomex.js'
 import { googledriveEmbedResolver } from '../embeds/googledrive.js'
+import { googleslidesEmbedResolver } from '../embeds/googleslides.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
 import { imgurBlockquoteEmbedResolver, imgurIframeEmbedResolver } from '../embeds/imgur.js'
 import {
@@ -334,6 +335,7 @@ const embedResolvers: Array<EmbedResolver> = [
   glomexIframeEmbedResolver,
   glomexElementEmbedResolver,
   googledriveEmbedResolver,
+  googleslidesEmbedResolver,
   guardianEmbedResolver,
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
