@@ -160,9 +160,33 @@ export type MediaResolver = {
   extract: (element: Element) => MaybePromise<MediaResolverResult | undefined>
 }
 
-export type WidgetResolver = EmbedResolver | MediaResolver | CiteResolver
+export type GalleryItem = {
+  url: string // Displayed <img src> (preview / display size).
+  fullUrl?: string // Full-resolution image from a wrapping <a href>, when present.
+  alt?: string
+  caption?: string // Per-image <figcaption>.
+}
 
-export type WidgetResolverResult = EmbedResolverResult | MediaResolverResult | CiteResolverResult
+export type GalleryResolverResult = {
+  provider: string
+  title?: string // Gallery-level caption.
+  layout?: string // "slideshow" for sliders and carousels; omitted for grids.
+  items: Array<GalleryItem>
+}
+
+export type GalleryResolver = {
+  kind: 'gallery'
+  selector: string
+  extract: (element: Element) => MaybePromise<GalleryResolverResult | undefined>
+}
+
+export type WidgetResolver = EmbedResolver | MediaResolver | CiteResolver | GalleryResolver
+
+export type WidgetResolverResult =
+  | EmbedResolverResult
+  | MediaResolverResult
+  | CiteResolverResult
+  | GalleryResolverResult
 
 export type EmojiResolverResult =
   | { glyph: string } // Replaced by the text

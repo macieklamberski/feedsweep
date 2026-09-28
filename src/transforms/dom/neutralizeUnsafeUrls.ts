@@ -2,6 +2,7 @@ import { parseSrcset, stringifySrcset } from 'srcset'
 import { toMap } from 'trousse'
 import type { DomTransform, IsSafeUrlFn, UrlRole } from '../../types.js'
 import { svgHrefAttribute, walkElements } from '../../utils/dom.js'
+import { rewriteGalleryItemUrls } from '../../utils/widgets.js'
 
 // Inert replacements that keep the element but render nothing: a same-page no-op for
 // links, the empty document for media (about:blank loads nothing and runs nothing).
@@ -107,7 +108,7 @@ const hrefTagRoles: ReadonlyMap<string, UrlRole> = toMap({
 
 // A javascript:, vbscript: or data:text/html url on any attribute a browser would follow.
 export const neutralizeUnsafeUrls: DomTransform = ({ isSafeUrlFn }) => {
-  return (document) => {
+  return async (document) => {
     walkElements(document, (element) => {
       // Skip elements with no attributes. hasAttributes is O(1) in linkedom.
       if (!element.hasAttributes()) {
@@ -139,5 +140,16 @@ export const neutralizeUnsafeUrls: DomTransform = ({ isSafeUrlFn }) => {
         neutralizeAttribute(element, svgHrefAttribute(element), hrefRole, isSafeUrlFn)
       }
     })
+
+    // Gallery placeholders keep their urls in a data-gallery-items JSON blob, out of reach of
+    // the per-attribute walk above. The display `url` is a media role, the full-size `fullUrl`
+    // a link, matching the fallback <img>/<a> the resolver emits.
+    for (const element of document.querySelectorAll('[data-gallery-items]')) {
+      await rewriteGalleryItemUrls(element, (url, key) => {
+        const role: UrlRole = key === 'url' ? 'media' : 'link'
+
+        return isUnsafe(url, role, isSafeUrlFn) ? sentinels[role] : undefined
+      })
+    }
   }
 }

@@ -321,7 +321,7 @@ export const batchSelectors = (selectors: ReadonlyArray<string>): Array<string> 
   return batches.map((batch) => batch.join(','))
 }
 
-export const generatedWrapperTypes = ['embed', 'cite', 'file', 'table', 'pre'] as const
+export const generatedWrapperTypes = ['embed', 'cite', 'file', 'gallery', 'table', 'pre'] as const
 
 export type GeneratedWrapperType = (typeof generatedWrapperTypes)[number]
 
