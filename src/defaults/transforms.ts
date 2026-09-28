@@ -109,6 +109,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Normalize lazy-loaded video embeds into a plain <iframe> before the media/embed
   // transforms run, so each is placeholdered and any poster connected.
   surfaceTemplateEmbeds,
+  // Points a Drupal media oEmbed frame at the page url it wraps, so the provider resolvers
+  // below see the video and not the site's proxy route. Runs before surfaceNoscriptEmbeds,
+  // which surfaces only a frame a resolver claims.
+  unwrapDrupalOembedIframes,
   surfaceNoscriptEmbeds,
   rebuildEmbedPlusEmbeds,
   rebuildLiteVideoEmbeds,
@@ -126,9 +130,6 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Runs before convertCiteCards so a payload naming `link` still reaches the cite pass, and
   // before stripEmptyTags, which is what deletes an empty carrier nothing has claimed.
   rebuildEmbedlyEmbeds,
-  // Points a Drupal media oEmbed frame at the page url it wraps, so the provider resolvers
-  // below see the video and not the site's proxy route.
-  unwrapDrupalOembedIframes,
   rebuildGettyImagesEmbeds,
   // A GitHub Gist embed is a JS-only <script> that renders nothing in a reader. Replace it
   // with a link to the gist so the content is at least reachable.

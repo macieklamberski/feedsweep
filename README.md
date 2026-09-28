@@ -67,6 +67,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `injectEnclosures` | Inject feed enclosures as native media or embed placeholders, collapsing a media group to one rendition and merging a player page entry with its media file; an image enclosure injects only when the content has no image of its own; anything else becomes a `data-file-*` placeholder, after the content |
 | `surfaceParkedMarkup` | Dissolve a lazy-loader container (`div.load-later[data-content]`) into the percent-encoded embed markup it holds, whatever platform that turns out to be |
 | `surfaceTemplateEmbeds` | Hoist a video embed out of a lazy-load `<template>` (e.g. Better Core Video Embeds) so it renders in a reader |
+| `unwrapDrupalOembedIframes` | Point a Drupal media oEmbed proxy frame (`/media/oembed?url=`) at the page url it wraps |
 | `surfaceNoscriptEmbeds` | Hoist a video `<iframe>` out of a `<noscript>` lazy-load fallback (e.g. WP Rocket, a3 Lazy Load); ignores non-video noscript iframes like Google Tag Manager |
 | `rebuildEmbedPlusEmbeds` | Rebuild a real `<iframe>` from an "Embed Plus for YouTube" facade (`.epyt-facade[data-facadesrc]`) |
 | `rebuildLiteVideoEmbeds` | Rebuild a real `<iframe>` from a `lite-youtube` / `lite-vimeo` web component's `videoid`, carrying over `start` and `videotitle` |
@@ -79,7 +80,6 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildLazyYtEmbeds` | Rebuild a real `<iframe>` from a lazy YouTube facade parking the id in a data attribute (`data-youtube-id`, `data-youtube`, `.youtube-embed`, `.youtube-player`) |
 | `rebuildElementorVideoEmbeds` | Rebuild a real `<iframe>` from an Elementor video widget's deferred `data-settings` (YouTube / Vimeo / Dailymotion / VideoPress) |
 | `rebuildEmbedlyEmbeds` | Unwrap an Embedly media widget to the inner provider iframe, carrying the poster as `data-thumbnail` |
-| `unwrapDrupalOembedIframes` | Point a Drupal media oEmbed proxy frame (`/media/oembed?url=`) at the page url it wraps |
 | `rebuildGettyImagesEmbeds` | Rebuild a real `<iframe>` from a Getty Images `gie` widget facade, composing the player URL from the inline config the loader script never runs |
 | `rebuildDeferredIframes` | Rebuild a real `<iframe>` from a URL parked in a `<div>` attribute (Pym.js `data-pym-src`, @newswire/frames `data-frame-src`) |
 | `linkifyGistEmbeds` | Replace a GitHub Gist script embed or `<amp-gist>` with a link to the gist |

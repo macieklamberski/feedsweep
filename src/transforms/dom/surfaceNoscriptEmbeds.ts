@@ -1,4 +1,6 @@
 import type { DomTransform, WidgetResolver } from '../../types.js'
+import { attr } from '../../utils/dom.js'
+import { resolveOrKeepUrl } from '../../utils/urls.js'
 
 // True when one of the widget resolvers claims the iframe, which is the same test convertWidgets
 // makes, so only iframes that would become a placeholder or a recovered media element pass.
@@ -20,9 +22,17 @@ const isResolvedIframe = async (
 export const surfaceNoscriptEmbeds: DomTransform = (context) => async (document) => {
   for (const noscript of document.querySelectorAll('noscript')) {
     const iframe = noscript.querySelector('iframe[src]')
+    const src = iframe ? resolveOrKeepUrl(attr(iframe, 'src'), context) : undefined
+
+    if (!iframe || !src) {
+      continue
+    }
+
+    // The resolvers read a host, which a protocol-relative src names only once resolved.
+    iframe.setAttribute('src', src)
 
     // Ungated, this would surface Google Tag Manager, reCAPTCHA and ad-network noscript frames.
-    if (!iframe || !(await isResolvedIframe(iframe, context.widgetResolvers))) {
+    if (!(await isResolvedIframe(iframe, context.widgetResolvers))) {
       continue
     }
 

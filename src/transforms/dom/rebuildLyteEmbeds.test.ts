@@ -42,10 +42,22 @@ describeForEachParser('rebuildLyteEmbeds', (parseHtml) => {
   })
 
   it('should keep an underscore-bearing video id intact', async () => {
-    const value = '<div id="WYL_a_b-c123def45"></div>'
-    const expected = '<iframe src="https://www.youtube.com/embed/a_b-c123def45"></iframe>'
+    const value = '<div id="WYL_a_b-c123def"></div>'
+    const expected = '<iframe src="https://www.youtube.com/embed/a_b-c123def"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a lyte_ element whose id names no video', async () => {
+    const value = '<div id="lyte_foo"></div>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a WYL_ element whose id carries a query', async () => {
+    const value = '<div id="WYL_dQw4w9WgXcQ?list=x"></div>'
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 
   it('should produce a youtube placeholder end to end', async () => {
