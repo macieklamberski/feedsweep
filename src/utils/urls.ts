@@ -23,6 +23,8 @@ const queryOrHashRegex = /[?#]/
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
 
+export const urlSafeTokenRegex = /^[A-Za-z0-9_-]+$/
+
 // No m3u8 or mpd: only Safari plays them natively, so promoting one breaks the player elsewhere.
 export const imageFileRegex = /\.(avif|gif|jpe?g|png|svg|webp)(\?|#|$)/i
 export const videoFileRegex = /\.(mp4|m4v|webm|mov|ogv)(\?|#|$)/i
