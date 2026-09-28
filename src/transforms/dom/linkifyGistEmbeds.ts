@@ -1,5 +1,6 @@
 import type { DomTransform } from '../../types.js'
 import { keepIfMatches } from '../../utils/dom.js'
+import { createLink } from '../../utils/widgets.js'
 
 const gistScriptRegex = /gist\.github\.com\/(?:([^/?"]+)\/)?([A-Za-z0-9]+)\.js/
 const gistIdRegex = /^[A-Za-z0-9]+$/
@@ -36,9 +37,6 @@ export const linkifyGistEmbeds: DomTransform = () => (document) => {
 
     const url = `https://gist.github.com/${path}`
 
-    const link = document.createElement('a')
-    link.setAttribute('href', url)
-    link.textContent = url
-    element.replaceWith(link)
+    element.replaceWith(createLink(document, url))
   }
 }

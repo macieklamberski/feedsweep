@@ -1,6 +1,6 @@
 import { coerceNumber } from 'trousse'
 import type { DomTransform } from '../../types.js'
-import { getElementDimensions, pixelDimensionLimit } from '../../utils/dom.js'
+import { getElementDimensions, getLazyValue, pixelDimensionLimit } from '../../utils/dom.js'
 import { getImageFingerprint, parseSrcset } from '../../utils/images.js'
 import * as styles from '../../utils/styles.js'
 import { isUrlShaped, isUsableSrc } from '../../utils/urls.js'
@@ -119,25 +119,19 @@ export const fixLazyImages: DomTransform = (context) => {
 
       // Promote the real src/srcset but keep the original lazy attributes in place.
       if (hasSrcCandidate) {
-        for (const attribute of lazySrcAttributes) {
-          const value = element.getAttribute(attribute)
+        const src = getLazyValue(element, lazySrcAttributes, isUsableLazyValue)
 
-          if (value && isUsableLazyValue(value)) {
-            element.setAttribute('src', value)
-            dropPixelDimensions(element)
-            break
-          }
+        if (src) {
+          element.setAttribute('src', src)
+          dropPixelDimensions(element)
         }
       }
 
       if (hasSrcsetCandidate) {
-        for (const attribute of lazySrcsetAttributes) {
-          const value = element.getAttribute(attribute)
+        const srcset = getLazyValue(element, lazySrcsetAttributes, isUsableLazyValue)
 
-          if (value && isUsableLazyValue(value)) {
-            element.setAttribute('srcset', value)
-            break
-          }
+        if (srcset) {
+          element.setAttribute('srcset', srcset)
         }
       }
     }

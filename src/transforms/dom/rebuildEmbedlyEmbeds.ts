@@ -2,7 +2,7 @@ import { parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, jsonAttr } from '../../utils/dom.js'
 import { isUrlShaped, placeholderBaseUrl } from '../../utils/urls.js'
-import { createIframe } from '../../utils/widgets.js'
+import { createIframe, createLink } from '../../utils/widgets.js'
 
 const embedlyCarrierSelector = [
   'iframe[src*="cdn.embedly.com/widgets/media.html"]',
@@ -69,11 +69,7 @@ export const rebuildEmbedlyEmbeds: DomTransform = () => (document) => {
     const source = attr(element, 'src')
 
     if (!payload && isUsableUrl(source)) {
-      const link = document.createElement('a')
-
-      link.setAttribute('href', source)
-      link.textContent = source
-      element.replaceWith(link)
+      element.replaceWith(createLink(document, source))
     }
   }
 }

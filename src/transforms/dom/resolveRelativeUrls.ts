@@ -2,7 +2,7 @@ import { stringifySrcset } from 'srcset'
 import type { DomTransform, ResolveUrlFn } from '../../types.js'
 import { svgHrefAttribute } from '../../utils/dom.js'
 import { countSrcsetCandidates, parseSrcset } from '../../utils/images.js'
-import { absoluteUrlRegex } from '../../utils/urls.js'
+import { absoluteUrlRegex, resolveOrKeepUrl } from '../../utils/urls.js'
 
 // An absolute value is left byte-identical, and a relative one with no `baseUrl` resolves to
 // nothing and stays as written.
@@ -14,15 +14,11 @@ const resolveAttribute = (
 ): void => {
   const value = element.getAttribute(attribute)
 
-  if (!value || absoluteUrlRegex.test(value)) {
+  if (!value) {
     return
   }
 
-  const resolved = resolveUrlFn(value, baseUrl)
-
-  if (resolved) {
-    element.setAttribute(attribute, resolved)
-  }
+  element.setAttribute(attribute, resolveOrKeepUrl(value, { baseUrl, resolveUrlFn }))
 }
 
 const resolveSrcset = (

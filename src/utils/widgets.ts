@@ -258,6 +258,14 @@ export const createImage = (document: Document, fields: ImageFields): HTMLElemen
   return image
 }
 
+export const createLink = (document: Document, href: string, text = href): HTMLElement => {
+  const link = document.createElement('a')
+  link.setAttribute('href', href)
+  link.textContent = text
+
+  return link
+}
+
 // A platform that publishes a canonical static render of something it would otherwise show in a
 // player: Datawrapper's chart png, Giphy's gif. The render goes inline where a reader sees it at
 // once, and the interactive version stays one click away on the platform's own page.

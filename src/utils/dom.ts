@@ -1,5 +1,6 @@
 import { coerceNumber, isNonEmptyString, type Nullish, startsWithAnyOf } from 'trousse'
 import * as styles from './styles.js'
+import { isUrlShaped } from './urls.js'
 
 // Linkedom mis-types Node as `() => void` in facades.d.ts (WebReflection/linkedom#167).
 export const Node = { ELEMENT_NODE: 1, TEXT_NODE: 3, COMMENT_NODE: 8 } as const
@@ -250,6 +251,14 @@ export const mediaElements = new Set([
   'picture',
   'video',
 ])
+
+export const mediaSelector = [...mediaElements].join(', ')
+
+export const headingSelector = 'h1, h2, h3, h4, h5, h6'
+
+// Flow containers whose direct children a paragraph pass regroups.
+export const processContainersSelector =
+  'body, div, blockquote, td, li, article, section, main, header, footer, aside'
 
 export const isMediaElement = (node: Node): boolean => {
   return isElement(node) && mediaElements.has(node.localName)
@@ -628,4 +637,20 @@ export const walkElements = (
   }
 
   return false
+}
+
+// The first value among lazy attributes that names a url, which a lazy-load library parks
+// where the real attribute belongs.
+export const getLazyValue = (
+  element: Element,
+  attributes: ReadonlyArray<string>,
+  isUsable: (value: string) => boolean = isUrlShaped,
+): string | undefined => {
+  for (const attribute of attributes) {
+    const value = element.getAttribute(attribute)
+
+    if (value && isUsable(value)) {
+      return value
+    }
+  }
 }
