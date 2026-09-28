@@ -133,6 +133,20 @@ describeForEachParser('khorosImageEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should leave an image whose class only contains emoticon- untouched', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emoticon-img"
+            src="https://example.com/img/sticker.png"
+            alt=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     // Windows Live Writer's own emoticons, which have no name table.
     it('should leave a Windows Live Writer emoticon untouched', async () => {
       const value = html`
