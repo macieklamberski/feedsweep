@@ -165,6 +165,7 @@ import { odnoklassnikiEmbedResolver } from '../embeds/odnoklassniki.js'
 import { odyseeEmbedResolver } from '../embeds/odysee.js'
 import { omnyEmbedResolver } from '../embeds/omny.js'
 import { padletEmbedResolver } from '../embeds/padlet.js'
+import { pastebinIframeEmbedResolver, pastebinScriptEmbedResolver } from '../embeds/pastebin.js'
 import { peertubeEmbedResolver } from '../embeds/peertube.js'
 import { pixivIframeEmbedResolver, pixivScriptEmbedResolver } from '../embeds/pixiv.js'
 import { podbeanEmbedResolver } from '../embeds/podbean.js'
@@ -467,8 +468,10 @@ const embedResolvers: Array<EmbedResolver> = [
   odyseeEmbedResolver,
   omnyEmbedResolver,
   padletEmbedResolver,
-  pixivScriptEmbedResolver,
+  pastebinIframeEmbedResolver,
+  pastebinScriptEmbedResolver,
   pixivIframeEmbedResolver,
+  pixivScriptEmbedResolver,
   podbeanEmbedResolver,
   podetizeScriptEmbedResolver,
   podetizeIframeEmbedResolver,
