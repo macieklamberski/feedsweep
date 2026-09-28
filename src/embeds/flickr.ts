@@ -1,7 +1,7 @@
 import { isHostOf, type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
-import { placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver, getEmbedSize } from '../utils/widgets.js'
 
 const flickrHosts = ['flickr.com']
@@ -16,8 +16,6 @@ const streamPathRegex = /^\/photos\/([\w.@-]+)\/show\/?$/
 const groupPathRegex = /^\/groups\/(\d+@N\d\d)\/pool\/show\/?$/
 const photoPathRegex = /^\/photos\/([\w.@-]+)\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
 const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/
-
-const safeSetIdRegex = /^\d+$/
 
 // The first class admits no dot, so `..` never reaches a minted path.
 // An owner is a numeric NSID with its `@N0…` suffix, or the path alias the owner chose.
@@ -180,7 +178,7 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   const owner = keepIfMatches(subject.owner, safeOwnerRegex)
   const author = readOwnerAlias(owner)
 
-  if (subject.setId && safeSetIdRegex.test(subject.setId)) {
+  if (subject.setId && digitsRegex.test(subject.setId)) {
     // The album page path starts with the owner, and `/sets/{id}` is kept as the markup spells
     // it: the path is still served and does not redirect to `/albums/` (both 200, 2026-08-14).
     return owner

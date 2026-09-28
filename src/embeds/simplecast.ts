@@ -1,12 +1,11 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { uuidRegex } from '../utils/urls.js'
+import { digitsRegex, uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `embed.simplecast.com/{8hex}` and `simplecast.com/e/{numeric}` are legacy spellings of the
 // episode, and `play.simplecast.com/{uuid}` is the share host.
 const legacyIdRegex = /^[0-9a-f]{8}$/i
-const numericIdRegex = /^\d+$/
 
 const simplecastHosts = ['simplecast.com']
 
@@ -27,7 +26,7 @@ export const extractSimplecastEpisode = (
     return { id, isCurrent: true }
   }
 
-  if (legacyIdRegex.test(id) || numericIdRegex.test(id)) {
+  if (legacyIdRegex.test(id) || digitsRegex.test(id)) {
     return { id, isCurrent: false }
   }
 }

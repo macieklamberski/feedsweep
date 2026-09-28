@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOrSubdomainOf, type Nullish, toMap } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // Music and podcasts embed through the same player, served from `embed.music.apple.com` and
@@ -16,11 +16,6 @@ const storefrontRegex = /^[a-z]{2}$/
 // A numeric music id, a two-letter prefixed playlist or station id, or an `id`-prefixed podcast id.
 const safeIdRegex = /^(?:id\d+|\d+|[a-z]{2}\.[a-z0-9-]+)$/i
 const podcastIdPrefixRegex = /^id/
-
-// A track or episode id is always numeric. It comes off the query decoded and is written into
-// the id, so anything else, a separator or a dot segment included, is refused.
-// `i` names the track in an album or the episode in a show, and its player is the song one.
-const trackIdRegex = /^\d+$/
 
 // The player is fluid-width. The podcast show player fills any frame and floors at 180 at 320
 // wide, 360 at 640 and 422 at 1280, and the episode player floors at 160 at every width.
@@ -54,7 +49,7 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
 
   const isPodcast = isHostOrSubdomainOf(parsed, applePodcastsHosts)
   const host = isPodcast ? 'podcasts.apple.com' : 'music.apple.com'
-  const trackId = keepIfMatches(parsed.searchParams.get('i'), trackIdRegex)
+  const trackId = keepIfMatches(parsed.searchParams.get('i'), digitsRegex)
   const id = trackId ?? pathId.replace(podcastIdPrefixRegex, '')
   // A refused `i` is dropped from the player url as well: the resolver does not forward a value
   // it would not put in the id, and the collection player is what the path names without it.

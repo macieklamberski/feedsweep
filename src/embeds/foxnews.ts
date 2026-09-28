@@ -1,12 +1,10 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'foxnews'
-
-const safeIdRegex = /^\d+$/
 
 const foxnewsHosts = ['video.foxnews.com']
 
@@ -39,7 +37,7 @@ export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  return id && safeIdRegex.test(id) ? composeEmbed(id) : undefined
+  return id && digitsRegex.test(id) ? composeEmbed(id) : undefined
 }
 
 // Fox's old share snippet is an `embed.js` script tag whose loader is gone, so nothing plays.

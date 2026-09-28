@@ -1,12 +1,8 @@
 import { composeEmbedUrl as composeVimeoUrl } from '../../embeds/vimeo.js'
 import { composeEmbedUrl as composeYoutubeUrl, youtubeEmbedParams } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
-import { pickQueryParams } from '../../utils/urls.js'
+import { digitsRegex, pickQueryParams } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
-
-// `start` carries a whole-second offset. Guard it so only digits reach the URL and a
-// crafted value can't inject extra query params.
-const startSecondsRegex = /^\d+$/
 
 type EmbedSource = {
   params: ReadonlyArray<string>
@@ -40,7 +36,7 @@ export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
     const params = pickQueryParams(element.getAttribute('params') ?? '', source.params)
     const start = element.getAttribute('start')
 
-    if (start && startSecondsRegex.test(start)) {
+    if (start && digitsRegex.test(start)) {
       params.start = start
     }
 
