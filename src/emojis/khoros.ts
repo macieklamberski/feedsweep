@@ -120,6 +120,11 @@ export const khorosImageEmojiResolver: EmojiResolver = {
       return
     }
 
+    // Samsung's codepoint-named set is a set of its own beside the faces Khoros keeps.
+    if (typeof glyph === 'string') {
+      return resolveEmojiImage(element, { isStrong: true, glyph, keepsPictures: false })
+    }
+
     return resolveEmojiImage(element, { isStrong: true, names, glyph, stem })
   },
 }

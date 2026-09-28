@@ -4,7 +4,7 @@ import { describeForEachParser, emojiConverters, html } from '../tests.js'
 describeForEachParser('easydiscussEmojiResolver', (parseHtml) => {
   const { transform } = emojiConverters(parseHtml)
 
-  it('should replace an EasyDiscuss smilie by its bb-smiley class', async () => {
+  it('should mark an EasyDiscuss smilie by its bb-smiley class', async () => {
     const value = html`
       <p>
         <img
@@ -14,7 +14,16 @@ describeForEachParser('easydiscussEmojiResolver', (parseHtml) => {
         >
       </p>
     `
-    const expected = '<p>🙂</p>'
+    const expected = html`
+      <p>
+        <img
+          alt=":)"
+          class="bb-smiley"
+          src="https://example.com/media/com_easydiscuss/images/markitup/emoticon-smile.png"
+          data-emoji=""
+        >
+      </p>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })

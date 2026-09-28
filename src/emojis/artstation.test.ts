@@ -5,15 +5,23 @@ describeForEachParser('artstationEmojiResolver', (parseHtml) => {
   const { transform, transformKeeping } = emojiConverters(parseHtml)
 
   describe('ArtStation (/mailer/emoji/ path with a generic emoji class)', () => {
-    // The generic class is read for a glyph alt and never for a shortcode, so the path is what
-    // lets the filename be looked up.
-    it('should replace an emoji named only by its path', async () => {
+    // The path claims a stock name, which the stock set keeps as its picture.
+    it('should mark a stock name from its path', async () => {
       const value = html`
         <p>
           <img class="emoji" alt="smiley" src="https://cdn.artstation.com/mailer/emoji/smiley.png">
         </p>
       `
-      const expected = '<p>🙂</p>'
+      const expected = html`
+        <p>
+          <img
+            class="emoji"
+            alt="smiley"
+            src="https://cdn.artstation.com/mailer/emoji/smiley.png"
+            data-emoji=""
+          >
+        </p>
+      `
 
       expect(await transform(value)).toEqualHtml(expected)
     })

@@ -50,7 +50,7 @@ describeForEachParser('boardgamegeekEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should convert an emoticon whose alt is an emoji', async () => {
+  it('should mark an emoticon whose alt is an emoji', async () => {
     const value = html`
       <p>
         <img
@@ -59,7 +59,15 @@ describeForEachParser('boardgamegeekEmojiResolver', (parseHtml) => {
         >
       </p>
     `
-    const expected = '<p>🙂</p>'
+    const expected = html`
+      <p>
+        <img
+          src="https://cf.geekdo-static.com/images/smile.gif"
+          alt="🙂"
+          data-emoji=""
+        >
+      </p>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })

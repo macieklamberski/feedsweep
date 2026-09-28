@@ -66,7 +66,7 @@ describeForEachParser('liferayEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a smile.gif without the emoticon alt to the forum names', async () => {
+  it('should mark a smile.gif without the emoticon alt through the forum names', async () => {
     const value = html`
       <p>
         <img
@@ -76,12 +76,21 @@ describeForEachParser('liferayEmojiResolver', (parseHtml) => {
         >
       </p>
     `
-    const expected = '<p>🙂</p>'
+    const expected = html`
+      <p>
+        <img
+          class="smilies"
+          src="https://example.com/images/emoticons/smile.gif"
+          alt=""
+          data-emoji=""
+        >
+      </p>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a name the forum tables carry to the smilies resolver', async () => {
+  it('should mark a name the forum tables carry through the smilies resolver', async () => {
     const value = html`
       <p>
         <img
@@ -90,7 +99,15 @@ describeForEachParser('liferayEmojiResolver', (parseHtml) => {
         >
       </p>
     `
-    const expected = '<p>😉</p>'
+    const expected = html`
+      <p>
+        <img
+          alt="emoticon"
+          src="https://example.com/o/classic-theme/images/emoticons/wink.gif"
+          data-emoji=""
+        >
+      </p>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })
