@@ -192,6 +192,10 @@ const specimens: Record<string, string | [string, string]> = {
     '<drupal-render-placeholder callback="comment.lazy_builders:renderLinks" arguments="0=node:1"></drupal-render-placeholder>',
   '.mcnPreviewText': '<span class="mcnPreviewText" style="display:none">Preview text</span>',
   '.tmblr-alt-text-helper': '<span class="tmblr-alt-text-helper">ALT</span>',
+  'blockquote.wp-embedded-content + iframe.wp-embedded-content': [
+    '<blockquote class="wp-embedded-content" data-secret="hDl4S8YwKz"><a href="https://www.e-startupindia.com/learn/gstr-1/">GSTR-1 Return Filing</a></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="https://www.e-startupindia.com/learn/gstr-1/embed/#?secret=hDl4S8YwKz" data-secret="hDl4S8YwKz" width="600" height="338"></iframe>',
+    '<blockquote class="wp-embedded-content" data-secret="hDl4S8YwKz"><a href="https://www.e-startupindia.com/learn/gstr-1/">GSTR-1 Return Filing</a></blockquote>',
+  ],
   'img[src*="steamcommunity.com"][src*="placeholder"]':
     '<img src="https://cdn.steamcommunity.com/news/placeholder_video.gif">',
   'script[consent-original-src-_]':
@@ -224,6 +228,45 @@ const specimens: Record<string, string | [string, string]> = {
 }
 
 const specimenEntries = Object.entries(specimens)
+
+const wordpressHandshakeFrames: Array<[string, string]> = [
+  [
+    'trailing slash',
+    '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="https://www.e-startupindia.com/learn/gstr-1/embed/#?secret=hDl4S8YwKz" data-secret="hDl4S8YwKz" width="600" height="338"></iframe>',
+  ],
+  [
+    'no trailing slash',
+    '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="https://www.elzeviro.eu/affari-di-palazzo/economia-e-finanza/la-coppia-liberista-boeri-perotti-vuole-ridurre-fondi-alle-universita.html/embed#?secret=77zVWLFl2K" data-secret="77zVWLFl2K" width="600" height="338"></iframe>',
+  ],
+  [
+    'query',
+    '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="http://technodivine.com/home/?p=687&amp;embed=true#?secret=j0JpdvuMl3" data-secret="j0JpdvuMl3" width="600" height="338"></iframe>',
+  ],
+]
+
+// WordPress stamps the class on the frame it renders for any oEmbed provider.
+const wordpressProviderFrames: Array<[string, string]> = [
+  [
+    'New York Times',
+    '<iframe class="wp-embedded-content" src="https://www.nytimes.com/svc/oembed/html/?url=https%3A%2F%2Fwww.nytimes.com%2Fstory.html"></iframe>',
+  ],
+  [
+    'Rumble',
+    '<iframe class="wp-embedded-content" src="https://rumble.com/embed/v2cr0zv/#?secret=YCf2RLw39L"></iframe>',
+  ],
+  [
+    'Audioboom',
+    '<iframe class="wp-embedded-content" src="https://embeds.audioboom.com/posts/6605531/embed/v4?eid=AQAAAJLuZVrbymQA#?secret=afwIW2qi8k"></iframe>',
+  ],
+  [
+    'Anchor show',
+    '<iframe class="wp-embedded-content" src="https://anchor.fm/turpentine-productions/embed#?secret=TBoS2x00Eq"></iframe>',
+  ],
+  [
+    'Flourish',
+    '<iframe class="wp-embedded-content" src="https://public.flourish.studio/visualisation/3197522/embed#?secret=VcZeafKFSe"></iframe>',
+  ],
+]
 
 describeForEachParser('stripNonContentElements', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
@@ -298,6 +341,75 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    // WordPress writes the handshake frame as `{post}/embed/`, `{post}/embed` and
+    // `?p={id}&embed=true`, each after its blockquote.
+    it.each(wordpressHandshakeFrames)(
+      'should strip a %s handshake frame paired with its blockquote',
+      async (_name, frame) => {
+        const blockquote = html`
+          <blockquote class="wp-embedded-content" data-secret="77zVWLFl2K">
+            <a href="https://www.elzeviro.eu/affari-di-palazzo/post.html">Post title</a>
+          </blockquote>
+        `
+        const value = `<p>Before.</p>${blockquote}\n${frame}<p>After.</p>`
+        const expected = `<p>Before.</p>${blockquote}\n<p>After.</p>`
+
+        expect(await transform(value)).toEqualHtml(expected)
+      },
+    )
+
+    // A handshake frame alone renders the post's card, and nothing else carries the post.
+    it('should keep a handshake frame with no blockquote beside it', async () => {
+      const value = html`
+        <p>Before.</p>
+        <iframe
+          class="wp-embedded-content"
+          sandbox="allow-scripts"
+          security="restricted"
+          src="https://www.e-startupindia.com/learn/gstr-1/embed/#?secret=hDl4S8YwKz"
+          data-secret="hDl4S8YwKz"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a provider frame that follows a plain blockquote', async () => {
+      const value = html`
+        <blockquote><p>A quoted line.</p></blockquote>
+        <iframe
+          class="wp-embedded-content"
+          src="https://rumble.com/embed/v2cr0zv/#?secret=YCf2RLw39L"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a provider frame that follows a post embed further down', async () => {
+      const value = html`
+        <blockquote class="wp-embedded-content">
+          <a href="https://www.e-startupindia.com/learn/gstr-1/">GSTR-1 Return Filing</a>
+        </blockquote>
+        <p>And the video:</p>
+        <iframe
+          class="wp-embedded-content"
+          src="https://rumble.com/embed/v2cr0zv/#?secret=YCf2RLw39L"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it.each(wordpressProviderFrames)(
+      'should keep the %s frame WordPress stamped as wp-embedded-content',
+      async (_name, frame) => {
+        const value = `<p>Before.</p>${frame}`
+
+        expect(await transform(value)).toEqualHtml(value)
+      },
+    )
 
     it('should remove image-link-expand carrying additional classes', async () => {
       const value = html`
