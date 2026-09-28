@@ -162,12 +162,17 @@ export const defaultNonContentSelectors = [
   '.pf-button', // PrintFriendly button.
 
   // Giveaway widgets. Each is a script mount whose loader never runs in a reader, so what
-  // survives is the mount's own fallback, a boilerplate link to the entry form.
+  // survives is the mount's own fallback.
   'a.rcptr', // Rafflecopter giveaway mount, a link reading "a Rafflecopter giveaway".
   'a.rafl', // The same mount as Rafflecopter's earlier loader wrote it.
   // Gleam competition mount. The loader would replace it with the entry form; without it the
   // anchor survives as a bare link named after the competition.
   'a.e-widget',
+  // Goodreads giveaway widget: a static card with the cover, the title, the closing date and an
+  // "Enter Giveaway" button, wrapped in a div whose id the script targets. The card is the
+  // widget's own fallback and is also pasted on its own without the wrapper.
+  '[id^="goodreadsGiveawayWidget"]',
+  '.goodreadsGiveawayWidget',
 
   // Ticketing and payment widgets, which are chrome around a transaction rather than anything
   // the item is about.
@@ -176,6 +181,15 @@ export const defaultNonContentSelectors = [
   'form[action*="paypal.com/cgi-bin/webscr"]', // PayPal buy, cart or subscribe form, or a donate form naming no button.
   'img[src*="paypal.com/"][src*="/i/btn/"]:not(a img)', // The PayPal button image pasted without its form.
 
+  // Affiliate booking widgets, which render a map or a form to sell the reader a stay or a
+  // ticket and carry none of the post.
+  'iframe[src*="stay22.com/embed"]', // Stay22 hotel map.
+  // GetYourGuide activity and availability widgets. The mount is an empty paragraph or div the
+  // partner script fills, or one holding only a "Powered by GetYourGuide" credit anchor.
+  // Publishers also paste the widget's whole attribute set onto their own heading or list of
+  // tours, so only a paragraph or div with no child element but anchors is claimed. Text is not
+  // checked, so a publisher's paragraph of prose carrying the attribute is claimed too.
+  ':is(p, div)[data-gyg-href]:not(:has(*:not(a)))',
   // Platform UI chrome and non-rendered scaffolding.
   // RedCircle's embed snippet ships a ten-pixel "Powered by RedCircle" line under the player.
   'p:has(> a.redcircle-link)',

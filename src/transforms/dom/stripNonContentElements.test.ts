@@ -185,6 +185,14 @@ const specimens: Record<string, string | [string, string]> = {
     '<a class="rafl" href="https://example.com/rafl/display/70b9a02412/" id="rc-70b9a02412" rel="nofollow">a Rafflecopter giveaway</a>',
   'a.e-widget':
     '<a class="e-widget no-button" href="https://example.com/3wKIE/win-100-amazon-gift-card" rel="nofollow">Win $100 Amazon Gift Card</a>',
+  '[id^="goodreadsGiveawayWidget"]':
+    '<div id="goodreadsGiveawayWidget182419"><div class="goodreadsGiveawayWidget"><h2><a href="https://example.com/">Goodreads</a> Book Giveaway</h2><div style="float: left;"><a href="https://example.com/book/show/29745568"><img alt="Benjamin McTish and The Hidden Caverns of Bristonbel by June M. Pace" src="https://example.com/books/1459384569l/29745568.jpg" width="100"></a></div><div class="giveaway_details">Giveaway ends May 13, 2016.<br>See the <a href="https://example.com/giveaway/show/182419">giveaway details</a> at Goodreads.</div><a class="goodreadsGiveawayWidgetEnterLink" href="https://example.com/giveaway/enter_choose_address/182419">Enter Giveaway</a></div></div>',
+  '.goodreadsGiveawayWidget':
+    '<div class="goodreadsGiveawayWidget" style="max-width: 350px; margin: 10px auto; padding: 10px 15px;"><h2><a href="https://example.com/">Goodreads</a> Book Giveaway</h2><div style="float: left;"><a href="https://example.com/book/show/36704145"><img src="https://example.com/books/1517005563l/36704145.jpg" alt="A Kiss, a Dance and a Diamond by Helen Lacey" width="100"></a></div><div class="giveaway_details"><p>Giveaway ends April 30, 2018.</p></div><p><a class="goodreadsGiveawayWidgetEnterLink" href="https://example.com/giveaway/enter_choose_address/268862">Enter Giveaway</a></p></div>',
+  'iframe[src*="stay22.com/embed"]':
+    '<iframe id="stay22-widget" src="https://www.stay22.com/embed/699754889b53f8015d33a6ae" width="100%" height="428" frameborder="0"></iframe>',
+  ':is(p, div)[data-gyg-href]:not(:has(*:not(a)))':
+    '<div data-gyg-href="https://example.com/default/activities.frame" data-gyg-locale-code="en-US" data-gyg-widget="activities" data-gyg-number-of-items="3" data-gyg-partner-id="66RVO1V" data-gyg-tour-ids="76035,75950,400712">Powered by <a href="https://example.com/sarajevo-l2281/" target="_blank" rel="noopener sponsored">GetYourGuide</a></div>',
   '.image-link-expand': '<div class="image-link-expand"><button><svg></svg></button></div>',
   'drupal-render-placeholder':
     '<drupal-render-placeholder callback="comment.lazy_builders:renderLinks" arguments="0=node:1"></drupal-render-placeholder>',
@@ -328,6 +336,31 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
         </ul>
         <div class="av-content-box">
           <p>More body text</p>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should strip an empty GetYourGuide paragraph mount', async () => {
+      const value =
+        '<p>Before</p><p data-gyg-href="https://example.com/default/activities.frame" data-gyg-locale-code="en-US" data-gyg-widget="activities" data-gyg-number-of-items="3" data-gyg-partner-id="66RVO1V"></p><p>After</p>'
+      const expected = '<p>Before</p><p>After</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // Publishers paste the GetYourGuide snippet's whole attribute set onto their own markup, so
+    // the attribute alone also names a heading and a hand-written list of tours, not only the
+    // partner script's mount.
+    it("should keep GetYourGuide mounts that carry the publisher's own markup", async () => {
+      const value = html`
+        <h3 data-gyg-href="https://widget.getyourguide.com/default/activities.frame" data-gyg-widget="activities" data-gyg-partner-id="SN3E6N5">The best Turkish bath and spa experiences in Istanbul:</h3>
+        <div data-gyg-href="https://widget.getyourguide.com/default/activities.frame" data-gyg-widget="activities" data-gyg-partner-id="SN3E6N5">
+          <ul>
+            <li><a href="https://gyg.me/o5CJHgXr">Private Turkish Bath, Sauna, and Massage</a> from US$58</li>
+            <li><a href="https://gyg.me/lXzd4xxJ">Traditional Turkish Bath</a> from US$25</li>
+          </ul>
         </div>
       `
 
