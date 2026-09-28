@@ -31,6 +31,30 @@ describeForEachParser('YouTube', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should resolve a carrier uCoz wrote behind the site host', async () => {
+    const value = html`
+      <iframe
+        allowfullscreen=""
+        frameborder="0"
+        height="315"
+        src="https://ahtary-city.ucoz.com//www.youtube.com/embed/MLANv9VJ5Ws"
+        width="560"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="youtube"
+        data-embed-id="MLANv9VJ5Ws"
+        data-embed-src="https://www.youtube.com/embed/MLANv9VJ5Ws"
+        data-embed-url="https://www.youtube.com/watch?v=MLANv9VJ5Ws"
+        data-embed-thumbnail="https://i.ytimg.com/vi/MLANv9VJ5Ws/hqdefault.jpg"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   it('should use built-in YouTube embed resolver', async () => {
     const value = html`
       <iframe

@@ -1,4 +1,4 @@
-import { decodeSegment, isPlainObject, parseUrl } from 'trousse'
+import { decodeSegment, isPlainObject, parseUrl, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -218,17 +218,33 @@ type SubstackPostAttributes = {
   timestamp?: string | null
 }
 
-// The current og:title quotes the caption behind the poster's name, and the payload carries no
-// field holding the caption on its own.
-const wrappedCaptionRegex = / on Instagram: ["\u201c]/
+// The og:title quotes the caption behind the poster's name, and the payload carries no field
+// holding the caption on its own. The quote mark follows the era of the post, not its language.
+const wrappedCaptionRegex = / on Instagram: (["\u201c\u201d])([\s\S]*)/
+
+const closingQuotes = toMap({ '"': '"', '\u201c': '\u201d', '\u201d': '\u201d' })
 
 // Instagram's og:title, which the payload carries in place of a caption field.
 const readPayloadCaption = (title: string | undefined): string | undefined => {
-  if (!title || wrappedCaptionRegex.test(title)) {
+  if (!title) {
     return
   }
 
-  return title
+  const wrapped = title.match(wrappedCaptionRegex)
+
+  if (!wrapped) {
+    return title
+  }
+
+  const [, opening, rest] = wrapped
+  const closing = closingQuotes.get(opening)
+
+  // A title cut at 64 characters ends in `…` with no closing mark, so only a fragment is left.
+  if (!closing || !rest.endsWith(closing)) {
+    return
+  }
+
+  return rest.slice(0, -closing.length) || undefined
 }
 
 // Only a rehosted copy: the earliest payloads carry Instagram's signed CDN url, long expired.
