@@ -59,9 +59,9 @@ describeForEachParser('twemojiEmojiResolver', (parseHtml) => {
     const shortNameCases: Array<[string, string]> = [
       ['a9', '©️'],
       ['ae', '®️'],
-      ['23-20e3', '#⃣'],
+      ['23-20e3', '#️⃣'],
       ['2a-fe0f-20e3', '*️⃣'],
-      ['31_20e3', '1⃣'],
+      ['31_20e3', '1️⃣'],
     ]
 
     it.each(shortNameCases)('should decode the two-digit filename %s', async (stem, glyph) => {

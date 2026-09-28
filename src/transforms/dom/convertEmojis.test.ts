@@ -236,9 +236,9 @@ describeForEachParser('convertEmojis', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should preserve BMP-only emoji (length 1 in JS)', async () => {
+    it('should give a text-default emoji alt its emoji presentation', async () => {
       const value = '<p><img class="wp-smiley" alt="✔"></p>'
-      const expected = '<p>✔</p>'
+      const expected = '<p>✔️</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })

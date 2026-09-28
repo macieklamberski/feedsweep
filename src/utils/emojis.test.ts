@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'bun:test'
-import { type EmojiNameTable, glyphFromCodepoints, mergeEmojiNames } from './emojis.js'
+import {
+  type EmojiNameTable,
+  glyphFromCodepoints,
+  mergeEmojiNames,
+  withEmojiPresentation,
+} from './emojis.js'
 
 const conflictingNameRegex = /happy/
 const capitalNameRegex = /lower case/
@@ -75,5 +80,22 @@ describe('glyphFromCodepoints', () => {
 
   it('should not add a second selector to a filename that carries one', () => {
     expect(glyphFromCodepoints('2764-fe0f')).toBe('❤️')
+  })
+})
+
+describe('withEmojiPresentation', () => {
+  const presentationCases: Array<[string, string]> = [
+    ['❤', '❤️'],
+    ['™', '™️'],
+    ['1⃣', '1️⃣'],
+    ['#⃣', '#️⃣'],
+    ['❤️', '❤️'],
+    ['1️⃣', '1️⃣'],
+    ['😀', '😀'],
+    ['👨‍👩‍👧', '👨‍👩‍👧'],
+  ]
+
+  it.each(presentationCases)('should turn %s into %s', (glyph, expected) => {
+    expect(withEmojiPresentation(glyph)).toBe(expected)
   })
 })

@@ -111,7 +111,7 @@ describeForEachParser('facebookElementEmojiResolver', (parseHtml) => {
         ></span>
       </p>
     `
-    const expected = '<p>5⃣</p>'
+    const expected = '<p>5️⃣</p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })

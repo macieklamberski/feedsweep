@@ -129,6 +129,17 @@ const codepointNameRegex =
 const codepointSeparatorRegex = /[-_]/
 const shortCodepointRegex = /^a[9e](?:[-_]fe0f)?$/
 const textDefaultRegex = /^(?!\p{Emoji_Presentation})\p{Extended_Pictographic}$/u
+const bareKeycapRegex = /^([0-9#*])\u20e3$/u
+
+// A glyph as the emoji picture it stands for. A lone ☺, © or ❤ renders as a text symbol unless
+// U+FE0F asks for the picture, and so does a keycap written as `1⃣` without it.
+export const withEmojiPresentation = (glyph: string): string => {
+  if (textDefaultRegex.test(glyph)) {
+    return `${glyph}\ufe0f`
+  }
+
+  return glyph.replace(bareKeycapRegex, '$1\ufe0f\u20e3')
+}
 
 export const glyphFromCodepoints = (stem: string): string | undefined => {
   if (!codepointNameRegex.test(stem)) {
@@ -143,8 +154,7 @@ export const glyphFromCodepoints = (stem: string): string | undefined => {
     return
   }
 
-  // A lone ☺, © or ❤ renders as a text symbol unless U+FE0F asks for the emoji picture.
-  return textDefaultRegex.test(glyph) ? `${glyph}️` : glyph
+  return withEmojiPresentation(glyph)
 }
 
 const bytePairRegex = /../g

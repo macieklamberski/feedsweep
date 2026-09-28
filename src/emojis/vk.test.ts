@@ -122,7 +122,7 @@ describeForEachParser('vkEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-      const expected = '<p>Love ❤</p>'
+      const expected = '<p>Love ❤️</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
