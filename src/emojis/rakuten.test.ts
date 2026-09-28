@@ -4,19 +4,19 @@ import { describeForEachParser, emojiConverters } from '../tests.js'
 describeForEachParser('rakutenEmojiResolver', (parseHtml) => {
   const { transform } = emojiConverters(parseHtml)
 
-  it('should mark a pictogram from the old host', async () => {
-    const value = '<p><img src="http://image.space.rakuten.co.jp/emoji/h068.gif" alt=""></p>'
+  it('should move a pictogram from the old host to the current one', async () => {
+    const value = '<p><img src="http://image.space.rakuten.co.jp/emoji/h734.gif" alt="!!"></p>'
     const expected =
-      '<p><img data-emoji="" src="http://image.space.rakuten.co.jp/emoji/h068.gif" alt=""></p>'
+      '<p><img src="https://plaza.jp.rakuten-static.com/img/user/emoji/h734.gif" alt="!!" data-emoji=""></p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should mark a pictogram from the current host', async () => {
+  it('should move a pictogram from the current host to https', async () => {
     const value =
-      '<p><img src="https://plaza.jp.rakuten-static.com/img/user/emoji/h068.gif" alt=""></p>'
+      '<p><img src="http://plaza.jp.rakuten-static.com/img/user/emoji/h068.gif" alt=""></p>'
     const expected =
-      '<p><img data-emoji="" src="https://plaza.jp.rakuten-static.com/img/user/emoji/h068.gif" alt=""></p>'
+      '<p><img src="https://plaza.jp.rakuten-static.com/img/user/emoji/h068.gif" data-emoji=""></p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })

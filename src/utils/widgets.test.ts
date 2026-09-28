@@ -395,6 +395,33 @@ describe('atUsername', () => {
 })
 
 describe('normalizeEmbedFields', () => {
+  describe('params', () => {
+    it('should write the per-embed params as a query string', () => {
+      const value = {
+        src: 'https://store.steampowered.com/widget/355060/',
+        params: { l: 'german', t: 'A game' },
+      }
+      const expected: Record<string, string | undefined> = {
+        src: 'https://store.steampowered.com/widget/355060/',
+        params: 'l=german&t=A+game',
+      }
+
+      expect(normalizeEmbedFields(value)).toEqual(expected)
+    })
+
+    it('should write no params for an empty record', () => {
+      const value = {
+        src: 'https://store.steampowered.com/widget/355060/',
+        params: {},
+      }
+      const expected: Record<string, string | undefined> = {
+        src: 'https://store.steampowered.com/widget/355060/',
+      }
+
+      expect(normalizeEmbedFields(value)).toEqual(expected)
+    })
+  })
+
   describe('src and url passthrough', () => {
     it('should pass src and url through without changing the protocol', () => {
       const value = {
@@ -494,6 +521,7 @@ describe('normalizeEmbedFields', () => {
         provider: 'p',
         id: 'i',
         src: 's',
+        params: { l: 'german' },
         url: 'u',
         thumbnail: 'https://cdn.example/t.jpg',
         width: 1,
@@ -510,6 +538,7 @@ describe('normalizeEmbedFields', () => {
 
       expect(Object.keys(fields)).toEqual([
         'src',
+        'params',
         'provider',
         'id',
         'url',
