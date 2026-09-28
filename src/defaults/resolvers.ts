@@ -112,6 +112,7 @@ import {
   imgurIframeEmbedResolver,
   imgurS9eEmbedResolver,
 } from '../embeds/imgur.js'
+import { inaEmbedResolver, inaScriptEmbedResolver } from '../embeds/ina.js'
 import {
   instagramAmpEmbedResolver,
   instagramBlockquoteEmbedResolver,
@@ -395,6 +396,8 @@ const embedResolvers: Array<EmbedResolver> = [
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
   imgurS9eEmbedResolver,
+  inaEmbedResolver,
+  inaScriptEmbedResolver,
   instagramBlockquoteEmbedResolver,
   instagramAmpEmbedResolver,
   instagramSubstackEmbedResolver,
