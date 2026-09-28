@@ -260,6 +260,7 @@ import { discourseMediaResolver } from '../media/discourse.js'
 import { ghostMediaResolver } from '../media/ghost.js'
 import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
+import { tumblrMediaResolver } from '../media/tumblr.js'
 import { wechatMediaResolver } from '../media/wechat.js'
 import { weeblyMediaResolver } from '../media/weebly.js'
 import { wikimediaMediaResolver } from '../media/wikimedia.js'
@@ -425,6 +426,7 @@ const mediaResolvers: Array<MediaResolver> = [
   ghostMediaResolver,
   podloveMediaResolver,
   substackMediaResolver,
+  tumblrMediaResolver,
   wechatMediaResolver,
   weeblyMediaResolver,
   wikimediaMediaResolver,

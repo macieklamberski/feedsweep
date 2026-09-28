@@ -97,4 +97,26 @@ describeForEachParser('Tumblr', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  it('should play the audio file an audio player frame names', async () => {
+    const value = html`
+      <iframe
+        class="tumblr_audio_player tumblr_audio_player_31002810632"
+        src="https://example.com/post/31002810632/audio_player_iframe/example/tumblr_m9xwj4xiRm1qzde3y?audio_file=https%3A%2F%2Fa.tumblr.com%2Ftumblr_m9xwj4xiRm1qzde3yo1.mp3"
+        frameborder="0"
+        allowtransparency="true"
+        scrolling="no"
+        width="540"
+        height="85"
+      ></iframe>
+    `
+    const expected = html`
+      <audio
+        controls
+        src="https://a.tumblr.com/tumblr_m9xwj4xiRm1qzde3yo1.mp3"
+      ></audio>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })
