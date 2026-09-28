@@ -63,6 +63,7 @@ import {
   buzzsproutIframeEmbedResolver,
   buzzsproutScriptEmbedResolver,
 } from '../embeds/buzzsprout.js'
+import { canvaIframeEmbedResolver, canvaWidgetEmbedResolver } from '../embeds/canva.js'
 import { captivateEmbedResolver } from '../embeds/captivate.js'
 import { cnbcIframeEmbedResolver } from '../embeds/cnbc.js'
 import {
@@ -328,6 +329,8 @@ const embedResolvers: Array<EmbedResolver> = [
   brightcoveVideoJsEmbedResolver,
   buzzsproutIframeEmbedResolver,
   buzzsproutScriptEmbedResolver,
+  canvaIframeEmbedResolver,
+  canvaWidgetEmbedResolver,
   captivateEmbedResolver,
   cnbcIframeEmbedResolver,
   cnnScriptEmbedResolver,
