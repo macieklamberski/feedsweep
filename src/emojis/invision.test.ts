@@ -109,4 +109,20 @@ describeForEachParser('invisionEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should replace an IPB 2 emoticon by the universal code in its emoid', async () => {
+    const value =
+      '<p><img src="https://example.com/forum/style_emoticons/default/ohmy.gif" emoid=":o" alt="ohmy.gif"></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>😲</p>')
+  })
+
+  it('should mark an IPB 2 emoticon whose emoid holds a board code', async () => {
+    const value =
+      '<p><img src="https://example.com/images/bow.gif" emoid=":bow:" alt="bow.gif"></p>'
+    const expected =
+      '<p><img data-emoji="" src="https://example.com/images/bow.gif" emoid=":bow:" alt="bow.gif"></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
 })

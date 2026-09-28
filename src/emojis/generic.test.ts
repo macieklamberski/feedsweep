@@ -110,4 +110,23 @@ describeForEachParser('genericCharacterEmojiResolver', (parseHtml) => {
 
     expect(await transformKeeping(value)).toEqualHtml(value)
   })
+
+  it('should replace an empty span named by its codepoint class', async () => {
+    const value =
+      '<p>Hi <span class="emoji emoji1f4c5" title="Calendario" role="button"></span></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>Hi 📅</p>')
+  })
+
+  it('should replace an empty span by its data-c character', async () => {
+    const value = '<p>Hi <span class="emoji" data-c="&#x1f348;"></span></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>Hi 🍈</p>')
+  })
+
+  it('should leave an empty span with nothing to read untouched', async () => {
+    const value = '<p>Hi <span class="emoji"></span></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
 })

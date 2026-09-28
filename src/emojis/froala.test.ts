@@ -159,4 +159,18 @@ describeForEachParser('froalaElementEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(value)
   })
+
+  it('should replace an EmojiOne span that lost the Froala class', async () => {
+    const value =
+      '<p>Hi <span style="background: url(&quot;https://cdnjs.cloudflare.com/ajax/libs/emojione/2.0.1/assets/svg/1f647.svg&quot;)"></span></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>Hi 🙇</p>')
+  })
+
+  it('should leave a paragraph painted with an EmojiOne file untouched', async () => {
+    const value =
+      '<p><span style="background: url(https://cdnjs.cloudflare.com/ajax/libs/emojione/2.0.1/assets/svg/1f647.svg)">Hello</span></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
 })

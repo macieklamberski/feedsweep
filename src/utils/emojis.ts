@@ -96,6 +96,7 @@ const shortcodes = toMap(mergeEmojiNames([{ name: 'shortcodes', names: emojiShor
 // Applied to a filename in turn: the query and hash split, then the stock-file, icon-set and
 // resolution markers that are not part of the name.
 export const queryOrHashRegex = /[?#]/
+const proxiedFileRegex = /#(https?:\/\/.+)$/
 const namePrefixRegex = /^(?:default_|face-|smiley-|sf-)/
 const nameVariantRegex = /@[0-9]+x$/
 
@@ -105,7 +106,10 @@ export const rendersNothing = (src: string): boolean => {
 }
 
 export const getFileStem = (src: string): string => {
-  const path = src.split(queryOrHashRegex)[0]
+  // A Google image proxy keeps the real file after the hash, as in
+  // `…=s0-d-e1-ft#https://…/1f4cc.png`.
+  const proxied = src.match(proxiedFileRegex)?.[1]
+  const path = (proxied ?? src).split(queryOrHashRegex)[0]
   const name = path.slice(path.lastIndexOf('/') + 1)
   const extension = name.lastIndexOf('.')
 
@@ -141,6 +145,25 @@ export const glyphFromCodepoints = (stem: string): string | undefined => {
 
   // A lone ☺, © or ❤ renders as a text symbol unless U+FE0F asks for the emoji picture.
   return textDefaultRegex.test(glyph) ? `${glyph}️` : glyph
+}
+
+const bytePairRegex = /../g
+const utf8Decoder = new TextDecoder('utf-8', { fatal: true })
+
+// A filename spelling its glyph's UTF-8 bytes in hex, as VK and Telegram name theirs.
+export const glyphFromUtf8Hex = (stem: string): string | undefined => {
+  const pairs = stem.match(bytePairRegex) ?? []
+  const bytes = Uint8Array.from(pairs, (pair) => Number.parseInt(pair, 16))
+
+  try {
+    const glyph = utf8Decoder.decode(bytes)
+
+    if (!isEmojiShaped(glyph)) {
+      return
+    }
+
+    return glyph
+  } catch {}
 }
 
 const codepointTextRegex = /^[0-9a-f]{2,5}(?:[-_][0-9a-f]{2,5})*$/

@@ -174,4 +174,20 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should mark a smilie from the blog folder without the class', async () => {
+    const value =
+      '<p><img src="https://example.com/bitrix/images/blog/smile/icon_cool.gif" title="Здорово"></p>'
+    const expected =
+      '<p><img src="https://example.com/bitrix/images/blog/smile/icon_cool.gif" title="Здорово" data-emoji=""></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a smilie from the forum folder by its universal code alt', async () => {
+    const value =
+      '<p><img src="https://example.com/bitrix/images/forum/smile/icon_smile.gif" alt=":)"></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>🙂</p>')
+  })
 })

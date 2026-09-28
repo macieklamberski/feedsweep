@@ -1,4 +1,4 @@
-import { expect, it } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, emojiConverters, html } from '../tests.js'
 
 describeForEachParser('discourseEmojiResolver', (parseHtml) => {
@@ -332,5 +332,27 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
     `
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  describe('CDN', () => {
+    it('should replace an emoji from the Discourse CDN by its name', async () => {
+      const value =
+        '<p><img src="https://emoji.discourse-cdn.com/twitter/slight_smile.png?v=10" class="emoji" alt=":slight_smile:"></p>'
+
+      expect(await transform(value)).toEqualHtml('<p>🙂</p>')
+    })
+
+    it('should replace an emoji from the Discourse CDN without the emoji class', async () => {
+      const value = '<p><img src="https://emoji.discourse-cdn.com/twitter/rocket.png?v=12"></p>'
+
+      expect(await transform(value)).toEqualHtml('<p>🚀</p>')
+    })
+
+    it('should read the Discourse name, not the typed code', async () => {
+      const value =
+        '<p><img src="https://emoji.discourse-cdn.com/twitter/smile.png?v=12" class="emoji" alt=":smile:"></p>'
+
+      expect(await transform(value)).toEqualHtml('<p>😄</p>')
+    })
   })
 })

@@ -1,6 +1,7 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
-import { type EmojiGlyph, resolveEmojiImage } from '../utils/emojis.js'
+import { attr } from '../utils/dom.js'
+import { type EmojiGlyph, getShortcode, resolveEmojiImage } from '../utils/emojis.js'
 import { getDirectoryGlyph, smiliesEmojiNames } from './smilies.js'
 
 const markerSelector = [
@@ -9,6 +10,7 @@ const markerSelector = [
   // fixLazyImages promotes to src before convertEmojis runs.
   'img[data-emoticon]', // Invision Power Board and IPS
   'img[class~="ipsemoji" i]', // IPS 4
+  'img[emoid]', // IPB 2 and 3, holding the code the author typed
 ].join(', ')
 
 const directories = [
@@ -74,9 +76,15 @@ export const invisionEmojiResolver: EmojiResolver = {
   extract: (element) => {
     const src = element.getAttribute('src') ?? ''
     const [uploads, styles] = directories
-    const glyph =
+    const code = getShortcode(attr(element, 'emoid'))
+    let glyph =
       getDirectoryGlyph(src, uploads, invisionEmojiNames) ??
       getDirectoryGlyph(src, styles, invisionEmojiNames)
+
+    // A universal code is an exact hint, and wins over a name the board keeps as its own drawing.
+    if (code) {
+      glyph = code
+    }
 
     return resolveEmojiImage(element, {
       isStrong: element.matches(markerSelector),

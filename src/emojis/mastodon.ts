@@ -1,16 +1,24 @@
 import type { EmojiResolver } from '../types.js'
-import { resolveEmojiImage } from '../utils/emojis.js'
+import { noEmojiNames, resolveEmojiImage } from '../utils/emojis.js'
 
-// Mastodon's custom emoji, which have no Unicode counterpart at all. Recognized so they can be
-// marked, never converted.
+const markerSelector = [
+  'img[class~="emojione" i]',
+  'img[class~="custom-emoji" i]', // Newer
+  'img[src*="/custom_emojis/" i]',
+].join(', ')
+
+// Mastodon's stock emoji, an SVG named by codepoint, as a copied post keeps it without the class.
+const stockSelector = 'img[draggable="false"][src*="/emoji/" i][src$=".svg" i]'
+
+// Mastodon's emoji. Its custom ones have no Unicode counterpart at all, so they are recognized to
+// be marked, and only a codepoint filename converts.
 export const mastodonEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: [
-    'img[class~="emojione" i]',
-    'img[class~="custom-emoji" i]', // Newer
-    'img[src*="/custom_emojis/" i]',
-  ].join(', '),
+  selector: `${markerSelector}, ${stockSelector}`,
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, {
+      isStrong: element.matches(markerSelector),
+      names: noEmojiNames,
+    })
   },
 }

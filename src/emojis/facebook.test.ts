@@ -47,6 +47,26 @@ describeForEachParser('facebookEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
   })
+
+  it('should replace an emoji behind a Google image proxy by its codepoint filename', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://ci4.googleusercontent.com/proxy/abc=s0-d-e1-ft#https://static.xx.fbcdn.net/images/emoji.php/v9/tac/1/16/1f4cc.png"
+          alt=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml('<p>📌</p>')
+  })
+
+  it('should replace an emoji from the Instagram static host by its codepoint filename', async () => {
+    const value =
+      '<p><img src="https://static.cdninstagram.com/images/emoji.php/v9/t8/1/16/2694.png" width="16"></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>⚔️</p>')
+  })
 })
 
 describeForEachParser('facebookElementEmojiResolver', (parseHtml) => {
@@ -212,6 +232,13 @@ describeForEachParser('facebookElementEmojiResolver', (parseHtml) => {
     const expected = '<p><span data-testid="emoji">😀</span></p>'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace an i painted from the older akamaihd host by its codepoint filename', async () => {
+    const value =
+      '<p>Hi <i style="background-image: url(https://fbstatic-a.akamaihd.net/images/emoji.php/v9/f4c/1/16/1f600.png)"></i></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>Hi 😀</p>')
   })
 })
 
@@ -518,5 +545,50 @@ describeForEachParser('facebookClassicEmojiResolver', (parseHtml) => {
     const value = '<p>Hi <span class="x_emoticon_smile" title=":)"></span></p>'
 
     expect(await transform(value)).toEqualHtml(value)
+  })
+})
+
+describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
+  const { transform } = emojiConverters(parseHtml)
+
+  describe('label wrappers', () => {
+    const labelCases: Array<[string, string]> = [
+      ['smile emoticon', '🙂'],
+      ['„wink“-Emoticon', '😉'],
+      ['Смайлик «heart»', '❤️'],
+      ['smilehymiö', '🙂'],
+      ['émoticône grin', '😁'],
+    ]
+
+    it.each(labelCases)('should replace an empty wrapper titled %s', async (title, glyph) => {
+      const value = `<p>Hi <span class="_47e3 _5mfr" title="${title}"></span></p>`
+
+      expect(await transform(value)).toEqualHtml(`<p>Hi ${glyph}</p>`)
+    })
+
+    it('should replace an empty i wrapper by its label', async () => {
+      const value = '<p>Hi <i class="_1gwo" title="heart emoticon"></i></p>'
+
+      expect(await transform(value)).toEqualHtml('<p>Hi ❤️</p>')
+    })
+
+    it('should keep a name without a universal code as its code', async () => {
+      const value = '<p>Hi <span class="_47e3" title="like emoticon"></span></p>'
+
+      expect(await transform(value)).toEqualHtml('<p>Hi <span data-emoji="">(y)</span></p>')
+    })
+
+    it('should leave a wrapper around prose untouched', async () => {
+      const value =
+        '<p><span class="_47e3 _5mfr" title="smile emoticon">Would you like help</span></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose label names no classic emoticon untouched', async () => {
+      const value = '<p><span class="_47e3" title="sticker"></span></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
   })
 })

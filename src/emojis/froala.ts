@@ -23,8 +23,16 @@ export const froalaImageEmojiResolver: EmojiResolver = {
 // blank once the site's CSS is gone.
 export const froalaElementEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: 'span[class~="fr-emoticon-img"]',
+  selector: [
+    'span[class~="fr-emoticon-img"]',
+    'span[style*="ajax/libs/emojione/" i]', // The same EmojiOne files, after a CMS dropped the class
+  ].join(', '),
   extract: (element) => {
+    // Without the class, a span holding text is a paragraph painted by accident.
+    if (!element.matches('[class~="fr-emoticon-img"]') && element.textContent?.trim()) {
+      return
+    }
+
     const url = bgImage(element)
 
     if (!url) {

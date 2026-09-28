@@ -13,9 +13,12 @@ const codepointClassRegex = /(?:^|\s)emoji([0-9a-f]+(?:-[0-9a-f]+)*)(?:\s|$)/i
 // its codepoints in a class like `emoji1f64b`.
 export const genericCharacterEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: 'img[class~="emoji" i][data-c]',
+  selector: 'img[class~="emoji" i][data-c], span[class~="emoji" i]',
   extract: (element) => {
-    if (attr(element, 'src')) {
+    const isSpan = element.tagName.toLowerCase() === 'span'
+
+    // A span holding its glyph as text needs nothing, and an image with a src is a picture.
+    if (isSpan ? element.textContent?.trim() : attr(element, 'src')) {
       return
     }
 
@@ -27,6 +30,11 @@ export const genericCharacterEmojiResolver: EmojiResolver = {
 
     const codepoints = attr(element, 'class')?.match(codepointClassRegex)?.[1]
     const glyph = codepoints ? glyphFromCodepoints(codepoints.toLowerCase()) : undefined
+
+    // An empty span with nothing to read is left for other passes.
+    if (isSpan) {
+      return glyph ? { glyph } : undefined
+    }
 
     return resolveEmojiImage(element, { isStrong: true, glyph })
   },

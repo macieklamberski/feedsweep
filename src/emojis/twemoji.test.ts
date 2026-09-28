@@ -149,5 +149,44 @@ describeForEachParser('twemojiEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should replace an emoji from the sopili mirror by its codepoint filename', async () => {
+      const value =
+        '<p><img src="https://pic.sopili.net/pub/emoji/twitter/2/72x72/1f914.png" width="20" height="20"></p>'
+
+      expect(await transform(value)).toEqualHtml('<p>🤔</p>')
+    })
+  })
+})
+
+describeForEachParser('twemojiElementEmojiResolver', (parseHtml) => {
+  const { transform } = emojiConverters(parseHtml)
+
+  it('should replace an empty span painted with a Twemoji file by its codepoint', async () => {
+    const value =
+      '<p>Hi <span style="-webkit-text-fill-color: transparent; background-image: url(&quot;https://abs-0.twimg.com/emoji/v2/svg/1f9d0.svg&quot;);"></span></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>Hi 🧐</p>')
+  })
+
+  it('should keep the glyph a painted span already holds', async () => {
+    const value =
+      '<p><span style="background-image: url(https://abs.twimg.com/emoji/v2/72x72/1f600.png)">😀</span></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>😀</p>')
+  })
+
+  it('should leave a painted span holding prose untouched', async () => {
+    const value =
+      '<p><span style="background-image: url(https://abs.twimg.com/emoji/v2/72x72/1f600.png)">Hello</span></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a span painted with another file untouched', async () => {
+    const value =
+      '<p><span style="background-image: url(https://example.com/a.png); --source: twimg.com/emoji/"></span></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 })

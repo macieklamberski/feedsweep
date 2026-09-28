@@ -235,4 +235,46 @@ describeForEachParser('wordpressEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
   })
+
+  it('should still replace an emoji whose alt holds its own markup', async () => {
+    const value =
+      '<p><img src="https://s.w.org/images/core/emoji/2.2.1/72x72/1f642.png" alt="<img src=&quot;https://s.w.org/images/core/emoji/2.2.1/72x72/1f642.png&quot; alt=&quot;🙂&quot;" class="wp-smiley"></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>🙂</p>')
+  })
+
+  it('should leave a photo that took the class from emoji markup in its alt untouched', async () => {
+    const value =
+      '<p><img src="https://example.com/wp-content/plugins/instagram-feed/img/placeholder.png" alt="<img src=&quot;https://s.w.org/images/core/emoji/15.0.3/72x72/1f5f3.png&quot; alt=&quot;🗳&quot;" class="wp-smiley"></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+})
+
+describeForEachParser('wordpressElementEmojiResolver', (parseHtml) => {
+  const { transform } = emojiConverters(parseHtml)
+
+  const spanCases: Array<[string, string]> = [
+    ['<span class="wp-smiley wp-emoji wp-emoji-smile" title=":)"></span>', '🙂'],
+    ["<span class='wp-smiley emoji emoji-smile' title=':-)'>:-)</span>", '🙂'],
+    ['<span class="wp-smiley wp-emoji wp-emoji-wink" title=";)">wink</span>', '😉'],
+  ]
+
+  it.each(spanCases)('should replace %s', async (span, glyph) => {
+    expect(await transform(`<p>Hi ${span}</p>`)).toEqualHtml(`<p>Hi ${glyph}</p>`)
+  })
+
+  it('should keep a code without a universal glyph as text', async () => {
+    const value =
+      '<p>Hi <span class="wp-smiley wp-emoji wp-emoji-mrgreen" title=":mrgreen:"></span></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>Hi <span data-emoji="">:mrgreen:</span></p>')
+  })
+
+  it('should leave a span holding prose untouched', async () => {
+    const value =
+      '<p><span class="wp-smiley" title=":)">This whole sentence is not a smiley</span></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
 })

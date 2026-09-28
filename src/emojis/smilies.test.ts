@@ -1105,4 +1105,11 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transformKeeping(value)).toEqualHtml(value)
     })
   })
+
+  it('should replace a CKEditor smiley copied into a theme folder', async () => {
+    const value =
+      '<p><img alt="wink" src="https://example.com/themes/default/ck_smiley/wink_smile.png" width="23"></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>😉</p>')
+  })
 })

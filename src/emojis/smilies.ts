@@ -335,6 +335,7 @@ const directories = [
   '/smileys/', // SMF, DokuWiki's lib/images/smileys/, Drupal
   '/smiles/', // uCoz, and boards that serve phpBB's set from a renamed directory
   '/smiley/', // CKEditor, FCKeditor and TinyMCE; ProBoards serves the same set from here
+  '/ck_smiley/', // CKEditor's set, copied into a theme
   '/emoticons/', // Serendipity's stock template set and emoticate plugin, IPS, Kunena
   'SMILIES_PATH', // phpBB's template variable left unsubstituted, raw or percent-encoded
 ]
