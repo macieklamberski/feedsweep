@@ -1,4 +1,4 @@
-import { composeEmbedUrl } from '../../embeds/youtube.js'
+import { composeEmbedUrl, isVideoId } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import { createIframe } from '../../utils/widgets.js'
 
@@ -11,7 +11,7 @@ export const rebuildLyteEmbeds: DomTransform = () => (document) => {
     }
 
     const videoId = element.id.slice(element.id.indexOf('_') + 1)
-    if (!videoId) {
+    if (!isVideoId(videoId)) {
       continue
     }
 

@@ -1,6 +1,7 @@
+import { parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, jsonAttr } from '../../utils/dom.js'
-import { isUrlShaped } from '../../utils/urls.js'
+import { isUrlShaped, placeholderBaseUrl } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 const embedlyCarrierSelector = [
@@ -33,15 +34,14 @@ export const rebuildEmbedlyEmbeds: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll(embedlyCarrierSelector)) {
     if (element.localName === 'iframe') {
       // The wrapper's query holds the embed as src, its poster as image and the canonical as url.
-      // A full URL parse throws on the protocol-relative //cdn.embedly.com form.
-      const params = new URLSearchParams(attr(element, 'src')?.split('?')[1] ?? '')
-      const inner = params.get('src')
+      const params = parseUrl(attr(element, 'src') ?? '', placeholderBaseUrl)?.searchParams
+      const inner = params?.get('src')
 
       if (!isUsableUrl(inner)) {
         continue
       }
 
-      const poster = params.get('image')
+      const poster = params?.get('image')
 
       element.replaceWith(composeIframe(document, inner, isUsableUrl(poster) ? poster : undefined))
       continue
