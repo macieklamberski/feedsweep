@@ -73,6 +73,10 @@ import { canvaIframeEmbedResolver, canvaWidgetEmbedResolver } from '../embeds/ca
 import { captivateEmbedResolver } from '../embeds/captivate.js'
 import { ccmaEmbedResolver } from '../embeds/ccma.js'
 import { channel9EmbedResolver } from '../embeds/channel9.js'
+import {
+  cloudflarestreamIframeEmbedResolver,
+  cloudflarestreamScriptEmbedResolver,
+} from '../embeds/cloudflarestream.js'
 import { cnbcIframeEmbedResolver } from '../embeds/cnbc.js'
 import {
   cnnFlashEmbedResolver,
@@ -409,6 +413,8 @@ const embedResolvers: Array<EmbedResolver> = [
   captivateEmbedResolver,
   ccmaEmbedResolver,
   channel9EmbedResolver,
+  cloudflarestreamIframeEmbedResolver,
+  cloudflarestreamScriptEmbedResolver,
   cnbcIframeEmbedResolver,
   cnnScriptEmbedResolver,
   cnnFlashEmbedResolver,
