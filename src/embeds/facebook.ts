@@ -1,7 +1,7 @@
 import { type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, parsePixelSize, text } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `fb.watch` is the short-link host the mobile app hands out, found inside both widget divs.
@@ -98,7 +98,6 @@ export const facebookAmpEmbedResolver = createMarkupEmbedResolver(
 const pluginPathRegex = /^(?:\/v\d+(?:\.\d+)?)?\/plugins\/(?:post|video)\.php$/
 // The pre-plugins video frame from old posts, naming its video in `video_id`.
 const legacyVideoPathRegex = /^\/video\/embed$/
-const safeVideoIdRegex = /^\d+$/
 
 // The dialog writes the chosen size into the query as well as onto the element. A Reel comes out
 // vertical, 267x476 or 304x540, and a landscape video 560x314.
@@ -120,13 +119,8 @@ const contentPathRegex = /^\/(?:reel\/[^/]+|[^/]+\/(?:posts|videos)\/[^/]+)/
 // The bare `/watch` hub is Facebook's video front page, where every visitor sees something else.
 const watchPathRegex = /^\/watch\/?$/
 
-// A Watch video id is numeric, in every spelling the corpus and the platform's own share urls
-// carry. Junk in `v` would otherwise mint a plugin frame that cannot load, where the generic
-// placeholder at least holds the url the publisher wrote.
-const safeWatchIdRegex = /^\d+$/
-
 const isWatchPage = (url: URL): boolean => {
-  return watchPathRegex.test(url.pathname) && safeWatchIdRegex.test(url.searchParams.get('v') ?? '')
+  return watchPathRegex.test(url.pathname) && digitsRegex.test(url.searchParams.get('v') ?? '')
 }
 
 // A post has no name: its words go to `description`, and the frame titles itself
@@ -141,7 +135,7 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
   if (legacyVideoPathRegex.test(parsed.pathname)) {
     const videoId = parsed.searchParams.get('video_id')
 
-    if (!videoId || !safeVideoIdRegex.test(videoId)) {
+    if (!videoId || !digitsRegex.test(videoId)) {
       return
     }
 

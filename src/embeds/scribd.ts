@@ -1,7 +1,7 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar, keepIfMatches, parseRatio } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The embed routes are the site's own. `scribdassets.com` served the Flash player and serves the
@@ -10,8 +10,6 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const scribdHosts = ['scribd.com']
 // scribdassets.com serves img/document/{id}/ images too, which would read here as documents.
 const scribdFlashHosts = [...scribdHosts, 'scribdassets.com']
-
-const safeDocumentIdRegex = /^\d+$/
 
 const documentIdMarkers = ['embeds', 'document', 'doc']
 
@@ -38,7 +36,7 @@ const readDocumentId = (parsed: URL): string | undefined => {
   const marker = segments.findIndex((segment) => documentIdMarkers.includes(segment))
   const document = marker < 0 ? undefined : segments[marker + 1]
 
-  return keepIfMatches(document, safeDocumentIdRegex)
+  return keepIfMatches(document, digitsRegex)
 }
 
 // The modern player, `scribd.com/embeds/{id}/content`. `/doc/{id}` is the pre-2018 spelling of
@@ -81,7 +79,7 @@ export const scribdFlashResolveEmbed: ResolveEmbed = (url, element) => {
 
   const document = parsed.searchParams.get('document_id') ?? flashVar(element, 'document_id')
 
-  return document && safeDocumentIdRegex.test(document) ? composeEmbed(document) : undefined
+  return document && digitsRegex.test(document) ? composeEmbed(document) : undefined
 }
 
 // Scribd's Flash viewer, scribdviewer.swf, dead since 2020 and naming its document in document_id.

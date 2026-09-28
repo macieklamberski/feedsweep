@@ -2,7 +2,7 @@ import { parseUrl } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
 import { attr, find, keepIfMatches, parsePixelSize, text, textNode } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const tiktokHosts = ['tiktok.com']
@@ -10,7 +10,6 @@ const tiktokHosts = ['tiktok.com']
 // A handle is the character set TikTok allows at signup. The signup form's 24-character ceiling
 // is a rule about who can pick a name, not about what the namespace holds.
 const safeHandleRegex = /^[a-zA-Z0-9_.]+$/
-const safeVideoIdRegex = /^\d+$/
 
 // Every player url TikTok has issued frames the clip by its numeric id: `/embed/{id}` and
 // `/embed/v2/{id}` from the oEmbed loader's eras, `/player/v1/{id}` from the current player.
@@ -87,7 +86,7 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
   }
 
   // Sanitizers empty or strip `data-video-id` while leaving the cite or a caption link intact.
-  const declaredId = keepIfMatches(declared, safeVideoIdRegex)
+  const declaredId = keepIfMatches(declared, digitsRegex)
   const videoId = declaredId ?? cited.videoId ?? linked.videoId
 
   if (!videoId) {
