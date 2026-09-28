@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import { baseContext, describeForEachParser, html } from '../tests.js'
+import { transformContent } from '../index.js'
+import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type {
   CiteResolverResult,
   EmbedResolverResult,
@@ -16,11 +17,13 @@ import {
   createMarkupEmbedResolver,
   createMediaElement,
   createPlaceholder,
+  createS9eEmbedResolver,
   createUrlEmbedResolver,
   getEmbedSize,
   normalizeEmbedFields,
   prepareCiteMetadata,
   prepareEmbedMetadata,
+  readS9eFragment,
   setDimensions,
   updateCitePlaceholder,
   updateEmbedPlaceholder,
@@ -359,6 +362,108 @@ describeForEachParser('updateCitePlaceholder', (parseHtml) => {
     updateCitePlaceholder(element, value)
 
     expect(element.outerHTML).toEqualHtml('<div data-cite-title="Post title"></div>')
+  })
+})
+
+describeForEachParser('readS9eFragment', (parseHtml) => {
+  const read = (value: string) => {
+    const element = parseHtml(value).querySelector('iframe')
+
+    return element ? readS9eFragment(element) : undefined
+  }
+
+  it('should read the first fragment of a helper frame', () => {
+    const value =
+      '<iframe src="https://s9e.github.io/iframe/2/twitter.min.html#123#theme=auto"></iframe>'
+
+    expect(read(value)).toBe('123')
+  })
+
+  it('should return undefined for a frame on any other host', () => {
+    const value =
+      '<iframe src="https://evil.test/s9e.github.io/iframe/2/twitter.min.html#123"></iframe>'
+
+    expect(read(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a helper frame naming nothing', () => {
+    const value = '<iframe src="https://s9e.github.io/iframe/2/twitter.min.html"></iframe>'
+
+    expect(read(value)).toBeUndefined()
+  })
+})
+
+const exampleFragmentRegex = /^\w+$/
+
+describeForEachParser('createS9eEmbedResolver', (parseHtml) => {
+  const resolver = createS9eEmbedResolver('example', exampleFragmentRegex, (fragment) => {
+    return {
+      provider: 'example',
+      id: fragment,
+      src: `https://player.example.com/${fragment}`,
+    }
+  })
+  const extract = resolverExtractor(parseHtml, resolver)
+
+  it('should compose the fragment into the platform url', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="example"
+        src="https://s9e.github.io/iframe/2/example.min.html#abc123#theme=auto"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc123',
+      src: 'https://player.example.com/abc123',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should ignore a fragment holding a character outside the class', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="example"
+        src="https://s9e.github.io/iframe/2/example.min.html#abc.123"
+      ></iframe>
+    `
+
+    expect(await extract(value)).toBeUndefined()
+  })
+})
+
+// The helper pages for Gist and Tumblr have no resolver behind them, so their frames stay the
+// generic placeholder.
+describeForEachParser('s9e helper frames no resolver claims', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml })
+  }
+
+  it('should leave the Gist helper frame a generic placeholder', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="gist"
+        src="https://s9e.github.io/iframe/2/gist.min.html#octocat/6cad326836d38bd3a7ae"
+      ></iframe>
+    `
+    const expected =
+      '<div data-embed-src="https://s9e.github.io/iframe/2/gist.min.html#octocat/6cad326836d38bd3a7ae"></div>'
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should leave the Tumblr helper frame a generic placeholder', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="tumblr"
+        src="https://s9e.github.io/iframe/2/tumblr.min.html#staff/729012345678901234"
+      ></iframe>
+    `
+    const expected =
+      '<div data-embed-src="https://s9e.github.io/iframe/2/tumblr.min.html#staff/729012345678901234"></div>'
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
 

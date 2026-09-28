@@ -6,6 +6,7 @@ import {
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
   imgurResolveEmbed,
+  imgurS9eEmbedResolver,
   readImgurHeight,
 } from './imgur.js'
 
@@ -407,6 +408,105 @@ describeForEachParser('imgurIframeEmbedResolver', (parseHtml) => {
 
 // The enclosure probe offers every attachment to every url resolver, so only a pipeline test
 // reaches the path where claiming a media url would cost a reader the file.
+describeForEachParser('imgurS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, imgurS9eEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read a post out of the helper frame', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="imgur"
+          src="https://s9e.github.io/iframe/2/imgur.min.html#1Jy5zcX"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'imgur',
+        id: '1Jy5zcX',
+        src: 'https://imgur.com/1Jy5zcX/embed',
+        url: 'https://imgur.com/1Jy5zcX',
+        thumbnail: 'https://i.imgur.com/1Jy5zcXm.jpg',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read an album out of the helper frame', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="imgur"
+          src="https://s9e.github.io/iframe/2/imgur.min.html#a/4dD8XWO"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'imgur',
+        id: 'a/4dD8XWO',
+        src: 'https://imgur.com/a/4dD8XWO/embed',
+        url: 'https://imgur.com/a/4dD8XWO',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read an encoded slash in an album fragment', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="imgur"
+          src="https://s9e.github.io/iframe/2/imgur.min.html#a%2F4dD8XWO"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'imgur',
+        id: 'a/4dD8XWO',
+        src: 'https://imgur.com/a/4dD8XWO/embed',
+        url: 'https://imgur.com/a/4dD8XWO',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a gallery fragment as the album it is', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="imgur"
+          src="https://s9e.github.io/iframe/2/imgur.min.html#gallery/4dD8XWO"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'imgur',
+        id: 'a/4dD8XWO',
+        src: 'https://imgur.com/a/4dD8XWO/embed',
+        url: 'https://imgur.com/a/4dD8XWO',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host naming the helper in its path', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="imgur"
+          src="https://evil.test/s9e.github.io/iframe/2/imgur.min.html#1Jy5zcX"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a fragment stepping out of the post path', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="imgur"
+          src="https://s9e.github.io/iframe/2/imgur.min.html#x/../../a/9L0qCYg"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 describeForEachParser('imgur through the pipeline', (parseHtml) => {
   const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
     return transformContent(value, {

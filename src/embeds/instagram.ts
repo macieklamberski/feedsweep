@@ -3,7 +3,12 @@ import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed }
 import { attr, find, jsonAttr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts, placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
-import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  atUsername,
+  createMarkupEmbedResolver,
+  createS9eEmbedResolver,
+  createUrlEmbedResolver,
+} from '../utils/widgets.js'
 
 const provider = 'instagram'
 
@@ -297,6 +302,13 @@ export const instagramResolveEmbed: ResolveEmbed = (url) => {
 export const instagramIframeEmbedResolver = createUrlEmbedResolver(
   instagramHosts,
   instagramResolveEmbed,
+)
+
+// A forum's s9e MediaEmbed helper frame, naming the post's shortcode in its url fragment.
+export const instagramS9eEmbedResolver = createS9eEmbedResolver(
+  'instagram',
+  /^[-\w]+$/,
+  (shortcode) => instagramResolveEmbed(`https://www.instagram.com/p/${shortcode}/`),
 )
 
 // The player measures itself once mounted and reports it under a `MEASURE` type. `LOADING`
