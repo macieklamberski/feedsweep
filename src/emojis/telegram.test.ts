@@ -97,7 +97,7 @@ describeForEachParser('telegramImageEmojiResolver', (parseHtml) => {
         <img src="https://web.telegram.org/k/assets/img/emoji/0023-20e3.png" alt="">
       </p>
     `
-    const expected = '<p>#⃣</p>'
+    const expected = '<p>#️⃣</p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })

@@ -1,6 +1,6 @@
 import type { DomTransform } from '../../types.js'
 import { batchSelectors, walkElements } from '../../utils/dom.js'
-import { emojiImageAttribute } from '../../utils/emojis.js'
+import { emojiImageAttribute, withEmojiPresentation } from '../../utils/emojis.js'
 
 const wrapFallbackText = (document: Document, text: string): Element => {
   const span = document.createElement('span')
@@ -53,7 +53,7 @@ export const convertEmojis: DomTransform = (context) => {
 
         // An empty result would leave the wrapping element for stripEmptyTags to delete.
         if ('glyph' in result) {
-          element.replaceWith(result.glyph)
+          element.replaceWith(withEmojiPresentation(result.glyph))
           return
         }
 
