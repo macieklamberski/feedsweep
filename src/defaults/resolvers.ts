@@ -237,6 +237,7 @@ import { vimeoEmbedResolver } from '../embeds/vimeo.js'
 import { vkEmbedResolver } from '../embeds/vk.js'
 import { wikimediaEmbedResolver } from '../embeds/wikimedia.js'
 import { wistiaEmbedResolver } from '../embeds/wistia.js'
+import { wordwallEmbedResolver } from '../embeds/wordwall.js'
 import { youkuEmbedResolver } from '../embeds/youku.js'
 import {
   youtubeAmpEmbedResolver,
@@ -542,6 +543,7 @@ const embedResolvers: Array<EmbedResolver> = [
   vimeoEmbedResolver,
   vkEmbedResolver,
   wistiaEmbedResolver,
+  wordwallEmbedResolver,
   youkuEmbedResolver,
   youtubeIframeEmbedResolver,
   youtubeAmpEmbedResolver,
