@@ -18,6 +18,30 @@ describe('reverbnationResolveEmbed', () => {
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should drop the tracking parameters from the widget query', () => {
+      const value =
+        'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55&pwc[size]=fit&utm_source=newsletter&utm_campaign=spring&fbclid=abc'
+      const expected: EmbedResolverResult = {
+        provider: 'reverbnation',
+        id: 'artist_1018382',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55&pwc[size]=fit',
+      }
+
+      expect(reverbnationResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the autoplay flag from the widget query', () => {
+      const value =
+        'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55&pwc[auto_play]=1&pwc[size]=fit'
+      const expected: EmbedResolverResult = {
+        provider: 'reverbnation',
+        id: 'artist_1018382',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55&pwc[size]=fit',
+      }
+
+      expect(reverbnationResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should give an http frame the scheme it needs to load', () => {
       const value =
         'http://www.reverbnation.com/widget_code/html_widget/artist_1123149?widget_id=55'

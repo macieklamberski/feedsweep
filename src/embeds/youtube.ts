@@ -4,7 +4,7 @@ import { attr } from '../utils/dom.js'
 import {
   composeQuery,
   parseUrlOnHosts,
-  pickUrlParams,
+  pickQueryParams,
   placeholderBaseUrl,
   splitStrayParams,
   urlSafeTokenRegex,
@@ -114,15 +114,6 @@ export const extractVideoId = (link: string): string | undefined => {
     .find((candidate) => !!candidate && isVideoId(candidate))
 }
 
-// The player url for a caller holding a url nothing has checked: a page builder stores whatever
-// the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
-export const readYoutubeEmbedSrc = (link: string): string | undefined => {
-  const url = parseUrlOnHosts(link, youtubeHosts)
-  const videoId = url && extractVideoId(url.href)
-
-  return videoId ? composeEmbedUrl(videoId) : undefined
-}
-
 // A clip embed needs both `clip` and `clipt`, and `loop` does nothing without `playlist`, which in
 // the wild is almost always the video's own id: YouTube's documented way to loop a single video.
 export const youtubeEmbedParams = [
@@ -135,6 +126,69 @@ export const youtubeEmbedParams = [
   'playlist',
   'loop',
 ]
+
+// A watch or share link spells its start offset as `t`: `90`, `90s`, `1m30s` or `1h2m3s`.
+const watchOffsetRegex = /^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/
+
+// The clock spelling some publishers write in a fragment: `24:09` or `1:02:03`.
+const clockOffsetRegex = /^(?:(\d+):)?(\d+):(\d+)$/
+
+const parseWatchOffset = (value: string): string | undefined => {
+  const match = watchOffsetRegex.exec(value) ?? clockOffsetRegex.exec(value)
+
+  if (!match?.[0]) {
+    return
+  }
+
+  const [, hours = '0', minutes = '0', seconds = '0'] = match
+
+  return String(Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds))
+}
+
+// The player ignores `t`, so an offset moves over as `start` unless one is stated. Besides the
+// query, the Flash-era spelling left it in the path as `/embed/{id}&t=6s`, and publishers write it
+// in the fragment as `#t=220`.
+const readEmbedParams = (url: string): Record<string, string> => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
+  const params = pickQueryParams(parsed?.search ?? '', youtubeEmbedParams)
+
+  if (!parsed || params.start) {
+    return params
+  }
+
+  const offsetQueries = [
+    parsed.search,
+    splitStrayParams(parsed.pathname).strayParams,
+    parsed.hash.slice(1),
+  ]
+  const start = offsetQueries
+    .map((query) => parseWatchOffset(new URLSearchParams(query).get('t') ?? ''))
+    .find(Boolean)
+
+  if (start) {
+    params.start = start
+  }
+
+  return params
+}
+
+// The player url for a caller holding a url nothing has checked: a page builder stores whatever
+// the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
+export const readYoutubeEmbedSrc = (link: string): string | undefined => {
+  const url = parseUrlOnHosts(link, youtubeHosts)
+
+  if (!url) {
+    return
+  }
+
+  const videoId = extractVideoId(url.href)
+
+  if (!videoId) {
+    return
+  }
+
+  return composeEmbedUrl(videoId, readEmbedParams(url.href))
+}
 
 // The Flash-era playlist player wrote `youtube.com/p/{id}`, where the id is the same playlist the
 // modern url spells as `list=PL{id}`.
@@ -239,7 +293,7 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   return {
     provider,
     id: videoId,
-    src: `${composeEmbedUrl(videoId)}${pickUrlParams(url, youtubeEmbedParams)}`,
+    src: composeEmbedUrl(videoId, readEmbedParams(url)),
     url: `https://www.youtube.com/watch?v=${videoId}`,
     thumbnail: composeThumbnailUrl(videoId),
     ratio: playerRatio,
