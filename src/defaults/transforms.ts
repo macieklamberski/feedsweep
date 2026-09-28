@@ -30,6 +30,7 @@ import { hoistBlocksFromParagraphs } from '../transforms/dom/hoistBlocksFromPara
 import { hoistFigcaptionFromAnchor } from '../transforms/dom/hoistFigcaptionFromAnchor.js'
 import { injectEnclosures } from '../transforms/dom/injectEnclosures.js'
 import { linkifyGistEmbeds } from '../transforms/dom/linkifyGistEmbeds.js'
+import { linkifyPaypalDonateForms } from '../transforms/dom/linkifyPaypalDonateForms.js'
 import { linkifyUrls } from '../transforms/dom/linkifyUrls.js'
 import { markTimestamps } from '../transforms/dom/markTimestamps.js'
 import { mergeConsecutiveOneLinerPres } from '../transforms/dom/mergeConsecutiveOneLinerPres.js'
@@ -137,6 +138,8 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // A GitHub Gist embed is a JS-only <script> that renders nothing in a reader. Replace it
   // with a link to the gist so the content is at least reachable.
   linkifyGistEmbeds,
+  // Runs before stripNonContentElements, which strips the `/cgi-bin/webscr` forms this leaves.
+  linkifyPaypalDonateForms,
   // A Substack @-mention is an empty span whose name lives only in its data-attrs JSON;
   // rebuild the anchor before stripEmptyTags deletes the span and the name with it.
   fixSubstackMentions,
