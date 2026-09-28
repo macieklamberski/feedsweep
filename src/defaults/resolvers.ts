@@ -256,6 +256,10 @@ import { wordpressElementEmojiResolver, wordpressEmojiResolver } from '../emojis
 import { xenforoEmojiResolver } from '../emojis/xenforo.js'
 import { yahooEmojiResolver } from '../emojis/yahoo.js'
 import { yahooJapanEmojiResolver } from '../emojis/yahoojapan.js'
+import { coblocksGalleryResolver } from '../galleries/coblocks.js'
+import { ghostGalleryResolver } from '../galleries/ghost.js'
+import { jetpackSlideshowResolver } from '../galleries/jetpack.js'
+import { wordpressGalleryResolver } from '../galleries/wordpress.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { ghostMediaResolver } from '../media/ghost.js'
 import { podloveMediaResolver } from '../media/podlove.js'
@@ -267,6 +271,7 @@ import type {
   CiteResolver,
   EmbedResolver,
   EmojiResolver,
+  GalleryResolver,
   MediaResolver,
   WidgetResolver,
 } from '../types.js'
@@ -465,10 +470,20 @@ const citeResolvers: Array<CiteResolver> = [
   microformatsCiteResolver,
 ]
 
+// Alphabetical by platform. No two selectors overlap: `wp-block-coblocks-gallery-*` is a
+// different class token from `wp-block-gallery`.
+const galleryResolvers: Array<GalleryResolver> = [
+  coblocksGalleryResolver,
+  ghostGalleryResolver,
+  jetpackSlideshowResolver,
+  wordpressGalleryResolver,
+]
+
 export const defaultWidgetResolvers: Array<WidgetResolver> = [
   ...embedResolvers,
   ...mediaResolvers,
   ...citeResolvers,
+  ...galleryResolvers,
 ]
 
 // First claim wins, so every resolver that reads a filename sits ahead of the ones that only
