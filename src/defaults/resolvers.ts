@@ -135,6 +135,7 @@ import {
 } from '../embeds/jwplayer.js'
 import { kalturaIframeEmbedResolver, kalturaScriptEmbedResolver } from '../embeds/kaltura.js'
 import { kindleEmbedResolver } from '../embeds/kindle.js'
+import { komootEmbedResolver } from '../embeds/komoot.js'
 import { learningappsEmbedResolver } from '../embeds/learningapps.js'
 import { libsynEmbedResolver } from '../embeds/libsyn.js'
 import { linkedinEmbedResolver } from '../embeds/linkedin.js'
@@ -423,6 +424,7 @@ const embedResolvers: Array<EmbedResolver> = [
   kalturaIframeEmbedResolver,
   kalturaScriptEmbedResolver,
   kindleEmbedResolver,
+  komootEmbedResolver,
   learningappsEmbedResolver,
   libsynEmbedResolver,
   linkedinEmbedResolver,
