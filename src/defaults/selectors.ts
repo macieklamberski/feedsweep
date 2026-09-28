@@ -111,6 +111,7 @@ export const defaultNonContentSelectors = [
   'a[href*="digg.com/submit"]', // Digg submit button, and the badge image nested inside it.
   'img[src*="digg.com/img/badges"]', // The same badge pasted without its anchor.
   'iframe[src*="plusone.google.com"]', // Google+ +1 button, whose endpoint closed with the service.
+  'iframe[src*="tunein.com/embed/follow/"]', // TuneIn follow button for a station or a show.
   'img[src*="w.sharethis.com/"]', // ShareThis chicklet icons, the button row's pre-widget form.
   // Hatena Bookmark's add button. A bookmark comment carries an author's real text on a
   // blockquote of its own, so neither entry is widened to the class prefix.

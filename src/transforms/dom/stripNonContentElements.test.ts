@@ -133,6 +133,8 @@ const specimens: Record<string, string | [string, string]> = {
     '<img src="https://digg.com/img/badges/100x20-digg-button.png" alt="Digg this">',
   'iframe[src*="plusone.google.com"]':
     '<iframe allowtransparency="true" frameborder="0" scrolling="no" src="https://plusone.google.com/_/+1/fastbutton?bsv&size=medium&hl=en-US&url=https%3A%2F%2Fexample.com%2Fa"></iframe>',
+  'iframe[src*="tunein.com/embed/follow/"]':
+    '<iframe src="https://tunein.com/embed/follow/p950157/?wmode=opaque"></iframe>',
   'img[src*="w.sharethis.com/"]':
     '<img src="https://w.sharethis.com/images/facebook_32.png" alt="Share on Facebook">',
   'a.hatena-bookmark-button':
