@@ -325,9 +325,15 @@ export const generatedWrapperTypes = ['embed', 'cite', 'file', 'table', 'pre'] a
 
 export type GeneratedWrapperType = (typeof generatedWrapperTypes)[number]
 
-const generatedWrapperPrefixes = generatedWrapperTypes.map((type) => `data-${type}`)
+// The trailing dash keeps a publisher's `data-preview` or `data-embedly-card` from matching.
+const generatedWrapperPrefixes = generatedWrapperTypes.map((type) => `data-${type}-`)
 
 export const isGeneratedWrapper = (element: Element): boolean => {
+  // wrapTablesForScroll marks its wrapper with a bare `data-table`.
+  if (element.hasAttribute('data-table')) {
+    return true
+  }
+
   return element.getAttributeNames().some((name) => startsWithAnyOf(name, generatedWrapperPrefixes))
 }
 
