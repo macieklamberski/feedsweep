@@ -132,6 +132,7 @@ import {
 } from '../embeds/instagram.js'
 import { issuuIframeEmbedResolver, issuuWidgetEmbedResolver } from '../embeds/issuu.js'
 import { ivooxEmbedResolver } from '../embeds/ivoox.js'
+import { jotformIframeEmbedResolver, jotformScriptEmbedResolver } from '../embeds/jotform.js'
 import {
   jwplayerAmpEmbedResolver,
   jwplayerIframeEmbedResolver,
@@ -427,6 +428,8 @@ const embedResolvers: Array<EmbedResolver> = [
   issuuWidgetEmbedResolver,
   issuuIframeEmbedResolver,
   ivooxEmbedResolver,
+  jotformScriptEmbedResolver,
+  jotformIframeEmbedResolver,
   jwplayerIframeEmbedResolver,
   jwplayerScriptEmbedResolver,
   jwplayerAmpEmbedResolver,
