@@ -2,14 +2,13 @@ import { getPathSegments, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'reddit'
 
 const redditHosts = ['reddit.com', 'redditmedia.com']
 
-const safeNameRegex = /^[A-Za-z0-9_-]+$/
 // The post counter started at one base36 character in 2005, and two-character permalinks are still
 // linked from real feeds.
 const safeThingIdRegex = /^[a-z0-9]+$/i
@@ -43,7 +42,7 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
 
   const [scope, name, comments, postId] = segments
 
-  if ((scope !== 'r' && scope !== 'user') || !name || !safeNameRegex.test(name)) {
+  if ((scope !== 'r' && scope !== 'user') || !name || !urlSafeTokenRegex.test(name)) {
     return
   }
 
@@ -80,7 +79,7 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
 const parseAuthor = (value: string | undefined): string | undefined => {
   const [scope, name, rest] = parseRedditPath(value) ?? []
 
-  if (scope !== 'user' || rest !== undefined || !name || !safeNameRegex.test(name)) {
+  if (scope !== 'user' || rest !== undefined || !name || !urlSafeTokenRegex.test(name)) {
     return
   }
 

@@ -1,7 +1,7 @@
 import { isHostOf, type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver, getEmbedSize } from '../utils/widgets.js'
 
 const flickrHosts = ['flickr.com']
@@ -18,10 +18,6 @@ const photoPathRegex = /^\/photos\/([\w.@-]+)\/(\d+)(?:\/in\/[^/]+)?\/player(?:\
 const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/
 
 const safeSetIdRegex = /^\d+$/
-
-// The secret lands in the photo file's name, so a dot or a separator in it would name
-// another path.
-const safePhotoSecretRegex = /^[\w-]+$/
 
 // The first class admits no dot, so `..` never reaches a minted path.
 // An owner is a numeric NSID with its `@N0…` suffix, or the path alias the owner chose.
@@ -163,7 +159,9 @@ const readPhotoSubject = (parsed: URL): FlickrPhoto | undefined => {
 // the frame.
 const composePhotoEmbed = (link: string, photo: FlickrPhoto): EmbedResolverResult => {
   const { photoId, owner } = photo
-  const secret = keepIfMatches(photo.secret, safePhotoSecretRegex)
+  // The secret lands in the photo file's name, so a dot or a separator in it would name
+  // another path.
+  const secret = keepIfMatches(photo.secret, urlSafeTokenRegex)
 
   return {
     provider: 'flickr',

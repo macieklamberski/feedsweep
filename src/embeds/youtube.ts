@@ -7,6 +7,7 @@ import {
   pickUrlParams,
   placeholderBaseUrl,
   splitStrayParams,
+  urlSafeTokenRegex,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -135,10 +136,6 @@ export const youtubeEmbedParams = [
   'loop',
 ]
 
-// Playlist (`list`), channel (`channel`) and legacy username ids. A charset guard, not a
-// length/prefix one: it only keeps a stray value out of the rebuilt url and the enrichment key.
-const safePlaylistChannelIdRegex = /^[a-zA-Z0-9_-]+$/
-
 // The Flash-era playlist player wrote `youtube.com/p/{id}`, where the id is the same playlist the
 // modern url spells as `list=PL{id}`.
 const legacyPlaylistIdRegex = /^[0-9A-F]{16}$/
@@ -189,9 +186,9 @@ const resolveCollectionEmbed = (
   const channel = parsed.searchParams.get('channel')
 
   if (segments[1] === 'live_stream') {
-    return channel && safePlaylistChannelIdRegex.test(channel)
-      ? composeChannelEmbed(channel)
-      : undefined
+    // Playlist (`list`), channel (`channel`) and legacy username ids. A charset guard, not a
+    // length/prefix one: it only keeps a stray value out of the rebuilt url and the enrichment key.
+    return channel && urlSafeTokenRegex.test(channel) ? composeChannelEmbed(channel) : undefined
   }
 
   // `/embed/videoseries?list=` and the bare `/embed/?list=` some WordPress plugins emit are the
@@ -202,7 +199,7 @@ const resolveCollectionEmbed = (
 
   // `listType=search` named a search query, not an id, and YouTube removed it in 2020: the
   // embed plays nothing and there is nothing to resolve it to.
-  if (listType === 'search' || !list || !safePlaylistChannelIdRegex.test(list)) {
+  if (listType === 'search' || !list || !urlSafeTokenRegex.test(list)) {
     return
   }
 
@@ -273,9 +270,7 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
     if (!videoId) {
       const channel = attr(element, 'data-live-channelid')
 
-      return channel && safePlaylistChannelIdRegex.test(channel)
-        ? composeChannelEmbed(channel)
-        : undefined
+      return channel && urlSafeTokenRegex.test(channel) ? composeChannelEmbed(channel) : undefined
     }
 
     if (!isVideoId(videoId)) {
