@@ -43,6 +43,7 @@ import { rebuildElementorVideoEmbeds } from '../transforms/dom/rebuildElementorV
 import { rebuildEmbedlyEmbeds } from '../transforms/dom/rebuildEmbedlyEmbeds.js'
 import { rebuildEmbedPlusEmbeds } from '../transforms/dom/rebuildEmbedPlusEmbeds.js'
 import { rebuildGettyImagesEmbeds } from '../transforms/dom/rebuildGettyImagesEmbeds.js'
+import { rebuildJsfiddleEmbeds } from '../transforms/dom/rebuildJsfiddleEmbeds.js'
 import { rebuildLazyLoadForVideos } from '../transforms/dom/rebuildLazyLoadForVideos.js'
 import { rebuildLazyYtEmbeds } from '../transforms/dom/rebuildLazyYtEmbeds.js'
 import { rebuildLiteVideoEmbeds } from '../transforms/dom/rebuildLiteVideoEmbeds.js'
@@ -132,6 +133,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // before stripEmptyTags, which is what deletes an empty carrier nothing has claimed.
   rebuildEmbedlyEmbeds,
   rebuildGettyImagesEmbeds,
+  rebuildJsfiddleEmbeds,
   // A GitHub Gist embed is a JS-only <script> that renders nothing in a reader. Replace it
   // with a link to the gist so the content is at least reachable.
   linkifyGistEmbeds,
