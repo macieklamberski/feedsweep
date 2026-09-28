@@ -217,6 +217,7 @@ import {
 } from '../embeds/telegram.js'
 import { tencentEmbedResolver } from '../embeds/tencent.js'
 import { tenorIframeEmbedResolver, tenorWidgetEmbedResolver } from '../embeds/tenor.js'
+import { thinglinkEmbedResolver } from '../embeds/thinglink.js'
 import {
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
@@ -532,8 +533,9 @@ const embedResolvers: Array<EmbedResolver> = [
   telegramIframeEmbedResolver,
   telegramS9eEmbedResolver,
   tencentEmbedResolver,
-  tenorWidgetEmbedResolver,
   tenorIframeEmbedResolver,
+  tenorWidgetEmbedResolver,
+  thinglinkEmbedResolver,
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
   tiktokS9eEmbedResolver,
