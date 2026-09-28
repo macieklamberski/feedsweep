@@ -90,6 +90,12 @@ import {
   facebookWidgetEmbedResolver,
   facebookXfbmlEmbedResolver,
 } from '../embeds/facebook.js'
+import {
+  fc2BlogScriptEmbedResolver,
+  fc2FlashEmbedResolver,
+  fc2IframeEmbedResolver,
+  fc2PlayerScriptEmbedResolver,
+} from '../embeds/fc2.js'
 import { figshareEmbedResolver } from '../embeds/figshare.js'
 import { firesideEmbedResolver } from '../embeds/fireside.js'
 import { flickrEmbedResolver } from '../embeds/flickr.js'
@@ -364,6 +370,10 @@ const embedResolvers: Array<EmbedResolver> = [
   facebookBlockquoteEmbedResolver,
   facebookXfbmlEmbedResolver,
   facebookAmpEmbedResolver,
+  fc2PlayerScriptEmbedResolver,
+  fc2BlogScriptEmbedResolver,
+  fc2IframeEmbedResolver,
+  fc2FlashEmbedResolver,
   figshareEmbedResolver,
   firesideEmbedResolver,
   flickrEmbedResolver,
