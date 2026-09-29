@@ -23,8 +23,9 @@ const postCollection = 'app.bsky.feed.post'
 // at://{authority}/{collection}/{rkey}.
 const atUriRegex = /^at:\/\/([^/]+)\/([^/]+)\/([^/?#]+)/
 
-// A DID or a handle, which is a domain name.
-const safeAuthorityRegex = /^(?:did:[a-z]+:[\w.:%-]+|[a-z\d-]+(?:\.[a-z\d-]+)+)$/i
+// A DID or a handle, which is a domain name. The only escape a DID carries is the `%3A` of a
+// did:web port, so no encoded separator reaches the minted path.
+const safeAuthorityRegex = /^(?:did:[a-z]+:(?:[\w.-]|%3A)+|[a-z\d-]+(?:\.[a-z\d-]+)+)$/i
 // A record key, never `.` or `..`: the protocol forbids them and they would climb out of the path.
 const safeRecordKeyRegex = /^(?!\.{1,2}$)[\w.~-]+$/
 
