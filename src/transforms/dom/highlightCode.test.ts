@@ -765,6 +765,21 @@ describeForEachParser('highlightCode', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should keep br line breaks in a standalone code with a language-* class', async () => {
+    const value = '<code class="language-python">a = 1<br>b = 2\nc = 3</code>'
+    const expected =
+      '<pre data-pre-language="python" data-pre-label="Python"><code class="language-python hljs">a = <span class="hljs-number">1</span>\nb = <span class="hljs-number">2</span>\nc = <span class="hljs-number">3</span></code></pre>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should promote a standalone code whose lines are split only by br', async () => {
+    const value = '<code>the quick brown fox<br>jumps over the lazy dog</code>'
+    const expected = '<pre><code>the quick brown fox<br>jumps over the lazy dog</code></pre>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should not highlight a hinted single-line inline code', async () => {
     const value = '<p>Use <code class="language-js">const x = 1</code> to declare</p>'
 
