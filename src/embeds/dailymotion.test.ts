@@ -136,7 +136,7 @@ describe('dailymotionResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'x7tgad0',
-      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0',
       url: 'https://www.dailymotion.com/video/x7tgad0',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
       ratio: '16/9',
@@ -150,9 +150,80 @@ describe('dailymotionResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'x8abcde',
-      src: 'https://www.dailymotion.com/embed/video/x8abcde?start=42',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8abcde&startTime=42',
       url: 'https://www.dailymotion.com/video/x8abcde',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8abcde',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read the start the player id form states', () => {
+    const value = 'https://geo.dailymotion.com/player.html?video=x8abcde&startTime=42'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x8abcde',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8abcde&startTime=42',
+      url: 'https://www.dailymotion.com/video/x8abcde',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8abcde',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  // A publisher's own player id plays on any site, while the generic player answers 403.
+  it('should keep the url of a player the publisher created', () => {
+    const value = 'https://geo.dailymotion.com/player/xiqhk.html?video=x8pq78m'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x8pq78m',
+      src: 'https://geo.dailymotion.com/player/xiqhk.html?video=x8pq78m',
+      url: 'https://www.dailymotion.com/video/x8pq78m',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8pq78m',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should rebuild the generic player on the player id', () => {
+    const value = 'https://geo.dailymotion.com/player.html?video=x8pq78m'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x8pq78m',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8pq78m',
+      url: 'https://www.dailymotion.com/video/x8pq78m',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8pq78m',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should rebuild a player path behind another segment', () => {
+    const value = 'https://geo.dailymotion.com/x/player/xiqhk.html?video=x8pq78m'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x8pq78m',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8pq78m',
+      url: 'https://www.dailymotion.com/video/x8pq78m',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8pq78m',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should rebuild a player path with a segment after it', () => {
+    const value = 'https://geo.dailymotion.com/player/xiqhk.html/extra?video=x8pq78m'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x8pq78m',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8pq78m',
+      url: 'https://www.dailymotion.com/video/x8pq78m',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8pq78m',
       ratio: '16/9',
     }
 
@@ -164,7 +235,7 @@ describe('dailymotionResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'x8abcde',
-      src: 'https://www.dailymotion.com/embed/video/x8abcde',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8abcde',
       url: 'https://www.dailymotion.com/video/x8abcde',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8abcde',
       ratio: '16/9',
@@ -193,7 +264,7 @@ describe('dailymotionResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'playlist/x6zqmk',
-      src: 'https://www.dailymotion.com/embed/playlist/x6zqmk',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x6zqmk',
       url: 'https://www.dailymotion.com/playlist/x6zqmk',
     }
 
@@ -222,7 +293,7 @@ describe('dailymotionResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'x7tgad0',
-      src: 'https://www.dailymotion.com/embed/video/x7tgad0?playlist=x6zqmk',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0&playlist=x6zqmk',
       url: 'https://www.dailymotion.com/video/x7tgad0',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
       ratio: '16/9',
@@ -235,7 +306,7 @@ describe('dailymotionResolveEmbed', () => {
 describe('readDailymotionEmbedSrc', () => {
   it('should build the player url from a pasted share link on the short domain', () => {
     const value = 'https://dai.ly/x7tgad0'
-    const expected = 'https://www.dailymotion.com/embed/video/x7tgad0'
+    const expected = 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0'
 
     expect(readDailymotionEmbedSrc(value)).toBe(expected)
   })
@@ -249,7 +320,7 @@ describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'x7tgad0',
-      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0',
       url: 'https://www.dailymotion.com/video/x7tgad0',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
       ratio: '16/9',
@@ -285,7 +356,7 @@ describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'x7tgad0',
-      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0',
       url: 'https://www.dailymotion.com/video/x7tgad0',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
       ratio: '16/9',
@@ -335,7 +406,7 @@ describeForEachParser('dailymotionEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'x7tgad0',
-      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0',
       url: 'https://www.dailymotion.com/video/x7tgad0',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
       ratio: '16/9',
@@ -351,7 +422,7 @@ describeForEachParser('dailymotionEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'x7tgad0',
-      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0',
       url: 'https://www.dailymotion.com/video/x7tgad0',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
       ratio: '16/9',
@@ -367,7 +438,7 @@ describeForEachParser('dailymotionEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'x7tgad0',
-      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0',
       url: 'https://www.dailymotion.com/video/x7tgad0',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
       ratio: '16/9',
@@ -383,7 +454,7 @@ describeForEachParser('dailymotionEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'x7tgad0',
-      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0',
       url: 'https://www.dailymotion.com/video/x7tgad0',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
       ratio: '16/9',
@@ -400,7 +471,7 @@ describeForEachParser('dailymotionEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'x7tgad0',
-      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0',
       url: 'https://www.dailymotion.com/video/x7tgad0',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
       ratio: '16/9',
