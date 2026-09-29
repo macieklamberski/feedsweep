@@ -1,5 +1,5 @@
 import type { MediaResolver } from '../types.js'
-import { flashVars, paramValue, parsePixelSize } from '../utils/dom.js'
+import { flashVars, parsePixelSize } from '../utils/dom.js'
 import { audioFileRegex, imageFileRegex, parseUrlOnHosts, videoFileRegex } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
@@ -56,8 +56,8 @@ export const weeblyMediaResolver: MediaResolver = {
 }
 
 // The video block before the wrapper: an iframe onto a player page whose query names the upload
-// and its poster by path. Both files serve from Weebly's own apex under /uploads/, whatever site
-// they belong to. The same route renders the map block, which names no upload and stays a frame.
+// and its poster by path. Both files serve from www.weebly.com under /uploads/, whatever site
+// they belong to. The map block sits beside it at generateMap.php and stays a frame.
 export const weeblyIframeMediaResolver: MediaResolver = {
   kind: 'media',
   selector: `iframe[src*="${weeblyHost}${videoAppPath}"]`,
@@ -87,7 +87,7 @@ export const weeblyIframeMediaResolver: MediaResolver = {
   },
 }
 
-// The Flash audio block: the player swf is gone, and the mp3 url and its label sit in flashvars.
+// The Flash audio block: Flash no longer runs, and the mp3 url and its label sit in flashvars.
 export const weeblyFlashMediaResolver: MediaResolver = {
   kind: 'media',
   selector: [
@@ -101,7 +101,7 @@ export const weeblyFlashMediaResolver: MediaResolver = {
       return
     }
 
-    const config = new URLSearchParams(flashVars(element) ?? paramValue(element, 'flashvars'))
+    const config = new URLSearchParams(flashVars(element) ?? '')
     const src = config.get('soundFile')
 
     if (!src || !audioFileRegex.test(src)) {

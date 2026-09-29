@@ -286,6 +286,30 @@ describeForEachParser('weeblyIframeMediaResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore a video path with a dot segment past its start', async () => {
+      const value = html`
+        <iframe src="http://www.weebly.com/weebly/apps/generateVideo.php?video=1/3/clip/../../../weebly/clip.mp4"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a video name carrying an encoded fragment separator', async () => {
+      const value = html`
+        <iframe src="http://www.weebly.com/weebly/apps/generateVideo.php?video=1/3/0/7/13078488/clip%23_706.mp4"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player page name under another path on the host', async () => {
+      const value = html`
+        <iframe src="http://www.weebly.com/x/weebly.com/weebly/apps/generateVideo.php?video=1/3/0/7/13078488/clip_706.mp4"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 
   describe('edge cases', () => {
@@ -293,6 +317,20 @@ describeForEachParser('weeblyIframeMediaResolver', (parseHtml) => {
       const value = html`
         <iframe
           src="http://www.weebly.com/weebly/apps/generateVideo.php?video=1/3/0/7/13078488/clip_706.mp4&image=1/3/0/7/13078488/clip_706.txt"
+        ></iframe>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'video',
+        src: 'https://www.weebly.com/uploads/1/3/0/7/13078488/clip_706.mp4',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the upload and drop a poster climbing out of the uploads directory', async () => {
+      const value = html`
+        <iframe
+          src="http://www.weebly.com/weebly/apps/generateVideo.php?video=1/3/0/7/13078488/clip_706.mp4&image=../../weebly/clip_706.jpg"
         ></iframe>
       `
       const expected: MediaResolverResult = {
@@ -372,6 +410,16 @@ describeForEachParser('weeblyFlashMediaResolver', (parseHtml) => {
     it('should ignore a foreign host naming the player in its path', async () => {
       const value = html`
         <object data="https://evil.test/www.weebly.com/weebly/apps/audioPlayer2.swf">
+          <param name="FlashVars" value="soundFile=http://www.example.com/uploads/4/4/2/7/4427146/knowing_yourself.mp3" />
+        </object>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player name under another path on the host', async () => {
+      const value = html`
+        <object data="http://www.weebly.com/x/weebly.com/weebly/apps/audioPlayer2.swf">
           <param name="FlashVars" value="soundFile=http://www.example.com/uploads/4/4/2/7/4427146/knowing_yourself.mp3" />
         </object>
       `
