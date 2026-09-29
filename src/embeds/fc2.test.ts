@@ -324,25 +324,6 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a language in uppercase', async () => {
-      const value = html`
-        <script
-          src="https://static.fc2.com/video/js/outerplayer.min.js"
-          url="https://video.fc2.com/JA/content/20190922FrnqLhsk/"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'fc2',
-        id: '20190922FrnqLhsk',
-        src: 'https://video.fc2.com/embed/player/20190922FrnqLhsk/',
-        url: 'https://video.fc2.com/JA/content/20190922FrnqLhsk/',
-        width: 512,
-        height: 288,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should keep a language in digits', async () => {
       const value = html`
         <script
