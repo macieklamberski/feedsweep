@@ -17,12 +17,14 @@ describe('vkResolveEmbed', () => {
       expect(vkResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the hash that unlocks a private video and drop the rest', () => {
-      const value = 'https://vk.com/video_ext.php?oid=123&id=456&hash=abc123&hd=2&autoplay=1'
+    it('should keep the hash in the player alone and drop the rest', () => {
+      const value =
+        'https://vkvideo.ru/video_ext.php?oid=-53159866&id=456240593&hash=622100e5918230de&hd=2'
       const expected: EmbedResolverResult = {
         provider: 'vk',
-        id: '123_456',
-        src: 'https://vk.com/video_ext.php?oid=123&id=456&hash=abc123',
+        id: '-53159866_456240593',
+        src: 'https://vkvideo.ru/video_ext.php?oid=-53159866&id=456240593&hash=622100e5918230de',
+        url: 'https://vkvideo.ru/video-53159866_456240593',
       }
 
       expect(vkResolveEmbed(value)).toEqual(expected)
@@ -122,6 +124,7 @@ describeForEachParser('vkEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
     it('should read the player on the vk.com host', async () => {
       const value = html`
         <iframe
@@ -137,6 +140,7 @@ describeForEachParser('vkEmbedResolver', (parseHtml) => {
         provider: 'vk',
         id: '444168992_456241377',
         src: 'https://vk.com/video_ext.php?oid=444168992&id=456241377&hash=fff86ef53c5f9a77',
+        url: 'https://vkvideo.ru/video444168992_456241377',
         width: 640,
         height: 360,
       }
@@ -179,6 +183,7 @@ describeForEachParser('vkEmbedResolver', (parseHtml) => {
         provider: 'vk',
         id: '25582471_136966218',
         src: 'https://vkontakte.ru/video_ext.php?oid=25582471&id=136966218&hash=482381d766b9995d',
+        url: 'https://vkvideo.ru/video25582471_136966218',
         width: 607,
         height: 360,
       }
