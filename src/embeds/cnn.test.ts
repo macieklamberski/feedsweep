@@ -92,13 +92,6 @@ describe('cnnResolveEmbed', () => {
       expect(cnnResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for a lookalike host', () => {
-      const value =
-        'https://fave.api.cnn.io.evil.test/v1/fav/?video=arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn'
-
-      expect(cnnResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for an id that steps out of its path', () => {
       const value =
         'https://fave.api.cnn.io/v1/fav/?video=../arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn'
@@ -296,6 +289,13 @@ describeForEachParser('cnnIframeEmbedResolver', (parseHtml) => {
   it('should ignore a foreign host carrying the same path', async () => {
     const value =
       '<iframe src="https://evil.test/v1/fav/?video=us/2018/06/24/finding-hope-suicide-special-report-full-show.cnn"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore a lookalike host that starts with the player host', async () => {
+    const value =
+      '<iframe src="https://fave.api.cnn.io.evil.test/v1/fav/?video=arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

@@ -53,7 +53,7 @@ const resolveVideoId = (value: string | null | undefined): EmbedResolverResult |
 }
 
 const resolveTarget = (url: string): EmbedResolverResult | undefined => {
-  const parsed = parseUrlOnHosts(url, cnnHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (parsed?.pathname === '/v1/fav/') {
     return resolveVideoId(parsed.searchParams.get('video'))
