@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { digitsRegex, uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -9,12 +9,14 @@ const legacyIdRegex = /^[0-9a-f]{8}$/i
 
 const simplecastHosts = ['simplecast.com']
 
+// The share host answers "This site is not available" in a frame, while the player host plays the
+// same uuid.
+const shareHost = 'play.simplecast.com'
+
 // The one height every iframe states.
 const playerHeight = 200
 
-export const extractSimplecastEpisode = (
-  link: string,
-): { id: string; isCurrent: boolean } | undefined => {
+export const extractSimplecastEpisode = (link: string): string | undefined => {
   const segments = getPathSegments(link)
   const id = segments[0] === 'e' ? segments[1] : segments[0]
 
@@ -22,29 +24,22 @@ export const extractSimplecastEpisode = (
     return
   }
 
-  if (uuidRegex.test(id)) {
-    return { id, isCurrent: true }
-  }
-
-  if (legacyIdRegex.test(id) || digitsRegex.test(id)) {
-    return { id, isCurrent: false }
+  if (uuidRegex.test(id) || legacyIdRegex.test(id) || digitsRegex.test(id)) {
+    return id
   }
 }
 
 export const simplecastResolveEmbed: ResolveEmbed = (url) => {
-  const episode = extractSimplecastEpisode(url)
+  const id = extractSimplecastEpisode(url)
 
-  if (!episode) {
+  if (!id) {
     return
   }
 
   return {
     provider: 'simplecast',
-    id: episode.id,
-    // Minting a legacy id onto the player host names no episode: the redirect assigns a new uuid.
-    // `player.simplecast.com/{anything}` answers 200 with the same app shell, since the id is
-    // resolved by javascript. Only the legacy host validates, answering 404 for an unknown id.
-    src: episode.isCurrent ? `https://player.simplecast.com/${episode.id}` : url,
+    id,
+    src: isHostOf(url, [shareHost]) ? `https://player.simplecast.com/${id}` : url,
     height: playerHeight,
   }
 }

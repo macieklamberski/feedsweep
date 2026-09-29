@@ -13,30 +13,21 @@ const uuid = '7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b'
 describe('extractSimplecastEpisode', () => {
   it('should read the current player uuid', () => {
     const value = `https://player.simplecast.com/${uuid}?dark=false`
-    const expected = {
-      id: uuid,
-      isCurrent: true,
-    }
+    const expected = uuid
 
     expect(extractSimplecastEpisode(value)).toEqual(expected)
   })
 
   it('should read the legacy embed id', () => {
     const value = 'https://embed.simplecast.com/a1b2c3d4?color=fff'
-    const expected = {
-      id: 'a1b2c3d4',
-      isCurrent: false,
-    }
+    const expected = 'a1b2c3d4'
 
     expect(extractSimplecastEpisode(value)).toEqual(expected)
   })
 
   it('should read the legacy numeric form', () => {
     const value = 'https://simplecast.com/e/1234567?style=medium'
-    const expected = {
-      id: '1234567',
-      isCurrent: false,
-    }
+    const expected = '1234567'
 
     expect(extractSimplecastEpisode(value)).toEqual(expected)
   })
@@ -141,13 +132,13 @@ describeForEachParser('simplecastEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, simplecastEmbedResolver)
 
   describe('happy paths', () => {
-    it('should read the player off an iframe carrier', async () => {
+    it('should keep a player iframe as written', async () => {
       const value =
         '<iframe src="https://player.simplecast.com/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b?dark=false"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'simplecast',
         id: '7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b',
-        src: 'https://player.simplecast.com/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b',
+        src: 'https://player.simplecast.com/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b?dark=false',
         height: 200,
       }
 
