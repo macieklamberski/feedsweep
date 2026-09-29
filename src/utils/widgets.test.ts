@@ -1798,7 +1798,7 @@ describe('prepareEmbedMetadata', () => {
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
   })
 
-  it('should clean the src once it resolves', () => {
+  it('should clean the src of a listed provider', () => {
     const value: Partial<EmbedResolverResult> = {
       provider: 'example',
       src: 'https://player.example/embed/abc?start=30&utm_source=feed',
@@ -1809,19 +1809,35 @@ describe('prepareEmbedMetadata', () => {
     }
     const context = {
       ...baseContext,
+      cleanedSrcProviders: ['example'],
       cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
     }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
   })
 
-  it('should keep the src as written when no cleaner is given', () => {
+  it('should keep the src of an unlisted provider as written', () => {
     const value: Partial<EmbedResolverResult> = {
       provider: 'example',
       src: 'https://player.example/embed/abc?start=30&utm_source=feed',
     }
+    const context = {
+      ...baseContext,
+      cleanedSrcProviders: ['other'],
+      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
+    }
 
-    expect(prepareEmbedMetadata(value, baseContext)).toEqual(value)
+    expect(prepareEmbedMetadata(value, context)).toEqual(value)
+  })
+
+  it('should keep the src of a listed provider as written when no cleaner is given', () => {
+    const value: Partial<EmbedResolverResult> = {
+      provider: 'example',
+      src: 'https://player.example/embed/abc?start=30&utm_source=feed',
+    }
+    const context = { ...baseContext, cleanedSrcProviders: ['example'] }
+
+    expect(prepareEmbedMetadata(value, context)).toEqual(value)
   })
 
   it('should keep the resolved url when the cleaner answers with nothing', () => {
