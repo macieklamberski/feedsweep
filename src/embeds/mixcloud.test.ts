@@ -43,11 +43,10 @@ describe('extractMixcloudShow', () => {
   const sitePageUrls: Array<string> = [
     'https://www.mixcloud.com/discover/house/',
     'https://www.mixcloud.com/genres/house/',
+    'https://www.mixcloud.com/Genres/house/',
     'https://www.mixcloud.com/categories/house/',
     'https://www.mixcloud.com/tag/house/',
     'https://www.mixcloud.com/live/photogmusic/',
-    'https://www.mixcloud.com/media/swf/',
-    'https://www.mixcloud.com/search/house/',
     'https://www.mixcloud.com/upload/photogmusic/',
     'https://www.mixcloud.com/photogmusic/uploads/',
     'https://www.mixcloud.com/photogmusic/favorites/',
@@ -69,10 +68,15 @@ describe('extractMixcloudShow', () => {
     expect(extractMixcloudShow(value)).toBeUndefined()
   })
 
-  // The site routes answer in lowercase only, and these two users own the capitalised names.
+  // `MEDIA` and `Search` are real users, answered in any case, so a missing show under either
+  // word reads as a show too.
   const siteWordUserUrls: Array<[string, string]> = [
     ['https://www.mixcloud.com/MEDIA/swcmx-vs-trkto-dembowlrd/', 'MEDIA/swcmx-vs-trkto-dembowlrd'],
+    ['https://www.mixcloud.com/media/swcmx-vs-trkto-dembowlrd/', 'media/swcmx-vs-trkto-dembowlrd'],
     ['https://www.mixcloud.com/Search/millers-mega-mix/', 'Search/millers-mega-mix'],
+    ['https://www.mixcloud.com/search/millers-mega-mix/', 'search/millers-mega-mix'],
+    ['https://www.mixcloud.com/media/swf/', 'media/swf'],
+    ['https://www.mixcloud.com/search/house/', 'search/house'],
   ]
 
   it.each(siteWordUserUrls)('should read the site-word user in %s', (value, expected) => {
