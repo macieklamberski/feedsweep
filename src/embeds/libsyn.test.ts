@@ -86,13 +86,12 @@ describe('extractLibsynEmbed', () => {
 })
 
 describe('libsynResolveEmbed', () => {
-  // The old host answers 500 for some older episodes while play.libsyn.com serves them all.
-  it('should move an old-host player to the current host and carry the height', () => {
+  it('should keep an old-host player as the publisher wrote it and read its height', () => {
     const value = 'https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/theme/custom/'
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/5508311',
-      src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
+      src: 'https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/theme/custom/',
       height: 90,
     }
 
@@ -112,12 +111,12 @@ describe('libsynResolveEmbed', () => {
     expect(libsynResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should leave the height out when the old player does not state one', () => {
+  it('should state no height when the player does not', () => {
     const value = 'https://html5-player.libsyn.com/embed/episode/id/5508311/theme/custom/'
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/5508311',
-      src: 'https://play.libsyn.com/embed/episode/id/5508311/',
+      src: 'https://html5-player.libsyn.com/embed/episode/id/5508311/theme/custom/',
     }
 
     expect(libsynResolveEmbed(value)).toEqual(expected)
@@ -140,7 +139,7 @@ describeForEachParser('libsynEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'libsyn',
         id: 'episode/5508311',
-        src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
+        src: 'https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/',
         height: 90,
       }
 
@@ -257,7 +256,7 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/5508311',
-      src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
+      src: 'https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/',
       height: 90,
     }
 
@@ -271,7 +270,7 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/5508311',
-      src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
+      src: 'https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/',
       height: 90,
     }
 
@@ -292,7 +291,7 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/41382385',
-      src: 'https://play.libsyn.com/embed/episode/id/41382385/',
+      src: 'https://html5-player.libsyn.com/embed/episode/id/41382385/theme/custom/direction/forward/custom-color/87A93A/autonext/no/thumbnail/yes/autoplay/no/preload/no/no_addthis/no/render-playlist/no',
       width: 700,
       height: 90,
       title: 'Behind the Blue: May 21, 2026 - UK and the Artemis Project',

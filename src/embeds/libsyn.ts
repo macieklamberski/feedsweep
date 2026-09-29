@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize } from '../utils/dom.js'
 
@@ -8,10 +8,6 @@ import { digitsRegex, isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const libsynHosts = ['libsyn.com']
-
-// The current player host. The old `html5-player.libsyn.com` answers 500 for some older episodes,
-// and which ones cannot be told from the url, so its players move here.
-const playerHost = 'play.libsyn.com'
 
 // `show` renders an error and `destination` is another id space, so a show carrier falls through.
 const embedKinds = ['episode', 'destination']
@@ -63,17 +59,13 @@ export const libsynResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const height = embed.height ? `height/${embed.height}/` : ''
-
   // No thumbnail and no canonical url: `oembed.libsyn.com` answers `No valid media found` to
   // `?item_id={id}` and an HTML page to `?url={player url}`, and artwork needs an authenticated
   // api call.
   return {
     provider,
     id: `${embed.kind}/${embed.id}`,
-    src: isHostOf(url, [playerHost])
-      ? url
-      : `https://${playerHost}/embed/${embed.kind}/id/${embed.id}/${height}`,
+    src: url,
     height: embed.height,
     title: attr(element, 'title'),
   }
