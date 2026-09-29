@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { rebuildPublicalbumGalleries } from './rebuildPublicalbumGalleries.js'
@@ -92,6 +93,7 @@ describeForEachParser('rebuildPublicalbumGalleries', (parseHtml) => {
           data-title="Spring walk"
         >
           <object></object>
+          <object data=" "></object>
         </div>
       `
 
@@ -182,6 +184,35 @@ describeForEachParser('rebuildPublicalbumGalleries', (parseHtml) => {
 
       expect(await transform(value)).toBe(expected)
     })
+  })
+
+  it('should keep the hidden album photos through the whole pipeline', async () => {
+    const value = html`
+      <div
+        class="pa-gallery-player-widget"
+        style="width:100%; height:480px; display:none;"
+        data-link="https://photos.example.com/share/first-album"
+        data-title="Spring walk"
+      >
+        <object data="https://lh3.example.com/pw/AP1GczFirst=w1920-h1080"></object>
+      </div>
+    `
+    const expected = html`
+      <figure>
+        <a href="https://photos.example.com/share/first-album">
+          <img src="https://lh3.example.com/pw/AP1GczFirst=w1920-h1080">
+        </a>
+        <figcaption>
+          <a href="https://photos.example.com/share/first-album">Spring walk</a>
+        </figcaption>
+      </figure>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 
   it('should be idempotent', async () => {

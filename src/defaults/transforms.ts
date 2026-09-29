@@ -106,6 +106,8 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // has to see it.
   surfaceParkedMarkup,
   stripComments,
+  // Runs before stripHiddenElements, which deletes the album div the plugin hides with inline
+  // `display:none`, and every photo url inside it.
   rebuildPublicalbumGalleries,
   stripHiddenElements,
   // Normalize lazy-loaded video embeds into a plain <iframe> before the media/embed

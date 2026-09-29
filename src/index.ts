@@ -129,6 +129,7 @@ export { rebuildLazyLoadForVideos } from './transforms/dom/rebuildLazyLoadForVid
 export { rebuildLazyYtEmbeds } from './transforms/dom/rebuildLazyYtEmbeds.js'
 export { rebuildLiteVideoEmbeds } from './transforms/dom/rebuildLiteVideoEmbeds.js'
 export { rebuildLyteEmbeds } from './transforms/dom/rebuildLyteEmbeds.js'
+export { rebuildPublicalbumGalleries } from './transforms/dom/rebuildPublicalbumGalleries.js'
 export { rebuildRocketYoutubePreviews } from './transforms/dom/rebuildRocketYoutubePreviews.js'
 export { rebuildVideoJsEmbeds } from './transforms/dom/rebuildVideoJsEmbeds.js'
 export { rebuildWistiaEmbeds } from './transforms/dom/rebuildWistiaEmbeds.js'
