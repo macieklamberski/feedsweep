@@ -368,8 +368,8 @@ describeForEachParser('nprFlashEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host naming the Flash player in its path', async () => {
-      const value = '<embed src="https://evil.test/npr.org/v2/?i=1&m=2&t=audio" />'
+    it('should ignore a foreign host carrying the Flash player path', async () => {
+      const value = '<embed src="https://evil.test/v2/?i=340005056&m=340005057&t=audio" />'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -448,8 +448,8 @@ describeForEachParser('nprIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host naming the player in its path', async () => {
-      const value = '<iframe src="https://evil.test/npr.org/player/embed/1/2"></iframe>'
+    it('should ignore a foreign host carrying the player path', async () => {
+      const value = '<iframe src="https://evil.test/player/embed/550179668/551339989"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

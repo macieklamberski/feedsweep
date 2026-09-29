@@ -223,6 +223,17 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a two-character language that carries a url separator', async () => {
+      const value = html`
+        <script
+          src="https://static.fc2.com/video/js/outerplayer.min.js"
+          url="https://video.fc2.com/j&/content/20190922FrnqLhsk/"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a content id outside its alphabet', async () => {
       const value = html`
         <script
@@ -258,12 +269,12 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // The selector carries the host as a substring, so a foreign host holding it in the path
+    // The selector carries the host as a substring, so a foreign host holding it in the query
     // still matches and only the host check in extract can turn it away.
     it('should ignore a loader served from another host', async () => {
       const value = html`
         <script
-          src="https://evil.test/static.fc2.com/video/js/outerplayer.min.js"
+          src="https://evil.test/video/js/outerplayer.min.js?static.fc2.com/video/js/outerplayer"
           url="https://video.fc2.com/content/20190922FrnqLhsk/"
         ></script>
       `
@@ -286,6 +297,45 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
         id: '20210528p7G2xWt4',
         src: 'https://video.fc2.com/embed/player/20210528p7G2xWt4/',
         url: 'https://video.fc2.com/ja/content/20210528p7G2xWt4/',
+        width: 512,
+        height: 288,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should take no language from a url whose content id is refused beside a data-id', async () => {
+      const value = html`
+        <script
+          src="https://static.fc2.com/video/js/outerplayer.min.js"
+          url="https://video.fc2.com/ja/content/2019.09.22/"
+          data-id="20210528p7G2xWt4"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '20210528p7G2xWt4',
+        src: 'https://video.fc2.com/embed/player/20210528p7G2xWt4/',
+        url: 'https://video.fc2.com/content/20210528p7G2xWt4/',
+        width: 512,
+        height: 288,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a language in uppercase', async () => {
+      const value = html`
+        <script
+          src="https://static.fc2.com/video/js/outerplayer.min.js"
+          url="https://video.fc2.com/JA/content/20190922FrnqLhsk/"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '20190922FrnqLhsk',
+        src: 'https://video.fc2.com/embed/player/20190922FrnqLhsk/',
+        url: 'https://video.fc2.com/JA/content/20190922FrnqLhsk/',
         width: 512,
         height: 288,
       }
@@ -352,6 +402,26 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
         url: 'https://video.fc2.com/content/20190922FrnqLhsk/',
         width: 448,
         height: 252,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should round a derived height down as the loader does', async () => {
+      const value = html`
+        <script
+          src="https://static.fc2.com/video/js/outerplayer.min.js"
+          url="https://video.fc2.com/content/20210528p7G2xWt4/"
+          w="446"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '20210528p7G2xWt4',
+        src: 'https://video.fc2.com/embed/player/20210528p7G2xWt4/',
+        url: 'https://video.fc2.com/content/20210528p7G2xWt4/',
+        width: 446,
+        height: 250,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -440,7 +510,7 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a shim served from another host', async () => {
       const value = html`
-        <script src="https://evil.test/admin.blog.fc2.com/fc2video2.php?id=20230116F3WJd7kn"></script>
+        <script src="https://evil.test/fc2video2.php?admin.blog.fc2.com/fc2video2.php&id=20230116F3WJd7kn"></script>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -779,6 +849,30 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
 
     it('should leave out a language carrying a url separator', async () => {
       const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=ja%2F.." />'
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '20120101QN5FVkv4',
+        src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
+        url: 'https://video.fc2.com/content/20120101QN5FVkv4/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave out a language longer than two letters', async () => {
+      const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=jpn" />'
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '20120101QN5FVkv4',
+        src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
+        url: 'https://video.fc2.com/content/20120101QN5FVkv4/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave out a two-character language carrying a url separator', async () => {
+      const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=j%2F" />'
       const expected: EmbedResolverResult = {
         provider: 'fc2',
         id: '20120101QN5FVkv4',
