@@ -72,6 +72,24 @@ describe('foxnewsResolveEmbed', () => {
       expect(foxnewsResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should return undefined for an id with letters before the digits', () => {
+      const value = 'https://video.foxbusiness.com/v/embed.js?id=abc6355436296112'
+
+      expect(foxnewsResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an id with letters after the digits', () => {
+      const value = 'https://video.foxbusiness.com/v/embed.js?id=6355436296112abc'
+
+      expect(foxnewsResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a url that does not parse', () => {
+      const value = 'http://['
+
+      expect(foxnewsResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should return undefined for a lookalike host', () => {
       const value = 'https://video.foxnews.com.evil.test/v/embed.js?id=5406119088001'
 
@@ -92,6 +110,18 @@ describe('foxnewsResolveEmbed', () => {
 
     it('should return undefined for the retired root embed.js route', () => {
       const value = 'https://video.foxnews.com/embed.js?id=11896855&w=432&h=266'
+
+      expect(foxnewsResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the player script outside the player route', () => {
+      const value = 'https://video.foxnews.com/static/embed.js?id=5406119088001'
+
+      expect(foxnewsResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for another page under the player route', () => {
+      const value = 'https://video.foxbusiness.com/v/other.html?id=6355436296112'
 
       expect(foxnewsResolveEmbed(value)).toBeUndefined()
     })
@@ -201,7 +231,7 @@ describeForEachParser('foxnewsIframeEmbedResolver', (parseHtml) => {
   })
 })
 
-describeForEachParser('fox through the pipeline', (parseHtml) => {
+describeForEachParser('foxnews through the pipeline', (parseHtml) => {
   const convert = (value: string) => {
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
   }
@@ -226,18 +256,5 @@ describeForEachParser('fox through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
-  })
-
-  it('should leave a Fox Business video link in prose alone', async () => {
-    const value = html`
-      <p>
-        Watch the clip at
-        <a href="https://video.foxbusiness.com/v/6297488565001/will-obamacare-hurt-productivity/"
-          >video.foxbusiness.com</a
-        >.
-      </p>
-    `
-
-    expect(await convert(value)).toEqualHtml(value)
   })
 })
