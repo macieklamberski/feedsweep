@@ -1,7 +1,7 @@
 import type { DomTransform, EmbedResolver, MediaResolver } from '../../types.js'
 import { attr, hasText } from '../../utils/dom.js'
 import { isUrlShaped } from '../../utils/urls.js'
-import { isEmbedOrMediaResolver } from '../../utils/widgets.js'
+import { createIframe, isEmbedOrMediaResolver } from '../../utils/widgets.js'
 
 const facadeSelector = 'a[data-iframely-url][href]'
 const wrapperSelector = '.iframely-embed'
@@ -34,9 +34,7 @@ export const rebuildIframelyEmbeds: DomTransform = (context) => {
       }
 
       const target = anchor.closest(wrapperSelector) ?? anchor
-      const probe = document.createElement('iframe')
-
-      probe.setAttribute('src', href)
+      const probe = createIframe(document, href)
 
       if (await isClaimed(probe, resolvers)) {
         target.replaceWith(probe)
