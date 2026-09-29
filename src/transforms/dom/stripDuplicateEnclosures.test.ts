@@ -296,6 +296,50 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should remove a marked video matching the source of a content video', async () => {
+      const value = html`
+        <video
+          controls
+          src="https://example.com/clip.mp4"
+          data-enclosure=""
+        ></video>
+        <video controls>
+          <source src="https://example.com/clip.mp4" type="video/mp4">
+        </video>
+      `
+      const expected = html`
+        <video controls>
+          <source src="https://example.com/clip.mp4" type="video/mp4">
+        </video>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove a marked video matching a content video', async () => {
+      const value = html`
+        <video
+          controls
+          src="https://example.com/clip.mp4"
+          data-enclosure=""
+        ></video>
+        <video controls src="https://example.com/clip.mp4"></video>
+      `
+      const expected = '<video controls src="https://example.com/clip.mp4"></video>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove a marked embed placeholder matching a content iframe', async () => {
+      const value = html`
+        <div data-embed-src="https://www.youtube.com/embed/abc" data-enclosure=""></div>
+        <iframe src="https://www.youtube.com/embed/abc"></iframe>
+      `
+      const expected = '<iframe src="https://www.youtube.com/embed/abc"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   it('should remove an empty wrapping figure left behind', async () => {

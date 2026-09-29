@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import { baseContext } from '../../tests.js'
+import { transformContent } from '../../index.js'
+import { baseContext, describeForEachParser } from '../../tests.js'
 import { unwrapCdataMarkers } from './unwrapCdataMarkers.js'
 
 describe('unwrapCdataMarkers', () => {
@@ -23,6 +24,12 @@ describe('unwrapCdataMarkers', () => {
 
   it('should leave a mid-content marker alone', () => {
     const value = 'Here is an example: <![CDATA[raw text]]> in XML.'
+
+    expect(transform(value)).toBe(value)
+  })
+
+  it('should leave a marker that ends the value but does not start it', () => {
+    const value = 'Here is an example: <![CDATA[raw text]]>'
 
     expect(transform(value)).toBe(value)
   })
@@ -61,5 +68,18 @@ describe('unwrapCdataMarkers', () => {
 
   it('should be idempotent on already-unwrapped content', async () => {
     expect(await transform(await transform('<![CDATA[<p>body</p>]]>'))).toBe('<p>body</p>')
+  })
+})
+
+describeForEachParser('unwrapCdataMarkers before parsing', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should keep the content of a whole-value CDATA block', async () => {
+    const value = '<![CDATA[<p>Hello</p>]]>'
+    const expected = '<p>Hello</p>'
+
+    expect(await convert(value)).toBe(expected)
   })
 })

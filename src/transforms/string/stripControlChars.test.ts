@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import { baseContext } from '../../tests.js'
+import { transformContent } from '../../index.js'
+import { baseContext, describeForEachParser } from '../../tests.js'
 import { stripControlChars } from './stripControlChars.js'
 
 describe('stripControlChars', () => {
@@ -105,13 +106,26 @@ describe('stripControlChars', () => {
     expect(transform(value)).toBe(value)
   })
 
+  it('should handle empty input', () => {
+    expect(transform('')).toBe('')
+  })
+
   it('should be idempotent', async () => {
     const value = '<p>before\x00\x07after</p>'
 
     expect(await transform(await transform(value))).toBe(await transform(value))
   })
+})
 
-  it('should handle empty input', () => {
-    expect(transform('')).toBe('')
+describeForEachParser('stripControlChars before parsing', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should strip a control character the parser keeps in the text', async () => {
+    const value = '<p>before\x07after</p>'
+    const expected = '<p>beforeafter</p>'
+
+    expect(await convert(value)).toBe(expected)
   })
 })

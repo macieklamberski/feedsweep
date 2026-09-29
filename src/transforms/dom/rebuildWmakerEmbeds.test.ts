@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { rebuildWmakerEmbeds } from './rebuildWmakerEmbeds.js'
@@ -121,5 +122,33 @@ describeForEachParser('rebuildWmakerEmbeds', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('dead WMaker players the pipeline repairs into an embed', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: permalink })
+  }
+
+  it('should turn the repaired player into an embed placeholder', async () => {
+    const value = html`
+      <object
+        type="application/x-shockwave-flash"
+        data="https://www.hospitalia.fr/v/633ed090acc56dbee0aea06de3d69c00e8757bba"
+        width="608"
+        height="372"
+      >
+        <param name="movie" value="https://www.hospitalia.fr/v/633ed090acc56dbee0aea06de3d69c00e8757bba">
+      </object>
+    `
+    const expected = html`
+      <div
+        data-embed-height="372"
+        data-embed-width="608"
+        data-embed-src="https://www.hospitalia.fr/embed/4183/"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

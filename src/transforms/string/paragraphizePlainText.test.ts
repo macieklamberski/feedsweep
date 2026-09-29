@@ -38,6 +38,12 @@ describe('paragraphizePlainText', () => {
     expect(paragraphize(value)).toBe(value)
   })
 
+  it('should not modify content whose tag name holds a digit', () => {
+    const value = 'Show notes\n\n<h2>Links</h2>'
+
+    expect(paragraphize(value)).toBe(value)
+  })
+
   it('should not modify content with self-closing HTML', () => {
     const value = '<img src="photo.jpg">'
 
@@ -79,6 +85,20 @@ describe('paragraphizePlainText', () => {
 
     it('should not autop a hyphenated custom element', () => {
       const value = '<amp-img src="photo.jpg" width="600" height="400"></amp-img>'
+
+      expect(paragraphize(value)).toBe(value)
+    })
+
+    // Beside text, so the escaped-fragment check cannot pass it through instead.
+    it('should not autop a hyphenated custom element beside text', () => {
+      const value =
+        'Photo of the week: <amp-img src="photo.jpg" width="600" height="400"></amp-img>'
+
+      expect(paragraphize(value)).toBe(value)
+    })
+
+    it('should not autop a hyphenated custom element whose name part starts with a digit', () => {
+      const value = 'Model: <amp-3d-gltf src="model.glb" width="600" height="400"></amp-3d-gltf>'
 
       expect(paragraphize(value)).toBe(value)
     })
@@ -186,6 +206,20 @@ describe('paragraphizePlainText', () => {
     it('should consume whitespace before a line break', () => {
       const value = 'Line one \nLine two'
       const expected = '<p>Line one<br />\nLine two</p>\n'
+
+      expect(paragraphize(value)).toBe(expected)
+    })
+
+    it('should consume a tab before a line break', () => {
+      const value = 'Line one\t\nLine two'
+      const expected = '<p>Line one<br />\nLine two</p>\n'
+
+      expect(paragraphize(value)).toBe(expected)
+    })
+
+    it('should keep punctuation before a line break', () => {
+      const value = 'Why?\nBecause'
+      const expected = '<p>Why?<br />\nBecause</p>\n'
 
       expect(paragraphize(value)).toBe(expected)
     })
