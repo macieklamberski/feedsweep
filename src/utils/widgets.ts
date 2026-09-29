@@ -234,6 +234,21 @@ export const isEmbedOrMediaResolver = (
   return playerResolverKinds.includes(resolver.kind)
 }
 
+// True when one of the resolvers claims the iframe, the same test convertWidgets makes, so only
+// an iframe that would become a placeholder or a recovered media element passes.
+export const isResolvedIframe = async (
+  iframe: Element,
+  resolvers: ReadonlyArray<WidgetResolver>,
+): Promise<boolean> => {
+  for (const resolver of resolvers) {
+    if (iframe.matches(resolver.selector) && (await resolver.extract(iframe))) {
+      return true
+    }
+  }
+
+  return false
+}
+
 export const isMediaResult = (result: WidgetResolverResult): result is MediaResolverResult => {
   return 'tag' in result
 }
