@@ -12,11 +12,13 @@ export const flashMp3PlayerMediaResolver: MediaResolver = {
   selector:
     'embed[src*="flash-mp3-player.net/medias/"], object[data*="flash-mp3-player.net/medias/"]',
   extract: (element) => {
-    if (!parseUrlOnHosts(readCarrierUrl(element), flashMp3PlayerHosts)) {
+    const parsed = parseUrlOnHosts(readCarrierUrl(element), flashMp3PlayerHosts)
+
+    if (!parsed) {
       return
     }
 
-    const source = flashVar(element, 'mp3')
+    const source = flashVar(element, 'mp3') ?? parsed.searchParams.get('mp3')
 
     if (!source) {
       return
