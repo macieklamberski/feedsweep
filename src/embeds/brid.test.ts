@@ -145,6 +145,20 @@ describeForEachParser('bridEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore a config that names no player', async () => {
+      const value = html`
+        <div
+          id="Brid_19464537"
+          class="brid"
+        ></div>
+        <script type="text/javascript">
+          $bp("Brid_19464537", {"width":"540","height":"300","video":"755958"});
+        </script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 
   describe('the size the div states when the config does not', () => {

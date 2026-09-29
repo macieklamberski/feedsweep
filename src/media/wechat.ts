@@ -1,7 +1,6 @@
 import type { MediaResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
-
-const mediaIdRegex = /^[A-Za-z0-9_-]+$/
+import { urlSafeTokenRegex } from '../utils/urls.js'
 
 // res.wx.qq.com serves the file for the id with no key, no Referer and no user agent.
 const composeSourceUrl = (mediaId: string): string => {
@@ -16,7 +15,7 @@ export const wechatMediaResolver: MediaResolver = {
     // The element's src is a WeChat template page, not the audio.
     const mediaId = attr(element, 'voice_encode_fileid')
 
-    if (!mediaId || !mediaIdRegex.test(mediaId)) {
+    if (!mediaId || !urlSafeTokenRegex.test(mediaId)) {
       return
     }
 

@@ -115,6 +115,28 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined for a config id behind a path step', async () => {
+      const value = html`
+        <div
+          class="issuuembed"
+          data-configid="../1016421/47623369"
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a config id followed by a path step', async () => {
+      const value = html`
+        <div
+          class="issuuembed"
+          data-configid="1016421/47623369/.."
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined for an empty config id', async () => {
       const value = html`
         <div
@@ -128,7 +150,7 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
 
     it('should return undefined for a data-url on another host', async () => {
       const value = html`
-        <div class="issuuembed" data-url="https://evil.test/issuu.com/user/docs/document"></div>
+        <div class="issuuembed" data-url="https://evil.test/ecosistemaurbano/docs/paisaje_transversal"></div>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -240,11 +262,39 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should claim a publisher name carrying a dot', async () => {
+      const value = html`
+        <iframe src="https://e.issuu.com/embed.html?u=swissgolf.ch&d=swiss_golf_02-26_de"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'swissgolf.ch/swiss_golf_02-26_de',
+        src: 'https://e.issuu.com/embed.html?u=swissgolf.ch&d=swiss_golf_02-26_de',
+        url: 'https://issuu.com/swissgolf.ch/docs/swiss_golf_02-26_de',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
     it('should return undefined for an issuu url naming no document', async () => {
       const value = '<iframe src="https://e.issuu.com/embed.html"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a query missing the document', async () => {
+      const value = '<iframe src="https://e.issuu.com/embed.html?u=ecosistemaurbano"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a publisher name that is a dot segment', async () => {
+      const value = html`
+        <iframe src="https://e.issuu.com/embed.html?u=..&d=paisaje_transversal"></iframe>
+      `
 
       expect(await extract(value)).toBeUndefined()
     })

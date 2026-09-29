@@ -37,7 +37,13 @@ describe('audiomackResolveEmbed', () => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/audiomack.com/embed/larrynorman/song/burn-2'
+      const value = 'https://evil.test/embed/larrynorman/song/burn-2'
+
+      expect(audiomackResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a route word that is not the player', () => {
+      const value = 'https://audiomack.com/widget/larrynorman/song/burn-2'
 
       expect(audiomackResolveEmbed(value)).toBeUndefined()
     })
@@ -85,6 +91,12 @@ describe('audiomackResolveEmbed', () => {
 
       expect(audiomackResolveEmbed(value)).toBeUndefined()
     })
+
+    it('should refuse an artist that is not one', () => {
+      const value = 'https://audiomack.com/embed/larry%2Fnorman/song/burn-2'
+
+      expect(audiomackResolveEmbed(value)).toBeUndefined()
+    })
   })
 
   describe('Variant #1: the two orders the current player accepts', () => {
@@ -102,12 +114,26 @@ describe('audiomackResolveEmbed', () => {
       expect(audiomackResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the parameters the current player takes', () => {
-      const value = 'https://audiomack.com/embed/song/mlgmusiz/new-year-new-glory?background=1'
+    it('should keep the private-link key in the player and link no page beside it', () => {
+      const value = 'https://audiomack.com/embed/song/mlgmusiz/new-year-new-glory?key=a1b2c3'
       const expected: EmbedResolverResult = {
         provider: 'audiomack',
         id: 'mlgmusiz/song/new-year-new-glory',
-        src: 'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory?background=1',
+        src: 'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory?key=a1b2c3',
+        height: 252,
+        author: 'mlgmusiz',
+      }
+
+      expect(audiomackResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the parameters the current player ignores', () => {
+      const value =
+        'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory?background=1&autoplay=1&utm_source=fb&fbclid=abc'
+      const expected: EmbedResolverResult = {
+        provider: 'audiomack',
+        id: 'mlgmusiz/song/new-year-new-glory',
+        src: 'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory',
         url: 'https://audiomack.com/mlgmusiz/song/new-year-new-glory',
         height: 252,
         author: 'mlgmusiz',
@@ -231,7 +257,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audiomack',
         id: 'larrynorman/song/burn-2',
-        src: 'https://audiomack.com/embed/larrynorman/song/burn-2?background=1',
+        src: 'https://audiomack.com/embed/larrynorman/song/burn-2',
         url: 'https://audiomack.com/larrynorman/song/burn-2',
         height: 252,
         author: 'larrynorman',
@@ -279,8 +305,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/audiomack.com/embed/larrynorman/song/burn-2"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/larrynorman/song/burn-2"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

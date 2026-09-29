@@ -49,6 +49,12 @@ describe('slideshareResolveEmbed', () => {
     expect(slideshareResolveEmbed(value)).toBeUndefined()
   })
 
+  it('should ignore a numeric path that names no embed route', () => {
+    const value = 'https://www.slideshare.net/6435157'
+
+    expect(slideshareResolveEmbed(value)).toBeUndefined()
+  })
+
   it('should ignore an embed path that stops before the deck', () => {
     const value = 'https://www.slideshare.net/slideshow/embed_code/'
 
@@ -63,6 +69,12 @@ describe('slideshareResolveEmbed', () => {
 
   it('should ignore a key outside the url-safe alphabet', () => {
     const value = 'https://www.slideshare.net/slideshow/embed_code/key/6PCW.PGFw9SwsAY'
+
+    expect(slideshareResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should ignore a key carrying an encoded slash', () => {
+    const value = 'https://www.slideshare.net/slideshow/embed_code/key/6PCW%2FPGFw9SwsAY'
 
     expect(slideshareResolveEmbed(value)).toBeUndefined()
   })
@@ -179,6 +191,118 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
         url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // The div lost its `__ss_` id, so the object is the wrapper and the title link sits outside it.
+    it('should compose the deck page for an owner spelled with capitals', async () => {
+      const value = html`
+        <div style="width:425px">
+          <strong>
+            <a
+              href="http://www.slideshare.net/Neusvn/diari-tea-concepcion-arenal"
+              title="Diari tea concepcion arenal"
+              >Diari tea concepcion arenal</a
+            >
+          </strong>
+          <object id="__sse13408892" width="425" height="355">
+            <param
+              name="movie"
+              value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=diariteaconcepcionarenal-120621115048-phpapp02&amp;stripped_title=diari-tea-concepcion-arenal&amp;userName=Neusvn"
+            />
+            <embed
+              name="__sse13408892"
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=diariteaconcepcionarenal-120621115048-phpapp02&amp;stripped_title=diari-tea-concepcion-arenal&amp;userName=Neusvn"
+              type="application/x-shockwave-flash"
+              width="425"
+              height="355"
+            ></embed>
+          </object>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '13408892',
+        src: 'https://www.slideshare.net/slideshow/embed_code/13408892',
+        url: 'https://www.slideshare.net/Neusvn/diari-tea-concepcion-arenal',
+        width: 425,
+        height: 355,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should compose the deck page for an owner carrying an underscore', async () => {
+      const value = html`
+        <div style="width:425px">
+          <strong>
+            <a
+              href="http://www.slideshare.net/IC_Agency/online-advertising-strategy-for-a-luxury-watch-brand"
+              title="Online Advertising Strategy for a Luxury Watch Brand"
+              >Online Advertising Strategy for a Luxury Watch Brand</a
+            >
+          </strong>
+          <object id="__sse6141159" width="425" height="355">
+            <param
+              name="movie"
+              value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=casestudyaponlineadvertisingv7-101213051013-phpapp02&amp;stripped_title=online-advertising-strategy-for-a-luxury-watch-brand&amp;userName=IC_Agency"
+            />
+            <embed
+              name="__sse6141159"
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=casestudyaponlineadvertisingv7-101213051013-phpapp02&amp;stripped_title=online-advertising-strategy-for-a-luxury-watch-brand&amp;userName=IC_Agency"
+              type="application/x-shockwave-flash"
+              width="425"
+              height="355"
+            ></embed>
+          </object>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '6141159',
+        src: 'https://www.slideshare.net/slideshow/embed_code/6141159',
+        url: 'https://www.slideshare.net/IC_Agency/online-advertising-strategy-for-a-luxury-watch-brand',
+        width: 425,
+        height: 355,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should compose the deck page for an owner carrying a dot', async () => {
+      const value = html`
+        <div style="width:425px">
+          <strong>
+            <a
+              href="http://www.slideshare.net/asierra.re/internet-patrimoni-i-arqueologia"
+              title="Internet, patrimoni i arqueologia"
+              >Internet, patrimoni i arqueologia</a
+            >
+          </strong>
+          <object id="__sse5543828" width="425" height="355">
+            <param
+              name="movie"
+              value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=presentaciopatrimoniarqueologiauboctubre2010share-101024093406-phpapp02&amp;stripped_title=internet-patrimoni-i-arqueologia&amp;userName=asierra.re"
+            />
+            <embed
+              name="__sse5543828"
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=presentaciopatrimoniarqueologiauboctubre2010share-101024093406-phpapp02&amp;stripped_title=internet-patrimoni-i-arqueologia&amp;userName=asierra.re"
+              type="application/x-shockwave-flash"
+              width="425"
+              height="355"
+            ></embed>
+          </object>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '5543828',
+        src: 'https://www.slideshare.net/slideshow/embed_code/5543828',
+        url: 'https://www.slideshare.net/asierra.re/internet-patrimoni-i-arqueologia',
+        width: 425,
+        height: 355,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -426,6 +550,45 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
           src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=110103quotes"
           type="application/x-shockwave-flash"
         ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a wrapper id that only ends in the deck spelling', async () => {
+      const value = html`
+        <div id="post__ss_6435157">
+          <embed
+            src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=110103quotes"
+            type="application/x-shockwave-flash"
+          ></embed>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a wrapper id that runs on past the deck', async () => {
+      const value = html`
+        <div id="__ss_6435157_caption">
+          <embed
+            src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=110103quotes"
+            type="application/x-shockwave-flash"
+          ></embed>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a path that runs on past the player', async () => {
+      const value = html`
+        <div id="__ss_6435157">
+          <embed
+            src="http://static.slidesharecdn.com/swf/ssplayer2.swf/page?doc=110103quotes"
+            type="application/x-shockwave-flash"
+          ></embed>
+        </div>
       `
 
       expect(await extract(value)).toBeUndefined()

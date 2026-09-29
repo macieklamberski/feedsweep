@@ -131,7 +131,7 @@ describeForEachParser('linkifyUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  const unlinkableTags: Array<string> = ['pre', 'code', 'kbd', 'samp', 'var', 'script']
+  const unlinkableTags: Array<string> = ['pre', 'code', 'kbd', 'samp', 'var', 'script', 'noscript']
 
   it.each(unlinkableTags)('should not link URL inside %s tag', async (tag) => {
     const value = `<${tag}>https://example.com</${tag}>`

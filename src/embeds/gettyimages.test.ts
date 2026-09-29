@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import { describeForEachParser, resolverExtractor } from '../tests.js'
+import { transformContent } from '../index.js'
+import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { composeWidgetEmbedUrl, gettyImagesEmbedResolver, readWidgetConfig } from './gettyimages.js'
 
@@ -56,6 +57,12 @@ describe('readWidgetConfig', () => {
   describe('sad paths', () => {
     it('should refuse a config with no signature, which the player rejects with a 400', () => {
       const value = `gie.widgets.load({id:'abc',w:'594px',h:'395px',items:'491183014'})`
+
+      expect(readWidgetConfig(value)).toBeUndefined()
+    })
+
+    it('should refuse a config with no embed token, which the player rejects with a 400', () => {
+      const value = `gie.widgets.load({sig:'def=',w:'594px',h:'395px',items:'491183014'})`
 
       expect(readWidgetConfig(value)).toBeUndefined()
     })
@@ -127,10 +134,52 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/embed.gettyimages.com/embed/491183014?sig=x"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/491183014?sig=x"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore the player route below a leading segment', async () => {
+      const value = '<iframe src="https://embed.gettyimages.com/x/embed/491183014?sig=x"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player route followed by a trailing segment', async () => {
+      const value =
+        '<iframe src="https://embed.gettyimages.com/embed/491183014/extra?sig=x"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+// Only the pipeline shows what the host's enclosures become, since injectEnclosures offers each
+// one to every url-keyed resolver.
+describeForEachParser('gettyimages enclosures', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a photo file on the media host an image', async () => {
+    const enclosures = [
+      {
+        url: 'https://media.gettyimages.com/id/2207912631/photo/person-playing-slot-machines-in-a-vibrant-casino-environment.jpg?s=612x612&w=0&k=20&c=VfjZJAwq_UnkAmMXEyOyUs-HpLnX1d6OlN2khiRTTn4=',
+        type: 'image/jpeg',
+      },
+    ]
+    const expected = html`
+      <img
+        src="https://media.gettyimages.com/id/2207912631/photo/person-playing-slot-machines-in-a-vibrant-casino-environment.jpg?s=612x612&amp;w=0&amp;k=20&amp;c=VfjZJAwq_UnkAmMXEyOyUs-HpLnX1d6OlN2khiRTTn4="
+        data-enclosure=""
+      />
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })

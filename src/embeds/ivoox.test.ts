@@ -156,6 +156,24 @@ describe('extractIvooxSubject', () => {
     expect(extractIvooxSubject(value)).toBeUndefined()
   })
 
+  it('should ignore a current player path followed by another segment', () => {
+    const value = 'https://www.ivoox.com/player_ej_80807760_6_1.html/extra'
+
+    expect(extractIvooxSubject(value)).toBeUndefined()
+  })
+
+  it('should ignore a legacy player path followed by another segment', () => {
+    const value = 'http://www.ivoox.com/playerivoox_ee_8292430_1.html/extra'
+
+    expect(extractIvooxSubject(value)).toBeUndefined()
+  })
+
+  it('should ignore a show player path followed by another segment', () => {
+    const value = 'https://www.ivoox.com/player_es_podcast_1267769_1.html/extra'
+
+    expect(extractIvooxSubject(value)).toBeUndefined()
+  })
+
   it('should return undefined for an ivoox url that is not a player', () => {
     const value = 'https://www.ivoox.com/podcast-something_sq_f1_1.html'
 

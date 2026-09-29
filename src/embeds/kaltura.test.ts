@@ -117,7 +117,35 @@ describe('kalturaResolveEmbed', () => {
 
     it('should ignore a foreign host carrying the same path', () => {
       const value =
-        'https://evil.test/cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/1?iframeembed=true&entry_id=1_w0bwzism'
+        'https://evil.test/p/520801/embedPlaykitJs/uiconf_id/1?iframeembed=true&entry_id=1_w0bwzism'
+
+      expect(kalturaResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a partner path behind another segment', () => {
+      const value =
+        'https://cdnapisec.kaltura.com/x/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bwzism'
+
+      expect(kalturaResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore an entry id behind a path step', () => {
+      const value =
+        'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=../1_w0bwzism'
+
+      expect(kalturaResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore an entry id followed by a path step', () => {
+      const value =
+        'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bwzism/..'
+
+      expect(kalturaResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore an entry id carrying an encoded slash', () => {
+      const value =
+        'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bw%2Fzism'
 
       expect(kalturaResolveEmbed(value)).toBeUndefined()
     })
@@ -209,7 +237,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
-        '<iframe src="https://evil.test/cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/1?iframeembed=true&entry_id=1_w0bwzism"></iframe>'
+        '<iframe src="https://evil.test/p/520801/embedPlaykitJs/uiconf_id/1?iframeembed=true&entry_id=1_w0bwzism"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -280,7 +308,7 @@ describeForEachParser('kalturaScriptEmbedResolver', (parseHtml) => {
 
     it('should ignore a script on a foreign host carrying the same path', async () => {
       const value =
-        '<script src="https://evil.test/cdnapisec.kaltura.com/p/1758271/embedIframeJs/uiconf_id/1?autoembed=true&entry_id=1_jhjo10ru"></script>'
+        '<script src="https://evil.test/p/1758271/embedIframeJs/uiconf_id/1?autoembed=true&entry_id=1_jhjo10ru&kaltura.com/p/"></script>'
 
       expect(await extract(value)).toBeUndefined()
     })

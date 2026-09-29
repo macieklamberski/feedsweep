@@ -19,9 +19,54 @@ describe('extractOmnyClip', () => {
     expect(extractOmnyClip(value)).toBe(expected)
   })
 
+  it('should read a clip whose slug carries digits', () => {
+    const value =
+      'https://omny.fm/shows/today-fm/could-2023-see-the-end-of-the-russia-ukraine-war/embed'
+    const expected = 'today-fm/could-2023-see-the-end-of-the-russia-ukraine-war'
+
+    expect(extractOmnyClip(value)).toBe(expected)
+  })
+
+  // Omny's own slugs are lowercase, and the player serves the same clip under a capitalised one.
+  it('should read a clip whose slug carries capitals', () => {
+    const value = 'https://omny.fm/shows/101-3-kdwb-clips/6AM-Hour-Holiday-Awkward/embed'
+    const expected = '101-3-kdwb-clips/6AM-Hour-Holiday-Awkward'
+
+    expect(extractOmnyClip(value)).toBe(expected)
+  })
+
   it('should return undefined for a show page that is not an embed', () => {
     const value = 'https://omny.fm/shows/the-show'
 
+    expect(extractOmnyClip(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a playlist page that is not an embed', () => {
+    const value = 'https://omny.fm/shows/the-show/playlists/highlights'
+
+    expect(extractOmnyClip(value)).toBeUndefined()
+  })
+
+  it('should return undefined for the clip path under another segment', () => {
+    const value = 'https://omny.fm/x/shows/the-show/an-episode/embed'
+
+    expect(extractOmnyClip(value)).toBeUndefined()
+  })
+
+  // The segments are composed into the minted src as written.
+  it('should return undefined for a segment carrying an encoded slash', () => {
+    const value = 'https://omny.fm/shows/the-show/an%2Fepisode/embed'
+
+    expect(extractOmnyClip(value)).toBeUndefined()
+  })
+
+  // The player answers 404 for both where the hyphenated slug answers 200.
+  const refusedSlugUrls: Array<string> = [
+    'https://omny.fm/shows/101-3-kdwb-clips/6AM.Hour-Holiday-Awkward/embed',
+    'https://omny.fm/shows/101-3-kdwb-clips/6AM_Hour-Holiday-Awkward/embed',
+  ]
+
+  it.each(refusedSlugUrls)('should return undefined for the slug in %s', (value) => {
     expect(extractOmnyClip(value)).toBeUndefined()
   })
 

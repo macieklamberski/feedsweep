@@ -4,9 +4,10 @@ import { attr } from '../utils/dom.js'
 import {
   composeQuery,
   parseUrlOnHosts,
-  pickUrlParams,
+  pickQueryParams,
   placeholderBaseUrl,
   splitStrayParams,
+  urlSafeTokenRegex,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -35,9 +36,6 @@ const pathWords = new Set([
   'v', // The Flash player path, shipped in pre-2010 object/embed markup
   'e', // A short-lived embed alias from the same era
   'w', // A watch alias of the same era; still serves the video today
-  'watch_popup',
-  'apiplayer', // The Flash-era chromeless players. Both endpoints are dead, and both
-  'get_video_info', // name the video in the query rather than the path
 ])
 
 const queryIdParams = ['v', 'vi', 'video_id']
@@ -45,7 +43,7 @@ const queryIdParams = ['v', 'vi', 'video_id']
 // The 2010 AJAX site and the profile grids of the same era kept the video id in the fragment
 // (`/watch#!v={id}`, `/user/{name}#p/u/1/{id}`), so the server-side path names no video. The
 // links survive in old posts, and the hash still says which video was meant.
-const hashbangIdRegex = /^#!(?:.*?[&;])?vi?=([^&;]+)/
+const hashbangIdRegex = /^#!vi?=([^&;]+)/
 const gridFragmentIdRegex = /^#p\/.+\/([0-9A-Za-z_-]{11})$/
 
 // `youtube.googleapis.com/v/{id}` is the Flash player's other host, still shipped by Blogger
@@ -113,15 +111,6 @@ export const extractVideoId = (link: string): string | undefined => {
     .find((candidate) => !!candidate && isVideoId(candidate))
 }
 
-// The player url for a caller holding a url nothing has checked: a page builder stores whatever
-// the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
-export const readYoutubeEmbedSrc = (link: string): string | undefined => {
-  const url = parseUrlOnHosts(link, youtubeHosts)
-  const videoId = url && extractVideoId(url.href)
-
-  return videoId ? composeEmbedUrl(videoId) : undefined
-}
-
 // A clip embed needs both `clip` and `clipt`, and `loop` does nothing without `playlist`, which in
 // the wild is almost always the video's own id: YouTube's documented way to loop a single video.
 export const youtubeEmbedParams = [
@@ -135,9 +124,68 @@ export const youtubeEmbedParams = [
   'loop',
 ]
 
-// Playlist (`list`), channel (`channel`) and legacy username ids. A charset guard, not a
-// length/prefix one: it only keeps a stray value out of the rebuilt url and the enrichment key.
-const safePlaylistChannelIdRegex = /^[a-zA-Z0-9_-]+$/
+// A watch or share link spells its start offset as `t`: `90`, `90s`, `1m30s` or `1h2m3s`.
+const watchOffsetRegex = /^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/
+
+// The clock spelling some publishers write in a fragment: `24:09` or `1:02:03`.
+const clockOffsetRegex = /^(?:(\d+):)?(\d+):(\d+)$/
+
+const parseWatchOffset = (value: string): string | undefined => {
+  const match = watchOffsetRegex.exec(value) ?? clockOffsetRegex.exec(value)
+
+  if (!match?.[0]) {
+    return
+  }
+
+  const [, hours = '0', minutes = '0', seconds = '0'] = match
+
+  return String(Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds))
+}
+
+// The player ignores `t`, so an offset moves over as `start` unless one is stated. Besides the
+// query, the Flash-era spelling left it in the path as `/embed/{id}&t=6s`, and publishers write it
+// in the fragment as `#t=220`.
+const readEmbedParams = (url: string): Record<string, string> => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
+  const params = pickQueryParams(parsed?.search ?? '', youtubeEmbedParams)
+
+  if (!parsed || params.start) {
+    return params
+  }
+
+  const offsetQueries = [
+    parsed.search,
+    splitStrayParams(parsed.pathname).strayParams,
+    parsed.hash.slice(1),
+  ]
+  const start = offsetQueries
+    .map((query) => parseWatchOffset(new URLSearchParams(query).get('t') ?? ''))
+    .find(Boolean)
+
+  if (start) {
+    params.start = start
+  }
+
+  return params
+}
+
+// The player url for a caller holding a url nothing has checked: a page builder stores whatever
+// the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
+export const readYoutubeEmbedSrc = (link: string): string | undefined => {
+  const url = parseUrlOnHosts(link, youtubeHosts)
+
+  if (!url) {
+    return
+  }
+
+  const videoId = extractVideoId(url.href)
+
+  if (!videoId) {
+    return
+  }
+
+  return composeEmbedUrl(videoId, readEmbedParams(url.href))
+}
 
 // The Flash-era playlist player wrote `youtube.com/p/{id}`, where the id is the same playlist the
 // modern url spells as `list=PL{id}`.
@@ -170,6 +218,20 @@ const composeUploadsEmbed = (user: string): EmbedResolverResult => {
   }
 }
 
+const composeVideoEmbed = (
+  videoId: string,
+  params?: Record<string, string>,
+): EmbedResolverResult => {
+  return {
+    provider,
+    id: videoId,
+    src: composeEmbedUrl(videoId, params),
+    url: `https://www.youtube.com/watch?v=${videoId}`,
+    thumbnail: composeThumbnailUrl(videoId),
+    ratio: playerRatio,
+  }
+}
+
 const composeChannelEmbed = (channel: string): EmbedResolverResult => {
   return {
     provider,
@@ -189,9 +251,9 @@ const resolveCollectionEmbed = (
   const channel = parsed.searchParams.get('channel')
 
   if (segments[1] === 'live_stream') {
-    return channel && safePlaylistChannelIdRegex.test(channel)
-      ? composeChannelEmbed(channel)
-      : undefined
+    // Playlist (`list`), channel (`channel`) and legacy username ids. A charset guard, not a
+    // length/prefix one: it only keeps a stray value out of the rebuilt url and the enrichment key.
+    return channel && urlSafeTokenRegex.test(channel) ? composeChannelEmbed(channel) : undefined
   }
 
   // `/embed/videoseries?list=` and the bare `/embed/?list=` some WordPress plugins emit are the
@@ -202,7 +264,7 @@ const resolveCollectionEmbed = (
 
   // `listType=search` named a search query, not an id, and YouTube removed it in 2020: the
   // embed plays nothing and there is nothing to resolve it to.
-  if (listType === 'search' || !list || !safePlaylistChannelIdRegex.test(list)) {
+  if (listType === 'search' || !list || !urlSafeTokenRegex.test(list)) {
     return
   }
 
@@ -239,14 +301,7 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
     return
   }
 
-  return {
-    provider,
-    id: videoId,
-    src: `${composeEmbedUrl(videoId)}${pickUrlParams(url, youtubeEmbedParams)}`,
-    url: `https://www.youtube.com/watch?v=${videoId}`,
-    thumbnail: composeThumbnailUrl(videoId),
-    ratio: playerRatio,
-  }
+  return composeVideoEmbed(videoId, readEmbedParams(url))
 }
 
 export const youtubeResolveEmbed: ResolveEmbed = (url, element) => {
@@ -254,6 +309,37 @@ export const youtubeResolveEmbed: ResolveEmbed = (url, element) => {
 
   return target && { ...target, title: attr(element, 'title') }
 }
+
+// FC2's blog player shell on static.fc2.com, a page that builds only the YouTube player its query
+// `id` names. The generic iframe placeholder for it carries no provider and no poster.
+export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
+  ['static.fc2.com'],
+  (url, element) => {
+    const parsed = parseUrl(url)
+
+    if (parsed?.pathname !== '/misc/blog/view/ext_youtube_player.html') {
+      return
+    }
+
+    // FC2's iframe snippet also carries the id as `data-id`, which the shell never reads.
+    const videoId = [parsed.searchParams.get('id'), attr(element, 'data-id')].find(
+      (candidate) => candidate && isVideoId(candidate),
+    )
+
+    if (!videoId) {
+      return
+    }
+
+    const title = parsed.searchParams.get('title')
+
+    return {
+      ...composeVideoEmbed(videoId),
+      // The shell draws no title when the query `title` is the string "undefined".
+      title: title && title !== 'undefined' ? title : undefined,
+    }
+  },
+  { preferResolverSize: true },
+)
 
 // A YouTube player iframe, a frame of a watch, shorts or playlist page, or the Flash player.
 export const youtubeIframeEmbedResolver = createUrlEmbedResolver(
@@ -273,9 +359,7 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
     if (!videoId) {
       const channel = attr(element, 'data-live-channelid')
 
-      return channel && safePlaylistChannelIdRegex.test(channel)
-        ? composeChannelEmbed(channel)
-        : undefined
+      return channel && urlSafeTokenRegex.test(channel) ? composeChannelEmbed(channel) : undefined
     }
 
     if (!isVideoId(videoId)) {
@@ -294,14 +378,7 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
       }
     }
 
-    return {
-      provider,
-      id: videoId,
-      src: composeEmbedUrl(videoId, params),
-      url: `https://www.youtube.com/watch?v=${videoId}`,
-      thumbnail: composeThumbnailUrl(videoId),
-      ratio: playerRatio,
-    }
+    return composeVideoEmbed(videoId, params)
   },
   { preferResolverSize: true },
 )

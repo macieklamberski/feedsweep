@@ -2,12 +2,11 @@ import type { Nullish } from 'trousse'
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches, paramValue } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brightcove'
 
-const safeIdRegex = /^\d+$/
 // The minimum length is the only check on the id: `AQ~~` decodes to the number 1.
 // A real Brightcove id runs to ten digits and more.
 const brightcoveIdRegex = /^\d{5,}$/
@@ -129,13 +128,13 @@ const brightcoveFlashResolveEmbed: ResolveEmbed = (url, element) => {
       parsed.searchParams.get('@videoPlayer') ??
       params?.get('videoId') ??
       parsed.searchParams.get('videoId'),
-    safeIdRegex,
+    digitsRegex,
   )
   const account = keepIfMatches(
     parsed.searchParams.get('publisherID') ??
       params?.get('publisherID') ??
       readPlayerKeyAccount(params?.get('playerKey')),
-    safeIdRegex,
+    digitsRegex,
   )
 
   if (!videoId || !account) {
@@ -161,9 +160,9 @@ export const brightcoveFlashEmbedResolver = createUrlEmbedResolver(
 export const brightcoveExperienceEmbedResolver = createMarkupEmbedResolver(
   'object.BrightcoveExperience',
   (element) => {
-    const videoId = keepIfMatches(paramValue(element, '@videoplayer'), safeIdRegex)
+    const videoId = keepIfMatches(paramValue(element, '@videoplayer'), digitsRegex)
     const account = videoId
-      ? keepIfMatches(readPlayerKeyAccount(paramValue(element, 'playerkey')), safeIdRegex)
+      ? keepIfMatches(readPlayerKeyAccount(paramValue(element, 'playerkey')), digitsRegex)
       : undefined
 
     if (!videoId || !account) {
@@ -198,13 +197,13 @@ export const brightcoveResolveEmbed: ResolveEmbed = (url, element) => {
 
   // `{player}_{embed}` is one segment holding two ids. A segment shaped otherwise is not a
   // player path.
-  if (!safeIdRegex.test(account) || !playerPathRegex.test(player)) {
+  if (!digitsRegex.test(account) || !playerPathRegex.test(player)) {
     return
   }
 
   // A reference id names the video for the account's own api, not the player, the same
   // exclusion the Flash form makes.
-  if (!safeIdRegex.test(videoId)) {
+  if (!digitsRegex.test(videoId)) {
     return
   }
 

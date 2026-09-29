@@ -6,6 +6,61 @@ import { resolveRelativeUrls } from './resolveRelativeUrls.js'
 
 const baseContext: TransformContext = { ...defaultContext, baseUrl: 'https://example.com' }
 
+const hostPrefixedSrcs: Array<[string, string, string]> = [
+  [
+    'at.ua',
+    'https://karmelitanki.at.ua//www.youtube.com/embed/4_VzRdCCGXo',
+    'https://www.youtube.com/embed/4_VzRdCCGXo',
+  ],
+  [
+    'auxerretv.com',
+    'http://www.auxerretv.com//www.dailymotion.com/embed/video/x152g3f',
+    'http://www.dailymotion.com/embed/video/x152g3f',
+  ],
+  [
+    'clan.su',
+    'http://www.znamya.clan.su//www.youtube.com/embed/NHSO_XO4dtE',
+    'http://www.youtube.com/embed/NHSO_XO4dtE',
+  ],
+  [
+    'ppcp.de',
+    'http://bernikay.ppcp.de//www.youtube.com/v/Bpt56ZueM-M?version=3&hl=en_US&rel=0',
+    'http://www.youtube.com/v/Bpt56ZueM-M?version=3&hl=en_US&rel=0',
+  ],
+  [
+    'smart-lab.ru',
+    'https://smart-lab.ru//www.youtube.com/embed/3vqldCtBlqM?si=yzn8_ivf_5ebnKCn',
+    'https://www.youtube.com/embed/3vqldCtBlqM?si=yzn8_ivf_5ebnKCn',
+  ],
+  [
+    'ucoz.org',
+    'https://tsubasa.ucoz.org//yandex.st/share/share.js',
+    'https://yandex.st/share/share.js',
+  ],
+  [
+    'ucoz.ru',
+    'https://stalker-living.ucoz.ru//www.youtube.com/embed/Pa1sl7mJtP8?rel=0',
+    'https://www.youtube.com/embed/Pa1sl7mJtP8?rel=0',
+  ],
+  [
+    'wikidot.com',
+    'http://asabrownell834.wikidot.com//www.youtube.com/embed/0fxXu5p1wUE',
+    'http://www.youtube.com/embed/0fxXu5p1wUE',
+  ],
+]
+
+const hostPrefixedKeptCarriers: Array<[string, string]> = [
+  ['img src', '<img src="https://example.com//www.youtube.com/embed/MLANv9VJ5Ws">'],
+  ['anchor href', '<a href="https://example.com//www.youtube.com/embed/MLANv9VJ5Ws">link</a>'],
+  ['video src', '<video src="https://example.com//cdn.example.org/clip.mp4"></video>'],
+  ['video poster', '<video poster="https://example.com//cdn.example.org/poster.jpg"></video>'],
+  ['object data', '<object data="https://example.com//www.youtube.com/v/MLANv9VJ5Ws"></object>'],
+  [
+    'blockquote cite',
+    '<blockquote cite="https://example.com//www.example.org/post">quote</blockquote>',
+  ],
+]
+
 describeForEachParser('resolveRelativeUrls', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
     return applyDomTransforms(parseHtml(value), [resolveRelativeUrls(context)])
@@ -273,6 +328,25 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
     expect(await transform(value, defaultContext)).toEqualHtml(expected)
   })
 
+  it('should leave a relative srcset untouched when baseUrl is missing', async () => {
+    const value = '<img srcset="/small.jpg 300w, /large.jpg 600w">'
+
+    expect(await transform(value, defaultContext)).toEqualHtml(value)
+  })
+
+  it('should leave an absolute srcset byte-identical', async () => {
+    const value =
+      '<img srcset="https://cdn.example.com/a.jpg 300w,https://cdn.example.com/b.jpg 600w">'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave an empty src untouched', async () => {
+    const value = '<img src="">'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should not modify html with no resolvable attributes', async () => {
     const value = '<p>No links or images</p>'
 
@@ -339,6 +413,119 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
       '<svg><image href="https://example.com/img.png" xlink:href="/legacy.png"></image></svg>'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it.each(hostPrefixedSrcs)(
+    'should strip the %s site host from a host-prefixed src',
+    async (_site, src, expectedSrc) => {
+      const value = `<iframe src="${src}"></iframe>`
+      const expected = `<iframe src="${expectedSrc}"></iframe>`
+
+      expect(await transform(value)).toEqualHtml(expected)
+    },
+  )
+
+  it('should strip the site host from a host-prefixed script src', async () => {
+    const value = html`
+      <script
+        src="https://needlework.ucoz.ua//api-maps.yandex.ru/services/constructor/1.0/js/?sid=qMkqdbHN9XKYsSEK"
+      ></script>
+    `
+    const expected = html`
+      <script
+        src="https://api-maps.yandex.ru/services/constructor/1.0/js/?sid=qMkqdbHN9XKYsSEK"
+      ></script>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should strip the site host from a host-prefixed src whose host label holds a digit', async () => {
+    const value = html`
+      <script
+        src="https://foto2004.ucoz.ru//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      ></script>
+    `
+    const expected = html`
+      <script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a double slash followed by path segments that only hold a dot', async () => {
+    const value = '<script src="https://example.com//assets/vendor.bundle/main.js"></script>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a double slash followed by a file name with a hash route', async () => {
+    const value = '<iframe src="https://example.com//widget.html#/player"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a double slash followed by a segment whose last label is not letters', async () => {
+    const value = '<iframe src="https://api.site.com//v1.0/x"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a double slash followed by a segment whose last label holds a digit', async () => {
+    const value = '<iframe src="https://api.site.com//v1.10/x"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should strip the site host from a host-prefixed embed src', async () => {
+    const value = '<embed src="https://ahtary-city.ucoz.com//www.youtube.com/v/MLANv9VJ5Ws">'
+    const expected = '<embed src="https://www.youtube.com/v/MLANv9VJ5Ws">'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it.each(hostPrefixedKeptCarriers)('should keep a host-prefixed %s', async (_carrier, value) => {
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a Jetpack Photon img src that names its origin after a double slash', async () => {
+    const value =
+      '<img src="https://i0.wp.com//s.w.org/style/images/about/WordPress-logotype-wmark.png">'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a host-prefixed tracking pixel img src', async () => {
+    const value =
+      '<img src="https://example.com//www.google-analytics.com/collect?v=1&amp;tid=UA-1">'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a double slash followed by a path segment that is not a host', async () => {
+    const value = '<iframe src="https://ahtary-city.ucoz.com//load/1-1-0-15"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a double slash followed by a file name', async () => {
+    const value = '<iframe src="https://ahtary-city.ucoz.com//index.php?id=1"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a host-prefixed url nested in the query', async () => {
+    const value =
+      '<iframe src="https://example.com/share?url=https://smart-lab.ru//www.youtube.com/embed/32KQbCEsCBA"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a double slash deeper in the path', async () => {
+    const value =
+      '<iframe src="https://ahtary-city.ucoz.com/news//www.youtube.com/embed/MLANv9VJ5Ws"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 
   it('should be idempotent', async () => {

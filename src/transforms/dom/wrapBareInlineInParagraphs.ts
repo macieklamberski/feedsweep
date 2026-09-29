@@ -5,12 +5,13 @@ import {
   isBlockElement,
   isElement,
   isText,
-  mediaElements,
+  mediaSelector,
+  processContainersSelector,
 } from '../../utils/dom.js'
 
-// Not the list in convertBreaksToParagraphs: figure is here so a bare caption gets a <p>.
-const processContainersSelector =
-  'body, div, blockquote, td, li, article, section, main, header, footer, aside, figure'
+// Figure is here so a bare caption gets a <p>. A <br> run inside one needs no paragraph, so
+// convertBreaksToParagraphs leaves it out.
+const containersSelector = `${processContainersSelector}, figure`
 
 // Contexts where inline content sits directly, so wrapping it in a <p> would be
 // wrong (captions, anchors, headings, raw-text blocks).
@@ -29,8 +30,6 @@ const inlineHostTags = new Set([
   'h5',
   'h6',
 ])
-
-const mediaSelector = [...mediaElements].join(', ')
 
 // Standalone media at a run's edge (bare or wrapped in a textless anchor/span)
 // renders as a block of its own. Pulling it into the text's paragraph would glue
@@ -64,7 +63,7 @@ const alwaysWrapTags = new Set(['body', 'figure'])
 // and every run in a wrapper unwrapWrappers dissolves, whose text would otherwise land bare.
 export const wrapBareInlineInParagraphs: DomTransform = () => {
   return (document) => {
-    for (const container of document.querySelectorAll(processContainersSelector)) {
+    for (const container of document.querySelectorAll(containersSelector)) {
       if (hasAncestorWithTagName(container, inlineHostTags)) {
         continue
       }

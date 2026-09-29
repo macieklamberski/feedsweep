@@ -1,12 +1,8 @@
 import { composeEmbedUrl as composeVimeoUrl } from '../../embeds/vimeo.js'
 import { composeEmbedUrl as composeYoutubeUrl, youtubeEmbedParams } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
-import { pickQueryParams } from '../../utils/urls.js'
+import { digitsRegex, pickQueryParams } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
-
-// `start` carries a whole-second offset. Guard it so only digits reach the URL and a
-// crafted value can't inject extra query params.
-const startSecondsRegex = /^\d+$/
 
 type EmbedSource = {
   params: ReadonlyArray<string>
@@ -25,11 +21,15 @@ const embedSources: Record<string, EmbedSource> = {
   },
 }
 
+// Some feeds escape the attribute's quotes twice, `videoid=\"{id}\"`, and the parser keeps the
+// backslashes and quotes as part of the value.
+const escapedQuotesRegex = /^\\"(.*)\\"$/
+
 // lite-youtube and lite-vimeo are web components that only build their iframe with JS on click.
 export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll('lite-youtube[videoid], lite-vimeo[videoid]')) {
     const source = embedSources[element.localName]
-    const videoId = element.getAttribute('videoid')
+    const videoId = element.getAttribute('videoid')?.replace(escapedQuotesRegex, '$1')
 
     if (!source || !videoId) {
       continue
@@ -40,7 +40,7 @@ export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
     const params = pickQueryParams(element.getAttribute('params') ?? '', source.params)
     const start = element.getAttribute('start')
 
-    if (start && startSecondsRegex.test(start)) {
+    if (start && digitsRegex.test(start)) {
       params.start = start
     }
 

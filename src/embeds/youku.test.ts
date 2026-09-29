@@ -79,7 +79,45 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/player.youku.com/embed/XODczMzU0NTAw"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/XODczMzU0NTAw"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the embed route below another segment', async () => {
+      const value = '<iframe src="https://player.youku.com/player/embed/XODczMzU0NTAw"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a segment after the embed id', async () => {
+      const value = '<iframe src="https://player.youku.com/embed/XODczMzU0NTAw/v.swf"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player.php swf below another segment', async () => {
+      const value = '<embed src="http://player.youku.com/v/player.php/sid/XODczMzU0NTAw/v.swf">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a segment after the player.php swf', async () => {
+      const value = '<embed src="http://player.youku.com/player.php/sid/XODczMzU0NTAw/v.swf/extra">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the static-host swf below another segment', async () => {
+      const value =
+        '<embed src="http://static.youku.com/x/v1.0.0080/v/swf/qplayer.swf?VideoIDS=XMTE4Mzc2NTcy">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a segment after the static-host swf', async () => {
+      const value =
+        '<embed src="http://static.youku.com/v1.0.0080/v/swf/qplayer.swf/extra?VideoIDS=XMTE4Mzc2NTcy">'
 
       expect(await extract(value)).toBeUndefined()
     })

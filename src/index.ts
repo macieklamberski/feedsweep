@@ -1,6 +1,7 @@
 import {
   defaultAllDomTransforms,
   defaultAvatarImageHosts,
+  defaultCleanedSrcProviders,
   defaultDeferredIframeSources,
   defaultEmojiResolvers,
   defaultFieldCleaners,
@@ -43,6 +44,7 @@ export const transformContent = async (
     nonContentSelectors: defaultNonContentSelectors,
     preservedPreClasses: defaultPreservedPreClasses,
     fieldCleaners: defaultFieldCleaners,
+    cleanedSrcProviders: defaultCleanedSrcProviders,
     resolveUrlFn: options.resolveUrlFn ?? defaultResolveUrlFn,
     cleanUrlFn: options.cleanUrlFn,
     assetProxyFn: options.assetProxyFn,
@@ -75,6 +77,7 @@ export const transformContent = async (
 
 export {
   defaultAllDomTransforms,
+  defaultCleanedSrcProviders,
   defaultEmbedRenderHints,
   defaultFieldCleaners,
   defaultHighlightFn,
@@ -88,6 +91,7 @@ export { assignVideoPosters } from './transforms/dom/assignVideoPosters.js'
 export { canonicalizeAlignment } from './transforms/dom/canonicalizeAlignment.js'
 export { cleanAnchorUrls } from './transforms/dom/cleanAnchorUrls.js'
 export { convertAmpNativeElements } from './transforms/dom/convertAmpNativeElements.js'
+export { convertAsciinemaEmbeds } from './transforms/dom/convertAsciinemaEmbeds.js'
 export { convertBreaksToParagraphs } from './transforms/dom/convertBreaksToParagraphs.js'
 export { convertCiteCards } from './transforms/dom/convertCiteCards.js'
 export { convertDatawrapperEmbeds } from './transforms/dom/convertDatawrapperEmbeds.js'
@@ -113,6 +117,7 @@ export { hoistBlocksFromParagraphs } from './transforms/dom/hoistBlocksFromParag
 export { hoistFigcaptionFromAnchor } from './transforms/dom/hoistFigcaptionFromAnchor.js'
 export { injectEnclosures } from './transforms/dom/injectEnclosures.js'
 export { linkifyGistEmbeds } from './transforms/dom/linkifyGistEmbeds.js'
+export { linkifyPaypalDonateForms } from './transforms/dom/linkifyPaypalDonateForms.js'
 export { linkifyUrls } from './transforms/dom/linkifyUrls.js'
 export { markTimestamps, parseTimestampSeconds } from './transforms/dom/markTimestamps.js'
 export { mergeConsecutiveOneLinerPres } from './transforms/dom/mergeConsecutiveOneLinerPres.js'
@@ -126,6 +131,7 @@ export { rebuildElementorVideoEmbeds } from './transforms/dom/rebuildElementorVi
 export { rebuildEmbedlyEmbeds } from './transforms/dom/rebuildEmbedlyEmbeds.js'
 export { rebuildEmbedPlusEmbeds } from './transforms/dom/rebuildEmbedPlusEmbeds.js'
 export { rebuildGettyImagesEmbeds } from './transforms/dom/rebuildGettyImagesEmbeds.js'
+export { rebuildJsfiddleEmbeds } from './transforms/dom/rebuildJsfiddleEmbeds.js'
 export { rebuildLazyLoadForVideos } from './transforms/dom/rebuildLazyLoadForVideos.js'
 export { rebuildLazyYtEmbeds } from './transforms/dom/rebuildLazyYtEmbeds.js'
 export { rebuildLiteVideoEmbeds } from './transforms/dom/rebuildLiteVideoEmbeds.js'

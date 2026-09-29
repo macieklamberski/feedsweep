@@ -92,14 +92,29 @@ describe('redcircleResolveEmbed', () => {
       expect(redcircleResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id that is not a uuid', () => {
-      const value = 'https://redcircle.com/embedded-player/sh/my-show/ep/latest'
+    it('should return undefined for an episode id that is not a uuid', () => {
+      const value =
+        'https://redcircle.com/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/latest'
 
       expect(redcircleResolveEmbed(value)).toBeUndefined()
     })
 
     it('should return undefined for a show id that is not a uuid', () => {
       const value = 'https://redcircle.com/embedded-show-webplayer/my-show'
+
+      expect(redcircleResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the player path under a route that is not a player', () => {
+      const value =
+        'https://redcircle.com/embedded-podcast/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5'
+
+      expect(redcircleResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an episode player missing the sh marker', () => {
+      const value =
+        'https://redcircle.com/embedded-player/show/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5'
 
       expect(redcircleResolveEmbed(value)).toBeUndefined()
     })
@@ -166,8 +181,11 @@ describeForEachParser('redcircleScriptEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<script src="https://evil.test/api.podcache.net/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5"></script>'
+      const value = html`
+        <script
+          src="https://evil.test/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5?podcache.net/embedded-"
+        ></script>
+      `
 
       expect(await extract(value)).toBeUndefined()
     })
