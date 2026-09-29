@@ -18,7 +18,7 @@ export const cnbcResolveEmbed: ResolveEmbed = (url) => {
   const [route, account, player, extra] = parsed ? getPathSegments(parsed) : []
   const guid = parsed?.searchParams.get('byGuid')
 
-  if (parsed?.hostname !== playerHost || route !== 'p' || !account || !player || extra) {
+  if (parsed?.hostname !== playerHost || route !== 'p' || !player || extra) {
     return
   }
 
