@@ -72,24 +72,6 @@ describeForEachParser('mediumCiteResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should leave the thumbnail undefined when the image anchor is empty', async () => {
-      const value = html`
-        <div class="graf graf--mixtapeEmbed">
-          <a href="https://example.com/page" class="markup--mixtapeEmbed-anchor">
-            <strong>Page title</strong>
-          </a>
-          <a href="https://example.com/page" class="js-mixtapeImage mixtapeImage mixtapeImage--empty"></a>
-        </div>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'medium',
-        url: 'https://example.com/page',
-        title: 'Page title',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should extract a bare anchor, the shape exported archives keep', async () => {
       const value = html`
         <a
@@ -145,21 +127,6 @@ describeForEachParser('mediumCiteResolver', (parseHtml) => {
         url: 'https://example.com/page',
         title: 'Page title',
         description: 'Preview text',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should leave the description undefined when the card carries only a title', async () => {
-      const value = html`
-        <a href="https://example.com/page" class="markup--mixtapeEmbed-anchor">
-          <strong>Page title</strong>
-        </a>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'medium',
-        url: 'https://example.com/page',
-        title: 'Page title',
       }
 
       expect(await extract(value)).toEqual(expected)

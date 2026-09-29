@@ -3,7 +3,7 @@ import { buildCite } from '../utils/cites.js'
 import { attr } from '../utils/dom.js'
 import { absoluteUrlRegex, parseUrlOnHosts } from '../utils/urls.js'
 
-const cardHosts = ['nytimes.com']
+const cardHost = 'nytimes.com'
 const cardPath = '/svc/oembed/html/'
 
 // The Times' oEmbed answer: an iframe of its own article card, a link card and not a player.
@@ -13,7 +13,7 @@ export const nytimesCiteResolver: CiteResolver = {
   kind: 'cite',
   selector: `iframe[src*="nytimes.com${cardPath}"]`,
   extract: (element) => {
-    const card = parseUrlOnHosts(attr(element, 'src'), cardHosts)
+    const card = parseUrlOnHosts(attr(element, 'src'), cardHost)
 
     if (card?.pathname !== cardPath) {
       return
