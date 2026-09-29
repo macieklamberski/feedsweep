@@ -231,6 +231,30 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a stated blog id carrying an uppercase letter', async () => {
+      const value = html`
+        <iframe
+          src="https://ameblo.jp/s/embed/reblog-card/tony-9/entry-latest.html"
+          data-ameba-id="TONY-9"
+          data-entry-id="12854455300"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a stated blog id carrying an underscore', async () => {
+      const value = html`
+        <iframe
+          src="https://ameblo.jp/s/embed/reblog-card/tony-9/entry-latest.html"
+          data-ameba-id="tony_9"
+          data-entry-id="12854455300"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a stated entry id carrying a path separator', async () => {
       const value = html`
         <iframe
@@ -370,6 +394,20 @@ describeForEachParser('amebaImagePageEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read a blog id carrying a digit', async () => {
+      const value = html`
+        <iframe src="https://ameblo.jp/p/embed/tony-9/image-12854455300-15446105444.html"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ameba',
+        id: 'tony-9/image-12854455300-15446105444',
+        src: 'https://ameblo.jp/p/embed/tony-9/image-12854455300-15446105444.html',
+        url: 'https://ameblo.jp/tony-9/image-12854455300-15446105444.html',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -390,6 +428,22 @@ describeForEachParser('amebaImagePageEmbedResolver', (parseHtml) => {
     it('should ignore a blog id carrying a path separator', async () => {
       const value = html`
         <iframe src="https://ameblo.jp/p/embed/sd/milk/image-12806733695-15295885078.html"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a blog id carrying an uppercase letter', async () => {
+      const value = html`
+        <iframe src="https://ameblo.jp/p/embed/TONY-9/image-12854455300-15446105444.html"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a blog id carrying an underscore', async () => {
+      const value = html`
+        <iframe src="https://ameblo.jp/p/embed/tony_9/image-12854455300-15446105444.html"></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()
