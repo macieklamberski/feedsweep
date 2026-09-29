@@ -304,7 +304,7 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take no language from a url whose content id is refused beside a data-id', async () => {
+    it('should keep the url language when data-id supplies the id the url refuses', async () => {
       const value = html`
         <script
           src="https://static.fc2.com/video/js/outerplayer.min.js"
@@ -316,7 +316,7 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
         provider: 'fc2',
         id: '20210528p7G2xWt4',
         src: 'https://video.fc2.com/embed/player/20210528p7G2xWt4/',
-        url: 'https://video.fc2.com/content/20210528p7G2xWt4/',
+        url: 'https://video.fc2.com/ja/content/20210528p7G2xWt4/',
         width: 512,
         height: 288,
       }
@@ -336,6 +336,44 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
         id: '20190922FrnqLhsk',
         src: 'https://video.fc2.com/embed/player/20190922FrnqLhsk/',
         url: 'https://video.fc2.com/JA/content/20190922FrnqLhsk/',
+        width: 512,
+        height: 288,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a language in digits', async () => {
+      const value = html`
+        <script
+          src="https://static.fc2.com/video/js/outerplayer.min.js"
+          url="https://video.fc2.com/12/content/20190922FrnqLhsk/"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '20190922FrnqLhsk',
+        src: 'https://video.fc2.com/embed/player/20190922FrnqLhsk/',
+        url: 'https://video.fc2.com/12/content/20190922FrnqLhsk/',
+        width: 512,
+        height: 288,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a language in underscores', async () => {
+      const value = html`
+        <script
+          src="https://static.fc2.com/video/js/outerplayer.min.js"
+          url="https://video.fc2.com/__/content/20190922FrnqLhsk/"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '20190922FrnqLhsk',
+        src: 'https://video.fc2.com/embed/player/20190922FrnqLhsk/',
+        url: 'https://video.fc2.com/__/content/20190922FrnqLhsk/',
         width: 512,
         height: 288,
       }
@@ -847,6 +885,30 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a language in digits', async () => {
+      const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=12" />'
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '20120101QN5FVkv4',
+        src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
+        url: 'https://video.fc2.com/12/content/20120101QN5FVkv4/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a language in underscores', async () => {
+      const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=__" />'
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '20120101QN5FVkv4',
+        src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
+        url: 'https://video.fc2.com/__/content/20120101QN5FVkv4/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should leave out a language carrying a url separator', async () => {
       const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=ja%2F.." />'
       const expected: EmbedResolverResult = {
@@ -859,7 +921,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should leave out a language longer than two letters', async () => {
+    it('should leave out a language longer than two characters', async () => {
       const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=jpn" />'
       const expected: EmbedResolverResult = {
         provider: 'fc2',
