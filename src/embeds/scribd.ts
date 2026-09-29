@@ -56,7 +56,10 @@ export const scribdResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const title = attr(element, 'title')
-  const result = { ...composeEmbed(document), title }
+  // The player frame plays as written, with its access key, page and view mode. A page url gets
+  // the player built.
+  const isPlayer = getPathSegments(parsed)[0] === 'embeds'
+  const result = { ...composeEmbed(document), ...(isPlayer && { src: url }), title }
   const ratio = parseRatio(attr(element, aspectRatioAttribute) ?? '')
 
   // The ratio describes the document and the declared height is a constant, so where both are

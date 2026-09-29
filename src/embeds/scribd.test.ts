@@ -102,6 +102,21 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('a player the publisher configured', () => {
+    it('should keep the access key, page and host the player url names', async () => {
+      const value =
+        '<iframe src="https://fr.scribd.com/embeds/488306777/content?start_page=1&view_mode=scroll&access_key=key-ZJXG4sWak4icye8tCa8g"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'scribd',
+        id: '488306777',
+        src: 'https://fr.scribd.com/embeds/488306777/content?start_page=1&view_mode=scroll&access_key=key-ZJXG4sWak4icye8tCa8g',
+        url: 'https://www.scribd.com/document/488306777',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   describe('the pre-2018 spelling', () => {
     it('should resolve a document named on the doc path', async () => {
       const value = '<iframe src="https://www.scribd.com/doc/108992419"></iframe>'
