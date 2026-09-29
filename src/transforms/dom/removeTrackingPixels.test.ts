@@ -222,6 +222,26 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should keep a content-sized image on a tracking-host subdomain', async () => {
+      const value = html`
+        <img src="https://media.beehiiv.com/cdn-cgi/image/fit=scale-down/uploads/photo.png" width="1200" height="800">
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a tracking-host image with only one content-sized dimension', async () => {
+      const value = '<img src="https://www.hubspot.com/hubfs/chart.png" width="640">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a tracking-host image sized by inline style', async () => {
+      const value = '<img src="https://media.beehiiv.com/uploads/photo.png" style="width:800px">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should not remove images from look-alike hosts', async () => {
       const value = '<img src="https://notfeedsportal.com/photo.jpg">'
 
@@ -240,6 +260,14 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
       const value = '<img src="https://example.com/pixel/abc.png">'
 
       expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should keep a content-sized image under a tracking path segment', async () => {
+      const value = html`
+        <img src="https://example.com/images/pixel/pixel-8-pro.jpg" width="800" height="600">
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
     })
 
     it('should detect tracking path in relative URLs', async () => {

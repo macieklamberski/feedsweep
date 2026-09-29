@@ -1,4 +1,4 @@
-import { isPlainObject } from 'trousse'
+import { getPathSegments, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest, readPixels } from '../utils/hints.js'
@@ -26,7 +26,7 @@ const playerHeight = 145
 // stable id without parsing the query.
 const composeEmbed = (parsed: URL, src: string): EmbedResolverResult | undefined => {
   const show = parsed.hostname.split('.')[0]
-  const episode = parsed.pathname.split('/').find(Boolean)
+  const episode = getPathSegments(parsed)[0]
 
   if (!show || !episode) {
     return
@@ -63,7 +63,7 @@ export const podigeeResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const [episode, ...rest] = parsed.pathname.split('/').filter(Boolean)
+  const [episode, ...rest] = getPathSegments(parsed)
 
   if (!episode) {
     return

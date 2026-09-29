@@ -230,7 +230,8 @@ const stripCodeGutters = (document: Document): void => {
   for (const table of document.querySelectorAll('table')) {
     const pres = Array.from(table.querySelectorAll('pre'))
 
-    if (pres.length === 0) {
+    // A gutter table is one row. A data table that numbers its rows beside a pre per row is not.
+    if (pres.length === 0 || table.querySelectorAll('tr').length !== 1) {
       continue
     }
 

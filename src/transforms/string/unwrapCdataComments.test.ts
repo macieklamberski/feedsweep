@@ -102,6 +102,13 @@ describe('unwrapCdataComments', () => {
     expect(transform(value)).toBe(value)
   })
 
+  it('should unwrap a wrapper before an unterminated one', () => {
+    const value = '<!--[CDATA[<p>article</p>]]--><!--[CDATA[unterminated'
+    const expected = '<p>article</p><!--[CDATA[unterminated'
+
+    expect(transform(value)).toBe(expected)
+  })
+
   it('should handle empty CDATA wrapper', () => {
     expect(transform('<!--[CDATA[]]-->')).toBe('')
   })

@@ -1,9 +1,9 @@
-import { parseUrl } from 'trousse'
+import { isHostOrSubdomainOf, parseUrl } from 'trousse'
 import { parseMastodonStatus } from '../embeds/mastodon.js'
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, isElement, text } from '../utils/dom.js'
-import { isOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 
 // When the linked article has a date, the generic onebox appends it to the source anchor's
 // text ("Whonix – 13 Jan 23") behind this spaced en dash.
@@ -68,7 +68,7 @@ export const discourseCiteResolver: CiteResolver = {
     // data-onebox-src arrives unrewritten, so a protocol-relative url names no host without a base.
     const cited = url ? parseUrl(url, placeholderBaseUrl) : undefined
 
-    if (cited && (isOnHosts(cited, socialPostHosts) || parseMastodonStatus(cited.href))) {
+    if (cited && (isHostOrSubdomainOf(cited, socialPostHosts) || parseMastodonStatus(cited.href))) {
       return
     }
 

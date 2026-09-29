@@ -73,6 +73,7 @@ const neutralizeSrcset = (element: Element, isSafeUrlFn: IsSafeUrlFn | undefined
 const genericAttributeRoles: Array<[string, UrlRole]> = [
   ['data-embed-url', 'link'],
   ['data-cite-url', 'link'],
+  ['data-file-url', 'link'],
   ['formaction', 'link'],
   ['data-embed-src', 'media'],
   ['data-embed-thumbnail', 'media'],
@@ -96,9 +97,13 @@ const tagAttributeRoles: ReadonlyMap<string, Array<[string, UrlRole]>> = toMap({
   form: [['action', 'link']],
 })
 const srcsetTags = new Set(['img', 'source'])
-// The two tags carrying their URL on href, which is read per element below because SVG1 spells
-// it xlink:href.
-const hrefTagRoles: ReadonlyMap<string, UrlRole> = toMap({ a: 'link', image: 'media' })
+// The tags carrying their URL on href, which is read per element below because SVG1 spells it
+// xlink:href. An image map's area is a link like an anchor.
+const hrefTagRoles: ReadonlyMap<string, UrlRole> = toMap({
+  a: 'link',
+  area: 'link',
+  image: 'media',
+})
 
 // A javascript:, vbscript: or data:text/html url on any attribute a browser would follow.
 export const neutralizeUnsafeUrls: DomTransform = ({ isSafeUrlFn }) => {

@@ -1,5 +1,7 @@
+import { decodeSegment } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { isUrlShaped } from '../../utils/urls.js'
+import { createLink } from '../../utils/widgets.js'
 
 // Matching a relative path too would take `class` and `style` values for addresses.
 const statedUrlRegex = /^(?:https?:)?\/\//i
@@ -27,11 +29,9 @@ export const surfaceParkedMarkup: DomTransform = () => (document) => {
       continue
     }
 
-    let markup: string
+    const markup = decodeSegment(encoded)
 
-    try {
-      markup = decodeURIComponent(encoded)
-    } catch {
+    if (markup === undefined) {
       continue
     }
 
@@ -44,11 +44,7 @@ export const surfaceParkedMarkup: DomTransform = () => (document) => {
     const url = container.getAttribute('data-url')
 
     if (url && isUrlShaped(url) && !hasStatedUrl(holder)) {
-      const link = document.createElement('a')
-
-      link.setAttribute('href', url)
-      link.textContent = url
-      holder.appendChild(link)
+      holder.appendChild(createLink(document, url))
     }
 
     container.replaceWith(...Array.from(holder.childNodes))

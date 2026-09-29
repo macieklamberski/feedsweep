@@ -7,7 +7,7 @@ describeForEachParser('Facebook', (parseHtml) => {
   // SDK widget div, facebookXfbmlEmbedResolver the pre-SDK `<fb:post>` tag,
   // facebookAmpEmbedResolver the AMP element, facebookIframeEmbedResolver the plugin url itself
   // and facebookBlockquoteEmbedResolver the dialog's fallback blockquote when the publisher kept
-  // only that. defaultEmojiImageHosts turns the emoji images a pasted post ships into their
+  // only that. facebookEmojiResolver turns the emoji images a pasted post ships into their
   // characters. A comment thread is page chrome, so `.fb-comments` is in
   // defaultNonContentSelectors and the AMP and plugin-url forms of it are refused; the like
   // button and the page timeline are refused for the same reason and disappear as empty tags.
@@ -282,6 +282,68 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should replace a Facebook emoji image with an empty alt by its filename', async () => {
+    const value = html`
+      <p>Great news
+        <img
+          class="_1ift"
+          src="https://static.xx.fbcdn.net/images/emoji.php/v9/t4/1/16/1f600.png"
+          alt=""
+        >
+        for everyone.</p>
+    `
+    const expected = '<p>Great news 😀 for everyone.</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should replace a Facebook emoji image served from the main host', async () => {
+    const value = html`
+      <p>See you there
+        <img
+          alt=""
+          class="img"
+          src="https://www.facebook.com/images/emoji.php/v9/f57/1/16/1f609.png"
+          width="16"
+        >
+      </p>
+    `
+    const expected = '<p>See you there 😉</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should replace a Facebook emoji painted as a span background', async () => {
+    const value = html`
+      <p>Congrats
+        <span
+          class="_6qdm"
+          style="background-image: url(&quot;https://static.xx.fbcdn.net/images/emoji.php/v9/fe5/1.5/16/1f389.png&quot;); height: 16px; width: 16px;"
+        ></span>
+        to the team.</p>
+    `
+    const expected = '<p>Congrats 🎉 to the team.</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // A post pasted from the classic site paints its emoticons from a sprite sheet the feed does
+  // not load, leaving empty spans that would be deleted as empty tags.
+  it('should replace a classic Facebook emoticon with its character', async () => {
+    const value = html`
+      <p>We are back
+        <span
+          class="emoticon emoticon_smile"
+          style="background-image: url(https://static.example.com/rsrc.php/v2/yO/r/rfFO0dqI-dD.png); display: inline-block; height: 16px; width: 16px;"
+          title=":)"
+        ></span>
+      </p>
+    `
+    const expected = '<p>We are back 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // Facebook refuses to be framed, so a carrier holding the page itself reaches a reader as a
   // blank frame. The plugin takes the page as its href, which is the repair the widget div and
   // the fallback blockquote already perform from their own attributes.
@@ -311,5 +373,26 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(hub, { parseHtmlFn: parseHtml })).toEqualHtml(
       '<div data-embed-src="https://www.facebook.com/watch"></div>',
     )
+  })
+
+  // A forum's s9e helper frame names a post in its fragment, and facebookS9eEmbedResolver reads
+  // it into the same plugin placeholder a pasted post gives.
+  it('should convert the s9e helper frame into the plugin placeholder', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="facebook"
+        src="https://s9e.github.io/iframe/2/facebook.min.html#example/posts/10150000000000001"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="facebook"
+        data-embed-id="https://www.facebook.com/example/posts/10150000000000001"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fexample%2Fposts%2F10150000000000001"
+        data-embed-url="https://www.facebook.com/example/posts/10150000000000001"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 })

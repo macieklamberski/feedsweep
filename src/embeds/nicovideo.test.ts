@@ -68,27 +68,34 @@ describe('extractNicovideoId', () => {
   })
 
   // Every spelling a broadcast arrives in, including the live host's own embed route.
-  it.each([
+  const broadcastUrls: Array<string> = [
     'https://live.nicovideo.jp/watch/lv346883570',
     'https://live.nicovideo.jp/embed/lv346883570',
     'https://www.nicovideo.jp/watch/lv346883570',
-  ])('should read the broadcast id from %s', (value) => {
+  ]
+
+  it.each(broadcastUrls)('should read the broadcast id from %s', (value) => {
     expect(extractNicovideoId(value)).toBe('lv346883570')
   })
 
   // The illustration, manga and news sites sit on the same domain and write the same route words
   // and id grammar, so their ids pass the video id test on shape alone. Each addresses something
   // the video player answers 500 for, so none is read as a video.
-  it.each([
+  const nonVideoCardUrls: Array<string> = [
     'https://ext.seiga.nicovideo.jp/thumb/im4572423',
     'https://ext.seiga.nicovideo.jp/thumb/mg316785',
     'https://seiga.nicovideo.jp/seiga/im4572423',
     'https://ext.manga.nicovideo.jp/thumb/mg316785',
     'https://manga.nicovideo.jp/watch/mg316785',
     'https://news.nicovideo.jp/watch/nw15391705',
-  ])('should refuse the illustration, manga and news card at %s', (value) => {
-    expect(extractNicovideoId(value)).toBeUndefined()
-  })
+  ]
+
+  it.each(nonVideoCardUrls)(
+    'should refuse the illustration, manga and news card at %s',
+    (value) => {
+      expect(extractNicovideoId(value)).toBeUndefined()
+    },
+  )
 })
 
 describeForEachParser('nicovideoScriptEmbedResolver', (parseHtml) => {

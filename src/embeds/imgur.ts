@@ -3,7 +3,11 @@ import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../type
 import { attr, find, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createS9eEmbedResolver,
+  createUrlEmbedResolver,
+} from '../utils/widgets.js'
 
 const provider = 'imgur'
 
@@ -156,6 +160,12 @@ export const imgurResolveEmbed: ResolveEmbed = (url) => {
 }
 
 export const imgurIframeEmbedResolver = createUrlEmbedResolver(imgurHosts, imgurResolveEmbed)
+
+// A forum's s9e MediaEmbed helper frame, naming the post or album in its url fragment. The helper
+// page reads an encoded `%2F` as the slash it stands for.
+export const imgurS9eEmbedResolver = createS9eEmbedResolver('imgur', /^(?:%2F|[\w/])+$/, (path) => {
+  return imgurResolveEmbed(`https://imgur.com/${path.replaceAll('%2F', '/')}`)
+})
 
 // The embed posts its rendered height on load, unasked, as a JSON string carrying
 // `message: 'resize_imgur'`. An album is served by an older template that posts nothing, and the

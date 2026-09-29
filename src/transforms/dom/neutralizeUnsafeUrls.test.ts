@@ -50,6 +50,13 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should neutralize a javascript: image map area to the link sentinel', async () => {
+      const value = '<map name="m"><area href="javascript:alert(1)" alt="x"></map>'
+      const expected = '<map name="m"><area href="#unsafe-link" alt="x"></map>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should neutralize a javascript: image to the media sentinel', async () => {
       const value = '<img src="javascript:alert(1)">'
       const expected = '<img src="about:blank">'
@@ -243,14 +250,16 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(expected)
     })
 
-    it('should neutralize unsafe embed and cite target urls with the link sentinel', async () => {
+    it('should neutralize unsafe embed, cite and file target urls with the link sentinel', async () => {
       const value = html`
         <div data-embed-url="javascript:alert(1)"></div>
         <div data-cite-url="javascript:alert(1)"></div>
+        <div data-file-url="javascript:alert(1)"></div>
       `
       const expected = html`
         <div data-embed-url="#unsafe-link"></div>
         <div data-cite-url="#unsafe-link"></div>
+        <div data-file-url="#unsafe-link"></div>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -299,7 +308,7 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
     // Stands in for a result with every field populated. The point is to fill each field the mint
     // path knows, not to be a valid result, so the declared field types are asserted away.
     const markerFields = <Type>(names: Array<string>): Type => {
-      return Object.fromEntries(names.map((name) => [name, 'not-a-url'])) as unknown as Type
+      return Object.fromEntries(names.map((name) => [name, 'not-a-url'])) as Type
     }
 
     const unchecked = async (document: Document, placeholder: Element): Promise<Array<string>> => {

@@ -1,4 +1,5 @@
 import type { DomTransform, EmbedRef } from '../../types.js'
+import { attr } from '../../utils/dom.js'
 import {
   createPlaceholderEnricher,
   prepareEmbedMetadata,
@@ -18,6 +19,8 @@ export const enrichEmbedPlaceholders: DomTransform = (context) => {
     (element): EmbedRef => ({
       provider: element.getAttribute('data-embed-provider') ?? '',
       id: element.getAttribute('data-embed-id') ?? '',
+      url: attr(element, 'data-embed-url'),
+      src: attr(element, 'data-embed-src'),
     }),
     enrichEmbedFn,
     // The payload's urls arrive from the platform API unresolved and uncleaned.

@@ -1,6 +1,6 @@
+import { decodeSegment } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
 import { findConfigScript, formatRatio } from '../utils/dom.js'
-import { decodeOrKeep } from '../utils/urls.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
 // The inline script's config comes in two spellings, `$bp("Brid_{n}", {...})` and
@@ -9,7 +9,7 @@ import { createMarkupEmbedResolver } from '../utils/widgets.js'
 const containerIdRegex = /Brid_[\w-]+/g
 const playerIdRegex = /"id"\s*:\s*"?(\d+)"?/
 const videoIdRegex = /"video"\s*:\s*"?(\d+)"?/
-const titleRegex = /"title"\s*:\s*"([^"]*)"/
+const titleRegex = /"title"\s*:\s*"([^"]+)"/
 const widthRegex = /"width"\s*:\s*"?(\d+)"?/
 const heightRegex = /"height"\s*:\s*"?(\d+)"?/
 
@@ -74,7 +74,7 @@ export const bridEmbedResolver = createMarkupEmbedResolver(
       // It is the page the loader's own code opens as its iframe player. A retired player id falls
       // back to the partner's current one, and a retired partner does not.
       src: `https://services.brid.tv/services/iframe/video/${videoId}/${playerId}`,
-      title: decodeOrKeep(title),
+      title: decodeSegment(title) ?? title,
       ...readEmbedSize(config),
     }
   },

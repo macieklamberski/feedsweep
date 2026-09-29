@@ -46,12 +46,16 @@ export const stripDuplicateEnclosures: DomTransform = (context) => (document) =>
   }
 
   for (const element of injected) {
-    if (contentKeys.has(buildMediaKey(element, context.cleanUrlFn))) {
+    const key = buildMediaKey(element, context.cleanUrlFn)
+
+    // A file placeholder carries neither `src` nor `data-embed-src`, so it has no key to match.
+    if (key && contentKeys.has(key)) {
       removeWithEmptyWrappers(element)
       continue
     }
 
-    // Keep it, but drop the marker so it doesn't leak into the output.
+    // The standard pipeline keeps the marker so a repeat run skips the enclosure. Here this pass
+    // does that job, since a repeat run's copy matches this one as inline media.
     element.removeAttribute(enclosureMarker)
   }
 }

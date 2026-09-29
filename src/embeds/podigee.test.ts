@@ -49,10 +49,12 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
 describe('podigeeResolveEmbed', () => {
   // The episode page is not the player: it redirects to the show's own site, so a carrier
   // framing it shows an article. `/embed` under the same path names the player.
-  it.each([
+  const episodePageUrls: Array<string> = [
     'https://cloudonaut.podigee.io/72-serverless-and-devops-a-match',
     'https://cloudonaut.podigee.io/72-serverless-and-devops-a-match/embed',
-  ])('should mint the player url from %s', (value) => {
+  ]
+
+  it.each(episodePageUrls)('should mint the player url from %s', (value) => {
     const expected: EmbedResolverResult = {
       provider: 'podigee',
       id: 'cloudonaut/72-serverless-and-devops-a-match',
@@ -114,12 +116,14 @@ describe('podigeeResolveEmbed', () => {
   describe('hosts that are not a show', () => {
     // The CDN hosts serve the player's assets and the episode audio. An enclosure read as an
     // episode would replace a playable audio element with a placeholder pointing at nothing.
-    it.each([
+    const cdnAndCompanyUrls: Array<string> = [
       'https://audio.podigee-cdn.net/2445300-m-a549c8ece885f4e7f31909676891fae8.mp3?source=feed',
       'https://main.podigee-cdn.net/uploads/u123/456-episode.mp3',
       'https://player.podigee-cdn.net/podcast-player/podigee-podcast-player.html',
       'https://www.podigee.com/2024-pricing-update',
-    ])('should return undefined for %s', (value) => {
+    ]
+
+    it.each(cdnAndCompanyUrls)('should return undefined for %s', (value) => {
       expect(podigeeResolveEmbed(value)).toBeUndefined()
     })
   })
@@ -127,12 +131,14 @@ describe('podigeeResolveEmbed', () => {
   describe('sad paths', () => {
     // The other two paths a show serves. Every episode segment carries its number and neither
     // of these does, which is what separates them.
-    it.each([
+    const nonEpisodeUrls: Array<string> = [
       'https://cloudonaut.podigee.io/feed/mp3',
       'https://cloudonaut.podigee.io/',
       'https://cloudonaut.podigee.io/about-the-show',
       'https://example.com/72-not-podigee',
-    ])('should return undefined for %s', (value) => {
+    ]
+
+    it.each(nonEpisodeUrls)('should return undefined for %s', (value) => {
       expect(podigeeResolveEmbed(value)).toBeUndefined()
     })
   })

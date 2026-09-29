@@ -11,15 +11,18 @@ import { codesandboxRenderHint } from '../embeds/codesandbox.js'
 import { deezerRenderHint } from '../embeds/deezer.js'
 import { donorboxRenderHint } from '../embeds/donorbox.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
-import { foxnewsRenderHint } from '../embeds/foxnews.js'
+import { foxbusinessRenderHint, foxnewsRenderHint } from '../embeds/foxnews.js'
 import { imgurRenderHint } from '../embeds/imgur.js'
+import { inaRenderHint } from '../embeds/ina.js'
 import { instagramRenderHint } from '../embeds/instagram.js'
 import { kalturaRenderHint } from '../embeds/kaltura.js'
 import { mailruRenderHint } from '../embeds/mailru.js'
 import { mastodonRenderHint } from '../embeds/mastodon.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
+import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
 import { omnyRenderHint } from '../embeds/omny.js'
+import { peertubeRenderHint } from '../embeds/peertube.js'
 import { podbeanRenderHint } from '../embeds/podbean.js'
 import { podigeeRenderHint } from '../embeds/podigee.js'
 import { redditRenderHint } from '../embeds/reddit.js'
@@ -30,6 +33,7 @@ import { soundcloudRenderHint } from '../embeds/soundcloud.js'
 import { spreakerRenderHint } from '../embeds/spreaker.js'
 import { tedRenderHint } from '../embeds/ted.js'
 import { telegramRenderHint } from '../embeds/telegram.js'
+import { tumblrRenderHint } from '../embeds/tumblr.js'
 import { twitterRenderHint } from '../embeds/twitter.js'
 import { videopressRenderHint } from '../embeds/videopress.js'
 import { vimeoRenderHint } from '../embeds/vimeo.js'
@@ -52,17 +56,21 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   cnnRenderHint,
   codesandboxRenderHint,
   deezerRenderHint,
-  flourishRenderHint,
-  foxnewsRenderHint,
   donorboxRenderHint,
+  flourishRenderHint,
+  foxbusinessRenderHint,
+  foxnewsRenderHint,
   imgurRenderHint,
+  inaRenderHint,
   instagramRenderHint,
   kalturaRenderHint,
   mailruRenderHint,
   mastodonRenderHint,
   mixcloudRenderHint,
   notecomRenderHint,
+  odnoklassnikiRenderHint,
   omnyRenderHint,
+  peertubeRenderHint,
   podbeanRenderHint,
   podigeeRenderHint,
   redditRenderHint,
@@ -73,6 +81,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   spreakerRenderHint,
   tedRenderHint,
   telegramRenderHint,
+  tumblrRenderHint,
   twitterRenderHint,
   videopressRenderHint,
   vimeoRenderHint,

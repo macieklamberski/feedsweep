@@ -4,7 +4,7 @@ import { attr, text } from '../utils/dom.js'
 
 const provider = 'bandcamp'
 
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // A release is either an album or a single track, and the id is Bandcamp's own numeric one.
@@ -30,7 +30,6 @@ const presetHeights = toMap({
   tall2: 450,
 })
 const releaseKinds = ['album', 'track']
-const numericIdRegex = /^\d+$/
 
 // The audio player spells its options as path segments (`EmbeddedPlayer/album=123/size=large/`)
 // while the video player uses a query string (`VideoEmbed?track=123&bgcol=…`). Both are minted
@@ -64,7 +63,7 @@ const readReleases = (link: string): Array<[string, string]> => {
   for (const kind of releaseKinds) {
     const id = parsed.searchParams.get(kind)
 
-    if (id && numericIdRegex.test(id)) {
+    if (id && digitsRegex.test(id)) {
       claim(kind, id)
     }
   }
@@ -127,7 +126,7 @@ export const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
   const anchor = parseFallback(element)
   const pageUrl = attr(anchor, 'href')
   // Bandcamp writes the label as `{title} by {artist}`, and " by " appears inside real titles too.
-  const title = text(anchor) || attr(element, 'title')
+  const title = text(anchor) ?? attr(element, 'title')
 
   return {
     provider,

@@ -102,12 +102,26 @@ describe('audiomackResolveEmbed', () => {
       expect(audiomackResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the parameters the current player takes', () => {
-      const value = 'https://audiomack.com/embed/song/mlgmusiz/new-year-new-glory?background=1'
+    it('should keep the private-link key in the player and link no page beside it', () => {
+      const value = 'https://audiomack.com/embed/song/mlgmusiz/new-year-new-glory?key=a1b2c3'
       const expected: EmbedResolverResult = {
         provider: 'audiomack',
         id: 'mlgmusiz/song/new-year-new-glory',
-        src: 'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory?background=1',
+        src: 'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory?key=a1b2c3',
+        height: 252,
+        author: 'mlgmusiz',
+      }
+
+      expect(audiomackResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the parameters the current player ignores', () => {
+      const value =
+        'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory?background=1&autoplay=1&utm_source=fb&fbclid=abc'
+      const expected: EmbedResolverResult = {
+        provider: 'audiomack',
+        id: 'mlgmusiz/song/new-year-new-glory',
+        src: 'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory',
         url: 'https://audiomack.com/mlgmusiz/song/new-year-new-glory',
         height: 252,
         author: 'mlgmusiz',
@@ -231,7 +245,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audiomack',
         id: 'larrynorman/song/burn-2',
-        src: 'https://audiomack.com/embed/larrynorman/song/burn-2?background=1',
+        src: 'https://audiomack.com/embed/larrynorman/song/burn-2',
         url: 'https://audiomack.com/larrynorman/song/burn-2',
         height: 252,
         author: 'larrynorman',

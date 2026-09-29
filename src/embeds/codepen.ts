@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize, text } from '../utils/dom.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codepen'
@@ -11,7 +11,6 @@ const codepenHosts = ['codepen.io', 'www.codepen.io']
 
 // Slugs come in three lengths: 5 on pens from around 2012, 7 since, and 32 hex on CodePen's own.
 const slugRegex = /^[A-Za-z0-9]+$/
-const userRegex = /^[A-Za-z0-9_-]+$/
 const playerParamRegex = /^[A-Za-z0-9,_-]{1,64}$/
 const leadingAtRegex = /^@/
 
@@ -61,7 +60,7 @@ const readUser = (value: string | undefined): string | undefined => {
   // The share dialog writes the handle with its `@`, while the url path carries both spellings.
   const name = value?.trim().replace(leadingAtRegex, '')
 
-  return name && name !== anonymousUser && userRegex.test(name) ? name : undefined
+  return name && name !== anonymousUser && urlSafeTokenRegex.test(name) ? name : undefined
 }
 
 const parseTarget = (value: string | undefined): CodepenTarget | undefined => {

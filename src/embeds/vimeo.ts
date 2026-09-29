@@ -3,6 +3,7 @@ import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed }
 import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   composeQuery,
+  digitsRegex,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -10,8 +11,6 @@ import {
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'vimeo'
-
-const safeVideoIdRegex = /^\d+$/
 
 // An unlisted video's privacy hash is ten lowercase hex characters, and case-sensitive.
 const unlistedHashRegex = /^[0-9a-f]{10}$/
@@ -47,10 +46,13 @@ const sitePathSegments = new Set([
   'watch',
 ])
 
+// `/ondemand/{name}/{id}` and `/channels/{name}/{id}` name the video in the third segment.
+const namedCollectionPaths = ['ondemand', 'channels']
+
 // An event names its videos under `/videos/`, but its bare and `/embed` forms are the common ones
 // and both would read as a video here.
 const readCollectionVideoId = (segments: Array<string>): string | undefined => {
-  if (segments[0] === 'showcase' || segments[0] === 'album') {
+  if (showcasePaths.has(segments[0])) {
     return segments[2] === 'video' ? segments[3] : undefined
   }
 
@@ -58,7 +60,7 @@ const readCollectionVideoId = (segments: Array<string>): string | undefined => {
     return segments[2] === 'videos' ? segments[3] : undefined
   }
 
-  if (segments[0] === 'ondemand' || segments[0] === 'channels') {
+  if (namedCollectionPaths.includes(segments[0])) {
     return segments.length === 3 ? segments[2] : undefined
   }
 }
@@ -87,7 +89,7 @@ const resolveShowcaseEmbed = (link: string): EmbedResolverResult | undefined => 
     return
   }
 
-  const showcaseId = keepIfMatches(segments[1], safeVideoIdRegex)
+  const showcaseId = keepIfMatches(segments[1], digitsRegex)
 
   return showcaseId ? composeShowcaseEmbed(showcaseId) : undefined
 }
@@ -109,7 +111,7 @@ const readReference = (link: string): VimeoReference | undefined => {
   const clipId = url.searchParams.get('clip_id')
 
   if (clipId) {
-    const id = keepIfMatches(clipId, safeVideoIdRegex)
+    const id = keepIfMatches(clipId, digitsRegex)
 
     return id ? { id } : undefined
   }
@@ -119,23 +121,21 @@ const readReference = (link: string): VimeoReference | undefined => {
   }
 
   if (collectionPaths.has(segments[0])) {
-    const id = keepIfMatches(readCollectionVideoId(segments), safeVideoIdRegex)
+    const id = keepIfMatches(readCollectionVideoId(segments), digitsRegex)
 
     return id ? { id } : undefined
   }
 
   // A ten-digit video id matches the hash shape, so only a segment after an id counts as one.
   const hashIndex = segments.findIndex((segment, index) => {
-    return (
-      index > 0 && unlistedHashRegex.test(segment) && safeVideoIdRegex.test(segments[index - 1])
-    )
+    return index > 0 && unlistedHashRegex.test(segment) && digitsRegex.test(segments[index - 1])
   })
   // The last numeric segment, which is the video in every remaining spelling: `/{id}`,
   // `/video/{id}` and the review pages.
   const path = hashIndex === -1 ? segments : segments.slice(0, hashIndex)
   const id = keepIfMatches(
-    path.findLast((segment) => safeVideoIdRegex.test(segment)),
-    safeVideoIdRegex,
+    path.findLast((segment) => digitsRegex.test(segment)),
+    digitsRegex,
   )
 
   if (!id) {

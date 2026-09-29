@@ -3,8 +3,7 @@ import { baseContext } from '../tests.js'
 import {
   cleanUrl,
   composeQuery,
-  decodeOrKeep,
-  decodeSegment,
+  filterUrlQuery,
   parseUrlOnHosts,
   pickQueryParams,
   pickUrlParams,
@@ -181,60 +180,6 @@ describe('cleanUrl', () => {
   })
 })
 
-describe('decodeSegment', () => {
-  it('should decode a percent-encoded segment', () => {
-    const value = 'urn%3Ali%3Ashare%3A6626097641602281472'
-    const expected = 'urn:li:share:6626097641602281472'
-
-    expect(decodeSegment(value)).toBe(expected)
-  })
-
-  it('should leave a plain segment unchanged', () => {
-    const value = 'urn:li:share:6626097641602281472'
-
-    expect(decodeSegment(value)).toBe(value)
-  })
-
-  it('should return undefined for a malformed escape', () => {
-    const value = '%E0%A4%A'
-
-    expect(decodeSegment(value)).toBeUndefined()
-  })
-
-  it('should return undefined for undefined', () => {
-    expect(decodeSegment(undefined)).toBeUndefined()
-  })
-})
-
-describe('decodeOrKeep', () => {
-  it('should decode a percent-encoded value', () => {
-    const value = 'FEAR%20STREET%20PART%202'
-    const expected = 'FEAR STREET PART 2'
-
-    expect(decodeOrKeep(value)).toBe(expected)
-  })
-
-  it('should leave a plain value unchanged', () => {
-    const value = 'FEAR STREET PART 2'
-
-    expect(decodeOrKeep(value)).toBe(value)
-  })
-
-  it('should keep a value whose escape is malformed', () => {
-    const value = 'FEAR%STREET'
-
-    expect(decodeOrKeep(value)).toBe(value)
-  })
-
-  it('should return undefined for undefined', () => {
-    expect(decodeOrKeep(undefined)).toBeUndefined()
-  })
-
-  it('should return undefined for an empty string', () => {
-    expect(decodeOrKeep('')).toBeUndefined()
-  })
-})
-
 describe('splitStrayParams', () => {
   it('should split the id from the tail at the first ampersand', () => {
     const value = 'mhrk1978&playlist=1&autoplay=1'
@@ -334,6 +279,42 @@ describe('composeQuery', () => {
     const expected = '?theme='
 
     expect(composeQuery(value)).toBe(expected)
+  })
+})
+
+describe('filterUrlQuery', () => {
+  const isKept = (name: string) => {
+    return name === 'file' || name.startsWith('pwc[')
+  }
+
+  it('should keep only the pairs the predicate accepts, in the order written', () => {
+    const value = new URL('https://example.com/e?utm_source=feed&file=a.ts&fbclid=abc')
+
+    expect(filterUrlQuery(value, isKept)).toBe('?file=a.ts')
+  })
+
+  it('should keep a repeated parameter once per pair', () => {
+    const value = new URL('https://example.com/e?file=a.ts&file=b.ts')
+
+    expect(filterUrlQuery(value, isKept)).toBe('?file=a.ts&file=b.ts')
+  })
+
+  it('should keep a bracketed name as written', () => {
+    const value = new URL('https://example.com/e?pwc[size]=fit')
+
+    expect(filterUrlQuery(value, isKept)).toBe('?pwc[size]=fit')
+  })
+
+  it('should return an empty string when nothing is kept', () => {
+    const value = new URL('https://example.com/e?utm_source=feed')
+
+    expect(filterUrlQuery(value, isKept)).toBe('')
+  })
+
+  it('should return an empty string for a url with no query', () => {
+    const value = new URL('https://example.com/e')
+
+    expect(filterUrlQuery(value, isKept)).toBe('')
   })
 })
 

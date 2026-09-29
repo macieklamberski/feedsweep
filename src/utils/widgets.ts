@@ -1,4 +1,11 @@
-import { isAnyOf, type MaybePromise, type Pattern, startsWithAnyOf, trimObject } from 'trousse'
+import {
+  isAnyOf,
+  isHostOrSubdomainOf,
+  type MaybePromise,
+  type Pattern,
+  startsWithAnyOf,
+  trimObject,
+} from 'trousse'
 import type {
   CiteResolverResult,
   EmbedResolver,
@@ -13,13 +20,16 @@ import type {
   WidgetResolverResult,
 } from '../types.js'
 import {
+  attr,
   type GeneratedWrapperType,
   getElementDimensions,
   getPairRatio,
   getStylePairRatio,
   getWrapperRatio,
+  isPercentageSized,
+  keepIfMatches,
 } from './dom.js'
-import { cleanUrl, isOnHosts, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
+import { cleanUrl, parseUrlOnHosts, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
 
 const parseOrKeepDate = (
   date: string | undefined,
@@ -35,6 +45,16 @@ const leadingAtRegex = /^@+/
 // `@` that separates its instance. On a platform that writes bare names it invents a handle.
 export const atUsername = (name: string): string => {
   return `@${name.replace(leadingAtRegex, '')}`
+}
+
+const s9eHelperHost = 's9e.github.io'
+
+// A forum's s9e MediaEmbed helper frame, `s9e.github.io/iframe/2/{platform}.min.html#{id}`, names
+// the content in its first url fragment and the helper's own settings in a second one.
+export const readS9eFragment = (element: Element): string | undefined => {
+  const src = attr(element, 'src')
+
+  return parseUrlOnHosts(src, s9eHelperHost) ? src?.split('#')[1] : undefined
 }
 
 const embedCarriers: Record<string, string> = {
@@ -73,6 +93,30 @@ export const createMarkupEmbedResolver = (
   }
 }
 
+// A forum's s9e MediaEmbed helper frame for one platform, composed into that platform's own url.
+// A fragment holding a character the helper page strips, such as a dot, could step out of the
+// composed path, so it is refused.
+export const createS9eEmbedResolver = (
+  platform: string,
+  fragmentRegex: RegExp,
+  compose: (fragment: string) => EmbedResolverResult | undefined,
+  options: ResolverOptions = {},
+): EmbedResolver => {
+  return createMarkupEmbedResolver(
+    `iframe[data-s9e-mediaembed="${platform}"]`,
+    (element) => {
+      const fragment = keepIfMatches(readS9eFragment(element), fragmentRegex)
+
+      if (!fragment) {
+        return
+      }
+
+      return compose(fragment)
+    },
+    options,
+  )
+}
+
 // What a carrier says about its size: the dimensions it declares, or the ratio a responsive
 // wrapper implies when it declares none. Never both, which is the rule the placeholder carries too.
 type EmbedSize = Pick<EmbedResolverResult, 'width' | 'height' | 'ratio'>
@@ -102,7 +146,8 @@ const decideSize = (
   }
 
   // Ancestors are read only with no resolver size: a theme's 16:9 wrapper once beat a 9:16 player.
-  const wrapperDepth = hasSize(result) ? 0 : undefined
+  // BR's player is `100%` by `100%` inside a ratio box the publisher sized.
+  const wrapperDepth = hasSize(result) && !isPercentageSized(element) ? 0 : undefined
   const declared = getEmbedSize(element, wrapperDepth)
 
   // A lone width reserves no space, so it never outranks a resolver's ratio or height.
@@ -172,7 +217,7 @@ export const createUrlEmbedResolver = (
     extract: (element) => {
       const src = readCarrierUrl(element)
 
-      if (!isOnHosts(src, hosts)) {
+      if (!isHostOrSubdomainOf(src, hosts)) {
         return
       }
 
@@ -181,10 +226,12 @@ export const createUrlEmbedResolver = (
   }
 }
 
+const playerResolverKinds: Array<WidgetResolver['kind']> = ['embed', 'media']
+
 export const isEmbedOrMediaResolver = (
   resolver: WidgetResolver,
 ): resolver is EmbedResolver | MediaResolver => {
-  return resolver.kind === 'embed' || resolver.kind === 'media'
+  return playerResolverKinds.includes(resolver.kind)
 }
 
 export const isMediaResult = (result: WidgetResolverResult): result is MediaResolverResult => {
@@ -247,6 +294,14 @@ export const createImage = (document: Document, fields: ImageFields): HTMLElemen
   return image
 }
 
+export const createLink = (document: Document, href: string, text = href): HTMLElement => {
+  const link = document.createElement('a')
+  link.setAttribute('href', href)
+  link.textContent = text
+
+  return link
+}
+
 // A platform that publishes a canonical static render of something it would otherwise show in a
 // player: Datawrapper's chart png, Giphy's gif. The render goes inline where a reader sees it at
 // once, and the interactive version stays one click away on the platform's own page.
@@ -293,8 +348,11 @@ export const createPlaceholder = <Type extends object>(
 export const normalizeEmbedFields = (
   metadata: Partial<EmbedResolverResult>,
 ): Record<string, string | undefined> => {
+  const params = new URLSearchParams(metadata.params).toString()
+
   return {
     src: metadata.src,
+    params: params || undefined,
     provider: metadata.provider,
     id: metadata.id,
     url: metadata.url,
@@ -454,6 +512,23 @@ export const createCitePlaceholder = (
   result: CiteResolverResult,
 ): HTMLElement => {
   return createPlaceholder(document, 'cite', normalizeCiteFields(result))
+}
+
+export type FileFields = {
+  url: string
+  name: string
+  type?: string
+  size?: number
+}
+
+// A file the reader downloads, never frames.
+export const createFilePlaceholder = (document: Document, fields: FileFields): HTMLElement => {
+  return createPlaceholder(document, 'file', {
+    url: fields.url,
+    name: fields.name,
+    type: fields.type,
+    size: fields.size ? String(fields.size) : undefined,
+  })
 }
 
 // The pass both placeholder kinds run for enrichment: read a ref off every placeholder in the

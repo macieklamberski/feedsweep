@@ -109,6 +109,7 @@ const composeAuthor = (name?: string, handle?: string): string | undefined => {
     return `${name} (${atUsername(handle)})`
   }
 
+  // biome-ignore lint/nursery/useNullishCoalescing: An empty payload name reads as absent.
   return name || (handle && atUsername(handle)) || undefined
 }
 

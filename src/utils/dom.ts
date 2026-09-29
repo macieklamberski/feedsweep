@@ -1,5 +1,6 @@
 import { coerceNumber, isNonEmptyString, type Nullish, startsWithAnyOf } from 'trousse'
 import * as styles from './styles.js'
+import { isUrlShaped } from './urls.js'
 
 // Linkedom mis-types Node as `() => void` in facades.d.ts (WebReflection/linkedom#167).
 export const Node = { ELEMENT_NODE: 1, TEXT_NODE: 3, COMMENT_NODE: 8 } as const
@@ -125,11 +126,25 @@ export const keepIfMatches = (value: Nullish<string>, regex: RegExp): string | u
   return value && regex.test(value) ? value : undefined
 }
 
-// A `.swf` carrier names what it plays in flashvars, an attribute on `<embed>` and a sibling
+// The `<object>` whose params configure a carrier: the carrier itself, or the object an `<embed>`
+// fallback sits in. Any wider search reads a neighbouring player's params.
+const paramOwner = (element: Nullish<Element>): Element | undefined => {
+  if (element?.localName === 'object') {
+    return element
+  }
+
+  const parent = element?.parentElement
+
+  if (parent?.localName === 'object') {
+    return parent
+  }
+}
+
+// A `.swf` carrier names what it plays in flashvars, an attribute on `<embed>` and a
 // `<param name="flashvars">` under `<object>`. Brightcove and Flickr write it as a query string,
 // Archive as a config blob.
 export const flashVars = (element: Nullish<Element>): string | undefined => {
-  return attr(element, 'flashvars') ?? paramValue(element?.parentElement, 'flashvars')
+  return attr(element, 'flashvars') ?? paramValue(paramOwner(element), 'flashvars')
 }
 
 // One named value out of that configuration, for a carrier that names a single thing.
@@ -237,6 +252,14 @@ export const mediaElements = new Set([
   'video',
 ])
 
+export const mediaSelector = [...mediaElements].join(', ')
+
+export const headingSelector = 'h1, h2, h3, h4, h5, h6'
+
+// Flow containers whose direct children a paragraph pass regroups.
+export const processContainersSelector =
+  'body, div, blockquote, td, li, article, section, main, header, footer, aside'
+
 export const isMediaElement = (node: Node): boolean => {
   return isElement(node) && mediaElements.has(node.localName)
 }
@@ -286,7 +309,28 @@ export const hasAncestorWithTagName = (node: Node, tagSet: Set<string>, stopAt?:
   return false
 }
 
-export const generatedWrapperTypes = ['embed', 'cite', 'table', 'pre'] as const
+// The selector engine jsdom uses refuses anything over 2048 characters, and the default
+// non-content list is longer than that, so a caller queries one batch at a time.
+const maxSelectorLength = 2000
+
+export const batchSelectors = (selectors: ReadonlyArray<string>): Array<string> => {
+  const batches: Array<Array<string>> = []
+  let length = maxSelectorLength
+
+  for (const selector of selectors) {
+    if (length + selector.length + 1 > maxSelectorLength) {
+      batches.push([])
+      length = 0
+    }
+
+    batches[batches.length - 1].push(selector)
+    length += selector.length + 1
+  }
+
+  return batches.map((batch) => batch.join(','))
+}
+
+export const generatedWrapperTypes = ['embed', 'cite', 'file', 'table', 'pre'] as const
 
 export type GeneratedWrapperType = (typeof generatedWrapperTypes)[number]
 
@@ -296,7 +340,11 @@ export const isGeneratedWrapper = (element: Element): boolean => {
   return element.getAttributeNames().some((name) => startsWithAnyOf(name, generatedWrapperPrefixes))
 }
 
-export const placeholderSelectors = ['[data-embed-provider]', '[data-cite-provider]']
+export const placeholderSelectors = [
+  '[data-embed-provider]',
+  '[data-cite-provider]',
+  '[data-file-url]',
+]
 
 // A player url or embed attribute states `200`, or `200px` where the publisher wrote the unit.
 // Not shared with dimensionAttribute: removeTrackingPixels needs 0, 1 and 2 to parse there.
@@ -332,7 +380,9 @@ const dimensionAttribute = (element: Element, name: string): number | undefined 
 const imageDimensionsRegex = /^\s*([0-9]+)\s*x\s*([0-9]+)\s*$/i
 
 export const getElementDimensions = (element: Element): { width?: number; height?: number } => {
-  const width = dimensionAttribute(element, 'width')
+  // `width: 1px; min-width: 100%` fills the container, so the stated width names no size.
+  const isContainerWide = styles.declarations(element)['min-width'] === '100%'
+  const width = isContainerWide ? undefined : dimensionAttribute(element, 'width')
   const height = dimensionAttribute(element, 'height')
 
   if (width !== undefined && height !== undefined) {
@@ -340,9 +390,10 @@ export const getElementDimensions = (element: Element): { width?: number; height
   }
 
   const dimensions = imageDimensionsRegex.exec(element.getAttribute('data-image-dimensions') ?? '')
+  const styleWidth = isContainerWide ? undefined : styles.pixels(element, 'width')
 
   return {
-    width: width ?? coerceNumber(dimensions?.[1]) ?? coerceNumber(styles.pixels(element, 'width')),
+    width: width ?? coerceNumber(dimensions?.[1]) ?? coerceNumber(styleWidth),
     height:
       height ?? coerceNumber(dimensions?.[2]) ?? coerceNumber(styles.pixels(element, 'height')),
   }
@@ -354,9 +405,9 @@ const paddingPercentRegex = /^([\d.]+)%$/
 const whitespaceRegex = /\s+/
 const wpEmbedAspectRegex = /wp-embed-aspect-(\d+)-(\d+)/
 
-// Some embed wrappers write the hack as `padding: 0 0 56.25%`, where only the three and four
-// value forms give the bottom a value of its own.
-const shorthandBottom = (declarations: styles.Declarations): string | undefined => {
+// Some embed wrappers write the hack as `padding: 0 0 56.25%` or `padding: 56.25% 0 0 0`, where
+// only the three and four value forms give the top and the bottom values of their own.
+const shorthandSide = (declarations: styles.Declarations, index: 0 | 2): string | undefined => {
   const padding = declarations.padding
 
   if (!padding || padding.includes('(')) {
@@ -365,7 +416,7 @@ const shorthandBottom = (declarations: styles.Declarations): string | undefined 
 
   const sides = padding.split(whitespaceRegex)
 
-  return sides.length >= 3 ? sides[2] : undefined
+  return sides.length >= 3 ? sides[index] : undefined
 }
 
 // Ordered by trust, the max-width pair last: it infers a ratio the others state outright.
@@ -392,11 +443,19 @@ const elementRatioSources: Array<(element: Element) => string | undefined> = [
   },
 
   // The legacy inline padding hack (`padding-bottom:56.25%`): the percent is the
-  // inverse of the ratio, bounded to keep a stray value from encoding nonsense.
+  // inverse of the ratio, bounded to keep a stray value from encoding nonsense. A wrapper that
+  // pads the top zeroes the bottom (`0`, `0%`, `0px`), so only a zero bottom yields to the top.
   (element) => {
+    // `parseStyles` drops a longhand that a later shorthand resets, so a longhand still present
+    // wins over the shorthand, as it does in the browser's cascade.
     const declarations = styles.declarations(element)
-    const padding =
-      declarations['padding-bottom'] ?? declarations['padding-top'] ?? shorthandBottom(declarations)
+    const top = declarations['padding-top'] ?? shorthandSide(declarations, 0)
+    let padding = declarations['padding-bottom'] ?? shorthandSide(declarations, 2)
+
+    if (padding === undefined || Number.parseFloat(padding) === 0) {
+      padding = top
+    }
+
     const percent = Number(padding?.match(paddingPercentRegex)?.[1])
 
     if (percent > 0 && percent < 1000) {
@@ -473,6 +532,28 @@ const readStyleLength = (value: string | undefined): number | undefined => {
   const digits = value?.match(styleLengthRegex)?.[1]
 
   return digits === undefined ? undefined : Number(digits)
+}
+
+const percentageLengthRegex = /^\s*[\d.]+%\s*$/
+
+// A browser applies `style="width:100%"` over a `width="500"` presentation attribute.
+const isPercentageLength = (
+  element: Element,
+  declarations: styles.Declarations,
+  name: string,
+): boolean => {
+  const value = declarations[name] ?? element.getAttribute(name)
+
+  return value !== null && value !== undefined && percentageLengthRegex.test(value)
+}
+
+export const isPercentageSized = (element: Element): boolean => {
+  const declarations = styles.declarations(element)
+
+  return (
+    isPercentageLength(element, declarations, 'width') &&
+    isPercentageLength(element, declarations, 'height')
+  )
 }
 
 // The inline-style spelling of the pair above. Read only where the element states no
@@ -564,4 +645,20 @@ export const walkElements = (
   }
 
   return false
+}
+
+// The first value among lazy attributes that names a url, which a lazy-load library parks
+// where the real attribute belongs.
+export const getLazyValue = (
+  element: Element,
+  attributes: ReadonlyArray<string>,
+  isUsable: (value: string) => boolean = isUrlShaped,
+): string | undefined => {
+  for (const attribute of attributes) {
+    const value = element.getAttribute(attribute)
+
+    if (value && isUsable(value)) {
+      return value
+    }
+  }
 }

@@ -1,4 +1,12 @@
-import { isHostOf, isSubdomainOf, parseUrl } from 'trousse'
+import {
+  audioExtensions,
+  documentExtensions,
+  flashExtensions,
+  imageExtensions,
+  isHostOrSubdomainOf,
+  parseUrl,
+  videoExtensions,
+} from 'trousse'
 import type { ResolveUrlFn, TransformContext } from '../types.js'
 
 // Each helper names the slice of the context it actually reads, so a caller holding only a
@@ -10,9 +18,13 @@ type CleanContext = Pick<TransformContext, 'cleanUrlFn'>
 export const placeholderBaseUrl = 'https://example.com'
 
 const urlShapeRegex = /[:/.]/
+const queryOrHashRegex = /[?#]/
 
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
+
+export const urlSafeTokenRegex = /^[A-Za-z0-9_-]+$/
+export const digitsRegex = /^\d+$/
 
 // No m3u8 or mpd: only Safari plays them natively, so promoting one breaks the player elsewhere.
 export const imageFileRegex = /\.(avif|gif|jpe?g|png|svg|webp)(\?|#|$)/i
@@ -22,9 +34,15 @@ export const audioFileRegex = /\.(aac|mp3|m4a|ogg|oga|wav|flac|opus)(\?|#|$)/i
 // A file no browser can play. Flash was blocked everywhere in January 2021, and hosts still
 // serve the `.swf` bytes, so a URL that reaches this is one that answers 200 and renders
 // nothing whatever a reader does with it.
-export const flashFileRegex = /\.swf(\?|#|$)/i
+export const flashFileRegex = new RegExp(`\\.(${flashExtensions.join('|')})(\\?|#|$)`, 'i')
 
-export const documentFileRegex = /\.(pdf|epub|docx?|pptx?|xlsx?)(\?|#|$)/i
+const fileExtensions = [
+  ...audioExtensions,
+  ...videoExtensions,
+  ...imageExtensions,
+  ...documentExtensions,
+]
+const fileRegex = new RegExp(`\\.(${fileExtensions.join('|')})(\\?|#|$)`, 'i')
 
 // Whether a url names audio or video the reader can play as it stands. A podcast host serves the
 // episode file from the same domain as its player, so a media url that skips this check reads as
@@ -33,16 +51,31 @@ export const isMediaFile = (value: string): boolean => {
   return audioFileRegex.test(value) || videoFileRegex.test(value)
 }
 
-// Whether a value names a file of any kind the reader can already show. The enclosure probe offers
-// every attachment a feed carries to every resolver, so a platform whose id shape admits a dot
-// would otherwise mint a player for an `.mp3` and take the place of a playable element.
+// Whether a value names an audio, video, image or document file. The enclosure probe offers every
+// attachment a feed carries to every resolver, so a platform whose id shape admits a dot would
+// otherwise mint a player for an `.mp3` and take the place of a playable element.
 export const isFileName = (value: string): boolean => {
-  return (
-    documentFileRegex.test(value) ||
-    audioFileRegex.test(value) ||
-    videoFileRegex.test(value) ||
-    imageFileRegex.test(value)
-  )
+  return fileRegex.test(value)
+}
+
+// A MediaWiki file page sits at `/wiki/File:Clip.webm`, so its path ends in the media's own
+// extension while the response is HTML. Feeds carry the colon percent-encoded too, and the
+// `/w/index.php?title=File:Clip.webm` spelling moves the namespace into the query.
+const filePagePathRegex = /\/wiki\/[^/?#]*(?::|%3A)[^/?#]*$/i
+const scriptPathRegex = /\/index\.php$/
+const titleParamRegex = /[?&]title=[^&#]*(?::|%3A)/i
+const filePageNameRegex = /\/wiki\/[^/?#]*?(?::|%3A)([^/?#]+)$/i
+
+export const isMediaWikiFilePage = (value: string): boolean => {
+  const path = value.split(queryOrHashRegex)[0]
+
+  return filePagePathRegex.test(path) || (scriptPathRegex.test(path) && titleParamRegex.test(value))
+}
+
+// The name as the wiki spells it, percent-encoding intact, which is the form `Special:FilePath`
+// and the API both take. Only the `/wiki/` spelling, since no feed carries the other on a frame.
+export const parseMediaWikiFileName = (value: string): string | undefined => {
+  return value.split(queryOrHashRegex)[0].match(filePageNameRegex)?.[1]
 }
 
 // Exact on purpose: Simplecast tells a current id from a legacy eight-hex one by this shape.
@@ -61,42 +94,14 @@ export const isUrlShaped = (value: string): boolean => {
   return urlShapeRegex.test(value)
 }
 
-// A url sits on one of the hosts when it is that host exactly or a subdomain of it. The pair is
-// the whole question every host-keyed resolver asks, and half of it silently claims too little.
-export const isOnHosts = (url: string | URL, hosts: string | ReadonlyArray<string>): boolean => {
-  return isHostOf(url, hosts) || isSubdomainOf(url, hosts)
-}
-
 export const parseUrlOnHosts = (
   url: string | undefined,
   hosts: string | ReadonlyArray<string>,
 ): URL | undefined => {
   const parsed = url ? parseUrl(url, placeholderBaseUrl) : undefined
 
-  if (parsed && isOnHosts(parsed, hosts)) {
+  if (parsed && isHostOrSubdomainOf(parsed, hosts)) {
     return parsed
-  }
-}
-
-// A path segment arrives percent-encoded, unlike a query value, which `searchParams` decodes.
-export const decodeSegment = (segment: string | undefined): string | undefined => {
-  try {
-    return segment === undefined ? undefined : decodeURIComponent(segment)
-  } catch {}
-}
-
-// Decodes a percent-encoded value, handing back the raw text when the escape is malformed, for a
-// field the undecoded form still reads as. A falsy value returns undefined, since
-// decodeURIComponent answers the string "undefined" for a missing one.
-export const decodeOrKeep = (value: string | undefined): string | undefined => {
-  if (!value) {
-    return
-  }
-
-  try {
-    return decodeURIComponent(value)
-  } catch {
-    return value
   }
 }
 
@@ -135,6 +140,21 @@ export const composeQuery = (params?: Record<string, string>): string => {
   const query = new URLSearchParams(params).toString()
 
   return query ? `?${query}` : ''
+}
+
+// The publisher's query with only the parameters a player reads left in it. Each pair stays as
+// written, so a repeated name and a bracketed one such as `pwc[size]` reach the player unchanged.
+export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): string => {
+  const pairs = url.search
+    .slice(1)
+    .split('&')
+    .filter((pair) => {
+      const [name] = [...new URLSearchParams(pair).keys()]
+
+      return !!name && isKept(name)
+    })
+
+  return pairs.length > 0 ? `?${pairs.join('&')}` : ''
 }
 
 // The query string an embed resolver carries over when it rebuilds a src from the video id:
@@ -177,6 +197,7 @@ type CleanUrl = {
 }
 
 export const cleanUrl: CleanUrl = ((url, context: CleanContext) => {
+  // biome-ignore lint/nursery/useNullishCoalescing: An empty cleaned url keeps the input url.
   return url ? context.cleanUrlFn?.(url) || url : undefined
 }) as CleanUrl
 

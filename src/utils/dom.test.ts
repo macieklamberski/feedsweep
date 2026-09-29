@@ -2,6 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, queryElement } from '../tests.js'
 import {
   attr,
+  batchSelectors,
   find,
   findConfigScript,
   flashVar,
@@ -14,6 +15,7 @@ import {
   hasZeroOpacity,
   isElementHidden,
   isEmptyElement,
+  isPercentageSized,
   keepIfMatches,
   paramValue,
   parsePixelSize,
@@ -23,6 +25,105 @@ import {
   textNode,
   walkElements,
 } from './dom.js'
+
+describeForEachParser('isPercentageSized', (parseHtml) => {
+  it('should read a percentage pair the style states', () => {
+    const document = parseHtml('<iframe style="width: 100%; height: 100%;"></iframe>')
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(true)
+  })
+
+  it('should read a percentage pair the attributes state', () => {
+    const document = parseHtml(html`
+      <iframe
+        width="100%"
+        height="100%"
+      ></iframe>
+    `)
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(true)
+  })
+
+  it('should read a fractional percentage pair', () => {
+    const document = parseHtml('<iframe style="width: 33.3%; height: 66.6%;"></iframe>')
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(true)
+  })
+
+  it('should refuse a percentage width beside a pixel height', () => {
+    const document = parseHtml(html`
+      <iframe
+        width="100%"
+        height="880"
+      ></iframe>
+    `)
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(false)
+  })
+
+  it('should refuse a percentage width beside a pixel height the style states', () => {
+    const document = parseHtml('<iframe style="width: 100%; height: 400px;"></iframe>')
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(false)
+  })
+
+  it('should refuse a pixel pair', () => {
+    const document = parseHtml(html`
+      <iframe
+        width="560"
+        height="315"
+      ></iframe>
+    `)
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(false)
+  })
+
+  it('should refuse an element stating no dimensions', () => {
+    const document = parseHtml('<iframe class="ead-iframe"></iframe>')
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(false)
+  })
+
+  it('should refuse a lone percentage height', () => {
+    const document = parseHtml('<iframe style="height: 100%;"></iframe>')
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(false)
+  })
+
+  it('should read the style percentage over a pixel attribute', () => {
+    const document = parseHtml(html`
+      <iframe
+        width="500"
+        height="300"
+        style="width: 100%; height: 100%;"
+      ></iframe>
+    `)
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(true)
+  })
+
+  it('should read the style pixels over a percentage attribute', () => {
+    const document = parseHtml(html`
+      <iframe
+        width="100%"
+        height="100%"
+        style="width: 500px; height: 300px;"
+      ></iframe>
+    `)
+    const element = queryElement(document, 'iframe')
+
+    expect(isPercentageSized(element)).toBe(false)
+  })
+})
 
 describeForEachParser('getStylePairRatio', (parseHtml) => {
   it('should read a small unitless pair as the shape it spells', () => {
@@ -114,6 +215,31 @@ describeForEachParser('getElementDimensions', (parseHtml) => {
     const image = queryElement(document, 'img')
 
     expect(getElementDimensions(image)).toEqual({ width: 50, height: 25 })
+  })
+
+  it('should drop a width that a container-wide min-width overrides', () => {
+    const document = parseHtml(
+      '<iframe style="width: 1px; min-width: 100%; height: 700px; border: none;"></iframe>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(iframe)).toEqual({ width: undefined, height: 700 })
+  })
+
+  it('should drop a width attribute that a container-wide min-width overrides', () => {
+    const document = parseHtml('<iframe width="1" height="700" style="min-width: 100%"></iframe>')
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(iframe)).toEqual({ width: undefined, height: 700 })
+  })
+
+  it('should keep a width beside a min-width narrower than the container', () => {
+    const document = parseHtml(
+      '<iframe style="width: 640px; min-width: 50%; height: 360px"></iframe>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(iframe)).toEqual({ width: 640, height: 360 })
   })
 
   it('should fall back to style when attribute is non-numeric', () => {
@@ -458,6 +584,34 @@ describeForEachParser('getWrapperRatio reading only the element itself', (parseH
     expect(getWrapperRatio(div, 0)).toBe('100/56.25')
   })
 
+  it('should read the padding hack from the top-only shorthand', () => {
+    const document = parseHtml('<div style="padding:56.25% 0 0 0;position:relative;"></div>')
+    const div = queryElement(document, 'div')
+
+    expect(getWrapperRatio(div, 0)).toBe('100/56.25')
+  })
+
+  it('should read the padding hack from the three-value top-only shorthand', () => {
+    const document = parseHtml('<div style="padding: 56.25% 0 0"></div>')
+    const div = queryElement(document, 'div')
+
+    expect(getWrapperRatio(div, 0)).toBe('100/56.25')
+  })
+
+  it('should ignore a shorthand bottom that a later longhand zeroes', () => {
+    const document = parseHtml('<div style="padding: 0 0 56.25%; padding-bottom: 0"></div>')
+    const div = queryElement(document, 'div')
+
+    expect(getWrapperRatio(div, 0)).toBeUndefined()
+  })
+
+  it('should ignore a shorthand top that a later longhand zeroes', () => {
+    const document = parseHtml('<div style="padding: 56.25% 0 0; padding-top: 0"></div>')
+    const div = queryElement(document, 'div')
+
+    expect(getWrapperRatio(div, 0)).toBeUndefined()
+  })
+
   // One or two values pad every side alike, which is spacing and says nothing about shape.
   it('should ignore a shorthand padding that states no bottom of its own', () => {
     const document = parseHtml('<div style="padding: 5%"></div>')
@@ -503,6 +657,42 @@ describeForEachParser('getWrapperRatio', (parseHtml) => {
     const iframe = queryElement(document, 'iframe')
 
     expect(getWrapperRatio(iframe)).toBe('100/50')
+  })
+
+  it('should read a padding-top hack beside a zero padding-bottom', () => {
+    const document = parseHtml(
+      '<div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0;"><iframe></iframe></div>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getWrapperRatio(iframe)).toBe('100/56.25')
+  })
+
+  it('should read a padding-top hack beside a zero-percent padding-bottom', () => {
+    const document = parseHtml(
+      '<div style="padding-top: 75%; padding-bottom: 0%"><iframe></iframe></div>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getWrapperRatio(iframe)).toBe('100/75')
+  })
+
+  it('should not read a padding-top hack beside a pixel padding-bottom', () => {
+    const document = parseHtml(
+      '<div style="padding-top: 10%; padding-bottom: 20px"><iframe></iframe></div>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getWrapperRatio(iframe)).toBeUndefined()
+  })
+
+  it('should not read a padding-top hack beside an em padding-bottom', () => {
+    const document = parseHtml(
+      '<div style="padding-top: 5%; padding-bottom: 1em"><iframe></iframe></div>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getWrapperRatio(iframe)).toBeUndefined()
   })
 
   it('should return undefined when no ancestor carries an aspect signal', () => {
@@ -1044,6 +1234,41 @@ describeForEachParser('flashVars', (parseHtml) => {
     expect(flashVars(element)).toBeUndefined()
   })
 
+  it('should read the param of an object carrier', () => {
+    const document = parseHtml(html`
+      <object data="player.swf">
+        <param name="flashvars" value="config=own" />
+      </object>
+    `)
+    const element = queryElement(document, 'object')
+
+    expect(flashVars(element)).toBe('config=own')
+  })
+
+  it('should not read the param of a neighbouring object', () => {
+    const document = parseHtml(html`
+      <p>
+        <object data="first.swf"><param name="flashvars" value="config=first" /></object>
+        <object data="second.swf"></object>
+      </p>
+    `)
+    const element = document.querySelectorAll('object')[1]
+
+    expect(flashVars(element)).toBeUndefined()
+  })
+
+  it('should not read an object param from a bare embed beside it', () => {
+    const document = parseHtml(html`
+      <p>
+        <object data="first.swf"><param name="flashvars" value="config=first" /></object>
+        <embed src="second.swf">
+      </p>
+    `)
+    const element = queryElement(document, 'embed')
+
+    expect(flashVars(element)).toBeUndefined()
+  })
+
   it('should return undefined when nothing carries the config', () => {
     const document = parseHtml('<embed src="player.swf">')
     const element = queryElement(document, 'embed')
@@ -1231,5 +1456,34 @@ describe('keepIfMatches', () => {
     expect(keepIfMatches('', safeIdRegex)).toBeUndefined()
     expect(keepIfMatches(null, safeIdRegex)).toBeUndefined()
     expect(keepIfMatches(undefined, safeIdRegex)).toBeUndefined()
+  })
+})
+
+describe('batchSelectors', () => {
+  it('should return one batch when the selectors fit', () => {
+    const value = ['.ad', 'iframe[src*="example.com"]', '#sidebar']
+
+    expect(batchSelectors(value)).toEqual(['.ad,iframe[src*="example.com"],#sidebar'])
+  })
+
+  // The selector engine jsdom uses refuses anything over 2048 characters.
+  it('should split selectors that would exceed the engine limit', () => {
+    const value = Array.from({ length: 40 }, (_, index) => `.${'a'.repeat(60)}${index}`)
+    const batches = batchSelectors(value)
+
+    expect(batches.length).toBeGreaterThan(1)
+    expect(Math.max(...batches.map((batch) => batch.length))).toBeLessThanOrEqual(2048)
+    expect(batches.join(',').split(',')).toEqual(value)
+  })
+
+  it('should keep a selector longer than the limit in a batch of its own', () => {
+    const value = [`.${'a'.repeat(2100)}`, '.ad']
+    const batches = batchSelectors(value)
+
+    expect(batches).toEqual([`.${'a'.repeat(2100)}`, '.ad'])
+  })
+
+  it('should return no batches for no selectors', () => {
+    expect(batchSelectors([])).toEqual([])
   })
 })
