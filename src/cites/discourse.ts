@@ -35,7 +35,7 @@ const githubDescription = (paragraph: Element): string | undefined => {
 
 // Engines whose cards are not link previews. TikTok, Reddit, Facebook and Twitch emit bare
 // iframes, not aside.onebox, and Mastodon links go through the generic engine.
-export const omittedOneboxClasses = [
+const omittedOneboxClasses = [
   'twitterstatus', // A social post: the heading is the author and the body the post text
   'threadsstatus', // The same social-post shape as twitterstatus
   'instagram', // Legacy social-post asides; since 2021 the engine emits a bare iframe
@@ -45,7 +45,7 @@ export const omittedOneboxClasses = [
 
 // Hosts with no onebox engine of their own: their posts arrive as generic asides whose og title
 // is the author's name.
-export const socialPostHosts = ['bsky.app', 'threads.net', 'threads.com']
+const socialPostHosts = ['bsky.app', 'threads.net', 'threads.com']
 
 // Any domain can be a Mastodon instance. A status page titles itself "Display Name
 // (@user@instance)", which the generic onebox renders as its heading.
