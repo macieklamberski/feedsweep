@@ -228,7 +228,12 @@ describeForEachParser('unwrapWrappers', (parseHtml) => {
 
   it('should unwrap a div whose data attributes only start like a placeholder type', async () => {
     const value = html`
-      <div data-preview="true" data-filename="a.txt" data-citation="1" data-embedly-card="1">
+      <div
+        data-preview="true"
+        data-filename="a.txt"
+        data-citation="1"
+        data-embedly-card="1"
+      >
         <p>Content</p>
       </div>
     `
