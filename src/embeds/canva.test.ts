@@ -206,11 +206,11 @@ describeForEachParser('canvaWidgetEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, canvaWidgetEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the legacy loader mount with room for its byline bar', async () => {
+    it('should resolve the legacy loader mount to its design ratio', async () => {
       const value = html`
         <div
           class="canva-embed"
-          data-height-ratio="1"
+          data-height-ratio="0.5625"
           data-design-id="DAC3_5NqG20"
           style="padding:100% 5px 5px 5px;background:rgba(0,0,0,0.03);border-radius:8px;"
         ></div>
@@ -220,7 +220,7 @@ describeForEachParser('canvaWidgetEmbedResolver', (parseHtml) => {
         id: 'DAC3_5NqG20',
         src: 'https://www.canva.com/design/DAC3_5NqG20/view?embed',
         url: 'https://www.canva.com/design/DAC3_5NqG20/view',
-        ratio: '250/298',
+        ratio: '1/0.5625',
       }
 
       expect(await extract(value)).toEqual(expected)

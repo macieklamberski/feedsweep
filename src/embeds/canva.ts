@@ -1,6 +1,6 @@
-import { isHostOf, parseUrl } from 'trousse'
+import { isHostOf, parseUrl, trimObject } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches } from '../utils/dom.js'
+import { attr, keepIfMatches, parseRatio } from '../utils/dom.js'
 import { urlSafeTokenRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -10,10 +10,6 @@ const canvaHosts = ['canva.com', 'www.canva.com']
 // /design/{designId}/{shareToken}/{view|watch}, where older snippets leave the token out. Both are
 // url-safe base64, and the class keeps anything else out of a minted path.
 const designPathRegex = /^\/design\/([\w-]+(?:\/[\w-]+)?)\/(view|watch)\/?$/
-
-// The legacy loader never frames the viewer narrower than this, and adds a byline bar below it.
-const sdkMinWidth = 250
-const sdkBarHeight = 48
 
 // Canva's design viewer, which frames a design at `view` and a video design at `watch`. Neither
 // the id nor the token addresses the design alone, so the id carries both. No thumbnail: its
@@ -45,8 +41,9 @@ export const canvaResolveEmbed: ResolveEmbed = (url) => {
 
 export const canvaIframeEmbedResolver = createUrlEmbedResolver(canvaHosts, canvaResolveEmbed)
 
-// The retired `sdk.canva.com/v1/embed.js` mount, which the loader frames at `/view?embed` and
-// sizes `width × data-height-ratio + 48`. Tuned to the narrowest frame, so the byline bar fits.
+// The retired `sdk.canva.com/v1/embed.js` mount, which the loader frames at `/view?embed`. The
+// loader adds 48px to `width × data-height-ratio`, but the viewer centres the design in any box
+// and overlays its controls, so the ratio alone shows the design edge to edge.
 export const canvaWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.canva-embed[data-design-id]',
   (element) => {
@@ -56,15 +53,14 @@ export const canvaWidgetEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const heightRatio = Number(attr(element, 'data-height-ratio'))
-    const height = Math.ceil(sdkMinWidth * heightRatio + sdkBarHeight)
+    const ratio = parseRatio(`1/${attr(element, 'data-height-ratio')}`)
 
     return {
       provider: 'canva',
       id,
       src: `https://www.canva.com/design/${id}/view?embed`,
       url: `https://www.canva.com/design/${id}/view`,
-      ...(heightRatio > 0 ? { ratio: `${sdkMinWidth}/${height}` } : {}),
+      ...trimObject({ ratio }),
     }
   },
   { preferResolverSize: true },
