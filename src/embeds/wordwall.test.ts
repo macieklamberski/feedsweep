@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { wordwallEmbedResolver } from './wordwall.js'
@@ -7,7 +8,7 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, wordwallEmbedResolver)
 
   describe('happy paths', () => {
-    it('should drop the locale prefix from the minted player url', async () => {
+    it('should keep the locale prefix in the player url and out of the id', async () => {
       const value = html`
         <iframe
           style="max-width: 100%;"
@@ -21,7 +22,7 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'wordwall',
         id: 'e10cc41040bb489c83a4fc6670afeb5d',
-        src: 'https://wordwall.net/embed/e10cc41040bb489c83a4fc6670afeb5d?themeId=46&templateId=54&fontStackId=0',
+        src: 'https://wordwall.net/es/embed/e10cc41040bb489c83a4fc6670afeb5d?themeId=46&templateId=54&fontStackId=0',
         width: 500,
         height: 380,
       }
@@ -53,13 +54,55 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the wordwall path', async () => {
-      const value = html`<iframe src="https://evil.test/wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
+      const value = html`<iframe src="https://evil.test/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the image cdn host carrying the player path', async () => {
+      const value = html`<iframe src="https://screens.cdn.wordwall.net/embed/play/65121/614/434"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an id carrying a query separator', async () => {
+      const value = html`<iframe src="https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d&a=1"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a locale carrying a query separator', async () => {
+      const value = html`<iframe src="https://wordwall.net/es&x=b/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a locale region carrying a query separator', async () => {
+      const value = html`<iframe src="https://wordwall.net/es-mx&x=b/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a wordwall url outside the embed route', async () => {
       const value = html`<iframe src="https://wordwall.net/play/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a numeric id under a locale prefix outside the embed route', async () => {
+      const value = html`<iframe src="https://wordwall.net/es/resource/3251143/english/what-are-they-doing-now"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a locale prefix that is not a language code', async () => {
+      const value = html`<iframe src="https://wordwall.net/e5s/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an id segment with a non-hex letter inside it', async () => {
+      const value = html`<iframe src="https://wordwall.net/embed/deadzone"></iframe>`
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -83,6 +126,17 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should mint the www spelling onto the bare page host', async () => {
+      const value = html`<iframe src="https://www.wordwall.net/embed/play/65121/614/434"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'wordwall',
+        id: 'play/65121/614/434',
+        src: 'https://wordwall.net/embed/play/65121/614/434',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should drop a query parameter that is not a rendering choice', async () => {
       const value = html`
         <iframe
@@ -98,6 +152,60 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('the legacy numeric play route', () => {
+    it('should keep all three numbers as the id and in the player url', async () => {
+      const value = html`
+        <iframe
+          style="max-width:100%"
+          src="https://wordwall.net/embed/play/65121/614/434"
+          width="500"
+          height="380"
+          frameborder="0"
+          allowfullscreen
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'wordwall',
+        id: 'play/65121/614/434',
+        src: 'https://wordwall.net/embed/play/65121/614/434',
+        width: 500,
+        height: 380,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore a play route missing its check number', async () => {
+      const value = html`<iframe src="https://wordwall.net/embed/play/65121/614"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a check number with a prefix before its digits', async () => {
+      const value = html`<iframe src="https://wordwall.net/embed/play/65121/614/x434"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a check number with a suffix after its digits', async () => {
+      const value = html`<iframe src="https://wordwall.net/embed/play/65121/614/434x"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a play route outside the embed route', async () => {
+      const value = html`<iframe src="https://wordwall.net/de/play/65121/614/434"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a locale prefix, which the play route does not serve', async () => {
+      const value = html`<iframe src="https://wordwall.net/de/embed/play/65121/614/434"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
     })
   })
 
@@ -118,5 +226,27 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
+})
+
+describeForEachParser('wordwall through the pipeline', (parseHtml) => {
+  it('should leave an activity image enclosure as an image', async () => {
+    const enclosures = [
+      {
+        url: 'https://screens.cdn.wordwall.net/800/51a2b39355314290be5b0e908a65c6fa_54',
+        type: 'image/jpeg',
+      },
+    ]
+    const expected = html`
+      <img data-enclosure="" src="https://screens.cdn.wordwall.net/800/51a2b39355314290be5b0e908a65c6fa_54">
+      <p>Body</p>
+    `
+    const result = await transformContent('<p>Body</p>', {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 })
