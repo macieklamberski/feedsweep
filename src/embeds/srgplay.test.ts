@@ -61,6 +61,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         id: 'urn:srf:video:620986d4-4b67-4c35-9be7-e80ef4baa706',
         src: 'https://www.srf.ch/play/embed?urn=urn:srf:video:620986d4-4b67-4c35-9be7-e80ef4baa706',
         url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn:srf:video:620986d4-4b67-4c35-9be7-e80ef4baa706',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -159,6 +160,8 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       '<iframe src="https://www.srf.ch/play/embedded?urn=urn:srf:video:cfb39f35-b1f7-4937-a806-68bea0e611d3"></iframe>',
       '<iframe src="https://www.srf.ch/x/play/tv/popupvideoplayer?id=09c4a927-c156-46b7-8f53-c6a6302bfd88"></iframe>',
       '<iframe src="https://www.srf.ch/play/tv/popupvideoplayerx?id=09c4a927-c156-46b7-8f53-c6a6302bfd88"></iframe>',
+      '<iframe src="https://www.srf.ch/x/player/tv/tagesschau--vom-19-07-2013/videoembed/g20?id=620986d4-4b67-4c35-9be7-e80ef4baa706"></iframe>',
+      '<iframe src="https://www.srf.ch/player/tv/tagesschau--vom-19-07-2013/videoembed/g20/x?id=620986d4-4b67-4c35-9be7-e80ef4baa706"></iframe>',
     ]
 
     it.each(playerPathLookalikes)('should return undefined for %s', async (value) => {
@@ -180,6 +183,20 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should state the live player ratio over the box the retired player declared', async () => {
+      const value =
+        '<iframe width="400" height="300" src="http://www.srf.ch/player/tv/tagesschau--vom-19-07-2013/videoembed/g20-will-steuerschlupfloecher-stopfen?id=620986d4-4b67-4c35-9be7-e80ef4baa706&mode=embed"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'srgplay',
+        id: 'urn:srf:video:620986d4-4b67-4c35-9be7-e80ef4baa706',
+        src: 'https://www.srf.ch/play/embed?urn=urn:srf:video:620986d4-4b67-4c35-9be7-e80ef4baa706',
+        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn:srf:video:620986d4-4b67-4c35-9be7-e80ef4baa706',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should accept a trailing slash on the player path', async () => {
       const value =
         '<iframe src="https://www.rts.ch/play/embed/?urn=urn:rts:video:5590499"></iframe>'
