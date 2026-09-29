@@ -60,6 +60,23 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should keep the query as published', async () => {
+      const value = html`
+        <div
+          class="gfm-embed"
+          data-url="https://www.gofundme.com/f/save-the-hall/widget/medium?sharesheet=campaign_nav&utm_source=widget"
+        ></div>
+      `
+      const expected = html`
+        <iframe
+          src="https://www.gofundme.com/f/save-the-hall/widget/medium?sharesheet=campaign_nav&utm_source=widget"
+          height="200"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -225,59 +242,6 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
     })
   })
 
-  describe('the tracking a shared snippet carries in its query', () => {
-    it('should drop sharesheet and attribution_id', async () => {
-      const value = html`
-        <div
-          class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/medium?sharesheet=campaign_nav&attribution_id=sl:8a55921a-79b1-4433-be49-b913310530ad"
-        ></div>
-      `
-      const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/medium"
-          height="200"
-        ></iframe>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep a parameter the sharesheet did not stamp', async () => {
-      const value = html`
-        <div
-          class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/medium?lang=en&sharesheet=campaign_nav"
-        ></div>
-      `
-      const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/medium?lang=en"
-          height="200"
-        ></iframe>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should drop the campaign tags a share link picks up', async () => {
-      const value = html`
-        <div
-          class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/medium?utm_source=widget&lang=en&UTM_Medium=referral&fbclid=IwAR0abc"
-        ></div>
-      `
-      const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/medium?lang=en"
-          height="200"
-        ></iframe>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-  })
-
   describe('gofundme.com markup this transform leaves alone', () => {
     it('should leave the retired Flash widget on funds.gofundme.com', async () => {
       const value = html`<embed src="https://funds.gofundme.com/widgetflex.swf?id=1234567"></embed>`
@@ -313,7 +277,7 @@ describeForEachParser('rebuildGofundmeEmbeds through the pipeline', (parseHtml) 
     `
     const expected = html`
       <div
-        data-embed-src="https://www.gofundme.com/f/save-the-hall/widget/medium"
+        data-embed-src="https://www.gofundme.com/f/save-the-hall/widget/medium?sharesheet=campaign_nav"
         data-embed-height="200"
       ></div>
     `

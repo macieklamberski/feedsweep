@@ -1,20 +1,7 @@
-import { isAnyOf } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, isEmptyElement } from '../../utils/dom.js'
-import { filterUrlQuery, parseUrlOnHosts } from '../../utils/urls.js'
+import { parseUrlOnHosts } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
-
-// GoFundMe's share sheet stamps these on the snippet it hands a supporter.
-const shareParams = ['sharesheet', 'attribution_id']
-
-// The share sheet's stamps and the campaign tags a share link picks up.
-const isKeptParam = (name: string): boolean => {
-  const lowercased = name.toLowerCase()
-
-  return (
-    !isAnyOf(lowercased, shareParams) && lowercased !== 'fbclid' && !lowercased.startsWith('utm_')
-  )
-}
 
 // The loader's starting height per size segment, `/f/{slug}/widget/{size}`, before the frame posts
 // its own. Any other segment, or none, starts at the large height.
@@ -36,8 +23,6 @@ export const rebuildGofundmeEmbeds: DomTransform = () => (document) => {
     if (!url) {
       continue
     }
-
-    url.search = filterUrlQuery(url, isKeptParam)
 
     // The host redirects `http:` to `https:`, and an `http:` frame is blocked as mixed content.
     url.protocol = 'https:'
