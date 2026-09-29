@@ -47,6 +47,45 @@ describe('nprResolveEmbed', () => {
 
       expect(nprResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should carry a pair off the video player without the media type', () => {
+      const value =
+        'https://www.npr.org/embedded-video?storyId=g-s1-74060&mediaId=g-s1-74060-100&jwMediaType=music'
+      const expected: EmbedResolverResult = {
+        provider: 'npr',
+        id: 'video/g-s1-74060/g-s1-74060-100',
+        src: 'https://www.npr.org/embedded-video?storyId=g-s1-74060&mediaId=g-s1-74060-100',
+        ratio: '16/9',
+      }
+
+      expect(nprResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should repair the retired video template onto the video player', () => {
+      const value =
+        'http://www.npr.org/templates/event/embeddedVideo.php?storyId=191047262&mediaId=191050756'
+      const expected: EmbedResolverResult = {
+        provider: 'npr',
+        id: 'video/191047262/191050756',
+        src: 'https://www.npr.org/embedded-video?storyId=191047262&mediaId=191050756',
+        ratio: '16/9',
+      }
+
+      expect(nprResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should repair the dead video player page onto the video player', () => {
+      const value =
+        'https://www.npr.org/player/embeddable/video/player.html?i=141331825&m=141398010'
+      const expected: EmbedResolverResult = {
+        provider: 'npr',
+        id: 'video/141331825/141398010',
+        src: 'https://www.npr.org/embedded-video?storyId=141331825&mediaId=141398010',
+        ratio: '16/9',
+      }
+
+      expect(nprResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -109,6 +148,54 @@ describe('nprResolveEmbed', () => {
 
       expect(nprResolveEmbed(value)).toBeUndefined()
     })
+
+    it('should ignore a video player naming no media', () => {
+      const value = 'https://www.npr.org/embedded-video?storyId=141331825'
+
+      expect(nprResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a video player naming no story', () => {
+      const value = 'https://www.npr.org/embedded-video?mediaId=141398010'
+
+      expect(nprResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a video media id carrying an encoded query', () => {
+      const value = 'https://www.npr.org/embedded-video?storyId=141331825&mediaId=141398010%26x%3D1'
+
+      expect(nprResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a video story id carrying an encoded slash', () => {
+      const value = 'https://www.npr.org/embedded-video?storyId=141331825%2Fx&mediaId=141398010'
+
+      expect(nprResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the video player below another path', () => {
+      const value = 'https://www.npr.org/x/embedded-video?storyId=141331825&mediaId=141398010'
+
+      expect(nprResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a path below the video player', () => {
+      const value = 'https://www.npr.org/embedded-video/extra?storyId=141331825&mediaId=141398010'
+
+      expect(nprResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a route other than the video player', () => {
+      const value = 'https://www.npr.org/embedded-foo?storyId=141331825&mediaId=141398010'
+
+      expect(nprResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the video player path on a foreign host', () => {
+      const value = 'https://evil.test/embedded-video?storyId=141331825&mediaId=141398010'
+
+      expect(nprResolveEmbed(value)).toBeUndefined()
+    })
   })
 })
 
@@ -149,6 +236,30 @@ describe('nprFlashResolveEmbed', () => {
 
       expect(nprFlashResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should mint a video pair onto the video player', () => {
+      const value = 'http://www.npr.org/v2/?i=131050832&m=131389645&t=video'
+      const expected: EmbedResolverResult = {
+        provider: 'npr',
+        id: 'video/131050832/131389645',
+        src: 'https://www.npr.org/embedded-video?storyId=131050832&mediaId=131389645',
+        ratio: '16/9',
+      }
+
+      expect(nprFlashResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint a video pair joined with semicolons onto the video player', () => {
+      const value = 'http://www.npr.org/v2/?i=131050832&m=131389645;t=video'
+      const expected: EmbedResolverResult = {
+        provider: 'npr',
+        id: 'video/131050832/131389645',
+        src: 'https://www.npr.org/embedded-video?storyId=131050832&mediaId=131389645',
+        ratio: '16/9',
+      }
+
+      expect(nprFlashResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -158,14 +269,8 @@ describe('nprFlashResolveEmbed', () => {
       expect(nprFlashResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a video pair', () => {
-      const value = 'http://www.npr.org/v2/?i=131050832&m=131389645&t=video'
-
-      expect(nprFlashResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a video pair joined with semicolons', () => {
-      const value = 'http://www.npr.org/v2/?i=131050832&m=131389645;t=video'
+    it('should ignore a video pair naming no media', () => {
+      const value = 'http://www.npr.org/v2/?i=131050832&t=video'
 
       expect(nprFlashResolveEmbed(value)).toBeUndefined()
     })
@@ -238,6 +343,28 @@ describeForEachParser('nprFlashEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should state the video ratio over the box the Flash carrier declared', async () => {
+      const value = html`
+        <embed
+          allowfullscreen="true"
+          base="http://www.npr.org"
+          height="386"
+          src="http://www.npr.org/v2/?i=131050832&#38;m=131389645&#38;t=video"
+          type="application/x-shockwave-flash"
+          width="400"
+          wmode="opaque"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'npr',
+        id: 'video/131050832/131389645',
+        src: 'https://www.npr.org/embedded-video?storyId=131050832&mediaId=131389645',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -268,6 +395,40 @@ describeForEachParser('nprIframeEmbedResolver', (parseHtml) => {
         id: '550179668/551339989',
         src: 'https://www.npr.org/player/embed/550179668/551339989',
         height: 290,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the box of the retired video template iframe', async () => {
+      const value = html`
+        <iframe
+          frameborder="0"
+          height="338"
+          scrolling="no"
+          src="https://www.npr.org/templates/event/embeddedVideo.php?storyId=673291531&mediaId=673300770"
+          width="600"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'npr',
+        id: 'video/673291531/673300770',
+        src: 'https://www.npr.org/embedded-video?storyId=673291531&mediaId=673300770',
+        width: 600,
+        height: 338,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state the video ratio for a video iframe declaring none', async () => {
+      const value =
+        '<iframe src="https://www.npr.org/embedded-video?storyId=141331825&mediaId=141398010"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'npr',
+        id: 'video/141331825/141398010',
+        src: 'https://www.npr.org/embedded-video?storyId=141331825&mediaId=141398010',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
