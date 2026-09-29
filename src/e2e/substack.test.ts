@@ -8,10 +8,10 @@ describeForEachParser('Substack', (parseHtml) => {
   // fixSubstackMentions, fixSubstackImageLinks and fixSubstackGalleries repair the three
   // components that ship broken, and defaultNonContentSelectors drops the subscribe and
   // publication promos. Everything else (captioned images, hydrated galleries, buttons,
-  // footnotes, code, the third-party wraps) reaches its
-  // shape through the generic passes: unwrapWrappers, flattenPictureElements,
-  // stripNonContentElements and convertWidgets. The Twitter, Instagram and Bluesky wraps are
-  // in open PRs #520, #548 and #547; their cases stay todo until those merge.
+  // footnotes, code, the third-party wraps) reaches its shape through the generic passes:
+  // unwrapWrappers, flattenPictureElements, stripNonContentElements and convertWidgets. The
+  // Twitter, Instagram and Bluesky wraps are in open PRs #520, #548 and #547; their cases stay
+  // todo until those merge.
 
   it('should convert a substack post embed into a cite placeholder', async () => {
     const value = html`
