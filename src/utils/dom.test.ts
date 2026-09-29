@@ -584,6 +584,34 @@ describeForEachParser('getWrapperRatio reading only the element itself', (parseH
     expect(getWrapperRatio(div, 0)).toBe('100/56.25')
   })
 
+  it('should read the padding hack from the top-only shorthand', () => {
+    const document = parseHtml('<div style="padding:56.25% 0 0 0;position:relative;"></div>')
+    const div = queryElement(document, 'div')
+
+    expect(getWrapperRatio(div, 0)).toBe('100/56.25')
+  })
+
+  it('should read the padding hack from the three-value top-only shorthand', () => {
+    const document = parseHtml('<div style="padding: 56.25% 0 0"></div>')
+    const div = queryElement(document, 'div')
+
+    expect(getWrapperRatio(div, 0)).toBe('100/56.25')
+  })
+
+  it('should ignore a shorthand bottom that a later longhand zeroes', () => {
+    const document = parseHtml('<div style="padding: 0 0 56.25%; padding-bottom: 0"></div>')
+    const div = queryElement(document, 'div')
+
+    expect(getWrapperRatio(div, 0)).toBeUndefined()
+  })
+
+  it('should ignore a shorthand top that a later longhand zeroes', () => {
+    const document = parseHtml('<div style="padding: 56.25% 0 0; padding-top: 0"></div>')
+    const div = queryElement(document, 'div')
+
+    expect(getWrapperRatio(div, 0)).toBeUndefined()
+  })
+
   // One or two values pad every side alike, which is spacing and says nothing about shape.
   it('should ignore a shorthand padding that states no bottom of its own', () => {
     const document = parseHtml('<div style="padding: 5%"></div>')

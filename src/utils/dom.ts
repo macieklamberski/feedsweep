@@ -405,9 +405,9 @@ const paddingPercentRegex = /^([\d.]+)%$/
 const whitespaceRegex = /\s+/
 const wpEmbedAspectRegex = /wp-embed-aspect-(\d+)-(\d+)/
 
-// Some embed wrappers write the hack as `padding: 0 0 56.25%`, where only the three and four
-// value forms give the bottom a value of its own.
-const shorthandBottom = (declarations: styles.Declarations): string | undefined => {
+// Some embed wrappers write the hack as `padding: 0 0 56.25%` or `padding: 56.25% 0 0 0`, where
+// only the three and four value forms give the top and the bottom values of their own.
+const shorthandSide = (declarations: styles.Declarations, index: 0 | 2): string | undefined => {
   const padding = declarations.padding
 
   if (!padding || padding.includes('(')) {
@@ -416,7 +416,7 @@ const shorthandBottom = (declarations: styles.Declarations): string | undefined 
 
   const sides = padding.split(whitespaceRegex)
 
-  return sides.length >= 3 ? sides[2] : undefined
+  return sides.length >= 3 ? sides[index] : undefined
 }
 
 // Ordered by trust, the max-width pair last: it infers a ratio the others state outright.
@@ -446,14 +446,16 @@ const elementRatioSources: Array<(element: Element) => string | undefined> = [
   // inverse of the ratio, bounded to keep a stray value from encoding nonsense. A wrapper that
   // pads the top zeroes the bottom (`0`, `0%`, `0px`), so only a zero bottom yields to the top.
   (element) => {
+    // `parseStyles` drops a longhand that a later shorthand resets, so a longhand still present
+    // wins over the shorthand, as it does in the browser's cascade.
     const declarations = styles.declarations(element)
-    let bottom = declarations['padding-bottom']
+    const top = declarations['padding-top'] ?? shorthandSide(declarations, 0)
+    let padding = declarations['padding-bottom'] ?? shorthandSide(declarations, 2)
 
-    if (bottom && Number.parseFloat(bottom) === 0) {
-      bottom = undefined
+    if (padding === undefined || Number.parseFloat(padding) === 0) {
+      padding = top
     }
 
-    const padding = bottom ?? declarations['padding-top'] ?? shorthandBottom(declarations)
     const percent = Number(padding?.match(paddingPercentRegex)?.[1])
 
     if (percent > 0 && percent < 1000) {
