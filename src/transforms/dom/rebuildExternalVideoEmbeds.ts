@@ -1,3 +1,4 @@
+import { coerceString, isString } from 'trousse'
 import { nicovideoResolveEmbed } from '../../embeds/nicovideo.js'
 import { readYoutubeEmbedSrc } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
@@ -5,9 +6,9 @@ import { parsePixelSize } from '../../utils/dom.js'
 import { createIframe, setDimensions } from '../../utils/widgets.js'
 
 type ExternalVideoConfig = {
-  url?: string
-  width?: string
-  height?: string
+  url?: unknown
+  width?: unknown
+  height?: unknown
 }
 
 const loaderSelector = 'script[src*="/contents/js/external_video.js"]'
@@ -50,8 +51,12 @@ export const rebuildExternalVideoEmbeds: DomTransform = () => {
       }
 
       const config = readConfig(script)
-      const url = config?.url ?? ''
-      const src = readYoutubeEmbedSrc(url) ?? nicovideoResolveEmbed(url)?.src
+
+      if (!isString(config?.url)) {
+        continue
+      }
+
+      const src = readYoutubeEmbedSrc(config.url) ?? nicovideoResolveEmbed(config.url)?.src
 
       if (!src) {
         continue
@@ -60,8 +65,8 @@ export const rebuildExternalVideoEmbeds: DomTransform = () => {
       const iframe = createIframe(document, src)
 
       setDimensions(iframe, {
-        width: parsePixelSize(config?.width),
-        height: parsePixelSize(config?.height),
+        width: parsePixelSize(coerceString(config.width)),
+        height: parsePixelSize(coerceString(config.height)),
       })
       script.remove()
       loader.replaceWith(iframe)

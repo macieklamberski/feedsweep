@@ -97,6 +97,22 @@ describeForEachParser('rebuildExternalVideoEmbeds', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should read a size written as a number', async () => {
+      const value = html`
+        <script>extVideoConfig = {"width":480,"height":320,"url":"https://www.youtube.com/watch?v=yoOT0NiydEA"};</script>
+        <script src="https://blog.seesaa.jp/contents/js/external_video.js"></script>
+      `
+      const expected = html`
+        <iframe
+          src="https://www.youtube.com/embed/yoOT0NiydEA"
+          width="480"
+          height="320"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should be idempotent', async () => {
       const value = html`
         <script>extVideoConfig = {"width":"480","height":"320","url":"https://www.youtube.com/watch?v=yoOT0NiydEA"};</script>
