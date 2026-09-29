@@ -293,6 +293,50 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should leave out a url language the content page does not serve', async () => {
+      const value = html`
+        <script
+          src="http://static.fc2.com/video/js/outerplayer.min.js"
+          url="http://video.fc2.com/zh/content/20130822huqehDnu/"
+          tk="TWpjNE1ESTFNVFk9"
+          w="448"
+          h="284"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '20130822huqehDnu',
+        src: 'https://video.fc2.com/embed/player/20130822huqehDnu/?tg=TWpjNE1ESTFNVFk9',
+        url: 'https://video.fc2.com/content/20130822huqehDnu/',
+        width: 448,
+        height: 284,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave out a served url language in another case', async () => {
+      const value = html`
+        <script
+          src="http://static.fc2.com/video/js/outerplayer.min.js"
+          url="http://video.fc2.com/JA/content/20130822huqehDnu/"
+          tk="TWpjNE1ESTFNVFk9"
+          w="448"
+          h="284"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '20130822huqehDnu',
+        src: 'https://video.fc2.com/embed/player/20130822huqehDnu/?tg=TWpjNE1ESTFNVFk9',
+        url: 'https://video.fc2.com/content/20130822huqehDnu/',
+        width: 448,
+        height: 284,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should drop a duration the loader states as zero', async () => {
       const value = html`
         <script

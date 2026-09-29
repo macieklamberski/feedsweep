@@ -50,11 +50,13 @@ const composeEmbed = (
   { contentId, locale }: ContentPage,
   params?: Record<string, string>,
 ): EmbedResolverResult => {
+  const localePath = servedLocales.includes(locale ?? '') ? `${locale}/` : ''
+
   return {
     provider,
     id: contentId,
     src: `https://video.fc2.com/embed/player/${contentId}/${composeQuery(params)}`,
-    url: `https://video.fc2.com/${locale ? `${locale}/` : ''}content/${contentId}/`,
+    url: `https://video.fc2.com/${localePath}content/${contentId}/`,
   }
 }
 
@@ -86,8 +88,7 @@ const fc2FlashResolveEmbed: ResolveEmbed = (url) => {
   // The Flash player names the same account tag `tk` as the loader does.
   const params = trimObject({ tg: parsed.searchParams.get('tk') }, Boolean)
   const duration = Number(parsed.searchParams.get('d'))
-  const lang = parsed.searchParams.get('lang') ?? ''
-  const locale = servedLocales.includes(lang) ? lang : undefined
+  const locale = parsed.searchParams.get('lang') ?? undefined
 
   return {
     ...composeEmbed({ contentId, locale }, params),
