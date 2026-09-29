@@ -121,11 +121,26 @@ describe('detectLanguage', () => {
     })
   })
 
+  // SyntaxHighlighter Evolved spells C# both ways across census feeds.
+  const brushLanguages = ['c#', 'c-sharp']
+
+  it.each(brushLanguages)('should detect the brush language %s', (language) => {
+    const { pre, code } = createElement(`<pre class="brush: ${language}"><code>x</code></pre>`)
+
+    expect(detectLanguage(pre, code)).toBe(language)
+  })
+
   describe('Crayon', () => {
     it('should detect Crayon lang: language', () => {
       const { pre, code } = createElement('<pre class="lang:ruby decode:true"><code>x</code></pre>')
 
       expect(detectLanguage(pre, code)).toBe('ruby')
+    })
+
+    it('should detect a Crayon language carrying a plus', () => {
+      const { pre, code } = createElement('<pre class="lang:c++ decode:true"><code>x</code></pre>')
+
+      expect(detectLanguage(pre, code)).toBe('c++')
     })
 
     it('should detect Crayon lang_ language', () => {
@@ -280,6 +295,14 @@ describe('detectLanguage', () => {
   })
 
   describe('GitHub / Sphinx wrapper class', () => {
+    it('should detect a Sphinx language carrying a digit', () => {
+      const { pre, code } = createElement(
+        '<div class="highlight-python3 notranslate"><div class="highlight"><pre>x</pre></div></div>',
+      )
+
+      expect(detectLanguage(pre, code)).toBe('python3')
+    })
+
     it('should detect a GitHub highlight-source-LANG wrapper class', () => {
       const { pre, code } = createElement(
         '<div class="highlight highlight-source-ruby"><pre><code>x</code></pre></div>',
@@ -972,6 +995,25 @@ describeForEachParser('highlightCode', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    const plaintextLanguages = ['plaintext', 'txt']
+
+    it.each(plaintextLanguages)(
+      'should leave a block declared as %s unlabeled',
+      async (language) => {
+        const value = `<pre><code class="language-${language}">just some plain text</code></pre>`
+
+        expect(await transform(value)).toEqualHtml(value)
+      },
+    )
+
+    it('should label a language the label map does not name by its capitalized token', async () => {
+      const value = '<pre><code class="language-docker">FROM node:22</code></pre>'
+      const expected =
+        '<pre data-pre-label="Docker" data-pre-language="docker"><code class="language-docker hljs"><span class="hljs-keyword">FROM</span> node:<span class="hljs-number">22</span></code></pre>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should leave a block declared as plain text unlabeled', async () => {
       const value = '<pre><code class="language-text">just some plain text</code></pre>'
 
@@ -1008,6 +1050,16 @@ describeForEachParser('highlightCode', (parseHtml) => {
   })
 
   describe('pre>code structure', () => {
+    // google-code-prettify numbers its lines as the items of an ordered list, with no newline.
+    it('should read each item of a numbered list as a line of its own', async () => {
+      const value =
+        '<pre class="prettyprint linenums lang-js"><ol class="linenums"><li class="L0">const a = 1</li><li class="L1">const b = 2</li></ol></pre>'
+      const expected =
+        '<pre data-pre-label="JavaScript" data-pre-language="js" class="prettyprint linenums lang-js"><code class="hljs"><span class="hljs-keyword">const</span> a = <span class="hljs-number">1</span>\n<span class="hljs-keyword">const</span> b = <span class="hljs-number">2</span></code></pre>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should wrap a bare pre content in a code', async () => {
       const value = '<pre>plain preformatted text</pre>'
       const expected = '<pre><code>plain preformatted text</code></pre>'

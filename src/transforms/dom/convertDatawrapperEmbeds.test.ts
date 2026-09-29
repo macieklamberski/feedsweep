@@ -115,6 +115,21 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should recover the script form of a chart whose id carries a digit', async () => {
+    const value = html`
+      <div id="datawrapper-vis-5AYa4">
+        <script type="text/javascript" defer src="https://datawrapper.dwcdn.net/5AYa4/embed.js" data-target="#datawrapper-vis-5AYa4"></script>
+      </div>
+    `
+    const expected = html`
+      <a href="https://datawrapper.dwcdn.net/5AYa4/">
+        <img src="https://datawrapper.dwcdn.net/5AYa4/full.png">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   // data-frame-src is now materialized into an <iframe> by rebuildDeferredIframes upstream, so
   // a Texas Tribune / @newswire/frames Datawrapper wrapper still becomes an image, end to end.
   it('should convert a data-frame-src datawrapper wrapper end to end', async () => {
