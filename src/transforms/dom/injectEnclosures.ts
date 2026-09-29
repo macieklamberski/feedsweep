@@ -33,12 +33,12 @@ import {
 export const enclosureMarker = 'data-enclosure'
 
 // Text a publishing tool wrote where a description would go, lowercased.
-const placeholderCaptions = new Set([
+const placeholderCaptions = [
   'thumbnail', // Duda
   'main image', // Duda
   'getassetsmediafromrepository', // Newsweek Polska
   'undefined', // A Mastodon client posting an image with no alt text
-])
+]
 
 // A single token holding a digit, an underscore or a hyphen: an upload's file name.
 const fileNameRegex = /^[\w.-]*[\d_-][\w.-]*$/
@@ -120,7 +120,7 @@ const readImageCaption = (
   const caption = enclosure.description?.trim()
   const normalized = normalize(caption)
 
-  if (!caption || placeholderCaptions.has(normalized)) {
+  if (!caption || placeholderCaptions.includes(normalized)) {
     return
   }
 

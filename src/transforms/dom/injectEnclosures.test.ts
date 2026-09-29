@@ -525,9 +525,9 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           { url: 'https://example.com/photo.jpg', type: 'image/jpeg', description },
         ])
         const expected = html`
-        <img src="https://example.com/photo.jpg" data-enclosure="">
-        <p>Content</p>
-      `
+          <img src="https://example.com/photo.jpg" data-enclosure="">
+          <p>Content</p>
+        `
 
         expect(await transform(value, context)).toEqualHtml(expected)
       },

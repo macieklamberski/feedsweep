@@ -89,6 +89,14 @@ const moveImageToVideoPoster = (image: Element, video: Element, overwrite = fals
     }
   }
 
+  // injectEnclosures hangs a captioned image in a figure, and the caption describes the image.
+  const figure = image.parentElement
+
+  if (image.hasAttribute(enclosureMarker) && figure?.localName === 'figure') {
+    figure.remove()
+    return
+  }
+
   removeWithEmptyWrappers(image)
 }
 
@@ -119,10 +127,6 @@ export const assignVideoPosters: DomTransform = () => (document) => {
   }
 
   for (const image of document.querySelectorAll(`img[${enclosureMarker}]`)) {
-    // injectEnclosures hangs a captioned image in a figure, and the caption describes the image.
-    const figure = image.parentElement?.localName === 'figure' ? image.parentElement : undefined
-
     moveImageToVideoPoster(image, video)
-    figure?.remove()
   }
 }

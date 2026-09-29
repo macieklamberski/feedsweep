@@ -88,6 +88,24 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should remove the figure of a captioned enclosure image it matches to an embed', async () => {
+    const value = html`
+      <figure>
+        <img src="https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg" data-enclosure="">
+        <figcaption>The harbour at dawn.</figcaption>
+      </figure>
+      <div data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"></div>
+    `
+    const expected = html`
+      <div
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should remove the figure of a captioned enclosure image it moves to the poster', async () => {
     const value = html`
       <figure>
