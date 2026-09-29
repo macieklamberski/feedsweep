@@ -94,6 +94,68 @@ describeForEachParser('unwrapDrupalOembedIframes', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should point a lazy iframe at the page url its data-src route wraps', async () => {
+    const value = html`
+      <iframe
+        width="800"
+        height="450"
+        class="media-oembed-content optanon-category-C0004"
+        loading="eager"
+        title="Trigger Point Series 2 | Coming soon | ITV"
+        data-src="https://www.example.com/media/oembed?url=https%3A//www.youtube.com/watch%3Fv%3DfKXGDRnkljI%26pp%3DygUWdHJpZ2dlciBwb2ludCBzZXJpZXMgMg%253D%253D&amp;max_width=0&amp;max_height=0&amp;hash=1SGMUJoPM5uf4jNDdqa4A1Hljmhe0uqi-pj41irQ_6Y"
+      ></iframe>
+    `
+    const expected = html`
+      <iframe
+        width="800"
+        height="450"
+        class="media-oembed-content optanon-category-C0004"
+        loading="eager"
+        title="Trigger Point Series 2 | Coming soon | ITV"
+        data-src="https://www.example.com/media/oembed?url=https%3A//www.youtube.com/watch%3Fv%3DfKXGDRnkljI%26pp%3DygUWdHJpZ2dlciBwb2ludCBzZXJpZXMgMg%253D%253D&amp;max_width=0&amp;max_height=0&amp;hash=1SGMUJoPM5uf4jNDdqa4A1Hljmhe0uqi-pj41irQ_6Y"
+        src="https://www.youtube.com/watch?v=fKXGDRnkljI&amp;pp=ygUWdHJpZ2dlciBwb2ludCBzZXJpZXMgMg%3D%3D"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should point a cookie-gated iframe at the page url its data-cookieblock-src route wraps', async () => {
+    const value = html`
+      <iframe
+        width="560"
+        height="315"
+        class="media-oembed-content"
+        loading="lazy"
+        title="jy030 27403 20270336 JY030 UBCTIRG Video V1"
+        data-cookieblock-src="https://www.example.com/media/oembed?url=https%3A//www.youtube.com/watch%3Fv%3Do8ZG_rBzwL4&amp;max_width=560&amp;max_height=316&amp;hash=cqu9Tsa-j_I25KS2TyGzQa6efE__pSdi3kRjJg6YZUo"
+        data-cookieconsent="marketing"
+      ></iframe>
+    `
+    const expected = html`
+      <iframe
+        width="560"
+        height="315"
+        class="media-oembed-content"
+        loading="lazy"
+        title="jy030 27403 20270336 JY030 UBCTIRG Video V1"
+        data-cookieblock-src="https://www.example.com/media/oembed?url=https%3A//www.youtube.com/watch%3Fv%3Do8ZG_rBzwL4&amp;max_width=560&amp;max_height=316&amp;hash=cqu9Tsa-j_I25KS2TyGzQa6efE__pSdi3kRjJg6YZUo"
+        data-cookieconsent="marketing"
+        src="https://www.youtube.com/watch?v=o8ZG_rBzwL4"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a lazy iframe whose data-src is not the oEmbed route', async () => {
+    const value = html`
+      <iframe data-src="https://www.example.com/player?url=https%3A//www.youtube.com/watch%3Fv%3D2dEj10uaqAs"></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should be idempotent', async () => {
     const value = html`
       <iframe src="https://www.example.com/media/oembed?url=https%3A//www.youtube.com/watch%3Fv%3D2dEj10uaqAs&amp;hash=abc"></iframe>
@@ -129,6 +191,36 @@ describeForEachParser('unwrapDrupalOembedIframes through the pipeline', (parseHt
         data-embed-url="https://www.youtube.com/watch?v=2dEj10uaqAs"
         data-embed-thumbnail="https://i.ytimg.com/vi/2dEj10uaqAs/hqdefault.jpg"
         data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(result).toEqualHtml(expected)
+  })
+
+  it('should let the provider claim the page a lazy route wraps', async () => {
+    const value = html`
+      <iframe
+        width="800"
+        height="450"
+        class="media-oembed-content optanon-category-C0004"
+        loading="eager"
+        title="Trigger Point Series 2 | Coming soon | ITV"
+        data-src="https://www.example.com/media/oembed?url=https%3A//www.youtube.com/watch%3Fv%3DfKXGDRnkljI%26pp%3DygUWdHJpZ2dlciBwb2ludCBzZXJpZXMgMg%253D%253D&amp;max_width=0&amp;max_height=0&amp;hash=1SGMUJoPM5uf4jNDdqa4A1Hljmhe0uqi-pj41irQ_6Y"
+      ></iframe>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+    const expected = html`
+      <div
+        data-embed-src="https://www.youtube.com/embed/fKXGDRnkljI"
+        data-embed-provider="youtube"
+        data-embed-id="fKXGDRnkljI"
+        data-embed-url="https://www.youtube.com/watch?v=fKXGDRnkljI"
+        data-embed-thumbnail="https://i.ytimg.com/vi/fKXGDRnkljI/hqdefault.jpg"
+        data-embed-ratio="16/9"
+        data-embed-title="Trigger Point Series 2 | Coming soon | ITV"
       ></div>
     `
 
