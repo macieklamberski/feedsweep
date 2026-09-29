@@ -707,6 +707,41 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       expect(await transform(value, withNoResolvers)).toEqualHtml(expected)
     })
 
+    it('should keep an <embed> wrapped deeper inside an object', async () => {
+      const value = html`
+        <object>
+          <param name="movie" value="https://example.com/player.swf" />
+          <div>
+            <embed src="https://example.com/player.swf" />
+          </div>
+        </object>
+      `
+      const expected = html`
+        <object>
+          <param value="https://example.com/player.swf" name="movie"></param>
+          <div>
+            <embed src="https://example.com/player.swf"></embed>
+          </div>
+        </object>
+      `
+
+      expect(await transform(value, withNoResolvers)).toEqualHtml(expected)
+    })
+
+    it('should let a resolver claim a bare .swf <embed> before the drop', async () => {
+      const value = '<embed src="http://vimeo.com/moogaloop.swf?clip_id=76979871">'
+      const expected = html`
+        <div
+          data-embed-url="https://vimeo.com/76979871"
+          data-embed-src="https://player.vimeo.com/video/76979871"
+          data-embed-provider="vimeo"
+          data-embed-id="76979871"
+        ></div>
+      `
+
+      expect(await transform(value, baseContext)).toEqualHtml(expected)
+    })
+
     it('should leave an object and the fallback it holds untouched', async () => {
       const value = html`
         <object width="400" height="300" data="https://example.com/player.swf">

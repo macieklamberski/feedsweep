@@ -206,7 +206,7 @@ export const convertWidgets: DomTransform = (context) => {
       // No browser runs a .swf since 2021. An <object> stays, since a browser then shows its
       // fallback children and a placeholder would drop them. A bare <embed> has none and goes.
       if (flashFileRegex.test(cleaned)) {
-        if (element.localName === 'embed' && element.parentElement?.localName !== 'object') {
+        if (element.localName === 'embed' && !element.closest('object')) {
           element.remove()
         }
 
