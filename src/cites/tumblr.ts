@@ -16,11 +16,11 @@ type TumblrLinkData = {
 
 // Comparable form of a URL, or of anchor text showing one: Tumblr drops the scheme and may
 // truncate with an ellipsis when it renders a link as its own label.
-const urlScheme = /^https?:\/\//
-const urlTail = /[…/]+$/ // Trailing ellipsis (U+2026) or slash characters
+const urlSchemeRegex = /^https?:\/\//
+const urlTailRegex = /[…/]+$/ // Trailing ellipsis (U+2026) or slash characters
 
 const bareUrl = (value: string): string => {
-  return value.replace(urlScheme, '').replace(urlTail, '')
+  return value.replace(urlSchemeRegex, '').replace(urlTailRegex, '')
 }
 
 // Tumblr's NPF link block: a bare anchor with the card as JSON, or a painted card, poster in CSS.

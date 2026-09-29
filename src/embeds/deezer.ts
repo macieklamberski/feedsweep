@@ -1,7 +1,7 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'deezer'
@@ -31,10 +31,6 @@ const pluginTypes = toMap({
   track: 'track',
   tracks: 'track',
 })
-
-// Every Deezer id is decimal, and the type is what tells two of them apart: 11969917 is a real
-// playlist and a real track at once, and no album.
-const safeIdRegex = /^\d+$/
 
 // The widget's first segment is its theme. `auto` follows the reader's colour scheme, and an
 // unknown one falls back to the theme Deezer's own share dialog writes.
@@ -83,7 +79,7 @@ export const deezerResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, deezerHosts)
   const resource = parsed && readResource(parsed)
 
-  if (!resource || !deezerHeights.has(resource.type) || !safeIdRegex.test(resource.id)) {
+  if (!resource || !deezerHeights.has(resource.type) || !digitsRegex.test(resource.id)) {
     return
   }
 

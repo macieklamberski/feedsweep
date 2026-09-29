@@ -1,0 +1,132 @@
+import { describe, expect, it } from 'bun:test'
+import { describeForEachParser, emojiConverters, html } from '../tests.js'
+
+describeForEachParser('genericEmojiResolver', (parseHtml) => {
+  const { transform, transformKeeping } = emojiConverters(parseHtml)
+
+  describe('shortcode alts', () => {
+    it('should leave a Discourse shortcode-alt with class="emoji" untouched', async () => {
+      const value = '<p><img class="emoji" alt=":slight_smile:"></p>'
+
+      expect(await transformKeeping(value)).toEqualHtml(value)
+    })
+
+    it('should leave a gemoji shortcode-alt with class="emoji" untouched', async () => {
+      const value = '<p><img class="emoji" alt=":tophat:"></p>'
+
+      expect(await transformKeeping(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('codepoint filenames', () => {
+    it('should decode a codepoint filename with a variation selector', async () => {
+      const value = html`
+        <p>Flying
+          <img
+            class="emoji"
+            src="https://example.com/emojis/2708-fe0f.png"
+            alt="airplane"
+          >
+        </p>
+      `
+      const expected = '<p>Flying ✈️</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should decode a NodeBB Emoji One filename', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emoji"
+            src="https://example.com/plugins/nodebb-plugin-emoji-one/static/images/1f600.png"
+            alt=":grinning:"
+          >
+        </p>
+      `
+      const expected = '<p>😀</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should decode an Atlassian emoji service filename', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emoji"
+            src="https://pf-emoji-service--cdn.us-east-1.prod.public.atl-paas.net/standard/ef8b0642-7523-4e13-9fd3-01b65648acf6/32x32/1f947.png"
+            alt=":first_place:"
+          >
+        </p>
+      `
+      const expected = '<p>🥇</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a named file with a shortcode alt untouched', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emoji"
+            src="https://example.com/assets/emoji/party_parrot.gif"
+            alt=":party_parrot:"
+          >
+        </p>
+      `
+
+      expect(await transformKeeping(value)).toEqualHtml(value)
+    })
+  })
+})
+
+describeForEachParser('genericCharacterEmojiResolver', (parseHtml) => {
+  const { transform, transformKeeping } = emojiConverters(parseHtml)
+
+  it('should replace an image with no src by the character it holds', async () => {
+    const value = '<p>Hi <img class="emoji emoji1f64b" data-c="🙋"></p>'
+    const expected = '<p>Hi 🙋</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should decode the codepoint class when the character is missing', async () => {
+    const value = '<p>Hi <img class="emoji emoji2600-fe0f" data-c=""></p>'
+    const expected = '<p>Hi ☀️</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave an image with a src to the generic resolver', async () => {
+    const value = html`
+      <p>
+        <img
+          class="emoji emoji1f64b"
+          data-c="x"
+          src="https://example.com/assets/emoji/party_parrot.gif"
+        >
+      </p>
+    `
+
+    expect(await transformKeeping(value)).toEqualHtml(value)
+  })
+
+  it('should replace an empty span named by its codepoint class', async () => {
+    const value =
+      '<p>Hi <span class="emoji emoji1f4c5" title="Calendario" role="button"></span></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>Hi 📅</p>')
+  })
+
+  it('should replace an empty span by its data-c character', async () => {
+    const value = '<p>Hi <span class="emoji" data-c="&#x1f348;"></span></p>'
+
+    expect(await transform(value)).toEqualHtml('<p>Hi 🍈</p>')
+  })
+
+  it('should leave an empty span with nothing to read untouched', async () => {
+    const value = '<p>Hi <span class="emoji"></span></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+})

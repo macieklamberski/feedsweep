@@ -1,8 +1,7 @@
 import type { DomTransform } from '../../types.js'
-import { blockElements, hasText, mediaElements } from '../../utils/dom.js'
+import { blockElements, hasText, mediaSelector } from '../../utils/dom.js'
 
 const blockInParagraphSelector = [...blockElements].map((tag) => `p ${tag}`).join(', ')
-const mediaSelector = [...mediaElements].join(', ')
 
 // A paragraph half left with neither text nor media renders as a blank line. One that
 // kept either stays.

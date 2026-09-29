@@ -2,7 +2,7 @@ import {
   defaultAllDomTransforms,
   defaultAvatarImageHosts,
   defaultDeferredIframeSources,
-  defaultEmojiImageHosts,
+  defaultEmojiResolvers,
   defaultFieldCleaners,
   defaultHighlightFn,
   defaultLazyIframeAttributes,
@@ -38,7 +38,7 @@ export const transformContent = async (
     deferredIframeSources: defaultDeferredIframeSources,
     trackingHosts: defaultTrackingHosts,
     trackingPathSegments: defaultTrackingPathSegments,
-    emojiImageHosts: defaultEmojiImageHosts,
+    emojiResolvers: defaultEmojiResolvers,
     avatarImageHosts: defaultAvatarImageHosts,
     nonContentSelectors: defaultNonContentSelectors,
     preservedPreClasses: defaultPreservedPreClasses,
@@ -88,9 +88,11 @@ export { assignVideoPosters } from './transforms/dom/assignVideoPosters.js'
 export { canonicalizeAlignment } from './transforms/dom/canonicalizeAlignment.js'
 export { cleanAnchorUrls } from './transforms/dom/cleanAnchorUrls.js'
 export { convertAmpNativeElements } from './transforms/dom/convertAmpNativeElements.js'
+export { convertAsciinemaEmbeds } from './transforms/dom/convertAsciinemaEmbeds.js'
 export { convertBreaksToParagraphs } from './transforms/dom/convertBreaksToParagraphs.js'
 export { convertCiteCards } from './transforms/dom/convertCiteCards.js'
 export { convertDatawrapperEmbeds } from './transforms/dom/convertDatawrapperEmbeds.js'
+export { convertEmojis } from './transforms/dom/convertEmojis.js'
 export { convertGiphyEmbeds } from './transforms/dom/convertGiphyEmbeds.js'
 export { convertLazyImageContainers } from './transforms/dom/convertLazyImageContainers.js'
 export { convertNoteEmbeds } from './transforms/dom/convertNoteEmbeds.js'
@@ -112,6 +114,7 @@ export { hoistBlocksFromParagraphs } from './transforms/dom/hoistBlocksFromParag
 export { hoistFigcaptionFromAnchor } from './transforms/dom/hoistFigcaptionFromAnchor.js'
 export { injectEnclosures } from './transforms/dom/injectEnclosures.js'
 export { linkifyGistEmbeds } from './transforms/dom/linkifyGistEmbeds.js'
+export { linkifyPaypalDonateForms } from './transforms/dom/linkifyPaypalDonateForms.js'
 export { linkifyUrls } from './transforms/dom/linkifyUrls.js'
 export { markTimestamps, parseTimestampSeconds } from './transforms/dom/markTimestamps.js'
 export { mergeConsecutiveOneLinerPres } from './transforms/dom/mergeConsecutiveOneLinerPres.js'
@@ -126,6 +129,7 @@ export { rebuildEmbedlyEmbeds } from './transforms/dom/rebuildEmbedlyEmbeds.js'
 export { rebuildEmbedPlusEmbeds } from './transforms/dom/rebuildEmbedPlusEmbeds.js'
 export { rebuildGettyImagesEmbeds } from './transforms/dom/rebuildGettyImagesEmbeds.js'
 export { rebuildIframelyEmbeds } from './transforms/dom/rebuildIframelyEmbeds.js'
+export { rebuildJsfiddleEmbeds } from './transforms/dom/rebuildJsfiddleEmbeds.js'
 export { rebuildLazyLoadForVideos } from './transforms/dom/rebuildLazyLoadForVideos.js'
 export { rebuildLazyYtEmbeds } from './transforms/dom/rebuildLazyYtEmbeds.js'
 export { rebuildLiteVideoEmbeds } from './transforms/dom/rebuildLiteVideoEmbeds.js'
@@ -159,7 +163,6 @@ export { surfaceTemplateEmbeds } from './transforms/dom/surfaceTemplateEmbeds.js
 export { trimPreWhitespace } from './transforms/dom/trimPreWhitespace.js'
 export { unwrapDoublyNestedLists } from './transforms/dom/unwrapDoublyNestedLists.js'
 export { unwrapDrupalOembedIframes } from './transforms/dom/unwrapDrupalOembedIframes.js'
-export { unwrapEmojiImages } from './transforms/dom/unwrapEmojiImages.js'
 export { unwrapHeadingBold } from './transforms/dom/unwrapHeadingBold.js'
 export { unwrapNestedCodeWrappers } from './transforms/dom/unwrapNestedCodeWrappers.js'
 export { unwrapWrappers } from './transforms/dom/unwrapWrappers.js'

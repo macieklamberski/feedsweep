@@ -1,8 +1,7 @@
 import type { DomTransform } from '../../types.js'
-import { hasAncestorWithTagName } from '../../utils/dom.js'
+import { hasAncestorWithTagName, headingSelector } from '../../utils/dom.js'
 import { isSamePage } from '../../utils/urls.js'
 
-const headingSelector = 'h1, h2, h3, h4, h5, h6'
 const supTags = new Set(['sup'])
 
 // Anchor class tokens that static-site generators attach to heading permalinks

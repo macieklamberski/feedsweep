@@ -1,13 +1,11 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
+import { urlSafeTokenRegex } from '../utils/urls.js'
 
 const provider = 'blogger'
 
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-
-// The alphabet is the whole guard: the prefix and the length are Google's to change.
-const safeTokenRegex = /^[\w-]+$/
 
 const bloggerHosts = ['blogger.com']
 
@@ -20,7 +18,8 @@ export const extractBloggerToken = (link: string): string | undefined => {
 
   const token = parsed.searchParams.get('token')
 
-  return keepIfMatches(token, safeTokenRegex)
+  // The alphabet is the whole guard: the prefix and the length are Google's to change.
+  return keepIfMatches(token, urlSafeTokenRegex)
 }
 
 // Blogger's own hosted video: an iframe on blogger.com/video.g with no poster and no page to open.

@@ -63,14 +63,19 @@ describe('extractTransistorEmbed', () => {
   // Transistor writes an episode's transcript beside it as `/s/{id}/{token}.{ext}`. The share
   // url above uses the same id, so it is the control: the sidecar is refused and the episode
   // it sits beside still reads.
-  it.each([
+  const transcriptSidecarUrls: Array<string> = [
     'https://share.transistor.fm/s/9f8e7d6c/8a7b6c5d.vtt',
     'https://share.transistor.fm/s/9f8e7d6c/8a7b6c5d.srt',
     'https://share.transistor.fm/s/9f8e7d6c/8a7b6c5d.txt',
     'https://share.transistor.fm/s/9f8e7d6c/8a7b6c5d.json',
-  ])('should return undefined for the transcript sidecar %s', (value) => {
-    expect(extractTransistorEmbed(value)).toBeUndefined()
-  })
+  ]
+
+  it.each(transcriptSidecarUrls)(
+    'should return undefined for the transcript sidecar %s',
+    (value) => {
+      expect(extractTransistorEmbed(value)).toBeUndefined()
+    },
+  )
 
   // Real Transistor examples. Dropping the mode segment would mint `/e/{slug}`, which asks for
   // an episode by a show's name and answers 404.
@@ -117,11 +122,13 @@ describe('extractTransistorEmbed', () => {
 
   // With no length left on either id, the alphabet is the whole guard, and excluding the dot is
   // what keeps a file on the host from reading as an episode.
-  it.each([
+  const fileUrls: Array<string> = [
     'https://share.transistor.fm/e/9f8e7d6c.mp3',
     'https://share.transistor.fm/s/9f8e7d6c.mp3',
     'https://share.transistor.fm/e/build-your-saas.mp3/latest',
-  ])('should return undefined for a file on the host at %s', (value) => {
+  ]
+
+  it.each(fileUrls)('should return undefined for a file on the host at %s', (value) => {
     expect(extractTransistorEmbed(value)).toBeUndefined()
   })
 

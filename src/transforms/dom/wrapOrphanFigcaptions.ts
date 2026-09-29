@@ -3,6 +3,8 @@ import { isElement } from '../../utils/dom.js'
 
 const mediaSelector = 'img, picture, video, audio, iframe'
 
+const captionBoundaryTags = ['figure', 'body']
+
 // The caption may sit inside a wrapper the publisher put it in, and it is that wrapper whose
 // siblings say what the caption belongs to. Only a wrapper holding nothing else counts, so a
 // caption buried in a container of mixed content is left alone.
@@ -12,7 +14,7 @@ const captionAnchor = (figcaption: Element): Element => {
   while (anchor.parentElement && anchor.parentElement.children.length === 1) {
     const parent = anchor.parentElement
 
-    if (parent.tagName.toLowerCase() === 'figure' || parent.tagName.toLowerCase() === 'body') {
+    if (captionBoundaryTags.includes(parent.tagName.toLowerCase())) {
       break
     }
 

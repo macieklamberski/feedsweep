@@ -5,6 +5,7 @@ import {
   readRedditHeight,
   redditIframeEmbedResolver,
   redditResolveEmbed,
+  redditS9eEmbedResolver,
   redditWidgetEmbedResolver,
 } from './reddit.js'
 
@@ -488,6 +489,54 @@ describeForEachParser('redditIframeEmbedResolver', (parseHtml) => {
     const value = '<iframe src="https://evil.test/r/pics/comments/dq4m1v/my_garden/"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
+  })
+})
+
+describeForEachParser('redditS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, redditS9eEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the post out of the helper frame', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="reddit"
+          src="https://s9e.github.io/iframe/2/reddit.min.html#UFOs/comments/1ud4vfe#theme=light"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/UFOs/comments/1ud4vfe',
+        src: 'https://embed.reddit.com/r/UFOs/comments/1ud4vfe/',
+        url: 'https://www.reddit.com/r/UFOs/comments/1ud4vfe/',
+        publisher: 'r/UFOs',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host naming the helper in its path', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="reddit"
+          src="https://evil.test/s9e.github.io/iframe/2/reddit.min.html#UFOs/comments/1ud4vfe"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a fragment stepping out of the post path', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="reddit"
+          src="https://s9e.github.io/iframe/2/reddit.min.html#x/../../../r/other/comments/abc12"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
 
