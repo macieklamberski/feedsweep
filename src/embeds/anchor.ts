@@ -27,7 +27,7 @@ export const extractAnchorEpisode = (link: string): string | undefined => {
   const show = segments[marker - 1]
   const episode = segments[marker + 2]
 
-  if (!show || !episode) {
+  if (!episode) {
     return
   }
 

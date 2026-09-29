@@ -3,8 +3,7 @@ import type { ResolveEmbed } from '../types.js'
 import { digitsRegex, parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-const cnbcHosts = ['cnbc.com']
-const playerHost = 'player.cnbc.com'
+const cnbcHosts = ['player.cnbc.com']
 
 // The JW player runs in aspect mode with a 56.25% spacer and its title band inside the picture.
 // CNBC's own snippet states 560 by 349, which leaves 34 pixels blank at that width.
@@ -18,7 +17,7 @@ export const cnbcResolveEmbed: ResolveEmbed = (url) => {
   const [route, account, player, extra] = parsed ? getPathSegments(parsed) : []
   const guid = parsed?.searchParams.get('byGuid')
 
-  if (parsed?.hostname !== playerHost || route !== 'p' || !player || extra) {
+  if (route !== 'p' || !player || extra) {
     return
   }
 

@@ -1,6 +1,7 @@
+import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cnn'
@@ -82,7 +83,7 @@ export const cnnIframeEmbedResolver = createUrlEmbedResolver(cnnHosts, cnnResolv
 const flashPlayerPathRegex = /^\/cnn\/\.element\/apps\/cvp\/.*\.swf$/
 
 export const cnnFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, cdnHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
     return

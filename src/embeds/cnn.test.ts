@@ -55,6 +55,21 @@ describe('cnnResolveEmbed', () => {
 
       expect(cnnResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should build the placeholder for a video in a hyphenated section', () => {
+      const value =
+        'https://fave.api.cnn.io/v1/fav/?video=cnn-en-espanol/2018/02/16/caminata-espacial-en-la-eei.cnn&customer=cnn&edition=domestic&env=prod'
+      const expected: EmbedResolverResult = {
+        provider: 'cnn',
+        id: 'cnn-en-espanol/2018/02/16/caminata-espacial-en-la-eei.cnn',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=cnn-en-espanol/2018/02/16/caminata-espacial-en-la-eei.cnn&customer=cnn&edition=domestic&env=prod',
+        url: 'https://www.cnn.com/videos/cnn-en-espanol/2018/02/16/caminata-espacial-en-la-eei.cnn',
+        ratio: '16/9',
+        date: '2018-02-16',
+      }
+
+      expect(cnnResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

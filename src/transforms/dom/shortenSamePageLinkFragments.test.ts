@@ -1,11 +1,21 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
-import type { TransformContext } from '../../types.js'
+import type { CleanUrlFn, TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { shortenSamePageLinkFragments } from './shortenSamePageLinkFragments.js'
 
 const pageContext: TransformContext = { ...baseContext, baseUrl: 'https://example.com/blog/post' }
+
+const unwrapRedirect: CleanUrlFn = (url) => {
+  const parsed = URL.parse(url)
+
+  if (parsed?.hostname !== 'redirect.example.org') {
+    return url
+  }
+
+  return parsed.searchParams.get('u') ?? url
+}
 
 describeForEachParser('shortenSamePageLinkFragments', (parseHtml) => {
   const transform = (value: string, context: TransformContext = pageContext) => {
@@ -145,11 +155,20 @@ describeForEachParser('shortenSamePageLinkFragments after the url passes', (pars
     return transformContent(value, {
       parseHtmlFn: parseHtml,
       baseUrl: 'https://example.com/blog/post',
+      cleanUrlFn: unwrapRedirect,
     })
   }
 
   it('should shorten a relative same-page link resolveRelativeUrls made absolute', async () => {
     const value = '<p><a href="/blog/post#sec">jump</a></p>'
+    const expected = '<p><a href="#sec">jump</a></p>'
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should shorten a same-page link cleanAnchorUrls unwrapped from a redirect', async () => {
+    const value =
+      '<p><a href="https://redirect.example.org/?u=https%3A%2F%2Fexample.com%2Fblog%2Fpost%23sec">jump</a></p>'
     const expected = '<p><a href="#sec">jump</a></p>'
 
     expect(await convert(value)).toEqualHtml(expected)
