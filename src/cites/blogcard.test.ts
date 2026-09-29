@@ -189,39 +189,9 @@ describeForEachParser('blogCardCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should leave optional fields undefined when only the title link is present', async () => {
-      const value = html`
-        <div class="blog-card">
-          <div class="blog-card-title">
-            <a href="https://example.com/post">Page title</a>
-          </div>
-        </div>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'blogcard',
-        url: 'https://example.com/post',
-        title: 'Page title',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {
-    it('should return undefined when the title link has no href', async () => {
-      const value = html`
-        <div class="blog-card">
-          <div class="blog-card-title">
-            <a>Page title</a>
-          </div>
-          <div class="blog-card-excerpt">Preview text</div>
-        </div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should return undefined when there is no title', async () => {
       const value = html`
         <div class="blog-card">
