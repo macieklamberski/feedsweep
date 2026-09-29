@@ -175,6 +175,7 @@ for (const [name, grammar] of Object.entries(extraLanguages)) {
 export const languageAliases: Record<string, Array<string>> = {
   bash: ['fish', 'tcsh', 'csh'],
   c: ['clike'],
+  csharp: ['c-sharp'],
   json: ['jsonc', 'json5', 'jsonl'],
   lisp: ['emacs-lisp', 'elisp', 'cl', 'common-lisp', 'common_lisp', 'commonlisp'],
   objectivec: ['objective-c'],
