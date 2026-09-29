@@ -177,7 +177,10 @@ export const convertWidgets: DomTransform = (context) => {
           { ...metadata, thumbnail: carriedThumbnail ?? metadata.thumbnail },
           context,
         )
-        const placeholder = createEmbedPlaceholder(document, { ...prepared, src })
+        const placeholder = createEmbedPlaceholder(document, {
+          ...prepared,
+          src: prepared.src ?? src,
+        })
 
         carrierOrShell(element).replaceWith(placeholder)
       }

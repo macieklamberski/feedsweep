@@ -43,6 +43,17 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    // Neither host serves a player: a show subdomain on either has no DNS record, and the
+    // player path answers 404 on www.podigee.com and player.podigee-cdn.net.
+    const nonPlayerHostUrls: Array<string> = [
+      'https://www.podigee.com/72-an-episode/embed',
+      'https://player.podigee-cdn.net/72-an-episode/embed',
+    ]
+
+    it.each(nonPlayerHostUrls)('should ignore %s', async (value) => {
+      expect(await extract(script(value))).toBeUndefined()
+    })
   })
 })
 

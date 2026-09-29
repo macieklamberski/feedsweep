@@ -1,6 +1,7 @@
+import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cnn'
@@ -28,9 +29,8 @@ const cdnHosts = ['cdn.turner.com']
 // The fave shell is a `padding-bottom: 56.25%` box, and ids of this form have 16:9 renditions.
 const playerRatio = '16/9'
 
-// The player answers 200 for any id, but `fave.api.cnn.io/v1/video?id={id}&customer=cnn` answers
-// with the headline, duration, renditions and posters for a real id and 404 for a fabricated one,
-// and `cnn.com/videos/{id}` discriminates the same way.
+// The player answers 200 for any id. `cnn.com/videos/{id}` answers 200 for a real id and 404 for a
+// fabricated one.
 const composeEmbed = (id: string): EmbedResolverResult => {
   return {
     provider,
@@ -52,7 +52,7 @@ const resolveVideoId = (value: string | null | undefined): EmbedResolverResult |
 }
 
 const resolveTarget = (url: string): EmbedResolverResult | undefined => {
-  const parsed = parseUrlOnHosts(url, cnnHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (parsed?.pathname === '/v1/fav/') {
     return resolveVideoId(parsed.searchParams.get('video'))
@@ -82,7 +82,7 @@ export const cnnIframeEmbedResolver = createUrlEmbedResolver(cnnHosts, cnnResolv
 const flashPlayerPathRegex = /^\/cnn\/\.element\/apps\/cvp\/.*\.swf$/
 
 export const cnnFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, cdnHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
     return

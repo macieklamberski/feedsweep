@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { helloassoEmbedResolver, helloassoResolveEmbed } from './helloasso.js'
+
+const utmParamRegex = /[?&]utm_\w+=\w+/g
 
 describe('helloassoResolveEmbed', () => {
   describe('happy paths', () => {
@@ -190,5 +193,37 @@ describeForEachParser('helloassoEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+describeForEachParser('helloasso widget through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      cleanUrlFn: (url) => url.replace(utmParamRegex, ''),
+    })
+  }
+
+  it("should hand the carrier src to the caller's cleaner", async () => {
+    const value = html`
+      <iframe
+        id="haWidget"
+        allowtransparency="true"
+        src="https://www.helloasso.com/associations/cine-club-du-quartier/formulaires/1/widget-bouton?utm_source=newsletter"
+        style="width: 100%; height: 70px; border: none;"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="helloasso"
+        data-embed-id="cine-club-du-quartier/formulaires/1"
+        data-embed-src="https://www.helloasso.com/associations/cine-club-du-quartier/formulaires/1/widget-bouton"
+        data-embed-url="https://www.helloasso.com/associations/cine-club-du-quartier/formulaires/1"
+        data-embed-height="70"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
