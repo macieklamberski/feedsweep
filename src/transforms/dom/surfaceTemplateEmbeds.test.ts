@@ -150,6 +150,40 @@ describeForEachParser('surfaceTemplateEmbeds (media)', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should surface a video with its own src parked in a template', async () => {
+    const value = html`
+      <div>
+        <template>
+          <video controls src="https://cdn.example.com/clip.mp4"></video>
+        </template>
+      </div>
+    `
+    const expected = '<div><video controls src="https://cdn.example.com/clip.mp4"></video></div>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should surface an audio with a source parked in a template', async () => {
+    const value = html`
+      <div>
+        <template>
+          <audio controls>
+            <source src="https://cdn.example.com/ep.mp3" type="audio/mpeg">
+          </audio>
+        </template>
+      </div>
+    `
+    const expected = html`
+      <div>
+        <audio controls>
+          <source src="https://cdn.example.com/ep.mp3" type="audio/mpeg">
+        </audio>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should leave a template holding no media or embed alone', async () => {
     const value = '<div><template><span class="skeleton"></span></template></div>'
 

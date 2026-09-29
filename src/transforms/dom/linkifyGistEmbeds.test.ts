@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { linkifyGistEmbeds } from './linkifyGistEmbeds.js'
@@ -66,6 +67,20 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should leave an amp-gist whose gist id carries a trailing path untouched', async () => {
+    const value = '<amp-gist data-gistid="b9bb35bc68df68259af94430f012425f/raw"></amp-gist>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a gist script whose id carries an encoded slash untouched', async () => {
+    const value = html`
+      <script src="https://gist.github.com/octocat/6cad326836d38bd3a7ae%2Fraw.js"></script>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should leave an amp-gist with an empty gist id untouched', async () => {
     const value = '<amp-gist data-gistid=""></amp-gist>'
 
@@ -92,5 +107,24 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     const twice = await applyDomTransforms(parseHtml(once), [linkifyGistEmbeds(baseContext)])
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('gist scripts the pipeline would otherwise delete', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should keep a gist script as a link to the gist', async () => {
+    const value = '<script src="https://gist.github.com/octocat/6cad326836d38bd3a7ae.js"></script>'
+    const expected = html`
+      <p>
+        <a
+          href="https://gist.github.com/octocat/6cad326836d38bd3a7ae"
+        >https://gist.github.com/octocat/6cad326836d38bd3a7ae</a>
+      </p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

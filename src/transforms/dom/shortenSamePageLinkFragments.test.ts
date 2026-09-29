@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -136,5 +137,21 @@ describeForEachParser('shortenSamePageLinkFragments', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('shortenSamePageLinkFragments after the url passes', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/blog/post',
+    })
+  }
+
+  it('should shorten a relative same-page link resolveRelativeUrls made absolute', async () => {
+    const value = '<p><a href="/blog/post#sec">jump</a></p>'
+    const expected = '<p><a href="#sec">jump</a></p>'
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

@@ -159,6 +159,20 @@ describeForEachParser('mergeWrappedCaptionText', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should leave a wrapper whose sibling is a figure of its own', async () => {
+    const value = html`
+      <figure>
+        <img src="chart.png">
+        <div>
+          <figure class="wp-block-pullquote"><blockquote><p>A quote.</p></blockquote></figure>
+          <figcaption>The device listing.</figcaption>
+        </div>
+      </figure>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should leave a wrapper whose sibling is an embed placeholder', async () => {
     const value = html`
       <figure>

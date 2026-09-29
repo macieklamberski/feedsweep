@@ -84,7 +84,13 @@ describeForEachParser('convertGiphyEmbeds', (parseHtml) => {
   })
 
   it('should leave an iframe on another host naming giphy in its query', async () => {
-    const value = '<iframe src="https://example.com/?ref=giphy.com/embed/abc123"></iframe>'
+    const value = '<iframe src="https://evil.test/embed/abc123?giphy.com/"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a giphy url whose route sits under another segment', async () => {
+    const value = '<iframe src="https://giphy.com/x/embed/abc123"></iframe>'
 
     expect(await transform(value)).toEqualHtml(value)
   })

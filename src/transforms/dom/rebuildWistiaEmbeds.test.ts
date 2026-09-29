@@ -38,6 +38,17 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should replace the wrapper when there is no padding div around it', async () => {
+    const value = html`
+      <div class="wistia_responsive_wrapper">
+        <div class="wistia_embed wistia_async_zyl6xrmj10"></div>
+      </div>
+    `
+    const expected = '<iframe src="https://fast.wistia.net/embed/iframe/zyl6xrmj10"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should leave an element without a recoverable id untouched', async () => {
     const value = '<div class="wistia_embed wistia_async_"></div>'
 
@@ -94,6 +105,12 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     const expected = '<iframe src="https://fast.wistia.net/embed/iframe/zyl6xrmj10x"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a custom element whose media id carries an encoded slash untouched', async () => {
+    const value = '<wistia-player media-id="zyl6xrmj10%2F..%2Fchannel"></wistia-player>'
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 
   it('should rebuild an iframe from a lone loader script', async () => {

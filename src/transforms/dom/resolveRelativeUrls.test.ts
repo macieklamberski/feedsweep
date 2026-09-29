@@ -328,6 +328,25 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
     expect(await transform(value, defaultContext)).toEqualHtml(expected)
   })
 
+  it('should leave a relative srcset untouched when baseUrl is missing', async () => {
+    const value = '<img srcset="/small.jpg 300w, /large.jpg 600w">'
+
+    expect(await transform(value, defaultContext)).toEqualHtml(value)
+  })
+
+  it('should leave an absolute srcset byte-identical', async () => {
+    const value =
+      '<img srcset="https://cdn.example.com/a.jpg 300w,https://cdn.example.com/b.jpg 600w">'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave an empty src untouched', async () => {
+    const value = '<img src="">'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should not modify html with no resolvable attributes', async () => {
     const value = '<p>No links or images</p>'
 
@@ -419,6 +438,31 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
     `
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should strip the site host from a host-prefixed src whose host label holds a digit', async () => {
+    const value = html`
+      <script
+        src="https://foto2004.ucoz.ru//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      ></script>
+    `
+    const expected = html`
+      <script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a double slash followed by path segments that only hold a dot', async () => {
+    const value = '<script src="https://example.com//assets/vendor.bundle/main.js"></script>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a double slash followed by a file name with a hash route', async () => {
+    const value = '<iframe src="https://example.com//widget.html#/player"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 
   it('should keep a double slash followed by a segment whose last label is not letters', async () => {
