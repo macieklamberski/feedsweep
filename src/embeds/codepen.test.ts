@@ -174,6 +174,18 @@ describe('codepenResolveEmbed', () => {
       expect(codepenResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should ignore the collection segment in the username position', () => {
+      const value = 'https://codepen.io/collection/embed/XJpKqXm'
+
+      expect(codepenResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the spark segment in the username position', () => {
+      const value = 'https://codepen.io/spark/embed/XJpKqXm'
+
+      expect(codepenResolveEmbed(value)).toBeUndefined()
+    })
+
     // A separate product with its own id space and no screenshot endpoint. Zero in the corpus.
     it('should ignore a project embed', () => {
       const value = 'https://codepen.io/argyleink/project/embed/ABCDEF'
@@ -524,6 +536,28 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should ignore a theme carrying a query of its own', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-theme-id="dark&amp;autoplay=1"
+          data-user="argyleink"
+          data-slug-hash="XJpKqXm"
+        ></p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        height: 300,
+        author: '@argyleink',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore a pane value that is not one', async () => {
       const value = html`
         <p
@@ -613,6 +647,28 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         id: 'XJpKqXm',
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?token=eyJhbGci.eyJzdWIi.SflKxwRJ',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm?token=eyJhbGci.eyJzdWIi.SflKxwRJ',
+        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        height: 300,
+        author: '@argyleink',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore a token carrying a query of its own', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-slug-hash="XJpKqXm"
+          data-user="argyleink"
+          data-token="c8ec7595b68381e99d38441487db546f&amp;autoplay=1"
+        ></p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
         height: 300,
         author: '@argyleink',

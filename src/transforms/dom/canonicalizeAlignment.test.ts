@@ -93,6 +93,23 @@ describeForEachParser('canonicalizeAlignment', (parseHtml) => {
       expect(await transform(value)).toContainHtml('data-align="center"')
     })
 
+    it('should read a media-primary paragraph text-align past a trailing line break', async () => {
+      const value = html`
+        <p style="text-align: center;">
+          <img src="https://example.com/files/Page_21.jpg?v=1760420592" alt="">
+          <br>
+        </p>
+      `
+      const expected = html`
+        <p style="text-align: center;">
+          <img src="https://example.com/files/Page_21.jpg?v=1760420592" alt="" data-align="center">
+          <br>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should read a media-primary paragraph text-align through a click-through link', async () => {
       const value = '<p style="text-align: center"><a href="x.jpg"><img src="a.jpg"></a></p>'
       const expected = html`

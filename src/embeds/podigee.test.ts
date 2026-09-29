@@ -38,8 +38,8 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
       expect(await extract(script('playerConfiguration'))).toBeUndefined()
     })
 
-    it('should ignore a configuration url on another host', async () => {
-      const value = script('https://example.com/player/embed')
+    it('should ignore a foreign host carrying the player path', async () => {
+      const value = script('https://evil.test/42-an-episode/embed?context=external')
 
       expect(await extract(value)).toBeUndefined()
     })

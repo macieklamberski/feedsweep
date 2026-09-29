@@ -31,6 +31,18 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  // gist.github.com answers an uppercase id on the user-less route with a redirect to the gist.
+  it('should link a user-less gist script whose id is uppercase', async () => {
+    const value = '<script src="https://gist.github.com/6CAD326836D38BD3A7AE.js"></script>'
+    const expected = html`
+      <a
+        href="https://gist.github.com/6CAD326836D38BD3A7AE"
+      >https://gist.github.com/6CAD326836D38BD3A7AE</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should drop a trailing ?file= query when building the link', async () => {
     const value = html`
       <script src="https://gist.github.com/octocat/6cad326836d38bd3a7ae.js?file=demo.py"></script>
@@ -56,6 +68,17 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
       <a
         href="https://gist.github.com/b9bb35bc68df68259af94430f012425f"
       >https://gist.github.com/b9bb35bc68df68259af94430f012425f</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should link an amp-gist whose gist id is uppercase', async () => {
+    const value = '<amp-gist data-gistid="B9BB35BC68DF68259AF94430F012425F"></amp-gist>'
+    const expected = html`
+      <a
+        href="https://gist.github.com/B9BB35BC68DF68259AF94430F012425F"
+      >https://gist.github.com/B9BB35BC68DF68259AF94430F012425F</a>
     `
 
     expect(await transform(value)).toEqualHtml(expected)

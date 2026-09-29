@@ -60,6 +60,14 @@ describe('extractWistiaEmbed', () => {
     expect(extractWistiaEmbed(value)).toEqual(expected)
   })
 
+  // The player serves the same media whatever case the id is spelled in.
+  it('should read an id spelled in capitals', () => {
+    const value = 'https://fast.wistia.net/embed/iframe/2FG072PFTB'
+    const expected = { route: 'iframe', id: '2FG072PFTB' }
+
+    expect(extractWistiaEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for a wistia url naming no media', () => {
     const value = 'https://wistia.com/pricing'
 

@@ -82,6 +82,12 @@ describe('extractVideoId', () => {
     expect(extractVideoId(value)).toBeUndefined()
   })
 
+  it('should return undefined for a url that cannot be parsed', () => {
+    const value = 'https://['
+
+    expect(extractVideoId(value)).toBeUndefined()
+  })
+
   it('should reject video id with unsafe characters', () => {
     const value = 'https://www.youtube.com/watch?v=<script>alert(1)</script>'
 

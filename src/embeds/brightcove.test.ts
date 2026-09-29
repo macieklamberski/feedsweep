@@ -292,6 +292,13 @@ describe('brightcoveResolveEmbed', () => {
       expect(brightcoveResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should return undefined when the player segment names no player id', () => {
+      const value =
+        'https://players.brightcove.net/1234567890/_default_default/index.html?videoId=6098765432'
+
+      expect(brightcoveResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should return undefined for another brightcove.net host', () => {
       const value = 'https://studio.brightcove.net/1234567890/default_default/index.html?videoId=1'
 

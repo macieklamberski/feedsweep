@@ -49,6 +49,14 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  // Wistia serves the same media for an id in any case.
+  it('should rebuild an iframe from a facade whose id is uppercase', async () => {
+    const value = '<div class="wistia_embed wistia_async_U3GZ5BKA6B"></div>'
+    const expected = '<iframe src="https://fast.wistia.net/embed/iframe/U3GZ5BKA6B"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should leave an element without a recoverable id untouched', async () => {
     const value = '<div class="wistia_embed wistia_async_"></div>'
 

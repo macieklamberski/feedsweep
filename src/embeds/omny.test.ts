@@ -27,6 +27,14 @@ describe('extractOmnyClip', () => {
     expect(extractOmnyClip(value)).toBe(expected)
   })
 
+  // Omny's own slugs are lowercase, and the player serves the same clip under a capitalised one.
+  it('should read a clip whose slug carries capitals', () => {
+    const value = 'https://omny.fm/shows/101-3-kdwb-clips/6AM-Hour-Holiday-Awkward/embed'
+    const expected = '101-3-kdwb-clips/6AM-Hour-Holiday-Awkward'
+
+    expect(extractOmnyClip(value)).toBe(expected)
+  })
+
   it('should return undefined for a show page that is not an embed', () => {
     const value = 'https://omny.fm/shows/the-show'
 

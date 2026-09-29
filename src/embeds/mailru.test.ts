@@ -92,6 +92,61 @@ describe('mailruResolveEmbed', () => {
       expect(mailruResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should move the dead api host onto the player for an album carrying a hyphen', () => {
+      const value =
+        'http://api.video.mail.ru/videos/embed/corp/hitech/news_hi-tech_mail_ru/1263.html'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'corp/hitech/news_hi-tech_mail_ru/1263',
+        src: 'https://my.mail.ru/corp/hitech/video/embed/news_hi-tech_mail_ru/1263',
+        url: 'https://my.mail.ru/corp/hitech/video/news_hi-tech_mail_ru/1263.html',
+        author: 'hitech',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    // The player finds the video by its counter and serves it under any album spelling.
+    it('should move the dead api host onto the player for an album carrying a dot', () => {
+      const value =
+        'http://api.video.mail.ru/videos/embed/corp/hitech/news_hi.tech_mail_ru/1263.html'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'corp/hitech/news_hi.tech_mail_ru/1263',
+        src: 'https://my.mail.ru/corp/hitech/video/embed/news_hi.tech_mail_ru/1263',
+        url: 'https://my.mail.ru/corp/hitech/video/news_hi.tech_mail_ru/1263.html',
+        author: 'hitech',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the path form whose album carries a hyphen', () => {
+      const value = 'https://my.mail.ru/corp/hitech/video/embed/news_hi-tech_mail_ru/1263'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'corp/hitech/news_hi-tech_mail_ru/1263',
+        src: 'https://my.mail.ru/corp/hitech/video/embed/news_hi-tech_mail_ru/1263',
+        url: 'https://my.mail.ru/corp/hitech/video/news_hi-tech_mail_ru/1263.html',
+        author: 'hitech',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the path form whose album carries a dot', () => {
+      const value = 'https://my.mail.ru/corp/hitech/video/embed/news_hi.tech_mail_ru/1263'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'corp/hitech/news_hi.tech_mail_ru/1263',
+        src: 'https://my.mail.ru/corp/hitech/video/embed/news_hi.tech_mail_ru/1263',
+        url: 'https://my.mail.ru/corp/hitech/video/news_hi.tech_mail_ru/1263.html',
+        author: 'hitech',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should read the video the Flash player names on its query', () => {
       const value =
         'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/anizm.com/4418/4427&autoplay=0'
