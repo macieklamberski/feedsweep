@@ -51,6 +51,12 @@ describe('extractAnchorEpisode', () => {
 
     expect(extractAnchorEpisode(value)).toBeUndefined()
   })
+
+  it('should return undefined when no show precedes the embed marker', () => {
+    const value = 'https://anchor.fm/embed/episodes/my-title-e123'
+
+    expect(extractAnchorEpisode(value)).toBeUndefined()
+  })
 })
 
 describe('anchorResolveEmbed', () => {

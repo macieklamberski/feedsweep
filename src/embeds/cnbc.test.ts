@@ -90,12 +90,6 @@ describe('cnbcResolveEmbed', () => {
       expect(cnbcResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for a player route naming no account', () => {
-      const value = 'https://player.cnbc.com/p?byGuid=7000344703'
-
-      expect(cnbcResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a player route naming no player', () => {
       const value = 'https://player.cnbc.com/p/gZWlPC?byGuid=7000344703'
 

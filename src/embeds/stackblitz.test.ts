@@ -223,14 +223,25 @@ describe('stackblitzResolveEmbed', () => {
     })
 
     it('should refuse a slug carrying an encoded slash', () => {
-      const value = 'https://stackblitz.com/edit/angular%2Fivy-snow'
+      const value = 'https://stackblitz.com/edit/angular%2fivy-snow'
 
       expect(stackblitzResolveEmbed(value)).toBeUndefined()
     })
 
     it('should refuse a slug led by an encoded slash', () => {
-      const value = 'https://stackblitz.com/edit/%2Fangular-ivy-snow'
+      const value = 'https://stackblitz.com/edit/%2fangular-ivy-snow'
 
+      expect(stackblitzResolveEmbed(value)).toBeUndefined()
+    })
+
+    // The oEmbed endpoint answers 404 for each where `angular-ivy-atksbw` answers 200.
+    const refusedSlugUrls: Array<string> = [
+      'https://stackblitz.com/edit/Angular-Ivy-Atksbw',
+      'https://stackblitz.com/edit/9angular-ivy-atksbw',
+      'https://stackblitz.com/edit/angular_ivy_atksbw',
+    ]
+
+    it.each(refusedSlugUrls)('should refuse the slug in %s', (value) => {
       expect(stackblitzResolveEmbed(value)).toBeUndefined()
     })
   })
@@ -286,8 +297,8 @@ describe('stackblitzResolveEmbed', () => {
       expect(stackblitzResolveEmbed(value)).toBeUndefined()
     })
 
-    // A slug carries dots, so a filename passes the slug test. The enclosure probe reads this same
-    // url shape, so a media file on the host would otherwise take the place of a playable element.
+    // The enclosure probe reads this same url shape, so a media file on the host would otherwise
+    // take the place of a playable element.
     const fileNameUrls: Array<string> = [
       'https://stackblitz.com/edit/angular-ivy-snow.mp3',
       'https://stackblitz.com/edit/angular-ivy-snow.mp4',

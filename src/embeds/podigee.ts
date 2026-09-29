@@ -7,10 +7,10 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'podigee'
 
-const podigeeHosts = ['podigee.io', 'podigee.com', 'podigee-cdn.net']
+const podigeeHosts = ['podigee.io']
 
-// A show is a subdomain of podigee.io, and podigee-cdn.net serves the player's assets and the
-// episode audio.
+// A show is a subdomain of podigee.io, and `www.podigee.io` is the company site, whose paths can
+// open with a number.
 const showHostRegex = /^(?!www\.)[a-z0-9-]+\.podigee\.io$/i
 
 // An episode is always numbered, which separates it from the two other paths a show serves:
@@ -58,7 +58,6 @@ export const podigeeScriptEmbedResolver = createMarkupEmbedResolver(
 export const podigeeResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, podigeeHosts)
 
-  // An enclosure on the CDN, {n}-{hash}.mp3, reads as an episode and would lose its audio.
   if (!parsed || !showHostRegex.test(parsed.hostname)) {
     return
   }

@@ -478,6 +478,17 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // Flickr answers 404 for `strictly.kev` and `-strictly-kev` beside the live `strictly-kev`.
+    const refusedAliasUrls: Array<string> = [
+      'https://www.flickr.com/photos/strictly.kev/show/',
+      'https://www.flickr.com/photos/-strictly-kev/show/',
+      'https://www.flickr.com/photos/strictly.kev/15753890338/player/',
+    ]
+
+    it.each(refusedAliasUrls)('should return undefined for the alias in %s', async (value) => {
+      expect(await extract(`<iframe src="${value}"></iframe>`)).toBeUndefined()
+    })
+
     it('should map a framed group pool slideshow page onto the group player', async () => {
       const value = html`
         <iframe src="https://www.flickr.com/groups/1753363@N23/pool/show/"></iframe>
@@ -875,6 +886,17 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         <embed
           src="https://www.flickr.com/apps/slideshow/show.swf"
           flashvars="page_show_url=%2Fphotos%2F..%2F..%2Fsets%2F72157624341%2Fshow%2F"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a config user carrying an encoded slash', async () => {
+      const value = html`
+        <embed
+          src="https://www.flickr.com/apps/slideshow/show.swf"
+          flashvars="user_id=bees%2Fpricing"
         />
       `
 

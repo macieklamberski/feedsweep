@@ -60,6 +60,16 @@ describe('extractOmnyClip', () => {
     expect(extractOmnyClip(value)).toBeUndefined()
   })
 
+  // The player answers 404 for both where the hyphenated slug answers 200.
+  const refusedSlugUrls: Array<string> = [
+    'https://omny.fm/shows/101-3-kdwb-clips/6AM.Hour-Holiday-Awkward/embed',
+    'https://omny.fm/shows/101-3-kdwb-clips/6AM_Hour-Holiday-Awkward/embed',
+  ]
+
+  it.each(refusedSlugUrls)('should return undefined for the slug in %s', (value) => {
+    expect(extractOmnyClip(value)).toBeUndefined()
+  })
+
   it('should return undefined when no clip is named', () => {
     const value = 'https://omny.fm/shows/embed'
 
