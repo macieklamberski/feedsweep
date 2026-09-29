@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import { JSDOM } from 'jsdom'
 import { parseHtml as parseWithLinkedom } from '../parsers/linkedom.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
+import { describeForEachParser, html, parseWithJsdom, resolverExtractor } from '../tests.js'
 import type { CiteResolverResult } from '../types.js'
 import { tcdCiteResolver } from './tcd.js'
 
@@ -157,9 +156,6 @@ describe('tcdCiteResolver on a card the parser splits', () => {
   })
 
   it('should read the rebuilt card under jsdom', async () => {
-    const parseWithJsdom = (markup: string) => {
-      return new JSDOM(`<!doctype html><body>${markup}</body>`).window.document
-    }
     const extract = resolverExtractor(parseWithJsdom, tcdCiteResolver)
     const expected: CiteResolverResult = {
       provider: 'tcd',

@@ -48,7 +48,7 @@ export const baseContext: TransformContext = {
   highlightFn: defaultHighlightFn,
 }
 
-const parseWithJsdom: ParseHtml = (html) => {
+export const parseWithJsdom: ParseHtml = (html) => {
   return new JSDOM(`<!doctype html><body>${html}</body>`).window.document
 }
 
