@@ -61,6 +61,34 @@ describeForEachParser('convertGiphyEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should read the id from a page url', async () => {
+    const value = '<iframe src="https://giphy.com/gifs/3o7TKSjRrfIPjeiVyM"></iframe>'
+    const expected = html`
+      <a href="https://giphy.com/gifs/3o7TKSjRrfIPjeiVyM">
+        <img src="https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should read the id after the title slug of a page url', async () => {
+    const value = '<iframe src="https://giphy.com/gifs/funny-cat-3o7TKSjRrfIPjeiVyM"></iframe>'
+    const expected = html`
+      <a href="https://giphy.com/gifs/3o7TKSjRrfIPjeiVyM">
+        <img src="https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave an iframe on another host naming giphy in its query', async () => {
+    const value = '<iframe src="https://example.com/?ref=giphy.com/embed/abc123"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   // The padding wrapper is not this transform's job: unwrapWrappers dissolves a sole-child
   // wrapper further down the pipeline, so removing it here would be a second implementation of
   // something that already works. Asserted end to end, since that is where the claim holds.

@@ -46,48 +46,15 @@ describeForEachParser('khorosImageEmojiResolver', (parseHtml) => {
 
   describe('Khoros / Lithium (/i/smilies/ stock faces)', () => {
     // The alt and title are translated per board, so the stock filename is the only stable key.
-    const faceCases: Array<[string, string, string]> = [
-      ['smiley-happy', 'Smiley heureux', '🙂'],
-      ['smiley-wink', "Smiley clignant de l'œil", '😉'],
-      ['smiley-very-happy', 'Smiley très heureux', '😁'],
-      ['smiley-tongue', 'Emotikon: Język', '😛'],
-      ['smiley-sad', 'Emotikon: Smutny', '🙁'],
-      ['smiley-mad', 'Smiley Mad', '😠'],
-      ['smiley-surprised', 'Emotikon: Zaskoczony', '😲'],
-      ['smiley-lol', 'Smiley LOL', '🤣'],
-      ['smiley-embarrassed', 'Smiley Embarrassed', '😳'],
-      ['smiley-indifferent', 'Smiley Indifferent', '😐'],
-      ['heart', 'Cœur', '❤️'],
-      ['cat-happy', 'Chat heureux', '😺'],
-      ['cat-very-happy', 'Chat très heureux', '😸'],
-      ['cat-lol', 'Chat MDR', '😹'],
-    ]
-
-    it.each(faceCases)('should replace the %s face', async (name, alt, expected) => {
+    it('should mark a stock face', async () => {
       const value = html`
         <p>
           <img
-            id="${name}"
-            class="emoticon emoticon-${name}"
-            src="https://example.com/i/smilies/16x16_${name}.png"
-            alt="${alt}"
-            title="${alt}"
-          >
-        </p>
-      `
-
-      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
-    })
-
-    it('should mark the smiley-frustrated face', async () => {
-      const value = html`
-        <p>
-          <img
-            id="smiley-frustrated"
-            class="emoticon emoticon-smiley-frustrated"
-            src="https://example.com/i/smilies/16x16_smiley-frustrated.png"
-            alt="Smiley frustré"
-            title="Smiley frustré"
+            id="smiley-happy"
+            class="emoticon emoticon-smiley-happy"
+            src="https://example.com/i/smilies/16x16_smiley-happy.png"
+            alt="Smiley heureux"
+            title="Smiley heureux"
           >
         </p>
       `
@@ -95,11 +62,11 @@ describeForEachParser('khorosImageEmojiResolver', (parseHtml) => {
         <p>
           <img
             data-emoji=""
-            id="smiley-frustrated"
-            class="emoticon emoticon-smiley-frustrated"
-            src="https://example.com/i/smilies/16x16_smiley-frustrated.png"
-            alt="Smiley frustré"
-            title="Smiley frustré"
+            id="smiley-happy"
+            class="emoticon emoticon-smiley-happy"
+            src="https://example.com/i/smilies/16x16_smiley-happy.png"
+            alt="Smiley heureux"
+            title="Smiley heureux"
           >
         </p>
       `
@@ -166,6 +133,20 @@ describeForEachParser('khorosImageEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should leave an image whose class only contains emoticon- untouched', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emoticon-img"
+            src="https://example.com/img/sticker.png"
+            alt=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     // Windows Live Writer's own emoticons, which have no name table.
     it('should leave a Windows Live Writer emoticon untouched', async () => {
       const value = html`
@@ -181,7 +162,7 @@ describeForEachParser('khorosImageEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should replace a face that lost its class by the name behind its size prefix', async () => {
+    it('should mark a face that lost its class by the name behind its size prefix', async () => {
       const value = html`
         <p>
           <img
@@ -190,25 +171,38 @@ describeForEachParser('khorosImageEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-      const expected = '<p>🙁</p>'
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/i/smilies/16x16_smiley-sad.png"
+            alt="Smiley triste"
+          >
+        </p>
+      `
 
       expect(await transform(value)).toEqualHtml(expected)
     })
 
     // Vodafone's copy of the set is sized 15x15.
-    it('should replace a face from the 15x15 set', async () => {
+    it('should mark a face from the 15x15 set by the name behind its size prefix', async () => {
       const value = html`
         <p>
           <img
-            id="smileywink"
-            class="emoticon emoticon-smileywink"
             src="https://example.com/html/@929CB104E9842E64CFFA4DDBA9219E92/images/emoticons/15x15_smiley-wink.gif"
             alt=""
-            title=""
           >
         </p>
       `
-      const expected = '<p>😉</p>'
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/html/@929CB104E9842E64CFFA4DDBA9219E92/images/emoticons/15x15_smiley-wink.gif"
+            alt=""
+          >
+        </p>
+      `
 
       expect(await transform(value)).toEqualHtml(expected)
     })

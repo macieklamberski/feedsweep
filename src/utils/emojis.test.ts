@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'bun:test'
+import { toMap } from 'trousse'
+import { parseHtml } from '../parsers/linkedom.js'
 import {
+  type EmojiGlyph,
   type EmojiNameTable,
   glyphFromCodepoints,
   mergeEmojiNames,
+  resolveEmojiImage,
   withEmojiPresentation,
 } from './emojis.js'
 
@@ -97,5 +101,59 @@ describe('withEmojiPresentation', () => {
 
   it.each(presentationCases)('should turn %s into %s', (glyph, expected) => {
     expect(withEmojiPresentation(glyph)).toBe(expected)
+  })
+})
+
+describe('resolveEmojiImage', () => {
+  // A set that ships a name no glyph stands for keeps every picture it draws.
+  const mixedNames = toMap<EmojiGlyph>({ grin: '😁', mrgreen: false })
+
+  const getImage = (tag: string): Element => {
+    return parseHtml(`<p>${tag}</p>`).querySelector('img') as Element
+  }
+
+  it('should keep a universal code alt in a mixed set as a marked picture', () => {
+    const image = getImage('<img src="https://example.com/smilies/grin.gif" alt=":)">')
+
+    expect(resolveEmojiImage(image, { isStrong: false, names: mixedNames })).toEqual({
+      custom: true,
+    })
+  })
+
+  it('should convert a codepoint filename in a mixed set', () => {
+    const image = getImage('<img src="https://example.com/smilies/1f600.png" alt="">')
+
+    expect(resolveEmojiImage(image, { isStrong: false, names: mixedNames })).toEqual({
+      glyph: '😀',
+    })
+  })
+
+  it('should convert a filename spelling its own alt in a mixed set', () => {
+    const image = getImage('<img src="https://example.com/smilies/3f.png" alt="?">')
+
+    expect(resolveEmojiImage(image, { isStrong: true, names: mixedNames })).toEqual({
+      glyph: '?',
+    })
+  })
+
+  it('should convert a two-digit filename spelling its own alt in a mixed set', () => {
+    const image = getImage('<img src="https://example.com/smilies/ae.png" alt="®">')
+
+    expect(resolveEmojiImage(image, { isStrong: true, names: mixedNames })).toEqual({
+      glyph: '®',
+    })
+  })
+
+  it('should convert a universal code alt when the set is declared not to keep pictures', () => {
+    const image = getImage('<img src="https://example.com/smilies/grin.gif" alt=":)">')
+    const match = { isStrong: true, names: mixedNames, keepsPictures: false }
+
+    expect(resolveEmojiImage(image, match)).toEqual({ glyph: '🙂' })
+  })
+
+  it('should leave a weak match with an unknown name untouched', () => {
+    const image = getImage('<img src="https://example.com/smilies/banner.gif" alt="">')
+
+    expect(resolveEmojiImage(image, { isStrong: false, names: mixedNames })).toBeUndefined()
   })
 })

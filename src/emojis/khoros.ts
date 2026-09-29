@@ -39,8 +39,8 @@ export const khorosEmojiResolver: EmojiResolver = {
 const markerSelector = [
   'img[class~="lia-image-emoji" i]',
   // As in `emoticon emoticon-smileywink`. Case-sensitive, since Windows Live Writer's
-  // `wlEmoticon-smile` has no name table.
-  'img[class*="emoticon-"]',
+  // `wlEmoticon-smile` has no name table. The `emoticon` class keeps Exblog's `emoticon-img` out.
+  'img.emoticon[class*="emoticon-"]',
 ].join(', ')
 
 // Khoros files its stock faces with a size prefix, as in `16x16_smiley-happy.png`, which
@@ -118,6 +118,11 @@ export const khorosImageEmojiResolver: EmojiResolver = {
 
     if (!element.matches(markerSelector) && glyph === undefined && !isKhorosName) {
       return
+    }
+
+    // Samsung's codepoint-named set is a set of its own beside the faces Khoros keeps.
+    if (typeof glyph === 'string') {
+      return resolveEmojiImage(element, { isStrong: true, glyph, keepsPictures: false })
     }
 
     return resolveEmojiImage(element, { isStrong: true, names, glyph, stem })

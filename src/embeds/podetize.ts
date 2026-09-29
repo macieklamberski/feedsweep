@@ -1,9 +1,7 @@
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
-
-const safeIdRegex = /^[A-Za-z0-9_-]+$/
 
 const podetizeHosts = ['player.podetize.com']
 
@@ -34,7 +32,7 @@ export const podetizeResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, podetizeHosts)
   const id = parsed?.searchParams.get('id')
 
-  if (parsed?.pathname !== '/' || !id || !safeIdRegex.test(id)) {
+  if (parsed?.pathname !== '/' || !id || !urlSafeTokenRegex.test(id)) {
     return
   }
 
@@ -50,7 +48,11 @@ export const podetizeScriptEmbedResolver = createMarkupEmbedResolver(
     const id = attr(element, 'data')
 
     // The selector matches a substring any host can carry, so the host is checked here.
-    if (!parseUrlOnHosts(attr(element, 'src'), podetizeHosts) || !id || !safeIdRegex.test(id)) {
+    if (
+      !parseUrlOnHosts(attr(element, 'src'), podetizeHosts) ||
+      !id ||
+      !urlSafeTokenRegex.test(id)
+    ) {
       return
     }
 
