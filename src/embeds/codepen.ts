@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize, text } from '../utils/dom.js'
-import { composeQuery, placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
+import { composeQuery, placeholderBaseUrl, urlSafeTokenRegex, uuidRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codepen'
@@ -11,6 +11,7 @@ const provider = 'codepen'
 const codepenHosts = ['codepen.io']
 
 // Slugs come in three lengths: 5 on pens from around 2012, 7 since, and 32 hex on CodePen's own.
+// Pens saved in the 2.0 editor take a uuid instead.
 const slugRegex = /^[A-Za-z0-9]+$/
 // Theme ids are digits or a lowercase name, and panes a comma-joined list of lowercase names.
 const playerParamRegex = /^[a-z0-9,]{1,64}$/
@@ -22,8 +23,8 @@ const leadingAtRegex = /^@/
 const reservedOwnerSegments = new Set(['collection', 'cpe', 'spark'])
 
 // What CodePen's share dialog writes in place of an author who asked not to be named, and what
-// the resolver falls back to when the markup names nobody. The player ignores this segment
-// either way, so it only has to be a syntactically valid username.
+// the resolver falls back to when the markup names nobody. The player ignores this segment, and
+// the pen page redirects it to the real owner, so it only has to be a syntactically valid username.
 const anonymousUser = 'anon'
 
 // Handles that name nobody. CodePen serves a pen under any word in the username position and
@@ -35,9 +36,8 @@ const defaultPenHeight = 300
 
 type CodepenTarget = {
   kind: 'pen' | 'embed'
-  // Absent when the url or the markup names no author. Only the pen's public page needs it:
-  // `codepen.io/{anyone}/embed/{slug}` serves the right pen and rewrites the byline itself,
-  // verified in a browser against a fabricated username on 2026-08-15.
+  // Absent when the url or the markup names no author. Only a private pen's page needs it: the
+  // page redirects any other word here to the real owner, but drops the token segment on the way.
   user?: string
   // How the owner is addressed in a public url: `team/{name}` for a team, `{name}` for a person.
   // The player does not care, but the pen's page does.
@@ -52,6 +52,8 @@ type CodepenTarget = {
   // belongs on the pen's own page, which has no panes to choose.
   defaultTab?: string
   themeId?: string
+  // A block from the 2.0 editor, whose player the loader builds under `/editor/`.
+  isEditor?: boolean
   // The height stated in the player's own query, which is where the loader puts it and where most
   // iframe urls carry it. An attribute on the carrier outranks it, since that is the box the
   // publisher actually laid out.
@@ -78,7 +80,9 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
     return
   }
 
-  const segments = getPathSegments(parsed)
+  const allSegments = getPathSegments(parsed)
+  // The 2.0 editor's pens sit one segment deeper, under `editor/`. The route word is case-sensitive.
+  const segments = allSegments[0] === 'editor' ? allSegments.slice(1) : allSegments
   // A team's pens sit one segment deeper, under `team/{name}/`.
   const isTeam = segments[0] === 'team'
   const [rawUser, kind, ...rest] = isTeam ? segments.slice(1) : segments
@@ -94,7 +98,7 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   // `embed/preview/{slug}` is the deferred-loading player, the same pen behind one more segment.
   const [slug, pathToken] = kind === 'embed' && rest[0] === 'preview' ? rest.slice(1) : rest
 
-  if (!slug || !slugRegex.test(slug)) {
+  if (!slug || !(slugRegex.test(slug) || uuidRegex.test(slug))) {
     return
   }
 
@@ -118,8 +122,6 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   }
 }
 
-// The loader spells the panes plural in the url it builds whatever the attribute is called:
-// `?default-tabs=css%2Cresult` is what a rendered block carries.
 const composePenQuery = (target: CodepenTarget, forPlayer: boolean): string => {
   const grants = trimObject({ key: target.key }, Boolean)
 
@@ -129,8 +131,7 @@ const composePenQuery = (target: CodepenTarget, forPlayer: boolean): string => {
 
   return composeQuery({
     ...grants,
-    // The player spells it plural in its query whatever the attribute is called.
-    ...(target.defaultTab && { 'default-tabs': target.defaultTab }),
+    ...(target.defaultTab && { 'default-tab': target.defaultTab }),
     ...(target.themeId && { 'theme-id': target.themeId }),
   })
 }
@@ -148,17 +149,24 @@ const composeEmbed = (
 ): EmbedResolverResult => {
   const owner = target.user ?? anonymousUser
   const slugPath = target.token ? `${target.slug}/${target.token}` : target.slug
+  const playerPath = target.isEditor ? `editor/${owner}` : owner
+  let pageOwner = target.ownerPath
+
+  // The page redirects to the real owner and keeps the query, but drops a token segment. A key
+  // pen stays out too: no private pen was at hand to see its redirect.
+  if (!pageOwner && !target.token && !target.key) {
+    pageOwner = anonymousUser
+  }
 
   return {
     provider,
     id: target.slug,
-    src: `https://codepen.io/${owner}/embed/${slugPath}${composePenQuery(target, true)}`,
-    // The public page is the one address the author's name really selects: an embed built with
-    // the wrong one still plays, but the page it links to belongs to whoever holds that handle.
-    ...(target.ownerPath && {
-      url: `https://codepen.io/${target.ownerPath}/pen/${slugPath}${composePenQuery(target, false)}`,
+    src: `https://codepen.io/${playerPath}/embed/${slugPath}${composePenQuery(target, true)}`,
+    ...(pageOwner && {
+      url: `https://codepen.io/${pageOwner}/pen/${slugPath}${composePenQuery(target, false)}`,
     }),
-    thumbnail: composeThumbnail(target),
+    // `shots.codepen.io` answers its 404 picture for every pen the 2.0 editor slugs with a uuid.
+    ...(!uuidRegex.test(target.slug) && { thumbnail: composeThumbnail(target) }),
     height: target.height ?? defaultPenHeight,
     ...(target.user && { author: `@${target.user}` }),
     ...extra,
@@ -226,9 +234,10 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
   // into the query of the iframe it built.
   const defaultTab = keepIfMatches(attr(element, 'data-default-tab'), playerParamRegex)
   const themeId = keepIfMatches(attr(element, 'data-theme-id'), playerParamRegex)
+  const isEditor = attr(element, 'data-version') === '2'
 
   return composeEmbed(
-    { kind: 'embed', user, ownerPath, key, token, slug, defaultTab, themeId, height },
+    { kind: 'embed', user, ownerPath, key, token, slug, defaultTab, themeId, isEditor, height },
     { title },
   )
 }

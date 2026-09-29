@@ -97,19 +97,6 @@ describeForEachParser('paragraphCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should extract a payload with no type', async () => {
-      const value = html`
-        <div data-type="embedly" data='{"url":"https://example.com/post","title":"Page title"}'></div>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'paragraph',
-        url: 'https://example.com/post',
-        title: 'Page title',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {

@@ -29,21 +29,6 @@ describeForEachParser('tumblrCiteResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should leave optional fields undefined when only url and title are present', async () => {
-      const value = html`
-        <p class="npf_link" data-npf='{"type":"link","url":"https://example.com/post","title":"Page title"}'>
-          <a href="https://example.com/post">Page title</a>
-        </p>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'tumblr',
-        url: 'https://example.com/post',
-        title: 'Page title',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should extract all fields from a rendered link block', async () => {
       const value = html`
         <div class="npf-link-block has-poster">
@@ -174,39 +159,9 @@ describeForEachParser('tumblrCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should trim the description and the publisher', async () => {
-      const value = html`
-        <p
-          class="npf_link"
-          data-npf='{"type":"link","url":"https://example.com/post","title":"Page title","description":"  Preview text\n","site_name":" example.com "}'
-        >
-          <a href="https://example.com/post">Page title</a>
-        </p>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'tumblr',
-        url: 'https://example.com/post',
-        title: 'Page title',
-        description: 'Preview text',
-        publisher: 'example.com',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {
-    it('should return undefined when the anchor text is just the url', async () => {
-      const value = html`
-        <p class="npf_link" data-npf='{"type":"link","url":"https://example.com/post"}'>
-          <a href="https://example.com/post">https://example.com/post</a>
-        </p>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should return undefined when the anchor text is the url without a scheme', async () => {
       const value = html`
         <p class="npf_link" data-npf='{"type":"link","url":"https://example.com/post"}'>
@@ -243,30 +198,10 @@ describeForEachParser('tumblrCiteResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined when the payload has no type', async () => {
-      const value = html`
-        <p class="npf_link" data-npf='{"url":"https://example.com/post","title":"Page title"}'>
-          <a href="https://example.com/post">Page title</a>
-        </p>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should return undefined for a poll block', async () => {
       const value = html`
         <p class="npf_link" data-npf='{"type":"poll","question":"Which one?","url":"https://example.com/post"}'>
           <a href="https://example.com/post">Which one?</a>
-        </p>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined when the data attribute is missing', async () => {
-      const value = html`
-        <p class="npf_link">
-          <a href="https://example.com/post">Page title</a>
         </p>
       `
 

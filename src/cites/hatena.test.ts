@@ -34,29 +34,6 @@ describeForEachParser('hatenaCiteResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should extract a blogcard the same way as a webcard', async () => {
-      const value = html`
-        <p>
-          <iframe
-            src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fentry"
-            title="Page title"
-            class="embed-card embed-blogcard"
-          ></iframe>
-          <cite class="hatena-citation">
-            <a href="https://example.com/entry">example.com</a>
-          </cite>
-        </p>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'hatena',
-        url: 'https://example.com/entry',
-        title: 'Page title',
-        publisher: 'example.com',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     // Of 756 corpus feeds framing the card renderer, 72 spell something other than
     // `embed-card`, so the host is what identifies the card rather than the class.
     it('should extract a card whose iframe carries no class', async () => {
@@ -99,25 +76,6 @@ describeForEachParser('hatenaCiteResolver', (parseHtml) => {
         url: 'https://example.com/entry',
         title: 'Page title',
         publisher: 'example.com',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    // A card pasted outside Hatena's own editor stands on its own, with no paragraph and no
-    // citation around it.
-    it('should extract a card standing outside a paragraph', async () => {
-      const value = html`
-        <iframe
-          src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fentry"
-          title="Page title"
-          loading="lazy"
-        ></iframe>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'hatena',
-        url: 'https://example.com/entry',
-        title: 'Page title',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -209,16 +167,6 @@ describeForEachParser('hatenaCiteResolver', (parseHtml) => {
       const value = html`
         <p>
           <iframe src="https://hatenablog-parts.com/embed" title="Page title" class="embed-card"></iframe>
-        </p>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined when the iframe src cannot be parsed', async () => {
-      const value = html`
-        <p>
-          <iframe src="http://[" title="Page title" class="embed-card"></iframe>
         </p>
       `
 

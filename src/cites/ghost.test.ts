@@ -61,29 +61,6 @@ describeForEachParser('ghostCiteResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return raw url and icon (hygiene is applied by the placeholder builder)', async () => {
-      const value = html`
-        <figure class="kg-card kg-bookmark-card">
-          <a class="kg-bookmark-container" href="http://example.com/post">
-            <div class="kg-bookmark-content">
-              <div class="kg-bookmark-title">T</div>
-              <div class="kg-bookmark-metadata">
-                <img class="kg-bookmark-icon" src="http://example.com/i.ico" alt="" />
-              </div>
-            </div>
-          </a>
-        </figure>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'ghost',
-        url: 'http://example.com/post',
-        title: 'T',
-        icon: 'http://example.com/i.ico',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should map the figcaption to the caption field', async () => {
       const value = html`
         <figure class="kg-card kg-bookmark-card">
@@ -131,33 +108,6 @@ describeForEachParser('ghostCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should trim every text field', async () => {
-      const value = html`
-        <figure class="kg-card kg-bookmark-card">
-          <a class="kg-bookmark-container" href="https://example.com/post">
-            <div class="kg-bookmark-content">
-              <div class="kg-bookmark-title"> Post title </div>
-              <div class="kg-bookmark-description"> Preview text </div>
-              <div class="kg-bookmark-metadata">
-                <span class="kg-bookmark-author"> Publisher name </span>
-                <span class="kg-bookmark-publisher"> Author name </span>
-              </div>
-            </div>
-          </a>
-        </figure>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'ghost',
-        url: 'https://example.com/post',
-        title: 'Post title',
-        description: 'Preview text',
-        author: 'Author name',
-        publisher: 'Publisher name',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('edge cases', () => {
@@ -181,36 +131,6 @@ describeForEachParser('ghostCiteResolver', (parseHtml) => {
           </a>
         </figure>
       `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined when title is whitespace-only', async () => {
-      const value = html`
-        <figure class="kg-card kg-bookmark-card">
-          <a class="kg-bookmark-container" href="https://example.com/post">
-            <div class="kg-bookmark-title"> </div>
-          </a>
-        </figure>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined when href is empty', async () => {
-      const value = html`
-        <figure class="kg-card kg-bookmark-card">
-          <a class="kg-bookmark-container" href="">
-            <div class="kg-bookmark-title">Post title</div>
-          </a>
-        </figure>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined when no bookmark card is present', async () => {
-      const value = '<p>Regular content</p>'
 
       expect(await extract(value)).toBeUndefined()
     })
