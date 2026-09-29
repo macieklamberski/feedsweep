@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { CiteResolverResult } from '../types.js'
 import { cocoonCiteResolver } from './cocoon.js'
@@ -235,5 +236,36 @@ describeForEachParser('cocoonCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+// The card carries the theme's display date, so what reaches the placeholder is whatever the
+// consumer's date parser makes of it.
+describeForEachParser('cocoon card through the pipeline', (parseHtml) => {
+  it('should hand the display date to the date parser', async () => {
+    const value = html`
+      <a href="https://example.com/post" class="blogcard-wrap">
+        <div class="blogcard-title">Post title</div>
+        <div class="blogcard-post-date">2018.10.14</div>
+      </a>
+    `
+    const parseDateFn = (raw: string) => {
+      return raw.replaceAll('.', '-')
+    }
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      parseDateFn,
+    })
+    const expected = html`
+      <div
+        data-cite-provider="cocoon"
+        data-cite-url="https://example.com/post"
+        data-cite-title="Post title"
+        data-cite-date="2018-10-14"
+      ></div>
+    `
+
+    expect(result).toEqualHtml(expected)
   })
 })

@@ -167,6 +167,17 @@ describeForEachParser('mediumCiteResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined when the anchor has no href', async () => {
+      const value = html`
+        <a class="markup--mixtapeEmbed-anchor">
+          <strong>Page title</strong>
+          <em>Preview text</em>example.com
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined when the title is missing', async () => {
       const value = html`
         <a href="https://example.com/page" class="markup--mixtapeEmbed-anchor">
