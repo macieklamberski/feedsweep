@@ -60,6 +60,45 @@ describe('blubrryResolveEmbed', () => {
     expect(blubrryResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should keep the options a media url player names as written', () => {
+    const value =
+      'https://player.blubrry.com/?podcast_id=154118304&media_url=https%3A%2F%2Fmedia.blubrry.com%2Fcardionerds%2Fcontent.blubrry.com%2Fcardionerds%2FCN_456.mp3&modern=1#mode-Light&border-000000&progress-000000'
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: 'https://media.blubrry.com/cardionerds/content.blubrry.com/cardionerds/CN_456.mp3',
+      src: value,
+      height: 164,
+    }
+
+    expect(blubrryResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep the options an episode player names as written', () => {
+    const value =
+      'https://player.blubrry.com/id/152054388?cache=1770400309#mode-Light&border-000000&progress-000000'
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: '152054388',
+      src: value,
+      height: 164,
+    }
+
+    expect(blubrryResolveEmbed(value)).toEqual(expected)
+  })
+
+  // A raw `+` reads back as a space, and minting the url again would name another file.
+  it('should keep a raw plus in a media url as written', () => {
+    const value = 'https://player.blubrry.com/?media_url=https://media.blubrry.com/show/ep+1.mp3'
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: 'https://media.blubrry.com/show/ep 1.mp3',
+      src: value,
+      height: 164,
+    }
+
+    expect(blubrryResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for a blubrry url naming no episode', () => {
     const value = 'https://blubrry.com/about'
 
