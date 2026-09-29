@@ -179,6 +179,13 @@ describeForEachParser('decodeDoubleEncodedTags', (parseHtml) => {
         '<p><b>bold</b></p><code>&lt;b&gt;code&lt;/b&gt;</code>',
       )
     })
+
+    it('should not strip an escaped paragraph pair inside a real pre element', async () => {
+      const value =
+        '<pre><p>&lt;p&gt;The post <a href="https://example.com">Example</a>&lt;/p&gt;</p></pre>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
   })
 
   describe('decodes code blocks but keeps their contents as text', () => {

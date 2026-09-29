@@ -63,6 +63,10 @@ export const decodeDoubleEncodedTags: DomTransform = () => {
         continue
       }
 
+      if (hasAncestorWithTagName(paragraph, opaqueTags)) {
+        continue
+      }
+
       if (
         !escapedParagraphOpenRegex.test(first.data) ||
         !escapedParagraphCloseRegex.test(last.data)
