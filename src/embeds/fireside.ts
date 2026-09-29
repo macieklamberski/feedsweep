@@ -2,9 +2,8 @@ import { decodeSegment, getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// `{show}+{episode}`: the `+` join tells a token from a single word, and each half is used as
-// written.
-const safeTokenRegex = /^[^+]+\+[^+]+$/
+// `{show}+{episode}`, both halves base64url.
+const safeTokenRegex = /^[A-Za-z0-9_-]+\+[A-Za-z0-9_-]+$/
 
 // A shape, not a version list: refusing a later version silently drops the height and the id.
 const playerVersionRegex = /^v\d$/
