@@ -1,7 +1,7 @@
-import { getPathSegments, toMap } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type FoxBrand = {
@@ -24,12 +24,9 @@ const foxbusinessBrand: FoxBrand = {
 
 // The two brands are separate id spaces: a Fox Business id on the Fox News player answers 404 and
 // its page url lands on the video index, so the carrier's own host is what names the brand.
-const brandsByPlayerHost = toMap({
-  [foxnewsBrand.playerHost]: foxnewsBrand,
-  [foxbusinessBrand.playerHost]: foxbusinessBrand,
-})
+const foxBrands = [foxnewsBrand, foxbusinessBrand]
 
-const playerHosts = [...brandsByPlayerHost.keys()]
+const playerHosts = foxBrands.map((brand) => brand.playerHost)
 
 // The player fills whatever frames it (`html, body { width: 100%; height: 100% }` on the embed
 // page), and Fox's own numbers for it are 16:9 throughout: 640 by 360 in the page's `og:video`
@@ -37,7 +34,8 @@ const playerHosts = [...brandsByPlayerHost.keys()]
 const playerRatio = '16/9'
 
 // `video-embed.html` is what Fox names as the player in the video page's `twitter:player` and
-// `embedUrl`.
+// `embedUrl`. The Fox News player answers 404 for an unknown id, while the Fox Business player
+// answers 200 with an empty shell and its page url redirects to the `/video` index.
 const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult => {
   return {
     provider: brand.provider,
@@ -52,23 +50,25 @@ const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult => {
 // iframe, and the rest of the query is the snippet's size or the embedding page's referrer. The
 // ids of the retired root `embed.js` route are gone from both the player and the page.
 export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, playerHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return
   }
 
-  const brand = brandsByPlayerHost.get(parsed.hostname)
+  const brand = foxBrands.find((brand) => brand.playerHost === parsed.hostname)
   const id = parsed.searchParams.get('video_id') ?? parsed.searchParams.get('id')
   const [route, page] = getPathSegments(parsed)
 
-  // `parseUrlOnHosts` admits a subdomain of a player host, which names no brand of its own, so
-  // `cdn.video.foxnews.com` reaches here and must not mint the parent host's player and page.
   if (!brand || route !== 'v' || (page !== 'embed.js' && page !== 'video-embed.html')) {
     return
   }
 
-  return id && digitsRegex.test(id) ? composeEmbed(brand, id) : undefined
+  if (!id || !digitsRegex.test(id)) {
+    return
+  }
+
+  return composeEmbed(brand, id)
 }
 
 // Fox's old share snippet is an `embed.js` script tag whose loader is gone, so nothing plays.
