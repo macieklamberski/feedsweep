@@ -130,7 +130,7 @@ export const appleEmbedResolver = createUrlEmbedResolver(appleHosts, (url, eleme
 // same marketing page, so the frame shows no player for anybody.
 const appleToolsHosts = ['tools.applemusic.com']
 
-const toolsPathRegex = /^\/embed\/v1\/([a-z-]+)\/([^/]+)$/
+const toolsPathRegex = /^\/embed\/v1\/([a-z]+)\/([^/]+)$/
 
 // The same album, playlist or song as the modern player, reached through the retired tool's url.
 // The tool wrote the storefront as `country`. A missing or malformed `country` drops the segment,

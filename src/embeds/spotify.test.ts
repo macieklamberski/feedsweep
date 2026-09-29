@@ -488,29 +488,40 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
     })
 
     it('should keep a By inside a playlist card act', async () => {
-      const midwordOwnerCardAttrs = jsonAttrValue({
-        image: 'https://i.scdn.co/image/ab67706c0000bebb3463194d462b129b0bbe5ee0',
-        title: 'He Is the Voice I Hear',
-        subtitle: 'Stand By Me Collective',
-        url: 'https://open.spotify.com/playlist/3237XsfR0Cj19KeN4T3Rxr',
+      const midwordByCardAttrs = jsonAttrValue({
+        image:
+          'https://mosaic.scdn.co/640/ab67616d0000b2730ed61f29c01fb0ec0189fec3ab67616d0000b273148b9745cd535caca93c0adaab67616d0000b2733d474b85b3ac8f9fe252569eab67616d0000b273f560475b307ae778ed9cb0ea',
+        title: "Gravity's Gone",
+        subtitle: 'Drive-By Truckers',
+        description: 'Drive-By Truckers Primer by Jay Busbee',
+        url: 'https://open.spotify.com/playlist/2YhTJBzliipdojkPBF2DsV',
+        belowTheFold: true,
+        noScroll: false,
       })
       const value = html`
         <iframe
           class="spotify-wrap playlist"
-          data-attrs="${midwordOwnerCardAttrs}"
-          src="https://open.spotify.com/embed/playlist/3237XsfR0Cj19KeN4T3Rxr"
+          data-attrs="${midwordByCardAttrs}"
+          src="https://open.spotify.com/embed/playlist/2YhTJBzliipdojkPBF2DsV"
+          frameborder="0"
+          gesture="media"
+          allowfullscreen="true"
+          allow="encrypted-media"
+          loading="lazy"
           data-component-name="Spotify2ToDOM"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'spotify',
-        id: 'playlist/3237XsfR0Cj19KeN4T3Rxr',
-        src: 'https://open.spotify.com/embed/playlist/3237XsfR0Cj19KeN4T3Rxr',
-        url: 'https://open.spotify.com/playlist/3237XsfR0Cj19KeN4T3Rxr',
-        thumbnail: 'https://i.scdn.co/image/ab67706c0000bebb3463194d462b129b0bbe5ee0',
+        id: 'playlist/2YhTJBzliipdojkPBF2DsV',
+        src: 'https://open.spotify.com/embed/playlist/2YhTJBzliipdojkPBF2DsV',
+        url: 'https://open.spotify.com/playlist/2YhTJBzliipdojkPBF2DsV',
+        thumbnail:
+          'https://mosaic.scdn.co/640/ab67616d0000b2730ed61f29c01fb0ec0189fec3ab67616d0000b273148b9745cd535caca93c0adaab67616d0000b2733d474b85b3ac8f9fe252569eab67616d0000b273f560475b307ae778ed9cb0ea',
         height: 352,
-        title: 'He Is the Voice I Hear',
-        author: 'Stand By Me Collective',
+        title: "Gravity's Gone",
+        description: 'Drive-By Truckers Primer by Jay Busbee',
+        author: 'Drive-By Truckers',
       }
 
       expect(await extract(value)).toEqual(expected)

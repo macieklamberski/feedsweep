@@ -32,6 +32,7 @@ import {
 // What a stub platform's snippet writes where the item's own fields belong.
 const playerLabelRegex = /^example player$/
 const typeLabelRegex = /^video$/
+const utmParamRegex = /[?&]utm_\w+=\w+/g
 
 describeForEachParser('createEmbedPlaceholder', (parseHtml) => {
   it('should leave the placeholder empty', () => {
@@ -1797,14 +1798,44 @@ describe('prepareEmbedMetadata', () => {
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
   })
 
-  // A player src carries query the platform needs, and every resolver has already curated it,
-  // either by minting the url from an id or by keeping the publisher's on purpose.
-  it('should not clean the src', () => {
+  it('should clean the src of a listed provider', () => {
     const value: Partial<EmbedResolverResult> = {
+      provider: 'example',
+      src: 'https://player.example/embed/abc?start=30&utm_source=feed',
+    }
+    const expected: Partial<EmbedResolverResult> = {
       provider: 'example',
       src: 'https://player.example/embed/abc?start=30',
     }
-    const context = { ...baseContext, cleanUrlFn: (url: string) => url.split('?')[0] ?? url }
+    const context = {
+      ...baseContext,
+      cleanedSrcProviders: ['example'],
+      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
+    }
+
+    expect(prepareEmbedMetadata(value, context)).toEqual(expected)
+  })
+
+  it('should keep the src of an unlisted provider as written', () => {
+    const value: Partial<EmbedResolverResult> = {
+      provider: 'example',
+      src: 'https://player.example/embed/abc?start=30&utm_source=feed',
+    }
+    const context = {
+      ...baseContext,
+      cleanedSrcProviders: ['other'],
+      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
+    }
+
+    expect(prepareEmbedMetadata(value, context)).toEqual(value)
+  })
+
+  it('should keep the src of a listed provider as written when no cleaner is given', () => {
+    const value: Partial<EmbedResolverResult> = {
+      provider: 'example',
+      src: 'https://player.example/embed/abc?start=30&utm_source=feed',
+    }
+    const context = { ...baseContext, cleanedSrcProviders: ['example'] }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(value)
   })

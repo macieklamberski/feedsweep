@@ -104,6 +104,12 @@ describeForEachParser('padletEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a board id carrying an encoded slash', async () => {
+      const value = '<iframe src="https://padlet.com/embed/228qqr%2f1n7d19"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore the embed route under another segment', async () => {
       const value = '<iframe src="https://padlet.com/x/embed/228qqr1n7d19"></iframe>'
 

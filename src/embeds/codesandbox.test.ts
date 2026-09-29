@@ -104,6 +104,12 @@ describe('codesandboxResolveEmbed', () => {
 
       expect(codesandboxResolveEmbed(value)).toBeUndefined()
     })
+
+    it('should ignore a hash carrying an escaped slash', () => {
+      const value = 'https://codesandbox.io/embed/83wzkj%2Fabc'
+
+      expect(codesandboxResolveEmbed(value)).toBeUndefined()
+    })
   })
 
   describe('edge cases', () => {
@@ -223,6 +229,12 @@ describe('codesandboxResolveEmbed', () => {
 
     it('should refuse the starter-template route, which saves no sandbox', () => {
       expect(codesandboxResolveEmbed('https://codesandbox.io/embed/new')).toBeUndefined()
+    })
+
+    it('should refuse the fork route, which names no sandbox', () => {
+      const value = 'https://codesandbox.io/embed/fork'
+
+      expect(codesandboxResolveEmbed(value)).toBeUndefined()
     })
   })
 })

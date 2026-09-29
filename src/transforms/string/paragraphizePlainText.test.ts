@@ -116,6 +116,27 @@ describe('paragraphizePlainText', () => {
 
       expect(paragraphize(value)).toBe(expected)
     })
+
+    it('should autop a comparison written with a less-than-or-equal sign', () => {
+      const value = 'Retry while count <= limit'
+      const expected = '<p>Retry while count <= limit</p>\n'
+
+      expect(paragraphize(value)).toBe(expected)
+    })
+
+    it('should autop a placeholder holding an equals sign', () => {
+      const value = 'Pass each option as --set <key=value>'
+      const expected = '<p>Pass each option as --set <key=value></p>\n'
+
+      expect(paragraphize(value)).toBe(expected)
+    })
+
+    it('should autop a url written in angle brackets', () => {
+      const value = 'Reported at <https://example.com/bugs/?67590>.'
+      const expected = '<p>Reported at <https://example.com/bugs/?67590>.</p>\n'
+
+      expect(paragraphize(value)).toBe(expected)
+    })
   })
 
   it('should handle empty string', () => {

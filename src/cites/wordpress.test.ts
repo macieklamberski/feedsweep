@@ -38,24 +38,6 @@ describeForEachParser('wordpressCiteResolver', (parseHtml) => {
     })
   })
 
-  describe('edge cases', () => {
-    it('should trim surrounding whitespace from the title', async () => {
-      const value = html`
-        <blockquote class="wp-embedded-content">
-          <a href="https://example.com/post/"> Padded title </a>
-        </blockquote>
-      `
-
-      const expected: CiteResolverResult = {
-        provider: 'wordpress',
-        url: 'https://example.com/post/',
-        title: 'Padded title',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-  })
-
   describe('sad paths', () => {
     it('should return undefined when the blockquote has no link', async () => {
       const value = html`

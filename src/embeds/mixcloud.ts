@@ -8,7 +8,7 @@ const provider = 'mixcloud'
 
 // A slug holds whatever script the publisher titled the show in, Japanese, Greek and accented Latin
 // among them.
-const unsafeSegmentRegex = /[/?#\\]|\s|^\.+$/
+const unsafeSegmentRegex = /[/?#\\]|\s|^\./
 
 const mixcloudHosts = ['mixcloud.com']
 
@@ -31,16 +31,14 @@ const sectionSlugs = new Set([
   'uploads',
 ])
 
-// First segments that are the site, not a user: `genres/{x}` is a listing served at exactly
-// the show shape, `categories/{x}` and `tag/{x}` redirect into it, and the widget's own url is
-// two segments, so a carrier missing its `feed` parameter would read as the user `widget`.
+// Site pages at the show shape: `genres/{x}` in any case, `categories/{x}` and `tag/{x}` that
+// redirect to it, and the widget's own url when a carrier loses its `feed` parameter. `media` and
+// `search` are real users with shows, so they stay off the list.
 const siteSegments = new Set([
   'categories',
   'discover',
   'genres',
   'live',
-  'media',
-  'search',
   'tag',
   'upload',
   'widget',

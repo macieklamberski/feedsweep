@@ -1,4 +1,4 @@
-import { getPathSegments, trimObject } from 'trousse'
+import { getPathSegments, isHostOf, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -11,11 +11,18 @@ const safeSlugRegex = /^[a-z0-9_]+$/i
 const htmlSuffixRegex = /\.html$/
 
 const tedHosts = ['ted.com']
+// Exact: `video.ted.com` and `download.ted.com` serve the talks' files under the same `/talks/`
+// path, such as `video.ted.com/talks/dynamic/{file}.flv`.
+const tedTalkHosts = ['embed.ted.com', 'embed-ssl.ted.com', 'www.ted.com', 'ted.com']
 
 // `embed.ted.com/talks/{slug}.html`, and a localized variant that inserts the language:
 // `embed.ted.com/talks/lang/{lang}/{slug}.html`. The slug is the talk's canonical id on
 // ted.com, so a watch url follows from it without a lookup.
 export const extractTedTalk = (link: string): string | undefined => {
+  if (!isHostOf(link, tedTalkHosts)) {
+    return
+  }
+
   const segments = getPathSegments(link)
 
   if (segments[0] !== 'talks') {

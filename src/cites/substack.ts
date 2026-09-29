@@ -65,7 +65,7 @@ export const substackOwnPostCiteResolver: CiteResolver = {
         // author's Substack profile, on custom domains too.
         url: attr(find(element, 'a[href]'), 'href'),
         title: text(element, 'h4'),
-        author: text(find(element, 'a[href*="substack.com/profile/"]')),
+        author: text(element, 'a[href*="substack.com/profile/"]'),
         thumbnail: attr(find(element, 'img'), 'src'),
       })
     }
@@ -127,8 +127,8 @@ export const substackPublicationCiteResolver: CiteResolver = {
       provider: 'substack',
       // On Substack's own site the blob omits base_url and the anchor carries the url.
       url: attrs?.base_url ?? attr(find(element, 'a.embedded-publication-link-part'), 'href'),
-      title: attrs?.name ?? text(find(element, '.embedded-publication-name')),
-      description: attrs?.hero_text ?? text(find(element, '.embedded-publication-hero-text')),
+      title: attrs?.name ?? text(element, '.embedded-publication-name'),
+      description: attrs?.hero_text ?? text(element, '.embedded-publication-hero-text'),
       author: attrs?.author_name,
       icon: attrs?.logo_url ?? attr(find(element, 'img.embedded-publication-logo'), 'src'),
     })

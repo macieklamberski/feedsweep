@@ -82,6 +82,12 @@ describe('extractVideoId', () => {
     expect(extractVideoId(value)).toBeUndefined()
   })
 
+  it('should return undefined for a url that cannot be parsed', () => {
+    const value = 'https://['
+
+    expect(extractVideoId(value)).toBeUndefined()
+  })
+
   it('should reject video id with unsafe characters', () => {
     const value = 'https://www.youtube.com/watch?v=<script>alert(1)</script>'
 
@@ -108,6 +114,25 @@ describe('extractVideoId', () => {
 
   it('should return undefined for channel url', () => {
     const value = 'https://www.youtube.com/@channel'
+
+    expect(extractVideoId(value)).toBeUndefined()
+  })
+
+  // These endpoints name the video in the query. `/watch_popup/{id}` answers 303 to a different
+  // video, and the other two answer 404.
+  const pathSpellingUrls: Array<string> = [
+    'https://www.youtube.com/watch_popup/dQw4w9WgXcQ',
+    'http://www.youtube.com/apiplayer/dQw4w9WgXcQ',
+    'http://www.youtube.com/get_video_info/dQw4w9WgXcQ',
+  ]
+
+  it.each(pathSpellingUrls)('should return undefined for the path spelling %s', (value) => {
+    expect(extractVideoId(value)).toBeUndefined()
+  })
+
+  // Every 2010 AJAX url puts the video first in the fragment.
+  it('should return undefined for a hashbang naming the video after another parameter', () => {
+    const value = 'http://www.youtube.com/watch#!feature=related&v=dQw4w9WgXcQ'
 
     expect(extractVideoId(value)).toBeUndefined()
   })

@@ -60,6 +60,15 @@ describe('extractWistiaEmbed', () => {
     expect(extractWistiaEmbed(value)).toEqual(expected)
   })
 
+  // The player serves the same media whatever case the id is spelled in, so the id is read in
+  // one spelling and the media reaches enrichment as one key.
+  it('should lowercase an id spelled in capitals', () => {
+    const value = 'https://fast.wistia.net/embed/iframe/2FG072PFTB'
+    const expected = { route: 'iframe', id: '2fg072pftb' }
+
+    expect(extractWistiaEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for a wistia url naming no media', () => {
     const value = 'https://wistia.com/pricing'
 
@@ -147,6 +156,18 @@ describe('wistiaResolveEmbed', () => {
   // Only the account page names the account, so it is the one carrier that can state a url.
   it('should name the page an account media url already spells out', () => {
     const value = 'https://acme.wistia.com/medias/2fg072pftb'
+    const expected: EmbedResolverResult = {
+      provider: 'wistia',
+      id: '2fg072pftb',
+      src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      url: 'https://acme.wistia.com/medias/2fg072pftb',
+    }
+
+    expect(wistiaResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should mint one key for an account media page spelled in capitals', () => {
+    const value = 'https://acme.wistia.com/medias/2FG072PFTB'
     const expected: EmbedResolverResult = {
       provider: 'wistia',
       id: '2fg072pftb',

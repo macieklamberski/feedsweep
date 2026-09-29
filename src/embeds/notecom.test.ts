@@ -108,6 +108,12 @@ describeForEachParser('notecomIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should state nothing for an id carrying an encoded slash', async () => {
+      const value = html`<iframe src="https://note.com/embed/notes/nf938%2fce640465"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should state nothing for a foreign host carrying the path', async () => {
       const value = html`<iframe src="https://evil.test/katayuma/n/nf938ce640465"></iframe>`
 

@@ -33,14 +33,19 @@ const githubDescription = (paragraph: Element): string | undefined => {
   return result.trim() || undefined
 }
 
-// Engines whose cards are not link previews. TikTok, Reddit, Facebook and Twitch emit bare
-// iframes, not aside.onebox, and Mastodon links go through the generic engine.
+// Engines whose cards are not link previews, or whose body is content a cite would drop. TikTok,
+// Reddit, Facebook and Twitch emit bare iframes, not aside.onebox, and Mastodon links go through
+// the generic engine.
 const omittedOneboxClasses = [
   'twitterstatus', // A social post: the heading is the author and the body the post text
   'threadsstatus', // The same social-post shape as twitterstatus
   'instagram', // Legacy social-post asides; since 2021 the engine emits a bare iframe
   'pdf', // A file card: the title is the filename and the only paragraph its size
   'googlemeet', // A join-call card: every field is a fixed label or the meeting code
+  'githubblob', // A file excerpt in a <pre><code> block
+  'githubgist', // The same file excerpt as githubblob, one block per gist file
+  'gitlabblob', // The same file excerpt as githubblob
+  'pastebin', // The paste's text in a <pre><code> block
 ]
 
 // Hosts with no onebox engine of their own: their posts arrive as generic asides whose og title
