@@ -1,18 +1,17 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
+import { digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'odnoklassniki'
-
-const safeVideoIdRegex = /^\d+$/
 
 // The player fills its box, and the watch page sizes it 16:9.
 const playerRatio = '16/9'
 
 export const odnoklassnikiResolveEmbed: ResolveEmbed = (url) => {
   const [route, segment, ...rest] = getPathSegments(url)
-  const videoId = keepIfMatches(segment, safeVideoIdRegex)
+  const videoId = keepIfMatches(segment, digitsRegex)
 
   if (!isAnyOf(route, 'videoembed') || !videoId || rest.length) {
     return

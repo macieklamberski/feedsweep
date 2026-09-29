@@ -1,6 +1,6 @@
 import { toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'netease'
@@ -17,7 +17,6 @@ const typeRoutes = toMap({
   '4': 'djradio',
 })
 
-const safeIdRegex = /^\d+$/
 const playerPathRegex = /^\/+outchain\/player\/?$/
 const flashPlayerPathRegex = /^\/+style\/swf\/widget\.swf$/
 
@@ -28,7 +27,7 @@ const composeResult = (
 ): EmbedResolverResult | undefined => {
   const route = typeRoutes.get(type)
 
-  if (!route || !safeIdRegex.test(id)) {
+  if (!route || !digitsRegex.test(id)) {
     return
   }
 

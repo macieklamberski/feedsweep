@@ -1,7 +1,7 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'crowdsignal'
@@ -11,7 +11,6 @@ const pollPathRegex = /^\/(\d+)(?:\/embed)?\/?$/
 const loaderPathRegex = /^\/p\/(\d+)\.js$/
 const retiredPollPathRegex = /^\/poll\/(\d+)\/?$/
 const flashPlayerPathRegex = /^\/poll\.swf$/
-const pollIdRegex = /^\d+$/
 
 const composeEmbed = (pollId: string): EmbedResolverResult => {
   return {
@@ -90,7 +89,7 @@ const crowdsignalFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const pollId = keepIfMatches(flashVar(element, 'p'), pollIdRegex)
+  const pollId = keepIfMatches(flashVar(element, 'p'), digitsRegex)
 
   if (!pollId) {
     return

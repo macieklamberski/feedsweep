@@ -2,7 +2,7 @@ import { getPathSegments, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tumblr'
@@ -15,7 +15,6 @@ const tumblrHosts = ['tumblr.com']
 // The blog key is a base64url token, written bare on the older route and prefixed `t:` on the
 // current one. Both spellings address the same post, so the id keeps the bare one.
 const safeBlogKeyRegex = /^(?:t:)?[\w-]+$/
-const safePostIdRegex = /^\d+$/
 
 const readPostEmbed = (href: string | undefined): EmbedResolverResult | undefined => {
   const parsed = parseUrlOnHosts(href, tumblrEmbedHosts)
@@ -30,7 +29,7 @@ const readPostEmbed = (href: string | undefined): EmbedResolverResult | undefine
     route !== 'embed' ||
     kind !== 'post' ||
     !safeBlogKeyRegex.test(blogKey) ||
-    !safePostIdRegex.test(postId)
+    !digitsRegex.test(postId)
   ) {
     return
   }

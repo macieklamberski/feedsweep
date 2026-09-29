@@ -1,6 +1,6 @@
 import { getPathSegments, parseUrl, toMap, trimObject } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, digitsRegex, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type EmbedShape = {
@@ -21,9 +21,6 @@ const embedParams = [
   'distanceMarkers',
   'privacyCode',
 ]
-
-// The id is minted into a path, so a separator in it would let the feed choose the path.
-const idRegex = /^\d+$/
 
 // An event names its id in `eventId`, and Ride with GPS serves no static render under `/events`.
 const embedKinds = toMap<EmbedShape>({
@@ -66,7 +63,7 @@ const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
 
   const id = parsed.searchParams.get(shape.idParam)
 
-  if (!id || !idRegex.test(id)) {
+  if (!id || !digitsRegex.test(id)) {
     return
   }
 
@@ -93,7 +90,7 @@ const readPathEmbed = (parsed: URL, url: string): EmbedResolverResult | undefine
   const segments = getPathSegments(parsed)
   const [path, id, marker] = segments
 
-  if (segments.length !== 3 || marker !== 'embed' || !id || !idRegex.test(id)) {
+  if (segments.length !== 3 || marker !== 'embed' || !id || !digitsRegex.test(id)) {
     return
   }
 
