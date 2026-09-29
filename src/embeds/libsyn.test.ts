@@ -86,9 +86,8 @@ describe('extractLibsynEmbed', () => {
 })
 
 describe('libsynResolveEmbed', () => {
-  // The old host answers 500 for older episodes while play.libsyn.com serves them, so the
-  // rebuilt src is a repair rather than a cosmetic rewrite.
-  it('should mint the modern player host and carry the height', () => {
+  // The old host answers 500 for some older episodes while play.libsyn.com serves them all.
+  it('should move an old-host player to the current host and carry the height', () => {
     const value = 'https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/theme/custom/'
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
@@ -100,8 +99,21 @@ describe('libsynResolveEmbed', () => {
     expect(libsynResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should leave the height out when the player does not state one', () => {
-    const value = 'https://play.libsyn.com/embed/episode/id/5508311/'
+  it('should keep a current-host player as the publisher wrote it', () => {
+    const value =
+      'https://play.libsyn.com/embed/episode/id/24311406/height/64/theme/modern/size/small/thumbnail/yes/custom-color/78e5ec/time-start/00:00:00/hide-show/yes/hide-playlist/yes/download/yes'
+    const expected: EmbedResolverResult = {
+      provider: 'libsyn',
+      id: 'episode/24311406',
+      src: value,
+      height: 64,
+    }
+
+    expect(libsynResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should leave the height out when the old player does not state one', () => {
+    const value = 'https://html5-player.libsyn.com/embed/episode/id/5508311/theme/custom/'
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/5508311',
@@ -231,7 +243,7 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/41557470',
-      src: 'https://play.libsyn.com/embed/episode/id/41557470/height/192/',
+      src: 'https://play.libsyn.com/embed/episode/id/41557470/height/192/theme/modern/size/large/thumbnail/yes/custom-color/a1a29c/time-start/00:00:00/playlist-height/200/direction/backward/download/yes/font-color/FFFFFF',
       height: 192,
     }
 

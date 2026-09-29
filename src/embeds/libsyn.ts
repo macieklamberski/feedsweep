@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize } from '../utils/dom.js'
 
@@ -8,6 +8,10 @@ import { digitsRegex, isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const libsynHosts = ['libsyn.com']
+
+// The current player host. The old `html5-player.libsyn.com` answers 500 for some older episodes,
+// and which ones cannot be told from the url, so its players move here.
+const playerHost = 'play.libsyn.com'
 
 // `show` renders an error and `destination` is another id space, so a show carrier falls through.
 const embedKinds = ['episode', 'destination']
@@ -67,14 +71,15 @@ export const libsynResolveEmbed: ResolveEmbed = (url, element) => {
   return {
     provider,
     id: `${embed.kind}/${embed.id}`,
-    src: `https://play.libsyn.com/embed/${embed.kind}/id/${embed.id}/${height}`,
+    src: isHostOf(url, [playerHost])
+      ? url
+      : `https://${playerHost}/embed/${embed.kind}/id/${embed.id}/${height}`,
     height: embed.height,
     title: attr(element, 'title'),
   }
 }
 
-// Libsyn's player iframe, whose old html5-player.libsyn.com host answers 500 for older episodes.
-// `play.libsyn.com` serves all of them.
+// Libsyn's player iframe, on the current host and the old one.
 export const libsynEmbedResolver = createUrlEmbedResolver(libsynHosts, libsynResolveEmbed)
 
 export const libsynFieldCleaners: Array<FieldCleaner> = [
