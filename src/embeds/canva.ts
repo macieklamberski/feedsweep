@@ -11,7 +11,7 @@ const canvaHosts = ['canva.com', 'www.canva.com']
 // url-safe base64, and the class keeps anything else out of a minted path.
 const designPathRegex = /^\/design\/([\w-]+(?:\/[\w-]+)?)\/(view|watch)\/?$/
 
-// The legacy loader never frames the viewer narrower than this, and adds a byline bar below it.
+// The legacy loader never frames the viewer narrower than this, and adds 48px to its height.
 const sdkMinWidth = 250
 const sdkBarHeight = 48
 
@@ -46,7 +46,8 @@ export const canvaResolveEmbed: ResolveEmbed = (url) => {
 export const canvaIframeEmbedResolver = createUrlEmbedResolver(canvaHosts, canvaResolveEmbed)
 
 // The retired `sdk.canva.com/v1/embed.js` mount, which the loader frames at `/view?embed` and
-// sizes `width × data-height-ratio + 48`. Tuned to the narrowest frame, so the byline bar fits.
+// sizes `width × data-height-ratio + 48`. The viewer centres the design in that box and draws its
+// controls over it. Tuned to the narrowest frame.
 export const canvaWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.canva-embed[data-design-id]',
   (element) => {
