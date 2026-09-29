@@ -73,6 +73,18 @@ describe('rtveResolveEmbed', () => {
       expect(rtveResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should return undefined for the embed path outside the drmn directory', () => {
+      const value = 'https://www.rtve.es/player/embed/video/2474214'
+
+      expect(rtveResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a drmn path that is not the embed', () => {
+      const value = 'https://www.rtve.es/drmn/share/video/2474214'
+
+      expect(rtveResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should return undefined for an rtve url that is not the player', () => {
       const value = 'https://www.rtve.es/play/videos/la-aventura-del-saber/copyleft/2474214/'
 
@@ -154,7 +166,7 @@ describeForEachParser('rtveIframeEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/www.rtve.es/drmn/embed/video/2474214"></iframe>'
+      const value = '<iframe src="https://evil.test/drmn/embed/video/2474214"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -269,6 +281,30 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the player off the older irtve.es domain', async () => {
+      const value = html`
+        <object
+          type="application/x-shockwave-flash"
+          height="239"
+          width="425"
+          data="http://www.irtve.es/swf/4.2.8/RTVEPlayerVideo.swf"
+        >
+          <param name="flashvars" value="assetID=1081934_es_videos&amp;location=embed_videos" />
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'rtve',
+        id: 'video/1081934',
+        src: 'https://www.rtve.es/drmn/embed/video/1081934/',
+        url: 'https://www.rtve.es/v/1081934/',
+        thumbnail: 'https://img.rtve.es/v/1081934/',
+        width: 425,
+        height: 239,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read an audio asset off the flashvars attribute', async () => {
       const value = html`
         <embed
@@ -318,9 +354,25 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined for a swf outside the swf directory', async () => {
+      const value = html`
+        <embed src="http://www.rtve.es/static/swf/v2/RTVEPlayer.swf?assetID=309749_es_videos" />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a page under the swf directory', async () => {
+      const value = html`
+        <embed src="http://www.rtve.es/swf/v2/RTVEPlayer.swf/about?assetID=309749_es_videos" />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined for a foreign host carrying the player path', async () => {
       const value = html`
-        <embed src="https://evil.test/www.rtve.es/swf/v2/RTVEPlayer.swf?assetID=309749_es_videos" />
+        <embed src="https://evil.test/swf/v2/RTVEPlayer.swf?assetID=309749_es_videos" />
       `
 
       expect(await extract(value)).toBeUndefined()

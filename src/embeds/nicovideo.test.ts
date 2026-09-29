@@ -4,6 +4,7 @@ import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   extractNicovideoId,
+  nicovideoIframeEmbedResolver,
   nicovideoResolveEmbed,
   nicovideoScriptEmbedResolver,
 } from './nicovideo.js'
@@ -67,6 +68,18 @@ describe('extractNicovideoId', () => {
     expect(extractNicovideoId(value)).toBeUndefined()
   })
 
+  it('should return undefined for an id with more than two letters before the number', () => {
+    const value = 'https://embed.nicovideo.jp/watch/abc123'
+
+    expect(extractNicovideoId(value)).toBeUndefined()
+  })
+
+  it('should return undefined for an id with letters after the number', () => {
+    const value = 'https://embed.nicovideo.jp/watch/sm9abc'
+
+    expect(extractNicovideoId(value)).toBeUndefined()
+  })
+
   // Every spelling a broadcast arrives in, including the live host's own embed route.
   const broadcastUrls: Array<string> = [
     'https://live.nicovideo.jp/watch/lv346883570',
@@ -96,6 +109,67 @@ describe('extractNicovideoId', () => {
       expect(extractNicovideoId(value)).toBeUndefined()
     },
   )
+})
+
+describeForEachParser('nicovideoIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, nicovideoIframeEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should rewrite the thumb card and keep the box it declares', async () => {
+      const value = html`
+        <iframe
+          scrolling="no"
+          height="176"
+          frameborder="0"
+          width="312"
+          style="border: 1px solid rgb(204, 204, 204);"
+          src="http://ext.nicovideo.jp/thumb/sm12692698"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'nicovideo',
+        id: 'sm12692698',
+        src: 'https://embed.nicovideo.jp/watch/sm12692698',
+        url: 'https://www.nicovideo.jp/watch/sm12692698',
+        width: 312,
+        height: 176,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the query the player iframe carries', async () => {
+      const value = html`
+        <iframe
+          width="640"
+          height="360"
+          src="http://embed.nicovideo.jp/watch/sm28553330?oldScript=1&amp;referer=http%3A%2F%2Fblog.livedoor.jp%2Fantijapanhunter%2F&amp;from=0&amp;allowProgrammaticFullScreen=1"
+          allow="autoplay"
+          style="max-width: 560px; word-break: break-all;"
+          frameborder="0"
+          allowfullscreen="allowfullscreen"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'nicovideo',
+        id: 'sm28553330',
+        src: 'https://embed.nicovideo.jp/watch/sm28553330',
+        url: 'https://www.nicovideo.jp/watch/sm28553330',
+        width: 640,
+        height: 360,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host carrying the thumb card path', async () => {
+      const value = '<iframe src="https://evil.test/thumb/sm12692698"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
 })
 
 describeForEachParser('nicovideoScriptEmbedResolver', (parseHtml) => {
@@ -190,9 +264,19 @@ describeForEachParser('nicovideoScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined for a sized script naming no video', async () => {
+      const value = html`
+        <script src="https://ext.nicovideo.jp/thumb_watch/?w=490&amp;h=307"></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     // The selector matches on a substring, so another host can carry the path and pass it.
     it('should return undefined for another host spelling the nicovideo path', async () => {
-      const value = '<script src="https://evil.test/nicovideo.jp/thumb_watch/sm9"></script>'
+      const value = html`
+        <script src="https://evil.test/thumb_watch/sm9?nicovideo.jp/thumb_watch"></script>
+      `
 
       expect(await extract(value)).toBeUndefined()
     })

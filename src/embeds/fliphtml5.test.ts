@@ -88,6 +88,19 @@ describe('fliphtml5ResolveEmbed', () => {
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep the case of an account', () => {
+      const value = 'https://online.fliphtml5.com/ActuSF/wgas/'
+      const expected: EmbedResolverResult = {
+        provider: 'fliphtml5',
+        id: 'ActuSF/wgas',
+        src: 'https://online.fliphtml5.com/ActuSF/wgas/',
+        url: 'https://online.fliphtml5.com/ActuSF/wgas/',
+        thumbnail: 'https://online.fliphtml5.com/ActuSF/wgas/files/shot.jpg',
+      }
+
+      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should keep the underscores of a custom book slug', () => {
       const value = 'https://online.fliphtml5.com/revku/MARZO_2026_EDICION_221/'
       const expected: EmbedResolverResult = {

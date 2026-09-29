@@ -786,10 +786,121 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined for a slideshow swf under another path', async () => {
+      const value = html`
+        <embed
+          src="https://www.flickr.com/x/apps/slideshow/show.swf"
+          flashvars="page_show_url=%2Fphotos%2Fbees%2Fsets%2F72157624341%2Fshow%2F"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a legacy slideshow path under another path', async () => {
+      const value =
+        '<iframe src="https://www.flickr.com/x/slideshow/index.gne?user_id=12345678@N00&amp;set_id=72157624341"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a legacy slideshow path followed by a trailing segment', async () => {
+      const value =
+        '<iframe src="https://www.flickr.com/slideshow/index.gne/extra?user_id=12345678@N00&amp;set_id=72157624341"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an album page under another path', async () => {
+      const value =
+        '<iframe src="https://www.flickr.com/x/photos/bees/sets/72157623516208778/show/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a photostream slideshow page under another path', async () => {
+      const value = '<iframe src="https://www.flickr.com/x/photos/12345678@N04/show/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a photostream slideshow page followed by a trailing segment', async () => {
+      const value = '<iframe src="https://www.flickr.com/photos/12345678@N04/show/extra"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a group pool slideshow page under another path', async () => {
+      const value = '<iframe src="https://www.flickr.com/x/groups/797770@N21/pool/show/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a group pool slideshow page followed by a trailing segment', async () => {
+      const value =
+        '<iframe src="https://www.flickr.com/groups/797770@N21/pool/show/extra"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a photo page player under another path', async () => {
+      const value =
+        '<iframe src="https://www.flickr.com/x/photos/bees/2341623661/player/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a photo page player followed by a trailing segment', async () => {
+      const value =
+        '<iframe src="https://www.flickr.com/photos/bees/2341623661/player/7c99f48bbf/extra"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an embedr photo under another path', async () => {
+      const value = '<iframe src="https://embedr.flickr.com/x/photos/2341623661"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an embedr photo followed by a trailing segment', async () => {
+      const value = '<iframe src="https://embedr.flickr.com/photos/2341623661/extra"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an owner opening with an encoded slash', async () => {
+      const value =
+        '<iframe src="https://www.flickr.com/slideShow/index.gne?user_id=%2Fbees"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an owner closing with an encoded traversal', async () => {
+      const value =
+        '<iframe src="https://www.flickr.com/slideShow/index.gne?user_id=bees%2F..%2Fx"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a group id opening with an encoded traversal', async () => {
+      const value =
+        '<iframe src="https://www.flickr.com/slideShow/index.gne?group_id=..%2F797770@N21"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a group id closing with an encoded traversal', async () => {
+      const value =
+        '<iframe src="https://www.flickr.com/slideShow/index.gne?group_id=797770@N21%2F.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined for a carrier on another host', async () => {
       const value = html`
         <embed
-          src="https://evil.test/flickr.com/apps/slideshow/show.swf"
+          src="https://evil.test/apps/slideshow/show.swf"
           flashvars="page_show_url=%2Fphotos%2Fbees%2Fsets%2F72157624341%2Fshow%2F"
         />
       `

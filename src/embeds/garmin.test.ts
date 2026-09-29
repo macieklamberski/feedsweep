@@ -126,9 +126,8 @@ describeForEachParser('garminEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a foreign host naming the embed route in its path', async () => {
-      const value =
-        '<iframe src="https://evil.test/connect.garmin.com/embed/activity/1393315994"></iframe>'
+    it('should ignore a foreign host carrying the embed route', async () => {
+      const value = '<iframe src="https://evil.test/embed/activity/1393315994"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

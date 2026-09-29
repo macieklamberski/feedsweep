@@ -12,6 +12,10 @@ import {
 
 // Imgur's own routes, none of which names a post to mint from.
 const sitePaths = [
+  'https://imgur.com/account/settings',
+  'https://imgur.com/emerald',
+  'https://imgur.com/register',
+  'https://imgur.com/vidgif',
   'https://imgur.com/upload',
   'https://imgur.com/about',
   'https://imgur.com/signin',
@@ -141,6 +145,39 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
         <blockquote
           class="imgur-embed-pub"
           data-id="../evil"
+        ></blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an id behind a path step', async () => {
+      const value = html`
+        <blockquote
+          class="imgur-embed-pub"
+          data-id="../pVa2rXL"
+        ></blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an id followed by a path step', async () => {
+      const value = html`
+        <blockquote
+          class="imgur-embed-pub"
+          data-id="pVa2rXL/.."
+        ></blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an id carrying an encoded slash', async () => {
+      const value = html`
+        <blockquote
+          class="imgur-embed-pub"
+          data-id="pVa2%2FrXL"
         ></blockquote>
       `
 
@@ -327,6 +364,12 @@ describe('imgurResolveEmbed', () => {
     })
   })
 
+  it('should ignore a slugged gallery id carrying an encoded slash', () => {
+    const value = 'https://imgur.com/gallery/cats-pVa2%2FrXL'
+
+    expect(imgurResolveEmbed(value)).toBeUndefined()
+  })
+
   it('should ignore another host carrying the post path', () => {
     const value = 'https://imgur.com.evil.test/pVa2rXL/embed'
 
@@ -483,11 +526,11 @@ describeForEachParser('imgurS9eEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host naming the helper in its path', async () => {
+    it('should ignore the helper path on a foreign host', async () => {
       const value = html`
         <iframe
           data-s9e-mediaembed="imgur"
-          src="https://evil.test/s9e.github.io/iframe/2/imgur.min.html#1Jy5zcX"
+          src="https://evil.test/iframe/2/imgur.min.html#1Jy5zcX"
         ></iframe>
       `
 

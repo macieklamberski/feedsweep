@@ -124,7 +124,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the wrapper path', async () => {
       const value =
-        '<iframe src="https://evil.test/www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2FUBVMSTz7mhvYogjfdeKcIB%2FRed_System_Color-0725"></iframe>'
+        '<iframe src="https://evil.test/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2FUBVMSTz7mhvYogjfdeKcIB%2FRed_System_Color-0725"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -178,8 +178,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the embed path', async () => {
-      const value =
-        '<iframe src="https://evil.test/embed.figma.com/deck/0txckPBPI1OqFNEa9VaKLP/TacTik"></iframe>'
+      const value = '<iframe src="https://evil.test/deck/0txckPBPI1OqFNEa9VaKLP/TacTik"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

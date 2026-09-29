@@ -334,6 +334,120 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should resolve a declared handle holding digits', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          data-unique-id="401kgoldirarollovers"
+          data-embed-type="creator"
+        >
+          <section></section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@401kgoldirarollovers',
+        src: 'https://www.tiktok.com/embed/@401kgoldirarollovers',
+        url: 'https://www.tiktok.com/@401kgoldirarollovers',
+        author: '@401kgoldirarollovers',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve a declared handle holding an underscore', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          data-unique-id="ott_races"
+          data-embed-type="creator"
+        >
+          <section></section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@ott_races',
+        src: 'https://www.tiktok.com/embed/@ott_races',
+        url: 'https://www.tiktok.com/@ott_races',
+        author: '@ott_races',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve a declared handle holding dots', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          data-unique-id=".a.u00"
+          data-embed-type="creator"
+        >
+          <section></section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@.a.u00',
+        src: 'https://www.tiktok.com/embed/@.a.u00',
+        url: 'https://www.tiktok.com/@.a.u00',
+        author: '@.a.u00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve a profile anchor whose handle holds digits', async () => {
+      const value = html`
+        <blockquote class="tiktok-embed">
+          <a href="https://www.tiktok.com/@401kgoldirarollovers">Profile</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@401kgoldirarollovers',
+        src: 'https://www.tiktok.com/embed/@401kgoldirarollovers',
+        url: 'https://www.tiktok.com/@401kgoldirarollovers',
+        author: '@401kgoldirarollovers',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve a profile anchor whose handle holds an underscore', async () => {
+      const value = html`
+        <blockquote class="tiktok-embed">
+          <a href="https://www.tiktok.com/@ott_races">Profile</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@ott_races',
+        src: 'https://www.tiktok.com/embed/@ott_races',
+        url: 'https://www.tiktok.com/@ott_races',
+        author: '@ott_races',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve a profile anchor whose handle holds dots', async () => {
+      const value = html`
+        <blockquote class="tiktok-embed">
+          <a href="https://www.tiktok.com/@.a.u00">Profile</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@.a.u00',
+        src: 'https://www.tiktok.com/embed/@.a.u00',
+        url: 'https://www.tiktok.com/@.a.u00',
+        author: '@.a.u00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   // The clip branch has measured the player better than the snippet a publisher pastes, so it
@@ -400,6 +514,36 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
           cite="https://www.tiktok.com/"
           data-video-id=""
         ></blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a profile anchor under another directory', async () => {
+      const value = html`
+        <blockquote class="tiktok-embed">
+          <a href="https://www.tiktok.com/x/@user">Profile</a>
+        </blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a profile anchor followed by another segment', async () => {
+      const value = html`
+        <blockquote class="tiktok-embed">
+          <a href="https://www.tiktok.com/@user/extra">Profile</a>
+        </blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a profile anchor whose handle carries an encoded slash', async () => {
+      const value = html`
+        <blockquote class="tiktok-embed">
+          <a href="https://www.tiktok.com/@user%2Fx">Profile</a>
+        </blockquote>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -780,6 +924,48 @@ describeForEachParser('tiktokIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should mint the player from a watch page whose handle holds digits', async () => {
+      const value =
+        '<iframe src="https://www.tiktok.com/@10gsocial/video/7178262497063914795"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@10gsocial/video/7178262497063914795',
+        src: 'https://www.tiktok.com/embed/v2/7178262497063914795',
+        url: 'https://www.tiktok.com/@10gsocial/video/7178262497063914795',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the player from a watch page whose handle holds underscores', async () => {
+      const value =
+        '<iframe src="https://www.tiktok.com/@_cat_riki/video/7162989971240930565"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@_cat_riki/video/7162989971240930565',
+        src: 'https://www.tiktok.com/embed/v2/7162989971240930565',
+        url: 'https://www.tiktok.com/@_cat_riki/video/7162989971240930565',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the player from a watch page whose handle holds dots', async () => {
+      const value =
+        '<iframe src="https://www.tiktok.com/@.a.u00/video/7312895136185289990"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@.a.u00/video/7312895136185289990',
+        src: 'https://www.tiktok.com/embed/v2/7312895136185289990',
+        url: 'https://www.tiktok.com/@.a.u00/video/7312895136185289990',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -810,9 +996,41 @@ describeForEachParser('tiktokIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should return undefined for a foreign host carrying the player path', async () => {
-      const value = html`
-        <iframe src="https://evil.test/www.tiktok.com/embed/v2/7520573541146692886"></iframe>
-      `
+      const value = '<iframe src="https://evil.test/embed/v2/7520573541146692886"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the player path under another directory', async () => {
+      const value = '<iframe src="https://www.tiktok.com/x/embed/v2/7520573541146692886"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the player path followed by another segment', async () => {
+      const value =
+        '<iframe src="https://www.tiktok.com/embed/v2/7520573541146692886/extra"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a watch path under another directory', async () => {
+      const value =
+        '<iframe src="https://www.tiktok.com/x/@user/video/7520573541146692886"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a watch path followed by another segment', async () => {
+      const value =
+        '<iframe src="https://www.tiktok.com/@user/video/7520573541146692886/extra"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a watch page whose handle carries an encoded slash', async () => {
+      const value =
+        '<iframe src="https://www.tiktok.com/@user%2Fx/video/7520573541146692886"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

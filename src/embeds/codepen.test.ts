@@ -45,6 +45,34 @@ describe('codepenResolveEmbed', () => {
       expect(codepenResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should build the placeholder from a player url on the www host', () => {
+      const value = 'https://www.codepen.io/argyleink/embed/XJpKqXm'
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://www.codepen.io/argyleink/embed/XJpKqXm',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        height: 300,
+        author: '@argyleink',
+      }
+
+      expect(codepenResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the hex slug CodePen mints for its own pens', () => {
+      const value = 'https://codepen.io/anon/embed/df41d39c06f1b477bd00d57ce9c853ee'
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'df41d39c06f1b477bd00d57ce9c853ee',
+        src: 'https://codepen.io/anon/embed/df41d39c06f1b477bd00d57ce9c853ee',
+        thumbnail: 'https://shots.codepen.io/anon/pen/df41d39c06f1b477bd00d57ce9c853ee-512.jpg',
+        height: 300,
+      }
+
+      expect(codepenResolveEmbed(value)).toEqual(expected)
+    })
+
     // The author's own query picks which panes open and which theme they use, so the url the
     // publisher wrote is what travels rather than one rebuilt from the slug.
     it('should keep the query the publisher wrote', () => {
@@ -161,7 +189,13 @@ describe('codepenResolveEmbed', () => {
     })
 
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/codepen.io/argyleink/embed/XJpKqXm'
+      const value = 'https://evil.test/argyleink/embed/XJpKqXm'
+
+      expect(codepenResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a player url naming no pen', () => {
+      const value = 'https://codepen.io/argyleink/embed'
 
       expect(codepenResolveEmbed(value)).toBeUndefined()
     })
@@ -658,6 +692,19 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a slug hash carrying a query', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-slug-hash="XJpKqXm?x=1"
+        >
+          <span>See the Pen</span>
+        </p>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     // The attribute alone is not the platform: other embed plugins carry their own slug hashes.
     it('should ignore a slug hash on a block that is not CodePen', async () => {
       const value = html`
@@ -747,6 +794,25 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
           class="codepen"
           data-slug-hash="XJpKqXm"
           data-user="anon"
+        ></p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/anon/embed/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/anon/pen/XJpKqXm-512.jpg',
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should treat a handle with an at sign inside it as no author', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-slug-hash="XJpKqXm"
+          data-user="argyle@ink"
         ></p>
       `
       const expected: EmbedResolverResult = {
@@ -979,7 +1045,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
     // The selector matches every iframe, so the host check inside `extract` is what rejects
     // this one. A lookalike host would never reach it.
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/codepen.io/argyleink/embed/XJpKqXm"></iframe>'
+      const value = '<iframe src="https://evil.test/argyleink/embed/XJpKqXm"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -1116,6 +1182,26 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
         height: 300,
         title: 'CodePen tricks I keep forgetting',
+        author: '@argyleink',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the bare CodePen title', async () => {
+      const value = html`
+        <iframe
+          src="https://codepen.io/argyleink/embed/XJpKqXm"
+          title="CodePen"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        height: 300,
         author: '@argyleink',
       }
 

@@ -85,6 +85,12 @@ describe('tuneinResolveEmbed', () => {
 
       expect(tuneinResolveEmbed(value)).toBeUndefined()
     })
+
+    it('should ignore a guide id whose kind letter is a separator', () => {
+      const value = 'https://tunein.com/embed/player/&285269/'
+
+      expect(tuneinResolveEmbed(value)).toBeUndefined()
+    })
   })
 })
 

@@ -255,6 +255,89 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should find the byline by its account link when it carries no time', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/BgPrjlfHcoB/"
+        >
+          <p>
+            <a href="https://www.instagram.com/p/BgPrjlfHcoB/">Bring some friends, a special one, or them all.</a>
+          </p>
+          <p>
+            A post shared by <a href="https://www.instagram.com/jervoisakl/">Jervois Steak House</a>
+            (@jervoisakl)
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/BgPrjlfHcoB',
+        src: 'https://www.instagram.com/p/BgPrjlfHcoB/embed/',
+        url: 'https://www.instagram.com/p/BgPrjlfHcoB/',
+        description: 'Bring some friends, a special one, or them all.',
+        author: '@jervoisakl',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the account out of the byline link when the text names no handle', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/BgPrjlfHcoB/"
+        >
+          <p>
+            <a href="https://www.instagram.com/p/BgPrjlfHcoB/">Bring some friends, a special one, or them all.</a>
+          </p>
+          <p>
+            A post shared by <a href="https://www.instagram.com/jervois.akl_1/">Jervois Steak House</a>
+            on <time datetime="2018-03-22T01:45:03+00:00">Mar 21, 2018 at 6:45pm PDT</time>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/BgPrjlfHcoB',
+        src: 'https://www.instagram.com/p/BgPrjlfHcoB/embed/',
+        url: 'https://www.instagram.com/p/BgPrjlfHcoB/',
+        description: 'Bring some friends, a special one, or them all.',
+        author: '@jervois.akl_1',
+        date: '2018-03-22T01:45:03+00:00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the account out of the byline text when its link is gone', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/BgPrjlfHcoB/"
+        >
+          <p>
+            <a href="https://www.instagram.com/p/BgPrjlfHcoB/">Bring some friends, a special one, or them all.</a>
+          </p>
+          <p>
+            A post shared by Jervois Steak House (@jervois.akl_1) on
+            <time datetime="2018-03-22T01:45:03+00:00">Mar 21, 2018 at 6:45pm PDT</time>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/BgPrjlfHcoB',
+        src: 'https://www.instagram.com/p/BgPrjlfHcoB/embed/',
+        url: 'https://www.instagram.com/p/BgPrjlfHcoB/',
+        description: 'Bring some friends, a special one, or them all.',
+        author: '@jervois.akl_1',
+        date: '2018-03-22T01:45:03+00:00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('the legacy blockquote without a permalink attribute', () => {
@@ -354,6 +437,27 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://www.instagram.com/p/CaUsPbUquKV/embed/',
         url: 'https://www.instagram.com/p/CaUsPbUquKV/',
         author: '@someuser',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a bare handle carrying a dot, an underscore and a digit', async () => {
+      const value = html`
+        <blockquote class="instagram-media">
+          <div>
+            <a href="https://www.instagram.com/p/CaUsPbUquKV/?utm_source=ig_embed" target="_blank">
+              <p>A post shared by @jervois.akl_1</p>
+            </a>
+          </div>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/CaUsPbUquKV',
+        src: 'https://www.instagram.com/p/CaUsPbUquKV/embed/',
+        url: 'https://www.instagram.com/p/CaUsPbUquKV/',
+        author: '@jervois.akl_1',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -611,9 +715,7 @@ describeForEachParser('instagramIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should return undefined for another host carrying the post path', async () => {
-      const value = html`
-        <iframe src="https://evil.test/www.instagram.com/p/CaUsPbUquKV/embed/"></iframe>
-      `
+      const value = '<iframe src="https://evil.test/p/CaUsPbUquKV/embed/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -643,11 +745,11 @@ describeForEachParser('instagramS9eEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host naming the helper in its path', async () => {
+    it('should ignore the helper path on a foreign host', async () => {
       const value = html`
         <iframe
           data-s9e-mediaembed="instagram"
-          src="https://evil.test/s9e.github.io/iframe/2/instagram.min.html#CdT-yWXBsI7"
+          src="https://evil.test/iframe/2/instagram.min.html#CdT-yWXBsI7"
         ></iframe>
       `
 
@@ -740,6 +842,48 @@ describe('instagramResolveEmbed', () => {
     }
 
     expect(instagramResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a post addressed through an account carrying a dot', () => {
+    const value = 'https://www.instagram.com/gieos.room/p/DFnlw8jsKPG'
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/DFnlw8jsKPG',
+      src: 'https://www.instagram.com/p/DFnlw8jsKPG/embed/',
+      url: 'https://www.instagram.com/p/DFnlw8jsKPG/',
+    }
+
+    expect(instagramResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a post addressed through an account carrying a digit', () => {
+    const value = 'https://www.instagram.com/thuyanj1/p/CaUsPbUquKV/'
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/CaUsPbUquKV',
+      src: 'https://www.instagram.com/p/CaUsPbUquKV/embed/',
+      url: 'https://www.instagram.com/p/CaUsPbUquKV/',
+    }
+
+    expect(instagramResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a shortcode carrying an underscore', () => {
+    const value = 'https://www.instagram.com/p/C_YIsLIOOro/'
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/C_YIsLIOOro',
+      src: 'https://www.instagram.com/p/C_YIsLIOOro/embed/',
+      url: 'https://www.instagram.com/p/C_YIsLIOOro/',
+    }
+
+    expect(instagramResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should return undefined for a post path nested two segments deep', () => {
+    const value = 'https://www.instagram.com/x/y/p/CaUsPbUquKV/'
+
+    expect(instagramResolveEmbed(value)).toBeUndefined()
   })
 
   it('should return undefined for an account page naming no post', () => {
@@ -849,6 +993,12 @@ describeForEachParser('instagramAmpEmbedResolver', (parseHtml) => {
 
   it('should return undefined for a shortcode outside the url-safe alphabet', async () => {
     const value = '<amp-instagram data-shortcode="../evil"></amp-instagram>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should return undefined for an empty shortcode', async () => {
+    const value = '<amp-instagram data-shortcode=""></amp-instagram>'
 
     expect(await extract(value)).toBeUndefined()
   })

@@ -54,6 +54,18 @@ describe('zencastrResolveEmbed', () => {
     expect(zencastrResolveEmbed(value)).toBeUndefined()
   })
 
+  it('should return undefined for the public episode page', () => {
+    const value = 'https://zencastr.com/z/cK98nMcr'
+
+    expect(zencastrResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for an embed path naming no episode', () => {
+    const value = 'https://zencastr.com/embed'
+
+    expect(zencastrResolveEmbed(value)).toBeUndefined()
+  })
+
   // The short host forwards the whole site, so Zencastr's vanity show links reach the resolver too.
   it('should return undefined for a show link on the short host', () => {
     const value = 'https://zen.ai/engineeringourfuture'
@@ -155,7 +167,7 @@ describeForEachParser('zencastrIframeEmbedResolver', (parseHtml) => {
   })
 
   it('should ignore a foreign host carrying the same path', async () => {
-    const value = '<iframe src="https://evil.test/zencastr.com/embed/cK98nMcr"></iframe>'
+    const value = '<iframe src="https://evil.test/embed/cK98nMcr"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

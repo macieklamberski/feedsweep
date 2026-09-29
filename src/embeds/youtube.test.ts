@@ -119,6 +119,18 @@ describe('extractVideoId', () => {
     expect(extractVideoId(value)).toBeUndefined()
   })
 
+  it('should extract a profile-grid video id carrying an underscore', () => {
+    const value = 'http://www.youtube.com/user/SomeUser#p/u/1/hT_nvWreIhg'
+
+    expect(extractVideoId(value)).toBe('hT_nvWreIhg')
+  })
+
+  it('should extract a profile-grid video id carrying a hyphen', () => {
+    const value = 'http://www.youtube.com/user/SomeUser#p/u/1/e-ORhEE9VVg'
+
+    expect(extractVideoId(value)).toBe('e-ORhEE9VVg')
+  })
+
   it('should reject id shorter than 11 chars', () => {
     const value = 'https://www.youtube.com/watch?v=abc123'
 
@@ -493,7 +505,21 @@ describe('youtubeResolveEmbed', () => {
   // `listType=search` named a query, not an id, and YouTube removed it in 2020: deliberately
   // left for the generic handling, which keeps whatever the publisher wrote.
   it('should not claim a listType=search embed', () => {
-    const value = 'https://www.youtube.com/embed?listType=search&list=sunrise+timelapse'
+    const value = 'https://www.youtube.com/embed?listType=search&list=timelapse'
+
+    expect(youtubeResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a playlist id carrying an encoded ampersand', () => {
+    const value =
+      'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index%3D2'
+
+    expect(youtubeResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a live_stream channel carrying an encoded ampersand', () => {
+    const value =
+      'https://www.youtube.com/embed/live_stream?channel=UCuAXFkgsw1L7xaCfnd5JJOw%26autoplay%3D1'
 
     expect(youtubeResolveEmbed(value)).toBeUndefined()
   })
@@ -554,6 +580,24 @@ describe('youtubeResolveEmbed', () => {
     })
 
     // A playlist id is case sensitive, so a lowercase spelling would mint a url that 404s.
+    it('should refuse a /p/ id that already carries the PL prefix', () => {
+      const value = 'http://www.youtube.com/p/PL7BE4DDAC0A0D31AF'
+
+      expect(youtubeResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a /p/ id longer than 16 hex characters', () => {
+      const value = 'http://www.youtube.com/p/7BE4DDAC0A0D31AF7BE4DDAC0A0D31AF'
+
+      expect(youtubeResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a /p/ id carrying an encoded slash', () => {
+      const value = 'http://www.youtube.com/p/7BE4DDAC0A0D%2F3'
+
+      expect(youtubeResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should refuse a lowercase /p/ id', () => {
       const value = 'http://www.youtube.com/p/7be4ddac0a0d31af'
 
@@ -762,6 +806,25 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should drop the label the AllVideos Joomla plugin writes', async () => {
+    const value = html`
+      <iframe
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        title="JoomlaWorks AllVideos Player"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should read the name the playlist carrier states', async () => {
     const value = html`
       <iframe
@@ -776,6 +839,39 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
       url: 'https://www.youtube.com/playlist?list=PLabc123',
       ratio: '16/9',
       title: 'Ambient works, 1992',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should extract metadata from a youtube-nocookie iframe', async () => {
+    const value = '<iframe src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should extract metadata from a Flash embed on the googleapis host', async () => {
+    const value = html`
+      <embed
+        src="http://youtube.googleapis.com/v/dQw4w9WgXcQ&hl=en_US"
+        type="application/x-shockwave-flash"
+      />
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)

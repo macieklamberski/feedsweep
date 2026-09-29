@@ -66,6 +66,12 @@ describe('extractLibsynEmbed', () => {
     expect(extractLibsynEmbed(value)).toBeUndefined()
   })
 
+  it('should return undefined for a player path under another first segment', () => {
+    const value = 'https://play.libsyn.com/player/episode/id/5508311/'
+
+    expect(extractLibsynEmbed(value)).toBeUndefined()
+  })
+
   it('should return undefined for a non-numeric id', () => {
     const value = 'https://play.libsyn.com/embed/episode/id/abc/'
 
@@ -212,6 +218,39 @@ describeForEachParser('libsyn through the pipeline', (parseHtml) => {
 
 describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, libsynEmbedResolver)
+
+  it('should drop the label the current player writes in place of the name', async () => {
+    const value = html`
+      <iframe
+        title="Embed Player"
+        src="https://play.libsyn.com/embed/episode/id/41557470/height/192/theme/modern/size/large/thumbnail/yes/custom-color/a1a29c/time-start/00:00:00/playlist-height/200/direction/backward/download/yes/font-color/FFFFFF"
+        height="192"
+        width="100%"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'libsyn',
+      id: 'episode/41557470',
+      src: 'https://play.libsyn.com/embed/episode/id/41557470/height/192/',
+      height: 192,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the YouTube label a copied snippet carries', async () => {
+    const value = html`
+      <iframe src="https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/" title="YouTube video player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'libsyn',
+      id: 'episode/5508311',
+      src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
+      height: 90,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
 
   it('should drop the label the player writes in place of the name', async () => {
     const value = html`

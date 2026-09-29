@@ -190,7 +190,7 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="fb-post"
-          data-href="https://evil.test/facebook.com/post"
+          data-href="https://evil.test/PageName/posts/123"
         ></div>
       `
 
@@ -253,7 +253,7 @@ describeForEachParser('facebookXfbmlEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should return undefined for a non-facebook href', async () => {
-      const value = '<fb:post href="https://evil.test/facebook.com/posts/123"></fb:post>'
+      const value = '<fb:post href="https://evil.test/PageName/posts/123"></fb:post>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -318,7 +318,7 @@ describeForEachParser('facebookAmpEmbedResolver', (parseHtml) => {
     it('should return undefined for a non-facebook href', async () => {
       const value = html`
         <amp-facebook
-          data-href="https://evil.test/facebook.com/posts/123"
+          data-href="https://evil.test/PageName/posts/123"
         ></amp-facebook>
       `
 
@@ -404,7 +404,7 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
     it('should return undefined for a cite pointing somewhere else entirely', async () => {
       const value = html`
         <blockquote
-          cite="https://evil.test/facebook.com/posts/123"
+          cite="https://evil.test/PageName/posts/123"
           class="fb-xfbml-parse-ignore"
         >
           <p>Not a facebook post.</p>
@@ -861,11 +861,11 @@ describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host naming the helper in its path', async () => {
+    it('should ignore a foreign host carrying the helper path', async () => {
       const value = html`
         <iframe
           data-s9e-mediaembed="facebook"
-          src="https://evil.test/s9e.github.io/iframe/2/facebook.min.html#1699244425543753"
+          src="https://evil.test/iframe/2/facebook.min.html#1699244425543753"
         ></iframe>
       `
 
@@ -900,6 +900,44 @@ describe('facebookResolveEmbed', () => {
 
   it('should return undefined for a legacy video frame with a non-numeric id', () => {
     const value = 'https://www.facebook.com/video/embed?video_id=../etc'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for the legacy video path under another segment', () => {
+    const value = 'https://www.facebook.com/x/video/embed?video_id=123456'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a path below the legacy video frame', () => {
+    const value = 'https://www.facebook.com/video/embed/extra?video_id=123456'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for the plugin path under another segment', () => {
+    const value =
+      'https://www.facebook.com/x/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a path below the plugin', () => {
+    const value =
+      'https://www.facebook.com/plugins/post.php/extra?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for the watch path under another segment', () => {
+    const value = 'https://www.facebook.com/x/watch/?v=1010445561578533'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a path below the watch page', () => {
+    const value = 'https://www.facebook.com/watch/extra?v=1010445561578533'
 
     expect(facebookResolveEmbed(value)).toBeUndefined()
   })

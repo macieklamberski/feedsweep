@@ -159,6 +159,46 @@ describe('stackblitzResolveEmbed', () => {
 
       expect(stackblitzResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read a project on the www host', () => {
+      const value = 'https://www.stackblitz.com/edit/angular-ivy-snow'
+      const expected: EmbedResolverResult = {
+        provider: 'stackblitz',
+        id: 'angular-ivy-snow',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow',
+        url: 'https://stackblitz.com/edit/angular-ivy-snow',
+        height: 500,
+      }
+
+      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+    })
+
+    const optionUrls = [
+      'https://stackblitz.com/edit/angular-ivy-snow?corp=1',
+      'https://stackblitz.com/edit/angular-ivy-snow?devtoolsheight=33',
+      'https://stackblitz.com/edit/angular-ivy-snow?hideExplorer=1',
+      'https://stackblitz.com/edit/angular-ivy-snow?hideNavigation=1',
+      'https://stackblitz.com/edit/angular-ivy-snow?orgName=acme',
+      'https://stackblitz.com/edit/angular-ivy-snow?orgProvider=github',
+      'https://stackblitz.com/edit/angular-ivy-snow?showSidebar=1',
+      'https://stackblitz.com/edit/angular-ivy-snow?sidebarView=search',
+      'https://stackblitz.com/edit/angular-ivy-snow?startScript=dev',
+      'https://stackblitz.com/edit/angular-ivy-snow?terminalHeight=50',
+      'https://stackblitz.com/edit/angular-ivy-snow?theme=dark',
+      'https://stackblitz.com/edit/angular-ivy-snow?zenMode=1',
+    ]
+
+    it.each(optionUrls)('should keep the embed option in %s', (value) => {
+      const expected: EmbedResolverResult = {
+        provider: 'stackblitz',
+        id: 'angular-ivy-snow',
+        src: value,
+        url: 'https://stackblitz.com/edit/angular-ivy-snow',
+        height: 500,
+      }
+
+      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -171,7 +211,25 @@ describe('stackblitzResolveEmbed', () => {
     })
 
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/stackblitz.com/edit/angular-ivy-snow'
+      const value = 'https://evil.test/edit/angular-ivy-snow'
+
+      expect(stackblitzResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the documentation subdomain carrying the same path', () => {
+      const value = 'https://developer.stackblitz.com/edit/angular-ivy-snow'
+
+      expect(stackblitzResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a slug carrying an encoded slash', () => {
+      const value = 'https://stackblitz.com/edit/angular%2Fivy-snow'
+
+      expect(stackblitzResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a slug led by an encoded slash', () => {
+      const value = 'https://stackblitz.com/edit/%2Fangular-ivy-snow'
 
       expect(stackblitzResolveEmbed(value)).toBeUndefined()
     })
@@ -308,7 +366,7 @@ describeForEachParser('stackblitzIframeEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/stackblitz.com/edit/angular-ivy-snow"></iframe>'
+      const value = '<iframe src="https://evil.test/edit/angular-ivy-snow"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

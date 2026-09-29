@@ -118,7 +118,7 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
     it('should ignore a foreign host carrying the loader path', async () => {
       const value = html`
         <script
-          src="https://evil.test/source.pixiv.net/source/embed.js"
+          src="https://evil.test/source/embed.js?source.pixiv.net/source/embed.js"
           data-id="45958594_2a40c2e14793e84b2a7d7d6ecc7cde12"
           data-size="small"
           data-border="on"

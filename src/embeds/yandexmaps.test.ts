@@ -141,7 +141,7 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
-        '<script src="https://evil.test/api-maps.yandex.ru/services/constructor/1.0/js/?sid=XrE3bAUZf88xO0B6nFH3wQbCoNJFhYBD&width=600&height=450"></script>'
+        '<script src="https://evil.test/services/constructor/1.0/js/?sid=XrE3bAUZf88xO0B6nFH3wQbCoNJFhYBD&width=600&height=450&api-maps.yandex.ru/services/constructor/"></script>'
 
       expect(await extract(value)).toBeUndefined()
     })

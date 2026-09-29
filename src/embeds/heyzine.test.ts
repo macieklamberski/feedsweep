@@ -202,6 +202,18 @@ describe('heyzineResolveEmbed', () => {
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should drop a tracking query', () => {
+      const value = 'https://heyzine.com/flip-book/4db16f598c.html?utm_source=newsletter'
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: '4db16f598c',
+        src: 'https://heyzine.com/flip-book/4db16f598c.html',
+        url: 'https://heyzine.com/flip-book/4db16f598c.html',
+      }
+
+      expect(heyzineResolveEmbed(value)).toEqual(expected)
+    })
   })
 })
 
@@ -259,9 +271,8 @@ describeForEachParser('heyzineEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a foreign host naming the flipbook route in its path', async () => {
-      const value =
-        '<iframe src="https://evil.test/heyzine.com/flip-book/4db16f598c.html"></iframe>'
+    it('should ignore the flipbook route on a foreign host', async () => {
+      const value = '<iframe src="https://evil.test/flip-book/4db16f598c.html"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

@@ -120,6 +120,19 @@ describe('neteaseResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
+    it('should drop a tracker the carrier appends', () => {
+      const value =
+        'https://music.163.com/outchain/player?type=2&id=1392990601&auto=1&height=66&utm_source=wechat'
+      const expected: EmbedResolverResult = {
+        provider: 'netease',
+        id: 'song/1392990601',
+        src: 'https://music.163.com/outchain/player?type=2&id=1392990601&height=66',
+        url: 'https://music.163.com/song?id=1392990601',
+      }
+
+      expect(neteaseResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should mint without a height when the carrier states none', () => {
       const value = 'https://music.163.com/outchain/player?type=1&id=34751981'
       const expected: EmbedResolverResult = {
@@ -202,12 +215,31 @@ describeForEachParser('neteaseEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should rebuild the player from the retired Flash embed', async () => {
+      const value = html`
+        <embed
+          src="http://music.163.com/style/swf/widget.swf?sid=409872507&amp;type=2&amp;auto=0&amp;width=320&amp;height=66"
+          width="340"
+          height="86"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'netease',
+        id: 'song/409872507',
+        src: 'https://music.163.com/outchain/player?type=2&id=409872507&height=66',
+        url: 'https://music.163.com/song?id=409872507',
+        width: 340,
+        height: 86,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host naming the player route in its path', async () => {
-      const value =
-        '<iframe src="https://evil.test/music.163.com/outchain/player?type=2&id=1392990601"></iframe>'
+    it('should ignore a foreign host carrying the player route', async () => {
+      const value = '<iframe src="https://evil.test/outchain/player?type=2&id=1392990601"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -215,8 +247,15 @@ describeForEachParser('neteaseEmbedResolver', (parseHtml) => {
 })
 
 describeForEachParser('netease shapes the pipeline settles first', (parseHtml) => {
-  const convert = (value: string): Promise<string> => {
-    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  const convert = (
+    value: string,
+    enclosures?: Array<{ url: string; type: string }>,
+  ): Promise<string> => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
   }
 
   const placeholder = async (value: string): Promise<Record<string, string>> => {
@@ -242,6 +281,23 @@ describeForEachParser('netease shapes the pipeline settles first', (parseHtml) =
       }
 
       expect(await placeholder(value)).toEqual(expected)
+    })
+  })
+
+  // music.163.com serves the song file on the same host as the player, and injectEnclosures offers
+  // every attachment to every url-keyed resolver.
+  describe('the song file on the player host', () => {
+    it('should leave a song enclosure playable', async () => {
+      const enclosures = [
+        { url: 'https://music.163.com/song/media/outer/url?id=1392990601.mp3', type: 'audio/mpeg' },
+      ]
+
+      const expected = html`
+        <audio data-enclosure="" controls src="https://music.163.com/song/media/outer/url?id=1392990601.mp3"></audio>
+        <p>Body</p>
+      `
+
+      expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
     })
   })
 })

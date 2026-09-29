@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
 import { convertWidgets } from '../transforms/dom/convertWidgets.js'
 import { rebuildWistiaEmbeds } from '../transforms/dom/rebuildWistiaEmbeds.js'
@@ -94,6 +95,12 @@ describe('extractWistiaEmbed', () => {
   // read as no route at all, the way any word the player does not serve does.
   it('should return undefined for a route naming an inherited member', () => {
     const value = 'https://fast.wistia.net/embed/constructor/sapab9p6qd'
+
+    expect(extractWistiaEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for an id carrying an encoded slash', () => {
+    const value = 'https://fast.wistia.net/embed/iframe/2fg072pftb%2Fsapab9p6qd'
 
     expect(extractWistiaEmbed(value)).toBeUndefined()
   })
@@ -205,6 +212,12 @@ describeForEachParser('wistiaEmbedResolver', (parseHtml) => {
 
     expect(await extract(value)).toBeUndefined()
   })
+
+  it('should ignore a foreign host carrying the player path', async () => {
+    const value = '<iframe src="https://evil.test/embed/iframe/2fg072pftb"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
 })
 
 // The JS facade has no iframe at all: rebuildWistiaEmbeds mints one, and the resolver reads it
@@ -268,5 +281,30 @@ describeForEachParser('wistiaEmbedResolver carrier title', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+// Wistia serves the media files themselves from its own subdomains, and `injectEnclosures` offers
+// every attachment to every url-keyed resolver.
+describeForEachParser('wistia enclosures through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a wistia video enclosure playable', async () => {
+    const enclosures = [
+      { url: 'https://embed-ssl.wistia.com/deliveries/abc123.bin', type: 'video/mp4' },
+    ]
+
+    const expected = html`
+      <video data-enclosure="" controls src="https://embed-ssl.wistia.com/deliveries/abc123.bin"></video>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })

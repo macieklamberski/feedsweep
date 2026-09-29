@@ -166,6 +166,19 @@ describe('spotifyResolveEmbed', () => {
       expect(spotifyResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should give an artist the taller player height', () => {
+      const value = 'https://open.spotify.com/embed/artist/0OdUWJ0sBjDrqHygGUXeCF'
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'artist/0OdUWJ0sBjDrqHygGUXeCF',
+        src: 'https://open.spotify.com/embed/artist/0OdUWJ0sBjDrqHygGUXeCF',
+        url: 'https://open.spotify.com/artist/0OdUWJ0sBjDrqHygGUXeCF',
+        height: 352,
+      }
+
+      expect(spotifyResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should ignore what follows the id', () => {
       const value = 'https://open.spotify.com/embed/show/4rOoJ6Egrf8K2IrywzwOMk/video'
       const expected: EmbedResolverResult = {
@@ -220,6 +233,42 @@ describe('spotifyResolveEmbed', () => {
 
     it('should return undefined for a legacy uri that names no id', () => {
       const value = 'https://embed.spotify.com/?uri=spotify:track'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an id carrying a path after it', () => {
+      const value = 'https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT%2Fx'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an id carrying a path before it', () => {
+      const value = 'https://open.spotify.com/embed/track/x%2F4cOdK2wGLETKBW3PvgPWqT'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a route prefix that only ends in embed', () => {
+      const value = 'https://open.spotify.com/noembed/track/4cOdK2wGLETKBW3PvgPWqT'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a route prefix that only starts with embed', () => {
+      const value = 'https://open.spotify.com/embedded/track/4cOdK2wGLETKBW3PvgPWqT'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a legacy uri under another scheme', () => {
+      const value = 'https://embed.spotify.com/?uri=notspotify:track:4cOdK2wGLETKBW3PvgPWqT'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a legacy uri that runs on past the id', () => {
+      const value = 'https://embed.spotify.com/?uri=spotify:track:4cOdK2wGLETKBW3PvgPWqT/extra'
 
       expect(spotifyResolveEmbed(value)).toBeUndefined()
     })
@@ -438,6 +487,35 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a By inside a playlist card act', async () => {
+      const midwordOwnerCardAttrs = jsonAttrValue({
+        image: 'https://i.scdn.co/image/ab67706c0000bebb3463194d462b129b0bbe5ee0',
+        title: 'He Is the Voice I Hear',
+        subtitle: 'Stand By Me Collective',
+        url: 'https://open.spotify.com/playlist/3237XsfR0Cj19KeN4T3Rxr',
+      })
+      const value = html`
+        <iframe
+          class="spotify-wrap playlist"
+          data-attrs="${midwordOwnerCardAttrs}"
+          src="https://open.spotify.com/embed/playlist/3237XsfR0Cj19KeN4T3Rxr"
+          data-component-name="Spotify2ToDOM"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'playlist/3237XsfR0Cj19KeN4T3Rxr',
+        src: 'https://open.spotify.com/embed/playlist/3237XsfR0Cj19KeN4T3Rxr',
+        url: 'https://open.spotify.com/playlist/3237XsfR0Cj19KeN4T3Rxr',
+        thumbnail: 'https://i.scdn.co/image/ab67706c0000bebb3463194d462b129b0bbe5ee0',
+        height: 352,
+        title: 'He Is the Voice I Hear',
+        author: 'Stand By Me Collective',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The card prints the type where a description would go, which the id already states.
     it('should state no description when the card holds only the type', async () => {
       const typeOnlyCardAttrs = jsonAttrValue({
@@ -601,7 +679,7 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
     it('should ignore artwork hosted somewhere else', async () => {
       const foreignArtworkAttrs = jsonAttrValue({
         title: 'A track',
-        image: 'https://evil.test/i.scdn.co/image/x',
+        image: 'https://evil.test/image/ab67616d0000b273',
       })
       const value = html`
         <iframe

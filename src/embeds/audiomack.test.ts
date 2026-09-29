@@ -37,7 +37,13 @@ describe('audiomackResolveEmbed', () => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/audiomack.com/embed/larrynorman/song/burn-2'
+      const value = 'https://evil.test/embed/larrynorman/song/burn-2'
+
+      expect(audiomackResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a route word that is not the player', () => {
+      const value = 'https://audiomack.com/widget/larrynorman/song/burn-2'
 
       expect(audiomackResolveEmbed(value)).toBeUndefined()
     })
@@ -82,6 +88,12 @@ describe('audiomackResolveEmbed', () => {
 
     it('should refuse a slug that is not one', () => {
       const value = 'https://audiomack.com/embed/larrynorman/song/burn.2%2Fother'
+
+      expect(audiomackResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse an artist that is not one', () => {
+      const value = 'https://audiomack.com/embed/larry%2Fnorman/song/burn-2'
 
       expect(audiomackResolveEmbed(value)).toBeUndefined()
     })
@@ -293,8 +305,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/audiomack.com/embed/larrynorman/song/burn-2"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/larrynorman/song/burn-2"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

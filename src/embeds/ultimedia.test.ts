@@ -56,7 +56,7 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the player path', async () => {
       const value =
-        '<iframe src="https://evil.test/www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/zone/1/showtitle/1/"></iframe>'
+        '<iframe src="https://evil.test/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/zone/1/showtitle/1/?ultimedia.com/deliver"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

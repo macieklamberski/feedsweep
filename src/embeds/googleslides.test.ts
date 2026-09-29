@@ -150,6 +150,13 @@ describe('googleslidesResolveEmbed', () => {
       expect(googleslidesResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should ignore a legacy frame whose id holds an encoded slash', () => {
+      const value =
+        'https://docs.google.com/presentation/embed?id=1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx'
+
+      expect(googleslidesResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore a deck exported as a pdf', () => {
       const value =
         'https://docs.google.com/presentation/d/1k5NXExE8IvVgEIAwhxzwNw93Kt6f8Yqp1K7TuSigXiE/export/pdf'

@@ -49,6 +49,12 @@ describe('slideshareResolveEmbed', () => {
     expect(slideshareResolveEmbed(value)).toBeUndefined()
   })
 
+  it('should ignore a numeric path that names no embed route', () => {
+    const value = 'https://www.slideshare.net/6435157'
+
+    expect(slideshareResolveEmbed(value)).toBeUndefined()
+  })
+
   it('should ignore an embed path that stops before the deck', () => {
     const value = 'https://www.slideshare.net/slideshow/embed_code/'
 
@@ -179,6 +185,27 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
         url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should compose the deck page for an owner spelled with capitals', async () => {
+      const value = html`
+        <div id="__ss_6435157">
+          <object id="__sse6435157">
+            <embed
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=cursoposter-120512061001-phpapp02&amp;stripped_title=la-comunicacin-cientfica-tipo-poster&amp;userName=EnfermeraEnEvidencias"
+              type="application/x-shockwave-flash"
+            ></embed>
+          </object>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '6435157',
+        src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+        url: 'https://www.slideshare.net/EnfermeraEnEvidencias/la-comunicacin-cientfica-tipo-poster',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -426,6 +453,45 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
           src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=110103quotes"
           type="application/x-shockwave-flash"
         ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a wrapper id that only ends in the deck spelling', async () => {
+      const value = html`
+        <div id="post__ss_6435157">
+          <embed
+            src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=110103quotes"
+            type="application/x-shockwave-flash"
+          ></embed>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a wrapper id that runs on past the deck', async () => {
+      const value = html`
+        <div id="__ss_6435157_caption">
+          <embed
+            src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=110103quotes"
+            type="application/x-shockwave-flash"
+          ></embed>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a path that runs on past the player', async () => {
+      const value = html`
+        <div id="__ss_6435157">
+          <embed
+            src="http://static.slidesharecdn.com/swf/ssplayer2.swf/page?doc=110103quotes"
+            type="application/x-shockwave-flash"
+          ></embed>
+        </div>
       `
 
       expect(await extract(value)).toBeUndefined()

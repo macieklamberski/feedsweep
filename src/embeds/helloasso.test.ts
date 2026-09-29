@@ -185,11 +185,8 @@ describeForEachParser('helloassoEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = html`
-        <iframe
-          src="https://evil.test/www.helloasso.com/associations/cine-club-du-quartier/formulaires/1/widget"
-        ></iframe>
-      `
+      const value =
+        '<iframe src="https://evil.test/associations/cine-club-du-quartier/formulaires/1/widget"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

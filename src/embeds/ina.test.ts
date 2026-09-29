@@ -187,6 +187,44 @@ describeForEachParser('inaEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read a player url naming a layout word where the box would be', async () => {
+      const value = html`
+        <iframe
+          src="https://player.ina.fr/player/embed/CPC7505456905/1/1b0bd203fbcd702f9bc9b10ac3d0fc21/wide/1"
+          width="100%"
+          height="100%"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ina',
+        id: 'CPC7505456905',
+        src: 'https://player.ina.fr/embed/CPC7505456905?pid=1&key=1b0bd203fbcd702f9bc9b10ac3d0fc21',
+        url: 'https://www.ina.fr/video/CPC7505456905',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a player url carrying segments past the box', async () => {
+      const value = html`
+        <iframe
+          src="http://player.ina.fr/player/embed/00034548/1/1b0bd203fbcd702f9bc9b10ac3d0fc21/560/315/0/148db8"
+          width="560"
+          height="315"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ina',
+        id: '00034548',
+        src: 'https://player.ina.fr/embed/00034548?pid=1&key=1b0bd203fbcd702f9bc9b10ac3d0fc21',
+        url: 'https://www.ina.fr/video/00034548',
+        width: 560,
+        height: 315,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

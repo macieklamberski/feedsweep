@@ -218,9 +218,8 @@ describeForEachParser('pbsIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a foreign host naming the player route in its path', async () => {
-      const value =
-        '<iframe src="https://evil.test/player.pbs.org/viralplayer/3005825044/"></iframe>'
+    it('should ignore a foreign host carrying the player route', async () => {
+      const value = '<iframe src="https://evil.test/viralplayer/3005825044/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

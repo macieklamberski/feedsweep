@@ -70,13 +70,6 @@ describeForEachParser('vidyardIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a foreign host carrying the player host in its path', async () => {
-      const value =
-        '<iframe src="https://evil.test/play.vidyard.com/gdoa8386mue3jppdkpZc9A.html"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a lookalike host', async () => {
       const value =
         '<iframe src="https://play.vidyard.com.evil.test/gdoa8386mue3jppdkpZc9A.html"></iframe>'

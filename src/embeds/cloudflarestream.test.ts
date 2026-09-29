@@ -311,7 +311,7 @@ describeForEachParser('cloudflarestreamScriptEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the loader path', async () => {
       const value =
-        '<script src="https://evil.test/embed.videodelivery.net/embed/r4xu.fla9.latest.js?video=5653cfd537db1edbed98c5c0119f390c"></script>'
+        '<script src="https://evil.test/embed/r4xu.fla9.latest.js?video=5653cfd537db1edbed98c5c0119f390c&embed.videodelivery.net/embed/"></script>'
 
       expect(await extract(value)).toBeUndefined()
     })

@@ -54,8 +54,20 @@ describeForEachParser('figshareEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
+      const value = '<iframe src="https://evil.test/articles/21109066/embed"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the widget route below a leading segment', async () => {
+      const value = '<iframe src="https://widgets.figshare.com/x/articles/21109066/embed"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the widget route followed by a trailing segment', async () => {
       const value =
-        '<iframe src="https://evil.test/widgets.figshare.com/articles/21109066/embed"></iframe>'
+        '<iframe src="https://widgets.figshare.com/articles/21109066/embed/extra"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

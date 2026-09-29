@@ -298,8 +298,12 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
 })
 
 describeForEachParser('ridewithgps shapes the pipeline repairs first', (parseHtml) => {
-  const convert = (value: string) => {
-    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
   }
   const placeholder = async (value: string) => {
     return readPlaceholder(await convert(value), parseHtml)
@@ -331,5 +335,21 @@ describeForEachParser('ridewithgps shapes the pipeline repairs first', (parseHtm
     const value = '<p>See <a href="https://ridewithgps.com/routes/38984773">the route</a>.</p>'
 
     expect(await convert(value)).toBe(value)
+  })
+
+  // ridewithgps.com serves the route thumbnail beside the embed, on the same route path.
+  it('should leave a route thumbnail enclosure an image', async () => {
+    const enclosures = [
+      { url: 'https://ridewithgps.com/routes/10953871/thumb.png', type: 'image/png' },
+    ]
+    const expected = html`
+      <img
+        data-enclosure=""
+        src="https://ridewithgps.com/routes/10953871/thumb.png"
+      >
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })

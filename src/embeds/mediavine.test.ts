@@ -203,7 +203,28 @@ describeForEachParser('mediavineScriptEmbedResolver', (parseHtml) => {
     // guard refuses it.
     it('should ignore a foreign host spelling the loader path', async () => {
       const value =
-        '<script src="https://evil.test/video.mediavine.com/videos/dx6ydyrbrjbbu2tncqzi.js"></script>'
+        '<script src="https://evil.test/videos/dx6ydyrbrjbbu2tncqzi.js?video.mediavine.com/videos/"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the loader path behind another segment', async () => {
+      const value =
+        '<script src="https://video.mediavine.com/videos/x/videos/dx6ydyrbrjbbu2tncqzi.js"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the loader path followed by another segment', async () => {
+      const value =
+        '<script src="https://video.mediavine.com/videos/dx6ydyrbrjbbu2tncqzi.js/extra"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a loader id carrying an encoded slash', async () => {
+      const value =
+        '<script src="https://video.mediavine.com/videos/dx6ydyrb%2Frjbbu2tncqzi.js"></script>'
 
       expect(await extract(value)).toBeUndefined()
     })
