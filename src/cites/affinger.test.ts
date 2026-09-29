@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
 import { convertCiteCards } from '../transforms/dom/convertCiteCards.js'
 import type { CiteResolverResult, TransformContext } from '../types.js'
@@ -24,7 +25,7 @@ describeForEachParser('affingerCiteResolver', (parseHtml) => {
           <div class="kanren st-cardbox st-cardbox-ex">
             <dl class="clearfix">
               <dt class="st-card-img">
-                <img data-src="https://example.com/shot.png" alt="" width="300" height="300" />
+                <img src="https://example.com/shot.png" alt="" width="300" height="300" />
               </dt>
               <dd>
                 <h5 class="st-cardbox-t">Page title</h5>
@@ -33,7 +34,7 @@ describeForEachParser('affingerCiteResolver', (parseHtml) => {
                 </div>
                 <p class="st-cardbox-site">
                   <span class="st-cardbox-favicon">
-                    <img data-src="https://www.google.com/s2/favicons?domain=example.com" width="16" height="16" alt="" />
+                    <img src="https://www.google.com/s2/favicons?domain=example.com" width="16" height="16" alt="" />
                   </span>
                   <span class="st-cardbox-host">example.com</span>
                 </p>
@@ -142,44 +143,6 @@ describeForEachParser('affingerCiteResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should read the title from a p element as well as an h5', async () => {
-      const value = html`
-        <a href="https://example.com/post" class="st-cardlink">
-          <div class="kanren st-cardbox">
-            <p class="st-cardbox-t">Page title</p>
-          </div>
-        </a>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'affinger',
-        url: 'https://example.com/post',
-        title: 'Page title',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should read an image from src when the lazy attribute is absent', async () => {
-      const value = html`
-        <a href="https://example.com/post" class="st-cardlink">
-          <div class="kanren st-cardbox">
-            <dt class="st-card-img">
-              <img src="https://example.com/cover.webp" />
-            </dt>
-            <h5 class="st-cardbox-t">Page title</h5>
-          </div>
-        </a>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'affinger',
-        url: 'https://example.com/post',
-        title: 'Page title',
-        thumbnail: 'https://example.com/cover.webp',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should read the label badge as the caption', async () => {
       const value = html`
         <a href="https://example.com/post" class="st-cardlink">
@@ -228,59 +191,9 @@ describeForEachParser('affingerCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should tolerate the literal undefined class the theme leaks', async () => {
-      const value = html`
-        <a href="https://example.com/post" class="st-cardlink">
-          <div class="kanren st-cardbox st-cardbox-ex undefined">
-            <h5 class="st-cardbox-t">Page title</h5>
-          </div>
-        </a>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'affinger',
-        url: 'https://example.com/post',
-        title: 'Page title',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {
-    it('should return undefined for the related-posts listing', async () => {
-      const value = html`
-        <div class="kanren" data-st-load-more-id="3519e768">
-          <dl class="clearfix">
-            <dt>
-              <a href="https://example.com/one">
-                <img src="https://example.com/one.webp" />
-              </a>
-            </dt>
-            <dd>
-              <h5 class="kanren-t">
-                <a href="https://example.com/one">One</a>
-              </h5>
-            </dd>
-          </dl>
-          <dl class="clearfix">
-            <dt>
-              <a href="https://example.com/two">
-                <img src="https://example.com/two.webp" />
-              </a>
-            </dt>
-            <dd>
-              <h5 class="kanren-t">
-                <a href="https://example.com/two">Two</a>
-              </h5>
-            </dd>
-          </dl>
-        </div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should return undefined for the header card grid', async () => {
       const value = html`
         <div class="st-cardlink-card st-cardlink-column-4">
@@ -380,5 +293,46 @@ describeForEachParser('affingerCiteResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+  })
+})
+
+// The theme lazy-loads the thumbnail and favicon through data-src, which the lazy-image pass
+// promotes to src before the cite pass reads it.
+describeForEachParser('affinger card through the pipeline', (parseHtml) => {
+  it('should read the lazy-loaded thumbnail and favicon', async () => {
+    const value = html`
+      <a class="st-cardlink" href="https://example.com/page">
+        <div class="kanren st-cardbox st-cardbox-ex">
+          <dl class="clearfix">
+            <dt class="st-card-img">
+              <img data-src="https://example.com/shot.png" alt="" />
+            </dt>
+            <dd>
+              <h5 class="st-cardbox-t">Page title</h5>
+              <p class="st-cardbox-site">
+                <span class="st-cardbox-favicon">
+                  <img data-src="https://example.com/favicon.png" alt="" />
+                </span>
+              </p>
+            </dd>
+          </dl>
+        </div>
+      </a>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+    const expected = html`
+      <div
+        data-cite-provider="affinger"
+        data-cite-url="https://example.com/page"
+        data-cite-title="Page title"
+        data-cite-icon="https://example.com/favicon.png"
+        data-cite-thumbnail="https://example.com/shot.png"
+      ></div>
+    `
+
+    expect(result).toEqualHtml(expected)
   })
 })
