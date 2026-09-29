@@ -266,7 +266,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
   })
 
   // A placeholder built from an enclosure carries its urls on the same terms as one built from
-  // the markup: every url resolved, and the canonical one cleaned.
+  // the markup: every url resolved, and the src and the canonical one cleaned.
   describe('placeholder fields', () => {
     const exampleResolver: EmbedResolver = {
       kind: 'embed',
@@ -321,6 +321,29 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           data-embed-src="https://example.com/e/x"
           data-embed-provider="example"
           data-embed-url="https://example.com/watch/x"
+          data-enclosure=""
+        ></div>
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should clean a player url no resolver claims with the provided cleanUrlFn', async () => {
+      const value = '<p>Content</p>'
+      const context: TransformContext = {
+        ...withExampleResolver([
+          {
+            url: 'https://player.example.org/clip.mp4',
+            playerUrl: 'https://player.example.org/e/x?utm_source=feed',
+            medium: 'video',
+          },
+        ]),
+        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+      }
+      const expected = html`
+        <div
+          data-embed-src="https://player.example.org/e/x"
           data-enclosure=""
         ></div>
         <p>Content</p>
