@@ -293,7 +293,7 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
     })
 
     // The tag-less rows of urlAttributes restate by hand the url-carrying field names minted in
-    // utils/widgets.ts, so a url field added there and not there ships unchecked and nothing
+    // utils/widgets.ts, so a url field added there and not in the table ships unchecked and nothing
     // fails. The next two derive both sides instead of listing them a third time: the field set
     // from normalizeEmbedFields/normalizeCiteFields, which of them are urls from
     // prepareEmbedMetadata/prepareCiteMetadata being the pass that resolves one, and the
