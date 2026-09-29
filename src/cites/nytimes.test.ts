@@ -129,7 +129,7 @@ describeForEachParser('nytimesCiteResolver', (parseHtml) => {
       const value = html`
         <iframe
           title="A post"
-          src="https://evil.test/www.nytimes.com/svc/oembed/html/?url=https%3A%2F%2Fwww.nytimes.com%2F2020%2F04%2F13%2Fscience%2Fputin.html"
+          src="https://evil.test/svc/oembed/html/?url=https%3A%2F%2Fwww.nytimes.com%2F2020%2F04%2F13%2Fscience%2Fputin.html&x=nytimes.com/svc/oembed/html/"
         ></iframe>
       `
 

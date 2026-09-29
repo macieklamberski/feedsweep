@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'bun:test'
+import { JSDOM } from 'jsdom'
+import { parseHtml as parseWithLinkedom } from '../parsers/linkedom.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { CiteResolverResult } from '../types.js'
 import { tcdCiteResolver } from './tcd.js'
@@ -124,5 +126,50 @@ describeForEachParser('tcdCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+// Half the sites close the thumbnail anchor before its div. linkedom then lands cardlink_content
+// beside the card, and jsdom rebuilds the card around it, so each parser gets its own case.
+describe('tcdCiteResolver on a card the parser splits', () => {
+  const value = html`
+    <div class="cardlink">
+      <a href="https://example.com/post">
+        <div class="cardlink_thumbnail">
+          <img src="https://example.com/thumb.jpg">
+      </a>
+      </div>
+      <div class="cardlink_content">
+        <span class="cardlink_timestamp">2022.05.03</span>
+        <div class="cardlink_title">
+          <a href="https://example.com/post">Page title</a>
+        </div>
+        <div class="cardlink_excerpt">Preview text</div>
+      </div>
+      <div class="cardlink_footer"></div>
+    </div>
+  `
+
+  it('should leave the card alone under linkedom', async () => {
+    const extract = resolverExtractor(parseWithLinkedom, tcdCiteResolver)
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should read the rebuilt card under jsdom', async () => {
+    const parseWithJsdom = (markup: string) => {
+      return new JSDOM(`<!doctype html><body>${markup}</body>`).window.document
+    }
+    const extract = resolverExtractor(parseWithJsdom, tcdCiteResolver)
+    const expected: CiteResolverResult = {
+      provider: 'tcd',
+      url: 'https://example.com/post',
+      title: 'Page title',
+      description: 'Preview text',
+      date: '2022.05.03',
+      thumbnail: 'https://example.com/thumb.jpg',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

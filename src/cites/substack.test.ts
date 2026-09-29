@@ -320,6 +320,12 @@ describeForEachParser('substackCrossPostCiteResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should return undefined when data-attrs is absent', async () => {
+    const value = makeContainer('embedded-post-wrap')
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
   it('should not match the own-post class', async () => {
     const value = makeContainer('digest-post-embed', {
       title: 'Model Drop',
@@ -538,6 +544,92 @@ describeForEachParser('substackPublicationCiteResolver', (parseHtml) => {
       const value = makeContainer('embedded-publication-wrap')
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  // The shape Substack's own site renders: the blob omits base_url, and the fields sit in markup.
+  describe('hydrated shape', () => {
+    it('should read the url and the logo off the markup when the blob omits them', async () => {
+      const publicationAttrs = jsonAttrValue({
+        url: 'https://otherpub.example.com?utm_medium=web',
+        publication_id: 1,
+        name: 'Other Pub',
+        hero_text: 'A newsletter.',
+        author_name: 'Casey Author',
+        show_subscribe: true,
+        language: 'en',
+      })
+      const value = html`
+        <div
+          class="embedded-publication-wrap"
+          data-attrs="${publicationAttrs}"
+          data-component-name="EmbeddedPublicationToDOMWithSubscribe"
+        >
+          <div class="embedded-publication show-subscribe">
+            <a class="embedded-publication-link-part" native="true" href="https://otherpub.example.com?utm_medium=web">
+              <img class="embedded-publication-logo" src="https://cdn.example.com/logo.png" width="56" height="56">
+              <span class="embedded-publication-name">Other Pub</span>
+              <div class="embedded-publication-hero-text">A newsletter.</div>
+            </a>
+          </div>
+        </div>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'substack',
+        url: 'https://otherpub.example.com?utm_medium=web',
+        title: 'Other Pub',
+        description: 'A newsletter.',
+        author: 'Casey Author',
+        icon: 'https://cdn.example.com/logo.png',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read every field off the markup when the card carries no blob', async () => {
+      const value = html`
+        <div
+          class="embedded-publication-wrap"
+          data-component-name="EmbeddedPublicationToDOMWithSubscribe"
+        >
+          <div class="embedded-publication show-subscribe">
+            <a class="embedded-publication-link-part" native="true" href="https://otherpub.example.com?utm_medium=web">
+              <img class="embedded-publication-logo" src="https://cdn.example.com/logo.png" width="56" height="56">
+              <span class="embedded-publication-name">Other Pub</span>
+              <div class="embedded-publication-hero-text">A newsletter.</div>
+            </a>
+          </div>
+        </div>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'substack',
+        url: 'https://otherpub.example.com?utm_medium=web',
+        title: 'Other Pub',
+        description: 'A newsletter.',
+        icon: 'https://cdn.example.com/logo.png',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should match a card without the wrap class by its component name', async () => {
+      const publicationAttrs = jsonAttrValue({
+        name: 'Other Pub',
+        base_url: 'https://otherpub.example.com',
+      })
+      const value = html`
+        <div
+          data-attrs="${publicationAttrs}"
+          data-component-name="EmbeddedPublicationToDOMWithSubscribe"
+        ></div>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'substack',
+        url: 'https://otherpub.example.com',
+        title: 'Other Pub',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

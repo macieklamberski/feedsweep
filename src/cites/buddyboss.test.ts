@@ -78,6 +78,33 @@ describeForEachParser('buddybossCiteResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should read the url from the image anchor when the title has no link', async () => {
+      const value = html`
+        <div class="bb-link-preview-container">
+          <div class="bb-link-preview-image">
+            <div class="bb-link-preview-image-cover">
+              <a href="https://example.com/calculator" target="_blank"><img src="https://example.com/opengraph-image" /></a>
+            </div>
+          </div>
+          <div class="bb-link-preview-info">
+            <p class="bb-link-preview-link-name">example.com</p>
+            <p class="bb-link-preview-title">Gold Calculator</p>
+          </div>
+        </div>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'buddyboss',
+        url: 'https://example.com/calculator',
+        title: 'Gold Calculator',
+        publisher: 'example.com',
+        thumbnail: 'https://example.com/opengraph-image',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 // The preview sits after the post's own paragraphs and the like button, so the pipeline is

@@ -212,6 +212,19 @@ describeForEachParser('tumblrCiteResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined when the truncated anchor text shows a url nesting a url', async () => {
+      const value = html`
+        <p
+          class="npf_link"
+          data-npf='{"type":"link","url":"https://archive.example.org/web/2020/https://example.com/post","display_url":"https://archive.example.org/web/2020/https://example.com/post"}'
+        >
+          <a href="https://archive.example.org/web/2020/https://example.com/post">archive.example.org/web/2020/https://exa…</a>
+        </p>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined when the payload has no type', async () => {
       const value = html`
         <p class="npf_link" data-npf='{"url":"https://example.com/post","title":"Page title"}'>

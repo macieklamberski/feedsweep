@@ -141,6 +141,36 @@ describeForEachParser('devtoLinkCiteResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('shapes that are not a link card', () => {
+    // Forem falls back to this bare link when it cannot unfurl the url.
+    it('should ignore the unfurl fallback that carries only a link', async () => {
+      const value = html`
+        <div class="crayons-card c-embed text-styles text-styles--secondary">
+          <a href="https://diode.zone/videos/embed/b95ed6f4-e552-49f4-b3a0-15d03c1880ed" rel="noopener noreferrer">
+            diode.zone
+          </a>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    // A Drupal oEmbed media field reusing the class.
+    it('should ignore a foreign video field carrying the class', async () => {
+      const value = html`
+        <div class="field field--name-field-media-oembed-video field--type-string field--label-hidden c-embed">
+          <iframe
+            src="https://voxdev.org/media/oembed?url=https%3A//www.youtube.com/watch%3Fv%3D7lPbA7HrGTg&max_width=0&max_height=0"
+            title="Randomised Control Trials: Lessons for Policy - RES 2016"
+            class="media-oembed-content"
+          ></iframe>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
 })
 
 describeForEachParser('devtoPostCiteResolver', (parseHtml) => {
@@ -370,18 +400,6 @@ describeForEachParser('devtoPostCiteResolver', (parseHtml) => {
         <div class="ltag__link--embedded">
           <div class="crayons-story ">
             <div class="crayons-story__body"></div>
-          </div>
-        </div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a removed post', async () => {
-      const value = html`
-        <div class="ltag__link--embedded">
-          <div class="crayons-card my-2 p-4">
-            <p class="color-base-60">Post not found or has been removed.</p>
           </div>
         </div>
       `

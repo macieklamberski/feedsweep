@@ -395,4 +395,26 @@ describeForEachParser('hatena cards beside the prose they sit in', (parseHtml) =
 
     expect(await convert(value)).toEqualHtml(expected)
   })
+
+  it('should leave the citation beside a card that carries no title', async () => {
+    const value = html`
+      <p>
+        <iframe
+          src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fentry"
+          class="embed-card embed-webcard"
+        ></iframe>
+        <cite class="hatena-citation">
+          <a href="https://example.com/entry">example.com</a>
+        </cite>
+      </p>
+    `
+    const expected = html`
+      <div data-embed-src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fentry"></div>
+      <p>
+        <cite class="hatena-citation"><a href="https://example.com/entry">example.com</a></cite>
+      </p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
 })
