@@ -190,6 +190,12 @@ const getCodeBlockText = (target: Element): string => {
       continue
     }
 
+    // A standalone <code> is never reached by replacePreLineBreaks, so its <br> lines land here.
+    if (node.localName === 'br') {
+      text += '\n'
+      continue
+    }
+
     if (node !== target && blockLineWrappers.has(node.localName) && text && !text.endsWith('\n')) {
       text += '\n'
     }
