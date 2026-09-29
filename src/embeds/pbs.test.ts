@@ -2,7 +2,12 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { pbsFlashEmbedResolver, pbsIframeEmbedResolver, pbsResolveEmbed } from './pbs.js'
+import {
+  pbsFlashEmbedResolver,
+  pbsIframeEmbedResolver,
+  pbsLegacyIframeEmbedResolver,
+  pbsResolveEmbed,
+} from './pbs.js'
 
 describe('pbsResolveEmbed', () => {
   describe('happy paths', () => {
@@ -220,6 +225,12 @@ describeForEachParser('pbsIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should leave the retired host to its own resolver', async () => {
+      const value = '<iframe src="http://video.pbs.org/viralplayer/1506734069"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should leave the Flash player to its own resolver', async () => {
       const value = html`
         <embed
@@ -227,6 +238,43 @@ describeForEachParser('pbsIframeEmbedResolver', (parseHtml) => {
           flashvars="video=2155877110&amp;player=viral"
         >
       `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+describeForEachParser('pbsLegacyIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, pbsLegacyIframeEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should repair the retired host onto the viral player at its own size', async () => {
+      const value = html`
+        <iframe
+          width="581"
+          height="415"
+          src="http://video.pbs.org/viralplayer/1506734069"
+          frameborder="0"
+          marginwidth="0"
+          marginheight="0"
+          scrolling="no"
+          seamless
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/1506734069',
+        src: 'https://player.pbs.org/viralplayer/1506734069/',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore the current player', async () => {
+      const value = '<iframe src="https://player.pbs.org/viralplayer/3005825044/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
