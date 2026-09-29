@@ -1,7 +1,7 @@
-import { getPathSegments, isHostOf, type Nullish, toMap } from 'trousse'
+import { getPathSegments, isHostOf, type Nullish, toMap, trimObject } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts, pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pbs'
@@ -18,6 +18,8 @@ const flashPlayerPath = '/video/media/swf/PBSPlayer.swf'
 
 const pbsHosts = [playerHost, legacyPlayerHost, flashHost]
 
+const iframeHosts = [playerHost, legacyPlayerHost]
+
 // The route a carrier names, against the id space it belongs to. `viralplayer` and
 // `widget/partnerplayer` serve each other's numeric ids; `partnerplayer` takes a base64url slug
 // and answers an error shell for a numeric one.
@@ -29,16 +31,12 @@ const idSpaces = toMap({
 
 const safeVideoIdRegex = /^[\w-]+={0,2}$/
 
-// The parameters the player reads besides the id: the clip bounds and chapter, the layout, and
-// the publisher's own settings. `autoplay` and `muted` are the reader's to set.
-const playerParams = [
-  'start',
-  'end',
-  'chapter',
-  'h',
-  'topbar',
-  'endscreen',
-  'previewLayout',
+// The parameters the player reads besides the id: the clip bounds and chapter, and the layout.
+// `autoplay` and `muted` are the reader's to set.
+const playerParams = ['start', 'end', 'chapter', 'h', 'topbar', 'endscreen', 'previewLayout']
+
+// Settings the publisher chose for this one embed, which a reader may override.
+const publisherParams = [
   'unsafeDisableUpsellHref',
   'unsafeDisableSponsorship',
   'unsafeDisableContinuousPlay',
@@ -53,6 +51,7 @@ const composeEmbed = (
   route: string,
   videoId: Nullish<string>,
   query = '',
+  params?: Record<string, string>,
 ): EmbedResolverResult | undefined => {
   const idSpace = idSpaces.get(route)
 
@@ -64,6 +63,7 @@ const composeEmbed = (
     provider,
     id: `${idSpace}/${videoId}`,
     src: `https://${playerHost}/${route}/${videoId}/${query}`,
+    params,
     ratio: playerRatio,
   }
 }
@@ -100,7 +100,15 @@ export const pbsResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  return composeEmbed(route, segments.at(-1), pickUrlParams(url, playerParams))
+  const query = pickUrlParams(url, playerParams)
+  const params = trimObject(pickQueryParams(parsed.search, publisherParams))
+
+  return composeEmbed(route, segments.at(-1), query, params)
 }
 
-export const pbsEmbedResolver = createUrlEmbedResolver(pbsHosts, pbsResolveEmbed)
+export const pbsIframeEmbedResolver = createUrlEmbedResolver(iframeHosts, pbsResolveEmbed)
+
+// The Flash box was sized for the retired player, not the viral player it now loads.
+export const pbsFlashEmbedResolver = createUrlEmbedResolver([flashHost], pbsResolveEmbed, {
+  preferResolverSize: true,
+})

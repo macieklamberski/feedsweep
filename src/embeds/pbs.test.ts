@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { pbsEmbedResolver, pbsResolveEmbed } from './pbs.js'
+import { pbsFlashEmbedResolver, pbsIframeEmbedResolver, pbsResolveEmbed } from './pbs.js'
 
 describe('pbsResolveEmbed', () => {
   describe('happy paths', () => {
@@ -56,15 +56,8 @@ describe('pbsResolveEmbed', () => {
       expect(pbsResolveEmbed(value)).toEqual(expected)
     })
 
-    // Each parameter the player bundle reads besides the clip bounds.
-    const playerParams: Array<string> = [
-      'chapter=2',
-      'h=360',
-      'previewLayout=fullbleed',
-      'unsafeDisableUpsellHref=true',
-      'unsafeDisableSponsorship=true',
-      'unsafeDisableContinuousPlay=true',
-    ]
+    // Each layout parameter the player bundle reads besides the clip bounds.
+    const playerParams: Array<string> = ['chapter=2', 'h=360', 'previewLayout=fullbleed']
 
     it.each(playerParams)('should keep %s', (param) => {
       const value = `https://player.pbs.org/viralplayer/3005825044/?${param}`
@@ -72,6 +65,40 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: `https://player.pbs.org/viralplayer/3005825044/?${param}`,
+        ratio: '13/9',
+      }
+
+      expect(pbsResolveEmbed(value)).toEqual(expected)
+    })
+
+    // Each setting the publisher chose for this one embed.
+    const publisherParams: Array<[string, string]> = [
+      ['unsafeDisableUpsellHref', 'true'],
+      ['unsafeDisableSponsorship', 'true'],
+      ['unsafeDisableContinuousPlay', 'true'],
+    ]
+
+    it.each(publisherParams)('should move %s off the src into params', (name, param) => {
+      const value = `https://player.pbs.org/viralplayer/3005825044/?${name}=${param}`
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/3005825044',
+        src: 'https://player.pbs.org/viralplayer/3005825044/',
+        params: { [name]: param },
+        ratio: '13/9',
+      }
+
+      expect(pbsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should split the layout into the src and the publisher settings into params', () => {
+      const value =
+        'https://player.pbs.org/viralplayer/3005825044/?topbar=false&unsafeDisableSponsorship=true&utm_source=feed'
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/3005825044',
+        src: 'https://player.pbs.org/viralplayer/3005825044/?topbar=false',
+        params: { unsafeDisableSponsorship: 'true' },
         ratio: '13/9',
       }
 
@@ -154,8 +181,8 @@ describe('pbsResolveEmbed', () => {
   })
 })
 
-describeForEachParser('pbsEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, pbsEmbedResolver)
+describeForEachParser('pbsIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, pbsIframeEmbedResolver)
 
   describe('happy paths', () => {
     it('should keep the box the carrier declares', async () => {
@@ -176,27 +203,6 @@ describeForEachParser('pbsEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should repair the Flash player onto the viral player', async () => {
-      const value = html`
-        <embed
-          src="http://www-tc.pbs.org/video/media/swf/PBSPlayer.swf"
-          flashvars="width=578&#038;height=329&#038;video=2155877110&#038;player=viral&#038;end=0&#038;lr_admap=in:pbs:0"
-          type="application/x-shockwave-flash"
-          width="578"
-          height="329"
-        >
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'pbs',
-        id: 'viralplayer/2155877110',
-        src: 'https://player.pbs.org/viralplayer/2155877110/',
-        width: 578,
-        height: 329,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {
@@ -210,6 +216,62 @@ describeForEachParser('pbsEmbedResolver', (parseHtml) => {
     it('should ignore a foreign host naming the player route in its path', async () => {
       const value =
         '<iframe src="https://evil.test/player.pbs.org/viralplayer/3005825044/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave the Flash player to its own resolver', async () => {
+      const value = html`
+        <embed
+          src="http://www-tc.pbs.org/video/media/swf/PBSPlayer.swf"
+          flashvars="video=2155877110&amp;player=viral"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, pbsFlashEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should repair the Flash player onto the viral player at its own size', async () => {
+      const value = html`
+        <embed
+          src="http://www-tc.pbs.org/video/media/swf/PBSPlayer.swf"
+          flashvars="width=578&#038;height=329&#038;video=2155877110&#038;player=viral&#038;end=0&#038;lr_admap=in:pbs:0"
+          type="application/x-shockwave-flash"
+          width="578"
+          height="329"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2155877110',
+        src: 'https://player.pbs.org/viralplayer/2155877110/',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore the current player', async () => {
+      const value = '<iframe src="https://player.pbs.org/viralplayer/3005825044/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the Flash player path on a foreign host', async () => {
+      const value = html`
+        <embed
+          src="http://evil.test/video/media/swf/PBSPlayer.swf"
+          flashvars="video=2155877110&amp;player=viral"
+        >
+      `
 
       expect(await extract(value)).toBeUndefined()
     })
