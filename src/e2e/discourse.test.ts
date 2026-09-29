@@ -98,6 +98,52 @@ describeForEachParser('Discourse', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should keep the code excerpt of a file onebox', async () => {
+    const value = html`
+      <aside
+        class="onebox githubblob"
+        data-onebox-src="https://github.com/owner/repo/blob/master/check_config.py"
+      >
+        <header class="source">
+          <a href="https://github.com/owner/repo/blob/master/check_config.py">github.com</a>
+        </header>
+        <article class="onebox-body">
+          <h4>
+            <a href="https://github.com/owner/repo/blob/master/check_config.py">owner/repo/blob/master/check_config.py</a>
+          </h4>
+          <pre><code class="lang-py">#!/usr/bin/python3</code></pre>
+          This file has been truncated.
+          <a href="https://github.com/owner/repo/blob/master/check_config.py">show original</a>
+        </article>
+        <div class="onebox-metadata"></div>
+        <div style="clear: both"></div>
+      </aside>
+    `
+    const expected = html`
+      <aside
+        class="onebox githubblob"
+        data-onebox-src="https://github.com/owner/repo/blob/master/check_config.py"
+      >
+        <p>
+          <a href="https://github.com/owner/repo/blob/master/check_config.py">github.com</a>
+        </p>
+        <h4>
+          <a href="https://github.com/owner/repo/blob/master/check_config.py">owner/repo/blob/master/check_config.py</a>
+        </h4>
+        <pre
+          data-pre-language="py"
+          data-pre-label="Python"
+        ><code class="lang-py hljs"><span class="hljs-comment">#!/usr/bin/python3</span></code></pre>
+        <p>
+          This file has been truncated.
+          <a href="https://github.com/owner/repo/blob/master/check_config.py">show original</a>
+        </p>
+      </aside>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // Bluesky has no onebox engine of its own, so its posts arrive through the generic one and
   // are recognized by the cited host instead of a class.
   it('should leave a social post recognized by its host as markup', async () => {
