@@ -165,8 +165,10 @@ const composeEmbed = (
     ...(pageOwner && {
       url: `https://codepen.io/${pageOwner}/pen/${slugPath}${composePenQuery(target, false)}`,
     }),
-    // `shots.codepen.io` answers its 404 picture for every pen the 2.0 editor slugs with a uuid.
-    ...(!uuidRegex.test(target.slug) && { thumbnail: composeThumbnail(target) }),
+    // `shots.codepen.io` answers its 404 picture for a pen the 2.0 editor slugs with a uuid, and
+    // a blank white one for a pen moved to that editor.
+    ...(!target.isEditor &&
+      !uuidRegex.test(target.slug) && { thumbnail: composeThumbnail(target) }),
     height: target.height ?? defaultPenHeight,
     ...(target.user && { author: `@${target.user}` }),
     ...extra,

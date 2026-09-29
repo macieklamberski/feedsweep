@@ -541,7 +541,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('the block the 2.0 editor writes', () => {
-    it('should build the player under the editor path, as the loader does', async () => {
+    it('should build the player under the editor path, with no thumbnail', async () => {
       const value = html`
         <p
           class="codepen"
@@ -568,7 +568,6 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         id: 'azpLzvW',
         src: 'https://codepen.io/editor/sturobson/embed/azpLzvW?default-tab=result',
         url: 'https://codepen.io/sturobson/pen/azpLzvW',
-        thumbnail: 'https://shots.codepen.io/sturobson/pen/azpLzvW-512.jpg',
         height: 700,
         title: 'Theme and Mode Toggle Demo',
         author: '@sturobson',
