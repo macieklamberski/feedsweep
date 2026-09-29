@@ -104,4 +104,19 @@ describeForEachParser('embedly card through the pipeline', (parseHtml) => {
 
     expect(result).toEqualHtml(expected)
   })
+
+  it('should keep the bare card anchor as an inline link in its paragraph', async () => {
+    const value = html`
+      <p>Read <a class="embedly-card" href="https://example.com/news/venture">Two Founders Launch a Venture</a> first.</p>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+    const expected = html`
+      <p>Read <a class="embedly-card" href="https://example.com/news/venture">Two Founders Launch a Venture</a> first.</p>
+    `
+
+    expect(result).toEqualHtml(expected)
+  })
 })

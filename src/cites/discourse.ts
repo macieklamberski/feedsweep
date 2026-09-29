@@ -37,7 +37,6 @@ const githubDescription = (paragraph: Element): string | undefined => {
 // iframes, not aside.onebox, and Mastodon links go through the generic engine.
 const omittedOneboxClasses = [
   'twitterstatus', // A social post: the heading is the author and the body the post text
-  'threadsstatus', // The same social-post shape as twitterstatus
   'instagram', // Legacy social-post asides; since 2021 the engine emits a bare iframe
   'pdf', // A file card: the title is the filename and the only paragraph its size
   'googlemeet', // A join-call card: every field is a fixed label or the meeting code

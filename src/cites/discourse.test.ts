@@ -468,7 +468,7 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
   })
 
   describe('omitted oneboxes', () => {
-    it('should not match the threadsstatus onebox', async () => {
+    it('should not cite a threadsstatus onebox, whose url is on a threads host', async () => {
       const value = html`
         <aside class="onebox threadsstatus" data-onebox-src="https://www.threads.net/@handle/post/C1a2b3c4d5e">
           <header class="source">
