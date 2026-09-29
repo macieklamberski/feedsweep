@@ -73,6 +73,12 @@ describe('slideshareResolveEmbed', () => {
     expect(slideshareResolveEmbed(value)).toBeUndefined()
   })
 
+  it('should ignore a key carrying an encoded slash', () => {
+    const value = 'https://www.slideshare.net/slideshow/embed_code/key/6PCW%2FPGFw9SwsAY'
+
+    expect(slideshareResolveEmbed(value)).toBeUndefined()
+  })
+
   it('should ignore another host carrying the embed path', () => {
     const value = 'https://slideshare.net.evil.test/slideshow/embed_code/6435157'
 
@@ -190,22 +196,113 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // The div lost its `__ss_` id, so the object is the wrapper and the title link sits outside it.
     it('should compose the deck page for an owner spelled with capitals', async () => {
       const value = html`
-        <div id="__ss_6435157">
-          <object id="__sse6435157">
+        <div style="width:425px">
+          <strong>
+            <a
+              href="http://www.slideshare.net/Neusvn/diari-tea-concepcion-arenal"
+              title="Diari tea concepcion arenal"
+              >Diari tea concepcion arenal</a
+            >
+          </strong>
+          <object id="__sse13408892" width="425" height="355">
+            <param
+              name="movie"
+              value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=diariteaconcepcionarenal-120621115048-phpapp02&amp;stripped_title=diari-tea-concepcion-arenal&amp;userName=Neusvn"
+            />
             <embed
-              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=cursoposter-120512061001-phpapp02&amp;stripped_title=la-comunicacin-cientfica-tipo-poster&amp;userName=EnfermeraEnEvidencias"
+              name="__sse13408892"
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=diariteaconcepcionarenal-120621115048-phpapp02&amp;stripped_title=diari-tea-concepcion-arenal&amp;userName=Neusvn"
               type="application/x-shockwave-flash"
+              width="425"
+              height="355"
             ></embed>
           </object>
         </div>
       `
       const expected: EmbedResolverResult = {
         provider: 'slideshare',
-        id: '6435157',
-        src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
-        url: 'https://www.slideshare.net/EnfermeraEnEvidencias/la-comunicacin-cientfica-tipo-poster',
+        id: '13408892',
+        src: 'https://www.slideshare.net/slideshow/embed_code/13408892',
+        url: 'https://www.slideshare.net/Neusvn/diari-tea-concepcion-arenal',
+        width: 425,
+        height: 355,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should compose the deck page for an owner carrying an underscore', async () => {
+      const value = html`
+        <div style="width:425px">
+          <strong>
+            <a
+              href="http://www.slideshare.net/IC_Agency/online-advertising-strategy-for-a-luxury-watch-brand"
+              title="Online Advertising Strategy for a Luxury Watch Brand"
+              >Online Advertising Strategy for a Luxury Watch Brand</a
+            >
+          </strong>
+          <object id="__sse6141159" width="425" height="355">
+            <param
+              name="movie"
+              value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=casestudyaponlineadvertisingv7-101213051013-phpapp02&amp;stripped_title=online-advertising-strategy-for-a-luxury-watch-brand&amp;userName=IC_Agency"
+            />
+            <embed
+              name="__sse6141159"
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=casestudyaponlineadvertisingv7-101213051013-phpapp02&amp;stripped_title=online-advertising-strategy-for-a-luxury-watch-brand&amp;userName=IC_Agency"
+              type="application/x-shockwave-flash"
+              width="425"
+              height="355"
+            ></embed>
+          </object>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '6141159',
+        src: 'https://www.slideshare.net/slideshow/embed_code/6141159',
+        url: 'https://www.slideshare.net/IC_Agency/online-advertising-strategy-for-a-luxury-watch-brand',
+        width: 425,
+        height: 355,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should compose the deck page for an owner carrying a dot', async () => {
+      const value = html`
+        <div style="width:425px">
+          <strong>
+            <a
+              href="http://www.slideshare.net/asierra.re/internet-patrimoni-i-arqueologia"
+              title="Internet, patrimoni i arqueologia"
+              >Internet, patrimoni i arqueologia</a
+            >
+          </strong>
+          <object id="__sse5543828" width="425" height="355">
+            <param
+              name="movie"
+              value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=presentaciopatrimoniarqueologiauboctubre2010share-101024093406-phpapp02&amp;stripped_title=internet-patrimoni-i-arqueologia&amp;userName=asierra.re"
+            />
+            <embed
+              name="__sse5543828"
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=presentaciopatrimoniarqueologiauboctubre2010share-101024093406-phpapp02&amp;stripped_title=internet-patrimoni-i-arqueologia&amp;userName=asierra.re"
+              type="application/x-shockwave-flash"
+              width="425"
+              height="355"
+            ></embed>
+          </object>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '5543828',
+        src: 'https://www.slideshare.net/slideshow/embed_code/5543828',
+        url: 'https://www.slideshare.net/asierra.re/internet-patrimoni-i-arqueologia',
+        width: 425,
+        height: 355,
       }
 
       expect(await extract(value)).toEqual(expected)

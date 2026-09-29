@@ -80,6 +80,12 @@ describe('extractNicovideoId', () => {
     expect(extractNicovideoId(value)).toBeUndefined()
   })
 
+  it('should return undefined for an id whose prefix carries a separator', () => {
+    const value = 'https://embed.nicovideo.jp/watch/s&9'
+
+    expect(extractNicovideoId(value)).toBeUndefined()
+  })
+
   // Every spelling a broadcast arrives in, including the live host's own embed route.
   const broadcastUrls: Array<string> = [
     'https://live.nicovideo.jp/watch/lv346883570',
