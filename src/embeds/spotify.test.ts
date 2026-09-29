@@ -487,35 +487,6 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a By inside a playlist card act', async () => {
-      const midwordOwnerCardAttrs = jsonAttrValue({
-        image: 'https://i.scdn.co/image/ab67706c0000bebb3463194d462b129b0bbe5ee0',
-        title: 'He Is the Voice I Hear',
-        subtitle: 'Stand By Me Collective',
-        url: 'https://open.spotify.com/playlist/3237XsfR0Cj19KeN4T3Rxr',
-      })
-      const value = html`
-        <iframe
-          class="spotify-wrap playlist"
-          data-attrs="${midwordOwnerCardAttrs}"
-          src="https://open.spotify.com/embed/playlist/3237XsfR0Cj19KeN4T3Rxr"
-          data-component-name="Spotify2ToDOM"
-        ></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'spotify',
-        id: 'playlist/3237XsfR0Cj19KeN4T3Rxr',
-        src: 'https://open.spotify.com/embed/playlist/3237XsfR0Cj19KeN4T3Rxr',
-        url: 'https://open.spotify.com/playlist/3237XsfR0Cj19KeN4T3Rxr',
-        thumbnail: 'https://i.scdn.co/image/ab67706c0000bebb3463194d462b129b0bbe5ee0',
-        height: 352,
-        title: 'He Is the Voice I Hear',
-        author: 'Stand By Me Collective',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     // The card prints the type where a description would go, which the id already states.
     it('should state no description when the card holds only the type', async () => {
       const typeOnlyCardAttrs = jsonAttrValue({

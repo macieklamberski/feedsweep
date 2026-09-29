@@ -112,6 +112,13 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore an id carrying an encoded slash', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/embed/1fv8993v57oI%2F3UiHioRJzFV1L1cq1c"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a segment in front of the route that is not a locale', async () => {
       const value =
         '<iframe src="https://www.ganjingworld.com/live/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
@@ -122,6 +129,20 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
     it('should ignore a lowercase locale', async () => {
       const value =
         '<iframe src="https://www.ganjingworld.com/zh-cn/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a locale whose language code carries a separator', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/z=-CN/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a locale whose region code carries a separator', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/zh-C=/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

@@ -55,6 +55,12 @@ describe('extractGeniallyViewId', () => {
     expect(extractGeniallyViewId(value)).toBeUndefined()
   })
 
+  it('should return undefined for a view id carrying an encoded slash', () => {
+    const value = 'https://view.genially.com/60294f8b2ec8%2f59ae0baa5'
+
+    expect(extractGeniallyViewId(value)).toBeUndefined()
+  })
+
   it('should return undefined for a url that cannot be parsed', () => {
     const value = 'https://['
 

@@ -110,6 +110,26 @@ describe('extractTransistorEmbed', () => {
     expect(extractTransistorEmbed(value)).toEqual(expected)
   })
 
+  it('should read a show slug led by a digit', () => {
+    const value = 'https://share.transistor.fm/e/100-segundos-para-la-media-noche/playlist'
+    const expected = {
+      kind: 'playlist',
+      id: '100-segundos-para-la-media-noche',
+    } as const
+
+    expect(extractTransistorEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a show slug carrying a digit past its start', () => {
+    const value = 'https://share.transistor.fm/e/talk2bewell/latest'
+    const expected = {
+      kind: 'latest',
+      id: 'talk2bewell',
+    } as const
+
+    expect(extractTransistorEmbed(value)).toEqual(expected)
+  })
+
   it('should read a single-character show slug', () => {
     const value = 'https://share.transistor.fm/e/z/playlist'
     const expected = {

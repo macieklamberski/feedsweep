@@ -60,6 +60,30 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read an owner alias carrying a hyphen', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://www.flickr.com/apps/slideshow/show.swf?v=124984"
+          allowFullScreen="true"
+          flashvars="offsite=true&amp;lang=de-de&amp;page_show_url=%2Fphotos%2Fe-governance%2Fsets%2F72157635557420286%2Fshow%2Fwith%2F9770691963%2F&amp;page_show_back_url=%2Fphotos%2Fe-governance%2Fsets%2F72157635557420286%2Fwith%2F9770691963%2F&amp;set_id=72157635557420286&amp;jump_to=9770691963"
+          width="200"
+          height="150"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'e-governance/72157635557420286',
+        src: 'https://embedr.flickr.com/photosets/72157635557420286?width=200&height=150',
+        url: 'https://www.flickr.com/photos/e-governance/sets/72157635557420286',
+        width: 200,
+        height: 150,
+        author: 'e-governance',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The endpoint renders `width: NaNpx` when it is given no size, so a carrier that states
     // none still has to name one.
     it('should fall back to the dialog size when the carrier states none', async () => {
@@ -396,6 +420,21 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should map a framed photostream of an owner alias carrying a hyphen', async () => {
+      const value = html`<iframe src="https://www.flickr.com/photos/e-governance/show/"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photostreams/e-governance',
+        src: 'https://www.flickr.com/photos/e-governance/player?width=400&height=300',
+        url: 'https://www.flickr.com/photos/e-governance/',
+        width: 400,
+        height: 300,
+        author: 'e-governance',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should map a framed group pool slideshow page onto the group player', async () => {
       const value = html`
         <iframe src="https://www.flickr.com/groups/797770@N21/pool/show/"></iframe>
@@ -464,6 +503,30 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         width: 500,
         height: 375,
         author: 'bees',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read an owner alias carrying a hyphen', async () => {
+      const value = html`
+        <iframe
+          src="https://www.flickr.com/photos/kimim-photo/11616055053/player/c64480d113"
+          height="480"
+          width="640"
+          frameborder="0"
+          allowfullscreen
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photos/kimim-photo/11616055053',
+        src: 'https://www.flickr.com/photos/kimim-photo/11616055053/player/c64480d113',
+        url: 'https://www.flickr.com/photos/kimim-photo/11616055053/',
+        thumbnail: 'https://live.staticflickr.com/0/11616055053_c64480d113_b.jpg',
+        width: 640,
+        height: 480,
+        author: 'kimim-photo',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -846,6 +909,13 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
     it('should return undefined for a photo page player under another path', async () => {
       const value =
         '<iframe src="https://www.flickr.com/x/photos/bees/2341623661/player/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a photo page player whose owner carries an encoded slash', async () => {
+      const value =
+        '<iframe src="https://www.flickr.com/photos/kimim%2Fphoto/11616055053/player/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

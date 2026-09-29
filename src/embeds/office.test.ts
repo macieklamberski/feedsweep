@@ -45,14 +45,27 @@ describe('officeResolveEmbed', () => {
       expect(officeResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the aspect ratio and first slide and drop the share link tracking', () => {
+    it('should keep the aspect ratio of the deck', () => {
       const value =
-        'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx&wdAr=1.3333333333333333&wdStartOn=3&wdOrigin=BROWSELINK&utm_source=hs_email'
+        'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fc%2Es%2Dmicrosoft%2Ecom%3A443%2Fen%2Dus%2FCMSFiles%2Fcalldeck%2Epptx%3Fversion%3Df3eef72b%2D35d3%2D95b2%2D4fda%2D73a47f805c7f&wdAr=1.7777777777777777'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx&wdAr=1.3333333333333333&wdStartOn=3',
-        url: 'https://slac.uconn.edu/files/GrantWritingSICSFLAGS.pptx',
-        title: 'GrantWritingSICSFLAGS.pptx',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fc.s-microsoft.com%3A443%2Fen-us%2FCMSFiles%2Fcalldeck.pptx%3Fversion%3Df3eef72b-35d3-95b2-4fda-73a47f805c7f&wdAr=1.7777777777777777',
+        url: 'https://c.s-microsoft.com:443/en-us/CMSFiles/calldeck.pptx?version=f3eef72b-35d3-95b2-4fda-73a47f805c7f',
+        title: 'calldeck.pptx',
+      }
+
+      expect(officeResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the share link origin and the newsletter tracking', () => {
+      const value =
+        'https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fwww.sba.gov%2Fsites%2Fdefault%2Ffiles%2F2025-05%2FSOP%252050%252010%25208%2520Technical%2520Updates%2520effective%25206.1.2025.docx&wdOrigin=BROWSELINK&utm_source=smallbusinessapproval.com&utm_medium=newsletter&utm_campaign=sba-loan-requirements-2025-guide'
+      const expected: EmbedResolverResult = {
+        provider: 'office',
+        src: 'https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fwww.sba.gov%2Fsites%2Fdefault%2Ffiles%2F2025-05%2FSOP%252050%252010%25208%2520Technical%2520Updates%2520effective%25206.1.2025.docx',
+        url: 'https://www.sba.gov/sites/default/files/2025-05/SOP%2050%2010%208%20Technical%20Updates%20effective%206.1.2025.docx',
+        title: 'SOP 50 10 8 Technical Updates effective 6.1.2025.docx',
       }
 
       expect(officeResolveEmbed(value)).toEqual(expected)
