@@ -109,12 +109,16 @@ export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {
 
   const title = attr(element, 'title')
   const [author] = show.split('/')
+  // A widget frame plays as the publisher wrote it. A Flash carrier or a bare show url gets the
+  // widget url built.
+  const isWidgetFrame =
+    element?.localName === 'iframe' && getPathSegments(url).join('/').startsWith('widget/iframe')
 
   return {
     provider,
     id: show,
     // The www url 301s to player-widget.mixcloud.com, a host one redirect away from changing.
-    src: `https://www.mixcloud.com/widget/iframe/?${query}`,
+    src: isWidgetFrame ? url : `https://www.mixcloud.com/widget/iframe/?${query}`,
     url: `https://www.mixcloud.com/${show}/`,
     // With the cover on, the artwork fills the frame, so only the coverless mini form is 60.
     height:
