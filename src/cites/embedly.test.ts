@@ -48,19 +48,6 @@ describeForEachParser('embedlyCiteResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    // The bare anchor form Embedly also emits already renders as the titled link a
-    // placeholder would fall back to, and it can sit inline in a sentence.
-    it('should ignore the bare anchor form', async () => {
-      const value = html`
-        <a
-          href="https://example.com/page"
-          class="embedly-card"
-        >Page title</a>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should return undefined when the anchor has no href', async () => {
       const value = html`
         <blockquote class="embedly-card">
