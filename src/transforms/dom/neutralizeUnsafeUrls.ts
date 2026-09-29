@@ -72,8 +72,7 @@ const neutralizeSrcset = (element: Element, isSafeUrlFn: IsSafeUrlFn | undefined
 // urls on data-* attributes of arbitrary elements.
 const genericAttributes = urlAttributes.filter(({ tag }) => !tag)
 const tagAttributes = groupUrlAttributesByTag(urlAttributes)
-// srcset is not a url but a list of them, so it is not a table row: it is rewritten whole, by
-// dropping the unsafe candidates rather than by swapping a sentinel in.
+// srcset holds a list of urls, so it has no table row: its unsafe candidates are dropped.
 const srcsetTags = new Set(['img', 'source'])
 
 // A javascript:, vbscript: or data:text/html url on any attribute a browser would follow.
@@ -92,9 +91,7 @@ export const neutralizeUnsafeUrls: DomTransform = ({ isSafeUrlFn }) => {
       const name = element.localName
 
       for (const { attribute, role } of tagAttributes.get(name) ?? []) {
-        // Walking the DOM rather than running a selector is what lets this pass reach an
-        // xlink:href, on an <a> as well as on an SVG <image>: a colon cannot appear in a CSS
-        // attribute selector, so a pass driven by one only ever sees the plain spelling.
+        // SVG 1 spells href as xlink:href, on an <a> as well as on an <image>.
         const spelling = attribute === 'href' ? svgHrefAttribute(element) : attribute
 
         neutralizeAttribute(element, spelling, role, isSafeUrlFn)

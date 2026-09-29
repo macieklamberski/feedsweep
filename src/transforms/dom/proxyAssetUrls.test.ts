@@ -506,18 +506,11 @@ describeForEachParser('proxyAssetUrls', (parseHtml) => {
 
     expect(twice).toEqualHtml(expected)
   })
-  // A url a placeholder mints is an asset or it is not, and the `asset` column of urlAttributes is
-  // the only place that says which: `data-embed-src` is a media url and is right to stay
-  // unproxied, being the player a reader frames, while the `data-embed-thumbnail` beside it is a
-  // file the proxy serves. So the table is the ground truth for the classification, and what the
-  // next two check is the pass against it. A url field added to utils/widgets.ts and never
-  // classified is caught: the pass leaves it alone and the table declares nothing about it, so it
-  // shows up as a url neither proxied nor accounted for.
-  //
-  // Every field is handed the same non-url marker and the context resolver answers with the asset
-  // url, so whatever the placeholder ends up carrying is exactly what the mint path treats as a
-  // url.
+  // A url field added to utils/widgets.ts and never classified in urlAttributes fails the next
+  // two: the pass leaves it alone and the table does not declare it as carrying no asset.
   const assetUrl = 'https://cdn.example.com/asset.jpg'
+  // Every field gets a non-url marker and this resolver maps any url to the asset url, so an
+  // attribute holding the asset url is one the mint path treats as a url.
   const mintContext: TransformContext = {
     ...defaultContext,
     resolveUrlFn: () => assetUrl,

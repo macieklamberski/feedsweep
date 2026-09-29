@@ -78,16 +78,8 @@ export const parseMediaWikiFileName = (value: string): string | undefined => {
 // Exact on purpose: Simplecast tells a current id from a legacy eight-hex one by this shape.
 export const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-// One attribute carrying one url, on one element. The two passes that act on a url by its element
-// and attribute, neutralizeUnsafeUrls and proxyAssetUrls, filter the table below for their own
-// list, so an attribute is declared once and neither can quietly fall behind the other.
-//
-// Two passes and no more. resolveRelativeUrls stays out because it asks nothing of the tag: it
-// matches `src` on any element at all, which several widget resolvers rely on to reach a
-// `script[src]` carrier, and it keeps its own list. `srcset` stays out because it is not one url
-// but a list of them: both passes rewrite the whole attribute, and each does so on terms this
-// table cannot state, neutralizeUnsafeUrls dropping the unsafe candidates and proxyAssetUrls
-// rewriting only when the proxy changed one.
+// One attribute carrying one url, on one element. neutralizeUnsafeUrls and proxyAssetUrls each
+// filter the table below for their own list, so an attribute is declared once for both.
 export type UrlAttribute = {
   // Element carrying the attribute. Absent where any element can carry it: an embed or cite
   // placeholder parks its urls on data-* attributes of whatever element it replaced.
@@ -97,11 +89,8 @@ export type UrlAttribute = {
   // url for.
   role: UrlRole
   // Kind of asset proxyAssetUrls hands to the caller's proxy, absent where the value is not an
-  // asset a proxy can serve. This is the only place that distinction is written down.
-  //
-  // `fromParent` is not a kind but the instruction to go and find one: a <source> or <track> is a
-  // video track inside a <video> and an audio one inside an <audio>, so nothing about the row
-  // itself can answer, and only the pass, holding the element, can.
+  // asset a proxy can serve. `fromParent` reads the kind off the parent of a <source> or <track>,
+  // a video track inside a <video> and an audio one inside an <audio>.
   asset?: AssetType | 'fromParent'
 }
 
@@ -133,9 +122,8 @@ export const urlAttributes: Array<UrlAttribute> = [
   { tag: 'image', attribute: 'href', role: 'media', asset: 'image' },
 ]
 
-// Keys the rows that name a tag by that tag, so a pass walking the DOM looks up an element's
-// attributes by its local name instead of scanning the table. Tag-less rows are left out; a
-// pass reads those on every element and filters for them separately.
+// The rows that name a tag, keyed by that tag. Tag-less rows are left out: a pass reads those on
+// every element.
 export const groupUrlAttributesByTag = <Attribute extends UrlAttribute>(
   attributes: ReadonlyArray<Attribute>,
 ): ReadonlyMap<string, Array<Attribute>> => {

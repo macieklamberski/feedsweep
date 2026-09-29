@@ -4,14 +4,18 @@ import { svgHrefAttribute } from '../../utils/dom.js'
 import { parseSrcset } from '../../utils/images.js'
 import { groupUrlAttributesByTag, type UrlAttribute, urlAttributes } from '../../utils/urls.js'
 
-// The rows naming an asset, which is the whole of what this pass acts on. `data-embed-src` is
-// media and is deliberately absent: it is the player a reader loads in a frame, not a file a
-// proxy can serve.
+// The rows naming an asset. `data-embed-src` has none: it is the player a reader loads in a
+// frame, not a file a proxy can serve.
 type ProxyableAttribute = UrlAttribute & { asset: NonNullable<UrlAttribute['asset']> }
 
-const proxyableAttributes = urlAttributes.filter((attribute): attribute is ProxyableAttribute => {
-  return attribute.asset !== undefined
-})
+const proxyableAttributes: Array<ProxyableAttribute> = []
+
+for (const attribute of urlAttributes) {
+  if (attribute.asset) {
+    proxyableAttributes.push({ ...attribute, asset: attribute.asset })
+  }
+}
+
 // A tag-less row is matched on its own attribute, since a placeholder parks it on whatever
 // element it replaced; the rest are matched by tag, which is also how an SVG <image> carrying
 // its url on xlink:href is reached at all.
