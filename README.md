@@ -145,7 +145,7 @@ const result = transformContent(html, {
   sameSiteUrls: ['https://example.com/?p=1'],
   // Resolve a relative URL against the base URL (defaults to standard URL resolution).
   resolveUrlFn: (url, baseUrl) => resolve(url, baseUrl),
-  // Rewrite anchor hrefs: unwrap redirects and strip tracking params.
+  // Rewrite anchor hrefs: unwrap redirects and strip tracking params, also on the url and src of embed placeholders.
   cleanUrlFn: cleanUrl,
   // Feed item enclosures (audio/video/image), injected into the content.
   enclosures: [{ url: 'https://example.com/audio.mp3', type: 'audio/mpeg' }],
