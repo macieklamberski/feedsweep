@@ -69,6 +69,23 @@ describe('extractMixcloudShow', () => {
     expect(extractMixcloudShow(value)).toBeUndefined()
   })
 
+  // The site routes answer in lowercase only, and these two users own the capitalised names.
+  const siteWordUserUrls: Array<[string, string]> = [
+    ['https://www.mixcloud.com/MEDIA/swcmx-vs-trkto-dembowlrd/', 'MEDIA/swcmx-vs-trkto-dembowlrd'],
+    ['https://www.mixcloud.com/Search/millers-mega-mix/', 'Search/millers-mega-mix'],
+  ]
+
+  it.each(siteWordUserUrls)('should read the site-word user in %s', (value, expected) => {
+    expect(extractMixcloudShow(value)).toBe(expected)
+  })
+
+  // The api answers 404 for `.4-natty-champs` where `4-natty-champs` is a live show.
+  it('should return undefined for a slug opening with a dot', () => {
+    const value = 'https://www.mixcloud.com/FakeIDRadio/.4-natty-champs/'
+
+    expect(extractMixcloudShow(value)).toBeUndefined()
+  })
+
   // The section words are matched whole, so a show whose title starts with one is still a show.
   it('should read a show whose slug begins with a section word', () => {
     const value = 'https://www.mixcloud.com/photogmusic/followers-only-mix/'
@@ -125,6 +142,13 @@ describe('extractMixcloudShow', () => {
 
   it('should return undefined for a user segment carrying an encoded slash', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2F..%252Fetc%2Fno-filter%2F'
+
+    expect(extractMixcloudShow(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a user segment carrying an encoded slash past its start', () => {
+    const value =
+      'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%252Fetc%2Fno-filter%2F'
 
     expect(extractMixcloudShow(value)).toBeUndefined()
   })

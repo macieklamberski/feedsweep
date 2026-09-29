@@ -13,14 +13,14 @@ const flashVideoPathRegex = /^\/apps\/video\/stewart\.swf$/i
 const legacyPlayerPathRegex = /^\/slideshow\/index\.gne$/i
 
 const setPathRegex = /^\/photos\/([\w.@-]+)\/sets\/(\d+)/
-const streamPathRegex = /^\/photos\/([\w.@-]+)\/show\/?$/
+const streamPathRegex = /^\/photos\/([\w@-]+)\/show\/?$/
 const groupPathRegex = /^\/groups\/(\d+@N\d\d)\/pool\/show\/?$/
-const photoPathRegex = /^\/photos\/([\w.@-]+)\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
+const photoPathRegex = /^\/photos\/([\w@-]+)\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
 const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/
 
-// The first class admits no dot, so `..` never reaches a minted path.
-// An owner is a numeric NSID with its `@N0…` suffix, or the path alias the owner chose.
-const safeOwnerRegex = /^[\w-][\w.-]*(?:@N\d\d)?$/
+// An owner is a numeric NSID with its `@N0…` suffix, or the path alias the owner chose. Flickr
+// answers 404 for an alias carrying a dot or opening with a hyphen.
+const safeOwnerRegex = /^\w[\w-]*(?:@N\d\d)?$/
 
 // A group and a photostream each resolve by NSID and only by NSID: the player answers 200 for
 // `groups/{nsid}` and for `photostreams/{nsid}`, and 404 for a path alias in either position.

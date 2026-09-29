@@ -70,6 +70,20 @@ describe('officeResolveEmbed', () => {
 
       expect(officeResolveEmbed(value)).toEqual(expected)
     })
+
+    // The viewer opens this 19-slide deck on its first slide with `wdStartOn=3` too.
+    it('should drop the start slide the viewer ignores', () => {
+      const value =
+        'https://view.officeapps.live.com/op/embed.aspx?src=http%3A%2F%2Fcutsarah.blog.uma.ac.id%2Fwp-content%2Fuploads%2Fsites%2F405%2F2023%2F01%2FKuliah-APIO-1_PENGANTAR-1.pptx&wdStartOn=3'
+      const expected: EmbedResolverResult = {
+        provider: 'office',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=http%3A%2F%2Fcutsarah.blog.uma.ac.id%2Fwp-content%2Fuploads%2Fsites%2F405%2F2023%2F01%2FKuliah-APIO-1_PENGANTAR-1.pptx',
+        url: 'http://cutsarah.blog.uma.ac.id/wp-content/uploads/sites/405/2023/01/Kuliah-APIO-1_PENGANTAR-1.pptx',
+        title: 'Kuliah-APIO-1_PENGANTAR-1.pptx',
+      }
+
+      expect(officeResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

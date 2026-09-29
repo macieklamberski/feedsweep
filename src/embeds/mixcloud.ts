@@ -8,7 +8,7 @@ const provider = 'mixcloud'
 
 // A slug holds whatever script the publisher titled the show in, Japanese, Greek and accented Latin
 // among them.
-const unsafeSegmentRegex = /[/?#\\]|\s|^\.+$/
+const unsafeSegmentRegex = /[/?#\\]|\s|^\./
 
 const mixcloudHosts = ['mixcloud.com']
 
@@ -34,6 +34,7 @@ const sectionSlugs = new Set([
 // First segments that are the site, not a user: `genres/{x}` is a listing served at exactly
 // the show shape, `categories/{x}` and `tag/{x}` redirect into it, and the widget's own url is
 // two segments, so a carrier missing its `feed` parameter would read as the user `widget`.
+// The site answers them in lowercase only: `MEDIA` and `Search` are real users.
 const siteSegments = new Set([
   'categories',
   'discover',
@@ -61,7 +62,7 @@ const readShowPath = (segments: Array<string>): string | undefined => {
     return
   }
 
-  if (siteSegments.has(user.toLowerCase()) || sectionSlugs.has(slug.toLowerCase())) {
+  if (siteSegments.has(user) || sectionSlugs.has(slug.toLowerCase())) {
     return
   }
 
