@@ -29,6 +29,32 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should recover a lite-youtube id from quotes the feed escaped twice', async () => {
+    const value = '<lite-youtube videoid=\\"k_3pRxdv-cI\\"></lite-youtube>'
+    const expected = '<iframe src="https://www.youtube.com/embed/k_3pRxdv-cI"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should recover a lite-vimeo id from quotes the feed escaped twice', async () => {
+    const value = '<lite-vimeo videoid=\\"364402896\\"></lite-vimeo>'
+    const expected = '<iframe src="https://player.vimeo.com/video/364402896"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a lite-youtube element whose videoid is not a video id alone', async () => {
+    const value = '<lite-youtube videoid="abc/../../x?y"></lite-youtube>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a lite-vimeo element whose videoid is not a video id alone', async () => {
+    const value = '<lite-vimeo videoid="364402896/../../x?y"></lite-vimeo>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should carry a youtube start offset into a query param', async () => {
     const value = html`
       <lite-youtube

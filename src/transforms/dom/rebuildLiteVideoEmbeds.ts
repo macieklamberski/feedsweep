@@ -1,33 +1,44 @@
 import { composeEmbedUrl as composeVimeoUrl } from '../../embeds/vimeo.js'
-import { composeEmbedUrl as composeYoutubeUrl, youtubeEmbedParams } from '../../embeds/youtube.js'
+import {
+  composeEmbedUrl as composeYoutubeUrl,
+  isVideoId,
+  youtubeEmbedParams,
+} from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import { digitsRegex, pickQueryParams } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 type EmbedSource = {
+  isId: (id: string) => boolean
   params: ReadonlyArray<string>
   compose: (id: string, params: Record<string, string>) => string
 }
 
 const embedSources: Record<string, EmbedSource> = {
   'lite-youtube': {
+    isId: isVideoId,
     params: youtubeEmbedParams,
     compose: (id, params) => composeYoutubeUrl(id, params),
   },
   // Vimeo's player takes the offset as a #t= fragment and reads nothing else.
   'lite-vimeo': {
+    isId: (id) => digitsRegex.test(id),
     params: ['start'],
     compose: (id, params) => composeVimeoUrl(id, undefined, params.start),
   },
 }
 
+// Some feeds escape the attribute's quotes twice, `videoid=\"{id}\"`, and the parser keeps the
+// backslashes and quotes as part of the value.
+const escapedQuotesRegex = /^\\"(.*)\\"$/
+
 // lite-youtube and lite-vimeo are web components that only build their iframe with JS on click.
 export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll('lite-youtube[videoid], lite-vimeo[videoid]')) {
     const source = embedSources[element.localName]
-    const videoId = element.getAttribute('videoid')
+    const videoId = element.getAttribute('videoid')?.replace(escapedQuotesRegex, '$1')
 
-    if (!source || !videoId) {
+    if (!source || !videoId || !source.isId(videoId)) {
       continue
     }
 
