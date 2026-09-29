@@ -6,6 +6,7 @@ import {
   dailymotionEmbedResolver,
   dailymotionResolveEmbed,
   extractDailymotionId,
+  readDailymotionEmbedSrc,
 } from './dailymotion.js'
 
 // Every url spelling that names a single video. All extract the same id, so a deleted row is a
@@ -101,6 +102,24 @@ describe('extractDailymotionId', () => {
   ]
 
   it.each(accountPageUrls)('should extract no id from %s', (value) => {
+    expect(extractDailymotionId(value)).toBeUndefined()
+  })
+
+  it('should extract no id from a segment carrying an encoded slash after the id', () => {
+    const value = 'https://www.dailymotion.com/video/x7tgad0%2F'
+
+    expect(extractDailymotionId(value)).toBeUndefined()
+  })
+
+  it('should extract no id from a segment carrying an encoded slash before the id', () => {
+    const value = 'https://www.dailymotion.com/video/%2Fx7tgad0'
+
+    expect(extractDailymotionId(value)).toBeUndefined()
+  })
+
+  it('should extract no id behind a three-letter segment where the locale sits', () => {
+    const value = 'https://www.dailymotion.com/fra/video/x7tgad0'
+
     expect(extractDailymotionId(value)).toBeUndefined()
   })
 
@@ -213,6 +232,15 @@ describe('dailymotionResolveEmbed', () => {
   })
 })
 
+describe('readDailymotionEmbedSrc', () => {
+  it('should build the player url from a pasted share link on the short domain', () => {
+    const value = 'https://dai.ly/x7tgad0'
+    const expected = 'https://www.dailymotion.com/embed/video/x7tgad0'
+
+    expect(readDailymotionEmbedSrc(value)).toBe(expected)
+  })
+})
+
 describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, dailymotionEmbedResolver)
 
@@ -232,6 +260,12 @@ describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
 
   it('should ignore a non-dailymotion iframe', async () => {
     const value = '<iframe src="https://example.com/video"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore a foreign host carrying the same path', async () => {
+    const value = '<iframe src="https://evil.test/embed/video/x7tgad0"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })
@@ -297,6 +331,38 @@ describeForEachParser('dailymotionEmbedResolver carrier title', (parseHtml) => {
   it('should drop the label the snippet writes in place of the name', async () => {
     const value = html`
       <iframe src="https://www.dailymotion.com/embed/video/x7tgad0" title="Dailymotion Video Player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x7tgad0',
+      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      url: 'https://www.dailymotion.com/video/x7tgad0',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the French label the snippet writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://www.dailymotion.com/embed/video/x7tgad0" title="Lecteur vidéo Dailymotion"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x7tgad0',
+      src: 'https://www.dailymotion.com/embed/video/x7tgad0',
+      url: 'https://www.dailymotion.com/video/x7tgad0',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the powered-by label the snippet writes in place of the name', async () => {
+    const value = html`
+      <iframe src="https://www.dailymotion.com/embed/video/x7tgad0" title="Powered by Dailymotion"></iframe>
     `
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',

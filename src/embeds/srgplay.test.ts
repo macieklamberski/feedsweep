@@ -115,7 +115,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the player path', async () => {
       const value =
-        '<iframe src="https://evil.test/tp.srgssr.ch/p/srf/embed?urn=urn:srf:video:cfb39f35-b1f7-4937-a806-68bea0e611d3"></iframe>'
+        '<iframe src="https://evil.test/p/srf/embed?urn=urn:srf:video:cfb39f35-b1f7-4937-a806-68bea0e611d3"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

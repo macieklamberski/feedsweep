@@ -116,6 +116,20 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('the document page', () => {
+    it('should resolve a document named on its page path', async () => {
+      const value = '<iframe src="https://www.scribd.com/document/526446879/some-slug"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'scribd',
+        id: '526446879',
+        src: 'https://www.scribd.com/embeds/526446879/content',
+        url: 'https://www.scribd.com/document/526446879',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   // Scribd's ids have been growing since 2008, and the length is not what names a document.
   describe('an id outside the lengths minted so far', () => {
     it('should resolve a document id longer than the ones in the wild', async () => {
@@ -284,6 +298,14 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
         <object
           data="https://www.scribd.com/embeds/526446879/content?document_id=108992419"
         ></object>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a path that runs on past the viewer', async () => {
+      const value = html`
+        <object data="http://d1.scribdassets.com/ScribdViewer.swf/page?document_id=108992419"></object>
       `
 
       expect(await extract(value)).toBeUndefined()

@@ -102,6 +102,20 @@ describeForEachParser('odnoklassnikiEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    // m.ok.ru answers its player with x-frame-options DENY, and ok.ru frames the same id.
+    it('should move the mobile player onto the host that frames it', async () => {
+      const value = '<iframe src="https://m.ok.ru/videoembed/36463446577"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'odnoklassniki',
+        id: '36463446577',
+        src: 'https://ok.ru/videoembed/36463446577',
+        url: 'https://ok.ru/video/36463446577',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

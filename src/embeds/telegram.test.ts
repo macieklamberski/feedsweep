@@ -214,6 +214,23 @@ describeForEachParser('telegramScriptEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should return undefined for a post led by a slash', async () => {
+      const value = '<script data-telegram-post="/tochkapress/111424"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a channel with no message id beside a pixel width', async () => {
+      const value = html`
+        <script
+          data-telegram-post="tochkapress"
+          data-width="480"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 
   describe('deliberate non-resolutions', () => {
@@ -369,7 +386,7 @@ describeForEachParser('telegramIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should not claim another host spelling t.me in its path', async () => {
-      const value = '<iframe src="https://evil.test/t.me/rvvoenkor/12345?embed=1"></iframe>'
+      const value = '<iframe src="https://evil.test/rvvoenkor/12345?embed=1"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

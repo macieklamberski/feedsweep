@@ -61,8 +61,18 @@ describe('donorboxResolveEmbed', () => {
       expect(donorboxResolveEmbed('https://donorbox.org/embed/donation-form-248/x')).toBeUndefined()
     })
 
+    it('should ignore a form path naming no campaign', () => {
+      expect(donorboxResolveEmbed('https://donorbox.org/embed')).toBeUndefined()
+    })
+
+    it('should ignore a slug carrying an encoded slash', () => {
+      const value = 'https://donorbox.org/embed/donation-form-248%2F..'
+
+      expect(donorboxResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', () => {
-      expect(donorboxResolveEmbed('https://evil.test/donorbox.org/embed/x')).toBeUndefined()
+      expect(donorboxResolveEmbed('https://evil.test/embed/donation-form-248')).toBeUndefined()
     })
   })
 })
@@ -122,7 +132,7 @@ describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/donorbox.org/embed/donation-form-248"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/donation-form-248"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

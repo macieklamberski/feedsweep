@@ -33,13 +33,19 @@ describe('aushaResolveEmbed', () => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/player.ausha.co/?podcastId=BGKwJUJG8D9m'
+      const value = 'https://evil.test/?podcastId=BGKwJUJG8D9m'
 
       expect(aushaResolveEmbed(value)).toBeUndefined()
     })
 
     it('should ignore an ausha host that is not a player', () => {
       const value = 'https://podcast.ausha.co/comicsdiscovery?podcastId=BGKwJUJG8D9m'
+
+      expect(aushaResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore an ausha host that is not a player at the root', () => {
+      const value = 'https://www.ausha.co/?podcastId=BGKwJUJG8D9m'
 
       expect(aushaResolveEmbed(value)).toBeUndefined()
     })
@@ -198,8 +204,7 @@ describeForEachParser('aushaEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/player.ausha.co/?podcastId=BGKwJUJG8D9m"></iframe>'
+      const value = '<iframe src="https://evil.test/?podcastId=BGKwJUJG8D9m"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

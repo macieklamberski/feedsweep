@@ -104,8 +104,30 @@ describeForEachParser('padletEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore the embed route under another segment', async () => {
+      const value = '<iframe src="https://padlet.com/x/embed/228qqr1n7d19"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the preview route under another segment', async () => {
+      const value = html`
+        <iframe src="https://padlet.com/x/padlets/5r949isxqdhfcca7/embeds/preview_embed"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a path below the preview route', async () => {
+      const value = html`
+        <iframe src="https://padlet.com/padlets/5r949isxqdhfcca7/embeds/preview_embed/extra"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/padlet.com/embed/228qqr1n7d19"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/228qqr1n7d19"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

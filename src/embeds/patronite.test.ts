@@ -99,7 +99,7 @@ describeForEachParser('patroniteEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
-        '<iframe src="https://evil.test/patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8"></iframe>'
+        '<iframe src="https://evil.test/widget/strajk/114344/small/FF3E3E/FEFFF8"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

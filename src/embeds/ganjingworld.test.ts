@@ -141,8 +141,7 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -176,6 +175,26 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
         id: '1fv8993v57oI3UiHioRJzFV1L1cq1c',
         src: 'https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c',
         url: 'https://www.ganjingworld.com/video/1fv8993v57oI3UiHioRJzFV1L1cq1c',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the tracker the publisher carried', async () => {
+      const value = html`
+        <iframe
+          width="728"
+          height="410"
+          src="https://www.ganjingworld.com/zh-CN/embed/1ilf5kdso911p2vxVOvfx6VqW1ld1c?utm_source=bannedbook.org"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ganjingworld',
+        id: '1ilf5kdso911p2vxVOvfx6VqW1ld1c',
+        src: 'https://www.ganjingworld.com/zh-CN/embed/1ilf5kdso911p2vxVOvfx6VqW1ld1c',
+        url: 'https://www.ganjingworld.com/zh-CN/video/1ilf5kdso911p2vxVOvfx6VqW1ld1c',
+        width: 728,
+        height: 410,
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -46,6 +46,9 @@ describe('extractMixcloudShow', () => {
     'https://www.mixcloud.com/categories/house/',
     'https://www.mixcloud.com/tag/house/',
     'https://www.mixcloud.com/live/photogmusic/',
+    'https://www.mixcloud.com/media/swf/',
+    'https://www.mixcloud.com/search/house/',
+    'https://www.mixcloud.com/upload/photogmusic/',
     'https://www.mixcloud.com/photogmusic/uploads/',
     'https://www.mixcloud.com/photogmusic/favorites/',
     'https://www.mixcloud.com/photogmusic/listens/',
@@ -112,6 +115,48 @@ describe('extractMixcloudShow', () => {
     const expected = 'szita-jános/show'
 
     expect(extractMixcloudShow(value)).toBe(expected)
+  })
+
+  it('should return undefined for a show path followed by another segment', () => {
+    const value = 'https://www.mixcloud.com/photogmusic/no-filter/extra/'
+
+    expect(extractMixcloudShow(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a user segment carrying an encoded slash', () => {
+    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2F..%252Fetc%2Fno-filter%2F'
+
+    expect(extractMixcloudShow(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a malformed escape in the user segment', () => {
+    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2F%E0%A4%A%2Fno-filter%2F'
+
+    expect(extractMixcloudShow(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a segment carrying an encoded question mark', () => {
+    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno%253Ffilter%2F'
+
+    expect(extractMixcloudShow(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a segment carrying an encoded hash', () => {
+    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno%2523filter%2F'
+
+    expect(extractMixcloudShow(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a segment carrying an encoded backslash', () => {
+    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno%255Cfilter%2F'
+
+    expect(extractMixcloudShow(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a feed parameter that cannot be parsed', () => {
+    const value = 'https://www.mixcloud.com/widget/iframe/?feed=http%3A%2F%2F%5B'
+
+    expect(extractMixcloudShow(value)).toBeUndefined()
   })
 
   it('should return undefined for a segment that climbs out of the path', () => {
@@ -185,6 +230,36 @@ describe('mixcloudResolveEmbed', () => {
       provider: 'mixcloud',
       id: 'photogmusic/no-filter',
       src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F&mini=1',
+      url: 'https://www.mixcloud.com/photogmusic/no-filter/',
+      height: 160,
+      author: 'photogmusic',
+    }
+
+    expect(mixcloudResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should carry the artwork flag', () => {
+    const value =
+      'https://www.mixcloud.com/widget/iframe/?hide_artwork=1&feed=%2Fubunoirwro%2Flab-under-the-radar-closing-set-2024-10-26-uczulenie%2F'
+    const expected: EmbedResolverResult = {
+      provider: 'mixcloud',
+      id: 'ubunoirwro/lab-under-the-radar-closing-set-2024-10-26-uczulenie',
+      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fubunoirwro%2Flab-under-the-radar-closing-set-2024-10-26-uczulenie%2F&hide_artwork=1',
+      url: 'https://www.mixcloud.com/ubunoirwro/lab-under-the-radar-closing-set-2024-10-26-uczulenie/',
+      height: 160,
+      author: 'ubunoirwro',
+    }
+
+    expect(mixcloudResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep a display option and drop a tracker beside it', () => {
+    const value =
+      'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F&light=1&utm_source=newsletter'
+    const expected: EmbedResolverResult = {
+      provider: 'mixcloud',
+      id: 'photogmusic/no-filter',
+      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F&light=1',
       url: 'https://www.mixcloud.com/photogmusic/no-filter/',
       height: 160,
       author: 'photogmusic',
@@ -275,6 +350,13 @@ describeForEachParser('mixcloudEmbedResolver', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should ignore the widget path on a foreign host', async () => {
+    const value =
+      '<iframe src="https://evil.test/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
   })
 
   it('should leave a non-show mixcloud url to the generic placeholder', async () => {

@@ -83,6 +83,32 @@ describe('appleResolveEmbed', () => {
       expect(appleResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should resolve a user playlist whose id carries a hyphen', () => {
+      const value = 'https://embed.music.apple.com/jp/playlist/mixtape/pl.u-4JommxbIaxX578b'
+      const expected: EmbedResolverResult = {
+        provider: 'applemusic',
+        id: 'playlist/pl.u-4JommxbIaxX578b',
+        src: 'https://embed.music.apple.com/jp/playlist/mixtape/pl.u-4JommxbIaxX578b',
+        url: 'https://music.apple.com/jp/playlist/mixtape/pl.u-4JommxbIaxX578b',
+        height: 450,
+      }
+
+      expect(appleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should resolve a station', () => {
+      const value = 'https://embed.music.apple.com/us/station/ochelli-com/ra.1461174708'
+      const expected: EmbedResolverResult = {
+        provider: 'applemusic',
+        id: 'station/ra.1461174708',
+        src: 'https://embed.music.apple.com/us/station/ochelli-com/ra.1461174708',
+        url: 'https://music.apple.com/us/station/ochelli-com/ra.1461174708',
+        height: 450,
+      }
+
+      expect(appleResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should resolve a podcast episode as its own provider', () => {
       const value =
         'https://embed.podcasts.apple.com/us/podcast/the-daily/id1200361736?i=1000123456789'
@@ -174,6 +200,18 @@ describe('appleResolveEmbed', () => {
 
     it('should return undefined for an id that is not an apple one', () => {
       const value = 'https://music.apple.com/us/album/thriller/abc'
+
+      expect(appleResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an id behind a prefix', () => {
+      const value = 'https://music.apple.com/us/album/thriller/x1440857781'
+
+      expect(appleResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an id followed by other characters', () => {
+      const value = 'https://music.apple.com/us/album/thriller/1440857781x'
 
       expect(appleResolveEmbed(value)).toBeUndefined()
     })
@@ -330,6 +368,39 @@ describeForEachParser('appleEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should state no runtime for an episode payload carrying an empty one', async () => {
+      const emptyCardAttrs = jsonAttrValue({
+        url: 'https://embed.podcasts.apple.com/us/podcast/undertone/id1693303954?i=1000664459889',
+        isEpisode: true,
+        imageUrl: '',
+        title: '',
+        podcastTitle: '',
+        podcastByline: '',
+        duration: '',
+        numEpisodes: '',
+        targetUrl: '',
+        releaseDate: '',
+      })
+      const value = html`
+        <div class="apple-podcast-container" data-component-name="ApplePodcastToDom">
+          <iframe
+            class="apple-podcast "
+            data-attrs="${emptyCardAttrs}"
+            src="https://embed.podcasts.apple.com/us/podcast/undertone/id1693303954?i=1000664459889"
+          ></iframe>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'applepodcasts',
+        id: 'podcast/1000664459889',
+        src: 'https://embed.podcasts.apple.com/us/podcast/undertone/id1693303954?i=1000664459889',
+        url: 'https://podcasts.apple.com/us/podcast/undertone/id1693303954?i=1000664459889',
+        height: 175,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The payload's own `targetUrl` is this page with an affiliate token on it, so the composed
     // url stands instead of it.
     it('should compose the url rather than take the payload affiliate link', async () => {
@@ -418,6 +489,42 @@ describeForEachParser('appleEmbedResolver carrier title', (parseHtml) => {
       id: 'podcast/1887512662',
       src: 'https://embed.podcasts.apple.com/gb/podcast/exploaded/id1887512662',
       url: 'https://podcasts.apple.com/gb/podcast/exploaded/id1887512662',
+      height: 450,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the label a copied YouTube snippet writes on a podcast player', async () => {
+    const value = html`
+      <iframe
+        src="https://embed.podcasts.apple.com/gb/podcast/exploaded/id1887512662"
+        title="YouTube video player"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'applepodcasts',
+      id: 'podcast/1887512662',
+      src: 'https://embed.podcasts.apple.com/gb/podcast/exploaded/id1887512662',
+      url: 'https://podcasts.apple.com/gb/podcast/exploaded/id1887512662',
+      height: 450,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the label the share dialog writes on a music player', async () => {
+    const value = html`
+      <iframe
+        src="https://embed.music.apple.com/us/album/thriller/1440857781"
+        title="Media player"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'applemusic',
+      id: 'album/1440857781',
+      src: 'https://embed.music.apple.com/us/album/thriller/1440857781',
+      url: 'https://music.apple.com/us/album/thriller/1440857781',
       height: 450,
     }
 
@@ -566,6 +673,20 @@ describeForEachParser('appleToolsEmbedResolver', (parseHtml) => {
     it('should drop a storefront that is not a two-letter code', async () => {
       const value =
         '<iframe src="https://tools.applemusic.com/embed/v1/album/111492?country=usa"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'applemusic',
+        id: 'album/111492',
+        src: 'https://embed.music.apple.com/album/111492',
+        url: 'https://music.apple.com/album/111492',
+        height: 450,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop a storefront carrying an equals sign', async () => {
+      const value =
+        '<iframe src="https://tools.applemusic.com/embed/v1/album/111492?country=u%3D"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'applemusic',
         id: 'album/111492',

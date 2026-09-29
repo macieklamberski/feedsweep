@@ -65,6 +65,44 @@ describe('podigeeResolveEmbed', () => {
     expect(podigeeResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should read a show whose subdomain carries digits', () => {
+    const value = 'https://diepresse1848.podigee.io/100-neue-episode'
+    const expected: EmbedResolverResult = {
+      provider: 'podigee',
+      id: 'diepresse1848/100-neue-episode',
+      src: 'https://diepresse1848.podigee.io/100-neue-episode/embed',
+      height: 145,
+    }
+
+    expect(podigeeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a show whose subdomain carries hyphens', () => {
+    const value =
+      'https://digitalisierung-erfolgreich-gestalten.podigee.io/28-digitalisierung-in-der-finanzwirtschaft-mit-sascha-rabe/embed?context=external'
+    const expected: EmbedResolverResult = {
+      provider: 'podigee',
+      id: 'digitalisierung-erfolgreich-gestalten/28-digitalisierung-in-der-finanzwirtschaft-mit-sascha-rabe',
+      src: value,
+      height: 145,
+    }
+
+    expect(podigeeResolveEmbed(value)).toEqual(expected)
+  })
+
+  // The company site sits on the show domain under www, and its paths can open with a number.
+  it('should return undefined for the www host', () => {
+    const value = 'https://www.podigee.io/2024-pricing-update'
+
+    expect(podigeeResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for an unnumbered episode with a number inside its slug', () => {
+    const value = 'https://cloudonaut.podigee.io/season-2-trailer'
+
+    expect(podigeeResolveEmbed(value)).toBeUndefined()
+  })
+
   // A carrier already framing the player is left as the publisher wrote it, so Podigee's own
   // `context=external` survives.
   it('should keep the query on a url that already names the player', () => {

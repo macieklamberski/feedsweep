@@ -125,11 +125,11 @@ describeForEachParser('Tumblr', (parseHtml) => {
       <div class="embed-tumblr">
         <div
           class="tumblr-post"
-          data-href="https://embed.tumblr.com/embed/post/t:AbCdEfGhIjKlMnOpQrStUv/123456789012345678/v2"
+          data-href="https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2"
           data-did="f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8"
         >
-          <a href="https://www.tumblr.com/exampleblog/123456789012345678"
-            >https://www.tumblr.com/exampleblog/123456789012345678</a
+          <a href="https://www.tumblr.com/exampleblog/144854447139"
+            >https://www.tumblr.com/exampleblog/144854447139</a
           >
         </div>
         <script
@@ -141,9 +141,9 @@ describeForEachParser('Tumblr', (parseHtml) => {
     const expected = html`
       <div
         data-embed-provider="tumblr"
-        data-embed-id="AbCdEfGhIjKlMnOpQrStUv/123456789012345678"
-        data-embed-src="https://embed.tumblr.com/embed/post/t:AbCdEfGhIjKlMnOpQrStUv/123456789012345678/v2"
-        data-embed-url="https://www.tumblr.com/exampleblog/123456789012345678"
+        data-embed-id="9NYQOutKOEXi4aopdzCr9A/144854447139"
+        data-embed-src="https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2"
+        data-embed-url="https://www.tumblr.com/exampleblog/144854447139"
       ></div>
     `
 
@@ -154,7 +154,7 @@ describeForEachParser('Tumblr', (parseHtml) => {
     const value = html`
       <iframe
         class="tumblr-embed tumblr-embed-loaded"
-        src="https://embed.tumblr.com/embed/post/t:AbCdEfGhIjKlMnOpQrStUv/123456789012345678/v2?width=542&language=en_US&did=f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8"
+        src="https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2?width=542&language=en_US&did=f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8"
         height="1391"
         title="Tumblr post"
       ></iframe>
@@ -162,8 +162,8 @@ describeForEachParser('Tumblr', (parseHtml) => {
     const expected = html`
       <div
         data-embed-provider="tumblr"
-        data-embed-id="AbCdEfGhIjKlMnOpQrStUv/123456789012345678"
-        data-embed-src="https://embed.tumblr.com/embed/post/t:AbCdEfGhIjKlMnOpQrStUv/123456789012345678/v2?width=542&amp;language=en_US&amp;did=f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8"
+        data-embed-id="9NYQOutKOEXi4aopdzCr9A/144854447139"
+        data-embed-src="https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2?width=542&amp;language=en_US&amp;did=f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8"
         data-embed-height="1391"
       ></div>
     `

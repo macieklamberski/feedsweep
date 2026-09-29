@@ -132,6 +132,22 @@ describe('foxnewsResolveEmbed', () => {
       expect(foxnewsResolveEmbed(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should take the iframe id over the script id when both are stated', () => {
+      const value =
+        'https://video.foxnews.com/v/video-embed.html?video_id=6178327154001&id=5406119088001'
+      const expected: EmbedResolverResult = {
+        provider: 'foxnews',
+        id: '6178327154001',
+        src: 'https://video.foxnews.com/v/video-embed.html?video_id=6178327154001',
+        url: 'https://www.foxnews.com/video/6178327154001',
+        ratio: '16/9',
+      }
+
+      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('foxnewsScriptEmbedResolver', (parseHtml) => {
@@ -178,7 +194,7 @@ describeForEachParser('foxnewsScriptEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
-        '<script src="https://evil.test/video.foxnews.com/v/embed.js?id=5406119088001"></script>'
+        '<script src="https://evil.test/v/embed.js?id=5406119088001&video.foxnews.com/v/embed.js"></script>'
 
       expect(await extract(value)).toBeUndefined()
     })

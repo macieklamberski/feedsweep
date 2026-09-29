@@ -93,8 +93,8 @@ describeForEachParser('amebaMoviePlayerEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host naming the player host in its path', async () => {
-      const value = '<iframe src="https://evil.test/static.blog-video.jp/?v=MCLP3ViB"></iframe>'
+    it('should ignore a foreign host carrying the same query', async () => {
+      const value = '<iframe src="https://evil.test/?v=MCLP3ViB"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

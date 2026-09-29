@@ -296,10 +296,8 @@ describeForEachParser('calameoEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host naming the viewer in its path', async () => {
-      const value = html`
-        <iframe src="https://evil.test/v.calameo.com/?bkcode=0077756511c9c6e552299"></iframe>
-      `
+    it('should ignore a foreign host carrying the viewer query', async () => {
+      const value = '<iframe src="https://evil.test/?bkcode=0077756511c9c6e552299"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

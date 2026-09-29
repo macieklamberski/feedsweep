@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { ardmediathekEmbedResolver } from './ardmediathek.js'
@@ -142,5 +143,47 @@ describeForEachParser('ardmediathekEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
+})
+
+// The resolver accepts every ardmediathek.de subdomain, and the img. and api. subdomains serve
+// the images a feed attaches as enclosures.
+describeForEachParser('ardmediathek enclosures through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave an image enclosure on the img subdomain an image', async () => {
+    const enclosures = [
+      {
+        url: 'https://img.ardmediathek.de/standard/00/59/47/33/24/-1899550789/16x9/960',
+        type: 'image/jpeg',
+      },
+    ]
+    const expected = html`
+      <img data-enclosure="" src="https://img.ardmediathek.de/standard/00/59/47/33/24/-1899550789/16x9/960">
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+
+  it('should leave an image enclosure on the api subdomain an image', async () => {
+    const enclosures = [
+      {
+        url: 'https://api.ardmediathek.de/image-service/image-collections/urn:ard:image-collection:2213972a8d101de1/16x9?w=960',
+        type: 'image/jpeg',
+      },
+    ]
+    const expected = html`
+      <img data-enclosure="" src="https://api.ardmediathek.de/image-service/image-collections/urn:ard:image-collection:2213972a8d101de1/16x9?w=960">
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })

@@ -92,6 +92,12 @@ describe('googledriveResolveEmbed', () => {
 
       expect(googledriveResolveEmbed(value)).toBeUndefined()
     })
+
+    it('should ignore a file id carrying a query separator', () => {
+      const value = 'https://drive.google.com/file/d/1UVR7Liw&sz=w1/preview'
+
+      expect(googledriveResolveEmbed(value)).toBeUndefined()
+    })
   })
 })
 

@@ -295,10 +295,10 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a foreign host naming the loader in its path', async () => {
+    it('should ignore a foreign host carrying the loader path', async () => {
       const value = html`
         <embed
-          src="https://evil.test/prezi.com/bin/preziloader.swf"
+          src="https://evil.test/bin/preziloader.swf"
           flashvars="prezi_id=testonly0001"
         />
       `

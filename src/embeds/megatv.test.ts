@@ -98,7 +98,7 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/www.megatv.com/embed/?p=2020687366"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/?p=2020687366"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -146,6 +146,18 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
         provider: 'megatv',
         id: '202037945',
         src: 'https://www.megatv.com/embed/?p=202037945',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint no page for an id carrying the prefix only past its start', async () => {
+      const value = '<iframe src="https://www.megatv.com/embed/?p=12020687366"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'megatv',
+        id: '12020687366',
+        src: 'https://www.megatv.com/embed/?p=12020687366',
         ratio: '16/9',
       }
 

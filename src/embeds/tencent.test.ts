@@ -91,8 +91,21 @@ describeForEachParser('tencentEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
+      const value = '<embed src="https://evil.test/TPout.swf?vid=u0015tdk4pp">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player path under another directory', async () => {
       const value =
-        '<iframe src="https://evil.test/v.qq.com/txp/iframe/player.html?vid=v03604lrvan"></iframe>'
+        '<iframe src="https://v.qq.com/x/txp/iframe/player.html?vid=v03604lrvan"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player path followed by another segment', async () => {
+      const value =
+        '<iframe src="https://v.qq.com/txp/iframe/player.html/extra?vid=v03604lrvan"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -116,6 +129,13 @@ describeForEachParser('tencentEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore an id carrying an encoded slash', async () => {
+      const value =
+        '<iframe src="https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%2Fx"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     // A snippet pasted with the route word still standing in for the id: `cover` names Tencent's
     // series route, and the poster and page urls minted from it are both dead.
     it('should ignore the route word left in the vid parameter', async () => {
@@ -126,6 +146,12 @@ describeForEachParser('tencentEmbedResolver', (parseHtml) => {
 
     it('should ignore a swf on the static host that is not the player', async () => {
       const value = '<embed src="http://static.video.qq.com/loader.swf?vid=u0015tdk4pp">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the swf path followed by another segment', async () => {
+      const value = '<embed src="http://static.video.qq.com/TPout.swf/extra?vid=u0015tdk4pp">'
 
       expect(await extract(value)).toBeUndefined()
     })

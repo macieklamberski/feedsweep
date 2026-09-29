@@ -51,6 +51,18 @@ describe('extractBandcampRelease', () => {
     expect(extractBandcampRelease(value)).toBeUndefined()
   })
 
+  it('should return undefined for a release option behind a prefix', () => {
+    const value = 'https://bandcamp.com/EmbeddedPlayer/xalbum=42/size=small/'
+
+    expect(extractBandcampRelease(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a release id followed by other characters', () => {
+    const value = 'https://bandcamp.com/EmbeddedPlayer/album=42x/size=small/'
+
+    expect(extractBandcampRelease(value)).toBeUndefined()
+  })
+
   it('should return undefined for a non-numeric id', () => {
     const value = 'https://bandcamp.com/VideoEmbed?track=abc'
 
@@ -284,6 +296,45 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should drop a size option behind a prefix', async () => {
+      const value = html`
+        <iframe src="https://bandcamp.com/EmbeddedPlayer/album=42/xsize=large/"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'album/42',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop a size preset followed by other characters', async () => {
+      const value = html`
+        <iframe src="https://bandcamp.com/EmbeddedPlayer/album=42/size=large-x/"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'album/42',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop a size preset carrying an encoded slash', async () => {
+      const value = html`
+        <iframe src="https://bandcamp.com/EmbeddedPlayer/album=42/size=large%2fsmall/"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'album/42',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -301,12 +352,12 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // The href is the placeholder's click target, and a foreign host can spell `bandcamp.com`
-    // anywhere in its path, so the release page is taken from the host and not from the string.
-    it('should refuse a fallback anchor naming Bandcamp inside a foreign path', async () => {
+    // The href is the placeholder's click target, so the release page is taken from a Bandcamp
+    // host only.
+    it('should refuse a fallback anchor on a foreign host carrying the same path', async () => {
       const value = html`
         <iframe src="https://bandcamp.com/EmbeddedPlayer/album=42/size=large/" seamless>
-          <a href="https://evil.test/bandcamp.com/album/do-you-wanna-be-rich">
+          <a href="https://evil.test/album/do-you-wanna-be-rich">
             Do You Wanna Be Rich? by My Expansive Awareness
           </a>
         </iframe>

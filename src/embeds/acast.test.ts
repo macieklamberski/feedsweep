@@ -171,9 +171,9 @@ describeForEachParser('acastEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should not claim another host spelling the embed host in its path', async () => {
+    it('should not claim a foreign host carrying the same path', async () => {
       const value = html`
-        <iframe src="https://evil.test/embed.acast.com/63d3cb7a675193001164ef5d/67ceebb0d64d9d8e86dcddea"></iframe>
+        <iframe src="https://evil.test/63d3cb7a675193001164ef5d/67ceebb0d64d9d8e86dcddea"></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()

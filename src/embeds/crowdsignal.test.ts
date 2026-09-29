@@ -46,6 +46,30 @@ describe('crowdsignalResolveEmbed', () => {
 
       expect(crowdsignalResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should drop the font size the snippet writes into the frame query', () => {
+      const value = 'https://poll.fm/15364010/embed?fontsize=medium'
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: '15364010',
+        src: 'https://poll.fm/15364010/embed',
+        url: 'https://poll.fm/15364010',
+      }
+
+      expect(crowdsignalResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop a tracker from the frame query', () => {
+      const value = 'https://poll.fm/17125374/embed?utm_source=twitter'
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: '17125374',
+        src: 'https://poll.fm/17125374/embed',
+        url: 'https://poll.fm/17125374',
+      }
+
+      expect(crowdsignalResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -137,6 +161,23 @@ describeForEachParser('crowdsignalScriptEmbedResolver', (parseHtml) => {
         id: '17342754',
         src: 'https://poll.fm/17342754/embed',
         url: 'https://poll.fm/17342754',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the loader on the www host', async () => {
+      const value = html`
+        <script
+          language="javascript"
+          src="http://www.polldaddy.com/p/63575.js"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: '63575',
+        src: 'https://poll.fm/63575/embed',
+        url: 'https://poll.fm/63575',
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
@@ -278,6 +279,66 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('the byline naming the author', () => {
+    it('should state no author when the only account link is the profile post itself', async () => {
+      const value = html`
+        <blockquote class="reddit-embed-bq">
+          <a href="https://www.reddit.com/user/photo_poster/comments/hj7k2p/a_long_exposure_test/">Everything in balance</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'user/photo_poster/comments/hj7k2p',
+        src: 'https://embed.reddit.com/user/photo_poster/comments/hj7k2p/',
+        url: 'https://www.reddit.com/user/photo_poster/comments/hj7k2p/',
+        title: 'Everything in balance',
+        publisher: 'u/photo_poster',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state no author when the byline links the profile root with no name', async () => {
+      const value = html`
+        <blockquote class="reddit-embed-bq">
+          <a href="https://www.reddit.com/r/pics/comments/dq4m1v/my_garden/">My dog</a>
+          by
+          <a href="https://www.reddit.com/user/">u/</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/pics/comments/dq4m1v',
+        src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
+        url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
+        title: 'My dog',
+        publisher: 'r/pics',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state no author when the byline names a deleted account', async () => {
+      const value = html`
+        <blockquote class="reddit-embed-bq">
+          <a href="https://www.reddit.com/r/pics/comments/dq4m1v/my_garden/">My dog</a>
+          by
+          <a href="https://www.reddit.com/user/%5Bdeleted%5D/">u/[deleted]</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/pics/comments/dq4m1v',
+        src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
+        url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
+        title: 'My dog',
+        publisher: 'r/pics',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   describe('sad paths', () => {
     it('should return undefined for a widget naming only an account', async () => {
       const value = html`
@@ -416,6 +477,30 @@ describe('redditResolveEmbed', () => {
     expect(redditResolveEmbed(value)).toBeUndefined()
   })
 
+  it('should ignore a permalink under a scope that is neither a subreddit nor an account', () => {
+    const value = 'https://www.reddit.com/x/pics/comments/dq4m1v/my_garden/'
+
+    expect(redditResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should ignore a subreddit route naming no subreddit', () => {
+    const value = 'https://www.reddit.com/r/'
+
+    expect(redditResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should ignore a subreddit name carrying an encoded separator', () => {
+    const value = 'https://www.reddit.com/r/pics%2F..%2Fadmin/comments/dq4m1v/my_garden/'
+
+    expect(redditResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should ignore a post id carrying an encoded separator after a valid id', () => {
+    const value = 'https://www.reddit.com/r/pics/comments/dq4m1v%2Fevil/my_garden/'
+
+    expect(redditResolveEmbed(value)).toBeUndefined()
+  })
+
   it('should ignore a comment id outside the base36 alphabet', () => {
     const value = 'https://www.reddit.com/r/pics/comments/dq4m1v/my_garden/..%2Fevil/'
 
@@ -516,11 +601,11 @@ describeForEachParser('redditS9eEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host naming the helper in its path', async () => {
+    it('should ignore a foreign host carrying the helper path', async () => {
       const value = html`
         <iframe
           data-s9e-mediaembed="reddit"
-          src="https://evil.test/s9e.github.io/iframe/2/reddit.min.html#UFOs/comments/1ud4vfe"
+          src="https://evil.test/iframe/2/reddit.min.html#UFOs/comments/1ud4vfe"
         ></iframe>
       `
 
@@ -537,6 +622,33 @@ describeForEachParser('redditS9eEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+// redditmedia.com is listed for its legacy player frame, and its g. subdomain serves the files
+// a post attaches.
+describeForEachParser('reddit through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a redditmedia image enclosure an image', async () => {
+    const enclosures = [
+      { url: 'https://g.redditmedia.com/f1cqmjhrnoshoediji58x/poster.jpg', type: 'image/jpeg' },
+    ]
+    const expected = html`
+      <img
+        data-enclosure=""
+        src="https://g.redditmedia.com/f1cqmjhrnoshoediji58x/poster.jpg"
+      >
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
 

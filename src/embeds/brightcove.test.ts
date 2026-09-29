@@ -81,6 +81,28 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a player off the federated path that names both ids', async () => {
+      const value = html`
+        <embed
+          src="http://admin.brightcove.com/viewer/us1/BrightcoveBootloader.swf?publisherID=1660622131"
+          flashVars="@videoPlayer=19521637001&playerID=19517958001&domain=embed&"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the federated path', async () => {
+      const value = html`
+        <embed
+          src="https://evil.test/services/viewer/federated_f9/19517958001?isVid=1&publisherID=1660622131"
+          flashVars="@videoPlayer=19521637001&playerID=19517958001&domain=embed&"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     // The legacy hosted player page. It is alive and it names its player, but nothing in the
     // url names the account, so there is nothing to mint and the generic placeholder keeps it.
     it('should ignore the hosted link player', async () => {
@@ -252,6 +274,13 @@ describe('brightcoveResolveEmbed', () => {
 
     it('should return undefined when the url names no video', () => {
       const value = 'https://players.brightcove.net/1234567890/default_default/index.html'
+
+      expect(brightcoveResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined when the account segment is not a number', () => {
+      const value =
+        'https://players.brightcove.net/acme/default_default/index.html?videoId=6098765432'
 
       expect(brightcoveResolveEmbed(value)).toBeUndefined()
     })
@@ -486,6 +515,28 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
         <video-js
           data-account="1234567890"
           data-video-id="my-clip"
+        ></video-js>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a reference id that ends in digits', async () => {
+      const value = html`
+        <video-js
+          data-account="1234567890"
+          data-video-id="ref:6098765432"
+        ></video-js>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a video id carrying a query', async () => {
+      const value = html`
+        <video-js
+          data-account="1234567890"
+          data-video-id="6098765432&autoplay=true"
         ></video-js>
       `
 

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
@@ -107,6 +108,17 @@ describeForEachParser('flourishWidgetEmbedResolver', (parseHtml) => {
         <div
           class="flourish-embed"
           data-src="visualisation/../evil"
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a data-src followed by a trailing segment', async () => {
+      const value = html`
+        <div
+          class="flourish-embed"
+          data-src="visualisation/29541520/extra"
         ></div>
       `
 
@@ -239,12 +251,20 @@ describeForEachParser('flourishIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    // The host substring sits in a foreign host's path, so the selector matches and the host
-    // check is what refuses it.
-    it('should return undefined for a lookalike host carrying the path', async () => {
-      const value = html`
-        <iframe src="https://evil.test/flo.uri.sh/visualisation/29132382/embed"></iframe>
-      `
+    it('should return undefined for a foreign host carrying the path', async () => {
+      const value = '<iframe src="https://evil.test/visualisation/29132382/embed"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a kind opening with a query separator', async () => {
+      const value = '<iframe src="https://flo.uri.sh/=visualisation/29132382/embed"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a kind closing with a query separator', async () => {
+      const value = '<iframe src="https://flo.uri.sh/visualisation=x/29132382/embed"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -306,9 +326,45 @@ describe('readFlourishHeight', () => {
     expect(readFlourishHeight(value)).toBeUndefined()
   })
 
+  it('should ignore a message that is not a string', () => {
+    const value = [JSON.stringify({ sender: 'Flourish', context: 'iframe.resize', height: 400 })]
+
+    expect(readFlourishHeight(value)).toBeUndefined()
+  })
+
   it('should ignore a payload that never parses as an object', () => {
     expect(readFlourishHeight({ sender: 'Flourish', height: 400 })).toBeUndefined()
     expect(readFlourishHeight('iframe.resize')).toBeUndefined()
+  })
+})
+
+// Only the pipeline shows what the host's enclosures become, since injectEnclosures offers each
+// one to every url-keyed resolver.
+describeForEachParser('flourish enclosures', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a chart thumbnail an image', async () => {
+    const enclosures = [
+      {
+        url: 'https://public.flourish.studio/visualisation/29541520/thumbnail',
+        type: 'image/jpeg',
+      },
+    ]
+    const expected = html`
+      <img
+        src="https://public.flourish.studio/visualisation/29541520/thumbnail"
+        data-enclosure=""
+      />
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
 

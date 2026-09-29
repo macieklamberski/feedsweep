@@ -122,6 +122,12 @@ describeForEachParser('spreakerIframeEmbedResolver', (parseHtml) => {
 
     expect(await extract(value)).toEqual(expected)
   })
+
+  it('should ignore a foreign host carrying the player path', async () => {
+    const value = '<iframe src="https://evil.test/player?episode_id=52842990"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
 })
 
 describeForEachParser('spreakerAnchorEmbedResolver', (parseHtml) => {

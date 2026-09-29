@@ -135,6 +135,167 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read the display name out of a byline led by an en dash', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p lang="en" dir="ltr">Tweet text here.</p>
+          <p>
+            &ndash; Display Name (@user)
+            <a href="https://twitter.com/user/status/123456789012345">May 12, 2020</a>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+        url: statusUrl,
+        description: 'Tweet text here.',
+        author: 'Display Name',
+        date: 'May 12, 2020',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the display name out of a byline led by a hyphen', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p lang="en" dir="ltr">Tweet text here.</p>
+          <p>
+            - Display Name (@user)
+            <a href="https://twitter.com/user/status/123456789012345">May 12, 2020</a>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+        url: statusUrl,
+        description: 'Tweet text here.',
+        author: 'Display Name',
+        date: 'May 12, 2020',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the byline as written when text leads the dash', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p lang="en" dir="ltr">Tweet text here.</p>
+          <p>
+            Posted &mdash; Display Name (@user)
+            <a href="https://twitter.com/user/status/123456789012345">May 12, 2020</a>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+        url: statusUrl,
+        description: 'Tweet text here.',
+        author: 'Posted — Display Name (@user)',
+        date: 'May 12, 2020',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the byline as written when text follows the handle', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p lang="en" dir="ltr">Tweet text here.</p>
+          <p>
+            &mdash; Display Name (@user) via web
+            <a href="https://twitter.com/user/status/123456789012345">May 12, 2020</a>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+        url: statusUrl,
+        description: 'Tweet text here.',
+        author: '— Display Name (@user) via web',
+        date: 'May 12, 2020',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a status and a byline whose handle holds capitals', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p lang="en" dir="ltr">Tweet text here.</p>
+          <p>
+            &mdash; Display Name (@AarikaRhodes)
+            <a href="https://twitter.com/AarikaRhodes/status/1468647038925500418">May 12, 2020</a>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: '1468647038925500418',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=1468647038925500418',
+        url: 'https://x.com/AarikaRhodes/status/1468647038925500418',
+        description: 'Tweet text here.',
+        author: 'Display Name',
+        date: 'May 12, 2020',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a status and a byline whose handle holds digits', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p lang="en" dir="ltr">Tweet text here.</p>
+          <p>
+            &mdash; Display Name (@a01744)
+            <a href="https://twitter.com/a01744/status/1458434502930358280">May 12, 2020</a>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: '1458434502930358280',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=1458434502930358280',
+        url: 'https://x.com/a01744/status/1458434502930358280',
+        description: 'Tweet text here.',
+        author: 'Display Name',
+        date: 'May 12, 2020',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a status and a byline whose handle holds an underscore', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p lang="en" dir="ltr">Tweet text here.</p>
+          <p>
+            &mdash; Display Name (@a_cowley)
+            <a href="https://twitter.com/a_cowley/status/677212533854466048">May 12, 2020</a>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: '677212533854466048',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=677212533854466048',
+        url: 'https://x.com/a_cowley/status/677212533854466048',
+        description: 'Tweet text here.',
+        author: 'Display Name',
+        date: 'May 12, 2020',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -149,6 +310,17 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         <blockquote class="twitter-tweet">
           <p>Text.</p>
           <a href="https://twitter.com.evil.test/user/status/${statusId}">Date</a>
+        </blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a status path nested under another directory', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p>Text.</p>
+          <a href="https://twitter.com/x/user/status/${statusId}">Date</a>
         </blockquote>
       `
 
@@ -260,6 +432,23 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           id: statusId,
           src: playerUrl,
           url: statusUrl,
+        }
+
+        expect(await extract(value)).toEqual(expected)
+      })
+
+      it('should carry the id when the attribute is all the skeleton holds', async () => {
+        const value = html`
+          <blockquote
+            class="rm-embed twitter-tweet"
+            data-partner="rebelmouse"
+            data-twitter-tweet-id="2072040167112638956"
+          ></blockquote>
+        `
+        const expected: EmbedResolverResult = {
+          provider: 'twitter',
+          id: '2072040167112638956',
+          src: 'https://platform.twitter.com/embed/Tweet.html?id=2072040167112638956',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -1279,7 +1468,7 @@ describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
       const value = html`
         <iframe
           data-s9e-mediaembed="twitter"
-          src="https://evil.test/s9e.github.io/iframe/2/twitter.min.html#1022299781106819073"
+          src="https://evil.test/iframe/2/twitter.min.html#1022299781106819073"
         ></iframe>
       `
 

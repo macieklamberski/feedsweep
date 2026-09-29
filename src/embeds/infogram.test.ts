@@ -268,6 +268,17 @@ describeForEachParser('infogramScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a script id that reaches the loader shape only after a prefix', async () => {
+      const value = html`
+        <script
+          id="infogram_x_infogram_0_ff7b6712-fc9f-408c-be33-88bc114f32ab"
+          src="https://e.infogram.com/js/dist/embed.js"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a chart id carrying a slash outside the editor prefix', async () => {
       const value = html`
         <script

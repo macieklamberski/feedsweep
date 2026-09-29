@@ -56,6 +56,19 @@ describe('codesandboxResolveEmbed', () => {
       expect(codesandboxResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should build the placeholder from an embed url on the www host', () => {
+      const value = 'https://www.codesandbox.io/embed/83wzkj'
+      const expected: EmbedResolverResult = {
+        provider: 'codesandbox',
+        id: '83wzkj',
+        src: 'https://www.codesandbox.io/embed/83wzkj',
+        url: 'https://codesandbox.io/s/83wzkj',
+        height: 500,
+      }
+
+      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should keep the query that chooses the pane and the file', () => {
       const value =
         'https://codesandbox.io/embed/column-layout-3ihtm?fontsize=14&hidenavigation=1&theme=light'
@@ -81,7 +94,13 @@ describe('codesandboxResolveEmbed', () => {
     })
 
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/codesandbox.io/embed/83wzkj'
+      const value = 'https://evil.test/embed/83wzkj'
+
+      expect(codesandboxResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a subdomain even when the path names a sandbox', () => {
+      const value = 'https://sse.codesandbox.io/embed/83wzkj'
 
       expect(codesandboxResolveEmbed(value)).toBeUndefined()
     })
@@ -268,7 +287,7 @@ describeForEachParser('codesandboxIframeEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/codesandbox.io/embed/83wzkj"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/83wzkj"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -380,5 +399,24 @@ describe('readCodesandboxHeight', () => {
     expect(readCodesandboxHeight({ context: 'iframe.resize', height: 0 })).toBeUndefined()
     expect(readCodesandboxHeight({ context: 'iframe.ready', height: 500 })).toBeUndefined()
     expect(readCodesandboxHeight('iframe.resize')).toBeUndefined()
+  })
+})
+
+describeForEachParser('codesandbox through the pipeline', (parseHtml) => {
+  it('should leave a video enclosure on the codesandbox host playable', async () => {
+    const enclosures = [{ url: 'https://codesandbox.io/embed/demo-clip.mp4', type: 'video/mp4' }]
+
+    const expected = html`
+      <video data-enclosure="" controls src="https://codesandbox.io/embed/demo-clip.mp4"></video>
+      <p>Body</p>
+    `
+
+    expect(
+      await transformContent('<p>Body</p>', {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://example.com/post',
+        enclosures,
+      }),
+    ).toEqualHtml(expected)
   })
 })

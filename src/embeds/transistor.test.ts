@@ -9,20 +9,20 @@ import {
 
 describe('extractTransistorEmbed', () => {
   it('should read an episode embed', () => {
-    const value = 'https://share.transistor.fm/e/a1b2c3d4'
+    const value = 'https://share.transistor.fm/e/c3be87f9'
     const expected = {
       kind: 'e',
-      id: 'a1b2c3d4',
+      id: 'c3be87f9',
     } as const
 
     expect(extractTransistorEmbed(value)).toEqual(expected)
   })
 
   it('should read an episode embed carrying display options', () => {
-    const value = 'https://share.transistor.fm/e/a1b2c3d4/dark'
+    const value = 'https://share.transistor.fm/e/c3be87f9/dark'
     const expected = {
       kind: 'e',
-      id: 'a1b2c3d4',
+      id: 'c3be87f9',
     } as const
 
     expect(extractTransistorEmbed(value)).toEqual(expected)
@@ -51,10 +51,10 @@ describe('extractTransistorEmbed', () => {
 
   // The share page and the player take the same id, so the share url reads as the episode.
   it('should read an episode from its share page url', () => {
-    const value = 'https://share.transistor.fm/s/9f8e7d6c'
+    const value = 'https://share.transistor.fm/s/668ca5be'
     const expected = {
       kind: 'e',
-      id: '9f8e7d6c',
+      id: '668ca5be',
     } as const
 
     expect(extractTransistorEmbed(value)).toEqual(expected)
@@ -64,10 +64,10 @@ describe('extractTransistorEmbed', () => {
   // url above uses the same id, so it is the control: the sidecar is refused and the episode
   // it sits beside still reads.
   const transcriptSidecarUrls: Array<string> = [
-    'https://share.transistor.fm/s/9f8e7d6c/8a7b6c5d.vtt',
-    'https://share.transistor.fm/s/9f8e7d6c/8a7b6c5d.srt',
-    'https://share.transistor.fm/s/9f8e7d6c/8a7b6c5d.txt',
-    'https://share.transistor.fm/s/9f8e7d6c/8a7b6c5d.json',
+    'https://share.transistor.fm/s/668ca5be/8a7b6c5d.vtt',
+    'https://share.transistor.fm/s/668ca5be/8a7b6c5d.srt',
+    'https://share.transistor.fm/s/668ca5be/8a7b6c5d.txt',
+    'https://share.transistor.fm/s/668ca5be/8a7b6c5d.json',
   ]
 
   it.each(transcriptSidecarUrls)(
@@ -123,12 +123,36 @@ describe('extractTransistorEmbed', () => {
   // With no length left on either id, the alphabet is the whole guard, and excluding the dot is
   // what keeps a file on the host from reading as an episode.
   const fileUrls: Array<string> = [
-    'https://share.transistor.fm/e/9f8e7d6c.mp3',
-    'https://share.transistor.fm/s/9f8e7d6c.mp3',
+    'https://share.transistor.fm/e/668ca5be.mp3',
+    'https://share.transistor.fm/s/668ca5be.mp3',
     'https://share.transistor.fm/e/build-your-saas.mp3/latest',
   ]
 
   it.each(fileUrls)('should return undefined for a file on the host at %s', (value) => {
+    expect(extractTransistorEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for an episode id carrying an encoded slash', () => {
+    const value = 'https://share.transistor.fm/e/c3be87f9%2Fx'
+
+    expect(extractTransistorEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a show slug led by an encoded slash', () => {
+    const value = 'https://share.transistor.fm/e/%2Fbuild-your-saas/latest'
+
+    expect(extractTransistorEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a show slug carrying an encoded slash', () => {
+    const value = 'https://share.transistor.fm/e/build-your-saas%2Fx/latest'
+
+    expect(extractTransistorEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for the player route with no id behind it', () => {
+    const value = 'https://share.transistor.fm/e'
+
     expect(extractTransistorEmbed(value)).toBeUndefined()
   })
 
@@ -149,12 +173,12 @@ describe('transistorResolveEmbed', () => {
   // The player cannot be opened as a page, so the share page the same id addresses is what the
   // placeholder clicks through to.
   it('should mint the share page from a player url that names no page', () => {
-    const value = 'https://share.transistor.fm/e/a1b2c3d4'
+    const value = 'https://share.transistor.fm/e/c3be87f9'
     const expected: EmbedResolverResult = {
       provider: 'transistor',
-      id: 'episode/a1b2c3d4',
-      src: 'https://share.transistor.fm/e/a1b2c3d4',
-      url: 'https://share.transistor.fm/s/a1b2c3d4',
+      id: 'episode/c3be87f9',
+      src: 'https://share.transistor.fm/e/c3be87f9',
+      url: 'https://share.transistor.fm/s/c3be87f9',
       height: 180,
     }
 
@@ -163,12 +187,12 @@ describe('transistorResolveEmbed', () => {
 
   // 180 across 49 of 49 sampled corpus iframes, and their oEmbed agrees.
   it('should size an episode at the fixed height', () => {
-    const value = 'https://share.transistor.fm/e/a1b2c3d4/dark'
+    const value = 'https://share.transistor.fm/e/c3be87f9/dark'
     const expected: EmbedResolverResult = {
       provider: 'transistor',
-      id: 'episode/a1b2c3d4',
-      src: 'https://share.transistor.fm/e/a1b2c3d4',
-      url: 'https://share.transistor.fm/s/a1b2c3d4',
+      id: 'episode/c3be87f9',
+      src: 'https://share.transistor.fm/e/c3be87f9',
+      url: 'https://share.transistor.fm/s/c3be87f9',
       height: 180,
     }
 
@@ -178,12 +202,12 @@ describe('transistorResolveEmbed', () => {
   // The share page refuses framing, so the mint has to be the `/e/` player it fronts, which
   // takes the same id, and the share page stays as the url.
   it('should mint the episode player from a share page url', () => {
-    const value = 'https://share.transistor.fm/s/9f8e7d6c'
+    const value = 'https://share.transistor.fm/s/668ca5be'
     const expected: EmbedResolverResult = {
       provider: 'transistor',
-      id: 'episode/9f8e7d6c',
-      src: 'https://share.transistor.fm/e/9f8e7d6c',
-      url: 'https://share.transistor.fm/s/9f8e7d6c',
+      id: 'episode/668ca5be',
+      src: 'https://share.transistor.fm/e/668ca5be',
+      url: 'https://share.transistor.fm/s/668ca5be',
       height: 180,
     }
 
@@ -225,7 +249,7 @@ describe('transistorResolveEmbed', () => {
   // `injectEnclosures` offers every enclosure to every url resolver, so a transcript listed as
   // one reached this and came back as the show player.
   it('should return undefined for a transcript listed as an enclosure', () => {
-    const value = 'https://share.transistor.fm/s/9f8e7d6c/8a7b6c5d.vtt'
+    const value = 'https://share.transistor.fm/s/668ca5be/8a7b6c5d.vtt'
 
     expect(transistorResolveEmbed(value)).toBeUndefined()
   })
@@ -238,16 +262,16 @@ describeForEachParser('transistorEmbedResolver', (parseHtml) => {
     it('should state the episode height for a carrier declaring none', async () => {
       const value = html`
         <iframe
-          src="https://share.transistor.fm/e/a1b2c3d4"
+          src="https://share.transistor.fm/e/c3be87f9"
           frameborder="no"
           scrolling="no"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'transistor',
-        id: 'episode/a1b2c3d4',
-        src: 'https://share.transistor.fm/e/a1b2c3d4',
-        url: 'https://share.transistor.fm/s/a1b2c3d4',
+        id: 'episode/c3be87f9',
+        src: 'https://share.transistor.fm/e/c3be87f9',
+        url: 'https://share.transistor.fm/s/c3be87f9',
         height: 180,
       }
 
@@ -278,7 +302,7 @@ describeForEachParser('transistorEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the player path', async () => {
-      const value = '<iframe src="https://evil.test/e/a1b2c3d4"></iframe>'
+      const value = '<iframe src="https://evil.test/e/c3be87f9"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

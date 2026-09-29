@@ -146,6 +146,42 @@ describe('vimeoResolveEmbed', () => {
     expect(vimeoResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should drop a query hash led by a character outside the hash', () => {
+    const value = 'https://player.vimeo.com/video/76979871?h=xa52724358e'
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '76979871',
+      src: 'https://player.vimeo.com/video/76979871',
+      url: 'https://vimeo.com/76979871',
+    }
+
+    expect(vimeoResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should drop a query hash followed by a character outside the hash', () => {
+    const value = 'https://player.vimeo.com/video/76979871?h=a52724358ex'
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '76979871',
+      src: 'https://player.vimeo.com/video/76979871',
+      url: 'https://vimeo.com/76979871',
+    }
+
+    expect(vimeoResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should drop a query hash carrying an encoded slash', () => {
+    const value = 'https://player.vimeo.com/video/76979871?h=a52724358%2F'
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '76979871',
+      src: 'https://player.vimeo.com/video/76979871',
+      url: 'https://vimeo.com/76979871',
+    }
+
+    expect(vimeoResolveEmbed(value)).toEqual(expected)
+  })
+
   // The share link states it as a path segment, which the player refuses: it takes the hash
   // only as a query parameter.
   it('should move an unlisted hash stated in the path into the query', () => {
@@ -312,6 +348,12 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should ignore a foreign host carrying the player path', async () => {
+    const value = '<iframe src="https://evil.test/video/76979871"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
   })
 
   it('should ignore a non-vimeo iframe', async () => {

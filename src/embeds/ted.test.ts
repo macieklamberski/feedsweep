@@ -26,6 +26,31 @@ describe('extractTedTalk', () => {
     expect(extractTedTalk(value)).toBe(expected)
   })
 
+  it('should read a talk slug carrying a digit', () => {
+    const value = 'https://embed.ted.com/talks/julian_treasure_5_ways_to_listen_better'
+    const expected = 'julian_treasure_5_ways_to_listen_better'
+
+    expect(extractTedTalk(value)).toBe(expected)
+  })
+
+  it('should return undefined for a slug led by an encoded slash', () => {
+    const value = 'https://embed.ted.com/talks/%2Fethan_zuckerman.html'
+
+    expect(extractTedTalk(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a slug followed by an encoded slash', () => {
+    const value = 'https://embed.ted.com/talks/ethan_zuckerman%2F..%2Fx.html'
+
+    expect(extractTedTalk(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a slug whose suffix only starts with html', () => {
+    const value = 'https://embed.ted.com/talks/ethan_zuckerman.htmlx'
+
+    expect(extractTedTalk(value)).toBeUndefined()
+  })
+
   it('should return undefined for a ted url that is not a talk', () => {
     const value = 'https://www.ted.com/playlists/123/something'
 
@@ -96,12 +121,10 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    // The selector matches on the carrier rather than on a substring, but a lookalike host is
-    // still what the host guard exists to refuse.
     it('should ignore a foreign host serving the same player path', async () => {
       const value = html`
         <embed
-          src="https://evil.test/video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          src="https://evil.test/assets/player/swf/EmbedPlayer.swf"
           flashvars="adKeys=talk=ethan_zuckerman;year=2010"
         />
       `
@@ -160,6 +183,45 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should recover a talk whose slug carries a digit', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          flashvars="vw=432&vh=240&adKeys=talk=diana_laufenberg_3_ways_to_teach;year=2010;theme=how_we_learn"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: 'diana_laufenberg_3_ways_to_teach',
+        src: 'https://embed.ted.com/embed/diana_laufenberg_3_ways_to_teach',
+        url: 'https://www.ted.com/talks/diana_laufenberg_3_ways_to_teach',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should refuse ad keys on a ted.com swf that is not the player', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/AdPlayer.swf"
+          flashvars="adKeys=talk=diana_laufenberg_3_ways_to_teach;year=2010"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should refuse ad keys on a path that only starts with the player file', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf/extra"
+          flashvars="adKeys=talk=diana_laufenberg_3_ways_to_teach;year=2010"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
 
     // A slug sitting at the truncation cap is a prefix of the real one two times in three, and

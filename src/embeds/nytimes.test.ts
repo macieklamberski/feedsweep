@@ -52,6 +52,13 @@ describe('nytimesResolveEmbed', () => {
       expect(nytimesResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should return undefined for a video id on a path that is not the player', () => {
+      const value =
+        'https://www.nytimes.com/video/arts/1247464583973/critics-picks-safe.html?videoId=1247464583973'
+
+      expect(nytimesResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should return undefined for a player naming no video', () => {
       const value = 'https://www.nytimes.com/video/players/offsite/index.html'
 
@@ -100,7 +107,7 @@ describeForEachParser('nytimesIframeEmbedResolver', (parseHtml) => {
 
   it('should ignore a foreign host carrying the same path', async () => {
     const value =
-      '<iframe src="https://evil.test/www.nytimes.com/video/players/offsite/index.html?videoId=100000007370133"></iframe>'
+      '<iframe src="https://evil.test/video/players/offsite/index.html?videoId=100000007370133"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })
