@@ -126,7 +126,7 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
     })
   })
 
-  describe('the share attribution the sharesheet stamps on the snippet', () => {
+  describe('the tracking a shared snippet carries in its query', () => {
     it('should drop sharesheet and attribution_id', async () => {
       const value = html`
         <div
@@ -145,6 +145,19 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
         <div
           class="gfm-embed"
           data-url="https://www.gofundme.com/f/save-the-hall/widget/medium?lang=en&sharesheet=campaign_nav"
+        ></div>
+      `
+      const expected =
+        '<iframe src="https://www.gofundme.com/f/save-the-hall/widget/medium?lang=en"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should drop the campaign tags a share link picks up', async () => {
+      const value = html`
+        <div
+          class="gfm-embed"
+          data-url="https://www.gofundme.com/f/save-the-hall/widget/medium?utm_source=widget&lang=en&UTM_Medium=referral&fbclid=IwAR0abc"
         ></div>
       `
       const expected =
