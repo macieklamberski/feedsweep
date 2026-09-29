@@ -141,6 +141,24 @@ describeForEachParser('tumblrCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should fall back to the anchor when payload fields are not strings', async () => {
+      const value = html`
+        <p
+          class="npf_link"
+          data-npf='{"type":"link","url":42,"display_url":{},"title":["Page title"],"poster":{"url":"https://example.com/cover.jpg"}}'
+        >
+          <a href="https://example.com/post">Anchor title</a>
+        </p>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'tumblr',
+        url: 'https://example.com/post',
+        title: 'Anchor title',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
