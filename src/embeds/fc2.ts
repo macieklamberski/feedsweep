@@ -22,9 +22,9 @@ const contentPageRegex = /^\/(?:([A-Za-z]{2})\/)?content\/([^/]+)\/?$/
 const embedPlayerRegex = /^\/+embed\/player\/([^/]+)\/?$/i
 const flashPlayerRegex = /^\/flv2\.swf$/
 
-// The languages the content page links as its alternates. It answers any other two letters with
-// the Japanese page.
-const servedLocales = ['cn', 'de', 'en', 'es', 'fr', 'id', 'ja', 'ko', 'pt', 'ru', 'tw', 'vi']
+// A shape, not a list: FC2 answers a language it does not serve with the Japanese page, so any two
+// letters still open the video.
+const localeRegex = /^[A-Za-z]{2}$/
 
 // The player reads `tg`, the embedding account's tag, and `sg=0`, which hides the suggestions
 // on its end screen.
@@ -86,8 +86,7 @@ const fc2FlashResolveEmbed: ResolveEmbed = (url) => {
   // The Flash player names the same account tag `tk` as the loader does.
   const params = trimObject({ tg: parsed.searchParams.get('tk') }, Boolean)
   const duration = Number(parsed.searchParams.get('d'))
-  const lang = parsed.searchParams.get('lang') ?? ''
-  const locale = servedLocales.includes(lang) ? lang : undefined
+  const locale = keepIfMatches(parsed.searchParams.get('lang'), localeRegex)
 
   return {
     ...composeEmbed({ contentId, locale }, params),

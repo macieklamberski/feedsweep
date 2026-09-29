@@ -631,8 +631,6 @@ describeForEachParser('fc2IframeEmbedResolver', (parseHtml) => {
   })
 })
 
-const servedLocales = ['cn', 'de', 'en', 'es', 'fr', 'id', 'ja', 'ko', 'pt', 'ru', 'tw', 'vi']
-
 describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, fc2FlashEmbedResolver)
 
@@ -690,18 +688,6 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
         height: 284,
         title: 'ガキの使いじゃあらへんで 　大晦日SP―②',
         duration: 5774,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it.each(servedLocales)('should keep the %s language in the page url', async (locale) => {
-      const value = `<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=${locale}" />`
-      const expected: EmbedResolverResult = {
-        provider: 'fc2',
-        id: '20120101QN5FVkv4',
-        src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
-        url: `https://video.fc2.com/${locale}/content/20120101QN5FVkv4/`,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -767,25 +753,25 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should leave out a language the content page does not serve', async () => {
+    it('should keep a language the content page does not link', async () => {
       const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=zh" />'
       const expected: EmbedResolverResult = {
         provider: 'fc2',
         id: '20120101QN5FVkv4',
         src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
-        url: 'https://video.fc2.com/content/20120101QN5FVkv4/',
+        url: 'https://video.fc2.com/zh/content/20120101QN5FVkv4/',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should leave out a served language in another case', async () => {
+    it('should keep a language in uppercase', async () => {
       const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=JA" />'
       const expected: EmbedResolverResult = {
         provider: 'fc2',
         id: '20120101QN5FVkv4',
         src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
-        url: 'https://video.fc2.com/content/20120101QN5FVkv4/',
+        url: 'https://video.fc2.com/JA/content/20120101QN5FVkv4/',
       }
 
       expect(await extract(value)).toEqual(expected)
