@@ -12,10 +12,11 @@ const flashPlayerPathRegex = /^\/apps\/slideshow\//i
 const flashVideoPathRegex = /^\/apps\/video\/stewart\.swf$/i
 const legacyPlayerPathRegex = /^\/slideshow\/index\.gne$/i
 
-const setPathRegex = /^\/photos\/([\w.@-]+)\/sets\/(\d+)/
+const setPathRegex = /^\/photos\/([\w.@-]+)\/(?:sets|albums)\/(\d+)/
 const streamPathRegex = /^\/photos\/([\w@-]+)\/show\/?$/
 const groupPathRegex = /^\/groups\/(\d+@N\d\d)\/pool\/show\/?$/
-const photoPathRegex = /^\/photos\/([\w@-]+)\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
+// An owner of `_` names nobody: the player ignores it, and `/photos/_/{photoId}/` answers 404.
+const photoPathRegex = /^\/photos\/(?:_|([\w@-]+))\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
 const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/
 
 // An owner is a numeric NSID with its `@N0…` suffix, or the path alias the owner chose. Flickr
@@ -196,8 +197,8 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   const author = readOwnerAlias(owner)
 
   if (subject.setId && digitsRegex.test(subject.setId)) {
-    // The album page path starts with the owner, and `/sets/{id}` is kept as the markup spells
-    // it: the path is still served and does not redirect to `/albums/` (both 200, 2026-08-14).
+    // The album page path starts with the owner. `/sets/{id}` is still served and does not
+    // redirect to `/albums/`, while the `/albums/` player redirects to `/sets/` (2026-09-29).
     return owner
       ? {
           provider: 'flickr',
