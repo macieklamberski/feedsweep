@@ -510,7 +510,7 @@ export const updateCitePlaceholder = (
 
 export const createCitePlaceholder = (
   document: Document,
-  result: CiteResolverResult,
+  result: Partial<CiteResolverResult>,
 ): HTMLElement => {
   return createPlaceholder(document, 'cite', normalizeCiteFields(result))
 }
