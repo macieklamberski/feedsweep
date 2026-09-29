@@ -1,12 +1,10 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { pickUrlParams } from '../utils/urls.js'
+import { digitsRegex, pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'strava'
-
-const safeEmbedIdRegex = /^\d+$/
 
 // The page each player kind embeds, and the player's ratio at its narrowest width, where the
 // fixed chrome makes it tallest.
@@ -30,7 +28,7 @@ const composeEmbed = (
   query = '',
 ): EmbedResolverResult | undefined => {
   const embedKind = embedKinds.get(kind ?? '')
-  const embedId = keepIfMatches(id, safeEmbedIdRegex)
+  const embedId = keepIfMatches(id, digitsRegex)
 
   if (!embedKind || !embedId) {
     return
