@@ -83,6 +83,15 @@ describeForEachParser('fixConcatenatedUrls', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should leave a file name with a path after a doubled slash alone', async () => {
+      const value = html`
+        <a href="https://example.com//index.php/component/k2/item/12">Read</a>
+        <a href="https://example.com//default.aspx/x">Read</a>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should leave a bare host with no path of its own alone', async () => {
       const value = '<a href="https://example.com//www.youtube.com">Watch</a>'
 

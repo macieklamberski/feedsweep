@@ -4,10 +4,11 @@ import type { DomTransform } from '../../types.js'
 const urlAttributes = ['src', 'href', 'data', 'poster']
 const selector = urlAttributes.map((name) => `[${name}]`).join(', ')
 
-// A protocol-relative url concatenated onto the site origin, so the path opens with the doubled
-// slash, the host the author wrote and a path of its own. The spelling varies from two slashes
-// to three.
-const concatenatedPathRegex = /^\/{2,}([a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,})(\/.*)$/i
+// A protocol-relative url concatenated onto the site origin, so the path opens with two or three
+// slashes, the host the author wrote and a path of its own. A doubled slash before a file such as
+// index.php reads as a host too, so a file extension is refused as a top-level domain.
+const concatenatedPathRegex =
+  /^\/{2,}([a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?!(?:php|html?|aspx?|jsp|cgi)\/)[a-z]{2,})(\/.*)$/i
 
 // An iframe src carrying the site origin concatenated onto a protocol-relative url loads the
 // publisher's own home page at 200, so nothing downstream can tell it is wrong.
