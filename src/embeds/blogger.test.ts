@@ -69,12 +69,23 @@ describe('bloggerResolveEmbed', () => {
       expect(bloggerResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should mint the canonical player url from the draft host', () => {
+    it('should keep a draft-host player url as written', () => {
       const value = `https://draft.blogger.com/video.g?token=${token}`
       const expected: EmbedResolverResult = {
         provider: 'blogger',
         id: token,
-        src: `https://www.blogger.com/video.g?token=${token}`,
+        src: value,
+      }
+
+      expect(bloggerResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the origin the player url names', () => {
+      const value = `https://www.blogger.com/video.g?token=${token}&origin=thecoffeepotbookclub.blogspot.com`
+      const expected: EmbedResolverResult = {
+        provider: 'blogger',
+        id: token,
+        src: value,
       }
 
       expect(bloggerResolveEmbed(value)).toEqual(expected)

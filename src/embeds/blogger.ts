@@ -35,7 +35,7 @@ export const bloggerResolveEmbed: ResolveEmbed = (url, element) => {
   return {
     provider,
     id: token,
-    src: `https://www.blogger.com/video.g?token=${token}`,
+    src: url,
     title: attr(element, 'title'),
   }
 }
