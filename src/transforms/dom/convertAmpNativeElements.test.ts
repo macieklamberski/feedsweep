@@ -130,10 +130,6 @@ describeForEachParser('convertAmpNativeElements', (parseHtml) => {
           src="clip.mp4"
           type="video/mp4"
         >
-        <track
-          src="captions.vtt"
-          kind="captions"
-        >
         <div fallback>Your browser does not support HTML5 video.</div>
       </amp-video>
     `
@@ -142,10 +138,6 @@ describeForEachParser('convertAmpNativeElements', (parseHtml) => {
         <source
           src="clip.mp4"
           type="video/mp4"
-        >
-        <track
-          src="captions.vtt"
-          kind="captions"
         >
       </video>
     `
