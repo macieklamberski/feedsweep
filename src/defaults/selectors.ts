@@ -173,6 +173,9 @@ export const defaultNonContentSelectors = [
   // widget's own fallback and is also pasted on its own without the wrapper.
   '[id^="goodreadsGiveawayWidget"]',
   '.goodreadsGiveawayWidget',
+  // The card's "Enter Giveaway" button, which publishers also paste on its own beside the cover
+  // and title they copied out of the card.
+  'a.goodreadsGiveawayWidgetEnterLink[href*="goodreads.com/giveaway/"]',
 
   // Ticketing and payment widgets, which are chrome around a transaction rather than anything
   // the item is about.
