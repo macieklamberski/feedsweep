@@ -4,6 +4,7 @@ import { parseHTML } from 'linkedom'
 import type { MaybePromise } from 'trousse'
 import {
   defaultAvatarImageHosts,
+  defaultCleanedSrcProviders,
   defaultDeferredIframeSources,
   defaultEmojiResolvers,
   defaultFieldCleaners,
@@ -37,6 +38,7 @@ export const baseContext: TransformContext = {
   nonContentSelectors: defaultNonContentSelectors,
   preservedPreClasses: defaultPreservedPreClasses,
   fieldCleaners: defaultFieldCleaners,
+  cleanedSrcProviders: defaultCleanedSrcProviders,
   lazySrcAttributes: defaultLazySrcAttributes,
   lazySrcsetAttributes: defaultLazySrcsetAttributes,
   lazyIframeAttributes: defaultLazyIframeAttributes,

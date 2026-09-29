@@ -223,6 +223,7 @@ export type TransformContext = {
   nonContentSelectors: Array<string>
   preservedPreClasses: Array<string>
   fieldCleaners: Array<FieldCleaner>
+  cleanedSrcProviders: Array<string>
   resolveUrlFn: ResolveUrlFn
   cleanUrlFn?: CleanUrlFn
   assetProxyFn?: AssetProxyFn
