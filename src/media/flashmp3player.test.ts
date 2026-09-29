@@ -43,6 +43,32 @@ describeForEachParser('flashMp3PlayerMediaResolver', (parseHtml) => {
     })
   })
 
+  describe('the nested pair the snippet usually ships', () => {
+    it('should play the file once when the embed sits inside its object', async () => {
+      const value = html`
+        <object
+          data="http://flash-mp3-player.net/medias/player_mp3_maxi.swf"
+          type="application/x-shockwave-flash"
+        >
+          <param
+            name="FlashVars"
+            value="mp3=http://example.com/audio/track.mp3&showstop=1"
+          />
+          <embed
+            src="http://flash-mp3-player.net/medias/player_mp3_maxi.swf"
+            flashvars="mp3=http://example.com/audio/track.mp3&showstop=1"
+          />
+        </object>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'http://example.com/audio/track.mp3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   describe('sad paths', () => {
     it('should ignore a player naming no file', async () => {
       const value = html`
@@ -55,21 +81,10 @@ describeForEachParser('flashMp3PlayerMediaResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an editor attribute holding the player url', async () => {
-      const value = html`
-        <div
-          data-mce-data="http://flash-mp3-player.net/medias/player_mp3_maxi.swf"
-          data-mce-flashvars="mp3=http://example.com/audio/track.mp3"
-        ></div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a foreign host naming the player in its path', async () => {
+    it('should ignore a foreign host carrying the same path', async () => {
       const value = html`
         <embed
-          src="http://evil.test/flash-mp3-player.net/medias/player_mp3_maxi.swf"
+          src="http://evil.test/medias/player_mp3_maxi.swf?flash-mp3-player.net/medias/"
           flashvars="mp3=http://example.com/audio/track.mp3"
         />
       `

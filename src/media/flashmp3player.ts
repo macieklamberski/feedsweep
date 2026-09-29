@@ -5,8 +5,8 @@ import { readCarrierUrl } from '../utils/widgets.js'
 
 const flashMp3PlayerHosts = ['flash-mp3-player.net']
 
-// The free Flash MP3 Player widget, in both its skins. Its own `.swf` answers 404, and the file
-// it plays is the publisher's own, named in `mp3` and usually still serving.
+// The Flash MP3 Player widget, an `<object>` or `<embed>` whose `.swf` on flash-mp3-player.net
+// answers 404, so it renders nothing.
 export const flashMp3PlayerMediaResolver: MediaResolver = {
   kind: 'media',
   selector:
