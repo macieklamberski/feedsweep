@@ -129,6 +129,8 @@ An embed placeholder states how big it is in one of two ways, never both. Where 
 
 A placeholder may also carry `data-embed-params`: settings the publisher chose for that one embed that a reader may override, such as the language of a widget's labels, written as a query string like `l=german`. They are kept off `data-embed-src`, so a reader appends them when it builds the frame, or sets its own in their place.
 
+`data-embed-src` keeps the scheme the feed wrote, so an older embed can still point at an `http:` player. A browser blocks an `http:` frame on an `https:` page as mixed content, so a reader served over `https:` should send `Content-Security-Policy: upgrade-insecure-requests`. Chromium, Firefox and WebKit then load the frame over `https:`, which plays wherever the platform still serves the player there.
+
 ## Options
 
 ```typescript
