@@ -117,6 +117,61 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should key an uppercase id to the lowercase id and src', async () => {
+      const value = html`
+        <iframe src="https://www.nbcnews.com/news/embedded-video/MMVO265460805743"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'nbcnews',
+        id: 'mmvo265460805743',
+        src: 'https://www.nbcnews.com/news/embedded-video/mmvo265460805743',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should key uppercase route words to the lowercase id and src', async () => {
+      const value = html`
+        <iframe src="https://www.nbcnews.com/NEWS/EMBEDDED-VIDEO/mmvo265460805743"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'nbcnews',
+        id: 'mmvo265460805743',
+        src: 'https://www.nbcnews.com/news/embedded-video/mmvo265460805743',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should key uppercase TODAY route words and id to the lowercase id and src', async () => {
+      const value = html`
+        <iframe src="https://www.today.com/TODAY/EMBEDDED-VIDEO/MMVO265460805743"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'nbcnews',
+        id: 'mmvo265460805743',
+        src: 'https://www.today.com/today/embedded-video/mmvo265460805743',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should refuse uppercase widget route words the platform does not serve', async () => {
+      const value = html`
+        <iframe src="https://www.nbcnews.com/WIDGET/VIDEO-EMBED/265460805743"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should refuse an uppercase offsite route word the platform does not serve', async () => {
+      const value = html`
+        <iframe src="https://www.today.com/OFFSITE/yard-pong-games-1244547139528"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should refuse a bare number on the embedded-video route', async () => {
       const value = html`
         <iframe src="https://www.nbcnews.com/news/embedded-video/265959493641"></iframe>
