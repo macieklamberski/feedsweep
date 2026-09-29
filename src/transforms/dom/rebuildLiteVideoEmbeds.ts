@@ -1,28 +1,21 @@
 import { composeEmbedUrl as composeVimeoUrl } from '../../embeds/vimeo.js'
-import {
-  composeEmbedUrl as composeYoutubeUrl,
-  isVideoId,
-  youtubeEmbedParams,
-} from '../../embeds/youtube.js'
+import { composeEmbedUrl as composeYoutubeUrl, youtubeEmbedParams } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import { digitsRegex, pickQueryParams } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 type EmbedSource = {
-  isId: (id: string) => boolean
   params: ReadonlyArray<string>
   compose: (id: string, params: Record<string, string>) => string
 }
 
 const embedSources: Record<string, EmbedSource> = {
   'lite-youtube': {
-    isId: isVideoId,
     params: youtubeEmbedParams,
     compose: (id, params) => composeYoutubeUrl(id, params),
   },
   // Vimeo's player takes the offset as a #t= fragment and reads nothing else.
   'lite-vimeo': {
-    isId: (id) => digitsRegex.test(id),
     params: ['start'],
     compose: (id, params) => composeVimeoUrl(id, undefined, params.start),
   },
@@ -38,7 +31,7 @@ export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
     const source = embedSources[element.localName]
     const videoId = element.getAttribute('videoid')?.replace(escapedQuotesRegex, '$1')
 
-    if (!source || !videoId || !source.isId(videoId)) {
+    if (!source || !videoId) {
       continue
     }
 

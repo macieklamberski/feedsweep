@@ -43,16 +43,11 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a lite-youtube element whose videoid is not a video id alone', async () => {
-    const value = '<lite-youtube videoid="abc/../../x?y"></lite-youtube>'
+  it('should build the player from a videoid as written, without checking it', async () => {
+    const value = '<lite-youtube videoid="not-a-video"></lite-youtube>'
+    const expected = '<iframe src="https://www.youtube.com/embed/not-a-video"></iframe>'
 
-    expect(await transform(value)).toEqualHtml(value)
-  })
-
-  it('should leave a lite-vimeo element whose videoid is not a video id alone', async () => {
-    const value = '<lite-vimeo videoid="364402896/../../x?y"></lite-vimeo>'
-
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should carry a youtube start offset into a query param', async () => {
