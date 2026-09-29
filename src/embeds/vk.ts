@@ -17,7 +17,8 @@ const players = toMap({
   '/video_ext.php': { kind: 'video', path: '/video_ext.php' },
 })
 
-// `hash` unlocks a video its owner shared privately. Quality and autoplay are the reader's call.
+// `hash` unlocks a video its owner shared privately, so it stays in `src`. The page url drops it,
+// since a public video's page ignores it. Quality and autoplay are the reader's call.
 const playerParams = ['oid', 'id', 'hash']
 
 // VK's player, `video_ext.php?oid={ownerId}&id={videoId}`, and the clip player beside it.
@@ -39,15 +40,6 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
   const params = pickQueryParams(parsed.search, playerParams)
   const id = `${ownerId}_${videoId}`
   const src = `https://${parsed.hostname}${player.path}${composeQuery(params)}`
-
-  // The page url cannot carry the `hash` a privately shared video needs.
-  if (params.hash) {
-    return {
-      provider: 'vk',
-      id,
-      src,
-    }
-  }
 
   return {
     provider: 'vk',
