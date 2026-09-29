@@ -204,6 +204,12 @@ describe('appleResolveEmbed', () => {
       expect(appleResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should return undefined for a playlist id carrying an encoded slash', () => {
+      const value = 'https://embed.music.apple.com/jp/playlist/mixtape/pl.u-4Jomm%2FbIaxX578b'
+
+      expect(appleResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should return undefined for an id behind a prefix', () => {
       const value = 'https://music.apple.com/us/album/thriller/x1440857781'
 
@@ -628,6 +634,14 @@ describeForEachParser('appleToolsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    // Every sampled tool url names an album or a song.
+    it('should ignore a kind carrying a hyphen', async () => {
+      const value =
+        '<iframe src="https://tools.applemusic.com/embed/v1/music-video/1440833098?country=us"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a route on the tool host that is not an embed', async () => {
       const value = '<iframe src="https://tools.applemusic.com/us/album/111492"></iframe>'
 
@@ -637,6 +651,13 @@ describeForEachParser('appleToolsEmbedResolver', (parseHtml) => {
     it('should ignore the embed route below another path', async () => {
       const value =
         '<iframe src="https://tools.applemusic.com/foo/embed/v1/album/111492?country=us"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a segment between the kind and the id', async () => {
+      const value =
+        '<iframe src="https://tools.applemusic.com/embed/v1/album/thriller/111492?country=us"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

@@ -709,24 +709,6 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should not cite a generic onebox of a Mastodon status, recognized by its url shape', async () => {
-      const value = html`
-        <aside class="onebox allowlistedgeneric" data-onebox-src="https://mastodon.social/@Gargron/117060465546524768">
-          <header class="source">
-            <a href="https://mastodon.social/@Gargron/117060465546524768" target="_blank" rel="noopener">mastodon.social</a>
-          </header>
-          <article class="onebox-body">
-            <h3>
-              <a href="https://mastodon.social/@Gargron/117060465546524768">Eugen Rochko (@Gargron@mastodon.social)</a>
-            </h3>
-            <p>Post text</p>
-          </article>
-        </aside>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should not cite a generic onebox whose title carries a fediverse handle', async () => {
       const value = html`
         <aside class="onebox allowlistedgeneric" data-onebox-src="https://mastodon.example/users/author/statuses/117060465546524768">

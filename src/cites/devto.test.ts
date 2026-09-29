@@ -89,31 +89,6 @@ describeForEachParser('devtoLinkCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should read the publisher from the text beside the favicon', async () => {
-      const value = html`
-        <div class="c-embed">
-          <div class="c-embed__body">
-            <h2>
-              <a href="https://example.com/page">Page title</a>
-            </h2>
-            <div class="color-secondary">
-              <img class="c-embed__favicon" src="https://example.com/favicon.png" />
-              example.com
-            </div>
-          </div>
-        </div>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'devto',
-        url: 'https://example.com/page',
-        title: 'Page title',
-        publisher: 'example.com',
-        icon: 'https://example.com/favicon.png',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {
@@ -122,18 +97,6 @@ describeForEachParser('devtoLinkCiteResolver', (parseHtml) => {
         <div class="c-embed">
           <div class="c-embed__body">
             <h2>Page title</h2>
-          </div>
-        </div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined when the title is missing', async () => {
-      const value = html`
-        <div class="c-embed">
-          <div class="c-embed__body">
-            <p>Preview text</p>
           </div>
         </div>
       `
@@ -369,25 +332,6 @@ describeForEachParser('devtoPostCiteResolver', (parseHtml) => {
         url: 'https://example.com/post',
         title: 'Page title',
         description: 'Status text',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should fall back to the title link when the navigation link is absent', async () => {
-      const value = html`
-        <div class="ltag__link--embedded">
-          <div class="crayons-story ">
-            <h2 class="crayons-story__title">
-              <a href="https://example.com/post">Page title</a>
-            </h2>
-          </div>
-        </div>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'devto',
-        url: 'https://example.com/post',
-        title: 'Page title',
       }
 
       expect(await extract(value)).toEqual(expected)

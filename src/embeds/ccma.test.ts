@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { ccmaEmbedResolver } from './ccma.js'
@@ -450,5 +451,29 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+describeForEachParser('ccma through the pipeline', (parseHtml) => {
+  it('should leave a video enclosure on the 3cat host playable', async () => {
+    const enclosures = [
+      {
+        url: 'https://mp4-high-dwn.3cat.cat/2024/01/15/1234567/1234567_1080.mp4',
+        type: 'video/mp4',
+      },
+    ]
+
+    const expected = html`
+      <video data-enclosure="" controls src="https://mp4-high-dwn.3cat.cat/2024/01/15/1234567/1234567_1080.mp4"></video>
+      <p>Body</p>
+    `
+
+    expect(
+      await transformContent('<p>Body</p>', {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://example.com/post',
+        enclosures,
+      }),
+    ).toEqualHtml(expected)
   })
 })

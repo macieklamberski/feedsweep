@@ -268,14 +268,22 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
 
   it('should read the name the carrier states', async () => {
     const value = html`
-      <iframe src="https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/" title="Episode 12: The Long Way Round"></iframe>
+      <iframe
+        title="Behind the Blue: May 21, 2026 - UK and the Artemis Project"
+        width="700px"
+        height="90px"
+        scrolling="no"
+        frameborder="no"
+        src="https://html5-player.libsyn.com/embed/episode/id/41382385/theme/custom/direction/forward/custom-color/87A93A/autonext/no/thumbnail/yes/autoplay/no/preload/no/no_addthis/no/render-playlist/no"
+      ></iframe>
     `
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
-      id: 'episode/5508311',
-      src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
+      id: 'episode/41382385',
+      src: 'https://play.libsyn.com/embed/episode/id/41382385/',
+      width: 700,
       height: 90,
-      title: 'Episode 12: The Long Way Round',
+      title: 'Behind the Blue: May 21, 2026 - UK and the Artemis Project',
     }
 
     expect(await extract(value)).toEqual(expected)

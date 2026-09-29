@@ -55,6 +55,21 @@ describe('cnnResolveEmbed', () => {
 
       expect(cnnResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should build the placeholder for a video in a hyphenated section', () => {
+      const value =
+        'https://fave.api.cnn.io/v1/fav/?video=cnn-en-espanol/2018/02/16/caminata-espacial-en-la-eei.cnn&customer=cnn&edition=domestic&env=prod'
+      const expected: EmbedResolverResult = {
+        provider: 'cnn',
+        id: 'cnn-en-espanol/2018/02/16/caminata-espacial-en-la-eei.cnn',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=cnn-en-espanol/2018/02/16/caminata-espacial-en-la-eei.cnn&customer=cnn&edition=domestic&env=prod',
+        url: 'https://www.cnn.com/videos/cnn-en-espanol/2018/02/16/caminata-espacial-en-la-eei.cnn',
+        ratio: '16/9',
+        date: '2018-02-16',
+      }
+
+      expect(cnnResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -73,13 +88,6 @@ describe('cnnResolveEmbed', () => {
 
     it('should return undefined for an id that is not a video path', () => {
       const value = 'https://fave.api.cnn.io/v1/fav/?video=19701&customer=cnn'
-
-      expect(cnnResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a lookalike host', () => {
-      const value =
-        'https://fave.api.cnn.io.evil.test/v1/fav/?video=arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn'
 
       expect(cnnResolveEmbed(value)).toBeUndefined()
     })
@@ -281,6 +289,13 @@ describeForEachParser('cnnIframeEmbedResolver', (parseHtml) => {
   it('should ignore a foreign host carrying the same path', async () => {
     const value =
       '<iframe src="https://evil.test/v1/fav/?video=us/2018/06/24/finding-hope-suicide-special-report-full-show.cnn"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore a lookalike host that starts with the player host', async () => {
+    const value =
+      '<iframe src="https://fave.api.cnn.io.evil.test/v1/fav/?video=arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

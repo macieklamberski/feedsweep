@@ -38,10 +38,21 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
       expect(await extract(script('playerConfiguration'))).toBeUndefined()
     })
 
-    it('should ignore a configuration url on another host', async () => {
-      const value = script('https://example.com/player/embed')
+    it('should ignore a foreign host carrying the player path', async () => {
+      const value = script('https://evil.test/42-an-episode/embed?context=external')
 
       expect(await extract(value)).toBeUndefined()
+    })
+
+    // Neither host serves a player: a show subdomain on either has no DNS record, and the
+    // player path answers 404 on www.podigee.com and player.podigee-cdn.net.
+    const nonPlayerHostUrls: Array<string> = [
+      'https://www.podigee.com/72-an-episode/embed',
+      'https://player.podigee-cdn.net/72-an-episode/embed',
+    ]
+
+    it.each(nonPlayerHostUrls)('should ignore %s', async (value) => {
+      expect(await extract(script(value))).toBeUndefined()
     })
   })
 })

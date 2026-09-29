@@ -269,6 +269,13 @@ describeForEachParser('flourishIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    // The player answers 403 for `st-ory/3677950` where `story/3677950` answers 200.
+    it('should return undefined for a kind carrying a hyphen', async () => {
+      const value = '<iframe src="https://flo.uri.sh/st-ory/3677950/embed"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined for a non-numeric id', async () => {
       const value = '<iframe src="https://flo.uri.sh/visualisation/evil/embed"></iframe>'
 
