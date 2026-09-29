@@ -6,6 +6,7 @@ import {
   instagramBlockquoteEmbedResolver,
   instagramIframeEmbedResolver,
   instagramResolveEmbed,
+  instagramS9eEmbedResolver,
   instagramSubstackEmbedResolver,
   readInstagramHeight,
 } from './instagram.js'
@@ -75,6 +76,96 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read a bare handle carrying a dot, an underscore and a digit', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-captioned
+          data-instgrm-permalink="https://www.instagram.com/p/DLpmxRVou5K/?utm_source=ig_embed&amp;utm_campaign=loading"
+          data-instgrm-version="14"
+        >
+          <div>
+            <div>
+              <a href="https://www.instagram.com/p/DLpmxRVou5K/?utm_source=ig_embed&amp;utm_campaign=loading" target="_blank">View this post on Instagram</a>
+            </div>
+            <p>
+              <a href="https://www.instagram.com/p/DLpmxRVou5K/?utm_source=ig_embed&amp;utm_campaign=loading" target="_blank">A post shared by @2.a.m_._</a>
+            </p>
+          </div>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DLpmxRVou5K',
+        src: 'https://www.instagram.com/p/DLpmxRVou5K/embed/captioned/',
+        url: 'https://www.instagram.com/p/DLpmxRVou5K/',
+        author: '@2.a.m_._',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a bare handle spelled with capitals', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-captioned
+          data-instgrm-permalink="https://www.instagram.com/p/DLpmxRVou5K/?utm_source=ig_embed&amp;utm_campaign=loading"
+          data-instgrm-version="14"
+        >
+          <div>
+            <div>
+              <a href="https://www.instagram.com/p/DLpmxRVou5K/?utm_source=ig_embed&amp;utm_campaign=loading" target="_blank">View this post on Instagram</a>
+            </div>
+            <p>
+              <a href="https://www.instagram.com/p/DLpmxRVou5K/?utm_source=ig_embed&amp;utm_campaign=loading" target="_blank">A post shared by @Anthony.Albrecht</a>
+            </p>
+          </div>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DLpmxRVou5K',
+        src: 'https://www.instagram.com/p/DLpmxRVou5K/embed/captioned/',
+        url: 'https://www.instagram.com/p/DLpmxRVou5K/',
+        author: '@Anthony.Albrecht',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // An autolinker on the publishing side turns the byline's handle into a link to another
+    // network, nested inside the link to the post.
+    it('should read past an account link that points at another host', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-captioned
+          data-instgrm-permalink="https://www.instagram.com/p/B2MOadDFuUB/?utm_source=ig_embed&amp;utm_campaign=loading"
+          data-instgrm-version="14"
+        >
+          <div>
+            <a href="https://www.instagram.com/p/B2MOadDFuUB/?utm_source=ig_embed&amp;utm_campaign=loading" target="_blank">
+              <div>View this post on Instagram</div>
+            </a>
+            <p>
+              <a href="https://www.instagram.com/p/B2MOadDFuUB/?utm_source=ig_embed&amp;utm_campaign=loading" target="_blank">
+                A post shared by MarceloGuaxinim (<a href="http://twitter.com/marceloguaxinim" target="_blank" rel="nofollow">@marceloguaxinim</a>)
+            </p>
+          </div>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/B2MOadDFuUB',
+        src: 'https://www.instagram.com/p/B2MOadDFuUB/embed/captioned/',
+        url: 'https://www.instagram.com/p/B2MOadDFuUB/',
+        author: '@marceloguaxinim',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('the uncaptioned blockquote', () => {
@@ -91,6 +182,36 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
         id: 'p/CaUsPbUquKV',
         src: 'https://www.instagram.com/p/CaUsPbUquKV/embed/',
         url: 'https://www.instagram.com/p/CaUsPbUquKV/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a byline handle carrying a dot, a digit and an underscore', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/reel/DMMWPU6PCU8/?utm_source=ig_embed&amp;utm_campaign=loading"
+          data-instgrm-version="14"
+        >
+          <div>
+            <a href="https://www.instagram.com/reel/DMMWPU6PCU8/?utm_source=ig_embed&amp;utm_campaign=loading" target="_blank">
+              <div>View this post on Instagram</div>
+            </a>
+            <p>
+              <a href="https://www.instagram.com/reel/DMMWPU6PCU8/?utm_source=ig_embed&amp;utm_campaign=loading" target="_blank">
+                A post shared by Busana &#8211; SMKN 3 Kudus (@busana.smk3kudus_official)
+              </a>
+            </p>
+          </div>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'reel/DMMWPU6PCU8',
+        src: 'https://www.instagram.com/reel/DMMWPU6PCU8/embed/',
+        url: 'https://www.instagram.com/reel/DMMWPU6PCU8/',
+        author: '@busana.smk3kudus_official',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -250,6 +371,252 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
         url: 'https://www.instagram.com/p/BgPrjlfHcoB/',
         author: '@jervoisakl',
         date: 'Mar 21, 2018',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should find the byline by its account link when it carries no time', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/BgPrjlfHcoB/"
+        >
+          <p>
+            <a href="https://www.instagram.com/p/BgPrjlfHcoB/">Bring some friends, a special one, or them all.</a>
+          </p>
+          <p>
+            A post shared by <a href="https://www.instagram.com/jervoisakl/">Jervois Steak House</a>
+            (@jervoisakl)
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/BgPrjlfHcoB',
+        src: 'https://www.instagram.com/p/BgPrjlfHcoB/embed/',
+        url: 'https://www.instagram.com/p/BgPrjlfHcoB/',
+        description: 'Bring some friends, a special one, or them all.',
+        author: '@jervoisakl',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // An account with no display name is written as a link holding the handle and nothing else.
+    it('should read the account out of the byline link when the text names no handle', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-captioned
+          data-instgrm-permalink="https://www.instagram.com/p/BgRph3VDrW0/"
+          data-instgrm-version="8"
+        >
+          <div>
+            <div>
+              <div></div>
+            </div>
+            <p>
+              <a href="https://www.instagram.com/p/BgRph3VDrW0/" target="_blank">
+                ?Alatw combo Latw? #iamafreestyler @iamafreestyler #ballerzdistrict @ballersdistrict #fsrepostfr #freestylefootball #fslife
+              </a>
+            </p>
+            <p>
+              A post shared by @<a href="https://www.instagram.com/lucie.__fs/" target="_blank"> lucie.__fs</a>
+              on <time datetime="2018-03-13T19:56:44+00:00">Mar 13, 2018 at 12:56pm PDT</time>
+            </p>
+          </div>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/BgRph3VDrW0',
+        src: 'https://www.instagram.com/p/BgRph3VDrW0/embed/captioned/',
+        url: 'https://www.instagram.com/p/BgRph3VDrW0/',
+        description:
+          '?Alatw combo Latw? #iamafreestyler @iamafreestyler #ballerzdistrict @ballersdistrict #fsrepostfr #freestylefootball #fslife',
+        author: '@lucie.__fs',
+        date: '2018-03-13T19:56:44+00:00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read an account link holding a digit', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-captioned
+          data-instgrm-permalink="https://www.instagram.com/p/BkDwEjcHzS5/"
+          data-instgrm-version="8"
+        >
+          <div>
+            <div>
+              <div></div>
+            </div>
+            <p>
+              <a href="https://www.instagram.com/p/BkDwEjcHzS5/" target="_blank">순민아 자켓 한벌만 해줘 #구걸 . . #pittiuomo #pitti94 #pittiimmagine</a>
+            </p>
+            <p>
+              A post shared by @<a href="https://www.instagram.com/59keem/" target="_blank"> 59keem</a>
+              on <time datetime="2018-06-15T20:24:12+00:00">Jun 15, 2018 at 1:24pm PDT</time>
+            </p>
+          </div>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/BkDwEjcHzS5',
+        src: 'https://www.instagram.com/p/BkDwEjcHzS5/embed/captioned/',
+        url: 'https://www.instagram.com/p/BkDwEjcHzS5/',
+        description: '순민아 자켓 한벌만 해줘 #구걸 . . #pittiuomo #pitti94 #pittiimmagine',
+        author: '@59keem',
+        date: '2018-06-15T20:24:12+00:00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read an account link spelled with capitals', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-captioned
+          data-instgrm-version="7"
+        >
+          <div>
+            <div>
+              <div></div>
+            </div>
+            <p>
+              <a href="https://www.instagram.com/p/BXKQsxVgaJq/" target="_blank">
+                Crowds are gathering for #bachtothebush #20 @natures_powerhouse_cooktown #paradise
+              </a>
+            </p>
+            <p>
+              A post shared by @<a href="https://www.instagram.com/Anthony.Albrecht/" target="_blank"> Anthony.Albrecht</a> on
+              <time datetime="2017-07-30T06:16:38+00:00">Jul 29, 2017 at 11:16pm PDT</time>
+            </p>
+          </div>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/BXKQsxVgaJq',
+        src: 'https://www.instagram.com/p/BXKQsxVgaJq/embed/captioned/',
+        url: 'https://www.instagram.com/p/BXKQsxVgaJq/',
+        description:
+          'Crowds are gathering for #bachtothebush #20 @natures_powerhouse_cooktown #paradise',
+        author: '@Anthony.Albrecht',
+        date: '2017-07-30T06:16:38+00:00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+    it('should read the account out of the byline text when its link is gone', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-captioned
+          data-instgrm-version="7"
+        >
+          <div>
+            <div>
+              <div></div>
+            </div>
+            <p>
+              <a href="https://www.instagram.com/p/BXKQsxVgaJq/" target="_blank">
+                Crowds are gathering for #bachtothebush #20 @natures_powerhouse_cooktown #paradise
+              </a>
+            </p>
+            <p>
+              A post shared by Anthony Albrecht (@anthony.albrecht) on
+              <time datetime="2017-07-30T06:16:38+00:00">Jul 29, 2017 at 11:16pm PDT</time>
+            </p>
+          </div>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/BXKQsxVgaJq',
+        src: 'https://www.instagram.com/p/BXKQsxVgaJq/embed/captioned/',
+        url: 'https://www.instagram.com/p/BXKQsxVgaJq/',
+        description:
+          'Crowds are gathering for #bachtothebush #20 @natures_powerhouse_cooktown #paradise',
+        author: '@anthony.albrecht',
+        date: '2017-07-30T06:16:38+00:00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a byline handle carrying an underscore and a digit when its link is gone', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-captioned
+          data-instgrm-version="7"
+        >
+          <div>
+            <div></div>
+            <p>
+              <a href="https://www.instagram.com/p/BUFvSqCgvLJ/" target="_blank">
+                Not a bad day at the office today. Hugs and kisses by just a few legends.. aaaand my tour kids wished me happy mothers day. Awww. #tourlife #theycallmemom #paulrodgers #robertplant #brianjohnson
+              </a>
+            </p>
+            <p>
+              A post shared by Brooke McLean (@bmclean_11) on
+              <time datetime="2017-05-14T22:33:34+00:00">May 14, 2017 at 3:33pm PDT</time>
+            </p>
+          </div>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/BUFvSqCgvLJ',
+        src: 'https://www.instagram.com/p/BUFvSqCgvLJ/embed/captioned/',
+        url: 'https://www.instagram.com/p/BUFvSqCgvLJ/',
+        description:
+          'Not a bad day at the office today. Hugs and kisses by just a few legends.. aaaand my tour kids wished me happy mothers day. Awww. #tourlife #theycallmemom #paulrodgers #robertplant #brianjohnson',
+        author: '@bmclean_11',
+        date: '2017-05-14T22:33:34+00:00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a byline handle spelled with capitals', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-captioned
+          data-instgrm-version="7"
+        >
+          <div>
+            <div>
+              <div></div>
+            </div>
+            <p>
+              <a href="https://www.instagram.com/p/BXKQsxVgaJq/" target="_blank">
+                Crowds are gathering for #bachtothebush #20 @natures_powerhouse_cooktown #paradise
+              </a>
+            </p>
+            <p>
+              A post shared by Anthony Albrecht (@Anthony.Albrecht) on
+              <time datetime="2017-07-30T06:16:38+00:00">Jul 29, 2017 at 11:16pm PDT</time>
+            </p>
+          </div>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/BXKQsxVgaJq',
+        src: 'https://www.instagram.com/p/BXKQsxVgaJq/embed/captioned/',
+        url: 'https://www.instagram.com/p/BXKQsxVgaJq/',
+        description:
+          'Crowds are gathering for #bachtothebush #20 @natures_powerhouse_cooktown #paradise',
+        author: '@Anthony.Albrecht',
+        date: '2017-07-30T06:16:38+00:00',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -610,8 +977,53 @@ describeForEachParser('instagramIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should return undefined for another host carrying the post path', async () => {
+      const value = '<iframe src="https://evil.test/p/CaUsPbUquKV/embed/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+describeForEachParser('instagramS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, instagramS9eEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the shortcode out of the helper frame', async () => {
       const value = html`
-        <iframe src="https://evil.test/www.instagram.com/p/CaUsPbUquKV/embed/"></iframe>
+        <iframe
+          data-s9e-mediaembed="instagram"
+          src="https://s9e.github.io/iframe/2/instagram.min.html#CdT-yWXBsI7#theme=auto"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/CdT-yWXBsI7',
+        src: 'https://www.instagram.com/p/CdT-yWXBsI7/embed/',
+        url: 'https://www.instagram.com/p/CdT-yWXBsI7/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore the helper path on a foreign host', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="instagram"
+          src="https://evil.test/iframe/2/instagram.min.html#CdT-yWXBsI7"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a fragment stepping out of the post path', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="instagram"
+          src="https://s9e.github.io/iframe/2/instagram.min.html#x/../../reel/CdWN1jeOWr0"
+        ></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -694,6 +1106,61 @@ describe('instagramResolveEmbed', () => {
     expect(instagramResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should read a post addressed through an account carrying a dot', () => {
+    const value = 'https://www.instagram.com/gieos.room/p/DFnlw8jsKPG'
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/DFnlw8jsKPG',
+      src: 'https://www.instagram.com/p/DFnlw8jsKPG/embed/',
+      url: 'https://www.instagram.com/p/DFnlw8jsKPG/',
+    }
+
+    expect(instagramResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a post addressed through an account carrying a digit', () => {
+    const value = 'https://www.instagram.com/thuyanj1/p/CaUsPbUquKV/'
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/CaUsPbUquKV',
+      src: 'https://www.instagram.com/p/CaUsPbUquKV/embed/',
+      url: 'https://www.instagram.com/p/CaUsPbUquKV/',
+    }
+
+    expect(instagramResolveEmbed(value)).toEqual(expected)
+  })
+
+  // Instagram redirects an account spelled with capitals to its lowercase path.
+  it('should read a post addressed through an account spelled with capitals', () => {
+    const value = 'https://www.instagram.com/Anthony.Albrecht/p/BXKQsxVgaJq/'
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/BXKQsxVgaJq',
+      src: 'https://www.instagram.com/p/BXKQsxVgaJq/embed/',
+      url: 'https://www.instagram.com/p/BXKQsxVgaJq/',
+    }
+
+    expect(instagramResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a shortcode carrying an underscore', () => {
+    const value = 'https://www.instagram.com/p/C_YIsLIOOro/'
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/C_YIsLIOOro',
+      src: 'https://www.instagram.com/p/C_YIsLIOOro/embed/',
+      url: 'https://www.instagram.com/p/C_YIsLIOOro/',
+    }
+
+    expect(instagramResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should return undefined for a post path nested two segments deep', () => {
+    const value = 'https://www.instagram.com/x/y/p/CaUsPbUquKV/'
+
+    expect(instagramResolveEmbed(value)).toBeUndefined()
+  })
+
   it('should return undefined for an account page naming no post', () => {
     const value = 'https://www.instagram.com/makoto57gpr?igsh=MWVhNHdjZXZvbDByZA=='
 
@@ -732,13 +1199,35 @@ describe('instagramResolveEmbed', () => {
   const reservedRouteUrls: Array<string> = [
     'https://www.instagram.com/share/p/BAJ0RmC0Vq/',
     'https://www.instagram.com/share/reel/BAJ0RmC0Vq/',
-    'https://www.instagram.com/explore/p/CaUsPbUquKV/',
     'https://www.instagram.com/stories/p/CaUsPbUquKV/',
-    'https://www.instagram.com/accounts/p/CaUsPbUquKV/',
+    'https://www.instagram.com/challenge/p/BXKQsxVgaJq/',
+    'https://www.instagram.com/developer/p/BXKQsxVgaJq/',
   ]
 
   it.each(reservedRouteUrls)('should return undefined for %s', (value) => {
     expect(instagramResolveEmbed(value)).toBeUndefined()
+  })
+
+  // Instagram redirects each of these to the post's own page, the same as an account prefix.
+  const redirectingRouteUrls: Array<string> = [
+    'https://www.instagram.com/about/p/BXKQsxVgaJq/',
+    'https://www.instagram.com/accounts/p/BXKQsxVgaJq/',
+    'https://www.instagram.com/api/p/BXKQsxVgaJq/',
+    'https://www.instagram.com/direct/p/BXKQsxVgaJq/',
+    'https://www.instagram.com/explore/p/BXKQsxVgaJq/',
+    'https://www.instagram.com/legal/p/BXKQsxVgaJq/',
+    'https://www.instagram.com/web/p/BXKQsxVgaJq/',
+  ]
+
+  it.each(redirectingRouteUrls)('should read the post behind the route in %s', (value) => {
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/BXKQsxVgaJq',
+      src: 'https://www.instagram.com/p/BXKQsxVgaJq/embed/',
+      url: 'https://www.instagram.com/p/BXKQsxVgaJq/',
+    }
+
+    expect(instagramResolveEmbed(value)).toEqual(expected)
   })
 
   it('should return undefined for a profile frame', () => {
@@ -804,6 +1293,12 @@ describeForEachParser('instagramAmpEmbedResolver', (parseHtml) => {
 
     expect(await extract(value)).toBeUndefined()
   })
+
+  it('should return undefined for an empty shortcode', async () => {
+    const value = '<amp-instagram data-shortcode=""></amp-instagram>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
 })
 
 describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
@@ -823,7 +1318,7 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
   }
 
   describe('the current payload', () => {
-    it('should drop the wrapped title and keep the author and the rehosted images', async () => {
+    it('should drop a wrapped caption cut before its closing quote and keep the author and the rehosted images', async () => {
       const value = makeContainer({
         instagram_id: 'DZmgID9Eawg',
         title: 'BBC News on Instagram: "Pakistan\'s prime minister says a peace …',
@@ -894,7 +1389,7 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the title that quotes the caption behind the poster', async () => {
+    it('should unwrap the whole caption the title quotes behind the poster', async () => {
       const value = makeContainer({
         instagram_id: 'DY11vsxO5c7',
         title: 'Christine Mari on Instagram: "draw what u want #comics"',
@@ -905,13 +1400,14 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
         id: 'p/DY11vsxO5c7',
         src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
         url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+        description: 'draw what u want #comics',
         author: '@christinemariart',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the same title when the quotes are curly', async () => {
+    it('should unwrap the same caption when the quotes are curly', async () => {
       const value = makeContainer({
         instagram_id: 'DY11vsxO5c7',
         title: 'Orca The Sproodle on Instagram: \u201cLook, it\u2019s exhausting\u201d',
@@ -921,6 +1417,69 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
         id: 'p/DY11vsxO5c7',
         src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
         url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+        description: 'Look, it\u2019s exhausting',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should unwrap a caption that opens on a closing curly quote', async () => {
+      const value = makeContainer({
+        instagram_id: 'C2NRNCFor5Y',
+        title: 'Consulting Humor on Instagram: \u201d@goodworkmb peace love #consulting\u201d',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/C2NRNCFor5Y',
+        src: 'https://www.instagram.com/p/C2NRNCFor5Y/embed/',
+        url: 'https://www.instagram.com/p/C2NRNCFor5Y/',
+        description: '@goodworkmb peace love #consulting',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop a wrapped caption that closes on a different quote than it opened with', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Orca The Sproodle on Instagram: \u201cLook, it\u2019s exhausting"',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop a wrapped title holding only the quote marks', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Orca The Sproodle on Instagram: ""',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should unwrap a caption that runs over several lines', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Orca The Sproodle on Instagram: \u201cLook,\nit\u2019s exhausting\u201d',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+        description: 'Look,\nit\u2019s exhausting',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -937,6 +1496,22 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
         src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
         url: 'https://www.instagram.com/p/DY11vsxO5c7/',
         description: 'Instagram keeps changing the feed and I am tired',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a raw caption that quotes behind a colon', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Recipe: "the best bread" from my kitchen',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+        description: 'Recipe: "the best bread" from my kitchen',
       }
 
       expect(await extract(value)).toEqual(expected)

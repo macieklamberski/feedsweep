@@ -115,7 +115,13 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/videopress.com/embed/FLEAXUMB"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/FLEAXUMB"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a guid carrying an encoded slash', async () => {
+      const value = '<iframe src="https://videopress.com/embed/FLEAXUMB%2Fx"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -253,6 +259,34 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the flashvars guid when the src names a different one', async () => {
+      const value = html`
+        <embed
+          src="http://s0.videopress.com/player.swf?guid=kUJmAcSf&v=1"
+          flashvars="guid=TxdSIdpO&isDynamicSeeking=false"
+        ></embed>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'videopress',
+        id: 'TxdSIdpO',
+        src: 'https://videopress.com/embed/TxdSIdpO',
+        url: 'https://videopress.com/v/TxdSIdpO',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore a path that only starts with the player file', async () => {
+      const value = html`
+        <embed
+          src="http://s0.videopress.com/player.swf/extra"
+          flashvars="guid=TxdSIdpO"
+        ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a swf that is not the player', async () => {

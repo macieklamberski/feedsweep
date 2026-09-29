@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { wikimediaEmbedResolver } from './wikimedia.js'
+import { composeFileTitle, wikimediaEmbedResolver } from './wikimedia.js'
+
+describe('composeFileTitle', () => {
+  it('should keep a percent sign that starts no escape', () => {
+    const value = '100%_x.webm'
+    const expected = '100% x'
+
+    expect(composeFileTitle(value)).toBe(expected)
+  })
+})
 
 describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, wikimediaEmbedResolver)

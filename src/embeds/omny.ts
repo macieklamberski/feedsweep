@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'omny'
 
-const safeSegmentRegex = /^[A-Za-z0-9._-]+$/
+const safeSegmentRegex = /^[A-Za-z0-9-]+$/
 
 const omnyHosts = ['omny.fm']
 

@@ -129,7 +129,21 @@ describeForEachParser('glomexIframeEmbedResolver', (parseHtml) => {
 
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
-        '<iframe src="https://evil.test/player.glomex.com/integration/1/integration.html?integrationId=40599x1hkkig7d8l"></iframe>'
+        '<iframe src="https://evil.test/integration/1/integration.html?integrationId=40599x1hkkig7d8l"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player path below a leading segment', async () => {
+      const value =
+        '<iframe src="https://player.glomex.com/x/integration/1/integration.html?integrationId=40599x1hkkig7d8l"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player path followed by a trailing segment', async () => {
+      const value =
+        '<iframe src="https://player.glomex.com/integration/1/integration.html/extra?integrationId=40599x1hkkig7d8l"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

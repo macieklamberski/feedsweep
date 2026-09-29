@@ -58,6 +58,39 @@ describeForEachParser('convertSmartframeEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should leave a customer id led by a path alone', async () => {
+    const value = html`
+      <smartframe-embed
+        customer-id="../b0c95bc04383cef69c6b47df872135cf"
+        image-id="WmOBDE33lTbF"
+      ></smartframe-embed>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a customer id trailed by a path alone', async () => {
+    const value = html`
+      <smartframe-embed
+        customer-id="b0c95bc04383cef69c6b47df872135cf/../x"
+        image-id="WmOBDE33lTbF"
+      ></smartframe-embed>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a customer id carrying an encoded slash alone', async () => {
+    const value = html`
+      <smartframe-embed
+        customer-id="b0c95bc04383cef69c6b47df87213%2f"
+        image-id="WmOBDE33lTbF"
+      ></smartframe-embed>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should leave an image id carrying a path alone', async () => {
     const value = html`
       <smartframe-embed

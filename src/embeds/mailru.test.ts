@@ -66,6 +66,87 @@ describe('mailruResolveEmbed', () => {
       expect(mailruResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should read the path form whose user carries a dot', () => {
+      const value = 'https://my.mail.ru/mail/eduspb.com/video/embed/_myvideo/199'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/eduspb.com/_myvideo/199',
+        src: 'https://my.mail.ru/mail/eduspb.com/video/embed/_myvideo/199',
+        url: 'https://my.mail.ru/mail/eduspb.com/video/_myvideo/199.html',
+        author: 'eduspb.com',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the path form whose user carries a hyphen', () => {
+      const value = 'https://my.mail.ru/mail/art-ifact/video/embed/kvantovaya_realnost/382'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/art-ifact/kvantovaya_realnost/382',
+        src: 'https://my.mail.ru/mail/art-ifact/video/embed/kvantovaya_realnost/382',
+        url: 'https://my.mail.ru/mail/art-ifact/video/kvantovaya_realnost/382.html',
+        author: 'art-ifact',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should move the dead api host onto the player for an album carrying a hyphen', () => {
+      const value =
+        'http://api.video.mail.ru/videos/embed/corp/hitech/news_hi-tech_mail_ru/1263.html'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'corp/hitech/news_hi-tech_mail_ru/1263',
+        src: 'https://my.mail.ru/corp/hitech/video/embed/news_hi-tech_mail_ru/1263',
+        url: 'https://my.mail.ru/corp/hitech/video/news_hi-tech_mail_ru/1263.html',
+        author: 'hitech',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    // The player finds the video by its counter and serves it under any album spelling.
+    it('should move the dead api host onto the player for an album carrying a dot', () => {
+      const value =
+        'http://api.video.mail.ru/videos/embed/corp/hitech/news_hi.tech_mail_ru/1263.html'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'corp/hitech/news_hi.tech_mail_ru/1263',
+        src: 'https://my.mail.ru/corp/hitech/video/embed/news_hi.tech_mail_ru/1263',
+        url: 'https://my.mail.ru/corp/hitech/video/news_hi.tech_mail_ru/1263.html',
+        author: 'hitech',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the path form whose album carries a hyphen', () => {
+      const value = 'https://my.mail.ru/corp/hitech/video/embed/news_hi-tech_mail_ru/1263'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'corp/hitech/news_hi-tech_mail_ru/1263',
+        src: 'https://my.mail.ru/corp/hitech/video/embed/news_hi-tech_mail_ru/1263',
+        url: 'https://my.mail.ru/corp/hitech/video/news_hi-tech_mail_ru/1263.html',
+        author: 'hitech',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the path form whose album carries a dot', () => {
+      const value = 'https://my.mail.ru/corp/hitech/video/embed/news_hi.tech_mail_ru/1263'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'corp/hitech/news_hi.tech_mail_ru/1263',
+        src: 'https://my.mail.ru/corp/hitech/video/embed/news_hi.tech_mail_ru/1263',
+        url: 'https://my.mail.ru/corp/hitech/video/news_hi.tech_mail_ru/1263.html',
+        author: 'hitech',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should read the video the Flash player names on its query', () => {
       const value =
         'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/anizm.com/4418/4427&autoplay=0'
@@ -83,7 +164,7 @@ describe('mailruResolveEmbed', () => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/my.mail.ru/video/embed/253943806846567285'
+      const value = 'https://evil.test/video/embed/253943806846567285'
 
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
@@ -100,6 +181,43 @@ describe('mailruResolveEmbed', () => {
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should ignore the numeric route behind another segment', () => {
+      const value = 'https://my.mail.ru/x/video/embed/253943806846567285'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the numeric route followed by another segment', () => {
+      const value = 'https://my.mail.ru/video/embed/253943806846567285/extra'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the legacy route behind another segment', () => {
+      const value = 'https://videoapi.my.mail.ru/x/videos/embed/mail/eduspb.com/_myvideo/248.html'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the legacy route followed by another segment', () => {
+      const value =
+        'https://videoapi.my.mail.ru/videos/embed/mail/eduspb.com/_myvideo/248.html/extra'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the path form behind another segment', () => {
+      const value = 'https://my.mail.ru/x/mail/shels_1991/video/embed/20/885'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the path form followed by another segment', () => {
+      const value = 'https://my.mail.ru/mail/shels_1991/video/embed/20/885/extra'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore a legacy path that does not name a video', () => {
       const value = 'https://videoapi.my.mail.ru/videos/embed/mail/eduspb.com/list.html'
 
@@ -112,6 +230,19 @@ describe('mailruResolveEmbed', () => {
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should ignore the Flash player path behind another segment', () => {
+      const value = 'http://img.mail.ru/x/r/video2/uvpv3.swf?2&movieSrc=mail/anizm.com/4418/4427'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the Flash player path followed by another segment', () => {
+      const value =
+        'http://img.mail.ru/r/video2/uvpv3.swf/extra?2&movieSrc=mail/anizm.com/4418/4427'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore the Flash player when nothing names a video', () => {
       const value = 'http://img.mail.ru/r/video2/uvpv3.swf?3'
 
@@ -120,6 +251,30 @@ describe('mailruResolveEmbed', () => {
 
     it('should refuse a movieSrc whose segments climb out of the minted path', () => {
       const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/../../885&autoplay=0'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a movieSrc behind a dot segment', () => {
+      const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=../mail/anizm.com/4418/4427'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a movieSrc followed by a dot segment', () => {
+      const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/anizm.com/4418/4427/..'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a movieSrc carrying an extra segment after the type', () => {
+      const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/x/anizm.com/4418/4427'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a movieSrc carrying an extra segment in the album', () => {
+      const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/anizm.com/44/18/4427'
 
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
@@ -177,8 +332,7 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/my.mail.ru/video/embed/253943806846567285"></iframe>'
+      const value = '<iframe src="https://evil.test/video/embed/253943806846567285"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

@@ -157,7 +157,7 @@ describeForEachParser('audioboomWidgetEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="ab-player"
-          data-boourl="https://evil.test/audioboo.fm/boos/2158735/embed"
+          data-boourl="https://evil.test/boos/2158735/embed"
         ></div>
       `
 

@@ -4,10 +4,8 @@ import { attr, parsePixelSize } from '../utils/dom.js'
 
 const provider = 'libsyn'
 
-import { isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-
-const safeIdRegex = /^\d+$/
 
 const libsynHosts = ['libsyn.com']
 
@@ -41,7 +39,7 @@ export const extractLibsynEmbed = (
 
   const id = readPathOption(segments, 'id')
 
-  if (!id || !safeIdRegex.test(id)) {
+  if (!id || !digitsRegex.test(id)) {
     return
   }
 

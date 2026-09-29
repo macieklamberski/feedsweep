@@ -40,7 +40,12 @@ export const extractWistiaEmbed = (
   const start = segments[0] === 'embed' ? 1 : 0
   const named = segments[start] ?? ''
   const route = playerRoutes.get(named)
-  const id = keepIfMatches(segments[start + 1]?.replace(jsonpSuffixRegex, ''), safeMediaIdRegex)
+  // Every route serves one media under any case of its id, and the media JSON names it in
+  // lowercase, so one spelling keeps the same media from reaching enrichment as two keys.
+  const id = keepIfMatches(
+    segments[start + 1]?.replace(jsonpSuffixRegex, ''),
+    safeMediaIdRegex,
+  )?.toLowerCase()
 
   if (!route || !id) {
     return

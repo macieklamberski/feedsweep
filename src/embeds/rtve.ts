@@ -1,7 +1,7 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rtve'
@@ -11,8 +11,6 @@ const provider = 'rtve'
 const rtveHosts = ['rtve.es', 'irtve.es']
 
 type Kind = 'audio' | 'video'
-
-const safeAssetIdRegex = /^\d+$/
 
 // The player is retired, so the band can never refuse a real id and only narrows the mint.
 // The asset is {id}_{locale}_{audios|videos}, in the swf query on v2 and the flashvars on 4.x.
@@ -56,7 +54,7 @@ export const rtveResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  if (!id || !safeAssetIdRegex.test(id)) {
+  if (!id || !digitsRegex.test(id)) {
     return
   }
 

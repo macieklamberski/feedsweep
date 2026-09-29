@@ -6,7 +6,7 @@ import {
   defaultLazySrcsetAttributes,
   defaultMediaSrcAttributes,
 } from './attributes.js'
-import { defaultFieldCleaners } from './cleaners.js'
+import { defaultCleanedSrcProviders, defaultFieldCleaners } from './cleaners.js'
 import {
   defaultAvatarImageHosts,
   defaultTrackingHosts,
@@ -31,6 +31,7 @@ export const defaultContext: TransformContext = {
   nonContentSelectors: defaultNonContentSelectors,
   preservedPreClasses: defaultPreservedPreClasses,
   fieldCleaners: defaultFieldCleaners,
+  cleanedSrcProviders: defaultCleanedSrcProviders,
   resolveUrlFn: defaultResolveUrlFn,
   highlightFn: defaultHighlightFn,
 }

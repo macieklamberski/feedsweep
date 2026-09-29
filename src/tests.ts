@@ -15,7 +15,7 @@ type ParseHtml = (html: string) => Document
 
 export const baseContext: TransformContext = defaultContext
 
-const parseWithJsdom: ParseHtml = (html) => {
+export const parseWithJsdom: ParseHtml = (html) => {
   return new JSDOM(`<!doctype html><body>${html}</body>`).window.document
 }
 

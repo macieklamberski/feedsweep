@@ -81,6 +81,42 @@ describe('extractMegaphoneEmbed', () => {
     expect(extractMegaphoneEmbed(value)).toBeUndefined()
   })
 
+  it('should not read an episode id behind an encoded parameter', () => {
+    const value = 'https://playlist.megaphone.fm/?e=%26x%3DAUDD4761726018'
+
+    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+  })
+
+  it('should not read an episode id followed by an encoded parameter', () => {
+    const value = 'https://playlist.megaphone.fm/?e=AUDD4761726018%26autoplay%3D1'
+
+    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+  })
+
+  it('should not read an episode prefix carrying an encoded parameter', () => {
+    const value = 'https://playlist.megaphone.fm/?e=AUDD%26x%3D4761726018'
+
+    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+  })
+
+  it('should not read a playlist id behind an encoded parameter', () => {
+    const value = 'https://playlist.megaphone.fm/?p=%26x%3DNSM7546490835'
+
+    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+  })
+
+  it('should not read a playlist id followed by an encoded parameter', () => {
+    const value = 'https://playlist.megaphone.fm/?p=NSM7546490835%26light%3Dtrue'
+
+    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+  })
+
+  it('should not read a playlist id carrying an encoded parameter', () => {
+    const value = 'https://playlist.megaphone.fm/?p=NSM%26x%3D7546490835'
+
+    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+  })
+
   // The prefix is the publisher's own name, so it has no length anyone controls. Both of these
   // are real episodes, confirmed against Megaphone's oEmbed, and a cap at eleven refused them.
   const longPublisherPrefixIds: Array<string> = [

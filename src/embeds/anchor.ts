@@ -3,8 +3,6 @@ import type { ResolveEmbed } from '../types.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-const safeSegmentRegex = /^[A-Za-z0-9._-]+$/
-
 // One service, three host generations, all still live in feeds: `anchor.fm` became
 // `podcasters.spotify.com` became `creators.spotify.com`. The Spotify resolver matches the
 // spotify.com hosts but rejects these paths, so they fall through to here.
@@ -29,7 +27,7 @@ export const extractAnchorEpisode = (link: string): string | undefined => {
   const show = segments[marker - 1]
   const episode = segments[marker + 2]
 
-  if (!show || !episode || ![show, episode].every((part) => safeSegmentRegex.test(part))) {
+  if (!episode) {
     return
   }
 

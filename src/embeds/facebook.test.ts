@@ -7,6 +7,7 @@ import {
   facebookBlockquoteEmbedResolver,
   facebookIframeEmbedResolver,
   facebookResolveEmbed,
+  facebookS9eEmbedResolver,
   facebookWidgetEmbedResolver,
   facebookXfbmlEmbedResolver,
 } from './facebook.js'
@@ -189,7 +190,7 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="fb-post"
-          data-href="https://evil.test/facebook.com/post"
+          data-href="https://evil.test/PageName/posts/123"
         ></div>
       `
 
@@ -252,7 +253,7 @@ describeForEachParser('facebookXfbmlEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should return undefined for a non-facebook href', async () => {
-      const value = '<fb:post href="https://evil.test/facebook.com/posts/123"></fb:post>'
+      const value = '<fb:post href="https://evil.test/PageName/posts/123"></fb:post>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -317,7 +318,7 @@ describeForEachParser('facebookAmpEmbedResolver', (parseHtml) => {
     it('should return undefined for a non-facebook href', async () => {
       const value = html`
         <amp-facebook
-          data-href="https://evil.test/facebook.com/posts/123"
+          data-href="https://evil.test/PageName/posts/123"
         ></amp-facebook>
       `
 
@@ -403,7 +404,7 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
     it('should return undefined for a cite pointing somewhere else entirely', async () => {
       const value = html`
         <blockquote
-          cite="https://evil.test/facebook.com/posts/123"
+          cite="https://evil.test/PageName/posts/123"
           class="fb-xfbml-parse-ignore"
         >
           <p>Not a facebook post.</p>
@@ -718,6 +719,172 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, facebookS9eEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should frame a bare post id under the placeholder page', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/2/facebook.min.html#1699244425543753"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/Bob/posts/1699244425543753',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FBob%2Fposts%2F1699244425543753',
+        url: 'https://www.facebook.com/Bob/posts/1699244425543753',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a post id behind its kind prefix', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/2/facebook.min.html#p783697877354329"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/Bob/posts/783697877354329',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FBob%2Fposts%2F783697877354329',
+        url: 'https://www.facebook.com/Bob/posts/783697877354329',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should send a video id to the watch page', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/facebook.min.html#video506931837457674"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/watch/?v=506931837457674',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D506931837457674',
+        url: 'https://www.facebook.com/watch/?v=506931837457674',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the page a post fragment names', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/2/facebook.min.html#batterymooch/posts/2091705384452370"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/batterymooch/posts/2091705384452370',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fbatterymooch%2Fposts%2F2091705384452370',
+        url: 'https://www.facebook.com/batterymooch/posts/2091705384452370',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a dotted page a post fragment names', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/2/facebook.min.html#john.doe/posts/2091705384452370"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/john.doe/posts/2091705384452370',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fjohn.doe%2Fposts%2F2091705384452370',
+        url: 'https://www.facebook.com/john.doe/posts/2091705384452370',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should frame a page and id fragment as the page post', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/2/facebook.min.html#example/1699244425543753"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/example/posts/1699244425543753',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fexample%2Fposts%2F1699244425543753',
+        url: 'https://www.facebook.com/example/posts/1699244425543753',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should send a page reel fragment to the watch page', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/2/facebook.min.html#example/reel/1574979536826284"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/watch/?v=1574979536826284',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1574979536826284',
+        url: 'https://www.facebook.com/watch/?v=1574979536826284',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should send a page video fragment to the watch page', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/2/facebook.min.html#supercars/videos/1574979536826284#theme=auto"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/watch/?v=1574979536826284',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1574979536826284',
+        url: 'https://www.facebook.com/watch/?v=1574979536826284',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host carrying the helper path', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://evil.test/iframe/2/facebook.min.html#1699244425543753"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a fragment carrying a separator in its id', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="facebook"
+          src="https://s9e.github.io/iframe/2/facebook.min.html#page/posts/1/../../evil"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 describe('facebookResolveEmbed', () => {
   it('should return undefined for a url that does not parse', () => {
     const value = 'not a url'
@@ -733,6 +900,44 @@ describe('facebookResolveEmbed', () => {
 
   it('should return undefined for a legacy video frame with a non-numeric id', () => {
     const value = 'https://www.facebook.com/video/embed?video_id=../etc'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for the legacy video path under another segment', () => {
+    const value = 'https://www.facebook.com/x/video/embed?video_id=123456'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a path below the legacy video frame', () => {
+    const value = 'https://www.facebook.com/video/embed/extra?video_id=123456'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for the plugin path under another segment', () => {
+    const value =
+      'https://www.facebook.com/x/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a path below the plugin', () => {
+    const value =
+      'https://www.facebook.com/plugins/post.php/extra?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for the watch path under another segment', () => {
+    const value = 'https://www.facebook.com/x/watch/?v=1010445561578533'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a path below the watch page', () => {
+    const value = 'https://www.facebook.com/watch/extra?v=1010445561578533'
 
     expect(facebookResolveEmbed(value)).toBeUndefined()
   })

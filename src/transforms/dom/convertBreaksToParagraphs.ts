@@ -7,11 +7,8 @@ import {
   isElement,
   isText,
   isWhitespaceText,
+  processContainersSelector,
 } from '../../utils/dom.js'
-
-// No figure, unlike wrapBareInlineInParagraphs: a <br> run inside one needs no paragraph.
-const processContainersSelector =
-  'body, div, blockquote, td, li, article, section, main, header, footer, aside'
 
 const preOrCodeTags = new Set(['pre', 'code'])
 

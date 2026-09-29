@@ -166,6 +166,19 @@ describe('spotifyResolveEmbed', () => {
       expect(spotifyResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should give an artist the taller player height', () => {
+      const value = 'https://open.spotify.com/embed/artist/0OdUWJ0sBjDrqHygGUXeCF'
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'artist/0OdUWJ0sBjDrqHygGUXeCF',
+        src: 'https://open.spotify.com/embed/artist/0OdUWJ0sBjDrqHygGUXeCF',
+        url: 'https://open.spotify.com/artist/0OdUWJ0sBjDrqHygGUXeCF',
+        height: 352,
+      }
+
+      expect(spotifyResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should ignore what follows the id', () => {
       const value = 'https://open.spotify.com/embed/show/4rOoJ6Egrf8K2IrywzwOMk/video'
       const expected: EmbedResolverResult = {
@@ -220,6 +233,42 @@ describe('spotifyResolveEmbed', () => {
 
     it('should return undefined for a legacy uri that names no id', () => {
       const value = 'https://embed.spotify.com/?uri=spotify:track'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an id carrying a path after it', () => {
+      const value = 'https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT%2Fx'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an id carrying a path before it', () => {
+      const value = 'https://open.spotify.com/embed/track/x%2F4cOdK2wGLETKBW3PvgPWqT'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a route prefix that only ends in embed', () => {
+      const value = 'https://open.spotify.com/noembed/track/4cOdK2wGLETKBW3PvgPWqT'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a route prefix that only starts with embed', () => {
+      const value = 'https://open.spotify.com/embedded/track/4cOdK2wGLETKBW3PvgPWqT'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a legacy uri under another scheme', () => {
+      const value = 'https://embed.spotify.com/?uri=notspotify:track:4cOdK2wGLETKBW3PvgPWqT'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a legacy uri that runs on past the id', () => {
+      const value = 'https://embed.spotify.com/?uri=spotify:track:4cOdK2wGLETKBW3PvgPWqT/extra'
 
       expect(spotifyResolveEmbed(value)).toBeUndefined()
     })
@@ -438,6 +487,46 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a By inside a playlist card act', async () => {
+      const midwordByCardAttrs = jsonAttrValue({
+        image:
+          'https://mosaic.scdn.co/640/ab67616d0000b2730ed61f29c01fb0ec0189fec3ab67616d0000b273148b9745cd535caca93c0adaab67616d0000b2733d474b85b3ac8f9fe252569eab67616d0000b273f560475b307ae778ed9cb0ea',
+        title: "Gravity's Gone",
+        subtitle: 'Drive-By Truckers',
+        description: 'Drive-By Truckers Primer by Jay Busbee',
+        url: 'https://open.spotify.com/playlist/2YhTJBzliipdojkPBF2DsV',
+        belowTheFold: true,
+        noScroll: false,
+      })
+      const value = html`
+        <iframe
+          class="spotify-wrap playlist"
+          data-attrs="${midwordByCardAttrs}"
+          src="https://open.spotify.com/embed/playlist/2YhTJBzliipdojkPBF2DsV"
+          frameborder="0"
+          gesture="media"
+          allowfullscreen="true"
+          allow="encrypted-media"
+          loading="lazy"
+          data-component-name="Spotify2ToDOM"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'playlist/2YhTJBzliipdojkPBF2DsV',
+        src: 'https://open.spotify.com/embed/playlist/2YhTJBzliipdojkPBF2DsV',
+        url: 'https://open.spotify.com/playlist/2YhTJBzliipdojkPBF2DsV',
+        thumbnail:
+          'https://mosaic.scdn.co/640/ab67616d0000b2730ed61f29c01fb0ec0189fec3ab67616d0000b273148b9745cd535caca93c0adaab67616d0000b2733d474b85b3ac8f9fe252569eab67616d0000b273f560475b307ae778ed9cb0ea',
+        height: 352,
+        title: "Gravity's Gone",
+        description: 'Drive-By Truckers Primer by Jay Busbee',
+        author: 'Drive-By Truckers',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The card prints the type where a description would go, which the id already states.
     it('should state no description when the card holds only the type', async () => {
       const typeOnlyCardAttrs = jsonAttrValue({
@@ -601,7 +690,7 @@ describeForEachParser('spotifyEmbedResolver', (parseHtml) => {
     it('should ignore artwork hosted somewhere else', async () => {
       const foreignArtworkAttrs = jsonAttrValue({
         title: 'A track',
-        image: 'https://evil.test/i.scdn.co/image/x',
+        image: 'https://evil.test/image/ab67616d0000b273',
       })
       const value = html`
         <iframe

@@ -33,7 +33,7 @@ describe('podomaticResolveEmbed', () => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/podomatic.com/embed/html5/episode/10076958'
+      const value = 'https://evil.test/embed/html5/episode/10076958'
 
       expect(podomaticResolveEmbed(value)).toBeUndefined()
     })
@@ -72,6 +72,24 @@ describe('podomaticResolveEmbed', () => {
 
     it('should refuse an id sitting where the kind belongs', () => {
       const value = 'https://www.podomatic.com/embed/html5/2295001'
+
+      expect(podomaticResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a player path under a route other than embed', () => {
+      const value = 'https://www.podomatic.com/widget/html5/episode/10076958'
+
+      expect(podomaticResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a kind carrying an encoded separator', () => {
+      const value = 'https://www.podomatic.com/embed/html5/episode%2F..%2F..%2Fadmin/10076958'
+
+      expect(podomaticResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a kind that starts with a digit', () => {
+      const value = 'https://www.podomatic.com/embed/html5/2episode/10076958'
 
       expect(podomaticResolveEmbed(value)).toBeUndefined()
     })
@@ -228,6 +246,15 @@ describe('podomaticResolveEmbed', () => {
 
       expect(podomaticResolveEmbed(value)).toBeUndefined()
     })
+
+    // The posting frame 404s for a real entry as for a fabricated one, and it names the entry by
+    // account and timestamp, not by the numeric id the html5 player takes.
+    it('should leave the dead posting frame alone', () => {
+      const value =
+        'http://rebelliondogs12stepradio.podomatic.com/embed/frame/posting/2016-07-08T15_06_10-07_00?json_url=http%3A%2F%2Frebelliondogs12stepradio.podomatic.com%2Fentry%2Fembed_params%2F2016-07-08T15_06_10-07_00%3Fcolor%3D43bee7%26autoPlay%3Dfalse%26facebook%3Dtrue%26height%3D85%26minicast%3Dfalse%26objembed%3D0%26width%3D440&notb=1'
+
+      expect(podomaticResolveEmbed(value)).toBeUndefined()
+    })
   })
 })
 
@@ -250,8 +277,7 @@ describeForEachParser('podomaticEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/podomatic.com/embed/html5/episode/10076958"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/html5/episode/10076958"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -65,6 +66,22 @@ describeForEachParser('convertLazyImageContainers', (parseHtml) => {
       <div data-src="https://example.com/photo.jpg">
         <img src="https://example.com/photo.jpg">
         Caption
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a textless child element inside the container', async () => {
+    const value = html`
+      <div data-src="https://example.com/photo.jpg">
+        <a href="https://example.com/photo-large.jpg"></a>
+      </div>
+    `
+    const expected = html`
+      <div data-src="https://example.com/photo.jpg">
+        <img src="https://example.com/photo.jpg">
+        <a href="https://example.com/photo-large.jpg"></a>
       </div>
     `
 
@@ -141,5 +158,18 @@ describeForEachParser('convertLazyImageContainers', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('convertLazyImageContainers through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should turn a gallery container into an image', async () => {
+    const value = '<div class="cesis_gallery_img" data-src="https://example.com/photo.jpg"></div>'
+    const expected = '<img src="https://example.com/photo.jpg">'
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
