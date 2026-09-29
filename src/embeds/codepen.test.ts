@@ -545,22 +545,32 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const value = html`
         <p
           class="codepen"
-          data-height="300"
-          data-default-tab="result"
-          data-slug-hash="LExymZM"
-          data-user="sturobson"
+          data-height="700"
+          data-pen-title="Theme and Mode Toggle Demo"
           data-version="2"
+          data-default-tab="result"
+          data-slug-hash="azpLzvW"
+          data-user="sturobson"
+          style="height: 700px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;"
         >
-          <span>See the Pen on <a href="https://codepen.io">CodePen</a>.</span>
+          <span
+            >See the Pen
+            <a href="https://codepen.io/editor/sturobson/pen/019f138e-9a52-7a4f-8fe8-39db4b632944">
+              Theme and Mode Toggle Demo</a
+            >
+            by Stuart Robson (<a href="https://codepen.io/sturobson">@sturobson</a>) on
+            <a href="https://codepen.io">CodePen</a>.</span
+          >
         </p>
       `
       const expected: EmbedResolverResult = {
         provider: 'codepen',
-        id: 'LExymZM',
-        src: 'https://codepen.io/editor/sturobson/embed/LExymZM?default-tab=result',
-        url: 'https://codepen.io/sturobson/pen/LExymZM',
-        thumbnail: 'https://shots.codepen.io/sturobson/pen/LExymZM-512.jpg',
-        height: 300,
+        id: 'azpLzvW',
+        src: 'https://codepen.io/editor/sturobson/embed/azpLzvW?default-tab=result',
+        url: 'https://codepen.io/sturobson/pen/azpLzvW',
+        thumbnail: 'https://shots.codepen.io/sturobson/pen/azpLzvW-512.jpg',
+        height: 700,
+        title: 'Theme and Mode Toggle Demo',
         author: '@sturobson',
       }
 
@@ -571,22 +581,32 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const value = html`
         <p
           class="codepen"
-          data-height="300"
-          data-default-tab="result"
-          data-slug-hash="LExymZM"
-          data-user="sturobson"
+          data-height="700"
+          data-pen-title="Theme and Mode Toggle Demo"
           data-version="1"
+          data-default-tab="result"
+          data-slug-hash="azpLzvW"
+          data-user="sturobson"
+          style="height: 700px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;"
         >
-          <span>See the Pen on <a href="https://codepen.io">CodePen</a>.</span>
+          <span
+            >See the Pen
+            <a href="https://codepen.io/editor/sturobson/pen/019f138e-9a52-7a4f-8fe8-39db4b632944">
+              Theme and Mode Toggle Demo</a
+            >
+            by Stuart Robson (<a href="https://codepen.io/sturobson">@sturobson</a>) on
+            <a href="https://codepen.io">CodePen</a>.</span
+          >
         </p>
       `
       const expected: EmbedResolverResult = {
         provider: 'codepen',
-        id: 'LExymZM',
-        src: 'https://codepen.io/sturobson/embed/LExymZM?default-tab=result',
-        url: 'https://codepen.io/sturobson/pen/LExymZM',
-        thumbnail: 'https://shots.codepen.io/sturobson/pen/LExymZM-512.jpg',
-        height: 300,
+        id: 'azpLzvW',
+        src: 'https://codepen.io/sturobson/embed/azpLzvW?default-tab=result',
+        url: 'https://codepen.io/sturobson/pen/azpLzvW',
+        thumbnail: 'https://shots.codepen.io/sturobson/pen/azpLzvW-512.jpg',
+        height: 700,
+        title: 'Theme and Mode Toggle Demo',
         author: '@sturobson',
       }
 

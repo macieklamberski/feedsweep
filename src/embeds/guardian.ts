@@ -2,7 +2,7 @@ import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-const guardianHosts = ['theguardian.com']
+const guardianHosts = ['embed.theguardian.com']
 
 // `/embed/video/{section}/video/{yyyy}/{mon}/{dd}/{slug}`.
 // The video's page is the same path on `www`, and a real path answers 200 where a fabricated
@@ -48,7 +48,7 @@ export const guardianResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, guardianHosts)
   const path = parsed?.pathname.match(playerPathRegex)?.[1]
 
-  if (parsed?.hostname !== 'embed.theguardian.com' || !path) {
+  if (!path) {
     return
   }
 

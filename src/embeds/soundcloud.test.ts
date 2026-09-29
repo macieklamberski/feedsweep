@@ -524,6 +524,21 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // A share token is letters and digits after its `s-`: the same token with a hyphen answers 404.
+    it('should not read a segment carrying a hyphen after s- as the token', async () => {
+      const value = html`
+        <iframe
+          src="https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy/s-vd94-jk1b3m"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        src: 'https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy/s-vd94-jk1b3m',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should keep a track slug holding s- as part of the permalink', async () => {
       const value = '<iframe src="https://soundcloud.com/anjunadeep/glass-house"></iframe>'
       const expected: EmbedResolverResult = {
