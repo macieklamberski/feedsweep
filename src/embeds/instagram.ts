@@ -19,20 +19,9 @@ const instagramHosts = ['instagram.com', 'instagr.am']
 const nonShortcodeSegments = new Set(['audio'])
 
 // Instagram's own routes sit where an account does: `share/p/{token}` carries a redirect
-// token, not a shortcode, and reading it as one mints a frame that cannot load.
-const sitePathSegments = new Set([
-  'about',
-  'accounts',
-  'api',
-  'challenge',
-  'developer',
-  'direct',
-  'explore',
-  'legal',
-  'share',
-  'stories',
-  'web',
-])
+// token, not a shortcode, and reading it as one mints a frame that cannot load. `explore`,
+// `accounts` and the other routes redirect `{route}/p/{code}` to the post, so they read as one.
+const sitePathSegments = new Set(['challenge', 'developer', 'share', 'stories'])
 
 // The account names the poster, not the post, so it is matched and dropped.
 // `tv` is the retired IGTV route and `reels` the plural spelling of the reel.

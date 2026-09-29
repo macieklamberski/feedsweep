@@ -634,6 +634,14 @@ describeForEachParser('appleToolsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    // Every sampled tool url names an album or a song.
+    it('should ignore a kind carrying a hyphen', async () => {
+      const value =
+        '<iframe src="https://tools.applemusic.com/embed/v1/music-video/1440833098?country=us"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a route on the tool host that is not an embed', async () => {
       const value = '<iframe src="https://tools.applemusic.com/us/album/111492"></iframe>'
 
