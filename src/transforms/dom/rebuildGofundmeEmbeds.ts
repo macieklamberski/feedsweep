@@ -16,6 +16,11 @@ const isKeptParam = (name: string): boolean => {
   )
 }
 
+// The loader's starting height per size segment, `/f/{slug}/widget/{size}`, before the frame posts
+// its own. Any other segment, or none, starts at the large height.
+const widgetHeights: Record<string, number> = { small: 70, medium: 200 }
+const largeWidgetHeight = 500
+
 // GoFundMe's campaign widget: an empty div carrying the campaign url in `data-url`, which only
 // its sibling loader script turns into an iframe.
 export const rebuildGofundmeEmbeds: DomTransform = () => (document) => {
@@ -37,6 +42,11 @@ export const rebuildGofundmeEmbeds: DomTransform = () => (document) => {
     // The host redirects `http:` to `https:`, and an `http:` frame is blocked as mixed content.
     url.protocol = 'https:'
 
-    element.replaceWith(createIframe(document, url.toString()))
+    const size = url.pathname.split('/')[4] ?? ''
+    const height = Object.hasOwn(widgetHeights, size) ? widgetHeights[size] : largeWidgetHeight
+    const iframe = createIframe(document, url.toString())
+
+    iframe.setAttribute('height', String(height))
+    element.replaceWith(iframe)
   }
 }
