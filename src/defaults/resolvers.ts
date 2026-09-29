@@ -30,12 +30,19 @@ import { swellCiteResolver } from '../cites/swell.js'
 import { tcdCiteResolver } from '../cites/tcd.js'
 import { tistoryCiteResolver } from '../cites/tistory.js'
 import { tumblrCiteResolver } from '../cites/tumblr.js'
+import { wordpressCiteResolver } from '../cites/wordpress.js'
 import { xenforoCiteResolver } from '../cites/xenforo.js'
 import { acastEmbedResolver } from '../embeds/acast.js'
+import {
+  amebaImagePageEmbedResolver,
+  amebaMoviePlayerEmbedResolver,
+  amebaReblogCardEmbedResolver,
+} from '../embeds/ameba.js'
 import { anchorEmbedResolver } from '../embeds/anchor.js'
 import { aparatIframeEmbedResolver, aparatScriptEmbedResolver } from '../embeds/aparat.js'
-import { appleEmbedResolver } from '../embeds/apple.js'
+import { appleEmbedResolver, appleToolsEmbedResolver } from '../embeds/apple.js'
 import { archiveFlashEmbedResolver, archiveIframeEmbedResolver } from '../embeds/archive.js'
+import { ardmediathekEmbedResolver } from '../embeds/ardmediathek.js'
 import { arteEmbedResolver } from '../embeds/arte.js'
 import { audioboomIframeEmbedResolver, audioboomWidgetEmbedResolver } from '../embeds/audioboom.js'
 import { audiomackEmbedResolver } from '../embeds/audiomack.js'
@@ -51,6 +58,7 @@ import {
   blueskyPostElementEmbedResolver,
   blueskyS9eEmbedResolver,
 } from '../embeds/bluesky.js'
+import { brEmbedResolver } from '../embeds/br.js'
 import { bridEmbedResolver } from '../embeds/brid.js'
 import {
   brightcoveExperienceEmbedResolver,
@@ -62,7 +70,15 @@ import {
   buzzsproutIframeEmbedResolver,
   buzzsproutScriptEmbedResolver,
 } from '../embeds/buzzsprout.js'
+import { calameoEmbedResolver } from '../embeds/calameo.js'
+import { canvaIframeEmbedResolver, canvaWidgetEmbedResolver } from '../embeds/canva.js'
 import { captivateEmbedResolver } from '../embeds/captivate.js'
+import { ccmaEmbedResolver } from '../embeds/ccma.js'
+import { channel9EmbedResolver } from '../embeds/channel9.js'
+import {
+  cloudflarestreamIframeEmbedResolver,
+  cloudflarestreamScriptEmbedResolver,
+} from '../embeds/cloudflarestream.js'
 import { cnbcIframeEmbedResolver } from '../embeds/cnbc.js'
 import {
   cnnFlashEmbedResolver,
@@ -71,34 +87,71 @@ import {
 } from '../embeds/cnn.js'
 import { codepenIframeEmbedResolver, codepenWidgetEmbedResolver } from '../embeds/codepen.js'
 import { codesandboxIframeEmbedResolver } from '../embeds/codesandbox.js'
+import {
+  crowdsignalFlashEmbedResolver,
+  crowdsignalIframeEmbedResolver,
+  crowdsignalScriptEmbedResolver,
+} from '../embeds/crowdsignal.js'
 import { dailymotionEmbedResolver } from '../embeds/dailymotion.js'
 import { deezerEmbedResolver } from '../embeds/deezer.js'
+import { documentcloudEmbedResolver } from '../embeds/documentcloud.js'
 import { donorboxEmbedResolver } from '../embeds/donorbox.js'
 import {
   facebookAmpEmbedResolver,
   facebookBlockquoteEmbedResolver,
   facebookIframeEmbedResolver,
+  facebookS9eEmbedResolver,
   facebookWidgetEmbedResolver,
   facebookXfbmlEmbedResolver,
 } from '../embeds/facebook.js'
+import {
+  fc2BlogScriptEmbedResolver,
+  fc2FlashEmbedResolver,
+  fc2IframeEmbedResolver,
+  fc2PlayerScriptEmbedResolver,
+} from '../embeds/fc2.js'
+import { figmaEmbedResolver } from '../embeds/figma.js'
 import { figshareEmbedResolver } from '../embeds/figshare.js'
 import { firesideEmbedResolver } from '../embeds/fireside.js'
 import { flickrEmbedResolver } from '../embeds/flickr.js'
+import {
+  fliphtml5IframeEmbedResolver,
+  fliphtml5LightBoxEmbedResolver,
+} from '../embeds/fliphtml5.js'
 import { flourishIframeEmbedResolver, flourishWidgetEmbedResolver } from '../embeds/flourish.js'
 import { foxnewsIframeEmbedResolver, foxnewsScriptEmbedResolver } from '../embeds/foxnews.js'
+import { ganjingworldEmbedResolver } from '../embeds/ganjingworld.js'
+import { garminEmbedResolver } from '../embeds/garmin.js'
 import { geniallyEmbedResolver } from '../embeds/genially.js'
 import { gettyImagesEmbedResolver } from '../embeds/gettyimages.js'
 import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds/glomex.js'
+import { googlebooksEmbedResolver } from '../embeds/googlebooks.js'
+import { googledriveEmbedResolver } from '../embeds/googledrive.js'
+import { googleslidesEmbedResolver } from '../embeds/googleslides.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
-import { imgurBlockquoteEmbedResolver, imgurIframeEmbedResolver } from '../embeds/imgur.js'
+import { helloassoEmbedResolver } from '../embeds/helloasso.js'
+import { heyzineEmbedResolver } from '../embeds/heyzine.js'
+import {
+  imgurBlockquoteEmbedResolver,
+  imgurIframeEmbedResolver,
+  imgurS9eEmbedResolver,
+} from '../embeds/imgur.js'
+import { inaEmbedResolver, inaScriptEmbedResolver } from '../embeds/ina.js'
+import {
+  infogramIframeEmbedResolver,
+  infogramScriptEmbedResolver,
+  infogramWidgetEmbedResolver,
+} from '../embeds/infogram.js'
 import {
   instagramAmpEmbedResolver,
   instagramBlockquoteEmbedResolver,
   instagramIframeEmbedResolver,
+  instagramS9eEmbedResolver,
   instagramSubstackEmbedResolver,
 } from '../embeds/instagram.js'
 import { issuuIframeEmbedResolver, issuuWidgetEmbedResolver } from '../embeds/issuu.js'
 import { ivooxEmbedResolver } from '../embeds/ivoox.js'
+import { jotformIframeEmbedResolver, jotformScriptEmbedResolver } from '../embeds/jotform.js'
 import {
   jwplayerAmpEmbedResolver,
   jwplayerIframeEmbedResolver,
@@ -106,6 +159,9 @@ import {
   jwplayerSetupEmbedResolver,
 } from '../embeds/jwplayer.js'
 import { kalturaIframeEmbedResolver, kalturaScriptEmbedResolver } from '../embeds/kaltura.js'
+import { kindleEmbedResolver } from '../embeds/kindle.js'
+import { komootEmbedResolver } from '../embeds/komoot.js'
+import { learningappsEmbedResolver } from '../embeds/learningapps.js'
 import { libsynEmbedResolver } from '../embeds/libsyn.js'
 import { linkedinEmbedResolver } from '../embeds/linkedin.js'
 import { mailruEmbedResolver } from '../embeds/mailru.js'
@@ -114,22 +170,43 @@ import { mediavineScriptEmbedResolver, mediavineWidgetEmbedResolver } from '../e
 import { megaphoneEmbedResolver } from '../embeds/megaphone.js'
 import { megatvEmbedResolver } from '../embeds/megatv.js'
 import { mixcloudEmbedResolver } from '../embeds/mixcloud.js'
+import { nbcnewsEmbedResolver } from '../embeds/nbcnews.js'
+import { neteaseEmbedResolver } from '../embeds/netease.js'
 import { nicovideoIframeEmbedResolver, nicovideoScriptEmbedResolver } from '../embeds/nicovideo.js'
 import { notecomIframeEmbedResolver } from '../embeds/notecom.js'
+import { nprFlashEmbedResolver, nprIframeEmbedResolver } from '../embeds/npr.js'
 import { nytimesIframeEmbedResolver } from '../embeds/nytimes.js'
+import { observableEmbedResolver } from '../embeds/observable.js'
+import { odnoklassnikiEmbedResolver } from '../embeds/odnoklassniki.js'
 import { odyseeEmbedResolver } from '../embeds/odysee.js'
+import { officeEmbedResolver } from '../embeds/office.js'
 import { omnyEmbedResolver } from '../embeds/omny.js'
 import { padletEmbedResolver } from '../embeds/padlet.js'
+import { pastebinIframeEmbedResolver, pastebinScriptEmbedResolver } from '../embeds/pastebin.js'
+import { patroniteEmbedResolver } from '../embeds/patronite.js'
+import {
+  pbsFlashEmbedResolver,
+  pbsIframeEmbedResolver,
+  pbsLegacyIframeEmbedResolver,
+} from '../embeds/pbs.js'
 import { peertubeEmbedResolver } from '../embeds/peertube.js'
+import { pixivIframeEmbedResolver, pixivScriptEmbedResolver } from '../embeds/pixiv.js'
 import { podbeanEmbedResolver } from '../embeds/podbean.js'
 import { podetizeIframeEmbedResolver, podetizeScriptEmbedResolver } from '../embeds/podetize.js'
 import { podigeeIframeEmbedResolver, podigeeScriptEmbedResolver } from '../embeds/podigee.js'
 import { podomaticEmbedResolver } from '../embeds/podomatic.js'
+import { preziEmbedResolver } from '../embeds/prezi.js'
 import { redcircleIframeEmbedResolver, redcircleScriptEmbedResolver } from '../embeds/redcircle.js'
-import { redditIframeEmbedResolver, redditWidgetEmbedResolver } from '../embeds/reddit.js'
+import {
+  redditIframeEmbedResolver,
+  redditS9eEmbedResolver,
+  redditWidgetEmbedResolver,
+} from '../embeds/reddit.js'
 import { reverbnationEmbedResolver } from '../embeds/reverbnation.js'
+import { ridewithgpsEmbedResolver } from '../embeds/ridewithgps.js'
 import { rtveFlashEmbedResolver, rtveIframeEmbedResolver } from '../embeds/rtve.js'
 import { rutubeEmbedResolver } from '../embeds/rutube.js'
+import { scratchEmbedResolver } from '../embeds/scratch.js'
 import { scribdFlashEmbedResolver, scribdIframeEmbedResolver } from '../embeds/scribd.js'
 import { simplecastEmbedResolver } from '../embeds/simplecast.js'
 import { sketchfabEmbedResolver } from '../embeds/sketchfab.js'
@@ -144,29 +221,62 @@ import {
 } from '../embeds/speakerdeck.js'
 import { spotifyEmbedResolver } from '../embeds/spotify.js'
 import { spreakerAnchorEmbedResolver, spreakerIframeEmbedResolver } from '../embeds/spreaker.js'
+import { srgplayEmbedResolver } from '../embeds/srgplay.js'
 import { stackblitzIframeEmbedResolver } from '../embeds/stackblitz.js'
 import { standfmEmbedResolver } from '../embeds/standfm.js'
+import { steamEmbedResolver } from '../embeds/steam.js'
+import { stravaIframeEmbedResolver, stravaPlaceholderEmbedResolver } from '../embeds/strava.js'
 import { tedEmbedResolver } from '../embeds/ted.js'
-import { telegramIframeEmbedResolver, telegramScriptEmbedResolver } from '../embeds/telegram.js'
+import {
+  telegramIframeEmbedResolver,
+  telegramS9eEmbedResolver,
+  telegramScriptEmbedResolver,
+} from '../embeds/telegram.js'
 import { tencentEmbedResolver } from '../embeds/tencent.js'
-import { tiktokBlockquoteEmbedResolver, tiktokIframeEmbedResolver } from '../embeds/tiktok.js'
+import { tenorIframeEmbedResolver, tenorWidgetEmbedResolver } from '../embeds/tenor.js'
+import { thinglinkEmbedResolver } from '../embeds/thinglink.js'
+import {
+  tiktokBlockquoteEmbedResolver,
+  tiktokIframeEmbedResolver,
+  tiktokS9eEmbedResolver,
+} from '../embeds/tiktok.js'
 import { transistorEmbedResolver } from '../embeds/transistor.js'
+import { tumblrIframeEmbedResolver, tumblrPostEmbedResolver } from '../embeds/tumblr.js'
+import { tuneinEmbedResolver } from '../embeds/tunein.js'
 import {
   twitterAmpEmbedResolver,
   twitterBlockquoteEmbedResolver,
   twitterIframeEmbedResolver,
+  twitterS9eEmbedResolver,
   twitterSubstackEmbedResolver,
 } from '../embeds/twitter.js'
 import { typeformIframeEmbedResolver, typeformWidgetEmbedResolver } from '../embeds/typeform.js'
+import { ultimediaEmbedResolver } from '../embeds/ultimedia.js'
 import {
   videopressFlashEmbedResolver,
   videopressIframeEmbedResolver,
 } from '../embeds/videopress.js'
+import {
+  vidyardIframeEmbedResolver,
+  vidyardImageEmbedResolver,
+  vidyardScriptEmbedResolver,
+} from '../embeds/vidyard.js'
 import { vimeoEmbedResolver } from '../embeds/vimeo.js'
+import { vkEmbedResolver } from '../embeds/vk.js'
 import { wikimediaEmbedResolver } from '../embeds/wikimedia.js'
 import { wistiaEmbedResolver } from '../embeds/wistia.js'
+import { wordwallEmbedResolver } from '../embeds/wordwall.js'
+import {
+  yandexMapsIframeEmbedResolver,
+  yandexMapsScriptEmbedResolver,
+} from '../embeds/yandexmaps.js'
 import { youkuEmbedResolver } from '../embeds/youku.js'
-import { youtubeAmpEmbedResolver, youtubeIframeEmbedResolver } from '../embeds/youtube.js'
+import {
+  youtubeAmpEmbedResolver,
+  youtubeFc2EmbedResolver,
+  youtubeIframeEmbedResolver,
+} from '../embeds/youtube.js'
+import { yumpuEmbedResolver } from '../embeds/yumpu.js'
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
 import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
@@ -260,6 +370,7 @@ import { discourseMediaResolver } from '../media/discourse.js'
 import { ghostMediaResolver } from '../media/ghost.js'
 import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
+import { tumblrMediaResolver } from '../media/tumblr.js'
 import { wechatMediaResolver } from '../media/wechat.js'
 import { weeblyMediaResolver } from '../media/weebly.js'
 import { wikimediaMediaResolver } from '../media/wikimedia.js'
@@ -276,12 +387,17 @@ import type {
 // element can't be re-matched, so a broader selector leaves the alphabet and moves below.
 const embedResolvers: Array<EmbedResolver> = [
   acastEmbedResolver,
+  amebaImagePageEmbedResolver,
+  amebaMoviePlayerEmbedResolver,
+  amebaReblogCardEmbedResolver,
   anchorEmbedResolver,
   aparatIframeEmbedResolver,
   aparatScriptEmbedResolver,
   appleEmbedResolver,
+  appleToolsEmbedResolver,
   archiveIframeEmbedResolver,
   archiveFlashEmbedResolver,
+  ardmediathekEmbedResolver,
   arteEmbedResolver,
   audioboomIframeEmbedResolver,
   audioboomWidgetEmbedResolver,
@@ -296,6 +412,7 @@ const embedResolvers: Array<EmbedResolver> = [
   blueskyIframeEmbedResolver,
   blueskyS9eEmbedResolver,
   blueskyPostElementEmbedResolver,
+  brEmbedResolver,
   bridEmbedResolver,
   brightcoveExperienceEmbedResolver,
   brightcoveFlashEmbedResolver,
@@ -303,7 +420,14 @@ const embedResolvers: Array<EmbedResolver> = [
   brightcoveVideoJsEmbedResolver,
   buzzsproutIframeEmbedResolver,
   buzzsproutScriptEmbedResolver,
+  calameoEmbedResolver,
+  canvaIframeEmbedResolver,
+  canvaWidgetEmbedResolver,
   captivateEmbedResolver,
+  ccmaEmbedResolver,
+  channel9EmbedResolver,
+  cloudflarestreamIframeEmbedResolver,
+  cloudflarestreamScriptEmbedResolver,
   cnbcIframeEmbedResolver,
   cnnScriptEmbedResolver,
   cnnFlashEmbedResolver,
@@ -311,41 +435,72 @@ const embedResolvers: Array<EmbedResolver> = [
   codepenWidgetEmbedResolver,
   codepenIframeEmbedResolver,
   codesandboxIframeEmbedResolver,
+  crowdsignalFlashEmbedResolver,
+  crowdsignalIframeEmbedResolver,
+  crowdsignalScriptEmbedResolver,
   dailymotionEmbedResolver,
   deezerEmbedResolver,
+  documentcloudEmbedResolver,
   donorboxEmbedResolver,
   facebookWidgetEmbedResolver,
   facebookIframeEmbedResolver,
+  facebookS9eEmbedResolver,
   facebookBlockquoteEmbedResolver,
   facebookXfbmlEmbedResolver,
   facebookAmpEmbedResolver,
+  fc2PlayerScriptEmbedResolver,
+  fc2BlogScriptEmbedResolver,
+  fc2IframeEmbedResolver,
+  fc2FlashEmbedResolver,
+  figmaEmbedResolver,
   figshareEmbedResolver,
   firesideEmbedResolver,
   flickrEmbedResolver,
+  fliphtml5IframeEmbedResolver,
+  fliphtml5LightBoxEmbedResolver,
   flourishWidgetEmbedResolver,
   flourishIframeEmbedResolver,
   foxnewsScriptEmbedResolver,
   foxnewsIframeEmbedResolver,
+  ganjingworldEmbedResolver,
+  garminEmbedResolver,
   geniallyEmbedResolver,
   gettyImagesEmbedResolver,
   glomexIframeEmbedResolver,
   glomexElementEmbedResolver,
+  googlebooksEmbedResolver,
+  googledriveEmbedResolver,
+  googleslidesEmbedResolver,
   guardianEmbedResolver,
+  helloassoEmbedResolver,
+  heyzineEmbedResolver,
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
+  imgurS9eEmbedResolver,
+  inaEmbedResolver,
+  inaScriptEmbedResolver,
+  infogramIframeEmbedResolver,
+  infogramScriptEmbedResolver,
+  infogramWidgetEmbedResolver,
   instagramBlockquoteEmbedResolver,
   instagramAmpEmbedResolver,
   instagramSubstackEmbedResolver,
   instagramIframeEmbedResolver,
+  instagramS9eEmbedResolver,
   issuuWidgetEmbedResolver,
   issuuIframeEmbedResolver,
   ivooxEmbedResolver,
+  jotformScriptEmbedResolver,
+  jotformIframeEmbedResolver,
   jwplayerIframeEmbedResolver,
   jwplayerScriptEmbedResolver,
   jwplayerAmpEmbedResolver,
   jwplayerSetupEmbedResolver,
   kalturaIframeEmbedResolver,
   kalturaScriptEmbedResolver,
+  kindleEmbedResolver,
+  komootEmbedResolver,
+  learningappsEmbedResolver,
   libsynEmbedResolver,
   linkedinEmbedResolver,
   mailruEmbedResolver,
@@ -354,27 +509,46 @@ const embedResolvers: Array<EmbedResolver> = [
   megaphoneEmbedResolver,
   megatvEmbedResolver,
   mixcloudEmbedResolver,
+  nbcnewsEmbedResolver,
+  neteaseEmbedResolver,
   nicovideoScriptEmbedResolver,
   nicovideoIframeEmbedResolver,
   notecomIframeEmbedResolver,
+  nprFlashEmbedResolver,
+  nprIframeEmbedResolver,
   nytimesIframeEmbedResolver,
+  observableEmbedResolver,
+  odnoklassnikiEmbedResolver,
   odyseeEmbedResolver,
+  officeEmbedResolver,
   omnyEmbedResolver,
   padletEmbedResolver,
+  pastebinIframeEmbedResolver,
+  pastebinScriptEmbedResolver,
+  patroniteEmbedResolver,
+  pbsFlashEmbedResolver,
+  pbsIframeEmbedResolver,
+  pbsLegacyIframeEmbedResolver,
+  pixivIframeEmbedResolver,
+  pixivScriptEmbedResolver,
   podbeanEmbedResolver,
   podetizeScriptEmbedResolver,
   podetizeIframeEmbedResolver,
   podigeeScriptEmbedResolver,
   podigeeIframeEmbedResolver,
   podomaticEmbedResolver,
+  preziEmbedResolver,
   redcircleScriptEmbedResolver,
   redcircleIframeEmbedResolver,
   redditWidgetEmbedResolver,
   redditIframeEmbedResolver,
+  redditS9eEmbedResolver,
   reverbnationEmbedResolver,
+  ridewithgpsEmbedResolver,
   rtveIframeEmbedResolver,
   rtveFlashEmbedResolver,
   rutubeEmbedResolver,
+  scratchEmbedResolver,
   scribdFlashEmbedResolver,
   scribdIframeEmbedResolver,
   simplecastEmbedResolver,
@@ -387,28 +561,51 @@ const embedResolvers: Array<EmbedResolver> = [
   spotifyEmbedResolver,
   spreakerIframeEmbedResolver,
   spreakerAnchorEmbedResolver,
+  srgplayEmbedResolver,
   stackblitzIframeEmbedResolver,
   standfmEmbedResolver,
+  steamEmbedResolver,
+  stravaIframeEmbedResolver,
+  stravaPlaceholderEmbedResolver,
   tedEmbedResolver,
   telegramScriptEmbedResolver,
   telegramIframeEmbedResolver,
+  telegramS9eEmbedResolver,
   tencentEmbedResolver,
+  tenorIframeEmbedResolver,
+  tenorWidgetEmbedResolver,
+  thinglinkEmbedResolver,
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
+  tiktokS9eEmbedResolver,
   transistorEmbedResolver,
+  tumblrIframeEmbedResolver,
+  tumblrPostEmbedResolver,
+  tuneinEmbedResolver,
   twitterBlockquoteEmbedResolver,
   twitterAmpEmbedResolver,
   twitterSubstackEmbedResolver,
   twitterIframeEmbedResolver,
+  twitterS9eEmbedResolver,
   typeformWidgetEmbedResolver,
   typeformIframeEmbedResolver,
+  ultimediaEmbedResolver,
   videopressIframeEmbedResolver,
   videopressFlashEmbedResolver,
+  vidyardIframeEmbedResolver,
+  vidyardImageEmbedResolver,
+  vidyardScriptEmbedResolver,
   vimeoEmbedResolver,
+  vkEmbedResolver,
   wistiaEmbedResolver,
+  wordwallEmbedResolver,
+  yandexMapsIframeEmbedResolver,
+  yandexMapsScriptEmbedResolver,
   youkuEmbedResolver,
   youtubeIframeEmbedResolver,
   youtubeAmpEmbedResolver,
+  youtubeFc2EmbedResolver,
+  yumpuEmbedResolver,
   zencastrBlockquoteEmbedResolver,
   zencastrIframeEmbedResolver,
   // Last, outside the alphabet: keyed on a path shape rather than a host, so every resolver
@@ -425,6 +622,7 @@ const mediaResolvers: Array<MediaResolver> = [
   ghostMediaResolver,
   podloveMediaResolver,
   substackMediaResolver,
+  tumblrMediaResolver,
   wechatMediaResolver,
   weeblyMediaResolver,
   wikimediaMediaResolver,
@@ -460,6 +658,7 @@ const citeResolvers: Array<CiteResolver> = [
   tcdCiteResolver,
   tistoryCiteResolver,
   tumblrCiteResolver,
+  wordpressCiteResolver,
   xenforoCiteResolver,
   // Last, outside the alphabet: `.h-cite` is generic markup any card may also carry.
   microformatsCiteResolver,

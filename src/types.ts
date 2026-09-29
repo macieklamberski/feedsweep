@@ -1,5 +1,3 @@
-import type { DiscoverResolveUrlFn } from 'feedscout'
-
 import type { MaybePromise, Pattern } from 'trousse'
 
 export type EnclosureThumbnail = {
@@ -25,12 +23,15 @@ export type Enclosure = {
   groupIndex?: number
 }
 
-export type ResolveUrlFn = DiscoverResolveUrlFn
+export type ResolveUrlFn = (url: string, baseUrl: string | undefined) => string | undefined
 
 export type EmbedResolverResult = {
   provider: string
   id?: string
   src: string
+  // Settings the publisher chose for this one embed that a reader may override, such as the
+  // language of a widget's labels. They stay off `src`, so a reader can apply its own instead.
+  params?: Record<string, string>
   url?: string
   thumbnail?: string
   width?: number

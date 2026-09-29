@@ -56,6 +56,56 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toBe(expected)
   })
 
+  it('should keep a lazy image whose placeholder is sized 1x1', async () => {
+    const value = html`
+      <p>Text</p>
+      <img
+        src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
+        data-src="https://example.com/photo.jpg"
+        width="1"
+        height="1"
+      >
+    `
+    const expected = html`
+      <p>Text</p>
+      <img src="https://example.com/photo.jpg" data-src="https://example.com/photo.jpg">
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should keep a lazy image whose placeholder is sized 1x1 in inline style', async () => {
+    const value = html`
+      <p>Text</p>
+      <img
+        src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
+        data-src="https://example.com/photo.jpg"
+        style="width:1px;height:1px"
+      >
+    `
+    const expected = html`
+      <p>Text</p>
+      <img src="https://example.com/photo.jpg" data-src="https://example.com/photo.jpg">
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should remove a lazy tracking pixel on a tracking host', async () => {
+    const value = html`
+      <p>Text</p>
+      <img
+        src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
+        data-src="https://pixel.wp.com/b.gif"
+        width="1"
+        height="1"
+      >
+    `
+    const expected = '<p>Text</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toBe(expected)
+  })
+
   it('should remove a 0x0 tracking pixel', async () => {
     // resolveMediaDimensions drops any width/height that is not a positive integer, so it used
     // to delete the zeros before removeTrackingPixels could read them. The pixel pass keys on
@@ -747,6 +797,36 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toBe(expected)
   })
 
+  // A widget resolver reads the anchors of a noscript fallback, so links minted out of its
+  // escaped text would give it urls as the title and the author.
+  it('should not linkify the escaped text of a noscript fallback', async () => {
+    const value = html`
+      <p>before</p>
+      <script
+        charset="utf-8"
+        src="http://source.pixiv.net/source/embed.js"
+        data-id="21083839_8595a4d2c55cbfd73b6d1bcd386bde6e"
+        data-size="medium"
+        data-border="on"
+      ></script>
+      <noscript>&lt;p&gt;&lt;a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=21083839" target="_blank"&gt;博麗神社&lt;/a&gt; by &lt;a href="http://www.pixiv.net/member.php?id=35490" target="_blank"&gt;kirero【二日目へ-22】&lt;/a&gt; on &lt;a href="http://www.pixiv.net/" target="_blank"&gt;pixiv&lt;/a&gt;&lt;/p&gt;</noscript>
+    `
+    const expected = html`
+      <p>before</p>
+      <div
+        data-embed-width="390"
+        data-embed-url="https://www.pixiv.net/artworks/21083839"
+        data-embed-src="https://embed.pixiv.net/embed_mk2.php?id=21083839_8595a4d2c55cbfd73b6d1bcd386bde6e&amp;size=medium&amp;border=on"
+        data-embed-provider="pixiv"
+        data-embed-id="21083839_8595a4d2c55cbfd73b6d1bcd386bde6e"
+        data-embed-height="300"
+      ></div>
+      <p><noscript>&lt;p&gt;&lt;a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=21083839" target="_blank"&gt;博麗神社&lt;/a&gt; by &lt;a href="http://www.pixiv.net/member.php?id=35490" target="_blank"&gt;kirero【二日目へ-22】&lt;/a&gt; on &lt;a href="http://www.pixiv.net/" target="_blank"&gt;pixiv&lt;/a&gt;&lt;/p&gt;</noscript></p>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   it('should mark a line-leading timestamp', async () => {
     const value = '<p>01:21 - Intro</p>'
     const expected = '<p><span data-timestamp="81">01:21</span> - Intro</p>'
@@ -938,6 +1018,19 @@ describeForEachParser('transformContent', (parseHtml) => {
 
     expect(result).toEqualHtml(expected)
     expect(await transformContent(result, options)).toBe(result)
+  })
+
+  // The marker the standard pipeline leaves on an injected enclosure is what tells a second
+  // pass the enclosure is already there.
+  it('should be idempotent for injected enclosures', async () => {
+    const options = {
+      parseHtmlFn: parseHtml,
+      enclosures: [{ url: 'https://example.com/episode.mp3', type: 'audio/mpeg' }],
+    }
+    const once = await transformContent('<p>Content</p>', options)
+    const twice = await transformContent(once, options)
+
+    expect(twice).toBe(once)
   })
 
   // Placeholders are the shape most likely to drift on a second pass: a cite one is built

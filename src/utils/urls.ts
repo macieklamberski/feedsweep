@@ -23,6 +23,9 @@ const queryOrHashRegex = /[?#]/
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
 
+export const urlSafeTokenRegex = /^[A-Za-z0-9_-]+$/
+export const digitsRegex = /^\d+$/
+
 // A browser strips C0 controls before reading the scheme, so \x01javascript: runs.
 // Whitespace inside the scheme is dropped as well, so java\tscript: runs too.
 const urlIgnorableRanges = [
@@ -150,6 +153,21 @@ export const composeQuery = (params?: Record<string, string>): string => {
   const query = new URLSearchParams(params).toString()
 
   return query ? `?${query}` : ''
+}
+
+// The publisher's query with only the parameters a player reads left in it. Each pair stays as
+// written, so a repeated name and a bracketed one such as `pwc[size]` reach the player unchanged.
+export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): string => {
+  const pairs = url.search
+    .slice(1)
+    .split('&')
+    .filter((pair) => {
+      const [name] = [...new URLSearchParams(pair).keys()]
+
+      return !!name && isKept(name)
+    })
+
+  return pairs.length > 0 ? `?${pairs.join('&')}` : ''
 }
 
 // The query string an embed resolver carries over when it rebuilds a src from the video id:

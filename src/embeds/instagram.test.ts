@@ -6,6 +6,7 @@ import {
   instagramBlockquoteEmbedResolver,
   instagramIframeEmbedResolver,
   instagramResolveEmbed,
+  instagramS9eEmbedResolver,
   instagramSubstackEmbedResolver,
   readInstagramHeight,
 } from './instagram.js'
@@ -619,6 +620,53 @@ describeForEachParser('instagramIframeEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('instagramS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, instagramS9eEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the shortcode out of the helper frame', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="instagram"
+          src="https://s9e.github.io/iframe/2/instagram.min.html#CdT-yWXBsI7#theme=auto"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/CdT-yWXBsI7',
+        src: 'https://www.instagram.com/p/CdT-yWXBsI7/embed/',
+        url: 'https://www.instagram.com/p/CdT-yWXBsI7/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host naming the helper in its path', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="instagram"
+          src="https://evil.test/s9e.github.io/iframe/2/instagram.min.html#CdT-yWXBsI7"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a fragment stepping out of the post path', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="instagram"
+          src="https://s9e.github.io/iframe/2/instagram.min.html#x/../../reel/CdWN1jeOWr0"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 describe('instagramResolveEmbed', () => {
   it('should resolve the frame a generator pastes directly', () => {
     const value = 'https://www.instagram.com/p/CaUsPbUquKV/embed/'
@@ -823,7 +871,7 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
   }
 
   describe('the current payload', () => {
-    it('should drop the wrapped title and keep the author and the rehosted images', async () => {
+    it('should drop a wrapped caption cut before its closing quote and keep the author and the rehosted images', async () => {
       const value = makeContainer({
         instagram_id: 'DZmgID9Eawg',
         title: 'BBC News on Instagram: "Pakistan\'s prime minister says a peace …',
@@ -894,7 +942,7 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the title that quotes the caption behind the poster', async () => {
+    it('should unwrap the whole caption the title quotes behind the poster', async () => {
       const value = makeContainer({
         instagram_id: 'DY11vsxO5c7',
         title: 'Christine Mari on Instagram: "draw what u want #comics"',
@@ -905,13 +953,14 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
         id: 'p/DY11vsxO5c7',
         src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
         url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+        description: 'draw what u want #comics',
         author: '@christinemariart',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the same title when the quotes are curly', async () => {
+    it('should unwrap the same caption when the quotes are curly', async () => {
       const value = makeContainer({
         instagram_id: 'DY11vsxO5c7',
         title: 'Orca The Sproodle on Instagram: \u201cLook, it\u2019s exhausting\u201d',
@@ -921,6 +970,69 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
         id: 'p/DY11vsxO5c7',
         src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
         url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+        description: 'Look, it\u2019s exhausting',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should unwrap a caption that opens on a closing curly quote', async () => {
+      const value = makeContainer({
+        instagram_id: 'C2NRNCFor5Y',
+        title: 'Consulting Humor on Instagram: \u201d@goodworkmb peace love #consulting\u201d',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/C2NRNCFor5Y',
+        src: 'https://www.instagram.com/p/C2NRNCFor5Y/embed/',
+        url: 'https://www.instagram.com/p/C2NRNCFor5Y/',
+        description: '@goodworkmb peace love #consulting',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop a wrapped caption that closes on a different quote than it opened with', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Orca The Sproodle on Instagram: \u201cLook, it\u2019s exhausting"',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop a wrapped title holding only the quote marks', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Orca The Sproodle on Instagram: ""',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should unwrap a caption that runs over several lines', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Orca The Sproodle on Instagram: \u201cLook,\nit\u2019s exhausting\u201d',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+        description: 'Look,\nit\u2019s exhausting',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -937,6 +1049,22 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
         src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
         url: 'https://www.instagram.com/p/DY11vsxO5c7/',
         description: 'Instagram keeps changing the feed and I am tired',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a raw caption that quotes behind a colon', async () => {
+      const value = makeContainer({
+        instagram_id: 'DY11vsxO5c7',
+        title: 'Recipe: "the best bread" from my kitchen',
+      })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/DY11vsxO5c7',
+        src: 'https://www.instagram.com/p/DY11vsxO5c7/embed/',
+        url: 'https://www.instagram.com/p/DY11vsxO5c7/',
+        description: 'Recipe: "the best bread" from my kitchen',
       }
 
       expect(await extract(value)).toEqual(expected)

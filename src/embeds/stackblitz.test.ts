@@ -53,6 +53,86 @@ describe('stackblitzResolveEmbed', () => {
       expect(stackblitzResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should drop the tracking parameters from the project query', () => {
+      const value =
+        'https://stackblitz.com/edit/angular-ivy-snow?embed=1&view=preview&utm_source=newsletter&utm_campaign=spring&fbclid=abc'
+      const expected: EmbedResolverResult = {
+        provider: 'stackblitz',
+        id: 'angular-ivy-snow',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&view=preview',
+        url: 'https://stackblitz.com/edit/angular-ivy-snow',
+        height: 500,
+      }
+
+      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep every file the embed opens', () => {
+      const value =
+        'https://stackblitz.com/edit/angular-ivy-snow?embed=1&file=src%2Fmain.ts&file=src%2Fapp.ts'
+      const expected: EmbedResolverResult = {
+        provider: 'stackblitz',
+        id: 'angular-ivy-snow',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&file=src%2Fmain.ts&file=src%2Fapp.ts',
+        url: 'https://stackblitz.com/edit/angular-ivy-snow',
+        height: 500,
+      }
+
+      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep an option spelled in another case, as the instance reads it', () => {
+      const value = 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&hideDevTools=1'
+      const expected: EmbedResolverResult = {
+        provider: 'stackblitz',
+        id: 'angular-ivy-snow',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&hideDevTools=1',
+        url: 'https://stackblitz.com/edit/angular-ivy-snow',
+        height: 500,
+      }
+
+      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the path the preview opens on', () => {
+      const value = 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&initialpath=%2Fabout'
+      const expected: EmbedResolverResult = {
+        provider: 'stackblitz',
+        id: 'angular-ivy-snow',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&initialpath=%2Fabout',
+        url: 'https://stackblitz.com/edit/angular-ivy-snow',
+        height: 500,
+      }
+
+      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the click-to-load flag the placeholder already stands in for', () => {
+      const value = 'https://stackblitz.com/edit/angular-ivy-atksbw?ctl=1'
+      const expected: EmbedResolverResult = {
+        provider: 'stackblitz',
+        id: 'angular-ivy-atksbw',
+        src: 'https://stackblitz.com/edit/angular-ivy-atksbw',
+        url: 'https://stackblitz.com/edit/angular-ivy-atksbw',
+        height: 500,
+      }
+
+      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the long spelling of the click-to-load flag', () => {
+      const value = 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&clicktoload=1'
+      const expected: EmbedResolverResult = {
+        provider: 'stackblitz',
+        id: 'angular-ivy-snow',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1',
+        url: 'https://stackblitz.com/edit/angular-ivy-snow',
+        height: 500,
+      }
+
+      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should read a slug ending in the hash a generated project carries', () => {
       const value = 'https://stackblitz.com/edit/vitejs-vite-jfnozz?embed=1&file=index.html'
       const expected: EmbedResolverResult = {

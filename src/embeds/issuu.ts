@@ -4,7 +4,7 @@ import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.j
 const provider = 'issuu'
 
 import { attr } from '../utils/dom.js'
-import { composeQuery, isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, digitsRegex, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const issuuHosts = ['issuu.com']
@@ -14,8 +14,6 @@ const issuuHosts = ['issuu.com']
 // A name of only dots is refused on purpose: `u=..&d=..` would mint `issuu.com/../docs/..`.
 const configIdRegex = /^\d+\/\d+$/
 const safeNameRegex = /^(?!\.+$)[\w.-]+$/
-
-const pageNumberRegex = /^\d+$/
 
 // Only `embed.html` is minted: `anonymous-embed.html` answers 403 for every document.
 const embedPaths = ['embed.html', 'anonymous-embed.html']
@@ -47,7 +45,7 @@ const composeDocumentEmbed = (
     return
   }
 
-  const safePage = page && pageNumberRegex.test(page) ? { p: page } : undefined
+  const safePage = page && digitsRegex.test(page) ? { p: page } : undefined
   const query = composeQuery({ u: publisher, d: documentName, ...safePage })
 
   return {

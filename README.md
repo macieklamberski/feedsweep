@@ -67,6 +67,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `injectEnclosures` | Inject feed enclosures as native media or embed placeholders, collapsing a media group to one rendition and merging a player page entry with its media file; an image enclosure injects only when the content has no image of its own; anything else becomes a `data-file-*` placeholder, after the content |
 | `surfaceParkedMarkup` | Dissolve a lazy-loader container (`div.load-later[data-content]`) into the percent-encoded embed markup it holds, whatever platform that turns out to be |
 | `surfaceTemplateEmbeds` | Hoist a video embed out of a lazy-load `<template>` (e.g. Better Core Video Embeds) so it renders in a reader |
+| `unwrapDrupalOembedIframes` | Point a Drupal media oEmbed proxy frame (`/media/oembed?url=`) at the page url it wraps |
 | `surfaceNoscriptEmbeds` | Hoist a video `<iframe>` out of a `<noscript>` lazy-load fallback (e.g. WP Rocket, a3 Lazy Load); ignores non-video noscript iframes like Google Tag Manager |
 | `rebuildEmbedPlusEmbeds` | Rebuild a real `<iframe>` from an "Embed Plus for YouTube" facade (`.epyt-facade[data-facadesrc]`) |
 | `rebuildLiteVideoEmbeds` | Rebuild a real `<iframe>` from a `lite-youtube` / `lite-vimeo` web component's `videoid`, carrying over `start` and `videotitle` |
@@ -79,15 +80,17 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildLazyYtEmbeds` | Rebuild a real `<iframe>` from a lazy YouTube facade parking the id in a data attribute (`data-youtube-id`, `data-youtube`, `.youtube-embed`, `.youtube-player`) |
 | `rebuildElementorVideoEmbeds` | Rebuild a real `<iframe>` from an Elementor video widget's deferred `data-settings` (YouTube / Vimeo / Dailymotion / VideoPress) |
 | `rebuildEmbedlyEmbeds` | Unwrap an Embedly media widget to the inner provider iframe, carrying the poster as `data-thumbnail` |
-| `unwrapDrupalOembedIframes` | Point a Drupal media oEmbed proxy frame (`/media/oembed?url=`) at the page url it wraps |
 | `rebuildGettyImagesEmbeds` | Rebuild a real `<iframe>` from a Getty Images `gie` widget facade, composing the player URL from the inline config the loader script never runs |
+| `rebuildJsfiddleEmbeds` | Rebuild a real `<iframe>` from a JSFiddle loader script onto the fiddle's own page |
 | `rebuildDeferredIframes` | Rebuild a real `<iframe>` from a URL parked in a `<div>` attribute (Pym.js `data-pym-src`, @newswire/frames `data-frame-src`) |
 | `linkifyGistEmbeds` | Replace a GitHub Gist script embed or `<amp-gist>` with a link to the gist |
+| `linkifyPaypalDonateForms` | Replace a PayPal donate button form with its button image linked to PayPal's donate page |
 | `fixSubstackMentions` | Rebuild a Substack @-mention (empty `span.mention-wrap`) into an inline `<a>@name</a>` link, so the name survives instead of vanishing mid-sentence |
 | `fixSubstackImageLinks` | Remint the `<img>` inside an emptied Substack lightbox anchor (`a.image-link` whose image child was stripped) from the anchor's own image href |
 | `convertNoteEmbeds` | Convert note.com's empty embed figures (`figure[embedded-service][data-src]`): media services become plain iframes for the widget pass, own-post embeds become plain links |
 | `convertAmpNativeElements` | Convert AMP custom elements with a native equivalent (`amp-img`, `amp-anim`, `amp-video`, `amp-audio`, `amp-iframe`) into that element |
 | `convertDatawrapperEmbeds` | Convert Datawrapper chart embeds (iframe, script/noscript, and link forms) into a static image linking to the interactive chart |
+| `convertAsciinemaEmbeds` | Replace an asciinema loader script with the cast's static SVG render, linked to the recording |
 | `convertGiphyEmbeds` | Convert a Giphy gif shipped as an iframe (`giphy.com/embed/{id}`, `media.giphy.com`, `giphy.com/gifs/{id}`) into an `<img>` of the gif, linked to its Giphy page |
 | `convertSmartframeEmbeds` | Convert SmartFrame's `<smartframe-embed>` element into the picture it names as a static image |
 | `convertWidgets` | Convert recognized widgets: embeds become `data-embed-*` placeholders, platform-hosted media becomes a real `<video>`/`<audio>` (from an id template, a media-file src, or a URL parked in a lazy media attribute) |
@@ -123,6 +126,8 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `stripControlChars` | Strip rendering-hostile control characters before parsing |
 
 An embed placeholder states how big it is in one of two ways, never both. Where something really measured the player, it carries `data-embed-width` and `data-embed-height` in pixels, or just one of them where that is all the platform states (a podcast player 200 pixels tall has no width worth naming). Where nothing measured it and only the shape is known, from a responsive wrapper or the platform's own ratio attribute, it carries `data-embed-ratio` instead: a CSS aspect-ratio value written from the numbers the source stated, such as `16/9`, `800/600` or `1.7777777777777777/1`, and ready to assign to `style.aspectRatio` as it stands. Nothing is reduced or rounded, so the value traces back to what the markup said.
+
+A placeholder may also carry `data-embed-params`: settings the publisher chose for that one embed that a reader may override, such as the language of a widget's labels, written as a query string like `l=german`. They are kept off `data-embed-src`, so a reader appends them when it builds the frame, or sets its own in their place.
 
 ## Options
 

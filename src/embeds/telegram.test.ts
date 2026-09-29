@@ -4,6 +4,7 @@ import type { EmbedResolverResult } from '../types.js'
 import {
   readTelegramHeight,
   telegramIframeEmbedResolver,
+  telegramS9eEmbedResolver,
   telegramScriptEmbedResolver,
 } from './telegram.js'
 
@@ -369,6 +370,54 @@ describeForEachParser('telegramIframeEmbedResolver', (parseHtml) => {
 
     it('should not claim another host spelling t.me in its path', async () => {
       const value = '<iframe src="https://evil.test/t.me/rvvoenkor/12345?embed=1"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+describeForEachParser('telegramS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, telegramS9eEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the post out of the helper frame', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="telegram"
+          src="https://s9e.github.io/iframe/2/telegram.min.html#UkrzalInfo/8220"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'telegram',
+        id: 'UkrzalInfo/8220',
+        src: 'https://t.me/UkrzalInfo/8220?embed=1',
+        url: 'https://t.me/UkrzalInfo/8220',
+        author: '@UkrzalInfo',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a fragment stepping out of the post path', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="telegram"
+          src="https://s9e.github.io/iframe/2/telegram.min.html#x/../../durov/1"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a fragment naming a channel alone', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="telegram"
+          src="https://s9e.github.io/iframe/2/telegram.min.html#UkrzalInfo"
+        ></iframe>
+      `
 
       expect(await extract(value)).toBeUndefined()
     })

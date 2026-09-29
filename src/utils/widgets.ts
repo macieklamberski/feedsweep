@@ -20,14 +20,16 @@ import type {
   WidgetResolverResult,
 } from '../types.js'
 import {
+  attr,
   type GeneratedWrapperType,
   getElementDimensions,
   getPairRatio,
   getStylePairRatio,
   getWrapperRatio,
   isPercentageSized,
+  keepIfMatches,
 } from './dom.js'
-import { cleanUrl, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
+import { cleanUrl, parseUrlOnHosts, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
 
 const parseOrKeepDate = (
   date: string | undefined,
@@ -43,6 +45,16 @@ const leadingAtRegex = /^@+/
 // `@` that separates its instance. On a platform that writes bare names it invents a handle.
 export const atUsername = (name: string): string => {
   return `@${name.replace(leadingAtRegex, '')}`
+}
+
+const s9eHelperHost = 's9e.github.io'
+
+// A forum's s9e MediaEmbed helper frame, `s9e.github.io/iframe/2/{platform}.min.html#{id}`, names
+// the content in its first url fragment and the helper's own settings in a second one.
+export const readS9eFragment = (element: Element): string | undefined => {
+  const src = attr(element, 'src')
+
+  return parseUrlOnHosts(src, s9eHelperHost) ? src?.split('#')[1] : undefined
 }
 
 const embedCarriers: Record<string, string> = {
@@ -79,6 +91,30 @@ export const createMarkupEmbedResolver = (
       return decideSize(element, extract(element), options.preferResolverSize)
     },
   }
+}
+
+// A forum's s9e MediaEmbed helper frame for one platform, composed into that platform's own url.
+// A fragment holding a character the helper page strips, such as a dot, could step out of the
+// composed path, so it is refused.
+export const createS9eEmbedResolver = (
+  platform: string,
+  fragmentRegex: RegExp,
+  compose: (fragment: string) => EmbedResolverResult | undefined,
+  options: ResolverOptions = {},
+): EmbedResolver => {
+  return createMarkupEmbedResolver(
+    `iframe[data-s9e-mediaembed="${platform}"]`,
+    (element) => {
+      const fragment = keepIfMatches(readS9eFragment(element), fragmentRegex)
+
+      if (!fragment) {
+        return
+      }
+
+      return compose(fragment)
+    },
+    options,
+  )
 }
 
 // What a carrier says about its size: the dimensions it declares, or the ratio a responsive
@@ -258,6 +294,14 @@ export const createImage = (document: Document, fields: ImageFields): HTMLElemen
   return image
 }
 
+export const createLink = (document: Document, href: string, text = href): HTMLElement => {
+  const link = document.createElement('a')
+  link.setAttribute('href', href)
+  link.textContent = text
+
+  return link
+}
+
 // A platform that publishes a canonical static render of something it would otherwise show in a
 // player: Datawrapper's chart png, Giphy's gif. The render goes inline where a reader sees it at
 // once, and the interactive version stays one click away on the platform's own page.
@@ -304,8 +348,11 @@ export const createPlaceholder = <Type extends object>(
 export const normalizeEmbedFields = (
   metadata: Partial<EmbedResolverResult>,
 ): Record<string, string | undefined> => {
+  const params = new URLSearchParams(metadata.params).toString()
+
   return {
     src: metadata.src,
+    params: params || undefined,
     provider: metadata.provider,
     id: metadata.id,
     url: metadata.url,

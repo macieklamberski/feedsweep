@@ -1,11 +1,9 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const podomaticHost = 'podomatic.com'
-
-const safeIdRegex = /^\d+$/
 
 // The html5 player's three styles, each measured in Chrome at 1200, 500 and 320 pixels wide:
 // the height is the same at every width, so this is a fixed height on a fluid width and never a
@@ -57,13 +55,13 @@ const readPlayer = (url: URL): Player | undefined => {
     const podcast = segments[3] ?? ''
 
     // The podcast segment is written into the src whichever id travels, and ..%2F.. never folds.
-    if (!safeIdRegex.test(podcast)) {
+    if (!digitsRegex.test(podcast)) {
       return
     }
 
     const episode = url.searchParams.get('episode_id') ?? ''
     const theme = url.searchParams.get('theme')
-    const named = safeIdRegex.test(episode) ? `?episode_id=${episode}` : ''
+    const named = digitsRegex.test(episode) ? `?episode_id=${episode}` : ''
     // The theme comes back decoded, so unencoded it could smuggle a second parameter.
     const themed = theme && named ? `&theme=${encodeURIComponent(theme)}` : ''
 
@@ -80,7 +78,7 @@ export const podomaticResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, podomaticHost)
   const player = parsed && readPlayer(parsed)
 
-  if (!player || !safeIdRegex.test(player.id)) {
+  if (!player || !digitsRegex.test(player.id)) {
     return
   }
 

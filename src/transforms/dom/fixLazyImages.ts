@@ -1,10 +1,57 @@
+import { coerceNumber } from 'trousse'
 import type { DomTransform } from '../../types.js'
+import { getElementDimensions, getLazyValue, pixelDimensionLimit } from '../../utils/dom.js'
 import { getImageFingerprint, parseSrcset } from '../../utils/images.js'
+import * as styles from '../../utils/styles.js'
 import { isUrlShaped, isUsableSrc } from '../../utils/urls.js'
 
 // Lazy image attributes also carry JSON blobs, which isUrlShaped alone lets through.
 const isUsableLazyValue = (value: string): boolean => {
   return isUrlShaped(value) && !value.startsWith('{') && !value.startsWith('[')
+}
+
+const isPixelLength = (value: number | undefined): boolean => {
+  return value !== undefined && value <= pixelDimensionLimit
+}
+
+// Only the pixel-sized declarations go, so every other rule stays as the source wrote it.
+const dropPixelStyleDimensions = (element: Element): void => {
+  const pixelProperties = ['width', 'height'].filter((property) => {
+    return isPixelLength(coerceNumber(styles.pixels(element, property)))
+  })
+
+  if (pixelProperties.length === 0) {
+    return
+  }
+
+  const kept = (element.getAttribute('style') ?? '').split(';').filter((declaration) => {
+    const property = declaration.split(':')[0]?.trim().toLowerCase() ?? ''
+
+    return !pixelProperties.includes(property)
+  })
+
+  if (kept.join('').trim() === '') {
+    element.removeAttribute('style')
+    return
+  }
+
+  element.setAttribute('style', kept.join(';'))
+}
+
+// A lazy loader sizes its placeholder gif at a pixel, in attributes or inline style, which then
+// reads as a tracking pixel once the real src is in place.
+const dropPixelDimensions = (element: Element): void => {
+  const { width, height } = getElementDimensions(element)
+
+  if (isPixelLength(width)) {
+    element.removeAttribute('width')
+  }
+
+  if (isPixelLength(height)) {
+    element.removeAttribute('height')
+  }
+
+  dropPixelStyleDimensions(element)
 }
 
 // A data: or blank src is a lazy placeholder and names no picture.
@@ -72,24 +119,19 @@ export const fixLazyImages: DomTransform = (context) => {
 
       // Promote the real src/srcset but keep the original lazy attributes in place.
       if (hasSrcCandidate) {
-        for (const attribute of lazySrcAttributes) {
-          const value = element.getAttribute(attribute)
+        const src = getLazyValue(element, lazySrcAttributes, isUsableLazyValue)
 
-          if (value && isUsableLazyValue(value)) {
-            element.setAttribute('src', value)
-            break
-          }
+        if (src) {
+          element.setAttribute('src', src)
+          dropPixelDimensions(element)
         }
       }
 
       if (hasSrcsetCandidate) {
-        for (const attribute of lazySrcsetAttributes) {
-          const value = element.getAttribute(attribute)
+        const srcset = getLazyValue(element, lazySrcsetAttributes, isUsableLazyValue)
 
-          if (value && isUsableLazyValue(value)) {
-            element.setAttribute('srcset', value)
-            break
-          }
+        if (srcset) {
+          element.setAttribute('srcset', srcset)
         }
       }
     }
