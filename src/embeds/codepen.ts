@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize, text } from '../utils/dom.js'
-import { composeQuery, placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
+import { composeQuery, placeholderBaseUrl, urlSafeTokenRegex, uuidRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codepen'
@@ -11,6 +11,7 @@ const provider = 'codepen'
 const codepenHosts = ['codepen.io']
 
 // Slugs come in three lengths: 5 on pens from around 2012, 7 since, and 32 hex on CodePen's own.
+// Pens saved in the 2.0 editor take a uuid instead.
 const slugRegex = /^[A-Za-z0-9]+$/
 // Theme ids are digits or a lowercase name, and panes a comma-joined list of lowercase names.
 const playerParamRegex = /^[a-z0-9,]{1,64}$/
@@ -79,7 +80,9 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
     return
   }
 
-  const segments = getPathSegments(parsed)
+  const allSegments = getPathSegments(parsed)
+  // The 2.0 editor's pens sit one segment deeper, under `editor/`. The route word is case-sensitive.
+  const segments = allSegments[0] === 'editor' ? allSegments.slice(1) : allSegments
   // A team's pens sit one segment deeper, under `team/{name}/`.
   const isTeam = segments[0] === 'team'
   const [rawUser, kind, ...rest] = isTeam ? segments.slice(1) : segments
@@ -95,7 +98,7 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   // `embed/preview/{slug}` is the deferred-loading player, the same pen behind one more segment.
   const [slug, pathToken] = kind === 'embed' && rest[0] === 'preview' ? rest.slice(1) : rest
 
-  if (!slug || !slugRegex.test(slug)) {
+  if (!slug || !(slugRegex.test(slug) || uuidRegex.test(slug))) {
     return
   }
 
@@ -162,7 +165,8 @@ const composeEmbed = (
     ...(pageOwner && {
       url: `https://codepen.io/${pageOwner}/pen/${slugPath}${composePenQuery(target, false)}`,
     }),
-    thumbnail: composeThumbnail(target),
+    // `shots.codepen.io` answers its 404 picture for every pen the 2.0 editor slugs with a uuid.
+    ...(!uuidRegex.test(target.slug) && { thumbnail: composeThumbnail(target) }),
     height: target.height ?? defaultPenHeight,
     ...(target.user && { author: `@${target.user}` }),
     ...extra,
