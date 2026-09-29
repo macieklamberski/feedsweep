@@ -28,8 +28,8 @@ const urnPlayerPathRegex = /^\/(?:p\/[^/]+\/embed|play\/embed)\/?$/
 
 // The page players, which name a media id in `id`: the retired per-show `videoembed` answers 404,
 // and `popupvideoplayer` is a live page that renders the same player as `/play/embed`.
-const pagePlayerPathRegex =
-  /^\/(?:player\/tv\/[^/]+\/videoembed\/[^/]+|play\/tv\/popupvideoplayer)$/
+const retiredPlayerPathRegex = /^\/player\/tv\/[^/]+\/videoembed\/[^/]+$/
+const popupPlayerPathRegex = /^\/play\/tv\/popupvideoplayer$/
 
 const readBusinessUnit = (parsed: URL): string | undefined => {
   for (const [unit, host] of playerHosts) {
@@ -74,19 +74,36 @@ const srgplayResolveEmbed: ResolveEmbed = (url) => {
     return composeEmbed(parsed.searchParams.get('urn'), parsed.search)
   }
 
-  if (pagePlayerPathRegex.test(parsed.pathname)) {
-    const mediaId = parsed.searchParams.get('id')
+  const isRetired = retiredPlayerPathRegex.test(parsed.pathname)
 
-    if (!mediaId) {
-      return
-    }
+  if (!isRetired && !popupPlayerPathRegex.test(parsed.pathname)) {
+    return
+  }
 
-    // The shared host names no business unit, so its urn names none either and has no host.
-    return composeEmbed(`urn:${readBusinessUnit(parsed)}:video:${mediaId}`, parsed.search)
+  const mediaId = parsed.searchParams.get('id')
+
+  if (!mediaId) {
+    return
+  }
+
+  // The shared host names no business unit, so its urn names none either and has no host.
+  const embed = composeEmbed(`urn:${readBusinessUnit(parsed)}:video:${mediaId}`, parsed.search)
+
+  if (!embed || !isRetired) {
+    return embed
+  }
+
+  // The retired player's box was drawn for another player. The current one fills its frame but
+  // never shrinks below 16:9 of its width, so a shorter frame crops its controls.
+  return {
+    ...embed,
+    ratio: '16/9',
   }
 }
 
 // SRG SSR's shared player, serving SRF, RTS, RSI and RTR. The retired per-show player is
 // dead markup whose own `id` still plays on the current one, and `rts.ch/embed/{code}` is a short
 // code in an id space only the platform's own 301 can read, so it keeps the generic placeholder.
-export const srgplayEmbedResolver = createUrlEmbedResolver(srgplayHosts, srgplayResolveEmbed)
+export const srgplayEmbedResolver = createUrlEmbedResolver(srgplayHosts, srgplayResolveEmbed, {
+  preferResolverSize: true,
+})
