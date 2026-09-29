@@ -16,9 +16,6 @@ const slugRegex = /^[A-Za-z0-9]+$/
 const playerParamRegex = /^[a-z0-9,]{1,64}$/
 const leadingAtRegex = /^@/
 
-// What the share dialog appends to a private pen.
-const privateParamRegex = /^[A-Za-z0-9_.-]{1,512}$/
-
 // Segments CodePen owns in the position a username sits in. `cpe` is the 2.0 editor's own path
 // and the prefill endpoint lives under it, so `cpe/embed/prefill` has the exact shape of a pen
 // url while naming no pen.
@@ -28,6 +25,10 @@ const reservedOwnerSegments = new Set(['collection', 'cpe', 'spark'])
 // the resolver falls back to when the markup names nobody. The player ignores this segment
 // either way, so it only has to be a syntactically valid username.
 const anonymousUser = 'anon'
+
+// Handles that name nobody. CodePen serves a pen under any word in the username position and
+// redirects its page to the real owner, so a route word there says nothing about who wrote it.
+const ownerlessUsers = new Set([anonymousUser, 'api', 'pen', 'project'])
 
 // CodePen's snippet ships `data-height="300"` and calls every attribute but slug and user optional.
 const defaultPenHeight = 300
@@ -62,7 +63,11 @@ const readUser = (value: string | undefined): string | undefined => {
   // The share dialog writes the handle with its `@`, while the url path carries both spellings.
   const name = value?.trim().replace(leadingAtRegex, '')
 
-  return name && name !== anonymousUser && urlSafeTokenRegex.test(name) ? name : undefined
+  if (!name || ownerlessUsers.has(name.toLowerCase()) || !urlSafeTokenRegex.test(name)) {
+    return
+  }
+
+  return name
 }
 
 const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
@@ -104,7 +109,7 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
       {
         user,
         ownerPath: user && (isTeam ? `team/${user}` : user),
-        key: keepIfMatches(parsed.searchParams.get('key') ?? undefined, privateParamRegex),
+        key: keepIfMatches(parsed.searchParams.get('key') ?? undefined, urlSafeTokenRegex),
         token: keepIfMatches(token, urlSafeTokenRegex),
         height,
       },

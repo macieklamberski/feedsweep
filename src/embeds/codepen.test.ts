@@ -48,16 +48,27 @@ describe('codepenResolveEmbed', () => {
     // CodePen route words that still play the pen when they stand in the username position.
     const ownerRouteWords: Array<string> = ['api', 'pen', 'project']
 
-    it.each(ownerRouteWords)('should read %s in the username position as a user', (user) => {
+    it.each(ownerRouteWords)('should play %s in the username position with no author', (user) => {
       const value = `https://codepen.io/${user}/embed/XJpKqXm`
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
         src: `https://codepen.io/${user}/embed/XJpKqXm`,
-        url: `https://codepen.io/${user}/pen/XJpKqXm`,
-        thumbnail: `https://shots.codepen.io/${user}/pen/XJpKqXm-512.jpg`,
+        thumbnail: 'https://shots.codepen.io/anon/pen/XJpKqXm-512.jpg',
         height: 300,
-        author: `@${user}`,
+      }
+
+      expect(codepenResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read a route word in the username position in any case', () => {
+      const value = 'https://codepen.io/API/embed/XJpKqXm'
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/API/embed/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/anon/pen/XJpKqXm-512.jpg',
+        height: 300,
       }
 
       expect(codepenResolveEmbed(value)).toEqual(expected)
