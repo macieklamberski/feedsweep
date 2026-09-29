@@ -1,7 +1,7 @@
 import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { digitsRegex, placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const amebaHosts = ['static.blog-video.jp']
@@ -10,8 +10,9 @@ const amebloHosts = ['ameblo.jp']
 // An id is letters and digits, with no length band: the ids in the corpus run to 26 characters
 // and a bound read off them would refuse the next generation.
 const safeVideoIdRegex = /^[A-Za-z0-9]+$/
+const blogIdRegex = /^[a-z0-9-]+$/
 const reblogCardPathRegex = /^\/s\/embed\/reblog-card\/([^/]+)\/entry-([^/]+)\.html$/
-const imagePagePathRegex = /^\/p\/embed\/([A-Za-z0-9_-]+\/image-\d+-\d+)\.html$/
+const imagePagePathRegex = /^\/p\/embed\/([a-z0-9-]+\/image-\d+-\d+)\.html$/
 
 // Ameba's movie player, `static.blog-video.jp/?v={id}`, for a video uploaded into a blog post.
 // The id is the whole key the platform's own endpoint takes. Its thumbnails are pathed by the
@@ -36,7 +37,7 @@ const readReblogCardId = (
   blogId: string | undefined,
   entryId: string | undefined,
 ): string | undefined => {
-  const safeBlogId = keepIfMatches(blogId, urlSafeTokenRegex)
+  const safeBlogId = keepIfMatches(blogId, blogIdRegex)
   const safeEntryId = keepIfMatches(entryId, digitsRegex)
 
   if (safeBlogId && safeEntryId) {
