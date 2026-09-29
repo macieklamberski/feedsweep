@@ -4,6 +4,7 @@ import {
   cleanUrl,
   composeQuery,
   filterUrlQuery,
+  isTrackingParam,
   parseUrlOnHosts,
   pickQueryParams,
   pickUrlParams,
@@ -315,6 +316,31 @@ describe('filterUrlQuery', () => {
     const value = new URL('https://example.com/e')
 
     expect(filterUrlQuery(value, isKept)).toBe('')
+  })
+})
+
+describe('isTrackingParam', () => {
+  it('should match fbclid', () => {
+    expect(isTrackingParam('fbclid')).toBe(true)
+  })
+
+  it('should match any utm_ name', () => {
+    expect(isTrackingParam('utm_source')).toBe(true)
+    expect(isTrackingParam('utm_name')).toBe(true)
+  })
+
+  it('should match regardless of case', () => {
+    expect(isTrackingParam('FBCLID')).toBe(true)
+    expect(isTrackingParam('UTM_Source')).toBe(true)
+  })
+
+  it('should not match a name that only contains utm', () => {
+    expect(isTrackingParam('utm')).toBe(false)
+    expect(isTrackingParam('xutm_source')).toBe(false)
+  })
+
+  it('should not match any other name', () => {
+    expect(isTrackingParam('cell')).toBe(false)
   })
 })
 

@@ -157,6 +157,13 @@ export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): str
   return pairs.length > 0 ? `?${pairs.join('&')}` : ''
 }
 
+// The campaign tags a share link picks up, which no player reads.
+export const isTrackingParam = (name: string): boolean => {
+  const lowercased = name.toLowerCase()
+
+  return lowercased === 'fbclid' || lowercased.startsWith('utm_')
+}
+
 // The query string an embed resolver carries over when it rebuilds a src from the video id:
 // only the parameters that change what plays. Returns it ready to append, so a src with
 // nothing worth keeping stays bare.
