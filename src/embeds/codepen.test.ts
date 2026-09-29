@@ -560,6 +560,32 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should keep the 1.0 player path for any other version', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-height="300"
+          data-default-tab="result"
+          data-slug-hash="LExymZM"
+          data-user="sturobson"
+          data-version="1"
+        >
+          <span>See the Pen on <a href="https://codepen.io">CodePen</a>.</span>
+        </p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'LExymZM',
+        src: 'https://codepen.io/sturobson/embed/LExymZM?default-tab=result',
+        url: 'https://codepen.io/sturobson/pen/LExymZM',
+        thumbnail: 'https://shots.codepen.io/sturobson/pen/LExymZM-512.jpg',
+        height: 300,
+        author: '@sturobson',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   // The loader copies both into the query of the iframe it builds. They describe the player, so
