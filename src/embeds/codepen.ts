@@ -6,23 +6,23 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'codepen'
 
-// Listed exactly, not by subdomain: blog.codepen.io and cdpn.io name no pen.
-const codepenHosts = ['codepen.io', 'www.codepen.io']
+// Listed exactly, not by subdomain: blog.codepen.io and cdpn.io name no pen, and www.codepen.io
+// redirects every path to the site root.
+const codepenHosts = ['codepen.io']
 
 // Slugs come in three lengths: 5 on pens from around 2012, 7 since, and 32 hex on CodePen's own.
 const slugRegex = /^[A-Za-z0-9]+$/
-const playerParamRegex = /^[A-Za-z0-9,_-]{1,64}$/
+// Theme ids are digits or a lowercase name, and panes a comma-joined list of lowercase names.
+const playerParamRegex = /^[a-z0-9,]{1,64}$/
 const leadingAtRegex = /^@/
 
-// `key` is what the share dialog appends to a private pen, and `token` the JWT a signed-token
-// embed carries. A JWT is dotted base64url and long, every character of it url-safe.
-const privateParamNames = ['key', 'token']
+// What the share dialog appends to a private pen.
 const privateParamRegex = /^[A-Za-z0-9_.-]{1,512}$/
 
 // Segments CodePen owns in the position a username sits in. `cpe` is the 2.0 editor's own path
 // and the prefill endpoint lives under it, so `cpe/embed/prefill` has the exact shape of a pen
 // url while naming no pen.
-const reservedOwnerSegments = new Set(['api', 'collection', 'cpe', 'pen', 'project', 'spark'])
+const reservedOwnerSegments = new Set(['collection', 'cpe', 'spark'])
 
 // What CodePen's share dialog writes in place of an author who asked not to be named, and what
 // the resolver falls back to when the markup names nobody. The player ignores this segment
@@ -41,9 +41,11 @@ type CodepenTarget = {
   // How the owner is addressed in a public url: `team/{name}` for a team, `{name}` for a person.
   // The player does not care, but the pen's page does.
   ownerPath?: string
-  // Whatever opens a private pen, by parameter name. Without it the placeholder would link to a
-  // pen the reader cannot see.
-  grants?: Record<string, string>
+  // What opens a private pen: the share dialog's `key`, or the token the loader appends to the
+  // slug as a path segment. Without either the placeholder would link to a pen the reader
+  // cannot see.
+  key?: string
+  token?: string
   // Which panes the player opens on and in what colours. The loader copies both into the query
   // of the iframe it builds, so a placeholder minted from the block carries them too. Neither
   // belongs on the pen's own page, which has no panes to choose.
@@ -85,23 +87,14 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   }
 
   // `embed/preview/{slug}` is the deferred-loading player, the same pen behind one more segment.
-  const slug = kind === 'embed' && rest[0] === 'preview' ? rest[1] : rest[0]
+  const [slug, pathToken] = kind === 'embed' && rest[0] === 'preview' ? rest.slice(1) : rest
 
   if (!slug || !slugRegex.test(slug)) {
     return
   }
 
   const user = readUser(rawUser)
-  const grants: Record<string, string> = {}
-
-  for (const name of privateParamNames) {
-    const value = keepIfMatches(parsed.searchParams.get(name) ?? undefined, privateParamRegex)
-
-    if (value) {
-      grants[name] = value
-    }
-  }
-
+  const token = pathToken ?? parsed.searchParams.get('token') ?? undefined
   const height = parsePixelSize(parsed.searchParams.get('height'))
 
   return {
@@ -111,7 +104,8 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
       {
         user,
         ownerPath: user && (isTeam ? `team/${user}` : user),
-        grants: trimObject(grants, Boolean),
+        key: keepIfMatches(parsed.searchParams.get('key') ?? undefined, privateParamRegex),
+        token: keepIfMatches(token, urlSafeTokenRegex),
         height,
       },
       Boolean,
@@ -122,12 +116,14 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
 // The loader spells the panes plural in the url it builds whatever the attribute is called:
 // `?default-tabs=css%2Cresult` is what a rendered block carries.
 const composePenQuery = (target: CodepenTarget, forPlayer: boolean): string => {
+  const grants = trimObject({ key: target.key }, Boolean)
+
   if (!forPlayer) {
-    return composeQuery(target.grants)
+    return composeQuery(grants)
   }
 
   return composeQuery({
-    ...target.grants,
+    ...grants,
     // The player spells it plural in its query whatever the attribute is called.
     ...(target.defaultTab && { 'default-tabs': target.defaultTab }),
     ...(target.themeId && { 'theme-id': target.themeId }),
@@ -146,15 +142,16 @@ const composeEmbed = (
   extra: Partial<EmbedResolverResult> = {},
 ): EmbedResolverResult => {
   const owner = target.user ?? anonymousUser
+  const slugPath = target.token ? `${target.slug}/${target.token}` : target.slug
 
   return {
     provider,
     id: target.slug,
-    src: `https://codepen.io/${owner}/embed/${target.slug}${composePenQuery(target, true)}`,
+    src: `https://codepen.io/${owner}/embed/${slugPath}${composePenQuery(target, true)}`,
     // The public page is the one address the author's name really selects: an embed built with
     // the wrong one still plays, but the page it links to belongs to whoever holds that handle.
     ...(target.ownerPath && {
-      url: `https://codepen.io/${target.ownerPath}/pen/${target.slug}${composePenQuery(target, false)}`,
+      url: `https://codepen.io/${target.ownerPath}/pen/${slugPath}${composePenQuery(target, false)}`,
     }),
     thumbnail: composeThumbnail(target),
     height: target.height ?? defaultPenHeight,
@@ -188,11 +185,10 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
     return
   }
 
-  const { slug } = reference
-  // The loader reads a signed token off the block and appends it to the player it builds, so a
-  // private pen embedded this way names its own key here, not in a url.
-  const token = keepIfMatches(attr(element, 'data-token'), privateParamRegex)
-  const grants = token ? { ...reference.grants, token } : reference.grants
+  const { slug, key } = reference
+  // The loader appends the block's token to the slug of the player it builds, so a private pen
+  // embedded this way names its token here, not in a url.
+  const token = keepIfMatches(attr(element, 'data-token'), urlSafeTokenRegex) ?? reference.token
   let user = reference.user
   let ownerPath = reference.ownerPath
   let linkedTitle: string | undefined
@@ -227,7 +223,7 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
   const themeId = keepIfMatches(attr(element, 'data-theme-id'), playerParamRegex)
 
   return composeEmbed(
-    { kind: 'embed', user, ownerPath, grants, slug, defaultTab, themeId, height },
+    { kind: 'embed', user, ownerPath, key, token, slug, defaultTab, themeId, height },
     { title },
   )
 }
