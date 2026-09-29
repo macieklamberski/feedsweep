@@ -400,12 +400,8 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
   })
 
   describe('scoped selectors', () => {
-    // The same wrapper with its player intact is a working embed, not chrome. Only the shells
-    // whose iframe the feed generator removed are stripped.
-    // Two plugins on the same path carry the post itself, and the entries above name the chrome
-    // ones by file so those two survive to be resolved.
     // A generator can write the Graph API version between the host and the file, and those urls
-    // still serve, so the chrome entries have to reach them too.
+    // still serve.
     it('should strip a versioned Facebook chrome plugin frame', async () => {
       const value = html`
         <iframe
@@ -424,6 +420,7 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       )
     })
 
+    // Two plugins on the same path carry the post itself and must survive to be resolved.
     it('should keep the Facebook post and video plugin frames', async () => {
       const value = html`
         <iframe
@@ -437,6 +434,8 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    // The same wrapper with its player intact is a working embed, not chrome. Only the shells
+    // whose iframe the feed generator removed are stripped.
     it('should keep an s9e wrapper whose player survived', async () => {
       const value = html`
         <span data-s9e-mediaembed="youtube">
