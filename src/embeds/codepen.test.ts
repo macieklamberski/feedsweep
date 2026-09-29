@@ -183,6 +183,12 @@ describe('codepenResolveEmbed', () => {
       expect(codepenResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should ignore a foreign host carrying the editor path', () => {
+      const value = 'https://evil.test/editor/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f2480'
+
+      expect(codepenResolveEmbed(value)).toBeUndefined()
+    })
+
     // www.codepen.io redirects every path to the site root, so the player never loads.
     it('should ignore the www host', () => {
       const value = 'https://www.codepen.io/argyleink/embed/XJpKqXm'
@@ -1268,6 +1274,64 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('the player the 2.0 editor writes', () => {
+    it('should read the owner after the editor segment and the uuid slug', async () => {
+      const value = html`
+        <iframe
+          id="cp_embed_019dcdfc-1e41-77c8-afdf-810ebc6f2480"
+          src="https://codepen.io/editor/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f2480?height=450&amp;theme-id=1&amp;slug-hash=019dcdfc-1e41-77c8-afdf-810ebc6f2480&amp;default-tab=result"
+          height="450"
+          scrolling="no"
+          frameborder="0"
+          allowfullscreen
+          allowpaymentrequest
+          name="CodePen Embed 019dcdfc-1e41-77c8-afdf-810ebc6f2480"
+          title="CodePen Embed 019dcdfc-1e41-77c8-afdf-810ebc6f2480"
+          class="cp_embed_iframe"
+          style="width:100%;overflow:hidden"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: '019dcdfc-1e41-77c8-afdf-810ebc6f2480',
+        src: 'https://codepen.io/editor/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f2480?height=450&theme-id=1&slug-hash=019dcdfc-1e41-77c8-afdf-810ebc6f2480&default-tab=result',
+        url: 'https://codepen.io/anon/pen/019dcdfc-1e41-77c8-afdf-810ebc6f2480',
+        height: 450,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a named owner after the editor segment', async () => {
+      const value =
+        '<iframe src="https://codepen.io/editor/CiTA/embed/019dcdfc-1e41-77c8-afdf-810ebc6f2480"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: '019dcdfc-1e41-77c8-afdf-810ebc6f2480',
+        src: 'https://codepen.io/editor/CiTA/embed/019dcdfc-1e41-77c8-afdf-810ebc6f2480',
+        url: 'https://codepen.io/CiTA/pen/019dcdfc-1e41-77c8-afdf-810ebc6f2480',
+        height: 300,
+        author: '@CiTA',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore an editor segment in capitals, which CodePen does not serve', async () => {
+      const value =
+        '<iframe src="https://codepen.io/EDITOR/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f2480"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a hyphenated slug that is not a uuid', async () => {
+      const value =
+        '<iframe src="https://codepen.io/editor/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f248"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
   describe('sad paths', () => {
     // The selector matches every iframe, so the host check inside `extract` is what rejects
     // this one. A lookalike host would never reach it.
@@ -1630,6 +1694,37 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
         thumbnail: 'https://assets.codepen.io/2869/internal/screenshots/pens/XJpKqXm.default.png',
         height: '600',
         author: '@argyleink',
+      }
+
+      expect(await placeholder(value)).toEqual(expected)
+    })
+  })
+
+  // The share dialog writes the 2.0 player's src protocol-relative, which a resolver only sees once
+  // the pipeline has made it absolute.
+  describe('the protocol-relative player the 2.0 editor writes', () => {
+    it('should turn the player into a placeholder', async () => {
+      const value = html`
+        <iframe
+          id="cp_embed_019e2c40-99c5-7617-8163-23c489a628b5"
+          src="//codepen.io/editor/anon/embed/019e2c40-99c5-7617-8163-23c489a628b5?height=450&amp;theme-id=1&amp;slug-hash=019e2c40-99c5-7617-8163-23c489a628b5&amp;default-tab=js,result"
+          height="450"
+          scrolling="no"
+          frameborder="0"
+          allowfullscreen
+          allowpaymentrequest
+          name="CodePen Embed 019e2c40-99c5-7617-8163-23c489a628b5"
+          title="CodePen Embed 019e2c40-99c5-7617-8163-23c489a628b5"
+          class="cp_embed_iframe"
+          style="width:100%;overflow:hidden"
+        ></iframe>
+      `
+      const expected: Record<string, string> = {
+        provider: 'codepen',
+        id: '019e2c40-99c5-7617-8163-23c489a628b5',
+        src: 'https://codepen.io/editor/anon/embed/019e2c40-99c5-7617-8163-23c489a628b5?height=450&theme-id=1&slug-hash=019e2c40-99c5-7617-8163-23c489a628b5&default-tab=js,result',
+        url: 'https://codepen.io/anon/pen/019e2c40-99c5-7617-8163-23c489a628b5',
+        height: '450',
       }
 
       expect(await placeholder(value)).toEqual(expected)
