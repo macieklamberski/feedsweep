@@ -8,9 +8,6 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
   const transform = (value: string) => {
     return applyDomTransforms(parseHtml(value), [rebuildGofundmeEmbeds(baseContext)])
   }
-  const convert = (value: string) => {
-    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
-  }
 
   describe('happy paths', () => {
     it('should rebuild an iframe from the campaign url', async () => {
@@ -35,6 +32,19 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
       `
       const expected =
         '<iframe src="https://www.gofundme.com/f/save-the-hall/widget/large/"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mint https for an http campaign url', async () => {
+      const value = html`
+        <div
+          class="gfm-embed"
+          data-url="http://www.gofundme.com/f/save-the-hall/widget/medium"
+        ></div>
+      `
+      const expected =
+        '<iframe src="https://www.gofundme.com/f/save-the-hall/widget/medium"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -101,6 +111,19 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    it('should be idempotent', async () => {
+      const value = html`
+        <div
+          class="gfm-embed"
+          data-url="https://www.gofundme.com/f/save-the-hall/widget/medium?sharesheet=campaign_nav"
+        ></div>
+      `
+      const once = await transform(value)
+      const twice = await transform(once)
+
+      expect(twice).toEqualHtml(once)
+    })
   })
 
   describe('the share attribution the sharesheet stamps on the snippet', () => {
@@ -146,36 +169,27 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
   })
+})
 
-  describe('the pipeline the widget reaches a reader through', () => {
-    it('should surface the widget into a placeholder and drop the loader script', async () => {
-      const value = html`
-        <div
-          class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/medium?sharesheet=campaign_nav"
-        ></div>
-        <script
-          defer
-          src="https://www.gofundme.com/static/js/embed.js"
-        ></script>
-      `
-      const expected =
-        '<div data-embed-src="https://www.gofundme.com/f/save-the-hall/widget/medium"></div>'
+describeForEachParser('rebuildGofundmeEmbeds through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
 
-      expect(await convert(value)).toEqualHtml(expected)
-    })
-  })
-
-  it('should be idempotent', async () => {
+  it('should surface the widget into a placeholder and drop the loader script', async () => {
     const value = html`
       <div
         class="gfm-embed"
         data-url="https://www.gofundme.com/f/save-the-hall/widget/medium?sharesheet=campaign_nav"
       ></div>
+      <script
+        defer
+        src="https://www.gofundme.com/static/js/embed.js"
+      ></script>
     `
-    const once = await transform(value)
-    const twice = await transform(once)
+    const expected =
+      '<div data-embed-src="https://www.gofundme.com/f/save-the-hall/widget/medium"></div>'
 
-    expect(twice).toEqualHtml(once)
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

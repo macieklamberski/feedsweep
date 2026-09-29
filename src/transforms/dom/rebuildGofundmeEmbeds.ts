@@ -26,6 +26,9 @@ export const rebuildGofundmeEmbeds: DomTransform = () => (document) => {
       url.searchParams.delete(name)
     }
 
+    // The host redirects `http:` to `https:`, and an `http:` frame is blocked as mixed content.
+    url.protocol = 'https:'
+
     element.replaceWith(createIframe(document, url.toString()))
   }
 }
