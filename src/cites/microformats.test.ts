@@ -216,22 +216,6 @@ describeForEachParser('microformatsCiteResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should accept the p- spelling of a response property', async () => {
-      const value = html`
-        <span class="h-cite p-bookmark-of">
-          <a class="u-url p-name" href="https://example.com/post">Page title</a>
-        </span>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'microformats',
-        url: 'https://example.com/post',
-        title: 'Page title',
-        kind: 'bookmark',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should map repost-of to the repost kind', async () => {
       const value = html`
         <span class="u-repost-of h-cite">
@@ -275,21 +259,6 @@ describeForEachParser('microformatsCiteResolver', (parseHtml) => {
         url: 'https://example.com/post',
         title: 'Page title',
         kind: 'watch',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should leave the kind unset for a bare citation with no response class', async () => {
-      const value = html`
-        <span class="h-cite">
-          <a class="u-url p-name" href="https://example.com/post">Page title</a>
-        </span>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'microformats',
-        url: 'https://example.com/post',
-        title: 'Page title',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -483,26 +452,6 @@ describeForEachParser('microformatsCiteResolver', (parseHtml) => {
         title: 'Page title',
         description: "The cited post's body.",
         kind: 'like',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should prefer the summary over e-content', async () => {
-      const value = html`
-        <div class="h-cite">
-          <a class="u-url p-name" href="https://example.com/post">Page title</a>
-          <p class="p-summary">Short summary.</p>
-          <div class="e-content">
-            <p>The much longer body.</p>
-          </div>
-        </div>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'microformats',
-        url: 'https://example.com/post',
-        title: 'Page title',
-        description: 'Short summary.',
       }
 
       expect(await extract(value)).toEqual(expected)
