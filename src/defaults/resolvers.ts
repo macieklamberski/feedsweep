@@ -184,7 +184,11 @@ import { omnyEmbedResolver } from '../embeds/omny.js'
 import { padletEmbedResolver } from '../embeds/padlet.js'
 import { pastebinIframeEmbedResolver, pastebinScriptEmbedResolver } from '../embeds/pastebin.js'
 import { patroniteEmbedResolver } from '../embeds/patronite.js'
-import { pbsFlashEmbedResolver, pbsIframeEmbedResolver } from '../embeds/pbs.js'
+import {
+  pbsFlashEmbedResolver,
+  pbsIframeEmbedResolver,
+  pbsLegacyIframeEmbedResolver,
+} from '../embeds/pbs.js'
 import { peertubeEmbedResolver } from '../embeds/peertube.js'
 import { pixivIframeEmbedResolver, pixivScriptEmbedResolver } from '../embeds/pixiv.js'
 import { podbeanEmbedResolver } from '../embeds/podbean.js'
@@ -524,6 +528,7 @@ const embedResolvers: Array<EmbedResolver> = [
   patroniteEmbedResolver,
   pbsFlashEmbedResolver,
   pbsIframeEmbedResolver,
+  pbsLegacyIframeEmbedResolver,
   pixivIframeEmbedResolver,
   pixivScriptEmbedResolver,
   podbeanEmbedResolver,

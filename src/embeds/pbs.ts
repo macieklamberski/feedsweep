@@ -18,8 +18,6 @@ const flashPlayerPath = '/video/media/swf/PBSPlayer.swf'
 
 const pbsHosts = [playerHost, legacyPlayerHost, flashHost]
 
-const iframeHosts = [playerHost, legacyPlayerHost]
-
 // The route a carrier names, against the id space it belongs to. `viralplayer` and
 // `widget/partnerplayer` serve each other's numeric ids; `partnerplayer` takes a base64url slug
 // and answers an error shell for a numeric one.
@@ -106,7 +104,14 @@ export const pbsResolveEmbed: ResolveEmbed = (url, element) => {
   return composeEmbed(route, segments.at(-1), query, params)
 }
 
-export const pbsIframeEmbedResolver = createUrlEmbedResolver(iframeHosts, pbsResolveEmbed)
+export const pbsIframeEmbedResolver = createUrlEmbedResolver([playerHost], pbsResolveEmbed)
+
+// The retired host's box was sized for the retired player, not the viral player it redirects to.
+export const pbsLegacyIframeEmbedResolver = createUrlEmbedResolver(
+  [legacyPlayerHost],
+  pbsResolveEmbed,
+  { preferResolverSize: true },
+)
 
 // The Flash box was sized for the retired player, not the viral player it now loads.
 export const pbsFlashEmbedResolver = createUrlEmbedResolver([flashHost], pbsResolveEmbed, {
