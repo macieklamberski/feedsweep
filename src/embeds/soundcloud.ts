@@ -97,7 +97,7 @@ const readPageKind = (segments: Array<string>): string | undefined => {
 
 // A private item's share url carries its token as a path segment, which the widget refuses:
 // there it is a `secret_token` parameter of its own.
-const secretTokenRegex = /^s-[\w-]+$/
+const secretTokenRegex = /^s-\w+$/
 
 // Any other subdomain is not a page: w.soundcloud.com/player would parse as a user named player.
 // `api` and `api-v2` carry the track references, `player` served the Flash swf, and `w` is the

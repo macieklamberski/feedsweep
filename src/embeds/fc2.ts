@@ -16,33 +16,21 @@ const videoHosts = ['video.fc2.com']
 // today's ids would refuse the next generation of them.
 const safeContentIdRegex = /^[A-Za-z0-9]+$/
 
-// The content page is `/content/{id}/`, behind a two-letter language on most snippets. The adult
-// site's `/a/content/` is refused, since the embed player cannot play it.
-const contentPageRegex = /^\/(?:([A-Za-z]{2})\/)?content\/([^/]+)\/?$/
+// The content page is `/content/{id}/`, behind a two-character language on most snippets. The
+// adult site's `/a/content/` is refused, since the embed player cannot play it.
+const contentPageRegex = /^\/(?:([A-Za-z0-9_]{2})\/)?content\/([^/]+)\/?$/
 const embedPlayerRegex = /^\/+embed\/player\/([^/]+)\/?$/i
 const flashPlayerRegex = /^\/flv2\.swf$/
 
 // A shape, not a list: FC2 answers a language it does not serve with the Japanese page, so any two
-// letters still open the video.
-const localeRegex = /^[A-Za-z]{2}$/
+// letters, digits or underscores still open the video.
+const localeRegex = /^[A-Za-z0-9_]{2}$/
 
 // The player reads `tg`, the embedding account's tag, and `sg=0`, which hides the suggestions
 // on its end screen.
 const playerParams = ['tg', 'sg']
 
 type ContentPage = { contentId: string; locale?: string }
-
-const readContentPage = (url: string | undefined): ContentPage | undefined => {
-  const parsed = parseUrlOnHosts(url, videoHosts)
-  const match = parsed?.pathname.match(contentPageRegex)
-  const contentId = keepIfMatches(match?.[2], safeContentIdRegex)
-
-  if (!contentId) {
-    return
-  }
-
-  return { contentId, locale: match?.[1] }
-}
 
 // `/embed/player/{id}/` is the route `outerplayer.min.js` composes. The content page is not a
 // frame target.
@@ -103,10 +91,10 @@ export const fc2PlayerScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    // The loader plays `data-id` whenever it is present, whatever `url` names.
-    const dataId = attr(element, 'data-id')
-    const page = readContentPage(attr(element, 'url'))
-    const contentId = dataId ? keepIfMatches(dataId, safeContentIdRegex) : page?.contentId
+    // The loader plays `data-id` whenever it is present, whatever `url` names, and the language
+    // still comes from `url`.
+    const page = parseUrlOnHosts(attr(element, 'url'), videoHosts)?.pathname.match(contentPageRegex)
+    const contentId = keepIfMatches(attr(element, 'data-id') ?? page?.[2], safeContentIdRegex)
 
     if (!contentId) {
       return
@@ -131,7 +119,7 @@ export const fc2PlayerScriptEmbedResolver = createMarkupEmbedResolver(
     const duration = Number(attr(element, 'd'))
 
     return {
-      ...composeEmbed({ contentId, locale: page?.locale }, params),
+      ...composeEmbed({ contentId, locale: page?.[1] }, params),
       width,
       height,
       title: attr(element, 'tl'),

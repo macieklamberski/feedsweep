@@ -43,11 +43,10 @@ describe('extractMixcloudShow', () => {
   const sitePageUrls: Array<string> = [
     'https://www.mixcloud.com/discover/house/',
     'https://www.mixcloud.com/genres/house/',
+    'https://www.mixcloud.com/Genres/house/',
     'https://www.mixcloud.com/categories/house/',
     'https://www.mixcloud.com/tag/house/',
     'https://www.mixcloud.com/live/photogmusic/',
-    'https://www.mixcloud.com/media/swf/',
-    'https://www.mixcloud.com/search/house/',
     'https://www.mixcloud.com/upload/photogmusic/',
     'https://www.mixcloud.com/photogmusic/uploads/',
     'https://www.mixcloud.com/photogmusic/favorites/',
@@ -66,6 +65,28 @@ describe('extractMixcloudShow', () => {
   ]
 
   it.each(sitePageUrls)('should return undefined for the site page %s', (value) => {
+    expect(extractMixcloudShow(value)).toBeUndefined()
+  })
+
+  // `MEDIA` and `Search` are real users, answered in any case, so a missing show under either
+  // word reads as a show too.
+  const siteWordUserUrls: Array<[string, string]> = [
+    ['https://www.mixcloud.com/MEDIA/swcmx-vs-trkto-dembowlrd/', 'MEDIA/swcmx-vs-trkto-dembowlrd'],
+    ['https://www.mixcloud.com/media/swcmx-vs-trkto-dembowlrd/', 'media/swcmx-vs-trkto-dembowlrd'],
+    ['https://www.mixcloud.com/Search/millers-mega-mix/', 'Search/millers-mega-mix'],
+    ['https://www.mixcloud.com/search/millers-mega-mix/', 'search/millers-mega-mix'],
+    ['https://www.mixcloud.com/media/swf/', 'media/swf'],
+    ['https://www.mixcloud.com/search/house/', 'search/house'],
+  ]
+
+  it.each(siteWordUserUrls)('should read the site-word user in %s', (value, expected) => {
+    expect(extractMixcloudShow(value)).toBe(expected)
+  })
+
+  // The api answers 404 for `.4-natty-champs` where `4-natty-champs` is a live show.
+  it('should return undefined for a slug opening with a dot', () => {
+    const value = 'https://www.mixcloud.com/FakeIDRadio/.4-natty-champs/'
+
     expect(extractMixcloudShow(value)).toBeUndefined()
   })
 
@@ -125,6 +146,13 @@ describe('extractMixcloudShow', () => {
 
   it('should return undefined for a user segment carrying an encoded slash', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2F..%252Fetc%2Fno-filter%2F'
+
+    expect(extractMixcloudShow(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a user segment carrying an encoded slash past its start', () => {
+    const value =
+      'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%252Fetc%2Fno-filter%2F'
 
     expect(extractMixcloudShow(value)).toBeUndefined()
   })

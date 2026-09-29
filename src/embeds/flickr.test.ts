@@ -404,6 +404,21 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    // Flickr redirects this query to `/photos/17367418@N03%20/player`, which answers 404.
+    it('should return undefined for a user carrying a trailing space', async () => {
+      const value = html`
+        <iframe
+          src="http://www.flickr.com/slideShow/index.gne?user_id=17367418@N03 &amp;tags=&amp;set_id=&amp;bgcolor=transparent"
+          frameBorder="0"
+          width="500px"
+          scrolling="no"
+          height="500px"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 
   // The page an album's own "view slideshow" link opened, pasted as the iframe src. Flickr
@@ -447,6 +462,26 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should map a framed album player onto the album player', async () => {
+      const value = html`
+        <iframe
+          src="https://www.flickr.com/photos/112691023@N04/albums/72157704164072492/player"
+          frameborder="0"
+          allowfullscreen
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: '112691023@N04/72157704164072492',
+        src: 'https://embedr.flickr.com/photosets/72157704164072492?width=400&height=300',
+        url: 'https://www.flickr.com/photos/112691023@N04/sets/72157704164072492',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should map a framed photostream slideshow page onto the stream player', async () => {
       const value = html`
         <iframe src="https://www.flickr.com/photos/33877051@N03/show/"></iframe>
@@ -476,6 +511,17 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    // Flickr answers 404 for `strictly.kev` and `-strictly-kev` beside the live `strictly-kev`.
+    const refusedAliasUrls: Array<string> = [
+      'https://www.flickr.com/photos/strictly.kev/show/',
+      'https://www.flickr.com/photos/-strictly-kev/show/',
+      'https://www.flickr.com/photos/strictly.kev/15753890338/player/',
+    ]
+
+    it.each(refusedAliasUrls)('should return undefined for the alias in %s', async (value) => {
+      expect(await extract(`<iframe src="${value}"></iframe>`)).toBeUndefined()
     })
 
     it('should map a framed group pool slideshow page onto the group player', async () => {
@@ -617,6 +663,24 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         url: 'https://www.flickr.com/photos/hankthetank/15591173770/',
         thumbnail: 'https://live.staticflickr.com/0/15591173770_542b374f55_b.jpg',
         author: 'hankthetank',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should reach the photo through the short url when the owner is an underscore', async () => {
+      const value = html`
+        <iframe
+          allowfullscreen=""
+          scrolling="no"
+          src="https://www.flickr.com/photos/_/54200280448/player/"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/2qzuB4W',
+        src: 'https://www.flickr.com/photos/_/54200280448/player/',
+        url: 'https://flic.kr/p/2qzuB4W',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -875,6 +939,17 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         <embed
           src="https://www.flickr.com/apps/slideshow/show.swf"
           flashvars="page_show_url=%2Fphotos%2F..%2F..%2Fsets%2F72157624341%2Fshow%2F"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a config user carrying an encoded slash', async () => {
+      const value = html`
+        <embed
+          src="https://www.flickr.com/apps/slideshow/show.swf"
+          flashvars="user_id=bees%2Fpricing"
         />
       `
 

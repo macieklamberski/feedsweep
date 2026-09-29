@@ -36,9 +36,6 @@ const pathWords = new Set([
   'v', // The Flash player path, shipped in pre-2010 object/embed markup
   'e', // A short-lived embed alias from the same era
   'w', // A watch alias of the same era; still serves the video today
-  'watch_popup',
-  'apiplayer', // The Flash-era chromeless players. Both endpoints are dead, and both
-  'get_video_info', // name the video in the query rather than the path
 ])
 
 const queryIdParams = ['v', 'vi', 'video_id']
@@ -46,7 +43,7 @@ const queryIdParams = ['v', 'vi', 'video_id']
 // The 2010 AJAX site and the profile grids of the same era kept the video id in the fragment
 // (`/watch#!v={id}`, `/user/{name}#p/u/1/{id}`), so the server-side path names no video. The
 // links survive in old posts, and the hash still says which video was meant.
-const hashbangIdRegex = /^#!(?:.*?[&;])?vi?=([^&;]+)/
+const hashbangIdRegex = /^#!vi?=([^&;]+)/
 const gridFragmentIdRegex = /^#p\/.+\/([0-9A-Za-z_-]{11})$/
 
 // `youtube.googleapis.com/v/{id}` is the Flash player's other host, still shipped by Blogger

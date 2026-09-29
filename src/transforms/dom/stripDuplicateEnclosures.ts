@@ -3,8 +3,7 @@ import { removeWithEmptyWrappers, walkElements } from '../../utils/dom.js'
 import { getImageFingerprint } from '../../utils/images.js'
 import { enclosureMarker } from './injectEnclosures.js'
 
-const existingMediaSelector =
-  'audio[src], video[src], iframe[src], source[src], img[src], [data-embed-src]'
+const existingMediaSelector = 'audio[src], video[src], source[src], img[src], [data-embed-src]'
 
 // The image key drops the query, which is what tells podcast proxy episodes apart.
 // A podcast proxy's audio url is `…/play.mp3?url={episode}`, so its identity lives in the query.

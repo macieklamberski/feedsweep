@@ -1199,15 +1199,35 @@ describe('instagramResolveEmbed', () => {
   const reservedRouteUrls: Array<string> = [
     'https://www.instagram.com/share/p/BAJ0RmC0Vq/',
     'https://www.instagram.com/share/reel/BAJ0RmC0Vq/',
-    'https://www.instagram.com/explore/p/CaUsPbUquKV/',
     'https://www.instagram.com/stories/p/CaUsPbUquKV/',
-    'https://www.instagram.com/accounts/p/CaUsPbUquKV/',
     'https://www.instagram.com/challenge/p/BXKQsxVgaJq/',
     'https://www.instagram.com/developer/p/BXKQsxVgaJq/',
   ]
 
   it.each(reservedRouteUrls)('should return undefined for %s', (value) => {
     expect(instagramResolveEmbed(value)).toBeUndefined()
+  })
+
+  // Instagram redirects each of these to the post's own page, the same as an account prefix.
+  const redirectingRouteUrls: Array<string> = [
+    'https://www.instagram.com/about/p/BXKQsxVgaJq/',
+    'https://www.instagram.com/accounts/p/BXKQsxVgaJq/',
+    'https://www.instagram.com/api/p/BXKQsxVgaJq/',
+    'https://www.instagram.com/direct/p/BXKQsxVgaJq/',
+    'https://www.instagram.com/explore/p/BXKQsxVgaJq/',
+    'https://www.instagram.com/legal/p/BXKQsxVgaJq/',
+    'https://www.instagram.com/web/p/BXKQsxVgaJq/',
+  ]
+
+  it.each(redirectingRouteUrls)('should read the post behind the route in %s', (value) => {
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/BXKQsxVgaJq',
+      src: 'https://www.instagram.com/p/BXKQsxVgaJq/embed/',
+      url: 'https://www.instagram.com/p/BXKQsxVgaJq/',
+    }
+
+    expect(instagramResolveEmbed(value)).toEqual(expected)
   })
 
   it('should return undefined for a profile frame', () => {

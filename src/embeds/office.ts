@@ -17,9 +17,9 @@ const officeHosts = ['view.officeapps.live.com']
 // the viewer answers any casing.
 const viewerPathRegex = /^\/+op\/(?:embed|view)\.aspx$/i
 
-// The document, the slide aspect ratio and the slide the deck opens on. Tracking such as `utm_*`,
-// `_hsenc` and the share link's `wdOrigin` is dropped.
-const viewerParams = ['src', 'wdAr', 'wdStartOn']
+// The document and the slide aspect ratio. Tracking such as `utm_*`, `_hsenc` and the share link's
+// `wdOrigin` is dropped, and so is `wdStartOn`, which the viewer ignores.
+const viewerParams = ['src', 'wdAr']
 
 // A download endpoint or a directory ends on a segment that names no file.
 const readFileName = (documentUrl: string): string | undefined => {
