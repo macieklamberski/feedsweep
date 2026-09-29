@@ -742,14 +742,6 @@ describeForEachParser('highlightCode', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should be idempotent on a bare pre', async () => {
-    const value = '<pre class="language-js">const x = 1</pre>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
-  })
-
   it('should highlight a standalone multi-line code (no pre) with a data-language hint', async () => {
     const value = [
       '<div><code data-language="bash">curl -X POST https://api.example.com/posts \\',
@@ -802,14 +794,6 @@ describeForEachParser('highlightCode', (parseHtml) => {
     const value = '<p>run <code>\n\n\n  npm install\n </code> first</p>'
 
     expect(await transform(value)).toEqualHtml(value)
-  })
-
-  it('should be idempotent on a standalone code', async () => {
-    const value = '<code class="language-python">def hello():\n    print("hi")</code>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
   })
 
   it('should handle html with no code blocks', async () => {
@@ -868,15 +852,6 @@ describeForEachParser('highlightCode', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should be idempotent on a Jekyll/Rouge block', async () => {
-    const value =
-      '<div class="language-rb highlighter-rouge"><div class="highlight"><pre class="highlight"><code>def hello\n  puts "hi"\nend</code></pre></div></div>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
-  })
-
   it('should highlight an Expressive Code block via its figcaption filename', async () => {
     const value =
       '<figure><figcaption><span>biome.json</span></figcaption><pre><code>{\n  "linter": true\n}</code></pre></figure>'
@@ -884,15 +859,6 @@ describeForEachParser('highlightCode', (parseHtml) => {
       '<figure><figcaption><span>biome.json</span></figcaption><pre data-pre-language="json" data-pre-label="JSON"><code class="hljs"><span class="hljs-punctuation">{</span>\n  <span class="hljs-attr">"linter"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span>\n<span class="hljs-punctuation">}</span></code></pre></figure>'
 
     expect(await transform(value)).toEqualHtml(expected)
-  })
-
-  it('should be idempotent on an Expressive Code block', async () => {
-    const value =
-      '<figure><figcaption><span>biome.json</span></figcaption><pre><code>{\n  "linter": true\n}</code></pre></figure>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
   })
 
   it('should highlight an EnlighterJS bare pre via data-enlighter-language', async () => {
@@ -921,14 +887,6 @@ describeForEachParser('highlightCode', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should be idempotent on a Forem class="highlight LANG" block', async () => {
-    const value = '<pre class="highlight ruby"><code>def hello\n  puts "hi"\nend</code></pre>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
-  })
-
   it('should highlight a GitHub highlight-source-LANG block', async () => {
     const value =
       '<div class="highlight highlight-source-ruby"><pre><code>def hello\n  puts "hi"\nend</code></pre></div>'
@@ -936,23 +894,6 @@ describeForEachParser('highlightCode', (parseHtml) => {
       '<div class="highlight highlight-source-ruby"><pre data-pre-language="ruby" data-pre-label="Ruby"><code class="hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">hello</span>\n  puts <span class="hljs-string">"hi"</span>\n<span class="hljs-keyword">end</span></code></pre></div>'
 
     expect(await transform(value)).toEqualHtml(expected)
-  })
-
-  it('should be idempotent on a GitHub highlight-source-LANG block', async () => {
-    const value =
-      '<div class="highlight highlight-source-ruby"><pre><code>def hello\n  puts "hi"\nend</code></pre></div>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
-  })
-
-  it('should be idempotent', async () => {
-    const value = '<pre><code class="language-js">const x = 1</code></pre>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
   })
 
   describe('language attributes', () => {
@@ -1102,6 +1043,65 @@ describeForEachParser('highlightCode', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+  })
+
+  it('should be idempotent on a bare pre', async () => {
+    const value = '<pre class="language-js">const x = 1</pre>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent on a standalone code', async () => {
+    const value = '<code class="language-python">def hello():\n    print("hi")</code>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent on a Jekyll/Rouge block', async () => {
+    const value =
+      '<div class="language-rb highlighter-rouge"><div class="highlight"><pre class="highlight"><code>def hello\n  puts "hi"\nend</code></pre></div></div>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent on an Expressive Code block', async () => {
+    const value =
+      '<figure><figcaption><span>biome.json</span></figcaption><pre><code>{\n  "linter": true\n}</code></pre></figure>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent on a Forem class="highlight LANG" block', async () => {
+    const value = '<pre class="highlight ruby"><code>def hello\n  puts "hi"\nend</code></pre>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent on a GitHub highlight-source-LANG block', async () => {
+    const value =
+      '<div class="highlight highlight-source-ruby"><pre><code>def hello\n  puts "hi"\nend</code></pre></div>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent', async () => {
+    const value = '<pre><code class="language-js">const x = 1</code></pre>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
   })
 })
 
