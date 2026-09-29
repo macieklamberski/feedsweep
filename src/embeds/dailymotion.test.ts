@@ -83,20 +83,24 @@ describe('extractDailymotionId', () => {
   // The oldest videos on the platform carry four characters, so an id test with a length floor
   // refused them: `x13i` was uploaded in 2005 and still answers with a title, a player and a
   // thumbnail.
-  it.each([
+  const fourCharacterIdUrls: Array<string> = [
     'https://www.dailymotion.com/video/x13i',
     'https://www.dailymotion.com/embed/video/x13i',
     'https://dai.ly/x13i',
-  ])('should extract a four-character id from %s', (value) => {
+  ]
+
+  it.each(fourCharacterIdUrls)('should extract a four-character id from %s', (value) => {
     expect(extractDailymotionId(value)).toBe('x13i')
   })
 
   // A locale is only stepped over where a route word follows it. Dailymotion's own account
   // pages sit at the head of the path, so a two-letter handle there names no video.
-  it.each([
+  const accountPageUrls: Array<string> = [
     'https://www.dailymotion.com/fr/dailymotion',
     'https://www.dailymotion.com/embed/fr/user/dailymotion',
-  ])('should extract no id from %s', (value) => {
+  ]
+
+  it.each(accountPageUrls)('should extract no id from %s', (value) => {
     expect(extractDailymotionId(value)).toBeUndefined()
   })
 
@@ -235,12 +239,14 @@ describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
   // The host check is what refused this, not the path reader. Each apex 301s straight to a
   // language landing page, dropping the video, so the id is worth more than the url the
   // publisher wrote.
-  it.each([
+  const countryApexUrls: Array<string> = [
     'https://www.dailymotion.fr/video/x7tgad0',
     'https://www.dailymotion.co.uk/video/x7tgad0',
     'https://www.dailymotion.es/video/x7tgad0',
     'https://www.dailymotion.it/video/x7tgad0',
-  ])('should resolve a video on the %s apex', async (url) => {
+  ]
+
+  it.each(countryApexUrls)('should resolve a video on the %s apex', async (url) => {
     const value = `<iframe src="${url}"></iframe>`
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',

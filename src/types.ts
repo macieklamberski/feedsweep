@@ -1,5 +1,3 @@
-import type { DiscoverResolveUrlFn } from 'feedscout'
-
 import type { MaybePromise, Pattern } from 'trousse'
 
 export type EnclosureThumbnail = {
@@ -25,12 +23,15 @@ export type Enclosure = {
   groupIndex?: number
 }
 
-export type ResolveUrlFn = DiscoverResolveUrlFn
+export type ResolveUrlFn = (url: string, baseUrl: string | undefined) => string | undefined
 
 export type EmbedResolverResult = {
   provider: string
   id?: string
   src: string
+  // Settings the publisher chose for this one embed that a reader may override, such as the
+  // language of a widget's labels. They stay off `src`, so a reader can apply its own instead.
+  params?: Record<string, string>
   url?: string
   thumbnail?: string
   width?: number
@@ -164,6 +165,19 @@ export type WidgetResolver = EmbedResolver | MediaResolver | CiteResolver
 
 export type WidgetResolverResult = EmbedResolverResult | MediaResolverResult | CiteResolverResult
 
+export type EmojiResolverResult =
+  | { glyph: string } // Replaced by the text
+  | { text: string } // Fallback text, wrapped in a span carrying data-emoji
+  | { custom: true } // Keeps the picture, gains data-emoji
+  | { image: string; alt?: string } // Becomes an image of that url, carrying data-emoji
+
+// Undefined is a weak match with no answer, which leaves the element to the next resolver.
+export type EmojiResolver = {
+  kind: 'emoji'
+  selector: string
+  extract: (element: Element) => EmojiResolverResult | undefined
+}
+
 export type CleanUrlFn = (url: string) => string
 
 // The role a URL plays in the output, so safety policy and neutralization can differ:
@@ -204,7 +218,7 @@ export type TransformContext = {
   deferredIframeSources: Array<DeferredIframeSource>
   trackingHosts: Array<string>
   trackingPathSegments: Array<string>
-  emojiImageHosts: Array<string>
+  emojiResolvers: Array<EmojiResolver>
   avatarImageHosts: Array<string>
   nonContentSelectors: Array<string>
   preservedPreClasses: Array<string>

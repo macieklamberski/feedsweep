@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { parseHTML } from 'linkedom'
 import { parseHtml } from '../../parsers/linkedom.js'
-import { baseContext, describeForEachParser, queryElement } from '../../tests.js'
+import { baseContext, describeForEachParser, html, queryElement } from '../../tests.js'
 import type { HighlightFn, TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { detectLanguage, highlightCode } from './highlightCode.js'
@@ -523,6 +523,33 @@ describeForEachParser('highlightCode', (parseHtml) => {
         '<table><tbody><tr><td>1</td><td>Apple</td></tr><tr><td>2</td><td>Banana</td></tr></tbody></table>'
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a data table with numbered rows of code untouched', async () => {
+      const value = html`
+        <table>
+          <tbody>
+            <tr><th>Step</th><th>Command</th></tr>
+            <tr><td>1</td><td><pre><code>npm install</code></pre></td></tr>
+            <tr><td>2</td><td><pre><code>npm run build --prod</code></pre></td></tr>
+          </tbody>
+        </table>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should drop a one-row gutter table with integer cells', async () => {
+      const value = html`
+        <table>
+          <tbody>
+            <tr><td>1</td><td><pre><code>npm install</code></pre></td></tr>
+          </tbody>
+        </table>
+      `
+      const expected = '<pre data-pre-numbered=""><code>npm install</code></pre>'
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should not mark a plain code block without a gutter', async () => {

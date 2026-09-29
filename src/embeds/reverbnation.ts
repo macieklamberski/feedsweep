@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const reverbnationHosts = ['reverbnation.com']
@@ -20,8 +20,23 @@ const flashPathRegex = /^\/+widgets\/swf\//
 // 404 for a fabricated one.
 const flashIdParams = ['id', 'emailPlaylist', 'twID']
 
-const composeSource = (id: string, search: string): string => {
-  return `https://www.reverbnation.com/widget_code/html_widget/${id}${search}`
+// The html widget's query selects which player is drawn and what it holds: `widget_id` and
+// `context_type`, and every option the widget config reads as `pwc[{name}]`, except autoplay,
+// which is the reader's to decide.
+const widgetParams = ['widget_id', 'context_type']
+
+const autoplayParam = 'pwc[auto_play]'
+
+const isWidgetParam = (name: string): boolean => {
+  if (name === autoplayParam) {
+    return false
+  }
+
+  return widgetParams.includes(name) || name.startsWith('pwc[')
+}
+
+const composeSource = (id: string, query: string): string => {
+  return `https://www.reverbnation.com/widget_code/html_widget/${id}${query}`
 }
 
 const readWidgetId = (url: URL): string | undefined => {
@@ -65,8 +80,7 @@ export const reverbnationResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider: 'reverbnation',
     id,
-    // The html widget's query selects which player is drawn and what it holds.
-    src: composeSource(id, widget ? parsed.search : ''),
+    src: composeSource(id, widget ? filterUrlQuery(parsed, isWidgetParam) : ''),
   }
 }
 

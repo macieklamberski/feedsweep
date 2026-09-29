@@ -1,12 +1,14 @@
-import { resolveUrl } from 'feedcanon'
+import { resolveUrl } from 'trousse'
 import { hljsHighlightFn } from '../highlighters/hljs.js'
 import { assignVideoPosters } from '../transforms/dom/assignVideoPosters.js'
 import { canonicalizeAlignment } from '../transforms/dom/canonicalizeAlignment.js'
 import { cleanAnchorUrls } from '../transforms/dom/cleanAnchorUrls.js'
 import { convertAmpNativeElements } from '../transforms/dom/convertAmpNativeElements.js'
+import { convertAsciinemaEmbeds } from '../transforms/dom/convertAsciinemaEmbeds.js'
 import { convertBreaksToParagraphs } from '../transforms/dom/convertBreaksToParagraphs.js'
 import { convertCiteCards } from '../transforms/dom/convertCiteCards.js'
 import { convertDatawrapperEmbeds } from '../transforms/dom/convertDatawrapperEmbeds.js'
+import { convertEmojis } from '../transforms/dom/convertEmojis.js'
 import { convertGiphyEmbeds } from '../transforms/dom/convertGiphyEmbeds.js'
 import { convertLazyImageContainers } from '../transforms/dom/convertLazyImageContainers.js'
 import { convertNoteEmbeds } from '../transforms/dom/convertNoteEmbeds.js'
@@ -28,6 +30,7 @@ import { hoistBlocksFromParagraphs } from '../transforms/dom/hoistBlocksFromPara
 import { hoistFigcaptionFromAnchor } from '../transforms/dom/hoistFigcaptionFromAnchor.js'
 import { injectEnclosures } from '../transforms/dom/injectEnclosures.js'
 import { linkifyGistEmbeds } from '../transforms/dom/linkifyGistEmbeds.js'
+import { linkifyPaypalDonateForms } from '../transforms/dom/linkifyPaypalDonateForms.js'
 import { linkifyUrls } from '../transforms/dom/linkifyUrls.js'
 import { markTimestamps } from '../transforms/dom/markTimestamps.js'
 import { mergeConsecutiveOneLinerPres } from '../transforms/dom/mergeConsecutiveOneLinerPres.js'
@@ -42,6 +45,7 @@ import { rebuildEmbedlyEmbeds } from '../transforms/dom/rebuildEmbedlyEmbeds.js'
 import { rebuildEmbedPlusEmbeds } from '../transforms/dom/rebuildEmbedPlusEmbeds.js'
 import { rebuildGettyImagesEmbeds } from '../transforms/dom/rebuildGettyImagesEmbeds.js'
 import { rebuildGofundmeEmbeds } from '../transforms/dom/rebuildGofundmeEmbeds.js'
+import { rebuildJsfiddleEmbeds } from '../transforms/dom/rebuildJsfiddleEmbeds.js'
 import { rebuildLazyLoadForVideos } from '../transforms/dom/rebuildLazyLoadForVideos.js'
 import { rebuildLazyYtEmbeds } from '../transforms/dom/rebuildLazyYtEmbeds.js'
 import { rebuildLiteVideoEmbeds } from '../transforms/dom/rebuildLiteVideoEmbeds.js'
@@ -75,7 +79,6 @@ import { surfaceTemplateEmbeds } from '../transforms/dom/surfaceTemplateEmbeds.j
 import { trimPreWhitespace } from '../transforms/dom/trimPreWhitespace.js'
 import { unwrapDoublyNestedLists } from '../transforms/dom/unwrapDoublyNestedLists.js'
 import { unwrapDrupalOembedIframes } from '../transforms/dom/unwrapDrupalOembedIframes.js'
-import { unwrapEmojiImages } from '../transforms/dom/unwrapEmojiImages.js'
 import { unwrapHeadingBold } from '../transforms/dom/unwrapHeadingBold.js'
 import { unwrapNestedCodeWrappers } from '../transforms/dom/unwrapNestedCodeWrappers.js'
 import { unwrapWrappers } from '../transforms/dom/unwrapWrappers.js'
@@ -110,6 +113,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Normalize lazy-loaded video embeds into a plain <iframe> before the media/embed
   // transforms run, so each is placeholdered and any poster connected.
   surfaceTemplateEmbeds,
+  // Points a Drupal media oEmbed frame at the page url it wraps, so the provider resolvers
+  // below see the video and not the site's proxy route. Runs before surfaceNoscriptEmbeds,
+  // which surfaces only a frame a resolver claims.
+  unwrapDrupalOembedIframes,
   surfaceNoscriptEmbeds,
   rebuildEmbedPlusEmbeds,
   rebuildLiteVideoEmbeds,
@@ -127,13 +134,13 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Runs before convertCiteCards so a payload naming `link` still reaches the cite pass, and
   // before stripEmptyTags, which is what deletes an empty carrier nothing has claimed.
   rebuildEmbedlyEmbeds,
-  // Points a Drupal media oEmbed frame at the page url it wraps, so the provider resolvers
-  // below see the video and not the site's proxy route.
-  unwrapDrupalOembedIframes,
   rebuildGettyImagesEmbeds,
+  rebuildJsfiddleEmbeds,
   // A GitHub Gist embed is a JS-only <script> that renders nothing in a reader. Replace it
   // with a link to the gist so the content is at least reachable.
   linkifyGistEmbeds,
+  // Runs before stripNonContentElements, which strips the `/cgi-bin/webscr` forms this leaves.
+  linkifyPaypalDonateForms,
   // A Substack @-mention is an empty span whose name lives only in its data-attrs JSON;
   // rebuild the anchor before stripEmptyTags deletes the span and the name with it.
   fixSubstackMentions,
@@ -164,6 +171,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // linked static <img> of the chart's published PNG render. Runs in this normalize
   // cluster so the emitted <img> is dimensioned and proxied by the image transforms below.
   convertDatawrapperEmbeds,
+  convertAsciinemaEmbeds,
   convertGiphyEmbeds,
   convertSmartframeEmbeds,
   unwrapDoublyNestedLists,
@@ -213,7 +221,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Runs after stripDuplicateTitleHeading: a removed title <h1> must not demote the body's
   // own headings.
   demoteHeadings,
-  unwrapEmojiImages,
+  convertEmojis,
   // Empties lone-backslash paragraphs (`<p>\</p>`); runs before stripEmptyTags so
   // the now-empty paragraphs are removed by it.
   stripMarkdownEscapeBackslashes,
@@ -231,7 +239,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   highlightCode,
   wrapBareInlineInParagraphs,
   stripLeadingIndentation,
-  // Runs after unwrapEmojiImages so a custom emoji already carries data-emoji: without it
+  // Runs after convertEmojis so a custom emoji already carries data-emoji: without it
   // the emoji reads as a block-displayed image and the <br> after it is taken as redundant.
   stripInterBlockBreaks,
   stripBoundaryBreaks,

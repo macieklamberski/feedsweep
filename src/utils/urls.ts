@@ -1,4 +1,12 @@
-import { isHostOrSubdomainOf, parseUrl } from 'trousse'
+import {
+  audioExtensions,
+  documentExtensions,
+  flashExtensions,
+  imageExtensions,
+  isHostOrSubdomainOf,
+  parseUrl,
+  videoExtensions,
+} from 'trousse'
 import type { ResolveUrlFn, TransformContext } from '../types.js'
 
 // Each helper names the slice of the context it actually reads, so a caller holding only a
@@ -15,6 +23,9 @@ const queryOrHashRegex = /[?#]/
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
 
+export const urlSafeTokenRegex = /^[A-Za-z0-9_-]+$/
+export const digitsRegex = /^\d+$/
+
 // No m3u8 or mpd: only Safari plays them natively, so promoting one breaks the player elsewhere.
 export const imageFileRegex = /\.(avif|gif|jpe?g|png|svg|webp)(\?|#|$)/i
 export const videoFileRegex = /\.(mp4|m4v|webm|mov|ogv)(\?|#|$)/i
@@ -23,9 +34,15 @@ export const audioFileRegex = /\.(aac|mp3|m4a|ogg|oga|wav|flac|opus)(\?|#|$)/i
 // A file no browser can play. Flash was blocked everywhere in January 2021, and hosts still
 // serve the `.swf` bytes, so a URL that reaches this is one that answers 200 and renders
 // nothing whatever a reader does with it.
-export const flashFileRegex = /\.swf(\?|#|$)/i
+export const flashFileRegex = new RegExp(`\\.(${flashExtensions.join('|')})(\\?|#|$)`, 'i')
 
-export const documentFileRegex = /\.(pdf|epub|docx?|pptx?|xlsx?)(\?|#|$)/i
+const fileExtensions = [
+  ...audioExtensions,
+  ...videoExtensions,
+  ...imageExtensions,
+  ...documentExtensions,
+]
+const fileRegex = new RegExp(`\\.(${fileExtensions.join('|')})(\\?|#|$)`, 'i')
 
 // Whether a url names audio or video the reader can play as it stands. A podcast host serves the
 // episode file from the same domain as its player, so a media url that skips this check reads as
@@ -34,16 +51,11 @@ export const isMediaFile = (value: string): boolean => {
   return audioFileRegex.test(value) || videoFileRegex.test(value)
 }
 
-// Whether a value names a file of any kind the reader can already show. The enclosure probe offers
-// every attachment a feed carries to every resolver, so a platform whose id shape admits a dot
-// would otherwise mint a player for an `.mp3` and take the place of a playable element.
+// Whether a value names an audio, video, image or document file. The enclosure probe offers every
+// attachment a feed carries to every resolver, so a platform whose id shape admits a dot would
+// otherwise mint a player for an `.mp3` and take the place of a playable element.
 export const isFileName = (value: string): boolean => {
-  return (
-    documentFileRegex.test(value) ||
-    audioFileRegex.test(value) ||
-    videoFileRegex.test(value) ||
-    imageFileRegex.test(value)
-  )
+  return fileRegex.test(value)
 }
 
 // A MediaWiki file page sits at `/wiki/File:Clip.webm`, so its path ends in the media's own
@@ -130,6 +142,21 @@ export const composeQuery = (params?: Record<string, string>): string => {
   return query ? `?${query}` : ''
 }
 
+// The publisher's query with only the parameters a player reads left in it. Each pair stays as
+// written, so a repeated name and a bracketed one such as `pwc[size]` reach the player unchanged.
+export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): string => {
+  const pairs = url.search
+    .slice(1)
+    .split('&')
+    .filter((pair) => {
+      const [name] = [...new URLSearchParams(pair).keys()]
+
+      return !!name && isKept(name)
+    })
+
+  return pairs.length > 0 ? `?${pairs.join('&')}` : ''
+}
+
 // The query string an embed resolver carries over when it rebuilds a src from the video id:
 // only the parameters that change what plays. Returns it ready to append, so a src with
 // nothing worth keeping stays bare.
@@ -170,6 +197,7 @@ type CleanUrl = {
 }
 
 export const cleanUrl: CleanUrl = ((url, context: CleanContext) => {
+  // biome-ignore lint/nursery/useNullishCoalescing: An empty cleaned url keeps the input url.
   return url ? context.cleanUrlFn?.(url) || url : undefined
 }) as CleanUrl
 

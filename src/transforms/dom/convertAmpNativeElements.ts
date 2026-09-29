@@ -18,6 +18,8 @@ const conversions: Array<AmpConversion> = [
   { selector: 'amp-video-iframe', target: 'iframe' },
 ]
 
+const sourceTags = ['source', 'track']
+
 // AMP media elements like <amp-img> and <amp-video> render nothing without the AMP runtime.
 export const convertAmpNativeElements: DomTransform = () => (document) => {
   for (const conversion of conversions) {
@@ -33,7 +35,7 @@ export const convertAmpNativeElements: DomTransform = () => (document) => {
       // Carry the playable sources over. AMP placeholder/fallback children are dropped.
       if (conversion.moveChildren) {
         for (const child of [...element.children]) {
-          if (child.localName === 'source' || child.localName === 'track') {
+          if (sourceTags.includes(child.localName)) {
             replacement.appendChild(child)
           }
         }

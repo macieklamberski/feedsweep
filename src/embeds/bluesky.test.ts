@@ -879,6 +879,23 @@ describeForEachParser('blueskyS9eEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read a helper page the forum serves from its own host', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="bluesky"
+          src="https://forum.example.com/iframe/bluesky.min.html#at://did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mhq7aeuwbg42"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:hhz4agnyzcrsvpnprxrbjrpa/3mhq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mhq7aeuwbg42',
+        url: 'https://bsky.app/profile/did:plc:hhz4agnyzcrsvpnprxrbjrpa/post/3mhq7aeuwbg42',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('guards', () => {

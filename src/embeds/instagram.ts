@@ -1,9 +1,14 @@
-import { decodeSegment, isPlainObject, parseUrl } from 'trousse'
+import { decodeSegment, isPlainObject, parseUrl, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
-import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import { parseUrlOnHosts, placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
+import {
+  atUsername,
+  createMarkupEmbedResolver,
+  createS9eEmbedResolver,
+  createUrlEmbedResolver,
+} from '../utils/widgets.js'
 
 const provider = 'instagram'
 
@@ -32,7 +37,6 @@ const sitePathSegments = new Set([
 // The account names the poster, not the post, so it is matched and dropped.
 // `tv` is the retired IGTV route and `reels` the plural spelling of the reel.
 const postPathRegex = /^\/(?:([A-Za-z0-9_.]+)\/)?(p|reel|reels|tv)\/([A-Za-z0-9_-]+)/
-const safeShortcodeRegex = /^[A-Za-z0-9_-]+$/
 
 type Post = { kind: string; shortcode: string }
 
@@ -201,7 +205,7 @@ export const instagramAmpEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     const shortcode = attr(element, 'data-shortcode') ?? attr(element, 'shortcode')
 
-    if (!shortcode || !safeShortcodeRegex.test(shortcode)) {
+    if (!shortcode || !urlSafeTokenRegex.test(shortcode)) {
       return
     }
 
@@ -219,17 +223,33 @@ type SubstackPostAttributes = {
   timestamp?: string | null
 }
 
-// The current og:title quotes the caption behind the poster's name, and the payload carries no
-// field holding the caption on its own.
-const wrappedCaptionRegex = / on Instagram: ["\u201c]/
+// The og:title quotes the caption behind the poster's name, and the payload carries no field
+// holding the caption on its own. The quote mark follows the era of the post, not its language.
+const wrappedCaptionRegex = / on Instagram: (["\u201c\u201d])([\s\S]*)/
+
+const closingQuotes = toMap({ '"': '"', '\u201c': '\u201d', '\u201d': '\u201d' })
 
 // Instagram's og:title, which the payload carries in place of a caption field.
 const readPayloadCaption = (title: string | undefined): string | undefined => {
-  if (!title || wrappedCaptionRegex.test(title)) {
+  if (!title) {
     return
   }
 
-  return title
+  const wrapped = title.match(wrappedCaptionRegex)
+
+  if (!wrapped) {
+    return title
+  }
+
+  const [, opening, rest] = wrapped
+  const closing = closingQuotes.get(opening)
+
+  // A title cut at 64 characters ends in `…` with no closing mark, so only a fragment is left.
+  if (!closing || !rest.endsWith(closing)) {
+    return
+  }
+
+  return rest.slice(0, -closing.length) || undefined
 }
 
 // Only a rehosted copy: the earliest payloads carry Instagram's signed CDN url, long expired.
@@ -244,7 +264,7 @@ export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
     const attributes = jsonAttr<SubstackPostAttributes>(element, 'data-attrs')
     const shortcode = attributes?.instagram_id
 
-    if (!shortcode || !safeShortcodeRegex.test(shortcode)) {
+    if (!shortcode || !urlSafeTokenRegex.test(shortcode)) {
       return
     }
 
@@ -282,6 +302,13 @@ export const instagramResolveEmbed: ResolveEmbed = (url) => {
 export const instagramIframeEmbedResolver = createUrlEmbedResolver(
   instagramHosts,
   instagramResolveEmbed,
+)
+
+// A forum's s9e MediaEmbed helper frame, naming the post's shortcode in its url fragment.
+export const instagramS9eEmbedResolver = createS9eEmbedResolver(
+  'instagram',
+  /^[-\w]+$/,
+  (shortcode) => instagramResolveEmbed(`https://www.instagram.com/p/${shortcode}/`),
 )
 
 // The player measures itself once mounted and reports it under a `MEASURE` type. `LOADING`

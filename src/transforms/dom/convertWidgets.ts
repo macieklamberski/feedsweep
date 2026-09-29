@@ -120,15 +120,15 @@ export const convertWidgets: DomTransform = (context) => {
 
     // Runs before the tiers below, which replace the iframes the playable guard relies on.
     for (const element of document.querySelectorAll('div, figure, span, li')) {
-      // A container that already wraps something playable is chrome around a real player,
-      // and the attribute belongs to that player, not to a missing element.
-      if (element.querySelector(playableSelector)) {
-        continue
-      }
-
       const parked = findParkedMedia(element, mediaSrcAttributes)
 
       if (!parked) {
+        continue
+      }
+
+      // A container that already wraps something playable is chrome around a real player,
+      // and the attribute belongs to that player, not to a missing element.
+      if (element.querySelector(playableSelector)) {
         continue
       }
 

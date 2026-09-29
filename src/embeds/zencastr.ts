@@ -1,11 +1,8 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
-
-// An id is url-safe base64, and the `embed` route serves neither a file nor a deeper route.
-const safeIdRegex = /^[A-Za-z0-9_-]+$/
 
 // `zen.ai` 301s every zencastr.com path, the episode files on `redirect.zen.ai` included.
 const zencastrHosts = ['zencastr.com', 'zen.ai']
@@ -19,7 +16,8 @@ export const zencastrResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, zencastrHosts)
   const [route, id, ...rest] = parsed ? getPathSegments(parsed) : []
 
-  if (route !== 'embed' || !id || rest.length || !safeIdRegex.test(id)) {
+  // An id is url-safe base64, and the `embed` route serves neither a file nor a deeper route.
+  if (route !== 'embed' || !id || rest.length || !urlSafeTokenRegex.test(id)) {
     return
   }
 

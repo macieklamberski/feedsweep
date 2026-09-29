@@ -1,7 +1,7 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, pickQueryParams, urlSafeTokenRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const audiomackHost = 'audiomack.com'
@@ -13,9 +13,6 @@ const audiomackHeights = toMap({
   song: 252,
 })
 
-// An artist handle and a slug, both of them lowercase words joined by hyphens or underscores.
-const safeSlugRegex = /^[\w-]+$/
-
 // The retired players 404 today, and the route word is the only place they record the kind.
 const retiredRoutes = toMap({
   embed3: 'song',
@@ -24,6 +21,10 @@ const retiredRoutes = toMap({
   'embed4-album': 'album',
   'embed4-large': 'song',
 })
+
+// The only parameter the share dialog writes and the player reads: the private-link key that
+// unlocks an unreleased track.
+const audiomackEmbedParams = ['key']
 
 type Track = { artist: string; kind: string; slug: string; search: string }
 
@@ -59,18 +60,21 @@ export const audiomackResolveEmbed: ResolveEmbed = (url, element) => {
 
   const { artist, kind, slug, search } = track
 
-  if (!safeSlugRegex.test(artist) || !safeSlugRegex.test(slug)) {
+  // An artist handle and a slug, both of them lowercase words joined by hyphens or underscores.
+  if (!urlSafeTokenRegex.test(artist) || !urlSafeTokenRegex.test(slug)) {
     return
   }
 
   const path = `${artist}/${kind}/${slug}`
+  const params = pickQueryParams(search, audiomackEmbedParams)
 
   return {
     provider: 'audiomack',
     // The whole path: the same artist and slug answer under song and under playlist alike.
     id: path,
-    src: `https://audiomack.com/embed/${path}${search}`,
-    url: `https://audiomack.com/${path}`,
+    src: `https://audiomack.com/embed/${path}${composeQuery(params)}`,
+    // The key is an access token, so a private track's page is not linked where it could leak.
+    url: params.key ? undefined : `https://audiomack.com/${path}`,
     height: audiomackHeights.get(kind),
     title: attr(element, 'title'),
     author: artist,

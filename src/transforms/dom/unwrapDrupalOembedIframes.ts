@@ -1,6 +1,7 @@
+import { parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
-import { isUrlShaped } from '../../utils/urls.js'
+import { isUrlShaped, placeholderBaseUrl } from '../../utils/urls.js'
 
 const proxySelector = 'iframe[src*="/media/oembed?"]'
 
@@ -10,8 +11,7 @@ const proxySelector = 'iframe[src*="/media/oembed?"]'
 // site.
 export const unwrapDrupalOembedIframes: DomTransform = () => (document) => {
   for (const iframe of document.querySelectorAll(proxySelector)) {
-    const query = attr(iframe, 'src')?.split('?')[1] ?? ''
-    const url = new URLSearchParams(query).get('url')
+    const url = parseUrl(attr(iframe, 'src') ?? '', placeholderBaseUrl)?.searchParams.get('url')
 
     // Requiring a scheme here drops protocol-relative and site-relative urls later passes resolve.
     if (!url || !isUrlShaped(url)) {
