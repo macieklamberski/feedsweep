@@ -29,9 +29,8 @@ const cdnHosts = ['cdn.turner.com']
 // The fave shell is a `padding-bottom: 56.25%` box, and ids of this form have 16:9 renditions.
 const playerRatio = '16/9'
 
-// The player answers 200 for any id, but `fave.api.cnn.io/v1/video?id={id}&customer=cnn` answers
-// with the headline, duration, renditions and posters for a real id and 404 for a fabricated one,
-// and `cnn.com/videos/{id}` discriminates the same way.
+// The player answers 200 for any id. `cnn.com/videos/{id}` answers 200 for a real id and 404 for a
+// fabricated one.
 const composeEmbed = (id: string): EmbedResolverResult => {
   return {
     provider,
