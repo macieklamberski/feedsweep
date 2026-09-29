@@ -189,6 +189,10 @@ const specimens: Record<string, string | [string, string]> = {
     '<div id="goodreadsGiveawayWidget182419"><div class="goodreadsGiveawayWidget"><h2><a href="https://example.com/">Goodreads</a> Book Giveaway</h2><div style="float: left;"><a href="https://example.com/book/show/29745568"><img alt="Benjamin McTish and The Hidden Caverns of Bristonbel by June M. Pace" src="https://example.com/books/1459384569l/29745568.jpg" width="100"></a></div><div class="giveaway_details">Giveaway ends May 13, 2016.<br>See the <a href="https://example.com/giveaway/show/182419">giveaway details</a> at Goodreads.</div><a class="goodreadsGiveawayWidgetEnterLink" href="https://example.com/giveaway/enter_choose_address/182419">Enter Giveaway</a></div></div>',
   '.goodreadsGiveawayWidget':
     '<div class="goodreadsGiveawayWidget" style="max-width: 350px; margin: 10px auto; padding: 10px 15px;"><h2><a href="https://example.com/">Goodreads</a> Book Giveaway</h2><div style="float: left;"><a href="https://example.com/book/show/36704145"><img src="https://example.com/books/1517005563l/36704145.jpg" alt="A Kiss, a Dance and a Diamond by Helen Lacey" width="100"></a></div><div class="giveaway_details"><p>Giveaway ends April 30, 2018.</p></div><p><a class="goodreadsGiveawayWidgetEnterLink" href="https://example.com/giveaway/enter_choose_address/268862">Enter Giveaway</a></p></div>',
+  'a.goodreadsGiveawayWidgetEnterLink[href*="goodreads.com/giveaway/"]': [
+    '<h2 style="font-size: 20px; font-weight: normal; line-height: 20px; margin: 0 0 10px; padding: 0; text-align: center;"><a class="goodreadsGiveawayWidgetEnterLink" href="https://www.goodreads.com/giveaway/show/249139">Enter Giveaway</a></h2>',
+    '<h2 style="font-size: 20px; font-weight: normal; line-height: 20px; margin: 0 0 10px; padding: 0; text-align: center;"></h2>',
+  ],
   'iframe[src*="stay22.com/embed"]':
     '<iframe id="stay22-widget" src="https://www.stay22.com/embed/699754889b53f8015d33a6ae" width="100%" height="428" frameborder="0"></iframe>',
   ':is(p, div)[data-gyg-href]:not(:has(*:not(a)))':
@@ -601,6 +605,22 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
             <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>
           </span>
         </span>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a prose link to a Goodreads giveaway', async () => {
+      const value = html`
+        <p>Enter the <a href="https://www.goodreads.com/giveaway/show/249139">Goodreads giveaway</a> by Friday.</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a link carrying the enter-link class that points away from Goodreads', async () => {
+      const value = html`
+        <p><a class="goodreadsGiveawayWidgetEnterLink" href="https://example.com/giveaway">Enter Giveaway</a></p>
       `
 
       expect(await transform(value)).toEqualHtml(value)
