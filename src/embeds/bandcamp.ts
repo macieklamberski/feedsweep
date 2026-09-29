@@ -32,8 +32,7 @@ const presetHeights = toMap({
 const releaseKinds = ['album', 'track']
 
 // The audio player spells its options as path segments (`EmbeddedPlayer/album=123/size=large/`)
-// while the video player uses a query string (`VideoEmbed?track=123&bgcol=…`). Both are minted
-// back at their shortest working form, verified live 2026-08-11, both 200.
+// while the video player uses a query string (`VideoEmbed?track=123&bgcol=…`).
 const videoPathRegex = /\/videoembed/i
 
 // A player pointing at a track inside an album names both, and the two orders both occur: the
@@ -109,7 +108,9 @@ export const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
   const [kind, id] = release
   // The video player names a track and only a track: `VideoEmbed?album={id}` answers 404. A video
   // carrier whose only release is an album falls back to the audio player, which does serve it.
-  const isVideo = videoPathRegex.test(parsed.pathname) && kind === 'track'
+  const isVideoPath = videoPathRegex.test(parsed.pathname)
+  const isVideo = isVideoPath && kind === 'track'
+  const isAlbumVideo = isVideoPath && kind !== 'track'
   const preset = getPathSegments(parsed)
     .map((segment) => segment.match(sizeRegex)?.[1])
     .find(Boolean)
@@ -127,13 +128,16 @@ export const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
   const pageUrl = attr(anchor, 'href')
   // Bandcamp writes the label as `{title} by {artist}`, and " by " appears inside real titles too.
   const title = text(anchor) ?? attr(element, 'title')
+  const playerSrc = isVideo
+    ? `https://bandcamp.com/VideoEmbed?${kind}=${id}`
+    : `https://bandcamp.com/EmbeddedPlayer/${selection}${size}`
 
   return {
     provider,
     id: `${kind}/${id}`,
-    src: isVideo
-      ? `https://bandcamp.com/VideoEmbed?${kind}=${id}`
-      : `https://bandcamp.com/EmbeddedPlayer/${selection}${size}`,
+    // A player frame plays as written, with the colours and tracklist the publisher picked. A
+    // Flash `<object>` or `<embed>` and a video frame naming only an album get the current player.
+    src: element?.localName === 'iframe' && !isAlbumVideo ? url : playerSrc,
     url: pageUrl,
     height,
     title,

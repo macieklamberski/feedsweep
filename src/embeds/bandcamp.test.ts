@@ -110,7 +110,7 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'album/3373381116',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=3373381116/size=large/',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=3373381116/size=large/bgcol=ffffff/transparent=true/',
         url: 'http://myexpansiveawareness.bandcamp.com/album/do-you-wanna-be-rich',
         height: 470,
         title: 'Do You Wanna Be Rich? by My Expansive Awareness',
@@ -121,12 +121,12 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
 
     // Dropping the track leaves an album player, which opens on the album's first track rather
     // than the one the publisher linked.
-    it('should keep the track a player opens an album at', async () => {
+    it('should keep the track a Flash player opens an album at', async () => {
       const value = html`
-        <iframe
+        <embed
           src="https://bandcamp.com/EmbeddedPlayer/album=1578579597/size=large/bgcol=333333/tracklist=false/artwork=small/track=1637967854/transparent=true/"
           seamless
-        ></iframe>
+         />
       `
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
@@ -139,11 +139,11 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
     })
 
     // The legacy player spells the track before the album, and means the same thing.
-    it('should keep both releases when the legacy path names the track first', async () => {
+    it('should keep both releases when a Flash player names the track first', async () => {
       const value = html`
-        <iframe
+        <embed
           src="https://bandcamp.com/EmbeddedPlayer/v=2/track=2747530839/album=2568747696/size=large/bgcol=ffffff/"
-        ></iframe>
+         />
       `
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
@@ -155,14 +155,30 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the video player form for a video embed', async () => {
+    it('should keep a legacy player frame as written', async () => {
+      const value = html`
+        <iframe
+          src="https://bandcamp.com/EmbeddedPlayer/v=2/album=4205469290/size=venti/bgcol=FFFFFF/linkcol=4285BB/"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'album/4205469290',
+        src: 'https://bandcamp.com/EmbeddedPlayer/v=2/album=4205469290/size=venti/bgcol=FFFFFF/linkcol=4285BB/',
+        height: 100,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a video player frame as written', async () => {
       const value = html`
         <iframe src="https://bandcamp.com/VideoEmbed?track=1959185434&bgcol=ffffff"></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'track/1959185434',
-        src: 'https://bandcamp.com/VideoEmbed?track=1959185434',
+        src: 'https://bandcamp.com/VideoEmbed?track=1959185434&bgcol=ffffff',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -299,7 +315,7 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
 
     it('should drop a size option behind a prefix', async () => {
       const value = html`
-        <iframe src="https://bandcamp.com/EmbeddedPlayer/album=42/xsize=large/"></iframe>
+        <embed src="https://bandcamp.com/EmbeddedPlayer/album=42/xsize=large/" />
       `
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
@@ -312,7 +328,7 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
 
     it('should drop a size preset followed by other characters', async () => {
       const value = html`
-        <iframe src="https://bandcamp.com/EmbeddedPlayer/album=42/size=large-x/"></iframe>
+        <embed src="https://bandcamp.com/EmbeddedPlayer/album=42/size=large-x/" />
       `
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
@@ -325,7 +341,7 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
 
     it('should drop a size preset carrying an encoded slash', async () => {
       const value = html`
-        <iframe src="https://bandcamp.com/EmbeddedPlayer/album=42/size=large%2fsmall/"></iframe>
+        <embed src="https://bandcamp.com/EmbeddedPlayer/album=42/size=large%2fsmall/" />
       `
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',

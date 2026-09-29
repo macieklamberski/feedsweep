@@ -943,7 +943,7 @@ describeForEachParser('Substack', (parseHtml) => {
   })
 
   it('should resolve a BandcampToDOM wrap into a bandcamp embed placeholder', async () => {
-    // The bandcamp resolver claims the player iframe and keeps the publisher's size preset.
+    // The bandcamp resolver claims the player iframe and keeps the player url the publisher wrote.
     const bandcampAttrs = jsonAttrValue({
       url: 'https://examplelabel.bandcamp.com/track/end-credits',
       thumbnail_url: 'https://substack-post-media.s3.amazonaws.com/public/images/b_700x700.jpeg',
@@ -971,7 +971,7 @@ describeForEachParser('Substack', (parseHtml) => {
       <div
         data-embed-provider="bandcamp"
         data-embed-id="track/1234567890"
-        data-embed-src="https://bandcamp.com/EmbeddedPlayer/track=1234567890/size=large/"
+        data-embed-src="https://bandcamp.com/EmbeddedPlayer/size=large/bgcol=ffffff/linkcol=333333/tracklist=false/artwork=small/track=1234567890/transparent=true/"
         data-embed-height="470"
       ></div>
     `
