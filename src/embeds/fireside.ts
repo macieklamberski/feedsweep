@@ -46,13 +46,15 @@ export const firesideResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
+  // A url ending in the token plays as written. The share route ends in `iframe`, and a `+` the
+  // feed encoded as `%2B` answers 404, so only those two get the player url.
+  const isPlayable = getPathSegments(url).at(-1) === player.token
+
   // The embed carries no metadata, no thumbnail and no canonical episode url.
   return {
     provider: 'fireside',
     id: player.token,
-    // Feeds write `fireside.fm/player/{version}/{token}`, which 301s to the same path on
-    // `player.fireside.fm`, where a real token answers 200 and a fabricated one 404.
-    src: `https://player.fireside.fm/${player.version}/${player.token}`,
+    src: isPlayable ? url : `https://player.fireside.fm/${player.version}/${player.token}`,
     height: playerHeight,
   }
 }

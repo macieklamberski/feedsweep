@@ -138,7 +138,7 @@ describe('firesideResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'fireside',
       id: 'DiNRb69N+Dagp3z15',
-      src: 'https://player.fireside.fm/v2/DiNRb69N+Dagp3z15',
+      src: 'https://fireside.fm/player/v2/DiNRb69N+Dagp3z15',
       height: 200,
     }
 
@@ -165,6 +165,19 @@ describe('firesideResolveEmbed', () => {
       provider: 'fireside',
       id: 'aHx_iT3N+3W9-AW7P',
       src: 'https://player.fireside.fm/v3/aHx_iT3N+3W9-AW7P',
+      height: 200,
+    }
+
+    expect(firesideResolveEmbed(value)).toEqual(expected)
+  })
+
+  // The written url answers 404, while the same token with a plain `+` plays.
+  it('should send a token whose plus arrived percent-encoded to the player url', () => {
+    const value = 'https://fireside.fm/player/v2/o5sVQfzy%2BKzqauAdJ'
+    const expected: EmbedResolverResult = {
+      provider: 'fireside',
+      id: 'o5sVQfzy+KzqauAdJ',
+      src: 'https://player.fireside.fm/v2/o5sVQfzy+KzqauAdJ',
       height: 200,
     }
 
@@ -200,7 +213,7 @@ describeForEachParser('firesideEmbedResolver', (parseHtml) => {
     })
 
     // The feed-side host writes the `player` segment and 301s to the same path on the player
-    // host, so both forms have to reach the resolver through the one host entry.
+    // host, so the url plays as written.
     it('should claim a player iframe on the feed-side host', async () => {
       const value = html`
         <iframe
@@ -211,7 +224,7 @@ describeForEachParser('firesideEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'fireside',
         id: 'DiNRb69N+Dagp3z15',
-        src: 'https://player.fireside.fm/v2/DiNRb69N+Dagp3z15',
+        src: 'https://fireside.fm/player/v2/DiNRb69N+Dagp3z15',
         height: 200,
       }
 
@@ -271,7 +284,7 @@ describeForEachParser('fireside through the pipeline', (parseHtml) => {
       <div
         data-embed-id="N8LaNbQY+MI2PkJ2g"
         data-embed-provider="fireside"
-        data-embed-src="https://player.fireside.fm/v3/N8LaNbQY+MI2PkJ2g"
+        data-embed-src="https://fireside.fm/player/v3/N8LaNbQY+MI2PkJ2g"
         data-embed-height="200"
       ></div>
     `
