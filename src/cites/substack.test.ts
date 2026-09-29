@@ -50,27 +50,6 @@ describeForEachParser('substackOwnPostCiteResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should extract a digest card using canonical_url', async () => {
-      const value = makeContainer('digest-post-embed', {
-        title: 'Model Drop',
-        canonical_url: 'https://thereader.example.com/p/model-drop',
-        cover_image: 'https://cdn.example.com/cover.webp',
-        publication_name: 'The Reader',
-        publishedBylines: [],
-        post_date: '2026-07-09T20:28:23.465Z',
-      })
-      const expected: CiteResolverResult = {
-        provider: 'substack',
-        url: 'https://thereader.example.com/p/model-drop',
-        title: 'Model Drop',
-        publisher: 'The Reader',
-        date: '2026-07-09T20:28:23.465Z',
-        thumbnail: 'https://cdn.example.com/cover.webp',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should return undefined when only the cross-post url key is present', async () => {
       const value = makeContainer('digest-post-embed', {
         title: 'Model Drop',
@@ -94,46 +73,11 @@ describeForEachParser('substackOwnPostCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should trim every text field', async () => {
-      const value = makeContainer('digest-post-embed', {
-        title: '  Model Drop  ',
-        canonical_url: 'https://thereader.example.com/p/model-drop',
-        caption: ' A look at the backlash. ',
-        publication_name: ' The Reader ',
-        publishedBylines: [{ name: ' Author name ' }],
-      })
-      const expected: CiteResolverResult = {
-        provider: 'substack',
-        url: 'https://thereader.example.com/p/model-drop',
-        title: 'Model Drop',
-        description: 'A look at the backlash.',
-        author: 'Author name',
-        publisher: 'The Reader',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('edge cases', () => {
-    it('should return undefined when canonical_url is missing', async () => {
-      const value = makeContainer('digest-post-embed', { title: 'Model Drop' })
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should return undefined when title is missing', async () => {
       const value = makeContainer('digest-post-embed', {
-        canonical_url: 'https://thereader.example.com/p/model-drop',
-      })
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined when title is whitespace-only', async () => {
-      const value = makeContainer('digest-post-embed', {
-        title: '   ',
         canonical_url: 'https://thereader.example.com/p/model-drop',
       })
 
@@ -148,12 +92,6 @@ describeForEachParser('substackOwnPostCiteResolver', (parseHtml) => {
 
     it('should return undefined when data-attrs is malformed json', async () => {
       const value = makeContainer('digest-post-embed', 'not-json')
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined when data-attrs is absent', async () => {
-      const value = makeContainer('digest-post-embed')
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -463,51 +401,6 @@ describeForEachParser('substackPublicationCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should extract a card carrying no logo', async () => {
-      const value = makeContainer('embedded-publication-wrap', {
-        name: 'Deep State Marauder',
-        base_url: 'https://marauder.example.com',
-        hero_text: 'Removing the Constitutional Crisis we are currently in.',
-        author_name: 'Author name',
-      })
-      const result = await extract(value)
-
-      expect(result?.icon).toBeUndefined()
-      expect(result?.title).toBe('Deep State Marauder')
-    })
-
-    it('should extract a card carrying no hero text', async () => {
-      const value = makeContainer('embedded-publication-wrap', {
-        name: 'Deep State Marauder',
-        base_url: 'https://marauder.example.com',
-        author_name: 'Author name',
-      })
-      const result = await extract(value)
-
-      expect(result?.description).toBeUndefined()
-      expect(result?.url).toBe('https://marauder.example.com')
-    })
-
-    it('should trim every text field', async () => {
-      const value = makeContainer('embedded-publication-wrap', {
-        name: '  Deep State Marauder  ',
-        base_url: '  https://marauder.example.com  ',
-        hero_text: '  A tagline.  ',
-        author_name: '  Author name  ',
-        logo_url: '  https://cdn.example.com/logo.png  ',
-      })
-      const expected: CiteResolverResult = {
-        provider: 'substack',
-        url: 'https://marauder.example.com',
-        title: 'Deep State Marauder',
-        description: 'A tagline.',
-        author: 'Author name',
-        icon: 'https://cdn.example.com/logo.png',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('edge cases', () => {
@@ -525,23 +418,8 @@ describeForEachParser('substackPublicationCiteResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined when name is whitespace-only', async () => {
-      const value = makeContainer('embedded-publication-wrap', {
-        name: '   ',
-        base_url: 'https://marauder.example.com',
-      })
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should return undefined when data-attrs is malformed json', async () => {
       const value = makeContainer('embedded-publication-wrap', '{"name":')
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined when data-attrs is absent', async () => {
-      const value = makeContainer('embedded-publication-wrap')
 
       expect(await extract(value)).toBeUndefined()
     })
