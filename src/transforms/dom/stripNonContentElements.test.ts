@@ -309,6 +309,40 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    // A generator can write the Graph API version between the host and the file, and those urls
+    // still serve.
+    it('should strip a versioned Facebook chrome plugin frame', async () => {
+      const value = html`
+        <iframe
+          src="https://www.facebook.com/v2.3/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Facme"
+        ></iframe>
+        <iframe
+          src="https://www.facebook.com/v2.10/plugins/share_button.php?href=https%3A%2F%2Fexample.com%2Fpost"
+        ></iframe>
+        <iframe
+          src="https://www.facebook.com/v2.5/plugins/like.php?href=https%3A%2F%2Fexample.com%2Fpost&layout=standard"
+        ></iframe>
+      `
+
+      expect(await transform(`<p>Before</p>${value}<p>After</p>`)).toEqualHtml(
+        '<p>Before</p><p>After</p>',
+      )
+    })
+
+    // Two plugins on the same path carry the post itself and must survive to be resolved.
+    it('should keep the Facebook post and video plugin frames', async () => {
+      const value = html`
+        <iframe
+          src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Facme%2Fposts%2F123"
+        ></iframe>
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Facme%2Fvideos%2F456"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should leave unrelated iframes and forms untouched', async () => {
       const value = html`
         <iframe src="https://example.com/embed"></iframe>
@@ -400,40 +434,6 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
   })
 
   describe('scoped selectors', () => {
-    // A generator can write the Graph API version between the host and the file, and those urls
-    // still serve.
-    it('should strip a versioned Facebook chrome plugin frame', async () => {
-      const value = html`
-        <iframe
-          src="https://www.facebook.com/v2.3/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Facme"
-        ></iframe>
-        <iframe
-          src="https://www.facebook.com/v2.10/plugins/share_button.php?href=https%3A%2F%2Fexample.com%2Fpost"
-        ></iframe>
-        <iframe
-          src="https://www.facebook.com/v2.5/plugins/like.php?href=https%3A%2F%2Fexample.com%2Fpost&layout=standard"
-        ></iframe>
-      `
-
-      expect(await transform(`<p>Before</p>${value}<p>After</p>`)).toEqualHtml(
-        '<p>Before</p><p>After</p>',
-      )
-    })
-
-    // Two plugins on the same path carry the post itself and must survive to be resolved.
-    it('should keep the Facebook post and video plugin frames', async () => {
-      const value = html`
-        <iframe
-          src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Facme%2Fposts%2F123"
-        ></iframe>
-        <iframe
-          src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Facme%2Fvideos%2F456"
-        ></iframe>
-      `
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
     // The same wrapper with its player intact is a working embed, not chrome. Only the shells
     // whose iframe the feed generator removed are stripped.
     it('should keep an s9e wrapper whose player survived', async () => {
