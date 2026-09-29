@@ -204,6 +204,15 @@ describeForEachParser('markTimestamps', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should wrap timestamps in table cells with no whitespace between them', async () => {
+    const value =
+      '<table><tbody><tr><td>Intro</td><td>0:00</td></tr><tr><td>Outro</td><td>1:00</td></tr></tbody></table>'
+    const expected =
+      '<table><tbody><tr><td>Intro</td><td><span data-timestamp="0">0:00</span></td></tr><tr><td>Outro</td><td><span data-timestamp="60">1:00</span></td></tr></tbody></table>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should not wrap an out-of-range seconds value', async () => {
     const value = '<p>12:99 - nope</p>'
 

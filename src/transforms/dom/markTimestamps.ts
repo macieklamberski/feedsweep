@@ -2,6 +2,7 @@ import type { DomTransform } from '../../types.js'
 import { collectTextNodes, isBlockElement, isBr, isElement, isText } from '../../utils/dom.js'
 
 const timestampIgnoreTags = new Set(['a', 'pre', 'code', 'kbd', 'samp', 'var', 'script', 'style'])
+const tableCellTags = ['td', 'th']
 
 // MM:SS or HH:MM:SS, with the seconds always two digits.
 const timestampToken = '(?:\\d{1,2}:)?\\d{1,2}:\\d{2}'
@@ -53,9 +54,17 @@ const shouldSkipElement = (element: Element): boolean => {
   )
 }
 
+const isLineBoundary = (node: Node): boolean => {
+  return (
+    isBlockElement(node) ||
+    isBr(node) ||
+    (isElement(node) && tableCellTags.includes(node.localName))
+  )
+}
+
 // Whether the text node's edge on one side is a line edge: nothing but spaces or tabs stand
-// between it and a block boundary, a `<br>` or a newline. Inline elements are read through, so
-// `<b>noon</b> 12:30` is mid-line although the text node starts right after the `<b>`.
+// between it and a block boundary, a table cell, a `<br>` or a newline. Inline elements are read
+// through, so `<b>noon</b> 12:30` is mid-line although the text node starts right after the `<b>`.
 const isLineEdge = (node: Node, forward: boolean): boolean => {
   let current = node
 
@@ -65,7 +74,7 @@ const isLineEdge = (node: Node, forward: boolean): boolean => {
     if (!adjacent) {
       const parent = current.parentNode
 
-      if (!isElement(parent) || isBlockElement(parent) || parent.localName === 'body') {
+      if (!isElement(parent) || isLineBoundary(parent) || parent.localName === 'body') {
         return true
       }
 
@@ -75,7 +84,7 @@ const isLineEdge = (node: Node, forward: boolean): boolean => {
 
     let sibling: Node = adjacent
 
-    while (isElement(sibling) && !isBlockElement(sibling) && !isBr(sibling)) {
+    while (isElement(sibling) && !isLineBoundary(sibling)) {
       const child = forward ? sibling.firstChild : sibling.lastChild
 
       if (!child) {
@@ -85,7 +94,7 @@ const isLineEdge = (node: Node, forward: boolean): boolean => {
       sibling = child
     }
 
-    if (isBlockElement(sibling) || isBr(sibling)) {
+    if (isLineBoundary(sibling)) {
       return true
     }
 
