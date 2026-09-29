@@ -65,6 +65,12 @@ describeForEachParser('stripDeadAnchors', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should preserve anchor with relative href that has a space inside javascript:', async () => {
+    const value = '<p><a href="java script:void(0)">guide</a></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should preserve anchor with relative href that reads as javascript without its space', async () => {
     const value = '<p><a href="java script.html">guide</a></p>'
 
