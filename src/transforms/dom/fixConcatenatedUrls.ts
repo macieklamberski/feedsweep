@@ -22,10 +22,9 @@ export const fixConcatenatedUrls: DomTransform = () => {
           continue
         }
 
-        element.setAttribute(
-          name,
-          `${url.protocol}//${match[1]}${match[2]}${url.search}${url.hash}`,
-        )
+        const repairedUrl = `${url.protocol}//${match[1]}${match[2]}${url.search}${url.hash}`
+
+        element.setAttribute(name, repairedUrl)
       }
     }
   }

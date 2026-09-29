@@ -52,11 +52,17 @@ describeForEachParser('fixConcatenatedUrls', (parseHtml) => {
 
     it('should repair a script and an anchor the same way', async () => {
       const value = html`
-        <script async src="http://www.example.com///pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script
+          async
+          src="http://www.example.com///pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+        ></script>
         <a href="https://example.com//www.youtube.com/watch?v=klM_7OkW3Y8">Watch</a>
       `
       const expected = html`
-        <script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script
+          async
+          src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+        ></script>
         <a href="https://www.youtube.com/watch?v=klM_7OkW3Y8">Watch</a>
       `
 
