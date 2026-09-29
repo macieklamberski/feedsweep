@@ -5,7 +5,7 @@ export {
   defaultLazySrcsetAttributes,
   defaultMediaSrcAttributes,
 } from './defaults/attributes.js'
-export { defaultFieldCleaners } from './defaults/cleaners.js'
+export { defaultCleanedSrcProviders, defaultFieldCleaners } from './defaults/cleaners.js'
 export { defaultEmbedRenderHints } from './defaults/hints.js'
 export {
   defaultAvatarImageHosts,
