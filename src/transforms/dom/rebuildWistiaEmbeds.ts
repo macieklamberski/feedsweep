@@ -24,16 +24,18 @@ const wistiaSelector = [
 // them on a substring, so nothing before `readSrcMediaId` has looked at the host.
 const srcCarrierTags = new Set(['script', 'iframe'])
 
+// Lowercased like the id the platform module reads out of a src, so a loader script still matches
+// the div or custom element that spells the same media in capitals.
 const readMediaId = (element: Element): string | undefined => {
   if (element.localName === 'wistia-player') {
-    return attr(element, 'media-id')
+    return attr(element, 'media-id')?.toLowerCase()
   }
 
   if (srcCarrierTags.has(element.localName)) {
     return readSrcMediaId(attr(element, 'src'))
   }
 
-  return element.className.match(wistiaIdRegex)?.[1]
+  return element.className.match(wistiaIdRegex)?.[1]?.toLowerCase()
 }
 
 // Wistia's async div, <wistia-player> element and loader script all render nothing without JS.
