@@ -2,7 +2,7 @@ import type { Nullish } from 'trousse'
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches, paramValue } from '../utils/dom.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brightcove'
@@ -68,7 +68,7 @@ const composePlayerUrl = (
   // Unescaped, `data-player="../../999999/stolen"` names another account's player.
   const segment = `${encodeURIComponent(player)}_${encodeURIComponent(embed)}`
   // The Flash `publisherID` comes out of a query decoded.
-  const accountSegment = encodeURIComponent(account)
+  const accountSegment = encodePathSegment(account)
 
   return `https://players.brightcove.net/${accountSegment}/${segment}/index.html?videoId=${videoId}`
 }

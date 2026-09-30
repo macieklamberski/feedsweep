@@ -4,6 +4,7 @@ import { attr, flashVar, keepIfMatches, parseRatio } from '../utils/dom.js'
 import {
   composeQuery,
   digitsRegex,
+  encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -34,7 +35,7 @@ const playerParams = ['access_key', 'start_page']
 const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
   const params = pickQueryParams(search, playerParams)
   // The Flash `document_id` comes out of a query decoded, and it goes into a path.
-  const segment = encodeURIComponent(document)
+  const segment = encodePathSegment(document)
 
   return {
     provider: 'scribd',

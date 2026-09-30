@@ -3,6 +3,7 @@ import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed }
 import { attr } from '../utils/dom.js'
 import {
   composeQuery,
+  encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -209,7 +210,7 @@ const composeUploadsEmbed = (user: string): EmbedResolverResult => {
     id: `user/${user}`,
     src: `https://www.youtube.com/embed${composeQuery({ listType: 'user_uploads', list: user })}`,
     // The username comes out of the query decoded, and it goes into a path.
-    url: `https://www.youtube.com/user/${encodeURIComponent(user)}`,
+    url: `https://www.youtube.com/user/${encodePathSegment(user)}`,
     ratio: playerRatio,
   }
 }
@@ -249,7 +250,7 @@ const resolveCollectionEmbed = (
   const channel = parsed.searchParams.get('channel')
 
   if (segments[1] === 'live_stream') {
-    return channel ? composeChannelEmbed(channel, encodeURIComponent(channel)) : undefined
+    return channel ? composeChannelEmbed(channel, encodePathSegment(channel)) : undefined
   }
 
   // `/embed/videoseries?list=` and the bare `/embed/?list=` some WordPress plugins emit are the

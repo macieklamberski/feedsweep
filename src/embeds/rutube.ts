@@ -1,6 +1,6 @@
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rutube'
@@ -20,7 +20,7 @@ const rutubeEmbedParams = ['p', 't', 'stopTime']
 
 const composeEmbed = (videoId: string, link: string): EmbedResolverResult => {
   // A playlist's `pl_video` comes out of the query decoded, and it goes into a path.
-  const segment = encodeURIComponent(videoId)
+  const segment = encodePathSegment(videoId)
 
   // rutube.ru/api/video/{id}/ answers key-free with the title, author, duration and a poster, 200
   // for a real id and 404 for an invented one, and the poster file is named by a hash the id does

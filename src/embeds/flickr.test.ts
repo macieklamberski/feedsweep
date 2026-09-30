@@ -419,8 +419,8 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/17367418@N03 ',
-        src: 'https://www.flickr.com/photos/17367418@N03 /player?width=500&height=500',
-        url: 'https://www.flickr.com/photos/17367418@N03 /',
+        src: 'https://www.flickr.com/photos/17367418@N03%20/player?width=500&height=500',
+        url: 'https://www.flickr.com/photos/17367418@N03%20/',
         width: 500,
         height: 500,
         author: '17367418@N03 ',
@@ -1019,8 +1019,8 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/bees/pricing',
-        src: 'https://www.flickr.com/photos/bees/pricing/player?width=400&height=300',
-        url: 'https://www.flickr.com/photos/bees/pricing/',
+        src: 'https://www.flickr.com/photos/bees%2Fpricing/player?width=400&height=300',
+        url: 'https://www.flickr.com/photos/bees%2Fpricing/',
         width: 400,
         height: 300,
         author: 'bees/pricing',
@@ -1131,10 +1131,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         '<iframe src="https://www.flickr.com/photos/kimim%2Fphoto/11616055053/player/"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photos/kimim%2Fphoto/11616055053',
+        id: 'photos/kimim/photo/11616055053',
         src: 'https://www.flickr.com/photos/kimim%2Fphoto/11616055053/player/',
         url: 'https://www.flickr.com/photos/kimim%2Fphoto/11616055053/',
-        author: 'kimim%2Fphoto',
+        author: 'kimim/photo',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1165,8 +1165,8 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams//bees',
-        src: 'https://www.flickr.com/photos//bees/player?width=400&height=300',
-        url: 'https://www.flickr.com/photos//bees/',
+        src: 'https://www.flickr.com/photos/%2Fbees/player?width=400&height=300',
+        url: 'https://www.flickr.com/photos/%2Fbees/',
         width: 400,
         height: 300,
         author: '/bees',
@@ -1181,8 +1181,8 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/bees/../x',
-        src: 'https://www.flickr.com/photos/bees/../x/player?width=400&height=300',
-        url: 'https://www.flickr.com/photos/bees/../x/',
+        src: 'https://www.flickr.com/photos/bees%2F..%2Fx/player?width=400&height=300',
+        url: 'https://www.flickr.com/photos/bees%2F..%2Fx/',
         width: 400,
         height: 300,
         author: 'bees/../x',

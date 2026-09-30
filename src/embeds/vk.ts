@@ -1,6 +1,11 @@
 import { parseUrl, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const vkHosts = ['vk.com', 'vk.ru', 'vkontakte.ru', 'vkvideo.ru']
@@ -43,7 +48,7 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
     id,
     src,
     // Both ids come out of the query decoded, and they go into a path.
-    url: `https://vkvideo.ru/${player.kind}${encodeURIComponent(id)}`,
+    url: `https://vkvideo.ru/${player.kind}${encodePathSegment(id)}`,
   }
 }
 

@@ -1,6 +1,11 @@
 import { getPathSegments, parseUrl, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type EmbedShape = {
@@ -82,7 +87,7 @@ const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
   }
 
   // The id comes out of the query decoded, and the page goes into a path beside the raw spelling.
-  return composeEmbed(kind, shape, encodeURIComponent(id), src, params.title)
+  return composeEmbed(kind, shape, encodePathSegment(id), src, params.title)
 }
 
 // The older per-resource spelling, `ridewithgps.com/{routes|trips}/{id}/embed`, which feeds

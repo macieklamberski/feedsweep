@@ -6,6 +6,7 @@ const provider = 'dailymotion'
 
 import {
   composeQuery,
+  encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -169,7 +170,7 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
 
   if (videoId) {
     // The geo player's `video` comes out of the query decoded, and it goes into two paths.
-    const segment = encodeURIComponent(videoId)
+    const segment = encodePathSegment(videoId)
 
     return {
       provider,
@@ -195,7 +196,7 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
       id: `playlist/${playlistId}`,
       src: composeEmbedUrl('playlist', playlistId),
       // The `playlist` parameter comes out of the query decoded, and it goes into a path.
-      url: `https://www.dailymotion.com/playlist/${encodeURIComponent(playlistId)}`,
+      url: `https://www.dailymotion.com/playlist/${encodePathSegment(playlistId)}`,
       title: attr(element, 'title'),
     }
   }

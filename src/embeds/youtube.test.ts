@@ -556,7 +556,7 @@ describe('youtubeResolveEmbed', () => {
       provider: 'youtube',
       id: 'channel/UCuAXFkgsw1L7xaCfnd5JJOw&autoplay=1',
       src: 'https://www.youtube.com/embed/live_stream?channel=UCuAXFkgsw1L7xaCfnd5JJOw%26autoplay%3D1',
-      url: 'https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw%26autoplay%3D1',
+      url: 'https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw&autoplay=1',
       ratio: '16/9',
     }
 

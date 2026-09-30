@@ -1,6 +1,7 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
+import { encodePathSegment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ccma'
@@ -56,7 +57,7 @@ const readFlashVideoId = (element: Element | undefined, name: string): string | 
     return
   }
 
-  return encodeURIComponent(videoId)
+  return encodePathSegment(videoId)
 }
 
 // The player frame in its 3Cat and CCMA spellings, the CCMA audio frame, and CCMA's two Flash

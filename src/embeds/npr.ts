@@ -1,6 +1,6 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const nprHosts = ['www.npr.org']
@@ -95,7 +95,7 @@ export const nprFlashResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // The pair comes out of the query decoded, and it goes into a path beside the raw path spelling.
-  return composeEmbed(encodeURIComponent(storyId), encodeURIComponent(mediaId))
+  return composeEmbed(encodePathSegment(storyId), encodePathSegment(mediaId))
 }
 
 // The Flash carriers state the box of the retired Flash player.

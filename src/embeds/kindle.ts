@@ -1,7 +1,12 @@
 import { isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const kindleHosts = [
@@ -44,7 +49,7 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
     ...pickQueryParams(parsed.search, cardParams),
   })
   // The ASIN comes out of the query decoded, and it goes into two paths.
-  const segment = encodeURIComponent(asin)
+  const segment = encodePathSegment(asin)
   const storefront = parsed.hostname.slice('read.'.length)
   const isSharedStore = sharedStoreHosts.includes(parsed.hostname)
 

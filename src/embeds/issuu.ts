@@ -4,7 +4,13 @@ import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.j
 const provider = 'issuu'
 
 import { attr } from '../utils/dom.js'
-import { composeQuery, digitsRegex, isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import {
+  composeQuery,
+  digitsRegex,
+  encodePathSegment,
+  isFileName,
+  parseUrlOnHosts,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const issuuHosts = ['issuu.com']
@@ -47,7 +53,7 @@ const composeDocumentEmbed = (
     id: `${publisher}/${documentName}`,
     src: `https://e.issuu.com/embed.html${query}`,
     // The iframe's `u` and `d` come out of the query decoded, and each goes into a path segment.
-    url: `https://issuu.com/${encodeURIComponent(publisher)}/docs/${encodeURIComponent(documentName)}`,
+    url: `https://issuu.com/${encodePathSegment(publisher)}/docs/${encodePathSegment(documentName)}`,
   }
 }
 

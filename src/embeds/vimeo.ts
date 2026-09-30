@@ -4,6 +4,7 @@ import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   composeQuery,
   digitsRegex,
+  encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -170,7 +171,7 @@ export const readVimeoEmbedSrc = (link: string): string | undefined => {
   const url = parseUrlOnHosts(link, vimeoHosts)
   const videoId = url && extractVimeoId(url.href)
 
-  return videoId ? composeEmbedUrl(encodeURIComponent(videoId)) : undefined
+  return videoId ? composeEmbedUrl(encodePathSegment(videoId)) : undefined
 }
 
 // `t` is the start offset, in Vimeo's `{n}s` form.
@@ -188,7 +189,7 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
 
   const { id: videoId, hash } = reference
   // A `clip_id` comes out of the query decoded, and it goes into a path.
-  const segment = encodeURIComponent(videoId)
+  const segment = encodePathSegment(videoId)
   const title = element ? attr(element, 'title') : undefined
   const params = {
     // The player takes the hash only as h=: the /video/{id}/{hash} path spelling is a 404.

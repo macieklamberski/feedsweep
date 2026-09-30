@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVars } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ted'
@@ -65,7 +65,7 @@ const readFlashTalk = (
 
   // The slug comes out of the flashvars decoded, and it goes into a path beside the raw spelling.
   return {
-    slug: encodeURIComponent(slug),
+    slug: encodePathSegment(slug),
     thumbnail: parseUrlOnHosts(poster, tedHosts) ? poster : undefined,
   }
 }

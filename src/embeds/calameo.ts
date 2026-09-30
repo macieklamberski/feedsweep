@@ -1,7 +1,7 @@
 import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { flashVars, keepIfMatches } from '../utils/dom.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The viewer and the book page both read `langid` as a two-letter language.
@@ -63,7 +63,7 @@ export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
     id: code,
     src: `https://v.calameo.com/?${query}`,
     // The code comes out of a query decoded, and it goes into a path.
-    url: `https://www.calameo.com/books/${encodeURIComponent(code)}${pageQuery}`,
+    url: `https://www.calameo.com/books/${encodePathSegment(code)}${pageQuery}`,
   }
 }
 
