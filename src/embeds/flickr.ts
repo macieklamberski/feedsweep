@@ -1,8 +1,11 @@
 import { decodeSegment, isHostOf, type Nullish, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar, flashVars, keepIfMatches } from '../utils/dom.js'
+import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver, getEmbedSize } from '../utils/widgets.js'
+
+const provider = 'flickr'
 
 const flickrHosts = ['flickr.com']
 const embedrHost = 'embedr.flickr.com'
@@ -200,7 +203,7 @@ const composePhotoEmbed = (src: string, photo: FlickrPhoto): EmbedResolverResult
   const { photoId, owner, secret } = photo
 
   return {
-    provider: 'flickr',
+    provider,
     // The photo's key-free oEmbed answers on the page url and on the short url alike.
     id: owner ? `photos/${owner}/${photoId}` : `p/${encodeBase58(photoId)}`,
     src,
@@ -220,7 +223,7 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   // redirect to `/albums/`, while the `/albums/` player redirects to `/sets/` (2026-09-29).
   if (subject.setId && owner) {
     return {
-      provider: 'flickr',
+      provider,
       // The album's key-free oEmbed needs `{owner}/{setId}`: a title, an author, a thumbnail.
       id: `${owner}/${subject.setId}`,
       src: composeAlbumPlayer(subject.setId),
@@ -232,7 +235,7 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   // The short url spells the set id in base58, which only a numeric id has.
   if (subject.setId && digitsRegex.test(subject.setId)) {
     return {
-      provider: 'flickr',
+      provider,
       // Addresses the player but not oEmbed.
       id: `photosets/${subject.setId}`,
       src: composeAlbumPlayer(subject.setId),
@@ -242,7 +245,7 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
 
   if (subject.groupId && nsidRegex.test(subject.groupId)) {
     return {
-      provider: 'flickr',
+      provider,
       id: `groups/${subject.groupId}`,
       src: composeGroupPlayer(subject.groupId),
       url: `https://www.flickr.com/groups/${subject.groupId}/`,
@@ -253,7 +256,7 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   // other. An alias resolves through the page player instead, which serves both spellings.
   if (owner) {
     return {
-      provider: 'flickr',
+      provider,
       id: `photostreams/${owner}`,
       // embedr 404s on an alias, so only an NSID goes there.
       src: nsidRegex.test(owner) ? composeStreamPlayer(owner) : composeAliasStreamPlayer(owner),
@@ -332,3 +335,10 @@ export const flickrEmbedResolver = createUrlEmbedResolver(flickrHosts, flickrRes
   // The carrier's size is already folded into the src, and it is what the endpoint renders at.
   preferResolverSize: true,
 })
+
+// Only embedr's video player answers player.js. A photo and the page player post no ready message.
+export const flickrRenderHint: EmbedRenderHint = {
+  provider,
+  isReady: isPlayerJsReady,
+  requestPlay: playerJsPlayRequest,
+}

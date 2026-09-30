@@ -1,7 +1,10 @@
 import { getPathSegments } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'transistor'
 
 const transistorHosts = ['transistor.fm']
 
@@ -54,7 +57,7 @@ export const transistorResolveEmbed: ResolveEmbed = (url) => {
   const path = embed.kind === 'e' ? `e/${embed.id}` : `e/${embed.id}/${embed.kind}`
 
   return {
-    provider: 'transistor',
+    provider,
     id: `${subjectNames[embed.kind]}/${embed.id}`,
     src: `https://share.transistor.fm/${path}`,
     // A show mode has no page: the embed slug is not the show's subdomain, which 404s.
@@ -69,3 +72,9 @@ export const transistorEmbedResolver = createUrlEmbedResolver(
   transistorHosts,
   transistorResolveEmbed,
 )
+
+export const transistorRenderHint: EmbedRenderHint = {
+  provider,
+  isReady: isPlayerJsReady,
+  requestPlay: playerJsPlayRequest,
+}

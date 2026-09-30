@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { vkEmbedResolver, vkResolveEmbed } from './vk.js'
+import { isVkReady, vkEmbedResolver, vkResolveEmbed } from './vk.js'
 
 describe('vkResolveEmbed', () => {
   describe('happy paths', () => {
@@ -198,5 +198,40 @@ describeForEachParser('vkEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+describe('isVkReady', () => {
+  it('should accept the message the player posts once it has loaded', () => {
+    const value = {
+      videoId: '444168992_456241378',
+      state: 'unstarted',
+      volume: 1,
+      muted: false,
+      time: 0,
+      duration: 2289,
+      quality: 0,
+      event: 'inited',
+    }
+
+    expect(isVkReady(value)).toBe(true)
+  })
+
+  it('should refuse another state message', () => {
+    const value = {
+      state: 'unstarted',
+      volume: 1,
+      muted: false,
+      time: 0,
+      duration: 2289,
+      quality: 240,
+      event: 'qualitychange',
+    }
+
+    expect(isVkReady(value)).toBe(false)
+  })
+
+  it('should refuse the event name posted as a string', () => {
+    expect(isVkReady('inited')).toBe(false)
   })
 })
