@@ -1069,3 +1069,32 @@ describeForEachParser('facebook through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+// A plugin frame's src is the publisher's own url, so it goes through the caller's cleaner.
+describeForEachParser('facebook src cleaning', (parseHtml) => {
+  it('should hand the plugin url to the caller cleanUrlFn', async () => {
+    const value =
+      '<iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FWillowbankRaceway%2Fvideos%2F732638203506014%2F&show_text=false&utm_source=feed"></iframe>'
+    const expected = html`
+      <div
+        data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FWillowbankRaceway%2Fvideos%2F732638203506014%2F&amp;show_text=false"
+        data-embed-provider="facebook"
+        data-embed-id="https://www.facebook.com/WillowbankRaceway/videos/732638203506014/"
+        data-embed-url="https://www.facebook.com/WillowbankRaceway/videos/732638203506014/"
+      ></div>
+    `
+
+    expect(
+      await transformContent(value, {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://example.com/post',
+        cleanUrlFn: (url) => {
+          const parsed = new URL(url)
+          parsed.searchParams.delete('utm_source')
+
+          return parsed.href
+        },
+      }),
+    ).toEqualHtml(expected)
+  })
+})

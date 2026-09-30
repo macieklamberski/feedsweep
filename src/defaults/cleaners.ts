@@ -59,4 +59,30 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
 // The providers whose src goes through the caller's cleanUrlFn. A generic cleaner knows nothing
 // about player params and can strip one the frame needs, so only a resolver that hands the
 // publisher's own url on as the src, tracking params included, is listed.
-export const defaultCleanedSrcProviders: Array<string> = ['helloasso', 'patronite']
+export const defaultCleanedSrcProviders: Array<string> = [
+  'applemusic',
+  'applepodcasts',
+  'bandcamp',
+  'blubrry',
+  'bluesky',
+  'deezer',
+  'facebook',
+  'googleslides',
+  'helloasso',
+  'issuu',
+  'ivoox',
+  'jwplayer',
+  'kindle',
+  'megaphone',
+  'mixcloud',
+  'odysee',
+  'patronite',
+  'podbean',
+  'scribd',
+  'sketchfab',
+  'slideshare',
+  'spreaker',
+  'twitter',
+  'videopress',
+  'vk',
+]
