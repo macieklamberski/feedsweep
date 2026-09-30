@@ -1,7 +1,15 @@
 import { parseUrl, toMap } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { composeQuery, digitsRegex, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import {
+  composeQuery,
+  digitsRegex,
+  dropUrlParams,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'vk'
 
 const vkHosts = ['vk.com', 'vk.ru', 'vkontakte.ru', 'vkvideo.ru']
 
@@ -37,12 +45,16 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const params = pickQueryParams(parsed.search, playerParams)
   const id = `${ownerId}_${videoId}`
-  const src = `https://${parsed.hostname}${player.path}${composeQuery(params)}`
+  // A player plays as written, with its quality and start options, less the autoplay the render
+  // hint applies on click. Only `video_embed` is rebuilt.
+  const src =
+    player.path === parsed.pathname
+      ? dropUrlParams(url, Object.keys(vkRenderHint.autoplayParams ?? {}))
+      : `https://${parsed.hostname}${player.path}${composeQuery(pickQueryParams(parsed.search, playerParams))}`
 
   return {
-    provider: 'vk',
+    provider,
     id,
     src,
     url: `https://vkvideo.ru/${player.kind}${id}`,
@@ -50,3 +62,8 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
 }
 
 export const vkEmbedResolver = createUrlEmbedResolver(vkHosts, vkResolveEmbed)
+
+export const vkRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: '1' },
+}
