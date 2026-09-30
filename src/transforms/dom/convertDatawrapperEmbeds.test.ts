@@ -111,6 +111,21 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should use a malformed wrapper chart id as written, even if the image answers an error', async () => {
+    const value = html`
+      <div id="datawrapper-vis-ab_cd">
+        <script src="https://datawrapper.dwcdn.net/ab_cd/embed.js"></script>
+      </div>
+    `
+    const expected = html`
+      <a href="https://datawrapper.dwcdn.net/ab_cd/">
+        <img src="https://datawrapper.dwcdn.net/ab_cd/full.png">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should recover the script form even when the noscript fallback is absent', async () => {
     const value = html`
       <div id="datawrapper-vis-CmrER" style="min-height:441px">
