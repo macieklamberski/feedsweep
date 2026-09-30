@@ -95,6 +95,20 @@ const presetCases: Array<[string, number]> = [
 describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, bandcampEmbedResolver)
 
+  describe('path values', () => {
+    it('should encode a path release value once', async () => {
+      const value =
+        '<iframe src="https://bandcamp.com/EmbeddedPlayer/track=%20235369944/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'track/ 235369944',
+        src: 'https://bandcamp.com/EmbeddedPlayer/track=%20235369944/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   describe('happy paths', () => {
     // Bandcamp's own snippet carries the release page and label in a fallback anchor, which is
     // the only place either appears: the player url names the release by number alone.

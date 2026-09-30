@@ -1,4 +1,4 @@
-import { getPathSegments, type Nullish, parseUrl, toMap } from 'trousse'
+import { decodeSegment, getPathSegments, type Nullish, parseUrl, toMap } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 
@@ -60,8 +60,9 @@ const readReleases = (link: string): Array<[string, string]> => {
   for (const segment of getPathSegments(parsed)) {
     const match = segment.match(releaseRegex)
 
+    // A path value is decoded, like a query one, so the player url encodes it once.
     if (match) {
-      claim(match[1], match[2])
+      claim(match[1], decodeSegment(match[2]) ?? match[2])
     }
   }
 

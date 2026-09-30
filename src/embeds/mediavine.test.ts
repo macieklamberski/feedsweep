@@ -81,7 +81,7 @@ describeForEachParser('mediavineWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'mediavine',
         id: '../../evil',
-        src: 'https://embed.mediavine.com/videos/../../evil/iframe',
+        src: 'https://embed.mediavine.com/videos/..%2F..%2Fevil/iframe',
       }
 
       expect(await extract(value)).toEqual(expected)

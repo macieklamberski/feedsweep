@@ -31,6 +31,26 @@ describe('extractPodbeanId', () => {
     expect(extractPodbeanId(value)).toBeUndefined()
   })
 
+  it('should return undefined for the legacy audio post player', () => {
+    const value =
+      'http://www.podbean.com/media/player/audio/postId/5412166?url=http%3A%2F%2Fthetilehurstend.podbean.com%2Fe%2Fepisode-45%2F'
+
+    expect(extractPodbeanId(value)).toBeUndefined()
+  })
+
+  it('should return undefined for the legacy multi-episode player', () => {
+    const value = 'https://www.podbean.com/media/player/multi?playlist=abc'
+
+    expect(extractPodbeanId(value)).toBeUndefined()
+  })
+
+  it('should decode a legacy path id before it moves into the query', () => {
+    const value = 'https://www.podbean.com/media/player/yx4hr%2Ff3d1e1'
+    const expected = 'yx4hr/f3d1e1'
+
+    expect(extractPodbeanId(value)).toBe(expected)
+  })
+
   it('should return undefined for a url that cannot be parsed', () => {
     const value = 'https://['
 

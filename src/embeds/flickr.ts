@@ -34,7 +34,7 @@ type FlickrPhoto = { photoId: string; owner?: string; secret?: string }
 // Flickr's own embed script writes these embedr endpoints into a frameless iframe. A real id
 // answers 200 with the whole slideshow and an invented one 404.
 const composeAlbumPlayer = (setId: string): string => {
-  return `https://embedr.flickr.com/photosets/${setId}`
+  return `https://embedr.flickr.com/photosets/${encodePathSegment(setId)}`
 }
 
 const composeStreamPlayer = (owner: string): string => {
@@ -93,9 +93,8 @@ const composePhotoThumbnail = (photoId: string, secret: string): string => {
 const dialogSize = { width: 400, height: 300 }
 
 // What a page path names, whether it arrived in the flashvars or as the framed page itself.
-// An owner read out of a path is decoded, so every owner is held in one form and only the urls
-// encode it.
-const decodeOwner = (owner: string): string => {
+// A value read out of a path is decoded, so each is held in one form and only the urls encode it.
+const decodePathValue = (owner: string): string => {
   return decodeSegment(owner) ?? owner
 }
 
@@ -103,7 +102,7 @@ const readPageSubject = (page: string): FlickrSubject | undefined => {
   const set = page.match(setPathRegex)
 
   if (set) {
-    return { owner: decodeOwner(set[1]), setId: set[2] }
+    return { owner: decodePathValue(set[1]), setId: decodePathValue(set[2]) }
   }
 
   const group = page.match(groupPathRegex)
@@ -115,7 +114,7 @@ const readPageSubject = (page: string): FlickrSubject | undefined => {
   const stream = page.match(streamPathRegex)
 
   if (stream) {
-    return { owner: decodeOwner(stream[1]) }
+    return { owner: decodePathValue(stream[1]) }
   }
 }
 
@@ -166,7 +165,7 @@ const readPhotoSubject = (parsed: URL): FlickrPhoto | undefined => {
   const player = parsed.pathname.match(photoPathRegex)
 
   if (player) {
-    return { owner: decodeOwner(player[1]), photoId: player[2], secret: player[3] }
+    return { owner: decodePathValue(player[1]), photoId: player[2], secret: player[3] }
   }
 
   const embedr = isHostOf(parsed, embedrHost) && parsed.pathname.match(embedrPhotoPathRegex)
@@ -206,7 +205,7 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
       // The album's key-free oEmbed needs `{owner}/{setId}`: a title, an author, a thumbnail.
       id: `${owner}/${subject.setId}`,
       src: composeAlbumPlayer(subject.setId),
-      url: `https://www.flickr.com/photos/${encodePathSegment(owner)}/sets/${subject.setId}`,
+      url: `https://www.flickr.com/photos/${encodePathSegment(owner)}/sets/${encodePathSegment(subject.setId)}`,
       author,
     }
   }
