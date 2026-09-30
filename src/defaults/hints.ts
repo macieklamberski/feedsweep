@@ -33,6 +33,7 @@ import { rutubeRenderHint } from '../embeds/rutube.js'
 import { sketchfabRenderHint } from '../embeds/sketchfab.js'
 import { soundcloudRenderHint } from '../embeds/soundcloud.js'
 import { spreakerRenderHint } from '../embeds/spreaker.js'
+import { srgplayRenderHint } from '../embeds/srgplay.js'
 import { tedRenderHint } from '../embeds/ted.js'
 import { telegramRenderHint } from '../embeds/telegram.js'
 import { tumblrRenderHint } from '../embeds/tumblr.js'
@@ -84,6 +85,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   sketchfabRenderHint,
   soundcloudRenderHint,
   spreakerRenderHint,
+  srgplayRenderHint,
   tedRenderHint,
   telegramRenderHint,
   tumblrRenderHint,
