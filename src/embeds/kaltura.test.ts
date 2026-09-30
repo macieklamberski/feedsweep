@@ -23,6 +23,18 @@ describe('kalturaResolveEmbed', () => {
       expect(kalturaResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep the session token of an access-controlled entry and mint no poster', () => {
+      const value =
+        'https://cdnapisec.kaltura.com/p/1660902/sp/166090200/embedIframeJs/uiconf_id/25717641/partner_id/1660902?iframeembed=true&entry_id=1_txx4an1j&flashvars[ks]=djJ8MTY2MDkwMnx'
+      const expected: EmbedResolverResult = {
+        provider: 'kaltura',
+        id: '1660902/1_txx4an1j',
+        src: 'https://cdnapisec.kaltura.com/p/1660902/sp/166090200/embedIframeJs/uiconf_id/25717641/partner_id/1660902?iframeembed=true&entry_id=1_txx4an1j&flashvars[ks]=djJ8MTY2MDkwMnx',
+      }
+
+      expect(kalturaResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should read the newer playkit player', () => {
       const value =
         'https://cdnapisec.kaltura.com/p/2296822/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_bs3s0fie'

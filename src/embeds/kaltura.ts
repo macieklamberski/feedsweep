@@ -21,6 +21,10 @@ const playbackParams = [
   'kalturaClipTo',
 ]
 
+// The session token an access-controlled entry plays with. It stays in `src` as written, and an
+// entry that needs it gets no thumbnail, since the poster would need it too.
+const tokenParam = 'flashvars[ks]'
+
 type Entry = {
   partner: string
   entryId: string
@@ -40,7 +44,12 @@ const readEntry = (url: string | undefined): Entry | undefined => {
 const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult => {
   const host = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
   const query = composeQuery({ iframeembed: 'true', entry_id: entryId })
-  const playback = filterUrlQuery(parsed, (name) => playbackParams.includes(name)).replace('?', '&')
+  const hasToken = parsed.searchParams.has(tokenParam)
+  const kept = filterUrlQuery(
+    parsed,
+    (name) => name === tokenParam || playbackParams.includes(name),
+  )
+  const playback = kept.replace('?', '&')
   // The entry comes out of the query decoded, and it goes into a path.
   const entrySegment = encodePathSegment(entryId)
 
@@ -50,7 +59,9 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult 
     id: `${partner}/${entryId}`,
     src: `https://${host}${parsed.pathname}${query}${playback}`,
     // The poster answers 200 `image/jpeg` for a real entry, 404 for an invented or a deleted one.
-    thumbnail: `https://${host}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
+    thumbnail: hasToken
+      ? undefined
+      : `https://${host}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
   }
 }
 
