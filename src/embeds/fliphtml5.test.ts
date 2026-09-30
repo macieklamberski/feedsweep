@@ -23,12 +23,12 @@ describe('fliphtml5ResolveEmbed', () => {
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the secret WordPress stamps on the frame', () => {
+    it('should drop the secret WordPress stamps on the frame', () => {
       const value = 'https://online.fliphtml5.com/mzsro/jvuq/#?secret=t5CbQCavWG'
       const expected: EmbedResolverResult = {
         provider: 'fliphtml5',
         id: 'mzsro/jvuq',
-        src: 'https://online.fliphtml5.com/mzsro/jvuq/#?secret=t5CbQCavWG',
+        src: 'https://online.fliphtml5.com/mzsro/jvuq/',
         url: 'https://online.fliphtml5.com/mzsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
       }
@@ -62,12 +62,12 @@ describe('fliphtml5ResolveEmbed', () => {
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the scheme of an http carrier', () => {
+    it('should mint the https viewer from an http carrier', () => {
       const value = 'http://online.fliphtml5.com/mzsro/jvuq/'
       const expected: EmbedResolverResult = {
         provider: 'fliphtml5',
         id: 'mzsro/jvuq',
-        src: 'http://online.fliphtml5.com/mzsro/jvuq/',
+        src: 'https://online.fliphtml5.com/mzsro/jvuq/',
         url: 'https://online.fliphtml5.com/mzsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
       }
@@ -183,7 +183,7 @@ describeForEachParser('fliphtml5IframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'fliphtml5',
         id: 'mzsro/jvuq',
-        src: 'https://online.fliphtml5.com/mzsro/jvuq/#?secret=t5CbQCavWG',
+        src: 'https://online.fliphtml5.com/mzsro/jvuq/',
         url: 'https://online.fliphtml5.com/mzsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
         width: 640,

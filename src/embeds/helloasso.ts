@@ -1,23 +1,19 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createUrlEmbedResolver, getEmbedSize } from '../utils/widgets.js'
 
 const provider = 'helloasso'
 
 const helloassoHosts = ['helloasso.com']
 
-// The box HelloAsso's snippet reserves for each kind. The full form grows to fit its steps.
-const widgetSizes: Record<string, Pick<EmbedResolverResult, 'width' | 'height'>> = {
-  widget: { height: 750 },
-  'widget-bouton': { height: 70 },
-  'widget-vignette': { width: 350, height: 450 },
-}
+// The box HelloAsso's snippet reserves for the full form, which grows to fit its steps.
+const formHeight = 750
 
 // A donation, membership, ticketing or shop form, framed from
 // `/associations/{org}/{type}/{slug}/{kind}`, where the kind is `widget` or a `widget-` variant
 // such as `widget-bouton` or `widget-vignette-horizontale`. The form page drops the kind segment.
-export const helloassoResolveEmbed: ResolveEmbed = (url) => {
+export const helloassoResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, helloassoHosts)
 
   if (!parsed) {
@@ -30,15 +26,24 @@ export const helloassoResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
+  // Every variant is minted as the full form. A form carrier's own height stands, while a button
+  // or card carrier's box was drawn for a variant the mint no longer loads.
+  const isSizedForm = kind === 'widget' && !!element && !!getEmbedSize(element, 0).height
+
   return {
     provider,
     id: `${org}/${type}/${slug}`,
-    // The kind segment picks the button, the card or the full form the publisher chose.
-    src: url,
+    src: `https://www.helloasso.com/associations/${org}/${type}/${slug}/widget`,
     url: `https://www.helloasso.com/associations/${org}/${type}/${slug}`,
-    ...widgetSizes[kind],
+    height: isSizedForm ? undefined : formHeight,
   }
 }
 
 // HelloAsso's form widget iframe.
-export const helloassoEmbedResolver = createUrlEmbedResolver(helloassoHosts, helloassoResolveEmbed)
+export const helloassoEmbedResolver = createUrlEmbedResolver(
+  helloassoHosts,
+  helloassoResolveEmbed,
+  {
+    preferResolverSize: true,
+  },
+)
