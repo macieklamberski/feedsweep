@@ -257,7 +257,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audiomack',
         id: 'larrynorman/song/burn-2',
-        src: 'https://audiomack.com/embed/larrynorman/song/burn-2',
+        src: 'https://audiomack.com/embed/song/larrynorman/burn-2?background=1',
         url: 'https://audiomack.com/larrynorman/song/burn-2',
         height: 252,
         author: 'larrynorman',
@@ -273,7 +273,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audiomack',
         id: 'billnass/song/hallo',
-        src: 'https://audiomack.com/embed/billnass/song/hallo',
+        src: 'https://audiomack.com//embed/billnass/song/hallo',
         url: 'https://audiomack.com/billnass/song/hallo',
         height: 252,
         author: 'billnass',

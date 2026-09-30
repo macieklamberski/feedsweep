@@ -67,12 +67,15 @@ export const audiomackResolveEmbed: ResolveEmbed = (url, element) => {
 
   const path = `${artist}/${kind}/${slug}`
   const params = pickQueryParams(search, audiomackEmbedParams)
+  // A current player frame plays as written, in either order of its path. A retired player
+  // answers 404, so it gets the current one.
+  const isPlayerFrame = element?.localName === 'iframe' && getPathSegments(parsed)[0] === 'embed'
 
   return {
     provider: 'audiomack',
     // The whole path: the same artist and slug answer under song and under playlist alike.
     id: path,
-    src: `https://audiomack.com/embed/${path}${composeQuery(params)}`,
+    src: isPlayerFrame ? url : `https://audiomack.com/embed/${path}${composeQuery(params)}`,
     // The key is an access token, so a private track's page is not linked where it could leak.
     url: params.key ? undefined : `https://audiomack.com/${path}`,
     height: audiomackHeights.get(kind),
