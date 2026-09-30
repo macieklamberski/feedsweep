@@ -1,7 +1,7 @@
 import { getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, text } from '../utils/dom.js'
-import { filterUrlQuery, isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'soundcloud'
@@ -34,8 +34,23 @@ const composeWidgetUrl = (target: string, secretToken?: string, startTrack?: str
   return `${widgetPlayerUrl}?${pairs.join('&')}`
 }
 
-// A widget naming nothing the resolver reads keeps these pairs as the carrier wrote them.
-const widgetParams = ['url', 'secret_token', 'start_track']
+// A private item's token sits beside `url=` or inside the url it names.
+const readQueryToken = (
+  params: URLSearchParams | undefined,
+  inner: Nullish<string>,
+): string | undefined => {
+  const token = params?.get('secret_token')
+
+  if (token) {
+    return token
+  }
+
+  if (!inner) {
+    return
+  }
+
+  return parseUrl(inner, placeholderBaseUrl)?.searchParams.get('secret_token') ?? undefined
+}
 
 // spotlight and groups answer 410, but the platform still holds them and no track takes the slug.
 // These second segments are the user's own tabs, and each answers with the profile.
@@ -175,10 +190,7 @@ const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
   const inner = params?.get('url')
   const reference = inner?.match(referenceRegex)
   const streamTrackId = parsed?.pathname.match(streamPathRegex)?.[1]
-  // A private item's token sits beside `url=` or inside the url it names.
-  const innerToken = inner
-    ? parseUrl(inner, placeholderBaseUrl)?.searchParams.get('secret_token')
-    : null
+  const queryToken = readQueryToken(params, inner)
   const startTrack = params?.get('start_track') ?? undefined
   const result: EmbedResolverResult = { provider, src: url }
 
@@ -186,7 +198,7 @@ const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
     result.id = `${reference[1]}/${reference[2]}`
     result.src = composeWidgetUrl(
       `https://api.soundcloud.com/${reference[1]}/${reference[2]}`,
-      params?.get('secret_token') ?? innerToken ?? undefined,
+      queryToken,
       startTrack,
     )
   } else if (streamTrackId) {
@@ -209,15 +221,12 @@ const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
 
   if (pageKind) {
     result.url = `https://soundcloud.com/${permalink.join('/')}`
-    result.src = composeWidgetUrl(
-      result.url,
-      secretToken ?? params?.get('secret_token') ?? innerToken ?? undefined,
-      startTrack,
-    )
+    result.src = composeWidgetUrl(result.url, secretToken, startTrack)
   } else if (shortLink) {
-    result.src = composeWidgetUrl(shortLink.href, undefined, startTrack)
-  } else if (parsed && inner && !reference) {
-    result.src = `${widgetPlayerUrl}${filterUrlQuery(parsed, (name) => widgetParams.includes(name))}`
+    result.src = composeWidgetUrl(shortLink.href, queryToken, startTrack)
+  } else if (inner && !reference) {
+    // A widget naming something the resolver does not read keeps that value in the same spelling.
+    result.src = composeWidgetUrl(inner, queryToken, startTrack)
   }
 
   if (flashPlayerHostRegex.test(parsed?.hostname ?? '') && !inner) {
