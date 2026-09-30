@@ -62,6 +62,7 @@ import { vidyardRenderHint } from '../embeds/vidyard.js'
 import { vimeoRenderHint } from '../embeds/vimeo.js'
 import { vkRenderHint } from '../embeds/vk.js'
 import { wistiaRenderHint } from '../embeds/wistia.js'
+import { youkuRenderHint } from '../embeds/youku.js'
 import { youtubeRenderHint } from '../embeds/youtube.js'
 import type { EmbedRenderHint } from '../types.js'
 
@@ -134,5 +135,6 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   vimeoRenderHint,
   vkRenderHint,
   wistiaRenderHint,
+  youkuRenderHint,
   youtubeRenderHint,
 ]
