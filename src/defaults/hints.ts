@@ -41,6 +41,7 @@ import { tumblrRenderHint } from '../embeds/tumblr.js'
 import { tuneinRenderHint } from '../embeds/tunein.js'
 import { twitterRenderHint } from '../embeds/twitter.js'
 import { videopressRenderHint } from '../embeds/videopress.js'
+import { vidyardRenderHint } from '../embeds/vidyard.js'
 import { vimeoRenderHint } from '../embeds/vimeo.js'
 import { wistiaRenderHint } from '../embeds/wistia.js'
 import { youtubeRenderHint } from '../embeds/youtube.js'
@@ -94,6 +95,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   tuneinRenderHint,
   twitterRenderHint,
   videopressRenderHint,
+  vidyardRenderHint,
   vimeoRenderHint,
   wistiaRenderHint,
   youtubeRenderHint,
