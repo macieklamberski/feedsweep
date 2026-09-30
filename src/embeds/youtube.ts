@@ -208,7 +208,8 @@ const composeUploadsEmbed = (user: string): EmbedResolverResult => {
     provider,
     id: `user/${user}`,
     src: `https://www.youtube.com/embed${composeQuery({ listType: 'user_uploads', list: user })}`,
-    url: `https://www.youtube.com/user/${user}`,
+    // The username comes out of the query decoded, and it goes into a path.
+    url: `https://www.youtube.com/user/${encodeURIComponent(user)}`,
     ratio: playerRatio,
   }
 }
@@ -227,12 +228,14 @@ const composeVideoEmbed = (
   }
 }
 
-const composeChannelEmbed = (channel: string): EmbedResolverResult => {
+// `segment` is the channel as the page path takes it: AMP's attribute goes in as written, and a
+// query value comes out decoded, so its caller encodes it.
+const composeChannelEmbed = (channel: string, segment = channel): EmbedResolverResult => {
   return {
     provider,
     id: `channel/${channel}`,
     src: composeEmbedUrl('live_stream', { channel }),
-    url: `https://www.youtube.com/channel/${channel}`,
+    url: `https://www.youtube.com/channel/${segment}`,
     ratio: playerRatio,
   }
 }
@@ -246,7 +249,7 @@ const resolveCollectionEmbed = (
   const channel = parsed.searchParams.get('channel')
 
   if (segments[1] === 'live_stream') {
-    return channel ? composeChannelEmbed(channel) : undefined
+    return channel ? composeChannelEmbed(channel, encodeURIComponent(channel)) : undefined
   }
 
   // `/embed/videoseries?list=` and the bare `/embed/?list=` some WordPress plugins emit are the

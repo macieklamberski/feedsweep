@@ -103,7 +103,9 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   }
 
   const user = readUser(rawUser)
-  const token = pathToken ?? parsed.searchParams.get('token') ?? undefined
+  const queryToken = parsed.searchParams.get('token')
+  // A query token comes out decoded, and it goes into a path beside the raw path spelling.
+  const token = pathToken ?? (queryToken ? encodeURIComponent(queryToken) : undefined)
   const height = parsePixelSize(parsed.searchParams.get('height'))
 
   return {

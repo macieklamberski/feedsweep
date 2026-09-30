@@ -303,8 +303,8 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'scribd',
         id: '../evil',
-        src: 'https://www.scribd.com/embeds/../evil/content',
-        url: 'https://www.scribd.com/document/../evil',
+        src: 'https://www.scribd.com/embeds/..%2Fevil/content',
+        url: 'https://www.scribd.com/document/..%2Fevil',
       }
 
       expect(await extract(value)).toEqual(expected)

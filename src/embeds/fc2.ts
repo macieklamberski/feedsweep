@@ -60,11 +60,14 @@ const fc2FlashResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const contentId = parsed.searchParams.get('i')
+  const videoId = parsed.searchParams.get('i')
 
-  if (!contentId) {
+  if (!videoId) {
     return
   }
+
+  // The id comes out of the query decoded, and it goes into a path.
+  const contentId = encodeURIComponent(videoId)
 
   // The Flash player names the same account tag `tk` as the loader does.
   const params = trimObject({ tg: parsed.searchParams.get('tk') }, Boolean)
@@ -129,11 +132,14 @@ export const fc2BlogScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="admin.blog.fc2.com/fc2video2.php"]',
   (element) => {
     const loader = parseUrlOnHosts(attr(element, 'src'), 'admin.blog.fc2.com')
-    const contentId = loader?.searchParams.get('id')
+    const videoId = loader?.searchParams.get('id')
 
-    if (!loader || !contentId) {
+    if (!loader || !videoId) {
       return
     }
+
+    // The id comes out of the query decoded, and it goes into a path.
+    const contentId = encodeURIComponent(videoId)
 
     // The shim writes `suggest="off"` on the loader unless `rel=1`, and a smaller box when `s`
     // is present with any value. The account tag it writes is not derivable from the url.

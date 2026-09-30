@@ -608,9 +608,9 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'fc2',
-        id: '2023/0116',
-        src: 'https://video.fc2.com/embed/player/2023/0116/?sg=0',
-        url: 'https://video.fc2.com/ja/content/2023/0116/',
+        id: '2023%2F0116',
+        src: 'https://video.fc2.com/embed/player/2023%2F0116/?sg=0',
+        url: 'https://video.fc2.com/ja/content/2023%2F0116/',
         width: 446,
         height: 380,
       }
@@ -883,9 +883,9 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
       const value = '<embed src="http://video.fc2.com/flv2.swf?i=../20120101QN5FVkv4" />'
       const expected: EmbedResolverResult = {
         provider: 'fc2',
-        id: '../20120101QN5FVkv4',
-        src: 'https://video.fc2.com/embed/player/../20120101QN5FVkv4/',
-        url: 'https://video.fc2.com/content/../20120101QN5FVkv4/',
+        id: '..%2F20120101QN5FVkv4',
+        src: 'https://video.fc2.com/embed/player/..%2F20120101QN5FVkv4/',
+        url: 'https://video.fc2.com/content/..%2F20120101QN5FVkv4/',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -895,9 +895,9 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
       const value = '<embed src="http://video.fc2.com/flv2.swf?i=2012%2F0101QN5FVkv4" />'
       const expected: EmbedResolverResult = {
         provider: 'fc2',
-        id: '2012/0101QN5FVkv4',
-        src: 'https://video.fc2.com/embed/player/2012/0101QN5FVkv4/',
-        url: 'https://video.fc2.com/content/2012/0101QN5FVkv4/',
+        id: '2012%2F0101QN5FVkv4',
+        src: 'https://video.fc2.com/embed/player/2012%2F0101QN5FVkv4/',
+        url: 'https://video.fc2.com/content/2012%2F0101QN5FVkv4/',
       }
 
       expect(await extract(value)).toEqual(expected)

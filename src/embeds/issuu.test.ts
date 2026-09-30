@@ -321,7 +321,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         provider: 'issuu',
         id: 'ecosistemaurbano/../../evil',
         src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=..%2F..%2Fevil',
-        url: 'https://issuu.com/ecosistemaurbano/docs/../../evil',
+        url: 'https://issuu.com/ecosistemaurbano/docs/..%2F..%2Fevil',
       }
 
       expect(await extract(value)).toEqual(expected)

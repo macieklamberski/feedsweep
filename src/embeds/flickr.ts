@@ -131,7 +131,10 @@ const readFlashPhoto = (element: Nullish<Element>): FlickrPhoto | undefined => {
     return
   }
 
-  return { photoId, secret: flashVar(element, 'photo_secret') }
+  const secret = flashVar(element, 'photo_secret')
+
+  // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
+  return { photoId, secret: secret ? encodeURIComponent(secret) : undefined }
 }
 
 // The iframe carrier names its subject in its own query. A set is preferred where several

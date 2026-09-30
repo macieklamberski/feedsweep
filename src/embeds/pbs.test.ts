@@ -316,6 +316,23 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should keep a decoded video id carrying a separator in one path segment', async () => {
+      const value = html`
+        <embed
+          src="http://www-tc.pbs.org/video/media/swf/PBSPlayer.swf"
+          flashvars="video=2155877110%2F..%2Fx&amp;player=viral"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2155877110%2F..%2Fx',
+        src: 'https://player.pbs.org/viralplayer/2155877110%2F..%2Fx/',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore the current player', async () => {
       const value = '<iframe src="https://player.pbs.org/viralplayer/3005825044/"></iframe>'
 

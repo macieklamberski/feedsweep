@@ -86,12 +86,16 @@ export const nprFlashResolveEmbed: ResolveEmbed = (url) => {
   // Some carriers join the query with `;`, so `m` would read `365995120;t=audio`.
   const params = new URLSearchParams(parsed.search.replaceAll(';', '&'))
 
+  const storyId = params.get('i') ?? ''
+  const mediaId = params.get('m') ?? ''
+
   // A video pair plays on the video player only.
   if (params.get('t') === 'video') {
-    return composeVideoEmbed(params.get('i') ?? '', params.get('m') ?? '')
+    return composeVideoEmbed(storyId, mediaId)
   }
 
-  return composeEmbed(params.get('i') ?? '', params.get('m') ?? '')
+  // The pair comes out of the query decoded, and it goes into a path beside the raw path spelling.
+  return composeEmbed(encodeURIComponent(storyId), encodeURIComponent(mediaId))
 }
 
 // The Flash carriers state the box of the retired Flash player.

@@ -13,11 +13,14 @@ const retiredPollPathRegex = /^\/poll\/(\d+)\/?$/
 const flashPlayerPathRegex = /^\/poll\.swf$/
 
 const composeEmbed = (pollId: string): EmbedResolverResult => {
+  // The Flash flashvar `p` comes out decoded, and it goes into a path.
+  const segment = encodeURIComponent(pollId)
+
   return {
     provider,
     id: pollId,
-    src: `https://poll.fm/${pollId}/embed`,
-    url: `https://poll.fm/${pollId}`,
+    src: `https://poll.fm/${segment}/embed`,
+    url: `https://poll.fm/${segment}`,
   }
 }
 

@@ -50,7 +50,8 @@ const readResource = (url: URL): Resource | undefined => {
   const segments = getPathSegments(url)
   const route = localeRegex.test(segments[0] ?? '') ? segments.slice(1) : segments
   const theme = url.searchParams.get('layout') ?? ''
-  const query = (name: string) => url.searchParams.get(name) ?? ''
+  // A query value comes out decoded, and the id goes into a path beside the raw path spellings.
+  const query = (name: string) => encodeURIComponent(url.searchParams.get(name) ?? '')
 
   // The current widget, `widget.deezer.com/widget/{theme}/{type}/{id}`.
   if (route[0] === 'widget') {

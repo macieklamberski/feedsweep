@@ -42,7 +42,8 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
     provider: 'vk',
     id,
     src,
-    url: `https://vkvideo.ru/${player.kind}${id}`,
+    // Both ids come out of the query decoded, and they go into a path.
+    url: `https://vkvideo.ru/${player.kind}${encodeURIComponent(id)}`,
   }
 }
 

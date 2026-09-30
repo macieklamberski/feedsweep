@@ -117,7 +117,8 @@ const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
   // Album and track both stay: given the album alone the player opens on the first track.
   const selection = releaseKinds
     .flatMap((wanted) => releases.filter(([named]) => named === wanted))
-    .map(([named, value]) => `${named}=${value}/`)
+    // A query id comes out decoded, and it goes into a path.
+    .map(([named, value]) => `${named}=${encodeURIComponent(value)}/`)
     .join('')
   const isAlbum = releases.some(([named]) => named === 'album')
   const tallKey = isAlbum ? 'tall/album' : 'tall/track'

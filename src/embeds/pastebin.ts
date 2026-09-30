@@ -28,7 +28,18 @@ const readPasteId = (url: string | undefined): string | undefined => {
     return
   }
 
-  return pasteId ?? parsed.searchParams.get('i') ?? undefined
+  if (pasteId) {
+    return pasteId
+  }
+
+  const queryId = parsed.searchParams.get('i')
+
+  if (!queryId) {
+    return
+  }
+
+  // The query id comes out decoded, and it goes into a path beside the raw path spelling.
+  return encodeURIComponent(queryId)
 }
 
 export const pastebinResolveEmbed: ResolveEmbed = (url) => {

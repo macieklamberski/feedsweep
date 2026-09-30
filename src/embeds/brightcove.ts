@@ -67,8 +67,10 @@ const composePlayerUrl = (
 ): string => {
   // Unescaped, `data-player="../../999999/stolen"` names another account's player.
   const segment = `${encodeURIComponent(player)}_${encodeURIComponent(embed)}`
+  // The Flash `publisherID` comes out of a query decoded.
+  const accountSegment = encodeURIComponent(account)
 
-  return `https://players.brightcove.net/${account}/${segment}/index.html?videoId=${videoId}`
+  return `https://players.brightcove.net/${accountSegment}/${segment}/index.html?videoId=${videoId}`
 }
 
 // Brightcove's in-page embed: a bare <video-js> or video element only its loader script fills.

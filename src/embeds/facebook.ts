@@ -1,7 +1,7 @@
 import { type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, parsePixelSize, text } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -143,7 +143,7 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
       return
     }
 
-    const watchUrl = `https://www.facebook.com/watch/?v=${videoId}`
+    const watchUrl = `https://www.facebook.com/watch/${composeQuery({ v: videoId })}`
 
     return composePluginEmbed('video', watchUrl, { id: videoId, ...querySize(parsed) })
   }

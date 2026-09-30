@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { extractVimeoId, vimeoEmbedResolver, vimeoResolveEmbed } from './vimeo.js'
+import {
+  extractVimeoId,
+  readVimeoEmbedSrc,
+  vimeoEmbedResolver,
+  vimeoResolveEmbed,
+} from './vimeo.js'
 
 // Every url spelling that names a single video. All extract the same id, so a deleted row is a
 // format that silently lost support.
@@ -106,6 +111,15 @@ describe('extractVimeoId', () => {
   })
 })
 
+describe('readVimeoEmbedSrc', () => {
+  it('should keep a decoded clip_id carrying a query in one path segment', () => {
+    const value = 'http://vimeo.com/moogaloop.swf?clip_id=123%3Fautoplay%3D1%26muted%3D1'
+    const expected = 'https://player.vimeo.com/video/123%3Fautoplay%3D1%26muted%3D1'
+
+    expect(readVimeoEmbedSrc(value)).toEqual(expected)
+  })
+})
+
 describe('vimeoResolveEmbed', () => {
   it('should build the embed without a thumbnail', () => {
     const value = 'https://vimeo.com/76979871'
@@ -148,8 +162,8 @@ describe('vimeoResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'vimeo',
       id: '4775093/',
-      src: 'https://player.vimeo.com/video/4775093/',
-      url: 'https://vimeo.com/4775093/',
+      src: 'https://player.vimeo.com/video/4775093%2F',
+      url: 'https://vimeo.com/4775093%2F',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)

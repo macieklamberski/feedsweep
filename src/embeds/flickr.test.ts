@@ -900,6 +900,26 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should keep a decoded secret carrying a separator in one thumbnail path segment', async () => {
+      const value = html`
+        <embed
+          src="https://www.flickr.com/apps/video/stewart.swf"
+          flashvars="photo_secret=3dfa305404%2F..%2Fx&amp;photo_id=2448291368"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/4Jm8J9',
+        src: 'https://embedr.flickr.com/photos/2448291368?width=400&height=300',
+        url: 'https://flic.kr/p/4Jm8J9',
+        thumbnail: 'https://live.staticflickr.com/0/2448291368_3dfa305404%2F..%2Fx_b.jpg',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

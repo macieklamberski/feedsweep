@@ -48,6 +48,17 @@ const composeAudioResult = (audioId: string): EmbedResolverResult => {
   }
 }
 
+// A flashvar comes out decoded, and the id goes into a path beside the raw path spellings.
+const readFlashVideoId = (element: Element | undefined, name: string): string | undefined => {
+  const videoId = flashVar(element, name)
+
+  if (!videoId) {
+    return
+  }
+
+  return encodeURIComponent(videoId)
+}
+
 // The player frame in its 3Cat and CCMA spellings, the CCMA audio frame, and CCMA's two Flash
 // players, both dead: the EVP generation carrying `videoid` in its flashvars, and the older SVP2
 // carrying `VIDEO_ID`.
@@ -77,13 +88,15 @@ export const ccmaResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   if (evpPlayerPathRegex.test(parsed.pathname)) {
-    return composeResult(flashVar(element, 'videoid'))
+    return composeResult(readFlashVideoId(element, 'videoid'))
   }
 
   if (svpPlayerPathRegex.test(parsed.pathname)) {
     const objectId = attr(element?.closest('object'), 'id')
 
-    return composeResult(flashVar(element, 'VIDEO_ID') ?? objectId?.match(svpObjectIdRegex)?.[1])
+    return composeResult(
+      readFlashVideoId(element, 'VIDEO_ID') ?? objectId?.match(svpObjectIdRegex)?.[1],
+    )
   }
 }
 

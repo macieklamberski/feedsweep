@@ -313,8 +313,8 @@ describe('nprFlashResolveEmbed', () => {
       const value = 'http://www.npr.org/v2/?i=340005056&m=340005057/../../stolen&t=audio'
       const expected: EmbedResolverResult = {
         provider: 'npr',
-        id: '340005056/340005057/../../stolen',
-        src: 'https://www.npr.org/player/embed/340005056/340005057/../../stolen',
+        id: '340005056/340005057%2F..%2F..%2Fstolen',
+        src: 'https://www.npr.org/player/embed/340005056/340005057%2F..%2F..%2Fstolen',
         height: 290,
       }
 

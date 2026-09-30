@@ -62,7 +62,8 @@ export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
     provider: 'calameo',
     id: code,
     src: `https://v.calameo.com/?${query}`,
-    url: `https://www.calameo.com/books/${code}${pageQuery}`,
+    // The code comes out of a query decoded, and it goes into a path.
+    url: `https://www.calameo.com/books/${encodeURIComponent(code)}${pageQuery}`,
   }
 }
 

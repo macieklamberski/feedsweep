@@ -34,7 +34,8 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
       provider: 'googleslides',
       id: fileId,
       src: `https://docs.google.com/presentation/embed${pickUrlParams(url, ['id', ...deckParams])}${parsed.hash}`,
-      url: `https://docs.google.com/presentation/d/${fileId}/pub`,
+      // The file id comes out of the query decoded, and it goes into a path.
+      url: `https://docs.google.com/presentation/d/${encodeURIComponent(fileId)}/pub`,
     }
   }
 

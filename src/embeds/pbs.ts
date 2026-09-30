@@ -73,7 +73,10 @@ const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | un
     return
   }
 
-  return composeEmbed('viralplayer', params.get('video'))
+  const videoId = params.get('video')
+
+  // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
+  return composeEmbed('viralplayer', videoId ? encodeURIComponent(videoId) : undefined)
 }
 
 // PBS's offsite player, which renders on its own but names no page and no poster.

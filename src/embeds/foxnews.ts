@@ -41,7 +41,8 @@ const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult => {
     provider: brand.provider,
     id,
     src: `https://${brand.playerHost}/v/video-embed.html${composeQuery({ video_id: id })}`,
-    url: `https://${brand.pageHost}/video/${id}`,
+    // The id comes out of the query decoded, and it goes into a path.
+    url: `https://${brand.pageHost}/video/${encodeURIComponent(id)}`,
     ratio: playerRatio,
   }
 }

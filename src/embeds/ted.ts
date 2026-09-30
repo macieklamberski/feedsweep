@@ -63,7 +63,11 @@ const readFlashTalk = (
   // with no signature and no expiry.
   const poster = config.get('su') ?? undefined
 
-  return { slug, thumbnail: parseUrlOnHosts(poster, tedHosts) ? poster : undefined }
+  // The slug comes out of the flashvars decoded, and it goes into a path beside the raw spelling.
+  return {
+    slug: encodeURIComponent(slug),
+    thumbnail: parseUrlOnHosts(poster, tedHosts) ? poster : undefined,
+  }
 }
 
 // TED's embed.ted.com iframe, and the dead Flash player that names the talk only in its flashVars.

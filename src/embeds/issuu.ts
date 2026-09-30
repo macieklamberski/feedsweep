@@ -46,7 +46,8 @@ const composeDocumentEmbed = (
     provider,
     id: `${publisher}/${documentName}`,
     src: `https://e.issuu.com/embed.html${query}`,
-    url: `https://issuu.com/${publisher}/docs/${documentName}`,
+    // The iframe's `u` and `d` come out of the query decoded, and each goes into a path segment.
+    url: `https://issuu.com/${encodeURIComponent(publisher)}/docs/${encodeURIComponent(documentName)}`,
   }
 }
 

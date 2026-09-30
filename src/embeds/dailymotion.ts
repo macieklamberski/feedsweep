@@ -68,13 +68,11 @@ const skipRouteWords = (segments: Array<string>): number => {
 // Share urls append a `_title-slug` to the id and the platform strips it itself. The Flash player
 // wrote `/swf/{id}&colors=…`, so a stray query rides on the segment too.
 const readId = (candidate: Nullish<string>): string | undefined => {
-  const head = candidate && splitStrayParams(candidate).head.split('_')[0]
-
-  if (!head) {
+  if (!candidate) {
     return
   }
 
-  return head
+  return splitStrayParams(candidate).head.split('_')[0]
 }
 
 // A playlist names no single video, so it is read separately and only once the video readers have
@@ -170,14 +168,17 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
   const videoId = extractDailymotionId(url)
 
   if (videoId) {
+    // The geo player's `video` comes out of the query decoded, and it goes into two paths.
+    const segment = encodeURIComponent(videoId)
+
     return {
       provider,
       id: videoId,
       src: ownPlayerRegex.test(parseUrl(url, placeholderBaseUrl)?.pathname ?? '')
         ? url
         : composeEmbedUrl('video', videoId, readPlayerParams(url)),
-      url: `https://www.dailymotion.com/video/${videoId}`,
-      thumbnail: `https://www.dailymotion.com/thumbnail/video/${videoId}`,
+      url: `https://www.dailymotion.com/video/${segment}`,
+      thumbnail: `https://www.dailymotion.com/thumbnail/video/${segment}`,
       ratio: '16/9',
       title: attr(element, 'title'),
     }
@@ -193,7 +194,8 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
       provider,
       id: `playlist/${playlistId}`,
       src: composeEmbedUrl('playlist', playlistId),
-      url: `https://www.dailymotion.com/playlist/${playlistId}`,
+      // The `playlist` parameter comes out of the query decoded, and it goes into a path.
+      url: `https://www.dailymotion.com/playlist/${encodeURIComponent(playlistId)}`,
       title: attr(element, 'title'),
     }
   }
