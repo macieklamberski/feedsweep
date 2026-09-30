@@ -1,6 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { pickUrlParams } from '../utils/urls.js'
+import { encodePathSegment, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The page routes a deck frame names. `/export` serves the deck as a file, which stays an
@@ -34,7 +34,8 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
       provider: 'googleslides',
       id: fileId,
       src: `https://docs.google.com/presentation/embed${pickUrlParams(url, ['id', ...deckParams])}${parsed.hash}`,
-      url: `https://docs.google.com/presentation/d/${fileId}/pub`,
+      // The file id comes out of the query decoded, and it goes into a path.
+      url: `https://docs.google.com/presentation/d/${encodePathSegment(fileId)}/pub`,
     }
   }
 

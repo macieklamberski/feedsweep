@@ -204,7 +204,7 @@ describe('googleslidesResolveEmbed', () => {
         provider: 'googleslides',
         id: '../../document/d/x',
         src: 'https://docs.google.com/presentation/embed?id=..%2F..%2Fdocument%2Fd%2Fx',
-        url: 'https://docs.google.com/presentation/d/../../document/d/x/pub',
+        url: 'https://docs.google.com/presentation/d/..%2F..%2Fdocument%2Fd%2Fx/pub',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -217,7 +217,7 @@ describe('googleslidesResolveEmbed', () => {
         provider: 'googleslides',
         id: '1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/x',
         src: 'https://docs.google.com/presentation/embed?id=1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx',
-        url: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/x/pub',
+        url: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx/pub',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)

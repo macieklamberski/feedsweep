@@ -4,7 +4,12 @@ import { attr, text } from '../utils/dom.js'
 
 const provider = 'bandcamp'
 
-import { composeQuery, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // A release is either an album or a single track.
@@ -117,7 +122,8 @@ const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
   // Album and track both stay: given the album alone the player opens on the first track.
   const selection = releaseKinds
     .flatMap((wanted) => releases.filter(([named]) => named === wanted))
-    .map(([named, value]) => `${named}=${value}/`)
+    // A query id comes out decoded, and it goes into a path.
+    .map(([named, value]) => `${named}=${encodePathSegment(value)}/`)
     .join('')
   const isAlbum = releases.some(([named]) => named === 'album')
   const tallKey = isAlbum ? 'tall/album' : 'tall/track'

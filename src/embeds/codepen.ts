@@ -1,7 +1,13 @@
 import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize, text } from '../utils/dom.js'
-import { composeQuery, isFileName, placeholderBaseUrl, uuidRegex } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  isFileName,
+  placeholderBaseUrl,
+  uuidRegex,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codepen'
@@ -104,7 +110,9 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   }
 
   const user = readUser(rawUser)
-  const token = pathToken ?? parsed.searchParams.get('token') ?? undefined
+  const queryToken = parsed.searchParams.get('token')
+  // A query token comes out decoded, and it goes into a path beside the raw path spelling.
+  const token = pathToken ?? (queryToken ? encodePathSegment(queryToken) : undefined)
   const height = parsePixelSize(parsed.searchParams.get('height'))
 
   return {

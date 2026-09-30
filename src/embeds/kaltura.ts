@@ -1,6 +1,6 @@
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'kaltura'
@@ -34,6 +34,8 @@ const readEntry = (url: string | undefined): Entry | undefined => {
 const composeEmbed = ({ partner, entryId, parsed }: Entry, src: string): EmbedResolverResult => {
   // A regional host serves its thumbnails itself, so the carrier's host is kept there.
   const thumbnailHost = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
+  // The entry comes out of the query decoded, and it goes into a path.
+  const entrySegment = encodePathSegment(entryId)
 
   return {
     provider,
@@ -41,7 +43,7 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry, src: string): EmbedRe
     id: `${partner}/${entryId}`,
     src,
     // The poster answers 200 `image/jpeg` for a real entry, 404 for an invented or a deleted one.
-    thumbnail: `https://${thumbnailHost}/p/${partner}/thumbnail/entry_id/${entryId}/width/640`,
+    thumbnail: `https://${thumbnailHost}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
   }
 }
 

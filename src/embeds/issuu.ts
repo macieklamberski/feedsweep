@@ -1,10 +1,10 @@
-import { getPathSegments, isAnyOf, parseUrl, trimObject } from 'trousse'
+import { decodeSegment, getPathSegments, isAnyOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 
 const provider = 'issuu'
 
 import { attr } from '../utils/dom.js'
-import { composeQuery, isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const issuuHosts = ['issuu.com']
@@ -45,7 +45,8 @@ const composeDocumentEmbed = (
     provider,
     id: `${publisher}/${documentName}`,
     src: `https://e.issuu.com/embed.html${query}`,
-    url: `https://issuu.com/${publisher}/docs/${documentName}`,
+    // The iframe's `u` and `d` come out of the query decoded, and each goes into a path segment.
+    url: `https://issuu.com/${encodePathSegment(publisher)}/docs/${encodePathSegment(documentName)}`,
   }
 }
 
@@ -63,7 +64,12 @@ const readDocumentUrl = (url: string): EmbedResolverResult | undefined => {
     return
   }
 
-  return composeDocumentEmbed(publisher, documentName, page === storyRoute ? undefined : page)
+  // Decoded here, so the url and the reader encode them once.
+  return composeDocumentEmbed(
+    decodeSegment(publisher) ?? publisher,
+    decodeSegment(documentName) ?? documentName,
+    page === storyRoute ? undefined : page,
+  )
 }
 
 // Issuu ships a document as an empty div only its `embed.js` loader hydrates into the reader.

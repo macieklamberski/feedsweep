@@ -1,4 +1,4 @@
-import { getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
+import { decodeSegment, getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
@@ -6,6 +6,7 @@ const provider = 'dailymotion'
 
 import {
   composeQuery,
+  encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -68,13 +69,11 @@ const skipRouteWords = (segments: Array<string>): number => {
 // Share urls append a `_title-slug` to the id and the platform strips it itself. The Flash player
 // wrote `/swf/{id}&colors=…`, so a stray query rides on the segment too.
 const readId = (candidate: Nullish<string>): string | undefined => {
-  const head = candidate && splitStrayParams(candidate).head.split('_')[0]
-
-  if (!head) {
+  if (!candidate) {
     return
   }
 
-  return head
+  return splitStrayParams(candidate).head.split('_')[0]
 }
 
 // A playlist names no single video, so it is read separately and only once the video readers have
@@ -89,8 +88,9 @@ const extractDailymotionPlaylistId = (link: string): string | undefined => {
   const segments = getPathSegments(url)
   const marker = skipRouteWords(segments)
 
-  const candidate =
-    segments[marker] === 'playlist' ? segments[marker + 1] : url.searchParams.get('playlist')
+  const pathId = segments[marker] === 'playlist' ? segments[marker + 1] : undefined
+  // The path id is decoded here, like the query one, so the url and the player encode it once.
+  const candidate = pathId ? (decodeSegment(pathId) ?? pathId) : url.searchParams.get('playlist')
 
   return readId(candidate)
 }
@@ -99,7 +99,7 @@ const readPathId = (url: URL, segments: Array<string>): string | undefined => {
   // The short domain is a pure shortener with no routes of its own: every path it does not know
   // as a video goes to `/urlshortener?path=…`, so nothing there needs telling from an id.
   if (url.hostname === 'dai.ly' || url.hostname.endsWith('.dai.ly')) {
-    return segments[0]
+    return segments[0] && (decodeSegment(segments[0]) ?? segments[0])
   }
 
   const index = skipRouteWords(segments)
@@ -108,7 +108,12 @@ const readPathId = (url: URL, segments: Array<string>): string | undefined => {
   // `/about` is five legal id characters.
   const candidate = index > 0 ? segments[index] : undefined
 
-  return candidate && !nonVideoWords.has(candidate) ? candidate : undefined
+  if (!candidate || nonVideoWords.has(candidate)) {
+    return
+  }
+
+  // Decoded here, so the url, the thumbnail and the player encode it once.
+  return decodeSegment(candidate) ?? candidate
 }
 
 export const extractDailymotionId = (link: string): string | undefined => {
@@ -170,14 +175,17 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
   const videoId = extractDailymotionId(url)
 
   if (videoId) {
+    // The geo player's `video` comes out of the query decoded, and it goes into two paths.
+    const segment = encodePathSegment(videoId)
+
     return {
       provider,
       id: videoId,
       src: ownPlayerRegex.test(parseUrl(url, placeholderBaseUrl)?.pathname ?? '')
         ? url
         : composeEmbedUrl('video', videoId, readPlayerParams(url)),
-      url: `https://www.dailymotion.com/video/${videoId}`,
-      thumbnail: `https://www.dailymotion.com/thumbnail/video/${videoId}`,
+      url: `https://www.dailymotion.com/video/${segment}`,
+      thumbnail: `https://www.dailymotion.com/thumbnail/video/${segment}`,
       ratio: '16/9',
       title: attr(element, 'title'),
     }
@@ -193,7 +201,8 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
       provider,
       id: `playlist/${playlistId}`,
       src: composeEmbedUrl('playlist', playlistId),
-      url: `https://www.dailymotion.com/playlist/${playlistId}`,
+      // The `playlist` parameter comes out of the query decoded, and it goes into a path.
+      url: `https://www.dailymotion.com/playlist/${encodePathSegment(playlistId)}`,
       title: attr(element, 'title'),
     }
   }

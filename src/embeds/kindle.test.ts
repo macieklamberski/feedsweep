@@ -85,8 +85,8 @@ describe('kindleResolveEmbed', () => {
         provider: 'kindle',
         id: '../embed',
         src: 'https://read.amazon.com/kp/card?asin=..%2Fembed&preview=inline&linkCode=kpd',
-        url: 'https://www.amazon.com/dp/../embed',
-        thumbnail: 'https://m.media-amazon.com/images/P/../embed.01._SCLZZZZZZZ_.jpg',
+        url: 'https://www.amazon.com/dp/..%2Fembed',
+        thumbnail: 'https://m.media-amazon.com/images/P/..%2Fembed.01._SCLZZZZZZZ_.jpg',
       }
 
       expect(kindleResolveEmbed(value)).toEqual(expected)

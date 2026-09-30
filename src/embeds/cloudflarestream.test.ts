@@ -352,9 +352,9 @@ describeForEachParser('cloudflarestreamScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'cloudflarestream',
         id: '../../35d8788a685e8cd8db81e6f3e2269e2a',
-        src: 'https://iframe.videodelivery.net/../../35d8788a685e8cd8db81e6f3e2269e2a',
+        src: 'https://iframe.videodelivery.net/..%2F..%2F35d8788a685e8cd8db81e6f3e2269e2a',
         thumbnail:
-          'https://videodelivery.net/../../35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg',
+          'https://videodelivery.net/..%2F..%2F35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg',
       }
 
       expect(await extract(value)).toEqual(expected)

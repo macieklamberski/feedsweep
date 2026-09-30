@@ -1,7 +1,12 @@
 import { getPathSegments, isHostOf, type Nullish, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
-import { parseUrlOnHosts, pickQueryParams, pickUrlParams } from '../utils/urls.js'
+import {
+  encodePathSegment,
+  parseUrlOnHosts,
+  pickQueryParams,
+  pickUrlParams,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pbs'
@@ -73,7 +78,10 @@ const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | un
     return
   }
 
-  return composeEmbed('viralplayer', params.get('video'))
+  const videoId = params.get('video')
+
+  // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
+  return composeEmbed('viralplayer', videoId ? encodePathSegment(videoId) : undefined)
 }
 
 // PBS's offsite player, which renders on its own but names no page and no poster.

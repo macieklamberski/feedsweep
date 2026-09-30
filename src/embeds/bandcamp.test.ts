@@ -348,6 +348,19 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should keep a decoded query id carrying a separator in one path segment', async () => {
+      const value = html`
+        <iframe src="https://bandcamp.com/EmbeddedPlayer/?album=123%2F..%2Fx"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'album/123/../x',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=123%2F..%2Fx/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore a carrier pointing somewhere else', async () => {
       const value = '<iframe src="https://example.com/EmbeddedPlayer/album=42/"></iframe>'
 

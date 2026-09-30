@@ -4,6 +4,7 @@ import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   composeQuery,
   digitsRegex,
+  encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -13,6 +14,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'vimeo'
 
 // An unlisted video's privacy hash is ten lowercase hex characters, and case-sensitive.
+const whitespaceRegex = /\s/
 const unlistedHashRegex = /^[0-9a-f]{10}$/
 
 const vimeoHosts = ['vimeo.com']
@@ -140,9 +142,20 @@ const readReference = (link: string): VimeoReference | undefined => {
     return
   }
 
+  if (hashIndex !== -1) {
+    return {
+      id,
+      hash: segments[hashIndex],
+    }
+  }
+
+  // A feed that lost the `&` before the next parameter leaves it after a space. A hash is hex and
+  // never holds one, so the cut repairs what the feed did.
+  const queryHash = url.searchParams.get('h')?.split(whitespaceRegex)[0]
+
   return {
     id,
-    hash: hashIndex === -1 ? (url.searchParams.get('h') ?? undefined) : segments[hashIndex],
+    hash: queryHash || undefined,
   }
 }
 
@@ -170,7 +183,7 @@ export const readVimeoEmbedSrc = (link: string): string | undefined => {
   const url = parseUrlOnHosts(link, vimeoHosts)
   const videoId = url && extractVimeoId(url.href)
 
-  return videoId ? composeEmbedUrl(videoId) : undefined
+  return videoId ? composeEmbedUrl(encodePathSegment(videoId)) : undefined
 }
 
 // `t` is the start offset, in Vimeo's `{n}s` form.
@@ -187,6 +200,8 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const { id: videoId, hash } = reference
+  // A `clip_id` comes out of the query decoded, and it goes into a path.
+  const segment = encodePathSegment(videoId)
   const title = element ? attr(element, 'title') : undefined
   const params = {
     // The player takes the hash only as h=: the /video/{id}/{hash} path spelling is a 404.
@@ -198,9 +213,9 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     // The hash travels in the id: an oEmbed lookup for the bare id answers 404.
     id: hash ? `${videoId}:${hash}` : videoId,
-    src: composeEmbedUrl(videoId, params),
-    // Without the hash the page loses its title and its poster, so it stays on the url too.
-    url: `https://vimeo.com/${videoId}${hash ? `/${hash}` : ''}`,
+    src: composeEmbedUrl(segment, params),
+    // Without the hash the page loses its title and its video, so it stays on the url too.
+    url: `https://vimeo.com/${segment}${hash ? `/${encodePathSegment(hash)}` : ''}`,
     title,
     // TODO: no thumbnail. Vimeo posters are not derivable from the id and need an oEmbed lookup.
   }

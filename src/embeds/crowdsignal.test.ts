@@ -371,8 +371,8 @@ describeForEachParser('crowdsignalFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'crowdsignal',
         id: '132074/results',
-        src: 'https://poll.fm/132074/results/embed',
-        url: 'https://poll.fm/132074/results',
+        src: 'https://poll.fm/132074%2Fresults/embed',
+        url: 'https://poll.fm/132074%2Fresults',
         height: 473,
       }
 

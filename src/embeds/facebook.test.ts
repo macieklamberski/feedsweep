@@ -903,8 +903,8 @@ describe('facebookResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'facebook',
       id: '../etc',
-      src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D..%2Fetc',
-      url: 'https://www.facebook.com/watch/?v=../etc',
+      src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D..%252Fetc',
+      url: 'https://www.facebook.com/watch/?v=..%2Fetc',
     }
 
     expect(facebookResolveEmbed(value)).toEqual(expected)

@@ -1,6 +1,6 @@
 import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // Every Youku video id opens with a literal X, and without it a route word in the id position,
@@ -24,8 +24,11 @@ const readVideoId = (url: string): string | undefined => {
   const parsed = parseUrlOnHosts(url, youkuHosts)
 
   if (parsed?.hostname === 'static.youku.com') {
-    return staticFlashPathRegex.test(parsed.pathname)
-      ? (parsed.searchParams.get('VideoIDS') ?? undefined)
+    const videoIds = parsed.searchParams.get('VideoIDS')
+
+    // The query value comes out decoded, and it goes into the player path.
+    return staticFlashPathRegex.test(parsed.pathname) && videoIds
+      ? encodePathSegment(videoIds)
       : undefined
   }
 
