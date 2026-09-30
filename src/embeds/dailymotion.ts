@@ -88,8 +88,9 @@ const extractDailymotionPlaylistId = (link: string): string | undefined => {
   const segments = getPathSegments(url)
   const marker = skipRouteWords(segments)
 
-  const candidate =
-    segments[marker] === 'playlist' ? segments[marker + 1] : url.searchParams.get('playlist')
+  const pathId = segments[marker] === 'playlist' ? segments[marker + 1] : undefined
+  // The path id is decoded here, like the query one, so the url and the player encode it once.
+  const candidate = pathId ? (decodeSegment(pathId) ?? pathId) : url.searchParams.get('playlist')
 
   return readId(candidate)
 }

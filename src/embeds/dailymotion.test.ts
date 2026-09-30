@@ -161,6 +161,18 @@ describe('dailymotionResolveEmbed', () => {
     expect(dailymotionResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should encode a playlist path id carrying an encoded slash once', () => {
+    const value = 'https://www.dailymotion.com/embed/playlist/x6zq%2Fmk'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'playlist/x6zq/mk',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x6zq%2Fmk',
+      url: 'https://www.dailymotion.com/playlist/x6zq%2Fmk',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should preserve the start offset', () => {
     const value = 'https://www.dailymotion.com/embed/video/x8abcde?start=42'
     const expected: EmbedResolverResult = {
