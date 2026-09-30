@@ -19,6 +19,7 @@ const provider = 'ridewithgps'
 const ridewithgpsHosts = ['ridewithgps.com']
 
 const embedParams = ['title', 'privacyCode']
+const privateParams = ['privacyCode']
 
 // An event names its id in `eventId`, and Ride with GPS serves no static render under `/events`.
 const embedKinds = toMap<EmbedShape>({
@@ -59,6 +60,21 @@ const composeEmbed = (
   }
 }
 
+// A private resource's page and thumbnail answer 403 without its token.
+const composePrivateEmbed = (
+  kind: string,
+  id: string,
+  src: string,
+  title?: string,
+): EmbedResolverResult => {
+  return {
+    provider,
+    id: `${kind}/${id}`,
+    src,
+    title,
+  }
+}
+
 // `ridewithgps.com/embeds?type={route|trip|event}`, the id in the parameter its kind names.
 const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
   const kind = parsed.searchParams.get('type') ?? ''
@@ -78,14 +94,8 @@ const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
   const { title, ...playerParams } = pickQueryParams(parsed.search, embedParams)
   const src = composeSource(kind, shape, id, playerParams)
 
-  // A private resource's page and thumbnail answer 403 without its token.
   if (playerParams.privacyCode) {
-    return {
-      provider,
-      id: `${kind}/${id}`,
-      src,
-      title,
-    }
+    return composePrivateEmbed(kind, id, src, title)
   }
 
   // The id comes out of the query decoded, and the page goes into a path beside the raw spelling.
@@ -109,7 +119,14 @@ const readPathEmbed = (parsed: URL): EmbedResolverResult | undefined => {
     return
   }
 
-  return composeEmbed(kind, shape, id, composeSource(kind, shape, decodeSegment(id) ?? id))
+  const playerParams = pickQueryParams(parsed.search, privateParams)
+  const src = composeSource(kind, shape, decodeSegment(id) ?? id, playerParams)
+
+  if (playerParams.privacyCode) {
+    return composePrivateEmbed(kind, id, src)
+  }
+
+  return composeEmbed(kind, shape, id, src)
 }
 
 const ridewithgpsResolveEmbed: ResolveEmbed = (url) => {

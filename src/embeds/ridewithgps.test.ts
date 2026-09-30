@@ -290,6 +290,18 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep the token of a private route in the src and mint no page', async () => {
+      const value =
+        '<iframe src="https://ridewithgps.com/routes/10953871/embed?privacyCode=AbC123"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ridewithgps',
+        id: 'route/10953871',
+        src: 'https://ridewithgps.com/embeds?type=route&id=10953871&privacyCode=AbC123',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read the resource out of the path when its query names another', async () => {
       const value =
         '<iframe src="https://ridewithgps.com/routes/10953871/embed?type=trip&id=372416891"></iframe>'
