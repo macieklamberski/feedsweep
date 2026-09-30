@@ -207,7 +207,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the player options and the language the publisher chose', async () => {
+    it('should drop the player options, the language and the widget id', async () => {
       const value = html`
         <iframe
           id="kaltura_player"
@@ -222,11 +222,53 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'kaltura',
         id: '2346171/0_bg4o7fhu',
-        src: 'https://cdnapisec.kaltura.com/p/2346171/sp/234617100/embedIframeJs/uiconf_id/42601131/partner_id/2346171?iframeembed=true&entry_id=0_bg4o7fhu&wid=1_z2u0xe5j',
+        src: 'https://cdnapisec.kaltura.com/p/2346171/sp/234617100/embedIframeJs/uiconf_id/42601131/partner_id/2346171?iframeembed=true&entry_id=0_bg4o7fhu',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/2346171/thumbnail/entry_id/0_bg4o7fhu/width/640',
         width: 1024,
         height: 170,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the start position of the embedIframeJs player as written', async () => {
+      const value = html`
+        <iframe
+          src="https://cdnapisec.kaltura.com/p/1660902/sp/166090200/embedIframeJs/uiconf_id/25717641/partner_id/1660902?iframeembed=true&amp;playerId=kaltura_player&amp;entry_id=1_txx4an1j&amp;flashvars%5BmediaProxy.mediaPlayFrom%5D=0&amp;flashvars%5BstreamerType%5D=auto&amp;wid=1_cpekzs9a"
+          width="560"
+          height="395"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'kaltura',
+        id: '1660902/1_txx4an1j',
+        src: 'https://cdnapisec.kaltura.com/p/1660902/sp/166090200/embedIframeJs/uiconf_id/25717641/partner_id/1660902?iframeembed=true&entry_id=1_txx4an1j&flashvars%5BmediaProxy.mediaPlayFrom%5D=0',
+        thumbnail:
+          'https://cdnapisec.kaltura.com/p/1660902/thumbnail/entry_id/1_txx4an1j/width/640',
+        width: 560,
+        height: 395,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the start position of the playkit player as written', async () => {
+      const value = html`
+        <iframe
+          src="https://cdnapisec.kaltura.com/p/2503451/embedPlaykitJs/uiconf_id/49754663?iframeembed=true&amp;entry_id=1_wyxnidl5&amp;kalturaSeekFrom=95"
+          width="560"
+          height="315"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'kaltura',
+        id: '2503451/1_wyxnidl5',
+        src: 'https://cdnapisec.kaltura.com/p/2503451/embedPlaykitJs/uiconf_id/49754663?iframeembed=true&entry_id=1_wyxnidl5&kalturaSeekFrom=95',
+        thumbnail:
+          'https://cdnapisec.kaltura.com/p/2503451/thumbnail/entry_id/1_wyxnidl5/width/640',
+        width: 560,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
