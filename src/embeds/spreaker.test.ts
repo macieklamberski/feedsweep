@@ -94,6 +94,19 @@ describe('spreakerResolveEmbed', () => {
     expect(spreakerResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should use a malformed episode id as written over a named show, even if the player answers an error', () => {
+    const value = 'https://widget.spreaker.com/player?episode_id=abc&show_id=1433865'
+    const expected: EmbedResolverResult = {
+      provider: 'spreaker',
+      id: 'episode/abc',
+      src: 'https://widget.spreaker.com/player?episode_id=abc',
+      url: 'https://www.spreaker.com/episode/abc',
+      height: 200,
+    }
+
+    expect(spreakerResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for a spreaker url naming no episode', () => {
     const value = 'https://widget.spreaker.com/player?x=1'
 
@@ -275,15 +288,22 @@ describeForEachParser('spreakerAnchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined when the resource names no id', async () => {
+    it('should use a malformed episode id as written, even if the player answers an error', async () => {
       const value = html`
         <a
           class="spreaker-player"
           data-resource="episode_id=abc"
         >Listen to "An episode" on Spreaker.</a>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'spreaker',
+        id: 'episode/abc',
+        src: 'https://widget.spreaker.com/player?episode_id=abc',
+        url: 'https://www.spreaker.com/episode/abc',
+        height: 200,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // A user player is documented and dead, and nothing else names a resource this resolver

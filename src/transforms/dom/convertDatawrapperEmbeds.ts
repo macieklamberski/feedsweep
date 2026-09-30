@@ -2,7 +2,7 @@ import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { createLinkedImage } from '../../utils/widgets.js'
 
-const chartIdRegex = /datawrapper\.dwcdn\.net\/([A-Za-z0-9]+)/
+const chartIdRegex = /datawrapper\.dwcdn\.net\/([^/?#]+)/
 const visWrapperIdRegex = /^datawrapper-vis-(.+)$/
 // Datawrapper ships a resize listener next to its iframes: pure noise once the chart is a
 // static image. Every modern minified variant postMessages on `datawrapper-height`. The

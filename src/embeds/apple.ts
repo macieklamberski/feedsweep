@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOrSubdomainOf, type Nullish, parseUrl, toMap } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, keepIfMatches } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // Music and podcasts embed through the same player, served from `embed.music.apple.com` and
@@ -49,10 +49,8 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
 
   const isPodcast = isHostOrSubdomainOf(parsed, applePodcastsHosts)
   const host = isPodcast ? 'podcasts.apple.com' : 'music.apple.com'
-  const trackId = keepIfMatches(parsed.searchParams.get('i'), digitsRegex)
+  const trackId = parsed.searchParams.get('i') || undefined
   const id = trackId ?? pathId.replace(podcastIdPrefixRegex, '')
-  // A refused `i` is dropped from the player url as well: the resolver does not forward a value
-  // it would not put in the id, and the collection player is what the path names without it.
   const query = trackId ? pickUrlParams(url, ['i']) : ''
 
   return {

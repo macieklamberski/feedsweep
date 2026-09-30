@@ -39,7 +39,7 @@ export const extractTedTalk = (link: string): string | undefined => {
 // `adKeys=talk={slug};year=2010;theme=…`. The player is dead, so these embeds render nothing.
 const flashPlayerPathRegex = /\/assets\/player\/swf\/embedplayer\.swf$/i
 // The talk key in the flashVars adKeys value, spelled talk={slug};year={year}.
-const adKeysTalkRegex = /(?:^|;)talk=([a-z0-9_]+)/i
+const adKeysTalkRegex = /(?:^|;)talk=([^;]+)/i
 
 // TED cut the talk key off at this length, so a slug this long is usually a prefix of the real
 // one but not always.
@@ -56,7 +56,7 @@ const readFlashTalk = (
   }
 
   const config = new URLSearchParams(flashVars(element) ?? '')
-  const slug = keepIfMatches(config.get('adKeys')?.match(adKeysTalkRegex)?.[1], safeSlugRegex)
+  const slug = config.get('adKeys')?.match(adKeysTalkRegex)?.[1]
 
   // A slug at the cap is a truncated key, and most of them lead to a talk page that 404s.
   if (!slug || slug.length >= truncatedSlugLength) {
