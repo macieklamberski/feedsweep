@@ -12,6 +12,7 @@ import { deezerRenderHint } from '../embeds/deezer.js'
 import { donorboxRenderHint } from '../embeds/donorbox.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
 import { foxbusinessRenderHint, foxnewsRenderHint } from '../embeds/foxnews.js'
+import { googleslidesRenderHint } from '../embeds/googleslides.js'
 import { imgurRenderHint } from '../embeds/imgur.js'
 import { inaRenderHint } from '../embeds/ina.js'
 import { instagramRenderHint } from '../embeds/instagram.js'
@@ -60,6 +61,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   flourishRenderHint,
   foxbusinessRenderHint,
   foxnewsRenderHint,
+  googleslidesRenderHint,
   imgurRenderHint,
   inaRenderHint,
   instagramRenderHint,

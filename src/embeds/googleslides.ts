@@ -1,8 +1,10 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { pickUrlParams } from '../utils/urls.js'
+import { dropUrlParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'googleslides'
 
 // Nothing but the id's own alphabet may reach a minted path.
 const deckIdRegex = /^[\w-]+$/
@@ -18,6 +20,10 @@ const deckParams = ['loop', 'delayms', 'slide']
 // `/presentation/d/e/{id}` names a deck published to the web and `/presentation/d/{id}` names it
 // by its Drive file id. The legacy `/presentation/embed?id={id}` 301s onto the second.
 // A Workspace prefix, `/a/{domain}/`, only picks the sign-in and serves the same deck.
+const withoutAutoplay = (url: string): string => {
+  return dropUrlParams(url, Object.keys(googleslidesRenderHint.autoplayParams ?? {}))
+}
+
 export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
   const pathSegments = getPathSegments(url)
@@ -34,11 +40,12 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
       return
     }
 
-    // The legacy player 301s onto the current one by itself, so it plays as written.
+    // The legacy player 301s onto the current one by itself, so it plays as written, less the
+    // start the render hint applies on click.
     return {
-      provider: 'googleslides',
+      provider,
       id: fileId,
-      src: url,
+      src: withoutAutoplay(url),
       url: `https://docs.google.com/presentation/d/${fileId}/pub`,
     }
   }
@@ -65,11 +72,11 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
   // The `/embed` player plays as written, with its slideshow settings. `/pub` answers
   // `x-frame-options: SAMEORIGIN`, so a page route gets the `/embed` frame.
   return {
-    provider: 'googleslides',
+    provider,
     id: deckId,
     src:
       route === 'embed'
-        ? url
+        ? withoutAutoplay(url)
         : `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${parsed.hash}`,
     url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
   }
@@ -79,3 +86,9 @@ export const googleslidesEmbedResolver = createUrlEmbedResolver(
   ['docs.google.com'],
   googleslidesResolveEmbed,
 )
+
+// `start` advances the deck on its own, at the pace `delayms` sets.
+export const googleslidesRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { start: 'true' },
+}
