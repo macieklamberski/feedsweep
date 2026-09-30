@@ -85,7 +85,7 @@ export const podigeeResolveEmbed: ResolveEmbed = (url) => {
 export const podigeeIframeEmbedResolver = createUrlEmbedResolver(podigeeHosts, podigeeResolveEmbed)
 
 // The player reports its height under a configurePlayer message, 0 before it has rendered and the
-// real value after, from the show's own subdomain.
+// real value after.
 export const readPodigeeHeight = (data: unknown): number | undefined => {
   return isPlainObject(data) && data.listenTo === 'configurePlayer'
     ? readPixels(data.height)
@@ -96,6 +96,9 @@ export const readPodigeeHeight = (data: unknown): number | undefined => {
 // for a click.
 export const podigeeRenderHint: EmbedRenderHint = {
   provider,
+  // Spelled out: every show's `/embed` 302s to the player on this host, so its messages come
+  // from here.
+  origin: 'https://player.podigee-cdn.net',
   isReady: isPlayerJsReady,
   requestPlay: playerJsPlayRequest,
   readHeight: readPodigeeHeight,
