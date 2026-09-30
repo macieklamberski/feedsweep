@@ -84,12 +84,20 @@ export const podigeeResolveEmbed: ResolveEmbed = (url) => {
 // An iframe framing a Podigee episode page rather than the player, so the reader gets an article.
 export const podigeeIframeEmbedResolver = createUrlEmbedResolver(podigeeHosts, podigeeResolveEmbed)
 
-// The player reports its height under a configurePlayer message, 0 before it has rendered and the
-// real value after.
+// The player reports its height under a configurePlayer message serialised to a JSON string, 0
+// before it has rendered and the real value after.
 export const readPodigeeHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) && data.listenTo === 'configurePlayer'
-    ? readPixels(data.height)
-    : undefined
+  if (typeof data !== 'string') {
+    return
+  }
+
+  try {
+    const message: unknown = JSON.parse(data)
+
+    if (isPlainObject(message) && message.listenTo === 'configurePlayer') {
+      return readPixels(message.height)
+    }
+  } catch {}
 }
 
 // The player takes no query to start and speaks player.js, and Podigee's help says playback waits
