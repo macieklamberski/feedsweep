@@ -658,7 +658,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photos/celesteh/15753890338',
-        src: 'https://www.flickr.com/photos/celesteh/15753890338/in/photostream/player/',
+        src: 'https://www.flickr.com/photos/celesteh/15753890338/player/',
         url: 'https://www.flickr.com/photos/celesteh/15753890338/',
         width: 500,
         height: 97,
@@ -697,7 +697,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the album the arrows walk through', async () => {
+    it('should leave out the album the arrows walk through', async () => {
       const value = html`
         <iframe
           width="500"
@@ -709,7 +709,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photos/jackieboyslim/8740425686',
-        src: 'https://www.flickr.com/photos/jackieboyslim/8740425686/in/set-72157633482544489/player/',
+        src: 'https://www.flickr.com/photos/jackieboyslim/8740425686/player/',
         url: 'https://www.flickr.com/photos/jackieboyslim/8740425686/',
         width: 500,
         height: 375,
@@ -820,7 +820,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photos/20899351@N00/3786844985',
-        src: 'https://www.flickr.com/photos/20899351@N00/3786844985/in/photolist-6LCz5M/player/',
+        src: 'https://www.flickr.com/photos/20899351@N00/3786844985/player/',
         url: 'https://www.flickr.com/photos/20899351@N00/3786844985/',
         width: 640,
         height: 329,
