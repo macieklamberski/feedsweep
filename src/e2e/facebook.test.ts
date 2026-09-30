@@ -155,7 +155,7 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/reel/123/"
-        data-embed-src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F123%2F&show_text=false&width=267"
+        data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Freel%2F123%2F"
         data-embed-url="https://www.facebook.com/reel/123/"
         data-embed-width="267"
         data-embed-height="476"
@@ -190,7 +190,7 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
-        data-embed-src="https://www.facebook.com/plugins/post.php?href=%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123&show_text=true"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
       ></div>
     `

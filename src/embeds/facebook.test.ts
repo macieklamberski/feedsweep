@@ -444,7 +444,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should name a post plugin iframe and keep the publisher src', async () => {
+    it('should rebuild a post plugin iframe around its href and drop the caption toggle', async () => {
       const value = html`
         <iframe
           src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123&show_text=true&width=500"
@@ -453,7 +453,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://www.facebook.com/PageName/posts/123',
-        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123&show_text=true&width=500',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
         width: 500,
       }
@@ -463,7 +463,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
 
     // The href rides as a query value, which `resolveUrlFn` never descends into, so the resolver
     // is the only thing that can give it a scheme. Refused outright it took the whole embed with
-    // it, since the plugin url is what names the provider. The src is left as published.
+    // it, since the plugin url is what names the provider. The rebuilt src spells it in full.
     it('should name a plugin iframe whose href carries no scheme', async () => {
       const value = html`
         <iframe
@@ -473,8 +473,44 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://www.facebook.com/PageName/posts/123',
-        src: 'https://www.facebook.com/plugins/post.php?href=%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123&show_text=true',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: '//www.facebook.com/PageName/posts/123',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep where a video starts and drop its size and app id', async () => {
+      const value = html`
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=314&amp;href=https%3A%2F%2Fwww.facebook.com%2Fdale.ghent%2Fvideos%2F1547460739144960%2F&amp;show_text=false&amp;width=560&amp;t=1"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/dale.ghent/videos/1547460739144960/',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fdale.ghent%2Fvideos%2F1547460739144960%2F&t=1',
+        url: 'https://www.facebook.com/dale.ghent/videos/1547460739144960/',
+        width: 560,
+        height: 314,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the app id the publisher wrote', async () => {
+      const value = html`
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fseantierney%2Fvideos%2F10153391162780883%2F&amp;width=600&amp;show_text=false&amp;appId=1676624405903774&amp;height=336"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/seantierney/videos/10153391162780883/',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fseantierney%2Fvideos%2F10153391162780883%2F',
+        url: 'https://www.facebook.com/seantierney/videos/10153391162780883/',
+        width: 600,
+        height: 336,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -507,7 +543,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://www.facebook.com/PageName/posts/123',
-        src: 'https://www.facebook.com/v2.5/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
       }
 
@@ -523,7 +559,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://www.facebook.com/PageName/videos/123/',
-        src: 'https://www.facebook.com/v17.0/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F',
         url: 'https://www.facebook.com/PageName/videos/123/',
       }
 
@@ -577,7 +613,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://www.facebook.com/PageName/videos/123/',
-        src: 'https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F&show_text=false&width=560',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F',
         url: 'https://www.facebook.com/PageName/videos/123/',
         width: 560,
         height: 314,
@@ -596,7 +632,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://www.facebook.com/reel/123/',
-        src: 'https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F123%2F&show_text=false&width=267',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Freel%2F123%2F',
         url: 'https://www.facebook.com/reel/123/',
         width: 267,
         height: 476,
@@ -632,7 +668,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://www.facebook.com/PageName/videos/123/',
-        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F&width=560',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F',
         url: 'https://www.facebook.com/PageName/videos/123/',
         width: 560,
       }
@@ -651,7 +687,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://www.facebook.com/PageName/videos/123/',
-        src: 'https://www.facebook.com/plugins/video.php?width=0&height=314&href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F',
         url: 'https://www.facebook.com/PageName/videos/123/',
         height: 314,
       }
