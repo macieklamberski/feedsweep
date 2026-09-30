@@ -7,7 +7,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, linkedinEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the share snippet and take the size the publisher stated', async () => {
+    it('should resolve the share snippet and state the post height over the stated box', async () => {
       const value = html`
         <iframe
           src="https://www.linkedin.com/embed/feed/update/urn:li:share:6626097641602281472"
@@ -23,14 +23,13 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:share:6626097641602281472',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:6626097641602281472',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:6626097641602281472',
-        width: 504,
-        height: 570,
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the layout flag on src and drop it from the canonical url', async () => {
+    it('should drop the compact layout flag the publisher chose', async () => {
       const value = html`
         <iframe
           src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7464944835901325312?compact=1"
@@ -41,52 +40,95 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'linkedin',
         id: 'urn:li:ugcPost:7464944835901325312',
-        src: 'https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7464944835901325312?compact=1',
+        src: 'https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7464944835901325312',
         url: 'https://www.linkedin.com/feed/update/urn:li:ugcPost:7464944835901325312',
-        width: 504,
-        height: 399,
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should resolve an activity urn carrying the collapsed flag', async () => {
+    it('should drop the collapsed flag from an activity urn', async () => {
       const value =
         '<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:activity:7493943835853750272?collapsed=1"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'linkedin',
         id: 'urn:li:activity:7493943835853750272',
-        src: 'https://www.linkedin.com/embed/feed/update/urn:li:activity:7493943835853750272?collapsed=1',
+        src: 'https://www.linkedin.com/embed/feed/update/urn:li:activity:7493943835853750272',
         url: 'https://www.linkedin.com/feed/update/urn:li:activity:7493943835853750272',
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The same post with its colons escaped. LinkedIn serves the escaped spelling a body
-    // identical to the plain one, so the src stays as the publisher wrote it and only the id
-    // and the canonical url are built from the decoded urn.
-    it('should keep a decoded urn in one path segment and its colons as written', async () => {
+    it('should keep a decoded urn in one path segment', async () => {
       const value =
         '<iframe src="https://www.linkedin.com/embed/feed/update/urn%3Ali%3Ashare%3A123%2F..%2Fx"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'linkedin',
         id: 'urn:li:share:123/../x',
-        src: 'https://www.linkedin.com/embed/feed/update/urn%3Ali%3Ashare%3A123%2F..%2Fx',
+        src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:123%2F..%2Fx',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:123%2F..%2Fx',
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read a urn whose colons are percent-encoded', async () => {
+    it('should mint the plain spelling for a urn whose colons are percent-encoded', async () => {
       const value =
         '<iframe src="https://www.linkedin.com/embed/feed/update/urn%3Ali%3Ashare%3A6626097641602281472"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'linkedin',
         id: 'urn:li:share:6626097641602281472',
-        src: 'https://www.linkedin.com/embed/feed/update/urn%3Ali%3Ashare%3A6626097641602281472',
+        src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:6626097641602281472',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:6626097641602281472',
+        height: 800,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the collapsed flag the share dialog wrote and its box', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          src="https://www.linkedin.com/embed/feed/update/urn:li:share:7382521851400372224?collapsed=1"
+          height="669"
+          width="504"
+          frameborder="0"
+          allowfullscreen=""
+          title="Embedded post"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'linkedin',
+        id: 'urn:li:share:7382521851400372224',
+        src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:7382521851400372224',
+        url: 'https://www.linkedin.com/feed/update/urn:li:share:7382521851400372224',
+        height: 800,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep an activity urn as written', async () => {
+      const value = html`
+        <iframe
+          allowfullscreen=""
+          frameborder="0"
+          height="756"
+          src="https://www.linkedin.com/embed/feed/update/urn:li:activity:6399565589790236672"
+          width="504"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'linkedin',
+        id: 'urn:li:activity:6399565589790236672',
+        src: 'https://www.linkedin.com/embed/feed/update/urn:li:activity:6399565589790236672',
+        url: 'https://www.linkedin.com/feed/update/urn:li:activity:6399565589790236672',
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -100,6 +142,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:share:746494483590132531274649448359013253127',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:746494483590132531274649448359013253127',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:746494483590132531274649448359013253127',
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -151,6 +194,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:share:not-a-number',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:not-a-number',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:not-a-number',
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -171,13 +215,8 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
     })
   })
 
-  // The height is a property of the post, not of the player: the frame is as tall as the update
-  // inside it, so no one number fits. The resolver therefore states none, and a carrier that
-  // states none too has to come back sizeless rather than with a default nobody measured. The
-  // spread that settled this was counted while the resolver was written and never recorded in the
-  // tree, so the decision stands on a judgement until someone counts it again.
-  describe('the size the resolver refuses to invent', () => {
-    it('should return no size when the carrier states none', async () => {
+  describe('the stated post height', () => {
+    it('should state the post height when the carrier states none', async () => {
       const value =
         '<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:6626097641602281472"></iframe>'
       const expected: EmbedResolverResult = {
@@ -185,6 +224,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:share:6626097641602281472',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:6626097641602281472',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:6626097641602281472',
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -202,6 +242,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:share:6626097641602281472',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:6626097641602281472',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:6626097641602281472',
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)

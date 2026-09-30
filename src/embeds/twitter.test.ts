@@ -1470,16 +1470,23 @@ describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
 
-    it('should ignore a fragment that is not a status id', async () => {
+  describe('edge cases', () => {
+    it('should keep a fragment holding an ampersand whole in the id parameter', async () => {
       const value = html`
         <iframe
           data-s9e-mediaembed="twitter"
-          src="https://s9e.github.io/iframe/2/twitter.min.html#not-a-status"
+          src="https://s9e.github.io/iframe/2/twitter.min.html#123&lang=en"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: '123&lang=en',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=123%26lang%3Den',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

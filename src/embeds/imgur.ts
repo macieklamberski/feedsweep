@@ -181,7 +181,7 @@ export const imgurIframeEmbedResolver = createUrlEmbedResolver(imgurHosts, imgur
 
 // A forum's s9e MediaEmbed helper frame, naming the post or album in its url fragment. The helper
 // page reads an encoded `%2F` as the slash it stands for.
-export const imgurS9eEmbedResolver = createS9eEmbedResolver('imgur', /^(?:%2F|[\w/])+$/, (path) => {
+export const imgurS9eEmbedResolver = createS9eEmbedResolver('imgur', (path) => {
   return imgurResolveEmbed(`https://imgur.com/${path.replaceAll('%2F', '/')}`)
 })
 

@@ -558,16 +558,24 @@ describeForEachParser('imgurS9eEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
 
-    it('should ignore a fragment stepping out of the post path', async () => {
+  describe('edge cases', () => {
+    it('should resolve dot segments in the fragment as a browser does', async () => {
       const value = html`
         <iframe
           data-s9e-mediaembed="imgur"
           src="https://s9e.github.io/iframe/2/imgur.min.html#x/../../a/9L0qCYg"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'imgur',
+        id: 'a/9L0qCYg',
+        src: 'https://imgur.com/a/9L0qCYg/embed',
+        url: 'https://imgur.com/a/9L0qCYg',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
