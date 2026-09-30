@@ -221,7 +221,12 @@ const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
 
   if (pageKind) {
     result.url = `https://soundcloud.com/${permalink.join('/')}`
-    result.src = composeWidgetUrl(result.url, secretToken, startTrack)
+    // A share link's `#t=` is where playback starts, so it rides on the page the widget names.
+    result.src = composeWidgetUrl(
+      `${result.url}${page?.hash ?? ''}`,
+      secretToken ?? queryToken,
+      startTrack,
+    )
   } else if (shortLink) {
     result.src = composeWidgetUrl(shortLink.href, queryToken, startTrack)
   } else if (inner && !reference) {

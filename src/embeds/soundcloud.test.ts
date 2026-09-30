@@ -741,6 +741,54 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a token written beside a page the widget names', async () => {
+      const value = html`
+        <iframe
+          src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy&amp;secret_token=s-vd94Qjk1b3m"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        src: 'https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy&secret_token=s-vd94Qjk1b3m',
+        url: 'https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy',
+        height: 166,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a token written inside the page the widget names', async () => {
+      const value = html`
+        <iframe
+          src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy%3Fsecret_token%3Ds-vd94Qjk1b3m"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        src: 'https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy&secret_token=s-vd94Qjk1b3m',
+        url: 'https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy',
+        height: 166,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep where a share link starts playback', async () => {
+      const value = html`
+        <iframe
+          src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/stingray-edmonton/bill-henderson-chilliwack%23t%3D1%3A30"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        src: 'https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/stingray-edmonton/bill-henderson-chilliwack%23t%3D1%3A30',
+        url: 'https://soundcloud.com/stingray-edmonton/bill-henderson-chilliwack',
+        height: 166,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should mint the page the widget names and drop its share tags', async () => {
       const value = html`
         <iframe
