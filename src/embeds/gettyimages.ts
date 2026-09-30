@@ -13,16 +13,24 @@ type WidgetConfig = {
   et: string
   sig: string
   tld: string
-  caption: string
   width?: number
   height?: number
+}
+
+// Getty signs the query up to `sig` in the order written: a pair dropped or moved before it
+// answers 400. The pairs after it, such as `caption` and `ver`, are unsigned.
+const readSignedQuery = (url: URL): string => {
+  const pairs = url.search.slice(1).split('&')
+  const signedPairs = pairs.slice(0, pairs.findIndex((pair) => pair.startsWith('sig=')) + 1)
+
+  return signedPairs.length > 0 ? `?${signedPairs.join('&')}` : ''
 }
 
 const gettyImagesResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, gettyImagesHosts)
   const itemId = parsed?.pathname.match(embedPathRegex)?.[1]
 
-  if (!itemId) {
+  if (!parsed || !itemId) {
     return
   }
 
@@ -31,8 +39,7 @@ const gettyImagesResolveEmbed: ResolveEmbed = (url) => {
     // `embed.gettyimages.com/oembed?url=http://gty.im/{items}` answers title, caption,
     // photographer, collection and a thumbnail with no key, and 404s on an invented id.
     id: itemId,
-    // Kept whole: without its `et` and `sig` the player answers 400.
-    src: url,
+    src: `https://embed.gettyimages.com/embed/${itemId}${readSignedQuery(parsed)}`,
     url: `https://www.gettyimages.com/detail/${itemId}`,
   }
 }
@@ -47,10 +54,6 @@ export const gettyImagesEmbedResolver = createUrlEmbedResolver(
 // the values, `caption: true ,`.
 const readConfigValue = (source: string, key: string): string | undefined => {
   return source.match(new RegExp(`\\b${key}\\s*:\\s*'([^']*)'`))?.[1]
-}
-
-const readConfigFlag = (source: string, key: string): string | undefined => {
-  return source.match(new RegExp(`\\b${key}\\s*:\\s*(true|false)\\b`))?.[1]
 }
 
 // What `rebuildGettyImagesEmbeds` needs out of a `gie.widgets.load({...})` call. Exported for
@@ -71,7 +74,6 @@ export const readWidgetConfig = (source: string): WidgetConfig | undefined => {
     et,
     sig,
     tld: readConfigValue(source, 'tld') ?? 'com',
-    caption: readConfigFlag(source, 'caption') ?? 'false',
     width: parsePixelSize(readConfigValue(source, 'w')),
     height: parsePixelSize(readConfigValue(source, 'h')),
   }
@@ -84,7 +86,6 @@ export const composeWidgetEmbedUrl = (config: WidgetConfig): string => {
     et: config.et,
     tld: config.tld,
     sig: config.sig,
-    caption: config.caption,
   })
 
   return `https://embed.gettyimages.com/embed/${config.items}?${query}`
