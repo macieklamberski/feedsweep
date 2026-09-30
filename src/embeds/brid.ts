@@ -1,7 +1,9 @@
 import { decodeSegment } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { findConfigScript, formatRatio } from '../utils/dom.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'brid'
 
 // The inline script's config comes in two spellings, `$bp("Brid_{n}", {...})` and
 // `_bp.push({"div": "Brid_{n}", "obj": {...}})`. `id` is the player, `video` the video, and the
@@ -65,7 +67,7 @@ export const bridEmbedResolver = createMarkupEmbedResolver(
     const title = config.match(titleRegex)?.[1]
 
     return {
-      provider: 'brid',
+      provider,
       // The player scopes the video the way a partner scopes a Kaltura entry, so it leads the
       // id, which is the order every other two-part id in the tree uses. The minted url keeps
       // Brid's own `/video/{video}/{player}` order, which is the platform's, not ours.
@@ -80,3 +82,15 @@ export const bridEmbedResolver = createMarkupEmbedResolver(
   },
   { preferResolverSize: true },
 )
+
+// The player posts `Brid|{player uid}|trigger|ready` once it has loaded.
+export const isBridReady = (data: unknown): boolean => {
+  return typeof data === 'string' && data.startsWith('Brid|') && data.endsWith('|trigger|ready')
+}
+
+// The player runs a string command `Brid|{method}`, and ignores it while an ad plays.
+export const bridRenderHint: EmbedRenderHint = {
+  provider,
+  isReady: isBridReady,
+  requestPlay: 'Brid|play',
+}
