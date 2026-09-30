@@ -812,6 +812,12 @@ describe('isSpotifyReady', () => {
     expect(isSpotifyReady(value)).toBe(false)
   })
 
+  it('should ignore the playback start the player posts once it plays', () => {
+    const value = { type: 'playback_started' }
+
+    expect(isSpotifyReady(value)).toBe(false)
+  })
+
   it('should ignore the ready message spelled as a JSON string', () => {
     const value = '{"type":"ready"}'
 
