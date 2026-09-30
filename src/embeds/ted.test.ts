@@ -124,12 +124,25 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, tedEmbedResolver)
 
   describe('happy paths', () => {
+    it('should keep the language a player frame names', async () => {
+      const value =
+        '<iframe src="https://embed-ssl.ted.com/talks/lang/ja/thomas_piketty_new_thoughts_on_capital_in_the_twenty_first_century.html"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: 'thomas_piketty_new_thoughts_on_capital_in_the_twenty_first_century',
+        src: 'https://embed-ssl.ted.com/talks/lang/ja/thomas_piketty_new_thoughts_on_capital_in_the_twenty_first_century.html',
+        url: 'https://www.ted.com/talks/thomas_piketty_new_thoughts_on_capital_in_the_twenty_first_century',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read a talk out of an iframe player', async () => {
       const value = '<iframe src="https://embed.ted.com/talks/ethan_zuckerman.html"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'ted',
         id: 'ethan_zuckerman',
-        src: 'https://embed.ted.com/embed/ethan_zuckerman',
+        src: 'https://embed.ted.com/talks/ethan_zuckerman.html',
         url: 'https://www.ted.com/talks/ethan_zuckerman',
       }
 
@@ -147,7 +160,7 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ted',
         id: 'ethan_zuckerman',
-        src: 'https://embed.ted.com/embed/ethan_zuckerman',
+        src: 'https://embed.ted.com/talks/ethan_zuckerman',
         url: 'https://www.ted.com/talks/ethan_zuckerman',
         title: 'Ethan Zuckerman: Listening to global voices',
       }

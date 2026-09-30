@@ -80,6 +80,10 @@ export const tedResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const title = attr(element, 'title')
+  // A player frame plays as written, with its language path. A framed talk page and the Flash
+  // player get the player.
+  const isPlayerFrame =
+    element?.localName === 'iframe' && isHostOf(url, ['embed.ted.com', 'embed-ssl.ted.com'])
 
   // The thumbnail is not derivable from the slug: TED's oEmbed returns `thumbnail_url`, so an
   // iframe carrier leaves it to enrichment. Only the Flash carrier states one, in its own config.
@@ -89,7 +93,7 @@ export const tedResolveEmbed: ResolveEmbed = (url, element) => {
     // Feeds carry a short slug (`ethan_zuckerman`) and TED redirects it to the full one, which
     // cannot be derived offline. `/embed/{slug}` reaches the canonical player in a single hop
     // while the `/talks/` path in the markup takes two.
-    src: `https://embed.ted.com/embed/${talk.slug}`,
+    src: isPlayerFrame ? url : `https://embed.ted.com/embed/${talk.slug}`,
     url: `https://www.ted.com/talks/${talk.slug}`,
     ...trimObject({ thumbnail: talk.thumbnail, title }, Boolean),
   }
