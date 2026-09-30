@@ -215,6 +215,35 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
   })
 })
 
+// Only the pipeline repairs the doubled `&amp;amp;` the resolver reads as `amp;` pairs.
+describeForEachParser('gettyimages doubly escaped src', (parseHtml) => {
+  it('should keep the signed query', async () => {
+    const value = html`
+      <iframe
+        src="https://embed.gettyimages.com/embed/674950774?et=4AHdkSWcRDxQ4l2sDHBIOA&amp;amp;tld=com&amp;amp;viewMoreLink=on&amp;amp;sig=5sVUWW_CnKTtYzfjDnnapRVqjnSK-3499ZUkhrnRc1g=&amp;amp;caption=true"
+        width="594"
+        height="396"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://www.gettyimages.com/detail/674950774"
+        data-embed-id="674950774"
+        data-embed-provider="gettyimages"
+        data-embed-src="https://embed.gettyimages.com/embed/674950774?et=4AHdkSWcRDxQ4l2sDHBIOA&amp;tld=com&amp;viewMoreLink=on&amp;sig=5sVUWW_CnKTtYzfjDnnapRVqjnSK-3499ZUkhrnRc1g="
+        data-embed-width="594"
+        data-embed-height="396"
+      ></div>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+})
+
 // Only the pipeline shows what the host's enclosures become, since injectEnclosures offers each
 // one to every url-keyed resolver.
 describeForEachParser('gettyimages enclosures', (parseHtml) => {

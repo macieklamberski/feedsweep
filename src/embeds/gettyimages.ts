@@ -5,6 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/
+const ampPrefixRegex = /^(amp;)+/
 
 const gettyImagesHosts = ['gettyimages.com']
 
@@ -21,7 +22,11 @@ type WidgetConfig = {
 // answers 400. The pairs after it, such as `caption` and `ver`, are unsigned.
 const readSignedQuery = (url: URL): string => {
   const pairs = url.search.slice(1).split('&')
-  const signedPairs = pairs.slice(0, pairs.findIndex((pair) => pair.startsWith('sig=')) + 1)
+  // A doubled `&amp;amp;` in the feed reaches the query as `amp;sig=`.
+  const isSignaturePair = (pair: string) => {
+    return pair.replace(ampPrefixRegex, '').startsWith('sig=')
+  }
+  const signedPairs = pairs.slice(0, pairs.findIndex(isSignaturePair) + 1)
 
   return signedPairs.length > 0 ? `?${signedPairs.join('&')}` : ''
 }
@@ -51,7 +56,7 @@ export const gettyImagesEmbedResolver = createUrlEmbedResolver(
 )
 
 // The config is a JavaScript object literal, not JSON, with unquoted keys and free spacing around
-// the values, `caption: true ,`.
+// the values, `items: '674950774' ,`.
 const readConfigValue = (source: string, key: string): string | undefined => {
   return source.match(new RegExp(`\\b${key}\\s*:\\s*'([^']*)'`))?.[1]
 }
