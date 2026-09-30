@@ -1,7 +1,13 @@
 import { getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, text } from '../utils/dom.js'
-import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  isFileName,
+  parseUrlOnHosts,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'soundcloud'
@@ -17,14 +23,12 @@ const referenceRegex =
 // The widget takes a page url in place of a reference, which is what makes the repair possible.
 const widgetPlayerUrl = 'https://w.soundcloud.com/player/'
 
-const composeWidgetUrl = (target: string, secretToken?: string): string => {
-  const query: Record<string, string> = { url: target }
+// What the widget plays and where: a private item's `secret_token` and a playlist's `start_track`.
+// The colours, the tabs, the visual layout and autoplay are the publisher's look and are dropped.
+const widgetParams = ['secret_token', 'start_track']
 
-  if (secretToken) {
-    query.secret_token = secretToken
-  }
-
-  return `${widgetPlayerUrl}?${new URLSearchParams(query)}`
+const composeWidgetUrl = (target: string, params: Record<string, string> = {}): string => {
+  return `${widgetPlayerUrl}${composeQuery({ url: target, ...params })}`
 }
 
 // spotlight and groups answer 410, but the platform still holds them and no track takes the slug.
@@ -113,9 +117,7 @@ const flashPlayerHostRegex = /^player\./
 const shortLinkHostRegex = /^on\./
 
 // The classic player is a bar for a single track and a scrolling list for anything holding
-// several, and `visual=true` swaps both for one big artwork box. These are the heights
-// SoundCloud's own embed config carries per player.
-const visualPlayerHeight = 450
+// several. These are the heights SoundCloud's own embed config carries per player.
 const classicPlayerHeights: Record<string, number | undefined> = {
   tracks: 166,
   playlists: 450,
@@ -193,29 +195,28 @@ const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
     result.url = `https://soundcloud.com/${permalink.join('/')}`
 
     if (!inner) {
-      result.src = composeWidgetUrl(result.url, secretToken)
+      result.src = composeWidgetUrl(result.url, secretToken ? { secret_token: secretToken } : {})
     }
   } else if (shortLink && !inner) {
     result.src = composeWidgetUrl(shortLink.href)
   }
 
-  if (flashPlayerHostRegex.test(parsed?.hostname ?? '')) {
-    if (!inner) {
-      return
-    }
+  if (flashPlayerHostRegex.test(parsed?.hostname ?? '') && !inner) {
+    return
+  }
 
-    result.src = composeWidgetUrl(inner)
+  // The widget plays what `url=` names, so it is rebuilt around that value as written, with the
+  // parameters that decide what plays.
+  if (inner) {
+    result.src = composeWidgetUrl(inner, pickQueryParams(parsed?.search ?? '', widgetParams))
   }
 
   if (!result.id && !pageKind && isFileName(parsed?.pathname ?? '')) {
     return
   }
 
-  // The visual player is one height whatever it holds, so it needs no reference to size it.
   const height =
-    params?.get('visual') === 'true'
-      ? visualPlayerHeight
-      : classicPlayerHeights[reference?.[1] ?? (streamTrackId && 'tracks') ?? pageKind ?? '']
+    classicPlayerHeights[reference?.[1] ?? (streamTrackId && 'tracks') ?? pageKind ?? '']
 
   if (height) {
     result.height = height
