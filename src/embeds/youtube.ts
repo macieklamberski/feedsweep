@@ -356,6 +356,11 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
       return channel ? composeChannelEmbed(channel) : undefined
     }
 
+    // `videoseries` and `live_stream` are route words that sit where a video id does.
+    if (nonVideoIds.has(videoId)) {
+      return
+    }
+
     const params: Record<string, string> = {}
 
     // AMP hands player parameters to the iframe as `data-param-{name}`, which are the same query

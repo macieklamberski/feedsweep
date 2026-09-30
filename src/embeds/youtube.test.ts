@@ -1062,6 +1062,12 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined for a videoid holding a route word', async () => {
+      const value = '<amp-youtube data-videoid="videoseries"></amp-youtube>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should use a malformed videoid as written, even if the player answers an error', async () => {
       const value = '<amp-youtube data-videoid="../../evil"></amp-youtube>'
       const expected: EmbedResolverResult = {

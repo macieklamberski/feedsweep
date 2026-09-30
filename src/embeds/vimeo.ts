@@ -194,13 +194,26 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
     ...pickQueryParams(parseUrl(url, placeholderBaseUrl)?.search ?? '', vimeoEmbedParams),
   }
 
+  // The hash travels in the id: an oEmbed lookup for the bare id answers 404.
+  const id = hash ? `${videoId}:${hash}` : videoId
+  const src = composeEmbedUrl(videoId, params)
+
+  // The hash is an access token: an unlisted video answers 403 without it, so it stays in `src`
+  // alone and a hashed player states no page url.
+  if (hash) {
+    return {
+      provider,
+      id,
+      src,
+      title,
+    }
+  }
+
   return {
     provider,
-    // The hash travels in the id: an oEmbed lookup for the bare id answers 404.
-    id: hash ? `${videoId}:${hash}` : videoId,
-    src: composeEmbedUrl(videoId, params),
-    // Without the hash the page loses its title and its poster, so it stays on the url too.
-    url: `https://vimeo.com/${videoId}${hash ? `/${hash}` : ''}`,
+    id,
+    src,
+    url: `https://vimeo.com/${videoId}`,
     title,
     // TODO: no thumbnail. Vimeo posters are not derivable from the id and need an oEmbed lookup.
   }
