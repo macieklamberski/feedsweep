@@ -150,7 +150,7 @@ describeForEachParser('inaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ina',
         id: 'I04224962',
-        src: 'https://player.ina.fr/embed/I04224962?pid=1&key=1b0bd203fbcd702f9bc9b10ac3d0fc21',
+        src: 'https://player.ina.fr/player/embed/I04224962/1/1b0bd203fbcd702f9bc9b10ac3d0fc21/460/259',
         url: 'https://www.ina.fr/video/I04224962',
         width: 460,
         height: 259,
@@ -199,7 +199,7 @@ describeForEachParser('inaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ina',
         id: 'CPC7505456905',
-        src: 'https://player.ina.fr/embed/CPC7505456905?pid=1&key=1b0bd203fbcd702f9bc9b10ac3d0fc21',
+        src: 'https://player.ina.fr/player/embed/CPC7505456905/1/1b0bd203fbcd702f9bc9b10ac3d0fc21/wide/1',
         url: 'https://www.ina.fr/video/CPC7505456905',
       }
 
@@ -217,7 +217,7 @@ describeForEachParser('inaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ina',
         id: '00034548',
-        src: 'https://player.ina.fr/embed/00034548?pid=1&key=1b0bd203fbcd702f9bc9b10ac3d0fc21',
+        src: 'http://player.ina.fr/player/embed/00034548/1/1b0bd203fbcd702f9bc9b10ac3d0fc21/560/315/0/148db8',
         url: 'https://www.ina.fr/video/00034548',
         width: 560,
         height: 315,

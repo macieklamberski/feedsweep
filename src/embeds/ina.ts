@@ -47,7 +47,7 @@ const composeEmbed = (
 }
 
 // INA's player urls, whose iframe routes redirect into autoplay and whose Flash route is dead.
-export const inaResolveEmbed: ResolveEmbed = (url) => {
+export const inaResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, inaHosts)
   const segments = parsed ? getPathSegments(parsed) : []
   const [route, kind, id, playerId, key, width, height] = segments
@@ -60,7 +60,15 @@ export const inaResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  return composeEmbed(id, playerId, key, width, height)
+  const embed = composeEmbed(id, playerId, key, width, height)
+
+  // An iframe route plays as written, and redirects onto the player by itself. The Flash route
+  // answers 404, so it gets the player.
+  if (element?.localName === 'iframe' && kind === 'embed') {
+    return { ...embed, src: url }
+  }
+
+  return embed
 }
 
 export const inaEmbedResolver = createUrlEmbedResolver(inaHosts, inaResolveEmbed)
