@@ -24,6 +24,11 @@ const borderedSizes = toMap({
   large: { width: 700, height: 550 },
 })
 
+// With no `size` and no `border`, the frame draws the small bordered card. The loader boxes that
+// card at 190 by 250 plus 30 for the border.
+const frameWidth = 220
+const frameHeight = 250
+
 const composeFrameUrl = (workId: string, size: string, border: string): string => {
   return `https://embed.pixiv.net/embed_mk2.php${composeQuery({ id: workId, size, border })}`
 }
@@ -59,6 +64,18 @@ const pixivResolveEmbed: ResolveEmbed = (url) => {
       id: workId,
       src: `https://embed.pixiv.net/embed_mk2.php${pickUrlParams(url, ['id', 'size', 'border'])}`,
       url: page,
+    }
+  }
+
+  // `embed_mk2.php` draws the same work as the older `code.php` card, from the same id.
+  if (route === 'code') {
+    return {
+      provider,
+      id: workId,
+      src: `https://embed.pixiv.net/embed_mk2.php${composeQuery({ id: workId })}`,
+      url: page,
+      width: frameWidth,
+      height: frameHeight,
     }
   }
 
