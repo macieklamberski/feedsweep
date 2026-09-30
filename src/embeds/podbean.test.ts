@@ -53,6 +53,7 @@ describe('podbeanResolveEmbed', () => {
       provider: 'podbean',
       id: 'yx4hr-f3d1e1',
       src: 'https://www.podbean.com/player-v2/?i=yx4hr-f3d1e1',
+      params: {},
       height: 150,
     }
 
@@ -65,6 +66,7 @@ describe('podbeanResolveEmbed', () => {
       provider: 'podbean',
       id: 'wyvke-1aefb6c-pb',
       src: 'https://www.podbean.com/player-v2/?i=wyvke-1aefb6c-pb',
+      params: { skin: '3' },
       height: 150,
     }
 
@@ -77,6 +79,7 @@ describe('podbeanResolveEmbed', () => {
       provider: 'podbean',
       id: 'wyvke-1aefb6c-pb',
       src: 'https://www.podbean.com/player-v2/?i=wyvke-1aefb6c-pb',
+      params: {},
       height: 315,
     }
 
@@ -101,6 +104,7 @@ describeForEachParser('podbeanEmbedResolver', (parseHtml) => {
         provider: 'podbean',
         id: 'yx4hr-f3d1e1',
         src: 'https://www.podbean.com/player-v2/?i=yx4hr-f3d1e1',
+        params: {},
         height: 150,
       }
 
@@ -119,8 +123,42 @@ describeForEachParser('podbeanEmbedResolver', (parseHtml) => {
         provider: 'podbean',
         id: 'k4xmn-9228ca-pb',
         src: 'https://www.podbean.com/player-v2/?i=k4xmn-9228ca-pb',
+        params: { skin: '1' },
         height: 150,
         title: 'The Stormy Success of the Comedy Hour',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+    it('should carry the player look as params and drop the tracking', async () => {
+      const value = html`
+        <iframe
+          title="Primal Rage - Sasquatch is so lonely"
+          allowtransparency="true"
+          height="150"
+          width="100%"
+          style="border: none; min-width: min(100%, 430px);"
+          scrolling="no"
+          data-name="pb-iframe-player"
+          src="https://www.podbean.com/player-v2/?i=m8ipg-1378b2f-pb&from=pb6admin&share=1&download=1&rtl=0&fonts=Verdana&skin=3&font-color=auto&logo_link=episode_page&btn-skin=1"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'podbean',
+        id: 'm8ipg-1378b2f-pb',
+        src: 'https://www.podbean.com/player-v2/?i=m8ipg-1378b2f-pb',
+        params: {
+          skin: '3',
+          'btn-skin': '1',
+          fonts: 'Verdana',
+          'font-color': 'auto',
+          rtl: '0',
+          share: '1',
+          download: '1',
+          logo_link: 'episode_page',
+        },
+        height: 150,
+        title: 'Primal Rage - Sasquatch is so lonely',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -153,6 +191,7 @@ describeForEachParser('podbeanEmbedResolver', (parseHtml) => {
         provider: 'podbean',
         id: 'wyvke-1aefb6c-pb',
         src: 'https://www.podbean.com/player-v2/?i=wyvke-1aefb6c-pb',
+        params: {},
         width: 640,
         height: 122,
       }

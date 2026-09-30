@@ -2,7 +2,7 @@ import { getPathSegments, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
+import { isMediaFile, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podbean'
@@ -37,6 +37,18 @@ export const extractPodbeanId = (link: string): string | undefined => {
   return keepIfMatches(id, safeIdRegex)
 }
 
+// The player's look the publisher picked. A reader may apply it or set its own.
+const displayParams = [
+  'skin',
+  'btn-skin',
+  'fonts',
+  'font-color',
+  'rtl',
+  'share',
+  'download',
+  'logo_link',
+]
+
 export const podbeanResolveEmbed: ResolveEmbed = (url, element) => {
   const id = extractPodbeanId(url)
 
@@ -44,7 +56,8 @@ export const podbeanResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const stated = parseUrl(url, placeholderBaseUrl)?.searchParams.get('size')
+  const search = parseUrl(url, placeholderBaseUrl)?.search ?? ''
+  const stated = new URLSearchParams(search).get('size')
   const height = parsePixelSize(stated) ?? defaultPlayerHeight
   const title = attr(element, 'title')
 
@@ -54,6 +67,7 @@ export const podbeanResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id,
     src: `https://www.podbean.com/player-v2/?i=${id}`,
+    params: pickQueryParams(search, displayParams),
     height,
     ...trimObject({ title }, Boolean),
   }
