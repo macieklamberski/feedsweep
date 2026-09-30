@@ -234,20 +234,25 @@ describeForEachParser('podigee through the pipeline', (parseHtml) => {
 })
 
 describe('readPodigeeHeight', () => {
-  it('should read the height out of the player configuration', () => {
-    const value = {
-      listenTo: 'configurePlayer',
-      height: 144.812,
-      title: 'Podcast player for episode "Scheiden tut weh - entscheiden auch".',
-    }
+  // Captured in Chrome from an episode player on `redfield.podigee.io`.
+  it('should read the height out of the player configuration the player posts as a string', () => {
+    const value =
+      '{"listenTo":"configurePlayer","height":144,"title":"Podcast player for episode \\"R#183 mit Michaela Schneider, CEO von Allgäu Concerts\\"."}'
 
-    expect(readPodigeeHeight(value)).toBe(144.812)
+    expect(readPodigeeHeight(value)).toBe(144)
   })
 
   it('should read nothing before the player has rendered', () => {
-    const value = { listenTo: 'configurePlayer', height: 0, title: 'Podcast player' }
+    const value = '{"listenTo":"configurePlayer","height":0,"title":"Podcast player"}'
 
     expect(readPodigeeHeight(value)).toBeUndefined()
-    expect(readPodigeeHeight({ listenTo: 'loadSubscribeButton' })).toBeUndefined()
+  })
+
+  it('should read nothing from another message the player posts', () => {
+    expect(readPodigeeHeight('{"listenTo":"loadSubscribeButton"}')).toBeUndefined()
+  })
+
+  it('should read nothing from a string that is not JSON', () => {
+    expect(readPodigeeHeight('{"listenTo":"configurePlayer",')).toBeUndefined()
   })
 })
