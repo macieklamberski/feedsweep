@@ -13,8 +13,13 @@ const kalturaHost = 'kaltura.com'
 // API host (`api.ca.kaltura.com`) serves them only itself, so the carrier's host is kept there.
 const saasHosts = new Set(['kaltura.com', 'www.kaltura.com', 'cdnapi.kaltura.com'])
 
-// The start position, as the embedIframeJs player and the embedPlaykitJs player read it.
-const playbackParams = ['flashvars[mediaProxy.mediaPlayFrom]', 'kalturaSeekFrom']
+// The clip's start and end, as the embedIframeJs player and the embedPlaykitJs player read them.
+const playbackParams = [
+  'flashvars[mediaProxy.mediaPlayFrom]',
+  'flashvars[mediaProxy.mediaPlayTo]',
+  'kalturaSeekFrom',
+  'kalturaClipTo',
+]
 
 type Entry = {
   partner: string

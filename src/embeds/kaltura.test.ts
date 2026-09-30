@@ -274,6 +274,47 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep the clip end of the embedIframeJs player as written', async () => {
+      const value = html`
+        <iframe
+          src="https://cdnapisec.kaltura.com/p/2375811/sp/237581100/embedIframeJs/uiconf_id/41951101/partner_id/2375811?iframeembed=true&playerId=kplayer&entry_id=1_vni6k5wu&flashvars[streamerType]=auto&flashvars[mediaProxy.mediaPlayTo]=120"
+          width="100%"
+          height="790"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'kaltura',
+        id: '2375811/1_vni6k5wu',
+        src: 'https://cdnapisec.kaltura.com/p/2375811/sp/237581100/embedIframeJs/uiconf_id/41951101/partner_id/2375811?iframeembed=true&entry_id=1_vni6k5wu&flashvars[mediaProxy.mediaPlayTo]=120',
+        thumbnail:
+          'https://cdnapisec.kaltura.com/p/2375811/thumbnail/entry_id/1_vni6k5wu/width/640',
+        height: 790,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the clip end of the playkit player as written', async () => {
+      const value = html`
+        <iframe
+          src="https://cdnapisec.kaltura.com/p/2503451/embedPlaykitJs/uiconf_id/49754663?iframeembed=true&amp;entry_id=1_wyxnidl5&amp;kalturaClipTo=120"
+          width="560"
+          height="315"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'kaltura',
+        id: '2503451/1_wyxnidl5',
+        src: 'https://cdnapisec.kaltura.com/p/2503451/embedPlaykitJs/uiconf_id/49754663?iframeembed=true&entry_id=1_wyxnidl5&kalturaClipTo=120',
+        thumbnail:
+          'https://cdnapisec.kaltura.com/p/2503451/thumbnail/entry_id/1_wyxnidl5/width/640',
+        width: 560,
+        height: 315,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should drop the config languages from the playkit player', async () => {
       const value = html`
         <iframe
