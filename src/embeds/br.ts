@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const brHost = 'br.de'
 
 // The slug BR writes in front of the token is decorative: the token alone names the media.
-const mediaTokenRegex = /av:[0-9a-f]+$/
+const mediaTokenRegex = /av:[^/]+$/
 
 const brResolveEmbed: ResolveEmbed = (url) => {
   const [section, route, slot] = getPathSegments(url)

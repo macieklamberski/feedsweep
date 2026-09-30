@@ -71,9 +71,7 @@ describeForEachParser('mediavineWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    // The attribute is whatever the feed wrote, and unescaped it picks the page: `../../evil`
-    // climbs out of the `videos` route and a `?` moves the rest of it into the query.
-    it('should keep a traversing video id inside its own path segment', async () => {
+    it('should use a malformed video id as written, even if the player answers an error', async () => {
       const value = html`
         <div
           class="mv-video-target"
@@ -83,23 +81,7 @@ describeForEachParser('mediavineWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'mediavine',
         id: '../../evil',
-        src: 'https://embed.mediavine.com/videos/..%2F..%2Fevil/iframe',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep a query a video id states out of the minted url', async () => {
-      const value = html`
-        <div
-          class="mv-video-target"
-          data-video-id="a?autoplay=1"
-        ></div>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'mediavine',
-        id: 'a?autoplay=1',
-        src: 'https://embed.mediavine.com/videos/a%3Fautoplay%3D1/iframe',
+        src: 'https://embed.mediavine.com/videos/../../evil/iframe',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -228,7 +210,7 @@ describeForEachParser('mediavineScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'mediavine',
         id: 'dx6ydyrb%2Frjbbu2tncqzi',
-        src: 'https://embed.mediavine.com/videos/dx6ydyrb%252Frjbbu2tncqzi/iframe',
+        src: 'https://embed.mediavine.com/videos/dx6ydyrb%2Frjbbu2tncqzi/iframe',
       }
 
       expect(await extract(value)).toEqual(expected)

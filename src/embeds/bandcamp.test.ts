@@ -57,10 +57,11 @@ describe('extractBandcampRelease', () => {
     expect(extractBandcampRelease(value)).toBeUndefined()
   })
 
-  it('should return undefined for a release id followed by other characters', () => {
+  it('should use a malformed release id as written, even if the player answers an error', () => {
     const value = 'https://bandcamp.com/EmbeddedPlayer/album=42x/size=small/'
+    const expected = 'album/42x'
 
-    expect(extractBandcampRelease(value)).toBeUndefined()
+    expect(extractBandcampRelease(value)).toEqual(expected)
   })
 
   it('should use a malformed query id as written, even if the player answers an error', () => {

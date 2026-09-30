@@ -117,6 +117,18 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('the document page', () => {
+    it('should resolve a document on the mobile site', async () => {
+      const value = '<iframe src="https://www.scribd.com/mobile/doc/173385168"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'scribd',
+        id: '173385168',
+        src: 'https://www.scribd.com/embeds/173385168/content',
+        url: 'https://www.scribd.com/document/173385168',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should resolve a document named on its page path', async () => {
       const value = '<iframe src="https://www.scribd.com/document/526446879/some-slug"></iframe>'
       const expected: EmbedResolverResult = {
@@ -161,8 +173,20 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a document id that is not numeric', async () => {
+    it('should use a malformed document id as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://www.scribd.com/document/my-document-slug"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'scribd',
+        id: 'my-document-slug',
+        src: 'https://www.scribd.com/embeds/my-document-slug/content',
+        url: 'https://www.scribd.com/document/my-document-slug',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should return undefined for a route word after another segment', async () => {
+      const value = '<iframe src="https://www.scribd.com/x/document/526446879"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

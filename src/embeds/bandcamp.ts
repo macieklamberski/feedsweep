@@ -7,8 +7,8 @@ const provider = 'bandcamp'
 import { composeQuery, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// A release is either an album or a single track, and the id is Bandcamp's own numeric one.
-const releaseRegex = /^(album|track)=(\d+)$/
+// A release is either an album or a single track.
+const releaseRegex = /^(album|track)=([^/]+)$/
 // The `size=` preset is a path segment that decides the player's exact pixels.
 const sizeRegex = /^size=([a-z0-9_]+)$/
 

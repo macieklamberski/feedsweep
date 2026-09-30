@@ -1,8 +1,8 @@
-import { getPathSegments, isPlainObject } from 'trousse'
+import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
@@ -12,6 +12,9 @@ import {
 const provider = 'reddit'
 
 const redditHosts = ['reddit.com', 'redditmedia.com']
+
+// A removed account's byline links `/user/[deleted]/`, which names nobody.
+const deletedAccountNames = ['[deleted]', '%5Bdeleted%5D']
 
 // What a permalink names. A post carries a title, a comment does not, and a subreddit names
 // neither, so the kind decides which fields the widget can fill.
@@ -77,7 +80,7 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
 const parseAuthor = (value: string | undefined): string | undefined => {
   const [scope, name, rest] = parseRedditPath(value) ?? []
 
-  if (scope !== 'user' || rest !== undefined || !name || !urlSafeTokenRegex.test(name)) {
+  if (scope !== 'user' || rest !== undefined || !name || isAnyOf(name, deletedAccountNames)) {
     return
   }
 

@@ -50,10 +50,15 @@ describe('tuneinResolveEmbed', () => {
       expect(tuneinResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a guide id of an unknown kind', () => {
+    it('should use a guide id of an unknown kind as written, with no page and no logo', () => {
       const value = 'https://tunein.com/embed/player/x285269/'
+      const expected: EmbedResolverResult = {
+        provider: 'tunein',
+        id: 'x285269',
+        src: 'https://tunein.com/embed/player/x285269/',
+      }
 
-      expect(tuneinResolveEmbed(value)).toBeUndefined()
+      expect(tuneinResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore the follow button', () => {
@@ -74,16 +79,17 @@ describe('tuneinResolveEmbed', () => {
       expect(tuneinResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a guide id with trailing letters', () => {
+    it('should use a malformed guide id as written, even if the player answers an error', () => {
       const value = 'https://tunein.com/embed/player/s285269abc/'
+      const expected: EmbedResolverResult = {
+        provider: 'tunein',
+        id: 's285269abc',
+        src: 'https://tunein.com/embed/player/s285269abc/',
+        url: 'https://tunein.com/radio/s285269abc/',
+        thumbnail: 'https://cdn-radiotime-logos.tunein.com/s285269abcd.png',
+      }
 
-      expect(tuneinResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a guide id with leading letters', () => {
-      const value = 'https://tunein.com/embed/player/as285269/'
-
-      expect(tuneinResolveEmbed(value)).toBeUndefined()
+      expect(tuneinResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore a guide id whose kind letter is a separator', () => {

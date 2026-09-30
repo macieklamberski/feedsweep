@@ -1,23 +1,23 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 
 const provider = 'issuu'
 
 import { attr } from '../utils/dom.js'
-import { composeQuery, digitsRegex, isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const issuuHosts = ['issuu.com']
 
-// A config id is a pair of counters, `1016421/47623369`, addressing the reader through the url
-// hash, and a publisher and document name pair addresses it through the query.
-const configIdRegex = /^\d+\/\d+$/
+// `issuu.com/{publisher}/docs/{document}/s/{story}` names a story, not a page, in the page's
+// position.
+const storyRoute = 's'
 
 // Only `embed.html` is minted: `anonymous-embed.html` answers 403 for every document.
 const embedPaths = ['embed.html', 'anonymous-embed.html']
 
 const composeConfigEmbed = (configId: string | undefined): EmbedResolverResult | undefined => {
-  if (!configId || !configIdRegex.test(configId)) {
+  if (!configId) {
     return
   }
 
@@ -39,8 +39,7 @@ const composeDocumentEmbed = (
     return
   }
 
-  const safePage = page && digitsRegex.test(page) ? { p: page } : undefined
-  const query = composeQuery({ u: publisher, d: documentName, ...safePage })
+  const query = composeQuery(trimObject({ u: publisher, d: documentName, p: page }))
 
   return {
     provider,
@@ -64,7 +63,7 @@ const readDocumentUrl = (url: string): EmbedResolverResult | undefined => {
     return
   }
 
-  return composeDocumentEmbed(publisher, documentName, page)
+  return composeDocumentEmbed(publisher, documentName, page === storyRoute ? undefined : page)
 }
 
 // Issuu ships a document as an empty div only its `embed.js` loader hydrates into the reader.

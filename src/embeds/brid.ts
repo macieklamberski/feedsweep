@@ -7,8 +7,8 @@ import { createMarkupEmbedResolver } from '../utils/widgets.js'
 // `_bp.push({"div": "Brid_{n}", "obj": {...}})`. `id` is the player, `video` the video, and the
 // title is percent-encoded.
 const containerIdRegex = /Brid_[\w-]+/g
-const playerIdRegex = /"id"\s*:\s*"?(\d+)"?/
-const videoIdRegex = /"video"\s*:\s*"?(\d+)"?/
+const playerIdRegex = /"id"\s*:\s*"?([^",}\s]+)"?/
+const videoIdRegex = /"video"\s*:\s*"?([^",}\s]+)"?/
 const titleRegex = /"title"\s*:\s*"([^"]+)"/
 const widthRegex = /"width"\s*:\s*"?(\d+)"?/
 const heightRegex = /"height"\s*:\s*"?(\d+)"?/

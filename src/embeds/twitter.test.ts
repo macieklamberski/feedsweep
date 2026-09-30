@@ -327,22 +327,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id that is not numeric', async () => {
-      const value = html`
-        <blockquote
-          class="twitter-tweet"
-          data-twitter-tweet-id="../evil"
-        >
-          <p>Text.</p>
-        </blockquote>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    // A block copied between platforms carries several generations of the attribute, and only
-    // the later one is intact, so each is validated rather than the first present one winning.
-    it('should read a later id attribute when an earlier one is malformed', async () => {
+    it('should use the first id attribute present as written, even if the player answers an error', async () => {
       const value = html`
         <blockquote
           class="twitter-tweet"
@@ -354,8 +339,8 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'twitter',
-        id: statusId,
-        src: `https://platform.twitter.com/embed/Tweet.html?id=${statusId}`,
+        id: '../evil',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=..%2Fevil',
         description: 'Text.',
       }
 

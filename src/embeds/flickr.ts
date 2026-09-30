@@ -21,8 +21,8 @@ const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/
 
 // A group and a photostream each resolve by NSID and only by NSID: the player answers 200 for
 // `groups/{nsid}` and for `photostreams/{nsid}`, and 404 for a path alias in either position.
-// Feeds spell `group_id` as an NSID in every non-mangled occurrence.
-const safeNsidRegex = /^\d+@N\d\d$/
+// An NSID carries `@N` and an alias never does.
+const nsidRegex = /@N/
 
 // What a carrier names, whichever carrier and whichever spelling: an album needs its set, a
 // group pool its NSID, a photostream only its owner.
@@ -147,7 +147,7 @@ const readLegacySubject = (parsed: URL): FlickrSubject => {
 // Only the path alias is a name. The NSID spelling of the same owner names nobody a reader
 // could read.
 const readOwnerAlias = (owner: string | undefined): string | undefined => {
-  return owner && !safeNsidRegex.test(owner) ? owner : undefined
+  return owner && !nsidRegex.test(owner) ? owner : undefined
 }
 
 // Flickr's own page player, `/photos/{owner}/{photoId}/player/`, optionally with the browsing
@@ -189,28 +189,31 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   const owner = subject.owner
   const author = readOwnerAlias(owner)
 
-  if (subject.setId && digitsRegex.test(subject.setId)) {
-    // The album page path starts with the owner. `/sets/{id}` is still served and does not
-    // redirect to `/albums/`, while the `/albums/` player redirects to `/sets/` (2026-09-29).
-    return owner
-      ? {
-          provider: 'flickr',
-          // The album's key-free oEmbed needs `{owner}/{setId}`: a title, an author, a thumbnail.
-          id: `${owner}/${subject.setId}`,
-          src: composeAlbumPlayer(subject.setId),
-          url: `https://www.flickr.com/photos/${owner}/sets/${subject.setId}`,
-          author,
-        }
-      : {
-          provider: 'flickr',
-          // Addresses the player but not oEmbed.
-          id: `photosets/${subject.setId}`,
-          src: composeAlbumPlayer(subject.setId),
-          url: composeShortAlbumUrl(subject.setId),
-        }
+  // The album page path starts with the owner. `/sets/{id}` is still served and does not
+  // redirect to `/albums/`, while the `/albums/` player redirects to `/sets/` (2026-09-29).
+  if (subject.setId && owner) {
+    return {
+      provider: 'flickr',
+      // The album's key-free oEmbed needs `{owner}/{setId}`: a title, an author, a thumbnail.
+      id: `${owner}/${subject.setId}`,
+      src: composeAlbumPlayer(subject.setId),
+      url: `https://www.flickr.com/photos/${owner}/sets/${subject.setId}`,
+      author,
+    }
   }
 
-  if (subject.groupId && safeNsidRegex.test(subject.groupId)) {
+  // The short url spells the set id in base58, which only a numeric id has.
+  if (subject.setId && digitsRegex.test(subject.setId)) {
+    return {
+      provider: 'flickr',
+      // Addresses the player but not oEmbed.
+      id: `photosets/${subject.setId}`,
+      src: composeAlbumPlayer(subject.setId),
+      url: composeShortAlbumUrl(subject.setId),
+    }
+  }
+
+  if (subject.groupId && nsidRegex.test(subject.groupId)) {
     return {
       provider: 'flickr',
       id: `groups/${subject.groupId}`,
@@ -226,7 +229,7 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
       provider: 'flickr',
       id: `photostreams/${owner}`,
       // embedr 404s on an alias, so only an NSID goes there.
-      src: safeNsidRegex.test(owner) ? composeStreamPlayer(owner) : composeAliasStreamPlayer(owner),
+      src: nsidRegex.test(owner) ? composeStreamPlayer(owner) : composeAliasStreamPlayer(owner),
       url: `https://www.flickr.com/photos/${owner}/`,
       author,
     }

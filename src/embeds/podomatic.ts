@@ -19,10 +19,6 @@ const html5Heights = toMap({
 // what Podomatic's own snippet writes on all 11 frames in the corpus, and it sits between the two.
 const currentHeight = 205
 
-// episode and podcast are the two kinds PodOmatic answers, and anything else under embed/html5
-// answers 404.
-const html5KindRegex = /^[a-z]+$/
-
 type Player = { kind: string; id: string; src: string; height: number }
 
 const readPlayer = (url: URL): Player | undefined => {
@@ -33,12 +29,13 @@ const readPlayer = (url: URL): Player | undefined => {
   }
 
   // `embed/html5/{episode|podcast}/{id}`, with an optional `style` selecting one of three
-  // player shapes. The style is kept because it is what chose the height.
-  if (segments[1] === 'html5' && html5KindRegex.test(segments[2] ?? '')) {
+  // player shapes. The style is kept because it is what chose the height. Any other kind answers
+  // 404.
+  if (segments[1] === 'html5' && segments[2]) {
     const style = url.searchParams.get('style') ?? ''
     const named = html5Heights.has(style) ? style : 'normal'
     const query = named === 'normal' ? '' : `?style=${named}`
-    const kind = segments[2] as string
+    const kind = segments[2]
     const id = segments[3] ?? ''
 
     return {

@@ -2,7 +2,7 @@ import type { Nullish } from 'trousse'
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches, paramValue } from '../utils/dom.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brightcove'
@@ -65,10 +65,9 @@ const composePlayerUrl = (
   player = 'default',
   embed = 'default',
 ): string => {
-  // Unescaped, `data-player="../../999999/stolen"` names another account's player.
-  const segment = `${encodeURIComponent(player)}_${encodeURIComponent(embed)}`
+  const query = composeQuery({ videoId })
 
-  return `https://players.brightcove.net/${account}/${segment}/index.html?videoId=${videoId}`
+  return `https://players.brightcove.net/${account}/${player}_${embed}/index.html${query}`
 }
 
 // Brightcove's in-page embed: a bare <video-js> or video element only its loader script fills.
@@ -87,9 +86,7 @@ export const brightcoveVideoJsEmbedResolver = createMarkupEmbedResolver(
     // could have chosen, so the id shape is all this carrier has to go on. The inference is safe
     // in practice too: nearly every feed carrying the element also ships the loader script.
     const videoId = keepIfMatches(attr(element, 'data-video-id'), brightcoveIdRegex)
-    const account = videoId
-      ? keepIfMatches(readPlayerAccount(element), brightcoveIdRegex)
-      : undefined
+    const account = videoId ? readPlayerAccount(element) : undefined
 
     if (!videoId || !account) {
       return
@@ -123,13 +120,11 @@ const brightcoveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const params = config ? new URLSearchParams(config) : undefined
   // `videoId` is the older spelling of `@videoPlayer`, and a few embeds put the flashVars set in
   // the url query.
-  const videoId = keepIfMatches(
+  const videoId =
     params?.get('@videoPlayer') ??
-      parsed.searchParams.get('@videoPlayer') ??
-      params?.get('videoId') ??
-      parsed.searchParams.get('videoId'),
-    digitsRegex,
-  )
+    parsed.searchParams.get('@videoPlayer') ??
+    params?.get('videoId') ??
+    parsed.searchParams.get('videoId')
   const account =
     parsed.searchParams.get('publisherID') ??
     params?.get('publisherID') ??
@@ -158,7 +153,7 @@ export const brightcoveFlashEmbedResolver = createUrlEmbedResolver(
 export const brightcoveExperienceEmbedResolver = createMarkupEmbedResolver(
   'object.BrightcoveExperience',
   (element) => {
-    const videoId = keepIfMatches(paramValue(element, '@videoplayer'), digitsRegex)
+    const videoId = paramValue(element, '@videoplayer')
     const account = videoId
       ? keepIfMatches(readPlayerKeyAccount(paramValue(element, 'playerkey')), digitsRegex)
       : undefined
@@ -199,16 +194,10 @@ export const brightcoveResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  // A reference id names the video for the account's own api, not the player, the same
-  // exclusion the Flash form makes.
-  if (!digitsRegex.test(videoId)) {
-    return
-  }
-
   return {
     provider,
     id: `${account}/${videoId}`,
-    src: `https://players.brightcove.net/${account}/${player}/index.html?videoId=${videoId}`,
+    src: `https://players.brightcove.net/${account}/${player}/index.html${composeQuery({ videoId })}`,
     title: attr(element, 'title'),
   }
 }

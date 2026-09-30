@@ -83,8 +83,7 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // A malformed config id must not block a resolution the second attribute can still supply.
-    it('should fall back to data-url when the config id is malformed', async () => {
+    it('should take a malformed config id over data-url, even if the player answers an error', async () => {
       const value = html`
         <div
           class="issuuembed"
@@ -94,9 +93,8 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'issuu',
-        id: 'ecosistemaurbano/paisaje_transversal',
-        src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal',
-        url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
+        id: 'not-a-config-id',
+        src: 'https://e.issuu.com/embed.html#not-a-config-id',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -104,37 +102,20 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a config id that is not a counter pair', async () => {
+    it('should use a malformed config id as written, even if the player answers an error', async () => {
       const value = html`
         <div
           class="issuuembed"
           data-configid="../evil/1"
         ></div>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: '../evil/1',
+        src: 'https://e.issuu.com/embed.html#../evil/1',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a config id behind a path step', async () => {
-      const value = html`
-        <div
-          class="issuuembed"
-          data-configid="../1016421/47623369"
-        ></div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a config id followed by a path step', async () => {
-      const value = html`
-        <div
-          class="issuuembed"
-          data-configid="1016421/47623369/.."
-        ></div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for an empty config id', async () => {
@@ -234,6 +215,22 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         provider: 'issuu',
         id: 'ecosistemaurbano/paisaje_transversal',
         src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal&p=7',
+        url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed page as written, even if the player answers an error', async () => {
+      const value = html`
+        <iframe
+          src="https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal&p=cover"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'ecosistemaurbano/paisaje_transversal',
+        src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal&p=cover',
         url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
       }
 
@@ -426,6 +423,19 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         provider: 'issuu',
         id: 'basilikimetatroulou/xyz_9_1_final',
         src: 'https://e.issuu.com/embed.html?u=basilikimetatroulou&d=xyz_9_1_final&p=1',
+        url: 'https://issuu.com/basilikimetatroulou/docs/xyz_9_1_final',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read the story route as a page', async () => {
+      const value =
+        '<iframe src="https://issuu.com/basilikimetatroulou/docs/xyz_9_1_final/s/12345"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'basilikimetatroulou/xyz_9_1_final',
+        src: 'https://e.issuu.com/embed.html?u=basilikimetatroulou&d=xyz_9_1_final',
         url: 'https://issuu.com/basilikimetatroulou/docs/xyz_9_1_final',
       }
 

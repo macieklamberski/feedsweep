@@ -5,8 +5,7 @@ import { createMarkupEmbedResolver } from '../utils/widgets.js'
 // Without /iframe the route answers 200 but is served x-frame-options: SAMEORIGIN.
 // A fabricated id answers 404 on the /iframe route.
 const composeEmbedUrl = (videoId: string): string => {
-  // The div carrier's id goes in as written: unescaped, ../../evil names another page.
-  return `https://embed.mediavine.com/videos/${encodeURIComponent(videoId)}/iframe`
+  return `https://embed.mediavine.com/videos/${videoId}/iframe`
 }
 
 // Mediavine ships a video as an empty div.mv-video-target its script builds into a player.

@@ -42,12 +42,23 @@ const readPost = (value: string | undefined): EmbedResolverResult | undefined =>
   return composePost(match[1], match[2])
 }
 
+// The attribute holds only the `{channel}/{id}` pair, so no route word can stand in either half.
+const readDeclaredPost = (value: string | undefined): EmbedResolverResult | undefined => {
+  const [channel, messageId, ...rest] = value?.split('/') ?? []
+
+  if (!channel || !messageId || rest.length) {
+    return
+  }
+
+  return composePost(channel, messageId)
+}
+
 // Telegram ships a post as a bare <script data-telegram-post> whose widget.js builds the iframe.
 // Feeds carrying the script almost never hold a t.me iframe anywhere.
 export const telegramScriptEmbedResolver = createMarkupEmbedResolver(
   'script[data-telegram-post]',
   (element) => {
-    const result = readPost(attr(element, 'data-telegram-post'))
+    const result = readDeclaredPost(attr(element, 'data-telegram-post'))
 
     if (!result) {
       return

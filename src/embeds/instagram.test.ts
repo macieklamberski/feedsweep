@@ -1056,6 +1056,18 @@ describe('instagramResolveEmbed', () => {
     expect(instagramResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should use a malformed shortcode as written, even if the player answers an error', () => {
+    const value = 'https://www.instagram.com/p/abc.def/embed/'
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/abc.def',
+      src: 'https://www.instagram.com/p/abc.def/embed/',
+      url: 'https://www.instagram.com/p/abc.def/',
+    }
+
+    expect(instagramResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should read the legacy short host', () => {
     const value = 'https://instagr.am/p/CaUsPbUquKV/'
     const expected: EmbedResolverResult = {

@@ -1,14 +1,11 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
+import { attr, parsePixelSize } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podbean'
-
-// The `-pb` suffix is real: the v2 player appends it to its own ids.
-const safeIdRegex = /^[a-z0-9]+-[a-z0-9]+(?:-pb)?$/i
 
 const podbeanHosts = ['podbean.com']
 
@@ -26,15 +23,17 @@ export const extractPodbeanId = (link: string): string | undefined => {
   }
 
   const segments = getPathSegments(parsed)
+
   // `/media/player/{id}` is the legacy form, `/player-v2/?i={id}` the current one.
   // /media/player/{id} 301s to /player-v2/?i={id}-pb for a real id and 404s an invented one, while
   // the v2 player answers 200 to any id.
-  const id =
-    segments[0] === 'media' && segments[1] === 'player'
-      ? segments[2]
-      : (parsed.searchParams.get('i') ?? undefined)
+  if (segments[0] === 'media' && segments[1] === 'player') {
+    return segments[2]
+  }
 
-  return keepIfMatches(id, safeIdRegex)
+  if (segments[0] === 'player-v2') {
+    return parsed.searchParams.get('i') ?? undefined
+  }
 }
 
 export const podbeanResolveEmbed: ResolveEmbed = (url, element) => {
@@ -53,7 +52,7 @@ export const podbeanResolveEmbed: ResolveEmbed = (url, element) => {
   return {
     provider,
     id,
-    src: `https://www.podbean.com/player-v2/?i=${id}`,
+    src: `https://www.podbean.com/player-v2/${composeQuery({ i: id })}`,
     height,
     title,
   }

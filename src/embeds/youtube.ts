@@ -317,9 +317,7 @@ export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
     }
 
     // FC2's iframe snippet also carries the id as `data-id`, which the shell never reads.
-    const videoId = [parsed.searchParams.get('id'), attr(element, 'data-id')].find(
-      (candidate) => candidate && isVideoId(candidate),
-    )
+    const videoId = [parsed.searchParams.get('id'), attr(element, 'data-id')].find(Boolean)
 
     if (!videoId) {
       return

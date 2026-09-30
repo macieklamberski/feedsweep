@@ -118,6 +118,25 @@ describeForEachParser('bridEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should use malformed ids as written, even if the player answers an error', async () => {
+      const value = html`
+        <div
+          id="Brid_3"
+          class="brid"
+        ></div>
+        <script type="text/javascript">
+          $bp("Brid_3", {"id":"26602a","video":"x755958"});
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brid',
+        id: '26602a/x755958',
+        src: 'https://services.brid.tv/services/iframe/video/x755958/26602a',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

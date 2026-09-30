@@ -1,10 +1,7 @@
 import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { composeQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, digitsRegex, isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-
-// The letters keep NPR's bare story number, written into ?e=, from reading as an episode.
-const safeEpisodeIdRegex = /^[A-Z]+\d+$/i
 
 const megaphoneHosts = ['megaphone.fm']
 
@@ -33,7 +30,8 @@ export const extractMegaphoneEmbed = (
       continue
     }
 
-    if (param === 'e' && !safeEpisodeIdRegex.test(id)) {
+    // NPR writes its bare story number into ?e=, and an episode id opens with letters.
+    if (param === 'e' && digitsRegex.test(id)) {
       continue
     }
 

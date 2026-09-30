@@ -25,7 +25,7 @@ const sitePathSegments = new Set(['challenge', 'developer', 'share', 'stories'])
 
 // The account names the poster, not the post, so it is matched and dropped.
 // `tv` is the retired IGTV route and `reels` the plural spelling of the reel.
-const postPathRegex = /^\/(?:([A-Za-z0-9_.]+)\/)?(p|reel|reels|tv)\/([A-Za-z0-9_-]+)/
+const postPathRegex = /^\/(?:([A-Za-z0-9_.]+)\/)?(p|reel|reels|tv)\/([^/]+)/
 
 type Post = { kind: string; shortcode: string }
 

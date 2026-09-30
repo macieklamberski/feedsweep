@@ -25,15 +25,8 @@ describe('extractPodbeanId', () => {
     expect(extractPodbeanId(value)).toBeUndefined()
   })
 
-  // The query decodes `i`, and the id is composed back into the minted `?i=`.
-  it('should return undefined for an id with an encoded parameter before it', () => {
-    const value = 'https://www.podbean.com/player-v2/?i=wyvke%26x%3D1-1aefb6c-pb'
-
-    expect(extractPodbeanId(value)).toBeUndefined()
-  })
-
-  it('should return undefined for an id with an encoded parameter after it', () => {
-    const value = 'https://www.podbean.com/player-v2/?i=yx4hr-f3d1e1%26x%3D1'
+  it('should return undefined for an id query off the v2 player route', () => {
+    const value = 'https://www.podbean.com/site/about?i=yx4hr-f3d1e1'
 
     expect(extractPodbeanId(value)).toBeUndefined()
   })
@@ -78,6 +71,18 @@ describe('podbeanResolveEmbed', () => {
       id: 'wyvke-1aefb6c-pb',
       src: 'https://www.podbean.com/player-v2/?i=wyvke-1aefb6c-pb',
       height: 315,
+    }
+
+    expect(podbeanResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should use a malformed id as written, even if the player answers an error', () => {
+    const value = 'https://www.podbean.com/player-v2/?i=wyvke%26x%3D1-1aefb6c-pb'
+    const expected: EmbedResolverResult = {
+      provider: 'podbean',
+      id: 'wyvke&x=1-1aefb6c-pb',
+      src: 'https://www.podbean.com/player-v2/?i=wyvke%26x%3D1-1aefb6c-pb',
+      height: 150,
     }
 
     expect(podbeanResolveEmbed(value)).toEqual(expected)
