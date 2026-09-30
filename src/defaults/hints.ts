@@ -22,6 +22,7 @@ import { mixcloudRenderHint } from '../embeds/mixcloud.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
 import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
 import { omnyRenderHint } from '../embeds/omny.js'
+import { pbsRenderHint } from '../embeds/pbs.js'
 import { peertubeRenderHint } from '../embeds/peertube.js'
 import { podbeanRenderHint } from '../embeds/podbean.js'
 import { podigeeRenderHint } from '../embeds/podigee.js'
@@ -70,6 +71,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   notecomRenderHint,
   odnoklassnikiRenderHint,
   omnyRenderHint,
+  pbsRenderHint,
   peertubeRenderHint,
   podbeanRenderHint,
   podigeeRenderHint,
