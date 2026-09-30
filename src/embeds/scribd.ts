@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar, parseRatio } from '../utils/dom.js'
 import {
@@ -50,11 +50,12 @@ const readDocumentId = (parsed: URL): string | undefined => {
   // Feeds carry the same routes under `/mobile`, the mobile site's prefix.
   const [marker, document] = segments[0] === 'mobile' ? segments.slice(1) : segments
 
-  if (!marker || !documentIdMarkers.includes(marker)) {
+  if (!marker || !documentIdMarkers.includes(marker) || !document) {
     return
   }
 
-  return document
+  // Decoded here, like the Flash `document_id`, so the player url encodes it once.
+  return decodeSegment(document) ?? document
 }
 
 // The modern player, `scribd.com/embeds/{id}/content`. `/doc/{id}` is the pre-2018 spelling of

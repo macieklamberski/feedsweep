@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
@@ -8,6 +8,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'podbean'
 
 const podbeanHosts = ['podbean.com']
+
+// Route words that sit where the legacy player's episode id does: `audio/postId/{post}` and
+// `multi?playlist={list}` are other players.
+const legacyRouteWords = ['audio', 'multi']
 
 // The v2 player renders 150 behind both url forms, and the legacy markup states 122 for a player
 // Podbean retired.
@@ -28,7 +32,14 @@ export const extractPodbeanId = (link: string): string | undefined => {
   // /media/player/{id} 301s to /player-v2/?i={id}-pb for a real id and 404s an invented one, while
   // the v2 player answers 200 to any id.
   if (segments[0] === 'media' && segments[1] === 'player') {
-    return segments[2]
+    const id = segments[2]
+
+    if (segments.length !== 3 || !id || isAnyOf(id, legacyRouteWords)) {
+      return
+    }
+
+    // The path id moves into the v2 player's query, so it is decoded first.
+    return decodeSegment(id) ?? id
   }
 
   if (segments[0] === 'player-v2') {

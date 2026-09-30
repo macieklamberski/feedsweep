@@ -526,7 +526,7 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '1234567890/6098765432',
-        src: 'https://players.brightcove.net/1234567890/../../999999/stolen_default/index.html?videoId=6098765432',
+        src: 'https://players.brightcove.net/1234567890/..%2F..%2F999999%2Fstolen_default/index.html?videoId=6098765432',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -543,7 +543,7 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '1234567890/6098765432',
-        src: 'https://players.brightcove.net/1234567890/default_e?autoplay=1/index.html?videoId=6098765432',
+        src: 'https://players.brightcove.net/1234567890/default_e%3Fautoplay=1/index.html?videoId=6098765432',
       }
 
       expect(await extract(value)).toEqual(expected)

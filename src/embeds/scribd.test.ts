@@ -12,6 +12,20 @@ import {
 describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, scribdIframeEmbedResolver)
 
+  describe('path values', () => {
+    it('should encode a path document id once', async () => {
+      const value = '<iframe src="https://www.scribd.com/embeds/12%203/content"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'scribd',
+        id: '12 3',
+        src: 'https://www.scribd.com/embeds/12%203/content',
+        url: 'https://www.scribd.com/document/12%203',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   describe('the current share-panel iframe', () => {
     // The snippet states height="500" for every document. The ratio beside it is the one that
     // describes this document, so the placeholder carries the ratio instead.

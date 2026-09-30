@@ -66,10 +66,11 @@ const composePlayerUrl = (
   embed = 'default',
 ): string => {
   const query = composeQuery({ videoId })
-  // The Flash `publisherID` comes out of a query decoded.
-  const accountSegment = encodePathSegment(account)
+  // Each part stays in its own segment: unescaped, `data-player="../../999999/stolen"` names
+  // another account's player, and the Flash `publisherID` comes out of a query decoded.
+  const segment = `${encodePathSegment(player)}_${encodePathSegment(embed)}`
 
-  return `https://players.brightcove.net/${accountSegment}/${player}_${embed}/index.html${query}`
+  return `https://players.brightcove.net/${encodePathSegment(account)}/${segment}/index.html${query}`
 }
 
 // Brightcove's in-page embed: a bare <video-js> or video element only its loader script fills.

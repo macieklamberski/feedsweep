@@ -1,11 +1,12 @@
+import { decodeSegment } from 'trousse'
 import { attr, parseRatio } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
 // Without /iframe the route answers 200 but is served x-frame-options: SAMEORIGIN.
 // A fabricated id answers 404 on the /iframe route.
 const composeEmbedUrl = (videoId: string): string => {
-  return `https://embed.mediavine.com/videos/${videoId}/iframe`
+  return `https://embed.mediavine.com/videos/${encodePathSegment(videoId)}/iframe`
 }
 
 // Mediavine ships a video as an empty div.mv-video-target its script builds into a player.
@@ -62,7 +63,8 @@ export const mediavineScriptEmbedResolver = createMarkupEmbedResolver(
     return {
       provider: 'mediavine',
       id: videoId,
-      src: composeEmbedUrl(videoId),
+      // The script path id is decoded, like the div's attribute, so the player url encodes it once.
+      src: composeEmbedUrl(decodeSegment(videoId) ?? videoId),
       ratio,
     }
   },
