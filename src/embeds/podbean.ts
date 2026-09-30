@@ -2,7 +2,7 @@ import { getPathSegments, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { isMediaFile, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, isMediaFile, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podbean'
@@ -15,6 +15,10 @@ const podbeanHosts = ['podbean.com']
 // The v2 player renders 150 behind both url forms, and the legacy markup states 122 for a player
 // Podbean retired.
 const defaultPlayerHeight = 150
+// The mini bar is 70 at any width. The square card fills its box, so it takes the 400 that
+// Podbean's own share snippet gives it.
+const miniPlayerHeight = 70
+const squarePlayerHeight = 400
 
 export const extractPodbeanId = (link: string): string | undefined => {
   const parsed = parseUrl(link, placeholderBaseUrl)
@@ -49,6 +53,22 @@ const displayParams = [
   'logo_link',
 ]
 
+// The layout picks which player loads, so it stays in the player url. Any non-zero number turns
+// one on, and `mini` wins over `square`.
+const layoutParams = ['square', 'mini', 'mini-only-play']
+
+const readLayoutHeight = (query: URLSearchParams): number => {
+  if (Number.parseInt(query.get('mini') ?? '', 10)) {
+    return miniPlayerHeight
+  }
+
+  if (Number.parseInt(query.get('square') ?? '', 10)) {
+    return squarePlayerHeight
+  }
+
+  return defaultPlayerHeight
+}
+
 export const podbeanResolveEmbed: ResolveEmbed = (url, element) => {
   const id = extractPodbeanId(url)
 
@@ -57,8 +77,8 @@ export const podbeanResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const search = parseUrl(url, placeholderBaseUrl)?.search ?? ''
-  const stated = new URLSearchParams(search).get('size')
-  const height = parsePixelSize(stated) ?? defaultPlayerHeight
+  const query = new URLSearchParams(search)
+  const height = parsePixelSize(query.get('size')) ?? readLayoutHeight(query)
   const title = attr(element, 'title')
 
   // api.podbean.com/v1/oembed answers key-free with no title, thumbnail or author, only the
@@ -66,7 +86,7 @@ export const podbeanResolveEmbed: ResolveEmbed = (url, element) => {
   return {
     provider,
     id,
-    src: `https://www.podbean.com/player-v2/?i=${id}`,
+    src: `https://www.podbean.com/player-v2/${composeQuery({ i: id, ...pickQueryParams(search, layoutParams) })}`,
     params: pickQueryParams(search, displayParams),
     height,
     ...trimObject({ title }, Boolean),

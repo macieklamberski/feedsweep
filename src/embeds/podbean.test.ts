@@ -86,6 +86,81 @@ describe('podbeanResolveEmbed', () => {
     expect(podbeanResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should keep the square layout and take the size it states', () => {
+    const value =
+      'https://www.podbean.com/player-v2/?from=embed&i=c5bz9-112428c-pb&square=1&share=1&download=1&fonts=Arial&skin=1&font-color=auto&rtl=0&logo_link=episode_page&btn-skin=7&size=300'
+    const expected: EmbedResolverResult = {
+      provider: 'podbean',
+      id: 'c5bz9-112428c-pb',
+      src: 'https://www.podbean.com/player-v2/?i=c5bz9-112428c-pb&square=1',
+      params: {
+        skin: '1',
+        'btn-skin': '7',
+        fonts: 'Arial',
+        'font-color': 'auto',
+        rtl: '0',
+        share: '1',
+        download: '1',
+        logo_link: 'episode_page',
+      },
+      height: 300,
+    }
+
+    expect(podbeanResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should state the square card at the height of its share snippet', () => {
+    const value = 'https://www.podbean.com/player-v2/?i=c5bz9-112428c-pb&square=1'
+    const expected: EmbedResolverResult = {
+      provider: 'podbean',
+      id: 'c5bz9-112428c-pb',
+      src: 'https://www.podbean.com/player-v2/?i=c5bz9-112428c-pb&square=1',
+      params: {},
+      height: 400,
+    }
+
+    expect(podbeanResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should state the mini bar at its own height', () => {
+    const value = 'https://www.podbean.com/player-v2/?i=m8ipg-1378b2f-pb&mini=1&mini-only-play=1'
+    const expected: EmbedResolverResult = {
+      provider: 'podbean',
+      id: 'm8ipg-1378b2f-pb',
+      src: 'https://www.podbean.com/player-v2/?i=m8ipg-1378b2f-pb&mini=1&mini-only-play=1',
+      params: {},
+      height: 70,
+    }
+
+    expect(podbeanResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should load the mini bar over the square card', () => {
+    const value = 'https://www.podbean.com/player-v2/?i=m8ipg-1378b2f-pb&square=1&mini=1'
+    const expected: EmbedResolverResult = {
+      provider: 'podbean',
+      id: 'm8ipg-1378b2f-pb',
+      src: 'https://www.podbean.com/player-v2/?i=m8ipg-1378b2f-pb&square=1&mini=1',
+      params: {},
+      height: 70,
+    }
+
+    expect(podbeanResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep a layout switched off as written', () => {
+    const value = 'https://www.podbean.com/player-v2/?i=m8ipg-1378b2f-pb&square=0'
+    const expected: EmbedResolverResult = {
+      provider: 'podbean',
+      id: 'm8ipg-1378b2f-pb',
+      src: 'https://www.podbean.com/player-v2/?i=m8ipg-1378b2f-pb&square=0',
+      params: {},
+      height: 150,
+    }
+
+    expect(podbeanResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should ignore a podbean url naming no episode', () => {
     const value = 'https://www.podbean.com/pricing'
 
