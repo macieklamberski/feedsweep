@@ -83,6 +83,19 @@ describe('cnbcResolveEmbed', () => {
       expect(cnbcResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should mint the share snippet player over a malformed player name', () => {
+      const value =
+        'https://player.cnbc.com/p/gZWlPC/cnbc_global%3Fsrc%3Devil.test?playertype=synd&byGuid=7000344703'
+      const expected: EmbedResolverResult = {
+        provider: 'cnbc',
+        id: '7000344703',
+        src: 'https://player.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&byGuid=7000344703',
+        ratio: '16/9',
+      }
+
+      expect(cnbcResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should return undefined for the player path on another cnbc.com host', () => {
       const value = 'https://www.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&byGuid=7000344703'
 
