@@ -54,11 +54,14 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
   // A refused `i` is dropped from the player url as well: the resolver does not forward a value
   // it would not put in the id, and the collection player is what the path names without it.
   const query = trackId ? pickUrlParams(url, ['i']) : ''
+  // A player on the embed host plays as written, with its locale and theme. A page url gets the
+  // player built.
+  const isPlayer = parsed.hostname.startsWith('embed.')
 
   return {
     provider: isPodcast ? 'applepodcasts' : 'applemusic',
     id: `${kind}/${id}`,
-    src: `https://embed.${host}${parsed.pathname}${query}`,
+    src: isPlayer ? url : `https://embed.${host}${parsed.pathname}${query}`,
     url: `https://${host}${parsed.pathname}${query}`,
     height: appleHeights.get(trackId ? 'song' : kind),
   }
