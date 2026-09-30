@@ -93,15 +93,73 @@ describe('extractOmnyClip', () => {
 })
 
 describe('omnyResolveEmbed', () => {
-  // 180 was measured on players carrying these, so dropping one would state a height for a
-  // player nobody asked for.
-  it('should state the player height and keep the display options', () => {
+  it('should drop the default audio rendering with the display options', () => {
     const value =
       'https://omny.fm/shows/the-show/an-episode/embed?media=audio&size=wide&style=cover'
     const expected: EmbedResolverResult = {
       provider: 'omny',
       id: 'the-show/an-episode',
-      src: 'https://omny.fm/shows/the-show/an-episode/embed?media=audio&size=wide&style=cover',
+      src: 'https://omny.fm/shows/the-show/an-episode/embed',
+      height: 180,
+    }
+
+    expect(omnyResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should give the video rendering its own shape', () => {
+    const value = 'https://omny.fm/shows/the-show/an-episode/embed?media=Video'
+    const expected: EmbedResolverResult = {
+      provider: 'omny',
+      id: 'the-show/an-episode',
+      src: 'https://omny.fm/shows/the-show/an-episode/embed?media=Video',
+      ratio: '16/9',
+    }
+
+    expect(omnyResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read the video rendering in any case', () => {
+    const value = 'https://omny.fm/shows/the-show/an-episode/embed?media=video'
+    const expected: EmbedResolverResult = {
+      provider: 'omny',
+      id: 'the-show/an-episode',
+      src: 'https://omny.fm/shows/the-show/an-episode/embed?media=video',
+      ratio: '16/9',
+    }
+
+    expect(omnyResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should drop the square layout and the artwork style', () => {
+    const value = 'https://omny.fm/shows/the-show/an-episode/embed?style=artwork&size=Square'
+    const expected: EmbedResolverResult = {
+      provider: 'omny',
+      id: 'the-show/an-episode',
+      src: 'https://omny.fm/shows/the-show/an-episode/embed',
+      height: 180,
+    }
+
+    expect(omnyResolveEmbed(value)).toEqual(expected)
+  })
+
+  // The list under the player grows with the playlist, so no height fits it.
+  it('should state no size for a playlist', () => {
+    const value = 'https://omny.fm/shows/the-show/playlists/highlights/embed?style=cover'
+    const expected: EmbedResolverResult = {
+      provider: 'omny',
+      id: 'the-show/playlists/highlights',
+      src: 'https://omny.fm/shows/the-show/playlists/highlights/embed',
+    }
+
+    expect(omnyResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should size a clip whose slug is the playlists word', () => {
+    const value = 'https://omny.fm/shows/the-show/playlists/embed'
+    const expected: EmbedResolverResult = {
+      provider: 'omny',
+      id: 'the-show/playlists',
+      src: 'https://omny.fm/shows/the-show/playlists/embed',
       height: 180,
     }
 
@@ -128,7 +186,7 @@ describe('omnyResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'omny',
       id: 'the-show/an-episode',
-      src: 'https://omny.fm/shows/the-show/an-episode/embed?style=cover',
+      src: 'https://omny.fm/shows/the-show/an-episode/embed',
       height: 180,
     }
 
@@ -152,7 +210,7 @@ describeForEachParser('omnyEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'omny',
         id: 'the-show/an-episode',
-        src: 'https://omny.fm/shows/the-show/an-episode/embed?style=cover',
+        src: 'https://omny.fm/shows/the-show/an-episode/embed',
         height: 180,
       }
 
@@ -179,6 +237,72 @@ describeForEachParser('omnyEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('playlists', () => {
+    it('should keep the box the carrier states', async () => {
+      const value = html`
+        <iframe
+          src="https://omny.fm/shows/the-show/playlists/highlights/embed"
+          width="100%"
+          height="600"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'omny',
+        id: 'the-show/playlists/highlights',
+        src: 'https://omny.fm/shows/the-show/playlists/highlights/embed',
+        height: 600,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('the snippets publishers wrote', () => {
+    it('should keep the start and drop a width the player does not take', async () => {
+      const value = html`
+        <iframe
+          class="zpiframe "
+          src="https://omny.fm/shows/the-shift/chris-parry-ceo-of-equity-guru-talks-to-us-about-a/embed?t=41m45s"
+          width="320"
+          height="180"
+          align="left"
+          frameBorder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'omny',
+        id: 'the-shift/chris-parry-ceo-of-equity-guru-talks-to-us-about-a',
+        src: 'https://omny.fm/shows/the-shift/chris-parry-ceo-of-equity-guru-talks-to-us-about-a/embed?t=41m45s',
+        height: 180,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the style the dialog wrote', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          allow="autoplay; clipboard-write"
+          frameborder="0"
+          height="180"
+          src="https://omny.fm/shows/cjad-800/mulcair-what-was-going-on-with-bernard-drainville/embed?style=Cover"
+          title="Mulcair: what was going on with Bernard Drainville?"
+          width="100%"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'omny',
+        id: 'cjad-800/mulcair-what-was-going-on-with-bernard-drainville',
+        src: 'https://omny.fm/shows/cjad-800/mulcair-what-was-going-on-with-bernard-drainville/embed',
+        height: 180,
+        title: 'Mulcair: what was going on with Bernard Drainville?',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   describe('sad paths', () => {
     // The carrier selector matches every iframe, so the host gate is the only thing that turns
     // this away, and a lookalike is the specimen that reaches it: host matching admits subdomains.
@@ -191,9 +315,8 @@ describeForEachParser('omnyEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    // 180 is what the markup usually states and what Omny's own oEmbed answers, but a publisher
-    // who stated a box of their own outranks it.
-    it('should take the size the carrier states over the player height', async () => {
+    // A box the publisher stated was drawn for a layout the mint may have dropped.
+    it("should give the player its own height over the carrier's box", async () => {
       const value = html`
         <iframe
           src="https://omny.fm/shows/the-show/an-episode/embed"
@@ -205,8 +328,7 @@ describeForEachParser('omnyEmbedResolver', (parseHtml) => {
         provider: 'omny',
         id: 'the-show/an-episode',
         src: 'https://omny.fm/shows/the-show/an-episode/embed',
-        width: 640,
-        height: 200,
+        height: 180,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -228,7 +350,7 @@ describeForEachParser('omny through the pipeline', (parseHtml) => {
     })
   }
 
-  it('should place the clip without the autoplay the publisher wrote', async () => {
+  it('should place the clip without the style and autoplay the publisher wrote', async () => {
     const value = html`
       <iframe
         src="https://omny.fm/shows/the-show/an-episode/embed?style=cover&autoplay=1"
@@ -236,7 +358,7 @@ describeForEachParser('omny through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://omny.fm/shows/the-show/an-episode/embed?style=cover"
+        data-embed-src="https://omny.fm/shows/the-show/an-episode/embed"
         data-embed-provider="omny"
         data-embed-id="the-show/an-episode"
         data-embed-height="180"
