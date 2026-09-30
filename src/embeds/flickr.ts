@@ -142,11 +142,17 @@ const readFlashPhoto = (element: Nullish<Element>): FlickrPhoto | undefined => {
   return { photoId, secret: secret ? encodePathSegment(secret) : undefined }
 }
 
+const trailingSlashesRegex = /\/+$/
+
 // The iframe carrier names its subject in its own query. A set is preferred where several
 // appear, being the narrowest of the three.
 const readLegacySubject = (parsed: URL): FlickrSubject => {
+  // Some feeds end the set id with the `/` of a path. A set id never holds one, so the trim
+  // repairs what the feed did.
+  const setId = parsed.searchParams.get('set_id')?.replace(trailingSlashesRegex, '')
+
   return {
-    setId: parsed.searchParams.get('set_id') ?? undefined,
+    setId: setId || undefined,
     owner: parsed.searchParams.get('user_id') ?? undefined,
     groupId: parsed.searchParams.get('group_id') ?? undefined,
   }
