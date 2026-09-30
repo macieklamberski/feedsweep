@@ -25,15 +25,17 @@ const playerHeight = 145
 // The show is the subdomain and the episode the first path segment, which together make a
 // stable id without parsing the query. The player url is the one Podigee's embed code writes, and
 // the `token` it can carry stays with it.
-const composeEmbed = (parsed: URL, episode: string): EmbedResolverResult => {
+// A show's own `/embed`, with no episode, plays its latest one and is keyed `{show}/embed`.
+const composeEmbed = (parsed: URL, episode?: string): EmbedResolverResult => {
   const show = parsed.hostname.split('.')[0]
   const token = parsed.searchParams.get('token') ?? undefined
   const query = composeQuery(trimObject({ context: 'external', token }, Boolean))
+  const path = episode ? `${episode}/embed` : 'embed'
 
   return {
     provider,
-    id: `${show}/${episode}`,
-    src: `https://${parsed.hostname}/${episode}/embed${query}`,
+    id: `${show}/${episode ?? 'embed'}`,
+    src: `https://${parsed.hostname}/${path}${query}`,
     height: playerHeight,
   }
 }
@@ -46,7 +48,14 @@ export const podigeeScriptEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     // The inline spellings, data-configuration="podigee" or "playerConfiguration", are not urls,
     // so they resolve against the placeholder host and fail the host check.
-    return podigeeResolveEmbed(attr(element, 'data-configuration') ?? '')
+    const configuration = attr(element, 'data-configuration') ?? ''
+    const parsed = parseUrlOnHosts(configuration, podigeeHosts)
+
+    if (parsed && showHostRegex.test(parsed.hostname) && parsed.pathname === '/embed') {
+      return composeEmbed(parsed)
+    }
+
+    return podigeeResolveEmbed(configuration)
   },
 )
 

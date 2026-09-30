@@ -38,6 +38,18 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should mint the show-level player, which plays the latest episode', async () => {
+      const value = script('https://theshow.podigee.io/embed?context=external')
+      const expected: EmbedResolverResult = {
+        provider: 'podigee',
+        id: 'theshow/embed',
+        src: 'https://theshow.podigee.io/embed?context=external',
+        height: 145,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should drop the campaign source from the player url', async () => {
       const value = script(
         'https://theshow.podigee.io/42-an-episode/embed?context=external&amp;source=spring-campaign',
@@ -64,6 +76,25 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
     it('should ignore an inline configuration reference', async () => {
       expect(await extract(script('podigee'))).toBeUndefined()
       expect(await extract(script('playerConfiguration'))).toBeUndefined()
+    })
+
+    // The company host answers `/embed` with a 301 to its marketing site.
+    it('should ignore the show-level player path on the company host', async () => {
+      const value = script('https://www.podigee.io/embed?context=external')
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an unnumbered page that does not name the player', async () => {
+      const value = script('https://theshow.podigee.io/about-the-show')
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the show-level player path', async () => {
+      const value = script('https://evil.test/embed?context=external')
+
+      expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the player path', async () => {
