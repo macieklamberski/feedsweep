@@ -62,7 +62,7 @@ export const readWidgetConfig = (source: string): WidgetConfig | undefined => {
   const et = readConfigValue(source, 'id')
   const sig = readConfigValue(source, 'sig')
 
-  if (!items || !digitsRegex.test(items) || !et || !sig) {
+  if (!items || !et || !sig) {
     return
   }
 
