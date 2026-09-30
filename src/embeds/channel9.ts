@@ -1,5 +1,5 @@
 import { decodeSegment, getPathSegments, isAnyOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { composeQuery } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -53,3 +53,11 @@ const channel9ResolveEmbed: ResolveEmbed = (url) => {
 // Microsoft Learn carries `x-frame-options: SAMEORIGIN`, while the embed page it ends on carries
 // neither that nor a `frame-ancestors` list.
 export const channel9EmbedResolver = createUrlEmbedResolver(channel9Hosts, channel9ResolveEmbed)
+
+// The embed page starts the video only on an `autoplay-request` message, and only when
+// `autoplay=true` is on its url. It posts nothing to say it is ready, so the message goes on load.
+export const channel9RenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: 'true' },
+  requestPlay: { type: 'autoplay-request' },
+}
