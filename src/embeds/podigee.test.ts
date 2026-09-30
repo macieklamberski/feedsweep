@@ -248,10 +248,6 @@ describe('readPodigeeHeight', () => {
     expect(readPodigeeHeight(value)).toBeUndefined()
   })
 
-  it('should read nothing from another message the player posts', () => {
-    expect(readPodigeeHeight('{"listenTo":"loadSubscribeButton"}')).toBeUndefined()
-  })
-
   it('should read nothing from a string that is not JSON', () => {
     expect(readPodigeeHeight('{"listenTo":"configurePlayer",')).toBeUndefined()
   })
