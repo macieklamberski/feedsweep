@@ -251,8 +251,9 @@ export const twitterResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
   const id = parsed && playerPaths.has(parsed.pathname) ? parsed.searchParams.get('id') : undefined
 
+  // A player frame plays as written, with its language and theme.
   if (id && digitsRegex.test(id)) {
-    return composeEmbed({ handle: '', id }, {})
+    return composeEmbed({ handle: '', id }, { src: url })
   }
 
   const status = readStatusUrl(url)
