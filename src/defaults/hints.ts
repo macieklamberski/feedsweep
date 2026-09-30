@@ -20,6 +20,7 @@ import { kalturaRenderHint } from '../embeds/kaltura.js'
 import { mailruRenderHint } from '../embeds/mailru.js'
 import { mastodonRenderHint } from '../embeds/mastodon.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
+import { neteaseRenderHint } from '../embeds/netease.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
 import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
 import { omnyRenderHint } from '../embeds/omny.js'
@@ -73,6 +74,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   mailruRenderHint,
   mastodonRenderHint,
   mixcloudRenderHint,
+  neteaseRenderHint,
   notecomRenderHint,
   odnoklassnikiRenderHint,
   omnyRenderHint,
