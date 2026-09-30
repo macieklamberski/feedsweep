@@ -104,7 +104,22 @@ describe('spreakerResolveEmbed', () => {
 describeForEachParser('spreakerIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, spreakerIframeEmbedResolver)
 
-  it('should take the episode name off the stated title', async () => {
+  // The old site-host route answers an error page in a frame, over http and https alike.
+  it('should move a player on the old site-host route to the current player', async () => {
+    const value =
+      '<iframe src="http://www.spreaker.com/embed/player/standard?episode_id=8308864"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'spreaker',
+      id: 'episode/8308864',
+      src: 'https://widget.spreaker.com/player?episode_id=8308864',
+      url: 'https://www.spreaker.com/episode/8308864',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should take the episode name off the stated title and keep the player url', async () => {
     const value = html`
       <iframe
         src="https://widget.spreaker.com/player?episode_id=52842990&theme=light"
@@ -114,7 +129,7 @@ describeForEachParser('spreakerIframeEmbedResolver', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'spreaker',
       id: 'episode/52842990',
-      src: 'https://widget.spreaker.com/player?episode_id=52842990',
+      src: 'https://widget.spreaker.com/player?episode_id=52842990&theme=light',
       url: 'https://www.spreaker.com/episode/52842990',
       height: 200,
       title: 'A Special Night In Beverly Hills',

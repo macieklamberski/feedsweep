@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
@@ -8,6 +8,10 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'spreaker'
 
 const spreakerHosts = ['spreaker.com']
+
+// The current player host. The old `www.spreaker.com/embed/player/{variant}` route answers an error
+// page in a frame, over http and https alike.
+const widgetHost = 'widget.spreaker.com'
 
 // An episode player, or a show player that plays the latest episode.
 const embedKinds = { episode_id: 'episode', show_id: 'show' } as const
@@ -45,13 +49,15 @@ export const spreakerResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const title = attr(element, 'title')
+  // A current player frame plays as written, with its playlist, theme and hide flags.
+  const isPlayerFrame = element?.localName === 'iframe' && isHostOf(url, [widgetHost])
 
   // Both kinds name a page that takes the bare id and redirects to its canonical slugged form,
   // `/episode/{id}` and `/show/{id}`, so the click target is the resource the player plays.
   return {
     provider,
     id: `${embed.kind}/${embed.id}`,
-    src: `https://widget.spreaker.com/player?${embed.param}=${embed.id}`,
+    src: isPlayerFrame ? url : `https://${widgetHost}/player?${embed.param}=${embed.id}`,
     url: `https://www.spreaker.com/${embed.kind}/${embed.id}`,
     height: playerHeight,
     title,
