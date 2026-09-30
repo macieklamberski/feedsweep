@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
@@ -10,6 +10,7 @@ const omnyHosts = ['omny.fm']
 
 // The boxes Omny's embed dialog writes: 180 tall for the wide audio player, 560 by 315 for the
 // video one. The square layout and the artwork style are dropped with the query that picked them.
+// A playlist grows with its list, so it states none.
 const audioHeight = 180
 const videoRatio = '16/9'
 
@@ -33,7 +34,8 @@ export const extractOmnyClip = (link: string): string | undefined => {
 }
 
 // media picks the audio or the video rendering of the clip, and t a position in it. style, size,
-// the colours and a publisher's autoplay are display and are left out.
+// the colours and a publisher's autoplay are display and are left out. `Audio` is the default
+// rendering, so only `Video` is written.
 const omnyEmbedParams = ['media', 't']
 
 export const omnyResolveEmbed: ResolveEmbed = (url, element) => {
@@ -43,17 +45,22 @@ export const omnyResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const params = pickQueryParams(parseUrl(url, placeholderBaseUrl)?.search ?? '', omnyEmbedParams)
+  const { media, t } = pickQueryParams(
+    parseUrl(url, placeholderBaseUrl)?.search ?? '',
+    omnyEmbedParams,
+  )
   // The player reads the value in any case.
-  const isVideo = params.media?.toLowerCase() === 'video'
+  const isVideo = media?.toLowerCase() === 'video'
+  const isPlaylist = clip.includes('/playlists/')
+  const query = composeQuery(trimObject({ media: isVideo ? media : undefined, t }))
   const title = attr(element, 'title')
 
   return {
     provider,
     id: clip,
-    src: `https://omny.fm/shows/${clip}/embed${composeQuery(params)}`,
-    height: isVideo ? undefined : audioHeight,
-    ratio: isVideo ? videoRatio : undefined,
+    src: `https://omny.fm/shows/${clip}/embed${query}`,
+    height: isVideo || isPlaylist ? undefined : audioHeight,
+    ratio: isVideo && !isPlaylist ? videoRatio : undefined,
     title,
   }
 }

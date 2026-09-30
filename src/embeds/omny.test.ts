@@ -93,13 +93,13 @@ describe('extractOmnyClip', () => {
 })
 
 describe('omnyResolveEmbed', () => {
-  it('should keep the rendering and drop the display options', () => {
+  it('should drop the default audio rendering with the display options', () => {
     const value =
       'https://omny.fm/shows/the-show/an-episode/embed?media=audio&size=wide&style=cover'
     const expected: EmbedResolverResult = {
       provider: 'omny',
       id: 'the-show/an-episode',
-      src: 'https://omny.fm/shows/the-show/an-episode/embed?media=audio',
+      src: 'https://omny.fm/shows/the-show/an-episode/embed',
       height: 180,
     }
 
@@ -136,6 +136,30 @@ describe('omnyResolveEmbed', () => {
       provider: 'omny',
       id: 'the-show/an-episode',
       src: 'https://omny.fm/shows/the-show/an-episode/embed',
+      height: 180,
+    }
+
+    expect(omnyResolveEmbed(value)).toEqual(expected)
+  })
+
+  // The list under the player grows with the playlist, so no height fits it.
+  it('should state no size for a playlist', () => {
+    const value = 'https://omny.fm/shows/the-show/playlists/highlights/embed?style=cover'
+    const expected: EmbedResolverResult = {
+      provider: 'omny',
+      id: 'the-show/playlists/highlights',
+      src: 'https://omny.fm/shows/the-show/playlists/highlights/embed',
+    }
+
+    expect(omnyResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should size a clip whose slug is the playlists word', () => {
+    const value = 'https://omny.fm/shows/the-show/playlists/embed'
+    const expected: EmbedResolverResult = {
+      provider: 'omny',
+      id: 'the-show/playlists',
+      src: 'https://omny.fm/shows/the-show/playlists/embed',
       height: 180,
     }
 
@@ -207,6 +231,26 @@ describeForEachParser('omnyEmbedResolver', (parseHtml) => {
         src: 'https://omny.fm/shows/the-show/an-episode/embed',
         height: 180,
         title: 'S5E10 Christmas Waltz',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('playlists', () => {
+    it('should keep the box the carrier states', async () => {
+      const value = html`
+        <iframe
+          src="https://omny.fm/shows/the-show/playlists/highlights/embed"
+          width="100%"
+          height="600"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'omny',
+        id: 'the-show/playlists/highlights',
+        src: 'https://omny.fm/shows/the-show/playlists/highlights/embed',
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
