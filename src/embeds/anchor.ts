@@ -33,23 +33,47 @@ export const extractAnchorEpisode = (link: string): string | undefined => {
   return `${show}/${episode}`
 }
 
-export const anchorResolveEmbed: ResolveEmbed = (url) => {
-  const episode = extractAnchorEpisode(url)
+// `anchor.fm/{show}/embed`, `podcasters.spotify.com/pod/show/{show}/embed`,
+// `creators.spotify.com/pod/profile/{show}/embed`.
+const extractAnchorShow = (link: string): string | undefined => {
+  const segments = getPathSegments(link)
 
-  if (!episode) {
+  if (segments.at(-1) !== 'embed') {
     return
   }
 
-  const [show, slug] = episode.split('/')
+  return segments.at(-2)
+}
 
-  // The player carries no metadata, and Anchor's old oEmbed endpoint is gone.
+// The player carries no metadata, and Anchor's old oEmbed endpoint is gone.
+export const anchorResolveEmbed: ResolveEmbed = (url) => {
+  const episode = extractAnchorEpisode(url)
+
+  if (episode) {
+    const [show, slug] = episode.split('/')
+
+    return {
+      provider: 'anchor',
+      id: episode,
+      src: `https://creators.spotify.com/pod/profile/${show}/embed/episodes/${slug}`,
+      height: playerHeight,
+    }
+  }
+
+  const show = extractAnchorShow(url)
+
+  if (!show) {
+    return
+  }
+
   return {
     provider: 'anchor',
-    id: episode,
-    src: `https://creators.spotify.com/pod/profile/${show}/embed/episodes/${slug}`,
+    id: show,
+    src: `https://creators.spotify.com/pod/profile/${show}/embed`,
     height: playerHeight,
   }
 }
 
-// Anchor's episode player iframe, on the anchor.fm host and the two Spotify hosts it became.
+// Anchor's episode and show player iframes, on the anchor.fm host and the two Spotify hosts it
+// became.
 export const anchorEmbedResolver = createUrlEmbedResolver(anchorHosts, anchorResolveEmbed)
