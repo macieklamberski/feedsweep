@@ -231,6 +231,20 @@ describe('dailymotionResolveEmbed', () => {
     expect(dailymotionResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should keep the loop of a player the publisher created', () => {
+    const value = 'https://geo.dailymotion.com/player/xiqhk.html?video=x8pq78m&loop=true'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x8pq78m',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8pq78m&loop=true',
+      url: 'https://www.dailymotion.com/video/x8pq78m',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8pq78m',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should drop the settings of a player the publisher created', () => {
     const value = 'https://geo.dailymotion.com/player/x8zbz.html?video=x83gvxa&mute=true'
     const expected: EmbedResolverResult = {

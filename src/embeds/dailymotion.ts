@@ -158,10 +158,10 @@ export const readDailymotionEmbedSrc = (link: string): string | undefined => {
   return videoId ? composeEmbedUrl('video', videoId) : undefined
 }
 
-// Where playback starts, and the playlist the video sits in. The rest of the publisher's
-// query is dropped with the rebuilt src.
+// Where playback starts, whether it loops, and the playlist the video sits in. The rest of the
+// publisher's query is dropped with the rebuilt src.
 // Neither player reads `autoplay` off the query: autostart comes from the saved configuration.
-const dailymotionEmbedParams = ['start', 'startTime', 'playlist']
+const dailymotionEmbedParams = ['start', 'startTime', 'loop', 'playlist']
 
 // A player id's player reads the start as `startTime` and ignores the old `start`.
 const readPlayerParams = (url: string): Record<string, string> => {
@@ -169,7 +169,7 @@ const readPlayerParams = (url: string): Record<string, string> => {
 
   return {
     ...trimObject(
-      { playlist: params.playlist, startTime: params.startTime ?? params.start },
+      { loop: params.loop, playlist: params.playlist, startTime: params.startTime ?? params.start },
       Boolean,
     ),
   }
