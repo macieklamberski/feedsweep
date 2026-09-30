@@ -237,6 +237,21 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
   })
 
   describe('the legacy slideshow iframe', () => {
+    it('should trim the path slash a feed left on the set id', async () => {
+      const value =
+        '<iframe src="http://www.flickr.com/slideShow/index.gne?user_id=24006738@N07&amp;set_id=72157627734131040/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: '24006738@N07/72157627734131040',
+        src: 'https://embedr.flickr.com/photosets/72157627734131040?width=400&height=300',
+        url: 'https://www.flickr.com/photos/24006738@N07/sets/72157627734131040',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should map a set slideshow onto the album player', async () => {
       const value = html`
         <iframe
