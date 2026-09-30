@@ -10,6 +10,7 @@ import { bridRenderHint } from '../embeds/brid.js'
 import { brightcoveRenderHint } from '../embeds/brightcove.js'
 import { buzzsproutRenderHint } from '../embeds/buzzsprout.js'
 import { captivateRenderHint } from '../embeds/captivate.js'
+import { ccmaRenderHint } from '../embeds/ccma.js'
 import { channel9RenderHint } from '../embeds/channel9.js'
 import { cloudflarestreamRenderHint } from '../embeds/cloudflarestream.js'
 import { cnnRenderHint } from '../embeds/cnn.js'
@@ -75,6 +76,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   brRenderHint,
   buzzsproutRenderHint,
   captivateRenderHint,
+  ccmaRenderHint,
   channel9RenderHint,
   cloudflarestreamRenderHint,
   cnnRenderHint,
