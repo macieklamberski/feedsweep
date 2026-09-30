@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, isPlainObject, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -98,7 +98,7 @@ export const codesandboxResolveEmbed: ResolveEmbed = (url, element) => {
     src: url,
     url: `https://codesandbox.io/${target.pagePath}`,
     height: defaultSandboxHeight,
-    ...trimObject({ title }, Boolean),
+    title,
   }
 }
 

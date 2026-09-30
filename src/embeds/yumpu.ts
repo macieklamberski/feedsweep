@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, isElement, isWhitespaceText, keepIfMatches, text } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
@@ -35,7 +35,7 @@ const readCompanion = (element: Element | undefined): Partial<EmbedResolverResul
 
   anchor?.remove()
 
-  return trimObject({ url: href, title: attr(anchor, 'title') ?? text(anchor) })
+  return { url: href, title: attr(anchor, 'title') ?? text(anchor) }
 }
 
 const yumpuResolveEmbed: ResolveEmbed = (url, element) => {

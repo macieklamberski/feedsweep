@@ -17,6 +17,7 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/',
+        params: {},
         ratio: '13/9',
       }
 
@@ -30,6 +31,7 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/2365866769',
         src: 'https://player.pbs.org/widget/partnerplayer/2365866769/?start=0&end=0&endscreen=false',
+        params: {},
         ratio: '13/9',
       }
 
@@ -42,6 +44,7 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'partnerplayer/Nt5uxMIZd-YQIx5g14yatg==',
         src: 'https://player.pbs.org/partnerplayer/Nt5uxMIZd-YQIx5g14yatg==/',
+        params: {},
         ratio: '13/9',
       }
 
@@ -55,6 +58,7 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/?topbar=false',
+        params: {},
         ratio: '13/9',
       }
 
@@ -70,6 +74,7 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: `https://player.pbs.org/viralplayer/3005825044/?${param}`,
+        params: {},
         ratio: '13/9',
       }
 
@@ -116,6 +121,7 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/',
+        params: {},
         ratio: '13/9',
       }
 
@@ -128,6 +134,7 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/1506734069',
         src: 'https://player.pbs.org/viralplayer/1506734069/',
+        params: {},
         ratio: '13/9',
       }
 
@@ -202,6 +209,7 @@ describeForEachParser('pbsIframeEmbedResolver', (parseHtml) => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/',
+        params: {},
         width: 512,
         height: 332,
       }
@@ -264,6 +272,7 @@ describeForEachParser('pbsLegacyIframeEmbedResolver', (parseHtml) => {
         provider: 'pbs',
         id: 'viralplayer/1506734069',
         src: 'https://player.pbs.org/viralplayer/1506734069/',
+        params: {},
         ratio: '13/9',
       }
 

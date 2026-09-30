@@ -1,4 +1,4 @@
-import { getPathSegments, type Nullish, parseUrl, toMap, trimObject } from 'trousse'
+import { getPathSegments, type Nullish, parseUrl, toMap } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 
@@ -134,7 +134,9 @@ export const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
     src: isVideo
       ? `https://bandcamp.com/VideoEmbed?${kind}=${id}`
       : `https://bandcamp.com/EmbeddedPlayer/${selection}${size}`,
-    ...trimObject({ height, url: pageUrl, title }, Boolean),
+    url: pageUrl,
+    height,
+    title,
   }
 }
 

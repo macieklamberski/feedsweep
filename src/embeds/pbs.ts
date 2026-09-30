@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, type Nullish, toMap, trimObject } from 'trousse'
+import { getPathSegments, isHostOf, type Nullish, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
 import { parseUrlOnHosts, pickQueryParams, pickUrlParams } from '../utils/urls.js'
@@ -99,7 +99,7 @@ export const pbsResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const query = pickUrlParams(url, playerParams)
-  const params = trimObject(pickQueryParams(parsed.search, publisherParams))
+  const params = pickQueryParams(parsed.search, publisherParams)
 
   return composeEmbed(route, segments.at(-1), query, params)
 }
