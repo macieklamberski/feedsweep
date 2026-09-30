@@ -531,13 +531,13 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
     })
 
     // The pre-plugins endpoint from old posts, which names its video in `video_id` rather than
-    // an encoded href, so the current plugin url has to be built from scratch.
-    it('should rebuild a legacy video frame onto the current plugin', async () => {
+    // an encoded href. It still plays, so only the page url is built from the id.
+    it('should keep a legacy video frame as written', async () => {
       const value = '<iframe src="https://www.facebook.com/video/embed?video_id=123456"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: '123456',
-        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D123456',
+        src: 'https://www.facebook.com/video/embed?video_id=123456',
         url: 'https://www.facebook.com/watch/?v=123456',
       }
 
