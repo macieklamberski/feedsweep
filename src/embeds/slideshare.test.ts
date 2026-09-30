@@ -622,6 +622,18 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
 describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, slideshareIframeEmbedResolver)
 
+  it('should keep the slide a player starts on', async () => {
+    const value =
+      '<iframe src="https://www.slideshare.net/slideshow/embed_code/key/LgJFBiDoPNkvPh?startSlide=1"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'slideshare',
+      id: 'LgJFBiDoPNkvPh',
+      src: 'https://www.slideshare.net/slideshow/embed_code/key/LgJFBiDoPNkvPh?startSlide=1',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should resolve the keyed iframe the current dialog writes', async () => {
     const value = html`
       <iframe
@@ -790,7 +802,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'slideshare',
         id: '10579166',
-        src: 'https://www.slideshare.net/slideshow/embed_code/10579166',
+        src: 'http://www.slideshare.net/slideshow/embed_code/10579166',
         url: 'http://www.slideshare.net/null0x00/make-profit-with-uiredressing-attacks',
         width: 425,
         height: 355,
@@ -854,7 +866,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'slideshare',
         id: '2nCJtB7MpHuSpf',
-        src: 'https://www.slideshare.net/slideshow/embed_code/key/2nCJtB7MpHuSpf',
+        src: 'https://de.slideshare.net/slideshow/embed_code/key/2nCJtB7MpHuSpf',
         url: 'https://de.slideshare.net/BLM_Bayern/christian-sieh',
         title: 'Christian Sieh',
         author: 'BLM Bayern',

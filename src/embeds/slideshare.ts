@@ -186,7 +186,8 @@ const slideshareResolveIframeEmbed: ResolveEmbed = (url, element) => {
   const caption = consumeCaption(element, wrapper)
   const title = caption.title ?? attr(element, 'title')
 
-  return { ...resolved, ...caption, title }
+  // The player plays as written, with the slide it starts on.
+  return { ...resolved, src: url, ...caption, title }
 }
 
 // SlideShare's player iframe, which names only the deck, and the caption the dialog ships with it.
