@@ -936,28 +936,72 @@ describeForEachParser('tiktokIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should resolve the first-generation embed path', async () => {
-      const value = '<iframe src="https://www.tiktok.com/embed/7520573541146692886"></iframe>'
+    it('should mint the v2 player from the first-generation embed path', async () => {
+      const value = '<iframe src="https://www.tiktok.com/embed/7568177676003970326"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
-        id: '7520573541146692886',
-        src: 'https://www.tiktok.com/embed/7520573541146692886',
+        id: '7568177676003970326',
+        src: 'https://www.tiktok.com/embed/v2/7568177676003970326',
         height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the player url with the query the publisher chose', async () => {
+    it('should mint the v2 player from the player path', async () => {
+      const value = '<iframe src="https://www.tiktok.com/player/v1/7633882165272513815"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '7633882165272513815',
+        src: 'https://www.tiktok.com/embed/v2/7633882165272513815',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the display flags of the player path', async () => {
       const value = html`
         <iframe
-          src="https://www.tiktok.com/player/v1/7520573541146692886?music_info=1&description=1"
+          src="https://www.tiktok.com/player/v1/7655022967344139551?description=0&amp;music_info=0&amp;rel=0&amp;native_context_menu=0"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
-        id: '7520573541146692886',
-        src: 'https://www.tiktok.com/player/v1/7520573541146692886?music_info=1&description=1',
+        id: '7655022967344139551',
+        src: 'https://www.tiktok.com/embed/v2/7655022967344139551',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the language and referrer of the v2 player', async () => {
+      const value = html`
+        <iframe
+          src="https://www.tiktok.com/embed/v2/7481819442272374018?lang=es-ES&amp;referrer=https%3A%2F%2Fexample.com%2Fpost%2F&amp;embedFrom=oembed"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '7481819442272374018',
+        src: 'https://www.tiktok.com/embed/v2/7481819442272374018',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the web app tracking of the first-generation embed path', async () => {
+      const value = html`
+        <iframe
+          src="https://www.tiktok.com/embed/7082054018259848453?is_from_webapp=1&amp;sender_device=pc&amp;web_id=6962132261881841158"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '7082054018259848453',
+        src: 'https://www.tiktok.com/embed/v2/7082054018259848453',
         height: 738,
       }
 
