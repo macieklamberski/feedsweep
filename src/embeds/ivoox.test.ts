@@ -278,6 +278,32 @@ describeForEachParser('ivooxEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, ivooxEmbedResolver)
 
   describe('happy paths', () => {
+    it('should keep a current player frame as written, with its locale and colour', async () => {
+      const value =
+        '<iframe src="https://ar.ivoox.com/es/player_ej_47243561_4_1.html?c1=ff6600"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ivoox',
+        id: '47243561',
+        src: 'https://ar.ivoox.com/es/player_ej_47243561_4_1.html?c1=ff6600',
+        height: 200,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // The legacy generation answers 404, and the current player plays the same episode.
+    it('should move a legacy player frame to the current player', async () => {
+      const value = '<iframe src="https://www.ivoox.com/playerivoox_ee_1418360_1.html"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ivoox',
+        id: '1418360',
+        src: 'https://www.ivoox.com/player_ej_1418360_1_1.html',
+        height: 200,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read the player url off an iframe carrier', async () => {
       const value = '<iframe src="https://www.ivoox.com/player_ej_80807760_6_1.html"></iframe>'
       const expected: EmbedResolverResult = {

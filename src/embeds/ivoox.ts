@@ -80,11 +80,18 @@ export const ivooxResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
+  // A current player frame plays as written, with its locale path and options. The legacy
+  // generation answers 404, so it gets the current player.
+  const isLegacy = legacyPlayerRegex.test(parseUrl(url, placeholderBaseUrl)?.pathname ?? '')
+  const isPlayerFrame = element?.localName === 'iframe' && !isLegacy
+
   // No thumbnail: iVoox publishes no key-free metadata endpoint for an episode id.
   return {
     provider,
     id: subject.kind === 'show' ? `podcast/${subject.id}` : subject.id,
-    src: `https://www.ivoox.com/player_${subject.player}_${subject.id}_${subject.skin}_${subject.page}.html`,
+    src: isPlayerFrame
+      ? url
+      : `https://www.ivoox.com/player_${subject.player}_${subject.id}_${subject.skin}_${subject.page}.html`,
     height: playerHeight,
     title: attr(element, 'title'),
   }
