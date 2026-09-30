@@ -207,7 +207,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the legacy note on its host with the embed flag its redirect needs', async () => {
+    it('should move the legacy note onto the embed host', async () => {
       const value = html`
         <iframe
           class="DC-note-image-space-filler"
@@ -220,7 +220,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'documentcloud',
         id: '2793355/annotations/287733',
-        src: 'https://www.documentcloud.org/documents/2793355-BLS-Jobs-Release/annotations/287733.html?embed=1',
+        src: 'https://embed.documentcloud.org/documents/2793355/annotations/287733/',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -244,7 +244,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'documentcloud',
         id: '2793355/annotations/a287733',
-        src: 'https://www.documentcloud.org/documents/2793355-BLS-Jobs-Release/annotations/a287733.html?embed=1',
+        src: 'https://embed.documentcloud.org/documents/2793355/annotations/a287733/',
       }
 
       expect(await extract(value)).toEqual(expected)

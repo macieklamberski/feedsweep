@@ -46,15 +46,10 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
 
     const [, id, part, number] = partMatch
 
-    // The legacy note plays only through its redirect, and only with the embed flag.
-    const src = isLegacyHost
-      ? `https://www.documentcloud.org${parsed.pathname}?embed=1`
-      : `${embedBaseUrl}/${id}/${part}/${number}/`
-
     return {
       provider: 'documentcloud',
       id: `${id}/${part}/${number}`,
-      src,
+      src: `${embedBaseUrl}/${id}/${part}/${number}/`,
     }
   }
 
