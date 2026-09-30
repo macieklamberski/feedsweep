@@ -46,6 +46,7 @@ import { twitterRenderHint } from '../embeds/twitter.js'
 import { videopressRenderHint } from '../embeds/videopress.js'
 import { vidyardRenderHint } from '../embeds/vidyard.js'
 import { vimeoRenderHint } from '../embeds/vimeo.js'
+import { vkRenderHint } from '../embeds/vk.js'
 import { wistiaRenderHint } from '../embeds/wistia.js'
 import { youtubeRenderHint } from '../embeds/youtube.js'
 import type { EmbedRenderHint } from '../types.js'
@@ -103,6 +104,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   videopressRenderHint,
   vidyardRenderHint,
   vimeoRenderHint,
+  vkRenderHint,
   wistiaRenderHint,
   youtubeRenderHint,
 ]
