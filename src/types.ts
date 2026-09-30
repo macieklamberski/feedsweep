@@ -51,8 +51,8 @@ export type ResolveEmbed = (url: string, element?: Element) => EmbedResolverResu
 export type EmbedRenderHint = {
   provider: string
   // The origin the player's messages arrive from, for a reader to check `event.origin` against.
-  // Absent where the player is served from the publisher's own host, a Mastodon instance or a
-  // Podigee show, and the frame's own origin is the one to match.
+  // Absent where the player is served from the publisher's own host or a Mastodon instance, and
+  // the frame's own origin is the one to match.
   origin?: string
   // Query parameters the player wants on every load, not only the one after a click. A reader
   // sets each over whatever the placeholder's url carries. They stay off the url itself, since a
