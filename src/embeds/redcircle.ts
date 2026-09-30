@@ -1,7 +1,7 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The loader is served from `api.podcache.net` and the player it builds from `redcircle.com`, on
@@ -52,8 +52,6 @@ const readSubject = (
   return { kind, show, episode }
 }
 
-const redcircleEmbedParams = ['theme']
-
 export const redcircleResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, redcircleHosts)
   const subject = parsed ? readSubject(getPathSegments(parsed)) : undefined
@@ -62,13 +60,11 @@ export const redcircleResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const query = composeQuery(pickQueryParams(parsed.search, redcircleEmbedParams))
-
   if (subject.kind === 'show') {
     return {
       provider: 'redcircle',
       id: `show/${subject.show}`,
-      src: `https://redcircle.com/embedded-show-webplayer/${subject.show}${query}`,
+      src: `https://redcircle.com/embedded-show-webplayer/${subject.show}`,
       url: `https://redcircle.com/shows/${subject.show}`,
       height: playerHeights.show,
     }
@@ -77,7 +73,7 @@ export const redcircleResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider: 'redcircle',
     id: `episode/${subject.show}/${subject.episode}`,
-    src: `https://redcircle.com/embedded-player/sh/${subject.show}/ep/${subject.episode}${query}`,
+    src: `https://redcircle.com/embedded-player/sh/${subject.show}/ep/${subject.episode}`,
     url: `https://redcircle.com/shows/${subject.show}/episodes/${subject.episode}`,
     height: playerHeights.episode,
   }

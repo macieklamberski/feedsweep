@@ -19,12 +19,12 @@ describe('officeResolveEmbed', () => {
       expect(officeResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should read the share spelling of the same viewer', () => {
+    it('should mint the embed viewer for the share spelling', () => {
       const value =
         'https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
         url: 'https://slac.uconn.edu/files/GrantWritingSICSFLAGS.pptx',
         title: 'GrantWritingSICSFLAGS.pptx',
       }
@@ -45,12 +45,12 @@ describe('officeResolveEmbed', () => {
       expect(officeResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the aspect ratio of the deck', () => {
+    it('should drop the aspect ratio of the deck', () => {
       const value =
         'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fc%2Es%2Dmicrosoft%2Ecom%3A443%2Fen%2Dus%2FCMSFiles%2Fcalldeck%2Epptx%3Fversion%3Df3eef72b%2D35d3%2D95b2%2D4fda%2D73a47f805c7f&wdAr=1.7777777777777777'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fc.s-microsoft.com%3A443%2Fen-us%2FCMSFiles%2Fcalldeck.pptx%3Fversion%3Df3eef72b-35d3-95b2-4fda-73a47f805c7f&wdAr=1.7777777777777777',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fc.s-microsoft.com%3A443%2Fen-us%2FCMSFiles%2Fcalldeck.pptx%3Fversion%3Df3eef72b-35d3-95b2-4fda-73a47f805c7f',
         url: 'https://c.s-microsoft.com:443/en-us/CMSFiles/calldeck.pptx?version=f3eef72b-35d3-95b2-4fda-73a47f805c7f',
         title: 'calldeck.pptx',
       }
@@ -63,7 +63,7 @@ describe('officeResolveEmbed', () => {
         'https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fwww.sba.gov%2Fsites%2Fdefault%2Ffiles%2F2025-05%2FSOP%252050%252010%25208%2520Technical%2520Updates%2520effective%25206.1.2025.docx&wdOrigin=BROWSELINK&utm_source=smallbusinessapproval.com&utm_medium=newsletter&utm_campaign=sba-loan-requirements-2025-guide'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fwww.sba.gov%2Fsites%2Fdefault%2Ffiles%2F2025-05%2FSOP%252050%252010%25208%2520Technical%2520Updates%2520effective%25206.1.2025.docx',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fwww.sba.gov%2Fsites%2Fdefault%2Ffiles%2F2025-05%2FSOP%252050%252010%25208%2520Technical%2520Updates%2520effective%25206.1.2025.docx',
         url: 'https://www.sba.gov/sites/default/files/2025-05/SOP%2050%2010%208%20Technical%20Updates%20effective%206.1.2025.docx',
         title: 'SOP 50 10 8 Technical Updates effective 6.1.2025.docx',
       }
@@ -122,12 +122,12 @@ describe('officeResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
-    it('should read the capitalised spelling of the viewer path', () => {
+    it('should mint the embed viewer for the capitalised spelling', () => {
       const value =
         'https://view.officeapps.live.com/op/View.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com/op/View.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
         url: 'https://slac.uconn.edu/files/GrantWritingSICSFLAGS.pptx',
         title: 'GrantWritingSICSFLAGS.pptx',
       }
@@ -135,12 +135,12 @@ describe('officeResolveEmbed', () => {
       expect(officeResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should read a viewer path with a doubled leading slash', () => {
+    it('should mint the embed viewer for a doubled leading slash', () => {
       const value =
         'https://view.officeapps.live.com//op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com//op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
         url: 'https://slac.uconn.edu/files/GrantWritingSICSFLAGS.pptx',
         title: 'GrantWritingSICSFLAGS.pptx',
       }
