@@ -127,13 +127,14 @@ describe('audiomackResolveEmbed', () => {
       expect(audiomackResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should drop the parameters the current player ignores', () => {
+    it('should carry the background setting as a param and drop the rest', () => {
       const value =
         'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory?background=1&autoplay=1&utm_source=fb&fbclid=abc'
       const expected: EmbedResolverResult = {
         provider: 'audiomack',
         id: 'mlgmusiz/song/new-year-new-glory',
         src: 'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory',
+        params: { background: '1' },
         url: 'https://audiomack.com/mlgmusiz/song/new-year-new-glory',
         height: 252,
         author: 'mlgmusiz',
@@ -258,6 +259,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
         provider: 'audiomack',
         id: 'larrynorman/song/burn-2',
         src: 'https://audiomack.com/embed/larrynorman/song/burn-2',
+        params: { background: '1' },
         url: 'https://audiomack.com/larrynorman/song/burn-2',
         height: 252,
         author: 'larrynorman',
