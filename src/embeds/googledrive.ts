@@ -1,7 +1,9 @@
 import { decodeSegment, getPathSegments } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { composeQuery, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'googledrive'
 
 // A link-shared file from before 2021 answers only with its resource key.
 const accessParams = ['resourcekey']
@@ -27,14 +29,14 @@ export const googledriveResolveEmbed: ResolveEmbed = (url) => {
   // The page and the thumbnail refuse a keyed file without its key, which stays in `src` alone.
   if (accessQuery) {
     return {
-      provider: 'googledrive',
+      provider,
       id: fileId,
       src: `${src}${accessQuery}`,
     }
   }
 
   return {
-    provider: 'googledrive',
+    provider,
     id: fileId,
     src,
     url: `https://drive.google.com/file/d/${fileId}/view`,
@@ -46,3 +48,8 @@ export const googledriveEmbedResolver = createUrlEmbedResolver(
   googledriveHosts,
   googledriveResolveEmbed,
 )
+
+export const googledriveRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: '1' },
+}
