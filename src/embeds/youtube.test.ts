@@ -438,14 +438,15 @@ describe('youtubeResolveEmbed', () => {
     expect(youtubeResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should preserve the self-loop playlist pair', () => {
-    const value = 'https://www.youtube.com/embed/dQw4w9WgXcQ?loop=1&playlist=dQw4w9WgXcQ'
+  it('should keep the playlist and drop the loop beside it', () => {
+    const value =
+      'https://www.youtube.com/embed/TkcZUZl8mnE?controls=1&mute=0&loop=1&autoplay=0&playlist=TkcZUZl8mnE'
     const expected: EmbedResolverResult = {
       provider: 'youtube',
-      id: 'dQw4w9WgXcQ',
-      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ?playlist=dQw4w9WgXcQ&loop=1',
-      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      id: 'TkcZUZl8mnE',
+      src: 'https://www.youtube.com/embed/TkcZUZl8mnE?playlist=TkcZUZl8mnE',
+      url: 'https://www.youtube.com/watch?v=TkcZUZl8mnE',
+      thumbnail: 'https://i.ytimg.com/vi/TkcZUZl8mnE/hqdefault.jpg',
       ratio: '16/9',
     }
 
@@ -788,6 +789,29 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
       src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
       url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should keep a start and an end of zero and drop the loop', async () => {
+    const value = html`
+      <iframe
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+        loading="eager"
+        referrerpolicy="strict-origin-when-cross-origin"
+        src="https://www.youtube.com/embed/D2vj0WcvH5c?autoplay=0&amp;controls=1&amp;end=0&amp;loop=0&amp;mute=0&amp;start=0"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;"
+        title="YouTube video"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'D2vj0WcvH5c',
+      src: 'https://www.youtube.com/embed/D2vj0WcvH5c?start=0&end=0',
+      url: 'https://www.youtube.com/watch?v=D2vj0WcvH5c',
+      thumbnail: 'https://i.ytimg.com/vi/D2vj0WcvH5c/hqdefault.jpg',
       ratio: '16/9',
     }
 

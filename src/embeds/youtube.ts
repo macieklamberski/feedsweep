@@ -111,18 +111,8 @@ export const extractVideoId = (link: string): string | undefined => {
     .find((candidate) => !!candidate && isVideoId(candidate))
 }
 
-// A clip embed needs both `clip` and `clipt`, and `loop` does nothing without `playlist`, which in
-// the wild is almost always the video's own id: YouTube's documented way to loop a single video.
-export const youtubeEmbedParams = [
-  'start',
-  'end',
-  'list',
-  'index',
-  'clip',
-  'clipt',
-  'playlist',
-  'loop',
-]
+// A clip embed needs both `clip` and `clipt`. `playlist` names the videos that play after this one.
+export const youtubeEmbedParams = ['start', 'end', 'list', 'index', 'clip', 'clipt', 'playlist']
 
 // A watch or share link spells its start offset as `t`: `90`, `90s`, `1m30s` or `1h2m3s`.
 const watchOffsetRegex = /^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/
