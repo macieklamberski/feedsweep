@@ -48,7 +48,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the heading the publisher named and drop the map layer', async () => {
+    it('should read the heading the publisher named as the title and keep it out of the src', async () => {
       const value = html`
         <iframe
           style="width: 1px; min-width: 100%; height: 540px; border: none;"
@@ -59,7 +59,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
         id: 'route/46929481',
-        src: 'https://ridewithgps.com/embeds?type=route&id=46929481&title=2023+Niseko+Classic',
+        src: 'https://ridewithgps.com/embeds?type=route&id=46929481',
         url: 'https://ridewithgps.com/routes/46929481',
         thumbnail: 'https://ridewithgps.com/routes/46929481/thumb.png',
         height: 540,
@@ -165,12 +165,12 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the title of a private route beside its privacy code', async () => {
+    it('should read the title of a private route and keep only its privacy code in the src', async () => {
       const value = html`<iframe src="https://ridewithgps.com/embeds?type=route&id=34497677&title=Loop&privacyCode=Kq7WdN2hPzVmT4rY"></iframe>`
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
         id: 'route/34497677',
-        src: 'https://ridewithgps.com/embeds?type=route&id=34497677&title=Loop&privacyCode=Kq7WdN2hPzVmT4rY',
+        src: 'https://ridewithgps.com/embeds?type=route&id=34497677&privacyCode=Kq7WdN2hPzVmT4rY',
         title: 'Loop',
       }
 

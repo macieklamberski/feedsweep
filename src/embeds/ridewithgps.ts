@@ -74,21 +74,22 @@ const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
     return
   }
 
-  const params = pickQueryParams(parsed.search, embedParams)
-  const src = composeSource(kind, shape, id, params)
+  // `title` is the heading the player draws over the map in place of the route's own name.
+  const { title, ...playerParams } = pickQueryParams(parsed.search, embedParams)
+  const src = composeSource(kind, shape, id, playerParams)
 
   // A private resource's page and thumbnail answer 403 without its token.
-  if (params.privacyCode) {
+  if (playerParams.privacyCode) {
     return {
       provider,
       id: `${kind}/${id}`,
       src,
-      title: params.title,
+      title,
     }
   }
 
   // The id comes out of the query decoded, and the page goes into a path beside the raw spelling.
-  return composeEmbed(kind, shape, encodePathSegment(id), src, params.title)
+  return composeEmbed(kind, shape, encodePathSegment(id), src, title)
 }
 
 // The older per-resource spelling, `ridewithgps.com/{routes|trips}/{id}/embed`, which feeds
