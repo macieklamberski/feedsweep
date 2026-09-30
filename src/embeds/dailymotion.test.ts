@@ -202,15 +202,57 @@ describe('dailymotionResolveEmbed', () => {
     expect(dailymotionResolveEmbed(value)).toEqual(expected)
   })
 
-  // A publisher's own player id plays on any site, while the generic player answers 403.
-  it('should keep the url of a player the publisher created', () => {
+  it('should rebuild a player the publisher created on the player id', () => {
     const value = 'https://geo.dailymotion.com/player/xiqhk.html?video=x8pq78m'
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'x8pq78m',
-      src: 'https://geo.dailymotion.com/player/xiqhk.html?video=x8pq78m',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8pq78m',
       url: 'https://www.dailymotion.com/video/x8pq78m',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8pq78m',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep the start and playlist of a player the publisher created', () => {
+    const value =
+      'https://geo.dailymotion.com/player/xe1o3.html?video=xak3lrq&startTime=0&playlist=x6zqmk'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'xak3lrq',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=xak3lrq&playlist=x6zqmk&startTime=0',
+      url: 'https://www.dailymotion.com/video/xak3lrq',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/xak3lrq',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep the loop of a player the publisher created', () => {
+    const value = 'https://geo.dailymotion.com/player/xiqhk.html?video=x8pq78m&loop=true'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x8pq78m',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8pq78m&loop=true',
+      url: 'https://www.dailymotion.com/video/x8pq78m',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8pq78m',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should drop the settings of a player the publisher created', () => {
+    const value = 'https://geo.dailymotion.com/player/x8zbz.html?video=x83gvxa&mute=true'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x83gvxa',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x83gvxa',
+      url: 'https://www.dailymotion.com/video/x83gvxa',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x83gvxa',
       ratio: '16/9',
     }
 

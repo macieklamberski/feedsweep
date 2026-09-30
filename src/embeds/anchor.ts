@@ -1,6 +1,5 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // One service, three host generations, all still live in feeds: `anchor.fm` became
@@ -36,18 +35,18 @@ export const extractAnchorEpisode = (link: string): string | undefined => {
 
 export const anchorResolveEmbed: ResolveEmbed = (url) => {
   const episode = extractAnchorEpisode(url)
-  const parsed = parseUrl(url, placeholderBaseUrl)
 
-  if (!episode || !parsed) {
+  if (!episode) {
     return
   }
+
+  const [show, slug] = episode.split('/')
 
   // The player carries no metadata, and Anchor's old oEmbed endpoint is gone.
   return {
     provider: 'anchor',
     id: episode,
-    // The host is kept: the three generations are not known to be interchangeable.
-    src: parsed.href,
+    src: `https://creators.spotify.com/pod/profile/${show}/embed/episodes/${slug}`,
     height: playerHeight,
   }
 }

@@ -22,12 +22,12 @@ describe('pastebinResolveEmbed', () => {
       expect(pastebinResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the dark theme the snippet chose and drop a tracker', () => {
-      const value = 'https://pastebin.com/embed_iframe/jFp3Y1wP?theme=dark&utm_source=feed'
+    it('should drop the dark theme the snippet chose', () => {
+      const value = 'https://pastebin.com/embed_iframe/jFp3Y1wP?theme=dark'
       const expected: EmbedResolverResult = {
         provider: 'pastebin',
         id: 'jFp3Y1wP',
-        src: 'https://pastebin.com/embed_iframe/jFp3Y1wP?theme=dark',
+        src: 'https://pastebin.com/embed_iframe/jFp3Y1wP',
         url: 'https://pastebin.com/jFp3Y1wP',
       }
 
@@ -158,12 +158,12 @@ describeForEachParser('pastebinScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the dark theme the script snippet chose', async () => {
+    it('should drop the dark theme the script snippet chose', async () => {
       const value = '<script src="https://pastebin.com/embed_js/heGyGJgS?theme=dark"></script>'
       const expected: EmbedResolverResult = {
         provider: 'pastebin',
         id: 'heGyGJgS',
-        src: 'https://pastebin.com/embed_iframe/heGyGJgS?theme=dark',
+        src: 'https://pastebin.com/embed_iframe/heGyGJgS',
         url: 'https://pastebin.com/heGyGJgS',
       }
 

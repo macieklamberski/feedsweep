@@ -141,9 +141,6 @@ export const extractDailymotionId = (link: string): string | undefined => {
 // `xpiw2` is the one in Dailymotion's own documentation.
 const playerId = 'xpiw2'
 
-// A publisher's own player, `geo.dailymotion.com/player/{playerId}.html`.
-const ownPlayerRegex = /^\/player\/[^/]+\.html$/
-
 export const composeEmbedUrl = (
   route: 'video' | 'playlist',
   id: string,
@@ -161,10 +158,10 @@ export const readDailymotionEmbedSrc = (link: string): string | undefined => {
   return videoId ? composeEmbedUrl('video', videoId) : undefined
 }
 
-// Where playback starts, and the playlist the video sits in. The rest of the publisher's
-// query is dropped with the rebuilt src.
+// Where playback starts, whether it loops, and the playlist the video sits in. The rest of the
+// publisher's query is dropped with the rebuilt src.
 // Neither player reads `autoplay` off the query: autostart comes from the saved configuration.
-const dailymotionEmbedParams = ['start', 'startTime', 'playlist']
+const dailymotionEmbedParams = ['start', 'startTime', 'loop', 'playlist']
 
 // A player id's player reads the start as `startTime` and ignores the old `start`.
 const readPlayerParams = (url: string): Record<string, string> => {
@@ -172,7 +169,7 @@ const readPlayerParams = (url: string): Record<string, string> => {
 
   return {
     ...trimObject(
-      { playlist: params.playlist, startTime: params.startTime ?? params.start },
+      { loop: params.loop, playlist: params.playlist, startTime: params.startTime ?? params.start },
       Boolean,
     ),
   }
@@ -188,9 +185,7 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
     return {
       provider,
       id: videoId,
-      src: ownPlayerRegex.test(parseUrl(url, placeholderBaseUrl)?.pathname ?? '')
-        ? url
-        : composeEmbedUrl('video', videoId, readPlayerParams(url)),
+      src: composeEmbedUrl('video', videoId, readPlayerParams(url)),
       url: `https://www.dailymotion.com/video/${segment}`,
       thumbnail: `https://www.dailymotion.com/thumbnail/video/${segment}`,
       ratio: '16/9',
