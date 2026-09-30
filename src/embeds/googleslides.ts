@@ -1,6 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { encodePathSegment, pickUrlParams } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The page routes a deck frame names. `/export` serves the deck as a file, which stays an
@@ -10,6 +10,14 @@ const deckRoutes = new Set(['edit', 'embed', 'preview', 'pub', 'pubembed'])
 // `loop` and `delayms` are the publisher's own slideshow settings and `slide` is the start
 // position. `start` autoplays the deck, which is the reader's call, so it goes with the trackers.
 const deckParams = ['loop', 'delayms', 'slide']
+
+// A share link can write its slide in the fragment, beside flags for the toolbar and where the
+// file was opened from. Only the slide the deck opens on is kept.
+const readDeckFragment = (parsed: URL): string => {
+  const query = composeQuery(pickQueryParams(parsed.hash.slice(1), ['slide']))
+
+  return query.replace('?', '#')
+}
 
 // `/presentation/d/e/{id}` names a deck published to the web and `/presentation/d/{id}` names it
 // by its Drive file id. The legacy `/presentation/embed?id={id}` 301s onto the second.
@@ -36,7 +44,7 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
     return {
       provider: 'googleslides',
       id: fileId,
-      src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${parsed.hash}`,
+      src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(parsed)}`,
       url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
     }
   }
@@ -64,7 +72,7 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider: 'googleslides',
     id: deckId,
-    src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${parsed.hash}`,
+    src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(parsed)}`,
     url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
   }
 }

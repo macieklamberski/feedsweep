@@ -58,6 +58,19 @@ describe('googleslidesResolveEmbed', () => {
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep only the slide a shared fragment opens on', () => {
+      const value =
+        'https://docs.google.com/presentation/d/1Hon1kkhjBilU1QXrpoC5TRK7vTqoGbYxvI1vFfuLtLM/edit#slide=id.g117889fc3d_0_0&pid=explorer&a=v&chrome=false&embedded=true'
+      const expected: EmbedResolverResult = {
+        provider: 'googleslides',
+        id: '1Hon1kkhjBilU1QXrpoC5TRK7vTqoGbYxvI1vFfuLtLM',
+        src: 'https://docs.google.com/presentation/d/1Hon1kkhjBilU1QXrpoC5TRK7vTqoGbYxvI1vFfuLtLM/embed#slide=id.g117889fc3d_0_0',
+        url: 'https://docs.google.com/presentation/d/1Hon1kkhjBilU1QXrpoC5TRK7vTqoGbYxvI1vFfuLtLM/pub',
+      }
+
+      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should resolve a deck framed by its file id', () => {
       const value =
         'https://docs.google.com/presentation/d/1OZRGyfKsSRX84MBi3LYPUkLkArsvevJV52Hm6zTd-9s/embed?start=false&loop=false&delayms=3000'
