@@ -81,14 +81,9 @@ export const extractMixcloudShow = (link: string): string | undefined => {
   return readShowUrl(link)?.key
 }
 
-// The widget's display options, in the order they are written back. Each is a flag the
-// publisher set to `1`, and together they pick which player the widget draws, so they ride
-// through into the minted url and the stated height describes that player.
-const displayOptions = ['mini', 'hide_cover', 'hide_artwork', 'light']
-
-// The player is fluid in width and fixed in height: the bar draws 160 whatever the frame allows,
-// and mini=1 with the cover hidden 60.
-const miniPlayerHeight = 60
+// The player is fluid in width and fixed in height: the bar draws 160 whatever the frame allows.
+// The publisher's `mini`, `hide_cover`, `hide_artwork` and `light` pick another look and are left
+// out, so every widget is this bar.
 const playerHeight = 160
 
 export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {
@@ -98,13 +93,7 @@ export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const params = parseUrl(url)?.searchParams
-  const options = displayOptions.filter((option) => params?.get(option) === '1')
   const query = new URLSearchParams({ feed: `/${show.key}/` })
-
-  for (const option of options) {
-    query.set(option, '1')
-  }
 
   const title = attr(element, 'title')
   const [author] = show.key.split('/')
@@ -115,9 +104,7 @@ export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {
     // The www url 301s to player-widget.mixcloud.com, a host one redirect away from changing.
     src: `https://www.mixcloud.com/widget/iframe/?${query}`,
     url: `https://www.mixcloud.com/${show.path}/`,
-    // With the cover on, the artwork fills the frame, so only the coverless mini form is 60.
-    height:
-      options.includes('mini') && options.includes('hide_cover') ? miniPlayerHeight : playerHeight,
+    height: playerHeight,
     author,
     title,
   }
