@@ -27,7 +27,8 @@ const deliveryThumbnailHost = 'videodelivery.net'
 const playerPathRegex = /^\/([^/]+)\/iframe\/?$/
 const deliveryPathRegex = /^\/([^/]+)\/?$/
 
-const playbackParams = ['startTime']
+// The start position and whether the video repeats, the playback parameters the player reads.
+const playbackParams = ['startTime', 'loop']
 
 const composeThumbnail = (videoId: string, host: string): string => {
   return `https://${host}/${videoId}/thumbnails/thumbnail.jpg`

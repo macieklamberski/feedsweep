@@ -10,15 +10,29 @@ import {
 
 describe('cloudflarestreamResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should take the poster as the thumbnail and drop it and the playback parameters from the src', () => {
+    it('should take the poster as the thumbnail and keep only the loop in the src', () => {
       const value =
         'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/iframe?controls=false&muted=true&preload=metadata&loop=true&autoplay=true&poster=https%3A%2F%2Fcustomer-qz3v4c7e4vfly110.cloudflarestream.com%2Fbeb50392b3f14f49b01fb75b20d4cef7%2Fthumbnails%2Fthumbnail.jpg%3Fheight%3D600'
       const expected: EmbedResolverResult = {
         provider: 'cloudflarestream',
         id: 'beb50392b3f14f49b01fb75b20d4cef7',
-        src: 'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/iframe',
+        src: 'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/iframe?loop=true',
         thumbnail:
           'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/thumbnails/thumbnail.jpg?height=600',
+      }
+
+      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the loop and drop the muting and preload', () => {
+      const value =
+        'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/b0f6489638fab333b9767877fbf92a8c/iframe?muted=true&preload=metadata&loop=true'
+      const expected: EmbedResolverResult = {
+        provider: 'cloudflarestream',
+        id: 'b0f6489638fab333b9767877fbf92a8c',
+        src: 'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/b0f6489638fab333b9767877fbf92a8c/iframe?loop=true',
+        thumbnail:
+          'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/b0f6489638fab333b9767877fbf92a8c/thumbnails/thumbnail.jpg',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
