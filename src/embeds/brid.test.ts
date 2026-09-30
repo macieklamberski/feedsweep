@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { bridEmbedResolver } from './brid.js'
+import { bridEmbedResolver, isBridReady } from './brid.js'
 
 const readPlaceholder = (
   result: string,
@@ -287,5 +287,23 @@ describeForEachParser('brid facades through the pipeline', (parseHtml) => {
     )
 
     expect(sources).toEqual(expected)
+  })
+})
+
+describe('isBridReady', () => {
+  it('should accept the message the player posts once it has loaded', () => {
+    expect(isBridReady('Brid|13663-264-1-0-1|trigger|ready')).toBe(true)
+  })
+
+  it('should refuse another player event', () => {
+    expect(isBridReady('Brid|13663-264-1-0-1|trigger|playerresize')).toBe(false)
+  })
+
+  it('should refuse a ready event from another sender', () => {
+    expect(isBridReady('13663-264-1-0-1|trigger|ready')).toBe(false)
+  })
+
+  it('should refuse a message that is not a string', () => {
+    expect(isBridReady({ event: 'ready' })).toBe(false)
   })
 })

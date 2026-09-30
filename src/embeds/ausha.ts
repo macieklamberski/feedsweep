@@ -1,7 +1,10 @@
 import { getPathSegments, trimObject } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'ausha'
 
 const aushaHost = 'ausha.co'
 
@@ -47,7 +50,7 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
   const query = composeQuery(trimObject({ [`${kind}Id`]: id, v: '3', t: start }, Boolean))
 
   return {
-    provider: 'ausha',
+    provider,
     // `api.ausha.co/v1/podcasts/{id}` is key-free and answers with the episode's title, show,
     // publication date, description and audio url, and 404s on a fabricated id. There is no
     // matching route for a show, so the kind says which of the two an enricher is holding.
@@ -62,3 +65,9 @@ export const aushaEmbedResolver = createUrlEmbedResolver([aushaHost], aushaResol
   // Carriers state the heights of older layouts, so the player's own height outranks them.
   preferResolverSize: true,
 })
+
+export const aushaRenderHint: EmbedRenderHint = {
+  provider,
+  isReady: isPlayerJsReady,
+  requestPlay: playerJsPlayRequest,
+}
