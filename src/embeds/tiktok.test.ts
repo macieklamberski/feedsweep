@@ -398,6 +398,28 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // TikTok handles are case-sensitive: `@NBA` and `@nba` are two accounts.
+    it('should resolve a declared handle holding capitals', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          data-unique-id="NBA"
+          data-embed-type="creator"
+        >
+          <section></section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@NBA',
+        src: 'https://www.tiktok.com/embed/@NBA',
+        url: 'https://www.tiktok.com/@NBA',
+        author: '@NBA',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should resolve a profile anchor whose handle holds digits', async () => {
       const value = html`
         <blockquote class="tiktok-embed">
@@ -444,6 +466,52 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://www.tiktok.com/embed/@.a.u00',
         url: 'https://www.tiktok.com/@.a.u00',
         author: '@.a.u00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+    it('should resolve a profile anchor whose handle holds capitals', async () => {
+      const value = html`
+        <blockquote class="tiktok-embed">
+          <a href="https://www.tiktok.com/@NBA">Profile</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@NBA',
+        src: 'https://www.tiktok.com/embed/@NBA',
+        url: 'https://www.tiktok.com/@NBA',
+        author: '@NBA',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // TikTok's own snippet wrote the account's opaque secUid where the handle goes.
+    it('should read a clip whose cite names the account by its secUid', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          cite="https://www.tiktok.com/@MS4wLjABAAAAK8xx3229m3fUzgHwcSSSaRV0c9Jb2tJ1hEx29oIMwyU/video/6808836928138448129"
+          data-video-id="6808836928138448129"
+        >
+          <section>
+            <a
+              title="@158669521"
+              href="https://www.tiktok.com/@MS4wLjABAAAAK8xx3229m3fUzgHwcSSSaRV0c9Jb2tJ1hEx29oIMwyU"
+              target="_blank"
+              >@158669521</a
+            >
+          </section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@MS4wLjABAAAAK8xx3229m3fUzgHwcSSSaRV0c9Jb2tJ1hEx29oIMwyU/video/6808836928138448129',
+        src: 'https://www.tiktok.com/embed/v2/6808836928138448129',
+        url: 'https://www.tiktok.com/@MS4wLjABAAAAK8xx3229m3fUzgHwcSSSaRV0c9Jb2tJ1hEx29oIMwyU/video/6808836928138448129',
+        author: '@158669521',
+        height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)

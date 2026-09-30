@@ -1,16 +1,16 @@
-import { getPathSegments, isAnyOf, isHostOf, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { filterUrlQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `blog.stackblitz.com` and `developer.stackblitz.com` are prose, and a project's running preview
 // lives on `*.stackblitz.io`, so only the bare host and its `www.` spelling name a project.
 const stackblitzHosts = ['stackblitz.com', 'www.stackblitz.com']
 
-// A project is addressed by its own slug, and hyphens and dots are both legal in it:
-// `vitejs-vite-jfnozz`, `angular-ivy-snow`.
-const slugRegex = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
+// A project is addressed by its own slug, lowercase words joined by hyphens: `vitejs-vite-jfnozz`,
+// `angular-ivy-snow`. The oEmbed endpoint answers 404 for the same slug capitalised.
+const slugRegex = /^[a-z][a-z0-9-]*$/
 
 // What the share dialog writes beside `width="100%"`.
 const defaultProjectHeight = 500
@@ -60,10 +60,6 @@ const parseTarget = (value: string | undefined): StackblitzTarget | undefined =>
     return
   }
 
-  if (isFileName(second)) {
-    return
-  }
-
   const query = filterUrlQuery(parsed, (name) => isAnyOf(name, stackblitzEmbedParams))
 
   return { id: second, query }
@@ -86,7 +82,7 @@ export const stackblitzResolveEmbed: ResolveEmbed = (url, element) => {
     src: `${project}${target.query}`,
     url: project,
     height: defaultProjectHeight,
-    ...trimObject({ title }, Boolean),
+    title,
   }
 }
 

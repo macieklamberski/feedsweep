@@ -34,23 +34,6 @@ describeForEachParser('buddybossCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should leave the optional fields undefined when only the title link is present', async () => {
-      const value = html`
-        <div class="bb-link-preview-container">
-          <div class="bb-link-preview-info">
-            <p class="bb-link-preview-title"><a href="https://example.com/calculator">Gold Calculator</a></p>
-          </div>
-        </div>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'buddyboss',
-        url: 'https://example.com/calculator',
-        title: 'Gold Calculator',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {

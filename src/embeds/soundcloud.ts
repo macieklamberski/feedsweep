@@ -97,7 +97,7 @@ const readPageKind = (segments: Array<string>): string | undefined => {
 
 // A private item's share url carries its token as a path segment, which the widget refuses:
 // there it is a `secret_token` parameter of its own.
-const secretTokenRegex = /^s-[\w-]+$/
+const secretTokenRegex = /^s-\w+$/
 
 // Any other subdomain is not a page: w.soundcloud.com/player would parse as a user named player.
 // `api` and `api-v2` carry the track references, `player` served the Flash swf, and `w` is the
@@ -159,7 +159,7 @@ const readSubstackTrack = (element: Nullish<Element>): Partial<EmbedResolverResu
 }
 
 // SoundCloud's widget iframe, the dead Flash player and a framed track page answering SAMEORIGIN.
-export const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
+const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
   // The factory has already matched the host, which means the url parsed, so there is no
   // unparseable case left to guard here.
   const parsed = parseUrl(url, placeholderBaseUrl)

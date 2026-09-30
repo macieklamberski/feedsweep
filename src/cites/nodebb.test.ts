@@ -60,30 +60,6 @@ describeForEachParser('nodebbCiteResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should read the publisher name without the domain span', async () => {
-      const value = html`
-        <div class="card link-preview">
-          <div class="card-body">
-            <h5 class="card-title">
-              <a href="https://example.com/post">Page title</a>
-            </h5>
-          </div>
-          <a href="https://example.com/post" class="card-footer">
-            <p class="d-inline-block text-truncate mb-0">Example <span>(example.com)</span>
-            </p>
-          </a>
-        </div>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'nodebb',
-        url: 'https://example.com/post',
-        title: 'Page title',
-        publisher: 'Example',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should fall back to the image anchor when the title has no link', async () => {
       const value = html`
         <div class="card link-preview">

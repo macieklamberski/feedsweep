@@ -64,10 +64,12 @@ describeForEachParser('convertAsciinemaEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should leave a cast id holding an encoded separator alone', async () => {
+    it('should use a malformed cast id as written, even if the image answers an error', async () => {
       const value = '<script src="https://asciinema.org/a/..%2Fsettings.js"></script>'
+      const expected =
+        '<a href="https://asciinema.org/a/..%2Fsettings"><img src="https://asciinema.org/a/..%2Fsettings.svg"></a>'
 
-      expect(await transform(value)).toEqualHtml(value)
+      expect(await transform(value)).toEqualHtml(expected)
     })
   })
 

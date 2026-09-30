@@ -283,21 +283,25 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
 
     it('should read the player off the older irtve.es domain', async () => {
       const value = html`
-        <object
+        <embed
+          id=""
           type="application/x-shockwave-flash"
-          height="239"
+          src="http://www.irtve.es/swf/4.2.15/RTVEPlayerVideo.swf"
+          allowscriptaccess="always"
+          allowfullscreen="allowfullscreen"
+          flashvars="assetID=1429661_es_videos&amp;location=embed_videos"
+          wmode="opaque"
+          quality="high"
           width="425"
-          data="http://www.irtve.es/swf/4.2.8/RTVEPlayerVideo.swf"
-        >
-          <param name="flashvars" value="assetID=1081934_es_videos&amp;location=embed_videos" />
-        </object>
+          height="239"
+        />
       `
       const expected: EmbedResolverResult = {
         provider: 'rtve',
-        id: 'video/1081934',
-        src: 'https://www.rtve.es/drmn/embed/video/1081934/',
-        url: 'https://www.rtve.es/v/1081934/',
-        thumbnail: 'https://img.rtve.es/v/1081934/',
+        id: 'video/1429661',
+        src: 'https://www.rtve.es/drmn/embed/video/1429661/',
+        url: 'https://www.rtve.es/v/1429661/',
+        thumbnail: 'https://img.rtve.es/v/1429661/',
         width: 425,
         height: 239,
       }
@@ -341,6 +345,22 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
     it('should return undefined for an asset outside the id grammar', async () => {
       const value = html`
         <embed src="http://www.rtve.es/swf/v2/RTVEPlayer.swf?assetID=../evil_es_videos" />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an asset id longer than the id band', async () => {
+      const value = html`
+        <embed src="http://www.rtve.es/swf/v2/RTVEPlayer.swf?assetID=1234567890123_es_videos" />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an asset with a segment after the kind', async () => {
+      const value = html`
+        <embed src="http://www.rtve.es/swf/v2/RTVEPlayer.swf?assetID=309749_es_videos_hd" />
       `
 
       expect(await extract(value)).toBeUndefined()

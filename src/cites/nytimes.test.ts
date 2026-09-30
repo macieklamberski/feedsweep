@@ -26,27 +26,6 @@ describeForEachParser('nytimesCiteResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // WordPress sandboxes the card and appends its handshake secret to the url.
-    it('should read the card WordPress wrapped', async () => {
-      const value = html`
-        <iframe
-          class="wp-embedded-content"
-          sandbox="allow-scripts"
-          security="restricted"
-          title="British Columbia Wildfire in Photos: ‘A Long-Lasting Scar’"
-          src="https://www.nytimes.com/svc/oembed/html/?url=https%3A%2F%2Fwww.nytimes.com%2F2023%2F08%2F19%2Fworld%2Fcanada%2Fcanada-wildfires-british-columbia-kelowna.html#?secret=mDnypfg4do"
-          data-secret="mDnypfg4do"
-        ></iframe>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'nytimes',
-        url: 'https://www.nytimes.com/2023/08/19/world/canada/canada-wildfires-british-columbia-kelowna.html',
-        title: 'British Columbia Wildfire in Photos: ‘A Long-Lasting Scar’',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should read a card pointing off the paper', async () => {
       const value = html`
         <iframe
@@ -78,6 +57,22 @@ describeForEachParser('nytimesCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should resolve a bare article path against nytimes.com', async () => {
+      const value = html`
+        <iframe
+          title="A post"
+          src="https://www.nytimes.com/svc/oembed/html/?url=%2F2020%2F04%2F13%2Fscience%2Fputin.html"
+        ></iframe>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'nytimes',
+        url: 'https://www.nytimes.com/2020/04/13/science/putin.html',
+        title: 'A post',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -97,28 +92,6 @@ describeForEachParser('nytimesCiteResolver', (parseHtml) => {
         <iframe
           title="A post"
           src="https://www.nytimes.com/svc/oembed/html/"
-        ></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a card whose article url is relative', async () => {
-      const value = html`
-        <iframe
-          title="A post"
-          src="https://www.nytimes.com/svc/oembed/html/?url=%2F2020%2F04%2F13%2Fscience%2Fputin.html"
-        ></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a card whose article url is a bare file name', async () => {
-      const value = html`
-        <iframe
-          title="A post"
-          src="https://www.nytimes.com/svc/oembed/html/?url=putin.html"
         ></iframe>
       `
 

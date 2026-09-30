@@ -1,8 +1,11 @@
 import { getPathSegments, isHostOrSubdomainOf, type Nullish, parseUrl, toMap } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, keepIfMatches } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const musicProvider = 'applemusic'
+const podcastsProvider = 'applepodcasts'
 
 // Music and podcasts embed through the same player, served from `embed.music.apple.com` and
 // `embed.podcasts.apple.com`, so both resolve here and only the provider name differs.
@@ -49,14 +52,12 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
 
   const isPodcast = isHostOrSubdomainOf(parsed, applePodcastsHosts)
   const host = isPodcast ? 'podcasts.apple.com' : 'music.apple.com'
-  const trackId = keepIfMatches(parsed.searchParams.get('i'), digitsRegex)
+  const trackId = parsed.searchParams.get('i') || undefined
   const id = trackId ?? pathId.replace(podcastIdPrefixRegex, '')
-  // A refused `i` is dropped from the player url as well: the resolver does not forward a value
-  // it would not put in the id, and the collection player is what the path names without it.
   const query = trackId ? pickUrlParams(url, ['i']) : ''
 
   return {
-    provider: isPodcast ? 'applepodcasts' : 'applemusic',
+    provider: isPodcast ? podcastsProvider : musicProvider,
     id: `${kind}/${id}`,
     src: `https://embed.${host}${parsed.pathname}${query}`,
     url: `https://${host}${parsed.pathname}${query}`,
@@ -130,7 +131,7 @@ export const appleEmbedResolver = createUrlEmbedResolver(appleHosts, (url, eleme
 // same marketing page, so the frame shows no player for anybody.
 const appleToolsHosts = ['tools.applemusic.com']
 
-const toolsPathRegex = /^\/embed\/v1\/([a-z-]+)\/([^/]+)$/
+const toolsPathRegex = /^\/embed\/v1\/([a-z]+)\/([^/]+)$/
 
 // The same album, playlist or song as the modern player, reached through the retired tool's url.
 // The tool wrote the storefront as `country`. A missing or malformed `country` drops the segment,
@@ -158,9 +159,9 @@ export const appleToolsEmbedResolver = createUrlEmbedResolver(
 )
 
 export const appleFieldCleaners: Array<FieldCleaner> = [
-  { provider: 'applepodcasts', field: 'title', drop: 'Media player' },
+  { provider: podcastsProvider, field: 'title', drop: 'Media player' },
   // A copied YouTube snippet with the src swapped.
-  { provider: 'applepodcasts', field: 'title', drop: 'YouTube video player' },
-  { provider: 'applemusic', field: 'title', drop: 'Media player' },
-  { provider: 'applemusic', field: 'title', drop: 'メディアプレイヤー' },
+  { provider: podcastsProvider, field: 'title', drop: 'YouTube video player' },
+  { provider: musicProvider, field: 'title', drop: 'Media player' },
+  { provider: musicProvider, field: 'title', drop: 'メディアプレイヤー' },
 ]

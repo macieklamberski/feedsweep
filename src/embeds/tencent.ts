@@ -36,7 +36,7 @@ const readVideoId = (url: string): string | undefined => {
 }
 
 // Tencent Video's player iframe and the dead Flash TPout.swf carrier, both naming the video in vid.
-export const tencentResolveEmbed: ResolveEmbed = (url) => {
+const tencentResolveEmbed: ResolveEmbed = (url) => {
   const videoId = readVideoId(url)
 
   if (!videoId) {

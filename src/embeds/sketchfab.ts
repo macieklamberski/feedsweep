@@ -29,7 +29,6 @@ const readModelUid = (parsed: URL): string | undefined => {
   }
 }
 
-// The carrier's title is not read: most state the snippet's own label, A 3D model, not the name.
 // The thumbnail sits under a per-model hash that the uid does not yield, and
 // `sketchfab.com/oembed?url=…` answers with it and the title, with no key.
 const sketchfabResolveEmbed: ResolveEmbed = (url, element) => {

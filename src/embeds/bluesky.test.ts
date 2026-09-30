@@ -905,12 +905,25 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
   describe('authority forms a post url names', () => {
     it('should read a did:web authority', async () => {
       const value =
-        '<iframe src="https://bsky.app/profile/did:web:example.com/post/3mkq7aeuwbg42"></iframe>'
+        '<iframe src="https://bsky.app/profile/did:web:didweb.watch/post/3m6p3vi6mlw2r"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'bluesky',
-        id: 'did:web:example.com/3mkq7aeuwbg42',
-        src: 'https://embed.bsky.app/embed/did:web:example.com/app.bsky.feed.post/3mkq7aeuwbg42',
-        url: 'https://bsky.app/profile/did:web:example.com/post/3mkq7aeuwbg42',
+        id: 'did:web:didweb.watch/3m6p3vi6mlw2r',
+        src: 'https://embed.bsky.app/embed/did:web:didweb.watch/app.bsky.feed.post/3m6p3vi6mlw2r',
+        url: 'https://bsky.app/profile/did:web:didweb.watch/post/3m6p3vi6mlw2r',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a did:web authority carrying an encoded port', async () => {
+      const value =
+        '<iframe src="https://bsky.app/profile/did:web:localhost%3A2583/post/3mkq7aeuwbg42"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:web:localhost%3A2583/3mkq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/did:web:localhost%3A2583/app.bsky.feed.post/3mkq7aeuwbg42',
+        url: 'https://bsky.app/profile/did:web:localhost%3A2583/post/3mkq7aeuwbg42',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1016,6 +1029,20 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
     it('should refuse a did method carrying a percent sign', async () => {
       const value =
         '<iframe src="https://bsky.app/profile/did:p%c:ghz4agnyzcrsvpnprxrbjrpa/post/3mkq7aeuwbg42"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should refuse a did carrying an encoded traversal', async () => {
+      const value =
+        '<iframe src="https://bsky.app/profile/did:plc:x%2F..%2F../post/3mkq7aeuwbg42"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should refuse a did:web path, which atproto does not resolve', async () => {
+      const value =
+        '<iframe src="https://bsky.app/profile/did:web:example.com:alice/post/3mkq7aeuwbg42"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

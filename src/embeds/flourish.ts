@@ -14,7 +14,7 @@ const flourishHosts = ['flo.uri.sh', 'public.flourish.studio']
 // Any resource, not a list: a kind refused here is deleted as an empty div, chart and all.
 // `visualisation` and `story` are the two kinds feeds carry, and the endpoint validates the pair:
 // a real id answers 200 and a wrong kind, an unknown kind or a fabricated id all answer 403.
-const safeResourceRegex = /^[a-z][a-z-]*$/
+const safeResourceRegex = /^[a-z]+$/
 
 // `template` has no embed form: its `/embed` answers 403 for a real id.
 const nonEmbeddableResource = 'template'

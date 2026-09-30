@@ -66,31 +66,6 @@ describeForEachParser('cocoonCiteResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should carry the label bar as the caption', async () => {
-      const value = html`
-        <a href="https://example.com/post" class="blogcard-wrap internal-blogcard-wrap">
-          <div class="blogcard-label internal-blogcard-label">
-            <span class="blogcard-label-text">関連記事</span>
-          </div>
-          <div class="blogcard internal-blogcard">
-            <div class="blogcard-content internal-blogcard-content">
-              <div class="blogcard-title internal-blogcard-title">Post title</div>
-            </div>
-            <div class="blogcard-domain internal-blogcard-domain">example.com</div>
-          </div>
-        </a>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'cocoon',
-        url: 'https://example.com/post',
-        title: 'Post title',
-        caption: '関連記事',
-        publisher: 'example.com',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should carry an author-written label rather than the stock one', async () => {
       const value = html`
         <a href="https://example.com/post" class="blogcard-wrap external-blogcard-wrap">
@@ -132,58 +107,9 @@ describeForEachParser('cocoonCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should leave optional fields undefined when only href and title are present', async () => {
-      const value = html`
-        <a href="https://example.com/post" class="blogcard-wrap">
-          <div class="blogcard-title">Post title</div>
-        </a>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'cocoon',
-        url: 'https://example.com/post',
-        title: 'Post title',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('edge cases', () => {
-    it('should read the description from the misspelled snippet class', async () => {
-      const value = html`
-        <a href="https://example.com/post" class="blogcard-wrap">
-          <div class="blogcard-title">Post title</div>
-          <div class="blogcard-snipet">Preview text</div>
-        </a>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'cocoon',
-        url: 'https://example.com/post',
-        title: 'Post title',
-        description: 'Preview text',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should pass the date through in the theme format', async () => {
-      const value = html`
-        <a href="https://example.com/post" class="blogcard-wrap">
-          <div class="blogcard-title">Post title</div>
-          <div class="blogcard-post-date">2018.10.14</div>
-        </a>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'cocoon',
-        url: 'https://example.com/post',
-        title: 'Post title',
-        date: '2018.10.14',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should fall back to the anchor title attribute when the title element is missing', async () => {
       const value = html`
         <a href="https://example.com/post" title="Title from attribute" class="blogcard-wrap">

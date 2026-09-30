@@ -11,7 +11,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10076958',
-        src: 'https://www.podomatic.com/embed/html5/episode/10076958',
+        src: 'https://podomatic.com/embed/html5/episode/10076958',
         height: 208,
       }
 
@@ -23,7 +23,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'podcast/2295001',
-        src: 'https://www.podomatic.com/embed/html5/podcast/2295001',
+        src: 'https://podomatic.com/embed/html5/podcast/2295001',
         height: 208,
       }
 
@@ -63,7 +63,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'channel/2295001',
-        src: 'https://www.podomatic.com/embed/html5/channel/2295001',
+        src: 'https://podomatic.com/embed/html5/channel/2295001',
         height: 208,
       }
 
@@ -101,7 +101,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10076958',
-        src: 'https://www.podomatic.com/embed/html5/episode/10076958?style=small',
+        src: 'https://podomatic.com/embed/html5/episode/10076958?style=small',
         height: 97,
       }
 
@@ -113,7 +113,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10076958',
-        src: 'https://www.podomatic.com/embed/html5/episode/10076958?style=square',
+        src: 'https://podomatic.com/embed/html5/episode/10076958?style=square',
         height: 504,
       }
 
@@ -125,7 +125,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10198381',
-        src: 'https://www.podomatic.com/embed/html5/episode/10198381',
+        src: 'https://podomatic.com/embed/html5/episode/10198381',
         height: 208,
       }
 
@@ -137,7 +137,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10198381',
-        src: 'https://www.podomatic.com/embed/html5/episode/10198381',
+        src: 'https://podomatic.com/embed/html5/episode/10198381',
         height: 208,
       }
 
@@ -149,7 +149,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10198381',
-        src: 'https://www.podomatic.com/embed/html5/episode/10198381',
+        src: 'https://podomatic.com/embed/html5/episode/10198381',
         height: 208,
       }
 
@@ -161,7 +161,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10198381',
-        src: 'https://www.podomatic.com/embed/html5/episode/10198381',
+        src: 'https://podomatic.com/embed/html5/episode/10198381',
         height: 208,
       }
 
@@ -176,7 +176,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/11083318',
-        src: 'https://www.podomatic.com/embed/v2/podcast/5476235?episode_id=11083318&theme=light',
+        src: 'https://podomatic.com/embed/v2/podcast/5476235?episode_id=11083318&theme=light',
         height: 205,
       }
 
@@ -189,7 +189,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/11083318',
-        src: 'https://www.podomatic.com/embed/v2/podcast/5476235?episode_id=11083318&theme=light%26autoplay%3Dtrue',
+        src: 'https://podomatic.com/embed/v2/podcast/5476235?episode_id=11083318&theme=light%26autoplay%3Dtrue',
         height: 205,
       }
 
@@ -201,7 +201,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'podcast/5476235',
-        src: 'https://www.podomatic.com/embed/v2/podcast/5476235',
+        src: 'https://podomatic.com/embed/v2/podcast/5476235',
         height: 205,
       }
 
@@ -213,7 +213,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'podcast/5476235',
-        src: 'https://www.podomatic.com/embed/v2/podcast/5476235',
+        src: 'https://podomatic.com/embed/v2/podcast/5476235',
         height: 205,
       }
 
@@ -267,7 +267,7 @@ describeForEachParser('podomaticEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10076958',
-        src: 'https://www.podomatic.com/embed/html5/episode/10076958',
+        src: 'https://podomatic.com/embed/html5/episode/10076958',
         height: 208,
       }
 
@@ -297,7 +297,7 @@ describeForEachParser('podomaticEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10076958',
-        src: 'https://www.podomatic.com/embed/html5/episode/10076958',
+        src: 'https://podomatic.com/embed/html5/episode/10076958',
         height: 208,
       }
 
@@ -318,7 +318,7 @@ describeForEachParser('podomaticEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10076958',
-        src: 'https://www.podomatic.com/embed/html5/episode/10076958?style=small',
+        src: 'https://podomatic.com/embed/html5/episode/10076958?style=small',
         height: 97,
       }
 
@@ -344,7 +344,7 @@ describeForEachParser('podomatic through the pipeline', (parseHtml) => {
       <div
         data-embed-id="episode/10076958"
         data-embed-provider="podomatic"
-        data-embed-src="https://www.podomatic.com/embed/html5/episode/10076958"
+        data-embed-src="https://podomatic.com/embed/html5/episode/10076958"
         data-embed-height="208"
       ></div>
     `

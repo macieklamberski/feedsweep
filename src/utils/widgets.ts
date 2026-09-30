@@ -440,14 +440,15 @@ export const cleanResultFields = <Result extends CleanableResult>(
   }
 }
 
-// The src is never cleaned: a player src carries query the platform needs.
 export const prepareEmbedMetadata = (
   metadata: Partial<EmbedResolverResult>,
   context: TransformContext,
 ): Partial<EmbedResolverResult> => {
+  const src = resolveOrDropUrl(metadata.src, context)
+
   return {
     ...cleanResultFields(metadata, context),
-    src: resolveOrDropUrl(metadata.src, context),
+    src: cleanUrl(src, context),
     url: cleanUrl(resolveOrDropUrl(metadata.url, context), context),
     thumbnail: resolveOrKeepUrl(metadata.thumbnail, context),
     avatar: resolveOrKeepUrl(metadata.avatar, context),
@@ -509,7 +510,7 @@ export const updateCitePlaceholder = (
 
 export const createCitePlaceholder = (
   document: Document,
-  result: CiteResolverResult,
+  result: Partial<CiteResolverResult>,
 ): HTMLElement => {
   return createPlaceholder(document, 'cite', normalizeCiteFields(result))
 }

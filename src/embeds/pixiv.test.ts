@@ -141,6 +141,19 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a work id whose hash carries a slash', async () => {
+      const value = html`
+        <script
+          src="https://source.pixiv.net/source/embed.js"
+          data-id="45958594_2a40/7d6e"
+          data-size="small"
+          data-border="on"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a work id carrying a query after its digits', async () => {
       const value = html`
         <script

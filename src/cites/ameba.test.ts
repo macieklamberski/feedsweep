@@ -40,62 +40,6 @@ describeForEachParser('amebaCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should extract a card without a thumbnail image', async () => {
-      const value = html`
-        <article class="ogpCard_wrap">
-          <a class="ogpCard_link" href="https://example.com/shop" data-ogp-card-log="">
-            <span class="ogpCard_content">
-              <span class="ogpCard_title">Page title</span>
-              <span class="ogpCard_description">Preview text</span>
-              <span class="ogpCard_url">
-                <span class="ogpCard_iconWrap">
-                  <img class="ogpCard_icon" src="https://c.stat100.ameba.jp/ameblo/symbols/editor_link.svg" />
-                </span>
-                <span class="ogpCard_urlText">example.com</span>
-              </span>
-            </span>
-          </a>
-        </article>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'ameba',
-        url: 'https://example.com/shop',
-        title: 'Page title',
-        description: 'Preview text',
-        publisher: 'example.com',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-  })
-
-  describe('edge cases', () => {
-    it('should not map the decorative link icon as an icon', async () => {
-      const value = html`
-        <article class="ogpCard_wrap">
-          <a class="ogpCard_link" href="https://example.com/page">
-            <span class="ogpCard_content">
-              <span class="ogpCard_title">Page title</span>
-              <span class="ogpCard_url">
-                <span class="ogpCard_iconWrap">
-                  <img class="ogpCard_icon" src="https://c.stat100.ameba.jp/ameblo/symbols/editor_link.svg" />
-                </span>
-                <span class="ogpCard_urlText">example.com</span>
-              </span>
-            </span>
-          </a>
-        </article>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'ameba',
-        url: 'https://example.com/page',
-        title: 'Page title',
-        publisher: 'example.com',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {

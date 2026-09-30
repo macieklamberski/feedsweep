@@ -129,6 +129,8 @@ An embed placeholder states how big it is in one of two ways, never both. Where 
 
 A placeholder may also carry `data-embed-params`: settings the publisher chose for that one embed that a reader may override, such as the language of a widget's labels, written as a query string like `l=german`. They are kept off `data-embed-src`, so a reader appends them when it builds the frame, or sets its own in their place.
 
+`data-embed-src` keeps the scheme the feed wrote, so an older embed can still point at an `http:` player. A browser blocks an `http:` frame on an `https:` page as mixed content, so a reader served over `https:` should send `Content-Security-Policy: upgrade-insecure-requests`. Chromium, Firefox and WebKit then load the frame over `https:`, which plays wherever the platform still serves the player there.
+
 ## Options
 
 ```typescript
@@ -145,7 +147,7 @@ const result = transformContent(html, {
   sameSiteUrls: ['https://example.com/?p=1'],
   // Resolve a relative URL against the base URL (defaults to standard URL resolution).
   resolveUrlFn: (url, baseUrl) => resolve(url, baseUrl),
-  // Rewrite anchor hrefs: unwrap redirects and strip tracking params.
+  // Rewrite anchor hrefs: unwrap redirects and strip tracking params, also on the url and the src of embed placeholders.
   cleanUrlFn: cleanUrl,
   // Feed item enclosures (audio/video/image), injected into the content.
   enclosures: [{ url: 'https://example.com/audio.mp3', type: 'audio/mpeg' }],

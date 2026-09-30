@@ -1,4 +1,4 @@
-import { composeEmbedUrl, isVideoId } from '../../embeds/youtube.js'
+import { composeEmbedUrl } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { createIframe } from '../../utils/widgets.js'
@@ -9,9 +9,7 @@ export const rebuildRocketYoutubePreviews: DomTransform = () => (document) => {
     // The div states the video twice, as the embed url in data-src and as the id in data-id.
     // One shape ships only the id.
     const videoId = attr(element, 'data-id')
-    const src =
-      attr(element, 'data-src') ??
-      (videoId && isVideoId(videoId) ? composeEmbedUrl(videoId) : undefined)
+    const src = attr(element, 'data-src') ?? (videoId ? composeEmbedUrl(videoId) : undefined)
 
     if (!src) {
       continue

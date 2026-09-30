@@ -12,15 +12,16 @@ const flashPlayerPathRegex = /^\/apps\/slideshow\//i
 const flashVideoPathRegex = /^\/apps\/video\/stewart\.swf$/i
 const legacyPlayerPathRegex = /^\/slideshow\/index\.gne$/i
 
-const setPathRegex = /^\/photos\/([\w.@-]+)\/sets\/(\d+)/
-const streamPathRegex = /^\/photos\/([\w.@-]+)\/show\/?$/
+const setPathRegex = /^\/photos\/([\w.@-]+)\/(?:sets|albums)\/(\d+)/
+const streamPathRegex = /^\/photos\/([\w@-]+)\/show\/?$/
 const groupPathRegex = /^\/groups\/(\d+@N\d\d)\/pool\/show\/?$/
-const photoPathRegex = /^\/photos\/([\w.@-]+)\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
+// An owner of `_` names nobody: the player ignores it, and `/photos/_/{photoId}/` answers 404.
+const photoPathRegex = /^\/photos\/(?:_|([\w@-]+))\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
 const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/
 
-// The first class admits no dot, so `..` never reaches a minted path.
-// An owner is a numeric NSID with its `@N0…` suffix, or the path alias the owner chose.
-const safeOwnerRegex = /^[\w-][\w.-]*(?:@N\d\d)?$/
+// An owner is a numeric NSID with its `@N0…` suffix, or the path alias the owner chose. Flickr
+// answers 404 for an alias carrying a dot or opening with a hyphen.
+const safeOwnerRegex = /^\w[\w-]*(?:@N\d\d)?$/
 
 // A group and a photostream each resolve by NSID and only by NSID: the player answers 200 for
 // `groups/{nsid}` and for `photostreams/{nsid}`, and 404 for a path alias in either position.
@@ -196,8 +197,8 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   const author = readOwnerAlias(owner)
 
   if (subject.setId && digitsRegex.test(subject.setId)) {
-    // The album page path starts with the owner, and `/sets/{id}` is kept as the markup spells
-    // it: the path is still served and does not redirect to `/albums/` (both 200, 2026-08-14).
+    // The album page path starts with the owner. `/sets/{id}` is still served and does not
+    // redirect to `/albums/`, while the `/albums/` player redirects to `/sets/` (2026-09-29).
     return owner
       ? {
           provider: 'flickr',

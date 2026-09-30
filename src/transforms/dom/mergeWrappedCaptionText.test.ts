@@ -122,6 +122,33 @@ describeForEachParser('mergeWrappedCaptionText', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  // The WordPress table block writes the table and its caption as the figure's only children.
+  it('should leave a table figure whose figcaption is a direct child', async () => {
+    const value = html`
+      <figure class="wp-block-table">
+        <table>
+          <tbody>
+            <tr>
+              <td>File size</td>
+              <td>Ratio</td>
+            </tr>
+            <tr>
+              <td>Less than 128KB</td>
+              <td>95%</td>
+            </tr>
+            <tr>
+              <td>128 KB or more</td>
+              <td>5%</td>
+            </tr>
+          </tbody>
+        </table>
+        <figcaption class="wp-element-caption">Office data capacity ratios</figcaption>
+      </figure>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should leave a figcaption alone in its wrapper', async () => {
     const value = html`
       <figure>

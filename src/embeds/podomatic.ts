@@ -44,7 +44,7 @@ const readPlayer = (url: URL): Player | undefined => {
     return {
       kind,
       id,
-      src: `https://www.podomatic.com/embed/html5/${kind}/${id}${query}`,
+      src: `https://podomatic.com/embed/html5/${kind}/${id}${query}`,
       height: html5Heights.get(named) ?? defaultHtml5Height,
     }
   }
@@ -68,7 +68,7 @@ const readPlayer = (url: URL): Player | undefined => {
     return {
       kind: named ? 'episode' : 'podcast',
       id: named ? episode : podcast,
-      src: `https://www.podomatic.com/embed/v2/podcast/${podcast}${named}${themed}`,
+      src: `https://podomatic.com/embed/v2/podcast/${podcast}${named}${themed}`,
       height: currentHeight,
     }
   }

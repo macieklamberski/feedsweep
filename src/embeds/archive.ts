@@ -107,7 +107,7 @@ const namesAudioFile = (config: string): boolean => {
   })
 }
 
-export const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
+const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
