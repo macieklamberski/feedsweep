@@ -1,5 +1,5 @@
-import { getPathSegments, toMap } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import { getPathSegments, isPlainObject, toMap } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -130,3 +130,15 @@ export const spotifyFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'YouTube video player' },
   { provider, field: 'description', drop: /^(?:album|episode|playlist|podcast|podcast episode)$/ },
 ]
+
+// The player posts its ready message as an object, and takes the play command as one too: the
+// same command as a JSON string is ignored.
+export const isSpotifyReady = (data: unknown): boolean => {
+  return isPlainObject(data) && data.type === 'ready'
+}
+
+export const spotifyRenderHint: EmbedRenderHint = {
+  provider,
+  isReady: isSpotifyReady,
+  requestPlay: { command: 'play' },
+}

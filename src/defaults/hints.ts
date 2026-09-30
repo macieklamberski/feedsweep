@@ -2,10 +2,14 @@ import { acastRenderHint } from '../embeds/acast.js'
 import { archiveRenderHint } from '../embeds/archive.js'
 import { arteRenderHint } from '../embeds/arte.js'
 import { audioboomRenderHint } from '../embeds/audioboom.js'
+import { blubrryRenderHint } from '../embeds/blubrry.js'
 import { blueskyRenderHint } from '../embeds/bluesky.js'
+import { brRenderHint } from '../embeds/br.js'
+import { bridRenderHint } from '../embeds/brid.js'
 import { brightcoveRenderHint } from '../embeds/brightcove.js'
 import { buzzsproutRenderHint } from '../embeds/buzzsprout.js'
 import { captivateRenderHint } from '../embeds/captivate.js'
+import { channel9RenderHint } from '../embeds/channel9.js'
 import { cloudflarestreamRenderHint } from '../embeds/cloudflarestream.js'
 import { cnnRenderHint } from '../embeds/cnn.js'
 import { codesandboxRenderHint } from '../embeds/codesandbox.js'
@@ -13,6 +17,7 @@ import { deezerRenderHint } from '../embeds/deezer.js'
 import { donorboxRenderHint } from '../embeds/donorbox.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
 import { foxbusinessRenderHint, foxnewsRenderHint } from '../embeds/foxnews.js'
+import { googledriveRenderHint } from '../embeds/googledrive.js'
 import { imgurRenderHint } from '../embeds/imgur.js'
 import { inaRenderHint } from '../embeds/ina.js'
 import { instagramRenderHint } from '../embeds/instagram.js'
@@ -20,6 +25,7 @@ import { kalturaRenderHint } from '../embeds/kaltura.js'
 import { mailruRenderHint } from '../embeds/mailru.js'
 import { mastodonRenderHint } from '../embeds/mastodon.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
+import { nicovideoRenderHint } from '../embeds/nicovideo.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
 import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
 import { omnyRenderHint } from '../embeds/omny.js'
@@ -32,6 +38,7 @@ import { rtveRenderHint } from '../embeds/rtve.js'
 import { rutubeRenderHint } from '../embeds/rutube.js'
 import { sketchfabRenderHint } from '../embeds/sketchfab.js'
 import { soundcloudRenderHint } from '../embeds/soundcloud.js'
+import { spotifyRenderHint } from '../embeds/spotify.js'
 import { spreakerRenderHint } from '../embeds/spreaker.js'
 import { srgplayRenderHint } from '../embeds/srgplay.js'
 import { tedRenderHint } from '../embeds/ted.js'
@@ -41,7 +48,9 @@ import { tumblrRenderHint } from '../embeds/tumblr.js'
 import { tuneinRenderHint } from '../embeds/tunein.js'
 import { twitterRenderHint } from '../embeds/twitter.js'
 import { videopressRenderHint } from '../embeds/videopress.js'
+import { vidyardRenderHint } from '../embeds/vidyard.js'
 import { vimeoRenderHint } from '../embeds/vimeo.js'
+import { vkRenderHint } from '../embeds/vk.js'
 import { wistiaRenderHint } from '../embeds/wistia.js'
 import { youtubeRenderHint } from '../embeds/youtube.js'
 import type { EmbedRenderHint } from '../types.js'
@@ -54,10 +63,14 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   archiveRenderHint,
   arteRenderHint,
   audioboomRenderHint,
+  blubrryRenderHint,
   blueskyRenderHint,
+  bridRenderHint,
   brightcoveRenderHint,
+  brRenderHint,
   buzzsproutRenderHint,
   captivateRenderHint,
+  channel9RenderHint,
   cloudflarestreamRenderHint,
   cnnRenderHint,
   codesandboxRenderHint,
@@ -66,6 +79,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   flourishRenderHint,
   foxbusinessRenderHint,
   foxnewsRenderHint,
+  googledriveRenderHint,
   imgurRenderHint,
   inaRenderHint,
   instagramRenderHint,
@@ -73,6 +87,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   mailruRenderHint,
   mastodonRenderHint,
   mixcloudRenderHint,
+  nicovideoRenderHint,
   notecomRenderHint,
   odnoklassnikiRenderHint,
   omnyRenderHint,
@@ -85,6 +100,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   rutubeRenderHint,
   sketchfabRenderHint,
   soundcloudRenderHint,
+  spotifyRenderHint,
   spreakerRenderHint,
   srgplayRenderHint,
   tedRenderHint,
@@ -94,7 +110,9 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   tuneinRenderHint,
   twitterRenderHint,
   videopressRenderHint,
+  vidyardRenderHint,
   vimeoRenderHint,
+  vkRenderHint,
   wistiaRenderHint,
   youtubeRenderHint,
 ]

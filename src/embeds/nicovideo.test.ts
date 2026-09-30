@@ -4,6 +4,7 @@ import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   extractNicovideoId,
+  isNicovideoReady,
   nicovideoIframeEmbedResolver,
   nicovideoResolveEmbed,
   nicovideoScriptEmbedResolver,
@@ -386,5 +387,39 @@ describeForEachParser('nicovideo through the pipeline', (parseHtml) => {
     const expected: Record<string, string> = {}
 
     expect(await placeholder(value)).toEqual(expected)
+  })
+})
+
+describe('isNicovideoReady', () => {
+  it('should accept the message the player posts once it has loaded', () => {
+    const value = {
+      sourceConnectorType: 0,
+      playerId: '1',
+      eventName: 'loadComplete',
+      data: {
+        videoInfo: {
+          watchId: 'sm9',
+          videoId: 'sm9',
+          title: '新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師',
+        },
+      },
+    }
+
+    expect(isNicovideoReady(value)).toBe(true)
+  })
+
+  it('should refuse another player event', () => {
+    const value = {
+      sourceConnectorType: 0,
+      playerId: '1',
+      eventName: 'playerStatusChange',
+      data: { playerStatus: 1 },
+    }
+
+    expect(isNicovideoReady(value)).toBe(false)
+  })
+
+  it('should refuse the event name posted as a string', () => {
+    expect(isNicovideoReady('loadComplete')).toBe(false)
   })
 })
