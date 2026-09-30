@@ -34,10 +34,11 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
       return
     }
 
+    // The legacy player 301s onto the current one by itself, so it plays as written.
     return {
       provider: 'googleslides',
       id: fileId,
-      src: `https://docs.google.com/presentation/embed${pickUrlParams(url, ['id', ...deckParams])}${parsed.hash}`,
+      src: url,
       url: `https://docs.google.com/presentation/d/${fileId}/pub`,
     }
   }
@@ -61,11 +62,15 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
 
   const deckPath = isPublished ? `e/${deckId}` : deckId
 
-  // `/pub` answers `x-frame-options: SAMEORIGIN`, so the frame is always `/embed`.
+  // The `/embed` player plays as written, with its slideshow settings. `/pub` answers
+  // `x-frame-options: SAMEORIGIN`, so a page route gets the `/embed` frame.
   return {
     provider: 'googleslides',
     id: deckId,
-    src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${parsed.hash}`,
+    src:
+      route === 'embed'
+        ? url
+        : `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${parsed.hash}`,
     url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
   }
 }
