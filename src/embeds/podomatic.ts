@@ -23,7 +23,7 @@ const currentHeight = 205
 // answers 404.
 const html5KindRegex = /^[a-z]+$/
 
-type Player = { kind: string; id: string; src: string; height: number }
+type Player = { kind: string; id: string; height: number }
 
 const readPlayer = (url: URL): Player | undefined => {
   const segments = getPathSegments(url)
@@ -37,14 +37,10 @@ const readPlayer = (url: URL): Player | undefined => {
   if (segments[1] === 'html5' && html5KindRegex.test(segments[2] ?? '')) {
     const style = url.searchParams.get('style') ?? ''
     const named = html5Heights.has(style) ? style : 'normal'
-    const query = named === 'normal' ? '' : `?style=${named}`
-    const kind = segments[2] as string
-    const id = segments[3] ?? ''
 
     return {
-      kind,
-      id,
-      src: `https://www.podomatic.com/embed/html5/${kind}/${id}${query}`,
+      kind: segments[2] as string,
+      id: segments[3] ?? '',
       height: html5Heights.get(named) ?? defaultHtml5Height,
     }
   }
@@ -54,21 +50,16 @@ const readPlayer = (url: URL): Player | undefined => {
   if (segments[1] === 'v2' && segments[2] === 'podcast') {
     const podcast = segments[3] ?? ''
 
-    // The podcast segment is written into the src whichever id travels, and ..%2F.. never folds.
     if (!digitsRegex.test(podcast)) {
       return
     }
 
     const episode = url.searchParams.get('episode_id') ?? ''
-    const theme = url.searchParams.get('theme')
-    const named = digitsRegex.test(episode) ? `?episode_id=${episode}` : ''
-    // The theme comes back decoded, so unencoded it could smuggle a second parameter.
-    const themed = theme && named ? `&theme=${encodeURIComponent(theme)}` : ''
+    const isEpisode = digitsRegex.test(episode)
 
     return {
-      kind: named ? 'episode' : 'podcast',
-      id: named ? episode : podcast,
-      src: `https://www.podomatic.com/embed/v2/podcast/${podcast}${named}${themed}`,
+      kind: isEpisode ? 'episode' : 'podcast',
+      id: isEpisode ? episode : podcast,
       height: currentHeight,
     }
   }
@@ -88,7 +79,8 @@ export const podomaticResolveEmbed: ResolveEmbed = (url) => {
     // enricher would call differs: `embed/html5/episode/{id}` and `embed/html5/podcast/{id}` each
     // answer with the canonical page, the feed url and the title of what they hold.
     id: `${player.kind}/${player.id}`,
-    src: player.src,
+    // The player plays as written, with its style and theme.
+    src: url,
     height: player.height,
   }
 }
