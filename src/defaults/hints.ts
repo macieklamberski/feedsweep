@@ -6,6 +6,7 @@ import { blueskyRenderHint } from '../embeds/bluesky.js'
 import { brightcoveRenderHint } from '../embeds/brightcove.js'
 import { buzzsproutRenderHint } from '../embeds/buzzsprout.js'
 import { captivateRenderHint } from '../embeds/captivate.js'
+import { cloudflarestreamRenderHint } from '../embeds/cloudflarestream.js'
 import { cnnRenderHint } from '../embeds/cnn.js'
 import { codesandboxRenderHint } from '../embeds/codesandbox.js'
 import { deezerRenderHint } from '../embeds/deezer.js'
@@ -22,6 +23,7 @@ import { mixcloudRenderHint } from '../embeds/mixcloud.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
 import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
 import { omnyRenderHint } from '../embeds/omny.js'
+import { pbsRenderHint } from '../embeds/pbs.js'
 import { peertubeRenderHint } from '../embeds/peertube.js'
 import { podbeanRenderHint } from '../embeds/podbean.js'
 import { podigeeRenderHint } from '../embeds/podigee.js'
@@ -35,6 +37,7 @@ import { srgplayRenderHint } from '../embeds/srgplay.js'
 import { tedRenderHint } from '../embeds/ted.js'
 import { telegramRenderHint } from '../embeds/telegram.js'
 import { tumblrRenderHint } from '../embeds/tumblr.js'
+import { tuneinRenderHint } from '../embeds/tunein.js'
 import { twitterRenderHint } from '../embeds/twitter.js'
 import { videopressRenderHint } from '../embeds/videopress.js'
 import { vimeoRenderHint } from '../embeds/vimeo.js'
@@ -54,6 +57,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   brightcoveRenderHint,
   buzzsproutRenderHint,
   captivateRenderHint,
+  cloudflarestreamRenderHint,
   cnnRenderHint,
   codesandboxRenderHint,
   deezerRenderHint,
@@ -71,6 +75,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   notecomRenderHint,
   odnoklassnikiRenderHint,
   omnyRenderHint,
+  pbsRenderHint,
   peertubeRenderHint,
   podbeanRenderHint,
   podigeeRenderHint,
@@ -84,6 +89,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   tedRenderHint,
   telegramRenderHint,
   tumblrRenderHint,
+  tuneinRenderHint,
   twitterRenderHint,
   videopressRenderHint,
   vimeoRenderHint,
