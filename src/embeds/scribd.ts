@@ -1,7 +1,13 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar, keepIfMatches, parseRatio } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  digitsRegex,
+  parseUrlOnHosts,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The embed routes are the site's own. `scribdassets.com` served the Flash player and serves the
@@ -20,14 +26,20 @@ const flashPlayerPathRegex = /\/scribdviewer\.swf$/i
 // the truth beside the wrong number, as a bare decimal width over height.
 const aspectRatioAttribute = 'data-aspect-ratio'
 
+// A private document opens only with its `access_key`, and `start_page` is where reading starts.
+const playerParams = ['access_key', 'start_page']
+
 // The embeds route answers 200 with an identical body for any id, rendering "Document deleted by
 // owner" for a Flash-era id and "Document Not Found" for an invented one.
-const composeEmbed = (document: string): EmbedResolverResult => {
+const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
+  const params = pickQueryParams(search, playerParams)
+
   return {
     provider: 'scribd',
     id: document,
-    src: `https://www.scribd.com/embeds/${document}/content`,
-    url: `https://www.scribd.com/document/${document}`,
+    src: `https://www.scribd.com/embeds/${document}/content${composeQuery(params)}`,
+    // The document page takes no key, so a private document gets no page url.
+    url: params.access_key ? undefined : `https://www.scribd.com/document/${document}`,
   }
 }
 
@@ -56,10 +68,7 @@ export const scribdResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const title = attr(element, 'title')
-  // The player frame plays as written, with its access key, page and view mode. A page url gets
-  // the player built.
-  const isPlayer = getPathSegments(parsed)[0] === 'embeds'
-  const result = { ...composeEmbed(document), ...(isPlayer && { src: url }), title }
+  const result = { ...composeEmbed(document, parsed.search), title }
   const ratio = parseRatio(attr(element, aspectRatioAttribute) ?? '')
 
   // The ratio describes the document and the declared height is a constant, so where both are
