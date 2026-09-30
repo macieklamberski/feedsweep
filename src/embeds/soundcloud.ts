@@ -1,13 +1,7 @@
 import { getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, text } from '../utils/dom.js'
-import {
-  composeQuery,
-  isFileName,
-  parseUrlOnHosts,
-  pickQueryParams,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { filterUrlQuery, isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'soundcloud'
@@ -23,13 +17,25 @@ const referenceRegex =
 // The widget takes a page url in place of a reference, which is what makes the repair possible.
 const widgetPlayerUrl = 'https://w.soundcloud.com/player/'
 
-// What the widget plays and where: a private item's `secret_token` and a playlist's `start_track`.
-// The colours, the tabs, the visual layout and autoplay are the publisher's look and are dropped.
-const widgetParams = ['secret_token', 'start_track']
+// The spelling SoundCloud's own share snippet writes: the item's url with its colon escaped and its
+// slashes kept, then a private item's `secret_token` and a list's `start_track`. The colours, the
+// tabs, the visual layout and autoplay are the publisher's look and are left out.
+const composeWidgetUrl = (target: string, secretToken?: string, startTrack?: string): string => {
+  const pairs = [`url=${encodeURIComponent(target).replaceAll('%2F', '/')}`]
 
-const composeWidgetUrl = (target: string, params: Record<string, string> = {}): string => {
-  return `${widgetPlayerUrl}${composeQuery({ url: target, ...params })}`
+  if (secretToken) {
+    pairs.push(`secret_token=${encodeURIComponent(secretToken)}`)
+  }
+
+  if (startTrack) {
+    pairs.push(`start_track=${encodeURIComponent(startTrack)}`)
+  }
+
+  return `${widgetPlayerUrl}?${pairs.join('&')}`
 }
+
+// A widget naming nothing the resolver reads keeps these pairs as the carrier wrote them.
+const widgetParams = ['url', 'secret_token', 'start_track']
 
 // spotlight and groups answer 410, but the platform still holds them and no track takes the slug.
 // These second segments are the user's own tabs, and each answers with the profile.
@@ -169,10 +175,20 @@ const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
   const inner = params?.get('url')
   const reference = inner?.match(referenceRegex)
   const streamTrackId = parsed?.pathname.match(streamPathRegex)?.[1]
+  // A private item's token sits beside `url=` or inside the url it names.
+  const innerToken = inner
+    ? parseUrl(inner, placeholderBaseUrl)?.searchParams.get('secret_token')
+    : null
+  const startTrack = params?.get('start_track') ?? undefined
   const result: EmbedResolverResult = { provider, src: url }
 
   if (reference) {
     result.id = `${reference[1]}/${reference[2]}`
+    result.src = composeWidgetUrl(
+      `https://api.soundcloud.com/${reference[1]}/${reference[2]}`,
+      params?.get('secret_token') ?? innerToken ?? undefined,
+      startTrack,
+    )
   } else if (streamTrackId) {
     // A track page is addressed by handle and slug, and the id does not yield either:
     // `soundcloud.com/tracks/{id}` redirects to a genre chart.
@@ -193,22 +209,19 @@ const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
 
   if (pageKind) {
     result.url = `https://soundcloud.com/${permalink.join('/')}`
-
-    if (!inner) {
-      result.src = composeWidgetUrl(result.url, secretToken ? { secret_token: secretToken } : {})
-    }
-  } else if (shortLink && !inner) {
-    result.src = composeWidgetUrl(shortLink.href)
+    result.src = composeWidgetUrl(
+      result.url,
+      secretToken ?? params?.get('secret_token') ?? innerToken ?? undefined,
+      startTrack,
+    )
+  } else if (shortLink) {
+    result.src = composeWidgetUrl(shortLink.href, undefined, startTrack)
+  } else if (parsed && inner && !reference) {
+    result.src = `${widgetPlayerUrl}${filterUrlQuery(parsed, (name) => widgetParams.includes(name))}`
   }
 
   if (flashPlayerHostRegex.test(parsed?.hostname ?? '') && !inner) {
     return
-  }
-
-  // The widget plays what `url=` names, so it is rebuilt around that value as written, with the
-  // parameters that decide what plays.
-  if (inner) {
-    result.src = composeWidgetUrl(inner, pickQueryParams(parsed?.search ?? '', widgetParams))
   }
 
   if (!result.id && !pageKind && isFileName(parsed?.pathname ?? '')) {
