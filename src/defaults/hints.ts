@@ -6,6 +6,7 @@ import { blueskyRenderHint } from '../embeds/bluesky.js'
 import { brightcoveRenderHint } from '../embeds/brightcove.js'
 import { buzzsproutRenderHint } from '../embeds/buzzsprout.js'
 import { captivateRenderHint } from '../embeds/captivate.js'
+import { channel9RenderHint } from '../embeds/channel9.js'
 import { cloudflarestreamRenderHint } from '../embeds/cloudflarestream.js'
 import { cnnRenderHint } from '../embeds/cnn.js'
 import { codesandboxRenderHint } from '../embeds/codesandbox.js'
@@ -58,6 +59,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   brightcoveRenderHint,
   buzzsproutRenderHint,
   captivateRenderHint,
+  channel9RenderHint,
   cloudflarestreamRenderHint,
   cnnRenderHint,
   codesandboxRenderHint,
