@@ -1,4 +1,4 @@
-import { getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
+import { decodeSegment, getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
@@ -98,7 +98,7 @@ const readPathId = (url: URL, segments: Array<string>): string | undefined => {
   // The short domain is a pure shortener with no routes of its own: every path it does not know
   // as a video goes to `/urlshortener?path=…`, so nothing there needs telling from an id.
   if (url.hostname === 'dai.ly' || url.hostname.endsWith('.dai.ly')) {
-    return segments[0]
+    return segments[0] && (decodeSegment(segments[0]) ?? segments[0])
   }
 
   const index = skipRouteWords(segments)
@@ -107,7 +107,12 @@ const readPathId = (url: URL, segments: Array<string>): string | undefined => {
   // `/about` is five legal id characters.
   const candidate = index > 0 ? segments[index] : undefined
 
-  return candidate && !nonVideoWords.has(candidate) ? candidate : undefined
+  if (!candidate || nonVideoWords.has(candidate)) {
+    return
+  }
+
+  // Decoded here, so the url, the thumbnail and the player encode it once.
+  return decodeSegment(candidate) ?? candidate
 }
 
 export const extractDailymotionId = (link: string): string | undefined => {

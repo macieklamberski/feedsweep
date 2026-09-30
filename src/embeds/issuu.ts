@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 
 const provider = 'issuu'
@@ -71,7 +71,12 @@ const readDocumentUrl = (url: string): EmbedResolverResult | undefined => {
     return
   }
 
-  return composeDocumentEmbed(publisher, documentName, page)
+  // Decoded here, so the url and the reader encode them once.
+  return composeDocumentEmbed(
+    decodeSegment(publisher) ?? publisher,
+    decodeSegment(documentName) ?? documentName,
+    page,
+  )
 }
 
 // Issuu ships a document as an empty div only its `embed.js` loader hydrates into the reader.

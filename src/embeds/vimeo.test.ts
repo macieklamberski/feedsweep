@@ -141,6 +141,7 @@ describe('vimeoResolveEmbed', () => {
       provider: 'vimeo',
       id: '76979871:a52724358e',
       src: 'https://player.vimeo.com/video/76979871?h=a52724358e',
+      url: 'https://vimeo.com/76979871/a52724358e',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -152,6 +153,20 @@ describe('vimeoResolveEmbed', () => {
       provider: 'vimeo',
       id: '76979871:../../showcase/1',
       src: 'https://player.vimeo.com/video/76979871?h=..%2F..%2Fshowcase%2F1',
+      url: 'https://vimeo.com/76979871/..%2F..%2Fshowcase%2F1',
+    }
+
+    expect(vimeoResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should cut a query hash at the whitespace a feed left in it', () => {
+    const value =
+      'https://player.vimeo.com/video/664725670?h=04acf91ce2 portrait=0&amp;color=98895e'
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '664725670:04acf91ce2',
+      src: 'https://player.vimeo.com/video/664725670?h=04acf91ce2',
+      url: 'https://vimeo.com/664725670/04acf91ce2',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -177,6 +192,7 @@ describe('vimeoResolveEmbed', () => {
       provider: 'vimeo',
       id: '76979871:a52724358e',
       src: 'https://player.vimeo.com/video/76979871?h=a52724358e',
+      url: 'https://vimeo.com/76979871/a52724358e',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -189,6 +205,7 @@ describe('vimeoResolveEmbed', () => {
       provider: 'vimeo',
       id: '76979871:a52724358e',
       src: 'https://player.vimeo.com/video/76979871?h=a52724358e',
+      url: 'https://vimeo.com/76979871/a52724358e',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -200,6 +217,7 @@ describe('vimeoResolveEmbed', () => {
       provider: 'vimeo',
       id: '76979871:a52724358e',
       src: 'https://player.vimeo.com/video/76979871?h=a52724358e&t=30s',
+      url: 'https://vimeo.com/76979871/a52724358e',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)

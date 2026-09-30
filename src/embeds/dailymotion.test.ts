@@ -107,14 +107,14 @@ describe('extractDailymotionId', () => {
 
   it('should use a malformed id with an encoded slash after it as written, even if the player answers an error', () => {
     const value = 'https://www.dailymotion.com/video/x7tgad0%2F'
-    const expected = 'x7tgad0%2F'
+    const expected = 'x7tgad0/'
 
     expect(extractDailymotionId(value)).toEqual(expected)
   })
 
   it('should use a malformed id with an encoded slash before it as written, even if the player answers an error', () => {
     const value = 'https://www.dailymotion.com/video/%2Fx7tgad0'
-    const expected = '%2Fx7tgad0'
+    const expected = '/x7tgad0'
 
     expect(extractDailymotionId(value)).toEqual(expected)
   })
@@ -141,6 +141,20 @@ describe('dailymotionResolveEmbed', () => {
       src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0',
       url: 'https://www.dailymotion.com/video/x7tgad0',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should encode a path id carrying an encoded slash once', () => {
+    const value = 'https://www.dailymotion.com/embed/video/x8abc%2Fdef'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x8abc/def',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8abc%2Fdef',
+      url: 'https://www.dailymotion.com/video/x8abc%2Fdef',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8abc%2Fdef',
       ratio: '16/9',
     }
 

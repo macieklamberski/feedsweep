@@ -14,6 +14,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'vimeo'
 
 // An unlisted video's privacy hash is ten lowercase hex characters, and case-sensitive.
+const whitespaceRegex = /\s/
 const unlistedHashRegex = /^[0-9a-f]{10}$/
 
 const vimeoHosts = ['vimeo.com']
@@ -141,9 +142,20 @@ const readReference = (link: string): VimeoReference | undefined => {
     return
   }
 
+  if (hashIndex !== -1) {
+    return {
+      id,
+      hash: segments[hashIndex],
+    }
+  }
+
+  // A feed that lost the `&` before the next parameter leaves it after a space. A hash is hex and
+  // never holds one, so the cut repairs what the feed did.
+  const queryHash = url.searchParams.get('h')?.split(whitespaceRegex)[0]
+
   return {
     id,
-    hash: hashIndex === -1 ? (url.searchParams.get('h') ?? undefined) : segments[hashIndex],
+    hash: queryHash || undefined,
   }
 }
 
@@ -197,26 +209,13 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
     ...pickQueryParams(parseUrl(url, placeholderBaseUrl)?.search ?? '', vimeoEmbedParams),
   }
 
-  // The hash travels in the id: an oEmbed lookup for the bare id answers 404.
-  const id = hash ? `${videoId}:${hash}` : videoId
-  const src = composeEmbedUrl(segment, params)
-
-  // The hash is an access token: an unlisted video answers 403 without it, so it stays in `src`
-  // alone and a hashed player states no page url.
-  if (hash) {
-    return {
-      provider,
-      id,
-      src,
-      title,
-    }
-  }
-
   return {
     provider,
-    id,
-    src,
-    url: `https://vimeo.com/${segment}`,
+    // The hash travels in the id: an oEmbed lookup for the bare id answers 404.
+    id: hash ? `${videoId}:${hash}` : videoId,
+    src: composeEmbedUrl(segment, params),
+    // Without the hash the page loses its title and its video, so it stays on the url too.
+    url: `https://vimeo.com/${segment}${hash ? `/${encodePathSegment(hash)}` : ''}`,
     title,
     // TODO: no thumbnail. Vimeo posters are not derivable from the id and need an oEmbed lookup.
   }

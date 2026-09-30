@@ -66,6 +66,18 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should encode a document name carrying an encoded slash once', async () => {
+      const value = '<div class="issuuembed" data-url="https://issuu.com/pub/docs/do%2Fc"></div>'
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'pub/do/c',
+        src: 'https://e.issuu.com/embed.html?u=pub&d=do%2Fc',
+        url: 'https://issuu.com/pub/docs/do%2Fc',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should carry a page number from the reader url into the query', async () => {
       const value = html`
         <div
