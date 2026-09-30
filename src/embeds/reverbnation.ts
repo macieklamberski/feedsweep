@@ -1,7 +1,9 @@
 import { getPathSegments } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'reverbnation'
 
 const reverbnationHosts = ['reverbnation.com']
 
@@ -71,7 +73,7 @@ export const reverbnationResolveEmbed: ResolveEmbed = (url) => {
   // No size either: the widget reflows, 500 tall at 1200 wide and 400 tall at 400 wide, neither a
   // fixed height nor a ratio. The widget page carries the slug that names the artist's page.
   return {
-    provider: 'reverbnation',
+    provider,
     id,
     src: composeSource(id, widget ? filterUrlQuery(parsed, isWidgetParam) : ''),
   }
@@ -82,3 +84,8 @@ export const reverbnationEmbedResolver = createUrlEmbedResolver(
   reverbnationHosts,
   reverbnationResolveEmbed,
 )
+
+export const reverbnationRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { 'pwc[auto_play]': 'true' },
+}
