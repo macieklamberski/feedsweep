@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl, toMap } from 'trousse'
+import { decodeSegment, getPathSegments, parseUrl, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import {
   composeQuery,
@@ -18,14 +18,8 @@ const provider = 'ridewithgps'
 
 const ridewithgpsHosts = ['ridewithgps.com']
 
-const embedParams = [
-  'title',
-  'overlay',
-  'metricUnits',
-  'sampleGraph',
-  'distanceMarkers',
-  'privacyCode',
-]
+const embedParams = ['title', 'privacyCode']
+const privateParams = ['privacyCode']
 
 // An event names its id in `eventId`, and Ride with GPS serves no static render under `/events`.
 const embedKinds = toMap<EmbedShape>({
@@ -36,6 +30,15 @@ const embedKinds = toMap<EmbedShape>({
 
 // Ride with GPS answers 404 on `/events/{id}/embed`.
 const kindsByPath = toMap({ routes: 'route', trips: 'trip' })
+
+const composeSource = (
+  kind: string,
+  shape: EmbedShape,
+  id: string,
+  params?: Record<string, string>,
+): string => {
+  return `https://ridewithgps.com/embeds${composeQuery({ type: kind, [shape.idParam]: id, ...params })}`
+}
 
 // Route, trip and event ids share one numeric grammar, so the kind rides in the id.
 const composeEmbed = (
@@ -57,6 +60,21 @@ const composeEmbed = (
   }
 }
 
+// A private resource's page and thumbnail answer 403 without its token.
+const composePrivateEmbed = (
+  kind: string,
+  id: string,
+  src: string,
+  title?: string,
+): EmbedResolverResult => {
+  return {
+    provider,
+    id: `${kind}/${id}`,
+    src,
+    title,
+  }
+}
+
 // `ridewithgps.com/embeds?type={route|trip|event}`, the id in the parameter its kind names.
 const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
   const kind = parsed.searchParams.get('type') ?? ''
@@ -72,27 +90,21 @@ const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
     return
   }
 
-  const params = pickQueryParams(parsed.search, embedParams)
-  const query = composeQuery({ type: kind, [shape.idParam]: id, ...params })
-  const src = `https://ridewithgps.com/embeds${query}`
+  // `title` is the heading the player draws over the map in place of the route's own name.
+  const { title, ...playerParams } = pickQueryParams(parsed.search, embedParams)
+  const src = composeSource(kind, shape, id, playerParams)
 
-  // A private resource's page and thumbnail answer 403 without its token.
-  if (params.privacyCode) {
-    return {
-      provider,
-      id: `${kind}/${id}`,
-      src,
-      title: params.title,
-    }
+  if (playerParams.privacyCode) {
+    return composePrivateEmbed(kind, id, src, title)
   }
 
   // The id comes out of the query decoded, and the page goes into a path beside the raw spelling.
-  return composeEmbed(kind, shape, encodePathSegment(id), src, params.title)
+  return composeEmbed(kind, shape, encodePathSegment(id), src, title)
 }
 
 // The older per-resource spelling, `ridewithgps.com/{routes|trips}/{id}/embed`, which feeds
-// carry protocol-relative.
-const readPathEmbed = (parsed: URL, url: string): EmbedResolverResult | undefined => {
+// carry protocol-relative. Ride with GPS redirects it to the query spelling.
+const readPathEmbed = (parsed: URL): EmbedResolverResult | undefined => {
   const segments = getPathSegments(parsed)
   const [path, id, marker] = segments
 
@@ -107,13 +119,20 @@ const readPathEmbed = (parsed: URL, url: string): EmbedResolverResult | undefine
     return
   }
 
-  return composeEmbed(kind, shape, id, url)
+  const playerParams = pickQueryParams(parsed.search, privateParams)
+  const src = composeSource(kind, shape, decodeSegment(id) ?? id, playerParams)
+
+  if (playerParams.privacyCode) {
+    return composePrivateEmbed(kind, id, src)
+  }
+
+  return composeEmbed(kind, shape, id, src)
 }
 
 const ridewithgpsResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  return parsed && (readQueryEmbed(parsed) ?? readPathEmbed(parsed, url))
+  return parsed && (readQueryEmbed(parsed) ?? readPathEmbed(parsed))
 }
 
 // The Ride with GPS route map iframe, in both its query and its path spelling.
