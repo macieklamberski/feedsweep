@@ -196,9 +196,7 @@ describeForEachParser('crowdsignalScriptEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-  })
 
-  describe('sad paths', () => {
     it('should use a loader naming no poll as written, even if the player answers an error', async () => {
       const value = '<script src="https://secure.polldaddy.com/p/embed.js"></script>'
       const expected: EmbedResolverResult = {
@@ -210,7 +208,9 @@ describeForEachParser('crowdsignalScriptEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
 
+  describe('sad paths', () => {
     it('should ignore a foreign host serving the loader path', async () => {
       const value = '<script src="https://evil.test/p/13332507.js?polldaddy.com/p/"></script>'
 
