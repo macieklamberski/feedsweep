@@ -6,24 +6,24 @@ import { aushaEmbedResolver, aushaResolveEmbed } from './ausha.js'
 
 describe('aushaResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should take the episode and the measured height off the player', () => {
+    it('should take the episode and the measured height off the player without its colour', () => {
       const value = 'https://player.ausha.co/?podcastId=BGKwJUJG8D9m&color=%23001B2D&v=3'
       const expected: EmbedResolverResult = {
         provider: 'ausha',
         id: 'podcast/BGKwJUJG8D9m',
-        src: 'https://player.ausha.co/?podcastId=BGKwJUJG8D9m&color=%23001B2D&v=3',
+        src: 'https://player.ausha.co/?podcastId=BGKwJUJG8D9m&v=3',
         height: 220,
       }
 
       expect(aushaResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should read the player spelled as index.html', () => {
+    it('should mint the bare root for the player spelled as index.html', () => {
       const value = 'https://player.ausha.co/index.html?podcastId=b3GxmHMGPEaQ&v=3'
       const expected: EmbedResolverResult = {
         provider: 'ausha',
         id: 'podcast/b3GxmHMGPEaQ',
-        src: 'https://player.ausha.co/index.html?podcastId=b3GxmHMGPEaQ&v=3',
+        src: 'https://player.ausha.co/?podcastId=b3GxmHMGPEaQ&v=3',
         height: 220,
       }
 
@@ -69,7 +69,7 @@ describe('aushaResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'ausha',
         id: 'podcast/podcast/BGKwJUJG8D9m',
-        src: 'https://player.ausha.co/?podcastId=podcast/BGKwJUJG8D9m&v=3',
+        src: 'https://player.ausha.co/?podcastId=podcast%2FBGKwJUJG8D9m&v=3',
         height: 220,
       }
 
@@ -102,7 +102,7 @@ describe('aushaResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'ausha',
         id: 'podcast/YK049s1DdWXX',
-        src: 'https://player.ausha.co/?showId=4qgQzfO219p2&podcastId=YK049s1DdWXX&t=0&v=3&playerId=ausha-vZGt',
+        src: 'https://player.ausha.co/?podcastId=YK049s1DdWXX&v=3&t=0',
         height: 220,
       }
 
@@ -114,7 +114,7 @@ describe('aushaResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'ausha',
         id: 'show/4qgQzfO219p2',
-        src: 'https://player.ausha.co/?showId=4qgQzfO219p2&multishow=false&v=3',
+        src: 'https://player.ausha.co/?showId=4qgQzfO219p2&v=3',
         height: 220,
       }
 
@@ -122,26 +122,16 @@ describe('aushaResolveEmbed', () => {
     })
   })
 
-  describe('the two shapes the player draws', () => {
-    it('should give the vertical player its taller box', () => {
+  // The vertical layout is the same episode drawn with its cover, 501 tall. The standard player
+  // is minted in its place.
+  describe('the vertical layout', () => {
+    it('should mint the standard player at its height', () => {
       const value =
         'https://player.ausha.co/?podcastId=yknWu4dagvGo&display=vertical&showId=yXGrf5edXR3o&v=3'
       const expected: EmbedResolverResult = {
         provider: 'ausha',
         id: 'podcast/yknWu4dagvGo',
-        src: 'https://player.ausha.co/?podcastId=yknWu4dagvGo&display=vertical&showId=yXGrf5edXR3o&v=3',
-        height: 501,
-      }
-
-      expect(aushaResolveEmbed(value)).toEqual(expected)
-    })
-
-    it('should give the horizontal player the usual box', () => {
-      const value = 'https://player.ausha.co/?podcastId=yknWu4dagvGo&display=horizontal&v=3'
-      const expected: EmbedResolverResult = {
-        provider: 'ausha',
-        id: 'podcast/yknWu4dagvGo',
-        src: 'https://player.ausha.co/?podcastId=yknWu4dagvGo&display=horizontal&v=3',
+        src: 'https://player.ausha.co/?podcastId=yknWu4dagvGo&v=3',
         height: 220,
       }
 
@@ -149,16 +139,28 @@ describe('aushaResolveEmbed', () => {
     })
   })
 
-  describe('the older widget, which states its own height', () => {
-    // Its height moves with what it holds, so every one of the 33 corpus frames declares one and
-    // the resolver states none of its own.
-    it('should claim the widget without stating a height', () => {
+  describe('the v2 widget, rebuilt as the v3 player', () => {
+    it('should mint the v3 player for the episode the widget names', () => {
+      const value =
+        'https://widget.ausha.co/index.html?chanId=y8wm8Tlwvv5L&showId=b7z8KuEkzXPd&color=%23D0021B&display=horizontal&v=2&height=200px&autonext=1&podcastId=BGA94HJRGq7R'
+      const expected: EmbedResolverResult = {
+        provider: 'ausha',
+        id: 'podcast/BGA94HJRGq7R',
+        src: 'https://player.ausha.co/?podcastId=BGA94HJRGq7R&v=3',
+        height: 220,
+      }
+
+      expect(aushaResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint the v3 player for a widget naming only its show', () => {
       const value =
         'https://widget.ausha.co/index.html?chanId=y8wm8Tlwvv5L&showId=b7z8KuEkzXPd&display=horizontal&v=2&height=200px&mode=latest'
       const expected: EmbedResolverResult = {
         provider: 'ausha',
         id: 'show/b7z8KuEkzXPd',
-        src: 'https://widget.ausha.co/index.html?chanId=y8wm8Tlwvv5L&showId=b7z8KuEkzXPd&display=horizontal&v=2&height=200px&mode=latest',
+        src: 'https://player.ausha.co/?showId=b7z8KuEkzXPd&v=3',
+        height: 220,
       }
 
       expect(aushaResolveEmbed(value)).toEqual(expected)
@@ -216,8 +218,33 @@ describeForEachParser('aushaEmbedResolver', (parseHtml) => {
     })
   })
 
+  // What Ausha's share dialog writes: the look the publisher picked, the start and the frame id
+  // its loader script resizes.
+  describe('the query the share dialog wrote', () => {
+    it('should keep the start and drop the look', async () => {
+      const value = html`
+        <iframe
+          src="https://player.ausha.co/?showId=b7XnHvGNO9OB&amp;color=%233a7bc7&amp;display=vertical&amp;multishow=false&amp;playlist=false&amp;dark=false&amp;t=0&amp;podcastId=dBDjWc7Y6Pny&amp;v=3&amp;playerId=ausha-Lfpz"
+          style="border: none; width: 100%; height: 500px;"
+          width=""
+          height=""
+          frameborder="0"
+          name="Ausha Podcast Player"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ausha',
+        id: 'podcast/dBDjWc7Y6Pny',
+        src: 'https://player.ausha.co/?podcastId=dBDjWc7Y6Pny&v=3&t=0',
+        height: 220,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   describe('the size a publisher states', () => {
-    it('should let the carrier box win over the measured one', async () => {
+    it("should state the player's own height over the carrier box", async () => {
       const value = html`
         <iframe
           src="https://player.ausha.co/?podcastId=BGKwJUJG8D9m&amp;display=vertical&amp;v=3"
@@ -228,8 +255,8 @@ describeForEachParser('aushaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ausha',
         id: 'podcast/BGKwJUJG8D9m',
-        src: 'https://player.ausha.co/?podcastId=BGKwJUJG8D9m&display=vertical&v=3',
-        height: 420,
+        src: 'https://player.ausha.co/?podcastId=BGKwJUJG8D9m&v=3',
+        height: 220,
       }
 
       expect(await extract(value)).toEqual(expected)

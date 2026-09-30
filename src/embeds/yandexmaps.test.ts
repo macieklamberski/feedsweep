@@ -8,7 +8,7 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, yandexMapsScriptEmbedResolver)
 
   describe('happy paths', () => {
-    it('should rebuild the constructor script onto the map widget frame in its locale', async () => {
+    it('should rebuild the constructor script onto the map widget frame without its locale', async () => {
       const value = html`
         <script
           type="text/javascript"
@@ -20,9 +20,9 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:669755b2ef0f5d7045582d539cdbb5a036d042af257453807f832e99a561f2f6',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A669755b2ef0f5d7045582d539cdbb5a036d042af257453807f832e99a561f2f6&lang=ru_RU&scroll=true&source=constructor',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A669755b2ef0f5d7045582d539cdbb5a036d042af257453807f832e99a561f2f6&source=constructor',
         thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A669755b2ef0f5d7045582d539cdbb5a036d042af257453807f832e99a561f2f6&width=650&height=366&lang=ru_RU',
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A669755b2ef0f5d7045582d539cdbb5a036d042af257453807f832e99a561f2f6&width=650&height=366',
         width: 1280,
         height: 720,
       }
@@ -60,14 +60,14 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:T-nTLncOvg4Imm-DPwvRpeKBNo5j9f7j',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3AT-nTLncOvg4Imm-DPwvRpeKBNo5j9f7j&lang=ru_RU&scroll=true&source=constructor',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3AT-nTLncOvg4Imm-DPwvRpeKBNo5j9f7j&source=constructor',
         height: 320,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a locale other than Russian in the frame and the thumbnail', async () => {
+    it('should drop a locale other than Russian from the frame and the thumbnail', async () => {
       const value = html`
         <script
           src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&width=700&height=450&lang=en_US"
@@ -76,9 +76,9 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&lang=en_US&source=constructor',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&source=constructor',
         thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&width=650&height=418&lang=en_US',
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&width=650&height=418',
         width: 700,
         height: 450,
       }
@@ -86,7 +86,7 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the wheel zoom the publisher turned off', async () => {
+    it('should drop the wheel zoom the publisher turned off', async () => {
       const value = html`
         <script
           src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A04ec63940a1621326b58c09d746fda091ebb98dd0702004681ee23e278348d6d&width=100%25&height=250&lang=ru_RU&scroll=false"
@@ -95,7 +95,7 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:04ec63940a1621326b58c09d746fda091ebb98dd0702004681ee23e278348d6d',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A04ec63940a1621326b58c09d746fda091ebb98dd0702004681ee23e278348d6d&lang=ru_RU&scroll=false&source=constructor',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A04ec63940a1621326b58c09d746fda091ebb98dd0702004681ee23e278348d6d&source=constructor',
         height: 250,
       }
 
@@ -111,7 +111,7 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:KuFkL5um1Q8O6zD79_lWgD7kyj2EPZeQ',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3AKuFkL5um1Q8O6zD79_lWgD7kyj2EPZeQ&lang=ru_RU&scroll=true&source=constructor',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3AKuFkL5um1Q8O6zD79_lWgD7kyj2EPZeQ&source=constructor',
         height: 400,
       }
 
@@ -130,7 +130,7 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:855da93025cc3bfe3d4b608b50d21825a24fe350250f46898de7e9fb3fcc894f',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A855da93025cc3bfe3d4b608b50d21825a24fe350250f46898de7e9fb3fcc894f&lang=ru_RU&scroll=true&source=constructor',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A855da93025cc3bfe3d4b608b50d21825a24fe350250f46898de7e9fb3fcc894f&source=constructor',
         height: 570,
       }
 
@@ -209,9 +209,9 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:ddca94115ee827d1f17a37eef3b95c46025b7747fb74c35ca4165b13f365c9b0',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3Addca94115ee827d1f17a37eef3b95c46025b7747fb74c35ca4165b13f365c9b0&lang=ru_RU&scroll=true&source=constructor',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3Addca94115ee827d1f17a37eef3b95c46025b7747fb74c35ca4165b13f365c9b0&source=constructor',
         thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3Addca94115ee827d1f17a37eef3b95c46025b7747fb74c35ca4165b13f365c9b0&width=500&height=400&lang=ru_RU',
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3Addca94115ee827d1f17a37eef3b95c46025b7747fb74c35ca4165b13f365c9b0&width=500&height=400',
         width: 500,
         height: 400,
       }
@@ -228,9 +228,9 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&lang=ru_RU&scroll=true&source=constructor',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&source=constructor',
         thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&width=650&height=418&lang=ru_RU',
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&width=650&height=418',
         width: 700,
         height: 450,
       }
@@ -247,9 +247,9 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:3ac70f6965af29b94637e92899a29cb82308a329d457a02b998e8aca5e95218c',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A3ac70f6965af29b94637e92899a29cb82308a329d457a02b998e8aca5e95218c&lang=ru_RU&scroll=true&source=constructor',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A3ac70f6965af29b94637e92899a29cb82308a329d457a02b998e8aca5e95218c&source=constructor',
         thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A3ac70f6965af29b94637e92899a29cb82308a329d457a02b998e8aca5e95218c&width=320&height=240&lang=ru_RU',
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A3ac70f6965af29b94637e92899a29cb82308a329d457a02b998e8aca5e95218c&width=320&height=240',
         width: 320,
         height: 240,
       }
@@ -266,95 +266,15 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:69a07b3ce1b83b89a19fd53f8afeffc4ca72dfafe7772fde955e3a10de775e04',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A69a07b3ce1b83b89a19fd53f8afeffc4ca72dfafe7772fde955e3a10de775e04&lang=ru_RU&scroll=true&source=constructor',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A69a07b3ce1b83b89a19fd53f8afeffc4ca72dfafe7772fde955e3a10de775e04&source=constructor',
         thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A69a07b3ce1b83b89a19fd53f8afeffc4ca72dfafe7772fde955e3a10de775e04&width=337&height=450&lang=ru_RU',
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A69a07b3ce1b83b89a19fd53f8afeffc4ca72dfafe7772fde955e3a10de775e04&width=337&height=450',
         width: 405,
         height: 541,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should drop a lang that is not a locale', async () => {
-      const value = html`
-        <script
-          src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&width=500&height=400&lang=russian"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'yandexmaps',
-        id: 'constructor:ca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&source=constructor',
-        thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&width=500&height=400',
-        width: 500,
-        height: 400,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should drop a lang with a prefix before the locale', async () => {
-      const value = html`
-        <script
-          src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&width=500&height=400&lang=xx_ru_RU"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'yandexmaps',
-        id: 'constructor:ca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&source=constructor',
-        thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&width=500&height=400',
-        width: 500,
-        height: 400,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should drop a lang with a suffix after the locale', async () => {
-      const value = html`
-        <script
-          src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&width=500&height=400&lang=ru_RU_xx"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'yandexmaps',
-        id: 'constructor:ca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&source=constructor',
-        thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&width=500&height=400',
-        width: 500,
-        height: 400,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    const separatorLangs: Array<[string, string]> = [
-      ['language', 'r%2F_RU'],
-      ['region', 'ru_R%2F'],
-    ]
-
-    it.each(separatorLangs)(
-      'should drop a lang with a separator in its %s',
-      async (_name, lang) => {
-        const value = `<script src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&width=500&height=400&lang=${lang}"></script>`
-        const expected: EmbedResolverResult = {
-          provider: 'yandexmaps',
-          id: 'constructor:ca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f',
-          src: 'https://yandex.ru/map-widget/v1/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&source=constructor',
-          thumbnail:
-            'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&width=500&height=400',
-          width: 500,
-          height: 400,
-        }
-
-        expect(await extract(value)).toEqual(expected)
-      },
-    )
 
     it('should encode a um id holding a path into the query', async () => {
       const value = html`
@@ -405,7 +325,7 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:fdfc0ac3ce8c3f2938c3c6b90160ef0ab0512304559d955f27f1a4563fce05c2',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3Afdfc0ac3ce8c3f2938c3c6b90160ef0ab0512304559d955f27f1a4563fce05c2&lang=ru_RU&scroll=true&source=constructor',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3Afdfc0ac3ce8c3f2938c3c6b90160ef0ab0512304559d955f27f1a4563fce05c2&source=constructor',
         height: 400,
       }
 
@@ -439,7 +359,7 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:ca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&lang=ru_RU&scroll=true&source=constructor',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3Aca3315e5d07d03182ee19c793734854b4b2b5cb671b548b014e3bea687d8240f&source=constructor',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -553,10 +473,10 @@ describeForEachParser('yandexmaps through the pipeline', (parseHtml) => {
       <div
         data-embed-height="450"
         data-embed-width="700"
-        data-embed-thumbnail="https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&amp;width=650&amp;height=418&amp;lang=ru_RU"
+        data-embed-thumbnail="https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&amp;width=650&amp;height=418"
         data-embed-id="constructor:0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10"
         data-embed-provider="yandexmaps"
-        data-embed-src="https://yandex.ru/map-widget/v1/?um=constructor%3A0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&amp;lang=ru_RU&amp;scroll=true&amp;source=constructor"
+        data-embed-src="https://yandex.ru/map-widget/v1/?um=constructor%3A0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&amp;source=constructor"
       ></div>
     `
 

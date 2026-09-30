@@ -5,61 +5,61 @@ import { komootEmbedResolver, komootResolveEmbed } from './komoot.js'
 
 describe('komootResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should build the map and the tour page from the tour id', () => {
-      const value = 'https://www.komoot.com/tour/727321743/embed?profile=1'
+    it('should build the map and the tour page and drop the elevation profile', () => {
+      const value = 'https://www.komoot.com/tour/178118403/embed?profile=1'
       const expected: EmbedResolverResult = {
         provider: 'komoot',
-        id: '727321743',
-        src: 'https://www.komoot.com/tour/727321743/embed?profile=1',
-        url: 'https://www.komoot.com/tour/727321743',
+        id: '178118403',
+        src: 'https://www.komoot.com/tour/178118403/embed',
+        url: 'https://www.komoot.com/tour/178118403',
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the locale in the map and the page but not in the id', () => {
+    it('should drop the locale from the map and the page', () => {
       const value = 'https://www.komoot.com/de-de/tour/2011745032/embed'
       const expected: EmbedResolverResult = {
         provider: 'komoot',
         id: '2011745032',
-        src: 'https://www.komoot.com/de-de/tour/2011745032/embed',
-        url: 'https://www.komoot.com/de-de/tour/2011745032',
+        src: 'https://www.komoot.com/tour/2011745032/embed',
+        url: 'https://www.komoot.com/tour/2011745032',
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the language and the gallery layout the publisher chose', () => {
+    it('should keep the share token and drop the language and the gallery layout', () => {
       const value =
         'https://www.komoot.com/tour/3055667226/embed?share_token=aFCLXUxhhEfqsWzhS25hO07CKF8AD7IEY8jdgcSp24c6iS2cR0&hl=es&layout=gallery&gallery=1'
       const expected: EmbedResolverResult = {
         provider: 'komoot',
         id: '3055667226',
-        src: 'https://www.komoot.com/tour/3055667226/embed?share_token=aFCLXUxhhEfqsWzhS25hO07CKF8AD7IEY8jdgcSp24c6iS2cR0&hl=es&layout=gallery&gallery=1',
+        src: 'https://www.komoot.com/tour/3055667226/embed?share_token=aFCLXUxhhEfqsWzhS25hO07CKF8AD7IEY8jdgcSp24c6iS2cR0',
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the classic layout the publisher chose', () => {
+    it('should drop the classic layout the publisher chose', () => {
       const value = 'https://www.komoot.com/tour/528636996/embed?layout=classic&profile=1'
       const expected: EmbedResolverResult = {
         provider: 'komoot',
         id: '528636996',
-        src: 'https://www.komoot.com/tour/528636996/embed?profile=1&layout=classic',
+        src: 'https://www.komoot.com/tour/528636996/embed',
         url: 'https://www.komoot.com/tour/528636996',
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should build the collection map and page from the collection id and slug', () => {
+    it('should build the collection map and page and drop the map layout', () => {
       const value =
         'https://www.komoot.com/collection/3965053/best-of-national-cycling-routes-of-estonian-islands/embed?layout=map'
       const expected: EmbedResolverResult = {
         provider: 'komoot',
         id: 'collection/3965053',
-        src: 'https://www.komoot.com/collection/3965053/best-of-national-cycling-routes-of-estonian-islands/embed?layout=map',
+        src: 'https://www.komoot.com/collection/3965053/best-of-national-cycling-routes-of-estonian-islands/embed',
         url: 'https://www.komoot.com/collection/3965053/best-of-national-cycling-routes-of-estonian-islands',
       }
 
@@ -175,43 +175,31 @@ describe('komootResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'komoot',
         id: '2011745032',
-        src: 'https://www.komoot.com/de-de/tour/2011745032/embed?share_token=aBTJUZkJPE0Q0fxRFmoCr1AfWEChEEtXO4Bm57ZbsAKrVDvgb8&profile=1',
+        src: 'https://www.komoot.com/tour/2011745032/embed?share_token=aBTJUZkJPE0Q0fxRFmoCr1AfWEChEEtXO4Bm57ZbsAKrVDvgb8',
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
     })
 
     it('should drop a tracking parameter the player does not read', () => {
-      const value = 'https://www.komoot.com/tour/727321743/embed?profile=1&utm_source=newsletter'
+      const value = 'https://www.komoot.com/tour/727321743/embed?utm_source=newsletter'
       const expected: EmbedResolverResult = {
         provider: 'komoot',
         id: '727321743',
-        src: 'https://www.komoot.com/tour/727321743/embed?profile=1',
+        src: 'https://www.komoot.com/tour/727321743/embed',
         url: 'https://www.komoot.com/tour/727321743',
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should mint the German locale for a tour framed on the German host', () => {
+    it('should mint no locale for a tour framed on the German host', () => {
       const value = 'https://www.komoot.de/tour/727321743/embed'
       const expected: EmbedResolverResult = {
         provider: 'komoot',
         id: '727321743',
-        src: 'https://www.komoot.com/de-de/tour/727321743/embed',
-        url: 'https://www.komoot.com/de-de/tour/727321743',
-      }
-
-      expect(komootResolveEmbed(value)).toEqual(expected)
-    })
-
-    it('should mint the German locale for a tour framed on the bare German host', () => {
-      const value = 'https://komoot.de/tour/727321743/embed'
-      const expected: EmbedResolverResult = {
-        provider: 'komoot',
-        id: '727321743',
-        src: 'https://www.komoot.com/de-de/tour/727321743/embed',
-        url: 'https://www.komoot.com/de-de/tour/727321743',
+        src: 'https://www.komoot.com/tour/727321743/embed',
+        url: 'https://www.komoot.com/tour/727321743',
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
@@ -247,7 +235,7 @@ describeForEachParser('komootEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'komoot',
         id: '727321743',
-        src: 'https://www.komoot.com/tour/727321743/embed?profile=1',
+        src: 'https://www.komoot.com/tour/727321743/embed',
         url: 'https://www.komoot.com/tour/727321743',
         height: 880,
       }

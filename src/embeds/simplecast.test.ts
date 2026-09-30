@@ -130,6 +130,30 @@ describe('simplecastResolveEmbed', () => {
     expect(simplecastResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should drop the display style from a legacy numeric url', () => {
+    const value = 'https://simplecast.com/e/144908?style=light'
+    const expected: EmbedResolverResult = {
+      provider: 'simplecast',
+      id: '144908',
+      src: 'https://simplecast.com/e/144908',
+      height: 200,
+    }
+
+    expect(simplecastResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should drop the display color from a legacy embed url', () => {
+    const value = 'https://embed.simplecast.com/a1b2c3d4?color=fff'
+    const expected: EmbedResolverResult = {
+      provider: 'simplecast',
+      id: 'a1b2c3d4',
+      src: 'https://embed.simplecast.com/a1b2c3d4',
+      height: 200,
+    }
+
+    expect(simplecastResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for a simplecast url naming no episode', () => {
     const value = 'https://simplecast.com/pricing'
 

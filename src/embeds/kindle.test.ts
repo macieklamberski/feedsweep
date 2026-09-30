@@ -5,66 +5,62 @@ import { kindleEmbedResolver, kindleResolveEmbed } from './kindle.js'
 
 describe('kindleResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should build the card, the page and the cover from the ASIN', () => {
+    it('should build the card and the cover from the ASIN', () => {
       const value =
         'https://read.amazon.com/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_dQVcnKwFnAcXcz&asin=B08DGQCKF3&tag=kpembed-20'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd&tag=kpembed-20',
-        url: 'https://www.amazon.com/dp/B08DGQCKF3',
+        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
       }
 
       expect(kindleResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the storefront the card was written for', () => {
+    it('should mint a British storefront card on the US reader host', () => {
       const value = 'https://read.amazon.co.uk/kp/card?asin=B08DGQCKF3&preview=inline'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.co.uk/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd',
-        url: 'https://www.amazon.co.uk/dp/B08DGQCKF3',
+        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
       }
 
       expect(kindleResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the Canadian storefront', () => {
+    it('should mint a Canadian storefront card on the US reader host', () => {
       const value = 'https://read.amazon.ca/kp/card?asin=B08DGQCKF3&preview=inline'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.ca/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd',
-        url: 'https://www.amazon.ca/dp/B08DGQCKF3',
+        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
       }
 
       expect(kindleResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the Indian storefront', () => {
+    it('should mint an Indian storefront card on the US reader host', () => {
       const value = 'https://read.amazon.in/kp/card?asin=B08DGQCKF3&preview=inline'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.in/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd',
-        url: 'https://www.amazon.in/dp/B08DGQCKF3',
+        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
       }
 
       expect(kindleResolveEmbed(value)).toEqual(expected)
     })
 
-    it("should carry the publisher's associate tag and link code", () => {
+    it("should drop the publisher's associate tag and link code", () => {
       const value =
         'https://read.amazon.com.au/kp/card?preview=inline&linkCode=ll1&ref_=k4w_oembed_y0sSritwWwbv0o&asin=B09SLB7V48&tag=yusukeblog00-22'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B09SLB7V48',
-        src: 'https://read.amazon.com.au/kp/card?asin=B09SLB7V48&preview=inline&linkCode=ll1&tag=yusukeblog00-22',
+        src: 'https://read.amazon.com/kp/card?asin=B09SLB7V48',
         thumbnail: 'https://m.media-amazon.com/images/P/B09SLB7V48.01._SCLZZZZZZZ_.jpg',
       }
 
@@ -84,8 +80,7 @@ describe('kindleResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: '../embed',
-        src: 'https://read.amazon.com/kp/card?asin=..%2Fembed&preview=inline&linkCode=kpd',
-        url: 'https://www.amazon.com/dp/..%2Fembed',
+        src: 'https://read.amazon.com/kp/card?asin=..%2Fembed',
         thumbnail: 'https://m.media-amazon.com/images/P/..%2Fembed.01._SCLZZZZZZZ_.jpg',
       }
 
@@ -111,20 +106,7 @@ describe('kindleResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd',
-        url: 'https://www.amazon.com/dp/B08DGQCKF3',
-        thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
-      }
-
-      expect(kindleResolveEmbed(value)).toEqual(expected)
-    })
-
-    it('should leave the product page unset on the reader host that serves two stores', () => {
-      const value = 'https://read.amazon.com.au/kp/card?asin=B08DGQCKF3&preview=inline'
-      const expected: EmbedResolverResult = {
-        provider: 'kindle',
-        id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com.au/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd',
+        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
       }
 
@@ -153,8 +135,7 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd&tag=kpembed-20',
-        url: 'https://www.amazon.com/dp/B08DGQCKF3',
+        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         width: 1080,
         height: 550,
@@ -164,7 +145,7 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it("should keep the share snippet's box and its new-tab preview", async () => {
+    it("should keep the share snippet's box and drop its new-tab preview", async () => {
       const value = html`
         <iframe
           allowfullscreen=""
@@ -179,8 +160,7 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B09KT8838X',
-        src: 'https://read.amazon.com/kp/card?asin=B09KT8838X&preview=newtab&linkCode=kpe',
-        url: 'https://www.amazon.com/dp/B09KT8838X',
+        src: 'https://read.amazon.com/kp/card?asin=B09KT8838X',
         thumbnail: 'https://m.media-amazon.com/images/P/B09KT8838X.01._SCLZZZZZZZ_.jpg',
         width: 212,
         height: 362,

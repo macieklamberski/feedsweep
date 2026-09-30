@@ -55,6 +55,13 @@ const composePhotoPlayer = (photoId: string): string => {
   return `https://embedr.flickr.com/photos/${photoId}`
 }
 
+// The page player ignores the owner segment and the secret after `player/`, and serves the same
+// page for a wrong secret. An `in/{context}` segment only picks the set its arrows walk through.
+const composePagePhotoPlayer = (photo: FlickrPhoto): string => {
+  const owner = photo.owner ? encodePathSegment(photo.owner) : '_'
+  return `https://www.flickr.com/photos/${owner}/${photo.photoId}/player/`
+}
+
 // Flickr's base58 alphabet for flic.kr short urls.
 const base58Alphabet = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
 
@@ -167,17 +174,23 @@ const readOwnerAlias = (owner: string | undefined): string | undefined => {
 // Flickr's own page player, `/photos/{owner}/{photoId}/player/`, optionally with the browsing
 // context it was opened from and the photo secret. embedr's endpoint names the photo alone, and
 // a bare numeric segment is a photo only there: on `www` it is an owner's photostream.
-const readPhotoSubject = (parsed: URL): FlickrPhoto | undefined => {
+const readPhotoPlayer = (parsed: URL): { src: string; photo: FlickrPhoto } | undefined => {
   const player = parsed.pathname.match(photoPathRegex)
 
   if (player) {
-    return { owner: decodePathValue(player[1]), photoId: player[2], secret: player[3] }
+    const photo = {
+      owner: player[1] ? decodePathValue(player[1]) : undefined,
+      photoId: player[2],
+      secret: player[3],
+    }
+
+    return { src: composePagePhotoPlayer(photo), photo }
   }
 
   const embedr = isHostOf(parsed, embedrHost) && parsed.pathname.match(embedrPhotoPathRegex)
 
   if (embedr) {
-    return { photoId: embedr[1] }
+    return { src: composePhotoPlayer(embedr[1]), photo: { photoId: embedr[1] } }
   }
 }
 
@@ -283,10 +296,10 @@ const resolveTarget = (
     return
   }
 
-  const photo = readPhotoSubject(parsed)
+  const player = readPhotoPlayer(parsed)
 
-  if (photo) {
-    return composePhotoEmbed(link, photo)
+  if (player) {
+    return composePhotoEmbed(player.src, player.photo)
   }
 
   const result = composePlayerEmbed(parsed, element)
