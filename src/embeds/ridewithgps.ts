@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl, toMap, trimObject } from 'trousse'
+import { getPathSegments, parseUrl, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { composeQuery, digitsRegex, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -48,7 +48,7 @@ const composeEmbed = (
     src,
     url: page,
     ...(shape.hasThumbnail ? { thumbnail: `${page}/thumb.png` } : undefined),
-    ...trimObject({ title }, Boolean),
+    title,
   }
 }
 
@@ -77,7 +77,7 @@ const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
       provider,
       id: `${kind}/${id}`,
       src,
-      ...trimObject({ title: params.title }, Boolean),
+      title: params.title,
     }
   }
 

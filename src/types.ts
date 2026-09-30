@@ -28,7 +28,7 @@ export type ResolveUrlFn = (url: string, baseUrl: string | undefined) => string 
 export type EmbedResolverResult = {
   provider: string
   id?: string
-  src: string
+  src?: string
   // Settings the publisher chose for this one embed that a reader may override, such as the
   // language of a widget's labels. They stay off `src`, so a reader can apply its own instead.
   params?: Record<string, string>
@@ -223,7 +223,6 @@ export type TransformContext = {
   nonContentSelectors: Array<string>
   preservedPreClasses: Array<string>
   fieldCleaners: Array<FieldCleaner>
-  cleanedSrcProviders: Array<string>
   resolveUrlFn: ResolveUrlFn
   cleanUrlFn?: CleanUrlFn
   assetProxyFn?: AssetProxyFn
