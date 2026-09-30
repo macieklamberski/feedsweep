@@ -11,27 +11,26 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 // all of them name the episode by the same numeric id.
 const legacyPlayerRegex = /\/playerivoox_e[emp]_([^_/]+)_\d+\.html$/
 // Enumerated, not `e[a-z]`: `player_el_` answers 404 while `ej` and `ek` serve.
-// `player_ej_` and `player_ek_` are two live generations of the current player.
-const episodePlayerRegex = /\/player_e[jk]_([^_/]+)(?:_(\d+))?_(\d+)\.html$/
+// `player_ej_` is the current player and `player_ek_` the mini one.
+const episodePlayerRegex = /\/player_e[jk]_([^_/]+)(?:_\d+)?_(\d+)\.html$/
 
 // The show player, which carries every episode. Its id is the podcast's, a different id space
 // from an episode's, so it cannot share the episode kind.
-const showPlayerRegex = /\/player_es_podcast_([^_/]+)(?:_(\d+))?_(\d+)\.html$/
+// The skin is a number, or `zp` on the current player.
+const showPlayerRegex = /\/player_es_podcast_([^_/]+)(?:_[^_/]+)?_(\d+)\.html$/
 
 const ivooxHosts = ['ivoox.com']
 
-// What most iframes on the current player state. The rest are 120, which looks like a compact
-// skin. A size in the markup wins over this, so it only applies where the publisher stated
-// none.
-const playerHeight = 200
+// The heights iVoox's embed dialog states for the current episode and show players. A box the
+// carrier states was drawn for a skin, a generation or a legacy player the mint no longer loads.
+const episodeHeight = 200
+const showHeight = 400
 
 export type IvooxSubject = {
   kind: 'episode' | 'show'
   id: string
-  // The skin picks the episode player's layout, the page which episode a show's playlist opens on.
-  skin: string
+  // Which episode a show's playlist opens on.
   page: string
-  player: string
 }
 
 export const extractIvooxSubject = (link: string): IvooxSubject | undefined => {
@@ -44,34 +43,25 @@ export const extractIvooxSubject = (link: string): IvooxSubject | undefined => {
   const show = parsed.pathname.match(showPlayerRegex)
 
   if (show?.[1]) {
-    return {
-      kind: 'show',
-      id: show[1],
-      skin: show[2] ?? '1',
-      page: show[3],
-      player: 'es_podcast',
-    }
+    return { kind: 'show', id: show[1], page: show[2] }
   }
 
   const episode = parsed.pathname.match(episodePlayerRegex)
 
   if (episode?.[1]) {
-    // The generation stays: `ek` serves, and rewriting it to `ej` swaps in a different player.
-    const player = episode[0].startsWith('/player_ek_') ? 'ek' : 'ej'
-
-    return { kind: 'episode', id: episode[1], skin: episode[2] ?? '1', page: episode[3], player }
+    return { kind: 'episode', id: episode[1], page: episode[2] }
   }
 
   // The three generations share one id space: `ivoox.com/x_rf_{id}_1.html` redirects to the
   // episode's own page for a legacy id and 404s for a fabricated one.
   const legacy = parsed.pathname.match(legacyPlayerRegex)
 
-  return legacy?.[1]
-    ? { kind: 'episode', id: legacy[1], skin: '1', page: '1', player: 'ej' }
-    : undefined
+  return legacy?.[1] ? { kind: 'episode', id: legacy[1], page: '1' } : undefined
 }
 
 // iVoox's player iframes, whose legacy `playerivoox_` generation now answers 404 for every id.
+// Every generation and skin is minted as the player the embed dialog calls current:
+// `player_ej_{id}_6_{page}` for an episode and `player_es_podcast_{id}_zp_{page}` for a show.
 // `player_ej_` answers 200 to any id at all, a javascript shell that resolves the id on load.
 export const ivooxResolveEmbed: ResolveEmbed = (url, element) => {
   const subject = extractIvooxSubject(url)
@@ -80,17 +70,29 @@ export const ivooxResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
+  if (subject.kind === 'show') {
+    return {
+      provider,
+      id: `podcast/${subject.id}`,
+      src: `https://www.ivoox.com/player_es_podcast_${subject.id}_zp_${subject.page}.html`,
+      height: showHeight,
+      title: attr(element, 'title'),
+    }
+  }
+
   // No thumbnail: iVoox publishes no key-free metadata endpoint for an episode id.
   return {
     provider,
-    id: subject.kind === 'show' ? `podcast/${subject.id}` : subject.id,
-    src: `https://www.ivoox.com/player_${subject.player}_${subject.id}_${subject.skin}_${subject.page}.html`,
-    height: playerHeight,
+    id: subject.id,
+    src: `https://www.ivoox.com/player_ej_${subject.id}_6_${subject.page}.html`,
+    height: episodeHeight,
     title: attr(element, 'title'),
   }
 }
 
-export const ivooxEmbedResolver = createUrlEmbedResolver(ivooxHosts, ivooxResolveEmbed)
+export const ivooxEmbedResolver = createUrlEmbedResolver(ivooxHosts, ivooxResolveEmbed, {
+  preferResolverSize: true,
+})
 
 export const ivooxFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'YouTube video player' },
