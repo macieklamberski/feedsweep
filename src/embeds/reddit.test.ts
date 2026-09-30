@@ -681,16 +681,25 @@ describeForEachParser('redditS9eEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
 
-    it('should ignore a fragment stepping out of the post path', async () => {
+  describe('edge cases', () => {
+    it('should resolve dot segments in the fragment as a browser does', async () => {
       const value = html`
         <iframe
           data-s9e-mediaembed="reddit"
           src="https://s9e.github.io/iframe/2/reddit.min.html#x/../../../r/other/comments/abc12"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/other/comments/abc12',
+        src: 'https://embed.reddit.com/r/other/comments/abc12/',
+        url: 'https://www.reddit.com/r/other/comments/abc12/',
+        publisher: 'r/other',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
