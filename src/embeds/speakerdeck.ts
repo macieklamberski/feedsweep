@@ -1,15 +1,10 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, parseRatio } from '../utils/dom.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'speakerdeck'
-
-// Ids are lowercase hex in two lengths: 32 for the current dashless UUID and 24 for the Mongo
-// ObjectId issued around 2011-2012, and those decks still play. `/player/` serves decks and
-// nothing else.
-const deckIdRegex = /^[0-9a-f]+$/
 
 // A few feeds fold the slide number into the id attribute itself.
 const slideSuffixRegex = /\?slide=([^&]+)$/
@@ -61,7 +56,8 @@ export const speakerdeckResolveEmbed: ResolveEmbed = (url, element) => {
   const segments = getPathSegments(url)
   const deckId = segments[0] === 'player' ? segments[1] : undefined
 
-  if (!deckId || !deckIdRegex.test(deckId)) {
+  // Speaker Deck serves files on its own host, so a file name is an enclosure.
+  if (!deckId || isFileName(deckId)) {
     return
   }
 

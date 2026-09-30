@@ -2,7 +2,7 @@ import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codesandbox'
@@ -10,11 +10,8 @@ const provider = 'codesandbox'
 // Listed exactly, not by subdomain: sse.codesandbox.io and blog.codesandbox.io name no sandbox.
 const codesandboxHosts = ['codesandbox.io', 'www.codesandbox.io']
 
-// No length bound: hashes run 3 to 10 characters, and `/embed/vue` is a real sandbox.
-const idRegex = /^[A-Za-z0-9]+$/
-
-// Words CodeSandbox owns where a slug sits. `github` is the one that bites, being spelled in the
-// hash's own alphabet. `new` opens a starter template with nothing saved behind it.
+// Words CodeSandbox owns where a slug sits. `new` opens a starter template with nothing saved
+// behind it.
 // `/embed/github/…` carries no hash and meets a Cloudflare challenge on every server-side
 // request.
 const reservedSlugSegments = new Set(['github', 'github.com', 'fork', 'new'])
@@ -38,10 +35,8 @@ type CodesandboxTarget = {
 }
 
 // The slug in front of the hash is renamable, so only the hash identifies a sandbox.
-const readId = (slug: string): string | undefined => {
-  const id = slug.slice(slug.lastIndexOf('-') + 1)
-
-  return idRegex.test(id) ? id : undefined
+const readId = (slug: string): string => {
+  return slug.slice(slug.lastIndexOf('-') + 1)
 }
 
 const parseTarget = (value: string | undefined): CodesandboxTarget | undefined => {
@@ -65,7 +60,8 @@ const parseTarget = (value: string | undefined): CodesandboxTarget | undefined =
     slug = second
   }
 
-  if (!slug || reservedSlugSegments.has(slug.toLowerCase())) {
+  // CodeSandbox serves files on its own host, so a file name is an enclosure.
+  if (!slug || reservedSlugSegments.has(slug.toLowerCase()) || isFileName(slug)) {
     return
   }
 

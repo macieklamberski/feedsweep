@@ -20,6 +20,18 @@ describe('slideshareResolveEmbed', () => {
     expect(slideshareResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should cut a numeric id at the query a feed wrote into the path', () => {
+    const value =
+      'https://www.slideshare.net/slideshow/embed_code/17382857&doc=random-130319172534-phpapp02'
+    const expected: EmbedResolverResult = {
+      provider: 'slideshare',
+      id: '17382857',
+      src: 'https://www.slideshare.net/slideshow/embed_code/17382857',
+    }
+
+    expect(slideshareResolveEmbed(value)).toEqual(expected)
+  })
+
   // Both spaces have grown since 2011, and neither length is what selects a deck.
   it('should keep a key longer than the ones minted so far', () => {
     const value = 'https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAYlongerkey'
@@ -67,15 +79,25 @@ describe('slideshareResolveEmbed', () => {
     expect(slideshareResolveEmbed(value)).toBeUndefined()
   })
 
-  it('should ignore a key outside the url-safe alphabet', () => {
+  it('should use a malformed key as written, even if the player answers an error', () => {
     const value = 'https://www.slideshare.net/slideshow/embed_code/key/6PCW.PGFw9SwsAY'
+    const expected: EmbedResolverResult = {
+      provider: 'slideshare',
+      id: '6PCW.PGFw9SwsAY',
+      src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCW.PGFw9SwsAY',
+    }
 
-    expect(slideshareResolveEmbed(value)).toBeUndefined()
+    expect(slideshareResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should ignore a key carrying an encoded slash', () => {
-    const value = 'https://www.slideshare.net/slideshow/embed_code/key/6PCW%2FPGFw9SwsAY'
+  // SlideShare serves files on slidesharecdn.com, and the file-name check is what keeps one from
+  // reading as a deck.
+  const fileUrls: Array<string> = [
+    'https://www.slidesharecdn.com/embed_code/6435157.mp3',
+    'https://www.slidesharecdn.com/embed_code/key/6PCWPGFw9SwsAY.mp3',
+  ]
 
+  it.each(fileUrls)('should ignore a file on the host at %s', (value) => {
     expect(slideshareResolveEmbed(value)).toBeUndefined()
   })
 
@@ -681,12 +703,17 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toBeUndefined()
   })
 
-  it('should ignore a key outside the url-safe alphabet', async () => {
+  it('should use a malformed key as written, even if the player answers an error', async () => {
     const value = html`
       <iframe src="https://www.slideshare.net/slideshow/embed_code/key/6PCW.PGFw9SwsAY"></iframe>
     `
+    const expected: EmbedResolverResult = {
+      provider: 'slideshare',
+      id: '6PCW.PGFw9SwsAY',
+      src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCW.PGFw9SwsAY',
+    }
 
-    expect(await extract(value)).toBeUndefined()
+    expect(await extract(value)).toEqual(expected)
   })
 
   // A lookalike host carries the embed path but is not the platform.

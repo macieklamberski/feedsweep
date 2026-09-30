@@ -105,10 +105,17 @@ describe('codesandboxResolveEmbed', () => {
       expect(codesandboxResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a hash carrying an escaped slash', () => {
+    it('should use a malformed hash as written, even if the player answers an error', () => {
       const value = 'https://codesandbox.io/embed/83wzkj%2Fabc'
+      const expected: EmbedResolverResult = {
+        provider: 'codesandbox',
+        id: '83wzkj%2Fabc',
+        src: 'https://codesandbox.io/embed/83wzkj%2Fabc',
+        url: 'https://codesandbox.io/s/83wzkj%2Fabc',
+        height: 500,
+      }
 
-      expect(codesandboxResolveEmbed(value)).toBeUndefined()
+      expect(codesandboxResolveEmbed(value)).toEqual(expected)
     })
   })
 

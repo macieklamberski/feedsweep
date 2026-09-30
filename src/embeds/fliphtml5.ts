@@ -1,7 +1,7 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize } from '../utils/dom.js'
-import { parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
+import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'fliphtml5'
@@ -23,11 +23,8 @@ export const fliphtml5ResolveEmbed: ResolveEmbed = (url) => {
   const segments = getPathSegments(parsed)
   const [account, book] = segments
 
-  if (segments.length !== 2 || !account || !book) {
-    return
-  }
-
-  if (!urlSafeTokenRegex.test(account) || !urlSafeTokenRegex.test(book)) {
+  // The viewer host serves files under an account, so a file name is an enclosure.
+  if (segments.length !== 2 || !account || !book || isFileName(book)) {
     return
   }
 

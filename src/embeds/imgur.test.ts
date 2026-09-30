@@ -32,6 +32,19 @@ const sitePaths = [
   'https://imgur.com/login',
   'https://imgur.com/trending',
   'https://imgur.com/download/abc12345',
+  'https://imgur.com/hot',
+  'https://imgur.com/top',
+  'https://imgur.com/jobs',
+  'https://imgur.com/removalrequest',
+  'https://imgur.com/blog',
+  'https://imgur.com/faq',
+  'https://imgur.com/help',
+  'https://imgur.com/ads',
+  'https://imgur.com/api',
+  'https://imgur.com/vote',
+  'https://imgur.com/notifications',
+  'https://imgur.com/dmca',
+  'https://imgur.com/Hot',
 ]
 
 describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
@@ -321,6 +334,19 @@ describe('imgurResolveEmbed', () => {
     expect(imgurResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should use a malformed id as written, even if the player answers an error', () => {
+    const value = 'https://imgur.com/pVa2_rXL'
+    const expected: EmbedResolverResult = {
+      provider: 'imgur',
+      id: 'pVa2_rXL',
+      src: 'https://imgur.com/pVa2_rXL/embed',
+      url: 'https://imgur.com/pVa2_rXL',
+      thumbnail: 'https://i.imgur.com/pVa2_rXLm.jpg',
+    }
+
+    expect(imgurResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should ignore an imgur url that names no post', () => {
     const value = 'https://imgur.com/'
 
@@ -402,6 +428,8 @@ describe('imgurResolveEmbed', () => {
       'https://i.imgur.com/pVa2rXL.mp4',
       'https://s.imgur.com/min/embed.js',
       'https://i.stack.imgur.com/pVa2rXL.png',
+      'https://imgur.com/pVa2rXL.jpg',
+      'https://imgur.com/pVa2rXL.gifv',
     ]
 
     it.each(fileUrls)('should ignore %s, which names a file rather than a post', (value) => {
