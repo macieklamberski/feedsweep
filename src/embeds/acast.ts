@@ -53,7 +53,8 @@ const acastResolveEmbed: ResolveEmbed = (url, element) => {
   return {
     provider,
     id: path,
-    src: `https://embed.acast.com/${path}`,
+    // A player frame plays as written, with its colours: every spelling redirects by itself.
+    src: element?.localName === 'iframe' ? url : `https://embed.acast.com/${path}`,
     height: playerHeight,
     title: attr(element, 'title'),
   }

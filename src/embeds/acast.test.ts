@@ -7,7 +7,7 @@ describeForEachParser('acastEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, acastEmbedResolver)
 
   describe('the episode player', () => {
-    it('should resolve the current embed code and drop its dollar prefix', async () => {
+    it('should resolve the current embed code as written', async () => {
       const value = html`
         <iframe
           src="https://embed.acast.com/$/63d3cb7a675193001164ef5d/67ceebb0d64d9d8e86dcddea?"
@@ -19,7 +19,7 @@ describeForEachParser('acastEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'acast',
         id: '63d3cb7a675193001164ef5d/67ceebb0d64d9d8e86dcddea',
-        src: 'https://embed.acast.com/63d3cb7a675193001164ef5d/67ceebb0d64d9d8e86dcddea',
+        src: 'https://embed.acast.com/$/63d3cb7a675193001164ef5d/67ceebb0d64d9d8e86dcddea?',
         height: 190,
       }
 
@@ -45,7 +45,7 @@ describeForEachParser('acastEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should resolve a slug show and episode and drop the display query', async () => {
+    it('should resolve a slug show and episode and keep the display query', async () => {
       const value = html`
         <iframe
           src="https://embed.acast.com/homebrewshow/homebrew-6?theme=default&cover=1&latest=1"
@@ -55,14 +55,14 @@ describeForEachParser('acastEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'acast',
         id: 'homebrewshow/homebrew-6',
-        src: 'https://embed.acast.com/homebrewshow/homebrew-6',
+        src: 'https://embed.acast.com/homebrewshow/homebrew-6?theme=default&cover=1&latest=1',
         height: 190,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should resolve the older player host onto the embed host', async () => {
+    it('should keep a player on the older host as written', async () => {
       const value = html`
         <iframe
           src="https://player.acast.com/5cd07163ad694b18367aeb03/episodes/homebrew-6?theme=default&cover=1&latest=1"
@@ -74,7 +74,7 @@ describeForEachParser('acastEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'acast',
         id: '5cd07163ad694b18367aeb03/homebrew-6',
-        src: 'https://embed.acast.com/5cd07163ad694b18367aeb03/homebrew-6',
+        src: 'https://player.acast.com/5cd07163ad694b18367aeb03/episodes/homebrew-6?theme=default&cover=1&latest=1',
         height: 190,
       }
 
@@ -92,7 +92,7 @@ describeForEachParser('acastEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'acast',
         id: '5abd5289e88d239f520d3378/5efe1045a43ded6858b856d8',
-        src: 'https://embed.acast.com/5abd5289e88d239f520d3378/5efe1045a43ded6858b856d8',
+        src: 'https://player.acast.com/5abd5289e88d239f520d3378/episodes/5efe1045a43ded6858b856d8#?secret=Ka4pKttEzU',
         height: 190,
       }
 
@@ -112,7 +112,7 @@ describeForEachParser('acastEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'acast',
         id: '66280c8cd1e1b20011ad73c5',
-        src: 'https://embed.acast.com/66280c8cd1e1b20011ad73c5',
+        src: 'https://embed.acast.com/66280c8cd1e1b20011ad73c5?episode-order=desc',
         height: 190,
       }
 
@@ -130,7 +130,7 @@ describeForEachParser('acastEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'acast',
         id: 'e6282aaf-1856-5081-9647-61ca6e74ad82',
-        src: 'https://embed.acast.com/e6282aaf-1856-5081-9647-61ca6e74ad82',
+        src: 'https://embed.acast.com/$/e6282aaf-1856-5081-9647-61ca6e74ad82',
         height: 190,
       }
 
