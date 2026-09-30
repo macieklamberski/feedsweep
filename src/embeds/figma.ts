@@ -17,8 +17,10 @@ const kindRegex = /^[a-z]+$/
 // A file key is base62, so a hyphenated marketing slug sitting in the same position is not one.
 const fileKeyRegex = /^[A-Za-z0-9]+$/
 
-// `node-id` names the frame the embed opens on, and `page-id` the page that holds it.
-const contentParams = ['node-id', 'page-id']
+// `node-id` names the frame the embed opens on, `page-id` the page that holds it,
+// `starting-point-node-id` the node that starts a prototype's flow, and `version-id` the version.
+// See: https://developers.figma.com/docs/embeds/embed-figma-prototype/.
+const contentParams = ['node-id', 'page-id', 'starting-point-node-id', 'version-id']
 
 // The community catalogue spells `community/file/{numeric id}`, which fills the same three
 // segments a file url does and reads as kind `community` over key `file`. That pair is identical

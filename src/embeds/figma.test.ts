@@ -94,6 +94,32 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep the node that starts the prototype flow', async () => {
+      const value =
+        '<iframe src="https://embed.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&starting-point-node-id=1%3A754&embed-host=share"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'figma',
+        id: 'proto/zMOWWSHAvmHWuk5UqiOchl',
+        src: 'https://embed.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&starting-point-node-id=1%3A754&embed-host=share',
+        url: 'https://www.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&starting-point-node-id=1%3A754',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the version a prototype names', async () => {
+      const value =
+        '<iframe src="https://embed.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&version-id=2215931418&embed-host=share"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'figma',
+        id: 'proto/zMOWWSHAvmHWuk5UqiOchl',
+        src: 'https://embed.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&version-id=2215931418&embed-host=share',
+        url: 'https://www.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&version-id=2215931418',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should state no box of its own for a prototype that declares none', async () => {
       const value =
         '<iframe src="https://embed.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&embed-host=share"></iframe>'
