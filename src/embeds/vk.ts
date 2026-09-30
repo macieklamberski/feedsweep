@@ -37,9 +37,12 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const params = pickQueryParams(parsed.search, playerParams)
   const id = `${ownerId}_${videoId}`
-  const src = `https://${parsed.hostname}${player.path}${composeQuery(params)}`
+  // A player plays as written, with its quality and start options. Only `video_embed` is rebuilt.
+  const src =
+    player.path === parsed.pathname
+      ? url
+      : `https://${parsed.hostname}${player.path}${composeQuery(pickQueryParams(parsed.search, playerParams))}`
 
   return {
     provider: 'vk',

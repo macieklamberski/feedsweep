@@ -10,20 +10,20 @@ describe('vkResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'vk',
         id: '-214899652_456246970',
-        src: 'https://vkvideo.ru/video_ext.php?oid=-214899652&id=456246970',
+        src: 'https://vkvideo.ru/video_ext.php?oid=-214899652&id=456246970&hd=1',
         url: 'https://vkvideo.ru/video-214899652_456246970',
       }
 
       expect(vkResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the hash in the player alone and drop the rest', () => {
+    it('should keep the hash and the rest of the player query as written', () => {
       const value =
         'https://vkvideo.ru/video_ext.php?oid=-53159866&id=456240593&hash=622100e5918230de&hd=2'
       const expected: EmbedResolverResult = {
         provider: 'vk',
         id: '-53159866_456240593',
-        src: 'https://vkvideo.ru/video_ext.php?oid=-53159866&id=456240593&hash=622100e5918230de',
+        src: 'https://vkvideo.ru/video_ext.php?oid=-53159866&id=456240593&hash=622100e5918230de&hd=2',
         url: 'https://vkvideo.ru/video-53159866_456240593',
       }
 
@@ -116,7 +116,7 @@ describeForEachParser('vkEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'vk',
         id: '-214899652_456246970',
-        src: 'https://vkvideo.ru/video_ext.php?oid=-214899652&id=456246970',
+        src: 'https://vkvideo.ru/video_ext.php?oid=-214899652&id=456246970&hd=1',
         url: 'https://vkvideo.ru/video-214899652_456246970',
         width: 640,
         height: 360,
@@ -182,7 +182,7 @@ describeForEachParser('vkEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'vk',
         id: '25582471_136966218',
-        src: 'https://vkontakte.ru/video_ext.php?oid=25582471&id=136966218&hash=482381d766b9995d',
+        src: 'http://vkontakte.ru/video_ext.php?oid=25582471&id=136966218&hash=482381d766b9995d',
         url: 'https://vkvideo.ru/video25582471_136966218',
         width: 607,
         height: 360,
