@@ -17,6 +17,19 @@ describe('vkResolveEmbed', () => {
       expect(vkResolveEmbed(value)).toEqual(expected)
     })
 
+    // Autoplay is the reader's call on click, through the render hint.
+    it('should drop the autoplay a player writes', () => {
+      const value = 'https://vk.com/video_ext.php?oid=422198122&id=456260058&autoplay=1'
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: '422198122_456260058',
+        src: 'https://vk.com/video_ext.php?oid=422198122&id=456260058',
+        url: 'https://vkvideo.ru/video422198122_456260058',
+      }
+
+      expect(vkResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should keep the hash and the rest of the player query as written', () => {
       const value =
         'https://vkvideo.ru/video_ext.php?oid=-53159866&id=456240593&hash=622100e5918230de&hd=2'
