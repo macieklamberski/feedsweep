@@ -1,12 +1,13 @@
-import { getPathSegments, type Nullish, parseUrl } from 'trousse'
+import { getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 
 const provider = 'dailymotion'
 
 import {
+  composeQuery,
   parseUrlOnHosts,
-  pickUrlParams,
+  pickQueryParams,
   placeholderBaseUrl,
   splitStrayParams,
 } from '../utils/urls.js'
@@ -123,8 +124,20 @@ export const extractDailymotionId = (link: string): string | undefined => {
     .find(Boolean)
 }
 
-export const composeEmbedUrl = (route: 'video' | 'playlist', id: string, query = ''): string => {
-  return `https://www.dailymotion.com/embed/${route}/${id}${query}`
+// The generic player, `www.dailymotion.com/embed/...` and the `geo.dailymotion.com/player.html` it
+// redirects to, answers 403 to a site off Dailymotion's allowlist. A player id plays anywhere, and
+// `xpiw2` is the one in Dailymotion's own documentation.
+const playerId = 'xpiw2'
+
+// A publisher's own player, `geo.dailymotion.com/player/{playerId}.html`.
+const ownPlayerRegex = /^\/player\/[^/]+\.html$/
+
+export const composeEmbedUrl = (
+  route: 'video' | 'playlist',
+  id: string,
+  params: Record<string, string> = {},
+): string => {
+  return `https://geo.dailymotion.com/player/${playerId}.html${composeQuery({ [route]: id, ...params })}`
 }
 
 // The player url for a caller holding a url nothing has checked: a page builder stores whatever
@@ -139,7 +152,19 @@ export const readDailymotionEmbedSrc = (link: string): string | undefined => {
 // Where playback starts, and the playlist the video sits in. The rest of the publisher's
 // query is dropped with the rebuilt src.
 // Neither player reads `autoplay` off the query: autostart comes from the saved configuration.
-const dailymotionEmbedParams = ['start', 'playlist']
+const dailymotionEmbedParams = ['start', 'startTime', 'playlist']
+
+// A player id's player reads the start as `startTime` and ignores the old `start`.
+const readPlayerParams = (url: string): Record<string, string> => {
+  const params = pickQueryParams(parseUrl(url)?.search ?? '', dailymotionEmbedParams)
+
+  return {
+    ...trimObject(
+      { playlist: params.playlist, startTime: params.startTime ?? params.start },
+      Boolean,
+    ),
+  }
+}
 
 export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
   const videoId = extractDailymotionId(url)
@@ -148,7 +173,9 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
     return {
       provider,
       id: videoId,
-      src: composeEmbedUrl('video', videoId, pickUrlParams(url, dailymotionEmbedParams)),
+      src: ownPlayerRegex.test(parseUrl(url, placeholderBaseUrl)?.pathname ?? '')
+        ? url
+        : composeEmbedUrl('video', videoId, readPlayerParams(url)),
       url: `https://www.dailymotion.com/video/${videoId}`,
       thumbnail: `https://www.dailymotion.com/thumbnail/video/${videoId}`,
       ratio: '16/9',

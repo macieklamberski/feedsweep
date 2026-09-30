@@ -203,6 +203,30 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined for an id smuggling a query into the player url', async () => {
+      const value = html`
+        <script
+          class="speakerdeck-embed"
+          data-id="40746bbd65b944eb848e90ab1be552c0?ad=1"
+          src="//speakerdeck.com/assets/embed.js"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a slide suffix that runs on past the number', async () => {
+      const value = html`
+        <script
+          class="speakerdeck-embed"
+          data-id="40746bbd65b944eb848e90ab1be552c0?slide=69a"
+          src="//speakerdeck.com/assets/embed.js"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined for an empty id', async () => {
       const value = html`
         <script class="speakerdeck-embed" data-id="" src="//speakerdeck.com/assets/embed.js"></script>
@@ -342,6 +366,13 @@ describeForEachParser('speakerdeckIframeEmbedResolver', (parseHtml) => {
 
   it('should ignore a player id that is not hex', async () => {
     const value = '<iframe src="https://speakerdeck.com/player/not-a-deck"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore a foreign host carrying the player path', async () => {
+    const value =
+      '<iframe src="https://evil.test/player/40746bbd65b944eb848e90ab1be552c0"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

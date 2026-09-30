@@ -25,6 +25,19 @@ describe('extractPodbeanId', () => {
     expect(extractPodbeanId(value)).toBeUndefined()
   })
 
+  // The query decodes `i`, and the id is composed back into the minted `?i=`.
+  it('should return undefined for an id with an encoded parameter before it', () => {
+    const value = 'https://www.podbean.com/player-v2/?i=wyvke%26x%3D1-1aefb6c-pb'
+
+    expect(extractPodbeanId(value)).toBeUndefined()
+  })
+
+  it('should return undefined for an id with an encoded parameter after it', () => {
+    const value = 'https://www.podbean.com/player-v2/?i=yx4hr-f3d1e1%26x%3D1'
+
+    expect(extractPodbeanId(value)).toBeUndefined()
+  })
+
   it('should return undefined for a url that cannot be parsed', () => {
     const value = 'https://['
 

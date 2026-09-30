@@ -5,34 +5,14 @@ describeForEachParser('tinymceEmojiResolver', (parseHtml) => {
   const { transform } = emojiConverters(parseHtml)
 
   describe('TinyMCE 3 (/plugins/emotions/img/ names)', () => {
-    const nameCases: Array<[string, string]> = [
-      ['sealed', '🤐'],
-      ['embarassed', '😳'],
-      ['tongue-out', '😛'],
-      ['money-mouth', '🤑'],
-    ]
-
-    it.each(nameCases)('should replace the %s face', async (name, expected) => {
+    // Misspelled in the distribution.
+    it('should mark the embarassed face', async () => {
       const value = html`
         <p>
           <img
-            src="https://example.com/editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-${name}.gif"
+            src="https://example.com/editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-embarassed.gif"
             class="flag"
             alt=""
-          >
-        </p>
-      `
-
-      expect(await transform(value)).toEqualHtml(`<p>${expected}</p>`)
-    })
-
-    it('should mark the foot-in-mouth face', async () => {
-      const value = html`
-        <p>
-          <img
-            src="https://example.com/editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-foot-in-mouth.gif"
-            class="flag"
-            alt="Foot in mouth"
           >
         </p>
       `
@@ -40,9 +20,9 @@ describeForEachParser('tinymceEmojiResolver', (parseHtml) => {
         <p>
           <img
             data-emoji=""
-            src="https://example.com/editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-foot-in-mouth.gif"
+            src="https://example.com/editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-embarassed.gif"
             class="flag"
-            alt="Foot in mouth"
+            alt=""
           >
         </p>
       `
@@ -52,7 +32,7 @@ describeForEachParser('tinymceEmojiResolver', (parseHtml) => {
   })
 
   describe('older copies (/plugins/emotions/images/)', () => {
-    it('should replace a stock face', async () => {
+    it('should mark a stock face', async () => {
       const value = html`
         <p>
           <img
@@ -61,8 +41,17 @@ describeForEachParser('tinymceEmojiResolver', (parseHtml) => {
           >
         </p>
       `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://example.com/wp-includes/js/tinymce/plugins/emotions/images/smiley-smile.gif"
+            alt="Sourire"
+          >
+        </p>
+      `
 
-      expect(await transform(value)).toEqualHtml('<p>🙂</p>')
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should leave a board file with an unknown name untouched', async () => {

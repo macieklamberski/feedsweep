@@ -1,7 +1,7 @@
-import { getPathSegments, isHostOrSubdomainOf, type Nullish, toMap } from 'trousse'
+import { getPathSegments, isHostOrSubdomainOf, type Nullish, parseUrl, toMap } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const musicProvider = 'applemusic'
@@ -19,11 +19,6 @@ const storefrontRegex = /^[a-z]{2}$/
 // A numeric music id, a two-letter prefixed playlist or station id, or an `id`-prefixed podcast id.
 const safeIdRegex = /^(?:id\d+|\d+|[a-z]{2}\.[a-z0-9-]+)$/i
 const podcastIdPrefixRegex = /^id/
-
-// A track or episode id is always numeric. It comes off the query decoded and is written into
-// the id, so anything else, a separator or a dot segment included, is refused.
-// `i` names the track in an album or the episode in a show, and its player is the song one.
-const trackIdRegex = /^\d+$/
 
 // The player is fluid-width. The podcast show player fills any frame and floors at 180 at 320
 // wide, 360 at 640 and 422 at 1280, and the episode player floors at 160 at every width.
@@ -57,10 +52,8 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
 
   const isPodcast = isHostOrSubdomainOf(parsed, applePodcastsHosts)
   const host = isPodcast ? 'podcasts.apple.com' : 'music.apple.com'
-  const trackId = keepIfMatches(parsed.searchParams.get('i'), trackIdRegex)
+  const trackId = parsed.searchParams.get('i') || undefined
   const id = trackId ?? pathId.replace(podcastIdPrefixRegex, '')
-  // A refused `i` is dropped from the player url as well: the resolver does not forward a value
-  // it would not put in the id, and the collection player is what the path names without it.
   const query = trackId ? pickUrlParams(url, ['i']) : ''
 
   return {
@@ -133,6 +126,37 @@ export const appleEmbedResolver = createUrlEmbedResolver(appleHosts, (url, eleme
 
   return result && { ...result, ...card, title: card.title ?? attr(element, 'title') }
 })
+
+// The retired Apple Music Marketing Tools host. Every id on it, real or not, redirects to the
+// same marketing page, so the frame shows no player for anybody.
+const appleToolsHosts = ['tools.applemusic.com']
+
+const toolsPathRegex = /^\/embed\/v1\/([a-z]+)\/([^/]+)$/
+
+// The same album, playlist or song as the modern player, reached through the retired tool's url.
+// The tool wrote the storefront as `country`. A missing or malformed `country` drops the segment,
+// and Apple serves a storefront-less url from the US store.
+export const appleToolsEmbedResolver = createUrlEmbedResolver(
+  appleToolsHosts,
+  (url) => {
+    const parsed = parseUrl(url, placeholderBaseUrl)
+    const match = parsed?.pathname.match(toolsPathRegex)
+
+    if (!match) {
+      return
+    }
+
+    const [, kind, pathId] = match
+
+    const country = parsed?.searchParams.get('country')?.toLowerCase()
+    const storefront = keepIfMatches(country, storefrontRegex)
+    const modernUrl = `https://music.apple.com/${storefront ? `${storefront}/` : ''}${kind}/${pathId}`
+
+    return appleResolveEmbed(modernUrl)
+  },
+  // The tool's snippet states 110 for a song and 500 for an album, sized for its retired player.
+  { preferResolverSize: true },
+)
 
 export const appleFieldCleaners: Array<FieldCleaner> = [
   { provider: podcastsProvider, field: 'title', drop: 'Media player' },

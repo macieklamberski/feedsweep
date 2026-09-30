@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'omny'
 
-const safeSegmentRegex = /^[A-Za-z0-9._-]+$/
+const safeSegmentRegex = /^[A-Za-z0-9-]+$/
 
 const omnyHosts = ['omny.fm']
 
@@ -55,7 +55,7 @@ export const omnyResolveEmbed: ResolveEmbed = (url, element) => {
     id: clip,
     src: `https://omny.fm/shows/${clip}/embed${query}`,
     height: playerHeight,
-    ...trimObject({ title }, Boolean),
+    title,
   }
 }
 

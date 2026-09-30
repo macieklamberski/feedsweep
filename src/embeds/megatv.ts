@@ -1,11 +1,9 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const megatvHosts = ['megatv.com']
-
-const safeEmbedIdRegex = /^\d+$/
 
 // The 2020 is a fixed prefix the player plugin writes, not the year: a June 2026 article embeds
 // 20202420350 behind it, checked 2026-09-07.
@@ -21,7 +19,7 @@ const megatvResolveEmbed: ResolveEmbed = (url) => {
 
   const id = parsed.searchParams.get('p')
 
-  if (!id || !safeEmbedIdRegex.test(id)) {
+  if (!id || !digitsRegex.test(id)) {
     return
   }
 

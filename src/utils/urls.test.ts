@@ -3,6 +3,8 @@ import { baseContext } from '../tests.js'
 import {
   cleanUrl,
   composeQuery,
+  dropUrlParams,
+  filterUrlQuery,
   parseUrlOnHosts,
   pickQueryParams,
   pickUrlParams,
@@ -278,6 +280,77 @@ describe('composeQuery', () => {
     const expected = '?theme='
 
     expect(composeQuery(value)).toBe(expected)
+  })
+})
+
+describe('dropUrlParams', () => {
+  it('should drop the named parameter and keep the rest as written', () => {
+    const value = 'https://vk.com/video_ext.php?oid=-1&id=2&hash=abc&autoplay=1'
+    const expected = 'https://vk.com/video_ext.php?oid=-1&id=2&hash=abc'
+
+    expect(dropUrlParams(value, ['autoplay'])).toBe(expected)
+  })
+
+  it('should return the url as written when it names none of the parameters', () => {
+    const value = 'https://vk.com/video_ext.php?oid=-1&id=2&hd=2'
+
+    expect(dropUrlParams(value, ['autoplay'])).toBe(value)
+  })
+
+  it('should drop the query mark when no parameter is left', () => {
+    const value = 'https://sketchfab.com/models/abc/embed?autostart=1'
+    const expected = 'https://sketchfab.com/models/abc/embed'
+
+    expect(dropUrlParams(value, ['autostart'])).toBe(expected)
+  })
+
+  it('should keep the fragment', () => {
+    const value = 'https://example.com/embed?autoplay=1&a=b#t=10'
+    const expected = 'https://example.com/embed?a=b#t=10'
+
+    expect(dropUrlParams(value, ['autoplay'])).toBe(expected)
+  })
+
+  it('should return a url that cannot be parsed as written', () => {
+    const value = 'https://['
+
+    expect(dropUrlParams(value, ['autoplay'])).toBe(value)
+  })
+})
+
+describe('filterUrlQuery', () => {
+  const isKept = (name: string) => {
+    return name === 'file' || name.startsWith('pwc[')
+  }
+
+  it('should keep only the pairs the predicate accepts, in the order written', () => {
+    const value = new URL('https://example.com/e?utm_source=feed&file=a.ts&fbclid=abc')
+
+    expect(filterUrlQuery(value, isKept)).toBe('?file=a.ts')
+  })
+
+  it('should keep a repeated parameter once per pair', () => {
+    const value = new URL('https://example.com/e?file=a.ts&file=b.ts')
+
+    expect(filterUrlQuery(value, isKept)).toBe('?file=a.ts&file=b.ts')
+  })
+
+  it('should keep a bracketed name as written', () => {
+    const value = new URL('https://example.com/e?pwc[size]=fit')
+
+    expect(filterUrlQuery(value, isKept)).toBe('?pwc[size]=fit')
+  })
+
+  it('should return an empty string when nothing is kept', () => {
+    const value = new URL('https://example.com/e?utm_source=feed')
+
+    expect(filterUrlQuery(value, isKept)).toBe('')
+  })
+
+  it('should return an empty string for a url with no query', () => {
+    const value = new URL('https://example.com/e')
+
+    expect(filterUrlQuery(value, isKept)).toBe('')
   })
 })
 

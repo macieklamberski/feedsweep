@@ -383,6 +383,16 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should not claim a stream file outside the stream directory', async () => {
+      const value = html`
+        <iframe
+          src="https://feeds.soundcloud.com/podcast/stream/2386923495-linear-digressions-ai.mp3"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should not claim an audio file anywhere else on the host', async () => {
       const value = '<iframe src="https://soundcloud.com/downloads/session.mp3"></iframe>'
 
@@ -485,15 +495,66 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
 
     // The widget refuses the token as a path segment and takes it as a parameter of its own.
     it('should move a private share token into the widget parameter', async () => {
-      const value = '<iframe src="https://soundcloud.com/anjunadeep/demo/s-Xy12Ab"></iframe>'
+      const value = html`
+        <iframe
+          src="https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy/s-vd94Qjk1b3m"
+        ></iframe>
+      `
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
-        src: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fanjunadeep%2Fdemo&secret_token=s-Xy12Ab',
-        url: 'https://soundcloud.com/anjunadeep/demo',
+        src: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fporzadnyagile%2F063-ocena-stanu-zwinnosci-firmy&secret_token=s-vd94Qjk1b3m',
+        url: 'https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy',
         height: 166,
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read a share token carrying an escaped slash as the token', async () => {
+      const value = html`
+        <iframe
+          src="https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy/s-vd94Qjk1b3m%2Fx"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        src: 'https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy/s-vd94Qjk1b3m%2Fx',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // A share token is letters and digits after its `s-`: the same token with a hyphen answers 404.
+    it('should not read a segment carrying a hyphen after s- as the token', async () => {
+      const value = html`
+        <iframe
+          src="https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy/s-vd94-jk1b3m"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        src: 'https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy/s-vd94-jk1b3m',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a track slug holding s- as part of the permalink', async () => {
+      const value = '<iframe src="https://soundcloud.com/anjunadeep/glass-house"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        src: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fanjunadeep%2Fglass-house',
+        url: 'https://soundcloud.com/anjunadeep/glass-house',
+        height: 166,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read a file named like a share token as the token', async () => {
+      const value = '<iframe src="https://soundcloud.com/anjunadeep/demo/s-Xy12Ab.mp3"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
     })
 
     // Already a working player, so only the url and the height are recovered from the page.
@@ -677,6 +738,30 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep the carrier title when the snippet track link is empty', async () => {
+      const value = html`
+        <iframe
+          title="Track by Artist"
+          src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1"
+        ></iframe>
+        <div>
+          <a href="https://soundcloud.com/artist">Artist</a> ·
+          <a href="https://soundcloud.com/artist/track"></a>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        id: 'tracks/1',
+        src: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1',
+        url: 'https://soundcloud.com/artist/track',
+        height: 166,
+        title: 'Track by Artist',
+        author: 'Artist',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should leave a sibling that is not the share snippet alone', async () => {
       const value = html`
         <iframe src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1"></iframe>
@@ -695,14 +780,14 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    // Two anchors is the whole shape check, so a foreign host spelling the platform in its path
-    // supplied the author, the title and the url, and the block they sat in was then deleted.
+    // Two anchors is the whole shape check, so two anchors on a foreign host would supply the
+    // author, the title and the url, and the block they sat in would then be deleted.
     it('should leave a sibling whose anchors are on a foreign host alone', async () => {
       const value = html`
         <iframe src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1"></iframe>
         <div>
-          <a href="https://evil.test/soundcloud.com/artist">Artist</a> ·
-          <a href="https://evil.test/soundcloud.com/artist/track">Track title</a>
+          <a href="https://evil.test/artist">Artist</a> ·
+          <a href="https://evil.test/artist/track">Track title</a>
         </div>
       `
       const expected = html`
@@ -713,8 +798,8 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
           data-embed-height="166"
         ></div>
         <div>
-          <a href="https://evil.test/soundcloud.com/artist">Artist</a> ·
-          <a href="https://evil.test/soundcloud.com/artist/track">Track title</a>
+          <a href="https://evil.test/artist">Artist</a> ·
+          <a href="https://evil.test/artist/track">Track title</a>
         </div>
       `
 
@@ -724,7 +809,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
     it('should return undefined for a foreign host carrying the player path', async () => {
       const value = html`
         <iframe
-          src="https://evil.test/w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1"
+          src="https://evil.test/player/?url=https%3A//api.soundcloud.com/tracks/1"
         ></iframe>
       `
 
@@ -803,6 +888,20 @@ describeForEachParser('soundcloudEmbedResolver carrier title', (parseHtml) => {
   it('should drop the platform name the snippet writes in place of the track name', async () => {
     const value = html`
       <iframe src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fanjunadeep%2Fedition-586" title="SoundCloud"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'soundcloud',
+      src: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fanjunadeep%2Fedition-586',
+      url: 'https://soundcloud.com/anjunadeep/edition-586',
+      height: 166,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the YouTube label a copied snippet carries over', async () => {
+    const value = html`
+      <iframe src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fanjunadeep%2Fedition-586" title="YouTube video player"></iframe>
     `
     const expected: EmbedResolverResult = {
       provider: 'soundcloud',

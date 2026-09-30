@@ -209,10 +209,10 @@ describeForEachParser('Bluesky', (parseHtml) => {
   // iframe fallback takes it and the placeholder claims no provider.
   it('should fall back a lookalike player host to a generic placeholder', async () => {
     const value = html`
-      <iframe src="https://evil.test/embed.bsky.app/embed/did:plc:ghz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mgq7aeuwbg42"></iframe>
+      <iframe src="https://evil.test/embed/did:plc:ghz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mgq7aeuwbg42"></iframe>
     `
     const expected = html`
-      <div data-embed-src="https://evil.test/embed.bsky.app/embed/did:plc:ghz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mgq7aeuwbg42"></div>
+      <div data-embed-src="https://evil.test/embed/did:plc:ghz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mgq7aeuwbg42"></div>
     `
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)

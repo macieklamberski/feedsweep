@@ -109,6 +109,20 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
 
     // Only the update path resolves. Without this, any four-segment linkedin path ending in a
     // urn would mint a `/feed/update/` url for something that is not a post.
+    it('should ignore the update path under another first segment', async () => {
+      const value =
+        '<iframe src="https://www.linkedin.com/posts/feed/update/urn:li:share:6626097641602281472"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the update action under another embed section', async () => {
+      const value =
+        '<iframe src="https://www.linkedin.com/embed/posts/update/urn:li:share:6626097641602281472"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a urn sitting under a different embed action', async () => {
       const value =
         '<iframe src="https://www.linkedin.com/embed/feed/comment/urn:li:comment:6626097641602281472"></iframe>'
@@ -131,6 +145,27 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a urn behind an encoded path step', async () => {
+      const value =
+        '<iframe src="https://www.linkedin.com/embed/feed/update/..%2Furn:li:share:6626097641602281472"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a urn followed by an encoded path step', async () => {
+      const value =
+        '<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:6626097641602281472%2F.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a urn kind carrying an encoded slash', async () => {
+      const value =
+        '<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:sh%2Fare:6626097641602281472"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a urn carrying a malformed escape', async () => {
       const value =
         '<iframe src="https://www.linkedin.com/embed/feed/update/urn%3Ali%3Ashare%3A%E0%A4%A"></iframe>'
@@ -140,7 +175,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
 
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
-        '<iframe src="https://evil.test/www.linkedin.com/embed/feed/update/urn:li:share:6626097641602281472"></iframe>'
+        '<iframe src="https://evil.test/embed/feed/update/urn:li:share:6626097641602281472"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

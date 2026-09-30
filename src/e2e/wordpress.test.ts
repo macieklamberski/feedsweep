@@ -11,7 +11,8 @@ describeForEachParser('WordPress', (parseHtml) => {
   // rebuildLazyLoadForVideos, rebuildEmbedPlusEmbeds and rebuildElementorVideoEmbeds.
   // An oEmbed block whose provider call failed ships the bare url alone. LinkifyUrls makes it a
   // link and unwrapWrappers drops the figure shell around it.
-  // wp-embedded-content post embeds are in open PR #361; add that clause when it merges.
+  // A post embed's blockquote becomes a cite through wordpressCiteResolver, and
+  // stripNonContentElements drops the frame paired with it.
 
   it('should reduce a failed oEmbed block to its linkified url', async () => {
     const value = html`
@@ -25,6 +26,39 @@ describeForEachParser('WordPress', (parseHtml) => {
     const expected = html`
       <p>Look:</p>
       <p> <a href="https://twitter.com/someone/status/1234567890123456789">https://twitter.com/someone/status/1234567890123456789</a> </p>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should turn a post embed into one cite and drop its paired frame', async () => {
+    const value = html`
+      <p>Read also:</p>
+      <blockquote class="wp-embedded-content" data-secret="hDl4S8YwKz">
+        <a href="https://www.e-startupindia.com/learn/gstr-1/">GSTR-1 Return Filing</a>
+      </blockquote>
+      <iframe
+        class="wp-embedded-content"
+        sandbox="allow-scripts"
+        security="restricted"
+        title="&#8220;GSTR-1 Return Filing&#8221; &#8212; E-Startup India"
+        src="https://www.e-startupindia.com/learn/gstr-1/embed/#?secret=hDl4S8YwKz"
+        data-secret="hDl4S8YwKz"
+        width="600"
+        height="338"
+        frameborder="0"
+        marginwidth="0"
+        marginheight="0"
+        scrolling="no"
+      ></iframe>
+    `
+    const expected = html`
+      <p>Read also:</p>
+      <div
+        data-cite-provider="wordpress"
+        data-cite-url="https://www.e-startupindia.com/learn/gstr-1/"
+        data-cite-title="GSTR-1 Return Filing"
+      ></div>
     `
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)

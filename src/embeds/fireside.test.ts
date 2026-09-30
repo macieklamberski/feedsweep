@@ -82,6 +82,30 @@ describe('extractFiresideToken', () => {
     expect(extractFiresideToken(value)).toBeUndefined()
   })
 
+  it('should return undefined for a version segment with a leading prefix', () => {
+    const value = 'https://player.fireside.fm/xv3/N8LaNbQY+MI2PkJ2g'
+
+    expect(extractFiresideToken(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a version segment with a trailing suffix', () => {
+    const value = 'https://player.fireside.fm/v3x/N8LaNbQY+MI2PkJ2g'
+
+    expect(extractFiresideToken(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a token opening with an encoded slash', () => {
+    const value = 'https://player.fireside.fm/v3/x%2FN8LaNbQY+MI2PkJ2g'
+
+    expect(extractFiresideToken(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a token closing with an encoded slash', () => {
+    const value = 'https://player.fireside.fm/v3/N8LaNbQY+MI2PkJ2g%2Fx'
+
+    expect(extractFiresideToken(value)).toBeUndefined()
+  })
+
   it('should return undefined for a token of the wrong shape', () => {
     const value = 'https://fireside.fm/player/v2/onlyoneside'
 

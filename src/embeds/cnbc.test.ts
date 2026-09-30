@@ -78,6 +78,24 @@ describe('cnbcResolveEmbed', () => {
       expect(cnbcResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should return undefined for the player path on another cnbc.com host', () => {
+      const value = 'https://www.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&byGuid=7000344703'
+
+      expect(cnbcResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for another route on the player host', () => {
+      const value = 'https://player.cnbc.com/x/gZWlPC/cnbc_global?playertype=synd&byGuid=7000344703'
+
+      expect(cnbcResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a player route naming no player', () => {
+      const value = 'https://player.cnbc.com/p/gZWlPC?byGuid=7000344703'
+
+      expect(cnbcResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should return undefined for a path that is not a player', () => {
       const value = 'https://player.cnbc.com/p/gZWlPC/cnbc_global/extra?byGuid=7000344703'
 
@@ -135,7 +153,7 @@ describeForEachParser('cnbcIframeEmbedResolver', (parseHtml) => {
 
   it('should ignore a foreign host carrying the same path', async () => {
     const value =
-      '<iframe src="https://evil.test/player.cnbc.com/p/gZWlPC/cnbc_global?byGuid=7000313539"></iframe>'
+      '<iframe src="https://evil.test/p/gZWlPC/cnbc_global?playertype=synd&amp;byGuid=7000313539"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

@@ -2,6 +2,7 @@ import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
+import { digitsRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flourish'
@@ -13,8 +14,7 @@ const flourishHosts = ['flo.uri.sh', 'public.flourish.studio']
 // Any resource, not a list: a kind refused here is deleted as an empty div, chart and all.
 // `visualisation` and `story` are the two kinds feeds carry, and the endpoint validates the pair:
 // a real id answers 200 and a wrong kind, an unknown kind or a fabricated id all answer 403.
-const safeResourceRegex = /^[a-z][a-z-]*$/
-const safeIdRegex = /^\d+$/
+const safeResourceRegex = /^[a-z]+$/
 
 // `template` has no embed form: its `/embed` answers 403 for a real id.
 const nonEmbeddableResource = 'template'
@@ -28,7 +28,7 @@ const composeEmbed = (resource: string, id: string): EmbedResolverResult | undef
     return
   }
 
-  if (!safeIdRegex.test(id)) {
+  if (!digitsRegex.test(id)) {
     return
   }
 

@@ -1,7 +1,7 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, parseRatio } from '../utils/dom.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'speakerdeck'
@@ -13,7 +13,6 @@ const deckIdRegex = /^[0-9a-f]+$/
 
 // A few feeds fold the slide number into the id attribute itself.
 const slideSuffixRegex = /\?slide=(\d+)$/
-const safeSlideRegex = /^\d+$/
 
 // Speaker Deck's snippet always carries the ratio, and 16:9 is what decks mostly are.
 const defaultDeckRatio = '16/9'
@@ -25,7 +24,7 @@ const composeEmbed = (
   deckId: string,
   { slide, title }: { slide?: string; title?: string },
 ): EmbedResolverResult => {
-  const safeSlide = slide && safeSlideRegex.test(slide) ? slide : undefined
+  const safeSlide = slide && digitsRegex.test(slide) ? slide : undefined
   const query = composeQuery(safeSlide ? { slide: safeSlide } : undefined)
 
   return {

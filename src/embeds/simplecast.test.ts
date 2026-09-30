@@ -47,6 +47,24 @@ describe('extractSimplecastEpisode', () => {
     expect(extractSimplecastEpisode(value)).toBeUndefined()
   })
 
+  it('should return undefined for a legacy segment longer than the eight-character id', () => {
+    const value = 'https://embed.simplecast.com/a1b2c3d4e5f6'
+
+    expect(extractSimplecastEpisode(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a legacy segment ending in the eight-character id', () => {
+    const value = 'https://embed.simplecast.com/x-a1b2c3d4'
+
+    expect(extractSimplecastEpisode(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a legacy segment carrying an encoded separator', () => {
+    const value = 'https://embed.simplecast.com/ab%2Fc3d'
+
+    expect(extractSimplecastEpisode(value)).toBeUndefined()
+  })
+
   it('should return undefined for a url that cannot be parsed', () => {
     const value = 'https://['
 

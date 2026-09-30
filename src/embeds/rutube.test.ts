@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { rutubeEmbedResolver, rutubeResolveEmbed } from './rutube.js'
@@ -60,6 +61,19 @@ describe('rutubeResolveEmbed', () => {
       expect(rutubeResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep the stop offset the publisher states', () => {
+      const value = 'https://rutube.ru/play/embed/c91d5d8847c7c5391a090fff38c86f34/?stopTime=600'
+      const expected: EmbedResolverResult = {
+        provider: 'rutube',
+        id: 'c91d5d8847c7c5391a090fff38c86f34',
+        src: 'https://rutube.ru/play/embed/c91d5d8847c7c5391a090fff38c86f34?stopTime=600',
+        url: 'https://rutube.ru/video/c91d5d8847c7c5391a090fff38c86f34/',
+        ratio: '16/9',
+      }
+
+      expect(rutubeResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should drop the player skin and the tracking riding with it', () => {
       const value =
         'https://rutube.ru/play/embed/c91d5d8847c7c5391a090fff38c86f34/?skinColor=e53935&utm_source=feed'
@@ -77,7 +91,7 @@ describe('rutubeResolveEmbed', () => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/rutube.ru/play/embed/c91d5d8847c7c5391a090fff38c86f34/'
+      const value = 'https://evil.test/play/embed/c91d5d8847c7c5391a090fff38c86f34/'
 
       expect(rutubeResolveEmbed(value)).toBeUndefined()
     })
@@ -98,6 +112,36 @@ describe('rutubeResolveEmbed', () => {
 
     it('should ignore the watch page, which frames nothing', () => {
       const value = 'https://rutube.ru/video/c91d5d8847c7c5391a090fff38c86f34/'
+
+      expect(rutubeResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the player path under another directory', () => {
+      const value = 'https://rutube.ru/api/play/embed/c91d5d8847c7c5391a090fff38c86f34/'
+
+      expect(rutubeResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a path that runs on past the id', () => {
+      const value = 'https://rutube.ru/play/embed/c91d5d8847c7c5391a090fff38c86f34/options/'
+
+      expect(rutubeResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the playlist route under another directory', () => {
+      const value = 'https://rutube.ru/api/pl/?pl_video=20a54e4a6f61441d808db45f823a7809'
+
+      expect(rutubeResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a playlist video carrying a path after the id', () => {
+      const value = 'https://rutube.ru/pl/?pl_video=20a54e4a6f61441d808db45f823a7809%2Fadd'
+
+      expect(rutubeResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a playlist video carrying a path before the id', () => {
+      const value = 'https://rutube.ru/pl/?pl_video=..%2F20a54e4a6f61441d808db45f823a7809'
 
       expect(rutubeResolveEmbed(value)).toBeUndefined()
     })
@@ -217,7 +261,7 @@ describeForEachParser('rutubeEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
-        '<iframe src="https://evil.test/rutube.ru/play/embed/c91d5d8847c7c5391a090fff38c86f34/"></iframe>'
+        '<iframe src="https://evil.test/play/embed/c91d5d8847c7c5391a090fff38c86f34/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -234,5 +278,34 @@ describeForEachParser('rutubeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+// rutube.ru is listed for the player, and its pic. subdomain serves the video posters.
+describeForEachParser('rutube through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a rutube poster enclosure an image', async () => {
+    const enclosures = [
+      {
+        url: 'http://pic.rutube.ru/video/c9/01/c901a7b4a00c71612e4414fe70ab963d.jpg',
+        type: 'image/jpeg',
+      },
+    ]
+    const expected = html`
+      <img
+        data-enclosure=""
+        src="http://pic.rutube.ru/video/c9/01/c901a7b4a00c71612e4414fe70ab963d.jpg"
+      >
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })

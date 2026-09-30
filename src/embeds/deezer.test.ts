@@ -35,7 +35,7 @@ describe('deezerResolveEmbed', () => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/widget.deezer.com/widget/dark/track/3135556'
+      const value = 'https://evil.test/widget/dark/track/3135556'
 
       expect(deezerResolveEmbed(value)).toBeUndefined()
     })
@@ -167,6 +167,58 @@ describe('deezerResolveEmbed', () => {
       expect(deezerResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should read the singular spelling of a track', () => {
+      const value = 'https://www.deezer.com/plugins/player?type=track&id=872090&app_id=1'
+      const expected: EmbedResolverResult = {
+        provider: 'deezer',
+        id: 'track/872090',
+        src: 'https://widget.deezer.com/widget/dark/track/872090',
+        url: 'https://www.deezer.com/track/872090',
+        height: 150,
+      }
+
+      expect(deezerResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the singular spelling of an episode', () => {
+      const value = 'https://www.deezer.com/plugins/player?type=episode&id=494190077&app_id=1'
+      const expected: EmbedResolverResult = {
+        provider: 'deezer',
+        id: 'episode/494190077',
+        src: 'https://widget.deezer.com/widget/dark/episode/494190077',
+        url: 'https://www.deezer.com/episode/494190077',
+        height: 300,
+      }
+
+      expect(deezerResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the plural spelling of an episode', () => {
+      const value = 'https://www.deezer.com/plugins/player?type=episodes&id=494190077&app_id=1'
+      const expected: EmbedResolverResult = {
+        provider: 'deezer',
+        id: 'episode/494190077',
+        src: 'https://widget.deezer.com/widget/dark/episode/494190077',
+        url: 'https://www.deezer.com/episode/494190077',
+        height: 300,
+      }
+
+      expect(deezerResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read a show under its own name', () => {
+      const value = 'https://www.deezer.com/plugins/player?type=show&id=32049&app_id=1'
+      const expected: EmbedResolverResult = {
+        provider: 'deezer',
+        id: 'show/32049',
+        src: 'https://widget.deezer.com/widget/dark/show/32049',
+        url: 'https://www.deezer.com/show/32049',
+        height: 300,
+      }
+
+      expect(deezerResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should step over the locale the site puts in front of the route', () => {
       const value = 'https://www.deezer.com/fr/plugins/player?type=playlist&id=57888101&app_id=1'
       const expected: EmbedResolverResult = {
@@ -230,6 +282,18 @@ describe('deezerResolveEmbed', () => {
 
     it('should refuse a swf naming no song', () => {
       const value = 'https://www.deezer.com/embedded/small-widget-v2.swf?colorBackground=0x009074'
+
+      expect(deezerResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a swf whose name only ends like the player', () => {
+      const value = 'https://www.deezer.com/embedded/x-small-widget.swf?idSong=293366'
+
+      expect(deezerResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a file beside the player', () => {
+      const value = 'https://www.deezer.com/embedded/small-widget.swf.xml?idSong=293366'
 
       expect(deezerResolveEmbed(value)).toBeUndefined()
     })
@@ -304,8 +368,7 @@ describeForEachParser('deezerEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/widget.deezer.com/widget/dark/track/3135556"></iframe>'
+      const value = '<iframe src="https://evil.test/widget/dark/track/3135556"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

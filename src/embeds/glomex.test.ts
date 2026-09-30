@@ -129,7 +129,21 @@ describeForEachParser('glomexIframeEmbedResolver', (parseHtml) => {
 
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
-        '<iframe src="https://evil.test/player.glomex.com/integration/1/integration.html?integrationId=40599x1hkkig7d8l"></iframe>'
+        '<iframe src="https://evil.test/integration/1/integration.html?integrationId=40599x1hkkig7d8l"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player path below a leading segment', async () => {
+      const value =
+        '<iframe src="https://player.glomex.com/x/integration/1/integration.html?integrationId=40599x1hkkig7d8l"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player path followed by a trailing segment', async () => {
+      const value =
+        '<iframe src="https://player.glomex.com/integration/1/integration.html/extra?integrationId=40599x1hkkig7d8l"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -209,7 +223,7 @@ describeForEachParser('glomexElementEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should drop a playlist id that could not be one and keep the integration', async () => {
+    it('should use a malformed playlist id as written, even if the player answers an error', async () => {
       const value = html`
         <glomex-player
           data-integration-id="40599x1hkkig7d8l"
@@ -218,8 +232,8 @@ describeForEachParser('glomexElementEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'glomex',
-        id: '40599x1hkkig7d8l',
-        src: 'https://player.glomex.com/integration/1/integration.html?integrationId=40599x1hkkig7d8l',
+        id: '40599x1hkkig7d8l/v-d3gnqat8p95t?x=1',
+        src: 'https://player.glomex.com/integration/1/integration.html?integrationId=40599x1hkkig7d8l&playlistId=v-d3gnqat8p95t%3Fx%3D1',
         ratio: '16/9',
       }
 

@@ -112,8 +112,14 @@ describeForEachParser('bitchuteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore an id carrying an encoded slash', async () => {
+      const value = '<iframe src="https://www.bitchute.com/embed/0fRr8eQ5%2Fhvv8/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/bitchute.com/embed/0fRr8eQ5hvv8/"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/0fRr8eQ5hvv8/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

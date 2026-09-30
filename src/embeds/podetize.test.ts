@@ -104,7 +104,7 @@ describeForEachParser('podetizeScriptEmbedResolver', (parseHtml) => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value = html`
         <script
-          src="https://evil.test/player.podetize.com/loadShowcasePlayer.js"
+          src="https://evil.test/loadShowcasePlayer.js?player.podetize.com/loadShowcasePlayer.js"
           data="P8RHvvMsf"
         ></script>
       `
@@ -147,8 +147,14 @@ describeForEachParser('podetizeIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should ignore a player url on another path', async () => {
+    const value = '<iframe src="https://player.podetize.com/other?id=P8RHvvMsf"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
   it('should ignore a foreign host carrying the same query', async () => {
-    const value = '<iframe src="https://evil.test/player.podetize.com/?id=P8RHvvMsf"></iframe>'
+    const value = '<iframe src="https://evil.test/?id=P8RHvvMsf"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

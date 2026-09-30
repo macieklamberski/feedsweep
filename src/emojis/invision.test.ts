@@ -6,7 +6,7 @@ describeForEachParser('invisionEmojiResolver', (parseHtml) => {
   const { transform, transformKeeping } = emojiConverters(parseHtml)
 
   describe('IPS / Invision (data-emoticon + /uploads/emoticons/ path)', () => {
-    it('should replace an emoticon whose alt is a shortcode', async () => {
+    it('should mark an emoticon despite its universal code alt', async () => {
       const value = html`
         <p>
           <img
@@ -20,35 +20,46 @@ describeForEachParser('invisionEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-      const expected = '<p>🙂</p>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should resolve a stock filename once the default_ prefix is dropped', async () => {
-      const value = html`
+      const expected = html`
         <p>
           <img
-            data-emoticon="true"
-            src="https://example.com/uploads/emoticons/default_wink.png"
-            alt=""
+            data-emoji=""
+            alt=":)"
+            data-emoticon=""
+            height="20"
+            src="https://example.com/uploads/emoticons/default_smile.png"
+            srcset="https://example.com/uploads/emoticons/smile@2x.png 2x"
+            title=":)"
+            width="20"
           >
         </p>
       `
-      const expected = '<p>😉</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should resolve a filename carrying a resolution variant suffix', async () => {
-      const value = html`
-        <p>
-          <img data-emoticon="" src="https://example.com/uploads/emoticons/biggrin@2x.png" alt="">
-        </p>
-      `
-      const expected = '<p>😁</p>'
+    // Without the data-emoticon marker, only a stock name is marked.
+    it('should mark a stock filename once the default_ prefix is dropped', async () => {
+      const value =
+        '<p><img src="https://example.com/uploads/emoticons/default_wink.png" alt=""></p>'
+      const expected =
+        '<p><img data-emoji="" src="https://example.com/uploads/emoticons/default_wink.png" alt=""></p>'
 
       expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark a filename carrying a resolution variant suffix', async () => {
+      const value = '<p><img src="https://example.com/uploads/emoticons/biggrin@2x.png" alt=""></p>'
+      const expected =
+        '<p><img data-emoji="" src="https://example.com/uploads/emoticons/biggrin@2x.png" alt=""></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave an unknown filename without the marker untouched', async () => {
+      const value = '<p><img src="https://example.com/uploads/emoticons/banner.png" alt=""></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
     })
 
     it('should leave a site-custom emoticon with its working image', async () => {
@@ -63,7 +74,7 @@ describeForEachParser('invisionEmojiResolver', (parseHtml) => {
   })
 
   describe('IPS / Invision lazy emoticon (spacer.png src + data-src)', () => {
-    it('should replace an emoticon whose alt is a shortcode', async () => {
+    it('should mark an emoticon whose alt is a universal code', async () => {
       const value = html`
         <p>Thanks
           <img
@@ -73,12 +84,21 @@ describeForEachParser('invisionEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-      const expected = '<p>Thanks 🙂</p>'
+      const expected = html`
+        <p>Thanks
+          <img
+            data-emoji=""
+            alt=":)"
+            src="https://example.com/forum/uploads/emoticons/fpn_smile.png"
+            data-src="https://example.com/forum/uploads/emoticons/fpn_smile.png"
+          >
+        </p>
+      `
 
       expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
     })
 
-    it('should resolve a stock filename behind a data-emoticon marker', async () => {
+    it('should mark a stock filename behind a data-emoticon marker', async () => {
       const value = html`
         <p>Thanks
           <img
@@ -89,7 +109,17 @@ describeForEachParser('invisionEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-      const expected = '<p>Thanks 😉</p>'
+      const expected = html`
+        <p>Thanks
+          <img
+            data-emoji=""
+            alt=""
+            data-emoticon=""
+            src="https://example.com/uploads/emoticons/default_wink.png"
+            data-src="https://example.com/uploads/emoticons/default_wink.png"
+          >
+        </p>
+      `
 
       expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
     })
@@ -110,11 +140,13 @@ describeForEachParser('invisionEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should replace an IPB 2 emoticon by the universal code in its emoid', async () => {
+  it('should mark an IPB 2 emoticon despite the universal code in its emoid', async () => {
     const value =
       '<p><img src="https://example.com/forum/style_emoticons/default/ohmy.gif" emoid=":o" alt="ohmy.gif"></p>'
+    const expected =
+      '<p><img data-emoji="" src="https://example.com/forum/style_emoticons/default/ohmy.gif" emoid=":o" alt="ohmy.gif"></p>'
 
-    expect(await transform(value)).toEqualHtml('<p>😲</p>')
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should mark an IPB 2 emoticon whose emoid holds a board code', async () => {

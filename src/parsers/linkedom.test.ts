@@ -104,7 +104,21 @@ describe('parseHtml', () => {
       expect(parentTagName).toBe('svg')
     })
 
-    // The svg region regex stops at the first `</svg>`, even inside an attribute
+    it('should expand an svg before an unclosed one', () => {
+      const document = parseHtml('<svg><title /><path d="M0 0" /></svg><svg><title />')
+      const parentTagName = queryElement(document, 'path').parentElement?.tagName.toLowerCase()
+
+      expect(parentTagName).toBe('svg')
+    })
+
+    it('should expand an svg before an unterminated svg tag', () => {
+      const document = parseHtml('<svg><title /><path d="M0 0" /></svg><svg')
+      const parentTagName = queryElement(document, 'path').parentElement?.tagName.toLowerCase()
+
+      expect(parentTagName).toBe('svg')
+    })
+
+    // The svg region stops at the first `</svg>`, even inside an attribute
     // value, so expansion is skipped for the rest of the element. Linkedom still
     // nests the unexpanded `<path />` under its anchor parent, so the structure
     // happens to survive. Pinned actual behavior.

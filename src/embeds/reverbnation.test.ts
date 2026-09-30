@@ -18,6 +18,30 @@ describe('reverbnationResolveEmbed', () => {
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should drop the tracking parameters from the widget query', () => {
+      const value =
+        'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55&pwc[size]=fit&utm_source=newsletter&utm_campaign=spring&fbclid=abc'
+      const expected: EmbedResolverResult = {
+        provider: 'reverbnation',
+        id: 'artist_1018382',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55&pwc[size]=fit',
+      }
+
+      expect(reverbnationResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the autoplay flag from the widget query', () => {
+      const value =
+        'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55&pwc[auto_play]=1&pwc[size]=fit'
+      const expected: EmbedResolverResult = {
+        provider: 'reverbnation',
+        id: 'artist_1018382',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55&pwc[size]=fit',
+      }
+
+      expect(reverbnationResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should give an http frame the scheme it needs to load', () => {
       const value =
         'http://www.reverbnation.com/widget_code/html_widget/artist_1123149?widget_id=55'
@@ -33,7 +57,7 @@ describe('reverbnationResolveEmbed', () => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/reverbnation.com/widget_code/html_widget/artist_1018382'
+      const value = 'https://evil.test/widget_code/html_widget/artist_1018382'
 
       expect(reverbnationResolveEmbed(value)).toBeUndefined()
     })
@@ -138,6 +162,27 @@ describe('reverbnationResolveEmbed', () => {
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should refuse an id parameter carrying a path after the number', () => {
+      const value =
+        'http://cache.reverbnation.com/widgets/swf/40/pro_widget.swf?id=artist_1354004%2F..%2F..%2Fadmin'
+
+      expect(reverbnationResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse an id parameter carrying a path before the kind', () => {
+      const value =
+        'http://cache.reverbnation.com/widgets/swf/40/pro_widget.swf?id=admin%2Fartist_1354004'
+
+      expect(reverbnationResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a swf outside the widgets directory', () => {
+      const value =
+        'http://cache.reverbnation.com/assets/widgets/swf/40/pro_widget.swf?id=artist_1354004'
+
+      expect(reverbnationResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should refuse a swf naming nothing', () => {
       const value = 'http://cache.reverbnation.com/widgets/swf/15/widgetPlayer.swf'
 
@@ -201,7 +246,7 @@ describeForEachParser('reverbnationEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
-        '<iframe src="https://evil.test/reverbnation.com/widget_code/html_widget/artist_1018382"></iframe>'
+        '<iframe src="https://evil.test/widget_code/html_widget/artist_1018382"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
