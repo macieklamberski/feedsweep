@@ -15,9 +15,7 @@ describe('extractIvooxSubject', () => {
     const expected: IvooxSubject = {
       kind: 'episode',
       id: '80807760',
-      skin: '6',
       page: '1',
-      player: 'ej',
     }
 
     expect(extractIvooxSubject(value)).toEqual(expected)
@@ -28,9 +26,7 @@ describe('extractIvooxSubject', () => {
     const expected: IvooxSubject = {
       kind: 'episode',
       id: '8292430',
-      skin: '1',
       page: '1',
-      player: 'ej',
     }
 
     expect(extractIvooxSubject(value)).toEqual(expected)
@@ -42,9 +38,7 @@ describe('extractIvooxSubject', () => {
     const expected: IvooxSubject = {
       kind: 'episode',
       id: '1617339',
-      skin: '1',
       page: '1',
-      player: 'ej',
     }
 
     expect(extractIvooxSubject(value)).toEqual(expected)
@@ -55,9 +49,7 @@ describe('extractIvooxSubject', () => {
     const expected: IvooxSubject = {
       kind: 'episode',
       id: '23415',
-      skin: '1',
       page: '1',
-      player: 'ej',
     }
 
     expect(extractIvooxSubject(value)).toEqual(expected)
@@ -77,9 +69,7 @@ describe('extractIvooxSubject', () => {
     const expected: IvooxSubject = {
       kind: 'episode',
       id: '45987110',
-      skin: '2',
       page: '1',
-      player: 'ej',
     }
 
     expect(extractIvooxSubject(value)).toEqual(expected)
@@ -90,9 +80,7 @@ describe('extractIvooxSubject', () => {
     const expected: IvooxSubject = {
       kind: 'episode',
       id: '178634916',
-      skin: '4',
       page: '1',
-      player: 'ek',
     }
 
     expect(extractIvooxSubject(value)).toEqual(expected)
@@ -103,9 +91,7 @@ describe('extractIvooxSubject', () => {
     const expected: IvooxSubject = {
       kind: 'episode',
       id: '178634916',
-      skin: '1',
       page: '1',
-      player: 'ek',
     }
 
     expect(extractIvooxSubject(value)).toEqual(expected)
@@ -116,9 +102,7 @@ describe('extractIvooxSubject', () => {
     const expected: IvooxSubject = {
       kind: 'show',
       id: '1267769',
-      skin: '1',
       page: '1',
-      player: 'es_podcast',
     }
 
     expect(extractIvooxSubject(value)).toEqual(expected)
@@ -129,9 +113,7 @@ describe('extractIvooxSubject', () => {
     const expected: IvooxSubject = {
       kind: 'show',
       id: '1267769',
-      skin: '9',
       page: '3',
-      player: 'es_podcast',
     }
 
     expect(extractIvooxSubject(value)).toEqual(expected)
@@ -142,9 +124,7 @@ describe('extractIvooxSubject', () => {
     const expected: IvooxSubject = {
       kind: 'show',
       id: '1267769',
-      skin: '1',
       page: '3',
-      player: 'es_podcast',
     }
 
     expect(extractIvooxSubject(value)).toEqual(expected)
@@ -155,9 +135,7 @@ describe('extractIvooxSubject', () => {
     const expected: IvooxSubject = {
       kind: 'episode',
       id: 'x80807760',
-      skin: '6',
       page: '1',
-      player: 'ej',
     }
 
     expect(extractIvooxSubject(value)).toEqual(expected)
@@ -168,9 +146,7 @@ describe('extractIvooxSubject', () => {
     const expected: IvooxSubject = {
       kind: 'episode',
       id: 'x8292430',
-      skin: '1',
       page: '1',
-      player: 'ej',
     }
 
     expect(extractIvooxSubject(value)).toEqual(expected)
@@ -181,9 +157,7 @@ describe('extractIvooxSubject', () => {
     const expected: IvooxSubject = {
       kind: 'show',
       id: 'x1267769',
-      skin: '1',
       page: '1',
-      player: 'es_podcast',
     }
 
     expect(extractIvooxSubject(value)).toEqual(expected)
@@ -233,7 +207,7 @@ describe('ivooxResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'ivoox',
       id: '8292430',
-      src: 'https://www.ivoox.com/player_ej_8292430_1_1.html',
+      src: 'https://www.ivoox.com/player_ej_8292430_6_1.html',
       height: 200,
     }
 
@@ -245,14 +219,14 @@ describe('ivooxResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'ivoox',
       id: '1617339',
-      src: 'https://www.ivoox.com/player_ej_1617339_1_1.html',
+      src: 'https://www.ivoox.com/player_ej_1617339_6_1.html',
       height: 200,
     }
 
     expect(ivooxResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should carry the skin the source states', () => {
+  it('should keep the current player as written', () => {
     const value = 'https://www.ivoox.com/player_ej_80807760_6_1.html'
     const expected: EmbedResolverResult = {
       provider: 'ivoox',
@@ -264,13 +238,12 @@ describe('ivooxResolveEmbed', () => {
     expect(ivooxResolveEmbed(value)).toEqual(expected)
   })
 
-  // `ek` serves, so the publisher's generation is kept rather than rewritten to `ej`.
-  it('should keep the newer player generation the source states', () => {
+  it('should mint the current player in place of the mini one', () => {
     const value = 'https://www.ivoox.com/player_ek_178634916_4_1.html'
     const expected: EmbedResolverResult = {
       provider: 'ivoox',
       id: '178634916',
-      src: 'https://www.ivoox.com/player_ek_178634916_4_1.html',
+      src: 'https://www.ivoox.com/player_ej_178634916_6_1.html',
       height: 200,
     }
 
@@ -283,8 +256,8 @@ describe('ivooxResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'ivoox',
       id: 'podcast/1267769',
-      src: 'https://www.ivoox.com/player_es_podcast_1267769_1_1.html',
-      height: 200,
+      src: 'https://www.ivoox.com/player_es_podcast_1267769_zp_1.html',
+      height: 400,
     }
 
     expect(ivooxResolveEmbed(value)).toEqual(expected)
@@ -297,8 +270,8 @@ describe('ivooxResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'ivoox',
       id: 'podcast/1267769',
-      src: 'https://www.ivoox.com/player_es_podcast_1267769_1_3.html',
-      height: 200,
+      src: 'https://www.ivoox.com/player_es_podcast_1267769_zp_3.html',
+      height: 400,
     }
 
     expect(ivooxResolveEmbed(value)).toEqual(expected)
@@ -343,9 +316,8 @@ describeForEachParser('ivooxEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    // The box the publisher stated wins over the player's own height, and wins whole: both
-    // dimensions replace it rather than a width landing beside a height nobody measured.
-    it('should take the size the carrier states over the player height', async () => {
+    // The box was drawn for a skin or generation the mint no longer loads.
+    it("should give the player its own height over the carrier's box", async () => {
       const value = html`
         <iframe
           src="https://www.ivoox.com/player_ek_178634916_4_1.html"
@@ -356,9 +328,8 @@ describeForEachParser('ivooxEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ivoox',
         id: '178634916',
-        src: 'https://www.ivoox.com/player_ek_178634916_4_1.html',
-        width: 600,
-        height: 300,
+        src: 'https://www.ivoox.com/player_ej_178634916_6_1.html',
+        height: 200,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -419,15 +390,63 @@ describeForEachParser('ivoox flash carriers through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-src="https://www.ivoox.com/player_ej_1617339_1_1.html"
+        data-embed-src="https://www.ivoox.com/player_ej_1617339_6_1.html"
         data-embed-provider="ivoox"
         data-embed-id="1617339"
-        data-embed-width="173"
-        data-embed-height="30"
+        data-embed-height="200"
       ></div>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+// What iVoox's embed dialog writes today: the regional host, the skin and the colour the
+// publisher picked.
+describeForEachParser('ivooxEmbedResolver on the snippets the dialog writes', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, ivooxEmbedResolver)
+
+  it('should mint the current episode player without the host, skin and colour', async () => {
+    const value = html`
+      <iframe
+        frameborder="0"
+        height="200"
+        id="audio_47243561"
+        scrolling="no"
+        src="https://ar.ivoox.com/es/player_ej_47243561_4_1.html?c1=ff6600"
+        style="border: 1px solid #eeeeee; box-sizing: border-box; width: 100%"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'ivoox',
+      id: '47243561',
+      src: 'https://www.ivoox.com/player_ej_47243561_6_1.html',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the current show player and drop its colour', async () => {
+    const value = html`
+      <iframe
+        loading="lazy"
+        src="https://www.ivoox.com/player_es_podcast_69122_zp_1.html?c1=98774e"
+        width="100%"
+        height="400"
+        frameborder="0"
+        scrolling="no"
+        allowfullscreen="allowfullscreen"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'ivoox',
+      id: 'podcast/69122',
+      src: 'https://www.ivoox.com/player_es_podcast_69122_zp_1.html',
+      height: 400,
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })
 
@@ -441,7 +460,7 @@ describeForEachParser('ivooxEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'ivoox',
       id: '178634916',
-      src: 'https://www.ivoox.com/player_ek_178634916_4_1.html',
+      src: 'https://www.ivoox.com/player_ej_178634916_6_1.html',
       height: 200,
     }
 
@@ -455,7 +474,7 @@ describeForEachParser('ivooxEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'ivoox',
       id: '178634916',
-      src: 'https://www.ivoox.com/player_ek_178634916_4_1.html',
+      src: 'https://www.ivoox.com/player_ej_178634916_6_1.html',
       height: 200,
       title: 'Episodio 12: La vuelta',
     }
