@@ -4,6 +4,7 @@ import { arteRenderHint } from '../embeds/arte.js'
 import { audioboomRenderHint } from '../embeds/audioboom.js'
 import { blubrryRenderHint } from '../embeds/blubrry.js'
 import { blueskyRenderHint } from '../embeds/bluesky.js'
+import { brRenderHint } from '../embeds/br.js'
 import { bridRenderHint } from '../embeds/brid.js'
 import { brightcoveRenderHint } from '../embeds/brightcove.js'
 import { buzzsproutRenderHint } from '../embeds/buzzsprout.js'
@@ -64,6 +65,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   blueskyRenderHint,
   bridRenderHint,
   brightcoveRenderHint,
+  brRenderHint,
   buzzsproutRenderHint,
   captivateRenderHint,
   channel9RenderHint,
