@@ -30,6 +30,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         provider: 'sketchfab',
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
+        params: { ui_theme: 'dark' },
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
         width: 800,
         height: 600,
@@ -57,9 +58,68 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         provider: 'sketchfab',
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
+        params: {},
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
         width: 640,
         height: 360,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+    it('should carry the viewer flags as params and drop the autostart', async () => {
+      const value = html`
+        <iframe
+          width="640"
+          height="480"
+          src="https://sketchfab.com/models/3b26bab70c1c4d64add90939878194c4/embed?autostart=1&amp;ui_controls=1&amp;ui_infos=1&amp;ui_inspector=1&amp;ui_stop=1&amp;ui_watermark=1&amp;ui_watermark_link=1"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'sketchfab',
+        id: '3b26bab70c1c4d64add90939878194c4',
+        src: 'https://sketchfab.com/models/3b26bab70c1c4d64add90939878194c4/embed',
+        params: {
+          ui_controls: '1',
+          ui_infos: '1',
+          ui_inspector: '1',
+          ui_stop: '1',
+          ui_watermark: '1',
+          ui_watermark_link: '1',
+        },
+        url: 'https://sketchfab.com/models/3b26bab70c1c4d64add90939878194c4',
+        width: 640,
+        height: 480,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+    it('should carry the preload as a param and drop the annotation cycle', async () => {
+      const value = html`
+        <iframe
+          src="https://sketchfab.com/models/20f091e6e62648e2b120ff6875aa4ba6/embed?annotation_cycle=5&amp;preload=1"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'sketchfab',
+        id: '20f091e6e62648e2b120ff6875aa4ba6',
+        src: 'https://sketchfab.com/models/20f091e6e62648e2b120ff6875aa4ba6/embed',
+        params: { preload: '1' },
+        url: 'https://sketchfab.com/models/20f091e6e62648e2b120ff6875aa4ba6',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should carry the spin as a param', async () => {
+      const value = html`
+        <iframe src="https://sketchfab.com/models/c13121255cf04d658885ebe177f130b4/embed?autospin=0.2"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'sketchfab',
+        id: 'c13121255cf04d658885ebe177f130b4',
+        src: 'https://sketchfab.com/models/c13121255cf04d658885ebe177f130b4/embed',
+        params: { autospin: '0.2' },
+        url: 'https://sketchfab.com/models/c13121255cf04d658885ebe177f130b4',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -129,6 +189,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         provider: 'sketchfab',
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
+        params: {},
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
       }
 
@@ -143,6 +204,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         provider: 'sketchfab',
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
+        params: {},
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
       }
 
@@ -157,6 +219,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         provider: 'sketchfab',
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
+        params: {},
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
       }
 
@@ -173,6 +236,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         provider: 'sketchfab',
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
+        params: {},
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
       }
 
@@ -220,6 +284,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
       provider: 'sketchfab',
       id: '00b8203bcdc2464bbac4b159be66e838',
       src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
+      params: {},
       url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
       width: 640,
       height: 480,
@@ -240,6 +305,7 @@ describeForEachParser('sketchfabEmbedResolver carrier title', (parseHtml) => {
       provider: 'sketchfab',
       id: '00b8203bcdc2464bbac4b159be66e838',
       src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
+      params: {},
       url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
     }
 
