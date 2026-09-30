@@ -19,6 +19,7 @@ import { instagramRenderHint } from '../embeds/instagram.js'
 import { kalturaRenderHint } from '../embeds/kaltura.js'
 import { mailruRenderHint } from '../embeds/mailru.js'
 import { mastodonRenderHint } from '../embeds/mastodon.js'
+import { megaphoneRenderHint } from '../embeds/megaphone.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
 import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
@@ -72,6 +73,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   kalturaRenderHint,
   mailruRenderHint,
   mastodonRenderHint,
+  megaphoneRenderHint,
   mixcloudRenderHint,
   notecomRenderHint,
   odnoklassnikiRenderHint,
