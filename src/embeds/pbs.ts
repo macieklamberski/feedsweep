@@ -1,5 +1,5 @@
 import { getPathSegments, isHostOf, type Nullish, toMap } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
 import {
   encodePathSegment,
@@ -123,3 +123,9 @@ export const pbsLegacyIframeEmbedResolver = createUrlEmbedResolver(
 export const pbsFlashEmbedResolver = createUrlEmbedResolver([flashHost], pbsResolveEmbed, {
   preferResolverSize: true,
 })
+
+export const pbsRenderHint: EmbedRenderHint = {
+  provider,
+  // The player reads `autoplay` as true for the string `true` alone, so `autoplay=1` stays paused.
+  autoplayParams: { autoplay: 'true' },
+}
