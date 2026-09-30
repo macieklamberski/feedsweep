@@ -104,11 +104,21 @@ export const codesandboxIframeEmbedResolver = createUrlEmbedResolver(
   codesandboxResolveEmbed,
 )
 
-// The editor posts its rendered height unasked, as `{ src, context: 'iframe.resize', height }`.
-// Without `autoresize=1` in the query it posts a constant 500.
+// The editor posts its rendered height unasked, as `{ src, context: 'iframe.resize', height }`
+// serialised to a JSON string. Without `autoresize=1` in the query it posts a constant 500.
 export const readCodesandboxHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) && data.context === 'iframe.resize'
-    ? readPixels(data.height)
+  let message = data
+
+  if (typeof data === 'string') {
+    try {
+      message = JSON.parse(data)
+    } catch {
+      return
+    }
+  }
+
+  return isPlainObject(message) && message.context === 'iframe.resize'
+    ? readPixels(message.height)
     : undefined
 }
 
