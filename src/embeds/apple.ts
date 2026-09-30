@@ -4,6 +4,9 @@ import { attr, jsonAttr, keepIfMatches } from '../utils/dom.js'
 import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const musicProvider = 'applemusic'
+const podcastsProvider = 'applepodcasts'
+
 // Music and podcasts embed through the same player, served from `embed.music.apple.com` and
 // `embed.podcasts.apple.com`, so both resolve here and only the provider name differs.
 const appleHosts = ['music.apple.com', 'podcasts.apple.com']
@@ -54,7 +57,7 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
   const query = trackId ? pickUrlParams(url, ['i']) : ''
 
   return {
-    provider: isPodcast ? 'applepodcasts' : 'applemusic',
+    provider: isPodcast ? podcastsProvider : musicProvider,
     id: `${kind}/${id}`,
     src: `https://embed.${host}${parsed.pathname}${query}`,
     url: `https://${host}${parsed.pathname}${query}`,
@@ -156,9 +159,9 @@ export const appleToolsEmbedResolver = createUrlEmbedResolver(
 )
 
 export const appleFieldCleaners: Array<FieldCleaner> = [
-  { provider: 'applepodcasts', field: 'title', drop: 'Media player' },
+  { provider: podcastsProvider, field: 'title', drop: 'Media player' },
   // A copied YouTube snippet with the src swapped.
-  { provider: 'applepodcasts', field: 'title', drop: 'YouTube video player' },
-  { provider: 'applemusic', field: 'title', drop: 'Media player' },
-  { provider: 'applemusic', field: 'title', drop: 'メディアプレイヤー' },
+  { provider: podcastsProvider, field: 'title', drop: 'YouTube video player' },
+  { provider: musicProvider, field: 'title', drop: 'Media player' },
+  { provider: musicProvider, field: 'title', drop: 'メディアプレイヤー' },
 ]
