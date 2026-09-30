@@ -49,7 +49,7 @@ export const vidyardIframeEmbedResolver = createUrlEmbedResolver(vidyardHosts, v
 export const vidyardImageEmbedResolver = createMarkupEmbedResolver(
   'img.vidyard-player-embed[data-uuid]',
   (element) => {
-    const uuid = keepIfMatches(attr(element, 'data-uuid'), uuidRegex)
+    const uuid = attr(element, 'data-uuid')
 
     if (!uuid) {
       return
@@ -66,7 +66,7 @@ export const vidyardScriptEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     // The selector matches a substring any host can carry, so the host is checked here.
     const parsed = parseUrlOnHosts(attr(element, 'src'), vidyardHosts)
-    const uuid = keepIfMatches(parsed?.pathname.match(scriptPathRegex)?.[1], uuidRegex)
+    const uuid = parsed?.pathname.match(scriptPathRegex)?.[1]
 
     if (!uuid) {
       return

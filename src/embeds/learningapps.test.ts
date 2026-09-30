@@ -77,16 +77,26 @@ describe('learningappsResolveEmbed', () => {
       expect(learningappsResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore an exercise id carrying a separator', () => {
+    it('should use a malformed exercise id as written, even if the player answers an error', () => {
       const value = 'https://learningapps.org/watch?app=../appicons'
+      const expected: EmbedResolverResult = {
+        provider: 'learningapps',
+        id: '../appicons',
+        src: 'https://learningapps.org/watch?app=..%2Fappicons',
+      }
 
-      expect(learningappsResolveEmbed(value)).toBeUndefined()
+      expect(learningappsResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should ignore an exercise id carrying an encoded separator after its first character', () => {
+    it('should keep an exercise id carrying an encoded separator as one parameter', () => {
       const value = 'https://learningapps.org/watch?app=abc%26v%3D1'
+      const expected: EmbedResolverResult = {
+        provider: 'learningapps',
+        id: 'abc&v=1',
+        src: 'https://learningapps.org/watch?app=abc%26v%3D1',
+      }
 
-      expect(learningappsResolveEmbed(value)).toBeUndefined()
+      expect(learningappsResolveEmbed(value)).toEqual(expected)
     })
   })
 

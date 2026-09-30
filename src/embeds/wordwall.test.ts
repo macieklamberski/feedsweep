@@ -184,16 +184,15 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a check number with a prefix before its digits', async () => {
+    it('should use a malformed check number as written, even if the player answers an error', async () => {
       const value = html`<iframe src="https://wordwall.net/embed/play/65121/614/x434"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'wordwall',
+        id: 'play/65121/614/x434',
+        src: 'https://wordwall.net/embed/play/65121/614/x434',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a check number with a suffix after its digits', async () => {
-      const value = html`<iframe src="https://wordwall.net/embed/play/65121/614/434x"></iframe>`
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a play route outside the embed route', async () => {

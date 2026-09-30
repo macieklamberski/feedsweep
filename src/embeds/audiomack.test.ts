@@ -88,16 +88,34 @@ describe('audiomackResolveEmbed', () => {
       expect(audiomackResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should refuse a slug that is not one', () => {
+    it('should use a malformed slug as written, even if the player answers an error', () => {
       const value = 'https://audiomack.com/embed/larrynorman/song/burn.2%2Fother'
+      const expected: EmbedResolverResult = {
+        provider: 'audiomack',
+        id: 'larrynorman/song/burn.2%2Fother',
+        src: 'https://audiomack.com/embed/larrynorman/song/burn.2%2Fother',
+        params: {},
+        url: 'https://audiomack.com/larrynorman/song/burn.2%2Fother',
+        height: 252,
+        author: 'larrynorman',
+      }
 
-      expect(audiomackResolveEmbed(value)).toBeUndefined()
+      expect(audiomackResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should refuse an artist that is not one', () => {
+    it('should use a malformed artist as written, even if the player answers an error', () => {
       const value = 'https://audiomack.com/embed/larry%2Fnorman/song/burn-2'
+      const expected: EmbedResolverResult = {
+        provider: 'audiomack',
+        id: 'larry%2Fnorman/song/burn-2',
+        src: 'https://audiomack.com/embed/larry%2Fnorman/song/burn-2',
+        params: {},
+        url: 'https://audiomack.com/larry%2Fnorman/song/burn-2',
+        height: 252,
+        author: 'larry%2Fnorman',
+      }
 
-      expect(audiomackResolveEmbed(value)).toBeUndefined()
+      expect(audiomackResolveEmbed(value)).toEqual(expected)
     })
   })
 

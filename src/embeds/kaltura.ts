@@ -1,15 +1,11 @@
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { attr, parsePixelSize } from '../utils/dom.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'kaltura'
 
-// An entry id is a namespace counter, an underscore and lowercase letters or digits,
-// `1_w0bwzism`. The shape is what makes it safe to mint into the thumbnail path. Neither half
-// carries a width, because that would refuse the next id space.
-const safeEntryIdRegex = /^\d+_[a-z0-9]+$/
-const partnerPathRegex = /^\/p\/(\d+)\//
+const partnerPathRegex = /^\/p\/([^/]+)\//
 
 const kalturaHost = 'kaltura.com'
 
@@ -30,7 +26,7 @@ type Entry = {
 const readEntry = (url: string | undefined): Entry | undefined => {
   const parsed = parseUrlOnHosts(url, kalturaHost)
   const partner = parsed?.pathname.match(partnerPathRegex)?.[1]
-  const entryId = keepIfMatches(parsed?.searchParams.get('entry_id'), safeEntryIdRegex)
+  const entryId = parsed?.searchParams.get('entry_id')
 
   return parsed && partner && entryId ? { partner, entryId, parsed } : undefined
 }
@@ -38,6 +34,8 @@ const readEntry = (url: string | undefined): Entry | undefined => {
 const composeEmbed = ({ partner, entryId, parsed }: Entry, src: string): EmbedResolverResult => {
   // A regional host serves its thumbnails itself, so the carrier's host is kept there.
   const thumbnailHost = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
+  // The entry comes out of the query decoded, and it goes into a path.
+  const entrySegment = encodePathSegment(entryId)
 
   return {
     provider,
@@ -45,7 +43,7 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry, src: string): EmbedRe
     id: `${partner}/${entryId}`,
     src,
     // The poster answers 200 `image/jpeg` for a real entry, 404 for an invented or a deleted one.
-    thumbnail: `https://${thumbnailHost}/p/${partner}/thumbnail/entry_id/${entryId}/width/640`,
+    thumbnail: `https://${thumbnailHost}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
   }
 }
 

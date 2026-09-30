@@ -1,10 +1,7 @@
 import { decodeSegment, getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { keepIfMatches } from '../utils/dom.js'
+import { encodePathSegment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-
-// The urn LinkedIn writes into the embed path. Feeds carry `share`, `ugcPost` and `activity`.
-const safeUrnRegex = /^urn:li:[a-zA-Z]+:\d+$/
 
 const linkedinHosts = ['linkedin.com']
 
@@ -17,7 +14,7 @@ const linkedinResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // Some carriers escape the colons, `urn%3Ali%3Ashare%3A…`, and LinkedIn serves both alike.
-  const postUrn = keepIfMatches(decodeSegment(urn), safeUrnRegex)
+  const postUrn = decodeSegment(urn)
 
   if (!postUrn) {
     return
@@ -32,7 +29,7 @@ const linkedinResolveEmbed: ResolveEmbed = (url) => {
     // Kept as written: `collapsed` and `compact` pick the layout the stated height belongs to.
     src: url,
     // The activity urn is assigned server-side, so a share urn cannot be rewritten to it.
-    url: `https://www.linkedin.com/feed/update/${postUrn}`,
+    url: `https://www.linkedin.com/feed/update/${encodePathSegment(postUrn)}`,
   }
 }
 

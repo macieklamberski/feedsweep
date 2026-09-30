@@ -58,24 +58,42 @@ describe('cnbcResolveEmbed', () => {
       expect(cnbcResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for a guid that is not numeric', () => {
+    it('should use a malformed guid as written, even if the player answers an error', () => {
       const value = 'https://player.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&byGuid=latest'
+      const expected: EmbedResolverResult = {
+        provider: 'cnbc',
+        id: 'latest',
+        src: 'https://player.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&byGuid=latest',
+        ratio: '16/9',
+      }
 
-      expect(cnbcResolveEmbed(value)).toBeUndefined()
+      expect(cnbcResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should return undefined for an account outside the token shape', () => {
+    it('should use a malformed account as written, even if the player answers an error', () => {
       const value =
         'https://player.cnbc.com/p/evil.test%2Fp%2FgZWlPC/cnbc_global?playertype=synd&byGuid=7000344703'
+      const expected: EmbedResolverResult = {
+        provider: 'cnbc',
+        id: '7000344703',
+        src: 'https://player.cnbc.com/p/evil.test%2Fp%2FgZWlPC/cnbc_global?playertype=synd&byGuid=7000344703',
+        ratio: '16/9',
+      }
 
-      expect(cnbcResolveEmbed(value)).toBeUndefined()
+      expect(cnbcResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should return undefined for a player outside the token shape', () => {
+    it('should use a malformed player as written, even if the player answers an error', () => {
       const value =
         'https://player.cnbc.com/p/gZWlPC/cnbc_global%3Fsrc%3Devil.test?playertype=synd&byGuid=7000344703'
+      const expected: EmbedResolverResult = {
+        provider: 'cnbc',
+        id: '7000344703',
+        src: 'https://player.cnbc.com/p/gZWlPC/cnbc_global%3Fsrc%3Devil.test?playertype=synd&byGuid=7000344703',
+        ratio: '16/9',
+      }
 
-      expect(cnbcResolveEmbed(value)).toBeUndefined()
+      expect(cnbcResolveEmbed(value)).toEqual(expected)
     })
 
     it('should return undefined for the player path on another cnbc.com host', () => {

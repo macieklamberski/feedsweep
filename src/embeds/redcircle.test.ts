@@ -92,17 +92,31 @@ describe('redcircleResolveEmbed', () => {
       expect(redcircleResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an episode id that is not a uuid', () => {
+    it('should use a malformed episode id as written, even if the player answers an error', () => {
       const value =
         'https://redcircle.com/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/latest'
+      const expected: EmbedResolverResult = {
+        provider: 'redcircle',
+        id: 'episode/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/latest',
+        src: 'https://redcircle.com/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/latest',
+        url: 'https://redcircle.com/shows/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/episodes/latest',
+        height: 170,
+      }
 
-      expect(redcircleResolveEmbed(value)).toBeUndefined()
+      expect(redcircleResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should return undefined for a show id that is not a uuid', () => {
+    it('should use a malformed show id as written, even if the player answers an error', () => {
       const value = 'https://redcircle.com/embedded-show-webplayer/my-show'
+      const expected: EmbedResolverResult = {
+        provider: 'redcircle',
+        id: 'show/my-show',
+        src: 'https://redcircle.com/embedded-show-webplayer/my-show',
+        url: 'https://redcircle.com/shows/my-show',
+        height: 320,
+      }
 
-      expect(redcircleResolveEmbed(value)).toBeUndefined()
+      expect(redcircleResolveEmbed(value)).toEqual(expected)
     })
 
     it('should return undefined for the player path under a route that is not a player', () => {

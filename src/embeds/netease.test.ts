@@ -76,24 +76,6 @@ describe('neteaseResolveEmbed', () => {
       expect(neteaseResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore an id that is not a number', () => {
-      const value = 'https://music.163.com/outchain/player?type=2&id=../../evil&height=66'
-
-      expect(neteaseResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an id that only ends in a number', () => {
-      const value = 'https://music.163.com/outchain/player?type=2&id=abc1'
-
-      expect(neteaseResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an id that only starts with a number', () => {
-      const value = 'https://music.163.com/outchain/player?type=2&id=1abc'
-
-      expect(neteaseResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore the song page, which is not a player', () => {
       const value = 'https://music.163.com/song?id=1392990601'
 
@@ -120,6 +102,18 @@ describe('neteaseResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
+    it('should use a malformed id as written, even if the player answers an error', () => {
+      const value = 'https://music.163.com/outchain/player?type=2&id=../../evil&height=66'
+      const expected: EmbedResolverResult = {
+        provider: 'netease',
+        id: 'song/../../evil',
+        src: 'https://music.163.com/outchain/player?type=2&id=..%2F..%2Fevil&height=66',
+        url: 'https://music.163.com/song?id=..%2F..%2Fevil',
+      }
+
+      expect(neteaseResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should drop a tracker the carrier appends', () => {
       const value =
         'https://music.163.com/outchain/player?type=2&id=1392990601&auto=1&height=66&utm_source=wechat'

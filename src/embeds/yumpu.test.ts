@@ -100,16 +100,15 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a hash carrying a character outside the hash alphabet', async () => {
+    it('should use a malformed hash as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://www.yumpu.com/de/embed/view/z4xY%2F..%2Fevil"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yumpu',
+        id: 'z4xY%2F..%2Fevil',
+        src: 'https://www.yumpu.com/de/embed/view/z4xY%2F..%2Fevil',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a hash carrying a query separator', async () => {
-      const value = '<iframe src="https://www.yumpu.com/de/embed/view/z4xY&x=1"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a locale prefix carrying a query separator', async () => {

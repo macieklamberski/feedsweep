@@ -1,19 +1,23 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 
 const provider = 'issuu'
 
 import { attr } from '../utils/dom.js'
-import { composeQuery, digitsRegex, isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import {
+  composeQuery,
+  digitsRegex,
+  encodePathSegment,
+  isFileName,
+  parseUrlOnHosts,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const issuuHosts = ['issuu.com']
 
 // A config id is a pair of counters, `1016421/47623369`, addressing the reader through the url
 // hash, and a publisher and document name pair addresses it through the query.
-// A name of only dots is refused on purpose: `u=..&d=..` would mint `issuu.com/../docs/..`.
 const configIdRegex = /^\d+\/\d+$/
-const safeNameRegex = /^(?!\.+$)[\w.-]+$/
 
 // Only `embed.html` is minted: `anonymous-embed.html` answers 403 for every document.
 const embedPaths = ['embed.html', 'anonymous-embed.html']
@@ -41,10 +45,6 @@ const composeDocumentEmbed = (
     return
   }
 
-  if (!safeNameRegex.test(publisher) || !safeNameRegex.test(documentName)) {
-    return
-  }
-
   const safePage = page && digitsRegex.test(page) ? { p: page } : undefined
   const query = composeQuery({ u: publisher, d: documentName, ...safePage })
 
@@ -52,7 +52,8 @@ const composeDocumentEmbed = (
     provider,
     id: `${publisher}/${documentName}`,
     src: `https://e.issuu.com/embed.html${query}`,
-    url: `https://issuu.com/${publisher}/docs/${documentName}`,
+    // The iframe's `u` and `d` come out of the query decoded, and each goes into a path segment.
+    url: `https://issuu.com/${encodePathSegment(publisher)}/docs/${encodePathSegment(documentName)}`,
   }
 }
 
@@ -70,7 +71,12 @@ const readDocumentUrl = (url: string): EmbedResolverResult | undefined => {
     return
   }
 
-  return composeDocumentEmbed(publisher, documentName, page)
+  // Decoded here, so the url and the reader encode them once.
+  return composeDocumentEmbed(
+    decodeSegment(publisher) ?? publisher,
+    decodeSegment(documentName) ?? documentName,
+    page,
+  )
 }
 
 // Issuu ships a document as an empty div only its `embed.js` loader hydrates into the reader.

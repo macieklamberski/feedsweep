@@ -53,22 +53,31 @@ describe('extractOmnyClip', () => {
     expect(extractOmnyClip(value)).toBeUndefined()
   })
 
-  // The segments are composed into the minted src as written.
-  it('should return undefined for a segment carrying an encoded slash', () => {
+  it('should use a malformed slug as written, even if the player answers an error', () => {
     const value = 'https://omny.fm/shows/the-show/an%2Fepisode/embed'
+    const expected = 'the-show/an%2Fepisode'
 
-    expect(extractOmnyClip(value)).toBeUndefined()
+    expect(extractOmnyClip(value)).toEqual(expected)
   })
 
   // The player answers 404 for both where the hyphenated slug answers 200.
-  const refusedSlugUrls: Array<string> = [
-    'https://omny.fm/shows/101-3-kdwb-clips/6AM.Hour-Holiday-Awkward/embed',
-    'https://omny.fm/shows/101-3-kdwb-clips/6AM_Hour-Holiday-Awkward/embed',
+  const malformedSlugUrls: Array<[string, string]> = [
+    [
+      'https://omny.fm/shows/101-3-kdwb-clips/6AM.Hour-Holiday-Awkward/embed',
+      '101-3-kdwb-clips/6AM.Hour-Holiday-Awkward',
+    ],
+    [
+      'https://omny.fm/shows/101-3-kdwb-clips/6AM_Hour-Holiday-Awkward/embed',
+      '101-3-kdwb-clips/6AM_Hour-Holiday-Awkward',
+    ],
   ]
 
-  it.each(refusedSlugUrls)('should return undefined for the slug in %s', (value) => {
-    expect(extractOmnyClip(value)).toBeUndefined()
-  })
+  it.each(malformedSlugUrls)(
+    'should use the malformed slug in %s as written, even if the player answers an error',
+    (value, expected) => {
+      expect(extractOmnyClip(value)).toEqual(expected)
+    },
+  )
 
   it('should return undefined when no clip is named', () => {
     const value = 'https://omny.fm/shows/embed'

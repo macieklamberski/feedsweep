@@ -203,6 +203,18 @@ describe('heyzineResolveEmbed', () => {
       expect(heyzineResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should use a malformed page as written, even if the player answers an error', () => {
+      const value = 'https://heyzine.com/flip-book/4db16f598c.html#page/cover'
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: '4db16f598c',
+        src: 'https://heyzine.com/flip-book/4db16f598c.html#page/cover',
+        url: 'https://heyzine.com/flip-book/4db16f598c.html#page/cover',
+      }
+
+      expect(heyzineResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should drop a tracking query', () => {
       const value = 'https://heyzine.com/flip-book/4db16f598c.html?utm_source=newsletter'
       const expected: EmbedResolverResult = {

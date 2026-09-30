@@ -406,7 +406,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
     })
 
     // Flickr redirects this query to `/photos/17367418@N03%20/player`, which answers 404.
-    it('should return undefined for a user carrying a trailing space', async () => {
+    it('should use a malformed user carrying a trailing space as written, even if the player answers an error', async () => {
       const value = html`
         <iframe
           src="http://www.flickr.com/slideShow/index.gne?user_id=17367418@N03 &amp;tags=&amp;set_id=&amp;bgcolor=transparent"
@@ -416,8 +416,17 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
           height="500px"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photostreams/17367418@N03 ',
+        src: 'https://www.flickr.com/photos/17367418@N03%20/player?width=500&height=500',
+        url: 'https://www.flickr.com/photos/17367418@N03%20/',
+        width: 500,
+        height: 500,
+        author: '17367418@N03 ',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
@@ -514,14 +523,48 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
     })
 
     // Flickr answers 404 for `strictly.kev` and `-strictly-kev` beside the live `strictly-kev`.
-    const refusedAliasUrls: Array<string> = [
-      'https://www.flickr.com/photos/strictly.kev/show/',
-      'https://www.flickr.com/photos/-strictly-kev/show/',
-      'https://www.flickr.com/photos/strictly.kev/15753890338/player/',
-    ]
+    it('should use a malformed alias carrying a dot as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://www.flickr.com/photos/strictly.kev/show/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photostreams/strictly.kev',
+        src: 'https://www.flickr.com/photos/strictly.kev/player?width=400&height=300',
+        url: 'https://www.flickr.com/photos/strictly.kev/',
+        width: 400,
+        height: 300,
+        author: 'strictly.kev',
+      }
 
-    it.each(refusedAliasUrls)('should return undefined for the alias in %s', async (value) => {
-      expect(await extract(`<iframe src="${value}"></iframe>`)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed alias opening with a hyphen as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://www.flickr.com/photos/-strictly-kev/show/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photostreams/-strictly-kev',
+        src: 'https://www.flickr.com/photos/-strictly-kev/player?width=400&height=300',
+        url: 'https://www.flickr.com/photos/-strictly-kev/',
+        width: 400,
+        height: 300,
+        author: '-strictly-kev',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed photo owner carrying a dot as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://www.flickr.com/photos/strictly.kev/15753890338/player/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photos/strictly.kev/15753890338',
+        src: 'https://www.flickr.com/photos/strictly.kev/15753890338/player/',
+        url: 'https://www.flickr.com/photos/strictly.kev/15753890338/',
+        author: 'strictly.kev',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should map a framed group pool slideshow page onto the group player', async () => {
@@ -627,7 +670,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the thumbnail when the player segment is not a secret', async () => {
+    it('should use a malformed secret as written, even if the url answers an error', async () => {
       const value = html`
         <iframe
           src="https://www.flickr.com/photos/hankthetank/15637343340/player/2d3295bc6d%20"
@@ -640,6 +683,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'photos/hankthetank/15637343340',
         src: 'https://www.flickr.com/photos/hankthetank/15637343340/player/2d3295bc6d%20',
         url: 'https://www.flickr.com/photos/hankthetank/15637343340/',
+        thumbnail: 'https://live.staticflickr.com/0/15637343340_2d3295bc6d%20_b.jpg',
         width: 560,
         height: 640,
         author: 'hankthetank',
@@ -856,6 +900,26 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should keep a decoded secret carrying a separator in one thumbnail path segment', async () => {
+      const value = html`
+        <embed
+          src="https://www.flickr.com/apps/video/stewart.swf"
+          flashvars="photo_secret=3dfa305404%2F..%2Fx&amp;photo_id=2448291368"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/4Jm8J9',
+        src: 'https://embedr.flickr.com/photos/2448291368?width=400&height=300',
+        url: 'https://flic.kr/p/4Jm8J9',
+        thumbnail: 'https://live.staticflickr.com/0/2448291368_3dfa305404%2F..%2Fx_b.jpg',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -934,7 +998,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for an owner outside the url-safe alphabet', async () => {
+    it('should return undefined for a page path with a segment between the owner and the set', async () => {
       const value = html`
         <embed
           src="https://www.flickr.com/apps/slideshow/show.swf"
@@ -945,20 +1009,27 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a config user carrying an encoded slash', async () => {
+    it('should use a malformed config user carrying an encoded slash as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="https://www.flickr.com/apps/slideshow/show.swf"
           flashvars="user_id=bees%2Fpricing"
         />
       `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photostreams/bees/pricing',
+        src: 'https://www.flickr.com/photos/bees%2Fpricing/player?width=400&height=300',
+        url: 'https://www.flickr.com/photos/bees%2Fpricing/',
+        width: 400,
+        height: 300,
+        author: 'bees/pricing',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    // A dots-only owner never reaches a minted path. The set beside it still resolves through
-    // the ownerless shape.
-    it('should keep the set when the owner is a traversal segment', async () => {
+    it('should use a malformed owner of a traversal segment as written, even if the url answers an error', async () => {
       const value = html`
         <embed
           src="https://www.flickr.com/apps/slideshow/show.swf"
@@ -967,11 +1038,12 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photosets/72157624341',
+        id: '../72157624341',
         src: 'https://embedr.flickr.com/photosets/72157624341?width=400&height=300',
-        url: 'https://flic.kr/s/2TWjFMp',
+        url: 'https://www.flickr.com/photos/../sets/72157624341',
         width: 400,
         height: 300,
+        author: '..',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1054,11 +1126,18 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a photo page player whose owner carries an encoded slash', async () => {
+    it('should use a malformed photo owner carrying an encoded slash as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://www.flickr.com/photos/kimim%2Fphoto/11616055053/player/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photos/kimim/photo/11616055053',
+        src: 'https://www.flickr.com/photos/kimim%2Fphoto/11616055053/player/',
+        url: 'https://www.flickr.com/photos/kimim%2Fphoto/11616055053/',
+        author: 'kimim/photo',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for a photo page player followed by a trailing segment', async () => {
@@ -1080,18 +1159,36 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for an owner opening with an encoded slash', async () => {
+    it('should use a malformed owner opening with an encoded slash as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://www.flickr.com/slideShow/index.gne?user_id=%2Fbees"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photostreams//bees',
+        src: 'https://www.flickr.com/photos/%2Fbees/player?width=400&height=300',
+        url: 'https://www.flickr.com/photos/%2Fbees/',
+        width: 400,
+        height: 300,
+        author: '/bees',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for an owner closing with an encoded traversal', async () => {
+    it('should use a malformed owner closing with an encoded traversal as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://www.flickr.com/slideShow/index.gne?user_id=bees%2F..%2Fx"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photostreams/bees/../x',
+        src: 'https://www.flickr.com/photos/bees%2F..%2Fx/player?width=400&height=300',
+        url: 'https://www.flickr.com/photos/bees%2F..%2Fx/',
+        width: 400,
+        height: 300,
+        author: 'bees/../x',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for a group id opening with an encoded traversal', async () => {

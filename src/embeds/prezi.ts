@@ -1,7 +1,7 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
+import { attr, flashVar } from '../utils/dom.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const preziHosts = ['prezi.com']
@@ -45,15 +45,26 @@ export const preziResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   if (loaderPathRegex.test(parsed.pathname)) {
-    const named = flashVar(element, 'prezi_id') ?? attr(element, 'id')?.match(elementIdRegex)?.[1]
-    const id = keepIfMatches(named, urlSafeTokenRegex)
+    const flashId = flashVar(element, 'prezi_id')
+    // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
+    const id = flashId
+      ? encodePathSegment(flashId)
+      : attr(element, 'id')?.match(elementIdRegex)?.[1]
 
-    return id ? composeEmbed(id) : undefined
+    if (!id) {
+      return
+    }
+
+    return composeEmbed(id)
   }
 
-  const id = keepIfMatches(readFrameId(getPathSegments(parsed)), urlSafeTokenRegex)
+  const id = readFrameId(getPathSegments(parsed))
 
-  return id ? composeEmbed(id) : undefined
+  if (!id) {
+    return
+  }
+
+  return composeEmbed(id)
 }
 
 export const preziEmbedResolver = createUrlEmbedResolver(preziHosts, preziResolveEmbed)

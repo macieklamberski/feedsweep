@@ -79,10 +79,11 @@ describe('extractJwplayerId', () => {
 
   // An underscore is outside the alphabet a media id is written in, and it is what tells a
   // malformed id from a short one, since a short id fails the same whether minted or passed through.
-  it('should return undefined when the media id is malformed', () => {
+  it('should use a malformed media id as written, even if the player answers an error', () => {
     const value = 'https://cdn.jwplayer.com/players/H4GX_r873-abc12345.html'
+    const expected = 'H4GX_r873'
 
-    expect(extractJwplayerId(value)).toBeUndefined()
+    expect(extractJwplayerId(value)).toEqual(expected)
   })
 })
 
@@ -231,20 +232,18 @@ describeForEachParser('jwplayerAmpEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should return undefined for a malformed media id', async () => {
+  it('should use a malformed media id as written, even if the player answers an error', async () => {
     const value = html`
       <amp-jwplayer data-media-id="../../evil" data-player-id="abc12345"></amp-jwplayer>
     `
+    const expected: EmbedResolverResult = {
+      provider: 'jwplayer',
+      id: '../../evil',
+      src: 'https://cdn.jwplayer.com/players/../../evil.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/../../evil/poster.jpg',
+    }
 
-    expect(await extract(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a media id carrying an encoded slash', async () => {
-    const value = html`
-      <amp-jwplayer data-media-id="H4GX%2Fr873" data-player-id="abc12345"></amp-jwplayer>
-    `
-
-    expect(await extract(value)).toBeUndefined()
+    expect(await extract(value)).toEqual(expected)
   })
 
   it('should return undefined for an empty media id', async () => {

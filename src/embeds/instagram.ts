@@ -2,7 +2,7 @@ import { decodeSegment, isPlainObject, parseUrl, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, parsePixelSize, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts, placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import {
   atUsername,
   createMarkupEmbedResolver,
@@ -194,7 +194,7 @@ export const instagramAmpEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     const shortcode = attr(element, 'data-shortcode') ?? attr(element, 'shortcode')
 
-    if (!shortcode || !urlSafeTokenRegex.test(shortcode)) {
+    if (!shortcode) {
       return
     }
 
@@ -253,7 +253,7 @@ export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
     const attributes = jsonAttr<SubstackPostAttributes>(element, 'data-attrs')
     const shortcode = attributes?.instagram_id
 
-    if (!shortcode || !urlSafeTokenRegex.test(shortcode)) {
+    if (!shortcode) {
       return
     }
 

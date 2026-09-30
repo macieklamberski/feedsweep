@@ -4,6 +4,7 @@ import { attr, flashVar, keepIfMatches, parseRatio } from '../utils/dom.js'
 import {
   composeQuery,
   digitsRegex,
+  encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -33,13 +34,15 @@ const playerParams = ['access_key', 'start_page']
 // owner" for a Flash-era id and "Document Not Found" for an invented one.
 const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
   const params = pickQueryParams(search, playerParams)
+  // The Flash `document_id` comes out of a query decoded, and it goes into a path.
+  const segment = encodePathSegment(document)
 
   return {
     provider: 'scribd',
     id: document,
-    src: `https://www.scribd.com/embeds/${document}/content${composeQuery(params)}`,
+    src: `https://www.scribd.com/embeds/${segment}/content${composeQuery(params)}`,
     // The document page takes no key, so a private document gets no page url.
-    url: params.access_key ? undefined : `https://www.scribd.com/document/${document}`,
+    url: params.access_key ? undefined : `https://www.scribd.com/document/${segment}`,
   }
 }
 
@@ -91,7 +94,11 @@ export const scribdFlashResolveEmbed: ResolveEmbed = (url, element) => {
 
   const document = parsed.searchParams.get('document_id') ?? flashVar(element, 'document_id')
 
-  return document && digitsRegex.test(document) ? composeEmbed(document) : undefined
+  if (!document) {
+    return
+  }
+
+  return composeEmbed(document)
 }
 
 // Scribd's Flash viewer, scribdviewer.swf, dead since 2020 and naming its document in document_id.

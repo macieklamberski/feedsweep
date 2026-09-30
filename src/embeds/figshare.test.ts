@@ -37,6 +37,17 @@ describeForEachParser('figshareEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should use a malformed article id as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://widgets.figshare.com/articles/21109066x/embed"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'figshare',
+        id: '21109066x',
+        src: 'https://widgets.figshare.com/articles/21109066x/embed',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

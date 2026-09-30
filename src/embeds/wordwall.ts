@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { digitsRegex, pickUrlParams } from '../utils/urls.js'
+import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `screens.cdn.wordwall.net` serves the activity images, so only the page hosts are claimed.
@@ -32,7 +32,7 @@ const extractActivityPath = (link: string): ActivityPath | undefined => {
   if (segments[0] === 'embed' && segments[1] === 'play') {
     const numbers = segments.slice(2, 5)
 
-    if (numbers.length !== 3 || !numbers.every((number) => digitsRegex.test(number))) {
+    if (numbers.length !== 3) {
       return
     }
 

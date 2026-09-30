@@ -1,7 +1,7 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts, pickQueryParams, uuidRegex } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The loader is served from `api.podcache.net` and the player it builds from `redcircle.com`, on
@@ -35,7 +35,7 @@ const readSubject = (
   // Only the webplayer spells the show id bare; the two loader paths put `sh` in front of it.
   const show = route === 'embedded-show-webplayer' ? rest[0] : rest[1]
 
-  if (!show || !uuidRegex.test(show) || (route !== 'embedded-show-webplayer' && rest[0] !== 'sh')) {
+  if (!show || (route !== 'embedded-show-webplayer' && rest[0] !== 'sh')) {
     return
   }
 
@@ -45,7 +45,7 @@ const readSubject = (
 
   const episode = rest[2] === 'ep' ? rest[3] : undefined
 
-  if (!episode || !uuidRegex.test(episode)) {
+  if (!episode) {
     return
   }
 

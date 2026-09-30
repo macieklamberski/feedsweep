@@ -1,7 +1,12 @@
 import { isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const kindleHosts = [
@@ -19,8 +24,6 @@ const sharedStoreHosts = ['read.amazon.com.au']
 // every store link it opens when a tag is present.
 const cardParams = ['preview', 'tag', 'linkCode']
 
-// An ASIN is uppercase alphanumeric, the ISBN-10 check letter included.
-const safeAsinRegex = /^[0-9A-Z]+$/
 const cardPathRegex = /^\/kp\/card\/?$/
 
 // The Kindle preview card WordPress writes for an Amazon book, `read.amazon.com/kp/card?asin=…`.
@@ -35,7 +38,7 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
 
   const asin = parsed.searchParams.get('asin')
 
-  if (!asin || !safeAsinRegex.test(asin)) {
+  if (!asin) {
     return
   }
 
@@ -45,6 +48,8 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
     linkCode: 'kpd',
     ...pickQueryParams(parsed.search, cardParams),
   })
+  // The ASIN comes out of the query decoded, and it goes into two paths.
+  const segment = encodePathSegment(asin)
   const storefront = parsed.hostname.slice('read.'.length)
   const isSharedStore = sharedStoreHosts.includes(parsed.hostname)
 
@@ -52,8 +57,8 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
     provider: 'kindle',
     id: asin,
     src: `https://${parsed.hostname}/kp/card${query}`,
-    url: isSharedStore ? undefined : `https://www.${storefront}/dp/${asin}`,
-    thumbnail: `https://m.media-amazon.com/images/P/${asin}.01._SCLZZZZZZZ_.jpg`,
+    url: isSharedStore ? undefined : `https://www.${storefront}/dp/${segment}`,
+    thumbnail: `https://m.media-amazon.com/images/P/${segment}.01._SCLZZZZZZZ_.jpg`,
     // The oEmbed writes the book's name here, never a player label.
     title: attr(element, 'title'),
   }

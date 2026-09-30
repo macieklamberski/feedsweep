@@ -6,8 +6,6 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'omny'
 
-const safeSegmentRegex = /^[A-Za-z0-9-]+$/
-
 const omnyHosts = ['omny.fm']
 
 // Carriers state 180 with and without style=cover and Omny's oEmbed agrees, but neither shape was
@@ -26,7 +24,7 @@ export const extractOmnyClip = (link: string): string | undefined => {
 
   const path = segments.slice(1, -1)
 
-  if (path.length < 2 || !path.every((segment) => safeSegmentRegex.test(segment))) {
+  if (path.length < 2) {
     return
   }
 

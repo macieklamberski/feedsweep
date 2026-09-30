@@ -94,10 +94,16 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a guid holding a separator', async () => {
+    it('should use a malformed guid as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://videopress.com/embed/FLEAXUMB-extra"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'videopress',
+        id: 'FLEAXUMB-extra',
+        src: 'https://videopress.com/embed/FLEAXUMB-extra',
+        url: 'https://videopress.com/v/FLEAXUMB-extra',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a videopress path that is not the player or the page', async () => {
@@ -116,12 +122,6 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
 
     it('should ignore a foreign host carrying the same path', async () => {
       const value = '<iframe src="https://evil.test/embed/FLEAXUMB"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a guid carrying an encoded slash', async () => {
-      const value = '<iframe src="https://videopress.com/embed/FLEAXUMB%2Fx"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

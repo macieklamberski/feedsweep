@@ -1,7 +1,12 @@
 import { getPathSegments, isHostOf, type Nullish, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
-import { parseUrlOnHosts, pickQueryParams, pickUrlParams } from '../utils/urls.js'
+import {
+  encodePathSegment,
+  parseUrlOnHosts,
+  pickQueryParams,
+  pickUrlParams,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pbs'
@@ -27,8 +32,6 @@ const idSpaces = toMap({
   partnerplayer: 'partnerplayer',
 })
 
-const safeVideoIdRegex = /^[\w-]+={0,2}$/
-
 // The parameters the player reads besides the id: the clip bounds and chapter, and the layout.
 // `autoplay` and `muted` are the reader's to set.
 const playerParams = ['start', 'end', 'chapter', 'h', 'topbar', 'endscreen', 'previewLayout']
@@ -53,7 +56,7 @@ const composeEmbed = (
 ): EmbedResolverResult | undefined => {
   const idSpace = idSpaces.get(route)
 
-  if (!videoId || !idSpace || !safeVideoIdRegex.test(videoId)) {
+  if (!videoId || !idSpace) {
     return
   }
 
@@ -75,7 +78,10 @@ const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | un
     return
   }
 
-  return composeEmbed('viralplayer', params.get('video'))
+  const videoId = params.get('video')
+
+  // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
+  return composeEmbed('viralplayer', videoId ? encodePathSegment(videoId) : undefined)
 }
 
 // PBS's offsite player, which renders on its own but names no page and no poster.

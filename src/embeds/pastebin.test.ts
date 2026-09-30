@@ -90,10 +90,16 @@ describe('pastebinResolveEmbed', () => {
       expect(pastebinResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a paste id carrying a separator', () => {
+    it('should use a malformed paste id as written, even if the player answers an error', () => {
       const value = 'https://pastebin.com/embed_iframe.php?i=AbCd%2F1234'
+      const expected: EmbedResolverResult = {
+        provider: 'pastebin',
+        id: 'AbCd%2F1234',
+        src: 'https://pastebin.com/embed_iframe/AbCd%2F1234',
+        url: 'https://pastebin.com/AbCd%2F1234',
+      }
 
-      expect(pastebinResolveEmbed(value)).toBeUndefined()
+      expect(pastebinResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore a deeper path under the embed route', () => {

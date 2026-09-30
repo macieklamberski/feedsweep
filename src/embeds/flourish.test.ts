@@ -103,17 +103,6 @@ describeForEachParser('flourishWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a non-numeric id', async () => {
-      const value = html`
-        <div
-          class="flourish-embed"
-          data-src="visualisation/../evil"
-        ></div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should return undefined for a data-src followed by a trailing segment', async () => {
       const value = html`
         <div
@@ -144,6 +133,23 @@ describeForEachParser('flourishWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should use a malformed widget id as written, even if the player answers an error', async () => {
+      const value = html`
+        <div
+          class="flourish-embed"
+          data-src="visualisation/evil"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flourish',
+        id: 'visualisation/evil',
+        src: 'https://flo.uri.sh/visualisation/evil/embed',
+        url: 'https://public.flourish.studio/visualisation/evil/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should omit the thumbnail when the div wraps no img', async () => {
       const value = html`
         <div
@@ -276,10 +282,16 @@ describeForEachParser('flourishIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a non-numeric id', async () => {
+    it('should use a malformed id as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://flo.uri.sh/visualisation/evil/embed"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flourish',
+        id: 'visualisation/evil',
+        src: 'https://flo.uri.sh/visualisation/evil/embed',
+        url: 'https://public.flourish.studio/visualisation/evil/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // The share page is the thing the placeholder links to, not a player to frame.

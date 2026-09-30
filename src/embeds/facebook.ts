@@ -1,7 +1,7 @@
 import { type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, parsePixelSize, text } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -124,7 +124,7 @@ const contentPathRegex = /^\/(?:reel\/[^/]+|[^/]+\/(?:posts|videos)\/[^/]+)/
 const watchPathRegex = /^\/watch\/?$/
 
 const isWatchPage = (url: URL): boolean => {
-  return watchPathRegex.test(url.pathname) && digitsRegex.test(url.searchParams.get('v') ?? '')
+  return watchPathRegex.test(url.pathname) && Boolean(url.searchParams.get('v'))
 }
 
 // A post has no name: its words go to `description`, and the frame titles itself
@@ -139,11 +139,11 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
   if (legacyVideoPathRegex.test(parsed.pathname)) {
     const videoId = parsed.searchParams.get('video_id')
 
-    if (!videoId || !digitsRegex.test(videoId)) {
+    if (!videoId) {
       return
     }
 
-    const watchUrl = `https://www.facebook.com/watch/?v=${videoId}`
+    const watchUrl = `https://www.facebook.com/watch/${composeQuery({ v: videoId })}`
 
     return composePluginEmbed('video', watchUrl, { id: videoId, ...querySize(parsed) })
   }

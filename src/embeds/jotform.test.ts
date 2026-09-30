@@ -169,10 +169,17 @@ describeForEachParser('jotformScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a form id that is not digits', async () => {
+    it('should use a malformed form id as written, even if the player answers an error', async () => {
       const value = html`<script src="https://form.jotform.com/jsform/my-form"></script>`
+      const expected: EmbedResolverResult = {
+        provider: 'jotform',
+        id: 'my-form',
+        src: 'https://form.jotform.com/my-form',
+        url: 'https://form.jotform.com/my-form',
+        height: 539,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a loader path below another route', async () => {

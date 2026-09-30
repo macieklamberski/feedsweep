@@ -1,6 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { digitsRegex, pickQueryParams, pickUrlParams } from '../utils/urls.js'
+import { pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The store's purchase box is a fixed bar.
@@ -14,7 +14,7 @@ const widgetParams = ['t']
 export const steamResolveEmbed: ResolveEmbed = (url) => {
   const [route, appId, subId] = getPathSegments(url)
 
-  if (route !== 'widget' || !digitsRegex.test(appId) || (subId && !digitsRegex.test(subId))) {
+  if (route !== 'widget' || !appId) {
     return
   }
 

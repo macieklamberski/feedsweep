@@ -145,15 +145,20 @@ describeForEachParser('tumblrPostEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a blog key carrying a separator', async () => {
+    it('should use a malformed blog key as written, even if the player answers an error', async () => {
       const value = html`
         <div
           class="tumblr-post"
           data-href="https://embed.tumblr.com/embed/post/t:AbCd%2FEfGh/144854447139/v2"
         ></div>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'tumblr',
+        id: 'AbCd%2FEfGh/144854447139',
+        src: 'https://embed.tumblr.com/embed/post/t:AbCd%2FEfGh/144854447139/v2',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a frame url that stops at the blog key', async () => {

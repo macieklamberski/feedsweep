@@ -179,26 +179,22 @@ describeForEachParser('vidyardImageEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a uuid carrying a path of its own', async () => {
+    it('should use a malformed uuid as written, even if the player answers an error', async () => {
       const value = html`
         <img
           class="vidyard-player-embed"
           data-uuid="../../stolen"
         />
       `
+      const expected: EmbedResolverResult = {
+        provider: 'vidyard',
+        id: '../../stolen',
+        src: 'https://play.vidyard.com/../../stolen.html',
+        url: 'https://share.vidyard.com/watch/../../stolen',
+        thumbnail: 'https://play.vidyard.com/../../stolen.jpg',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a uuid carrying a separator', async () => {
-      const value = html`
-        <img
-          class="vidyard-player-embed"
-          data-uuid="usZcdj/A3ec9sx"
-        />
-      `
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
@@ -303,10 +299,17 @@ describeForEachParser('vidyardScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a uuid carrying an encoded path of its own', async () => {
+    it('should use a malformed uuid as written, even if the player answers an error', async () => {
       const value = '<script src="https://play.vidyard.com/..%2F..%2Fstolen.js"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'vidyard',
+        id: '..%2F..%2Fstolen',
+        src: 'https://play.vidyard.com/..%2F..%2Fstolen.html',
+        url: 'https://share.vidyard.com/watch/..%2F..%2Fstolen',
+        thumbnail: 'https://play.vidyard.com/..%2F..%2Fstolen.jpg',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a loader path followed by a segment of its own', async () => {

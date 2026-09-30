@@ -1,13 +1,11 @@
 import { getPathSegments, isHostOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { attr, flashVars } from '../utils/dom.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ted'
 
-// Talk slugs are the speaker and title joined by underscores, e.g. `ethan_zuckerman`.
-const safeSlugRegex = /^[a-z0-9_]+$/i
 const htmlSuffixRegex = /\.html$/
 
 const tedHosts = ['ted.com']
@@ -29,9 +27,7 @@ export const extractTedTalk = (link: string): string | undefined => {
     return
   }
 
-  const slug = (segments[1] === 'lang' ? segments[3] : segments[1])?.replace(htmlSuffixRegex, '')
-
-  return keepIfMatches(slug, safeSlugRegex)
+  return (segments[1] === 'lang' ? segments[3] : segments[1])?.replace(htmlSuffixRegex, '')
 }
 
 // The Flash player's url is the same file for every talk, so the carrier names nothing on its
@@ -67,7 +63,11 @@ const readFlashTalk = (
   // with no signature and no expiry.
   const poster = config.get('su') ?? undefined
 
-  return { slug, thumbnail: parseUrlOnHosts(poster, tedHosts) ? poster : undefined }
+  // The slug comes out of the flashvars decoded, and it goes into a path beside the raw spelling.
+  return {
+    slug: encodePathSegment(slug),
+    thumbnail: parseUrlOnHosts(poster, tedHosts) ? poster : undefined,
+  }
 }
 
 // TED's embed.ted.com iframe, and the dead Flash player that names the talk only in its flashVars.

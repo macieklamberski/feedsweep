@@ -228,12 +228,22 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a volume id carrying a path separator', async () => {
+    it('should use a malformed volume id as written, even if the player answers an error', async () => {
       const value = html`
         <iframe src="https://books.google.com/books?id=3bm6g7DHDjAC%2Fstolen&output=embed"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'googlebooks',
+        id: '3bm6g7DHDjAC/stolen',
+        src: 'https://books.google.com/books?id=3bm6g7DHDjAC%2Fstolen&output=embed',
+        url: 'https://books.google.com/books?id=3bm6g7DHDjAC%2Fstolen',
+        thumbnail:
+          'https://books.google.com/books/content?id=3bm6g7DHDjAC%2Fstolen&printsec=frontcover&img=1&zoom=1',
+        width: 500,
+        height: 500,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 

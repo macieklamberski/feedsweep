@@ -73,10 +73,30 @@ describe('deezerResolveEmbed', () => {
       expect(deezerResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should refuse an id that is not a deezer id', () => {
+    it('should use a malformed id as written, even if the player answers an error', () => {
       const value = 'https://widget.deezer.com/widget/dark/track/harder-better'
+      const expected: EmbedResolverResult = {
+        provider: 'deezer',
+        id: 'track/harder-better',
+        src: 'https://widget.deezer.com/widget/dark/track/harder-better',
+        url: 'https://www.deezer.com/track/harder-better',
+        height: 150,
+      }
 
-      expect(deezerResolveEmbed(value)).toBeUndefined()
+      expect(deezerResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a decoded plugin id carrying a separator in one path segment', () => {
+      const value = 'https://www.deezer.com/plugins/player?type=album&id=75337%2F..%2F1&app_id=1'
+      const expected: EmbedResolverResult = {
+        provider: 'deezer',
+        id: 'album/75337%2F..%2F1',
+        src: 'https://widget.deezer.com/widget/dark/album/75337%2F..%2F1',
+        url: 'https://www.deezer.com/album/75337%2F..%2F1',
+        height: 300,
+      }
+
+      expect(deezerResolveEmbed(value)).toEqual(expected)
     })
 
     it('should refuse an artist, which the widget serves as a blank page', () => {

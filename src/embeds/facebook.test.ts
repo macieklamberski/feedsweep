@@ -898,10 +898,40 @@ describe('facebookResolveEmbed', () => {
     expect(facebookResolveEmbed(value)).toBeUndefined()
   })
 
-  it('should return undefined for a legacy video frame with a non-numeric id', () => {
+  it('should use a malformed legacy video id as written, even if the player answers an error', () => {
     const value = 'https://www.facebook.com/video/embed?video_id=../etc'
+    const expected: EmbedResolverResult = {
+      provider: 'facebook',
+      id: '../etc',
+      src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D..%252Fetc',
+      url: 'https://www.facebook.com/watch/?v=..%2Fetc',
+    }
 
-    expect(facebookResolveEmbed(value)).toBeUndefined()
+    expect(facebookResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should use a malformed watch id as written, even if the player answers an error', () => {
+    const value = 'https://www.facebook.com/watch/?v=banana'
+    const expected: EmbedResolverResult = {
+      provider: 'facebook',
+      id: 'https://www.facebook.com/watch/?v=banana',
+      src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3Dbanana',
+      url: 'https://www.facebook.com/watch/?v=banana',
+    }
+
+    expect(facebookResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should use a malformed watch id of one space as written, even if the player answers an error', () => {
+    const value = 'https://www.facebook.com/watch/?v=%20'
+    const expected: EmbedResolverResult = {
+      provider: 'facebook',
+      id: 'https://www.facebook.com/watch/?v=%20',
+      src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D%2520',
+      url: 'https://www.facebook.com/watch/?v=%20',
+    }
+
+    expect(facebookResolveEmbed(value)).toEqual(expected)
   })
 
   it('should return undefined for the legacy video path under another segment', () => {
@@ -995,9 +1025,6 @@ describe('facebookResolveEmbed', () => {
     'https://www.facebook.com/nasa/videos/',
     'https://www.facebook.com/watch',
     'https://www.facebook.com/watch/',
-    // A Watch id is numeric; junk in `v` would mint a plugin frame that cannot load.
-    'https://www.facebook.com/watch/?v=banana',
-    'https://www.facebook.com/watch/?v=%20',
     // A group post is login-walled, so there is nothing a plugin could show an anonymous reader.
     'https://www.facebook.com/groups/743994612334347/posts/1854848817915582/',
     'https://www.facebook.com/help/videos/',

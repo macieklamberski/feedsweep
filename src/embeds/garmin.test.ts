@@ -73,12 +73,6 @@ describe('garminResolveEmbed', () => {
       expect(garminResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore an activity id that is not a number', () => {
-      const value = 'https://connect.garmin.com/embed/activity/latest'
-
-      expect(garminResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore the embed route nested under another section', () => {
       const value = 'https://connect.garmin.com/course/embed/activity/1393315994'
 
@@ -89,6 +83,20 @@ describe('garminResolveEmbed', () => {
       const value = 'https://connect.garmin.com/modern/activity/embed/1393315994/extra'
 
       expect(garminResolveEmbed(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed activity id as written, even if the player answers an error', () => {
+      const value = 'https://connect.garmin.com/embed/activity/latest'
+      const expected: EmbedResolverResult = {
+        provider: 'garmin',
+        id: 'latest',
+        src: 'https://connect.garmin.com/embed/activity/latest',
+        url: 'https://connect.garmin.com/app/activity/latest',
+      }
+
+      expect(garminResolveEmbed(value)).toEqual(expected)
     })
   })
 })

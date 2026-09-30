@@ -44,23 +44,20 @@ describe('odnoklassnikiResolveEmbed', () => {
 
       expect(odnoklassnikiResolveEmbed(value)).toBeUndefined()
     })
+  })
 
-    it('should ignore a video id that is not a number', () => {
+  describe('edge cases', () => {
+    it('should use a malformed video id as written, even if the player answers an error', () => {
       const value = 'https://ok.ru/videoembed/latest'
+      const expected: EmbedResolverResult = {
+        provider: 'odnoklassniki',
+        id: 'latest',
+        src: 'https://ok.ru/videoembed/latest',
+        url: 'https://ok.ru/video/latest',
+        ratio: '16/9',
+      }
 
-      expect(odnoklassnikiResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a video id with letters before the digits', () => {
-      const value = 'https://ok.ru/videoembed/abc36463446577'
-
-      expect(odnoklassnikiResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a video id with letters after the digits', () => {
-      const value = 'https://ok.ru/videoembed/36463446577abc'
-
-      expect(odnoklassnikiResolveEmbed(value)).toBeUndefined()
+      expect(odnoklassnikiResolveEmbed(value)).toEqual(expected)
     })
   })
 })

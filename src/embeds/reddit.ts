@@ -13,10 +13,6 @@ const provider = 'reddit'
 
 const redditHosts = ['reddit.com', 'redditmedia.com']
 
-// The post counter started at one base36 character in 2005, and two-character permalinks are still
-// linked from real feeds.
-const safeThingIdRegex = /^[a-z0-9]+$/i
-
 // What a permalink names. A post carries a title, a comment does not, and a subreddit names
 // neither, so the kind decides which fields the widget can fill.
 type RedditTarget = {
@@ -46,7 +42,7 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
 
   const [scope, name, comments, postId] = segments
 
-  if ((scope !== 'r' && scope !== 'user') || !name || !urlSafeTokenRegex.test(name)) {
+  if ((scope !== 'r' && scope !== 'user') || !name) {
     return
   }
 
@@ -58,7 +54,7 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
     return scope === 'r' ? { kind: 'subreddit', path: `r/${name}`, publisher } : undefined
   }
 
-  if (comments !== 'comments' || !postId || !safeThingIdRegex.test(postId)) {
+  if (comments !== 'comments' || !postId) {
     return
   }
 
@@ -71,9 +67,7 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
   const commentId = segments[5]
 
   if (commentId) {
-    return safeThingIdRegex.test(commentId)
-      ? { kind: 'comment', path: `${post}/comment/${commentId}`, publisher }
-      : undefined
+    return { kind: 'comment', path: `${post}/comment/${commentId}`, publisher }
   }
 
   return { kind: 'post', path: post, publisher }

@@ -98,27 +98,6 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id of the wrong shape', async () => {
-      const value =
-        '<iframe src="https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1.mp4"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore an id of the wrong shape behind a locale', async () => {
-      const value =
-        '<iframe src="https://www.ganjingworld.com/vi-VN/embed/1fv8993v57oI3UiHioRJzFV1.mp4"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore an id carrying an encoded slash', async () => {
-      const value =
-        '<iframe src="https://www.ganjingworld.com/embed/1fv8993v57oI%2F3UiHioRJzFV1L1cq1c"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a segment in front of the route that is not a locale', async () => {
       const value =
         '<iframe src="https://www.ganjingworld.com/live/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
@@ -176,6 +155,45 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should use a malformed id as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1.mp4"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ganjingworld',
+        id: '1fv8993v57oI3UiHioRJzFV1.mp4',
+        src: 'https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1.mp4',
+        url: 'https://www.ganjingworld.com/video/1fv8993v57oI3UiHioRJzFV1.mp4',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed id behind a locale as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/vi-VN/embed/1fv8993v57oI3UiHioRJzFV1.mp4"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ganjingworld',
+        id: '1fv8993v57oI3UiHioRJzFV1.mp4',
+        src: 'https://www.ganjingworld.com/vi-VN/embed/1fv8993v57oI3UiHioRJzFV1.mp4',
+        url: 'https://www.ganjingworld.com/vi-VN/video/1fv8993v57oI3UiHioRJzFV1.mp4',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed id carrying an encoded slash as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/embed/1fv8993v57oI%2F3UiHioRJzFV1L1cq1c"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ganjingworld',
+        id: '1fv8993v57oI%2F3UiHioRJzFV1L1cq1c',
+        src: 'https://www.ganjingworld.com/embed/1fv8993v57oI%2F3UiHioRJzFV1L1cq1c',
+        url: 'https://www.ganjingworld.com/video/1fv8993v57oI%2F3UiHioRJzFV1L1cq1c',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should pass a 13-character legacy id through', async () => {
       const value = '<iframe src="https://www.ganjingworld.com/embed/Vvuz8d7kgQ5aw"></iframe>'
       const expected: EmbedResolverResult = {

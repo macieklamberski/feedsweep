@@ -2,7 +2,6 @@ import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { digitsRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flourish'
@@ -21,14 +20,10 @@ const nonEmbeddableResource = 'template'
 
 // The div names its chart by a relative `{resource}/{id}` path, at most with a cache-busting
 // query. A full URL or any other shape is dropped.
-const widgetSrcRegex = /^([a-z]+)\/(\d+)(?:\?.*)?$/
+const widgetSrcRegex = /^([a-z]+)\/([^/?]+)(?:\?.*)?$/
 
 const composeEmbed = (resource: string, id: string): EmbedResolverResult | undefined => {
-  if (!safeResourceRegex.test(resource) || resource === nonEmbeddableResource) {
-    return
-  }
-
-  if (!digitsRegex.test(id)) {
+  if (!safeResourceRegex.test(resource) || resource === nonEmbeddableResource || !id) {
     return
   }
 

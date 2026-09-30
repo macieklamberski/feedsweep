@@ -1,11 +1,8 @@
 import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { flashVars, keepIfMatches } from '../utils/dom.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-
-// A publication code is hex, and nothing else may reach a minted path.
-const safeCodeRegex = /^[0-9a-f]+$/
 
 // The viewer and the book page both read `langid` as a two-letter language.
 const languageRegex = /^[a-z]{2}$/
@@ -22,7 +19,7 @@ export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
   const params = urlParams?.has('bkcode') ? urlParams : new URLSearchParams(flashVars(element))
   const code = params.get('bkcode')
 
-  if (!code || !safeCodeRegex.test(code)) {
+  if (!code) {
     return
   }
 
@@ -65,7 +62,8 @@ export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
     provider: 'calameo',
     id: code,
     src: `https://v.calameo.com/?${query}`,
-    url: `https://www.calameo.com/books/${code}${pageQuery}`,
+    // The code comes out of a query decoded, and it goes into a path.
+    url: `https://www.calameo.com/books/${encodePathSegment(code)}${pageQuery}`,
   }
 }
 

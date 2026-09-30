@@ -805,7 +805,27 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a token that would climb out of the pen path', async () => {
+    it('should keep a decoded query token carrying a separator in one path segment', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-href="https://codepen.io/leaverou/pen/OJYzQjN?token=c8ec7595%2F..%2Fx"
+        ></p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'OJYzQjN',
+        src: 'https://codepen.io/leaverou/embed/OJYzQjN/c8ec7595%2F..%2Fx',
+        url: 'https://codepen.io/leaverou/pen/OJYzQjN/c8ec7595%2F..%2Fx',
+        thumbnail: 'https://shots.codepen.io/leaverou/pen/OJYzQjN-512.jpg',
+        height: 300,
+        author: '@leaverou',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed token as written, even if the player answers an error', async () => {
       const value = html`
         <p
           class="codepen"
@@ -817,8 +837,8 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
-        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm/..',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm/..',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
         height: 300,
         author: '@argyleink',
@@ -827,7 +847,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a token carrying a query of its own', async () => {
+    it('should use a malformed token carrying a query as written, even if the player answers an error', async () => {
       const value = html`
         <p
           class="codepen"
@@ -839,8 +859,8 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
-        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm/c8ec7595b68381e99d38441487db546f&autoplay=1',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm/c8ec7595b68381e99d38441487db546f&autoplay=1',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
         height: 300,
         author: '@argyleink',
@@ -907,7 +927,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a slug that is not a pen id', async () => {
+    it('should use a malformed slug hash as written, even if the player answers an error', async () => {
       const value = html`
         <p
           class="codepen"
@@ -916,11 +936,19 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
           <span>See the Pen</span>
         </p>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'not a slug',
+        src: 'https://codepen.io/anon/embed/not a slug',
+        url: 'https://codepen.io/anon/pen/not a slug',
+        thumbnail: 'https://shots.codepen.io/anon/pen/not a slug-512.jpg',
+        height: 300,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a slug hash carrying a query', async () => {
+    it('should use a malformed slug hash carrying a query as written, even if the player answers an error', async () => {
       const value = html`
         <p
           class="codepen"
@@ -929,8 +957,16 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
           <span>See the Pen</span>
         </p>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm?x=1',
+        src: 'https://codepen.io/anon/embed/XJpKqXm?x=1',
+        url: 'https://codepen.io/anon/pen/XJpKqXm?x=1',
+        thumbnail: 'https://shots.codepen.io/anon/pen/XJpKqXm?x=1-512.jpg',
+        height: 300,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // The attribute alone is not the platform: other embed plugins carry their own slug hashes.
@@ -1037,7 +1073,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should treat a handle with an at sign inside it as no author', async () => {
+    it('should use a malformed handle as written, even if the player answers an error', async () => {
       const value = html`
         <p
           class="codepen"
@@ -1048,10 +1084,11 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/anon/embed/XJpKqXm',
-        url: 'https://codepen.io/anon/pen/XJpKqXm',
-        thumbnail: 'https://shots.codepen.io/anon/pen/XJpKqXm-512.jpg',
+        src: 'https://codepen.io/argyle@ink/embed/XJpKqXm',
+        url: 'https://codepen.io/argyle@ink/pen/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/argyle@ink/pen/XJpKqXm-512.jpg',
         height: 300,
+        author: '@argyle@ink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1435,7 +1472,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a key carrying a query of its own off the pen page', async () => {
+    it('should use a malformed key as written, even if the player answers an error', async () => {
       const value = html`
         <iframe
           height="400"
@@ -1446,7 +1483,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         provider: 'codepen',
         id: 'XJpKqXm',
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc%26autoplay%3D1',
-        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc%26autoplay%3D1',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
         height: 400,
         author: '@argyleink',

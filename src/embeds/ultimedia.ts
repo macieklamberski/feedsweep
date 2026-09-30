@@ -5,7 +5,7 @@ import { createMarkupEmbedResolver } from '../utils/widgets.js'
 const provider = 'ultimedia'
 
 // The account key and the video id each sit directly after their own route word.
-const playerPathRegex = /\/mdtk\/([a-z\d]+)\/src\/([a-z\d]+)(?:\/|$)/
+const playerPathRegex = /\/mdtk\/([^/]+)\/src\/([^/]+)(?:\/|$)/
 
 // Ultimedia, trading as Digiteka: the generic player iframe, which plays as it stands and states
 // its own size. The legacy `/swf/iframe_pub.php` route carries no account key and its player is

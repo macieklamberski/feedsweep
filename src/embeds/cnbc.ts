@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { digitsRegex, parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const cnbcHosts = ['player.cnbc.com']
@@ -21,19 +21,16 @@ export const cnbcResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  // No width: a band would refuse the next account CNBC opens.
-  if (!urlSafeTokenRegex.test(account) || !urlSafeTokenRegex.test(player)) {
+  if (!guid) {
     return
   }
 
-  if (!guid || !digitsRegex.test(guid)) {
-    return
-  }
+  const query = composeQuery({ playertype: 'synd', byGuid: guid })
 
   return {
     provider: 'cnbc',
     id: guid,
-    src: `https://player.cnbc.com/p/${account}/${player}?playertype=synd&byGuid=${guid}`,
+    src: `https://player.cnbc.com/p/${account}/${player}${query}`,
     ratio: playerRatio,
   }
 }

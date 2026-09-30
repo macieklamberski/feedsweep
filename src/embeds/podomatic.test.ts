@@ -52,10 +52,16 @@ describe('podomaticResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
-    it('should refuse an id that is not a podomatic id', () => {
+    it('should use a malformed episode id as written, even if the player answers an error', () => {
       const value = 'https://www.podomatic.com/embed/html5/episode/latest'
+      const expected: EmbedResolverResult = {
+        provider: 'podomatic',
+        id: 'episode/latest',
+        src: 'https://podomatic.com/embed/html5/episode/latest',
+        height: 208,
+      }
 
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
+      expect(podomaticResolveEmbed(value)).toEqual(expected)
     })
 
     it('should read a kind PodOmatic has not published yet', () => {
@@ -208,24 +214,28 @@ describe('podomaticResolveEmbed', () => {
       expect(podomaticResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should drop an episode parameter that is not an id', () => {
+    it('should use a malformed episode id as written, even if the player answers an error', () => {
       const value = 'https://www.podomatic.com/embed/v2/podcast/5476235?episode_id=latest'
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
-        id: 'podcast/5476235',
-        src: 'https://podomatic.com/embed/v2/podcast/5476235',
+        id: 'episode/latest',
+        src: 'https://podomatic.com/embed/v2/podcast/5476235?episode_id=latest',
         height: 205,
       }
 
       expect(podomaticResolveEmbed(value)).toEqual(expected)
     })
 
-    // The episode is a real id, so the podcast segment is the only thing standing between the
-    // feed and the minted path.
-    it('should refuse a podcast segment that is not an id', () => {
+    it('should use a malformed podcast id as written, even if the player answers an error', () => {
       const value = 'https://www.podomatic.com/embed/v2/podcast/..%2F..%2Fadmin?episode_id=11083318'
+      const expected: EmbedResolverResult = {
+        provider: 'podomatic',
+        id: 'episode/11083318',
+        src: 'https://podomatic.com/embed/v2/podcast/..%2F..%2Fadmin?episode_id=11083318',
+        height: 205,
+      }
 
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
+      expect(podomaticResolveEmbed(value)).toEqual(expected)
     })
   })
 

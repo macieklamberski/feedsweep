@@ -5,11 +5,11 @@ import { parseUrlOnHosts, pickQueryParams, placeholderBaseUrl } from '../utils/u
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The current editor issues a chart id under `_/`, older ones a slug or a uuid.
-const chartIdRegex = /^(?:_\/)?[\w-]+$/
+const chartIdRegex = /^(?:_\/)?[^/]+$/
 // A live chart's mount id ends in `?live`, which the loader appends to the frame url as written.
-const mountIdRegex = /^((?:_\/)?[\w-]+)(?:\?(.*))?$/
+const mountIdRegex = /^([^?]+)(?:\?(.*))?$/
 // The loader's script id, `infogram_{width}_{chart id}`.
-const scriptIdRegex = /^infogram_\d+_((?:_\/)?[\w-]+)$/
+const scriptIdRegex = /^infogram_\d+_(.+)$/
 
 const infogramHosts = [
   'e.infogram.com',

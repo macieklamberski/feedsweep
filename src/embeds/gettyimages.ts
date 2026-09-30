@@ -1,10 +1,10 @@
 import type { ResolveEmbed } from '../types.js'
 import { parsePixelSize } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.
-const embedPathRegex = /^\/embed\/(\d+)\/?$/
+const embedPathRegex = /^\/embed\/([^/]+)\/?$/
 
 const gettyImagesHosts = ['gettyimages.com']
 
@@ -22,7 +22,7 @@ const gettyImagesResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, gettyImagesHosts)
   const itemId = parsed?.pathname.match(embedPathRegex)?.[1]
 
-  if (!itemId || !digitsRegex.test(itemId)) {
+  if (!itemId) {
     return
   }
 

@@ -1,6 +1,6 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const podomaticHost = 'podomatic.com'
@@ -52,16 +52,15 @@ const readPlayer = (url: URL): Player | undefined => {
   // embed/v2/podcast/{podcast}?episode_id={episode}&theme={theme} is the snippet Podomatic hands
   // out today, and its episode_id is the id the html5 route takes in its path.
   if (segments[1] === 'v2' && segments[2] === 'podcast') {
-    const podcast = segments[3] ?? ''
+    const podcast = segments[3]
 
-    // The podcast segment is written into the src whichever id travels, and ..%2F.. never folds.
-    if (!digitsRegex.test(podcast)) {
+    if (!podcast) {
       return
     }
 
     const episode = url.searchParams.get('episode_id') ?? ''
     const theme = url.searchParams.get('theme')
-    const named = digitsRegex.test(episode) ? `?episode_id=${episode}` : ''
+    const named = episode ? composeQuery({ episode_id: episode }) : ''
     // The theme comes back decoded, so unencoded it could smuggle a second parameter.
     const themed = theme && named ? `&theme=${encodeURIComponent(theme)}` : ''
 
@@ -78,7 +77,7 @@ export const podomaticResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, podomaticHost)
   const player = parsed && readPlayer(parsed)
 
-  if (!player || !digitsRegex.test(player.id)) {
+  if (!player?.id) {
     return
   }
 

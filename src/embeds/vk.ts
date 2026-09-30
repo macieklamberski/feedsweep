@@ -1,12 +1,14 @@
 import { parseUrl, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { composeQuery, digitsRegex, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const vkHosts = ['vk.com', 'vk.ru', 'vkontakte.ru', 'vkvideo.ru']
-
-// An owner id is negative for a community.
-const safeOwnerIdRegex = /^-?\d+$/
 
 // The page a player opens is spelled with the endpoint's own word, on the host vk.com redirects
 // videos to. A clip page on vk.com redirects to an unsupported-browser page instead.
@@ -33,7 +35,7 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
   const ownerId = parsed.searchParams.get('oid') ?? ''
   const videoId = parsed.searchParams.get('id') ?? ''
 
-  if (!player || !safeOwnerIdRegex.test(ownerId) || !digitsRegex.test(videoId)) {
+  if (!player || !ownerId || !videoId) {
     return
   }
 
@@ -45,7 +47,8 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
     provider: 'vk',
     id,
     src,
-    url: `https://vkvideo.ru/${player.kind}${id}`,
+    // Both ids come out of the query decoded, and they go into a path.
+    url: `https://vkvideo.ru/${player.kind}${encodePathSegment(id)}`,
   }
 }
 

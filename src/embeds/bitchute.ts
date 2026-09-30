@@ -1,10 +1,7 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-
-// No width: a band measured off today's ids would refuse the ones BitChute mints next.
-const safeVideoIdRegex = /^[a-zA-Z0-9]+$/
 
 const bitchuteHosts = ['bitchute.com']
 
@@ -16,9 +13,7 @@ const bitchuteResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const videoId = keepIfMatches(id, safeVideoIdRegex)
-
-  if (!videoId) {
+  if (!id) {
     return
   }
 
@@ -28,9 +23,9 @@ const bitchuteResolveEmbed: ResolveEmbed = (url, element) => {
   // `api.bitchute.com/oembed/?url={page}` answers with it, the title and the channel, key-free.
   return {
     provider: 'bitchute',
-    id: videoId,
-    src: `https://www.bitchute.com/embed/${videoId}/`,
-    url: `https://www.bitchute.com/video/${videoId}/`,
+    id,
+    src: `https://www.bitchute.com/embed/${id}/`,
+    url: `https://www.bitchute.com/video/${id}/`,
     title,
   }
 }

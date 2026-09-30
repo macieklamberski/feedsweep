@@ -86,17 +86,33 @@ describe('googledriveResolveEmbed', () => {
 
       expect(googledriveResolveEmbed(value)).toBeUndefined()
     })
+  })
 
-    it('should ignore a file id carrying a separator', () => {
+  describe('edge cases', () => {
+    it('should use a malformed file id as written, even if the player answers an error', () => {
       const value = 'https://drive.google.com/file/d/1UVR7Liw%2F..%2Fother/preview'
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: '1UVR7Liw%2F..%2Fother',
+        src: 'https://drive.google.com/file/d/1UVR7Liw%2F..%2Fother/preview',
+        url: 'https://drive.google.com/file/d/1UVR7Liw%2F..%2Fother/view',
+        thumbnail: 'https://drive.google.com/thumbnail?id=1UVR7Liw%2F..%2Fother&sz=w640',
+      }
 
-      expect(googledriveResolveEmbed(value)).toBeUndefined()
+      expect(googledriveResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should ignore a file id carrying a query separator', () => {
+    it('should use a malformed file id carrying a query separator as written, even if the player answers an error', () => {
       const value = 'https://drive.google.com/file/d/1UVR7Liw&sz=w1/preview'
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: '1UVR7Liw&sz=w1',
+        src: 'https://drive.google.com/file/d/1UVR7Liw&sz=w1/preview',
+        url: 'https://drive.google.com/file/d/1UVR7Liw&sz=w1/view',
+        thumbnail: 'https://drive.google.com/thumbnail?id=1UVR7Liw%26sz%3Dw1&sz=w640',
+      }
 
-      expect(googledriveResolveEmbed(value)).toBeUndefined()
+      expect(googledriveResolveEmbed(value)).toEqual(expected)
     })
   })
 })

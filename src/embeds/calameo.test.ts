@@ -85,28 +85,16 @@ describe('calameoResolveEmbed', () => {
       expect(calameoResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a code outside the hex alphabet', () => {
+    it('should use a malformed code as written, even if the player answers an error', () => {
       const value = 'https://v.calameo.com/?bkcode=../books'
+      const expected: EmbedResolverResult = {
+        provider: 'calameo',
+        id: '../books',
+        src: 'https://v.calameo.com/?bkcode=..%2Fbooks',
+        url: 'https://www.calameo.com/books/..%2Fbooks',
+      }
 
-      expect(calameoResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a code with a path in front of the hex', () => {
-      const value = 'https://v.calameo.com/?bkcode=../0077756511c9c6e552299'
-
-      expect(calameoResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a code with a path after the hex', () => {
-      const value = 'https://v.calameo.com/?bkcode=0077756511c9c6e552299/../x'
-
-      expect(calameoResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a code with an encoded slash between hex characters', () => {
-      const value = 'https://v.calameo.com/?bkcode=0077756511c9c6e552299%2F0'
-
-      expect(calameoResolveEmbed(value)).toBeUndefined()
+      expect(calameoResolveEmbed(value)).toEqual(expected)
     })
 
     it('should drop a language with a prefix in front of the two letters', () => {

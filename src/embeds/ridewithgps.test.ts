@@ -175,11 +175,18 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id carrying a path separator', async () => {
+    it('should use a malformed route id as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://ridewithgps.com/embeds?type=route&id=1%2F..%2F9"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ridewithgps',
+        id: 'route/1%2F..%2F9',
+        src: 'https://ridewithgps.com/embeds?type=route&id=1%2F..%2F9',
+        url: 'https://ridewithgps.com/routes/1%2F..%2F9',
+        thumbnail: 'https://ridewithgps.com/routes/1%2F..%2F9/thumb.png',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a route whose id sits in eventId', async () => {
@@ -277,10 +284,17 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id carrying an encoded path separator', async () => {
+    it('should use a malformed route id as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://ridewithgps.com/routes/1%2F..%2F9/embed"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ridewithgps',
+        id: 'route/1%2F..%2F9',
+        src: 'https://ridewithgps.com/routes/1%2F..%2F9/embed',
+        url: 'https://ridewithgps.com/routes/1%2F..%2F9',
+        thumbnail: 'https://ridewithgps.com/routes/1%2F..%2F9/thumb.png',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore an event framed on the embed path', async () => {

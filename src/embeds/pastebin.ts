@@ -1,14 +1,12 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pastebin'
 
 const pastebinHosts = ['pastebin.com']
-
-const safePasteIdRegex = /^[a-zA-Z0-9]+$/
 
 // The snippet's dark variant, a publisher layout choice the frame honours.
 const pastebinEmbedParams = ['theme']
@@ -30,13 +28,24 @@ const readPasteId = (url: string | undefined): string | undefined => {
     return
   }
 
-  return pasteId ?? parsed.searchParams.get('i') ?? undefined
+  if (pasteId) {
+    return pasteId
+  }
+
+  const queryId = parsed.searchParams.get('i')
+
+  if (!queryId) {
+    return
+  }
+
+  // The query id comes out decoded, and it goes into a path beside the raw path spelling.
+  return encodePathSegment(queryId)
 }
 
 export const pastebinResolveEmbed: ResolveEmbed = (url) => {
   const pasteId = readPasteId(url)
 
-  if (!pasteId || !safePasteIdRegex.test(pasteId)) {
+  if (!pasteId) {
     return
   }
 

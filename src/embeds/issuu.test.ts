@@ -66,6 +66,18 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should encode a document name carrying an encoded slash once', async () => {
+      const value = '<div class="issuuembed" data-url="https://issuu.com/pub/docs/do%2Fc"></div>'
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'pub/do/c',
+        src: 'https://e.issuu.com/embed.html?u=pub&d=do%2Fc',
+        url: 'https://issuu.com/pub/docs/do%2Fc',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should carry a page number from the reader url into the query', async () => {
       const value = html`
         <div
@@ -291,12 +303,18 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a publisher name that is a dot segment', async () => {
+    it('should use a malformed publisher name as written, even if the player answers an error', async () => {
       const value = html`
         <iframe src="https://e.issuu.com/embed.html?u=..&d=paisaje_transversal"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: '../paisaje_transversal',
+        src: 'https://e.issuu.com/embed.html?u=..&d=paisaje_transversal',
+        url: 'https://issuu.com/../docs/paisaje_transversal',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for a query missing the publisher', async () => {
@@ -307,20 +325,18 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // The query is interpolated straight into the minted url, so a name that is not a name has
-    // to stop here.
-    it('should return undefined for a document name holding a traversal', async () => {
+    it('should use a malformed document name as written, even if the player answers an error', async () => {
       const value = html`
         <iframe src="https://e.issuu.com/embed.html?u=ecosistemaurbano&d=../../evil"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'ecosistemaurbano/../../evil',
+        src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=..%2F..%2Fevil',
+        url: 'https://issuu.com/ecosistemaurbano/docs/..%2F..%2Fevil',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for names that are dot segments', async () => {
-      const value = '<iframe src="https://e.issuu.com/embed.html?u=..&d=.."></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should not claim another host spelling the embed path', async () => {

@@ -64,16 +64,16 @@ describe('preziResolveEmbed', () => {
       expect(preziResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore an id that climbs out of the login-gated embed route', () => {
+    it('should use a malformed presentation id as written, even if the player answers an error', () => {
       const value = 'https://prezi.com/p/embed/..%2Fx/'
+      const expected: EmbedResolverResult = {
+        provider: 'prezi',
+        id: '..%2Fx',
+        src: 'https://prezi.com/p/..%2Fx/embed',
+        url: 'https://prezi.com/p/..%2Fx/',
+      }
 
-      expect(preziResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a frame id carrying a query separator', () => {
-      const value = 'https://prezi.com/embed/testonly0001=x/'
-
-      expect(preziResolveEmbed(value)).toBeUndefined()
+      expect(preziResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore an embed word under a route other than the presentation one', () => {
@@ -229,37 +229,21 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a flashvars id that climbs out of the path', async () => {
-      const value = html`
-        <embed
-          src="http://prezi.com/bin/preziloader.swf"
-          flashvars="prezi_id=../x"
-        />
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a flashvars id carrying a path separator', async () => {
+    it('should use a malformed presentation id as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="http://prezi.com/bin/preziloader.swf"
           flashvars="prezi_id=testonly0001/x"
         />
       `
+      const expected: EmbedResolverResult = {
+        provider: 'prezi',
+        id: 'testonly0001%2Fx',
+        src: 'https://prezi.com/p/testonly0001%2Fx/embed',
+        url: 'https://prezi.com/p/testonly0001%2Fx/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a flashvars id that climbs out of the path after a valid prefix', async () => {
-      const value = html`
-        <embed
-          src="http://prezi.com/bin/preziloader.swf"
-          flashvars="prezi_id=testonly0001/../../x"
-        />
-      `
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a path that runs on past the loader', async () => {

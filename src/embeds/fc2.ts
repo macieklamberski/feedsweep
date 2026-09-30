@@ -3,6 +3,7 @@ import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
 import {
   composeQuery,
+  encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -11,10 +12,6 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'fc2'
 const videoHosts = ['video.fc2.com']
-
-// A content id is a date and letters, bounded only by its alphabet, since a shape read off
-// today's ids would refuse the next generation of them.
-const safeContentIdRegex = /^[A-Za-z0-9]+$/
 
 // The content page is `/content/{id}/`, behind a two-character language on most snippets. The
 // adult site's `/a/content/` is refused, since the embed player cannot play it.
@@ -48,8 +45,7 @@ const composeEmbed = (
 
 const fc2IframeResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
-  const match = parsed?.pathname.match(embedPlayerRegex)
-  const contentId = keepIfMatches(match?.[1], safeContentIdRegex)
+  const contentId = parsed?.pathname.match(embedPlayerRegex)?.[1]
 
   if (!parsed || !contentId) {
     return
@@ -65,11 +61,14 @@ const fc2FlashResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const contentId = keepIfMatches(parsed.searchParams.get('i'), safeContentIdRegex)
+  const videoId = parsed.searchParams.get('i')
 
-  if (!contentId) {
+  if (!videoId) {
     return
   }
+
+  // The id comes out of the query decoded, and it goes into a path.
+  const contentId = encodePathSegment(videoId)
 
   // The Flash player names the same account tag `tk` as the loader does.
   const params = trimObject({ tg: parsed.searchParams.get('tk') }, Boolean)
@@ -94,7 +93,7 @@ export const fc2PlayerScriptEmbedResolver = createMarkupEmbedResolver(
     // The loader plays `data-id` whenever it is present, whatever `url` names, and the language
     // still comes from `url`.
     const page = parseUrlOnHosts(attr(element, 'url'), videoHosts)?.pathname.match(contentPageRegex)
-    const contentId = keepIfMatches(attr(element, 'data-id') ?? page?.[2], safeContentIdRegex)
+    const contentId = attr(element, 'data-id') ?? page?.[2]
 
     if (!contentId) {
       return
@@ -134,11 +133,14 @@ export const fc2BlogScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="admin.blog.fc2.com/fc2video2.php"]',
   (element) => {
     const loader = parseUrlOnHosts(attr(element, 'src'), 'admin.blog.fc2.com')
-    const contentId = keepIfMatches(loader?.searchParams.get('id'), safeContentIdRegex)
+    const videoId = loader?.searchParams.get('id')
 
-    if (!loader || !contentId) {
+    if (!loader || !videoId) {
       return
     }
+
+    // The id comes out of the query decoded, and it goes into a path.
+    const contentId = encodePathSegment(videoId)
 
     // The shim writes `suggest="off"` on the loader unless `rel=1`, and a smaller box when `s`
     // is present with any value. The account tag it writes is not derivable from the url.

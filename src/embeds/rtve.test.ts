@@ -61,10 +61,18 @@ describe('rtveResolveEmbed', () => {
       expect(rtveResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id outside the numeric shape', () => {
+    it('should use a malformed asset id as written, even if the player answers an error', () => {
       const value = 'https://www.rtve.es/drmn/embed/video/evil'
+      const expected: EmbedResolverResult = {
+        provider: 'rtve',
+        id: 'video/evil',
+        src: 'https://www.rtve.es/drmn/embed/video/evil/',
+        url: 'https://www.rtve.es/v/evil/',
+        thumbnail: 'https://img.rtve.es/v/evil/',
+        ratio: '16/9',
+      }
 
-      expect(rtveResolveEmbed(value)).toBeUndefined()
+      expect(rtveResolveEmbed(value)).toEqual(expected)
     })
 
     it('should return undefined for a player url naming no asset', () => {

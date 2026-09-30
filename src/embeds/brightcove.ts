@@ -2,7 +2,7 @@ import type { Nullish } from 'trousse'
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches, paramValue } from '../utils/dom.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brightcove'
@@ -67,8 +67,10 @@ const composePlayerUrl = (
 ): string => {
   // Unescaped, `data-player="../../999999/stolen"` names another account's player.
   const segment = `${encodeURIComponent(player)}_${encodeURIComponent(embed)}`
+  // The Flash `publisherID` comes out of a query decoded.
+  const accountSegment = encodePathSegment(account)
 
-  return `https://players.brightcove.net/${account}/${segment}/index.html?videoId=${videoId}`
+  return `https://players.brightcove.net/${accountSegment}/${segment}/index.html?videoId=${videoId}`
 }
 
 // Brightcove's in-page embed: a bare <video-js> or video element only its loader script fills.
@@ -130,12 +132,10 @@ const brightcoveFlashResolveEmbed: ResolveEmbed = (url, element) => {
       parsed.searchParams.get('videoId'),
     digitsRegex,
   )
-  const account = keepIfMatches(
+  const account =
     parsed.searchParams.get('publisherID') ??
-      params?.get('publisherID') ??
-      readPlayerKeyAccount(params?.get('playerKey')),
-    digitsRegex,
-  )
+    params?.get('publisherID') ??
+    readPlayerKeyAccount(params?.get('playerKey'))
 
   if (!videoId || !account) {
     return
@@ -197,7 +197,7 @@ export const brightcoveResolveEmbed: ResolveEmbed = (url, element) => {
 
   // `{player}_{embed}` is one segment holding two ids. A segment shaped otherwise is not a
   // player path.
-  if (!digitsRegex.test(account) || !playerPathRegex.test(player)) {
+  if (!playerPathRegex.test(player)) {
     return
   }
 

@@ -11,7 +11,7 @@ const frameHosts = ['embed.pixiv.net']
 const pixivHosts = ['pixiv.net']
 
 // A work id is the illustration's number and an upload hash. The endpoint keys on the number.
-const safeWorkIdRegex = /^(\d+)(?:_[0-9a-f]+)?$/
+const illustIdRegex = /^(\d+)(?:_[0-9a-f]+)?$/
 const workPathRegex = /^\/(?:member_illust\.php|artworks\/\d+)$/
 const artistPathRegex = /^\/(?:member\.php|users\/\d+)$/
 const framePathRegex = /^\/(code|embed_mk2|fixed|oembed_iframe)\.php$/
@@ -44,14 +44,14 @@ const pixivResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const route = parsed.pathname.match(framePathRegex)?.[1]
-  const workId = parsed.searchParams.get('id') ?? ''
-  const illustId = workId.match(safeWorkIdRegex)?.[1]
+  const workId = parsed.searchParams.get('id')
 
-  if (!route || !illustId) {
+  if (!route || !workId) {
     return
   }
 
-  const page = `https://www.pixiv.net/artworks/${illustId}`
+  const illustId = workId.match(illustIdRegex)?.[1]
+  const page = illustId ? `https://www.pixiv.net/artworks/${illustId}` : undefined
 
   if (route === 'embed_mk2') {
     return {
@@ -82,24 +82,28 @@ const pixivResolveEmbed: ResolveEmbed = (url) => {
 export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="source.pixiv.net/source/embed.js"][data-id], script[src*="s.pximg.net/source/embed.js"][data-id]',
   (element) => {
-    const workId = attr(element, 'data-id') ?? ''
-    const illustId = workId.match(safeWorkIdRegex)?.[1]
+    const workId = attr(element, 'data-id')
     const size = attr(element, 'data-size') ?? ''
     const border = attr(element, 'data-border')
     const bordered = borderedSizes.get(size)
 
     // The selector matches a substring any host can carry. pixiv's loader also renders nothing
     // without all three attributes.
-    if (!parseUrlOnHosts(attr(element, 'src'), loaderHosts) || !illustId || !bordered || !border) {
+    if (!parseUrlOnHosts(attr(element, 'src'), loaderHosts) || !workId || !bordered || !border) {
       return
     }
 
     // A page saved after the loader ran keeps the filled `div.pixiv-embed` of the same work, and
     // its frame is read by pixivIframeEmbedResolver. A paragraph can separate the two.
-    if (element.ownerDocument.querySelector(`div.pixiv-embed[data-done][data-id="${workId}"]`)) {
-      return
+    const mounts = element.ownerDocument.querySelectorAll('div.pixiv-embed[data-done][data-id]')
+
+    for (const mount of mounts) {
+      if (attr(mount, 'data-id') === workId) {
+        return
+      }
     }
 
+    const illustId = workId.match(illustIdRegex)?.[1]
     const isBordered = border === 'on'
     const box = isBordered ? bordered : undefined
     const fallback = element.nextElementSibling
@@ -116,7 +120,7 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
       provider,
       id: workId,
       src: composeFrameUrl(workId, size, isBordered ? 'on' : 'off'),
-      url: `https://www.pixiv.net/artworks/${illustId}`,
+      url: illustId ? `https://www.pixiv.net/artworks/${illustId}` : undefined,
       width: box?.width,
       height: box?.height,
       title: text(work),

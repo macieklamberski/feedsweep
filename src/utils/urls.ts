@@ -133,6 +133,13 @@ export const pickQueryParams = (
   return picked
 }
 
+// A decoded value written into a url path stays one segment. Only the characters that would open
+// a new segment, a query or a fragment, a literal `%` and whitespace are escaped, so an `@`, `=` or
+// `:` the value holds reads as written.
+export const encodePathSegment = (value: string): string => {
+  return value.replace(/[%/?#\s]/g, (character) => encodeURIComponent(character))
+}
+
 // The other half of `pickQueryParams`: the pairs it returns, back into a query ready to append.
 // A resolver that has nothing to carry over gets an empty string, so its src stays bare rather
 // than ending on a lone `?`.

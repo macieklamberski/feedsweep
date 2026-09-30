@@ -85,20 +85,20 @@ describe('thinglinkResolveEmbed', () => {
       expect(thinglinkResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should refuse a scene id that is not digits', () => {
+    it('should use a malformed scene id as written, even if the player answers an error', () => {
       const value = 'https://www.thinglink.com/card/8536092593073684%2Fother'
+      const expected: EmbedResolverResult = {
+        provider: 'thinglink',
+        id: '8536092593073684%2Fother',
+        src: 'https://www.thinglink.com/card/8536092593073684%2Fother',
+        url: 'https://www.thinglink.com/card/8536092593073684%2Fother',
+      }
 
-      expect(thinglinkResolveEmbed(value)).toBeUndefined()
+      expect(thinglinkResolveEmbed(value)).toEqual(expected)
     })
 
     it('should refuse a route that is not a viewer', () => {
       const value = 'https://www.thinglink.com/scene/853609259307368449'
-
-      expect(thinglinkResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should refuse a scene id with a letter before the digits', () => {
-      const value = 'https://www.thinglink.com/card/x853609259307368449'
 
       expect(thinglinkResolveEmbed(value)).toBeUndefined()
     })

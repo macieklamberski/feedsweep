@@ -65,10 +65,17 @@ describe('donorboxResolveEmbed', () => {
       expect(donorboxResolveEmbed('https://donorbox.org/embed')).toBeUndefined()
     })
 
-    it('should ignore a slug carrying an encoded slash', () => {
+    it('should use a malformed slug as written, even if the player answers an error', () => {
       const value = 'https://donorbox.org/embed/donation-form-248%2F..'
+      const expected: EmbedResolverResult = {
+        provider: 'donorbox',
+        id: 'donation-form-248%2F..',
+        src: 'https://donorbox.org/embed/donation-form-248%2F..',
+        url: 'https://donorbox.org/donation-form-248%2F..',
+        height: 900,
+      }
 
-      expect(donorboxResolveEmbed(value)).toBeUndefined()
+      expect(donorboxResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore a foreign host carrying the same path', () => {

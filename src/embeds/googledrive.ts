@@ -1,10 +1,7 @@
-import { getPathSegments } from 'trousse'
+import { decodeSegment, getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { pickUrlParams } from '../utils/urls.js'
+import { composeQuery, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-
-// A file id is url-safe base64, and nothing else may reach a minted path.
-const fileIdRegex = /^[\w-]+$/
 
 // A link-shared file from before 2021 answers only with its resource key.
 const accessParams = ['resourcekey']
@@ -20,7 +17,7 @@ export const googledriveResolveEmbed: ResolveEmbed = (url) => {
   const segments = getPathSegments(url)
   const fileId = segments[0] === 'file' && segments[1] === 'd' ? segments[2] : undefined
 
-  if (!fileId || !fileIdRegex.test(fileId)) {
+  if (!fileId) {
     return
   }
 
@@ -41,7 +38,7 @@ export const googledriveResolveEmbed: ResolveEmbed = (url) => {
     id: fileId,
     src,
     url: `https://drive.google.com/file/d/${fileId}/view`,
-    thumbnail: `https://drive.google.com/thumbnail?id=${fileId}&sz=w640`,
+    thumbnail: `https://drive.google.com/thumbnail${composeQuery({ id: decodeSegment(fileId) ?? fileId, sz: 'w640' })}`,
   }
 }
 

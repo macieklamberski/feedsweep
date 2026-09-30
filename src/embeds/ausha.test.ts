@@ -64,10 +64,16 @@ describe('aushaResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
-    it('should refuse an id holding a separator', () => {
+    it('should use a malformed id as written, even if the player answers an error', () => {
       const value = 'https://player.ausha.co/?podcastId=podcast/BGKwJUJG8D9m&v=3'
+      const expected: EmbedResolverResult = {
+        provider: 'ausha',
+        id: 'podcast/podcast/BGKwJUJG8D9m',
+        src: 'https://player.ausha.co/?podcastId=podcast/BGKwJUJG8D9m&v=3',
+        height: 220,
+      }
 
-      expect(aushaResolveEmbed(value)).toBeUndefined()
+      expect(aushaResolveEmbed(value)).toEqual(expected)
     })
 
     it('should read an id longer than the twelve characters minted today', () => {

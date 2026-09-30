@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize, text } from '../utils/dom.js'
-import { composeQuery, placeholderBaseUrl, urlSafeTokenRegex, uuidRegex } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, placeholderBaseUrl, uuidRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codepen'
@@ -65,7 +65,7 @@ const readUser = (value: string | undefined): string | undefined => {
   // The share dialog writes the handle with its `@`, while the url path carries both spellings.
   const name = value?.trim().replace(leadingAtRegex, '')
 
-  if (!name || ownerlessUsers.has(name.toLowerCase()) || !urlSafeTokenRegex.test(name)) {
+  if (!name || ownerlessUsers.has(name.toLowerCase())) {
     return
   }
 
@@ -103,7 +103,9 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   }
 
   const user = readUser(rawUser)
-  const token = pathToken ?? parsed.searchParams.get('token') ?? undefined
+  const queryToken = parsed.searchParams.get('token')
+  // A query token comes out decoded, and it goes into a path beside the raw path spelling.
+  const token = pathToken ?? (queryToken ? encodePathSegment(queryToken) : undefined)
   const height = parsePixelSize(parsed.searchParams.get('height'))
 
   return {
@@ -111,8 +113,8 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
     slug,
     user,
     ownerPath: user && (isTeam ? `team/${user}` : user),
-    key: keepIfMatches(parsed.searchParams.get('key') ?? undefined, urlSafeTokenRegex),
-    token: keepIfMatches(token, urlSafeTokenRegex),
+    key: parsed.searchParams.get('key') ?? undefined,
+    token,
     height,
   }
 }
@@ -175,7 +177,7 @@ const composeEmbed = (
 const readPenReference = (element: Element): CodepenTarget | undefined => {
   const slug = attr(element, 'data-slug-hash')
 
-  if (slug && slugRegex.test(slug)) {
+  if (slug) {
     return { kind: 'embed', slug }
   }
 
@@ -198,7 +200,7 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
   const { slug, key } = reference
   // The loader appends the block's token to the slug of the player it builds, so a private pen
   // embedded this way names its token here, not in a url.
-  const token = keepIfMatches(attr(element, 'data-token'), urlSafeTokenRegex) ?? reference.token
+  const token = attr(element, 'data-token') ?? reference.token
   let user = reference.user
   let ownerPath = reference.ownerPath
   let linkedTitle: string | undefined

@@ -222,11 +222,16 @@ describeForEachParser('mediavineScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a loader id carrying an encoded slash', async () => {
+    it('should use a malformed loader id as written, even if the player answers an error', async () => {
       const value =
         '<script src="https://video.mediavine.com/videos/dx6ydyrb%2Frjbbu2tncqzi.js"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'mediavine',
+        id: 'dx6ydyrb%2Frjbbu2tncqzi',
+        src: 'https://embed.mediavine.com/videos/dx6ydyrb%252Frjbbu2tncqzi/iframe',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore the videos route naming no file', async () => {

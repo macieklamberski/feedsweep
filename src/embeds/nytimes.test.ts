@@ -65,17 +65,25 @@ describe('nytimesResolveEmbed', () => {
       expect(nytimesResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id that is not numeric', () => {
-      const value = 'https://www.nytimes.com/video/players/offsite/index.html?videoId=latest'
-
-      expect(nytimesResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a lookalike host', () => {
       const value =
         'https://www.nytimes.com.evil.test/video/players/offsite/index.html?videoId=100000004460561'
 
       expect(nytimesResolveEmbed(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed video id as written, even if the player answers an error', () => {
+      const value = 'https://www.nytimes.com/video/players/offsite/index.html?videoId=latest'
+      const expected: EmbedResolverResult = {
+        provider: 'nytimes',
+        id: 'latest',
+        src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=latest',
+        ratio: '16/9',
+      }
+
+      expect(nytimesResolveEmbed(value)).toEqual(expected)
     })
   })
 })

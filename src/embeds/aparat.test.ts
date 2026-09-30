@@ -185,10 +185,17 @@ describeForEachParser('aparatScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a hash carrying an encoded slash', async () => {
+    it('should use a malformed hash as written, even if the player answers an error', async () => {
       const value = '<script src="https://www.aparat.com/embed/inT%2Ftf"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'aparat',
+        id: 'inT%2Ftf',
+        src: 'https://www.aparat.com/video/video/embed/videohash/inT%2Ftf/vt/frame',
+        url: 'https://www.aparat.com/v/inT%2Ftf',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a loader script naming no hash', async () => {

@@ -63,10 +63,11 @@ describe('extractBandcampRelease', () => {
     expect(extractBandcampRelease(value)).toBeUndefined()
   })
 
-  it('should return undefined for a non-numeric id', () => {
+  it('should use a malformed query id as written, even if the player answers an error', () => {
     const value = 'https://bandcamp.com/VideoEmbed?track=abc'
+    const expected = 'track/abc'
 
-    expect(extractBandcampRelease(value)).toBeUndefined()
+    expect(extractBandcampRelease(value)).toEqual(expected)
   })
 
   it('should return undefined for a url that cannot be parsed', () => {
@@ -344,6 +345,19 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       `
 
       expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should keep a decoded query id carrying a separator in one path segment', async () => {
+      const value = html`
+        <iframe src="https://bandcamp.com/EmbeddedPlayer/?album=123%2F..%2Fx"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'album/123/../x',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=123%2F..%2Fx/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a carrier pointing somewhere else', async () => {

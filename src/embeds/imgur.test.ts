@@ -140,50 +140,6 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for an id outside the url-safe alphabet', async () => {
-      const value = html`
-        <blockquote
-          class="imgur-embed-pub"
-          data-id="../evil"
-        ></blockquote>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id behind a path step', async () => {
-      const value = html`
-        <blockquote
-          class="imgur-embed-pub"
-          data-id="../pVa2rXL"
-        ></blockquote>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id followed by a path step', async () => {
-      const value = html`
-        <blockquote
-          class="imgur-embed-pub"
-          data-id="pVa2rXL/.."
-        ></blockquote>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id carrying an encoded slash', async () => {
-      const value = html`
-        <blockquote
-          class="imgur-embed-pub"
-          data-id="pVa2%2FrXL"
-        ></blockquote>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should return undefined for an empty id', async () => {
       const value = html`
         <blockquote
@@ -199,6 +155,44 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
       const value = '<blockquote data-id="pVa2rXL"></blockquote>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed id as written, even if the player answers an error', async () => {
+      const value = html`
+        <blockquote
+          class="imgur-embed-pub"
+          data-id="../evil"
+        ></blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'imgur',
+        id: '../evil',
+        src: 'https://imgur.com/../evil/embed',
+        url: 'https://imgur.com/../evil',
+        thumbnail: 'https://i.imgur.com/../evilm.jpg',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed id carrying an encoded slash as written, even if the player answers an error', async () => {
+      const value = html`
+        <blockquote
+          class="imgur-embed-pub"
+          data-id="pVa2%2FrXL"
+        ></blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'imgur',
+        id: 'pVa2%2FrXL',
+        src: 'https://imgur.com/pVa2%2FrXL/embed',
+        url: 'https://imgur.com/pVa2%2FrXL',
+        thumbnail: 'https://i.imgur.com/pVa2%2FrXLm.jpg',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

@@ -74,7 +74,7 @@ const parsePost = (value: string): ImgurPost | undefined => {
   const isAlbum = value.startsWith(albumPrefix)
   const id = isAlbum ? value.slice(albumPrefix.length) : value
 
-  if (safePostIdRegex.test(id)) {
+  if (id) {
     return { id, isAlbum }
   }
 }
@@ -150,7 +150,7 @@ export const imgurResolveEmbed: ResolveEmbed = (url) => {
     return composeAlbumEmbed(second)
   }
 
-  if (!route || sitePathSegments.has(route)) {
+  if (!route || sitePathSegments.has(route) || !safePostIdRegex.test(route)) {
     return
   }
 

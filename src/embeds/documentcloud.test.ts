@@ -226,6 +226,30 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should use a malformed page number as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://embed.documentcloud.org/documents/28200073/pages/p1/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'documentcloud',
+        id: '28200073/pages/p1',
+        src: 'https://embed.documentcloud.org/documents/28200073/pages/p1/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed legacy note id as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://www.documentcloud.org/documents/2793355-BLS-Jobs-Release/annotations/a287733.html"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'documentcloud',
+        id: '2793355/annotations/a287733',
+        src: 'https://www.documentcloud.org/documents/2793355-BLS-Jobs-Release/annotations/a287733.html',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore the legacy note path on the embed host, which answers it with a 404', async () => {
       const value =
         '<iframe src="https://embed.documentcloud.org/documents/2793355-BLS-Jobs-Release/annotations/287733.html"></iframe>'

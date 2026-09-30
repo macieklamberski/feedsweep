@@ -22,7 +22,7 @@ const jotformHosts = [
   'www.jotform.com',
 ]
 
-const loaderPathRegex = /^\/jsform\/(\d+)$/
+const loaderPathRegex = /^\/jsform\/([^/]+)$/
 
 // The loader's starting box, which the iframe snippet also states. A card form starts at 640, and
 // nothing in the markup tells a card form from a classic one.
