@@ -6,6 +6,7 @@ import { blueskyRenderHint } from '../embeds/bluesky.js'
 import { brightcoveRenderHint } from '../embeds/brightcove.js'
 import { buzzsproutRenderHint } from '../embeds/buzzsprout.js'
 import { captivateRenderHint } from '../embeds/captivate.js'
+import { channel9RenderHint } from '../embeds/channel9.js'
 import { cloudflarestreamRenderHint } from '../embeds/cloudflarestream.js'
 import { cnnRenderHint } from '../embeds/cnn.js'
 import { codesandboxRenderHint } from '../embeds/codesandbox.js'
@@ -21,6 +22,7 @@ import { kalturaRenderHint } from '../embeds/kaltura.js'
 import { mailruRenderHint } from '../embeds/mailru.js'
 import { mastodonRenderHint } from '../embeds/mastodon.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
+import { nicovideoRenderHint } from '../embeds/nicovideo.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
 import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
 import { omnyRenderHint } from '../embeds/omny.js'
@@ -34,12 +36,14 @@ import { rutubeRenderHint } from '../embeds/rutube.js'
 import { sketchfabRenderHint } from '../embeds/sketchfab.js'
 import { soundcloudRenderHint } from '../embeds/soundcloud.js'
 import { spreakerRenderHint } from '../embeds/spreaker.js'
+import { srgplayRenderHint } from '../embeds/srgplay.js'
 import { tedRenderHint } from '../embeds/ted.js'
 import { telegramRenderHint } from '../embeds/telegram.js'
 import { tumblrRenderHint } from '../embeds/tumblr.js'
 import { tuneinRenderHint } from '../embeds/tunein.js'
 import { twitterRenderHint } from '../embeds/twitter.js'
 import { videopressRenderHint } from '../embeds/videopress.js'
+import { vidyardRenderHint } from '../embeds/vidyard.js'
 import { vimeoRenderHint } from '../embeds/vimeo.js'
 import { wistiaRenderHint } from '../embeds/wistia.js'
 import { youtubeRenderHint } from '../embeds/youtube.js'
@@ -57,6 +61,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   brightcoveRenderHint,
   buzzsproutRenderHint,
   captivateRenderHint,
+  channel9RenderHint,
   cloudflarestreamRenderHint,
   cnnRenderHint,
   codesandboxRenderHint,
@@ -73,6 +78,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   mailruRenderHint,
   mastodonRenderHint,
   mixcloudRenderHint,
+  nicovideoRenderHint,
   notecomRenderHint,
   odnoklassnikiRenderHint,
   omnyRenderHint,
@@ -86,12 +92,14 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   sketchfabRenderHint,
   soundcloudRenderHint,
   spreakerRenderHint,
+  srgplayRenderHint,
   tedRenderHint,
   telegramRenderHint,
   tumblrRenderHint,
   tuneinRenderHint,
   twitterRenderHint,
   videopressRenderHint,
+  vidyardRenderHint,
   vimeoRenderHint,
   wistiaRenderHint,
   youtubeRenderHint,
