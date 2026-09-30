@@ -1,13 +1,12 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, trimObject } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const aushaHost = 'ausha.co'
 
-// The v3 player is a fixed height on a fluid width: 220, and 501 with `display=vertical`.
+// The v3 player is a fixed height on a fluid width.
 const playerHeight = 220
-const verticalHeight = 501
 
 // The v2 widget on the other host has no one height. Its 33 frames state 400 (11), 495 (8),
 // 200 (8), 250, 470 and 201, because `playlist` and `mode=latest` change what it holds. Every one
@@ -45,7 +44,17 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
 
   const [kind, id] = named
 
-  const vertical = parsed.searchParams.get('display') === 'vertical'
+  if (isWidget) {
+    return {
+      provider: 'ausha',
+      id: `${kind}/${id}`,
+      src: url,
+    }
+  }
+
+  // The spelling Ausha's share dialog writes, with the start position the frame names.
+  const start = parsed.searchParams.get('t') ?? undefined
+  const query = composeQuery(trimObject({ [`${kind}Id`]: id, v: '3', t: start }, Boolean))
 
   return {
     provider: 'ausha',
@@ -53,8 +62,8 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
     // publication date, description and audio url, and 404s on a fabricated id. There is no
     // matching route for a show, so the kind says which of the two an enricher is holding.
     id: `${kind}/${id}`,
-    src: url,
-    ...(isPlayer && { height: vertical ? verticalHeight : playerHeight }),
+    src: `https://player.ausha.co/${query}`,
+    height: playerHeight,
   }
 }
 
