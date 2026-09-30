@@ -163,7 +163,7 @@ export const readDailymotionEmbedSrc = (link: string): string | undefined => {
 
 // Where playback starts, and the playlist the video sits in. The rest of the publisher's
 // query is dropped with the rebuilt src.
-// Neither player reads `autoplay` off the query.
+// Neither player reads `autoplay` off the query: autostart comes from the saved configuration.
 const dailymotionEmbedParams = ['start', 'startTime', 'playlist']
 
 // A player id's player reads the start as `startTime` and ignores the old `start`.

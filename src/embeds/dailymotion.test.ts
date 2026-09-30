@@ -538,6 +538,13 @@ describeForEachParser('dailymotionEmbedResolver carrier title', (parseHtml) => {
 })
 
 describe('dailymotionRenderHint', () => {
+  it('should name the frame the way the player reads its message channel back', () => {
+    const value = JSON.parse(decodeURIComponent(dailymotionRenderHint.frameName ?? ''))
+    const expected = { dmInternalData: { iframeId: 'dm1' } }
+
+    expect(value).toEqual(expected)
+  })
+
   // Captured from `geo.dailymotion.com/player/xpiw2.html` framed with the hint's name.
   it('should recognise the ready event the player posts', () => {
     expect(dailymotionRenderHint.isReady?.('{"event":"apiready","id":"dm1"}')).toBe(true)
