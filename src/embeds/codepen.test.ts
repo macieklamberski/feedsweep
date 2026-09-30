@@ -1340,11 +1340,19 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a hyphenated slug that is not a uuid', async () => {
+    it('should use a malformed slug as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://codepen.io/editor/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f248"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: '019dcdfc-1e41-77c8-afdf-810ebc6f248',
+        src: 'https://codepen.io/editor/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f248',
+        url: 'https://codepen.io/anon/pen/019dcdfc-1e41-77c8-afdf-810ebc6f248',
+        thumbnail: 'https://shots.codepen.io/anon/pen/019dcdfc-1e41-77c8-afdf-810ebc6f248-512.jpg',
+        height: 300,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
@@ -1770,7 +1778,7 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
 })
 
 // The enclosure probe offers every attachment a feed carries to this resolver, and CodePen serves
-// uploads on its own host, so the slug alphabet is what keeps a file playable.
+// uploads on its own host, so the file-name check is what keeps a file playable.
 describeForEachParser('codepen through the pipeline', (parseHtml) => {
   it('should leave a video enclosure on the codepen host playable', async () => {
     const enclosures = [

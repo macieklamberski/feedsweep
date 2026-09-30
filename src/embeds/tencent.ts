@@ -1,10 +1,6 @@
 import type { ResolveEmbed } from '../types.js'
-import { keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-
-// A Tencent Video id is a run of lowercase letters and digits, eleven characters in the wild.
-const safeVideoIdRegex = /^[a-z0-9]+$/
 
 // A vid of cover is an unfilled snippet's route word, and it mints a grey poster and a dead link.
 // The word is Tencent's own, from `v.qq.com/x/cover/{cid}/{vid}.html`.
@@ -30,9 +26,14 @@ const readVideoId = (url: string): string | undefined => {
     return
   }
 
-  const videoId = keepIfMatches(parsed.searchParams.get('vid'), safeVideoIdRegex)
+  const videoId = parsed.searchParams.get('vid')
 
-  return videoId && !nonVideoWords.has(videoId) ? videoId : undefined
+  // Tencent serves video on the player host, so a file name in vid is an enclosure.
+  if (!videoId || isFileName(videoId) || nonVideoWords.has(videoId)) {
+    return
+  }
+
+  return videoId
 }
 
 // Tencent Video's player iframe and the dead Flash TPout.swf carrier, both naming the video in vid.

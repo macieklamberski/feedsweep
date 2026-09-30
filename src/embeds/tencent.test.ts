@@ -129,11 +129,19 @@ describeForEachParser('tencentEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id carrying an encoded slash', async () => {
+    it('should use a malformed id as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%2Fx"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'tencent',
+        id: 'v03604lrvan/x',
+        src: 'https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan/x',
+        url: 'https://v.qq.com/x/page/v03604lrvan/x.html',
+        thumbnail: 'https://puui.qpic.cn/qqvideo_ori/0/v03604lrvan/x_496_280/0',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // A snippet pasted with the route word still standing in for the id: `cover` names Tencent's
@@ -205,8 +213,7 @@ describeForEachParser('tencentEmbedResolver', (parseHtml) => {
 
 // The enclosure probe offers every attachment a feed carries to this resolver, and Tencent serves
 // video on the same domains as the player. The url is written onto the player path with the file
-// name in `vid` so the path regex admits it and the id alphabet is the thing that refuses it,
-// which is the guard the module credits with keeping a file playable.
+// name in `vid` so the path regex admits it and only the file-name check refuses it.
 describeForEachParser('tencent through the pipeline', (parseHtml) => {
   it('should leave a video enclosure on the player host playable', async () => {
     const enclosures = [

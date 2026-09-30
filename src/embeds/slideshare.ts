@@ -1,14 +1,10 @@
 import { getPathSegments, type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const slideshareHosts = ['slideshare.net', 'slidesharecdn.com']
-
-// The modern embed names a deck by an opaque key, the pre-2015 one by the deck's numeric id, and
-// both still serve: `/slideshow/embed_code/6435157` lands on the key form and renders the deck.
-const safeDeckKeyRegex = /^[A-Za-z0-9]+$/
 
 // The Flash wrapper spells its id `__ss_{id}` on the div and `__sse{id}` on the object inside.
 // Many carriers name the deck on the div alone.
@@ -41,16 +37,12 @@ export const slideshareResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // `/slideshow/embed_code/key/{key}` is the current form and `/slideshow/embed_code/{id}` the
-  // one it replaced. The key form is left as it stands. The numeric one is already canonical.
+  // one it replaced, which still serves by redirecting to the key form.
   const isKeyed = segments[marker + 1] === 'key'
   const deck = isKeyed ? segments[marker + 2] : segments[marker + 1]
-  const safeDeckRegex = isKeyed ? safeDeckKeyRegex : digitsRegex
 
-  if (!deck) {
-    return
-  }
-
-  if (!safeDeckRegex.test(deck)) {
+  // SlideShare serves files on slidesharecdn.com, so a file name is an enclosure.
+  if (!deck || isFileName(deck)) {
     return
   }
 

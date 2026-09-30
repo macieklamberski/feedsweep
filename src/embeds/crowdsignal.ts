@@ -8,9 +8,12 @@ const provider = 'crowdsignal'
 
 // `/results` is the poll's own tally page, a different thing from the poll.
 const pollPathRegex = /^\/(\d+)(?:\/embed)?\/?$/
-const loaderPathRegex = /^\/p\/(\d+)\.js$/
-const retiredPollPathRegex = /^\/poll\/(\d+)\/?$/
+const loaderPathRegex = /^\/p\/([^/]+)\.js$/
+const retiredPollPathRegex = /^\/poll\/([^/]+)\/?$/
 const flashPlayerPathRegex = /^\/poll\.swf$/
+
+// Scripts in the loader directory that name no poll.
+const nonPollScripts = new Set(['embed'])
 
 const composeEmbed = (pollId: string): EmbedResolverResult => {
   return {
@@ -60,15 +63,20 @@ export const crowdsignalScriptEmbedResolver = createMarkupEmbedResolver(
     const loader = parseUrlOnHosts(attr(element, 'src'), 'polldaddy.com')
     const pollId = loader?.pathname.match(loaderPathRegex)?.[1]
 
-    if (!pollId) {
+    if (!pollId || nonPollScripts.has(pollId)) {
       return
     }
 
     // The frame resolver runs first, so a snippet whose <noscript> held the frame already stands
-    // as this poll's placeholder and the loader has nothing left to add. The id is digits.
-    const placeholder = `[data-embed-provider="${provider}"][data-embed-id="${pollId}"]`
+    // as this poll's placeholder and the loader has nothing left to add.
+    const placeholders = element.ownerDocument?.querySelectorAll(
+      `[data-embed-provider="${provider}"]`,
+    )
+    const hasPlaceholder = [...(placeholders ?? [])].some((placeholder) => {
+      return placeholder.getAttribute('data-embed-id') === pollId
+    })
 
-    if (element.ownerDocument?.querySelector(placeholder)) {
+    if (hasPlaceholder) {
       return
     }
 

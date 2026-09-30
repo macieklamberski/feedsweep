@@ -28,7 +28,7 @@ describe('extractTransistorEmbed', () => {
     expect(extractTransistorEmbed(value)).toEqual(expected)
   })
 
-  // Transistor has minted eight-character episode ids so far, so only the alphabet is checked.
+  // Transistor has minted eight-character episode ids so far, and the length selects nothing.
   it('should read an episode id longer than the ones minted so far', () => {
     const value = 'https://share.transistor.fm/e/a1b2c3d4e5f6g7h8'
     const expected = {
@@ -140,8 +140,8 @@ describe('extractTransistorEmbed', () => {
     expect(extractTransistorEmbed(value)).toEqual(expected)
   })
 
-  // With no length left on either id, the alphabet is the whole guard, and excluding the dot is
-  // what keeps a file on the host from reading as an episode.
+  // Transistor serves the episode audio on the player host, and the file-name check is what keeps
+  // it from reading as an episode.
   const fileUrls: Array<string> = [
     'https://share.transistor.fm/e/668ca5be.mp3',
     'https://share.transistor.fm/s/668ca5be.mp3',
@@ -152,22 +152,24 @@ describe('extractTransistorEmbed', () => {
     expect(extractTransistorEmbed(value)).toBeUndefined()
   })
 
-  it('should return undefined for an episode id carrying an encoded slash', () => {
+  it('should use a malformed episode id as written, even if the player answers an error', () => {
     const value = 'https://share.transistor.fm/e/c3be87f9%2Fx'
+    const expected = {
+      kind: 'e',
+      id: 'c3be87f9%2Fx',
+    } as const
 
-    expect(extractTransistorEmbed(value)).toBeUndefined()
+    expect(extractTransistorEmbed(value)).toEqual(expected)
   })
 
-  it('should return undefined for a show slug led by an encoded slash', () => {
-    const value = 'https://share.transistor.fm/e/%2Fbuild-your-saas/latest'
-
-    expect(extractTransistorEmbed(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a show slug carrying an encoded slash', () => {
+  it('should use a malformed show slug as written, even if the player answers an error', () => {
     const value = 'https://share.transistor.fm/e/build-your-saas%2Fx/latest'
+    const expected = {
+      kind: 'latest',
+      id: 'build-your-saas%2Fx',
+    } as const
 
-    expect(extractTransistorEmbed(value)).toBeUndefined()
+    expect(extractTransistorEmbed(value)).toEqual(expected)
   })
 
   it('should return undefined for the player route with no id behind it', () => {

@@ -303,10 +303,16 @@ describe('speakerdeckResolveEmbed', () => {
     expect(speakerdeckResolveEmbed(value)).toBeUndefined()
   })
 
-  it('should ignore a player id outside the hex alphabet', () => {
+  it('should use a malformed deck id as written, even if the player answers an error', () => {
     const value = 'https://speakerdeck.com/player/not-a-deck'
+    const expected: EmbedResolverResult = {
+      provider: 'speakerdeck',
+      id: 'not-a-deck',
+      src: 'https://speakerdeck.com/player/not-a-deck',
+      ratio: '16/9',
+    }
 
-    expect(speakerdeckResolveEmbed(value)).toBeUndefined()
+    expect(speakerdeckResolveEmbed(value)).toEqual(expected)
   })
 })
 
@@ -364,10 +370,16 @@ describeForEachParser('speakerdeckIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toBeUndefined()
   })
 
-  it('should ignore a player id that is not hex', async () => {
+  it('should use a malformed deck id as written, even if the player answers an error', async () => {
     const value = '<iframe src="https://speakerdeck.com/player/not-a-deck"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'speakerdeck',
+      id: 'not-a-deck',
+      src: 'https://speakerdeck.com/player/not-a-deck',
+      ratio: '16/9',
+    }
 
-    expect(await extract(value)).toBeUndefined()
+    expect(await extract(value)).toEqual(expected)
   })
 
   it('should ignore a foreign host carrying the player path', async () => {
@@ -418,7 +430,7 @@ describeForEachParser('speakerdeckIframeEmbedResolver', (parseHtml) => {
 })
 
 // The enclosure probe offers every attachment a feed carries to this resolver, and the deck
-// route is on Speaker Deck's own host, so the id alphabet is what keeps a file playable.
+// route is on Speaker Deck's own host, so the file-name check is what keeps a file playable.
 describeForEachParser('speakerdeck through the pipeline', (parseHtml) => {
   it('should leave a video enclosure on the speakerdeck host playable', async () => {
     const enclosures = [

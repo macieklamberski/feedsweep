@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize, text } from '../utils/dom.js'
-import { composeQuery, placeholderBaseUrl, uuidRegex } from '../utils/urls.js'
+import { composeQuery, isFileName, placeholderBaseUrl, uuidRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codepen'
@@ -98,7 +98,8 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   // `embed/preview/{slug}` is the deferred-loading player, the same pen behind one more segment.
   const [slug, pathToken] = kind === 'embed' && rest[0] === 'preview' ? rest.slice(1) : rest
 
-  if (!slug || !(slugRegex.test(slug) || uuidRegex.test(slug))) {
+  // CodePen serves assets on its own host, so a file name is an enclosure.
+  if (!slug || isFileName(slug)) {
     return
   }
 

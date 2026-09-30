@@ -134,16 +134,30 @@ describe('fliphtml5ResolveEmbed', () => {
       expect(fliphtml5ResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a separator hidden in the account segment', () => {
+    it('should use a malformed account as written, even if the player answers an error', () => {
       const value = 'https://online.fliphtml5.com/mz%2Fsro/jvuq/'
+      const expected: EmbedResolverResult = {
+        provider: 'fliphtml5',
+        id: 'mz%2Fsro/jvuq',
+        src: 'https://online.fliphtml5.com/mz%2Fsro/jvuq/',
+        url: 'https://online.fliphtml5.com/mz%2Fsro/jvuq/',
+        thumbnail: 'https://online.fliphtml5.com/mz%2Fsro/jvuq/files/shot.jpg',
+      }
 
-      expect(fliphtml5ResolveEmbed(value)).toBeUndefined()
+      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should ignore a separator hidden in the book segment', () => {
+    it('should use a malformed book as written, even if the player answers an error', () => {
       const value = 'https://online.fliphtml5.com/mzsro/jv%2Fuq/'
+      const expected: EmbedResolverResult = {
+        provider: 'fliphtml5',
+        id: 'mzsro/jv%2Fuq',
+        src: 'https://online.fliphtml5.com/mzsro/jv%2Fuq/',
+        url: 'https://online.fliphtml5.com/mzsro/jv%2Fuq/',
+        thumbnail: 'https://online.fliphtml5.com/mzsro/jv%2Fuq/files/shot.jpg',
+      }
 
-      expect(fliphtml5ResolveEmbed(value)).toBeUndefined()
+      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore the shelf on the apex host', () => {
