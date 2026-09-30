@@ -28,7 +28,9 @@ import { instagramRenderHint } from '../embeds/instagram.js'
 import { kalturaRenderHint } from '../embeds/kaltura.js'
 import { mailruRenderHint } from '../embeds/mailru.js'
 import { mastodonRenderHint } from '../embeds/mastodon.js'
+import { megaphoneRenderHint } from '../embeds/megaphone.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
+import { nbcnewsRenderHint } from '../embeds/nbcnews.js'
 import { nicovideoRenderHint } from '../embeds/nicovideo.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
 import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
@@ -38,6 +40,7 @@ import { peertubeRenderHint } from '../embeds/peertube.js'
 import { podbeanRenderHint } from '../embeds/podbean.js'
 import { podigeeRenderHint } from '../embeds/podigee.js'
 import { redditRenderHint } from '../embeds/reddit.js'
+import { reverbnationRenderHint } from '../embeds/reverbnation.js'
 import { rtveRenderHint } from '../embeds/rtve.js'
 import { rutubeRenderHint } from '../embeds/rutube.js'
 import { sketchfabRenderHint } from '../embeds/sketchfab.js'
@@ -96,7 +99,9 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   kalturaRenderHint,
   mailruRenderHint,
   mastodonRenderHint,
+  megaphoneRenderHint,
   mixcloudRenderHint,
+  nbcnewsRenderHint,
   nicovideoRenderHint,
   notecomRenderHint,
   odnoklassnikiRenderHint,
@@ -106,6 +111,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   podbeanRenderHint,
   podigeeRenderHint,
   redditRenderHint,
+  reverbnationRenderHint,
   rtveRenderHint,
   rutubeRenderHint,
   sketchfabRenderHint,
