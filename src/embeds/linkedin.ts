@@ -20,16 +20,17 @@ const linkedinResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
+  const urnSegment = encodePathSegment(postUrn)
+
   // No size: the height is the post's, not the player's, and the embed posts its measured height
   // only to LinkedIn's own origins. No title: carriers state the boilerplate "Embedded post" in
   // eight languages.
   return {
     provider: 'linkedin',
     id: postUrn,
-    // Kept as written: `collapsed` and `compact` pick the layout the stated height belongs to.
-    src: url,
+    src: `https://www.linkedin.com/embed/feed/update/${urnSegment}`,
     // The activity urn is assigned server-side, so a share urn cannot be rewritten to it.
-    url: `https://www.linkedin.com/feed/update/${encodePathSegment(postUrn)}`,
+    url: `https://www.linkedin.com/feed/update/${urnSegment}`,
   }
 }
 
