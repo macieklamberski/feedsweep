@@ -11,6 +11,7 @@ import { cnnRenderHint } from '../embeds/cnn.js'
 import { codesandboxRenderHint } from '../embeds/codesandbox.js'
 import { deezerRenderHint } from '../embeds/deezer.js'
 import { donorboxRenderHint } from '../embeds/donorbox.js'
+import { flickrRenderHint } from '../embeds/flickr.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
 import { foxbusinessRenderHint, foxnewsRenderHint } from '../embeds/foxnews.js'
 import { imgurRenderHint } from '../embeds/imgur.js'
@@ -63,6 +64,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   codesandboxRenderHint,
   deezerRenderHint,
   donorboxRenderHint,
+  flickrRenderHint,
   flourishRenderHint,
   foxbusinessRenderHint,
   foxnewsRenderHint,
