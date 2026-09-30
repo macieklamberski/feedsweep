@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -33,16 +33,23 @@ export const extractAnchorEpisode = (link: string): string | undefined => {
   return `${show}/${episode}`
 }
 
+const anchorShowPathRegex = /^\/([^/]+)\/embed\/?$/
+const spotifyShowPathRegex = /^\/pod\/(?:show|profile)\/([^/]+)\/embed\/?$/
+
 // `anchor.fm/{show}/embed`, `podcasters.spotify.com/pod/show/{show}/embed`,
 // `creators.spotify.com/pod/profile/{show}/embed`.
 const extractAnchorShow = (link: string): string | undefined => {
-  const segments = getPathSegments(link)
+  const parsed = parseUrl(link)
 
-  if (segments.at(-1) !== 'embed') {
+  if (!parsed) {
     return
   }
 
-  return segments.at(-2)
+  const pathRegex = isHostOrSubdomainOf(parsed, ['anchor.fm'])
+    ? anchorShowPathRegex
+    : spotifyShowPathRegex
+
+  return parsed.pathname.match(pathRegex)?.[1]
 }
 
 // The player carries no metadata, and Anchor's old oEmbed endpoint is gone.
