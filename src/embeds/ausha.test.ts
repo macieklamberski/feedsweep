@@ -139,16 +139,28 @@ describe('aushaResolveEmbed', () => {
     })
   })
 
-  describe('the older widget, which states its own height', () => {
-    // Its height moves with what it holds, so every one of the 33 corpus frames declares one and
-    // the resolver states none of its own.
-    it('should claim the widget without stating a height', () => {
+  describe('the v2 widget, rebuilt as the v3 player', () => {
+    it('should mint the v3 player for the episode the widget names', () => {
+      const value =
+        'https://widget.ausha.co/index.html?chanId=y8wm8Tlwvv5L&showId=b7z8KuEkzXPd&color=%23D0021B&display=horizontal&v=2&height=200px&autonext=1&podcastId=BGA94HJRGq7R'
+      const expected: EmbedResolverResult = {
+        provider: 'ausha',
+        id: 'podcast/BGA94HJRGq7R',
+        src: 'https://player.ausha.co/?podcastId=BGA94HJRGq7R&v=3',
+        height: 220,
+      }
+
+      expect(aushaResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint the v3 player for a widget naming only its show', () => {
       const value =
         'https://widget.ausha.co/index.html?chanId=y8wm8Tlwvv5L&showId=b7z8KuEkzXPd&display=horizontal&v=2&height=200px&mode=latest'
       const expected: EmbedResolverResult = {
         provider: 'ausha',
         id: 'show/b7z8KuEkzXPd',
-        src: 'https://widget.ausha.co/index.html?chanId=y8wm8Tlwvv5L&showId=b7z8KuEkzXPd&display=horizontal&v=2&height=200px&mode=latest',
+        src: 'https://player.ausha.co/?showId=b7z8KuEkzXPd&v=3',
+        height: 220,
       }
 
       expect(aushaResolveEmbed(value)).toEqual(expected)
@@ -224,7 +236,7 @@ describeForEachParser('aushaEmbedResolver', (parseHtml) => {
         provider: 'ausha',
         id: 'podcast/dBDjWc7Y6Pny',
         src: 'https://player.ausha.co/?podcastId=dBDjWc7Y6Pny&v=3&t=0',
-        height: 500,
+        height: 220,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -232,7 +244,7 @@ describeForEachParser('aushaEmbedResolver', (parseHtml) => {
   })
 
   describe('the size a publisher states', () => {
-    it('should let the carrier box win over the measured one', async () => {
+    it("should state the player's own height over the carrier box", async () => {
       const value = html`
         <iframe
           src="https://player.ausha.co/?podcastId=BGKwJUJG8D9m&amp;display=vertical&amp;v=3"
@@ -244,7 +256,7 @@ describeForEachParser('aushaEmbedResolver', (parseHtml) => {
         provider: 'ausha',
         id: 'podcast/BGKwJUJG8D9m',
         src: 'https://player.ausha.co/?podcastId=BGKwJUJG8D9m&v=3',
-        height: 420,
+        height: 220,
       }
 
       expect(await extract(value)).toEqual(expected)

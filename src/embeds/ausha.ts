@@ -8,11 +8,8 @@ const aushaHost = 'ausha.co'
 // The v3 player is a fixed height on a fluid width.
 const playerHeight = 220
 
-// The v2 widget on the other host has no one height. Its 33 frames state 400 (11), 495 (8),
-// 200 (8), 250, 470 and 201, because `playlist` and `mode=latest` change what it holds. Every one
-// of them declares a height, so there is nothing here the carrier does not already say.
-const widgetHosts = ['widget.ausha.co']
-const playerHosts = ['player.ausha.co']
+// The v2 widget takes the same ids as the v3 player, so both are minted as the v3 player.
+const playerHosts = ['player.ausha.co', 'widget.ausha.co']
 
 export const aushaResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, aushaHost)
@@ -21,12 +18,13 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const isPlayer = playerHosts.includes(parsed.hostname)
-  const isWidget = widgetHosts.includes(parsed.hostname)
   const segments = getPathSegments(parsed)
 
   // Both hosts serve their player from the root, spelled either bare or as `index.html`.
-  if ((!isPlayer && !isWidget) || (segments.length > 0 && segments[0] !== 'index.html')) {
+  if (
+    !playerHosts.includes(parsed.hostname) ||
+    (segments.length > 0 && segments[0] !== 'index.html')
+  ) {
     return
   }
 
@@ -44,14 +42,6 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
 
   const [kind, id] = named
 
-  if (isWidget) {
-    return {
-      provider: 'ausha',
-      id: `${kind}/${id}`,
-      src: url,
-    }
-  }
-
   // The spelling Ausha's share dialog writes, with the start position the frame names.
   const start = parsed.searchParams.get('t') ?? undefined
   const query = composeQuery(trimObject({ [`${kind}Id`]: id, v: '3', t: start }, Boolean))
@@ -68,4 +58,7 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
 }
 
 // Ausha's v3 player iframe and the v2 widget, both naming the episode or show in the query.
-export const aushaEmbedResolver = createUrlEmbedResolver([aushaHost], aushaResolveEmbed)
+export const aushaEmbedResolver = createUrlEmbedResolver([aushaHost], aushaResolveEmbed, {
+  // Carriers state the heights of older layouts, so the player's own height outranks them.
+  preferResolverSize: true,
+})
