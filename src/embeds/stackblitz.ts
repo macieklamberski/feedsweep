@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isHostOf, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
@@ -82,7 +82,7 @@ export const stackblitzResolveEmbed: ResolveEmbed = (url, element) => {
     src: `${project}${target.query}`,
     url: project,
     height: defaultProjectHeight,
-    ...trimObject({ title }, Boolean),
+    title,
   }
 }
 

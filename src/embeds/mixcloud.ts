@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments, parseUrl, trimObject } from 'trousse'
+import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
@@ -120,7 +120,7 @@ export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {
     height:
       options.includes('mini') && options.includes('hide_cover') ? miniPlayerHeight : playerHeight,
     author,
-    ...trimObject({ title }, Boolean),
+    title,
   }
 }
 
