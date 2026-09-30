@@ -1,5 +1,5 @@
-import { parseUrl, toMap } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { isPlainObject, parseUrl, toMap } from 'trousse'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import {
   composeQuery,
   encodePathSegment,
@@ -7,6 +7,8 @@ import {
   placeholderBaseUrl,
 } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'vk'
 
 const vkHosts = ['vk.com', 'vk.ru', 'vkontakte.ru', 'vkvideo.ru']
 
@@ -44,7 +46,7 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
   const src = `https://${parsed.hostname}${player.path}${composeQuery(params)}`
 
   return {
-    provider: 'vk',
+    provider,
     id,
     src,
     // Both ids come out of the query decoded, and they go into a path.
@@ -53,3 +55,18 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
 }
 
 export const vkEmbedResolver = createUrlEmbedResolver(vkHosts, vkResolveEmbed)
+
+// The player posts its state with `event: 'inited'` once it has loaded, and only when `js_api` is
+// on its url.
+export const isVkReady = (data: unknown): boolean => {
+  return isPlainObject(data) && data.event === 'inited'
+}
+
+// See: https://vk.com/js/api/videoplayer.js.
+// `autoplay=1` starts the player muted, while a play command starts it with sound.
+export const vkRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { js_api: '1' },
+  isReady: isVkReady,
+  requestPlay: { method: 'play' },
+}

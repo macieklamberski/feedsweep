@@ -61,6 +61,9 @@ export type EmbedRenderHint = {
   // Query parameters that start playback, for a load that follows a person's click. They never
   // go on the placeholder's url, since a placeholder must not start on page load.
   autoplayParams?: Record<string, string>
+  // The `name` a reader gives the frame before it loads. A player that reads `window.name` to
+  // open its message channel posts no ready message without it.
+  frameName?: string
   isReady?: (data: unknown) => boolean
   // Posted once: a second post pauses a player whose play command toggles.
   requestPlay?: unknown
