@@ -50,6 +50,17 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should use a malformed chart id as written, even if the url answers an error', async () => {
+    const value = '<iframe src="https://datawrapper.dwcdn.net/ab_cd/1/"></iframe>'
+    const expected = html`
+      <a href="https://datawrapper.dwcdn.net/ab_cd/">
+        <img src="https://datawrapper.dwcdn.net/ab_cd/full.png">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should remove the sibling resize listener script', async () => {
     const value = html`
       <iframe src="https://datawrapper.dwcdn.net/bdqZJ/2/" title="Egg prices"></iframe>

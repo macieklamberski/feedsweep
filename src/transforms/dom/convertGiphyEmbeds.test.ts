@@ -83,6 +83,17 @@ describeForEachParser('convertGiphyEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should use a malformed gif id as written, even if the url answers an error', async () => {
+    const value = '<iframe src="https://giphy.com/embed/abc_def.x"></iframe>'
+    const expected = html`
+      <a href="https://giphy.com/gifs/abc_def.x">
+        <img src="https://media.giphy.com/media/abc_def.x/giphy.gif">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should leave an iframe on another host naming giphy in its query', async () => {
     const value = '<iframe src="https://evil.test/embed/abc123?giphy.com/"></iframe>'
 
