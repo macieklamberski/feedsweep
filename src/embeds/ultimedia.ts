@@ -1,3 +1,4 @@
+import type { EmbedRenderHint } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
@@ -30,3 +31,9 @@ export const ultimediaEmbedResolver = createMarkupEmbedResolver(
     }
   },
 )
+
+export const ultimediaRenderHint: EmbedRenderHint = {
+  provider,
+  // `autoplay` alone starts the player muted, and `muteForced=0` lifts it.
+  autoplayParams: { autoplay: '1', muteForced: '0' },
+}
