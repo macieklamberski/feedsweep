@@ -17,7 +17,7 @@ describe('cnnResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn&customer=cnn&edition=domestic&env=prod',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=arts%2F2018%2F07%2F09%2Fspencer-tunick-nude-art-melbourne.cnn&customer=cnn&edition=domestic&env=prod',
         url: 'https://www.cnn.com/videos/arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn',
         ratio: '16/9',
         date: '2018-07-09',
@@ -32,7 +32,7 @@ describe('cnnResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'living/2014/01/11/ac-intv-fallon-neuroscientist-finds-psychopathy.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=living/2014/01/11/ac-intv-fallon-neuroscientist-finds-psychopathy.cnn&customer=cnn&edition=domestic&env=prod',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=living%2F2014%2F01%2F11%2Fac-intv-fallon-neuroscientist-finds-psychopathy.cnn&customer=cnn&edition=domestic&env=prod',
         url: 'https://www.cnn.com/videos/living/2014/01/11/ac-intv-fallon-neuroscientist-finds-psychopathy.cnn',
         ratio: '16/9',
         date: '2014-01-11',
@@ -47,7 +47,7 @@ describe('cnnResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'business/2008/04/22/tucker.nau.nola.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=business/2008/04/22/tucker.nau.nola.cnn&customer=cnn&edition=domestic&env=prod',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=business%2F2008%2F04%2F22%2Ftucker.nau.nola.cnn&customer=cnn&edition=domestic&env=prod',
         url: 'https://www.cnn.com/videos/business/2008/04/22/tucker.nau.nola.cnn',
         ratio: '16/9',
         date: '2008-04-22',
@@ -62,7 +62,7 @@ describe('cnnResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'cnn-en-espanol/2018/02/16/caminata-espacial-en-la-eei.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=cnn-en-espanol/2018/02/16/caminata-espacial-en-la-eei.cnn&customer=cnn&edition=domestic&env=prod',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=cnn-en-espanol%2F2018%2F02%2F16%2Fcaminata-espacial-en-la-eei.cnn&customer=cnn&edition=domestic&env=prod',
         url: 'https://www.cnn.com/videos/cnn-en-espanol/2018/02/16/caminata-espacial-en-la-eei.cnn',
         ratio: '16/9',
         date: '2018-02-16',
@@ -92,11 +92,19 @@ describe('cnnResolveEmbed', () => {
       expect(cnnResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id that steps out of its path', () => {
+    it('should use a malformed section as written, even if the player answers an error', () => {
       const value =
         'https://fave.api.cnn.io/v1/fav/?video=../arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn'
+      const expected: EmbedResolverResult = {
+        provider: 'cnn',
+        id: '../arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=..%2Farts%2F2018%2F07%2F09%2Fspencer-tunick-nude-art-melbourne.cnn&customer=cnn&edition=domestic&env=prod',
+        url: 'https://www.cnn.com/videos/../arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn',
+        ratio: '16/9',
+        date: '2018-07-09',
+      }
 
-      expect(cnnResolveEmbed(value)).toBeUndefined()
+      expect(cnnResolveEmbed(value)).toEqual(expected)
     })
 
     it('should return undefined for an id followed by another query pair', () => {
@@ -106,18 +114,19 @@ describe('cnnResolveEmbed', () => {
       expect(cnnResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for a section carrying a query pair', () => {
-      const value =
-        'https://fave.api.cnn.io/v1/fav/?video=arts%26env%3Ddev/2018/07/09/spencer-tunick-nude-art-melbourne.cnn'
-
-      expect(cnnResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a slug carrying a query pair', () => {
+    it('should use a malformed slug as written, even if the player answers an error', () => {
       const value =
         'https://fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick%26env%3Ddev.cnn'
+      const expected: EmbedResolverResult = {
+        provider: 'cnn',
+        id: 'arts/2018/07/09/spencer-tunick&env=dev.cnn',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=arts%2F2018%2F07%2F09%2Fspencer-tunick%26env%3Ddev.cnn&customer=cnn&edition=domestic&env=prod',
+        url: 'https://www.cnn.com/videos/arts/2018/07/09/spencer-tunick&env=dev.cnn',
+        ratio: '16/9',
+        date: '2018-07-09',
+      }
 
-      expect(cnnResolveEmbed(value)).toBeUndefined()
+      expect(cnnResolveEmbed(value)).toEqual(expected)
     })
   })
 
@@ -127,7 +136,7 @@ describe('cnnResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'arts/2018/13/09/spencer-tunick.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=arts/2018/13/09/spencer-tunick.cnn&customer=cnn&edition=domestic&env=prod',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=arts%2F2018%2F13%2F09%2Fspencer-tunick.cnn&customer=cnn&edition=domestic&env=prod',
         url: 'https://www.cnn.com/videos/arts/2018/13/09/spencer-tunick.cnn',
         ratio: '16/9',
       }
@@ -140,7 +149,7 @@ describe('cnnResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'specials/2016/2018/07/09/retro.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=specials/2016/2018/07/09/retro.cnn&customer=cnn&edition=domestic&env=prod',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=specials%2F2016%2F2018%2F07%2F09%2Fretro.cnn&customer=cnn&edition=domestic&env=prod',
         url: 'https://www.cnn.com/videos/specials/2016/2018/07/09/retro.cnn',
         ratio: '16/9',
         date: '2018-07-09',
@@ -154,7 +163,7 @@ describe('cnnResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'specials/2016/05/04/2018/07/09/retro.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=specials/2016/05/04/2018/07/09/retro.cnn&customer=cnn&edition=domestic&env=prod',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=specials%2F2016%2F05%2F04%2F2018%2F07%2F09%2Fretro.cnn&customer=cnn&edition=domestic&env=prod',
         url: 'https://www.cnn.com/videos/specials/2016/05/04/2018/07/09/retro.cnn',
         ratio: '16/9',
         date: '2018-07-09',
@@ -169,7 +178,7 @@ describe('cnnResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'world/2009/07/30/ctw.perry.beruit.party.tour.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=world/2009/07/30/ctw.perry.beruit.party.tour.cnn&customer=cnn&edition=domestic&env=prod',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=world%2F2009%2F07%2F30%2Fctw.perry.beruit.party.tour.cnn&customer=cnn&edition=domestic&env=prod',
         url: 'https://www.cnn.com/videos/world/2009/07/30/ctw.perry.beruit.party.tour.cnn',
         ratio: '16/9',
         date: '2009-07-30',
@@ -188,7 +197,7 @@ describe('cnnFlashResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'bestoftv/2011/05/31/exp.nr.cell.phone.carcinogen.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=bestoftv/2011/05/31/exp.nr.cell.phone.carcinogen.cnn&customer=cnn&edition=domestic&env=prod',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=bestoftv%2F2011%2F05%2F31%2Fexp.nr.cell.phone.carcinogen.cnn&customer=cnn&edition=domestic&env=prod',
         url: 'https://www.cnn.com/videos/bestoftv/2011/05/31/exp.nr.cell.phone.carcinogen.cnn',
         ratio: '16/9',
         date: '2011-05-31',
@@ -203,7 +212,7 @@ describe('cnnFlashResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'politics/2011/02/27/rs.book.google.power.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=politics/2011/02/27/rs.book.google.power.cnn&customer=cnn&edition=domestic&env=prod',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=politics%2F2011%2F02%2F27%2Frs.book.google.power.cnn&customer=cnn&edition=domestic&env=prod',
         url: 'https://www.cnn.com/videos/politics/2011/02/27/rs.book.google.power.cnn',
         ratio: '16/9',
         date: '2011-02-27',
@@ -258,7 +267,7 @@ describeForEachParser('cnnIframeEmbedResolver', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'cnn',
       id: 'us/2018/06/24/finding-hope-suicide-special-report-full-show.cnn',
-      src: 'https://fave.api.cnn.io/v1/fav/?video=us/2018/06/24/finding-hope-suicide-special-report-full-show.cnn&customer=cnn&edition=domestic&env=prod',
+      src: 'https://fave.api.cnn.io/v1/fav/?video=us%2F2018%2F06%2F24%2Ffinding-hope-suicide-special-report-full-show.cnn&customer=cnn&edition=domestic&env=prod',
       url: 'https://www.cnn.com/videos/us/2018/06/24/finding-hope-suicide-special-report-full-show.cnn',
       width: 416,
       height: 234,
@@ -277,7 +286,7 @@ describeForEachParser('cnnIframeEmbedResolver', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'cnn',
       id: 'us/2018/06/24/finding-hope-suicide-special-report-full-show.cnn',
-      src: 'https://fave.api.cnn.io/v1/fav/?video=us/2018/06/24/finding-hope-suicide-special-report-full-show.cnn&customer=cnn&edition=domestic&env=prod',
+      src: 'https://fave.api.cnn.io/v1/fav/?video=us%2F2018%2F06%2F24%2Ffinding-hope-suicide-special-report-full-show.cnn&customer=cnn&edition=domestic&env=prod',
       url: 'https://www.cnn.com/videos/us/2018/06/24/finding-hope-suicide-special-report-full-show.cnn',
       ratio: '16/9',
       date: '2018-06-24',
@@ -317,7 +326,7 @@ describeForEachParser('cnnFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'politics/2011/02/27/rs.book.google.power.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=politics/2011/02/27/rs.book.google.power.cnn&customer=cnn&edition=domestic&env=prod',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=politics%2F2011%2F02%2F27%2Frs.book.google.power.cnn&customer=cnn&edition=domestic&env=prod',
         url: 'https://www.cnn.com/videos/politics/2011/02/27/rs.book.google.power.cnn',
         ratio: '16/9',
         date: '2011-02-27',
@@ -336,7 +345,7 @@ describeForEachParser('cnnFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'us/2012/01/14/pkg-candiotti-gay-man-faces-deportation.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=us/2012/01/14/pkg-candiotti-gay-man-faces-deportation.cnn&customer=cnn&edition=domestic&env=prod',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=us%2F2012%2F01%2F14%2Fpkg-candiotti-gay-man-faces-deportation.cnn&customer=cnn&edition=domestic&env=prod',
         url: 'https://www.cnn.com/videos/us/2012/01/14/pkg-candiotti-gay-man-faces-deportation.cnn',
         ratio: '16/9',
         date: '2012-01-14',
@@ -370,7 +379,7 @@ describeForEachParser('cnnScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'politics/2009/05/21/obama.guantanamo.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=politics/2009/05/21/obama.guantanamo.cnn&customer=cnn&edition=domestic&env=prod',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=politics%2F2009%2F05%2F21%2Fobama.guantanamo.cnn&customer=cnn&edition=domestic&env=prod',
         url: 'https://www.cnn.com/videos/politics/2009/05/21/obama.guantanamo.cnn',
         ratio: '16/9',
         date: '2009-05-21',
@@ -407,7 +416,7 @@ describeForEachParser('cnnIframeEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'cnn',
       id: 'politics/2020/11/07/biden-wins-election-vpx.cnn',
-      src: 'https://fave.api.cnn.io/v1/fav/?video=politics/2020/11/07/biden-wins-election-vpx.cnn&customer=cnn&edition=domestic&env=prod',
+      src: 'https://fave.api.cnn.io/v1/fav/?video=politics%2F2020%2F11%2F07%2Fbiden-wins-election-vpx.cnn&customer=cnn&edition=domestic&env=prod',
       url: 'https://www.cnn.com/videos/politics/2020/11/07/biden-wins-election-vpx.cnn',
       ratio: '16/9',
       title: 'Biden wins the election',

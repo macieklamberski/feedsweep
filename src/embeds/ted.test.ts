@@ -290,17 +290,21 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // A slug sitting at the truncation cap is a prefix of the real one two times in three, and
-    // refusing it leaves the generic placeholder rather than a TED one whose link does not serve.
-    it('should refuse a slug sitting at the truncation cap', async () => {
+    it('should use a slug cut at the truncation cap as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
           flashvars="adKeys=talk=nicholas_christakis_the_hidden_influence_of_social_netw;year=2010"
         />
       `
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: 'nicholas_christakis_the_hidden_influence_of_social_netw',
+        src: 'https://embed.ted.com/embed/nicholas_christakis_the_hidden_influence_of_social_netw',
+        url: 'https://www.ted.com/talks/nicholas_christakis_the_hidden_influence_of_social_netw',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should refuse a player whose configuration names no talk', async () => {

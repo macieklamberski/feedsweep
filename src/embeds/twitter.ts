@@ -91,14 +91,11 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
   // iframe a publisher nested in the quote would otherwise name the tweet.
   const frame = parseUrl(attr(find(element, 'iframe[src]'), 'src') ?? '', placeholderBaseUrl)
   const framed = frame && isTweetUrl(frame) ? frame.searchParams.get('id') : undefined
-  // Each id is validated on its own, because the attributes disagree: a block copied between
-  // platforms carries several generations of them and only one is guaranteed to be intact.
-  const declared = [
-    attr(element, 'data-twitter-tweet-id'),
-    attr(element, 'data-tweet-id'),
-    attr(element, 'data-tweetid'),
-    framed,
-  ].find((id) => id && digitsRegex.test(id))
+  const declared =
+    attr(element, 'data-twitter-tweet-id') ??
+    attr(element, 'data-tweet-id') ??
+    attr(element, 'data-tweetid') ??
+    framed
 
   return declared ? { status: { handle: '', id: declared } } : undefined
 }

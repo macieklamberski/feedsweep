@@ -194,7 +194,7 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a card naming no entry id in either source', async () => {
+    it('should use a malformed entry id as written, even if the player answers an error', async () => {
       const value = html`
         <iframe
           src="https://ameblo.jp/s/embed/reblog-card/ncbar/entry-latest.html"
@@ -202,59 +202,17 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
           data-entry-id="latest"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'ameba',
+        id: 'ncbar/entry-latest',
+        src: 'https://ameblo.jp/s/embed/reblog-card/ncbar/entry-latest.html',
+        url: 'https://ameblo.jp/ncbar/entry-latest.html',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a stated blog id carrying a path separator', async () => {
-      const value = html`
-        <iframe
-          src="https://ameblo.jp/s/embed/reblog-card/ncbar/entry-latest.html"
-          data-ameba-id="../hijacked"
-          data-entry-id="12423195042"
-        ></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a stated blog id trailed by a path separator', async () => {
-      const value = html`
-        <iframe
-          src="https://ameblo.jp/s/embed/reblog-card/ncbar/entry-latest.html"
-          data-ameba-id="ncbar/hijacked"
-          data-entry-id="12423195042"
-        ></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a stated blog id carrying an uppercase letter', async () => {
-      const value = html`
-        <iframe
-          src="https://ameblo.jp/s/embed/reblog-card/tony-9/entry-latest.html"
-          data-ameba-id="TONY-9"
-          data-entry-id="12854455300"
-        ></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a stated blog id carrying an underscore', async () => {
-      const value = html`
-        <iframe
-          src="https://ameblo.jp/s/embed/reblog-card/tony-9/entry-latest.html"
-          data-ameba-id="tony_9"
-          data-entry-id="12854455300"
-        ></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a stated entry id carrying a path separator', async () => {
+    it('should use a malformed stated entry id as written, even if the player answers an error', async () => {
       const value = html`
         <iframe
           src="https://ameblo.jp/s/embed/reblog-card/ncbar/entry-latest.html"
@@ -262,8 +220,14 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
           data-entry-id="12423195042/../1"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'ameba',
+        id: 'ncbar/entry-12423195042/../1',
+        src: 'https://ameblo.jp/s/embed/reblog-card/ncbar/entry-12423195042/../1.html',
+        url: 'https://ameblo.jp/ncbar/entry-12423195042/../1.html',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
@@ -286,7 +250,7 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should fall back to the card path when the stated pair is malformed', async () => {
+    it('should use a malformed stated blog id as written, even if the player answers an error', async () => {
       const value = html`
         <iframe
           src="https://ameblo.jp/s/embed/reblog-card/ncbar/entry-12423195042.html"
@@ -296,9 +260,9 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'ameba',
-        id: 'ncbar/entry-12423195042',
-        src: 'https://ameblo.jp/s/embed/reblog-card/ncbar/entry-12423195042.html',
-        url: 'https://ameblo.jp/ncbar/entry-12423195042.html',
+        id: '../hijacked/entry-12423195042',
+        src: 'https://ameblo.jp/s/embed/reblog-card/../hijacked/entry-12423195042.html',
+        url: 'https://ameblo.jp/../hijacked/entry-12423195042.html',
       }
 
       expect(await extract(value)).toEqual(expected)

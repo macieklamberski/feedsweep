@@ -21,8 +21,8 @@ const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/
 
 // A group and a photostream each resolve by NSID and only by NSID: the player answers 200 for
 // `groups/{nsid}` and for `photostreams/{nsid}`, and 404 for a path alias in either position.
-// Feeds spell `group_id` as an NSID in every non-mangled occurrence.
-const safeNsidRegex = /^\d+@N\d\d$/
+// An NSID carries `@N` and an alias never does.
+const nsidRegex = /@N/
 
 // What a carrier names, whichever carrier and whichever spelling: an album needs its set, a
 // group pool its NSID, a photostream only its owner.
@@ -34,7 +34,7 @@ type FlickrPhoto = { photoId: string; owner?: string; secret?: string }
 // Flickr's own embed script writes these embedr endpoints into a frameless iframe. A real id
 // answers 200 with the whole slideshow and an invented one 404.
 const composeAlbumPlayer = (setId: string): string => {
-  return `https://embedr.flickr.com/photosets/${setId}`
+  return `https://embedr.flickr.com/photosets/${encodePathSegment(setId)}`
 }
 
 const composeStreamPlayer = (owner: string): string => {
@@ -93,9 +93,8 @@ const composePhotoThumbnail = (photoId: string, secret: string): string => {
 const dialogSize = { width: 400, height: 300 }
 
 // What a page path names, whether it arrived in the flashvars or as the framed page itself.
-// An owner read out of a path is decoded, so every owner is held in one form and only the urls
-// encode it.
-const decodeOwner = (owner: string): string => {
+// A value read out of a path is decoded, so each is held in one form and only the urls encode it.
+const decodePathValue = (owner: string): string => {
   return decodeSegment(owner) ?? owner
 }
 
@@ -103,7 +102,7 @@ const readPageSubject = (page: string): FlickrSubject | undefined => {
   const set = page.match(setPathRegex)
 
   if (set) {
-    return { owner: decodeOwner(set[1]), setId: set[2] }
+    return { owner: decodePathValue(set[1]), setId: decodePathValue(set[2]) }
   }
 
   const group = page.match(groupPathRegex)
@@ -115,7 +114,7 @@ const readPageSubject = (page: string): FlickrSubject | undefined => {
   const stream = page.match(streamPathRegex)
 
   if (stream) {
-    return { owner: decodeOwner(stream[1]) }
+    return { owner: decodePathValue(stream[1]) }
   }
 }
 
@@ -143,11 +142,17 @@ const readFlashPhoto = (element: Nullish<Element>): FlickrPhoto | undefined => {
   return { photoId, secret: secret ? encodePathSegment(secret) : undefined }
 }
 
+const trailingSlashesRegex = /\/+$/
+
 // The iframe carrier names its subject in its own query. A set is preferred where several
 // appear, being the narrowest of the three.
 const readLegacySubject = (parsed: URL): FlickrSubject => {
+  // Some feeds end the set id with the `/` of a path. A set id never holds one, so the trim
+  // repairs what the feed did.
+  const setId = parsed.searchParams.get('set_id')?.replace(trailingSlashesRegex, '')
+
   return {
-    setId: parsed.searchParams.get('set_id') ?? undefined,
+    setId: setId || undefined,
     owner: parsed.searchParams.get('user_id') ?? undefined,
     groupId: parsed.searchParams.get('group_id') ?? undefined,
   }
@@ -156,7 +161,7 @@ const readLegacySubject = (parsed: URL): FlickrSubject => {
 // Only the path alias is a name. The NSID spelling of the same owner names nobody a reader
 // could read.
 const readOwnerAlias = (owner: string | undefined): string | undefined => {
-  return owner && !safeNsidRegex.test(owner) ? owner : undefined
+  return owner && !nsidRegex.test(owner) ? owner : undefined
 }
 
 // Flickr's own page player, `/photos/{owner}/{photoId}/player/`, optionally with the browsing
@@ -166,7 +171,7 @@ const readPhotoSubject = (parsed: URL): FlickrPhoto | undefined => {
   const player = parsed.pathname.match(photoPathRegex)
 
   if (player) {
-    return { owner: decodeOwner(player[1]), photoId: player[2], secret: player[3] }
+    return { owner: decodePathValue(player[1]), photoId: player[2], secret: player[3] }
   }
 
   const embedr = isHostOf(parsed, embedrHost) && parsed.pathname.match(embedrPhotoPathRegex)
@@ -198,28 +203,31 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   const owner = subject.owner
   const author = readOwnerAlias(owner)
 
-  if (subject.setId && digitsRegex.test(subject.setId)) {
-    // The album page path starts with the owner. `/sets/{id}` is still served and does not
-    // redirect to `/albums/`, while the `/albums/` player redirects to `/sets/` (2026-09-29).
-    return owner
-      ? {
-          provider: 'flickr',
-          // The album's key-free oEmbed needs `{owner}/{setId}`: a title, an author, a thumbnail.
-          id: `${owner}/${subject.setId}`,
-          src: composeAlbumPlayer(subject.setId),
-          url: `https://www.flickr.com/photos/${encodePathSegment(owner)}/sets/${subject.setId}`,
-          author,
-        }
-      : {
-          provider: 'flickr',
-          // Addresses the player but not oEmbed.
-          id: `photosets/${subject.setId}`,
-          src: composeAlbumPlayer(subject.setId),
-          url: composeShortAlbumUrl(subject.setId),
-        }
+  // The album page path starts with the owner. `/sets/{id}` is still served and does not
+  // redirect to `/albums/`, while the `/albums/` player redirects to `/sets/` (2026-09-29).
+  if (subject.setId && owner) {
+    return {
+      provider: 'flickr',
+      // The album's key-free oEmbed needs `{owner}/{setId}`: a title, an author, a thumbnail.
+      id: `${owner}/${subject.setId}`,
+      src: composeAlbumPlayer(subject.setId),
+      url: `https://www.flickr.com/photos/${encodePathSegment(owner)}/sets/${encodePathSegment(subject.setId)}`,
+      author,
+    }
   }
 
-  if (subject.groupId && safeNsidRegex.test(subject.groupId)) {
+  // The short url spells the set id in base58, which only a numeric id has.
+  if (subject.setId && digitsRegex.test(subject.setId)) {
+    return {
+      provider: 'flickr',
+      // Addresses the player but not oEmbed.
+      id: `photosets/${subject.setId}`,
+      src: composeAlbumPlayer(subject.setId),
+      url: composeShortAlbumUrl(subject.setId),
+    }
+  }
+
+  if (subject.groupId && nsidRegex.test(subject.groupId)) {
     return {
       provider: 'flickr',
       id: `groups/${subject.groupId}`,
@@ -235,7 +243,7 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
       provider: 'flickr',
       id: `photostreams/${owner}`,
       // embedr 404s on an alias, so only an NSID goes there.
-      src: safeNsidRegex.test(owner) ? composeStreamPlayer(owner) : composeAliasStreamPlayer(owner),
+      src: nsidRegex.test(owner) ? composeStreamPlayer(owner) : composeAliasStreamPlayer(owner),
       url: `https://www.flickr.com/photos/${encodePathSegment(owner)}/`,
       author,
     }

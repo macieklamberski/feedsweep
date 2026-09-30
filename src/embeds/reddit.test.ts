@@ -318,6 +318,47 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should use an author name as written', async () => {
+      const value = html`
+        <blockquote class="reddit-embed-bq">
+          <a href="https://www.reddit.com/r/pics/comments/dq4m1v/my_garden/">My dog</a>
+          by
+          <a href="https://www.reddit.com/user/some.one/">u/some.one</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/pics/comments/dq4m1v',
+        src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
+        url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
+        title: 'My dog',
+        author: 'u/some.one',
+        publisher: 'r/pics',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state no author when the byline names a deleted account unencoded', async () => {
+      const value = html`
+        <blockquote class="reddit-embed-bq">
+          <a href="https://www.reddit.com/r/pics/comments/dq4m1v/my_garden/">My dog</a>
+          by
+          <a href="https://www.reddit.com/user/[deleted]/">u/[deleted]</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/pics/comments/dq4m1v',
+        src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
+        url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
+        title: 'My dog',
+        publisher: 'r/pics',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should state no author when the byline names a deleted account', async () => {
       const value = html`
         <blockquote class="reddit-embed-bq">

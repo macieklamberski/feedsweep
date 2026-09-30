@@ -150,6 +150,23 @@ describeForEachParser('flourishWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should use a malformed widget kind as written, even if the player answers an error', async () => {
+      const value = html`
+        <div
+          class="flourish-embed"
+          data-src="st-ory/3677950"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flourish',
+        id: 'st-ory/3677950',
+        src: 'https://flo.uri.sh/st-ory/3677950/embed',
+        url: 'https://public.flourish.studio/st-ory/3677950/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should omit the thumbnail when the div wraps no img', async () => {
       const value = html`
         <div
@@ -263,23 +280,41 @@ describeForEachParser('flourishIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a kind opening with a query separator', async () => {
+    it('should use a malformed kind opening with a query separator as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://flo.uri.sh/=visualisation/29132382/embed"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flourish',
+        id: '=visualisation/29132382',
+        src: 'https://flo.uri.sh/=visualisation/29132382/embed',
+        url: 'https://public.flourish.studio/=visualisation/29132382/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for a kind closing with a query separator', async () => {
+    it('should use a malformed kind closing with a query separator as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://flo.uri.sh/visualisation=x/29132382/embed"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flourish',
+        id: 'visualisation=x/29132382',
+        src: 'https://flo.uri.sh/visualisation=x/29132382/embed',
+        url: 'https://public.flourish.studio/visualisation=x/29132382/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // The player answers 403 for `st-ory/3677950` where `story/3677950` answers 200.
-    it('should return undefined for a kind carrying a hyphen', async () => {
+    it('should use a malformed kind carrying a hyphen as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://flo.uri.sh/st-ory/3677950/embed"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flourish',
+        id: 'st-ory/3677950',
+        src: 'https://flo.uri.sh/st-ory/3677950/embed',
+        url: 'https://public.flourish.studio/st-ory/3677950/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should use a malformed id as written, even if the player answers an error', async () => {

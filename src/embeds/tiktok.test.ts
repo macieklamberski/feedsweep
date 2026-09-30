@@ -658,9 +658,30 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The video id is interpolated into the player url, so anything non-numeric is refused,
-    // and the cite still names the clip.
-    it('should ignore a data-video-id that is not numeric and read the cite', async () => {
+    it('should use a malformed handle from the author text as written, even if the url answers an error', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          data-video-id="7001234567890123456"
+        >
+          <section>
+            <a href="https://www.tiktok.com/@lynja-cooks?refer=embed">@lynja-cooks</a>
+          </section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@lynja-cooks/video/7001234567890123456',
+        src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
+        url: 'https://www.tiktok.com/@lynja-cooks/video/7001234567890123456',
+        height: 738,
+        author: '@lynja-cooks',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed data-video-id as written over the cite, even if the player answers an error', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -670,8 +691,8 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
-        id: '@user/video/7001234567890123456',
-        src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
+        id: '@user/video/../evil',
+        src: 'https://www.tiktok.com/embed/v2/../evil',
         url: 'https://www.tiktok.com/@user/video/7001234567890123456',
         height: 738,
       }

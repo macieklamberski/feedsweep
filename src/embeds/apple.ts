@@ -16,8 +16,6 @@ const applePodcastsHosts = ['podcasts.apple.com']
 // optional. A music id is numeric, a playlist or station id carries a two-letter prefix
 // (`pl.`, `ra.`) and a podcast id an `id` one.
 const storefrontRegex = /^[a-z]{2}$/
-// A numeric music id, a two-letter prefixed playlist or station id, or an `id`-prefixed podcast id.
-const safeIdRegex = /^(?:id\d+|\d+|[a-z]{2}\.[a-z0-9-]+)$/i
 const podcastIdPrefixRegex = /^id/
 
 // The player is fluid-width. The podcast show player fills any frame and floors at 180 at 320
@@ -46,7 +44,12 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
   const [kind, ...rest] = storefrontRegex.test(segments[0] ?? '') ? segments.slice(1) : segments
   const pathId = rest[rest.length - 1]
 
-  if (!kind || !pathId || !appleHeights.has(kind) || !safeIdRegex.test(pathId)) {
+  // A segment past the id, such as an artist's `see-all`, names a page on the site, not a player.
+  if (rest.length > 2) {
+    return
+  }
+
+  if (!kind || !pathId || !appleHeights.has(kind)) {
     return
   }
 

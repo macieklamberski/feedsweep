@@ -42,25 +42,25 @@ describe('heyzineResolveEmbed', () => {
       expect(heyzineResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should lowercase an uppercase id', () => {
+    it('should lowercase the key of an uppercase id and keep its case in the url', () => {
       const value = 'https://heyzine.com/flip-book/4DB16F598C.html'
       const expected: EmbedResolverResult = {
         provider: 'heyzine',
         id: '4db16f598c',
-        src: 'https://heyzine.com/flip-book/4db16f598c.html',
-        url: 'https://heyzine.com/flip-book/4db16f598c.html',
+        src: 'https://heyzine.com/flip-book/4DB16F598C.html',
+        url: 'https://heyzine.com/flip-book/4DB16F598C.html',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should read a custom slug, lowercased and without the extension', () => {
+    it('should lowercase the key of a custom slug and keep its case in the url', () => {
       const value = 'https://heyzine.com/flip-book/ThroughThePrism'
       const expected: EmbedResolverResult = {
         provider: 'heyzine',
         id: 'throughtheprism',
-        src: 'https://heyzine.com/flip-book/throughtheprism',
-        url: 'https://heyzine.com/flip-book/throughtheprism',
+        src: 'https://heyzine.com/flip-book/ThroughThePrism',
+        url: 'https://heyzine.com/flip-book/ThroughThePrism',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -141,20 +141,8 @@ describe('heyzineResolveEmbed', () => {
       expect(heyzineResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a longer hexadecimal name without the extension', () => {
-      const value = 'https://heyzine.com/flip-book/4db16f598c5'
-
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a custom slug with the extension, which the viewer does not serve', () => {
       const value = 'https://heyzine.com/flip-book/ThroughThePrism.html'
-
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a custom slug carrying an encoded separator', () => {
-      const value = 'https://heyzine.com/flip-book/Through%2FThePrism'
 
       expect(heyzineResolveEmbed(value)).toBeUndefined()
     })
@@ -184,8 +172,32 @@ describe('heyzineResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'heyzine',
         id: 'brochure2026',
-        src: 'https://heyzine.com/flip-book/brochure2026',
-        url: 'https://heyzine.com/flip-book/brochure2026',
+        src: 'https://heyzine.com/flip-book/Brochure2026',
+        url: 'https://heyzine.com/flip-book/Brochure2026',
+      }
+
+      expect(heyzineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should build a longer bare hexadecimal name as a slug, as written', () => {
+      const value = 'https://heyzine.com/flip-book/4db16f598c5'
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: '4db16f598c5',
+        src: 'https://heyzine.com/flip-book/4db16f598c5',
+        url: 'https://heyzine.com/flip-book/4db16f598c5',
+      }
+
+      expect(heyzineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should use a malformed slug as written, even if the player answers an error', () => {
+      const value = 'https://heyzine.com/flip-book/Through%2FThePrism'
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: 'through%2ftheprism',
+        src: 'https://heyzine.com/flip-book/Through%2FThePrism',
+        url: 'https://heyzine.com/flip-book/Through%2FThePrism',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -266,8 +278,8 @@ describeForEachParser('heyzineEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'heyzine',
         id: 'throughtheprism',
-        src: 'https://heyzine.com/flip-book/throughtheprism',
-        url: 'https://heyzine.com/flip-book/throughtheprism',
+        src: 'https://heyzine.com/flip-book/ThroughThePrism',
+        url: 'https://heyzine.com/flip-book/ThroughThePrism',
         height: 600,
       }
 

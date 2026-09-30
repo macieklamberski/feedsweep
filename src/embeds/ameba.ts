@@ -1,13 +1,12 @@
 import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches } from '../utils/dom.js'
-import { composeQuery, digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { attr } from '../utils/dom.js'
+import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const amebaHosts = ['static.blog-video.jp']
 const amebloHosts = ['ameblo.jp']
 
-const blogIdRegex = /^[a-z0-9-]+$/
 const reblogCardPathRegex = /^\/s\/embed\/reblog-card\/([^/]+)\/entry-([^/]+)\.html$/
 const imagePagePathRegex = /^\/p\/embed\/([^/]+\/image-[^/]+)\.html$/
 
@@ -34,12 +33,11 @@ const readReblogCardId = (
   blogId: string | undefined,
   entryId: string | undefined,
 ): string | undefined => {
-  const safeBlogId = keepIfMatches(blogId, blogIdRegex)
-  const safeEntryId = keepIfMatches(entryId, digitsRegex)
-
-  if (safeBlogId && safeEntryId) {
-    return `${safeBlogId}/entry-${safeEntryId}`
+  if (!blogId || !entryId) {
+    return
   }
+
+  return `${blogId}/entry-${entryId}`
 }
 
 // Ameba's reblog card, `ameblo.jp/s/embed/reblog-card/{amebaId}/entry-{entryId}.html`, the iframe

@@ -1,11 +1,8 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
+import { attr, parsePixelSize } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
-
-// A channel upload is addressed by a bare number, so the prefix is optional.
-const safeVideoIdRegex = /^(?:[a-z]{2})?\d+$/
 
 // lv names a live broadcast, which the video player answers 500 for and the live host serves as a
 // programme card even after the broadcast ends.
@@ -29,10 +26,14 @@ export const extractNicovideoId = (link: string): string | undefined => {
     return
   }
 
-  const segments = getPathSegments(parsed)
-  const marker = segments.findIndex((segment) => videoIdMarkers.includes(segment))
+  // Every player and card route opens the path, and a marker deeper in it is another page's.
+  const [marker, videoId] = getPathSegments(parsed)
 
-  return keepIfMatches(marker < 0 ? undefined : segments[marker + 1], safeVideoIdRegex)
+  if (!marker || !videoIdMarkers.includes(marker)) {
+    return
+  }
+
+  return videoId
 }
 
 export const nicovideoResolveEmbed: ResolveEmbed = (url) => {

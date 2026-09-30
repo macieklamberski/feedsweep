@@ -83,11 +83,11 @@ describe('extractMixcloudShow', () => {
     expect(extractMixcloudShow(value)).toBe(expected)
   })
 
-  // The api answers 404 for `.4-natty-champs` where `4-natty-champs` is a live show.
-  it('should return undefined for a slug opening with a dot', () => {
+  it('should use a malformed slug as written, even if the player answers an error', () => {
     const value = 'https://www.mixcloud.com/FakeIDRadio/.4-natty-champs/'
+    const expected = 'FakeIDRadio/.4-natty-champs'
 
-    expect(extractMixcloudShow(value)).toBeUndefined()
+    expect(extractMixcloudShow(value)).toBe(expected)
   })
 
   // The section words are matched whole, so a show whose title starts with one is still a show.
@@ -144,41 +144,11 @@ describe('extractMixcloudShow', () => {
     expect(extractMixcloudShow(value)).toBeUndefined()
   })
 
-  it('should return undefined for a user segment carrying an encoded slash', () => {
+  it('should decode a user segment carrying an encoded slash for the key', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2F..%252Fetc%2Fno-filter%2F'
+    const expected = '../etc/no-filter'
 
-    expect(extractMixcloudShow(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a user segment carrying an encoded slash past its start', () => {
-    const value =
-      'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%252Fetc%2Fno-filter%2F'
-
-    expect(extractMixcloudShow(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a malformed escape in the user segment', () => {
-    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2F%E0%A4%A%2Fno-filter%2F'
-
-    expect(extractMixcloudShow(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a segment carrying an encoded question mark', () => {
-    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno%253Ffilter%2F'
-
-    expect(extractMixcloudShow(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a segment carrying an encoded hash', () => {
-    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno%2523filter%2F'
-
-    expect(extractMixcloudShow(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a segment carrying an encoded backslash', () => {
-    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno%255Cfilter%2F'
-
-    expect(extractMixcloudShow(value)).toBeUndefined()
+    expect(extractMixcloudShow(value)).toBe(expected)
   })
 
   it('should return undefined for a feed parameter that cannot be parsed', () => {
@@ -193,16 +163,11 @@ describe('extractMixcloudShow', () => {
     expect(extractMixcloudShow(value)).toBeUndefined()
   })
 
-  it('should return undefined for a malformed escape', () => {
+  it('should keep a malformed escape as written', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fuser%2F%E0%A4%A%2F'
+    const expected = 'user/%EF%BF%BD%A'
 
-    expect(extractMixcloudShow(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a segment outside the url charset', () => {
-    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fuser%2F..%252Fetc%2F'
-
-    expect(extractMixcloudShow(value)).toBeUndefined()
+    expect(extractMixcloudShow(value)).toBe(expected)
   })
 
   // The audio, the artwork and their subdomains are all on the host list, and each file path
@@ -228,6 +193,20 @@ describe('mixcloudResolveEmbed', () => {
       url: 'https://www.mixcloud.com/photogmusic/no-filter/',
       height: 160,
       author: 'photogmusic',
+    }
+
+    expect(mixcloudResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should key and query a show by its decoded names and link it by the written path', () => {
+    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2F..%252Fetc%2Fno-filter%2F'
+    const expected: EmbedResolverResult = {
+      provider: 'mixcloud',
+      id: '../etc/no-filter',
+      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2F..%2Fetc%2Fno-filter%2F',
+      url: 'https://www.mixcloud.com/..%2Fetc/no-filter/',
+      height: 160,
+      author: '..',
     }
 
     expect(mixcloudResolveEmbed(value)).toEqual(expected)

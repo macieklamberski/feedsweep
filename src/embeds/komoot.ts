@@ -1,6 +1,6 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, digitsRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Resource = {
@@ -27,7 +27,7 @@ const mapParams = ['share_token', 'profile', 'hl', 'layout', 'gallery']
 const readResource = (segments: Array<string>): Resource | undefined => {
   const [route, id = '', ...rest] = segments
 
-  if (!digitsRegex.test(id)) {
+  if (!id) {
     return
   }
 

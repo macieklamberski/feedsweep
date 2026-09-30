@@ -214,7 +214,44 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('set ids in a path', () => {
+    it('should keep a decoded set id in one path segment', async () => {
+      const value = html`
+        <iframe
+          src="http://www.flickr.com/slideShow/index.gne?user_id=35408001@N04&amp;set_id=123%2F..%2F..%2Fphotos%2Fx"
+          width="600"
+          height="500"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: '35408001@N04/123/../../photos/x',
+        src: 'https://embedr.flickr.com/photosets/123%2F..%2F..%2Fphotos%2Fx?width=600&height=500',
+        url: 'https://www.flickr.com/photos/35408001@N04/sets/123%2F..%2F..%2Fphotos%2Fx',
+        width: 600,
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   describe('the legacy slideshow iframe', () => {
+    it('should trim the path slash a feed left on the set id', async () => {
+      const value =
+        '<iframe src="http://www.flickr.com/slideShow/index.gne?user_id=24006738@N07&amp;set_id=72157627734131040/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: '24006738@N07/72157627734131040',
+        src: 'https://embedr.flickr.com/photosets/72157627734131040?width=400&height=300',
+        url: 'https://www.flickr.com/photos/24006738@N07/sets/72157627734131040',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should map a set slideshow onto the album player', async () => {
       const value = html`
         <iframe
@@ -370,6 +407,22 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should use a malformed set id as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://www.flickr.com/slideShow/index.gne?user_id=bees&amp;set_id=72157613575700166x"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'bees/72157613575700166x',
+        src: 'https://embedr.flickr.com/photosets/72157613575700166x?width=400&height=300',
+        url: 'https://www.flickr.com/photos/bees/sets/72157613575700166x',
+        width: 400,
+        height: 300,
+        author: 'bees',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // A group only resolves by its NSID: the player 404s on a group's path alias but answers
     // the NSID with the whole pool slideshow, and the corpus spells group_id as an NSID.
     it('should map a group slideshow onto the group player', async () => {
@@ -395,8 +448,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // `group_id=197` appears in the corpus: a mangled value that is not an NSID and would mint
-    // a 404, so it stays unresolved.
+    // `group_id=197` appears in the corpus. The group player takes an NSID only.
     it('should return undefined for a group id that is not an nsid', async () => {
       const value = html`
         <iframe src="https://www.flickr.com/slideshow/index.gne?group_id=197"></iframe>
@@ -419,11 +471,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/17367418@N03 ',
-        src: 'https://www.flickr.com/photos/17367418@N03%20/player?width=500&height=500',
+        src: 'https://embedr.flickr.com/photostreams/17367418@N03%20?width=500&height=500',
         url: 'https://www.flickr.com/photos/17367418@N03%20/',
         width: 500,
         height: 500,
-        author: '17367418@N03 ',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1191,18 +1242,34 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for a group id opening with an encoded traversal', async () => {
+    it('should use a malformed group id opening with an encoded traversal as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://www.flickr.com/slideShow/index.gne?group_id=..%2F797770@N21"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'groups/../797770@N21',
+        src: 'https://embedr.flickr.com/groups/../797770@N21?width=400&height=300',
+        url: 'https://www.flickr.com/groups/../797770@N21/',
+        width: 400,
+        height: 300,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for a group id closing with an encoded traversal', async () => {
+    it('should use a malformed group id closing with an encoded traversal as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://www.flickr.com/slideShow/index.gne?group_id=797770@N21%2F.."></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'groups/797770@N21/..',
+        src: 'https://embedr.flickr.com/groups/797770@N21/..?width=400&height=300',
+        url: 'https://www.flickr.com/groups/797770@N21/../',
+        width: 400,
+        height: 300,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for a carrier on another host', async () => {

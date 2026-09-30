@@ -62,26 +62,8 @@ describe('extractNicovideoId', () => {
     expect(extractNicovideoId(value)).toBeUndefined()
   })
 
-  it('should return undefined for an id that is not the documented shape', () => {
-    const value = 'https://ext.nicovideo.jp/thumb_watch/../etc'
-
-    expect(extractNicovideoId(value)).toBeUndefined()
-  })
-
-  it('should return undefined for an id with more than two letters before the number', () => {
-    const value = 'https://embed.nicovideo.jp/watch/abc123'
-
-    expect(extractNicovideoId(value)).toBeUndefined()
-  })
-
-  it('should return undefined for an id with letters after the number', () => {
-    const value = 'https://embed.nicovideo.jp/watch/sm9abc'
-
-    expect(extractNicovideoId(value)).toBeUndefined()
-  })
-
-  it('should return undefined for an id whose prefix carries a separator', () => {
-    const value = 'https://embed.nicovideo.jp/watch/s&9'
+  it('should return undefined for a marker deeper in the path', () => {
+    const value = 'https://www.nicovideo.jp/api/watch/v3_guest/sm9'
 
     expect(extractNicovideoId(value)).toBeUndefined()
   })
@@ -322,6 +304,18 @@ describe('nicovideoResolveEmbed', () => {
       id: '1576909203',
       src: 'https://embed.nicovideo.jp/watch/1576909203',
       url: 'https://www.nicovideo.jp/watch/1576909203',
+    }
+
+    expect(nicovideoResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should use a malformed video id as written, even if the player answers an error', () => {
+    const value = 'https://embed.nicovideo.jp/watch/s&9'
+    const expected: EmbedResolverResult = {
+      provider: 'nicovideo',
+      id: 's&9',
+      src: 'https://embed.nicovideo.jp/watch/s&9',
+      url: 'https://www.nicovideo.jp/watch/s&9',
     }
 
     expect(nicovideoResolveEmbed(value)).toEqual(expected)

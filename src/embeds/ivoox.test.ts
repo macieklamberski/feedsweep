@@ -150,6 +150,45 @@ describe('extractIvooxSubject', () => {
     expect(extractIvooxSubject(value)).toEqual(expected)
   })
 
+  it('should use a malformed episode id as written, even if the player answers an error', () => {
+    const value = 'https://www.ivoox.com/player_ej_x80807760_6_1.html'
+    const expected: IvooxSubject = {
+      kind: 'episode',
+      id: 'x80807760',
+      skin: '6',
+      page: '1',
+      player: 'ej',
+    }
+
+    expect(extractIvooxSubject(value)).toEqual(expected)
+  })
+
+  it('should use a malformed legacy episode id as written, even if the player answers an error', () => {
+    const value = 'http://www.ivoox.com/playerivoox_ee_x8292430_1.html'
+    const expected: IvooxSubject = {
+      kind: 'episode',
+      id: 'x8292430',
+      skin: '1',
+      page: '1',
+      player: 'ej',
+    }
+
+    expect(extractIvooxSubject(value)).toEqual(expected)
+  })
+
+  it('should use a malformed podcast id as written, even if the player answers an error', () => {
+    const value = 'https://www.ivoox.com/player_es_podcast_x1267769_1.html'
+    const expected: IvooxSubject = {
+      kind: 'show',
+      id: 'x1267769',
+      skin: '1',
+      page: '1',
+      player: 'es_podcast',
+    }
+
+    expect(extractIvooxSubject(value)).toEqual(expected)
+  })
+
   it('should ignore a slugged page whose file name ends in a player', () => {
     const value = 'https://www.ivoox.com/mi-podcast-player_ej_123456_1_1.html'
 

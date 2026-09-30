@@ -1,16 +1,12 @@
 import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { filterUrlQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `blog.stackblitz.com` and `developer.stackblitz.com` are prose, and a project's running preview
 // lives on `*.stackblitz.io`, so only the bare host and its `www.` spelling name a project.
 const stackblitzHosts = ['stackblitz.com', 'www.stackblitz.com']
-
-// A project is addressed by its own slug, lowercase words joined by hyphens: `vitejs-vite-jfnozz`,
-// `angular-ivy-snow`. The oEmbed endpoint answers 404 for the same slug capitalised.
-const slugRegex = /^[a-z][a-z0-9-]*$/
 
 // What the share dialog writes beside `width="100%"`.
 const defaultProjectHeight = 500
@@ -56,7 +52,12 @@ const parseTarget = (value: string | undefined): StackblitzTarget | undefined =>
   const [first, second] = getPathSegments(parsed)
 
   // /github/{owner}/{repo} renders, but its id is a key the oEmbed endpoint answers 404 on.
-  if ((first !== 'edit' && first !== 'run') || !second || !slugRegex.test(second)) {
+  if ((first !== 'edit' && first !== 'run') || !second) {
+    return
+  }
+
+  // The enclosure probe offers every attachment on this host, and a file's name reads as a slug.
+  if (isFileName(second)) {
     return
   }
 

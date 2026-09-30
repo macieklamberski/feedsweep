@@ -198,26 +198,21 @@ describe('appleResolveEmbed', () => {
       expect(appleResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id that is not an apple one', () => {
+    it('should use a malformed id as written, even if the player answers an error', () => {
       const value = 'https://music.apple.com/us/album/thriller/abc'
+      const expected: EmbedResolverResult = {
+        provider: 'applemusic',
+        id: 'album/abc',
+        src: 'https://embed.music.apple.com/us/album/thriller/abc',
+        url: 'https://music.apple.com/us/album/thriller/abc',
+        height: 450,
+      }
 
-      expect(appleResolveEmbed(value)).toBeUndefined()
+      expect(appleResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should return undefined for a playlist id carrying an encoded slash', () => {
-      const value = 'https://embed.music.apple.com/jp/playlist/mixtape/pl.u-4Jomm%2FbIaxX578b'
-
-      expect(appleResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id behind a prefix', () => {
-      const value = 'https://music.apple.com/us/album/thriller/x1440857781'
-
-      expect(appleResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id followed by other characters', () => {
-      const value = 'https://music.apple.com/us/album/thriller/1440857781x'
+    it('should return undefined for a page past the id', () => {
+      const value = 'https://music.apple.com/us/artist/michael-jackson/32940/see-all'
 
       expect(appleResolveEmbed(value)).toBeUndefined()
     })

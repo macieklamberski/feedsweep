@@ -99,11 +99,17 @@ describe('komootResolveEmbed', () => {
       expect(komootResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should ignore a collection id that is not a number', () => {
+    it('should use a malformed collection id as written, even if the player answers an error', () => {
       const value =
         'https://www.komoot.com/collection/latest/best-of-national-cycling-routes-of-estonian-islands/embed'
+      const expected: EmbedResolverResult = {
+        provider: 'komoot',
+        id: 'collection/latest',
+        src: 'https://www.komoot.com/collection/latest/best-of-national-cycling-routes-of-estonian-islands/embed',
+        url: 'https://www.komoot.com/collection/latest/best-of-national-cycling-routes-of-estonian-islands',
+      }
 
-      expect(komootResolveEmbed(value)).toBeUndefined()
+      expect(komootResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore a route word that is neither a tour nor a collection', () => {
@@ -113,26 +119,20 @@ describe('komootResolveEmbed', () => {
       expect(komootResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a tour id that is not a number', () => {
+    it('should use a malformed tour id as written, even if the player answers an error', () => {
       const value = 'https://www.komoot.com/tour/latest/embed'
+      const expected: EmbedResolverResult = {
+        provider: 'komoot',
+        id: 'latest',
+        src: 'https://www.komoot.com/tour/latest/embed',
+        url: 'https://www.komoot.com/tour/latest',
+      }
 
-      expect(komootResolveEmbed(value)).toBeUndefined()
+      expect(komootResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore a foreign host carrying the tour route', () => {
       const value = 'https://evil.test/tour/727321743/embed'
-
-      expect(komootResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a tour id with a prefix before its digits', () => {
-      const value = 'https://www.komoot.com/tour/x727321743/embed'
-
-      expect(komootResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a tour id with a suffix after its digits', () => {
-      const value = 'https://www.komoot.com/tour/727321743x/embed'
 
       expect(komootResolveEmbed(value)).toBeUndefined()
     })

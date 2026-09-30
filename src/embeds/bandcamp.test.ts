@@ -57,10 +57,11 @@ describe('extractBandcampRelease', () => {
     expect(extractBandcampRelease(value)).toBeUndefined()
   })
 
-  it('should return undefined for a release id followed by other characters', () => {
+  it('should use a malformed release id as written, even if the player answers an error', () => {
     const value = 'https://bandcamp.com/EmbeddedPlayer/album=42x/size=small/'
+    const expected = 'album/42x'
 
-    expect(extractBandcampRelease(value)).toBeUndefined()
+    expect(extractBandcampRelease(value)).toEqual(expected)
   })
 
   it('should use a malformed query id as written, even if the player answers an error', () => {
@@ -93,6 +94,20 @@ const presetCases: Array<[string, number]> = [
 
 describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, bandcampEmbedResolver)
+
+  describe('path values', () => {
+    it('should encode a path release value once', async () => {
+      const value =
+        '<iframe src="https://bandcamp.com/EmbeddedPlayer/track=%20235369944/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'track/ 235369944',
+        src: 'https://bandcamp.com/EmbeddedPlayer/track=%20235369944/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 
   describe('happy paths', () => {
     // Bandcamp's own snippet carries the release page and label in a fallback anchor, which is

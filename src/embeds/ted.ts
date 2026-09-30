@@ -37,10 +37,6 @@ const flashPlayerPathRegex = /\/assets\/player\/swf\/embedplayer\.swf$/i
 // The talk key in the flashVars adKeys value, spelled talk={slug};year={year}.
 const adKeysTalkRegex = /(?:^|;)talk=([^;]+)/i
 
-// TED cut the talk key off at this length, so a slug this long is usually a prefix of the real
-// one but not always.
-const truncatedSlugLength = 55
-
 const readFlashTalk = (
   url: string,
   element: Element | undefined,
@@ -54,8 +50,7 @@ const readFlashTalk = (
   const config = new URLSearchParams(flashVars(element) ?? '')
   const slug = config.get('adKeys')?.match(adKeysTalkRegex)?.[1]
 
-  // A slug at the cap is a truncated key, and most of them lead to a talk page that 404s.
-  if (!slug || slug.length >= truncatedSlugLength) {
+  if (!slug) {
     return
   }
 

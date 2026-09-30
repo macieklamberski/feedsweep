@@ -88,16 +88,16 @@ describe('podomaticResolveEmbed', () => {
       expect(podomaticResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should refuse a kind carrying an encoded separator', () => {
-      const value = 'https://www.podomatic.com/embed/html5/episode%2F..%2F..%2Fadmin/10076958'
-
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should refuse a kind that starts with a digit', () => {
+    it('should use a malformed kind as written, even if the player answers an error', () => {
       const value = 'https://www.podomatic.com/embed/html5/2episode/10076958'
+      const expected: EmbedResolverResult = {
+        provider: 'podomatic',
+        id: '2episode/10076958',
+        src: 'https://podomatic.com/embed/html5/2episode/10076958',
+        height: 208,
+      }
 
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
+      expect(podomaticResolveEmbed(value)).toEqual(expected)
     })
   })
 

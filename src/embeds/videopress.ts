@@ -1,14 +1,10 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
+import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'videopress'
-
-// A guid is letters and digits, and one minted in 2009 for the Flash player still answers on the
-// current routes.
-const safeGuidRegex = /^[a-zA-Z0-9]+$/
 
 // Not wordpress.com itself: every blog frames its posts on that domain, and those are cards.
 // `video.wordpress.com` is the older alias of the same player, and the Flash player lived on
@@ -71,16 +67,13 @@ const videopressFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  // Each guid is checked on its own: the flashvars one and the src one disagree often.
-  const safeGuid = [flashVar(element, 'guid'), parsed.searchParams.get('guid')]
-    .map((guid) => keepIfMatches(guid, safeGuidRegex))
-    .find(Boolean)
+  const guid = flashVar(element, 'guid') ?? parsed.searchParams.get('guid')
 
-  if (!safeGuid) {
+  if (!guid) {
     return
   }
 
-  return composeEmbed(safeGuid)
+  return composeEmbed(guid)
 }
 
 // The VideoPress Flash player: a player.swf embed naming the guid in flashvars, dead since Flash.

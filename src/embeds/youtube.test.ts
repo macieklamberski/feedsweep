@@ -1173,7 +1173,7 @@ describeForEachParser('youtubeFc2EmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the id attribute when the query names a route word', async () => {
+    it('should use a malformed query id as written, even if the player answers an error', async () => {
       const value = html`
         <iframe
           src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?id=playlist"
@@ -1182,10 +1182,10 @@ describeForEachParser('youtubeFc2EmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'youtube',
-        id: 'NBwJR7X3krE',
-        src: 'https://www.youtube.com/embed/NBwJR7X3krE',
-        url: 'https://www.youtube.com/watch?v=NBwJR7X3krE',
-        thumbnail: 'https://i.ytimg.com/vi/NBwJR7X3krE/hqdefault.jpg',
+        id: 'playlist',
+        src: 'https://www.youtube.com/embed/playlist',
+        url: 'https://www.youtube.com/watch?v=playlist',
+        thumbnail: 'https://i.ytimg.com/vi/playlist/hqdefault.jpg',
         ratio: '16/9',
       }
 
@@ -1240,14 +1240,6 @@ describeForEachParser('youtubeFc2EmbedResolver', (parseHtml) => {
     it('should ignore a path going on past the shell', async () => {
       const value = html`
         <iframe src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html/x?id=dQw4w9WgXcQ"></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a shell naming no video', async () => {
-      const value = html`
-        <iframe src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?id=playlist"></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()

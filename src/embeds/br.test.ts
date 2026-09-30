@@ -84,16 +84,15 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a token followed by more than hex digits', async () => {
-      const value = html`<iframe src="https://www.br.de/mediathek/embed/av:5dc03b78-extra"></iframe>`
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a token that is not hex digits', async () => {
+    it('should use a malformed token as written, even if the player answers an error', async () => {
       const value = html`<iframe src="https://www.br.de/mediathek/embed/av:zz5dc03b7808e85c001af059"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'br',
+        id: 'av:zz5dc03b7808e85c001af059',
+        src: 'https://www.br.de/mediathek/embed/av:zz5dc03b7808e85c001af059',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a token carrying an encoded path separator', async () => {

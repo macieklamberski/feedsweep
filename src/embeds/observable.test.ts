@@ -59,45 +59,36 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
         provider: 'observable',
         id: '@neocartocnrs/borders',
         src: 'https://observablehq.com/embed/%40neocartocnrs/borders?cells=map',
-        url: 'https://observablehq.com/@neocartocnrs/borders',
+        url: 'https://observablehq.com/%40neocartocnrs/borders',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse a notebook segment that decodes to a second path', async () => {
+    it('should use a notebook segment that decodes to a second path as written', async () => {
       const value =
         '<iframe src="https://observablehq.com/embed/@neocartocnrs/borders%2Fmap?cells=map"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'observable',
+        id: '@neocartocnrs/borders/map',
+        src: 'https://observablehq.com/embed/@neocartocnrs/borders%2Fmap?cells=map',
+        url: 'https://observablehq.com/@neocartocnrs/borders%2Fmap',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse a handle segment that decodes to a second path', async () => {
-      const value =
-        '<iframe src="https://observablehq.com/embed/%40user%2Fx/notebook?cells=map"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a notebook segment that decodes to a parent segment', async () => {
-      const value =
-        '<iframe src="https://observablehq.com/embed/@neocartocnrs/%252E.?cells=map"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a notebook segment that decodes to a current segment', async () => {
-      const value =
-        '<iframe src="https://observablehq.com/embed/@neocartocnrs/%252e?cells=map"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a notebook segment carrying a malformed escape', async () => {
+    it('should keep a notebook segment carrying a malformed escape as written', async () => {
       const value =
         '<iframe src="https://observablehq.com/embed/@neocartocnrs/borders%E0%A4%A?cells=map"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'observable',
+        id: '@neocartocnrs/borders%E0%A4%A',
+        src: 'https://observablehq.com/embed/@neocartocnrs/borders%E0%A4%A?cells=map',
+        url: 'https://observablehq.com/@neocartocnrs/borders%E0%A4%A',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 

@@ -1,12 +1,11 @@
 import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // Every Youku video id opens with a literal X, and without it a route word in the id position,
 // embed/about, reads as a video.
-// The rest is the base64 spelling of a number, padding kept: `XODczMzU0NTAw`, `XNDUyNTczMDEyOA==`.
-const safeVideoIdRegex = /^X[A-Za-z0-9=]+$/
+const videoIdRegex = /^X[^/]+$/
 
 const youkuHosts = ['player.youku.com', 'static.youku.com']
 
@@ -36,7 +35,13 @@ const readVideoId = (url: string): string | undefined => {
   const videoId =
     parsed?.pathname.match(embedPathRegex)?.[1] ?? parsed?.pathname.match(flashPathRegex)?.[1]
 
-  return keepIfMatches(videoId, safeVideoIdRegex)
+  // The enclosure probe offers a file on the player host, such as `/embed/{id}.mp4`, to this
+  // resolver, and the file has to stay playable.
+  if (videoId && isFileName(videoId)) {
+    return
+  }
+
+  return keepIfMatches(videoId, videoIdRegex)
 }
 
 const youkuResolveEmbed: ResolveEmbed = (url) => {

@@ -191,16 +191,30 @@ describeForEachParser('telegramScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a non-numeric message id', async () => {
+    it('should use a malformed message id as written, even if the player answers an error', async () => {
       const value = '<script data-telegram-post="tochkapress/latest"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'telegram',
+        id: 'tochkapress/latest',
+        src: 'https://t.me/tochkapress/latest?embed=1',
+        url: 'https://t.me/tochkapress/latest',
+        author: '@tochkapress',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for a two-character channel', async () => {
+    it('should use a malformed channel as written, even if the player answers an error', async () => {
       const value = '<script data-telegram-post="ab/111424"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'telegram',
+        id: 'ab/111424',
+        src: 'https://t.me/ab/111424?embed=1',
+        url: 'https://t.me/ab/111424',
+        author: '@ab',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for a traversal in the attribute', async () => {
@@ -211,6 +225,12 @@ describeForEachParser('telegramScriptEmbedResolver', (parseHtml) => {
 
     it('should return undefined for an empty attribute', async () => {
       const value = '<script data-telegram-post=""></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a message id with no channel', async () => {
+      const value = '<script data-telegram-post="/111424"></script>'
 
       expect(await extract(value)).toBeUndefined()
     })

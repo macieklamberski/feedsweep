@@ -42,7 +42,7 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // Youku has minted ids of several lengths, so only the `X` and the alphabet are checked.
+    // Youku has minted ids of several lengths, so only the `X` is checked.
     it('should read an id longer than the ones minted so far', async () => {
       const value =
         '<iframe src="https://player.youku.com/embed/XNDUyNTczMDEyOFdvcmtpbmdMb25nZXI="></iframe>'
@@ -59,6 +59,19 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should use a malformed video id as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://player.youku.com/embed/XNDUy_NTcz-MDEyOA"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'youku',
+        id: 'XNDUy_NTcz-MDEyOA',
+        src: 'https://player.youku.com/embed/XNDUy_NTcz-MDEyOA',
+        url: 'https://v.youku.com/v_show/id_XNDUy_NTcz-MDEyOA.html',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore a video id that is not one', async () => {
       const value = '<iframe src="https://player.youku.com/embed/watch"></iframe>'
 
@@ -196,7 +209,7 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
 })
 
 // The enclosure probe offers every attachment a feed carries to this resolver, and the player
-// hosts are the ones a Youku file would sit on, so the id alphabet is what keeps a file playable.
+// hosts are the ones a Youku file would sit on.
 describeForEachParser('youku through the pipeline', (parseHtml) => {
   it('should leave a video enclosure on the player host playable', async () => {
     const enclosures = [

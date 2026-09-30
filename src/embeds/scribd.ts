@@ -1,9 +1,8 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, flashVar, keepIfMatches, parseRatio } from '../utils/dom.js'
+import { attr, flashVar, parseRatio } from '../utils/dom.js'
 import {
   composeQuery,
-  digitsRegex,
   encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,
@@ -48,10 +47,15 @@ const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
 
 const readDocumentId = (parsed: URL): string | undefined => {
   const segments = getPathSegments(parsed)
-  const marker = segments.findIndex((segment) => documentIdMarkers.includes(segment))
-  const document = marker < 0 ? undefined : segments[marker + 1]
+  // Feeds carry the same routes under `/mobile`, the mobile site's prefix.
+  const [marker, document] = segments[0] === 'mobile' ? segments.slice(1) : segments
 
-  return keepIfMatches(document, digitsRegex)
+  if (!marker || !documentIdMarkers.includes(marker) || !document) {
+    return
+  }
+
+  // Decoded here, like the Flash `document_id`, so the player url encodes it once.
+  return decodeSegment(document) ?? document
 }
 
 // The modern player, `scribd.com/embeds/{id}/content`. `/doc/{id}` is the pre-2018 spelling of

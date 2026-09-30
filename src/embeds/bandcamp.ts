@@ -1,4 +1,4 @@
-import { getPathSegments, type Nullish, parseUrl, toMap } from 'trousse'
+import { decodeSegment, getPathSegments, type Nullish, parseUrl, toMap } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 
@@ -12,8 +12,8 @@ import {
 } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// A release is either an album or a single track, and the id is Bandcamp's own numeric one.
-const releaseRegex = /^(album|track)=(\d+)$/
+// A release is either an album or a single track.
+const releaseRegex = /^(album|track)=([^/]+)$/
 // The `size=` preset is a path segment that decides the player's exact pixels.
 const sizeRegex = /^size=([a-z0-9_]+)$/
 
@@ -60,8 +60,9 @@ const readReleases = (link: string): Array<[string, string]> => {
   for (const segment of getPathSegments(parsed)) {
     const match = segment.match(releaseRegex)
 
+    // A path value is decoded, like a query one, so the player url encodes it once.
     if (match) {
-      claim(match[1], match[2])
+      claim(match[1], decodeSegment(match[2]) ?? match[2])
     }
   }
 
