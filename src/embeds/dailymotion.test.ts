@@ -4,6 +4,7 @@ import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   dailymotionEmbedResolver,
+  dailymotionRenderHint,
   dailymotionResolveEmbed,
   extractDailymotionId,
   readDailymotionEmbedSrc,
@@ -533,5 +534,24 @@ describeForEachParser('dailymotionEmbedResolver carrier title', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describe('dailymotionRenderHint', () => {
+  // Captured from `geo.dailymotion.com/player/xpiw2.html` framed with the hint's name.
+  it('should recognise the ready event the player posts', () => {
+    expect(dailymotionRenderHint.isReady?.('{"event":"apiready","id":"dm1"}')).toBe(true)
+  })
+
+  it('should ignore the ready event of a frame given another id', () => {
+    expect(dailymotionRenderHint.isReady?.('{"event":"apiready","id":"dm2"}')).toBe(false)
+  })
+
+  it('should ignore the other events the player posts', () => {
+    expect(dailymotionRenderHint.isReady?.('{"event":"playerstate","id":"dm1"}')).toBe(false)
+  })
+
+  it('should ignore a ready event posted as an object', () => {
+    expect(dailymotionRenderHint.isReady?.({ event: 'apiready', id: 'dm1' })).toBe(false)
   })
 })

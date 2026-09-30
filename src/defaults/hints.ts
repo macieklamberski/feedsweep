@@ -9,6 +9,7 @@ import { captivateRenderHint } from '../embeds/captivate.js'
 import { cloudflarestreamRenderHint } from '../embeds/cloudflarestream.js'
 import { cnnRenderHint } from '../embeds/cnn.js'
 import { codesandboxRenderHint } from '../embeds/codesandbox.js'
+import { dailymotionRenderHint } from '../embeds/dailymotion.js'
 import { deezerRenderHint } from '../embeds/deezer.js'
 import { donorboxRenderHint } from '../embeds/donorbox.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
@@ -61,6 +62,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   cloudflarestreamRenderHint,
   cnnRenderHint,
   codesandboxRenderHint,
+  dailymotionRenderHint,
   deezerRenderHint,
   donorboxRenderHint,
   flourishRenderHint,

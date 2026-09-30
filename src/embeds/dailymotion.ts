@@ -1,5 +1,12 @@
-import { decodeSegment, getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
-import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import {
+  decodeSegment,
+  getPathSegments,
+  isPlainObject,
+  type Nullish,
+  parseUrl,
+  trimObject,
+} from 'trousse'
+import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 const provider = 'dailymotion'
@@ -156,7 +163,7 @@ export const readDailymotionEmbedSrc = (link: string): string | undefined => {
 
 // Where playback starts, and the playlist the video sits in. The rest of the publisher's
 // query is dropped with the rebuilt src.
-// Neither player reads `autoplay` off the query: autostart comes from the saved configuration.
+// Neither player reads `autoplay` off the query.
 const dailymotionEmbedParams = ['start', 'startTime', 'playlist']
 
 // A player id's player reads the start as `startTime` and ignores the old `start`.
@@ -220,3 +227,28 @@ export const dailymotionFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Powered by Dailymotion' },
   { provider, field: 'title', strip: 'Dailymotion video player – ' },
 ]
+
+// The player opens its message channel only when `window.name` holds the `dmInternalData` JSON
+// Dailymotion's embed library writes there, and every event it posts carries `iframeId` as `id`.
+const iframeId = 'dm1'
+
+const isDailymotionReady = (data: unknown): boolean => {
+  if (typeof data !== 'string') {
+    return false
+  }
+
+  try {
+    const message: unknown = JSON.parse(data)
+
+    return isPlainObject(message) && message.event === 'apiready' && message.id === iframeId
+  } catch {
+    return false
+  }
+}
+
+export const dailymotionRenderHint: EmbedRenderHint = {
+  provider,
+  frameName: encodeURIComponent(JSON.stringify({ dmInternalData: { iframeId } })),
+  isReady: isDailymotionReady,
+  requestPlay: { command: 'play' },
+}
