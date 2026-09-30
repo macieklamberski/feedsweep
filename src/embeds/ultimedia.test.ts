@@ -87,6 +87,20 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should ignore another route word carrying the player segments', async () => {
+      const value =
+        '<iframe src="https://www.ultimedia.com/deliver/musique/iframe/mdtk/01999636/src/83vrlm/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player segments under a prefixed path', async () => {
+      const value =
+        '<iframe src="https://www.ultimedia.com/x/deliver/generic/iframe/mdtk/01999636/src/83vrlm/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a route word that only ends in mdtk', async () => {
       const value =
         '<iframe src="https://www.ultimedia.com/deliver/generic/iframe/xmdtk/01357940/src/ml3ffr/zone/1/"></iframe>'
