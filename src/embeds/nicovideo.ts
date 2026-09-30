@@ -1,8 +1,10 @@
-import { getPathSegments, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { getPathSegments, isPlainObject, parseUrl } from 'trousse'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'nicovideo'
 
 // lv names a live broadcast, which the video player answers 500 for and the live host serves as a
 // programme card even after the broadcast ends.
@@ -47,7 +49,7 @@ export const nicovideoResolveEmbed: ResolveEmbed = (url) => {
   // player url. No size is stated for it: a guess would outrank the height the carrier states.
   if (liveIdRegex.test(videoId)) {
     return {
-      provider: 'nicovideo',
+      provider,
       id: videoId,
       src: `https://live.nicovideo.jp/embed/${videoId}`,
       url: `https://live.nicovideo.jp/watch/${videoId}`,
@@ -56,7 +58,7 @@ export const nicovideoResolveEmbed: ResolveEmbed = (url) => {
 
   // embed.nicovideo.jp/watch/{id} answers a real id 200 with the title and an invented one 500.
   return {
-    provider: 'nicovideo',
+    provider,
     id: videoId,
     src: `https://embed.nicovideo.jp/watch/${videoId}`,
     url: `https://www.nicovideo.jp/watch/${videoId}`,
@@ -93,3 +95,17 @@ export const nicovideoScriptEmbedResolver = createMarkupEmbedResolver(
     return { ...result, width, height }
   },
 )
+
+// The player posts `loadComplete` once it has loaded, and only when `jsapi` is on its url.
+export const isNicovideoReady = (data: unknown): boolean => {
+  return isPlainObject(data) && data.eventName === 'loadComplete'
+}
+
+// The player takes commands only from the origin of its `document.referrer`, and only for the
+// `playerId` on its url.
+export const nicovideoRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { jsapi: '1', playerId: '1' },
+  isReady: isNicovideoReady,
+  requestPlay: { sourceConnectorType: 1, playerId: '1', eventName: 'play' },
+}
