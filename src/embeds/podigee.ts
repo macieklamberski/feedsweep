@@ -1,8 +1,8 @@
-import { getPathSegments, isPlainObject } from 'trousse'
+import { getPathSegments, isPlainObject, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest, readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podigee'
@@ -23,16 +23,19 @@ const safeEpisodeRegex = /^\d+-/
 const playerHeight = 145
 
 // The show is the subdomain and the episode the first path segment, which together make a
-// stable id without parsing the query.
-const composeEmbed = (parsed: URL, src: string): EmbedResolverResult | undefined => {
+// stable id without parsing the query. The player url is the one Podigee's embed code writes, and
+// the `token` it can carry stays with it.
+const composeEmbed = (parsed: URL, episode: string): EmbedResolverResult => {
   const show = parsed.hostname.split('.')[0]
-  const episode = getPathSegments(parsed)[0]
+  const token = parsed.searchParams.get('token') ?? undefined
+  const query = composeQuery(trimObject({ context: 'external', token }, Boolean))
 
-  if (!show || !episode) {
-    return
+  return {
+    provider,
+    id: `${show}/${episode}`,
+    src: `https://${parsed.hostname}/${episode}/embed${query}`,
+    height: playerHeight,
   }
-
-  return { provider, id: `${show}/${episode}`, src, height: playerHeight }
 }
 
 // Podigee's loader script names the player url in data-configuration, and a reader never runs it.
@@ -41,17 +44,9 @@ const composeEmbed = (parsed: URL, src: string): EmbedResolverResult | undefined
 export const podigeeScriptEmbedResolver = createMarkupEmbedResolver(
   'script.podigee-podcast-player[data-configuration]',
   (element) => {
-    const configuration = attr(element, 'data-configuration')
-    const parsed = parseUrlOnHosts(configuration, podigeeHosts)
-
-    // Only a real player url counts, which the host check is enough to decide: the inline-config
-    // spellings are not urls, so they resolve against the placeholder host and fail it.
-    // The inline spellings are data-configuration="podigee" or "playerConfiguration".
-    if (!parsed) {
-      return
-    }
-
-    return composeEmbed(parsed, parsed.href)
+    // The inline spellings, data-configuration="podigee" or "playerConfiguration", are not urls,
+    // so they resolve against the placeholder host and fail the host check.
+    return podigeeResolveEmbed(attr(element, 'data-configuration') ?? '')
   },
 )
 
@@ -68,17 +63,14 @@ export const podigeeResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  // Rebuilding the src would drop the context=external Podigee's own redirect carries, and embed
-  // has to be the last segment: with anything after it the show serves its website page.
+  // With anything after `embed` the show serves its website page.
   if (rest[0] === 'embed' && rest.length === 1) {
-    return composeEmbed(parsed, parsed.href)
+    return composeEmbed(parsed, episode)
   }
 
   // {episode}/embed answers 302 to player.podigee-cdn.net/podcast-player/podigee-podcast-player
   // .html for a real episode and 404 for an invented one.
-  return safeEpisodeRegex.test(episode)
-    ? composeEmbed(parsed, `https://${parsed.hostname}/${episode}/embed`)
-    : undefined
+  return safeEpisodeRegex.test(episode) ? composeEmbed(parsed, episode) : undefined
 }
 
 // An iframe framing a Podigee episode page rather than the player, so the reader gets an article.
