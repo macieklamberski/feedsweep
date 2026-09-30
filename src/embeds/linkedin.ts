@@ -5,8 +5,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const linkedinHosts = ['linkedin.com']
 
-// The post fills the frame's width and grows with its text and images, whatever the viewport.
-const postHeight = 1200
+// The post fills the frame's width and grows with its text and images, and neither scrolls inside
+// the frame nor reports its height. 800 fits the header, the text and most images, and cuts the
+// reactions under a long post.
+const postHeight = 800
 
 // A post has no name, and the frame titles itself `Embedded post` in the reader's language.
 const linkedinResolveEmbed: ResolveEmbed = (url) => {

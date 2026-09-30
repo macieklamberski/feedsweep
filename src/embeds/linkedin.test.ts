@@ -23,7 +23,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:share:6626097641602281472',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:6626097641602281472',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:6626097641602281472',
-        height: 1200,
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -42,7 +42,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:ugcPost:7464944835901325312',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7464944835901325312',
         url: 'https://www.linkedin.com/feed/update/urn:li:ugcPost:7464944835901325312',
-        height: 1200,
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -56,7 +56,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:activity:7493943835853750272',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:activity:7493943835853750272',
         url: 'https://www.linkedin.com/feed/update/urn:li:activity:7493943835853750272',
-        height: 1200,
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -70,7 +70,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:share:123/../x',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:123%2F..%2Fx',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:123%2F..%2Fx',
-        height: 1200,
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -84,7 +84,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:share:6626097641602281472',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:6626097641602281472',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:6626097641602281472',
-        height: 1200,
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -107,7 +107,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:share:7382521851400372224',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:7382521851400372224',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:7382521851400372224',
-        height: 1200,
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -128,7 +128,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:activity:6399565589790236672',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:activity:6399565589790236672',
         url: 'https://www.linkedin.com/feed/update/urn:li:activity:6399565589790236672',
-        height: 1200,
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -142,7 +142,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:share:746494483590132531274649448359013253127',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:746494483590132531274649448359013253127',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:746494483590132531274649448359013253127',
-        height: 1200,
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -194,7 +194,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:share:not-a-number',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:not-a-number',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:not-a-number',
-        height: 1200,
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -224,7 +224,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:share:6626097641602281472',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:6626097641602281472',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:6626097641602281472',
-        height: 1200,
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -242,7 +242,7 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
         id: 'urn:li:share:6626097641602281472',
         src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:6626097641602281472',
         url: 'https://www.linkedin.com/feed/update/urn:li:share:6626097641602281472',
-        height: 1200,
+        height: 800,
       }
 
       expect(await extract(value)).toEqual(expected)
