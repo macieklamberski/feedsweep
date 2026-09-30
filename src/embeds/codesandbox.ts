@@ -74,13 +74,16 @@ const parseTarget = (value: string | undefined): CodesandboxTarget | undefined =
     return
   }
 
+  // The file the editor opens on, spelled `file` on the DevBox-era routes and `module` on the
+  // embed renderer. The rest of the query is the editor's look.
   if (isProject) {
     const pagePath = `p/${second}/${slug}`
+    const file = parsed.searchParams.get('file') ?? undefined
+    const query = composeQuery(trimObject({ file, embed: '1' }, Boolean))
 
-    return { slug, id, pagePath, src: `https://codesandbox.io/${pagePath}?embed=1` }
+    return { slug, id, pagePath, src: `https://codesandbox.io/${pagePath}${query}` }
   }
 
-  // The file the editor opens on. The rest of the query is the editor's look.
   const module = parsed.searchParams.get('module') ?? undefined
   const query = composeQuery(trimObject({ module }, Boolean))
 

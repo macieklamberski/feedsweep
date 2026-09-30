@@ -229,13 +229,13 @@ describe('codesandboxResolveEmbed', () => {
       expect(codesandboxResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep only the embed flag on a DevBox route', () => {
+    it('should keep the file and the embed flag on a DevBox route', () => {
       const value =
         'https://codesandbox.io/p/sandbox/wizardly-wildflower-nrhln8?file=%2Fsrc%2Findex.js&embed=1&theme=dark'
       const expected: EmbedResolverResult = {
         provider: 'codesandbox',
         id: 'nrhln8',
-        src: 'https://codesandbox.io/p/sandbox/wizardly-wildflower-nrhln8?embed=1',
+        src: 'https://codesandbox.io/p/sandbox/wizardly-wildflower-nrhln8?file=%2Fsrc%2Findex.js&embed=1',
         url: 'https://codesandbox.io/p/sandbox/wizardly-wildflower-nrhln8',
         height: 500,
       }
