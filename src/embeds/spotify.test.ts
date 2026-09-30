@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, jsonAttrValue, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { spotifyEmbedResolver, spotifyResolveEmbed } from './spotify.js'
+import { isSpotifyReady, spotifyEmbedResolver, spotifyResolveEmbed } from './spotify.js'
 
 describe('spotifyResolveEmbed', () => {
   describe('happy paths', () => {
@@ -787,5 +787,34 @@ describeForEachParser('spotifyEmbedResolver carrier title', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describe('isSpotifyReady', () => {
+  it('should recognise the ready message the player posts', () => {
+    const value = { type: 'ready' }
+
+    expect(isSpotifyReady(value)).toBe(true)
+  })
+
+  it('should ignore the playback updates the player posts after it', () => {
+    const value = {
+      type: 'playback_update',
+      payload: {
+        isPaused: false,
+        isBuffering: true,
+        duration: 0,
+        position: 0,
+        playingURI: '',
+      },
+    }
+
+    expect(isSpotifyReady(value)).toBe(false)
+  })
+
+  it('should ignore the ready message spelled as a JSON string', () => {
+    const value = '{"type":"ready"}'
+
+    expect(isSpotifyReady(value)).toBe(false)
   })
 })
