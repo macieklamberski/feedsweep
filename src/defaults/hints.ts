@@ -49,6 +49,7 @@ import { transistorRenderHint } from '../embeds/transistor.js'
 import { tumblrRenderHint } from '../embeds/tumblr.js'
 import { tuneinRenderHint } from '../embeds/tunein.js'
 import { twitterRenderHint } from '../embeds/twitter.js'
+import { ultimediaRenderHint } from '../embeds/ultimedia.js'
 import { videopressRenderHint } from '../embeds/videopress.js'
 import { vidyardRenderHint } from '../embeds/vidyard.js'
 import { vimeoRenderHint } from '../embeds/vimeo.js'
@@ -113,6 +114,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   tumblrRenderHint,
   tuneinRenderHint,
   twitterRenderHint,
+  ultimediaRenderHint,
   videopressRenderHint,
   vidyardRenderHint,
   vimeoRenderHint,
