@@ -20,25 +20,23 @@ const typeRoutes = toMap({
 const playerPathRegex = /^\/+outchain\/player\/?$/
 const flashPlayerPathRegex = /^\/+style\/swf\/widget\.swf$/
 
-const composeResult = (
-  type: string,
-  id: string,
-  height: string | null,
-): EmbedResolverResult | undefined => {
+// Without `height` the player loads its list layout and fills its box, so this shows the header,
+// the first track and the footer.
+const playerHeight = 180
+
+const composeResult = (type: string, id: string): EmbedResolverResult | undefined => {
   const route = typeRoutes.get(type)
 
   if (!route || !id) {
     return
   }
 
-  // The player picks its layout from `height`, so it names the form the publisher chose.
-  const params: Record<string, string> = height ? { type, id, height } : { type, id }
-
   return {
     provider,
     id: `${route}/${id}`,
-    src: `https://music.163.com/outchain/player${composeQuery(params)}`,
+    src: `https://music.163.com/outchain/player${composeQuery({ type, id })}`,
     url: `https://music.163.com/${route}${composeQuery({ id })}`,
+    height: playerHeight,
   }
 }
 
@@ -54,12 +52,14 @@ export const neteaseResolveEmbed: ResolveEmbed = (url) => {
   const query = parsed.searchParams
 
   if (playerPathRegex.test(parsed.pathname)) {
-    return composeResult(query.get('type') ?? '', query.get('id') ?? '', query.get('height'))
+    return composeResult(query.get('type') ?? '', query.get('id') ?? '')
   }
 
   if (flashPlayerPathRegex.test(parsed.pathname)) {
-    return composeResult(query.get('type') ?? '', query.get('sid') ?? '', query.get('height'))
+    return composeResult(query.get('type') ?? '', query.get('sid') ?? '')
   }
 }
 
-export const neteaseEmbedResolver = createUrlEmbedResolver(neteaseHosts, neteaseResolveEmbed)
+export const neteaseEmbedResolver = createUrlEmbedResolver(neteaseHosts, neteaseResolveEmbed, {
+  preferResolverSize: true,
+})

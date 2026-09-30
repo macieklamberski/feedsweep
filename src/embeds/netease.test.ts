@@ -31,8 +31,9 @@ describe('neteaseResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'netease',
         id: 'song/1392990601',
-        src: 'https://music.163.com/outchain/player?type=2&id=1392990601&height=66',
+        src: 'https://music.163.com/outchain/player?type=2&id=1392990601',
         url: 'https://music.163.com/song?id=1392990601',
+        height: 180,
       }
 
       expect(neteaseResolveEmbed(value)).toEqual(expected)
@@ -43,8 +44,9 @@ describe('neteaseResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'netease',
         id: 'playlist/2105474477',
-        src: 'https://music.163.com/outchain/player?type=0&id=2105474477&height=430',
+        src: 'https://music.163.com/outchain/player?type=0&id=2105474477',
         url: 'https://music.163.com/playlist?id=2105474477',
+        height: 180,
       }
 
       expect(neteaseResolveEmbed(value)).toEqual(expected)
@@ -55,8 +57,9 @@ describe('neteaseResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'netease',
         id: 'djradio/792544462',
-        src: 'https://music.163.com/outchain/player?type=4&id=792544462&height=430',
+        src: 'https://music.163.com/outchain/player?type=4&id=792544462',
         url: 'https://music.163.com/djradio?id=792544462',
+        height: 180,
       }
 
       expect(neteaseResolveEmbed(value)).toEqual(expected)
@@ -107,8 +110,9 @@ describe('neteaseResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'netease',
         id: 'song/../../evil',
-        src: 'https://music.163.com/outchain/player?type=2&id=..%2F..%2Fevil&height=66',
+        src: 'https://music.163.com/outchain/player?type=2&id=..%2F..%2Fevil',
         url: 'https://music.163.com/song?id=..%2F..%2Fevil',
+        height: 180,
       }
 
       expect(neteaseResolveEmbed(value)).toEqual(expected)
@@ -120,20 +124,22 @@ describe('neteaseResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'netease',
         id: 'song/1392990601',
-        src: 'https://music.163.com/outchain/player?type=2&id=1392990601&height=66',
+        src: 'https://music.163.com/outchain/player?type=2&id=1392990601',
         url: 'https://music.163.com/song?id=1392990601',
+        height: 180,
       }
 
       expect(neteaseResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should mint without a height when the carrier states none', () => {
+    it('should name the album page for the album type', () => {
       const value = 'https://music.163.com/outchain/player?type=1&id=34751981'
       const expected: EmbedResolverResult = {
         provider: 'netease',
         id: 'album/34751981',
         src: 'https://music.163.com/outchain/player?type=1&id=34751981',
         url: 'https://music.163.com/album?id=34751981',
+        height: 180,
       }
 
       expect(neteaseResolveEmbed(value)).toEqual(expected)
@@ -144,8 +150,9 @@ describe('neteaseResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'netease',
         id: 'program/2066770638',
-        src: 'https://music.163.com/outchain/player?type=3&id=2066770638&height=66',
+        src: 'https://music.163.com/outchain/player?type=3&id=2066770638',
         url: 'https://music.163.com/program?id=2066770638',
+        height: 180,
       }
 
       expect(neteaseResolveEmbed(value)).toEqual(expected)
@@ -159,8 +166,9 @@ describe('neteaseResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'netease',
         id: 'song/409872507',
-        src: 'https://music.163.com/outchain/player?type=2&id=409872507&height=66',
+        src: 'https://music.163.com/outchain/player?type=2&id=409872507',
         url: 'https://music.163.com/song?id=409872507',
+        height: 180,
       }
 
       expect(neteaseResolveEmbed(value)).toEqual(expected)
@@ -190,7 +198,7 @@ describeForEachParser('neteaseEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, neteaseEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the box the carrier declares', async () => {
+    it('should state the list player height over the box the carrier declares', async () => {
       const value = html`
         <iframe
           src="https://music.163.com/outchain/player?type=2&amp;id=1392990601&amp;auto=1&amp;height=66"
@@ -201,10 +209,9 @@ describeForEachParser('neteaseEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'netease',
         id: 'song/1392990601',
-        src: 'https://music.163.com/outchain/player?type=2&id=1392990601&height=66',
+        src: 'https://music.163.com/outchain/player?type=2&id=1392990601',
         url: 'https://music.163.com/song?id=1392990601',
-        width: 330,
-        height: 86,
+        height: 180,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -221,10 +228,9 @@ describeForEachParser('neteaseEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'netease',
         id: 'song/409872507',
-        src: 'https://music.163.com/outchain/player?type=2&id=409872507&height=66',
+        src: 'https://music.163.com/outchain/player?type=2&id=409872507',
         url: 'https://music.163.com/song?id=409872507',
-        width: 340,
-        height: 86,
+        height: 180,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -268,10 +274,9 @@ describeForEachParser('netease shapes the pipeline settles first', (parseHtml) =
       const expected: Record<string, string> = {
         provider: 'netease',
         id: 'song/1392990601',
-        src: 'https://music.163.com/outchain/player?type=2&id=1392990601&height=66',
+        src: 'https://music.163.com/outchain/player?type=2&id=1392990601',
         url: 'https://music.163.com/song?id=1392990601',
-        width: '330',
-        height: '86',
+        height: '180',
       }
 
       expect(await placeholder(value)).toEqual(expected)
