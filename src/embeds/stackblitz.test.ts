@@ -26,12 +26,12 @@ const readPlaceholder = (
 
 describe('stackblitzResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should build the placeholder from a project url', () => {
+    it('should mint the embed view for a project url', () => {
       const value = 'https://stackblitz.com/edit/angular-ivy-snow'
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'angular-ivy-snow',
-        src: 'https://stackblitz.com/edit/angular-ivy-snow',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1',
         url: 'https://stackblitz.com/edit/angular-ivy-snow',
         height: 500,
       }
@@ -39,13 +39,13 @@ describe('stackblitzResolveEmbed', () => {
       expect(stackblitzResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the query that chooses the open file and the pane', () => {
+    it('should keep the open file and drop the pane', () => {
       const value =
         'https://stackblitz.com/edit/angular-ivy-snow?embed=1&file=src%2Fmain.ts&view=preview'
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'angular-ivy-snow',
-        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&file=src%2Fmain.ts&view=preview',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&file=src%2Fmain.ts',
         url: 'https://stackblitz.com/edit/angular-ivy-snow',
         height: 500,
       }
@@ -53,13 +53,13 @@ describe('stackblitzResolveEmbed', () => {
       expect(stackblitzResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should drop the tracking parameters from the project query', () => {
+    it('should drop the tracking parameters and the pane from the project query', () => {
       const value =
         'https://stackblitz.com/edit/angular-ivy-snow?embed=1&view=preview&utm_source=newsletter&utm_campaign=spring&fbclid=abc'
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'angular-ivy-snow',
-        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&view=preview',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1',
         url: 'https://stackblitz.com/edit/angular-ivy-snow',
         height: 500,
       }
@@ -82,11 +82,11 @@ describe('stackblitzResolveEmbed', () => {
     })
 
     it('should keep an option spelled in another case, as the instance reads it', () => {
-      const value = 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&hideDevTools=1'
+      const value = 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&initialPath=%2Fabout'
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'angular-ivy-snow',
-        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&hideDevTools=1',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&initialPath=%2Fabout',
         url: 'https://stackblitz.com/edit/angular-ivy-snow',
         height: 500,
       }
@@ -112,7 +112,7 @@ describe('stackblitzResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'angular-ivy-atksbw',
-        src: 'https://stackblitz.com/edit/angular-ivy-atksbw',
+        src: 'https://stackblitz.com/edit/angular-ivy-atksbw?embed=1',
         url: 'https://stackblitz.com/edit/angular-ivy-atksbw',
         height: 500,
       }
@@ -152,7 +152,7 @@ describe('stackblitzResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'nextjs-app-router-server-components-streaming-suspense-boundaries-demo-starter-k9xj2',
-        src: 'https://stackblitz.com/edit/nextjs-app-router-server-components-streaming-suspense-boundaries-demo-starter-k9xj2',
+        src: 'https://stackblitz.com/edit/nextjs-app-router-server-components-streaming-suspense-boundaries-demo-starter-k9xj2?embed=1',
         url: 'https://stackblitz.com/edit/nextjs-app-router-server-components-streaming-suspense-boundaries-demo-starter-k9xj2',
         height: 500,
       }
@@ -165,7 +165,7 @@ describe('stackblitzResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'angular-ivy-snow',
-        src: 'https://stackblitz.com/edit/angular-ivy-snow',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1',
         url: 'https://stackblitz.com/edit/angular-ivy-snow',
         height: 500,
       }
@@ -173,9 +173,11 @@ describe('stackblitzResolveEmbed', () => {
       expect(stackblitzResolveEmbed(value)).toEqual(expected)
     })
 
-    const optionUrls = [
+    // The layout, the theme and the settings the project runs with.
+    const displayUrls = [
       'https://stackblitz.com/edit/angular-ivy-snow?corp=1',
       'https://stackblitz.com/edit/angular-ivy-snow?devtoolsheight=33',
+      'https://stackblitz.com/edit/angular-ivy-snow?hidedevtools=1',
       'https://stackblitz.com/edit/angular-ivy-snow?hideExplorer=1',
       'https://stackblitz.com/edit/angular-ivy-snow?hideNavigation=1',
       'https://stackblitz.com/edit/angular-ivy-snow?orgName=acme',
@@ -185,14 +187,15 @@ describe('stackblitzResolveEmbed', () => {
       'https://stackblitz.com/edit/angular-ivy-snow?startScript=dev',
       'https://stackblitz.com/edit/angular-ivy-snow?terminalHeight=50',
       'https://stackblitz.com/edit/angular-ivy-snow?theme=dark',
+      'https://stackblitz.com/edit/angular-ivy-snow?view=preview',
       'https://stackblitz.com/edit/angular-ivy-snow?zenMode=1',
     ]
 
-    it.each(optionUrls)('should keep the embed option in %s', (value) => {
+    it.each(displayUrls)('should drop the embed option in %s', (value) => {
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'angular-ivy-snow',
-        src: value,
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1',
         url: 'https://stackblitz.com/edit/angular-ivy-snow',
         height: 500,
       }
@@ -227,7 +230,7 @@ describe('stackblitzResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'angular%2fivy-snow',
-        src: 'https://stackblitz.com/edit/angular%2fivy-snow',
+        src: 'https://stackblitz.com/edit/angular%2fivy-snow?embed=1',
         url: 'https://stackblitz.com/edit/angular%2fivy-snow',
         height: 500,
       }
@@ -240,7 +243,7 @@ describe('stackblitzResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'Angular-Ivy-Atksbw',
-        src: 'https://stackblitz.com/edit/Angular-Ivy-Atksbw',
+        src: 'https://stackblitz.com/edit/Angular-Ivy-Atksbw?embed=1',
         url: 'https://stackblitz.com/edit/Angular-Ivy-Atksbw',
         height: 500,
       }
@@ -261,7 +264,7 @@ describe('stackblitzResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'angular-ivy-snow',
-        src: 'https://stackblitz.com/edit/angular-ivy-snow',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1',
         url: 'https://stackblitz.com/edit/angular-ivy-snow',
         height: 500,
       }
@@ -269,12 +272,12 @@ describe('stackblitzResolveEmbed', () => {
       expect(stackblitzResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should carry the publisher layout across the repair', () => {
+    it('should drop the publisher layout across the repair', () => {
       const value = 'https://stackblitz.com/run/angular-ivy-snow?embed=1&view=preview'
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'angular-ivy-snow',
-        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&view=preview',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1',
         url: 'https://stackblitz.com/edit/angular-ivy-snow',
         height: 500,
       }
@@ -341,7 +344,7 @@ describeForEachParser('stackblitzIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the height the publisher laid out over the share dialog default', async () => {
+    it('should drop the pane and keep the height the publisher laid out', async () => {
       const value = html`
         <iframe
           class="iframe-full-w"
@@ -352,7 +355,7 @@ describeForEachParser('stackblitzIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'angular-editable-textbox',
-        src: 'https://stackblitz.com/edit/angular-editable-textbox?view=preview',
+        src: 'https://stackblitz.com/edit/angular-editable-textbox?embed=1',
         url: 'https://stackblitz.com/edit/angular-editable-textbox',
         height: 423,
       }

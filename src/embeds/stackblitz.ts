@@ -11,34 +11,13 @@ const stackblitzHosts = ['stackblitz.com', 'www.stackblitz.com']
 // What the share dialog writes beside `width="100%"`.
 const defaultProjectHeight = 500
 
-// The options a StackBlitz instance reads from an embed url, looked up in any case as current
-// instances do. `file` may repeat, one per open tab. `ctl` and `clicktoload` are left out: the
-// reader's placeholder already waits for a click, so a second one only adds a step.
-// See: https://developer.stackblitz.com/platform/api/javascript-sdk-options.
-const stackblitzEmbedParams = [
-  'corp',
-  'devtoolsheight',
-  'embed',
-  'file',
-  'hidedevtools',
-  'hideExplorer',
-  'hideNavigation',
-  'initialpath',
-  'orgName',
-  'orgProvider',
-  'showSidebar',
-  'sidebarView',
-  'startScript',
-  'terminalHeight',
-  'theme',
-  'view',
-  'zenMode',
-]
+// The options that pick where the project opens, looked up in any case as current instances do:
+// the open file, which may repeat once per tab, and the path the preview loads.
+// See: https://developer.stackblitz.com/guides/integration/embedding.
+const stackblitzEmbedParams = ['file', 'initialpath']
 
 type StackblitzTarget = {
   id: string
-  // The query the publisher chose, which selects the open file, the pane and the theme. Carried
-  // across when `/run/` is rewritten so the repair keeps their layout.
   query: string
 }
 
@@ -61,9 +40,10 @@ const parseTarget = (value: string | undefined): StackblitzTarget | undefined =>
     return
   }
 
-  const query = filterUrlQuery(parsed, (name) => isAnyOf(name, stackblitzEmbedParams))
+  const options = filterUrlQuery(parsed, (name) => isAnyOf(name, stackblitzEmbedParams))
 
-  return { id: second, query }
+  // `embed=1` is what the share dialog writes, and it opens the embed view at any width.
+  return { id: second, query: `?embed=1${options.replace('?', '&')}` }
 }
 
 // StackBlitz's editor iframe, whose retired /run/{slug} route answers 404 while /edit/ serves.
