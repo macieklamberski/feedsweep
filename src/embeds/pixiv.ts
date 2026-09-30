@@ -16,6 +16,10 @@ const workPathRegex = /^\/(?:member_illust\.php|artworks\/\d+)$/
 const artistPathRegex = /^\/(?:member\.php|users\/\d+)$/
 const framePathRegex = /^\/(code|embed_mk2|fixed|oembed_iframe)\.php$/
 
+// `embed_mk2.php` is the current frame, and it draws the same work as the older `code.php` card
+// from the same id.
+const frameRoutes = ['embed_mk2', 'code']
+
 // The loader draws nothing for a `data-size` outside its own table.
 const loaderSizes = ['small', 'medium', 'large']
 
@@ -53,7 +57,7 @@ const pixivResolveEmbed: ResolveEmbed = (url) => {
   const illustId = workId.match(illustIdRegex)?.[1]
   const page = illustId ? `https://www.pixiv.net/artworks/${illustId}` : undefined
 
-  if (route === 'embed_mk2') {
+  if (frameRoutes.includes(route)) {
     return {
       provider,
       id: workId,

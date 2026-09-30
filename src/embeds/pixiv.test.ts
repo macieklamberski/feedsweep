@@ -561,7 +561,7 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the older card at the box it declares', async () => {
+    it('should rebuild the older card on the current frame and its box', async () => {
       const value = html`
         <iframe
           style="background:transparent;"
@@ -577,10 +577,10 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '12233044_207713685a42a25dbbc43c976b610482',
-        src: 'https://embed.pixiv.net/code.php?id=12233044_207713685a42a25dbbc43c976b610482',
+        src: 'https://embed.pixiv.net/embed_mk2.php?id=12233044_207713685a42a25dbbc43c976b610482',
         url: 'https://www.pixiv.net/artworks/12233044',
-        width: 380,
-        height: 168,
+        width: 220,
+        height: 250,
       }
 
       expect(await extract(value)).toEqual(expected)
