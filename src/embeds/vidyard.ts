@@ -1,5 +1,5 @@
 import { parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -81,3 +81,9 @@ export const vidyardScriptEmbedResolver = createMarkupEmbedResolver(
     return width && height ? { ...result, width, height } : result
   },
 )
+
+export const vidyardRenderHint: EmbedRenderHint = {
+  provider,
+  // `1` lets the browser start the video muted, and `2` starts it only with sound.
+  autoplayParams: { autoplay: '2' },
+}
