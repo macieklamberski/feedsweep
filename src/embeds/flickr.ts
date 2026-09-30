@@ -16,7 +16,7 @@ const setPathRegex = /^\/photos\/([^/]+)\/(?:sets|albums)\/(\d+)/
 const streamPathRegex = /^\/photos\/([^/]+)\/show\/?$/
 const groupPathRegex = /^\/groups\/(\d+@N\d\d)\/pool\/show\/?$/
 // An owner of `_` names nobody: the player ignores it, and `/photos/_/{photoId}/` answers 404.
-const photoPathRegex = /^\/photos\/(?:_|([^/]+))\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
+const photoPathRegex = /^\/photos\/(?:_|([^/]+))\/(\d+)(?:\/in\/([^/]+))?\/player(?:\/([^/]+))?\/?$/
 const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/
 
 // A group and a photostream each resolve by NSID and only by NSID: the player answers 200 for
@@ -29,7 +29,8 @@ const nsidRegex = /@N/
 type FlickrSubject = { setId?: string; owner?: string; groupId?: string }
 
 // A single photo, whose owner and secret are each in the path on one of the two carriers only.
-type FlickrPhoto = { photoId: string; owner?: string; secret?: string }
+// The page player also names the album or stream its arrows walk through.
+type FlickrPhoto = { photoId: string; owner?: string; secret?: string; context?: string }
 
 // Flickr's own embed script writes these embedr endpoints into a frameless iframe. A real id
 // answers 200 with the whole slideshow and an invented one 404.
@@ -53,6 +54,15 @@ const composeGroupPlayer = (groupId: string): string => {
 
 const composePhotoPlayer = (photoId: string): string => {
   return `https://embedr.flickr.com/photos/${photoId}`
+}
+
+// The page player ignores the owner segment and the secret after `player/`, and serves the same
+// page for a wrong secret.
+const composePagePhotoPlayer = (photo: FlickrPhoto): string => {
+  const owner = photo.owner ? encodePathSegment(photo.owner) : '_'
+  const context = photo.context ? `in/${photo.context}/` : ''
+
+  return `https://www.flickr.com/photos/${owner}/${photo.photoId}/${context}player/`
 }
 
 // Flickr's base58 alphabet for flic.kr short urls.
@@ -167,17 +177,24 @@ const readOwnerAlias = (owner: string | undefined): string | undefined => {
 // Flickr's own page player, `/photos/{owner}/{photoId}/player/`, optionally with the browsing
 // context it was opened from and the photo secret. embedr's endpoint names the photo alone, and
 // a bare numeric segment is a photo only there: on `www` it is an owner's photostream.
-const readPhotoSubject = (parsed: URL): FlickrPhoto | undefined => {
+const readPhotoPlayer = (parsed: URL): { src: string; photo: FlickrPhoto } | undefined => {
   const player = parsed.pathname.match(photoPathRegex)
 
   if (player) {
-    return { owner: decodePathValue(player[1]), photoId: player[2], secret: player[3] }
+    const photo = {
+      owner: player[1] ? decodePathValue(player[1]) : undefined,
+      photoId: player[2],
+      context: player[3],
+      secret: player[4],
+    }
+
+    return { src: composePagePhotoPlayer(photo), photo }
   }
 
   const embedr = isHostOf(parsed, embedrHost) && parsed.pathname.match(embedrPhotoPathRegex)
 
   if (embedr) {
-    return { photoId: embedr[1] }
+    return { src: composePhotoPlayer(embedr[1]), photo: { photoId: embedr[1] } }
   }
 }
 
@@ -283,10 +300,10 @@ const resolveTarget = (
     return
   }
 
-  const photo = readPhotoSubject(parsed)
+  const player = readPhotoPlayer(parsed)
 
-  if (photo) {
-    return composePhotoEmbed(link, photo)
+  if (player) {
+    return composePhotoEmbed(player.src, player.photo)
   }
 
   const result = composePlayerEmbed(parsed, element)

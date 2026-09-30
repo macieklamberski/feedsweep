@@ -668,8 +668,8 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The file url needs the secret beside the photo id.
-    it('should compose the photo file when the path carries the secret', async () => {
+    // The file url needs the secret beside the photo id. The player serves the same page without it.
+    it('should compose the photo file from the secret and leave it out of the player', async () => {
       const value = html`
         <iframe
           src="https://www.flickr.com/photos/hankthetank/15637343340/player/2d3295bc6d"
@@ -686,12 +686,34 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photos/hankthetank/15637343340',
-        src: 'https://www.flickr.com/photos/hankthetank/15637343340/player/2d3295bc6d',
+        src: 'https://www.flickr.com/photos/hankthetank/15637343340/player/',
         url: 'https://www.flickr.com/photos/hankthetank/15637343340/',
         thumbnail: 'https://live.staticflickr.com/0/15637343340_2d3295bc6d_b.jpg',
         width: 560,
         height: 640,
         author: 'hankthetank',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the album the arrows walk through', async () => {
+      const value = html`
+        <iframe
+          width="500"
+          height="375"
+          frameborder="0"
+          src="https://www.flickr.com/photos/jackieboyslim/8740425686/in/set-72157633482544489/player/"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photos/jackieboyslim/8740425686',
+        src: 'https://www.flickr.com/photos/jackieboyslim/8740425686/in/set-72157633482544489/player/',
+        url: 'https://www.flickr.com/photos/jackieboyslim/8740425686/',
+        width: 500,
+        height: 375,
+        author: 'jackieboyslim',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -710,7 +732,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photos/kimim-photo/11616055053',
-        src: 'https://www.flickr.com/photos/kimim-photo/11616055053/player/c64480d113',
+        src: 'https://www.flickr.com/photos/kimim-photo/11616055053/player/',
         url: 'https://www.flickr.com/photos/kimim-photo/11616055053/',
         thumbnail: 'https://live.staticflickr.com/0/11616055053_c64480d113_b.jpg',
         width: 640,
@@ -732,7 +754,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photos/hankthetank/15637343340',
-        src: 'https://www.flickr.com/photos/hankthetank/15637343340/player/2d3295bc6d%20',
+        src: 'https://www.flickr.com/photos/hankthetank/15637343340/player/',
         url: 'https://www.flickr.com/photos/hankthetank/15637343340/',
         thumbnail: 'https://live.staticflickr.com/0/15637343340_2d3295bc6d%20_b.jpg',
         width: 560,
@@ -754,7 +776,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photos/hankthetank/15591173770',
-        src: 'https://www.flickr.com/photos/hankthetank/15591173770/player/542b374f55',
+        src: 'https://www.flickr.com/photos/hankthetank/15591173770/player/',
         url: 'https://www.flickr.com/photos/hankthetank/15591173770/',
         thumbnail: 'https://live.staticflickr.com/0/15591173770_542b374f55_b.jpg',
         author: 'hankthetank',
@@ -798,7 +820,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photos/20899351@N00/3786844985',
-        src: 'http://www.flickr.com/photos/20899351@N00/3786844985/in/photolist-6LCz5M/player/',
+        src: 'https://www.flickr.com/photos/20899351@N00/3786844985/in/photolist-6LCz5M/player/',
         url: 'https://www.flickr.com/photos/20899351@N00/3786844985/',
         width: 640,
         height: 329,
