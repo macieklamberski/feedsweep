@@ -554,4 +554,8 @@ describe('dailymotionRenderHint', () => {
   it('should ignore a ready event posted as an object', () => {
     expect(dailymotionRenderHint.isReady?.({ event: 'apiready', id: 'dm1' })).toBe(false)
   })
+
+  it('should ignore a string that is not JSON', () => {
+    expect(dailymotionRenderHint.isReady?.('apiready')).toBe(false)
+  })
 })
