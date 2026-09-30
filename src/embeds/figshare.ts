@@ -21,7 +21,7 @@ const figshareResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider: 'figshare',
     id: articleId,
-    src: url,
+    src: `https://widgets.figshare.com/articles/${articleId}/embed`,
   }
 }
 

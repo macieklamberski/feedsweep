@@ -23,7 +23,6 @@ const queryOrHashRegex = /[?#]/
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
 
-export const urlSafeTokenRegex = /^[A-Za-z0-9_-]+$/
 export const digitsRegex = /^\d+$/
 
 // No m3u8 or mpd: only Safari plays them natively, so promoting one breaks the player elsewhere.

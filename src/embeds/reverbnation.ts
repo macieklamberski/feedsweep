@@ -20,19 +20,12 @@ const flashPathRegex = /^\/+widgets\/swf\//
 // 404 for a fabricated one.
 const flashIdParams = ['id', 'emailPlaylist', 'twID']
 
-// The html widget's query selects which player is drawn and what it holds: `widget_id` and
-// `context_type`, and every option the widget config reads as `pwc[{name}]`, except autoplay,
-// which is the reader's to decide.
-const widgetParams = ['widget_id', 'context_type']
-
-const autoplayParam = 'pwc[auto_play]'
+// The three parameters that decide what the html widget plays. `widget_id` picks the player,
+// `pwc[song_ids]` one song on it, and `pwc[included_songs]` whether the rest of the list comes too.
+const widgetParams = ['widget_id', 'pwc[song_ids]', 'pwc[included_songs]']
 
 const isWidgetParam = (name: string): boolean => {
-  if (name === autoplayParam) {
-    return false
-  }
-
-  return widgetParams.includes(name) || name.startsWith('pwc[')
+  return widgetParams.includes(name)
 }
 
 const composeSource = (id: string, query: string): string => {
