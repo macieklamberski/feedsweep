@@ -41,7 +41,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the page, frame and scaling and drop the viewport and share token', async () => {
+    it('should keep the page and frame and drop the viewport, scaling and share token', async () => {
       const value = html`
         <iframe
           width="800"
@@ -52,7 +52,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'figma',
         id: 'proto/LBH1O9AxQLxp0ixZBd1Pxk',
-        src: 'https://embed.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0%3A1&scaling=contain&embed-host=share',
+        src: 'https://embed.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0%3A1&embed-host=share',
         url: 'https://www.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0%3A1',
         width: 800,
         height: 450,
@@ -74,7 +74,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should rebuild a deck and carry its scaling into the src', async () => {
+    it('should rebuild a deck without its scaling', async () => {
       const value = html`
         <iframe
           width="800"
@@ -85,7 +85,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'figma',
         id: 'deck/0txckPBPI1OqFNEa9VaKLP',
-        src: 'https://embed.figma.com/deck/0txckPBPI1OqFNEa9VaKLP/TacTik?node-id=1-540&scaling=min-zoom&embed-host=share',
+        src: 'https://embed.figma.com/deck/0txckPBPI1OqFNEa9VaKLP/TacTik?node-id=1-540&embed-host=share',
         url: 'https://www.figma.com/deck/0txckPBPI1OqFNEa9VaKLP/TacTik?node-id=1-540',
         width: 800,
         height: 450,
