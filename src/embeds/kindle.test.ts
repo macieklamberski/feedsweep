@@ -11,7 +11,7 @@ describe('kindleResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd&tag=kpembed-20',
+        src: 'https://read.amazon.com/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_dQVcnKwFnAcXcz&asin=B08DGQCKF3&tag=kpembed-20',
         url: 'https://www.amazon.com/dp/B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
       }
@@ -24,7 +24,7 @@ describe('kindleResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.co.uk/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd',
+        src: 'https://read.amazon.co.uk/kp/card?asin=B08DGQCKF3&preview=inline',
         url: 'https://www.amazon.co.uk/dp/B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
       }
@@ -37,7 +37,7 @@ describe('kindleResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.ca/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd',
+        src: 'https://read.amazon.ca/kp/card?asin=B08DGQCKF3&preview=inline',
         url: 'https://www.amazon.ca/dp/B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
       }
@@ -50,7 +50,7 @@ describe('kindleResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.in/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd',
+        src: 'https://read.amazon.in/kp/card?asin=B08DGQCKF3&preview=inline',
         url: 'https://www.amazon.in/dp/B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
       }
@@ -64,7 +64,7 @@ describe('kindleResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B09SLB7V48',
-        src: 'https://read.amazon.com.au/kp/card?asin=B09SLB7V48&preview=inline&linkCode=ll1&tag=yusukeblog00-22',
+        src: 'https://read.amazon.com.au/kp/card?preview=inline&linkCode=ll1&ref_=k4w_oembed_y0sSritwWwbv0o&asin=B09SLB7V48&tag=yusukeblog00-22',
         thumbnail: 'https://m.media-amazon.com/images/P/B09SLB7V48.01._SCLZZZZZZZ_.jpg',
       }
 
@@ -129,7 +129,7 @@ describe('kindleResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd',
+        src: 'https://read.amazon.com/kp/card/?asin=B08DGQCKF3',
         url: 'https://www.amazon.com/dp/B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
       }
@@ -142,7 +142,7 @@ describe('kindleResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com.au/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd',
+        src: 'https://read.amazon.com.au/kp/card?asin=B08DGQCKF3&preview=inline',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
       }
 
@@ -171,7 +171,7 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3&preview=inline&linkCode=kpd&tag=kpembed-20',
+        src: 'https://read.amazon.com/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_dQVcnKwFnAcXcz&asin=B08DGQCKF3&tag=kpembed-20',
         url: 'https://www.amazon.com/dp/B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         width: 1080,
@@ -197,7 +197,7 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B09KT8838X',
-        src: 'https://read.amazon.com/kp/card?asin=B09KT8838X&preview=newtab&linkCode=kpe',
+        src: 'https://read.amazon.com/kp/card?asin=B09KT8838X&preview=newtab&linkCode=kpe&ref_=cm_sw_r_kb_dp_WANT1RK5JJX35VAMQE8X&hideBuy=true&hideShare=true',
         url: 'https://www.amazon.com/dp/B09KT8838X',
         thumbnail: 'https://m.media-amazon.com/images/P/B09KT8838X.01._SCLZZZZZZZ_.jpg',
         width: 212,

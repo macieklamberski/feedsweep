@@ -1,7 +1,7 @@
 import { isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const kindleHosts = [
@@ -14,10 +14,6 @@ const kindleHosts = [
 
 // `read.amazon.com.au` also serves cards for books sold only on `amazon.co.jp`.
 const sharedStoreHosts = ['read.amazon.com.au']
-
-// `preview=newtab` opens the sample in a new tab. The card's script sets `tag` and `linkCode` on
-// every store link it opens when a tag is present.
-const cardParams = ['preview', 'tag', 'linkCode']
 
 // An ASIN is uppercase alphanumeric, the ISBN-10 check letter included.
 const safeAsinRegex = /^[0-9A-Z]+$/
@@ -39,19 +35,13 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const query = composeQuery({
-    asin,
-    preview: 'inline',
-    linkCode: 'kpd',
-    ...pickQueryParams(parsed.search, cardParams),
-  })
   const storefront = parsed.hostname.slice('read.'.length)
   const isSharedStore = sharedStoreHosts.includes(parsed.hostname)
 
   return {
     provider: 'kindle',
     id: asin,
-    src: `https://${parsed.hostname}/kp/card${query}`,
+    src: url,
     url: isSharedStore ? undefined : `https://www.${storefront}/dp/${asin}`,
     thumbnail: `https://m.media-amazon.com/images/P/${asin}.01._SCLZZZZZZZ_.jpg`,
     // The oEmbed writes the book's name here, never a player label.
