@@ -332,6 +332,21 @@ describeForEachParser('deezerEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, deezerEmbedResolver)
 
   describe('happy paths', () => {
+    // Deezer redirects the plugin to the current widget, which plays the album.
+    it('should keep a plugin player frame as written', async () => {
+      const value =
+        '<iframe src="https://www.deezer.com/plugins/player?format=classic&amp;autoplay=false&amp;playlist=false&amp;width=635&amp;height=80&amp;color=1990DB&amp;layout=dark&amp;size=medium&amp;type=album&amp;id=13687020&amp;title=&amp;app_id=1"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'deezer',
+        id: 'album/13687020',
+        src: 'https://www.deezer.com/plugins/player?format=classic&autoplay=false&playlist=false&width=635&height=80&color=1990DB&layout=dark&size=medium&type=album&id=13687020&title=&app_id=1',
+        url: 'https://www.deezer.com/album/13687020',
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should take the widget out of an iframe', async () => {
       const value = '<iframe src="https://widget.deezer.com/widget/dark/track/3135556"></iframe>'
       const expected: EmbedResolverResult = {

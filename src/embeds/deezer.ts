@@ -57,8 +57,8 @@ const readResource = (url: URL): Resource | undefined => {
     return { type: route[2] ?? '', id: route[3] ?? '', theme: route[1] ?? '' }
   }
 
-  // The classic plugin player, `deezer.com/plugins/player?type={type}&id={id}`. It answers 200 and
-  // renders Deezer's own "Page not found" for every id, real ones included.
+  // The classic plugin player, `deezer.com/plugins/player?type={type}&id={id}`, which Deezer
+  // redirects to the current widget.
   if (route[0] === 'plugins' && route[1] === 'player') {
     return { type: pluginTypes.get(query('type')) ?? '', id: query('id'), theme }
   }
@@ -91,14 +91,20 @@ export const deezerResolveEmbed: ResolveEmbed = (url, element) => {
     // The type qualifies the id because the endpoint an enricher would call is
     // `api.deezer.com/{type}/{id}`, and the id alone does not say which one.
     id: `${type}/${id}`,
-    src: `https://widget.deezer.com/widget/${theme}/${type}/${id}`,
+    // A player frame plays as written, the plugin through Deezer's own redirect. A Flash carrier
+    // gets the widget.
+    src:
+      element?.localName === 'iframe'
+        ? url
+        : `https://widget.deezer.com/widget/${theme}/${type}/${id}`,
     url: `https://www.deezer.com/${type}/${id}`,
     height: deezerHeights.get(type),
     title: attr(element, 'title'),
   }
 }
 
-// Deezer's widget iframe, plus the plugin player and the Flash swfs, which play nothing today.
+// Deezer's widget iframe and its plugin player, which Deezer redirects to the widget, plus the
+// Flash swfs, which play nothing today and get the widget.
 export const deezerEmbedResolver = createUrlEmbedResolver(deezerHosts, deezerResolveEmbed)
 
 export const deezerFieldCleaners: Array<FieldCleaner> = [
