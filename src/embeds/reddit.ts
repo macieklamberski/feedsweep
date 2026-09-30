@@ -159,7 +159,7 @@ export const redditIframeEmbedResolver = createUrlEmbedResolver(redditHosts, red
 
 // A forum's s9e MediaEmbed helper frame, naming the post as `{subreddit}/comments/{id}` in its
 // url fragment.
-export const redditS9eEmbedResolver = createS9eEmbedResolver('reddit', /^[\w/]+$/, (fragment) => {
+export const redditS9eEmbedResolver = createS9eEmbedResolver('reddit', (fragment) => {
   return redditResolveEmbed(`https://www.reddit.com/r/${fragment}`)
 })
 

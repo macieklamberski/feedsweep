@@ -1,6 +1,6 @@
-import { parseUrl, trimObject } from 'trousse'
+import { parseUrl } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
-import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
+import { attr, parsePixelSize } from '../utils/dom.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
@@ -19,9 +19,6 @@ const widgetPath = '/map-widget/v1/'
 // names the constructor space, since `um` also carries `mymaps:` maps.
 const constructorIdRegex = /^constructor:(.+)/
 
-// The static render answers 400 to an unknown `lang`, so only a Yandex locale such as `ru_RU`
-// is carried.
-const localeRegex = /^[a-z]{2}_[A-Z]{2}$/
 const spacedQueryRegex = /\/js\/%20(.+)/
 
 // The static render answers 400 unless both dimensions are stated, and 400 again above 650 by
@@ -30,32 +27,19 @@ const maximumStaticWidth = 650
 const maximumStaticHeight = 450
 
 // Composed from the id alone, with no key and no expiry.
-const composeStatic = (
-  um: string,
-  lang: string | undefined,
-  width: number,
-  height: number,
-): string => {
+const composeStatic = (um: string, width: number, height: number): string => {
   const scale = Math.min(maximumStaticWidth / width, maximumStaticHeight / height, 1)
-  const query = composeQuery(
-    trimObject({
-      um,
-      width: `${Math.round(width * scale)}`,
-      height: `${Math.round(height * scale)}`,
-      lang,
-    }),
-  )
+  const query = composeQuery({
+    um,
+    width: `${Math.round(width * scale)}`,
+    height: `${Math.round(height * scale)}`,
+  })
 
   return `https://api-maps.yandex.ru/services/constructor/1.0/static/${query}`
 }
 
-// `scroll` is the wheel zoom the publisher set per map, so it stays in the frame as stated.
-const composeWidget = (
-  um: string,
-  lang: string | undefined,
-  scroll: string | undefined,
-): string => {
-  const query = composeQuery(trimObject({ um, lang, scroll, source: 'constructor' }))
+const composeWidget = (um: string): string => {
+  const query = composeQuery({ um, source: 'constructor' })
 
   return `https://yandex.ru${widgetPath}${query}`
 }
@@ -72,8 +56,7 @@ const resolveConstructorMap = (
   }
 
   const um = `constructor:${constructorId}`
-  const lang = keepIfMatches(query.get('lang'), localeRegex)
-  const src = composeWidget(um, lang, query.get('scroll') ?? undefined)
+  const src = composeWidget(um)
 
   if (!height) {
     return { provider, id: um, src }
@@ -84,7 +67,7 @@ const resolveConstructorMap = (
     return { provider, id: um, src, height }
   }
 
-  const thumbnail = composeStatic(um, lang, width, height)
+  const thumbnail = composeStatic(um, width, height)
 
   return { provider, id: um, src, thumbnail, width, height }
 }

@@ -8,21 +8,20 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, wordwallEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the locale prefix in the player url and out of the id', async () => {
+    it('should keep the template a player states and drop its theme', async () => {
       const value = html`
         <iframe
-          style="max-width: 100%;"
-          src="https://wordwall.net/es/embed/e10cc41040bb489c83a4fc6670afeb5d?themeId=46&templateId=54&fontStackId=0"
-          width="500"
-          height="380"
+          allowfullscreen=""
           frameborder="0"
-          allowfullscreen="allowfullscreen"
+          height="380"
+          src="https://wordwall.net/embed/79f873e001b84886aba4cb63e7c9f6e4?themeId=1&amp;templateId=3"
+          width="500"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'wordwall',
-        id: 'e10cc41040bb489c83a4fc6670afeb5d',
-        src: 'https://wordwall.net/es/embed/e10cc41040bb489c83a4fc6670afeb5d?themeId=46&templateId=54&fontStackId=0',
+        id: '79f873e001b84886aba4cb63e7c9f6e4',
+        src: 'https://wordwall.net/embed/79f873e001b84886aba4cb63e7c9f6e4?templateId=3',
         width: 500,
         height: 380,
       }
@@ -30,20 +29,42 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the rendering query a player states without a locale', async () => {
+    it('should drop the font stack a player states', async () => {
       const value = html`
         <iframe
           allowfullscreen=""
           frameborder="0"
           height="380"
-          src="https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d?themeId=1&amp;templateId=22"
+          src="https://wordwall.net/embed/4d9be8cbd5034225b49395cb39e62982?themeId=1&amp;templateId=3&amp;fontStackId=0"
+          style="max-width: 100%;"
           width="500"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'wordwall',
-        id: 'd4e3c25ffe7545a19a8b0cd802f68f4d',
-        src: 'https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d?themeId=1&templateId=22',
+        id: '4d9be8cbd5034225b49395cb39e62982',
+        src: 'https://wordwall.net/embed/4d9be8cbd5034225b49395cb39e62982?templateId=3',
+        width: 500,
+        height: 380,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the locale prefix from the player url and keep it out of the id', async () => {
+      const value = html`
+        <iframe
+          allowfullscreen=""
+          frameborder="0"
+          height="380"
+          src="https://wordwall.net/pl/embed/4f37d8201dea4a218f20e24bf5a6b622?themeId=52&amp;templateId=8"
+          width="500"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'wordwall',
+        id: '4f37d8201dea4a218f20e24bf5a6b622',
+        src: 'https://wordwall.net/embed/4f37d8201dea4a218f20e24bf5a6b622?templateId=8',
         width: 500,
         height: 380,
       }
@@ -137,17 +158,17 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop a query parameter that is not a rendering choice', async () => {
+    it('should drop a tracker beside the template', async () => {
       const value = html`
         <iframe
-          src="https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d?themeId=1&utm_source=lesson"
+          src="https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d?templateId=22&utm_source=lesson"
           height="380"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'wordwall',
         id: 'd4e3c25ffe7545a19a8b0cd802f68f4d',
-        src: 'https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d?themeId=1',
+        src: 'https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d?templateId=22',
         height: 380,
       }
 
