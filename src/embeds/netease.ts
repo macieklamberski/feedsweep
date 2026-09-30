@@ -1,5 +1,5 @@
 import { toMap } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -63,3 +63,8 @@ export const neteaseResolveEmbed: ResolveEmbed = (url) => {
 export const neteaseEmbedResolver = createUrlEmbedResolver(neteaseHosts, neteaseResolveEmbed, {
   preferResolverSize: true,
 })
+
+export const neteaseRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { auto: '1' },
+}

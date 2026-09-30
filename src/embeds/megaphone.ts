@@ -1,7 +1,10 @@
 import { parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { composeQuery, digitsRegex, isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'megaphone'
 
 const megaphoneHosts = ['megaphone.fm']
 
@@ -49,7 +52,7 @@ export const megaphoneResolveEmbed: ResolveEmbed = (url) => {
   }
 
   return {
-    provider: 'megaphone',
+    provider,
     id: `${embed.kind}/${embed.id}`,
     src: `https://playlist.megaphone.fm/${composeQuery({ [embed.param]: embed.id })}`,
     height: embed.height,
@@ -58,3 +61,9 @@ export const megaphoneResolveEmbed: ResolveEmbed = (url) => {
 
 // Megaphone's player iframe, ?e= for an episode or ?p= for a playlist, some with no height at all.
 export const megaphoneEmbedResolver = createUrlEmbedResolver(megaphoneHosts, megaphoneResolveEmbed)
+
+export const megaphoneRenderHint: EmbedRenderHint = {
+  provider,
+  isReady: isPlayerJsReady,
+  requestPlay: playerJsPlayRequest,
+}

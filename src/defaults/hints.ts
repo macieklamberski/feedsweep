@@ -28,7 +28,10 @@ import { instagramRenderHint } from '../embeds/instagram.js'
 import { kalturaRenderHint } from '../embeds/kaltura.js'
 import { mailruRenderHint } from '../embeds/mailru.js'
 import { mastodonRenderHint } from '../embeds/mastodon.js'
+import { megaphoneRenderHint } from '../embeds/megaphone.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
+import { nbcnewsRenderHint } from '../embeds/nbcnews.js'
+import { neteaseRenderHint } from '../embeds/netease.js'
 import { nicovideoRenderHint } from '../embeds/nicovideo.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
 import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
@@ -38,6 +41,7 @@ import { peertubeRenderHint } from '../embeds/peertube.js'
 import { podbeanRenderHint } from '../embeds/podbean.js'
 import { podigeeRenderHint } from '../embeds/podigee.js'
 import { redditRenderHint } from '../embeds/reddit.js'
+import { reverbnationRenderHint } from '../embeds/reverbnation.js'
 import { rtveRenderHint } from '../embeds/rtve.js'
 import { rutubeRenderHint } from '../embeds/rutube.js'
 import { sketchfabRenderHint } from '../embeds/sketchfab.js'
@@ -47,6 +51,7 @@ import { spreakerRenderHint } from '../embeds/spreaker.js'
 import { srgplayRenderHint } from '../embeds/srgplay.js'
 import { tedRenderHint } from '../embeds/ted.js'
 import { telegramRenderHint } from '../embeds/telegram.js'
+import { tencentRenderHint } from '../embeds/tencent.js'
 import { transistorRenderHint } from '../embeds/transistor.js'
 import { tumblrRenderHint } from '../embeds/tumblr.js'
 import { tuneinRenderHint } from '../embeds/tunein.js'
@@ -57,6 +62,7 @@ import { vidyardRenderHint } from '../embeds/vidyard.js'
 import { vimeoRenderHint } from '../embeds/vimeo.js'
 import { vkRenderHint } from '../embeds/vk.js'
 import { wistiaRenderHint } from '../embeds/wistia.js'
+import { youkuRenderHint } from '../embeds/youku.js'
 import { youtubeRenderHint } from '../embeds/youtube.js'
 import type { EmbedRenderHint } from '../types.js'
 
@@ -95,7 +101,10 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   kalturaRenderHint,
   mailruRenderHint,
   mastodonRenderHint,
+  megaphoneRenderHint,
   mixcloudRenderHint,
+  nbcnewsRenderHint,
+  neteaseRenderHint,
   nicovideoRenderHint,
   notecomRenderHint,
   odnoklassnikiRenderHint,
@@ -105,6 +114,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   podbeanRenderHint,
   podigeeRenderHint,
   redditRenderHint,
+  reverbnationRenderHint,
   rtveRenderHint,
   rutubeRenderHint,
   sketchfabRenderHint,
@@ -114,6 +124,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   srgplayRenderHint,
   tedRenderHint,
   telegramRenderHint,
+  tencentRenderHint,
   transistorRenderHint,
   tumblrRenderHint,
   tuneinRenderHint,
@@ -124,5 +135,6 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   vimeoRenderHint,
   vkRenderHint,
   wistiaRenderHint,
+  youkuRenderHint,
   youtubeRenderHint,
 ]
