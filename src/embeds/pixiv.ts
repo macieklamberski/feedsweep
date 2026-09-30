@@ -1,7 +1,7 @@
-import { parseUrl, toMap } from 'trousse'
+import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pixiv'
@@ -16,21 +16,20 @@ const workPathRegex = /^\/(?:member_illust\.php|artworks\/\d+)$/
 const artistPathRegex = /^\/(?:member\.php|users\/\d+)$/
 const framePathRegex = /^\/(code|embed_mk2|fixed|oembed_iframe)\.php$/
 
-// The bordered frame's box per `data-size`: the loader's own table plus 30 for the border. The
-// borderless frame takes the illustration's size, which only a request to pixiv answers.
-const borderedSizes = toMap({
-  small: { width: 220, height: 250 },
-  medium: { width: 390, height: 300 },
-  large: { width: 700, height: 550 },
-})
+// `embed_mk2.php` is the current frame, and it draws the same work as the older `code.php` card
+// from the same id.
+const frameRoutes = ['embed_mk2', 'code']
+
+// The loader draws nothing for a `data-size` outside its own table.
+const loaderSizes = ['small', 'medium', 'large']
 
 // With no `size` and no `border`, the frame draws the small bordered card. The loader boxes that
 // card at 190 by 250 plus 30 for the border.
 const frameWidth = 220
 const frameHeight = 250
 
-const composeFrameUrl = (workId: string, size: string, border: string): string => {
-  return `https://embed.pixiv.net/embed_mk2.php${composeQuery({ id: workId, size, border })}`
+const composeFrameUrl = (workId: string): string => {
+  return `https://embed.pixiv.net/embed_mk2.php${composeQuery({ id: workId })}`
 }
 
 const findAnchor = (anchors: Array<Element>, pathRegex: RegExp): Element | undefined => {
@@ -58,21 +57,11 @@ const pixivResolveEmbed: ResolveEmbed = (url) => {
   const illustId = workId.match(illustIdRegex)?.[1]
   const page = illustId ? `https://www.pixiv.net/artworks/${illustId}` : undefined
 
-  if (route === 'embed_mk2') {
+  if (frameRoutes.includes(route)) {
     return {
       provider,
       id: workId,
-      src: `https://embed.pixiv.net/embed_mk2.php${pickUrlParams(url, ['id', 'size', 'border'])}`,
-      url: page,
-    }
-  }
-
-  // `embed_mk2.php` draws the same work as the older `code.php` card, from the same id.
-  if (route === 'code') {
-    return {
-      provider,
-      id: workId,
-      src: `https://embed.pixiv.net/embed_mk2.php${composeQuery({ id: workId })}`,
+      src: composeFrameUrl(workId),
       url: page,
       width: frameWidth,
       height: frameHeight,
@@ -102,11 +91,15 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
     const workId = attr(element, 'data-id')
     const size = attr(element, 'data-size') ?? ''
     const border = attr(element, 'data-border')
-    const bordered = borderedSizes.get(size)
 
     // The selector matches a substring any host can carry. pixiv's loader also renders nothing
     // without all three attributes.
-    if (!parseUrlOnHosts(attr(element, 'src'), loaderHosts) || !workId || !bordered || !border) {
+    if (
+      !parseUrlOnHosts(attr(element, 'src'), loaderHosts) ||
+      !workId ||
+      !loaderSizes.includes(size) ||
+      !border
+    ) {
       return
     }
 
@@ -121,8 +114,6 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
     }
 
     const illustId = workId.match(illustIdRegex)?.[1]
-    const isBordered = border === 'on'
-    const box = isBordered ? bordered : undefined
     const fallback = element.nextElementSibling
     const anchors =
       fallback?.localName === 'noscript' ? Array.from(fallback.querySelectorAll('a[href]')) : []
@@ -136,10 +127,10 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
     const result: EmbedResolverResult = {
       provider,
       id: workId,
-      src: composeFrameUrl(workId, size, isBordered ? 'on' : 'off'),
+      src: composeFrameUrl(workId),
       url: illustId ? `https://www.pixiv.net/artworks/${illustId}` : undefined,
-      width: box?.width,
-      height: box?.height,
+      width: frameWidth,
+      height: frameHeight,
       title: text(work),
       author: text(artist),
     }
