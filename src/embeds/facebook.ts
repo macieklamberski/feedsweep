@@ -145,7 +145,8 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
 
     const watchUrl = `https://www.facebook.com/watch/?v=${videoId}`
 
-    return composePluginEmbed('video', watchUrl, { id: videoId, ...querySize(parsed) })
+    // The legacy frame still plays as written.
+    return composePluginEmbed('video', watchUrl, { id: videoId, src: url, ...querySize(parsed) })
   }
 
   if (contentPathRegex.test(parsed.pathname) || isWatchPage(parsed)) {
