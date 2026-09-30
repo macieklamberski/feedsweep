@@ -22,7 +22,12 @@ describeForEachParser('rebuildLyteEmbeds', (parseHtml) => {
   })
 
   it('should rebuild an iframe from a standalone lyte_ node', async () => {
-    const value = '<div id="lyte_dQw4w9WgXcQ"></div>'
+    const value = html`
+      <div
+        id="lyte_dQw4w9WgXcQ"
+        class="pL"
+      ></div>
+    `
     const expected = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
@@ -33,7 +38,10 @@ describeForEachParser('rebuildLyteEmbeds', (parseHtml) => {
       <div
         id="WYL_dQw4w9WgXcQ"
         class="lyMe"
-      ><div id="lyte_dQw4w9WgXcQ"></div>
+      ><div
+          id="lyte_dQw4w9WgXcQ"
+          class="pL"
+        ></div>
       </div>
     `
     const expected = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>'
@@ -42,20 +50,52 @@ describeForEachParser('rebuildLyteEmbeds', (parseHtml) => {
   })
 
   it('should keep an underscore-bearing video id intact', async () => {
-    const value = '<div id="WYL_a_b-c123def"></div>'
+    const value = html`
+      <div
+        id="WYL_a_b-c123def"
+        class="lyMe"
+      ></div>
+    `
     const expected = '<iframe src="https://www.youtube.com/embed/a_b-c123def"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a lyte_ element whose id names no video', async () => {
-    const value = '<div id="lyte_foo"></div>'
+  it('should leave a lyte_ element without the plugin class', async () => {
+    const value = '<div id="lyte_dQw4w9WgXcQ"></div>'
 
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  it('should leave a WYL_ element whose id carries a query', async () => {
-    const value = '<div id="WYL_dQw4w9WgXcQ?list=x"></div>'
+  it('should leave a WYL_ element without the plugin class', async () => {
+    const value = '<div id="WYL_dQw4w9WgXcQ"></div>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should use a malformed video id as written, even if the player answers an error', async () => {
+    const value = html`
+      <div
+        id="WYL_dQw4w9WgXcQ?list=x"
+        class="lyMe"
+      ></div>
+    `
+    const expected = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?list=x"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a playlist facade, whose id names a playlist', async () => {
+    const value = html`
+      <div
+        id="WYL_PLx0sYbCqOb8TBPRdmBHs5Iftvv9TPboYG"
+        class="lyMe playlist"
+      ><div
+          id="lyte_PLx0sYbCqOb8TBPRdmBHs5Iftvv9TPboYG"
+          class="pL"
+        ></div>
+      </div>
+    `
 
     expect(await transform(value)).toEqualHtml(value)
   })

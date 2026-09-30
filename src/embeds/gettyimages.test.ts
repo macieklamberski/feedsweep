@@ -67,10 +67,17 @@ describe('readWidgetConfig', () => {
       expect(readWidgetConfig(value)).toBeUndefined()
     })
 
-    it('should refuse an item id that is not one', () => {
+    it('should use a malformed item id as written, even if the player answers an error', () => {
       const value = `gie.widgets.load({id:'abc',sig:'def=',items:'not-an-id'})`
+      const expected = {
+        items: 'not-an-id',
+        et: 'abc',
+        sig: 'def=',
+        tld: 'com',
+        caption: 'false',
+      }
 
-      expect(readWidgetConfig(value)).toBeUndefined()
+      expect(readWidgetConfig(value)).toEqual(expected)
     })
   })
 })

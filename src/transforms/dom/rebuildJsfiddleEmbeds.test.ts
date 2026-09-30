@@ -60,10 +60,11 @@ describeForEachParser('rebuildJsfiddleEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should leave a loader whose slug carries a dot alone', async () => {
+    it('should use a malformed slug as written, even if the page answers an error', async () => {
       const value = '<script src="https://jsfiddle.net/user/slug.js/1/embed/"></script>'
+      const expected = '<iframe height="400" src="https://jsfiddle.net/user/slug.js/1/"></iframe>'
 
-      expect(await transform(value)).toEqualHtml(value)
+      expect(await transform(value)).toEqualHtml(expected)
     })
   })
 

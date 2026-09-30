@@ -122,10 +122,12 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a custom element whose media id carries an encoded slash untouched', async () => {
+  it('should use a malformed media id as written, even if the player answers an error', async () => {
     const value = '<wistia-player media-id="u3gz5bka6b%2F..%2Fchannel"></wistia-player>'
+    const expected =
+      '<iframe src="https://fast.wistia.net/embed/iframe/u3gz5bka6b%2f..%2fchannel"></iframe>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should rebuild an iframe from a lone loader script', async () => {
