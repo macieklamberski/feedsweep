@@ -7,20 +7,19 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'videopress'
 
 // Not wordpress.com itself: every blog frames its posts on that domain, and those are cards.
-// `video.wordpress.com` is the older alias of the same player, and the Flash player lived on
-// `s0.videopress.com` and `v0.wordpress.com`.
+// `video.wordpress.com` is the documented player host, the one its oEmbed writes, and the Flash
+// player lived on `s0.videopress.com` and `v0.wordpress.com`.
 const videopressHosts = ['videopress.com', 'video.wordpress.com', 'v0.wordpress.com']
 
-// Where playback starts, whether it loops, and whether the publisher asked for the HD
-// rendition. The rest of the query the block editor writes (`cover`, `preloadContent`,
-// `useAverageColor`) styles the player and goes with the rebuilt src.
-const videopressEmbedParams = ['at', 'hd', 'loop']
+// Where playback starts and whether it loops. The rest of the query the block editor writes goes
+// with the rebuilt src: `hd` picks the rendition, `cover` and `useAverageColor` style the player.
+const videopressEmbedParams = ['at', 'loop']
 
 const composeEmbed = (guid: string, query = ''): EmbedResolverResult => {
   return {
     provider,
     id: guid,
-    src: `https://videopress.com/embed/${guid}${query}`,
+    src: `https://video.wordpress.com/embed/${guid}${query}`,
     url: `https://videopress.com/v/${guid}`,
   }
 }

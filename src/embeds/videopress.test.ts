@@ -7,7 +7,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, videopressIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the block editor embed and drop the player styling query', async () => {
+    it('should resolve the block editor embed and drop its rendition and styling query', async () => {
       const value = html`
         <iframe
           title="VideoPress Video Player"
@@ -23,7 +23,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'FLEAXUMB',
-        src: 'https://videopress.com/embed/FLEAXUMB?hd=0',
+        src: 'https://video.wordpress.com/embed/FLEAXUMB',
         url: 'https://videopress.com/v/FLEAXUMB',
         width: 800,
         height: 450,
@@ -32,7 +32,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should resolve the shortcode iframe on the videopress host', async () => {
+    it('should mint the documented player host for the shortcode iframe on the videopress host', async () => {
       const value = html`
         <iframe
           width="640"
@@ -45,10 +45,37 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'bDC13L49',
-        src: 'https://videopress.com/embed/bDC13L49?hd=1',
+        src: 'https://video.wordpress.com/embed/bDC13L49',
         url: 'https://videopress.com/v/bDC13L49',
         width: 640,
         height: 360,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the loop flag and drop the rendition and styling the block editor writes', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          title="VideoPress Video Player"
+          aria-label="VideoPress Video Player"
+          width="500"
+          height="375"
+          src="https://videopress.com/embed/xcCfesgJ?cover=1&amp;autoPlay=0&amp;controls=1&amp;loop=1&amp;muted=1&amp;persistVolume=0&amp;playsinline=0&amp;preloadContent=metadata&amp;useAverageColor=1&amp;hd=0"
+          frameborder="0"
+          allowfullscreen
+          data-resize-to-parent="true"
+          allow="clipboard-write"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'videopress',
+        id: 'xcCfesgJ',
+        src: 'https://video.wordpress.com/embed/xcCfesgJ?loop=1',
+        url: 'https://videopress.com/v/xcCfesgJ',
+        width: 500,
+        height: 375,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -61,7 +88,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'FLEAXUMB',
-        src: 'https://videopress.com/embed/FLEAXUMB?at=42&loop=1',
+        src: 'https://video.wordpress.com/embed/FLEAXUMB?at=42&loop=1',
         url: 'https://videopress.com/v/FLEAXUMB',
       }
 
@@ -73,7 +100,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'bDC13L49x',
-        src: 'https://videopress.com/embed/bDC13L49x',
+        src: 'https://video.wordpress.com/embed/bDC13L49x',
         url: 'https://videopress.com/v/bDC13L49x',
       }
 
@@ -85,7 +112,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'FLEAXUMB',
-        src: 'https://videopress.com/embed/FLEAXUMB',
+        src: 'https://video.wordpress.com/embed/FLEAXUMB',
         url: 'https://videopress.com/v/FLEAXUMB',
       }
 
@@ -99,7 +126,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'FLEAXUMB-extra',
-        src: 'https://videopress.com/embed/FLEAXUMB-extra',
+        src: 'https://video.wordpress.com/embed/FLEAXUMB-extra',
         url: 'https://videopress.com/v/FLEAXUMB-extra',
       }
 
@@ -138,7 +165,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'FLEAXUMB',
-        src: 'https://videopress.com/embed/FLEAXUMB',
+        src: 'https://video.wordpress.com/embed/FLEAXUMB',
         url: 'https://videopress.com/v/FLEAXUMB',
       }
 
@@ -169,7 +196,7 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'TxdSIdpO',
-        src: 'https://videopress.com/embed/TxdSIdpO',
+        src: 'https://video.wordpress.com/embed/TxdSIdpO',
         url: 'https://videopress.com/v/TxdSIdpO',
         width: 450,
         height: 274,
@@ -190,7 +217,7 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'TxdSIdpO',
-        src: 'https://videopress.com/embed/TxdSIdpO',
+        src: 'https://video.wordpress.com/embed/TxdSIdpO',
         url: 'https://videopress.com/v/TxdSIdpO',
         width: 400,
         height: 224,
@@ -214,7 +241,7 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'TxdSIdpO',
-        src: 'https://videopress.com/embed/TxdSIdpO',
+        src: 'https://video.wordpress.com/embed/TxdSIdpO',
         url: 'https://videopress.com/v/TxdSIdpO',
         width: 450,
         height: 274,
@@ -241,7 +268,7 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: '../etc',
-        src: 'https://videopress.com/embed/../etc',
+        src: 'https://video.wordpress.com/embed/../etc',
         url: 'https://videopress.com/v/../etc',
       }
 
@@ -258,7 +285,7 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'TxdSIdpO',
-        src: 'https://videopress.com/embed/TxdSIdpO',
+        src: 'https://video.wordpress.com/embed/TxdSIdpO',
         url: 'https://videopress.com/v/TxdSIdpO',
       }
 
@@ -299,7 +326,7 @@ describeForEachParser('videopressIframeEmbedResolver carrier title', (parseHtml)
     const expected: EmbedResolverResult = {
       provider: 'videopress',
       id: 'TxdSIdpO',
-      src: 'https://videopress.com/embed/TxdSIdpO',
+      src: 'https://video.wordpress.com/embed/TxdSIdpO',
       url: 'https://videopress.com/v/TxdSIdpO',
     }
 
@@ -313,7 +340,7 @@ describeForEachParser('videopressIframeEmbedResolver carrier title', (parseHtml)
     const expected: EmbedResolverResult = {
       provider: 'videopress',
       id: 'TxdSIdpO',
-      src: 'https://videopress.com/embed/TxdSIdpO',
+      src: 'https://video.wordpress.com/embed/TxdSIdpO',
       url: 'https://videopress.com/v/TxdSIdpO',
       title: 'WordPress Category Hierarchy',
     }
