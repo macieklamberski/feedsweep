@@ -1,8 +1,8 @@
-import { getPathSegments, isPlainObject, type Nullish } from 'trousse'
+import { getPathSegments, isPlainObject, type Nullish, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find, isBlockElement, isBr, isElement, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'bluesky'
@@ -244,7 +244,10 @@ export const blueskyIframeEmbedResolver = createUrlEmbedResolver(blueskyHosts, (
     return
   }
 
-  return { ...composeEmbedResult(post), ...readSubstackPost(element) }
+  // The colour mode the publisher picked is a param a reader may apply or override.
+  const params = pickQueryParams(parseUrl(url)?.search ?? '', ['colorMode'])
+
+  return { ...composeEmbedResult(post), params, ...readSubstackPost(element) }
 })
 
 // A forum's s9e MediaEmbed helper iframe on s9e.github.io, naming the post in its url fragment.
