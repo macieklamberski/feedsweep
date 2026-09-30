@@ -19,7 +19,7 @@ const framePathRegex = /^\/(code|embed_mk2|fixed|oembed_iframe)\.php$/
 // The loader draws nothing for a `data-size` outside its own table.
 const loaderSizes = ['small', 'medium', 'large']
 
-// pixiv's oEmbed answer states this box for every kind of work.
+// The frame fills any box. This is the box pixiv's oEmbed snippet gives every kind of work.
 const frameWidth = 600
 const frameHeight = 315
 
@@ -136,6 +136,4 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
 
 // pixiv's frames on `embed.pixiv.net`: the loader's `embed_mk2.php`, the older `code.php` card,
 // Hatena Blog's `fixed.php` and the oEmbed `oembed_iframe.php`.
-export const pixivIframeEmbedResolver = createUrlEmbedResolver(frameHosts, pixivResolveEmbed, {
-  preferResolverSize: true,
-})
+export const pixivIframeEmbedResolver = createUrlEmbedResolver(frameHosts, pixivResolveEmbed)

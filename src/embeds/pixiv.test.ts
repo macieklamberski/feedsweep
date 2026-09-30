@@ -537,7 +537,7 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, pixivIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should rebuild the frame the loader wrote on the oEmbed frame and its box', async () => {
+    it('should rebuild the frame the loader wrote on the oEmbed frame, keeping its box', async () => {
       const value = html`
         <iframe
           frameborder="0"
@@ -554,14 +554,14 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
         id: '21083839_8595a4d2c55cbfd73b6d1bcd386bde6e',
         src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=21083839',
         url: 'https://www.pixiv.net/artworks/21083839',
-        width: 600,
-        height: 315,
+        width: 390,
+        height: 347,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should rebuild the older card on the oEmbed frame and its box', async () => {
+    it('should rebuild the older card on the oEmbed frame, keeping its box', async () => {
       const value = html`
         <iframe
           style="background:transparent;"
@@ -579,14 +579,14 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
         id: '12233044_207713685a42a25dbbc43c976b610482',
         src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=12233044',
         url: 'https://www.pixiv.net/artworks/12233044',
-        width: 600,
-        height: 315,
+        width: 380,
+        height: 168,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should rebuild the Hatena Blog frame on the oEmbed frame and its box', async () => {
+    it('should rebuild the Hatena Blog frame on the oEmbed frame, keeping its box', async () => {
       const value = html`
         <iframe
           src="https://embed.pixiv.net/fixed.php?id=149288339"
@@ -603,8 +603,8 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
         id: '149288339',
         src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=149288339',
         url: 'https://www.pixiv.net/artworks/149288339',
-        width: 600,
-        height: 315,
+        width: 400,
+        height: 350,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -823,8 +823,8 @@ describeForEachParser('pixiv through the pipeline', (parseHtml) => {
         data-embed-id="21083839_8595a4d2c55cbfd73b6d1bcd386bde6e"
         data-embed-src="https://embed.pixiv.net/oembed_iframe.php?type=illust&amp;id=21083839"
         data-embed-url="https://www.pixiv.net/artworks/21083839"
-        data-embed-width="600"
-        data-embed-height="315"
+        data-embed-width="390"
+        data-embed-height="347"
       ></div>
     `
 
