@@ -31,6 +31,7 @@ import { mastodonRenderHint } from '../embeds/mastodon.js'
 import { megaphoneRenderHint } from '../embeds/megaphone.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
 import { nbcnewsRenderHint } from '../embeds/nbcnews.js'
+import { neteaseRenderHint } from '../embeds/netease.js'
 import { nicovideoRenderHint } from '../embeds/nicovideo.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
 import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
@@ -102,6 +103,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   megaphoneRenderHint,
   mixcloudRenderHint,
   nbcnewsRenderHint,
+  neteaseRenderHint,
   nicovideoRenderHint,
   notecomRenderHint,
   odnoklassnikiRenderHint,
