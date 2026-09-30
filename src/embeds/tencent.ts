@@ -1,6 +1,8 @@
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'tencent'
 
 // A vid of cover is an unfilled snippet's route word, and it mints a grey poster and a dead link.
 // The word is Tencent's own, from `v.qq.com/x/cover/{cid}/{vid}.html`.
@@ -45,7 +47,7 @@ const tencentResolveEmbed: ResolveEmbed = (url) => {
   }
 
   return {
-    provider: 'tencent',
+    provider,
     id: videoId,
     src: `https://v.qq.com/txp/iframe/player.html?vid=${videoId}`,
     url: `https://v.qq.com/x/page/${videoId}.html`,
@@ -60,3 +62,9 @@ const tencentResolveEmbed: ResolveEmbed = (url) => {
 export const tencentEmbedResolver = createUrlEmbedResolver(tencentHosts, tencentResolveEmbed, {
   preferResolverSize: true,
 })
+
+// The player reads a boolean setting as the string `true`, so `autoplay=1` stays paused.
+export const tencentRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: 'true' },
+}
