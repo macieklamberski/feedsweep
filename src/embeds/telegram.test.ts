@@ -437,17 +437,6 @@ describeForEachParser('telegramS9eEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a fragment stepping out of the post path', async () => {
-      const value = html`
-        <iframe
-          data-s9e-mediaembed="telegram"
-          src="https://s9e.github.io/iframe/2/telegram.min.html#x/../../durov/1"
-        ></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a fragment naming a channel alone', async () => {
       const value = html`
         <iframe
@@ -457,6 +446,26 @@ describeForEachParser('telegramS9eEmbedResolver', (parseHtml) => {
       `
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should resolve dot segments in the fragment as a browser does', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="telegram"
+          src="https://s9e.github.io/iframe/2/telegram.min.html#x/../../durov/1"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'telegram',
+        id: 'durov/1',
+        src: 'https://t.me/durov/1?embed=1',
+        url: 'https://t.me/durov/1',
+        author: '@durov',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

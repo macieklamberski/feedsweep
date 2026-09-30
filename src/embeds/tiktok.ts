@@ -2,7 +2,7 @@ import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, parsePixelSize, text, textNode } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
-import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import {
   atUsername,
   createMarkupEmbedResolver,
@@ -217,7 +217,6 @@ export const tiktokIframeEmbedResolver = createUrlEmbedResolver(
 // A forum's s9e MediaEmbed helper frame, naming the clip id in its url fragment.
 export const tiktokS9eEmbedResolver = createS9eEmbedResolver(
   'tiktok',
-  digitsRegex,
-  (videoId) => tiktokResolveEmbed(`https://www.tiktok.com/embed/v2/${videoId}`),
+  (videoId) => tiktokResolveEmbed(`https://www.tiktok.com/embed/v2/${encodePathSegment(videoId)}`),
   { preferResolverSize: true },
 )

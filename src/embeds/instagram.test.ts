@@ -1017,16 +1017,24 @@ describeForEachParser('instagramS9eEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
 
-    it('should ignore a fragment stepping out of the post path', async () => {
+  describe('edge cases', () => {
+    it('should keep a fragment holding slashes inside the shortcode segment', async () => {
       const value = html`
         <iframe
           data-s9e-mediaembed="instagram"
           src="https://s9e.github.io/iframe/2/instagram.min.html#x/../../reel/CdWN1jeOWr0"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/x%2F..%2F..%2Freel%2FCdWN1jeOWr0',
+        src: 'https://www.instagram.com/p/x%2F..%2F..%2Freel%2FCdWN1jeOWr0/embed/',
+        url: 'https://www.instagram.com/p/x%2F..%2F..%2Freel%2FCdWN1jeOWr0/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

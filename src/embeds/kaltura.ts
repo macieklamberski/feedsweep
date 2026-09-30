@@ -1,6 +1,6 @@
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'kaltura'
@@ -9,13 +9,21 @@ const partnerPathRegex = /^\/p\/([^/]+)\//
 
 const kalturaHost = 'kaltura.com'
 
-// The SaaS hosts all serve the thumbnail route from `cdnapisec.kaltura.com`; a regional API
-// host (`api.ca.kaltura.com`) serves it only itself, so the carrier's host is kept there.
+// The SaaS hosts all serve the player and the thumbnail from `cdnapisec.kaltura.com`; a regional
+// API host (`api.ca.kaltura.com`) serves them only itself, so the carrier's host is kept there.
 const saasHosts = new Set(['kaltura.com', 'www.kaltura.com', 'cdnapi.kaltura.com'])
 
-// The parameters the auto-embed script takes for itself: the div it writes into and the box it
-// gives the iframe. The player options in `flashvars[…]` travel with the rebuilt url.
-const scriptOnlyParams = ['autoembed', 'playerId', 'cache_st', 'width', 'height']
+// The clip's start and end, as the embedIframeJs player and the embedPlaykitJs player read them.
+const playbackParams = [
+  'flashvars[mediaProxy.mediaPlayFrom]',
+  'flashvars[mediaProxy.mediaPlayTo]',
+  'kalturaSeekFrom',
+  'kalturaClipTo',
+]
+
+// The session token an access-controlled entry plays with. It stays in `src` as written, and an
+// entry that needs it gets no thumbnail, since the poster would need it too.
+const tokenParam = 'flashvars[ks]'
 
 type Entry = {
   partner: string
@@ -31,9 +39,17 @@ const readEntry = (url: string | undefined): Entry | undefined => {
   return parsed && partner && entryId ? { partner, entryId, parsed } : undefined
 }
 
-const composeEmbed = ({ partner, entryId, parsed }: Entry, src: string): EmbedResolverResult => {
-  // A regional host serves its thumbnails itself, so the carrier's host is kept there.
-  const thumbnailHost = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
+// The player path names the partner and the player config. Without `iframeembed=true` the same
+// route answers the auto-embed script, not a player.
+const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult => {
+  const host = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
+  const query = composeQuery({ iframeembed: 'true', entry_id: entryId })
+  const hasToken = parsed.searchParams.has(tokenParam)
+  const kept = filterUrlQuery(
+    parsed,
+    (name) => name === tokenParam || playbackParams.includes(name),
+  )
+  const playback = kept.replace('?', '&')
   // The entry comes out of the query decoded, and it goes into a path.
   const entrySegment = encodePathSegment(entryId)
 
@@ -41,9 +57,11 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry, src: string): EmbedRe
     provider,
     // Title and metadata sit behind a session key.
     id: `${partner}/${entryId}`,
-    src,
+    src: `https://${host}${parsed.pathname}${query}${playback}`,
     // The poster answers 200 `image/jpeg` for a real entry, 404 for an invented or a deleted one.
-    thumbnail: `https://${thumbnailHost}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
+    thumbnail: hasToken
+      ? undefined
+      : `https://${host}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
   }
 }
 
@@ -54,7 +72,7 @@ export const kalturaResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  return { ...composeEmbed(entry, url), title: attr(element, 'title') }
+  return { ...composeEmbed(entry), title: attr(element, 'title') }
 }
 
 // Kaltura's embedIframeJs and embedPlaykitJs iframes, which render and only lack a poster.
@@ -73,18 +91,9 @@ export const kalturaScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const src = new URL(entry.parsed)
-    const width = parsePixelSize(src.searchParams.get('width'))
-    const height = parsePixelSize(src.searchParams.get('height'))
-
-    for (const name of scriptOnlyParams) {
-      src.searchParams.delete(name)
-    }
-
-    // The same url with `iframeembed=true` for `autoembed=true` is the iframe the script writes.
-    src.searchParams.set('iframeembed', 'true')
-
-    const result = composeEmbed(entry, src.toString())
+    const width = parsePixelSize(entry.parsed.searchParams.get('width'))
+    const height = parsePixelSize(entry.parsed.searchParams.get('height'))
+    const result = composeEmbed(entry)
 
     return width && height ? { ...result, width, height } : result
   },

@@ -394,10 +394,8 @@ describeForEachParser('readS9eFragment', (parseHtml) => {
   })
 })
 
-const exampleFragmentRegex = /^\w+$/
-
 describeForEachParser('createS9eEmbedResolver', (parseHtml) => {
-  const resolver = createS9eEmbedResolver('example', exampleFragmentRegex, (fragment) => {
+  const resolver = createS9eEmbedResolver('example', (fragment) => {
     return {
       provider: 'example',
       id: fragment,
@@ -422,15 +420,20 @@ describeForEachParser('createS9eEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should ignore a fragment holding a character outside the class', async () => {
+  it('should use a fragment holding a dot as written', async () => {
     const value = html`
       <iframe
         data-s9e-mediaembed="example"
         src="https://s9e.github.io/iframe/2/example.min.html#abc.123"
       ></iframe>
     `
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc.123',
+      src: 'https://player.example.com/abc.123',
+    }
 
-    expect(await extract(value)).toBeUndefined()
+    expect(await extract(value)).toEqual(expected)
   })
 })
 
