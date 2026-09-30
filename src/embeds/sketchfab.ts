@@ -29,12 +29,29 @@ const readModelUid = (parsed: URL): string | undefined => {
   }
 }
 
+// The viewer's look the publisher picked: every `ui_` flag, the spin and the preload. A reader may
+// apply them or set its own.
+const displayParams = ['autospin', 'preload']
+
+const readDisplayParams = (parsed: URL): Record<string, string> => {
+  const params = [...parsed.searchParams].filter(([name]) => {
+    return name.startsWith('ui_') || displayParams.includes(name)
+  })
+
+  return Object.fromEntries(params)
+}
+
 // The carrier's title is not read: most state the snippet's own label, A 3D model, not the name.
 // The thumbnail sits under a per-model hash that the uid does not yield, and
 // `sketchfab.com/oembed?url=…` answers with it and the title, with no key.
 const sketchfabResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
-  const uid = parsed ? readModelUid(parsed) : undefined
+
+  if (!parsed) {
+    return
+  }
+
+  const uid = readModelUid(parsed)
 
   if (!uid) {
     return
@@ -44,6 +61,7 @@ const sketchfabResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id: uid,
     src: `https://sketchfab.com/models/${uid}/embed`,
+    params: readDisplayParams(parsed),
     // The slug is not derivable from the uid, and the site redirects the unslugged `/models/{uid}`
     // to the `/3d-models/{slug}-{uid}` page.
     url: `https://sketchfab.com/models/${uid}`,
