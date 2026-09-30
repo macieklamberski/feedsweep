@@ -18,12 +18,12 @@ describe('donorboxResolveEmbed', () => {
       expect(donorboxResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the query the publisher wrote', () => {
+    it('should keep the amount the publisher prefilled', () => {
       const value = 'https://donorbox.org/embed/donation-form-248?default_interval=m&amount=25'
       const expected: EmbedResolverResult = {
         provider: 'donorbox',
         id: 'donation-form-248',
-        src: 'https://donorbox.org/embed/donation-form-248?default_interval=m&amount=25',
+        src: 'https://donorbox.org/embed/donation-form-248?amount=25',
         url: 'https://donorbox.org/donation-form-248',
         height: 900,
       }
@@ -131,6 +131,34 @@ describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
         src: 'https://donorbox.org/embed/donation-form-248',
         url: 'https://donorbox.org/donation-form-248',
         height: 640,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  // What Donorbox's embed dialog writes: the interval the form opens on and the hidden meter.
+  describe('the query the embed dialog wrote', () => {
+    it('should drop the interval and the meter setting', async () => {
+      const value = html`
+        <iframe
+          src="https://donorbox.org/embed/kde-community?default_interval=o&hide_donation_meter=true"
+          name="donorbox"
+          allowpaymentrequest="allowpaymentrequest"
+          seamless="seamless"
+          frameborder="0"
+          scrolling="no"
+          height="550px"
+          width="100%"
+          style="max-width: 500px; min-width: 310px; max-height:none!important; border-radius: 15px;"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'donorbox',
+        id: 'kde-community',
+        src: 'https://donorbox.org/embed/kde-community',
+        url: 'https://donorbox.org/kde-community',
+        height: 550,
       }
 
       expect(await extract(value)).toEqual(expected)
