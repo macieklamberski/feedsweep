@@ -13,7 +13,7 @@ const tumblrEmbedHosts = ['embed.tumblr.com']
 const tumblrHosts = ['tumblr.com']
 
 // The blog key is written bare on the older route and prefixed `t:` on the current one. Both
-// spellings address the same post, so the id keeps the bare one.
+// spellings address the same post, so the id keeps the bare one and `src` the current one.
 const blogKeyPrefixRegex = /^t:/
 
 const readPostEmbed = (href: string | undefined): EmbedResolverResult | undefined => {
@@ -30,10 +30,12 @@ const readPostEmbed = (href: string | undefined): EmbedResolverResult | undefine
     return
   }
 
+  const bareKey = blogKey.replace(blogKeyPrefixRegex, '')
+
   return {
     provider,
-    id: `${blogKey.replace(blogKeyPrefixRegex, '')}/${postId}`,
-    src: parsed.href,
+    id: `${bareKey}/${postId}`,
+    src: `https://embed.tumblr.com/embed/post/t:${bareKey}/${postId}/v2`,
   }
 }
 
