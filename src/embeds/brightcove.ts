@@ -2,7 +2,7 @@ import type { Nullish } from 'trousse'
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches, paramValue } from '../utils/dom.js'
-import { composeQuery, digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brightcove'
@@ -66,8 +66,10 @@ const composePlayerUrl = (
   embed = 'default',
 ): string => {
   const query = composeQuery({ videoId })
+  // The Flash `publisherID` comes out of a query decoded.
+  const accountSegment = encodePathSegment(account)
 
-  return `https://players.brightcove.net/${account}/${player}_${embed}/index.html${query}`
+  return `https://players.brightcove.net/${accountSegment}/${player}_${embed}/index.html${query}`
 }
 
 // Brightcove's in-page embed: a bare <video-js> or video element only its loader script fills.

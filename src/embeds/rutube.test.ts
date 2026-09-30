@@ -139,8 +139,8 @@ describe('rutubeResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'rutube',
         id: '20a54e4a6f61441d808db45f823a7809/add',
-        src: 'https://rutube.ru/play/embed/20a54e4a6f61441d808db45f823a7809/add',
-        url: 'https://rutube.ru/video/20a54e4a6f61441d808db45f823a7809/add/',
+        src: 'https://rutube.ru/play/embed/20a54e4a6f61441d808db45f823a7809%2Fadd',
+        url: 'https://rutube.ru/video/20a54e4a6f61441d808db45f823a7809%2Fadd/',
         ratio: '16/9',
       }
 

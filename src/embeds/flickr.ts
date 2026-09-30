@@ -1,7 +1,7 @@
-import { isHostOf, type Nullish, parseUrl } from 'trousse'
+import { decodeSegment, isHostOf, type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar, flashVars, keepIfMatches } from '../utils/dom.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver, getEmbedSize } from '../utils/widgets.js'
 
 const flickrHosts = ['flickr.com']
@@ -38,13 +38,13 @@ const composeAlbumPlayer = (setId: string): string => {
 }
 
 const composeStreamPlayer = (owner: string): string => {
-  return `https://embedr.flickr.com/photostreams/${owner}`
+  return `https://embedr.flickr.com/photostreams/${encodePathSegment(owner)}`
 }
 
 // The page player takes either owner spelling, serves no frame-blocking header and takes the
 // same width and height query as embedr.
 const composeAliasStreamPlayer = (owner: string): string => {
-  return `https://www.flickr.com/photos/${owner}/player`
+  return `https://www.flickr.com/photos/${encodePathSegment(owner)}/player`
 }
 
 const composeGroupPlayer = (groupId: string): string => {
@@ -93,11 +93,17 @@ const composePhotoThumbnail = (photoId: string, secret: string): string => {
 const dialogSize = { width: 400, height: 300 }
 
 // What a page path names, whether it arrived in the flashvars or as the framed page itself.
+// An owner read out of a path is decoded, so every owner is held in one form and only the urls
+// encode it.
+const decodeOwner = (owner: string): string => {
+  return decodeSegment(owner) ?? owner
+}
+
 const readPageSubject = (page: string): FlickrSubject | undefined => {
   const set = page.match(setPathRegex)
 
   if (set) {
-    return { owner: set[1], setId: set[2] }
+    return { owner: decodeOwner(set[1]), setId: set[2] }
   }
 
   const group = page.match(groupPathRegex)
@@ -109,7 +115,7 @@ const readPageSubject = (page: string): FlickrSubject | undefined => {
   const stream = page.match(streamPathRegex)
 
   if (stream) {
-    return { owner: stream[1] }
+    return { owner: decodeOwner(stream[1]) }
   }
 }
 
@@ -131,7 +137,10 @@ const readFlashPhoto = (element: Nullish<Element>): FlickrPhoto | undefined => {
     return
   }
 
-  return { photoId, secret: flashVar(element, 'photo_secret') }
+  const secret = flashVar(element, 'photo_secret')
+
+  // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
+  return { photoId, secret: secret ? encodePathSegment(secret) : undefined }
 }
 
 // The iframe carrier names its subject in its own query. A set is preferred where several
@@ -157,7 +166,7 @@ const readPhotoSubject = (parsed: URL): FlickrPhoto | undefined => {
   const player = parsed.pathname.match(photoPathRegex)
 
   if (player) {
-    return { owner: player[1], photoId: player[2], secret: player[3] }
+    return { owner: decodeOwner(player[1]), photoId: player[2], secret: player[3] }
   }
 
   const embedr = isHostOf(parsed, embedrHost) && parsed.pathname.match(embedrPhotoPathRegex)
@@ -178,7 +187,7 @@ const composePhotoEmbed = (src: string, photo: FlickrPhoto): EmbedResolverResult
     id: owner ? `photos/${owner}/${photoId}` : `p/${encodeBase58(photoId)}`,
     src,
     url: owner
-      ? `https://www.flickr.com/photos/${owner}/${photoId}/`
+      ? `https://www.flickr.com/photos/${encodePathSegment(owner)}/${photoId}/`
       : composeShortPhotoUrl(photoId),
     thumbnail: secret ? composePhotoThumbnail(photoId, secret) : undefined,
     author: readOwnerAlias(owner),
@@ -197,7 +206,7 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
       // The album's key-free oEmbed needs `{owner}/{setId}`: a title, an author, a thumbnail.
       id: `${owner}/${subject.setId}`,
       src: composeAlbumPlayer(subject.setId),
-      url: `https://www.flickr.com/photos/${owner}/sets/${subject.setId}`,
+      url: `https://www.flickr.com/photos/${encodePathSegment(owner)}/sets/${subject.setId}`,
       author,
     }
   }
@@ -230,7 +239,7 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
       id: `photostreams/${owner}`,
       // embedr 404s on an alias, so only an NSID goes there.
       src: nsidRegex.test(owner) ? composeStreamPlayer(owner) : composeAliasStreamPlayer(owner),
-      url: `https://www.flickr.com/photos/${owner}/`,
+      url: `https://www.flickr.com/photos/${encodePathSegment(owner)}/`,
       author,
     }
   }

@@ -563,6 +563,19 @@ describe('youtubeResolveEmbed', () => {
     expect(youtubeResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should keep a decoded uploads username carrying a separator in one path segment', () => {
+    const value = 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser%2F..%2Fx'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'user/SomeUser/../x',
+      src: 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser%2F..%2Fx',
+      url: 'https://www.youtube.com/user/SomeUser%2F..%2Fx',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for a user_uploads embed with no list', () => {
     const value = 'https://www.youtube.com/embed?listType=user_uploads'
 
@@ -1058,6 +1071,12 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
 
     it('should return undefined for an empty videoid', async () => {
       const value = '<amp-youtube data-videoid=""></amp-youtube>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a videoid holding a route word', async () => {
+      const value = '<amp-youtube data-videoid="videoseries"></amp-youtube>'
 
       expect(await extract(value)).toBeUndefined()
     })

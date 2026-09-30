@@ -1,7 +1,12 @@
 import { getPathSegments, type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  digitsRegex,
+  encodePathSegment,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const slideshareHosts = ['slideshare.net', 'slidesharecdn.com']
@@ -215,7 +220,11 @@ const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
   // anchor.
   const account = parsed.searchParams.get('userName')
   const slug = parsed.searchParams.get('stripped_title')
-  const composed = account && slug ? `https://www.slideshare.net/${account}/${slug}` : undefined
+  // Both come out of the query decoded, and each goes into a path segment of its own.
+  const composed =
+    account && slug
+      ? `https://www.slideshare.net/${encodePathSegment(account)}/${encodePathSegment(slug)}`
+      : undefined
 
   return composeEmbed(deck, { ...caption, url: caption.url ?? composed })
 }

@@ -238,9 +238,9 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'prezi',
-        id: 'testonly0001/x',
-        src: 'https://prezi.com/p/testonly0001/x/embed',
-        url: 'https://prezi.com/p/testonly0001/x/',
+        id: 'testonly0001%2Fx',
+        src: 'https://prezi.com/p/testonly0001%2Fx/embed',
+        url: 'https://prezi.com/p/testonly0001%2Fx/',
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -805,6 +805,26 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a decoded query token carrying a separator in one path segment', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-href="https://codepen.io/leaverou/pen/OJYzQjN?token=c8ec7595%2F..%2Fx"
+        ></p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'OJYzQjN',
+        src: 'https://codepen.io/leaverou/embed/OJYzQjN/c8ec7595%2F..%2Fx',
+        url: 'https://codepen.io/leaverou/pen/OJYzQjN/c8ec7595%2F..%2Fx',
+        thumbnail: 'https://shots.codepen.io/leaverou/pen/OJYzQjN-512.jpg',
+        height: 300,
+        author: '@leaverou',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should use a malformed token as written, even if the player answers an error', async () => {
       const value = html`
         <p

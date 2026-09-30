@@ -66,6 +66,19 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
     // The same post with its colons escaped. LinkedIn serves the escaped spelling a body
     // identical to the plain one, so the src stays as the publisher wrote it and only the id
     // and the canonical url are built from the decoded urn.
+    it('should keep a decoded urn in one path segment and its colons as written', async () => {
+      const value =
+        '<iframe src="https://www.linkedin.com/embed/feed/update/urn%3Ali%3Ashare%3A123%2F..%2Fx"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'linkedin',
+        id: 'urn:li:share:123/../x',
+        src: 'https://www.linkedin.com/embed/feed/update/urn%3Ali%3Ashare%3A123%2F..%2Fx',
+        url: 'https://www.linkedin.com/feed/update/urn:li:share:123%2F..%2Fx',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read a urn whose colons are percent-encoded', async () => {
       const value =
         '<iframe src="https://www.linkedin.com/embed/feed/update/urn%3Ali%3Ashare%3A6626097641602281472"></iframe>'

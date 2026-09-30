@@ -91,7 +91,7 @@ describe('calameoResolveEmbed', () => {
         provider: 'calameo',
         id: '../books',
         src: 'https://v.calameo.com/?bkcode=..%2Fbooks',
-        url: 'https://www.calameo.com/books/../books',
+        url: 'https://www.calameo.com/books/..%2Fbooks',
       }
 
       expect(calameoResolveEmbed(value)).toEqual(expected)

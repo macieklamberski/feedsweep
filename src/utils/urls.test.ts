@@ -4,6 +4,7 @@ import {
   cleanUrl,
   composeQuery,
   dropUrlParams,
+  encodePathSegment,
   filterUrlQuery,
   parseUrlOnHosts,
   pickQueryParams,
@@ -239,6 +240,28 @@ describe('pickQueryParams', () => {
     const expected = { start: '10' }
 
     expect(pickQueryParams(value, ['start'])).toEqual(expected)
+  })
+})
+
+describe('encodePathSegment', () => {
+  it('should escape the characters that would open a segment, a query or a fragment', () => {
+    const value = '123/../x?autoplay=1#t'
+    const expected = '123%2F..%2Fx%3Fautoplay=1%23t'
+
+    expect(encodePathSegment(value)).toBe(expected)
+  })
+
+  it('should escape a literal percent sign and whitespace', () => {
+    const value = '50% off\tnow'
+    const expected = '50%25%20off%09now'
+
+    expect(encodePathSegment(value)).toBe(expected)
+  })
+
+  it('should leave the characters a path segment may hold as written', () => {
+    const value = '35408001@N04:urn=a&b'
+
+    expect(encodePathSegment(value)).toBe(value)
   })
 })
 

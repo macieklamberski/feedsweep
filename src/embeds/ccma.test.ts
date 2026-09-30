@@ -85,9 +85,9 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'ccma',
-        id: '../../x',
-        src: 'https://www.3cat.cat/3cat/video/../../x/embed/',
-        url: 'https://www.ccma.cat/video/../../x/',
+        id: '..%2F..%2Fx',
+        src: 'https://www.3cat.cat/3cat/video/..%2F..%2Fx/embed/',
+        url: 'https://www.ccma.cat/video/..%2F..%2Fx/',
         ratio: '16/9',
       }
 
@@ -120,6 +120,24 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
         id: '723529',
         src: 'https://www.3cat.cat/3cat/video/723529/embed/',
         url: 'https://www.ccma.cat/video/723529/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a decoded video id carrying a separator in one path segment', async () => {
+      const value = html`
+        <embed
+          src="https://www.tv3.cat/svp2/svp2.swf"
+          flashvars="VIDEO_ID=723529%2F..%2Fx"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ccma',
+        id: '723529%2F..%2Fx',
+        src: 'https://www.3cat.cat/3cat/video/723529%2F..%2Fx/embed/',
+        url: 'https://www.ccma.cat/video/723529%2F..%2Fx/',
         ratio: '16/9',
       }
 

@@ -142,6 +142,20 @@ describe('kalturaResolveEmbed', () => {
       expect(kalturaResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep a decoded entry id carrying a separator in one thumbnail path segment', () => {
+      const value =
+        'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bwzism%2F..%2F..%2Fx'
+      const expected: EmbedResolverResult = {
+        provider: 'kaltura',
+        id: '520801/1_w0bwzism/../../x',
+        src: 'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bwzism%2F..%2F..%2Fx',
+        thumbnail:
+          'https://cdnapisec.kaltura.com/p/520801/thumbnail/entry_id/1_w0bwzism%2F..%2F..%2Fx/width/640',
+      }
+
+      expect(kalturaResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should leave the Flash widget alone', () => {
       const value =
         'http://www.kaltura.com/index.php/kwidget/wid/_203822/uiconf_id/1898102/entry_id/1_s2i7y09d/'

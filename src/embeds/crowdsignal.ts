@@ -1,7 +1,7 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'crowdsignal'
@@ -13,11 +13,14 @@ const retiredPollPathRegex = /^\/poll\/(\d+)\/?$/
 const flashPlayerPathRegex = /^\/poll\.swf$/
 
 const composeEmbed = (pollId: string): EmbedResolverResult => {
+  // The Flash flashvar `p` comes out decoded, and it goes into a path.
+  const segment = encodePathSegment(pollId)
+
   return {
     provider,
     id: pollId,
-    src: `https://poll.fm/${pollId}/embed`,
-    url: `https://poll.fm/${pollId}`,
+    src: `https://poll.fm/${segment}/embed`,
+    url: `https://poll.fm/${segment}`,
   }
 }
 

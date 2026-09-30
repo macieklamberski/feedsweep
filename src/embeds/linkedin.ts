@@ -1,5 +1,6 @@
 import { decodeSegment, getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
+import { encodePathSegment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const linkedinHosts = ['linkedin.com']
@@ -28,7 +29,7 @@ const linkedinResolveEmbed: ResolveEmbed = (url) => {
     // Kept as written: `collapsed` and `compact` pick the layout the stated height belongs to.
     src: url,
     // The activity urn is assigned server-side, so a share urn cannot be rewritten to it.
-    url: `https://www.linkedin.com/feed/update/${postUrn}`,
+    url: `https://www.linkedin.com/feed/update/${encodePathSegment(postUrn)}`,
   }
 }
 
