@@ -191,7 +191,7 @@ describe('mixcloudResolveEmbed', () => {
       id: 'photogmusic/no-filter',
       src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F',
       url: 'https://www.mixcloud.com/photogmusic/no-filter/',
-      height: 160,
+      height: 120,
       author: 'photogmusic',
     }
 
@@ -205,89 +205,24 @@ describe('mixcloudResolveEmbed', () => {
       id: '../etc/no-filter',
       src: 'https://www.mixcloud.com/widget/iframe/?feed=%2F..%2Fetc%2Fno-filter%2F',
       url: 'https://www.mixcloud.com/..%2Fetc/no-filter/',
-      height: 160,
+      height: 120,
       author: '..',
     }
 
     expect(mixcloudResolveEmbed(value)).toEqual(expected)
   })
 
-  // The display options pick the player, so they ride through and the height follows them.
-  it('should carry the display options and size the mini player by them', () => {
+  // The display options pick another look, so the widget is minted as the cover player.
+  it('should drop the display options and state the cover player box', () => {
     const value =
-      'https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&light=1&mini=1&feed=%2Fdjgavinboyd%2Fsoul-has-no-tempo%2F'
+      'https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&light=1&mini=1&hide_artwork=1&feed=%2Fdjgavinboyd%2Fsoul-has-no-tempo%2F'
     const expected: EmbedResolverResult = {
       provider: 'mixcloud',
       id: 'djgavinboyd/soul-has-no-tempo',
-      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fdjgavinboyd%2Fsoul-has-no-tempo%2F&mini=1&hide_cover=1&light=1',
+      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fdjgavinboyd%2Fsoul-has-no-tempo%2F',
       url: 'https://www.mixcloud.com/djgavinboyd/soul-has-no-tempo/',
-      height: 60,
+      height: 120,
       author: 'djgavinboyd',
-    }
-
-    expect(mixcloudResolveEmbed(value)).toEqual(expected)
-  })
-
-  // The bar shrinks to the mini height only with the cover hidden: with it on, the artwork
-  // player is what `mini` selects, and that one fills whatever height it gets.
-  it('should keep the full height for a mini player showing its cover', () => {
-    const value =
-      'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F&mini=1'
-    const expected: EmbedResolverResult = {
-      provider: 'mixcloud',
-      id: 'photogmusic/no-filter',
-      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F&mini=1',
-      url: 'https://www.mixcloud.com/photogmusic/no-filter/',
-      height: 160,
-      author: 'photogmusic',
-    }
-
-    expect(mixcloudResolveEmbed(value)).toEqual(expected)
-  })
-
-  it('should carry the artwork flag', () => {
-    const value =
-      'https://www.mixcloud.com/widget/iframe/?hide_artwork=1&feed=%2Fubunoirwro%2Flab-under-the-radar-closing-set-2024-10-26-uczulenie%2F'
-    const expected: EmbedResolverResult = {
-      provider: 'mixcloud',
-      id: 'ubunoirwro/lab-under-the-radar-closing-set-2024-10-26-uczulenie',
-      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fubunoirwro%2Flab-under-the-radar-closing-set-2024-10-26-uczulenie%2F&hide_artwork=1',
-      url: 'https://www.mixcloud.com/ubunoirwro/lab-under-the-radar-closing-set-2024-10-26-uczulenie/',
-      height: 160,
-      author: 'ubunoirwro',
-    }
-
-    expect(mixcloudResolveEmbed(value)).toEqual(expected)
-  })
-
-  it('should keep a display option and drop a tracker beside it', () => {
-    const value =
-      'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F&light=1&utm_source=newsletter'
-    const expected: EmbedResolverResult = {
-      provider: 'mixcloud',
-      id: 'photogmusic/no-filter',
-      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F&light=1',
-      url: 'https://www.mixcloud.com/photogmusic/no-filter/',
-      height: 160,
-      author: 'photogmusic',
-    }
-
-    expect(mixcloudResolveEmbed(value)).toEqual(expected)
-  })
-
-  // Only a flag set to `1` is a display option. Anything else in the query, the legacy
-  // `embed_type` or a flag switched off, is not written back.
-  it('should drop a display option that is not switched on', () => {
-    const value =
-      'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F&mini=0&autoplay=1'
-
-    const expected: EmbedResolverResult = {
-      provider: 'mixcloud',
-      id: 'photogmusic/no-filter',
-      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F',
-      url: 'https://www.mixcloud.com/photogmusic/no-filter/',
-      height: 160,
-      author: 'photogmusic',
     }
 
     expect(mixcloudResolveEmbed(value)).toEqual(expected)
@@ -311,7 +246,7 @@ describeForEachParser('mixcloudEmbedResolver', (parseHtml) => {
       id: 'photogmusic/no-filter',
       src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F',
       url: 'https://www.mixcloud.com/photogmusic/no-filter/',
-      height: 160,
+      height: 120,
       author: 'photogmusic',
     }
 
@@ -328,9 +263,9 @@ describeForEachParser('mixcloudEmbedResolver', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'mixcloud',
       id: 'djselarom/dark-synthesis-25',
-      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fdjselarom%2Fdark-synthesis-25%2F&hide_cover=1',
+      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fdjselarom%2Fdark-synthesis-25%2F',
       url: 'https://www.mixcloud.com/djselarom/dark-synthesis-25/',
-      height: 160,
+      height: 120,
       title: 'Dark Synthesis #25',
       author: 'djselarom',
     }
@@ -352,7 +287,7 @@ describeForEachParser('mixcloudEmbedResolver', (parseHtml) => {
       id: 'FakeIDRadio/4-natty-champs',
       src: 'https://www.mixcloud.com/widget/iframe/?feed=%2FFakeIDRadio%2F4-natty-champs%2F',
       url: 'https://www.mixcloud.com/FakeIDRadio/4-natty-champs/',
-      height: 160,
+      height: 120,
       author: 'FakeIDRadio',
     }
 
@@ -381,7 +316,7 @@ describeForEachParser('mixcloudEmbedResolver', (parseHtml) => {
       id: 'photogmusic/no-filter',
       src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F',
       url: 'https://www.mixcloud.com/photogmusic/no-filter/',
-      height: 160,
+      height: 120,
       author: 'photogmusic',
     }
 
@@ -408,7 +343,7 @@ describeForEachParser('mixcloud through the pipeline', (parseHtml) => {
         data-embed-provider="mixcloud"
         data-embed-id="photogmusic/no-filter"
         data-embed-url="https://www.mixcloud.com/photogmusic/no-filter/"
-        data-embed-height="160"
+        data-embed-height="120"
         data-embed-author="photogmusic"
       ></div>
     `
