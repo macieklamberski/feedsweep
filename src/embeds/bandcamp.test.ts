@@ -78,8 +78,15 @@ describe('extractBandcampRelease', () => {
   })
 })
 
-// Presets the lab's carriers wrote, each drawn by the publisher in a box of its own.
-const presetCases: Array<string> = ['small', 'medium', 'venti', 'grande2', 'tall']
+// Presets the lab's carriers wrote, each in the box its layout draws. Each row is
+// [preset, height].
+const presetCases: Array<[string, number]> = [
+  ['small', 42],
+  ['medium', 120],
+  ['venti', 100],
+  ['grande2', 355],
+  ['tall', 295],
+]
 
 describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, bandcampEmbedResolver)
@@ -156,8 +163,7 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // `t=` is the track number the album player opens on, the other way the embed dialog
-    // spells a picked track.
+    // `t=` is the track number the album player opens on: this specimen plays track 38.
     it('should keep the track number an album player opens on', async () => {
       const value = html`
         <iframe
@@ -311,10 +317,10 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
 
     it.each(presetCases)(
       'should mint the default player in place of the %s preset',
-      async (preset) => {
+      async (preset, height) => {
         const value = html`
           <iframe
-            style="border: 0; width: 100%; height: 42px;"
+            style="border: 0; width: 100%; height: ${height}px;"
             src="https://bandcamp.com/EmbeddedPlayer/album=42/size=${preset}/bgcol=ffffff/linkcol=0687f5/transparent=true/"
             seamless
           ></iframe>

@@ -14,7 +14,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // A release is either an album or a single track.
 const releaseRegex = /^(album|track)=([^/]+)$/
-// The track number an album player opens on, which the embed dialog writes when a track is picked.
+// The track number an album player opens on: `album=2182110545/t=38/` plays track 38.
 const startTrackRegex = /^t=[^/]+$/
 // The player with no `size` segment, Bandcamp's own default layout. It lays out as a strip 100
 // tall at any width and leaves the rest of the frame blank.
