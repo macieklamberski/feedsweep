@@ -58,6 +58,19 @@ describe('googleslidesResolveEmbed', () => {
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep only the slide a shared fragment opens on', () => {
+      const value =
+        'https://docs.google.com/presentation/d/1Hon1kkhjBilU1QXrpoC5TRK7vTqoGbYxvI1vFfuLtLM/edit#slide=id.g117889fc3d_0_0&pid=explorer&a=v&chrome=false&embedded=true'
+      const expected: EmbedResolverResult = {
+        provider: 'googleslides',
+        id: '1Hon1kkhjBilU1QXrpoC5TRK7vTqoGbYxvI1vFfuLtLM',
+        src: 'https://docs.google.com/presentation/d/1Hon1kkhjBilU1QXrpoC5TRK7vTqoGbYxvI1vFfuLtLM/embed#slide=id.g117889fc3d_0_0',
+        url: 'https://docs.google.com/presentation/d/1Hon1kkhjBilU1QXrpoC5TRK7vTqoGbYxvI1vFfuLtLM/pub',
+      }
+
+      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should resolve a deck framed by its file id', () => {
       const value =
         'https://docs.google.com/presentation/d/1OZRGyfKsSRX84MBi3LYPUkLkArsvevJV52Hm6zTd-9s/embed?start=false&loop=false&delayms=3000'
@@ -123,13 +136,13 @@ describe('googleslidesResolveEmbed', () => {
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the legacy frame that names the file id in its query, without its autoplay', () => {
+    it('should rebuild the legacy frame that names the file id in its query onto the current player', () => {
       const value =
         'https://docs.google.com/presentation/embed?id=1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk&start=false&loop=false&delayms=3000'
       const expected: EmbedResolverResult = {
         provider: 'googleslides',
         id: '1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk',
-        src: 'https://docs.google.com/presentation/embed?id=1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk&loop=false&delayms=3000',
+        src: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/embed?loop=false&delayms=3000',
         url: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/pub',
       }
 
@@ -203,7 +216,7 @@ describe('googleslidesResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'googleslides',
         id: '../../document/d/x',
-        src: 'https://docs.google.com/presentation/embed?id=..%2F..%2Fdocument%2Fd%2Fx',
+        src: 'https://docs.google.com/presentation/d/..%2F..%2Fdocument%2Fd%2Fx/embed',
         url: 'https://docs.google.com/presentation/d/..%2F..%2Fdocument%2Fd%2Fx/pub',
       }
 
@@ -216,7 +229,7 @@ describe('googleslidesResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'googleslides',
         id: '1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/x',
-        src: 'https://docs.google.com/presentation/embed?id=1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx',
+        src: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx/embed',
         url: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx/pub',
       }
 
