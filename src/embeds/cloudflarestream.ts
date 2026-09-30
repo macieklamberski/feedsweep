@@ -1,5 +1,5 @@
 import { isHostOrSubdomainOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   absoluteUrlRegex,
@@ -9,6 +9,8 @@ import {
   placeholderBaseUrl,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'cloudflarestream'
 
 const cloudflarestreamHosts = [
   'cloudflarestream.com', // Every publisher's own `customer-{accountCode}` subdomain
@@ -61,7 +63,7 @@ export const cloudflarestreamResolveEmbed: ResolveEmbed = (url) => {
   const poster = keepIfMatches(parsed.searchParams.get('poster'), absoluteUrlRegex)
 
   return {
-    provider: 'cloudflarestream',
+    provider,
     // The bare `videodelivery.net` serves every account's video, so the id needs no account code.
     id: videoId,
     src: `https://${parsed.hostname}${playerPath}${pickUrlParams(url, playerParams)}`,
@@ -94,10 +96,15 @@ export const cloudflarestreamScriptEmbedResolver = createMarkupEmbedResolver(
     // The loader names no account, so the video is rebuilt on the shared host, which holds it
     // whichever account uploaded it.
     return {
-      provider: 'cloudflarestream',
+      provider,
       id: videoId,
       src: `https://${deliveryPlayerHost}/${segment}`,
       thumbnail: composeThumbnail(segment, deliveryThumbnailHost),
     }
   },
 )
+
+export const cloudflarestreamRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: 'true' },
+}
