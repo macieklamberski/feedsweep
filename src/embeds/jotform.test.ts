@@ -8,16 +8,6 @@ import {
   jotformScriptEmbedResolver,
 } from './jotform.js'
 
-const trackerUrls: Array<string> = [
-  'https://form.jotform.com/260493476454061?fbclid=abc',
-  'https://form.jotform.com/260493476454061?utm_campaign=spring',
-  'https://form.jotform.com/260493476454061?utm_content=link',
-  'https://form.jotform.com/260493476454061?utm_id=42',
-  'https://form.jotform.com/260493476454061?utm_medium=email',
-  'https://form.jotform.com/260493476454061?utm_source=post',
-  'https://form.jotform.com/260493476454061?utm_term=form',
-]
-
 describe('jotformResolveEmbed', () => {
   describe('happy paths', () => {
     it('should build the form from the bare id url', () => {
@@ -46,24 +36,12 @@ describe('jotformResolveEmbed', () => {
       expect(jotformResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep a prefill the publisher wrote and drop a campaign tag', () => {
-      const value = 'https://form.jotform.com/260493476454061?name=Jane&utm_source=post'
+    it('should carry the query over as published, campaign tags included', () => {
+      const value = 'https://form.jotform.com/260493476454061?name=Jane&utm_source=post&fbclid=abc'
       const expected: EmbedResolverResult = {
         provider: 'jotform',
         id: '260493476454061',
-        src: 'https://form.jotform.com/260493476454061?name=Jane',
-        url: 'https://form.jotform.com/260493476454061',
-        height: 539,
-      }
-
-      expect(jotformResolveEmbed(value)).toEqual(expected)
-    })
-
-    it.each(trackerUrls)('should drop the campaign tag from %s', (value) => {
-      const expected: EmbedResolverResult = {
-        provider: 'jotform',
-        id: '260493476454061',
-        src: 'https://form.jotform.com/260493476454061',
+        src: 'https://form.jotform.com/260493476454061?name=Jane&utm_source=post&fbclid=abc',
         url: 'https://form.jotform.com/260493476454061',
         height: 539,
       }

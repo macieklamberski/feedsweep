@@ -79,7 +79,7 @@ const readId = (candidate: Nullish<string>): string | undefined => {
 
 // A playlist names no single video, so it is read separately and only once the video readers have
 // found nothing: `/embed/video/{id}?playlist={id}` is a video playing inside one, not a playlist.
-export const extractDailymotionPlaylistId = (link: string): string | undefined => {
+const extractDailymotionPlaylistId = (link: string): string | undefined => {
   const url = parseUrl(link, placeholderBaseUrl)
 
   if (!url) {

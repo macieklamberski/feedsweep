@@ -158,16 +158,22 @@ export const convertWidgets: DomTransform = (context) => {
 
         const src = resolveOrDropUrl(metadata.src, context)
 
-        if (!src) {
-          continue
-        }
-
         if (isMediaResult(metadata)) {
+          if (!src) {
+            continue
+          }
+
           const poster = resolveOrKeepUrl(metadata.poster, context)
           const mediaElement = createMediaElement(document, { ...metadata, src, poster })
           const target = carrierOrShell(element)
 
           target.replaceWith(captionMedia(document, mediaElement, target, metadata.title))
+          continue
+        }
+
+        // A src that resolves to nothing drops the embed. No src at all names a player only a
+        // fetch can find, which enrichment fills in from the provider and id.
+        if (metadata.src ? !src : !metadata.id) {
           continue
         }
 

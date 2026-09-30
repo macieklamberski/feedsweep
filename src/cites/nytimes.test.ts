@@ -57,6 +57,22 @@ describeForEachParser('nytimesCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should resolve a bare article path against nytimes.com', async () => {
+      const value = html`
+        <iframe
+          title="A post"
+          src="https://www.nytimes.com/svc/oembed/html/?url=%2F2020%2F04%2F13%2Fscience%2Fputin.html"
+        ></iframe>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'nytimes',
+        url: 'https://www.nytimes.com/2020/04/13/science/putin.html',
+        title: 'A post',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -76,17 +92,6 @@ describeForEachParser('nytimesCiteResolver', (parseHtml) => {
         <iframe
           title="A post"
           src="https://www.nytimes.com/svc/oembed/html/"
-        ></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a card whose article url is relative', async () => {
-      const value = html`
-        <iframe
-          title="A post"
-          src="https://www.nytimes.com/svc/oembed/html/?url=%2F2020%2F04%2F13%2Fscience%2Fputin.html"
         ></iframe>
       `
 
