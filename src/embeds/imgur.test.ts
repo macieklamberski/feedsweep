@@ -43,6 +43,8 @@ const sitePaths = [
   'https://imgur.com/api',
   'https://imgur.com/vote',
   'https://imgur.com/notifications',
+  'https://imgur.com/dmca',
+  'https://imgur.com/Hot',
 ]
 
 describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {

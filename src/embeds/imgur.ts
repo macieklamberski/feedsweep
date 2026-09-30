@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -29,7 +29,7 @@ const tagRoute = 't'
 
 // Imgur's own pages sit at the same depth as a post. `memes`, `tools` and `viral` are posts a
 // person uploaded, and `topics` serves the not-found shell an untaken id does.
-const sitePathSegments = new Set([
+const sitePathSegments = [
   'about',
   'account',
   'ads',
@@ -37,6 +37,7 @@ const sitePathSegments = new Set([
   'apps',
   'blog',
   'contact',
+  'dmca',
   'download',
   'emerald',
   'faq',
@@ -61,7 +62,7 @@ const sitePathSegments = new Set([
   'user',
   'vidgif',
   'vote',
-])
+]
 
 // The gallery's own listings, sitting where an album id would. `trending` also passes the id shape.
 const galleryListingSegments = new Set(['hot', 'new', 'top', 'trending'])
@@ -162,7 +163,7 @@ export const imgurResolveEmbed: ResolveEmbed = (url) => {
     return composeAlbumEmbed(second)
   }
 
-  if (!route || sitePathSegments.has(route)) {
+  if (!route || isAnyOf(route, sitePathSegments)) {
     return
   }
 

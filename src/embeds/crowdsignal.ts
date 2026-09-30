@@ -12,9 +12,6 @@ const loaderPathRegex = /^\/p\/([^/]+)\.js$/
 const retiredPollPathRegex = /^\/poll\/([^/]+)\/?$/
 const flashPlayerPathRegex = /^\/poll\.swf$/
 
-// Scripts in the loader directory that name no poll.
-const nonPollScripts = new Set(['embed'])
-
 const composeEmbed = (pollId: string): EmbedResolverResult => {
   // The Flash flashvar `p` comes out decoded, and it goes into a path.
   const segment = encodePathSegment(pollId)
@@ -66,7 +63,7 @@ export const crowdsignalScriptEmbedResolver = createMarkupEmbedResolver(
     const loader = parseUrlOnHosts(attr(element, 'src'), 'polldaddy.com')
     const pollId = loader?.pathname.match(loaderPathRegex)?.[1]
 
-    if (!pollId || nonPollScripts.has(pollId)) {
+    if (!pollId) {
       return
     }
 

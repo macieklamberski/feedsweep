@@ -44,7 +44,8 @@ export const slideshareResolveEmbed: ResolveEmbed = (url) => {
   // `/slideshow/embed_code/key/{key}` is the current form and `/slideshow/embed_code/{id}` the
   // one it replaced, which still serves by redirecting to the key form.
   const isKeyed = segments[marker + 1] === 'key'
-  const deck = isKeyed ? segments[marker + 2] : segments[marker + 1]
+  // Some feeds put `&doc=` where the `?` belonged, so the id is cut at the `&`: an id never holds one.
+  const deck = (isKeyed ? segments[marker + 2] : segments[marker + 1])?.split('&')[0]
 
   // SlideShare serves files on slidesharecdn.com, so a file name is an enclosure.
   if (!deck || isFileName(deck)) {

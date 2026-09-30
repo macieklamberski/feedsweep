@@ -20,6 +20,18 @@ describe('slideshareResolveEmbed', () => {
     expect(slideshareResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should cut a numeric id at the query a feed wrote into the path', () => {
+    const value =
+      'https://www.slideshare.net/slideshow/embed_code/17382857&doc=random-130319172534-phpapp02'
+    const expected: EmbedResolverResult = {
+      provider: 'slideshare',
+      id: '17382857',
+      src: 'https://www.slideshare.net/slideshow/embed_code/17382857',
+    }
+
+    expect(slideshareResolveEmbed(value)).toEqual(expected)
+  })
+
   // Both spaces have grown since 2011, and neither length is what selects a deck.
   it('should keep a key longer than the ones minted so far', () => {
     const value = 'https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAYlongerkey'
