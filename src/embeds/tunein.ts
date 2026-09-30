@@ -1,6 +1,8 @@
 import { getPathSegments } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'tunein'
 
 // A guide id opens with its kind letter: `s` for a station, `p` for a program, `t` for a topic.
 const guideIdRegex = /^([a-z])/
@@ -23,7 +25,7 @@ export const tuneinResolveEmbed: ResolveEmbed = (url) => {
   const hasPage = pageKinds.includes(kind)
 
   return {
-    provider: 'tunein',
+    provider,
     id: guideId,
     src: `https://tunein.com/embed/player/${guideId}/`,
     url: hasPage ? `https://tunein.com/radio/${guideId}/` : undefined,
@@ -32,3 +34,8 @@ export const tuneinResolveEmbed: ResolveEmbed = (url) => {
 }
 
 export const tuneinEmbedResolver = createUrlEmbedResolver(['tunein.com'], tuneinResolveEmbed)
+
+export const tuneinRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: 'true' },
+}
