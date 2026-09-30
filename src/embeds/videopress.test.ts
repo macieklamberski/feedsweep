@@ -23,7 +23,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'FLEAXUMB',
-        src: 'https://videopress.com/embed/FLEAXUMB?hd=0',
+        src: 'https://video.wordpress.com/embed/FLEAXUMB?cover=1&preloadContent=metadata&useAverageColor=1&hd=0',
         url: 'https://videopress.com/v/FLEAXUMB',
         width: 800,
         height: 450,
@@ -45,7 +45,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'bDC13L49',
-        src: 'https://videopress.com/embed/bDC13L49?hd=1',
+        src: 'https://videopress.com/embed/bDC13L49?hd=1&autoPlay=0',
         url: 'https://videopress.com/v/bDC13L49',
         width: 640,
         height: 360,
@@ -61,7 +61,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'FLEAXUMB',
-        src: 'https://videopress.com/embed/FLEAXUMB?at=42&loop=1',
+        src: 'https://videopress.com/embed/FLEAXUMB?at=42&loop=1&muted=1',
         url: 'https://videopress.com/v/FLEAXUMB',
       }
 
@@ -80,12 +80,12 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should resolve the page url a page builder frames as the player', async () => {
+    it('should keep the page url a page builder frames, which serves the player', async () => {
       const value = '<iframe src="https://videopress.com/v/FLEAXUMB"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'FLEAXUMB',
-        src: 'https://videopress.com/embed/FLEAXUMB',
+        src: 'https://videopress.com/v/FLEAXUMB',
         url: 'https://videopress.com/v/FLEAXUMB',
       }
 
@@ -138,7 +138,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'FLEAXUMB',
-        src: 'https://videopress.com/embed/FLEAXUMB',
+        src: 'https://video.wordpress.com/embed/FLEAXUMB',
         url: 'https://videopress.com/v/FLEAXUMB',
       }
 

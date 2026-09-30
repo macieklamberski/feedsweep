@@ -1,7 +1,7 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'videopress'
@@ -15,16 +15,11 @@ const safeGuidRegex = /^[a-zA-Z0-9]+$/
 // `s0.videopress.com` and `v0.wordpress.com`.
 const videopressHosts = ['videopress.com', 'video.wordpress.com', 'v0.wordpress.com']
 
-// Where playback starts, whether it loops, and whether the publisher asked for the HD
-// rendition. The rest of the query the block editor writes (`cover`, `preloadContent`,
-// `useAverageColor`) styles the player and goes with the rebuilt src.
-const videopressEmbedParams = ['at', 'hd', 'loop']
-
-const composeEmbed = (guid: string, query = ''): EmbedResolverResult => {
+const composeEmbed = (guid: string): EmbedResolverResult => {
   return {
     provider,
     id: guid,
-    src: `https://videopress.com/embed/${guid}${query}`,
+    src: `https://videopress.com/embed/${guid}`,
     url: `https://videopress.com/v/${guid}`,
   }
 }
@@ -44,8 +39,10 @@ const videopressResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
+  // The player plays as written, with the start, loop, cover and controls the publisher set.
   return {
-    ...composeEmbed(safeGuid, pickUrlParams(url, videopressEmbedParams)),
+    ...composeEmbed(safeGuid),
+    src: url,
     title: attr(element, 'title'),
   }
 }
@@ -61,7 +58,9 @@ export const videopressIframeEmbedResolver = createUrlEmbedResolver(
 export const readVideopressEmbedSrc = (link: string): string | undefined => {
   const url = parseUrlOnHosts(link, videopressHosts)
 
-  return url ? videopressResolveEmbed(url.href)?.src : undefined
+  const guid = url ? videopressResolveEmbed(url.href)?.id : undefined
+
+  return guid ? composeEmbed(guid).src : undefined
 }
 
 const flashPlayerPathRegex = /\/player\.swf$/i
