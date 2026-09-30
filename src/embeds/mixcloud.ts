@@ -81,9 +81,9 @@ export const extractMixcloudShow = (link: string): string | undefined => {
   return readShowUrl(link)?.key
 }
 
-// The player is fluid in width and fixed in height: the bar draws 160 whatever the frame allows.
-// The publisher's `mini`, `hide_cover`, `hide_artwork` and `light` pick another look and are left
-// out, so every widget is this bar.
+// Without the publisher's `mini`, `hide_cover`, `hide_artwork` and `light`, the widget is the cover
+// player, which fills whatever box it gets. 160 is the box stated for it, tall enough for the
+// artwork and the play button.
 const playerHeight = 160
 
 export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {

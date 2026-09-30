@@ -212,10 +212,10 @@ describe('mixcloudResolveEmbed', () => {
     expect(mixcloudResolveEmbed(value)).toEqual(expected)
   })
 
-  // The display options pick another look, so the widget is minted as the bar and sized as one.
-  it('should drop the display options and size the bar the widget draws', () => {
+  // The display options pick another look, so the widget is minted as the cover player.
+  it('should drop the display options and state the cover player box', () => {
     const value =
-      'https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&light=1&mini=1&feed=%2Fdjgavinboyd%2Fsoul-has-no-tempo%2F'
+      'https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&light=1&mini=1&hide_artwork=1&feed=%2Fdjgavinboyd%2Fsoul-has-no-tempo%2F'
     const expected: EmbedResolverResult = {
       provider: 'mixcloud',
       id: 'djgavinboyd/soul-has-no-tempo',
