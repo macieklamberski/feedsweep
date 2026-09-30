@@ -1,5 +1,5 @@
 import { isHostOrSubdomainOf, toMap } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -105,3 +105,9 @@ const srgplayResolveEmbed: ResolveEmbed = (url) => {
 export const srgplayEmbedResolver = createUrlEmbedResolver(srgplayHosts, srgplayResolveEmbed, {
   preferResolverSize: true,
 })
+
+export const srgplayRenderHint: EmbedRenderHint = {
+  provider,
+  // The player reads `autoPlay` with a capital P, and a lowercase `autoplay` leaves it paused.
+  autoplayParams: { autoPlay: 'true' },
+}
