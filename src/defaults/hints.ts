@@ -30,6 +30,8 @@ import { mailruRenderHint } from '../embeds/mailru.js'
 import { mastodonRenderHint } from '../embeds/mastodon.js'
 import { megaphoneRenderHint } from '../embeds/megaphone.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
+import { nbcnewsRenderHint } from '../embeds/nbcnews.js'
+import { neteaseRenderHint } from '../embeds/netease.js'
 import { nicovideoRenderHint } from '../embeds/nicovideo.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
 import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
@@ -49,6 +51,7 @@ import { spreakerRenderHint } from '../embeds/spreaker.js'
 import { srgplayRenderHint } from '../embeds/srgplay.js'
 import { tedRenderHint } from '../embeds/ted.js'
 import { telegramRenderHint } from '../embeds/telegram.js'
+import { tencentRenderHint } from '../embeds/tencent.js'
 import { transistorRenderHint } from '../embeds/transistor.js'
 import { tumblrRenderHint } from '../embeds/tumblr.js'
 import { tuneinRenderHint } from '../embeds/tunein.js'
@@ -99,6 +102,8 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   mastodonRenderHint,
   megaphoneRenderHint,
   mixcloudRenderHint,
+  nbcnewsRenderHint,
+  neteaseRenderHint,
   nicovideoRenderHint,
   notecomRenderHint,
   odnoklassnikiRenderHint,
@@ -118,6 +123,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   srgplayRenderHint,
   tedRenderHint,
   telegramRenderHint,
+  tencentRenderHint,
   transistorRenderHint,
   tumblrRenderHint,
   tuneinRenderHint,
