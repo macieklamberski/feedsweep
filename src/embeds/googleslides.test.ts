@@ -6,7 +6,7 @@ import { googleslidesEmbedResolver, googleslidesResolveEmbed } from './googlesli
 
 describe('googleslidesResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should keep the slideshow settings of a published deck frame and drop its autoplay', () => {
+    it('should keep a published deck frame as written and leave its start to the render hint', () => {
       const value =
         'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed?start=true&loop=true&delayms=3000'
       const expected: EmbedResolverResult = {
@@ -123,7 +123,7 @@ describe('googleslidesResolveEmbed', () => {
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the legacy frame that names the file id in its query, without its autoplay', () => {
+    it('should keep the legacy frame that names the file id in its query as written', () => {
       const value =
         'https://docs.google.com/presentation/embed?id=1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk&start=false&loop=false&delayms=3000'
       const expected: EmbedResolverResult = {
@@ -205,13 +205,13 @@ describe('googleslidesResolveEmbed', () => {
   })
 
   describe('the Workspace domain prefix', () => {
-    it('should frame a published deck behind a Workspace prefix on its own path', () => {
+    it('should keep a published deck frame behind a Workspace prefix as written', () => {
       const value =
         'https://docs.google.com/a/redhat.com/presentation/d/e/2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231/embed?start=false&loop=false&delayms=3000'
       const expected: EmbedResolverResult = {
         provider: 'googleslides',
         id: '2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231',
-        src: 'https://docs.google.com/presentation/d/e/2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231/embed?loop=false&delayms=3000',
+        src: 'https://docs.google.com/a/redhat.com/presentation/d/e/2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231/embed?loop=false&delayms=3000',
         url: 'https://docs.google.com/presentation/d/e/2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231/pub',
       }
 
