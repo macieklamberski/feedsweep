@@ -1,7 +1,6 @@
 import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { filterUrlQuery } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'observable'
@@ -16,13 +15,6 @@ const handleRegex = /^@[^\s/?#]+$/
 const notebookRegex = /^(?!(?:\.|%2e){1,2}$)[^\s/?#]+$/i
 const versionSuffixRegex = /@[^@/]*$/
 
-// The campaign tags a share link picks up, the only part of the query the frame does not get.
-const isKeptParam = (name: string): boolean => {
-  const lowercased = name.toLowerCase()
-
-  return lowercased !== 'fbclid' && !lowercased.startsWith('utm_')
-}
-
 // Observable's notebook frame, observablehq.com/embed/@{user}/{notebook}[@{version}]?cells={names},
 // or embed/{16 hex}[@{version}] for a notebook addressed by its id.
 const observableResolveEmbed: ResolveEmbed = (url) => {
@@ -34,8 +26,7 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // The query names which cells the frame renders, in `cells` or a repeated `cell`, and the frame
-  // hands the rest to the notebook's own code, so all of it but the trackers is kept.
-  parsed.search = filterUrlQuery(parsed, isKeptParam)
+  // hands the rest to the notebook's own code, so all of it is kept.
   const src = parsed.href
 
   // `@{version}` pins one revision of a notebook rather than naming another one, and the document

@@ -97,16 +97,16 @@ const parseFallback = (element: Nullish<Element>): Element | undefined => {
   )
 }
 
-export const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
+const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
-  const releases = readReleases(url)
-  const release = releases.find(([kind]) => kind === 'track') ?? releases[0]
+  const release = extractBandcampRelease(url)
 
   if (!parsed || !release) {
     return
   }
 
-  const [kind, id] = release
+  const releases = readReleases(url)
+  const [kind, id] = release.split('/')
   // The video player names a track and only a track: `VideoEmbed?album={id}` answers 404. A video
   // carrier whose only release is an album falls back to the audio player, which does serve it.
   const isVideo = videoPathRegex.test(parsed.pathname) && kind === 'track'
@@ -130,7 +130,7 @@ export const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
 
   return {
     provider,
-    id: `${kind}/${id}`,
+    id: release,
     src: isVideo
       ? `https://bandcamp.com/VideoEmbed${composeQuery({ [kind]: id })}`
       : `https://bandcamp.com/EmbeddedPlayer/${selection}${size}`,

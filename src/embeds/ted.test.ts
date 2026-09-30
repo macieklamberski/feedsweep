@@ -188,6 +188,23 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should use a malformed talk key as written, even if the url answers an error', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          flashvars="adKeys=talk=brene-brown.on_vulnerability;year=2010"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: 'brene-brown.on_vulnerability',
+        src: 'https://embed.ted.com/embed/brene-brown.on_vulnerability',
+        url: 'https://www.ted.com/talks/brene-brown.on_vulnerability',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The `<object>` dialect states the configuration in a sibling param rather than on the
     // carrier, and both spellings appear in the same snippet.
     it('should read the configuration out of a sibling param', async () => {
