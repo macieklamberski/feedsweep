@@ -51,6 +51,7 @@ import { spreakerRenderHint } from '../embeds/spreaker.js'
 import { srgplayRenderHint } from '../embeds/srgplay.js'
 import { tedRenderHint } from '../embeds/ted.js'
 import { telegramRenderHint } from '../embeds/telegram.js'
+import { tencentRenderHint } from '../embeds/tencent.js'
 import { transistorRenderHint } from '../embeds/transistor.js'
 import { tumblrRenderHint } from '../embeds/tumblr.js'
 import { tuneinRenderHint } from '../embeds/tunein.js'
@@ -122,6 +123,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   srgplayRenderHint,
   tedRenderHint,
   telegramRenderHint,
+  tencentRenderHint,
   transistorRenderHint,
   tumblrRenderHint,
   tuneinRenderHint,
