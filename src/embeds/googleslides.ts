@@ -30,12 +30,14 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
       return
     }
 
+    // The file id comes out of the query decoded, and it goes into a path.
+    const deckPath = encodePathSegment(fileId)
+
     return {
       provider: 'googleslides',
       id: fileId,
-      src: `https://docs.google.com/presentation/embed${pickUrlParams(url, ['id', ...deckParams])}${parsed.hash}`,
-      // The file id comes out of the query decoded, and it goes into a path.
-      url: `https://docs.google.com/presentation/d/${encodePathSegment(fileId)}/pub`,
+      src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${parsed.hash}`,
+      url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
     }
   }
 
