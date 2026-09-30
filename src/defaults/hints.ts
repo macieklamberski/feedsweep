@@ -34,6 +34,7 @@ import { spreakerRenderHint } from '../embeds/spreaker.js'
 import { tedRenderHint } from '../embeds/ted.js'
 import { telegramRenderHint } from '../embeds/telegram.js'
 import { tumblrRenderHint } from '../embeds/tumblr.js'
+import { tuneinRenderHint } from '../embeds/tunein.js'
 import { twitterRenderHint } from '../embeds/twitter.js'
 import { videopressRenderHint } from '../embeds/videopress.js'
 import { vimeoRenderHint } from '../embeds/vimeo.js'
@@ -82,6 +83,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   tedRenderHint,
   telegramRenderHint,
   tumblrRenderHint,
+  tuneinRenderHint,
   twitterRenderHint,
   videopressRenderHint,
   vimeoRenderHint,
