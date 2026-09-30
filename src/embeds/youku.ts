@@ -1,7 +1,9 @@
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
 import { encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'youku'
 
 // Every Youku video id opens with a literal X, and without it a route word in the id position,
 // embed/about, reads as a video.
@@ -54,7 +56,7 @@ const youkuResolveEmbed: ResolveEmbed = (url) => {
   // The poster lives under a hash the id does not yield, and the player host serves the same
   // shell for any id.
   return {
-    provider: 'youku',
+    provider,
     id: videoId,
     src: `https://player.youku.com/embed/${videoId}`,
     url: `https://v.youku.com/v_show/id_${videoId}.html`,
@@ -66,3 +68,8 @@ const youkuResolveEmbed: ResolveEmbed = (url) => {
 export const youkuEmbedResolver = createUrlEmbedResolver(youkuHosts, youkuResolveEmbed, {
   preferResolverSize: true,
 })
+
+export const youkuRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: 'true' },
+}

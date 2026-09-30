@@ -8,7 +8,7 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, pixivScriptEmbedResolver)
 
   describe('happy paths', () => {
-    it('should build the small card from the loader, with the credits', async () => {
+    it('should mint the oEmbed frame from the loader, with the credits', async () => {
       const value = html`
         <script
           src="https://s.pximg.net/source/embed.js"
@@ -28,10 +28,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '68454421_3242fa3dae02423915c3de740a31d501',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=68454421_3242fa3dae02423915c3de740a31d501',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=68454421',
         url: 'https://www.pixiv.net/artworks/68454421',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
         title: 'コミティア124　新刊サンプル',
         author: 'みなづき忍',
       }
@@ -39,7 +39,7 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the medium size the loader names and state the small card', async () => {
+    it('should drop the medium size the loader names', async () => {
       const value = html`
         <script
           src="http://source.pixiv.net/source/embed.js"
@@ -59,10 +59,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '32104226_e6e76f8a0e345d37e9ae9f92d4bdc6cf',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=32104226_e6e76f8a0e345d37e9ae9f92d4bdc6cf',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=32104226',
         url: 'https://www.pixiv.net/artworks/32104226',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
         title: 'C83新刊 まんまるドロップ',
         author: '空木次葉@31日東H-10b',
       }
@@ -70,7 +70,7 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the border setting and state the bordered card', async () => {
+    it('should drop the border setting', async () => {
       const value = html`
         <script
           charset="utf-8"
@@ -83,10 +83,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '23640843_aed3b4ace6e9e5064dc2b234a588ab61',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=23640843_aed3b4ace6e9e5064dc2b234a588ab61',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=23640843',
         url: 'https://www.pixiv.net/artworks/23640843',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -105,10 +105,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '15697702_45428a6a134cff27a403d86973c3baf2',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=15697702_45428a6a134cff27a403d86973c3baf2',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=15697702',
         url: 'https://www.pixiv.net/artworks/15697702',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -141,9 +141,9 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '../other',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=..%2Fother',
-        width: 220,
-        height: 250,
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=..%2Fother',
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -161,9 +161,9 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '45958594_2a40&size=large',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=45958594_2a40%26size%3Dlarge',
-        width: 220,
-        height: 250,
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594_2a40%26size%3Dlarge',
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -186,9 +186,9 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '45958594"]',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=45958594%22%5D',
-        width: 220,
-        height: 250,
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594%22%5D',
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -251,10 +251,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594',
         url: 'https://www.pixiv.net/artworks/45958594',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -273,10 +273,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594',
         url: 'https://www.pixiv.net/artworks/45958594',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -295,10 +295,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594',
         url: 'https://www.pixiv.net/artworks/45958594',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
         title: 'A work',
       }
 
@@ -318,10 +318,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594',
         url: 'https://www.pixiv.net/artworks/45958594',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -340,10 +340,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594',
         url: 'https://www.pixiv.net/artworks/45958594',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -362,10 +362,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594',
         url: 'https://www.pixiv.net/artworks/45958594',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -384,10 +384,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594',
         url: 'https://www.pixiv.net/artworks/45958594',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -406,10 +406,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=45958594_2a40c2e14793e84b2a7d7d6ecc7cde12',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594',
         url: 'https://www.pixiv.net/artworks/45958594',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -467,10 +467,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '20876902_3eb1f86c6564f3f6b250710fc5f386e0',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=20876902_3eb1f86c6564f3f6b250710fc5f386e0',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=20876902',
         url: 'https://www.pixiv.net/artworks/20876902',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -495,10 +495,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '20876902_3eb1f86c6564f3f6b250710fc5f386e0',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=20876902_3eb1f86c6564f3f6b250710fc5f386e0',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=20876902',
         url: 'https://www.pixiv.net/artworks/20876902',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -522,10 +522,10 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '20876902_3eb1f86c6564f3f6b250710fc5f386e0',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=20876902_3eb1f86c6564f3f6b250710fc5f386e0',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=20876902',
         url: 'https://www.pixiv.net/artworks/20876902',
-        width: 220,
-        height: 250,
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -537,7 +537,7 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, pixivIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should state the small card over the box the loader measured for the medium one', async () => {
+    it('should rebuild the frame the loader wrote on the oEmbed frame, keeping its box', async () => {
       const value = html`
         <iframe
           frameborder="0"
@@ -552,16 +552,16 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '21083839_8595a4d2c55cbfd73b6d1bcd386bde6e',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=21083839_8595a4d2c55cbfd73b6d1bcd386bde6e',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=21083839',
         url: 'https://www.pixiv.net/artworks/21083839',
-        width: 220,
-        height: 250,
+        width: 390,
+        height: 347,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should rebuild the older card on the current frame and its box', async () => {
+    it('should rebuild the older card on the oEmbed frame, keeping its box', async () => {
       const value = html`
         <iframe
           style="background:transparent;"
@@ -577,16 +577,16 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '12233044_207713685a42a25dbbc43c976b610482',
-        src: 'https://embed.pixiv.net/embed_mk2.php?id=12233044_207713685a42a25dbbc43c976b610482',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=12233044',
         url: 'https://www.pixiv.net/artworks/12233044',
-        width: 220,
-        height: 250,
+        width: 380,
+        height: 168,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the Hatena Blog frame', async () => {
+    it('should rebuild the Hatena Blog frame on the oEmbed frame, keeping its box', async () => {
       const value = html`
         <iframe
           src="https://embed.pixiv.net/fixed.php?id=149288339"
@@ -601,7 +601,7 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '149288339',
-        src: 'https://embed.pixiv.net/fixed.php?id=149288339',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=149288339',
         url: 'https://www.pixiv.net/artworks/149288339',
         width: 400,
         height: 350,
@@ -619,6 +619,21 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
           frameborder="0"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'pixiv',
+        id: '93349282',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=93349282',
+        url: 'https://www.pixiv.net/artworks/93349282',
+        width: 600,
+        height: 315,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop a tracker from the oEmbed frame', async () => {
+      const value =
+        '<iframe src="https://embed.pixiv.net/oembed_iframe.php?type=illust&amp;id=93349282&amp;utm_source=feed"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '93349282',
@@ -670,7 +685,9 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '149288339/../x',
-        src: 'https://embed.pixiv.net/fixed.php?id=149288339%2F..%2Fx',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=149288339%2F..%2Fx',
+        width: 600,
+        height: 315,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -734,10 +751,10 @@ describeForEachParser('pixiv through the pipeline', (parseHtml) => {
       <div
         data-embed-provider="pixiv"
         data-embed-id="45958594_2a40c2e14793e84b2a7d7d6ecc7cde12"
-        data-embed-src="https://embed.pixiv.net/embed_mk2.php?id=45958594_2a40c2e14793e84b2a7d7d6ecc7cde12"
+        data-embed-src="https://embed.pixiv.net/oembed_iframe.php?type=illust&amp;id=45958594"
         data-embed-url="https://www.pixiv.net/artworks/45958594"
-        data-embed-width="220"
-        data-embed-height="250"
+        data-embed-width="600"
+        data-embed-height="315"
         data-embed-title="A work"
         data-embed-author="An artist"
       ></div>
@@ -762,10 +779,10 @@ describeForEachParser('pixiv through the pipeline', (parseHtml) => {
       <div
         data-embed-provider="pixiv"
         data-embed-id="45958594_2a40c2e14793e84b2a7d7d6ecc7cde12"
-        data-embed-src="https://embed.pixiv.net/embed_mk2.php?id=45958594_2a40c2e14793e84b2a7d7d6ecc7cde12"
+        data-embed-src="https://embed.pixiv.net/oembed_iframe.php?type=illust&amp;id=45958594"
         data-embed-url="https://www.pixiv.net/artworks/45958594"
-        data-embed-width="220"
-        data-embed-height="250"
+        data-embed-width="600"
+        data-embed-height="315"
       ></div>
       <p>on <a href="http://www.pixiv.net/">pixiv</a></p>
     `
@@ -804,10 +821,10 @@ describeForEachParser('pixiv through the pipeline', (parseHtml) => {
       <div
         data-embed-provider="pixiv"
         data-embed-id="21083839_8595a4d2c55cbfd73b6d1bcd386bde6e"
-        data-embed-src="https://embed.pixiv.net/embed_mk2.php?id=21083839_8595a4d2c55cbfd73b6d1bcd386bde6e"
+        data-embed-src="https://embed.pixiv.net/oembed_iframe.php?type=illust&amp;id=21083839"
         data-embed-url="https://www.pixiv.net/artworks/21083839"
-        data-embed-width="220"
-        data-embed-height="250"
+        data-embed-width="390"
+        data-embed-height="347"
       ></div>
     `
 
@@ -827,10 +844,10 @@ describeForEachParser('pixiv through the pipeline', (parseHtml) => {
         data-enclosure=""
         data-embed-provider="pixiv"
         data-embed-id="21083839_8595a4d2c55cbfd73b6d1bcd386bde6e"
-        data-embed-src="https://embed.pixiv.net/embed_mk2.php?id=21083839_8595a4d2c55cbfd73b6d1bcd386bde6e"
+        data-embed-src="https://embed.pixiv.net/oembed_iframe.php?type=illust&amp;id=21083839"
         data-embed-url="https://www.pixiv.net/artworks/21083839"
-        data-embed-width="220"
-        data-embed-height="250"
+        data-embed-width="600"
+        data-embed-height="315"
       ></div>
       <p>Body</p>
     `

@@ -17,21 +17,19 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/',
-        params: {},
         ratio: '13/9',
       }
 
       expect(pbsResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should give the widget route the same key and keep the clip bounds it reads', () => {
+    it('should give the widget route the same key and keep only its clip bounds', () => {
       const value =
         'https://player.pbs.org/widget/partnerplayer/2365866769/?start=0&end=0&chapterbar=false&endscreen=false'
       const expected: EmbedResolverResult = {
         provider: 'pbs',
         id: 'viralplayer/2365866769',
-        src: 'https://player.pbs.org/widget/partnerplayer/2365866769/?start=0&end=0&endscreen=false',
-        params: {},
+        src: 'https://player.pbs.org/widget/partnerplayer/2365866769/?start=0&end=0',
         ratio: '13/9',
       }
 
@@ -44,71 +42,57 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'partnerplayer/Nt5uxMIZd-YQIx5g14yatg==',
         src: 'https://player.pbs.org/partnerplayer/Nt5uxMIZd-YQIx5g14yatg==/',
-        params: {},
         ratio: '13/9',
       }
 
       expect(pbsResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should drop trackers and the reader settings from the query', () => {
+    it('should drop trackers, the reader settings and the layout from the query', () => {
       const value =
         'https://player.pbs.org/viralplayer/3005825044/?utm_source=feed&autoplay=true&muted=true&topbar=false'
       const expected: EmbedResolverResult = {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
-        src: 'https://player.pbs.org/viralplayer/3005825044/?topbar=false',
-        params: {},
+        src: 'https://player.pbs.org/viralplayer/3005825044/',
         ratio: '13/9',
       }
 
       expect(pbsResolveEmbed(value)).toEqual(expected)
     })
 
-    // Each layout parameter the player bundle reads besides the clip bounds.
-    const playerParams: Array<string> = ['chapter=2', 'h=360', 'previewLayout=fullbleed']
+    // The clip bounds and the chapter, which decide what plays.
+    const playbackParams: Array<string> = ['start=30', 'end=60', 'chapter=2']
 
-    it.each(playerParams)('should keep %s', (param) => {
+    it.each(playbackParams)('should keep %s', (param) => {
       const value = `https://player.pbs.org/viralplayer/3005825044/?${param}`
       const expected: EmbedResolverResult = {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: `https://player.pbs.org/viralplayer/3005825044/?${param}`,
-        params: {},
         ratio: '13/9',
       }
 
       expect(pbsResolveEmbed(value)).toEqual(expected)
     })
 
-    // Each setting the publisher chose for this one embed.
-    const publisherParams: Array<[string, string]> = [
-      ['unsafeDisableUpsellHref', 'true'],
-      ['unsafeDisableSponsorship', 'true'],
-      ['unsafeDisableContinuousPlay', 'true'],
+    // The layout and the settings the publisher chose for this one embed.
+    const displayParams: Array<string> = [
+      'h=360',
+      'topbar=false',
+      'endscreen=false',
+      'previewLayout=fullbleed',
+      'unsafeDisableUpsellHref=true',
+      'unsafeDisableSponsorship=true',
+      'unsafeDisableContinuousPlay=true',
     ]
 
-    it.each(publisherParams)('should move %s off the src into params', (name, param) => {
-      const value = `https://player.pbs.org/viralplayer/3005825044/?${name}=${param}`
+    it.each(displayParams)('should drop %s', (param) => {
+      const value = `https://player.pbs.org/viralplayer/3005825044/?${param}`
       const expected: EmbedResolverResult = {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/',
-        params: { [name]: param },
-        ratio: '13/9',
-      }
-
-      expect(pbsResolveEmbed(value)).toEqual(expected)
-    })
-
-    it('should split the layout into the src and the publisher settings into params', () => {
-      const value =
-        'https://player.pbs.org/viralplayer/3005825044/?topbar=false&unsafeDisableSponsorship=true&utm_source=feed'
-      const expected: EmbedResolverResult = {
-        provider: 'pbs',
-        id: 'viralplayer/3005825044',
-        src: 'https://player.pbs.org/viralplayer/3005825044/?topbar=false',
-        params: { unsafeDisableSponsorship: 'true' },
         ratio: '13/9',
       }
 
@@ -121,7 +105,6 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/',
-        params: {},
         ratio: '13/9',
       }
 
@@ -134,7 +117,6 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/1506734069',
         src: 'https://player.pbs.org/viralplayer/1506734069/',
-        params: {},
         ratio: '13/9',
       }
 
@@ -179,7 +161,6 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005%2F825044',
         src: 'https://player.pbs.org/viralplayer/3005%2F825044/',
-        params: {},
         ratio: '13/9',
       }
 
@@ -210,7 +191,6 @@ describeForEachParser('pbsIframeEmbedResolver', (parseHtml) => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/',
-        params: {},
         width: 512,
         height: 332,
       }
@@ -273,7 +253,6 @@ describeForEachParser('pbsLegacyIframeEmbedResolver', (parseHtml) => {
         provider: 'pbs',
         id: 'viralplayer/1506734069',
         src: 'https://player.pbs.org/viralplayer/1506734069/',
-        params: {},
         ratio: '13/9',
       }
 
