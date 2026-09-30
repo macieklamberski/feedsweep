@@ -66,13 +66,13 @@ describe('canvaResolveEmbed', () => {
       expect(canvaResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the meta layout the publisher chose', () => {
+    it('should drop the meta flag the oEmbed snippet writes', () => {
       const value =
         'https://www.canva.com/design/DAF_VGS3W3Y/EoSxKp1t6a1Sfsq9j-4_8A/view?embed&meta'
       const expected: EmbedResolverResult = {
         provider: 'canva',
         id: 'DAF_VGS3W3Y/EoSxKp1t6a1Sfsq9j-4_8A',
-        src: 'https://www.canva.com/design/DAF_VGS3W3Y/EoSxKp1t6a1Sfsq9j-4_8A/view?embed&meta',
+        src: 'https://www.canva.com/design/DAF_VGS3W3Y/EoSxKp1t6a1Sfsq9j-4_8A/view?embed',
         url: 'https://www.canva.com/design/DAF_VGS3W3Y/EoSxKp1t6a1Sfsq9j-4_8A/view',
       }
 
