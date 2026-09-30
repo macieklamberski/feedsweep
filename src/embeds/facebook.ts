@@ -1,4 +1,4 @@
-import { type Nullish, parseUrl } from 'trousse'
+import { type Nullish, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, parsePixelSize, text } from '../utils/dom.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
@@ -32,29 +32,24 @@ const readFallback = (blockquote: Nullish<Element>): Partial<EmbedResolverResult
 
 const fallbackSelector = '.fb-xfbml-parse-ignore blockquote, blockquote.fb-xfbml-parse-ignore'
 
-// A carrier that does not already hold a plugin url resolves to one built around the page it
-// named, which is the only form Facebook frames. The page is also the canonical url, so a caller
-// that knows a better id than the href states it in `extra`.
+// Every carrier resolves to a plugin url built around the page it names, which is the only form
+// Facebook frames. The page is also the canonical url, so a caller that knows a better id than
+// the href states it in `extra`. `t`, where a video starts, is kept as the carrier wrote it.
 const composePluginEmbed = (
   plugin: string,
   href: string,
   extra: Partial<EmbedResolverResult>,
-  start?: string,
+  t?: string,
 ): EmbedResolverResult => {
   // Absolutised here: `resolveUrlFn` never touches the id or a query, so a bare href would reach
   // enrichment with no scheme and address nothing.
   const absoluteHref = parseUrl(href, 'https://www.facebook.com')?.href ?? href
-  const pairs = [`href=${encodeURIComponent(absoluteHref)}`]
-
-  // Where a video starts playing, kept as the carrier wrote it.
-  if (start) {
-    pairs.push(`t=${encodeURIComponent(start)}`)
-  }
+  const query = composeQuery(trimObject({ href: absoluteHref, t }))
 
   return {
     provider: 'facebook',
     id: absoluteHref,
-    src: `https://www.facebook.com/plugins/${plugin}.php?${pairs.join('&')}`,
+    src: `https://www.facebook.com/plugins/${plugin}.php${query}`,
     url: href,
     ...extra,
   }
@@ -172,12 +167,16 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  // The plugin is rebuilt around the href it names. The caption toggle, the width the dialog
-  // wrote and the publisher's app id are the look, and the size stays on the result.
+  // The plugin is rebuilt around the href it names. The caption toggle, the size the dialog wrote,
+  // the app id and a Graph API version in the path are the look, and the size stays on the result.
   const plugin = parsed.pathname.endsWith('/video.php') ? 'video' : 'post'
-  const start = parsed.searchParams.get('t') ?? undefined
 
-  return composePluginEmbed(plugin, href, querySize(parsed), start)
+  return composePluginEmbed(
+    plugin,
+    href,
+    querySize(parsed),
+    parsed.searchParams.get('t') ?? undefined,
+  )
 }
 
 // Facebook's plugin iframe, or a pasted post, video or watch page, which x-frame-options blanks.

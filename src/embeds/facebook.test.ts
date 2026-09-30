@@ -498,6 +498,24 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a start at zero', async () => {
+      const value = html`
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=314&amp;href=https%3A%2F%2Fwww.facebook.com%2Fnolimitblades%2Fvideos%2F835543906514182%2F&amp;show_text=false&amp;width=560&amp;t=0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/nolimitblades/videos/835543906514182/',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fnolimitblades%2Fvideos%2F835543906514182%2F&t=0',
+        url: 'https://www.facebook.com/nolimitblades/videos/835543906514182/',
+        width: 560,
+        height: 314,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should drop the app id the publisher wrote', async () => {
       const value = html`
         <iframe
@@ -534,7 +552,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
 
     // Older SDKs built the plugin url with their Graph API version in the path, and those
     // copies still serve the same plugin.
-    it('should accept the versioned post plugin path', async () => {
+    it('should drop the Graph API version from a post plugin path', async () => {
       const value = html`
         <iframe
           src="https://www.facebook.com/v2.5/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
