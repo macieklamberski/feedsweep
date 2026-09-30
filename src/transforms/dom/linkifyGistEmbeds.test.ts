@@ -84,24 +84,30 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave an amp-gist with a malformed gist id untouched', async () => {
+  it('should use a malformed gist id as written, even if the link answers an error', async () => {
     const value = '<amp-gist data-gistid="../../evil"></amp-gist>'
+    const expected =
+      '<a href="https://gist.github.com/../../evil">https://gist.github.com/../../evil</a>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave an amp-gist whose gist id carries a trailing path untouched', async () => {
+  it('should use a gist id carrying a trailing path as written', async () => {
     const value = '<amp-gist data-gistid="b9bb35bc68df68259af94430f012425f/raw"></amp-gist>'
+    const expected =
+      '<a href="https://gist.github.com/b9bb35bc68df68259af94430f012425f/raw">https://gist.github.com/b9bb35bc68df68259af94430f012425f/raw</a>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a gist script whose id carries an encoded slash untouched', async () => {
+  it('should use a malformed gist script id as written, even if the link answers an error', async () => {
     const value = html`
       <script src="https://gist.github.com/octocat/6cad326836d38bd3a7ae%2Fraw.js"></script>
     `
+    const expected =
+      '<a href="https://gist.github.com/octocat/6cad326836d38bd3a7ae%2Fraw">https://gist.github.com/octocat/6cad326836d38bd3a7ae%2Fraw</a>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should leave an amp-gist with an empty gist id untouched', async () => {

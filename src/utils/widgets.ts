@@ -448,7 +448,7 @@ export const prepareEmbedMetadata = (
 
   return {
     ...cleanResultFields(metadata, context),
-    src: isAnyOf(metadata.provider, context.cleanedSrcProviders) ? cleanUrl(src, context) : src,
+    src: cleanUrl(src, context),
     url: cleanUrl(resolveOrDropUrl(metadata.url, context), context),
     thumbnail: resolveOrKeepUrl(metadata.thumbnail, context),
     avatar: resolveOrKeepUrl(metadata.avatar, context),

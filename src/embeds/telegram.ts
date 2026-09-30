@@ -63,7 +63,7 @@ export const telegramScriptEmbedResolver = createMarkupEmbedResolver(
 )
 
 // The post iframe that script builds, saved into the feed by a CMS that ran it first.
-export const telegramResolveEmbed: ResolveEmbed = (url) => {
+const telegramResolveEmbed: ResolveEmbed = (url) => {
   return readPost(getPathSegments(url).join('/'))
 }
 

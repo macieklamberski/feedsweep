@@ -109,16 +109,11 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   return {
     kind,
     slug,
-    ...trimObject(
-      {
-        user,
-        ownerPath: user && (isTeam ? `team/${user}` : user),
-        key: keepIfMatches(parsed.searchParams.get('key') ?? undefined, urlSafeTokenRegex),
-        token: keepIfMatches(token, urlSafeTokenRegex),
-        height,
-      },
-      Boolean,
-    ),
+    user,
+    ownerPath: user && (isTeam ? `team/${user}` : user),
+    key: keepIfMatches(parsed.searchParams.get('key') ?? undefined, urlSafeTokenRegex),
+    token: keepIfMatches(token, urlSafeTokenRegex),
+    height,
   }
 }
 

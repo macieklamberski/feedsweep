@@ -1,4 +1,4 @@
-import { composeEmbedUrl, readSrcMediaId, safeMediaIdRegex } from '../../embeds/wistia.js'
+import { composeEmbedUrl, readSrcMediaId } from '../../embeds/wistia.js'
 import type { DomTransform } from '../../types.js'
 import { attr, parseRatio } from '../../utils/dom.js'
 import { createIframe } from '../../utils/widgets.js'
@@ -59,7 +59,7 @@ export const rebuildWistiaEmbeds: DomTransform = () => (document) => {
 
     const mediaId = readMediaId(element)
 
-    if (!mediaId || !safeMediaIdRegex.test(mediaId)) {
+    if (!mediaId) {
       continue
     }
 

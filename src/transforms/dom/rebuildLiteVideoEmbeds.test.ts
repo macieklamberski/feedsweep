@@ -74,14 +74,15 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should ignore a non-numeric start', async () => {
+  it('should use a malformed start as written, as one parameter', async () => {
     const value = html`
       <lite-youtube
         videoid="dQw4w9WgXcQ"
         start="10&autoplay=1"
       ></lite-youtube>
     `
-    const expected = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>'
+    const expected =
+      '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=10%26autoplay%3D1"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
