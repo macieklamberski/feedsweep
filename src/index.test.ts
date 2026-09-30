@@ -814,12 +814,12 @@ describeForEachParser('transformContent', (parseHtml) => {
     const expected = html`
       <p>before</p>
       <div
-        data-embed-width="390"
+        data-embed-width="220"
         data-embed-url="https://www.pixiv.net/artworks/21083839"
-        data-embed-src="https://embed.pixiv.net/embed_mk2.php?id=21083839_8595a4d2c55cbfd73b6d1bcd386bde6e&amp;size=medium&amp;border=on"
+        data-embed-src="https://embed.pixiv.net/embed_mk2.php?id=21083839_8595a4d2c55cbfd73b6d1bcd386bde6e"
         data-embed-provider="pixiv"
         data-embed-id="21083839_8595a4d2c55cbfd73b6d1bcd386bde6e"
-        data-embed-height="300"
+        data-embed-height="250"
       ></div>
       <p><noscript>&lt;p&gt;&lt;a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=21083839" target="_blank"&gt;博麗神社&lt;/a&gt; by &lt;a href="http://www.pixiv.net/member.php?id=35490" target="_blank"&gt;kirero【二日目へ-22】&lt;/a&gt; on &lt;a href="http://www.pixiv.net/" target="_blank"&gt;pixiv&lt;/a&gt;&lt;/p&gt;</noscript></p>
     `
