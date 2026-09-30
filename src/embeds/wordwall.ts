@@ -11,16 +11,10 @@ const activityIdRegex = /^[0-9a-f]+$/i
 
 const localeRegex = /^[a-z]+(?:-[a-z]+)?$/i
 
-// `themeId` picks the skin, `templateId` the activity type the author converted to, and
-// `fontStackId` the lettering, so the query selects which rendering of the activity plays.
-const renderingParams = ['themeId', 'templateId', 'fontStackId']
+// `templateId` picks the game the activity is played as, over the one the activity stores.
+const playParams = ['templateId']
 
-type ActivityPath = {
-  locale?: string
-  activityId: string
-}
-
-const extractActivityPath = (link: string): ActivityPath | undefined => {
+const extractActivityId = (link: string): string | undefined => {
   if (!isHostOf(link, wordwallHosts)) {
     return
   }
@@ -36,11 +30,11 @@ const extractActivityPath = (link: string): ActivityPath | undefined => {
       return
     }
 
-    return { activityId: `play/${numbers.join('/')}` }
+    return `play/${numbers.join('/')}`
   }
 
   // Wordwall serves the same activity at `/embed/{id}` and at `/{lang}/embed/{id}`, where the
-  // locale prefix sets the language of the player strings and of the activity's instructions.
+  // locale prefix only sets the language of the player strings.
   const locale = segments[0] === 'embed' ? undefined : segments[0]
   const idIndex = locale ? 2 : 1
 
@@ -52,25 +46,16 @@ const extractActivityPath = (link: string): ActivityPath | undefined => {
     return
   }
 
-  const activityId = keepIfMatches(segments[idIndex], activityIdRegex)
-
-  if (!activityId) {
-    return
-  }
-
-  return { locale, activityId }
+  return keepIfMatches(segments[idIndex], activityIdRegex)
 }
 
 // Wordwall's activity player, a classroom quiz or game a teacher's post pastes under a lesson.
 const wordwallResolveEmbed: ResolveEmbed = (url) => {
-  const activityPath = extractActivityPath(url)
+  const activityId = extractActivityId(url)
 
-  if (!activityPath) {
+  if (!activityId) {
     return
   }
-
-  const { locale, activityId } = activityPath
-  const localePrefix = locale ? `/${locale}` : ''
 
   // No thumbnail offline: the embed page's `og:image` on `screens.cdn.wordwall.net` is keyed by
   // a hash that appears nowhere in the embed url.
@@ -78,7 +63,7 @@ const wordwallResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider: 'wordwall',
     id: activityId,
-    src: `https://wordwall.net${localePrefix}/embed/${activityId}${pickUrlParams(url, renderingParams)}`,
+    src: `https://wordwall.net/embed/${activityId}${pickUrlParams(url, playParams)}`,
   }
 }
 

@@ -87,13 +87,9 @@ export const telegramIframeEmbedResolver = createUrlEmbedResolver(
 )
 
 // A forum's s9e MediaEmbed helper frame, naming the post as `{channel}/{id}` in its url fragment.
-export const telegramS9eEmbedResolver = createS9eEmbedResolver(
-  'telegram',
-  /^[\w/]+$/,
-  (fragment) => {
-    return telegramResolveEmbed(`https://t.me/${fragment}`)
-  },
-)
+export const telegramS9eEmbedResolver = createS9eEmbedResolver('telegram', (fragment) => {
+  return telegramResolveEmbed(`https://t.me/${fragment}`)
+})
 
 // The player reports a `resize` event with its height, `null` for a post it could not load,
 // which reads as nothing.
