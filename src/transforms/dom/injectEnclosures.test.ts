@@ -329,7 +329,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(expected)
     })
 
-    it("should clean a listed provider's src with the provided cleanUrlFn", async () => {
+    it('should clean the src with the provided cleanUrlFn', async () => {
       const value = '<p>Content</p>'
       const trackedResolver: EmbedResolver = {
         ...exampleResolver,
@@ -338,7 +338,6 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       const context: TransformContext = {
         ...withExampleResolver([{ url: 'https://example.com/e/x', medium: 'video' }]),
         widgetResolvers: [trackedResolver],
-        cleanedSrcProviders: ['example'],
         cleanUrlFn: (url) => url.split('?')[0] ?? url,
       }
       const expected = html`
