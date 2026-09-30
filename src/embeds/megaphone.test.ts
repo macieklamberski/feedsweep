@@ -169,6 +169,7 @@ describe('megaphoneResolveEmbed', () => {
       provider: 'megaphone',
       id: 'episode/AUDD4761726018',
       src: 'https://playlist.megaphone.fm/?e=AUDD4761726018',
+      params: {},
       height: 200,
     }
 
@@ -182,6 +183,7 @@ describe('megaphoneResolveEmbed', () => {
       provider: 'megaphone',
       id: 'playlist/NSM7546490835',
       src: 'https://playlist.megaphone.fm/?p=NSM7546490835',
+      params: {},
       height: 482,
     }
 
@@ -199,12 +201,27 @@ describeForEachParser('megaphoneEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, megaphoneEmbedResolver)
 
   describe('happy paths', () => {
+    it('should carry the light style as a param', async () => {
+      const value =
+        '<iframe src="https://playlist.megaphone.fm/?e=FOXM3419299445&amp;light=true"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'megaphone',
+        id: 'episode/FOXM3419299445',
+        src: 'https://playlist.megaphone.fm/?e=FOXM3419299445',
+        params: { light: 'true' },
+        height: 200,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read the player off an iframe carrier', async () => {
       const value = '<iframe src="https://playlist.megaphone.fm/?e=AUDD4761726018"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'megaphone',
         id: 'episode/AUDD4761726018',
         src: 'https://playlist.megaphone.fm/?e=AUDD4761726018',
+        params: {},
         height: 200,
       }
 
@@ -237,6 +254,7 @@ describeForEachParser('megaphoneEmbedResolver', (parseHtml) => {
         provider: 'megaphone',
         id: 'playlist/NSM7546490835',
         src: 'https://playlist.megaphone.fm/?p=NSM7546490835',
+        params: {},
         width: 640,
         height: 200,
       }

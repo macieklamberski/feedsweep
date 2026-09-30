@@ -1,6 +1,6 @@
 import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, isFileName, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The letters keep NPR's bare story number, written into ?e=, from reading as an episode.
@@ -38,6 +38,11 @@ export const extractMegaphoneEmbed = (
 
 // No metadata and no thumbnail without an api key, so the height is the substance here, and
 // some iframes carry no height at all.
+// Where playback starts stays in the player url. The look the publisher picked is a param a reader
+// may apply or override.
+const startParams = ['start']
+const displayParams = ['light', 'artwork']
+
 export const megaphoneResolveEmbed: ResolveEmbed = (url) => {
   const embed = extractMegaphoneEmbed(url)
 
@@ -45,10 +50,17 @@ export const megaphoneResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
+  const search = parseUrl(url, placeholderBaseUrl)?.search ?? ''
+  const query = composeQuery({
+    [embed.param]: embed.id,
+    ...pickQueryParams(search, startParams),
+  })
+
   return {
     provider: 'megaphone',
     id: `${embed.kind}/${embed.id}`,
-    src: `https://playlist.megaphone.fm/?${embed.param}=${embed.id}`,
+    src: `https://playlist.megaphone.fm/${query}`,
+    params: pickQueryParams(search, displayParams),
     height: embed.height,
   }
 }
