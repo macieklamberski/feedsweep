@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl, toMap } from 'trousse'
+import { decodeSegment, getPathSegments, parseUrl, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import {
   composeQuery,
@@ -18,14 +18,7 @@ const provider = 'ridewithgps'
 
 const ridewithgpsHosts = ['ridewithgps.com']
 
-const embedParams = [
-  'title',
-  'overlay',
-  'metricUnits',
-  'sampleGraph',
-  'distanceMarkers',
-  'privacyCode',
-]
+const embedParams = ['title', 'privacyCode']
 
 // An event names its id in `eventId`, and Ride with GPS serves no static render under `/events`.
 const embedKinds = toMap<EmbedShape>({
@@ -36,6 +29,15 @@ const embedKinds = toMap<EmbedShape>({
 
 // Ride with GPS answers 404 on `/events/{id}/embed`.
 const kindsByPath = toMap({ routes: 'route', trips: 'trip' })
+
+const composeSource = (
+  kind: string,
+  shape: EmbedShape,
+  id: string,
+  params?: Record<string, string>,
+): string => {
+  return `https://ridewithgps.com/embeds${composeQuery({ type: kind, [shape.idParam]: id, ...params })}`
+}
 
 // Route, trip and event ids share one numeric grammar, so the kind rides in the id.
 const composeEmbed = (
@@ -73,8 +75,7 @@ const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
   }
 
   const params = pickQueryParams(parsed.search, embedParams)
-  const query = composeQuery({ type: kind, [shape.idParam]: id, ...params })
-  const src = `https://ridewithgps.com/embeds${query}`
+  const src = composeSource(kind, shape, id, params)
 
   // A private resource's page and thumbnail answer 403 without its token.
   if (params.privacyCode) {
@@ -91,8 +92,8 @@ const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
 }
 
 // The older per-resource spelling, `ridewithgps.com/{routes|trips}/{id}/embed`, which feeds
-// carry protocol-relative.
-const readPathEmbed = (parsed: URL, url: string): EmbedResolverResult | undefined => {
+// carry protocol-relative. Ride with GPS redirects it to the query spelling.
+const readPathEmbed = (parsed: URL): EmbedResolverResult | undefined => {
   const segments = getPathSegments(parsed)
   const [path, id, marker] = segments
 
@@ -107,13 +108,13 @@ const readPathEmbed = (parsed: URL, url: string): EmbedResolverResult | undefine
     return
   }
 
-  return composeEmbed(kind, shape, id, url)
+  return composeEmbed(kind, shape, id, composeSource(kind, shape, decodeSegment(id) ?? id))
 }
 
 const ridewithgpsResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  return parsed && (readQueryEmbed(parsed) ?? readPathEmbed(parsed, url))
+  return parsed && (readQueryEmbed(parsed) ?? readPathEmbed(parsed))
 }
 
 // The Ride with GPS route map iframe, in both its query and its path spelling.
