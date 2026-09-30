@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments, type Nullish, parseUrl, toMap } from 'trousse'
+import { decodeSegment, getPathSegments, type Nullish, parseUrl } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 
@@ -14,31 +14,15 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // A release is either an album or a single track.
 const releaseRegex = /^(album|track)=([^/]+)$/
-// The `size=` preset is a path segment that decides the player's exact pixels.
-const sizeRegex = /^size=([a-z0-9_]+)$/
-
-// Bandcamp has one `tall` preset whose height depends on the release, hence the two slashed keys.
-// No preset tracks its width. The presets with a tracklist stretch to the frame and scroll their
-// rows inside it, and the rest lay out to a height of their own and leave the remainder blank.
-const presetHeights = toMap({
-  venti: 100,
-  grande: 100,
-  grande2: 355,
-  grande3: 415,
-  large: 470,
-  medium: 120,
-  small: 42,
-  short: 23,
-  // Bandcamp spells both `size=tall`, and an unknown preset such as `tall_album` serves `venti`.
-  'tall/album': 295,
-  'tall/track': 270,
-  tall2: 450,
-})
+// The track number an album player opens on, which the embed dialog writes when a track is picked.
+const startTrackRegex = /^t=[^/]+$/
+// The player with no `size` segment, Bandcamp's own default layout. It lays out as a strip 100
+// tall at any width and leaves the rest of the frame blank.
+const playerHeight = 100
 const releaseKinds = ['album', 'track']
 
 // The audio player spells its options as path segments (`EmbeddedPlayer/album=123/size=large/`)
-// while the video player uses a query string (`VideoEmbed?track=123&bgcol=…`). Both are minted
-// back at their shortest working form, verified live 2026-08-11, both 200.
+// while the video player uses a query string (`VideoEmbed?track=123&bgcol=…`).
 const videoPathRegex = /\/videoembed/i
 
 // A player pointing at a track inside an album names both, and the two orders both occur: the
@@ -116,20 +100,14 @@ const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
   // The video player names a track and only a track: `VideoEmbed?album={id}` answers 404. A video
   // carrier whose only release is an album falls back to the audio player, which does serve it.
   const isVideo = videoPathRegex.test(parsed.pathname) && kind === 'track'
-  const preset = getPathSegments(parsed)
-    .map((segment) => segment.match(sizeRegex)?.[1])
-    .find(Boolean)
-  const size = preset ? `size=${preset}/` : ''
+  const startTrack = getPathSegments(parsed).find((segment) => startTrackRegex.test(segment))
+  const start = startTrack ? `${startTrack}/` : ''
   // Album and track both stay: given the album alone the player opens on the first track.
   const selection = releaseKinds
     .flatMap((wanted) => releases.filter(([named]) => named === wanted))
     // A query id comes out decoded, and it goes into a path.
     .map(([named, value]) => `${named}=${encodePathSegment(value)}/`)
     .join('')
-  const isAlbum = releases.some(([named]) => named === 'album')
-  const tallKey = isAlbum ? 'tall/album' : 'tall/track'
-  const presetKey = preset === 'tall' ? tallKey : preset
-  const height = presetHeights.get(presetKey ?? '')
   const anchor = parseFallback(element)
   const pageUrl = attr(anchor, 'href')
   // Bandcamp writes the label as `{title} by {artist}`, and " by " appears inside real titles too.
@@ -140,15 +118,18 @@ const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
     id: release,
     src: isVideo
       ? `https://bandcamp.com/VideoEmbed${composeQuery({ [kind]: id })}`
-      : `https://bandcamp.com/EmbeddedPlayer/${selection}${size}`,
+      : `https://bandcamp.com/EmbeddedPlayer/${selection}${start}`,
     url: pageUrl,
-    height,
+    height: isVideo ? undefined : playerHeight,
     title,
   }
 }
 
 // Bandcamp's player iframe, whose fallback anchor is the only place the release page appears.
-export const bandcampEmbedResolver = createUrlEmbedResolver(bandcampHosts, bandcampResolveEmbed)
+// The default player outranks a box drawn for a preset it no longer loads, such as `size=large`.
+export const bandcampEmbedResolver = createUrlEmbedResolver(bandcampHosts, bandcampResolveEmbed, {
+  preferResolverSize: true,
+})
 
 export const bandcampFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'YouTube video player' },
