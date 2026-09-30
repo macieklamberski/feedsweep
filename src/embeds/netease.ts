@@ -20,9 +20,9 @@ const typeRoutes = toMap({
 const playerPathRegex = /^\/+outchain\/player\/?$/
 const flashPlayerPathRegex = /^\/+style\/swf\/widget\.swf$/
 
-// Without `height` the player loads its list layout and fills its box, so this shows the header,
-// the first track and the footer.
-const playerHeight = 180
+// Without `height` the player loads its list layout and fills its box. 250 shows the header, about
+// three tracks and the footer, so a playlist shows that it holds more than one.
+const playerHeight = 250
 
 const composeResult = (type: string, id: string): EmbedResolverResult | undefined => {
   const route = typeRoutes.get(type)
