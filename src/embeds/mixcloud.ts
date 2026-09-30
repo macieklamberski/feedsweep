@@ -82,9 +82,9 @@ export const extractMixcloudShow = (link: string): string | undefined => {
 }
 
 // Without the publisher's `mini`, `hide_cover`, `hide_artwork` and `light`, the widget is the cover
-// player, which fills whatever box it gets. 160 is the box stated for it, tall enough for the
-// artwork and the play button.
-const playerHeight = 160
+// player, which fills whatever box it gets. 120 is the height Mixcloud's oEmbed states for its
+// widget.
+const playerHeight = 120
 
 export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {
   const show = readShowUrl(url)
