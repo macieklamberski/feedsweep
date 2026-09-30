@@ -32,7 +32,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should resolve the shortcode iframe on the videopress host', async () => {
+    it('should resolve the shortcode iframe and leave autoplay to the render hint', async () => {
       const value = html`
         <iframe
           width="640"
@@ -45,7 +45,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'videopress',
         id: 'bDC13L49',
-        src: 'https://videopress.com/embed/bDC13L49?hd=1&autoPlay=0',
+        src: 'https://videopress.com/embed/bDC13L49?hd=1',
         url: 'https://videopress.com/v/bDC13L49',
         width: 640,
         height: 360,

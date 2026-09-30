@@ -1,7 +1,7 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { dropUrlParams, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'videopress'
@@ -39,10 +39,11 @@ const videopressResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  // The player plays as written, with the start, loop, cover and controls the publisher set.
+  // The player plays as written, with the start, loop, cover and controls the publisher set, less
+  // the autoplay the render hint applies on click.
   return {
     ...composeEmbed(safeGuid),
-    src: url,
+    src: dropUrlParams(url, Object.keys(videopressRenderHint.autoplayParams ?? {})),
     title: attr(element, 'title'),
   }
 }
