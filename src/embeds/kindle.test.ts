@@ -79,35 +79,17 @@ describe('kindleResolveEmbed', () => {
       expect(kindleResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore an ASIN outside its alphabet', () => {
+    it('should use a malformed ASIN as written, even if the card answers an error', () => {
       const value = 'https://read.amazon.com/kp/card?asin=../embed'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: '../embed',
+        src: 'https://read.amazon.com/kp/card?asin=..%2Fembed&preview=inline&linkCode=kpd',
+        url: 'https://www.amazon.com/dp/../embed',
+        thumbnail: 'https://m.media-amazon.com/images/P/../embed.01._SCLZZZZZZZ_.jpg',
+      }
 
-      expect(kindleResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an ASIN led by a dot segment', () => {
-      const value = 'https://read.amazon.com/kp/card?asin=../B08DGQCKF3'
-
-      expect(kindleResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an ASIN trailed by a dot segment', () => {
-      const value = 'https://read.amazon.com/kp/card?asin=B08DGQCKF3/..'
-
-      expect(kindleResolveEmbed(value)).toBeUndefined()
-    })
-
-    // Each ASIN holds one separator and no dot, so only the separator refuses it.
-    const separatorAsinUrls: Array<string> = [
-      'https://read.amazon.com/kp/card?asin=B08DGQCKF3/EMBED',
-      'https://read.amazon.com/kp/card?asin=B08DGQCKF3%3FEMBED',
-      'https://read.amazon.com/kp/card?asin=B08DGQCKF3%26EMBED',
-      'https://read.amazon.com/kp/card?asin=B08DGQCKF3%3DEMBED',
-      'https://read.amazon.com/kp/card?asin=B08DGQCKF3%23EMBED',
-    ]
-
-    it.each(separatorAsinUrls)('should ignore %s, an ASIN carrying a separator', (value) => {
-      expect(kindleResolveEmbed(value)).toBeUndefined()
+      expect(kindleResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore the card route under another path', () => {

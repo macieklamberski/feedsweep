@@ -126,10 +126,16 @@ describe('canvaResolveEmbed', () => {
       expect(canvaResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a share token carrying a dot', () => {
+    it('should use a malformed share token as written, even if the player answers an error', () => {
       const value = 'https://www.canva.com/design/DAHLowacSd4/token.with.dots/view?embed'
+      const expected: EmbedResolverResult = {
+        provider: 'canva',
+        id: 'DAHLowacSd4/token.with.dots',
+        src: 'https://www.canva.com/design/DAHLowacSd4/token.with.dots/view?embed',
+        url: 'https://www.canva.com/design/DAHLowacSd4/token.with.dots/view',
+      }
 
-      expect(canvaResolveEmbed(value)).toBeUndefined()
+      expect(canvaResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore a design route below another path', () => {
@@ -242,12 +248,19 @@ describeForEachParser('canvaWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a design id carrying a path separator', async () => {
+    it('should use a malformed design id as written, even if the player answers an error', async () => {
       const value = html`
         <div class="canva-embed" data-height-ratio="1" data-design-id="DAC3_5NqG20%2F..%2Fedit"></div>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'canva',
+        id: 'DAC3_5NqG20%2F..%2Fedit',
+        src: 'https://www.canva.com/design/DAC3_5NqG20%2F..%2Fedit/view?embed',
+        url: 'https://www.canva.com/design/DAC3_5NqG20%2F..%2Fedit/view',
+        ratio: '250/298',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

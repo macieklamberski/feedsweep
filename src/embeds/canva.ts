@@ -1,15 +1,13 @@
 import { isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches } from '../utils/dom.js'
-import { urlSafeTokenRegex } from '../utils/urls.js'
+import { attr } from '../utils/dom.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // Exact: `document-export.canva.com` serves the files a design exports.
 const canvaHosts = ['canva.com', 'www.canva.com']
 
-// /design/{designId}/{shareToken}/{view|watch}, where older snippets leave the token out. Both are
-// url-safe base64, and the class keeps anything else out of a minted path.
-const designPathRegex = /^\/design\/([\w-]+(?:\/[\w-]+)?)\/(view|watch)\/?$/
+// /design/{designId}/{shareToken}/{view|watch}, where older snippets leave the token out.
+const designPathRegex = /^\/design\/([^/]+(?:\/[^/]+)?)\/(view|watch)\/?$/
 
 // The legacy loader never frames the viewer narrower than this, and adds 48px to its height.
 const sdkMinWidth = 250
@@ -51,7 +49,7 @@ export const canvaIframeEmbedResolver = createUrlEmbedResolver(canvaHosts, canva
 export const canvaWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.canva-embed[data-design-id]',
   (element) => {
-    const id = keepIfMatches(attr(element, 'data-design-id'), urlSafeTokenRegex)
+    const id = attr(element, 'data-design-id')
 
     if (!id) {
       return

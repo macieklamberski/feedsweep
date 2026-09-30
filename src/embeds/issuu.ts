@@ -11,9 +11,7 @@ const issuuHosts = ['issuu.com']
 
 // A config id is a pair of counters, `1016421/47623369`, addressing the reader through the url
 // hash, and a publisher and document name pair addresses it through the query.
-// A name of only dots is refused on purpose: `u=..&d=..` would mint `issuu.com/../docs/..`.
 const configIdRegex = /^\d+\/\d+$/
-const safeNameRegex = /^(?!\.+$)[\w.-]+$/
 
 // Only `embed.html` is minted: `anonymous-embed.html` answers 403 for every document.
 const embedPaths = ['embed.html', 'anonymous-embed.html']
@@ -38,10 +36,6 @@ const composeDocumentEmbed = (
   page?: string,
 ): EmbedResolverResult | undefined => {
   if (!publisher || !documentName) {
-    return
-  }
-
-  if (!safeNameRegex.test(publisher) || !safeNameRegex.test(documentName)) {
     return
   }
 

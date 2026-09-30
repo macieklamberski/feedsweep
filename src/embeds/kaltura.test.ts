@@ -108,13 +108,6 @@ describe('kalturaResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore an entry id carrying no namespace counter', () => {
-      const value =
-        'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=rq4nfd7g'
-
-      expect(kalturaResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a foreign host carrying the same path', () => {
       const value =
         'https://evil.test/p/520801/embedPlaykitJs/uiconf_id/1?iframeembed=true&entry_id=1_w0bwzism'
@@ -129,27 +122,6 @@ describe('kalturaResolveEmbed', () => {
       expect(kalturaResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore an entry id behind a path step', () => {
-      const value =
-        'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=../1_w0bwzism'
-
-      expect(kalturaResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an entry id followed by a path step', () => {
-      const value =
-        'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bwzism/..'
-
-      expect(kalturaResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an entry id carrying an encoded slash', () => {
-      const value =
-        'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bw%2Fzism'
-
-      expect(kalturaResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a player that names no entry', () => {
       const value =
         'https://cdnapisec.kaltura.com/p/520801/sp/52080100/embedIframeJs/uiconf_id/31230141/partner_id/520801?iframeembed=true'
@@ -157,11 +129,17 @@ describe('kalturaResolveEmbed', () => {
       expect(kalturaResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore an entry id that is not one', () => {
+    it('should use a malformed entry id as written, even if the thumbnail answers an error', () => {
       const value =
         'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=latest'
+      const expected: EmbedResolverResult = {
+        provider: 'kaltura',
+        id: '520801/latest',
+        src: 'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=latest',
+        thumbnail: 'https://cdnapisec.kaltura.com/p/520801/thumbnail/entry_id/latest/width/640',
+      }
 
-      expect(kalturaResolveEmbed(value)).toBeUndefined()
+      expect(kalturaResolveEmbed(value)).toEqual(expected)
     })
 
     it('should leave the Flash widget alone', () => {

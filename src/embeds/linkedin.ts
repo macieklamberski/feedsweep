@@ -1,10 +1,6 @@
 import { decodeSegment, getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { keepIfMatches } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-
-// The urn LinkedIn writes into the embed path. Feeds carry `share`, `ugcPost` and `activity`.
-const safeUrnRegex = /^urn:li:[a-zA-Z]+:\d+$/
 
 const linkedinHosts = ['linkedin.com']
 
@@ -17,7 +13,7 @@ const linkedinResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // Some carriers escape the colons, `urn%3Ali%3Ashare%3A…`, and LinkedIn serves both alike.
-  const postUrn = keepIfMatches(decodeSegment(urn), safeUrnRegex)
+  const postUrn = decodeSegment(urn)
 
   if (!postUrn) {
     return

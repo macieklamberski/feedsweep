@@ -3,8 +3,7 @@ import { attr, keepIfMatches } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
-// One class for both ids and `auto`, the playlist the integration picks itself.
-// An integration id is a run of lowercase letters and digits, a playlist id `v-` and twelve more.
+// A playlist id is `v-` and twelve more, or `auto`, the playlist the integration picks itself.
 const safeIdRegex = /^[a-z0-9-]+$/
 
 const glomexHosts = ['player.glomex.com']
@@ -32,13 +31,11 @@ const readEmbed = (
   integrationId: string | undefined,
   playlistId: string | undefined,
 ): EmbedResolverResult | undefined => {
-  const safeIntegrationId = keepIfMatches(integrationId, safeIdRegex)
-
-  if (!safeIntegrationId) {
+  if (!integrationId) {
     return
   }
 
-  return composeEmbed(safeIntegrationId, keepIfMatches(playlistId, safeIdRegex))
+  return composeEmbed(integrationId, keepIfMatches(playlistId, safeIdRegex))
 }
 
 export const glomexResolveEmbed: ResolveEmbed = (url) => {

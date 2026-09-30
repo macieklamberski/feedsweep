@@ -1,6 +1,6 @@
 import { getPathSegments, parseUrl, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, digitsRegex, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type EmbedShape = {
@@ -63,7 +63,7 @@ const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
 
   const id = parsed.searchParams.get(shape.idParam)
 
-  if (!id || !digitsRegex.test(id)) {
+  if (!id) {
     return
   }
 
@@ -90,7 +90,7 @@ const readPathEmbed = (parsed: URL, url: string): EmbedResolverResult | undefine
   const segments = getPathSegments(parsed)
   const [path, id, marker] = segments
 
-  if (segments.length !== 3 || marker !== 'embed' || !id || !digitsRegex.test(id)) {
+  if (segments.length !== 3 || marker !== 'embed' || !id) {
     return
   }
 

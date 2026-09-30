@@ -1,6 +1,6 @@
 import { getPathSegments, type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, find, keepIfMatches, text } from '../utils/dom.js'
+import { attr, find, text } from '../utils/dom.js'
 import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -16,9 +16,6 @@ const wrapperIdRegex = /^__ss[e_]?(\d+)$/
 
 // Two players, the presentation one and the document one, sharing a query.
 const flashPlayerPathRegex = /\/swf\/(?:ssplayer\d?|doc_player)\.swf$/
-
-// A url-safe path segment that is not `.` or `..`.
-const safePageSegmentRegex = /^(?!\.+$)[A-Za-z0-9_.-]+$/
 
 const composeEmbed = (deck: string, fields?: Partial<EmbedResolverResult>): EmbedResolverResult => {
   return {
@@ -216,8 +213,8 @@ export const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
   // The swf query names the deck's owner and slug, which compose the same page the wrapper
   // links to. It is the fallback for a snippet that kept the player and dropped the wrapper's
   // anchor.
-  const account = keepIfMatches(parsed.searchParams.get('userName'), safePageSegmentRegex)
-  const slug = keepIfMatches(parsed.searchParams.get('stripped_title'), safePageSegmentRegex)
+  const account = parsed.searchParams.get('userName')
+  const slug = parsed.searchParams.get('stripped_title')
   const composed = account && slug ? `https://www.slideshare.net/${account}/${slug}` : undefined
 
   return composeEmbed(deck, { ...caption, url: caption.url ?? composed })

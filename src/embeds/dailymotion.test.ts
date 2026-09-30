@@ -105,16 +105,18 @@ describe('extractDailymotionId', () => {
     expect(extractDailymotionId(value)).toBeUndefined()
   })
 
-  it('should extract no id from a segment carrying an encoded slash after the id', () => {
+  it('should use a malformed id with an encoded slash after it as written, even if the player answers an error', () => {
     const value = 'https://www.dailymotion.com/video/x7tgad0%2F'
+    const expected = 'x7tgad0%2F'
 
-    expect(extractDailymotionId(value)).toBeUndefined()
+    expect(extractDailymotionId(value)).toEqual(expected)
   })
 
-  it('should extract no id from a segment carrying an encoded slash before the id', () => {
+  it('should use a malformed id with an encoded slash before it as written, even if the player answers an error', () => {
     const value = 'https://www.dailymotion.com/video/%2Fx7tgad0'
+    const expected = '%2Fx7tgad0'
 
-    expect(extractDailymotionId(value)).toBeUndefined()
+    expect(extractDailymotionId(value)).toEqual(expected)
   })
 
   it('should extract no id behind a three-letter segment where the locale sits', () => {

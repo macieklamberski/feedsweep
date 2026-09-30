@@ -8,8 +8,6 @@ const provider = 'pastebin'
 
 const pastebinHosts = ['pastebin.com']
 
-const safePasteIdRegex = /^[a-zA-Z0-9]+$/
-
 // The snippet's dark variant, a publisher layout choice the frame honours.
 const pastebinEmbedParams = ['theme']
 
@@ -36,7 +34,7 @@ const readPasteId = (url: string | undefined): string | undefined => {
 export const pastebinResolveEmbed: ResolveEmbed = (url) => {
   const pasteId = readPasteId(url)
 
-  if (!pasteId || !safePasteIdRegex.test(pasteId)) {
+  if (!pasteId) {
     return
   }
 

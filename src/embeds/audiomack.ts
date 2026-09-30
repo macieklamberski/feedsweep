@@ -1,7 +1,7 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts, pickQueryParams, urlSafeTokenRegex } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const audiomackHost = 'audiomack.com'
@@ -62,12 +62,6 @@ export const audiomackResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const { artist, kind, slug, search } = track
-
-  // An artist handle and a slug, both of them lowercase words joined by hyphens or underscores.
-  if (!urlSafeTokenRegex.test(artist) || !urlSafeTokenRegex.test(slug)) {
-    return
-  }
-
   const path = `${artist}/${kind}/${slug}`
   const params = pickQueryParams(search, audiomackEmbedParams)
   const display = pickQueryParams(search, audiomackDisplayParams)

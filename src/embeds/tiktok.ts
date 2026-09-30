@@ -23,7 +23,7 @@ const playerPathRegex = /^\/(?:embed(?:\/v2)?|player\/v1)\/(\d+)\/?$/
 
 // A watch url names the clip's owner and the clip: `/@handle/video/{id}`. Sanitized copies
 // sometimes keep only the `/video/{id}` half, so the handle is optional.
-const watchPathRegex = /^(?:\/@([a-zA-Z0-9_.]+))?\/video\/(\d+)\/?$/
+const watchPathRegex = /^(?:\/@([^/]+))?\/video\/(\d+)\/?$/
 
 // Not a 9/16 ratio: the frame stays 738 tall at any width, and the ratio asks 1778 at 1000.
 // The clip is letterboxed inside a frame whose header, caption, sound row and action rail set
@@ -129,7 +129,7 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
 }
 
 // A profile url and nothing else: `/@handle`, with no video segment after it.
-const profilePathRegex = /^\/@([a-zA-Z0-9_.]+)\/?$/
+const profilePathRegex = /^\/@([^/]+)\/?$/
 
 // The account a blockquote names, from `data-unique-id` where the creator widget declares it,
 // otherwise from the profile anchor. The half-encoded shape keeps no data attributes at all,
@@ -137,7 +137,7 @@ const profilePathRegex = /^\/@([a-zA-Z0-9_.]+)\/?$/
 const readHandle = (element: Element): string | undefined => {
   const declared = attr(element, 'data-unique-id')
 
-  if (declared && safeHandleRegex.test(declared)) {
+  if (declared) {
     return declared
   }
 

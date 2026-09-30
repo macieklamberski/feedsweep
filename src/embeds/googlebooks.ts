@@ -1,10 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import {
-  composeQuery,
-  pickQueryParams,
-  placeholderBaseUrl,
-  urlSafeTokenRegex,
-} from '../utils/urls.js'
+import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'googlebooks'
@@ -40,7 +35,7 @@ export const googlebooksEmbedResolver = createMarkupEmbedResolver(
     const [route, ...rest] = getPathSegments(parsed)
     const id = parsed.searchParams.get('id')
 
-    if (route !== 'books' || rest.length || !id || !urlSafeTokenRegex.test(id)) {
+    if (route !== 'books' || rest.length || !id) {
       return
     }
 

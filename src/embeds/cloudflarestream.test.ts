@@ -107,11 +107,18 @@ describe('cloudflarestreamResolveEmbed', () => {
       expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore an uppercase video id', () => {
+    it('should use a malformed video id as written, even if the player answers an error', () => {
       const value =
         'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35D8788A685E8CD8DB81E6F3E2269E2A/iframe'
+      const expected: EmbedResolverResult = {
+        provider: 'cloudflarestream',
+        id: '35D8788A685E8CD8DB81E6F3E2269E2A',
+        src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35D8788A685E8CD8DB81E6F3E2269E2A/iframe',
+        thumbnail:
+          'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35D8788A685E8CD8DB81E6F3E2269E2A/thumbnails/thumbnail.jpg',
+      }
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore the account host without the iframe route', () => {
@@ -134,18 +141,32 @@ describe('cloudflarestreamResolveEmbed', () => {
       expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a signed token on the account host', () => {
+    it('should use a signed token on the account host as written', () => {
       const value =
         'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5YzJlNDFhNyJ9.c2lnbmF0dXJl/iframe'
+      const expected: EmbedResolverResult = {
+        provider: 'cloudflarestream',
+        id: 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5YzJlNDFhNyJ9.c2lnbmF0dXJl',
+        src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5YzJlNDFhNyJ9.c2lnbmF0dXJl/iframe',
+        thumbnail:
+          'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5YzJlNDFhNyJ9.c2lnbmF0dXJl/thumbnails/thumbnail.jpg',
+      }
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should ignore a signed token on the shared player host', () => {
+    it('should use a signed token on the shared player host as written', () => {
       const value =
         'https://iframe.videodelivery.net/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0ZjdiMGM4ZSJ9.c2lnbmF0dXJl'
+      const expected: EmbedResolverResult = {
+        provider: 'cloudflarestream',
+        id: 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0ZjdiMGM4ZSJ9.c2lnbmF0dXJl',
+        src: 'https://iframe.videodelivery.net/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0ZjdiMGM4ZSJ9.c2lnbmF0dXJl',
+        thumbnail:
+          'https://videodelivery.net/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0ZjdiMGM4ZSJ9.c2lnbmF0dXJl/thumbnails/thumbnail.jpg',
+      }
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore the shared path on another delivery subdomain', () => {
@@ -325,18 +346,18 @@ describeForEachParser('cloudflarestreamScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should refuse a video id carrying a path of its own', async () => {
+    it('should use a malformed video id as written, even if the player answers an error', async () => {
       const value =
         '<script src="https://embed.videodelivery.net/embed/r4xu.fla9.latest.js?video=..%2F..%2F35d8788a685e8cd8db81e6f3e2269e2a"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'cloudflarestream',
+        id: '../../35d8788a685e8cd8db81e6f3e2269e2a',
+        src: 'https://iframe.videodelivery.net/../../35d8788a685e8cd8db81e6f3e2269e2a',
+        thumbnail:
+          'https://videodelivery.net/../../35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a video id followed by a path of its own', async () => {
-      const value =
-        '<script src="https://embed.videodelivery.net/embed/r4xu.fla9.latest.js?video=5653cfd537db1edbed98c5c0119f390c%2Fdownloads"></script>'
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

@@ -19,8 +19,6 @@ const sharedStoreHosts = ['read.amazon.com.au']
 // every store link it opens when a tag is present.
 const cardParams = ['preview', 'tag', 'linkCode']
 
-// An ASIN is uppercase alphanumeric, the ISBN-10 check letter included.
-const safeAsinRegex = /^[0-9A-Z]+$/
 const cardPathRegex = /^\/kp\/card\/?$/
 
 // The Kindle preview card WordPress writes for an Amazon book, `read.amazon.com/kp/card?asin=…`.
@@ -35,7 +33,7 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
 
   const asin = parsed.searchParams.get('asin')
 
-  if (!asin || !safeAsinRegex.test(asin)) {
+  if (!asin) {
     return
   }
 

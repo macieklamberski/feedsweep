@@ -16,10 +16,6 @@ const spotifyHeights = toMap({
   artist: 352,
 })
 
-// Base62 with no separator, since the id is written into the player path and the `type/id`
-// key. The length is not checked: a wrong id fails the same whether it is minted or passed
-// through, and a bound would refuse the next id space.
-const safeIdRegex = /^[a-zA-Z0-9]+$/
 // `embed` opens a player path, `embed-podcast` its older podcast-only twin, `intl-{lang}` a
 // localized page path. Whatever follows the id (`/video` on a video podcast) is decorative.
 const pathPrefixRegex = /^(?:embed|embed-podcast|intl-[a-z]{2})$/
@@ -105,7 +101,7 @@ export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
     (legacy ? [legacy[1], legacy[2]] : readPathPair(parseUrlOnHosts(uri, spotifyHosts)))
   const [type, id] = pair ?? []
 
-  if (!type || !id || !spotifyHeights.has(type) || !safeIdRegex.test(id)) {
+  if (!type || !id || !spotifyHeights.has(type)) {
     return
   }
 

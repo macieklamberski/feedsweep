@@ -5,11 +5,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const nprHosts = ['www.npr.org']
 
-// Current ids read `nx-s1-{n}`, and the media half can be `nx-s1-{uuid}` or `nx-s1-{n}-1`.
-const safeIdRegex = /^[a-z0-9-]+$/
-
 const composeEmbed = (storyId: string, mediaId: string): EmbedResolverResult | undefined => {
-  if (!safeIdRegex.test(storyId) || !safeIdRegex.test(mediaId)) {
+  if (!storyId || !mediaId) {
     return
   }
 
@@ -23,7 +20,7 @@ const composeEmbed = (storyId: string, mediaId: string): EmbedResolverResult | u
 
 // NPR's video player. The two retired routes redirect to it or name the same pair.
 const composeVideoEmbed = (storyId: string, mediaId: string): EmbedResolverResult | undefined => {
-  if (!safeIdRegex.test(storyId) || !safeIdRegex.test(mediaId)) {
+  if (!storyId || !mediaId) {
     return
   }
 

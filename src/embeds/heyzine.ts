@@ -19,7 +19,7 @@ const flipBookIdRegex = /^([0-9a-f]{10})(?:\.html)?$/i
 // The viewer serves a longer bare hexadecimal name as the book its first ten characters name.
 const hexNameRegex = /^[0-9a-f]+$/i
 // The viewer opens on the page a `#page/{n}` fragment names, framed or not.
-const pageFragmentRegex = /^#page\/\d+$/
+const pageFragmentRegex = /^#page\/[^/]+$/
 
 // A custom slug is served only without `.html`, in either case.
 const readFlipBook = (name: string): FlipBook | undefined => {

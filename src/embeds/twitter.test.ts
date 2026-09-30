@@ -1272,6 +1272,17 @@ describe('twitterResolveEmbed', () => {
     expect(twitterResolveEmbed('https://platform.twitter.com/embed/Tweet.html')).toBeUndefined()
   })
 
+  it('should use a malformed player id as written, even if the player answers an error', () => {
+    const value = 'https://platform.twitter.com/embed/Tweet.html?id=20x'
+    const expected: EmbedResolverResult = {
+      provider: 'twitter',
+      id: '20x',
+      src: 'https://platform.twitter.com/embed/Tweet.html?id=20x',
+    }
+
+    expect(twitterResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for an invalid url', () => {
     expect(twitterResolveEmbed('not a url')).toBeUndefined()
   })

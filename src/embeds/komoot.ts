@@ -1,12 +1,6 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import {
-  composeQuery,
-  digitsRegex,
-  parseUrlOnHosts,
-  pickQueryParams,
-  urlSafeTokenRegex,
-} from '../utils/urls.js'
+import { composeQuery, digitsRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Resource = {
@@ -43,7 +37,7 @@ const readResource = (segments: Array<string>): Resource | undefined => {
 
   const [slug = '', action] = rest
 
-  if (route === 'collection' && urlSafeTokenRegex.test(slug) && action === 'embed') {
+  if (route === 'collection' && slug && action === 'embed') {
     return { id: `collection/${id}`, path: `collection/${id}/${slug}` }
   }
 }

@@ -607,14 +607,21 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a profile anchor whose handle carries an encoded slash', async () => {
+    it('should use a malformed profile handle as written, even if the player answers an error', async () => {
       const value = html`
         <blockquote class="tiktok-embed">
           <a href="https://www.tiktok.com/@user%2Fx">Profile</a>
         </blockquote>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@user%2Fx',
+        src: 'https://www.tiktok.com/embed/@user%2Fx',
+        url: 'https://www.tiktok.com/@user%2Fx',
+        author: '@user%2Fx',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // A hashtag is not an account and there is no clip either, so nothing can be minted.
@@ -672,9 +679,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The handle is interpolated into the viewer url, so anything outside TikTok's own
-    // character set is refused. The profile anchor still names the account, so it wins.
-    it('should ignore a data-unique-id that is not a handle and read the anchor', async () => {
+    it('should use a malformed data-unique-id as written, even if the player answers an error', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -689,10 +694,10 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
-        id: '@user',
-        src: 'https://www.tiktok.com/embed/@user',
+        id: '@../evil',
+        src: 'https://www.tiktok.com/embed/@../evil',
         url: 'https://www.tiktok.com/@user',
-        author: '@user',
+        author: '@../evil',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1096,11 +1101,18 @@ describeForEachParser('tiktokIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a watch page whose handle carries an encoded slash', async () => {
+    it('should use a malformed watch page handle as written, even if the url answers an error', async () => {
       const value =
         '<iframe src="https://www.tiktok.com/@user%2Fx/video/7520573541146692886"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@user%2Fx/video/7520573541146692886',
+        src: 'https://www.tiktok.com/embed/v2/7520573541146692886',
+        url: 'https://www.tiktok.com/@user%2Fx/video/7520573541146692886',
+        height: 738,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined when the player path holds no numeric id', async () => {

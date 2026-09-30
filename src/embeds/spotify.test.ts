@@ -237,16 +237,17 @@ describe('spotifyResolveEmbed', () => {
       expect(spotifyResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id carrying a path after it', () => {
+    it('should use a malformed id as written, even if the player answers an error', () => {
       const value = 'https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT%2Fx'
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'track/4cOdK2wGLETKBW3PvgPWqT%2Fx',
+        src: 'https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT%2Fx',
+        url: 'https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT%2Fx',
+        height: 152,
+      }
 
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id carrying a path before it', () => {
-      const value = 'https://open.spotify.com/embed/track/x%2F4cOdK2wGLETKBW3PvgPWqT'
-
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
+      expect(spotifyResolveEmbed(value)).toEqual(expected)
     })
 
     it('should return undefined for a route prefix that only ends in embed', () => {

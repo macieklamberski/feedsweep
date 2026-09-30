@@ -27,8 +27,6 @@ const idSpaces = toMap({
   partnerplayer: 'partnerplayer',
 })
 
-const safeVideoIdRegex = /^[\w-]+={0,2}$/
-
 // The parameters the player reads besides the id: the clip bounds and chapter, and the layout.
 // `autoplay` and `muted` are the reader's to set.
 const playerParams = ['start', 'end', 'chapter', 'h', 'topbar', 'endscreen', 'previewLayout']
@@ -53,7 +51,7 @@ const composeEmbed = (
 ): EmbedResolverResult | undefined => {
   const idSpace = idSpaces.get(route)
 
-  if (!videoId || !idSpace || !safeVideoIdRegex.test(videoId)) {
+  if (!videoId || !idSpace) {
     return
   }
 

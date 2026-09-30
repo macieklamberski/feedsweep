@@ -1,6 +1,6 @@
 import { isHostOrSubdomainOf, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'srgplay'
@@ -18,10 +18,9 @@ const playerHosts = toMap({
 const srgplayHosts = ['srgssr.ch', ...playerHosts.values()]
 const srgplayEmbedParams = ['startTime', 'subdivisions']
 
-// The urn is written into a composed url, so one holding a separator or a query would let a feed
-// choose the path. Its segment count varies: the corpus carries `urn:srf:ais:video:` beside
-// `urn:srf:video:`, so it is kept as the source wrote it.
-const safeUrnRegex = /^urn:([a-z]+):[a-z0-9:-]+$/
+// The business unit after `urn:` picks the host. The rest varies in segment count, the corpus
+// carries `urn:srf:ais:video:` beside `urn:srf:video:`, so it is kept as the source wrote it.
+const urnUnitRegex = /^urn:([a-z]+):/
 
 // The shared player, and the same player on each unit's own host.
 const urnPlayerPathRegex = /^\/(?:p\/[^/]+\/embed|play\/embed)\/?$/
@@ -40,7 +39,7 @@ const readBusinessUnit = (parsed: URL): string | undefined => {
 }
 
 const composeEmbed = (urn: string | null, search: string): EmbedResolverResult | undefined => {
-  const unit = urn?.match(safeUrnRegex)?.[1]
+  const unit = urn?.match(urnUnitRegex)?.[1]
   const host = unit && playerHosts.get(unit)
 
   if (!urn || !host) {
@@ -50,15 +49,14 @@ const composeEmbed = (urn: string | null, search: string): EmbedResolverResult |
   // `/play/tv/-/video/-` redirects onto the slugged page and answers 404 for a urn naming nothing.
   // The route spells the medium, so an audio urn needs one this platform has not been measured on.
   const page = urn.includes(':video:')
-    ? `https://www.${host}/play/tv/-/video/-?urn=${urn}`
+    ? `https://www.${host}/play/tv/-/video/-${composeQuery({ urn })}`
     : undefined
-  const src = `https://www.${host}/play/embed?urn=${urn}`
-  const carried = new URLSearchParams(pickQueryParams(search, srgplayEmbedParams)).toString()
+  const query = composeQuery({ urn, ...pickQueryParams(search, srgplayEmbedParams) })
 
   return {
     provider,
     id: urn,
-    src: carried ? `${src}&${carried}` : src,
+    src: `https://www.${host}/play/embed${query}`,
     url: page,
   }
 }

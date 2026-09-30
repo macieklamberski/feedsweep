@@ -1,6 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
+import { attr, flashVars } from '../utils/dom.js'
 import {
   audioFileRegex,
   composeQuery,
@@ -11,10 +11,6 @@ import {
 import { createUrlEmbedResolver, getEmbedSize } from '../utils/widgets.js'
 
 const provider = 'archive'
-
-// The lookahead refuses a segment of dots alone: the Flash config and the stranded `&` spelling
-// arrive as raw text no `URL` has folded, and `..` would climb out of every path minted from it.
-const safeIdentifierRegex = /^(?!\.+$)[\w.-]+$/
 
 const archiveHosts = ['archive.org']
 
@@ -32,7 +28,13 @@ const readSegmentParts = (link: string): { head: string; strayParams: string } =
 }
 
 export const extractArchiveIdentifier = (link: string): string | undefined => {
-  return keepIfMatches(readSegmentParts(link).head, safeIdentifierRegex)
+  const { head } = readSegmentParts(link)
+
+  if (!head) {
+    return
+  }
+
+  return head
 }
 
 // `playlist` puts the item's whole file list in the player, `list_height` sizes that list, and
@@ -118,7 +120,7 @@ export const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const config = flashVars(element) ?? parsed.searchParams.get('config')
   const identifier = config?.match(downloadIdentifierRegex)?.[1]
 
-  if (!identifier || !safeIdentifierRegex.test(identifier) || !config) {
+  if (!identifier || !config) {
     return
   }
 

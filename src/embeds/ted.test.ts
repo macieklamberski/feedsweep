@@ -56,22 +56,18 @@ describe('extractTedTalk', () => {
     expect(extractTedTalk(value)).toBe(expected)
   })
 
-  it('should return undefined for a slug led by an encoded slash', () => {
-    const value = 'https://embed.ted.com/talks/%2Fethan_zuckerman.html'
-
-    expect(extractTedTalk(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a slug followed by an encoded slash', () => {
+  it('should use a malformed slug as written, even if the player answers an error', () => {
     const value = 'https://embed.ted.com/talks/ethan_zuckerman%2F..%2Fx.html'
+    const expected = 'ethan_zuckerman%2F..%2Fx'
 
-    expect(extractTedTalk(value)).toBeUndefined()
+    expect(extractTedTalk(value)).toBe(expected)
   })
 
-  it('should return undefined for a slug whose suffix only starts with html', () => {
+  it('should use a malformed slug suffix as written, even if the player answers an error', () => {
     const value = 'https://embed.ted.com/talks/ethan_zuckerman.htmlx'
+    const expected = 'ethan_zuckerman.htmlx'
 
-    expect(extractTedTalk(value)).toBeUndefined()
+    expect(extractTedTalk(value)).toBe(expected)
   })
 
   it('should return undefined for a ted url that is not a talk', () => {

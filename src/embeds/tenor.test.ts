@@ -56,10 +56,16 @@ describe('tenorResolveEmbed', () => {
       expect(tenorResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a post id that is not digits', () => {
+    it('should use a malformed post id as written, even if the player answers an error', () => {
       const value = 'https://tenor.com/embed/embed.js'
+      const expected: EmbedResolverResult = {
+        provider: 'tenor',
+        id: 'embed.js',
+        src: 'https://tenor.com/embed/embed.js',
+        url: 'https://tenor.com/view/embed.js',
+      }
 
-      expect(tenorResolveEmbed(value)).toBeUndefined()
+      expect(tenorResolveEmbed(value)).toEqual(expected)
     })
   })
 })
@@ -135,37 +141,22 @@ describeForEachParser('tenorWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a post id that is not digits', async () => {
+    it('should use a malformed post id as written, even if the player answers an error', async () => {
       const value = html`
         <div
           class="tenor-gif-embed"
           data-postid="../../search/cats"
         ></div>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'tenor',
+        id: '../../search/cats',
+        src: 'https://tenor.com/embed/../../search/cats',
+        url: 'https://tenor.com/view/../../search/cats',
+        ratio: '1.33/1',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a post id that starts with digits and walks out of the route', async () => {
-      const value = html`
-        <div
-          class="tenor-gif-embed"
-          data-postid="16892698/../../search/cats"
-        ></div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a post id that ends with digits and walks out of the route', async () => {
-      const value = html`
-        <div
-          class="tenor-gif-embed"
-          data-postid="../../search/16892698"
-        ></div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

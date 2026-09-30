@@ -39,10 +39,9 @@ export const rutubeResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const candidate = playlistPathRegex.test(parsed.pathname)
+  const videoId = playlistPathRegex.test(parsed.pathname)
     ? parsed.searchParams.get('pl_video')
-    : parsed.pathname.match(embedPathRegex)?.[1]
-  const videoId = keepIfMatches(candidate, safeVideoIdRegex)
+    : keepIfMatches(parsed.pathname.match(embedPathRegex)?.[1], safeVideoIdRegex)
 
   if (!videoId) {
     return

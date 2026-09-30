@@ -3,7 +3,7 @@ import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const figshareHosts = ['figshare.com']
-const widgetPathRegex = /^\/articles\/(\d+)\/embed\/?$/
+const widgetPathRegex = /^\/articles\/([^/]+)\/embed\/?$/
 
 // The widget host answers the same shell for any article id. `api.figshare.com/v2/articles/{id}`
 // answers 200 with the title, the authors, the files and a poster for a real id and 404 for a

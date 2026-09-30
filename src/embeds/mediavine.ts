@@ -33,7 +33,7 @@ export const mediavineWidgetEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-const scriptIdRegex = /^\/videos\/([A-Za-z0-9]+)\.js$/
+const scriptIdRegex = /^\/videos\/([^/]+)\.js$/
 
 // The selector matches on a substring, so any host can spell `video.mediavine.com/videos` inside
 // its own path and reach this. The path shape alone must not mint a Mediavine url.

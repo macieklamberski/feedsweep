@@ -1,6 +1,6 @@
 import { getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 
 const provider = 'dailymotion'
 
@@ -12,9 +12,6 @@ import {
   splitStrayParams,
 } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-
-// No length floor: the oldest ids are four characters, and `x13i` still plays.
-const safeVideoIdRegex = /^[a-zA-Z0-9]+$/
 
 // Listed one by one: `dailymotion.de` is third-party, and a tld pattern would trust it.
 // Each apex redirects to a language landing page, dropping the video.
@@ -73,7 +70,11 @@ const skipRouteWords = (segments: Array<string>): number => {
 const readId = (candidate: Nullish<string>): string | undefined => {
   const head = candidate && splitStrayParams(candidate).head.split('_')[0]
 
-  return keepIfMatches(head, safeVideoIdRegex)
+  if (!head) {
+    return
+  }
+
+  return head
 }
 
 // A playlist names no single video, so it is read separately and only once the video readers have
@@ -117,8 +118,7 @@ export const extractDailymotionId = (link: string): string | undefined => {
     return
   }
 
-  // Each candidate is validated on its own, so a path segment that is not an id still leaves
-  // the geo player's `video` parameter to be read.
+  // A path naming no video still leaves the geo player's `video` parameter to be read.
   return [readPathId(url, getPathSegments(url)), url.searchParams.get('video')]
     .map(readId)
     .find(Boolean)

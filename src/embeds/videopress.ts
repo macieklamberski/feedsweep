@@ -38,14 +38,12 @@ const videopressResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const safeGuid = keepIfMatches(guid, safeGuidRegex)
-
-  if (!safeGuid) {
+  if (!guid) {
     return
   }
 
   return {
-    ...composeEmbed(safeGuid, pickUrlParams(url, videopressEmbedParams)),
+    ...composeEmbed(guid, pickUrlParams(url, videopressEmbedParams)),
     title: attr(element, 'title'),
   }
 }

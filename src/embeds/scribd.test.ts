@@ -282,12 +282,18 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a document id outside the numeric shape', async () => {
+    it('should use a malformed document id as written, even if the player answers an error', async () => {
       const value = html`
         <object data="http://d1.scribdassets.com/ScribdViewer.swf?document_id=../evil"></object>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'scribd',
+        id: '../evil',
+        src: 'https://www.scribd.com/embeds/../evil/content',
+        url: 'https://www.scribd.com/document/../evil',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // The factory hands every carrier on a Scribd host to the Flash reader, including the

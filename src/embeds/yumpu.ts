@@ -10,7 +10,6 @@ const provider = 'yumpu'
 // the bare host and its `www.` spelling name a document.
 const yumpuHosts = ['yumpu.com', 'www.yumpu.com']
 
-const documentHashRegex = /^[A-Za-z0-9]+$/
 const localeRegex = /^[a-z]{2}$/
 const documentPathRegex = /^\/[a-z]{2}\/document\/view\/\d+(?:\/|$)/
 
@@ -50,16 +49,15 @@ const yumpuResolveEmbed: ResolveEmbed = (url, element) => {
   // YUMPU redirects an embed path with no locale prefix to `/en/`.
   const locale = isLocaleless ? 'en' : keepIfMatches(segments[0], localeRegex)
   const [embed, view, hash] = isLocaleless ? segments : segments.slice(1)
-  const id = keepIfMatches(hash, documentHashRegex)
 
-  if (!locale || embed !== 'embed' || view !== 'view' || !id) {
+  if (!locale || embed !== 'embed' || view !== 'view' || !hash) {
     return
   }
 
   return {
     provider,
-    id,
-    src: `https://www.yumpu.com/${locale}/embed/view/${id}`,
+    id: hash,
+    src: `https://www.yumpu.com/${locale}/embed/view/${hash}`,
     ...readCompanion(element),
   }
 }

@@ -130,12 +130,10 @@ const brightcoveFlashResolveEmbed: ResolveEmbed = (url, element) => {
       parsed.searchParams.get('videoId'),
     digitsRegex,
   )
-  const account = keepIfMatches(
+  const account =
     parsed.searchParams.get('publisherID') ??
-      params?.get('publisherID') ??
-      readPlayerKeyAccount(params?.get('playerKey')),
-    digitsRegex,
-  )
+    params?.get('publisherID') ??
+    readPlayerKeyAccount(params?.get('playerKey'))
 
   if (!videoId || !account) {
     return
@@ -197,7 +195,7 @@ export const brightcoveResolveEmbed: ResolveEmbed = (url, element) => {
 
   // `{player}_{embed}` is one segment holding two ids. A segment shaped otherwise is not a
   // player path.
-  if (!digitsRegex.test(account) || !playerPathRegex.test(player)) {
+  if (!playerPathRegex.test(player)) {
     return
   }
 

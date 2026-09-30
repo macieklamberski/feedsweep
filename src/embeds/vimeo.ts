@@ -111,9 +111,7 @@ const readReference = (link: string): VimeoReference | undefined => {
   const clipId = url.searchParams.get('clip_id')
 
   if (clipId) {
-    const id = keepIfMatches(clipId, digitsRegex)
-
-    return id ? { id } : undefined
+    return { id: clipId }
   }
 
   if (sitePathSegments.has(segments[0])) {
@@ -144,10 +142,7 @@ const readReference = (link: string): VimeoReference | undefined => {
 
   return {
     id,
-    hash:
-      hashIndex === -1
-        ? keepIfMatches(url.searchParams.get('h'), unlistedHashRegex)
-        : segments[hashIndex],
+    hash: hashIndex === -1 ? (url.searchParams.get('h') ?? undefined) : segments[hashIndex],
   }
 }
 

@@ -87,10 +87,16 @@ describe('komootResolveEmbed', () => {
       expect(komootResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a collection slug carrying a query separator', () => {
+    it('should use a malformed collection slug as written, even if the player answers an error', () => {
       const value = 'https://www.komoot.com/collection/3965053/best&layout=x/embed'
+      const expected: EmbedResolverResult = {
+        provider: 'komoot',
+        id: 'collection/3965053',
+        src: 'https://www.komoot.com/collection/3965053/best&layout=x/embed',
+        url: 'https://www.komoot.com/collection/3965053/best&layout=x',
+      }
 
-      expect(komootResolveEmbed(value)).toBeUndefined()
+      expect(komootResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore a collection id that is not a number', () => {

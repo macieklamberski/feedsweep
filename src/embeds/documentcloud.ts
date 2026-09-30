@@ -10,8 +10,8 @@ const documentcloudEmbedParams = ['embed', 'fullscreen', 'mode', 'onlyshoworg', 
 
 // s3.documentcloud.org serves the page image under the slug in the exact case the path spells it.
 const documentSegmentRegex = /^(\d+)-(.+?)(\.html)?$/
-const partPathRegex = /^\/documents\/(\d+)\/(annotations|pages)\/(\d+)\/?$/
-const legacyNotePathRegex = /^\/documents\/(\d+)-[^/]+\/(annotations)\/(\d+)\.html$/
+const partPathRegex = /^\/documents\/(\d+)\/(annotations|pages)\/([^/]+)\/?$/
+const legacyNotePathRegex = /^\/documents\/(\d+)-[^/]+\/(annotations)\/([^/]+)\.html$/
 
 // DocumentCloud's viewer iframe, `embed.documentcloud.org/documents/{id}-{slug}/`, and the older
 // `www.documentcloud.org/documents/{id}-{slug}.html`, which redirects to it. The carrier `title`

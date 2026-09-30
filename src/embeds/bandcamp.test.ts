@@ -63,10 +63,11 @@ describe('extractBandcampRelease', () => {
     expect(extractBandcampRelease(value)).toBeUndefined()
   })
 
-  it('should return undefined for a non-numeric id', () => {
+  it('should use a malformed query id as written, even if the player answers an error', () => {
     const value = 'https://bandcamp.com/VideoEmbed?track=abc'
+    const expected = 'track/abc'
 
-    expect(extractBandcampRelease(value)).toBeUndefined()
+    expect(extractBandcampRelease(value)).toEqual(expected)
   })
 
   it('should return undefined for a url that cannot be parsed', () => {

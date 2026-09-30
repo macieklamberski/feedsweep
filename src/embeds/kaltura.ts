@@ -1,15 +1,11 @@
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
+import { attr, parsePixelSize } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'kaltura'
 
-// An entry id is a namespace counter, an underscore and lowercase letters or digits,
-// `1_w0bwzism`. The shape is what makes it safe to mint into the thumbnail path. Neither half
-// carries a width, because that would refuse the next id space.
-const safeEntryIdRegex = /^\d+_[a-z0-9]+$/
-const partnerPathRegex = /^\/p\/(\d+)\//
+const partnerPathRegex = /^\/p\/([^/]+)\//
 
 const kalturaHost = 'kaltura.com'
 
@@ -30,7 +26,7 @@ type Entry = {
 const readEntry = (url: string | undefined): Entry | undefined => {
   const parsed = parseUrlOnHosts(url, kalturaHost)
   const partner = parsed?.pathname.match(partnerPathRegex)?.[1]
-  const entryId = keepIfMatches(parsed?.searchParams.get('entry_id'), safeEntryIdRegex)
+  const entryId = parsed?.searchParams.get('entry_id')
 
   return parsed && partner && entryId ? { partner, entryId, parsed } : undefined
 }

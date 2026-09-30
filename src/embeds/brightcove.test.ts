@@ -34,8 +34,6 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The `federated_` path already names the platform, so the id shape is only keeping the two
-    // numbers safe to mint with.
     it('should read a short account and video id off a federated player', async () => {
       const value = html`
         <embed
@@ -47,6 +45,22 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1660/1952',
         src: 'https://players.brightcove.net/1660/default_default/index.html?videoId=1952',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed publisher id as written, even if the player answers an error', async () => {
+      const value = html`
+        <embed
+          src="http://c.brightcove.com/services/viewer/federated_f9/1951?isVid=1&publisherID=acme"
+          flashVars="@videoPlayer=1952&playerID=1951&domain=embed&"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: 'acme/1952',
+        src: 'https://players.brightcove.net/acme/default_default/index.html?videoId=1952',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -278,11 +292,16 @@ describe('brightcoveResolveEmbed', () => {
       expect(brightcoveResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined when the account segment is not a number', () => {
+    it('should use a malformed account as written, even if the player answers an error', () => {
       const value =
         'https://players.brightcove.net/acme/default_default/index.html?videoId=6098765432'
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: 'acme/6098765432',
+        src: 'https://players.brightcove.net/acme/default_default/index.html?videoId=6098765432',
+      }
 
-      expect(brightcoveResolveEmbed(value)).toBeUndefined()
+      expect(brightcoveResolveEmbed(value)).toEqual(expected)
     })
 
     // `{player}_{embed}` is one segment holding two ids.

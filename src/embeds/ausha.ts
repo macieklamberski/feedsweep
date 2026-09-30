@@ -5,9 +5,6 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const aushaHost = 'ausha.co'
 
-// No length: every id is twelve characters today, and a bound would refuse the next id space.
-const safeIdRegex = /^[A-Za-z0-9]+$/
-
 // The v3 player is a fixed height on a fluid width: 220, and 501 with `display=vertical`.
 const playerHeight = 220
 const verticalHeight = 501
@@ -40,7 +37,7 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
   const named = [
     ['podcast', podcast],
     ['show', show],
-  ].find(([, value]) => safeIdRegex.test(value as string))
+  ].find(([, value]) => value)
 
   if (!named) {
     return

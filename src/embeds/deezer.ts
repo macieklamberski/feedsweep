@@ -1,7 +1,7 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'deezer'
@@ -79,7 +79,7 @@ export const deezerResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, deezerHosts)
   const resource = parsed && readResource(parsed)
 
-  if (!resource || !deezerHeights.has(resource.type) || !digitsRegex.test(resource.id)) {
+  if (!resource || !deezerHeights.has(resource.type) || !resource.id) {
     return
   }
 

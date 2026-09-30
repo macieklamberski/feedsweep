@@ -30,16 +30,15 @@ describe('amebaResolveEmbed', () => {
       expect(amebaResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a video id outside its alphabet', () => {
-      const value = 'https://static.blog-video.jp/?v=../output'
-
-      expect(amebaResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a video id trailed by an encoded parameter', () => {
+    it('should use a malformed video id as written, even if the player answers an error', () => {
       const value = 'https://static.blog-video.jp/?v=MCLP3ViB%26autoplay%3D1'
+      const expected: EmbedResolverResult = {
+        provider: 'ameba',
+        id: 'MCLP3ViB&autoplay=1',
+        src: 'https://static.blog-video.jp/?v=MCLP3ViB%26autoplay%3D1',
+      }
 
-      expect(amebaResolveEmbed(value)).toBeUndefined()
+      expect(amebaResolveEmbed(value)).toEqual(expected)
     })
   })
 
@@ -417,33 +416,23 @@ describeForEachParser('amebaImagePageEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a blog id carrying an encoded path separator', async () => {
+    it('should use a malformed blog id as written, even if the player answers an error', async () => {
       const value = html`
         <iframe src="https://ameblo.jp/p/embed/sd%2Fmilk/image-1-2.html"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'ameba',
+        id: 'sd%2Fmilk/image-1-2',
+        src: 'https://ameblo.jp/p/embed/sd%2Fmilk/image-1-2.html',
+        url: 'https://ameblo.jp/sd%2Fmilk/image-1-2.html',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a blog id carrying a path separator', async () => {
       const value = html`
         <iframe src="https://ameblo.jp/p/embed/sd/milk/image-12806733695-15295885078.html"></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a blog id carrying an uppercase letter', async () => {
-      const value = html`
-        <iframe src="https://ameblo.jp/p/embed/TONY-9/image-12854455300-15446105444.html"></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a blog id carrying an underscore', async () => {
-      const value = html`
-        <iframe src="https://ameblo.jp/p/embed/tony_9/image-12854455300-15446105444.html"></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -465,12 +454,18 @@ describeForEachParser('amebaImagePageEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an image page naming no numeric entry and image', async () => {
+    it('should use a malformed image name as written, even if the player answers an error', async () => {
       const value = html`
         <iframe src="https://ameblo.jp/p/embed/sd-milk/image-latest-cover.html"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'ameba',
+        id: 'sd-milk/image-latest-cover',
+        src: 'https://ameblo.jp/p/embed/sd-milk/image-latest-cover.html',
+        url: 'https://ameblo.jp/sd-milk/image-latest-cover.html',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore an embed route that names no image', async () => {

@@ -66,24 +66,6 @@ describe('foxnewsResolveEmbed', () => {
       expect(foxnewsResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id that is not numeric', () => {
-      const value = 'https://video.foxnews.com/v/embed.js?id=latest'
-
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id with letters before the digits', () => {
-      const value = 'https://video.foxbusiness.com/v/embed.js?id=abc6355436296112'
-
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id with letters after the digits', () => {
-      const value = 'https://video.foxbusiness.com/v/embed.js?id=6355436296112abc'
-
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a url that does not parse', () => {
       const value = 'http://['
 
@@ -142,6 +124,19 @@ describe('foxnewsResolveEmbed', () => {
         id: '6178327154001',
         src: 'https://video.foxnews.com/v/video-embed.html?video_id=6178327154001',
         url: 'https://www.foxnews.com/video/6178327154001',
+        ratio: '16/9',
+      }
+
+      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should use a malformed id as written, even if the player answers an error', () => {
+      const value = 'https://video.foxnews.com/v/embed.js?id=latest'
+      const expected: EmbedResolverResult = {
+        provider: 'foxnews',
+        id: 'latest',
+        src: 'https://video.foxnews.com/v/video-embed.html?video_id=latest',
+        url: 'https://www.foxnews.com/video/latest',
         ratio: '16/9',
       }
 

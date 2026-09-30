@@ -29,9 +29,7 @@ export const extractTedTalk = (link: string): string | undefined => {
     return
   }
 
-  const slug = (segments[1] === 'lang' ? segments[3] : segments[1])?.replace(htmlSuffixRegex, '')
-
-  return keepIfMatches(slug, safeSlugRegex)
+  return (segments[1] === 'lang' ? segments[3] : segments[1])?.replace(htmlSuffixRegex, '')
 }
 
 // The Flash player's url is the same file for every talk, so the carrier names nothing on its

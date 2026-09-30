@@ -21,9 +21,8 @@ const deliveryPlayerHost = 'iframe.videodelivery.net'
 // The image is served from the bare host.
 const deliveryThumbnailHost = 'videodelivery.net'
 
-const safeVideoIdRegex = /^[a-z0-9]+$/
-const playerPathRegex = /^\/([a-z0-9]+)\/iframe\/?$/
-const deliveryPathRegex = /^\/([a-z0-9]+)\/?$/
+const playerPathRegex = /^\/([^/]+)\/iframe\/?$/
+const deliveryPathRegex = /^\/([^/]+)\/?$/
 
 const playerParams = ['poster', 'startTime']
 
@@ -82,7 +81,7 @@ export const cloudflarestreamScriptEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     // The selector matches a substring any host can carry, so the host is checked here.
     const parsed = parseUrlOnHosts(attr(element, 'src'), cloudflarestreamHosts)
-    const videoId = keepIfMatches(parsed?.searchParams.get('video'), safeVideoIdRegex)
+    const videoId = parsed?.searchParams.get('video')
 
     if (!videoId) {
       return

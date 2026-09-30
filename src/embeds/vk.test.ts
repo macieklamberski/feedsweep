@@ -74,28 +74,28 @@ describe('vkResolveEmbed', () => {
       expect(vkResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore an owner id with a prefix outside its alphabet', () => {
+    it('should use a malformed owner id as written, even if the player answers an error', () => {
       const value = 'https://vk.com/video_ext.php?oid=../1&id=2'
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: '../1_2',
+        src: 'https://vk.com/video_ext.php?oid=..%2F1&id=2',
+        url: 'https://vkvideo.ru/video../1_2',
+      }
 
-      expect(vkResolveEmbed(value)).toBeUndefined()
+      expect(vkResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should ignore an owner id with a suffix outside its alphabet', () => {
-      const value = 'https://vk.com/video_ext.php?oid=1/../x&id=2'
-
-      expect(vkResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a video id with a prefix outside its alphabet', () => {
+    it('should use a malformed video id as written, even if the player answers an error', () => {
       const value = 'https://vk.com/video_ext.php?oid=-1&id=../2'
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: '-1_../2',
+        src: 'https://vk.com/video_ext.php?oid=-1&id=..%2F2',
+        url: 'https://vkvideo.ru/video-1_../2',
+      }
 
-      expect(vkResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a video id with a suffix outside its alphabet', () => {
-      const value = 'https://vk.com/video_ext.php?oid=-1&id=2/../x'
-
-      expect(vkResolveEmbed(value)).toBeUndefined()
+      expect(vkResolveEmbed(value)).toEqual(expected)
     })
   })
 })

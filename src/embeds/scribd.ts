@@ -79,7 +79,11 @@ export const scribdFlashResolveEmbed: ResolveEmbed = (url, element) => {
 
   const document = parsed.searchParams.get('document_id') ?? flashVar(element, 'document_id')
 
-  return document && digitsRegex.test(document) ? composeEmbed(document) : undefined
+  if (!document) {
+    return
+  }
+
+  return composeEmbed(document)
 }
 
 // Scribd's Flash viewer, scribdviewer.swf, dead since 2020 and naming its document in document_id.

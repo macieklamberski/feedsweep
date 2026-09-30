@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
@@ -7,7 +7,6 @@ import {
   pickQueryParams,
   placeholderBaseUrl,
   splitStrayParams,
-  urlSafeTokenRegex,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -187,10 +186,6 @@ export const readYoutubeEmbedSrc = (link: string): string | undefined => {
   return composeEmbedUrl(videoId, readEmbedParams(url.href))
 }
 
-// The Flash-era playlist player wrote `youtube.com/p/{id}`, where the id is the same playlist the
-// modern url spells as `list=PL{id}`.
-const legacyPlaylistIdRegex = /^[0-9A-F]{16}$/
-
 // A Short gets the same landscape player as a film, so a carrier's portrait box never fills.
 const playerRatio = '16/9'
 
@@ -202,7 +197,7 @@ const composeListEmbed = (list: string): EmbedResolverResult => {
     provider,
     id: `playlist/${list}`,
     src: composeEmbedUrl('videoseries', { list }),
-    url: `https://www.youtube.com/playlist?list=${list}`,
+    url: `https://www.youtube.com/playlist${composeQuery({ list })}`,
     ratio: playerRatio,
   }
 }
@@ -212,7 +207,7 @@ const composeUploadsEmbed = (user: string): EmbedResolverResult => {
   return {
     provider,
     id: `user/${user}`,
-    src: `https://www.youtube.com/embed?listType=user_uploads&list=${user}`,
+    src: `https://www.youtube.com/embed${composeQuery({ listType: 'user_uploads', list: user })}`,
     url: `https://www.youtube.com/user/${user}`,
     ratio: playerRatio,
   }
@@ -226,7 +221,7 @@ const composeVideoEmbed = (
     provider,
     id: videoId,
     src: composeEmbedUrl(videoId, params),
-    url: `https://www.youtube.com/watch?v=${videoId}`,
+    url: `https://www.youtube.com/watch${composeQuery({ v: videoId })}`,
     thumbnail: composeThumbnailUrl(videoId),
     ratio: playerRatio,
   }
@@ -251,9 +246,7 @@ const resolveCollectionEmbed = (
   const channel = parsed.searchParams.get('channel')
 
   if (segments[1] === 'live_stream') {
-    // Playlist (`list`), channel (`channel`) and legacy username ids. A charset guard, not a
-    // length/prefix one: it only keeps a stray value out of the rebuilt url and the enrichment key.
-    return channel && urlSafeTokenRegex.test(channel) ? composeChannelEmbed(channel) : undefined
+    return channel ? composeChannelEmbed(channel) : undefined
   }
 
   // `/embed/videoseries?list=` and the bare `/embed/?list=` some WordPress plugins emit are the
@@ -264,7 +257,7 @@ const resolveCollectionEmbed = (
 
   // `listType=search` named a search query, not an id, and YouTube removed it in 2020: the
   // embed plays nothing and there is nothing to resolve it to.
-  if (listType === 'search' || !list || !urlSafeTokenRegex.test(list)) {
+  if (listType === 'search' || !list) {
     return
   }
 
@@ -286,13 +279,15 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
     }
   }
 
-  // The Flash player took its playlist on `/p/`, and the swf it points at is dead, so the id is
-  // the only thing left to rebuild from. The publisher's `?hl=` and `&fs=1` are player chrome and
-  // go with the rest of the query.
+  // The Flash player took its playlist on `/p/{id}`, the playlist the modern url spells as
+  // `list=PL{id}`, and the swf it points at is dead, so the id is the only thing left to rebuild
+  // from. The publisher's `?hl=` and `&fs=1` are player chrome and go with the rest of the query.
   if (segments[0] === 'p') {
-    const list = splitStrayParams(segments[1] ?? '').head
+    const head = splitStrayParams(segments[1] ?? '').head
+    // The id moves from a path segment into the query, so it is decoded first.
+    const list = decodeSegment(head) ?? head
 
-    return legacyPlaylistIdRegex.test(list) ? composeListEmbed(`PL${list}`) : undefined
+    return list ? composeListEmbed(`PL${list}`) : undefined
   }
 
   const videoId = extractVideoId(url)
@@ -359,11 +354,7 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
     if (!videoId) {
       const channel = attr(element, 'data-live-channelid')
 
-      return channel && urlSafeTokenRegex.test(channel) ? composeChannelEmbed(channel) : undefined
-    }
-
-    if (!isVideoId(videoId)) {
-      return
+      return channel ? composeChannelEmbed(channel) : undefined
     }
 
     const params: Record<string, string> = {}

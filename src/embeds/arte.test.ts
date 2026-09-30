@@ -76,40 +76,30 @@ describeForEachParser('arteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a language outside the two-letter shape', async () => {
+    it('should use a malformed language as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://www.arte.tv/embeds/fra/095172-005-A"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'arte',
+        id: 'fra/095172-005-A',
+        src: 'https://www.arte.tv/embeds/fra/095172-005-A',
+        url: 'https://www.arte.tv/fra/videos/095172-005-A/',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a language carrying a percent sign', async () => {
-      const value = '<iframe src="https://www.arte.tv/embeds/f%/095172-005-A"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore an id outside the program shape', async () => {
+    it('should use a malformed program id as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://www.arte.tv/embeds/fr/095172-005"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'arte',
+        id: 'fr/095172-005',
+        src: 'https://www.arte.tv/embeds/fr/095172-005',
+        url: 'https://www.arte.tv/fr/videos/095172-005/',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a program id behind a prefix', async () => {
-      const value = '<iframe src="https://www.arte.tv/embeds/fr/x095172-005-A"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a program id followed by other characters', async () => {
-      const value = '<iframe src="https://www.arte.tv/embeds/fr/095172-005-Ax"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a version letter that is a percent sign', async () => {
-      const value = '<iframe src="https://www.arte.tv/embeds/fr/095172-005-%"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore an arte url that is not the player', async () => {

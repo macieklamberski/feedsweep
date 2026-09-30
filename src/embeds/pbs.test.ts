@@ -173,16 +173,17 @@ describe('pbsResolveEmbed', () => {
       expect(pbsResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore an id carrying a separator', () => {
+    it('should use a malformed video id as written, even if the player answers an error', () => {
       const value = 'https://player.pbs.org/viralplayer/3005%2F825044/'
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/3005%2F825044',
+        src: 'https://player.pbs.org/viralplayer/3005%2F825044/',
+        params: {},
+        ratio: '13/9',
+      }
 
-      expect(pbsResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an id carrying a query separator', () => {
-      const value = 'https://player.pbs.org/viralplayer/3005&start=1/'
-
-      expect(pbsResolveEmbed(value)).toBeUndefined()
+      expect(pbsResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore a route the retired host did not serve', () => {

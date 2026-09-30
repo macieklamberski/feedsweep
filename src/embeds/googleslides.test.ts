@@ -138,25 +138,6 @@ describe('googleslidesResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a published id carrying an encoded path', () => {
-      const value = 'https://docs.google.com/presentation/d/e/2PACX-1v%2F..%2Fx/embed'
-
-      expect(googleslidesResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a legacy frame whose id holds a path', () => {
-      const value = 'https://docs.google.com/presentation/embed?id=../../document/d/x'
-
-      expect(googleslidesResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a legacy frame whose id holds an encoded slash', () => {
-      const value =
-        'https://docs.google.com/presentation/embed?id=1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx'
-
-      expect(googleslidesResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a deck exported as a pdf', () => {
       const value =
         'https://docs.google.com/presentation/d/1k5NXExE8IvVgEIAwhxzwNw93Kt6f8Yqp1K7TuSigXiE/export/pdf'
@@ -201,6 +182,45 @@ describe('googleslidesResolveEmbed', () => {
         'https://docs.google.com/viewer?url=https%3A%2F%2Fexample.com%2Fa.pdf&embedded=true'
 
       expect(googleslidesResolveEmbed(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed published id as written, even if the player answers an error', () => {
+      const value = 'https://docs.google.com/presentation/d/e/2PACX-1v%2F..%2Fx/embed'
+      const expected: EmbedResolverResult = {
+        provider: 'googleslides',
+        id: '2PACX-1v%2F..%2Fx',
+        src: 'https://docs.google.com/presentation/d/e/2PACX-1v%2F..%2Fx/embed',
+        url: 'https://docs.google.com/presentation/d/e/2PACX-1v%2F..%2Fx/pub',
+      }
+
+      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should use a malformed legacy file id as written, even if the player answers an error', () => {
+      const value = 'https://docs.google.com/presentation/embed?id=../../document/d/x'
+      const expected: EmbedResolverResult = {
+        provider: 'googleslides',
+        id: '../../document/d/x',
+        src: 'https://docs.google.com/presentation/embed?id=..%2F..%2Fdocument%2Fd%2Fx',
+        url: 'https://docs.google.com/presentation/d/../../document/d/x/pub',
+      }
+
+      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should use a malformed legacy file id carrying an encoded slash as written, even if the player answers an error', () => {
+      const value =
+        'https://docs.google.com/presentation/embed?id=1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx'
+      const expected: EmbedResolverResult = {
+        provider: 'googleslides',
+        id: '1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/x',
+        src: 'https://docs.google.com/presentation/embed?id=1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx',
+        url: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/x/pub',
+      }
+
+      expect(googleslidesResolveEmbed(value)).toEqual(expected)
     })
   })
 

@@ -159,6 +159,21 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should use a malformed item id as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://embed.gettyimages.com/embed/latest?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=&caption=true"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'gettyimages',
+        id: 'latest',
+        src: 'https://embed.gettyimages.com/embed/latest?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=&caption=true',
+        url: 'https://www.gettyimages.com/detail/latest',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 // Only the pipeline shows what the host's enclosures become, since injectEnclosures offers each

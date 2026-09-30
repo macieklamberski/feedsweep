@@ -6,8 +6,6 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 // `ganjing.com` 301s onto `www.ganjingworld.com/embed/{same id}`, so both hosts name one embed.
 const ganjingworldHosts = ['ganjingworld.com', 'ganjing.com']
 
-const videoIdRegex = /^[a-zA-Z0-9]+$/
-
 // The platform's locale segment is case-sensitive: `zh-CN` 301s onto the bare id, `zh-cn` 404s.
 // Only the platform's own spelling is claimed, so a lowercase one falls to the generic fallback.
 const localeRegex = /^[a-z]{2}-[A-Z]{2}$/
@@ -22,13 +20,11 @@ const readVideo = (url: string): Video | undefined => {
 
   // The route word tells an embed from a channel, `/channel`, or a shared post, `/s`.
   if (first === 'embed') {
-    const id = keepIfMatches(second, videoIdRegex)
-
-    if (!id) {
+    if (!second) {
       return
     }
 
-    return { id }
+    return { id: second }
   }
 
   if (second !== 'embed') {
@@ -36,13 +32,12 @@ const readVideo = (url: string): Video | undefined => {
   }
 
   const locale = keepIfMatches(first, localeRegex)
-  const id = keepIfMatches(third, videoIdRegex)
 
-  if (!locale || !id) {
+  if (!locale || !third) {
     return
   }
 
-  return { locale, id }
+  return { locale, id: third }
 }
 
 // No title: the carrier states one, but Gan Jing World is unmeasured, so reading it risks putting

@@ -370,14 +370,22 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a post id outside the base36 alphabet', async () => {
+    it('should use a malformed post id as written, even if the player answers an error', async () => {
       const value = html`
         <blockquote class="reddit-embed-bq">
           <a href="https://www.reddit.com/r/pics/comments/..%2Fevil/my_garden/">My dog</a>
         </blockquote>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/pics/comments/..%2Fevil',
+        src: 'https://embed.reddit.com/r/pics/comments/..%2Fevil/',
+        url: 'https://www.reddit.com/r/pics/comments/..%2Fevil/',
+        title: 'My dog',
+        publisher: 'r/pics',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for another host carrying the permalink path', async () => {
@@ -489,22 +497,43 @@ describe('redditResolveEmbed', () => {
     expect(redditResolveEmbed(value)).toBeUndefined()
   })
 
-  it('should ignore a subreddit name carrying an encoded separator', () => {
+  it('should use a malformed subreddit name as written, even if the player answers an error', () => {
     const value = 'https://www.reddit.com/r/pics%2F..%2Fadmin/comments/dq4m1v/my_garden/'
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'r/pics%2F..%2Fadmin/comments/dq4m1v',
+      src: 'https://embed.reddit.com/r/pics%2F..%2Fadmin/comments/dq4m1v/',
+      url: 'https://www.reddit.com/r/pics%2F..%2Fadmin/comments/dq4m1v/',
+      publisher: 'r/pics%2F..%2Fadmin',
+    }
 
-    expect(redditResolveEmbed(value)).toBeUndefined()
+    expect(redditResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should ignore a post id carrying an encoded separator after a valid id', () => {
+  it('should use a malformed post id as written, even if the player answers an error', () => {
     const value = 'https://www.reddit.com/r/pics/comments/dq4m1v%2Fevil/my_garden/'
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'r/pics/comments/dq4m1v%2Fevil',
+      src: 'https://embed.reddit.com/r/pics/comments/dq4m1v%2Fevil/',
+      url: 'https://www.reddit.com/r/pics/comments/dq4m1v%2Fevil/',
+      publisher: 'r/pics',
+    }
 
-    expect(redditResolveEmbed(value)).toBeUndefined()
+    expect(redditResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should ignore a comment id outside the base36 alphabet', () => {
+  it('should use a malformed comment id as written, even if the player answers an error', () => {
     const value = 'https://www.reddit.com/r/pics/comments/dq4m1v/my_garden/..%2Fevil/'
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'r/pics/comments/dq4m1v/comment/..%2Fevil',
+      src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/comment/..%2Fevil/',
+      url: 'https://www.reddit.com/r/pics/comments/dq4m1v/comment/..%2Fevil/',
+      publisher: 'r/pics',
+    }
 
-    expect(redditResolveEmbed(value)).toBeUndefined()
+    expect(redditResolveEmbed(value)).toEqual(expected)
   })
 
   it('should ignore the media host serving a post its attachments', () => {

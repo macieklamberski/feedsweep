@@ -128,7 +128,7 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a work id outside its alphabet', async () => {
+    it('should use a malformed work id as written, even if the player answers an error', async () => {
       const value = html`
         <script
           src="https://source.pixiv.net/source/embed.js"
@@ -137,24 +137,18 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
           data-border="on"
         ></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'pixiv',
+        id: '../other',
+        src: 'https://embed.pixiv.net/embed_mk2.php?id=..%2Fother&size=small&border=on',
+        width: 220,
+        height: 250,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a work id whose hash carries a slash', async () => {
-      const value = html`
-        <script
-          src="https://source.pixiv.net/source/embed.js"
-          data-id="45958594_2a40/7d6e"
-          data-size="small"
-          data-border="on"
-        ></script>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a work id carrying a query after its digits', async () => {
+    it('should use a malformed work id carrying a query as written, even if the player answers an error', async () => {
       const value = html`
         <script
           src="https://source.pixiv.net/source/embed.js"
@@ -163,21 +157,40 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
           data-border="on"
         ></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'pixiv',
+        id: '45958594_2a40&size=large',
+        src: 'https://embed.pixiv.net/embed_mk2.php?id=45958594_2a40%26size%3Dlarge&size=small&border=on',
+        width: 220,
+        height: 250,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a work id carrying a query before its digits', async () => {
+    it('should use a work id carrying a quote as written, beside a filled mount', async () => {
       const value = html`
+        <div
+          class="pixiv-embed"
+          data-id="45958594"
+          data-done="1"
+        ></div>
         <script
           src="https://source.pixiv.net/source/embed.js"
-          data-id="x&amp;size=large1_ab"
+          data-id="45958594&quot;]"
           data-size="small"
           data-border="on"
         ></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'pixiv',
+        id: '45958594"]',
+        src: 'https://embed.pixiv.net/embed_mk2.php?id=45958594%22%5D&size=small&border=on',
+        width: 220,
+        height: 250,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a size the loader does not know', async () => {
@@ -650,11 +663,16 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a work id carrying a path', async () => {
+    it('should use a malformed work id as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://embed.pixiv.net/fixed.php?id=149288339%2F..%2Fx"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'pixiv',
+        id: '149288339/../x',
+        src: 'https://embed.pixiv.net/fixed.php?id=149288339%2F..%2Fx',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore the oEmbed frame of a novel', async () => {

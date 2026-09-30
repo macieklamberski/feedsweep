@@ -1,6 +1,6 @@
 import { toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'netease'
@@ -27,7 +27,7 @@ const composeResult = (
 ): EmbedResolverResult | undefined => {
   const route = typeRoutes.get(type)
 
-  if (!route || !digitsRegex.test(id)) {
+  if (!route || !id) {
     return
   }
 
@@ -38,7 +38,7 @@ const composeResult = (
     provider,
     id: `${route}/${id}`,
     src: `https://music.163.com/outchain/player${composeQuery(params)}`,
-    url: `https://music.163.com/${route}?id=${id}`,
+    url: `https://music.163.com/${route}${composeQuery({ id })}`,
   }
 }
 

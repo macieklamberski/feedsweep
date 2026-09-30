@@ -314,26 +314,40 @@ describeForEachParser('crowdsignalFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a poll id that only ends in digits', async () => {
+    it('should use a malformed poll id as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="http://www.polldaddy.com/poll.swf"
           flashvars="p=poll132074"
         >
       `
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: 'poll132074',
+        src: 'https://poll.fm/poll132074/embed',
+        url: 'https://poll.fm/poll132074',
+        height: 473,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a poll id carrying a path separator', async () => {
+    it('should use a malformed poll id carrying a path separator as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="http://www.polldaddy.com/poll.swf"
           flashvars="p=132074%2Fresults"
         >
       `
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: '132074/results',
+        src: 'https://poll.fm/132074/results/embed',
+        url: 'https://poll.fm/132074/results',
+        height: 473,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

@@ -12,9 +12,9 @@ const tumblrEmbedHosts = ['embed.tumblr.com']
 // `tumblr.com/{blog}/{id}/{slug}` on the current one.
 const tumblrHosts = ['tumblr.com']
 
-// The blog key is a base64url token, written bare on the older route and prefixed `t:` on the
-// current one. Both spellings address the same post, so the id keeps the bare one.
-const safeBlogKeyRegex = /^(?:t:)?[\w-]+$/
+// The blog key is written bare on the older route and prefixed `t:` on the current one. Both
+// spellings address the same post, so the id keeps the bare one.
+const blogKeyPrefixRegex = /^t:/
 
 const readPostEmbed = (href: string | undefined): EmbedResolverResult | undefined => {
   const parsed = parseUrlOnHosts(href, tumblrEmbedHosts)
@@ -23,20 +23,16 @@ const readPostEmbed = (href: string | undefined): EmbedResolverResult | undefine
     return
   }
 
-  const [route, kind, blogKey = '', postId = ''] = getPathSegments(parsed)
+  const [route, kind, blogKey, postId = ''] = getPathSegments(parsed)
 
-  if (
-    route !== 'embed' ||
-    kind !== 'post' ||
-    !safeBlogKeyRegex.test(blogKey) ||
-    !digitsRegex.test(postId)
-  ) {
+  // The digits tell a post id from a route word such as `v2` standing in its place.
+  if (route !== 'embed' || kind !== 'post' || !blogKey || !digitsRegex.test(postId)) {
     return
   }
 
   return {
     provider,
-    id: `${blogKey.replace('t:', '')}/${postId}`,
+    id: `${blogKey.replace(blogKeyPrefixRegex, '')}/${postId}`,
     src: parsed.href,
   }
 }

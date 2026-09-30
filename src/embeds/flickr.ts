@@ -1,7 +1,7 @@
 import { isHostOf, type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar, flashVars, keepIfMatches } from '../utils/dom.js'
-import { digitsRegex, placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver, getEmbedSize } from '../utils/widgets.js'
 
 const flickrHosts = ['flickr.com']
@@ -12,16 +12,12 @@ const flashPlayerPathRegex = /^\/apps\/slideshow\//i
 const flashVideoPathRegex = /^\/apps\/video\/stewart\.swf$/i
 const legacyPlayerPathRegex = /^\/slideshow\/index\.gne$/i
 
-const setPathRegex = /^\/photos\/([\w.@-]+)\/(?:sets|albums)\/(\d+)/
-const streamPathRegex = /^\/photos\/([\w@-]+)\/show\/?$/
+const setPathRegex = /^\/photos\/([^/]+)\/(?:sets|albums)\/(\d+)/
+const streamPathRegex = /^\/photos\/([^/]+)\/show\/?$/
 const groupPathRegex = /^\/groups\/(\d+@N\d\d)\/pool\/show\/?$/
 // An owner of `_` names nobody: the player ignores it, and `/photos/_/{photoId}/` answers 404.
-const photoPathRegex = /^\/photos\/(?:_|([\w@-]+))\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
+const photoPathRegex = /^\/photos\/(?:_|([^/]+))\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
 const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/
-
-// An owner is a numeric NSID with its `@N0…` suffix, or the path alias the owner chose. Flickr
-// answers 404 for an alias carrying a dot or opening with a hyphen.
-const safeOwnerRegex = /^\w[\w-]*(?:@N\d\d)?$/
 
 // A group and a photostream each resolve by NSID and only by NSID: the player answers 200 for
 // `groups/{nsid}` and for `photostreams/{nsid}`, and 404 for a path alias in either position.
@@ -174,10 +170,7 @@ const readPhotoSubject = (parsed: URL): FlickrPhoto | undefined => {
 // Both carriers frame the photo. At the box publishers declare, embedr's chrome takes most of
 // the frame.
 const composePhotoEmbed = (src: string, photo: FlickrPhoto): EmbedResolverResult => {
-  const { photoId, owner } = photo
-  // The secret lands in the photo file's name, so a dot or a separator in it would name
-  // another path.
-  const secret = keepIfMatches(photo.secret, urlSafeTokenRegex)
+  const { photoId, owner, secret } = photo
 
   return {
     provider: 'flickr',
@@ -193,7 +186,7 @@ const composePhotoEmbed = (src: string, photo: FlickrPhoto): EmbedResolverResult
 }
 
 const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined => {
-  const owner = keepIfMatches(subject.owner, safeOwnerRegex)
+  const owner = subject.owner
   const author = readOwnerAlias(owner)
 
   if (subject.setId && digitsRegex.test(subject.setId)) {

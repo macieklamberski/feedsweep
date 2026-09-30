@@ -75,18 +75,16 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an uppercase video id, which the player does not serve', async () => {
+    it('should use a malformed video id as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ML3FFR/zone/1/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ultimedia',
+        id: '01357940/ML3FFR',
+        src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ML3FFR/zone/1/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a video id that turns uppercase partway', async () => {
-      const value =
-        '<iframe src="https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3FFR/zone/1/"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a route word that only ends in mdtk', async () => {

@@ -4,7 +4,7 @@ import { attr, text } from '../utils/dom.js'
 
 const provider = 'bandcamp'
 
-import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // A release is either an album or a single track, and the id is Bandcamp's own numeric one.
@@ -63,7 +63,7 @@ const readReleases = (link: string): Array<[string, string]> => {
   for (const kind of releaseKinds) {
     const id = parsed.searchParams.get(kind)
 
-    if (id && digitsRegex.test(id)) {
+    if (id) {
       claim(kind, id)
     }
   }
@@ -132,7 +132,7 @@ export const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id: `${kind}/${id}`,
     src: isVideo
-      ? `https://bandcamp.com/VideoEmbed?${kind}=${id}`
+      ? `https://bandcamp.com/VideoEmbed${composeQuery({ [kind]: id })}`
       : `https://bandcamp.com/EmbeddedPlayer/${selection}${size}`,
     url: pageUrl,
     height,

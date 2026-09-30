@@ -138,6 +138,20 @@ describe('guardianResolveEmbed', () => {
 
       expect(guardianResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should use a malformed path as written, even if the player answers an error', () => {
+      const value =
+        'https://embed.theguardian.com/embed/video/Society/video/15/June/1st/superbugs_video'
+      const expected: EmbedResolverResult = {
+        provider: 'guardian',
+        id: 'Society/video/15/June/1st/superbugs_video',
+        src: 'https://embed.theguardian.com/embed/video/Society/video/15/June/1st/superbugs_video',
+        url: 'https://www.theguardian.com/Society/video/15/June/1st/superbugs_video',
+        ratio: '16/9',
+      }
+
+      expect(guardianResolveEmbed(value)).toEqual(expected)
+    })
   })
 })
 

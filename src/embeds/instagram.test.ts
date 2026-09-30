@@ -1288,10 +1288,16 @@ describeForEachParser('instagramAmpEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should return undefined for a shortcode outside the url-safe alphabet', async () => {
+  it('should use a malformed shortcode as written, even if the player answers an error', async () => {
     const value = '<amp-instagram data-shortcode="../evil"></amp-instagram>'
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/../evil',
+      src: 'https://www.instagram.com/p/../evil/embed/',
+      url: 'https://www.instagram.com/p/../evil/',
+    }
 
-    expect(await extract(value)).toBeUndefined()
+    expect(await extract(value)).toEqual(expected)
   })
 
   it('should return undefined for an empty shortcode', async () => {
@@ -1583,10 +1589,16 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a shortcode outside the url-safe alphabet', async () => {
+    it('should use a malformed shortcode as written, even if the player answers an error', async () => {
       const value = makeContainer({ instagram_id: '../evil' })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/../evil',
+        src: 'https://www.instagram.com/p/../evil/embed/',
+        url: 'https://www.instagram.com/p/../evil/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

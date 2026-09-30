@@ -26,7 +26,7 @@ const readVideoId = (url: string): string | undefined => {
 
   if (parsed?.hostname === 'static.youku.com') {
     return staticFlashPathRegex.test(parsed.pathname)
-      ? keepIfMatches(parsed.searchParams.get('VideoIDS'), safeVideoIdRegex)
+      ? (parsed.searchParams.get('VideoIDS') ?? undefined)
       : undefined
   }
 

@@ -23,12 +23,6 @@ const postCollection = 'app.bsky.feed.post'
 // at://{authority}/{collection}/{rkey}.
 const atUriRegex = /^at:\/\/([^/]+)\/([^/]+)\/([^/?#]+)/
 
-// A DID or a handle, which is a domain name. The only escape a DID carries is the `%3A` of a
-// did:web port, so no encoded separator reaches the minted path.
-const safeAuthorityRegex = /^(?:did:[a-z]+:(?:[\w.-]|%3A)+|[a-z\d-]+(?:\.[a-z\d-]+)+)$/i
-// A record key, never `.` or `..`: the protocol forbids them and they would climb out of the path.
-const safeRecordKeyRegex = /^(?!\.{1,2}$)[\w.~-]+$/
-
 // Whitespace, an en dash, an em dash or a hyphen.
 const authorSeparatorRegex = /^[\s–—-]+/
 
@@ -50,12 +44,6 @@ type SubstackPostAttributes = {
   imageUrls?: Array<string>
 }
 
-const composePost = (authority: string, rkey: string): BlueskyPost | undefined => {
-  if (safeAuthorityRegex.test(authority) && safeRecordKeyRegex.test(rkey)) {
-    return { authority, rkey }
-  }
-}
-
 const extractBlueskyPost = (uri: string): BlueskyPost | undefined => {
   // Not `new URL`: it reads the colon in a DID authority as a port and fails.
   const match = uri.match(atUriRegex)
@@ -64,7 +52,7 @@ const extractBlueskyPost = (uri: string): BlueskyPost | undefined => {
     return
   }
 
-  return composePost(match[1], match[3])
+  return { authority: match[1], rkey: match[3] }
 }
 
 const extractBlueskyPostFromUrl = (link: string): BlueskyPost | undefined => {
@@ -86,7 +74,7 @@ const extractBlueskyPostFromUrl = (link: string): BlueskyPost | undefined => {
     (root === 'profile' && collection === 'post') ||
     (root === 'embed' && collection === postCollection)
   ) {
-    return composePost(authority, rkey)
+    return { authority, rkey }
   }
 }
 

@@ -88,28 +88,34 @@ describe('steamResolveEmbed', () => {
       expect(steamResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a widget whose app id is not a number', () => {
+    it('should use a malformed app id as written, even if the widget answers an error', () => {
       const value = 'https://store.steampowered.com/widget/news'
+      const expected: EmbedResolverResult = {
+        provider: 'steam',
+        id: 'news',
+        src: 'https://store.steampowered.com/widget/news/',
+        params: {},
+        url: 'https://store.steampowered.com/app/news/',
+        thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/news/header.jpg',
+        height: 190,
+      }
 
-      expect(steamResolveEmbed(value)).toBeUndefined()
+      expect(steamResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should ignore an app id with a prefix before its digits', () => {
-      const value = 'https://store.steampowered.com/widget/x355060'
-
-      expect(steamResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an app id with an encoded path after its digits', () => {
-      const value = 'https://store.steampowered.com/widget/355060%2F..%2Fsearch'
-
-      expect(steamResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a purchase option that is not a number', () => {
+    it('should use a malformed purchase option as written, even if the widget answers an error', () => {
       const value = 'https://store.steampowered.com/widget/355060/abc'
+      const expected: EmbedResolverResult = {
+        provider: 'steam',
+        id: '355060',
+        src: 'https://store.steampowered.com/widget/355060/abc/',
+        params: {},
+        url: 'https://store.steampowered.com/app/355060/',
+        thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/355060/header.jpg',
+        height: 190,
+      }
 
-      expect(steamResolveEmbed(value)).toBeUndefined()
+      expect(steamResolveEmbed(value)).toEqual(expected)
     })
   })
 })

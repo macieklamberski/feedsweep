@@ -1,7 +1,6 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ccma'
@@ -12,9 +11,9 @@ const ccmaHosts = [
   'tv3.cat', // The Flash players
 ]
 
-const embedPathRegex = /^\/+3cat\/video\/(\d+)\/embed\/?$/
+const embedPathRegex = /^\/+3cat\/video\/([^/]+)\/embed\/?$/
 const legacyEmbedPathRegex = /^\/+video\/embed\/(super3\/)?(\d+)\/?$/
-const audioEmbedPathRegex = /^\/+audio\/embed\/(\d+)\/?$/
+const audioEmbedPathRegex = /^\/+audio\/embed\/([^/]+)\/?$/
 const evpPlayerPathRegex = /^\/+ria\/players\//
 const svpPlayerPathRegex = /^\/+svp2\/svp2\.swf$/
 const svpObjectIdRegex = /^SVP(\d+)IE$/
@@ -25,7 +24,7 @@ const composeResult = (
   videoId: string | undefined,
   isSuper3 = false,
 ): EmbedResolverResult | undefined => {
-  if (!videoId || !digitsRegex.test(videoId)) {
+  if (!videoId) {
     return
   }
 

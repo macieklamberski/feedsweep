@@ -2,7 +2,7 @@ import { isHostOrSubdomainOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
@@ -139,7 +139,7 @@ const composeEmbed = (status: Status, extra: Partial<EmbedResolverResult>): Embe
   return {
     provider,
     id: status.id,
-    src: `https://platform.twitter.com/embed/Tweet.html?id=${status.id}`,
+    src: `https://platform.twitter.com/embed/Tweet.html${composeQuery({ id: status.id })}`,
     url: status.handle ? `https://x.com/${status.handle}/status/${status.id}` : undefined,
     ...extra,
   }
@@ -251,7 +251,7 @@ export const twitterResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
   const id = parsed && playerPaths.has(parsed.pathname) ? parsed.searchParams.get('id') : undefined
 
-  if (id && digitsRegex.test(id)) {
+  if (id) {
     return composeEmbed({ handle: '', id }, {})
   }
 

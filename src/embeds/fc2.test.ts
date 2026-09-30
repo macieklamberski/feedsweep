@@ -234,18 +234,26 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a content id outside its alphabet', async () => {
+    it('should use a malformed content id as written, even if the player answers an error', async () => {
       const value = html`
         <script
           src="https://static.fc2.com/video/js/outerplayer.min.js"
           url="https://video.fc2.com/content/2019.09.22/"
         ></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '2019.09.22',
+        src: 'https://video.fc2.com/embed/player/2019.09.22/',
+        url: 'https://video.fc2.com/content/2019.09.22/',
+        width: 512,
+        height: 288,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a data-id outside its alphabet beside a valid url', async () => {
+    it('should use a malformed data-id as written beside a valid url, even if the player answers an error', async () => {
       const value = html`
         <script
           src="https://static.fc2.com/video/js/outerplayer.min.js"
@@ -253,11 +261,19 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
           data-id="../20190922FrnqLhsk"
         ></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '../20190922FrnqLhsk',
+        src: 'https://video.fc2.com/embed/player/../20190922FrnqLhsk/',
+        url: 'https://video.fc2.com/content/../20190922FrnqLhsk/',
+        width: 512,
+        height: 288,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a data-id that carries a url separator', async () => {
+    it('should use a malformed data-id carrying a url separator as written, even if the player answers an error', async () => {
       const value = html`
         <script
           src="https://static.fc2.com/video/js/outerplayer.min.js"
@@ -265,8 +281,16 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
           data-id="2019/0922FrnqLhsk"
         ></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '2019/0922FrnqLhsk',
+        src: 'https://video.fc2.com/embed/player/2019/0922FrnqLhsk/',
+        url: 'https://video.fc2.com/content/2019/0922FrnqLhsk/',
+        width: 512,
+        height: 288,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // The selector carries the host as a substring, so a foreign host holding it in the query
@@ -562,20 +586,36 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a content id outside its alphabet', async () => {
+    it('should use a malformed content id as written, even if the player answers an error', async () => {
       const value = html`
         <script src="https://admin.blog.fc2.com/fc2video2.php?id=2023-01-16&uno=12879754"></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '2023-01-16',
+        src: 'https://video.fc2.com/embed/player/2023-01-16/?sg=0',
+        url: 'https://video.fc2.com/ja/content/2023-01-16/',
+        width: 446,
+        height: 380,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a content id that carries an encoded slash', async () => {
+    it('should use a malformed content id carrying an encoded slash as written, even if the player answers an error', async () => {
       const value = html`
         <script src="https://admin.blog.fc2.com/fc2video2.php?id=2023%2F0116&uno=12879754"></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '2023/0116',
+        src: 'https://video.fc2.com/embed/player/2023/0116/?sg=0',
+        url: 'https://video.fc2.com/ja/content/2023/0116/',
+        width: 446,
+        height: 380,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
@@ -705,16 +745,28 @@ describeForEachParser('fc2IframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a content id outside its alphabet', async () => {
+    it('should use a malformed content id as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://video.fc2.com/embed/player/2020.09.26/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '2020.09.26',
+        src: 'https://video.fc2.com/embed/player/2020.09.26/',
+        url: 'https://video.fc2.com/content/2020.09.26/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a content id that carries a url separator', async () => {
+    it('should use a malformed content id carrying a url separator as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://video.fc2.com/embed/player/2020&x=0926/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '2020&x=0926',
+        src: 'https://video.fc2.com/embed/player/2020&x=0926/',
+        url: 'https://video.fc2.com/content/2020&x=0926/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a route that is not the player', async () => {
@@ -827,16 +879,28 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a content id outside its alphabet', async () => {
+    it('should use a malformed content id as written, even if the player answers an error', async () => {
       const value = '<embed src="http://video.fc2.com/flv2.swf?i=../20120101QN5FVkv4" />'
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '../20120101QN5FVkv4',
+        src: 'https://video.fc2.com/embed/player/../20120101QN5FVkv4/',
+        url: 'https://video.fc2.com/content/../20120101QN5FVkv4/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a content id that carries an encoded slash', async () => {
+    it('should use a malformed content id carrying an encoded slash as written, even if the player answers an error', async () => {
       const value = '<embed src="http://video.fc2.com/flv2.swf?i=2012%2F0101QN5FVkv4" />'
+      const expected: EmbedResolverResult = {
+        provider: 'fc2',
+        id: '2012/0101QN5FVkv4',
+        src: 'https://video.fc2.com/embed/player/2012/0101QN5FVkv4/',
+        url: 'https://video.fc2.com/content/2012/0101QN5FVkv4/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 

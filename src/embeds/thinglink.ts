@@ -24,7 +24,7 @@ const readSceneId = (url: URL): string | undefined => {
 const posterIdCeiling = 1200000000000000000n
 
 const composePosterUrl = (id: string): string | undefined => {
-  if (BigInt(id) >= posterIdCeiling) {
+  if (!digitsRegex.test(id) || BigInt(id) >= posterIdCeiling) {
     return
   }
 
@@ -35,7 +35,7 @@ export const thinglinkResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, thinglinkHost)
   const id = parsed && readSceneId(parsed)
 
-  if (!id || !digitsRegex.test(id)) {
+  if (!id) {
     return
   }
 
