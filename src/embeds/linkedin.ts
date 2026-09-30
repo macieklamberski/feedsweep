@@ -5,6 +5,11 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const linkedinHosts = ['linkedin.com']
 
+// The post fills the frame's width and grows with its text and images, and neither scrolls inside
+// the frame nor reports its height. 800 fits the header, the text and most images, and cuts the
+// reactions under a long post.
+const postHeight = 800
+
 // A post has no name, and the frame titles itself `Embedded post` in the reader's language.
 const linkedinResolveEmbed: ResolveEmbed = (url) => {
   const [route, section, action, urn] = getPathSegments(url)
@@ -20,18 +25,21 @@ const linkedinResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  // No size: the height is the post's, not the player's, and the embed posts its measured height
-  // only to LinkedIn's own origins. No title: carriers state the boilerplate "Embedded post" in
-  // eight languages.
+  const urnSegment = encodePathSegment(postUrn)
+
+  // No title: carriers state the boilerplate "Embedded post" in eight languages.
   return {
     provider: 'linkedin',
     id: postUrn,
-    // Kept as written: `collapsed` and `compact` pick the layout the stated height belongs to.
-    src: url,
+    src: `https://www.linkedin.com/embed/feed/update/${urnSegment}`,
     // The activity urn is assigned server-side, so a share urn cannot be rewritten to it.
-    url: `https://www.linkedin.com/feed/update/${encodePathSegment(postUrn)}`,
+    url: `https://www.linkedin.com/feed/update/${urnSegment}`,
+    height: postHeight,
   }
 }
 
 // LinkedIn's post iframe, linkedin.com/embed/feed/update/{urn}, the platform's only embed form.
-export const linkedinEmbedResolver = createUrlEmbedResolver(linkedinHosts, linkedinResolveEmbed)
+// A carrier's height fits the `collapsed` or `compact` layout the mint drops, or one post's length.
+export const linkedinEmbedResolver = createUrlEmbedResolver(linkedinHosts, linkedinResolveEmbed, {
+  preferResolverSize: true,
+})

@@ -6,13 +6,13 @@ import { reverbnationEmbedResolver, reverbnationResolveEmbed } from './reverbnat
 
 describe('reverbnationResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should keep the query a widget frame already carries', () => {
+    it('should keep the widget id and drop the design and size', () => {
       const value =
         'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=50&pwc[design]=default&pwc[size]=fit'
       const expected: EmbedResolverResult = {
         provider: 'reverbnation',
         id: 'artist_1018382',
-        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=50&pwc[design]=default&pwc[size]=fit',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=50',
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
@@ -24,7 +24,7 @@ describe('reverbnationResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'reverbnation',
         id: 'artist_1018382',
-        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55&pwc[size]=fit',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55',
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
@@ -36,7 +36,55 @@ describe('reverbnationResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'reverbnation',
         id: 'artist_1018382',
-        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55&pwc[size]=fit',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55',
+      }
+
+      expect(reverbnationResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the song a widget plays', () => {
+      const value =
+        'https://www.reverbnation.com/widget_code/html_widget/artist_5181346?widget_id=55&pwc[song_ids]=25061544&context_type=song&pwc[size]=small'
+      const expected: EmbedResolverResult = {
+        provider: 'reverbnation',
+        id: 'artist_5181346',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_5181346?widget_id=55&pwc[song_ids]=25061544',
+      }
+
+      expect(reverbnationResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the whole list a widget includes', () => {
+      const value =
+        'https://www.reverbnation.com/widget_code/html_widget/playlist_3560811?widget_id=55&pwc[included_songs]=1&context_type=playlist&pwc[size]=small'
+      const expected: EmbedResolverResult = {
+        provider: 'reverbnation',
+        id: 'playlist_3560811',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/playlist_3560811?widget_id=55&pwc[included_songs]=1',
+      }
+
+      expect(reverbnationResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a single song on the older widget', () => {
+      const value =
+        'http://www.reverbnation.com/widget_code/html_widget/artist_175461?widget_id=50&posted_by=fan_1899577&pwc[design]=default&pwc[background_color]=%23333333&pwc[included_songs]=0&pwc[song_ids]=7025881&pwc[photo]=1%2C0&pwc[size]=fit'
+      const expected: EmbedResolverResult = {
+        provider: 'reverbnation',
+        id: 'artist_175461',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_175461?widget_id=50&pwc[included_songs]=0&pwc[song_ids]=7025881',
+      }
+
+      expect(reverbnationResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the colour, the branding and the promoter', () => {
+      const value =
+        'https://www.reverbnation.com/widget_code/html_widget/artist_3930057?widget_id=55&pwc[song_ids]=34482761&context_type=song&spoid=promoter_2740&pwc[size]=small&pwc[branded]=1&pwc[color]=dark'
+      const expected: EmbedResolverResult = {
+        provider: 'reverbnation',
+        id: 'artist_3930057',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_3930057?widget_id=55&pwc[song_ids]=34482761',
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
@@ -107,7 +155,7 @@ describe('reverbnationResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'reverbnation',
         id: 'Album_170738',
-        src: 'https://www.reverbnation.com/widget_code/html_widget/Album_170738?widget_id=55&context_type=album',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/Album_170738?widget_id=55',
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
