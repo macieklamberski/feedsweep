@@ -6,10 +6,6 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mixcloud'
 
-// A slug holds whatever script the publisher titled the show in, Japanese, Greek and accented Latin
-// among them.
-const unsafeSegmentRegex = /[/?#\\]|\s|^\./
-
 const mixcloudHosts = ['mixcloud.com']
 
 // An account's sections sit where a show slug does, and the widget answers {user}/uploads with the
@@ -44,29 +40,28 @@ const siteSegments = new Set([
   'widget',
 ])
 
-// Exactly a user and a slug: a deeper path is a section of the site, not a show, and the value
-// goes back into a url, so anything else is left to the generic placeholder.
-const readShowPath = (segments: Array<string>): string | undefined => {
-  // Decoded before the check, because a separator arrives disguised as often as it arrives
-  // plain: `..%2Fetc` is one.
-  const [user, slug] = segments.map(decodeSegment)
+type Show = { key: string; path: string }
 
-  if (segments.length !== 2 || !user || !slug) {
+// Exactly a user and a slug: a deeper path is a section of the site, not a show. The decoded
+// names serve the lookups and the key, and the written segments serve the page path.
+const readShow = (segments: Array<string>): Show | undefined => {
+  const [rawUser, rawSlug] = segments
+
+  if (segments.length !== 2 || !rawUser || !rawSlug) {
     return
   }
 
-  if (unsafeSegmentRegex.test(user) || unsafeSegmentRegex.test(slug)) {
-    return
-  }
+  const user = decodeSegment(rawUser) ?? rawUser
+  const slug = decodeSegment(rawSlug) ?? rawSlug
 
   if (siteSegments.has(user.toLowerCase()) || sectionSlugs.has(slug.toLowerCase())) {
     return
   }
 
-  return `${user}/${slug}`
+  return { key: `${user}/${slug}`, path: `${rawUser}/${rawSlug}` }
 }
 
-export const extractMixcloudShow = (link: string): string | undefined => {
+const readShowUrl = (link: string): Show | undefined => {
   const parsed = parseUrl(link)
   // The feed parameter holds a path in the newer embeds and a whole url in the Flash
   // mixcloudLoader.swf one.
@@ -79,7 +74,11 @@ export const extractMixcloudShow = (link: string): string | undefined => {
     return
   }
 
-  return readShowPath(getPathSegments(source))
+  return readShow(getPathSegments(source))
+}
+
+export const extractMixcloudShow = (link: string): string | undefined => {
+  return readShowUrl(link)?.key
 }
 
 // The widget's display options, in the order they are written back. Each is a flag the
@@ -93,7 +92,7 @@ const miniPlayerHeight = 60
 const playerHeight = 160
 
 export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {
-  const show = extractMixcloudShow(url)
+  const show = readShowUrl(url)
 
   if (!show) {
     return
@@ -101,21 +100,21 @@ export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {
 
   const params = parseUrl(url)?.searchParams
   const options = displayOptions.filter((option) => params?.get(option) === '1')
-  const query = new URLSearchParams({ feed: `/${show}/` })
+  const query = new URLSearchParams({ feed: `/${show.key}/` })
 
   for (const option of options) {
     query.set(option, '1')
   }
 
   const title = attr(element, 'title')
-  const [author] = show.split('/')
+  const [author] = show.key.split('/')
 
   return {
     provider,
-    id: show,
+    id: show.key,
     // The www url 301s to player-widget.mixcloud.com, a host one redirect away from changing.
     src: `https://www.mixcloud.com/widget/iframe/?${query}`,
-    url: `https://www.mixcloud.com/${show}/`,
+    url: `https://www.mixcloud.com/${show.path}/`,
     // With the cover on, the artwork fills the frame, so only the coverless mini form is 60.
     height:
       options.includes('mini') && options.includes('hide_cover') ? miniPlayerHeight : playerHeight,

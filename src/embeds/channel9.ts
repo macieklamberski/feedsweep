@@ -1,5 +1,6 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { decodeSegment, getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
+import { composeQuery } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'channel9'
@@ -12,9 +13,6 @@ const embedUrl =
 // Channel 9 is retired and cannot mint a new section.
 const episodeSections = ['shows', 'blogs', 'series']
 
-// A name carrying `&` or `=` would add its own parameter to the minted query.
-const queryUnsafeRegex = /[&=]/
-
 const channel9ResolveEmbed: ResolveEmbed = (url) => {
   const segments = getPathSegments(url)
   const section = segments.at(0)
@@ -24,12 +22,9 @@ const channel9ResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  // Channel 9's first redirect only lowercases the names, so a `+` stays a `+` in the query.
-  const names = segments.slice(1, -1).map((name) => name.toLowerCase())
-
-  if (names.some((name) => queryUnsafeRegex.test(name))) {
-    return
-  }
+  // Channel 9's first redirect lowercases the names. They move from path segments into the query,
+  // so they are decoded first and composed as one parameter each.
+  const names = segments.slice(1, -1).map((name) => (decodeSegment(name) ?? name).toLowerCase())
 
   if (isAnyOf(section, episodeSections) && names.length === 2) {
     const [show, episode] = names
@@ -38,7 +33,7 @@ const channel9ResolveEmbed: ResolveEmbed = (url) => {
     return {
       provider,
       id: `${show}/${episode}`,
-      src: `${embedUrl}?show=${show}&ep=${episode}`,
+      src: `${embedUrl}${composeQuery({ show, ep: episode })}`,
     }
   }
 
@@ -49,7 +44,7 @@ const channel9ResolveEmbed: ResolveEmbed = (url) => {
     return {
       provider,
       id: `events/${event}-${edition}/${session}`,
-      src: `${embedUrl}?ev=${event}-${edition}&session=${session}`,
+      src: `${embedUrl}${composeQuery({ ev: `${event}-${edition}`, session })}`,
     }
   }
 }

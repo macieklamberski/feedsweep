@@ -10,10 +10,6 @@ const observableHosts = ['observablehq.com']
 
 // Observable serves the hex id in lowercase only, and answers 404 to an uppercase spelling.
 const notebookIdRegex = /^[0-9a-f]{16}$/
-// Both segments are spliced into the notebook's page url, where a dot segment, `%2e` included,
-// would resolve out of the notebook.
-const handleRegex = /^@[^\s/?#]+$/
-const notebookRegex = /^(?!(?:\.|%2e){1,2}$)[^\s/?#]+$/i
 const versionSuffixRegex = /@[^@/]*$/
 
 // The campaign tags a share link picks up, the only part of the query the frame does not get.
@@ -51,11 +47,17 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
     }
   }
 
-  const handle = keepIfMatches(decodeSegment(segments[1]), handleRegex)
-  const slug = decodeSegment(segments[2])?.replace(versionSuffixRegex, '')
-  const notebook = keepIfMatches(slug, notebookRegex)
+  const [, rawHandle, rawSlug] = segments
 
-  if (!handle || !notebook) {
+  if (!rawHandle || !rawSlug) {
+    return
+  }
+
+  // The decoded names serve the `@` check and the key, and the written segments the page path.
+  const handle = decodeSegment(rawHandle) ?? rawHandle
+  const notebook = (decodeSegment(rawSlug) ?? rawSlug).replace(versionSuffixRegex, '')
+
+  if (!handle.startsWith('@') || !notebook) {
     return
   }
 
@@ -63,7 +65,7 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
     provider,
     id: `${handle}/${notebook}`,
     src,
-    url: `https://observablehq.com/${handle}/${notebook}`,
+    url: `https://observablehq.com/${rawHandle}/${rawSlug.replace(versionSuffixRegex, '')}`,
   }
 }
 
