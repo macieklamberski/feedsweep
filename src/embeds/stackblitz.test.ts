@@ -173,6 +173,19 @@ describe('stackblitzResolveEmbed', () => {
       expect(stackblitzResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep the npm script the project starts', () => {
+      const value = 'https://stackblitz.com/edit/angular-ivy-snow?startScript=build%2Cserve'
+      const expected: EmbedResolverResult = {
+        provider: 'stackblitz',
+        id: 'angular-ivy-snow',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&startScript=build%2Cserve',
+        url: 'https://stackblitz.com/edit/angular-ivy-snow',
+        height: 500,
+      }
+
+      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+    })
+
     // The layout, the theme and the settings the project runs with.
     const displayUrls = [
       'https://stackblitz.com/edit/angular-ivy-snow?corp=1',
@@ -184,7 +197,6 @@ describe('stackblitzResolveEmbed', () => {
       'https://stackblitz.com/edit/angular-ivy-snow?orgProvider=github',
       'https://stackblitz.com/edit/angular-ivy-snow?showSidebar=1',
       'https://stackblitz.com/edit/angular-ivy-snow?sidebarView=search',
-      'https://stackblitz.com/edit/angular-ivy-snow?startScript=dev',
       'https://stackblitz.com/edit/angular-ivy-snow?terminalHeight=50',
       'https://stackblitz.com/edit/angular-ivy-snow?theme=dark',
       'https://stackblitz.com/edit/angular-ivy-snow?view=preview',

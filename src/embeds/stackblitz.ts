@@ -11,10 +11,11 @@ const stackblitzHosts = ['stackblitz.com', 'www.stackblitz.com']
 // What the share dialog writes beside `width="100%"`.
 const defaultProjectHeight = 500
 
-// The options that pick where the project opens, looked up in any case as current instances do:
-// the open file, which may repeat once per tab, and the path the preview loads.
+// The options that pick where the project opens and what it runs, looked up in any case as current
+// instances do: the open file, which may repeat once per tab, the path the preview loads, and the
+// npm script the project starts.
 // See: https://developer.stackblitz.com/guides/integration/embedding.
-const stackblitzEmbedParams = ['file', 'initialpath']
+const stackblitzEmbedParams = ['file', 'initialpath', 'startScript']
 
 type StackblitzTarget = {
   id: string
