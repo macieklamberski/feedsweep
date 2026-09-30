@@ -2,6 +2,7 @@ import { acastRenderHint } from '../embeds/acast.js'
 import { archiveRenderHint } from '../embeds/archive.js'
 import { arteRenderHint } from '../embeds/arte.js'
 import { audioboomRenderHint } from '../embeds/audioboom.js'
+import { aushaRenderHint } from '../embeds/ausha.js'
 import { blubrryRenderHint } from '../embeds/blubrry.js'
 import { blueskyRenderHint } from '../embeds/bluesky.js'
 import { brRenderHint } from '../embeds/br.js'
@@ -15,6 +16,7 @@ import { cnnRenderHint } from '../embeds/cnn.js'
 import { codesandboxRenderHint } from '../embeds/codesandbox.js'
 import { deezerRenderHint } from '../embeds/deezer.js'
 import { donorboxRenderHint } from '../embeds/donorbox.js'
+import { flickrRenderHint } from '../embeds/flickr.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
 import { foxbusinessRenderHint, foxnewsRenderHint } from '../embeds/foxnews.js'
 import { googledriveRenderHint } from '../embeds/googledrive.js'
@@ -64,6 +66,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   archiveRenderHint,
   arteRenderHint,
   audioboomRenderHint,
+  aushaRenderHint,
   blubrryRenderHint,
   blueskyRenderHint,
   bridRenderHint,
@@ -77,6 +80,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   codesandboxRenderHint,
   deezerRenderHint,
   donorboxRenderHint,
+  flickrRenderHint,
   flourishRenderHint,
   foxbusinessRenderHint,
   foxnewsRenderHint,
