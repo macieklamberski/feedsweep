@@ -41,7 +41,7 @@ const readVideoId = (url: string): string | undefined => {
   return keepIfMatches(videoId, videoIdRegex)
 }
 
-export const youkuResolveEmbed: ResolveEmbed = (url) => {
+const youkuResolveEmbed: ResolveEmbed = (url) => {
   const videoId = readVideoId(url)
 
   if (!videoId) {

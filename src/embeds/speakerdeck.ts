@@ -4,6 +4,8 @@ import { attr, parseRatio } from '../utils/dom.js'
 import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'speakerdeck'
+
 // Ids are lowercase hex in two lengths: 32 for the current dashless UUID and 24 for the Mongo
 // ObjectId issued around 2011-2012, and those decks still play. `/player/` serves decks and
 // nothing else.
@@ -25,7 +27,7 @@ const composeEmbed = (
   const query = composeQuery(slide ? { slide } : undefined)
 
   return {
-    provider: 'speakerdeck',
+    provider,
     id: slide ? `${deckId}/${slide}` : deckId,
     src: `https://speakerdeck.com/player/${deckId}${query}`,
     title,
@@ -77,5 +79,5 @@ export const speakerdeckIframeEmbedResolver = createUrlEmbedResolver(
 )
 
 export const speakerdeckFieldCleaners: Array<FieldCleaner> = [
-  { provider: 'speakerdeck', field: 'title', drop: 'null' },
+  { provider, field: 'title', drop: 'null' },
 ]

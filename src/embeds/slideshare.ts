@@ -195,7 +195,7 @@ export const slideshareIframeEmbedResolver = createUrlEmbedResolver(
 // Flash died in 2020 and these embeds have rendered nothing since, but the markup is still in
 // old posts and their feeds. The numeric id in the wrapper is the same id the modern embed
 // route accepts, so the dead player can be replaced by one that works.
-export const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
+const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {

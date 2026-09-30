@@ -214,7 +214,7 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the cells and drop the trackers from the src', async () => {
+    it('should keep the query in the src as published, trackers included', async () => {
       const value = html`
         <iframe
           width="75%"
@@ -226,27 +226,7 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'observable',
         id: '@d3/sortable-bar-chart',
-        src: 'https://observablehq.com/embed/@d3/sortable-bar-chart?cell=viewof+order&cell=chart',
-        url: 'https://observablehq.com/@d3/sortable-bar-chart',
-        height: 535,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should drop a campaign tag outside the standard set from the src', async () => {
-      const value = html`
-        <iframe
-          width="75%"
-          height="535"
-          frameborder="0"
-          src="https://observablehq.com/embed/@d3/sortable-bar-chart?utm_name=feed&cell=chart"
-        ></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'observable',
-        id: '@d3/sortable-bar-chart',
-        src: 'https://observablehq.com/embed/@d3/sortable-bar-chart?cell=chart',
+        src: 'https://observablehq.com/embed/@d3/sortable-bar-chart?cell=viewof+order&utm_source=feed&cell=chart&fbclid=IwAR0abc',
         url: 'https://observablehq.com/@d3/sortable-bar-chart',
         height: 535,
       }

@@ -264,7 +264,6 @@ const resolveCollectionEmbed = (
   return listType === 'user_uploads' ? composeUploadsEmbed(list) : composeListEmbed(list)
 }
 
-// The carrier's title is not read: it is the player's own localised label as often as a name.
 const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   const parsed = parseUrl(url, placeholderBaseUrl)
   const segments = parsed ? getPathSegments(parsed) : []

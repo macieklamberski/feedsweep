@@ -12,7 +12,7 @@ describeForEachParser('typeformWidgetEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, typeformWidgetEmbedResolver)
 
   describe('the share panel snippet', () => {
-    it('should recover the form and its title from an empty div', async () => {
+    it('should name a live embed by its id and title, with no player', async () => {
       const value = html`
         <div
           data-tf-live="01HCZ4DNW8JM6PEGNTQWF2PW87"
@@ -27,11 +27,25 @@ describeForEachParser('typeformWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'typeform',
         id: '01HCZ4DNW8JM6PEGNTQWF2PW87',
-        src: 'https://form.typeform.com/to/01HCZ4DNW8JM6PEGNTQWF2PW87',
-        url: 'https://form.typeform.com/to/01HCZ4DNW8JM6PEGNTQWF2PW87',
         // The snippet's inline style states the height. Its width is a percentage, not pixels.
         height: 500,
         title: 'User Satisfaction Survey',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Typeform's loader reads the region to pick `api.typeform.eu`, which enrichment needs.
+    it('should lead a live id with the region the snippet names', async () => {
+      const value = html`
+        <div
+          data-tf-live="01HCZ4DNW8JM6PEGNTQWF2PW87"
+          data-tf-region="eu"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'typeform',
+        id: 'eu/01HCZ4DNW8JM6PEGNTQWF2PW87',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -81,8 +95,6 @@ describeForEachParser('typeformWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'typeform',
         id: '01HXYZ',
-        src: 'https://form.typeform.com/to/01HXYZ',
-        url: 'https://form.typeform.com/to/01HXYZ',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -261,6 +273,59 @@ describeForEachParser('typeformIframeEmbedResolver', (parseHtml) => {
 // The enclosure probe offers every attachment a feed carries to this resolver, and Typeform
 // admits every subdomain of its own host, so the id alphabet is what keeps a file playable.
 describeForEachParser('typeform through the pipeline', (parseHtml) => {
+  it('should keep a live embed as a placeholder with no player', async () => {
+    const value = html`
+      <p>Before</p>
+      <div
+        data-tf-live="01HCZ4DNW8JM6PEGNTQWF2PW87"
+        data-tf-iframe-props="title=User Satisfaction Survey"
+      ></div>
+      <script src="//embed.typeform.com/next/embed.js"></script>
+      <p>After</p>
+    `
+    const expected = html`
+      <p>Before</p>
+      <div
+        data-embed-title="User Satisfaction Survey"
+        data-embed-id="01HCZ4DNW8JM6PEGNTQWF2PW87"
+        data-embed-provider="typeform"
+      ></div>
+      <p>After</p>
+    `
+
+    expect(
+      await transformContent(value, {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://example.com/post',
+      }),
+    ).toEqualHtml(expected)
+  })
+
+  it('should take the player from enrichment', async () => {
+    const value = '<div data-tf-live="01HCZ4DNW8JM6PEGNTQWF2PW87" data-tf-region="eu"></div>'
+    const expected = html`
+      <div
+        data-embed-url="https://form.typeform.com/to/bd3tQuXe"
+        data-embed-src="https://form.typeform.com/to/bd3tQuXe"
+        data-embed-id="eu/01HCZ4DNW8JM6PEGNTQWF2PW87"
+        data-embed-provider="typeform"
+      ></div>
+    `
+
+    expect(
+      await transformContent(value, {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://example.com/post',
+        enrichEmbedFn: (embeds) => {
+          return embeds.map(() => ({
+            src: 'https://form.typeform.com/to/bd3tQuXe',
+            url: 'https://form.typeform.com/to/bd3tQuXe',
+          }))
+        },
+      }),
+    ).toEqualHtml(expected)
+  })
+
   it('should leave an audio enclosure on the typeform host playable', async () => {
     const enclosures = [{ url: 'https://api.typeform.com/to/MTt3Pw7K.mp3', type: 'audio/mpeg' }]
 

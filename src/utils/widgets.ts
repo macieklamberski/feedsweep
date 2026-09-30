@@ -458,7 +458,7 @@ export const prepareEmbedMetadata = (
 
 export const createEmbedPlaceholder = (
   document: Document,
-  metadata: Partial<EmbedResolverResult> & Pick<EmbedResolverResult, 'src'>,
+  metadata: Partial<EmbedResolverResult>,
 ): HTMLElement => {
   const element = document.createElement('div')
   updateEmbedPlaceholder(element, metadata)

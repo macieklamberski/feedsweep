@@ -82,7 +82,7 @@ export const issuuWidgetEmbedResolver = createMarkupEmbedResolver(
 // The reader iframe, at `e.issuu.com/embed.html` or the document page pasted from the address bar.
 // The Flash viewer `static.issuu.com/webembed/…/IssuuReader.swf` names its document in a
 // `documentId` flashvar, a third id space neither url form accepts.
-export const issuuResolveEmbed: ResolveEmbed = (url, element) => {
+const issuuResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
 
   if (!parsed) {

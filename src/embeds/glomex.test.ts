@@ -220,7 +220,7 @@ describeForEachParser('glomexElementEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should drop a playlist id that could not be one and keep the integration', async () => {
+    it('should use a malformed playlist id as written, even if the player answers an error', async () => {
       const value = html`
         <glomex-player
           data-integration-id="40599x1hkkig7d8l"
@@ -229,8 +229,8 @@ describeForEachParser('glomexElementEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'glomex',
-        id: '40599x1hkkig7d8l',
-        src: 'https://player.glomex.com/integration/1/integration.html?integrationId=40599x1hkkig7d8l',
+        id: '40599x1hkkig7d8l/v-d3gnqat8p95t?x=1',
+        src: 'https://player.glomex.com/integration/1/integration.html?integrationId=40599x1hkkig7d8l&playlistId=v-d3gnqat8p95t%3Fx%3D1',
         ratio: '16/9',
       }
 

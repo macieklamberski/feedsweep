@@ -167,14 +167,14 @@ describe('appleResolveEmbed', () => {
     // `searchParams` hands `i` back decoded, and the id is composed from it, so a value that is
     // not a track id falls back to the path's own. The query is re-encoded on the way into the
     // player url, and a refused one is dropped from it, so the collection player is what opens.
-    it('should fall back to the path id when the track id is not numeric', () => {
+    it('should use a malformed track id as written, even if the player answers an error', () => {
       const value = 'https://music.apple.com/us/album/thriller/1440857781?i=../../evil'
       const expected: EmbedResolverResult = {
         provider: 'applemusic',
-        id: 'album/1440857781',
-        src: 'https://embed.music.apple.com/us/album/thriller/1440857781',
-        url: 'https://music.apple.com/us/album/thriller/1440857781',
-        height: 450,
+        id: 'album/../../evil',
+        src: 'https://embed.music.apple.com/us/album/thriller/1440857781?i=..%2F..%2Fevil',
+        url: 'https://music.apple.com/us/album/thriller/1440857781?i=..%2F..%2Fevil',
+        height: 175,
       }
 
       expect(appleResolveEmbed(value)).toEqual(expected)

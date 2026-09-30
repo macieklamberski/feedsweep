@@ -1,10 +1,7 @@
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
-
-// A playlist id is `v-` and twelve more, or `auto`, the playlist the integration picks itself.
-const safeIdRegex = /^[a-z0-9-]+$/
 
 const glomexHosts = ['player.glomex.com']
 const playerPathRegex = /^\/integration\/[^/]+\/(?:integration|iframe-player)\.html$/
@@ -35,10 +32,10 @@ const readEmbed = (
     return
   }
 
-  return composeEmbed(integrationId, keepIfMatches(playlistId, safeIdRegex))
+  return composeEmbed(integrationId, playlistId)
 }
 
-export const glomexResolveEmbed: ResolveEmbed = (url) => {
+const glomexResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, glomexHosts)
 
   if (!parsed || !playerPathRegex.test(parsed.pathname)) {
