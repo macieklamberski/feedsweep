@@ -77,7 +77,7 @@ export const audiomackResolveEmbed: ResolveEmbed = (url, element) => {
     // The whole path: the same artist and slug answer under song and under playlist alike.
     id: path,
     src: `https://audiomack.com/embed/${path}${composeQuery(params)}`,
-    ...(Object.keys(display).length > 0 && { params: display }),
+    params: display,
     // The key is an access token, so a private track's page is not linked where it could leak.
     url: params.key ? undefined : `https://audiomack.com/${path}`,
     height: audiomackHeights.get(kind),
