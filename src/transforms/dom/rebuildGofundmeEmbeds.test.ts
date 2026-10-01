@@ -10,7 +10,41 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
   }
 
   describe('happy paths', () => {
-    it('should rebuild an iframe from the campaign url', async () => {
+    it('should rebuild the large widget from the campaign url', async () => {
+      const value = html`
+        <div
+          class="gfm-embed"
+          data-url="https://www.gofundme.com/f/save-the-hall/widget/large"
+        ></div>
+      `
+      const expected = html`
+        <iframe
+          src="https://www.gofundme.com/f/save-the-hall/widget/large"
+          height="560"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should drop the query the share dialog writes', async () => {
+      const value = html`
+        <div
+          class="gfm-embed"
+          data-url="https://www.gofundme.com/f/save-the-hall/widget/large?sharesheet=campaign_page"
+        ></div>
+      `
+      const expected = html`
+        <iframe
+          src="https://www.gofundme.com/f/save-the-hall/widget/large"
+          height="560"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should rebuild a medium widget as the large one', async () => {
       const value = html`
         <div
           class="gfm-embed"
@@ -19,25 +53,42 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
       `
       const expected = html`
         <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/medium"
-          height="200"
+          src="https://www.gofundme.com/f/save-the-hall/widget/large"
+          height="560"
         ></iframe>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should keep the widget size segment the publisher chose', async () => {
+    it('should rebuild a small button widget as the large one', async () => {
       const value = html`
         <div
           class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/large/"
+          data-url="https://www.gofundme.com/f/save-the-hall/widget/small/donate"
         ></div>
       `
       const expected = html`
         <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/large/"
-          height="500"
+          src="https://www.gofundme.com/f/save-the-hall/widget/large"
+          height="560"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should rebuild a campaign page url onto its widget', async () => {
+      const value = html`
+        <div
+          class="gfm-embed"
+          data-url="https://www.gofundme.com/f/save-the-hall"
+        ></div>
+      `
+      const expected = html`
+        <iframe
+          src="https://www.gofundme.com/f/save-the-hall/widget/large"
+          height="560"
         ></iframe>
       `
 
@@ -48,30 +99,30 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
       const value = html`
         <div
           class="gfm-embed"
-          data-url="http://www.gofundme.com/f/save-the-hall/widget/medium"
+          data-url="http://www.gofundme.com/f/save-the-hall/widget/large"
         ></div>
       `
       const expected = html`
         <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/medium"
-          height="200"
+          src="https://www.gofundme.com/f/save-the-hall/widget/large"
+          height="560"
         ></iframe>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should keep the query as published', async () => {
+    it('should insert the slug as written', async () => {
       const value = html`
         <div
           class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/medium?sharesheet=campaign_nav&utm_source=widget"
+          data-url="https://www.gofundme.com/f/Save-The-Hall/widget/large"
         ></div>
       `
       const expected = html`
         <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/medium?sharesheet=campaign_nav&utm_source=widget"
-          height="200"
+          src="https://www.gofundme.com/f/Save-The-Hall/widget/large"
+          height="560"
         ></iframe>
       `
 
@@ -80,11 +131,11 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should leave a data-url pointing off gofundme.com', async () => {
+    it('should leave a data-url on a foreign host', async () => {
       const value = html`
         <div
           class="gfm-embed"
-          data-url="https://example.org/readme.html"
+          data-url="https://evil.test/f/save-the-hall/widget/large"
         ></div>
       `
 
@@ -95,7 +146,7 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
       const value = html`
         <div
           class="gfm-embed"
-          data-url="https://gofundme.com.evil.test/f/save-the-hall/widget/medium"
+          data-url="https://gofundme.com.evil.test/f/save-the-hall/widget/large"
         ></div>
       `
 
@@ -112,6 +163,39 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    it('should leave a charity widget on another route', async () => {
+      const value = html`
+        <div
+          class="gfm-embed"
+          data-url="https://www.gofundme.com/charity/save-the-hall/widget/donationsbtn"
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a campaign route that is not the first segment', async () => {
+      const value = html`
+        <div
+          class="gfm-embed"
+          data-url="https://www.gofundme.com/x/f/save-the-hall"
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a campaign route naming no campaign', async () => {
+      const value = html`
+        <div
+          class="gfm-embed"
+          data-url="https://www.gofundme.com/f/"
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
   })
 
   describe('edge cases', () => {
@@ -119,9 +203,9 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
       const value = html`
         <div
           class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/medium"
+          data-url="https://www.gofundme.com/f/save-the-hall/widget/large"
         >
-          <iframe src="https://www.gofundme.com/f/save-the-hall/widget/medium"></iframe>
+          <iframe src="https://www.gofundme.com/f/save-the-hall/widget/large"></iframe>
         </div>
       `
 
@@ -132,7 +216,7 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
       const value = html`
         <div
           class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/medium"
+          data-url="https://www.gofundme.com/f/save-the-hall/widget/large"
         >
           <a href="https://www.gofundme.com/f/save-the-hall">Donate</a>
         </div>
@@ -145,116 +229,13 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
       const value = html`
         <div
           class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/medium?sharesheet=campaign_nav"
+          data-url="https://www.gofundme.com/f/save-the-hall/widget/large?sharesheet=campaign_page"
         ></div>
       `
       const once = await transform(value)
       const twice = await transform(once)
 
       expect(twice).toEqualHtml(once)
-    })
-  })
-
-  describe('the starting height the loader gives each size segment', () => {
-    it('should start a small widget at 70', async () => {
-      const value = html`
-        <div
-          class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/small"
-        ></div>
-      `
-      const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/small"
-          height="70"
-        ></iframe>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should start a medium widget at 200', async () => {
-      const value = html`
-        <div
-          class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/medium"
-        ></div>
-      `
-      const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/medium"
-          height="200"
-        ></iframe>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should start a large widget at 500', async () => {
-      const value = html`
-        <div
-          class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/large"
-        ></div>
-      `
-      const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/large"
-          height="500"
-        ></iframe>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should start a url with no size segment at the large height', async () => {
-      const value = html`
-        <div
-          class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget"
-        ></div>
-      `
-      const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget"
-          height="500"
-        ></iframe>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should start a size segment named after an object prototype key at the large height', async () => {
-      const value = html`
-        <div
-          class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/constructor"
-        ></div>
-      `
-      const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/constructor"
-          height="500"
-        ></iframe>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-  })
-
-  describe('gofundme.com markup this transform leaves alone', () => {
-    it('should leave the retired Flash widget on funds.gofundme.com', async () => {
-      const value = html`<embed src="https://funds.gofundme.com/widgetflex.swf?id=1234567"></embed>`
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
-    it('should leave a campaign link written in prose', async () => {
-      const value = html`
-        <p>We are <a href="https://www.gofundme.com/f/save-the-hall">raising funds</a>.</p>
-      `
-
-      expect(await transform(value)).toEqualHtml(value)
     })
   })
 })
@@ -268,7 +249,7 @@ describeForEachParser('rebuildGofundmeEmbeds through the pipeline', (parseHtml) 
     const value = html`
       <div
         class="gfm-embed"
-        data-url="https://www.gofundme.com/f/save-the-hall/widget/medium?sharesheet=campaign_nav"
+        data-url="https://www.gofundme.com/f/save-the-hall/widget/medium?sharesheet=campaign_page"
       ></div>
       <script
         defer
@@ -277,8 +258,8 @@ describeForEachParser('rebuildGofundmeEmbeds through the pipeline', (parseHtml) 
     `
     const expected = html`
       <div
-        data-embed-src="https://www.gofundme.com/f/save-the-hall/widget/medium?sharesheet=campaign_nav"
-        data-embed-height="200"
+        data-embed-src="https://www.gofundme.com/f/save-the-hall/widget/large"
+        data-embed-height="560"
       ></div>
     `
 

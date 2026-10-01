@@ -175,6 +175,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // placeholdered downstream. Runs before convertDatawrapperEmbeds so a data-frame-src
   // Datawrapper div becomes an iframe that convertDatawrapperEmbeds turns into a static image.
   rebuildDeferredIframes,
+  // Runs before stripEmptyTags, which deletes the empty widget div, and before convertWidgets.
   rebuildGofundmeEmbeds,
   // Converts Datawrapper chart embeds (iframe, script/noscript, and link forms) into a
   // linked static <img> of the chart's published PNG render. Runs in this normalize
