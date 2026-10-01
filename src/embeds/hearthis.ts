@@ -44,10 +44,8 @@ export const hearthisResolveEmbed: ResolveEmbed = (url) => {
 // hearthis.at's track and set player iframes, on hearthis.at or app.hearthis.at.
 export const hearthisEmbedResolver = createUrlEmbedResolver(hearthisHosts, hearthisResolveEmbed)
 
-// A track starts from `autoplay=1`, which a set ignores. A set starts on the `play` message, which
-// leaves a track stalled unless `autoplay=1` started it.
+// A set page ignores `autoplay=1`, and its `play` message plays the track whose id equals the set id.
 export const hearthisRenderHint: EmbedRenderHint = {
   provider,
   autoplayParams: { autoplay: '1' },
-  requestPlay: 'play',
 }

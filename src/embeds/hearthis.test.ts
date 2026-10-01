@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
-import { hearthisEmbedResolver, hearthisResolveEmbed } from './hearthis.js'
+import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import { hearthisEmbedResolver, hearthisRenderHint, hearthisResolveEmbed } from './hearthis.js'
 
 describe('hearthisResolveEmbed', () => {
   describe('happy paths', () => {
@@ -240,5 +240,13 @@ describeForEachParser('hearthis through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describe('hearthisRenderHint', () => {
+  it('should start a track with the autoplay flag and post no play message', () => {
+    const expected: EmbedRenderHint = { provider: 'hearthis', autoplayParams: { autoplay: '1' } }
+
+    expect(hearthisRenderHint).toEqual(expected)
   })
 })
