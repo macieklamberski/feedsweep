@@ -162,6 +162,22 @@ describeForEachParser('normalizeAnchoredHeadings', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should keep an image when a self-referential link holding it unwraps', async () => {
+      const value = html`
+        <h2 id="photo">
+          <a href="#photo"><img src="https://example.com/photo.png"></a>
+        </h2>
+      `
+      const expected = html`
+        <h2>
+          <a id="photo" href="#photo"></a>
+          <img src="https://example.com/photo.png">
+        </h2>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should keep the title when the link wraps only part of the heading', async () => {
       const value = html`
         <h2 id="getting-started">
@@ -346,6 +362,18 @@ describeForEachParser('normalizeAnchoredHeadings', (parseHtml) => {
 
     it('should leave a disclosure button (role + aria-expanded)', async () => {
       const value = '<h4><a href="#section" role="button" aria-expanded="false">Section</a></h4>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('linked images', () => {
+    it('should leave a link to another page that holds only an image', async () => {
+      const value = html`
+        <h1>
+          <a href="https://example.com/post/photo-2#main"><img src="https://example.com/photo.png"></a>
+        </h1>
+      `
 
       expect(await transform(value)).toEqualHtml(value)
     })
