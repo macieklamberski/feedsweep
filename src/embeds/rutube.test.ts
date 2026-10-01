@@ -134,16 +134,17 @@ describe('rutubeResolveEmbed', () => {
       expect(rutubeResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a playlist video carrying a path after the id', () => {
+    it('should use a malformed playlist video id as written, even if the player answers an error', () => {
       const value = 'https://rutube.ru/pl/?pl_video=20a54e4a6f61441d808db45f823a7809%2Fadd'
+      const expected: EmbedResolverResult = {
+        provider: 'rutube',
+        id: '20a54e4a6f61441d808db45f823a7809/add',
+        src: 'https://rutube.ru/play/embed/20a54e4a6f61441d808db45f823a7809%2Fadd',
+        url: 'https://rutube.ru/video/20a54e4a6f61441d808db45f823a7809%2Fadd/',
+        ratio: '16/9',
+      }
 
-      expect(rutubeResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a playlist video carrying a path before the id', () => {
-      const value = 'https://rutube.ru/pl/?pl_video=..%2F20a54e4a6f61441d808db45f823a7809'
-
-      expect(rutubeResolveEmbed(value)).toBeUndefined()
+      expect(rutubeResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore a playlist route that names no video', () => {
@@ -199,7 +200,7 @@ describeForEachParser('rutubeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, rutubeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the box the share snippet states over the default ratio', async () => {
+    it('should keep the default ratio over the box the share snippet states', async () => {
       const value = html`
         <iframe
           width="720"
@@ -214,14 +215,13 @@ describeForEachParser('rutubeEmbedResolver', (parseHtml) => {
         id: 'c91d5d8847c7c5391a090fff38c86f34',
         src: 'https://rutube.ru/play/embed/c91d5d8847c7c5391a090fff38c86f34',
         url: 'https://rutube.ru/video/c91d5d8847c7c5391a090fff38c86f34/',
-        width: 720,
-        height: 405,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the title and the vertical box a publisher states', async () => {
+    it('should take the title and ignore the vertical box a publisher states', async () => {
       const value = html`
         <iframe
           width="461"
@@ -235,8 +235,7 @@ describeForEachParser('rutubeEmbedResolver', (parseHtml) => {
         id: 'c4eafc923fb615b68fb3e13d9995d3aa',
         src: 'https://rutube.ru/play/embed/c4eafc923fb615b68fb3e13d9995d3aa',
         url: 'https://rutube.ru/video/c4eafc923fb615b68fb3e13d9995d3aa/',
-        width: 461,
-        height: 819,
+        ratio: '16/9',
         title: 'Склад Radaway в Москве',
       }
 

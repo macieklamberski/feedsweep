@@ -327,6 +327,19 @@ describeForEachParser('stripBoundaryBreaks', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should strip a br before an empty inline wrapper at the block edge', async () => {
+      const value = '<p>Line one<br><span></span></p>'
+      const expected = '<p>Line one<span></span></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should preserve a br before an image at the block edge', async () => {
+      const value = '<p>Line one<br><img data-emoji="x"></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
   })
 })
 

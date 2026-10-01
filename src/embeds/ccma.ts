@@ -1,7 +1,7 @@
 import { parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { digitsRegex } from '../utils/urls.js'
+import { encodePathSegment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ccma'
@@ -12,9 +12,9 @@ const ccmaHosts = [
   'tv3.cat', // The Flash players
 ]
 
-const embedPathRegex = /^\/+3cat\/video\/(\d+)\/embed\/?$/
+const embedPathRegex = /^\/+3cat\/video\/([^/]+)\/embed\/?$/
 const legacyEmbedPathRegex = /^\/+video\/embed\/(super3\/)?(\d+)\/?$/
-const audioEmbedPathRegex = /^\/+audio\/embed\/(\d+)\/?$/
+const audioEmbedPathRegex = /^\/+audio\/embed\/([^/]+)\/?$/
 const evpPlayerPathRegex = /^\/+ria\/players\//
 const svpPlayerPathRegex = /^\/+svp2\/svp2\.swf$/
 const svpObjectIdRegex = /^SVP(\d+)IE$/
@@ -25,7 +25,7 @@ const composeResult = (
   videoId: string | undefined,
   isSuper3 = false,
 ): EmbedResolverResult | undefined => {
-  if (!videoId || !digitsRegex.test(videoId)) {
+  if (!videoId) {
     return
   }
 
@@ -47,6 +47,17 @@ const composeAudioResult = (audioId: string): EmbedResolverResult => {
     id: `audio/${audioId}`,
     src: `https://www.3cat.cat/3cat/audio/${audioId}/embed/`,
   }
+}
+
+// A flashvar comes out decoded, and the id goes into a path beside the raw path spellings.
+const readFlashVideoId = (element: Element | undefined, name: string): string | undefined => {
+  const videoId = flashVar(element, name)
+
+  if (!videoId) {
+    return
+  }
+
+  return encodePathSegment(videoId)
 }
 
 // The player frame in its 3Cat and CCMA spellings, the CCMA audio frame, and CCMA's two Flash
@@ -78,16 +89,21 @@ export const ccmaResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   if (evpPlayerPathRegex.test(parsed.pathname)) {
-    return composeResult(flashVar(element, 'videoid'))
+    return composeResult(readFlashVideoId(element, 'videoid'))
   }
 
   if (svpPlayerPathRegex.test(parsed.pathname)) {
     const objectId = attr(element?.closest('object'), 'id')
 
-    return composeResult(flashVar(element, 'VIDEO_ID') ?? objectId?.match(svpObjectIdRegex)?.[1])
+    return composeResult(
+      readFlashVideoId(element, 'VIDEO_ID') ?? objectId?.match(svpObjectIdRegex)?.[1],
+    )
   }
 }
 
-export const ccmaEmbedResolver = createUrlEmbedResolver(ccmaHosts, ccmaResolveEmbed, {
-  preferResolverSize: true,
-})
+export const ccmaEmbedResolver = createUrlEmbedResolver(ccmaHosts, ccmaResolveEmbed)
+
+export const ccmaRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: 'true' },
+}

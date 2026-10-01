@@ -394,10 +394,8 @@ describeForEachParser('readS9eFragment', (parseHtml) => {
   })
 })
 
-const exampleFragmentRegex = /^\w+$/
-
 describeForEachParser('createS9eEmbedResolver', (parseHtml) => {
-  const resolver = createS9eEmbedResolver('example', exampleFragmentRegex, (fragment) => {
+  const resolver = createS9eEmbedResolver('example', (fragment) => {
     return {
       provider: 'example',
       id: fragment,
@@ -422,15 +420,20 @@ describeForEachParser('createS9eEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should ignore a fragment holding a character outside the class', async () => {
+  it('should use a fragment holding a dot as written', async () => {
     const value = html`
       <iframe
         data-s9e-mediaembed="example"
         src="https://s9e.github.io/iframe/2/example.min.html#abc.123"
       ></iframe>
     `
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc.123',
+      src: 'https://player.example.com/abc.123',
+    }
 
-    expect(await extract(value)).toBeUndefined()
+    expect(await extract(value)).toEqual(expected)
   })
 })
 
@@ -891,7 +894,7 @@ describeForEachParser('createCitePlaceholder', (parseHtml) => {
   })
 })
 
-describeForEachParser('preferResolverSize', (parseHtml) => {
+describeForEachParser('readCarrierSize', (parseHtml) => {
   const base: EmbedResolverResult = { provider: 'example', id: 'abc', src: 'https://x.test/abc' }
 
   const resolve = (
@@ -903,25 +906,9 @@ describeForEachParser('preferResolverSize', (parseHtml) => {
     return element ? resolver.extract(element) : undefined
   }
 
-  describe('a markup-keyed resolver', () => {
-    it('should take the size the carrier declares by default', () => {
-      const resolver = createMarkupEmbedResolver('div.player', () => base)
-      const value = html`
-        <div
-          class="player"
-          width="640"
-          height="360"
-        ></div>
-      `
-      const expected: EmbedResolverResult = { ...base, width: 640, height: 360 }
-
-      expect(resolve(resolver, value)).toEqual(expected)
-    })
-
-    it('should keep its own numbers when the declared size is refused', () => {
-      const resolver = createMarkupEmbedResolver('div.player', () => ({ ...base, height: 200 }), {
-        preferResolverSize: true,
-      })
+  describe('a resolver that leaves the option off', () => {
+    it('should keep its own height over the box a markup carrier declares', () => {
+      const resolver = createMarkupEmbedResolver('div.player', () => ({ ...base, height: 200 }))
       const value = html`
         <div
           class="player"
@@ -933,10 +920,37 @@ describeForEachParser('preferResolverSize', (parseHtml) => {
 
       expect(resolve(resolver, value)).toEqual(expected)
     })
-  })
 
-  describe('a url-keyed resolver', () => {
-    it('should take the size the carrier declares by default', () => {
+    it('should keep its own ratio over the box a url carrier declares', () => {
+      const resolver = createUrlEmbedResolver(['x.test'], () => ({ ...base, ratio: '16/9' }))
+      const value = html`
+        <iframe
+          src="https://x.test/abc"
+          width="1080"
+          height="1920"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = { ...base, ratio: '16/9' }
+
+      expect(resolve(resolver, value)).toEqual(expected)
+    })
+
+    it('should keep its own ratio over a carrier sized 100% inside a wrapper', () => {
+      const resolver = createMarkupEmbedResolver('div.player', () => ({ ...base, ratio: '16/9' }))
+      const value = html`
+        <div style="padding-bottom: 75%">
+          <div
+            class="player"
+            style="width: 100%; height: 100%"
+          ></div>
+        </div>
+      `
+      const expected: EmbedResolverResult = { ...base, ratio: '16/9' }
+
+      expect(resolve(resolver, value)).toEqual(expected)
+    })
+
+    it('should state no size when it states none, whatever the carrier declares', () => {
       const resolver = createUrlEmbedResolver(['x.test'], () => base)
       const value = html`
         <iframe
@@ -945,35 +959,42 @@ describeForEachParser('preferResolverSize', (parseHtml) => {
           height="360"
         ></iframe>
       `
+
+      expect(resolve(resolver, value)).toEqual(base)
+    })
+
+    it('should state no size when it states none, whatever an ancestor wrapper implies', () => {
+      const resolver = createMarkupEmbedResolver('div.player', () => base)
+      const value = html`
+        <div style="aspect-ratio: 4/3">
+          <div class="player"></div>
+        </div>
+      `
+
+      expect(resolve(resolver, value)).toEqual(base)
+    })
+  })
+
+  describe('a resolver that turns the option on', () => {
+    it('should take the box a markup carrier declares', () => {
+      const resolver = createMarkupEmbedResolver('div.player', () => ({ ...base, height: 200 }), {
+        readCarrierSize: true,
+      })
+      const value = html`
+        <div
+          class="player"
+          width="640"
+          height="360"
+        ></div>
+      `
       const expected: EmbedResolverResult = { ...base, width: 640, height: 360 }
 
       expect(resolve(resolver, value)).toEqual(expected)
     })
 
-    it('should keep its own numbers when the declared size is refused', () => {
-      const resolver = createUrlEmbedResolver(['x.test'], () => ({ ...base, height: 200 }), {
-        preferResolverSize: true,
-      })
-      const value = html`
-        <iframe
-          src="https://x.test/abc"
-          width="640"
-          height="360"
-        ></iframe>
-      `
-      const expected: EmbedResolverResult = { ...base, height: 200 }
-
-      expect(resolve(resolver, value)).toEqual(expected)
-    })
-  })
-
-  // The option says prefer, so it applies only where there is something to prefer. Refusing the
-  // carrier while stating nothing is how a placeholder ends up with no size at all, which is what
-  // a TikTok enclosure carrying the feed's own dimensions once did.
-  describe('a resolver that asks to be preferred and states no size', () => {
-    it('should fall back to the size the carrier declares', () => {
-      const resolver = createUrlEmbedResolver(['x.test'], () => base, {
-        preferResolverSize: true,
+    it('should take the box a url carrier declares', () => {
+      const resolver = createUrlEmbedResolver(['x.test'], () => ({ ...base, ratio: '16/9' }), {
+        readCarrierSize: true,
       })
       const value = html`
         <iframe
@@ -987,27 +1008,14 @@ describeForEachParser('preferResolverSize', (parseHtml) => {
       expect(resolve(resolver, value)).toEqual(expected)
     })
 
-    it('should fall back to the ratio a responsive wrapper implies', () => {
-      const resolver = createMarkupEmbedResolver('div.player', () => base, {
-        preferResolverSize: true,
-      })
-      const value = html`
-        <div style="aspect-ratio: 4/3">
-          <div class="player"></div>
-        </div>
-      `
-      const expected: EmbedResolverResult = { ...base, ratio: '4/3' }
-
-      expect(resolve(resolver, value)).toEqual(expected)
-    })
-
-    it('should state no size when the carrier declares none either', () => {
-      const resolver = createUrlEmbedResolver(['x.test'], () => base, {
-        preferResolverSize: true,
+    it('should keep its own size where the carrier declares none', () => {
+      const resolver = createUrlEmbedResolver(['x.test'], () => ({ ...base, ratio: '16/9' }), {
+        readCarrierSize: true,
       })
       const value = '<iframe src="https://x.test/abc"></iframe>'
+      const expected: EmbedResolverResult = { ...base, ratio: '16/9' }
 
-      expect(resolve(resolver, value)).toEqual(base)
+      expect(resolve(resolver, value)).toEqual(expected)
     })
   })
 
@@ -1023,7 +1031,7 @@ describeForEachParser('preferResolverSize', (parseHtml) => {
 
     const build = (result: EmbedResolverResult, markup: string) => {
       return resolve(
-        createMarkupEmbedResolver('div.player', () => result),
+        createMarkupEmbedResolver('div.player', () => result, { readCarrierSize: true }),
         markup,
       )
     }
@@ -1798,7 +1806,7 @@ describe('prepareEmbedMetadata', () => {
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
   })
 
-  it('should clean the src of a listed provider', () => {
+  it('should clean the src with the provided cleanUrlFn', () => {
     const value: Partial<EmbedResolverResult> = {
       provider: 'example',
       src: 'https://player.example/embed/abc?start=30&utm_source=feed',
@@ -1809,33 +1817,18 @@ describe('prepareEmbedMetadata', () => {
     }
     const context = {
       ...baseContext,
-      cleanedSrcProviders: ['example'],
       cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
     }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
   })
 
-  it('should keep the src of an unlisted provider as written', () => {
+  it('should keep the src as written when no cleaner is given', () => {
     const value: Partial<EmbedResolverResult> = {
       provider: 'example',
       src: 'https://player.example/embed/abc?start=30&utm_source=feed',
     }
-    const context = {
-      ...baseContext,
-      cleanedSrcProviders: ['other'],
-      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
-    }
-
-    expect(prepareEmbedMetadata(value, context)).toEqual(value)
-  })
-
-  it('should keep the src of a listed provider as written when no cleaner is given', () => {
-    const value: Partial<EmbedResolverResult> = {
-      provider: 'example',
-      src: 'https://player.example/embed/abc?start=30&utm_source=feed',
-    }
-    const context = { ...baseContext, cleanedSrcProviders: ['example'] }
+    const context = { ...baseContext }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(value)
   })

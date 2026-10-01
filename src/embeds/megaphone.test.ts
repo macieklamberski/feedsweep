@@ -74,45 +74,9 @@ describe('extractMegaphoneEmbed', () => {
     expect(extractMegaphoneEmbed(url)).toBeUndefined()
   })
 
-  // An episode id is letters followed by exactly ten digits, so a bare number is not one.
+  // NPR writes its bare story number into ?e=, and an episode id opens with letters.
   it('should not read a bare number as an episode id', () => {
     const value = 'https://playlist.megaphone.fm/?e=510310'
-
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
-  })
-
-  it('should not read an episode id behind an encoded parameter', () => {
-    const value = 'https://playlist.megaphone.fm/?e=%26x%3DAUDD4761726018'
-
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
-  })
-
-  it('should not read an episode id followed by an encoded parameter', () => {
-    const value = 'https://playlist.megaphone.fm/?e=AUDD4761726018%26autoplay%3D1'
-
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
-  })
-
-  it('should not read an episode prefix carrying an encoded parameter', () => {
-    const value = 'https://playlist.megaphone.fm/?e=AUDD%26x%3D4761726018'
-
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
-  })
-
-  it('should not read a playlist id behind an encoded parameter', () => {
-    const value = 'https://playlist.megaphone.fm/?p=%26x%3DNSM7546490835'
-
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
-  })
-
-  it('should not read a playlist id followed by an encoded parameter', () => {
-    const value = 'https://playlist.megaphone.fm/?p=NSM7546490835%26light%3Dtrue'
-
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
-  })
-
-  it('should not read a playlist id carrying an encoded parameter', () => {
-    const value = 'https://playlist.megaphone.fm/?p=NSM%26x%3D7546490835'
 
     expect(extractMegaphoneEmbed(value)).toBeUndefined()
   })
@@ -188,6 +152,30 @@ describe('megaphoneResolveEmbed', () => {
     expect(megaphoneResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should use a malformed episode id as written, even if the player answers an error', () => {
+    const value = 'https://playlist.megaphone.fm/?e=AUDD4761726018%26autoplay%3D1'
+    const expected: EmbedResolverResult = {
+      provider: 'megaphone',
+      id: 'episode/AUDD4761726018&autoplay=1',
+      src: 'https://playlist.megaphone.fm/?e=AUDD4761726018%26autoplay%3D1',
+      height: 200,
+    }
+
+    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should use a malformed playlist id as written, even if the player answers an error', () => {
+    const value = 'https://playlist.megaphone.fm/?p=NSM7546490835%26light%3Dtrue'
+    const expected: EmbedResolverResult = {
+      provider: 'megaphone',
+      id: 'playlist/NSM7546490835&light=true',
+      src: 'https://playlist.megaphone.fm/?p=NSM7546490835%26light%3Dtrue',
+      height: 482,
+    }
+
+    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for a megaphone url naming no episode', () => {
     const value = 'https://playlist.megaphone.fm/?x=ABC123'
 
@@ -223,9 +211,8 @@ describeForEachParser('megaphoneEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    // The two kinds are separated so a playlist is not squeezed into the episode height, but a
-    // publisher who stated a box of their own outranks that measurement.
-    it('should take the size the carrier states over the height the kind implies', async () => {
+    // The two kinds are separated so a playlist is not squeezed into the episode height.
+    it('should keep the height the kind implies over the size the carrier states', async () => {
       const value = html`
         <iframe
           src="https://playlist.megaphone.fm/?p=NSM7546490835"
@@ -237,8 +224,7 @@ describeForEachParser('megaphoneEmbedResolver', (parseHtml) => {
         provider: 'megaphone',
         id: 'playlist/NSM7546490835',
         src: 'https://playlist.megaphone.fm/?p=NSM7546490835',
-        width: 640,
-        height: 200,
+        height: 482,
       }
 
       expect(await extract(value)).toEqual(expected)

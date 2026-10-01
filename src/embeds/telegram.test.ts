@@ -97,57 +97,15 @@ describeForEachParser('telegramScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('the width the snippet states', () => {
-    it('should read a pixel width', async () => {
+    // The widget sizes itself from the post, and `data-width` is the carrier's size, which
+    // shallow handling does not read.
+    it('should state no size over a pixel width', async () => {
       const value = html`
         <script
           async
           src="https://telegram.org/js/telegram-widget.js?22"
           data-telegram-post="tochkapress/111424"
           data-width="480"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'telegram',
-        id: 'tochkapress/111424',
-        src: 'https://t.me/tochkapress/111424?embed=1',
-        url: 'https://t.me/tochkapress/111424',
-        width: 480,
-        author: '@tochkapress',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should read a width spelled in px', async () => {
-      const value = html`
-        <script
-          async
-          src="https://telegram.org/js/telegram-widget.js?22"
-          data-telegram-post="tochkapress/111424"
-          data-width="480px"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'telegram',
-        id: 'tochkapress/111424',
-        src: 'https://t.me/tochkapress/111424?embed=1',
-        url: 'https://t.me/tochkapress/111424',
-        width: 480,
-        author: '@tochkapress',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    // The post resolves without a size either way, so the whole result is stated: a percentage
-    // is not a pixel width, and the widget states no height at all.
-    it('should drop a percentage width', async () => {
-      const value = html`
-        <script
-          async
-          src="https://telegram.org/js/telegram-widget.js?22"
-          data-telegram-post="tochkapress/111424"
-          data-width="100%"
         ></script>
       `
       const expected: EmbedResolverResult = {
@@ -191,16 +149,30 @@ describeForEachParser('telegramScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a non-numeric message id', async () => {
+    it('should use a malformed message id as written, even if the player answers an error', async () => {
       const value = '<script data-telegram-post="tochkapress/latest"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'telegram',
+        id: 'tochkapress/latest',
+        src: 'https://t.me/tochkapress/latest?embed=1',
+        url: 'https://t.me/tochkapress/latest',
+        author: '@tochkapress',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for a two-character channel', async () => {
+    it('should use a malformed channel as written, even if the player answers an error', async () => {
       const value = '<script data-telegram-post="ab/111424"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'telegram',
+        id: 'ab/111424',
+        src: 'https://t.me/ab/111424?embed=1',
+        url: 'https://t.me/ab/111424',
+        author: '@ab',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for a traversal in the attribute', async () => {
@@ -211,6 +183,12 @@ describeForEachParser('telegramScriptEmbedResolver', (parseHtml) => {
 
     it('should return undefined for an empty attribute', async () => {
       const value = '<script data-telegram-post=""></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a message id with no channel', async () => {
+      const value = '<script data-telegram-post="/111424"></script>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -277,7 +255,7 @@ describeForEachParser('telegramIframeEmbedResolver', (parseHtml) => {
 
   describe('the rendered widget iframe', () => {
     // What the widget script builds, saved into the feed by a CMS that ran it: 34 corpus feeds
-    // carry a t.me iframe. `width="100%"` is not a pixel size, so only the height survives.
+    // carry a t.me iframe. Its box is not read: the post is sized from its height message.
     it('should claim the iframe the widget builds', async () => {
       const value = html`
         <iframe
@@ -293,7 +271,6 @@ describeForEachParser('telegramIframeEmbedResolver', (parseHtml) => {
         id: 'rvvoenkor/12345',
         src: 'https://t.me/rvvoenkor/12345?embed=1',
         url: 'https://t.me/rvvoenkor/12345',
-        height: 500,
         author: '@rvvoenkor',
       }
 
@@ -417,17 +394,6 @@ describeForEachParser('telegramS9eEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a fragment stepping out of the post path', async () => {
-      const value = html`
-        <iframe
-          data-s9e-mediaembed="telegram"
-          src="https://s9e.github.io/iframe/2/telegram.min.html#x/../../durov/1"
-        ></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a fragment naming a channel alone', async () => {
       const value = html`
         <iframe
@@ -437,6 +403,26 @@ describeForEachParser('telegramS9eEmbedResolver', (parseHtml) => {
       `
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should resolve dot segments in the fragment as a browser does', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="telegram"
+          src="https://s9e.github.io/iframe/2/telegram.min.html#x/../../durov/1"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'telegram',
+        id: 'durov/1',
+        src: 'https://t.me/durov/1?embed=1',
+        url: 'https://t.me/durov/1',
+        author: '@durov',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

@@ -18,6 +18,7 @@ describe('crowdsignalResolveEmbed', () => {
         id: '17125374',
         src: 'https://poll.fm/17125374/embed',
         url: 'https://poll.fm/17125374',
+        height: 533,
       }
 
       expect(crowdsignalResolveEmbed(value)).toEqual(expected)
@@ -30,6 +31,7 @@ describe('crowdsignalResolveEmbed', () => {
         id: '13332507',
         src: 'https://poll.fm/13332507/embed',
         url: 'https://poll.fm/13332507',
+        height: 533,
       }
 
       expect(crowdsignalResolveEmbed(value)).toEqual(expected)
@@ -42,6 +44,7 @@ describe('crowdsignalResolveEmbed', () => {
         id: '17125374',
         src: 'https://poll.fm/17125374/embed',
         url: 'https://poll.fm/17125374',
+        height: 533,
       }
 
       expect(crowdsignalResolveEmbed(value)).toEqual(expected)
@@ -54,6 +57,7 @@ describe('crowdsignalResolveEmbed', () => {
         id: '15364010',
         src: 'https://poll.fm/15364010/embed',
         url: 'https://poll.fm/15364010',
+        height: 533,
       }
 
       expect(crowdsignalResolveEmbed(value)).toEqual(expected)
@@ -66,6 +70,7 @@ describe('crowdsignalResolveEmbed', () => {
         id: '17125374',
         src: 'https://poll.fm/17125374/embed',
         url: 'https://poll.fm/17125374',
+        height: 533,
       }
 
       expect(crowdsignalResolveEmbed(value)).toEqual(expected)
@@ -117,6 +122,7 @@ describeForEachParser('crowdsignalIframeEmbedResolver', (parseHtml) => {
         id: '17125374',
         src: 'https://poll.fm/17125374/embed',
         url: 'https://poll.fm/17125374',
+        height: 533,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -149,6 +155,7 @@ describeForEachParser('crowdsignalScriptEmbedResolver', (parseHtml) => {
         id: '13332507',
         src: 'https://poll.fm/13332507/embed',
         url: 'https://poll.fm/13332507',
+        height: 533,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -161,6 +168,7 @@ describeForEachParser('crowdsignalScriptEmbedResolver', (parseHtml) => {
         id: '17342754',
         src: 'https://poll.fm/17342754/embed',
         url: 'https://poll.fm/17342754',
+        height: 533,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -178,6 +186,35 @@ describeForEachParser('crowdsignalScriptEmbedResolver', (parseHtml) => {
         id: '63575',
         src: 'https://poll.fm/63575/embed',
         url: 'https://poll.fm/63575',
+        height: 533,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed poll id as written, even if the player answers an error', async () => {
+      const value = '<script src="https://secure.polldaddy.com/p/1333a.js"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: '1333a',
+        src: 'https://poll.fm/1333a/embed',
+        url: 'https://poll.fm/1333a',
+        height: 533,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a loader naming no poll as written, even if the player answers an error', async () => {
+      const value = '<script src="https://secure.polldaddy.com/p/embed.js"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: 'embed',
+        src: 'https://poll.fm/embed/embed',
+        url: 'https://poll.fm/embed',
+        height: 533,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -185,12 +222,6 @@ describeForEachParser('crowdsignalScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a loader naming no poll', async () => {
-      const value = '<script src="https://secure.polldaddy.com/p/embed.js"></script>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a foreign host serving the loader path', async () => {
       const value = '<script src="https://evil.test/p/13332507.js?polldaddy.com/p/"></script>'
 
@@ -242,6 +273,21 @@ describeForEachParser('crowdsignalScriptEmbedResolver', (parseHtml) => {
 
       expect(document.querySelector('noscript')).not.toBeNull()
     })
+
+    it('should remove a noscript linking the same malformed poll on the retired page', async () => {
+      const value = html`
+        <div>
+          <script src="https://secure.polldaddy.com/p/1333a.js"></script>
+          <noscript><a href="https://polldaddy.com/poll/1333a/">Take the poll</a></noscript>
+        </div>
+      `
+      const document = parseHtml(value)
+      const loader = document.querySelector('script') as Element
+
+      await crowdsignalScriptEmbedResolver.extract(loader)
+
+      expect(document.querySelector('noscript')).toBeNull()
+    })
   })
 })
 
@@ -273,7 +319,7 @@ describeForEachParser('crowdsignalFlashEmbedResolver', (parseHtml) => {
         id: '132074',
         src: 'https://poll.fm/132074/embed',
         url: 'https://poll.fm/132074',
-        height: 473,
+        height: 533,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -314,26 +360,40 @@ describeForEachParser('crowdsignalFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a poll id that only ends in digits', async () => {
+    it('should use a malformed poll id as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="http://www.polldaddy.com/poll.swf"
           flashvars="p=poll132074"
         >
       `
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: 'poll132074',
+        src: 'https://poll.fm/poll132074/embed',
+        url: 'https://poll.fm/poll132074',
+        height: 533,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a poll id carrying a path separator', async () => {
+    it('should use a malformed poll id carrying a path separator as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="http://www.polldaddy.com/poll.swf"
           flashvars="p=132074%2Fresults"
         >
       `
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: '132074/results',
+        src: 'https://poll.fm/132074%2Fresults/embed',
+        url: 'https://poll.fm/132074%2Fresults',
+        height: 533,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
@@ -358,6 +418,7 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
+        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="13332507"
         data-embed-src="https://poll.fm/13332507/embed"
@@ -382,6 +443,7 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     const expected = html`
       <p>Vote in <a href="https://poll.fm/13332507">our poll</a> before Friday.</p>
       <div
+        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="13332507"
         data-embed-src="https://poll.fm/13332507/embed"
@@ -401,6 +463,7 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     const expected = html`
       <p>Intro.</p>
       <div
+        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="13332507"
         data-embed-src="https://poll.fm/13332507/embed"
@@ -421,6 +484,7 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
+        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="1333"
         data-embed-src="https://poll.fm/1333/embed"
@@ -441,6 +505,7 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
+        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="1804433"
         data-embed-src="https://poll.fm/1804433/embed"
@@ -462,6 +527,7 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
+        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="13332507"
         data-embed-src="https://poll.fm/13332507/embed"
@@ -482,6 +548,7 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
+        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="13332507"
         data-embed-src="https://poll.fm/13332507/embed"
@@ -502,6 +569,7 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
+        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="13332507"
         data-embed-src="https://poll.fm/13332507/embed"
@@ -522,6 +590,7 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
+        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="1804433"
         data-embed-src="https://poll.fm/1804433/embed"
@@ -542,6 +611,7 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
+        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="1804433"
         data-embed-src="https://poll.fm/1804433/embed"
@@ -562,6 +632,7 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
+        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="1804433"
         data-embed-src="https://poll.fm/1804433/embed"
@@ -607,6 +678,7 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
       <figure class="wp-block-embed is-provider-crowdsignal">
         <p><script>var pd_tags = new Array;pd_tags["17125374-src"]="poll-oembed-simple";</script></p>
         <div
+          data-embed-height="533"
           data-embed-provider="crowdsignal"
           data-embed-id="17125374"
           data-embed-src="https://poll.fm/17125374/embed"

@@ -27,6 +27,7 @@ describe('standfmResolveEmbed', () => {
         id: 'channels/645af1b90b5e6b2d87ce1dc9',
         src: 'https://stand.fm/embed/channels/645af1b90b5e6b2d87ce1dc9',
         url: 'https://stand.fm/channels/645af1b90b5e6b2d87ce1dc9',
+        height: 390,
       }
 
       expect(standfmResolveEmbed(value)).toEqual(expected)

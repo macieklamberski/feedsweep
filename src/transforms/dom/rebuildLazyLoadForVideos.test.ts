@@ -143,6 +143,7 @@ describeForEachParser('rebuildLazyLoadForVideos', (parseHtml) => {
         data-embed-src="https://player.vimeo.com/video/76979871"
         data-embed-provider="vimeo"
         data-embed-id="76979871"
+        data-embed-ratio="16/9"
         data-embed-url="https://vimeo.com/76979871"
         data-embed-title="Glass Beach"
       ></div>

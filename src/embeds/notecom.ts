@@ -6,8 +6,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'notecom'
 
-// A note id is `n` followed by lowercase hex, e.g. `nf938ce640465`.
-const safeNoteIdRegex = /^n[0-9a-f]+$/
+// A note id opens with `n`, e.g. `nf938ce640465`.
+const noteIdRegex = /^n/
 
 // `note.mu` is the platform's former domain and still 301s to `note.com` on the same path
 // (checked 2026-08-15), so both are matched and only the current one is minted.
@@ -27,7 +27,7 @@ const composePostUrl = (noteId: string, pageUrl: string | undefined): string => 
 }
 
 const composeEmbed = (noteId: string, pageUrl?: string): EmbedResolverResult | undefined => {
-  if (!safeNoteIdRegex.test(noteId)) {
+  if (!noteIdRegex.test(noteId)) {
     return
   }
 
@@ -56,7 +56,7 @@ const readNoteUrl = (link: string): NoteUrl | undefined => {
     return { noteId: segments[1], kind: 'post' }
   }
 
-  if (segments[0] === 'embed' && segments[1] === 'notes' && segments[2]) {
+  if (segments[0] === 'embed' && segments[1] === 'notes' && segments.length === 3) {
     return { noteId: segments[2], kind: 'player' }
   }
 }

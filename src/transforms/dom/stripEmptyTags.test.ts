@@ -99,6 +99,16 @@ describeForEachParser('stripEmptyTags', (parseHtml) => {
     expect(await transform('<div class="wrapper"></div>')).toEqualHtml('')
   })
 
+  it('should strip an empty span whose data attribute only starts like a placeholder type', async () => {
+    expect(await transform('<span data-preload="true"></span>')).toEqualHtml('')
+  })
+
+  it('should keep an empty embed placeholder', async () => {
+    const value = '<div data-embed-provider="youtube" data-embed-id="abc"></div>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should strip nested empty tags', async () => {
     expect(await transform('<div><p></p></div>')).toEqualHtml('')
   })

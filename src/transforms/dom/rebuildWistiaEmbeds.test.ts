@@ -49,17 +49,16 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  // Wistia serves the same media for an id in any case, so the id is minted in one spelling.
-  it('should rebuild a facade whose id is uppercase onto the lowercase id', async () => {
+  it('should rebuild a facade whose id is uppercase, keeping its case', async () => {
     const value = '<div class="wistia_embed wistia_async_U3GZ5BKA6B"></div>'
-    const expected = '<iframe src="https://fast.wistia.net/embed/iframe/u3gz5bka6b"></iframe>'
+    const expected = '<iframe src="https://fast.wistia.net/embed/iframe/U3GZ5BKA6B"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should rebuild a custom element whose id is uppercase onto the lowercase id', async () => {
+  it('should rebuild a custom element whose id is uppercase, keeping its case', async () => {
     const value = '<wistia-player media-id="U3GZ5BKA6B"></wistia-player>'
-    const expected = '<iframe src="https://fast.wistia.net/embed/iframe/u3gz5bka6b"></iframe>'
+    const expected = '<iframe src="https://fast.wistia.net/embed/iframe/U3GZ5BKA6B"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
@@ -81,6 +80,7 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
         data-embed-src="https://fast.wistia.net/embed/iframe/u3gz5bka6b"
         data-embed-provider="wistia"
         data-embed-id="u3gz5bka6b"
+        data-embed-ratio="16/9"
       ></div>
     `
     const result = await transformContent(value, {
@@ -122,10 +122,12 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a custom element whose media id carries an encoded slash untouched', async () => {
+  it('should use a malformed media id as written, even if the player answers an error', async () => {
     const value = '<wistia-player media-id="u3gz5bka6b%2F..%2Fchannel"></wistia-player>'
+    const expected =
+      '<iframe src="https://fast.wistia.net/embed/iframe/u3gz5bka6b%2F..%2Fchannel"></iframe>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should rebuild an iframe from a lone loader script', async () => {
@@ -157,7 +159,20 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     `
     const expected = html`
       <script src="https://fast.wistia.com/embed/medias/U3GZ5BKA6B.jsonp"></script>
-      <iframe src="https://fast.wistia.net/embed/iframe/u3gz5bka6b"></iframe>
+      <iframe src="https://fast.wistia.net/embed/iframe/U3GZ5BKA6B"></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should not duplicate the player when the script and its div spell the id in different cases', async () => {
+    const value = html`
+      <script src="https://fast.wistia.com/embed/medias/u3gz5bka6b.jsonp"></script>
+      <div class="wistia_embed wistia_async_U3GZ5BKA6B"></div>
+    `
+    const expected = html`
+      <script src="https://fast.wistia.com/embed/medias/u3gz5bka6b.jsonp"></script>
+      <iframe src="https://fast.wistia.net/embed/iframe/U3GZ5BKA6B"></iframe>
     `
 
     expect(await transform(value)).toEqualHtml(expected)

@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import { parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 
 const jsfiddleHosts = ['jsfiddle.net']
 
@@ -13,7 +13,7 @@ export const composeFiddleUrl = (url: string | undefined): string | undefined =>
   const route = segments.indexOf('embed')
   const fiddle = route > 0 ? segments.slice(0, route) : []
 
-  if (!fiddle.length || !fiddle.every((segment) => urlSafeTokenRegex.test(segment))) {
+  if (!fiddle.length) {
     return
   }
 

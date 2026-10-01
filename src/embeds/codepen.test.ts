@@ -90,14 +90,12 @@ describe('codepenResolveEmbed', () => {
       expect(codepenResolveEmbed(value)).toEqual(expected)
     })
 
-    // The author's own query picks which panes open and which theme they use, so the url the
-    // publisher wrote is what travels rather than one rebuilt from the slug.
-    it('should keep the query the publisher wrote', () => {
+    it('should drop the panes the publisher picked', () => {
       const value = 'https://codepen.io/argyleink/embed/XJpKqXm?default-tab=css%2Cresult'
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm?default-tab=css%2Cresult',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
         height: 300,
@@ -277,10 +275,10 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm?default-tab=css%2Cresult&theme-id=default',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 437,
+        height: 300,
         title: 'Parallax Card',
         author: '@argyleink',
       }
@@ -358,7 +356,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/keyframers/embed/XJpKqXm',
+        src: 'https://codepen.io/team/keyframers/embed/XJpKqXm',
         url: 'https://codepen.io/team/keyframers/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/keyframers/pen/XJpKqXm-512.jpg',
         height: 300,
@@ -416,7 +414,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/keyframers/embed/XJpKqXm',
+        src: 'https://codepen.io/team/keyframers/embed/XJpKqXm',
         url: 'https://codepen.io/team/keyframers/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/keyframers/pen/XJpKqXm-512.jpg',
         height: 300,
@@ -503,10 +501,10 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'pFzlJ',
-        src: 'https://codepen.io/wesbos/embed/pFzlJ?default-tab=result&theme-id=0',
+        src: 'https://codepen.io/wesbos/embed/pFzlJ',
         url: 'https://codepen.io/wesbos/pen/pFzlJ',
         thumbnail: 'https://shots.codepen.io/wesbos/pen/pFzlJ-512.jpg',
-        height: 268,
+        height: 300,
         title: 'Flexbox Demo',
         author: '@wesbos',
       }
@@ -566,9 +564,9 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'azpLzvW',
-        src: 'https://codepen.io/editor/sturobson/embed/azpLzvW?default-tab=result',
+        src: 'https://codepen.io/editor/sturobson/embed/azpLzvW',
         url: 'https://codepen.io/sturobson/pen/azpLzvW',
-        height: 700,
+        height: 300,
         title: 'Theme and Mode Toggle Demo',
         author: '@sturobson',
       }
@@ -601,10 +599,10 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'azpLzvW',
-        src: 'https://codepen.io/sturobson/embed/azpLzvW?default-tab=result',
+        src: 'https://codepen.io/sturobson/embed/azpLzvW',
         url: 'https://codepen.io/sturobson/pen/azpLzvW',
         thumbnail: 'https://shots.codepen.io/sturobson/pen/azpLzvW-512.jpg',
-        height: 700,
+        height: 300,
         title: 'Theme and Mode Toggle Demo',
         author: '@sturobson',
       }
@@ -613,82 +611,14 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
     })
   })
 
-  // The loader copies both into the query of the iframe it builds. They describe the player, so
-  // the pen's own page, which has no panes to choose, must not carry them.
+  // The loader copies both into the query of the iframe it builds. They are the publisher's look.
   describe('the panes and theme the author picked', () => {
-    it('should put them on the player and keep them off the pen page', async () => {
+    it('should leave them off the player and the pen page', async () => {
       const value = html`
         <p
           class="codepen"
           data-default-tab="js,result"
           data-theme-id="dark"
-          data-user="argyleink"
-          data-slug-hash="XJpKqXm"
-        ></p>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'codepen',
-        id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm?default-tab=js%2Cresult&theme-id=dark',
-        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
-        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 300,
-        author: '@argyleink',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should ignore a theme carrying a query of its own', async () => {
-      const value = html`
-        <p
-          class="codepen"
-          data-theme-id="dark&amp;autoplay=1"
-          data-user="argyleink"
-          data-slug-hash="XJpKqXm"
-        ></p>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'codepen',
-        id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
-        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
-        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 300,
-        author: '@argyleink',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should ignore a theme and panes spelled outside the lowercase names', async () => {
-      const value = html`
-        <p
-          class="codepen"
-          data-default-tab="CSS_Result"
-          data-theme-id="Dark-1"
-          data-user="argyleink"
-          data-slug-hash="XJpKqXm"
-        ></p>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'codepen',
-        id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
-        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
-        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 300,
-        author: '@argyleink',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should ignore a pane value that is not one', async () => {
-      const value = html`
-        <p
-          class="codepen"
-          data-default-tab="<script>"
           data-user="argyleink"
           data-slug-hash="XJpKqXm"
         ></p>
@@ -735,9 +665,9 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The url in `data-href` is the player's own, so the height the author picked can sit in its
-    // query with no `data-height` beside it.
-    it('should take the height from the url when the block states none', async () => {
+    // The url in `data-href` is the player's own, and the height in its query is the carrier's,
+    // which shallow handling does not read.
+    it('should state the default height over the height the url names', async () => {
       const value = html`
         <p
           class="codepen"
@@ -750,7 +680,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 600,
+        height: 300,
         author: '@argyleink',
       }
 
@@ -774,7 +704,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'OJYzQjN',
-        src: 'https://codepen.io/leaverou/embed/OJYzQjN/c8ec7595b68381e99d38441487db546f?default-tab=css%2Cresult',
+        src: 'https://codepen.io/leaverou/embed/OJYzQjN/c8ec7595b68381e99d38441487db546f',
         url: 'https://codepen.io/leaverou/pen/OJYzQjN/c8ec7595b68381e99d38441487db546f',
         thumbnail: 'https://shots.codepen.io/leaverou/pen/OJYzQjN-512.jpg',
         height: 300,
@@ -805,7 +735,27 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a token that would climb out of the pen path', async () => {
+    it('should keep a decoded query token carrying a separator in one path segment', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-href="https://codepen.io/leaverou/pen/OJYzQjN?token=c8ec7595%2F..%2Fx"
+        ></p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'OJYzQjN',
+        src: 'https://codepen.io/leaverou/embed/OJYzQjN/c8ec7595%2F..%2Fx',
+        url: 'https://codepen.io/leaverou/pen/OJYzQjN/c8ec7595%2F..%2Fx',
+        thumbnail: 'https://shots.codepen.io/leaverou/pen/OJYzQjN-512.jpg',
+        height: 300,
+        author: '@leaverou',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed token as written, even if the player answers an error', async () => {
       const value = html`
         <p
           class="codepen"
@@ -817,8 +767,8 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
-        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm/..',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm/..',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
         height: 300,
         author: '@argyleink',
@@ -827,7 +777,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a token carrying a query of its own', async () => {
+    it('should use a malformed token carrying a query as written, even if the player answers an error', async () => {
       const value = html`
         <p
           class="codepen"
@@ -839,8 +789,8 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
-        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm/c8ec7595b68381e99d38441487db546f&autoplay=1',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm/c8ec7595b68381e99d38441487db546f&autoplay=1',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
         height: 300,
         author: '@argyleink',
@@ -907,7 +857,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a slug that is not a pen id', async () => {
+    it('should use a malformed slug hash as written, even if the player answers an error', async () => {
       const value = html`
         <p
           class="codepen"
@@ -916,11 +866,19 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
           <span>See the Pen</span>
         </p>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'not a slug',
+        src: 'https://codepen.io/anon/embed/not a slug',
+        url: 'https://codepen.io/anon/pen/not a slug',
+        thumbnail: 'https://shots.codepen.io/anon/pen/not a slug-512.jpg',
+        height: 300,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a slug hash carrying a query', async () => {
+    it('should use a malformed slug hash carrying a query as written, even if the player answers an error', async () => {
       const value = html`
         <p
           class="codepen"
@@ -929,8 +887,16 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
           <span>See the Pen</span>
         </p>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm?x=1',
+        src: 'https://codepen.io/anon/embed/XJpKqXm?x=1',
+        url: 'https://codepen.io/anon/pen/XJpKqXm?x=1',
+        thumbnail: 'https://shots.codepen.io/anon/pen/XJpKqXm?x=1-512.jpg',
+        height: 300,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // The attribute alone is not the platform: other embed plugins carry their own slug hashes.
@@ -1037,7 +1003,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should treat a handle with an at sign inside it as no author', async () => {
+    it('should use a malformed handle as written, even if the player answers an error', async () => {
       const value = html`
         <p
           class="codepen"
@@ -1048,10 +1014,11 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/anon/embed/XJpKqXm',
-        url: 'https://codepen.io/anon/pen/XJpKqXm',
-        thumbnail: 'https://shots.codepen.io/anon/pen/XJpKqXm-512.jpg',
+        src: 'https://codepen.io/argyle@ink/embed/XJpKqXm',
+        url: 'https://codepen.io/argyle@ink/pen/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/argyle@ink/pen/XJpKqXm-512.jpg',
         height: 300,
+        author: '@argyle@ink',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1077,10 +1044,10 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm?default-tab=js%2Cresult',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 400,
+        height: 300,
         title: 'Parallax Card',
         author: '@argyleink',
       }
@@ -1101,36 +1068,33 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/anon/embed/XJpKqXm?theme-id=dark',
+        src: 'https://codepen.io/anon/embed/XJpKqXm',
         url: 'https://codepen.io/anon/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/anon/pen/XJpKqXm-512.jpg',
-        height: 331,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
   })
 
-  // Three sources, in the order the publisher's own intent runs out: the box they laid out, the
-  // number the loader put in the query, then CodePen's own default for a player that says nothing.
   describe('how tall the player is', () => {
-    it('should take the height stated in the query when no attribute states one', async () => {
+    it('should state the default height over the height the query names', async () => {
       const value = '<iframe src="https://codepen.io/argyleink/embed/XJpKqXm?height=600"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm?height=600',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 600,
+        height: 300,
         author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The attribute is the box the publisher actually laid out, so it outranks the query.
-    it('should prefer the stated attribute over the query', async () => {
+    it('should state the platform height over both the attribute and the query', async () => {
       const value = html`
         <iframe
           height="450"
@@ -1140,10 +1104,10 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm?height=600',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 450,
+        height: 300,
         author: '@argyleink',
       }
 
@@ -1165,25 +1129,6 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // A zero is a height nobody laid out, so the player takes the default as if it stated none.
-    it('should treat a height of zero as no height at all', async () => {
-      const value = '<iframe src="https://codepen.io/argyleink/embed/XJpKqXm?height=0"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'codepen',
-        id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm?height=0',
-        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
-        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 300,
-        author: '@argyleink',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    // A carrier that states a width and no height neither takes the default nor gets paired with
-    // it: 800 by the default height would describe a box the publisher never asked for, and 800
-    // on its own is a number the reader lays nothing out from.
     it('should keep the default height over a width the carrier stated', async () => {
       const value = '<iframe width="800" src="https://codepen.io/argyleink/embed/XJpKqXm"></iframe>'
       const expected: EmbedResolverResult = {
@@ -1199,10 +1144,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // A ratio inferred from an ancestor's responsive wrapper ranks below what a resolver states.
-    // The default height is a resolver statement, a corpus-typical value for a pen that declares
-    // none, so it stands over the wrapper the same as a measured height would. Only the carrier
-    // itself outranks the resolver, and a wrapper is not the carrier.
+    // A ratio inferred from an ancestor's responsive wrapper is not read, so the default height
+    // stands.
     it('should keep the default height over a ratio inferred from a wrapper', async () => {
       const value = html`
         <div style="padding-bottom:56.25%">
@@ -1223,8 +1166,40 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
     })
   })
 
+  // The loader writes the publisher's panes, theme and flags into the iframe's query.
+  describe('the query the loader wrote', () => {
+    it('should drop the panes and flags from the player', async () => {
+      const value = html`
+        <iframe
+          code-pen
+          src="https://codepen.io/miriamsuzanne/embed/KKEXQKr?embed-version=2&amp;default-tab=result&amp;user=miriamsuzanne&amp;editable=true"
+          height="400"
+          title="Custom element, two ways"
+          allowfullscreen="true"
+          allowtransparency="true"
+          frameborder="0"
+          loading="lazy"
+          scrolling="no"
+          width="100%"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'KKEXQKr',
+        src: 'https://codepen.io/miriamsuzanne/embed/KKEXQKr',
+        url: 'https://codepen.io/miriamsuzanne/pen/KKEXQKr',
+        thumbnail: 'https://shots.codepen.io/miriamsuzanne/pen/KKEXQKr-512.jpg',
+        height: 300,
+        title: 'Custom element, two ways',
+        author: '@miriamsuzanne',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   describe('Variant #2b: the deferred-loading preview path', () => {
-    it('should read the pen from behind the preview segment', async () => {
+    it('should mint the full player for the pen behind the preview segment', async () => {
       const value = html`
         <iframe
           id="cp_embed_XJpKqXm"
@@ -1237,7 +1212,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/preview/XJpKqXm?height=300&slug-hash=XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
         height: 300,
@@ -1262,10 +1237,10 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm?theme-id=dark',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 331,
+        height: 300,
         author: '@argyleink',
       }
 
@@ -1293,9 +1268,9 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: '019dcdfc-1e41-77c8-afdf-810ebc6f2480',
-        src: 'https://codepen.io/editor/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f2480?height=450&theme-id=1&slug-hash=019dcdfc-1e41-77c8-afdf-810ebc6f2480&default-tab=result',
+        src: 'https://codepen.io/editor/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f2480',
         url: 'https://codepen.io/anon/pen/019dcdfc-1e41-77c8-afdf-810ebc6f2480',
-        height: 450,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1323,11 +1298,18 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a hyphenated slug that is not a uuid', async () => {
+    it('should use a malformed slug as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://codepen.io/editor/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f248"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: '019dcdfc-1e41-77c8-afdf-810ebc6f248',
+        src: 'https://codepen.io/editor/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f248',
+        url: 'https://codepen.io/anon/pen/019dcdfc-1e41-77c8-afdf-810ebc6f248',
+        height: 300,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
@@ -1363,7 +1345,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'OJYzQjN',
-        src: 'https://codepen.io/leaverou/embed/OJYzQjN/c8ec7595b68381e99d38441487db546f?default-tab=css%2Cresult',
+        src: 'https://codepen.io/leaverou/embed/OJYzQjN/c8ec7595b68381e99d38441487db546f',
         url: 'https://codepen.io/leaverou/pen/OJYzQjN/c8ec7595b68381e99d38441487db546f',
         thumbnail: 'https://shots.codepen.io/leaverou/pen/OJYzQjN-512.jpg',
         height: 300,
@@ -1383,7 +1365,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'OJYzQjN',
-        src: 'https://codepen.io/leaverou/embed/preview/OJYzQjN/c8ec7595b68381e99d38441487db546f',
+        src: 'https://codepen.io/leaverou/embed/OJYzQjN/c8ec7595b68381e99d38441487db546f',
         url: 'https://codepen.io/leaverou/pen/OJYzQjN/c8ec7595b68381e99d38441487db546f',
         thumbnail: 'https://shots.codepen.io/leaverou/pen/OJYzQjN-512.jpg',
         height: 300,
@@ -1403,7 +1385,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'OJYzQjN',
-        src: 'https://codepen.io/leaverou/embed/OJYzQjN?token=c8ec7595b68381e99d38441487db546f',
+        src: 'https://codepen.io/leaverou/embed/OJYzQjN/c8ec7595b68381e99d38441487db546f',
         url: 'https://codepen.io/leaverou/pen/OJYzQjN/c8ec7595b68381e99d38441487db546f',
         thumbnail: 'https://shots.codepen.io/leaverou/pen/OJYzQjN-512.jpg',
         height: 300,
@@ -1425,17 +1407,17 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm?height=600&amp;key=abc123XYZ',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc123XYZ',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc123XYZ',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 400,
+        height: 300,
         author: '@argyleink',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a key carrying a query of its own off the pen page', async () => {
+    it('should use a malformed key as written, even if the player answers an error', async () => {
       const value = html`
         <iframe
           height="400"
@@ -1446,9 +1428,9 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         provider: 'codepen',
         id: 'XJpKqXm',
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc%26autoplay%3D1',
-        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc%26autoplay%3D1',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 400,
+        height: 300,
         author: '@argyleink',
       }
 
@@ -1486,7 +1468,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         id: 'XJpKqXm',
         src: 'https://codepen.io/anon/embed/XJpKqXm?key=abc123XYZ',
         thumbnail: 'https://shots.codepen.io/anon/pen/XJpKqXm-512.jpg',
-        height: 400,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1505,7 +1487,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc123XYZ',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc123XYZ',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 400,
+        height: 300,
         author: '@argyleink',
       }
 
@@ -1660,7 +1642,7 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: '437',
+        height: '300',
         title: 'Parallax Card',
         author: '@argyleink',
       }
@@ -1670,6 +1652,29 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
 
     it('should leave none of the loader behind', async () => {
       expect(await convert(value)).not.toContain('ei.js')
+    })
+  })
+
+  describe('the protocol-relative player carrying a token', () => {
+    it('should keep the token appended to the slug', async () => {
+      const value = html`
+        <iframe
+          id="cp_embed_xbggQgj/f8fd92ac42f4d00a63df914c70439a39"
+          src="//codepen.io/anon/embed/xbggQgj/f8fd92ac42f4d00a63df914c70439a39?height=450&amp;theme-id=1&amp;slug-hash=xbggQgj/f8fd92ac42f4d00a63df914c70439a39&amp;default-tab=css,result"
+          height="450"
+          scrolling="no"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: Record<string, string> = {
+        provider: 'codepen',
+        id: 'xbggQgj',
+        src: 'https://codepen.io/anon/embed/xbggQgj/f8fd92ac42f4d00a63df914c70439a39',
+        thumbnail: 'https://shots.codepen.io/anon/pen/xbggQgj-512.jpg',
+        height: '300',
+      }
+
+      expect(await placeholder(value)).toEqual(expected)
     })
   })
 
@@ -1688,10 +1693,10 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
       const expected: Record<string, string> = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/preview/XJpKqXm?height=600',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://assets.codepen.io/2869/internal/screenshots/pens/XJpKqXm.default.png',
-        height: '600',
+        height: '300',
         author: '@argyleink',
       }
 
@@ -1721,9 +1726,9 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
       const expected: Record<string, string> = {
         provider: 'codepen',
         id: '019e2c40-99c5-7617-8163-23c489a628b5',
-        src: 'https://codepen.io/editor/anon/embed/019e2c40-99c5-7617-8163-23c489a628b5?height=450&theme-id=1&slug-hash=019e2c40-99c5-7617-8163-23c489a628b5&default-tab=js,result',
+        src: 'https://codepen.io/editor/anon/embed/019e2c40-99c5-7617-8163-23c489a628b5',
         url: 'https://codepen.io/anon/pen/019e2c40-99c5-7617-8163-23c489a628b5',
-        height: '450',
+        height: '300',
       }
 
       expect(await placeholder(value)).toEqual(expected)
@@ -1753,7 +1758,7 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
 })
 
 // The enclosure probe offers every attachment a feed carries to this resolver, and CodePen serves
-// uploads on its own host, so the slug alphabet is what keeps a file playable.
+// uploads on its own host, so the file-name check is what keeps a file playable.
 describeForEachParser('codepen through the pipeline', (parseHtml) => {
   it('should leave a video enclosure on the codepen host playable', async () => {
     const enclosures = [

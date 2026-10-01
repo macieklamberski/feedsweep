@@ -76,6 +76,7 @@ describe('geniallyResolveEmbed', () => {
       provider: 'genially',
       id: viewId,
       src: `https://view.genially.com/${viewId}`,
+      ratio: '16/9',
     }
 
     expect(geniallyResolveEmbed(value)).toEqual(expected)
@@ -87,6 +88,7 @@ describe('geniallyResolveEmbed', () => {
       provider: 'genially',
       id: viewId,
       src: `https://view.genially.com/${viewId}`,
+      ratio: '16/9',
     }
 
     expect(geniallyResolveEmbed(value)).toEqual(expected)
@@ -114,6 +116,7 @@ describeForEachParser('geniallyEmbedResolver', (parseHtml) => {
         provider: 'genially',
         id: '60294f8b2ec856159ae0baa5',
         src: 'https://view.genially.com/60294f8b2ec856159ae0baa5',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -132,6 +135,7 @@ describeForEachParser('geniallyEmbedResolver', (parseHtml) => {
         provider: 'genially',
         id: '60294f8b2ec856159ae0baa5',
         src: 'https://view.genially.com/60294f8b2ec856159ae0baa5',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -149,6 +153,7 @@ describeForEachParser('geniallyEmbedResolver', (parseHtml) => {
         provider: 'genially',
         id: '60294f8b2ec856159ae0baa5',
         src: 'https://view.genially.com/60294f8b2ec856159ae0baa5',
+        ratio: '16/9',
         title: 'Raisonnement argumenté',
       }
 
@@ -168,9 +173,9 @@ describeForEachParser('geniallyEmbedResolver', (parseHtml) => {
   })
 
   describe('the size a publisher states', () => {
-    // Genially presentations are authored at whatever canvas the author picked, so the resolver
-    // states no size and the publisher's box is the only measurement there is.
-    it('should take the whole box the carrier states', async () => {
+    // Genially presentations are authored at whatever canvas the author picked, and the carrier's
+    // box is not read, so every presentation states 16:9.
+    it('should state the platform size over the box the carrier states', async () => {
       const value = html`
         <iframe
           src="https://view.genially.com/60294f8b2ec856159ae0baa5"
@@ -182,8 +187,7 @@ describeForEachParser('geniallyEmbedResolver', (parseHtml) => {
         provider: 'genially',
         id: '60294f8b2ec856159ae0baa5',
         src: 'https://view.genially.com/60294f8b2ec856159ae0baa5',
-        width: 1200,
-        height: 675,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

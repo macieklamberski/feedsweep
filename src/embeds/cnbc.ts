@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { digitsRegex, parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const cnbcHosts = ['player.cnbc.com']
@@ -21,23 +21,20 @@ export const cnbcResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  // No width: a band would refuse the next account CNBC opens.
-  if (!urlSafeTokenRegex.test(account) || !urlSafeTokenRegex.test(player)) {
+  if (!guid) {
     return
   }
 
-  if (!guid || !digitsRegex.test(guid)) {
-    return
-  }
+  const query = composeQuery({ playertype: 'synd', byGuid: guid })
 
   return {
     provider: 'cnbc',
     id: guid,
-    src: `https://player.cnbc.com/p/${account}/${player}?playertype=synd&byGuid=${guid}`,
+    // Any player name plays the guid, and `cnbc_global` is the one CNBC's share snippet writes.
+    // Another account answers 404, so the account stays as written.
+    src: `https://player.cnbc.com/p/${account}/cnbc_global${query}`,
     ratio: playerRatio,
   }
 }
 
-export const cnbcIframeEmbedResolver = createUrlEmbedResolver(cnbcHosts, cnbcResolveEmbed, {
-  preferResolverSize: true,
-})
+export const cnbcIframeEmbedResolver = createUrlEmbedResolver(cnbcHosts, cnbcResolveEmbed)

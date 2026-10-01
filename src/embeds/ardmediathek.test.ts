@@ -20,6 +20,7 @@ describeForEachParser('ardmediathekEmbedResolver', (parseHtml) => {
         id: 'Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
         src: 'https://www.ardmediathek.de/embed/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
         url: 'https://www.ardmediathek.de/video/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -32,6 +33,7 @@ describeForEachParser('ardmediathekEmbedResolver', (parseHtml) => {
         id: 'NjVmZWU0NjQtYTE1Mi00NjBkLTk5ODAtZmIwYmE5NDAwYjU4',
         src: 'https://www.ardmediathek.de/embed/NjVmZWU0NjQtYTE1Mi00NjBkLTk5ODAtZmIwYmE5NDAwYjU4',
         url: 'https://www.ardmediathek.de/video/NjVmZWU0NjQtYTE1Mi00NjBkLTk5ODAtZmIwYmE5NDAwYjU4',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -44,6 +46,7 @@ describeForEachParser('ardmediathekEmbedResolver', (parseHtml) => {
         id: 'Y3JpZDovL3N3ci5kZS9h-ZXgv_bzIzMjIwOTc',
         src: 'https://www.ardmediathek.de/embed/Y3JpZDovL3N3ci5kZS9h-ZXgv_bzIzMjIwOTc',
         url: 'https://www.ardmediathek.de/video/Y3JpZDovL3N3ci5kZS9h-ZXgv_bzIzMjIwOTc',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -55,6 +58,7 @@ describeForEachParser('ardmediathekEmbedResolver', (parseHtml) => {
         id: 'Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
         src: 'https://www.ardmediathek.de/embed/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
         url: 'https://www.ardmediathek.de/video/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -86,10 +90,17 @@ describeForEachParser('ardmediathekEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id carrying a character no base64 id has', async () => {
+    it('should use a malformed id as written, even if the player answers an error', async () => {
       const value = html`<iframe src="https://www.ardmediathek.de/embed/Beitrag%20sophora.mp3"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'ardmediathek',
+        id: 'Beitrag%20sophora.mp3',
+        src: 'https://www.ardmediathek.de/embed/Beitrag%20sophora.mp3',
+        url: 'https://www.ardmediathek.de/video/Beitrag%20sophora.mp3',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
@@ -101,6 +112,7 @@ describeForEachParser('ardmediathekEmbedResolver', (parseHtml) => {
         id: 'Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
         src: 'https://www.ardmediathek.de/embed/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
         url: 'https://www.ardmediathek.de/video/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -127,6 +139,7 @@ describeForEachParser('ardmediathekEmbedResolver', (parseHtml) => {
         id: 'Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
         src: 'https://www.ardmediathek.de/embed/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc?startTime=831.00',
         url: 'https://www.ardmediathek.de/video/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -139,6 +152,7 @@ describeForEachParser('ardmediathekEmbedResolver', (parseHtml) => {
         id: 'Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
         src: 'https://www.ardmediathek.de/embed/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
         url: 'https://www.ardmediathek.de/video/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

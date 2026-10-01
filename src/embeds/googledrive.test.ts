@@ -15,6 +15,7 @@ describe('googledriveResolveEmbed', () => {
         url: 'https://drive.google.com/file/d/1y5iOrW7Epj-cNdscnRAVDzUCKaMjjo6r/view',
         thumbnail:
           'https://drive.google.com/thumbnail?id=1y5iOrW7Epj-cNdscnRAVDzUCKaMjjo6r&sz=w640',
+        ratio: '4/3',
       }
 
       expect(googledriveResolveEmbed(value)).toEqual(expected)
@@ -30,6 +31,7 @@ describe('googledriveResolveEmbed', () => {
         url: 'https://drive.google.com/file/d/1sefYqtj-3TfSZEq2qvoiPY16_F0jAk6G/view',
         thumbnail:
           'https://drive.google.com/thumbnail?id=1sefYqtj-3TfSZEq2qvoiPY16_F0jAk6G&sz=w640',
+        ratio: '4/3',
       }
 
       expect(googledriveResolveEmbed(value)).toEqual(expected)
@@ -43,6 +45,7 @@ describe('googledriveResolveEmbed', () => {
         src: 'https://drive.google.com/file/d/0ByrtauTmPYKtR3dPN0lxY2hwdFE/preview',
         url: 'https://drive.google.com/file/d/0ByrtauTmPYKtR3dPN0lxY2hwdFE/view',
         thumbnail: 'https://drive.google.com/thumbnail?id=0ByrtauTmPYKtR3dPN0lxY2hwdFE&sz=w640',
+        ratio: '4/3',
       }
 
       expect(googledriveResolveEmbed(value)).toEqual(expected)
@@ -55,6 +58,7 @@ describe('googledriveResolveEmbed', () => {
         provider: 'googledrive',
         id: '0Bzq4uXIf8dNTVS1wQl9sME5FcFE',
         src: 'https://drive.google.com/file/d/0Bzq4uXIf8dNTVS1wQl9sME5FcFE/preview?resourcekey=0-aeSGEHR1GEcB98yGmsP_XA',
+        ratio: '4/3',
       }
 
       expect(googledriveResolveEmbed(value)).toEqual(expected)
@@ -86,17 +90,35 @@ describe('googledriveResolveEmbed', () => {
 
       expect(googledriveResolveEmbed(value)).toBeUndefined()
     })
+  })
 
-    it('should ignore a file id carrying a separator', () => {
+  describe('edge cases', () => {
+    it('should use a malformed file id as written, even if the player answers an error', () => {
       const value = 'https://drive.google.com/file/d/1UVR7Liw%2F..%2Fother/preview'
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: '1UVR7Liw%2F..%2Fother',
+        src: 'https://drive.google.com/file/d/1UVR7Liw%2F..%2Fother/preview',
+        url: 'https://drive.google.com/file/d/1UVR7Liw%2F..%2Fother/view',
+        thumbnail: 'https://drive.google.com/thumbnail?id=1UVR7Liw%2F..%2Fother&sz=w640',
+        ratio: '4/3',
+      }
 
-      expect(googledriveResolveEmbed(value)).toBeUndefined()
+      expect(googledriveResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should ignore a file id carrying a query separator', () => {
+    it('should use a malformed file id carrying a query separator as written, even if the player answers an error', () => {
       const value = 'https://drive.google.com/file/d/1UVR7Liw&sz=w1/preview'
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: '1UVR7Liw&sz=w1',
+        src: 'https://drive.google.com/file/d/1UVR7Liw&sz=w1/preview',
+        url: 'https://drive.google.com/file/d/1UVR7Liw&sz=w1/view',
+        thumbnail: 'https://drive.google.com/thumbnail?id=1UVR7Liw%26sz%3Dw1&sz=w640',
+        ratio: '4/3',
+      }
 
-      expect(googledriveResolveEmbed(value)).toBeUndefined()
+      expect(googledriveResolveEmbed(value)).toEqual(expected)
     })
   })
 })
@@ -105,7 +127,7 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, googledriveEmbedResolver)
 
   describe('happy paths', () => {
-    it('should take the box the carrier declares', async () => {
+    it('should state the platform size over the box the carrier declares', async () => {
       const value = html`
         <iframe
           src="https://drive.google.com/file/d/1y5iOrW7Epj-cNdscnRAVDzUCKaMjjo6r/preview"
@@ -120,8 +142,7 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
         url: 'https://drive.google.com/file/d/1y5iOrW7Epj-cNdscnRAVDzUCKaMjjo6r/view',
         thumbnail:
           'https://drive.google.com/thumbnail?id=1y5iOrW7Epj-cNdscnRAVDzUCKaMjjo6r&sz=w640',
-        width: 640,
-        height: 480,
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -141,8 +162,7 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
         src: 'https://drive.google.com/file/d/0ByrtauTmPYKtR3dPN0lxY2hwdFE/preview',
         url: 'https://drive.google.com/file/d/0ByrtauTmPYKtR3dPN0lxY2hwdFE/view',
         thumbnail: 'https://drive.google.com/thumbnail?id=0ByrtauTmPYKtR3dPN0lxY2hwdFE&sz=w640',
-        width: 520,
-        height: 480,
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)

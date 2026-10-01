@@ -8,19 +8,20 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, ultimediaEmbedResolver)
 
   describe('happy paths', () => {
-    it('should build the placeholder from the generic player iframe', async () => {
+    it('should mint the player from the account key and the video id', async () => {
       const value =
         '<iframe src="https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/zone/1/showtitle/1/"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'ultimedia',
         id: '01357940/ml3ffr',
-        src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/zone/1/showtitle/1/',
+        src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should hand on a protocol-relative src as the markup wrote it', async () => {
+    it('should mint the player from a protocol-relative src', async () => {
       const value = html`
         <iframe
           loading="lazy"
@@ -32,9 +33,8 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ultimedia',
         id: '01357940/ml3ffr',
-        src: '//www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/zone/1/showtitle/1/',
-        width: 600,
-        height: 336,
+        src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -46,7 +46,8 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ultimedia',
         id: '01357940/ml3ffr',
-        src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr',
+        src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -75,16 +76,29 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an uppercase video id, which the player does not serve', async () => {
+    it('should use a malformed video id as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ML3FFR/zone/1/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ultimedia',
+        id: '01357940/ML3FFR',
+        src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ML3FFR/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore another route word carrying the player segments', async () => {
+      const value =
+        '<iframe src="https://www.ultimedia.com/deliver/musique/iframe/mdtk/01999636/src/83vrlm/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a video id that turns uppercase partway', async () => {
+    it('should ignore the player segments under a prefixed path', async () => {
       const value =
-        '<iframe src="https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3FFR/zone/1/"></iframe>'
+        '<iframe src="https://www.ultimedia.com/x/deliver/generic/iframe/mdtk/01999636/src/83vrlm/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -94,6 +108,66 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
         '<iframe src="https://www.ultimedia.com/deliver/generic/iframe/xmdtk/01357940/src/ml3ffr/zone/1/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('what the rebuild drops', () => {
+    it('should drop the zone that selects a publisher placement', async () => {
+      const value = html`
+        <iframe
+          src="http://www.ultimedia.com/deliver/generic/iframe/mdtk/01999636/src/83vrlm/zone/6/showtitle/1/"
+          width="430"
+          height="300"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ultimedia',
+        id: '01999636/83vrlm',
+        src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01999636/src/83vrlm/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop an autoplay segment', async () => {
+      const value =
+        '<iframe src="https://www.ultimedia.com/deliver/generic/iframe/mdtk/01999636/src/83vrlm/autoplay/no/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ultimedia',
+        id: '01999636/83vrlm',
+        src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01999636/src/83vrlm/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop a muteForced segment', async () => {
+      const value =
+        '<iframe src="https://www.ultimedia.com/deliver/generic/iframe/mdtk/01999636/src/83vrlm/muteForced/1/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ultimedia',
+        id: '01999636/83vrlm',
+        src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01999636/src/83vrlm/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the query', async () => {
+      const value =
+        '<iframe src="https://www.ultimedia.com/deliver/generic/iframe/mdtk/01999636/src/83vrlm/?utm_source=newsletter"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ultimedia',
+        id: '01999636/83vrlm',
+        src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01999636/src/83vrlm/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
@@ -127,11 +201,10 @@ describeForEachParser('ultimedia urls the pipeline absolutises first', (parseHtm
     `
     const expected = html`
       <div
-        data-embed-height="336"
-        data-embed-width="600"
         data-embed-id="01357940/ml3ffr"
         data-embed-provider="ultimedia"
-        data-embed-src="https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/zone/1/showtitle/1/"
+        data-embed-ratio="16/9"
+        data-embed-src="https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/"
       ></div>
     `
 

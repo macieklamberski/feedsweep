@@ -181,11 +181,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The other shapes state the player's fixed height. The hydrated iframe rendered at this
-    // height against the blockquote's own max-width, so the pair is a real measurement of this
-    // clip and wins over it. The text is gone, replaced by the frame, so there is no caption or
-    // author left to take.
-    it('should keep the size the hydrated player rendered at', async () => {
+    // The hydrated iframe's inline height is the carrier's box, which shallow handling does not
+    // read. The text is gone, replaced by the frame, so there is no caption or author left to take.
+    it('should state the player height over the size the hydrated player rendered at', async () => {
       const value = html`
         <blockquote
           id="v25421583374779120"
@@ -199,37 +197,6 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
               name="__tt_embed__v25421583374779120"
               src="https://www.tiktok.com/embed/v2/7000000000000000000?lang=es-ES"
               style="width: 100%;height: 758px;max-height: 758px"
-            ></iframe>
-          </p>
-        </blockquote>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'tiktok',
-        id: '@user/video/7000000000000000000',
-        src: 'https://www.tiktok.com/embed/v2/7000000000000000000',
-        url: 'https://www.tiktok.com/@user/video/7000000000000000000',
-        width: 605,
-        height: 758,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    // The style is read with parsePixelSize, which bounds a declared pixel size to 10..9999 and
-    // rejects a fraction. A hydrated height of `758.53px` is not a measurement a reader can put
-    // in a width/height attribute, and a `1px` or `99999px` box is not one the player rendered.
-    it('should ignore a hydrated size outside the pixel bounds', async () => {
-      const value = html`
-        <blockquote
-          class="tiktok-embed"
-          cite="https://www.tiktok.com/@user/video/7000000000000000000"
-          data-video-id="7000000000000000000"
-          style="max-width: 605px;"
-        >
-          <p>
-            <iframe
-              src="https://www.tiktok.com/embed/v2/7000000000000000000"
-              style="width: 100%;height: 758.53px"
             ></iframe>
           </p>
         </blockquote>
@@ -267,6 +234,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user',
         src: 'https://www.tiktok.com/embed/@user',
         url: 'https://www.tiktok.com/@user',
+        height: 478,
         author: '@user',
       }
 
@@ -291,6 +259,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@averylonghandlepastwhatsignupallows',
         src: 'https://www.tiktok.com/embed/@averylonghandlepastwhatsignupallows',
         url: 'https://www.tiktok.com/@averylonghandlepastwhatsignupallows',
+        height: 478,
         author: '@averylonghandlepastwhatsignupallows',
       }
 
@@ -308,6 +277,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@averylonghandlepastwhatsignupallows',
         src: 'https://www.tiktok.com/embed/@averylonghandlepastwhatsignupallows',
         url: 'https://www.tiktok.com/@averylonghandlepastwhatsignupallows',
+        height: 478,
         author: '@averylonghandlepastwhatsignupallows',
       }
 
@@ -328,6 +298,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user',
         src: 'https://www.tiktok.com/embed/@user',
         url: 'https://www.tiktok.com/@user',
+        height: 478,
         description: 'caption text',
         author: '@user',
       }
@@ -350,6 +321,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@401kgoldirarollovers',
         src: 'https://www.tiktok.com/embed/@401kgoldirarollovers',
         url: 'https://www.tiktok.com/@401kgoldirarollovers',
+        height: 478,
         author: '@401kgoldirarollovers',
       }
 
@@ -371,6 +343,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@ott_races',
         src: 'https://www.tiktok.com/embed/@ott_races',
         url: 'https://www.tiktok.com/@ott_races',
+        height: 478,
         author: '@ott_races',
       }
 
@@ -392,6 +365,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@.a.u00',
         src: 'https://www.tiktok.com/embed/@.a.u00',
         url: 'https://www.tiktok.com/@.a.u00',
+        height: 478,
         author: '@.a.u00',
       }
 
@@ -414,6 +388,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@NBA',
         src: 'https://www.tiktok.com/embed/@NBA',
         url: 'https://www.tiktok.com/@NBA',
+        height: 478,
         author: '@NBA',
       }
 
@@ -431,6 +406,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@401kgoldirarollovers',
         src: 'https://www.tiktok.com/embed/@401kgoldirarollovers',
         url: 'https://www.tiktok.com/@401kgoldirarollovers',
+        height: 478,
         author: '@401kgoldirarollovers',
       }
 
@@ -448,6 +424,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@ott_races',
         src: 'https://www.tiktok.com/embed/@ott_races',
         url: 'https://www.tiktok.com/@ott_races',
+        height: 478,
         author: '@ott_races',
       }
 
@@ -465,6 +442,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@.a.u00',
         src: 'https://www.tiktok.com/embed/@.a.u00',
         url: 'https://www.tiktok.com/@.a.u00',
+        height: 478,
         author: '@.a.u00',
       }
 
@@ -481,6 +459,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@NBA',
         src: 'https://www.tiktok.com/embed/@NBA',
         url: 'https://www.tiktok.com/@NBA',
+        height: 478,
         author: '@NBA',
       }
 
@@ -518,10 +497,8 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
     })
   })
 
-  // The clip branch has measured the player better than the snippet a publisher pastes, so it
-  // outranks whatever box the blockquote states. The account branch states no size of its own,
-  // and a resolver stating none falls back to the carrier however the option is set, which is
-  // what keeps the option from producing a sizeless placeholder.
+  // Neither branch reads the box the blockquote states: a clip states the player's height and an
+  // account the profile card's.
   describe('a box the blockquote states over the player it holds', () => {
     it('should state the player height over a pixel box on the blockquote', async () => {
       const value = html`
@@ -550,7 +527,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should let the account shape keep the box the blockquote states', async () => {
+    it('should ignore the box the blockquote states on the account shape', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -565,8 +542,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user',
         src: 'https://www.tiktok.com/embed/@user',
         url: 'https://www.tiktok.com/@user',
-        width: 605,
-        height: 400,
+        height: 478,
         author: '@user',
       }
 
@@ -607,14 +583,22 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a profile anchor whose handle carries an encoded slash', async () => {
+    it('should use a malformed profile handle as written, even if the player answers an error', async () => {
       const value = html`
         <blockquote class="tiktok-embed">
           <a href="https://www.tiktok.com/@user%2Fx">Profile</a>
         </blockquote>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@user%2Fx',
+        src: 'https://www.tiktok.com/embed/@user%2Fx',
+        url: 'https://www.tiktok.com/@user%2Fx',
+        height: 478,
+        author: '@user%2Fx',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // A hashtag is not an account and there is no clip either, so nothing can be minted.
@@ -651,9 +635,30 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The video id is interpolated into the player url, so anything non-numeric is refused,
-    // and the cite still names the clip.
-    it('should ignore a data-video-id that is not numeric and read the cite', async () => {
+    it('should use a malformed handle from the author text as written, even if the url answers an error', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          data-video-id="7001234567890123456"
+        >
+          <section>
+            <a href="https://www.tiktok.com/@lynja-cooks?refer=embed">@lynja-cooks</a>
+          </section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@lynja-cooks/video/7001234567890123456',
+        src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
+        url: 'https://www.tiktok.com/@lynja-cooks/video/7001234567890123456',
+        height: 738,
+        author: '@lynja-cooks',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed data-video-id as written over the cite, even if the player answers an error', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -663,8 +668,8 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
-        id: '@user/video/7001234567890123456',
-        src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
+        id: '@user/video/../evil',
+        src: 'https://www.tiktok.com/embed/v2/../evil',
         url: 'https://www.tiktok.com/@user/video/7001234567890123456',
         height: 738,
       }
@@ -672,9 +677,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The handle is interpolated into the viewer url, so anything outside TikTok's own
-    // character set is refused. The profile anchor still names the account, so it wins.
-    it('should ignore a data-unique-id that is not a handle and read the anchor', async () => {
+    it('should use a malformed data-unique-id as written, even if the player answers an error', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -689,10 +692,11 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
-        id: '@user',
-        src: 'https://www.tiktok.com/embed/@user',
+        id: '@../evil',
+        src: 'https://www.tiktok.com/embed/@../evil',
         url: 'https://www.tiktok.com/@user',
-        author: '@user',
+        height: 478,
+        author: '@../evil',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -755,36 +759,6 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
         url: 'https://www.tiktok.com/@user/video/7001234567890123456',
         height: 738,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    // The measurement must not depend on which player url the CMS stored, so the hydrated
-    // iframe is matched by the same paths the direct carrier resolver claims.
-    it('should keep the hydrated measurement when the stored iframe uses the first-generation path', async () => {
-      const value = html`
-        <blockquote
-          class="tiktok-embed"
-          cite="https://www.tiktok.com/@user/video/7000000000000000000"
-          data-video-id="7000000000000000000"
-          style="max-width: 605px;"
-        >
-          <p>
-            <iframe
-              src="https://www.tiktok.com/embed/7000000000000000000"
-              style="width: 100%;height: 758px"
-            ></iframe>
-          </p>
-        </blockquote>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'tiktok',
-        id: '@user/video/7000000000000000000',
-        src: 'https://www.tiktok.com/embed/v2/7000000000000000000',
-        url: 'https://www.tiktok.com/@user/video/7000000000000000000',
-        width: 605,
-        height: 758,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -874,8 +848,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
           data-embed-id="@user/video/7000000000000000000"
           data-embed-src="https://www.tiktok.com/embed/v2/7000000000000000000"
           data-embed-url="https://www.tiktok.com/@user/video/7000000000000000000"
-          data-embed-width="605"
-          data-embed-height="758"
+          data-embed-height="738"
         ></div>
       `
 
@@ -910,28 +883,72 @@ describeForEachParser('tiktokIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should resolve the first-generation embed path', async () => {
-      const value = '<iframe src="https://www.tiktok.com/embed/7520573541146692886"></iframe>'
+    it('should mint the v2 player from the first-generation embed path', async () => {
+      const value = '<iframe src="https://www.tiktok.com/embed/7568177676003970326"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
-        id: '7520573541146692886',
-        src: 'https://www.tiktok.com/embed/7520573541146692886',
+        id: '7568177676003970326',
+        src: 'https://www.tiktok.com/embed/v2/7568177676003970326',
         height: 738,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the player url with the query the publisher chose', async () => {
+    it('should mint the v2 player from the player path', async () => {
+      const value = '<iframe src="https://www.tiktok.com/player/v1/7633882165272513815"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '7633882165272513815',
+        src: 'https://www.tiktok.com/embed/v2/7633882165272513815',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the display flags of the player path', async () => {
       const value = html`
         <iframe
-          src="https://www.tiktok.com/player/v1/7520573541146692886?music_info=1&description=1"
+          src="https://www.tiktok.com/player/v1/7655022967344139551?description=0&amp;music_info=0&amp;rel=0&amp;native_context_menu=0"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
-        id: '7520573541146692886',
-        src: 'https://www.tiktok.com/player/v1/7520573541146692886?music_info=1&description=1',
+        id: '7655022967344139551',
+        src: 'https://www.tiktok.com/embed/v2/7655022967344139551',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the language and referrer of the v2 player', async () => {
+      const value = html`
+        <iframe
+          src="https://www.tiktok.com/embed/v2/7481819442272374018?lang=es-ES&amp;referrer=https%3A%2F%2Fexample.com%2Fpost%2F&amp;embedFrom=oembed"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '7481819442272374018',
+        src: 'https://www.tiktok.com/embed/v2/7481819442272374018',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the web app tracking of the first-generation embed path', async () => {
+      const value = html`
+        <iframe
+          src="https://www.tiktok.com/embed/7082054018259848453?is_from_webapp=1&amp;sender_device=pc&amp;web_id=6962132261881841158"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '7082054018259848453',
+        src: 'https://www.tiktok.com/embed/v2/7082054018259848453',
         height: 738,
       }
 
@@ -1096,11 +1113,18 @@ describeForEachParser('tiktokIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a watch page whose handle carries an encoded slash', async () => {
+    it('should use a malformed watch page handle as written, even if the url answers an error', async () => {
       const value =
         '<iframe src="https://www.tiktok.com/@user%2Fx/video/7520573541146692886"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@user%2Fx/video/7520573541146692886',
+        src: 'https://www.tiktok.com/embed/v2/7520573541146692886',
+        url: 'https://www.tiktok.com/@user%2Fx/video/7520573541146692886',
+        height: 738,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined when the player path holds no numeric id', async () => {

@@ -44,23 +44,20 @@ describe('odnoklassnikiResolveEmbed', () => {
 
       expect(odnoklassnikiResolveEmbed(value)).toBeUndefined()
     })
+  })
 
-    it('should ignore a video id that is not a number', () => {
+  describe('edge cases', () => {
+    it('should use a malformed video id as written, even if the player answers an error', () => {
       const value = 'https://ok.ru/videoembed/latest'
+      const expected: EmbedResolverResult = {
+        provider: 'odnoklassniki',
+        id: 'latest',
+        src: 'https://ok.ru/videoembed/latest',
+        url: 'https://ok.ru/video/latest',
+        ratio: '16/9',
+      }
 
-      expect(odnoklassnikiResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a video id with letters before the digits', () => {
-      const value = 'https://ok.ru/videoembed/abc36463446577'
-
-      expect(odnoklassnikiResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a video id with letters after the digits', () => {
-      const value = 'https://ok.ru/videoembed/36463446577abc'
-
-      expect(odnoklassnikiResolveEmbed(value)).toBeUndefined()
+      expect(odnoklassnikiResolveEmbed(value)).toEqual(expected)
     })
   })
 })
@@ -69,7 +66,7 @@ describeForEachParser('odnoklassnikiEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, odnoklassnikiEmbedResolver)
 
   describe('happy paths', () => {
-    it('should take the box the carrier declares over the player ratio', async () => {
+    it('should keep the player ratio over the box the carrier declares', async () => {
       const value = html`
         <iframe
           src="http://ok.ru/videoembed/36463446577"
@@ -83,8 +80,7 @@ describeForEachParser('odnoklassnikiEmbedResolver', (parseHtml) => {
         id: '36463446577',
         src: 'https://ok.ru/videoembed/36463446577',
         url: 'https://ok.ru/video/36463446577',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

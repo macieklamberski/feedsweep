@@ -928,6 +928,24 @@ describeForEachParser('highlightCode', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    // Sphinx names Pygments' shell-session lexer in its wrapper class, 25 census feeds.
+    it('should highlight a Sphinx block whose language name carries a hyphen', async () => {
+      const value =
+        '<div class="highlight-shell-session notranslate"><div class="highlight"><pre>$ ls -la</pre></div></div>'
+      const expected =
+        '<div class="highlight-shell-session notranslate"><div class="highlight"><pre data-pre-label="Shell" data-pre-language="shell-session"><code class="hljs"><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">ls</span> -la</span></code></pre></div></div>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should highlight a brush that spells C# as c-sharp', async () => {
+      const value = '<pre class="brush: c-sharp"><code>var x = 1;</code></pre>'
+      const expected =
+        '<pre data-pre-label="C#" data-pre-language="c-sharp" class="brush: c-sharp"><code class="hljs"><span class="hljs-keyword">var</span> x = <span class="hljs-number">1</span>;</code></pre>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should label from the highlight.js display name', async () => {
       const value = '<pre><code class="language-crystal">puts "hi"</code></pre>'
       const expected =

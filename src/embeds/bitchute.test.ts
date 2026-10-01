@@ -24,8 +24,7 @@ describeForEachParser('bitchuteEmbedResolver', (parseHtml) => {
         id: '0fRr8eQ5hvv8',
         src: 'https://www.bitchute.com/embed/0fRr8eQ5hvv8/',
         url: 'https://www.bitchute.com/video/0fRr8eQ5hvv8/',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -51,8 +50,7 @@ describeForEachParser('bitchuteEmbedResolver', (parseHtml) => {
         id: '0fRr8eQ5hvv8',
         src: 'https://www.bitchute.com/embed/0fRr8eQ5hvv8/',
         url: 'https://www.bitchute.com/video/0fRr8eQ5hvv8/',
-        width: 459,
-        height: 344,
+        ratio: '16/9',
         title: 'The Currency Act of 1764 The British Law That Started the Revolution',
       }
 
@@ -66,6 +64,7 @@ describeForEachParser('bitchuteEmbedResolver', (parseHtml) => {
         id: '0fRr8eQ5hvv8',
         src: 'https://www.bitchute.com/embed/0fRr8eQ5hvv8/',
         url: 'https://www.bitchute.com/video/0fRr8eQ5hvv8/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -80,6 +79,7 @@ describeForEachParser('bitchuteEmbedResolver', (parseHtml) => {
         id: '0fRr8eQ5hvv8Nk3TzQpW7bXm4',
         src: 'https://www.bitchute.com/embed/0fRr8eQ5hvv8Nk3TzQpW7bXm4/',
         url: 'https://www.bitchute.com/video/0fRr8eQ5hvv8Nk3TzQpW7bXm4/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -106,16 +106,17 @@ describeForEachParser('bitchuteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id of the wrong shape', async () => {
+    it('should use a malformed id as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://www.bitchute.com/embed/0fRr8eQ5hvv8.mp4/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bitchute',
+        id: '0fRr8eQ5hvv8.mp4',
+        src: 'https://www.bitchute.com/embed/0fRr8eQ5hvv8.mp4/',
+        url: 'https://www.bitchute.com/video/0fRr8eQ5hvv8.mp4/',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore an id carrying an encoded slash', async () => {
-      const value = '<iframe src="https://www.bitchute.com/embed/0fRr8eQ5%2Fhvv8/"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a foreign host carrying the same path', async () => {

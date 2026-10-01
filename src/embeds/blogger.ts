@@ -1,7 +1,7 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches } from '../utils/dom.js'
-import { urlSafeTokenRegex } from '../utils/urls.js'
+import { attr } from '../utils/dom.js'
+import { composeQuery } from '../utils/urls.js'
 
 const provider = 'blogger'
 
@@ -16,10 +16,7 @@ export const extractBloggerToken = (link: string): string | undefined => {
     return
   }
 
-  const token = parsed.searchParams.get('token')
-
-  // The alphabet is the whole guard: the prefix and the length are Google's to change.
-  return keepIfMatches(token, urlSafeTokenRegex)
+  return parsed.searchParams.get('token') || undefined
 }
 
 // Blogger's own hosted video: an iframe on blogger.com/video.g with no poster and no page to open.
@@ -35,7 +32,8 @@ export const bloggerResolveEmbed: ResolveEmbed = (url, element) => {
   return {
     provider,
     id: token,
-    src: `https://www.blogger.com/video.g?token=${token}`,
+    src: `https://www.blogger.com/video.g${composeQuery({ token })}`,
+    ratio: '16/9',
     title: attr(element, 'title'),
   }
 }

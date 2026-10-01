@@ -1,13 +1,10 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, findConfigScript, keepIfMatches } from '../utils/dom.js'
+import { attr, findConfigScript } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const fileExtensionRegex = /\.[a-z]+$/i
-
-// No length: JW has minted eight characters so far, and a bound would refuse the next id space.
-const safeMediaIdRegex = /^[a-zA-Z0-9]+$/
 
 const jwplayerHosts = ['jwplayer.com', 'jwplatform.com']
 
@@ -24,9 +21,7 @@ export const extractJwplayerId = (link: string): string | undefined => {
 
   // Embed URLs end in `{mediaId}-{playerId}.html`. The media id is the part before the
   // first dash, with the file extension dropped.
-  const mediaId = lastSegment.replace(fileExtensionRegex, '').split('-')[0]
-
-  return keepIfMatches(mediaId, safeMediaIdRegex)
+  return lastSegment.replace(fileExtensionRegex, '').split('-')[0]
 }
 
 // The poster endpoint answers about a media and 404s for anything else, so a playlist id must
@@ -42,6 +37,7 @@ const composeJwplayerEmbed = (id: string, isPlaylist = false): EmbedResolverResu
     src: `https://cdn.jwplayer.com/players/${id}.html`,
     // A playlist id 404s on the poster endpoint, so the thumbnail is gated on the kind.
     ...(!isPlaylist && { thumbnail: `https://cdn.jwplayer.com/v2/media/${id}/poster.jpg` }),
+    ratio: '16/9',
   }
 }
 
@@ -84,7 +80,7 @@ export const jwplayerAmpEmbedResolver = createMarkupEmbedResolver(
     const playlistId = attr(element, 'data-playlist-id')
     const id = playlistId ?? attr(element, 'data-media-id')
 
-    if (!id || !safeMediaIdRegex.test(id)) {
+    if (!id) {
       return
     }
 
@@ -100,7 +96,7 @@ export const jwplayerSetupEmbedResolver = createMarkupEmbedResolver('div.jwplaye
   const config = findConfigScript(element)?.textContent
   const mediaId = config?.match(setupPlaylistRegex)?.[1]
 
-  if (!mediaId || !safeMediaIdRegex.test(mediaId)) {
+  if (!mediaId) {
     return
   }
 

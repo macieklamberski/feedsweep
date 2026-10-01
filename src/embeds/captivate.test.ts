@@ -123,9 +123,8 @@ describeForEachParser('captivateEmbedResolver', (parseHtml) => {
   })
 
   describe('the size a publisher states', () => {
-    // The 200 the resolver states is the corpus-typical box, and the publisher's own choice
-    // outranks it: they sized the player they actually embedded.
-    it('should let the carrier height win over the stated one', async () => {
+    // The 200 the resolver states is the corpus-typical box, and the carrier's height is not read.
+    it('should keep the stated height over the carrier height', async () => {
       const value = html`
         <iframe
           src="https://player.captivate.fm/show/7fa2e8ef-c3e0-4d27-aad0-35dad879c65c"
@@ -137,7 +136,7 @@ describeForEachParser('captivateEmbedResolver', (parseHtml) => {
         provider: 'captivate',
         id: 'show/7fa2e8ef-c3e0-4d27-aad0-35dad879c65c',
         src: 'https://player.captivate.fm/show/7fa2e8ef-c3e0-4d27-aad0-35dad879c65c',
-        height: 500,
+        height: 200,
       }
 
       expect(await extract(value)).toEqual(expected)

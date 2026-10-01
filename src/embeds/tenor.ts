@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches, parseRatio, text } from '../utils/dom.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { attr, text } from '../utils/dom.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tenor'
@@ -15,6 +15,8 @@ const composeEmbed = (postId: string): EmbedResolverResult => {
     id: postId,
     src: `https://tenor.com/embed/${postId}`,
     url: `https://tenor.com/view/${postId}`,
+    // The ratio `embed.js` falls back to when the snippet states none.
+    ratio: '1.33/1',
   }
 }
 
@@ -32,13 +34,11 @@ export const tenorResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const id = keepIfMatches(postId, digitsRegex)
-
-  if (!id) {
+  if (!postId) {
     return
   }
 
-  return composeEmbed(id)
+  return composeEmbed(postId)
 }
 
 // The share snippet: an inert div holding the GIF's own link and a search link, which
@@ -47,7 +47,7 @@ export const tenorResolveEmbed: ResolveEmbed = (url) => {
 export const tenorWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.tenor-gif-embed[data-postid]',
   (element) => {
-    const postId = keepIfMatches(attr(element, 'data-postid'), digitsRegex)
+    const postId = attr(element, 'data-postid')
 
     if (!postId) {
       return
@@ -57,8 +57,6 @@ export const tenorWidgetEmbedResolver = createMarkupEmbedResolver(
     // search link, which names a query and not this GIF.
     return {
       ...composeEmbed(postId),
-      // `embed.js` falls back to 1.33 when the snippet states no ratio.
-      ratio: parseRatio(attr(element, 'data-aspect-ratio') ?? '1.33'),
       title: text(element, 'a[href*="tenor.com/view/"]'),
     }
   },

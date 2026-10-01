@@ -1,15 +1,10 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'wistia'
-
-// Letters and digits, which is all the player path takes: a hyphen marks a slug and a dot a
-// file, and no route here serves either as a player. The length is not checked, since a wrong id
-// fails the same whether it is minted or passed through, and a bound refuses the next id space.
-export const safeMediaIdRegex = /^[a-zA-Z0-9]+$/
 
 // The script form names the media through a JSONP callback, with no page in the url.
 const jsonpSuffixRegex = /\.jsonp$/
@@ -40,14 +35,10 @@ export const extractWistiaEmbed = (
   const start = segments[0] === 'embed' ? 1 : 0
   const named = segments[start] ?? ''
   const route = playerRoutes.get(named)
-  // Every route serves one media under any case of its id, and the media JSON names it in
-  // lowercase, so one spelling keeps the same media from reaching enrichment as two keys.
-  const id = keepIfMatches(
-    segments[start + 1]?.replace(jsonpSuffixRegex, ''),
-    safeMediaIdRegex,
-  )?.toLowerCase()
+  const id = segments[start + 1]?.replace(jsonpSuffixRegex, '')
 
-  if (!route || !id) {
+  // A dot marks a file such as the media JSON, and no route serves a file as a player.
+  if (!route || !id || id.includes('.')) {
     return
   }
 
@@ -74,13 +65,18 @@ export const wistiaResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
+  // Every route serves one media under any case of its id, and the media JSON names it in
+  // lowercase, so the key folds case to keep one media on one key.
+  const key = embed.id.toLowerCase()
+
   // A media keeps the bare id it has always carried. The other two qualify it, because the three
   // share one id grammar and enrichment receives the provider and the id alone.
   return {
     provider,
-    id: embed.route === 'iframe' ? embed.id : `${embed.route}/${embed.id}`,
+    id: embed.route === 'iframe' ? key : `${embed.route}/${key}`,
     src: composeEmbedUrl(embed.route, embed.id),
     url: embed.page,
+    ratio: '16/9',
     // Wistia's own snippet writes the media's name here with the word `Video` appended.
     title: element ? attr(element, 'title') : undefined,
   }

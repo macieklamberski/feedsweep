@@ -30,10 +30,11 @@ describe('extractBloggerToken', () => {
     expect(extractBloggerToken(value)).toBeUndefined()
   })
 
-  it('should return undefined for a token outside the url-safe base64 alphabet', () => {
+  it('should use a malformed token as written, even if the player answers an error', () => {
     const value = 'https://www.blogger.com/video.g?token=../../etc'
+    const expected = '../../etc'
 
-    expect(extractBloggerToken(value)).toBeUndefined()
+    expect(extractBloggerToken(value)).toEqual(expected)
   })
 
   it('should return undefined for an empty token', () => {
@@ -64,6 +65,7 @@ describe('bloggerResolveEmbed', () => {
         provider: 'blogger',
         id: token,
         src: `https://www.blogger.com/video.g?token=${token}`,
+        ratio: '16/9',
       }
 
       expect(bloggerResolveEmbed(value)).toEqual(expected)
@@ -75,6 +77,19 @@ describe('bloggerResolveEmbed', () => {
         provider: 'blogger',
         id: token,
         src: `https://www.blogger.com/video.g?token=${token}`,
+        ratio: '16/9',
+      }
+
+      expect(bloggerResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a token holding an ampersand as one query parameter', () => {
+      const value = 'https://www.blogger.com/video.g?token=AD6v%26x'
+      const expected: EmbedResolverResult = {
+        provider: 'blogger',
+        id: 'AD6v&x',
+        src: 'https://www.blogger.com/video.g?token=AD6v%26x',
+        ratio: '16/9',
       }
 
       expect(bloggerResolveEmbed(value)).toEqual(expected)
@@ -110,6 +125,7 @@ describeForEachParser('bloggerEmbedResolver', (parseHtml) => {
         provider: 'blogger',
         id: token,
         src: `https://www.blogger.com/video.g?token=${token}`,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -147,6 +163,7 @@ describeForEachParser('bloggerEmbedResolver carrier title', (parseHtml) => {
       provider: 'blogger',
       id: 'AD6v5dz1',
       src: 'https://www.blogger.com/video.g?token=AD6v5dz1',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -160,6 +177,7 @@ describeForEachParser('bloggerEmbedResolver carrier title', (parseHtml) => {
       provider: 'blogger',
       id: 'AD6v5dz1',
       src: 'https://www.blogger.com/video.g?token=AD6v5dz1',
+      ratio: '16/9',
       title: 'Garden tour, June',
     }
 
