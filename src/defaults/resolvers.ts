@@ -224,6 +224,7 @@ import { scratchEmbedResolver } from '../embeds/scratch.js'
 import { scribdFlashEmbedResolver, scribdIframeEmbedResolver } from '../embeds/scribd.js'
 import { simplecastEmbedResolver } from '../embeds/simplecast.js'
 import { sketchfabEmbedResolver } from '../embeds/sketchfab.js'
+import { slideserveEmbedResolver } from '../embeds/slideserve.js'
 import {
   slideshareFlashEmbedResolver,
   slideshareIframeEmbedResolver,
@@ -595,6 +596,7 @@ const embedResolvers: Array<EmbedResolver> = [
   scribdIframeEmbedResolver,
   simplecastEmbedResolver,
   sketchfabEmbedResolver,
+  slideserveEmbedResolver,
   slideshareFlashEmbedResolver,
   slideshareIframeEmbedResolver,
   soundcloudEmbedResolver,
