@@ -82,6 +82,11 @@ const specimens: Record<string, string | [string, string]> = {
     '<img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate with PayPal">',
   'p:has(> a.redcircle-link)':
     '<p style="font-size: 10px; color: gray;">Powered by <a class="redcircle-link" href="https://example.com/?utm_source=rc_embedded_player">RedCircle</a></p>',
+  'iframe[src*="zeno.fm/player/"] + a:is([href$="zeno.fm/"], [href$="zeno.fm"], [href$="zenomedia.com/"])':
+    [
+      '<iframe src="https://zeno.fm/player/halshack" width="575" height="250" frameborder="0" scrolling="no"></iframe><a href="https://zeno.fm/" target="_blank" style="display: block; font-size: 0.9em; line-height: 10px;">A Zeno.FM Station</a>',
+      '<iframe src="https://zeno.fm/player/halshack" width="575" height="250" frameborder="0" scrolling="no"></iframe>',
+    ],
   '[class*="share-buttons"]': '<div class="share-buttons"><a href="/fb">Facebook</a></div>',
   '.sharethis-inline-share-buttons': '<div class="sharethis-inline-share-buttons"></div>',
   '.sharedaddy': '<div class="sharedaddy sd-sharing-enabled"></div>',
@@ -286,6 +291,21 @@ const wordpressProviderFrames: Array<[string, string]> = [
   ],
 ]
 
+// Zeno.FM's snippet links to the Zeno home page under each of its names, whatever text the
+// publisher gave the link.
+const zenoHomeLinks: Array<[string, string, string]> = [
+  [
+    'www.zeno.fm with no trailing slash',
+    '<iframe src="//www.zeno.fm/player/straighttalkradio" width="575" height="240" frameborder="0" scrolling="no"></iframe><a href="https://www.zeno.fm" target="_blank" style="display: block; font-size: 0.9em; line-height: 10px;">Omnicast Media Station - Listen Live</a>',
+    '<iframe src="//www.zeno.fm/player/straighttalkradio" width="575" height="240" frameborder="0" scrolling="no"></iframe>',
+  ],
+  [
+    'zenomedia.com',
+    '<iframe frameborder="0" height="240" scrolling="no" src="//www.zeno.fm/player/sure-fm-master-input-station" width="575"></iframe><a href="https://www.zenomedia.com/" style="display: block; font-size: 0.9em; line-height: 10px;" target="_blank">...</a>',
+    '<iframe frameborder="0" height="240" scrolling="no" src="//www.zeno.fm/player/sure-fm-master-input-station" width="575"></iframe>',
+  ],
+]
+
 describeForEachParser('stripNonContentElements', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
     return applyDomTransforms(parseHtml(value), [stripNonContentElements(context)])
@@ -378,6 +398,13 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    it.each(zenoHomeLinks)(
+      'should strip the Zeno.FM link to %s after the player',
+      async (_name, value, expected) => {
+        expect(await transform(value)).toEqualHtml(expected)
+      },
+    )
 
     it('should keep a read-more wrapper that holds real content (anchor-scoped)', async () => {
       const value = '<div class="read-more-section"><p>Body</p></div>'
@@ -665,6 +692,29 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
     it('should keep the tweet player that shares the button host', async () => {
       const value =
         '<iframe src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a prose link to the Zeno.FM home page away from the player', async () => {
+      const value = html`
+        <iframe src="https://zeno.fm/player/halshack" width="575" height="250"></iframe>
+        <p>Download the app from <a href="https://zeno.fm/">Zeno.FM</a> to listen on the go.</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a link to the station page after the Zeno.FM player', async () => {
+      const value =
+        '<iframe src="https://zeno.fm/player/speedradiobgd" width="300" height="250"></iframe><a href="https://zeno.fm/radio/speedradiobgd/">https://zeno.fm/radio/speedradiobgd/</a>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a Zeno.FM home link after another player streaming from Zeno', async () => {
+      const value =
+        '<iframe src="https://radioplayer.link/iframe/index.php?stream=http://stream.zeno.fm/qe66dtnrxd0uv" width="660" height="400"></iframe><a href="https://www.zeno.fm">Listen on Zeno.FM</a>'
 
       expect(await transform(value)).toEqualHtml(value)
     })
