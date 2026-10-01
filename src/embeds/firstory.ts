@@ -1,7 +1,6 @@
 import { parseUrl } from 'trousse'
-import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -39,10 +38,3 @@ export const firstoryEmbedResolver = createUrlEmbedResolver(firstoryHosts, first
 export const firstoryFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Firstory' },
 ]
-
-// The player takes no query to start; it speaks player.js.
-export const firstoryRenderHint: EmbedRenderHint = {
-  provider,
-  isReady: isPlayerJsReady,
-  requestPlay: playerJsPlayRequest,
-}
