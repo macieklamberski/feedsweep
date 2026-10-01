@@ -222,6 +222,23 @@ describeForEachParser('rebuildPiktochartEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should keep a paragraph that only ends in the loading text', async () => {
+      const value = html`
+        <div
+          class="piktowrapper-embed"
+          data-uid="25180247-creatividad_pensamiento-critico"
+        >
+          <p>Still Loading...</p>
+        </div>
+      `
+      const expected = html`
+        <p>Still Loading...</p>
+        <iframe src="https://create.piktochart.com/embed/25180247-creatividad_pensamiento-critico"></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should keep a line break that does not follow the loading gif', async () => {
       const value = html`
         <div
