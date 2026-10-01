@@ -14,12 +14,12 @@ describe('podcloudResolveEmbed', () => {
   describe('happy paths', () => {
     it('should mint the episode player and page', () => {
       const value =
-        'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable/player'
+        'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees/player'
       const expected: EmbedResolverResult = {
         provider: 'podcloud',
-        id: 'danslajungledunumerique/plaider-pour-un-numerique-plus-responsable',
-        src: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable/player',
-        url: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable',
+        id: 'danslajungledunumerique/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees',
+        src: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees/player',
+        url: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees',
       }
 
       expect(podcloudResolveEmbed(value)).toEqual(expected)
@@ -91,12 +91,12 @@ describe('podcloudResolveEmbed', () => {
   describe('what the mint drops: display options and query', () => {
     it('should fold the fixed-size option onto the player', () => {
       const value =
-        'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable/player/fixed-size'
+        'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees/player/fixed-size'
       const expected: EmbedResolverResult = {
         provider: 'podcloud',
-        id: 'danslajungledunumerique/plaider-pour-un-numerique-plus-responsable',
-        src: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable/player',
-        url: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable',
+        id: 'danslajungledunumerique/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees',
+        src: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees/player',
+        url: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees',
       }
 
       expect(podcloudResolveEmbed(value)).toEqual(expected)
@@ -126,6 +126,67 @@ describe('podcloudResolveEmbed', () => {
       expect(podcloudResolveEmbed(value)).toEqual(expected)
     })
   })
+
+  describe('the options that pick what plays', () => {
+    it('should keep a guid on the episode player and key on the item it loads', () => {
+      const value =
+        'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees/player/guid:61ebca9c439904127e67a5d1'
+      const expected: EmbedResolverResult = {
+        provider: 'podcloud',
+        id: 'guid:61ebca9c439904127e67a5d1',
+        src: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees/player/guid:61ebca9c439904127e67a5d1',
+      }
+
+      expect(podcloudResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a guid on the show player', () => {
+      const value = 'https://podcloud.fr/podcast/oxymut/player/guid:6404f24035f425550919c39b'
+      const expected: EmbedResolverResult = {
+        provider: 'podcloud',
+        id: 'guid:6404f24035f425550919c39b',
+        src: 'https://podcloud.fr/podcast/oxymut/player/guid:6404f24035f425550919c39b',
+      }
+
+      expect(podcloudResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a playlist and key on it', () => {
+      const value =
+        'https://podcloud.fr/podcast/oxymut/player/playlist:5e1f0c2a8b3d4e0011223344-5e1f0c2a8b3d4e0055667788'
+      const expected: EmbedResolverResult = {
+        provider: 'podcloud',
+        id: 'playlist:5e1f0c2a8b3d4e0011223344-5e1f0c2a8b3d4e0055667788',
+        src: 'https://podcloud.fr/podcast/oxymut/player/playlist:5e1f0c2a8b3d4e0011223344-5e1f0c2a8b3d4e0055667788',
+      }
+
+      expect(podcloudResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should key on the playlist when a guid is named beside it', () => {
+      const value =
+        'https://podcloud.fr/podcast/oxymut/player/guid:6404f24035f425550919c39b/playlist:5e1f0c2a8b3d4e0011223344-5e1f0c2a8b3d4e0055667788'
+      const expected: EmbedResolverResult = {
+        provider: 'podcloud',
+        id: 'playlist:5e1f0c2a8b3d4e0011223344-5e1f0c2a8b3d4e0055667788',
+        src: 'https://podcloud.fr/podcast/oxymut/player/guid:6404f24035f425550919c39b/playlist:5e1f0c2a8b3d4e0011223344-5e1f0c2a8b3d4e0055667788',
+      }
+
+      expect(podcloudResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the display option and keep the guid joined to it by a semicolon', () => {
+      const value =
+        'https://podcloud.fr/podcast/oxymut/player/fixed-size;guid:6404f24035f425550919c39b'
+      const expected: EmbedResolverResult = {
+        provider: 'podcloud',
+        id: 'guid:6404f24035f425550919c39b',
+        src: 'https://podcloud.fr/podcast/oxymut/player/guid:6404f24035f425550919c39b',
+      }
+
+      expect(podcloudResolveEmbed(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('podcloudIframeEmbedResolver', (parseHtml) => {
@@ -137,16 +198,16 @@ describeForEachParser('podcloudIframeEmbedResolver', (parseHtml) => {
         <iframe
           width="100%"
           height="320"
-          src="https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/kant-et-la-raison-pure/player"
+          src="https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/francois-chatelet-une-histoire-de-la-raison-13-slash-20-francois-chatelet-une-histoire-de-la-raison-13-slash-20-kant-et-la-raison-pure-1ere-diffusion-19-slash-08-slash-1992/player"
           frameborder="0"
           allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'podcloud',
-        id: 'les-nuits-de-france-culture/kant-et-la-raison-pure',
-        src: 'https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/kant-et-la-raison-pure/player',
-        url: 'https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/kant-et-la-raison-pure',
+        id: 'les-nuits-de-france-culture/francois-chatelet-une-histoire-de-la-raison-13-slash-20-francois-chatelet-une-histoire-de-la-raison-13-slash-20-kant-et-la-raison-pure-1ere-diffusion-19-slash-08-slash-1992',
+        src: 'https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/francois-chatelet-une-histoire-de-la-raison-13-slash-20-francois-chatelet-une-histoire-de-la-raison-13-slash-20-kant-et-la-raison-pure-1ere-diffusion-19-slash-08-slash-1992/player',
+        url: 'https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/francois-chatelet-une-histoire-de-la-raison-13-slash-20-francois-chatelet-une-histoire-de-la-raison-13-slash-20-kant-et-la-raison-pure-1ere-diffusion-19-slash-08-slash-1992',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -290,7 +351,7 @@ describe('podcloudRenderHint', () => {
   // Captured in Chrome from an episode player framed 300 pixels wide on a foreign origin.
   it('should read the height out of the resize message the player posts', () => {
     const value =
-      '{"src":"https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable/player","context":"iframe.resize","height":420}'
+      '{"src":"https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees/player","context":"iframe.resize","height":420}'
 
     expect(podcloudRenderHint.readHeight?.(value)).toBe(420)
   })
@@ -310,17 +371,17 @@ describeForEachParser('podcloud through the pipeline', (parseHtml) => {
       <iframe
         width="100%"
         height="320"
-        src="https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/kant-et-la-raison-pure/player"
+        src="https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/francois-chatelet-une-histoire-de-la-raison-13-slash-20-francois-chatelet-une-histoire-de-la-raison-13-slash-20-kant-et-la-raison-pure-1ere-diffusion-19-slash-08-slash-1992/player"
         frameborder="0"
       ></iframe>
       <script src="https://podcloud.fr/player-embed/helper.js"></script>
     `
     const expected = html`
       <div
-        data-embed-url="https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/kant-et-la-raison-pure"
-        data-embed-id="les-nuits-de-france-culture/kant-et-la-raison-pure"
+        data-embed-url="https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/francois-chatelet-une-histoire-de-la-raison-13-slash-20-francois-chatelet-une-histoire-de-la-raison-13-slash-20-kant-et-la-raison-pure-1ere-diffusion-19-slash-08-slash-1992"
+        data-embed-id="les-nuits-de-france-culture/francois-chatelet-une-histoire-de-la-raison-13-slash-20-francois-chatelet-une-histoire-de-la-raison-13-slash-20-kant-et-la-raison-pure-1ere-diffusion-19-slash-08-slash-1992"
         data-embed-provider="podcloud"
-        data-embed-src="https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/kant-et-la-raison-pure/player"
+        data-embed-src="https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/francois-chatelet-une-histoire-de-la-raison-13-slash-20-francois-chatelet-une-histoire-de-la-raison-13-slash-20-kant-et-la-raison-pure-1ere-diffusion-19-slash-08-slash-1992/player"
       ></div>
     `
 
@@ -334,16 +395,16 @@ describeForEachParser('podcloud through the pipeline', (parseHtml) => {
       <div
         data-podcloud="player"
         data-feed="xv-bras-xv-jambes"
-        data-item="festival-rugbimages"
+        data-item="festival-rugbimages-colloque-la-melee-au-coeur-du-jeu-et-des-debats"
       ></div>
     `
     const expected = html`
       <p>Avant</p>
       <div
-        data-embed-url="https://podcloud.fr/podcast/xv-bras-xv-jambes/episode/festival-rugbimages"
-        data-embed-id="xv-bras-xv-jambes/festival-rugbimages"
+        data-embed-url="https://podcloud.fr/podcast/xv-bras-xv-jambes/episode/festival-rugbimages-colloque-la-melee-au-coeur-du-jeu-et-des-debats"
+        data-embed-id="xv-bras-xv-jambes/festival-rugbimages-colloque-la-melee-au-coeur-du-jeu-et-des-debats"
         data-embed-provider="podcloud"
-        data-embed-src="https://podcloud.fr/podcast/xv-bras-xv-jambes/episode/festival-rugbimages/player"
+        data-embed-src="https://podcloud.fr/podcast/xv-bras-xv-jambes/episode/festival-rugbimages-colloque-la-melee-au-coeur-du-jeu-et-des-debats/player"
       ></div>
     `
 
