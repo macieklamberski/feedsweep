@@ -1060,6 +1060,81 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 
+  it('should keep the post Blogger runs on inside the caption block', async () => {
+    const value = html`
+      <div>
+        <iframe
+          src="//www.slideshare.net/slideshow/embed_code/key/uQJbKEhYOWJAi5"
+        ></iframe>
+        <br />
+        <div style="margin-bottom: 5px;">
+          <strong>
+            <a
+              href="https://www.slideshare.net/xristoasxar/ss-73029387"
+              title="Θέματα και απαντήσεις"
+              >Θέματα και απαντήσεις</a
+            >
+          </strong>
+          from <strong><a href="https://www.slideshare.net/xristoasxar">Χρήστος Χαρμπής</a></strong>
+          <div class="separator">
+            <a href="https://example.com/themata.html"><img src="https://example.com/shot.jpg" /></a>
+          </div>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-author="Χρήστος Χαρμπής"
+        data-embed-title="Θέματα και απαντήσεις"
+        data-embed-url="https://www.slideshare.net/xristoasxar/ss-73029387"
+        data-embed-id="uQJbKEhYOWJAi5"
+        data-embed-provider="slideshare"
+        data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/uQJbKEhYOWJAi5"
+        data-embed-ratio="595/485"
+      ></div>
+      <a href="https://example.com/themata.html"><img src="https://example.com/shot.jpg" /></a>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should take a SlideShare logo link in the caption block with it', async () => {
+    const value = html`
+      <div>
+        <iframe src="http://www.slideshare.net/slideshow/embed_code/29123651"></iframe>
+        <br />
+        <div style="margin-bottom: 5px;">
+          <b>
+            <a
+              href="https://fr.slideshare.net/zampire/down-de-la-guilde-rage"
+              title="Down de la guilde rage"
+              >Down de la guilde rage</a
+            >
+          </b>
+          from <b><a href="http://www.slideshare.net/zampire">zampire</a></b>
+          <br />
+          <br />
+          <div class="separator">
+            <a href="http://fr.slideshare.net/"><img src="https://example.com/slideshare.jpg" /></a>
+          </div>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-author="zampire"
+        data-embed-title="Down de la guilde rage"
+        data-embed-url="https://fr.slideshare.net/zampire/down-de-la-guilde-rage"
+        data-embed-id="29123651"
+        data-embed-provider="slideshare"
+        data-embed-src="https://www.slideshare.net/slideshow/embed_code/29123651"
+        data-embed-ratio="595/485"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
   // A block naming the deck's page without its owner is a sentence about the deck as often as a
   // caption, so its words stay where the publisher wrote them.
   it('should leave a block that names no owner where it is', async () => {
