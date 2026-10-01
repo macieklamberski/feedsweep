@@ -1,12 +1,7 @@
 import { getPathSegments, isHostOf, type Nullish, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
-import {
-  encodePathSegment,
-  parseUrlOnHosts,
-  pickQueryParams,
-  pickUrlParams,
-} from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pbs'
@@ -32,16 +27,8 @@ const idSpaces = toMap({
   partnerplayer: 'partnerplayer',
 })
 
-// The parameters the player reads besides the id: the clip bounds and chapter, and the layout.
-// `autoplay` and `muted` are the reader's to set.
-const playerParams = ['start', 'end', 'chapter', 'h', 'topbar', 'endscreen', 'previewLayout']
-
-// Settings the publisher chose for this one embed, which a reader may override.
-const publisherParams = [
-  'unsafeDisableUpsellHref',
-  'unsafeDisableSponsorship',
-  'unsafeDisableContinuousPlay',
-]
+// The clip bounds and the chapter, the playback parameters the player reads besides the id.
+const playbackParams = ['start', 'end', 'chapter']
 
 // A 16:9 video above a control bar of fixed height, so the ratio errs tall at narrow widths.
 const playerRatio = '13/9'
@@ -52,7 +39,6 @@ const composeEmbed = (
   route: string,
   videoId: Nullish<string>,
   query = '',
-  params?: Record<string, string>,
 ): EmbedResolverResult | undefined => {
   const idSpace = idSpaces.get(route)
 
@@ -64,7 +50,6 @@ const composeEmbed = (
     provider,
     id: `${idSpace}/${videoId}`,
     src: `https://${playerHost}/${route}/${videoId}/${query}`,
-    params,
     ratio: playerRatio,
   }
 }
@@ -104,10 +89,7 @@ export const pbsResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const query = pickUrlParams(url, playerParams)
-  const params = pickQueryParams(parsed.search, publisherParams)
-
-  return composeEmbed(route, segments.at(-1), query, params)
+  return composeEmbed(route, segments.at(-1), pickUrlParams(url, playbackParams))
 }
 
 export const pbsIframeEmbedResolver = createUrlEmbedResolver([playerHost], pbsResolveEmbed)

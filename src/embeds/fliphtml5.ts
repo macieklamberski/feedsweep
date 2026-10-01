@@ -1,7 +1,7 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr, parsePixelSize } from '../utils/dom.js'
-import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { isFileName, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'fliphtml5'
@@ -10,9 +10,7 @@ const provider = 'fliphtml5'
 // the same two-segment shape.
 const fliphtml5Hosts = ['online.fliphtml5.com']
 
-// FlipHTML5's flipbook viewer, `online.fliphtml5.com/{account}/{book}/`. No query parameter the
-// viewer reads is known, so the query is dropped with any tracker in it. The fragment stays: it
-// holds the `#p=` start page and the `#?secret=` WordPress stamps on an untrusted oEmbed frame.
+// FlipHTML5's flipbook viewer, `online.fliphtml5.com/{account}/{book}/`, opening at the `#p=` page.
 export const fliphtml5ResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, fliphtml5Hosts)
 
@@ -28,13 +26,16 @@ export const fliphtml5ResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
+  const viewerUrl = `https://online.fliphtml5.com/${account}/${book}/`
+  const { p: page } = pickQueryParams(parsed.hash.slice(1), ['p'])
+
   return {
     provider,
     id: `${account}/${book}`,
-    src: `${parsed.protocol}//${parsed.host}${parsed.pathname}${parsed.hash}`,
-    url: `https://online.fliphtml5.com/${account}/${book}/`,
+    src: page ? `${viewerUrl}#p=${page}` : viewerUrl,
+    url: viewerUrl,
     // The cover the viewer's own `og:image` names, 404 on a book that does not exist.
-    thumbnail: `https://online.fliphtml5.com/${account}/${book}/files/shot.jpg`,
+    thumbnail: `${viewerUrl}files/shot.jpg`,
   }
 }
 

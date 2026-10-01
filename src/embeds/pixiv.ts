@@ -16,20 +16,20 @@ const workPathRegex = /^\/(?:member_illust\.php|artworks\/\d+)$/
 const artistPathRegex = /^\/(?:member\.php|users\/\d+)$/
 const framePathRegex = /^\/(code|embed_mk2|fixed|oembed_iframe)\.php$/
 
-// `embed_mk2.php` is the current frame, and it draws the same work as the older `code.php` card
-// from the same id.
-const frameRoutes = ['embed_mk2', 'code']
-
 // The loader draws nothing for a `data-size` outside its own table.
 const loaderSizes = ['small', 'medium', 'large']
 
-// With no `size` and no `border`, the frame draws the small bordered card. The loader boxes that
-// card at 190 by 250 plus 30 for the border.
-const frameWidth = 220
-const frameHeight = 250
+// The frame fills any box. This is the box pixiv's oEmbed snippet gives every kind of work.
+const frameWidth = 600
+const frameHeight = 315
 
-const composeFrameUrl = (workId: string): string => {
-  return `https://embed.pixiv.net/embed_mk2.php${composeQuery({ id: workId })}`
+const readIllustId = (workId: string): string => {
+  return workId.match(illustIdRegex)?.[1] ?? workId
+}
+
+// See: https://embed.pixiv.net/oembed.php?url=https://www.pixiv.net/artworks/149288339.
+const composeFrameUrl = (illustId: string): string => {
+  return `https://embed.pixiv.net/oembed_iframe.php${composeQuery({ type: 'illust', id: illustId })}`
 }
 
 const findAnchor = (anchors: Array<Element>, pathRegex: RegExp): Element | undefined => {
@@ -54,37 +54,28 @@ const pixivResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const illustId = workId.match(illustIdRegex)?.[1]
-  const page = illustId ? `https://www.pixiv.net/artworks/${illustId}` : undefined
-
-  if (frameRoutes.includes(route)) {
-    return {
-      provider,
-      id: workId,
-      src: composeFrameUrl(workId),
-      url: page,
-      width: frameWidth,
-      height: frameHeight,
-    }
-  }
+  const illustId = readIllustId(workId)
+  const page = illustIdRegex.test(workId) ? `https://www.pixiv.net/artworks/${illustId}` : undefined
 
   // `type` picks the id space, and a novel's number reads the same as an illustration's.
   if (route === 'oembed_iframe' && parsed.searchParams.get('type') !== 'illust') {
     return
   }
 
-  // The host redirects `http:` to `https:` on every route.
   return {
     provider,
-    id: workId,
-    src: `https://embed.pixiv.net${parsed.pathname}${parsed.search}`,
+    id: illustId,
+    src: composeFrameUrl(illustId),
     url: page,
+    width: frameWidth,
+    height: frameHeight,
   }
 }
 
 // pixiv's illustration embed: a loader script naming the work in `data-id`, the box in
 // `data-size` and the frame style in `data-border`, with a <noscript> beside it naming the title
-// and the author. The loader writes a frame onto `embed.pixiv.net/embed_mk2.php`.
+// and the author. The loader writes a frame onto `embed.pixiv.net/embed_mk2.php`, and the result
+// mints the frame pixiv's oEmbed answer names for the same work.
 export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="source.pixiv.net/source/embed.js"][data-id], script[src*="s.pximg.net/source/embed.js"][data-id]',
   (element) => {
@@ -113,7 +104,7 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
       }
     }
 
-    const illustId = workId.match(illustIdRegex)?.[1]
+    const illustId = readIllustId(workId)
     const fallback = element.nextElementSibling
     const anchors =
       fallback?.localName === 'noscript' ? Array.from(fallback.querySelectorAll('a[href]')) : []
@@ -126,9 +117,9 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
     const artist = isPixivBlock ? findAnchor(anchors, artistPathRegex) : undefined
     const result: EmbedResolverResult = {
       provider,
-      id: workId,
-      src: composeFrameUrl(workId),
-      url: illustId ? `https://www.pixiv.net/artworks/${illustId}` : undefined,
+      id: illustId,
+      src: composeFrameUrl(illustId),
+      url: illustIdRegex.test(workId) ? `https://www.pixiv.net/artworks/${illustId}` : undefined,
       width: frameWidth,
       height: frameHeight,
       title: text(work),
@@ -146,6 +137,4 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
 
 // pixiv's frames on `embed.pixiv.net`: the loader's `embed_mk2.php`, the older `code.php` card,
 // Hatena Blog's `fixed.php` and the oEmbed `oembed_iframe.php`.
-export const pixivIframeEmbedResolver = createUrlEmbedResolver(frameHosts, pixivResolveEmbed, {
-  preferResolverSize: true,
-})
+export const pixivIframeEmbedResolver = createUrlEmbedResolver(frameHosts, pixivResolveEmbed)
