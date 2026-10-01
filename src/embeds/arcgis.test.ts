@@ -34,13 +34,27 @@ describe('arcgisResolveEmbed', () => {
       expect(arcgisResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should drop the display settings of the Map Viewer embed itself', () => {
+    it('should keep the start position of the Map Viewer embed and drop its display settings', () => {
       const value =
         'https://arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=02b63130e0ad4462a904215858213ee7&theme=dark&heading=true&scroll=false&center=-118.62436330839162,37.21741015933211&scale=36111.909643'
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
         id: '02b63130e0ad4462a904215858213ee7',
-        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=02b63130e0ad4462a904215858213ee7',
+        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=02b63130e0ad4462a904215858213ee7&center=-118.62436330839162,37.21741015933211&scale=36111.909643',
+        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=02b63130e0ad4462a904215858213ee7',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the zoom level of a Map Viewer link', () => {
+      const value =
+        'https://www.arcgis.com/apps/mapviewer/index.html?webmap=02b63130e0ad4462a904215858213ee7&level=12'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: '02b63130e0ad4462a904215858213ee7',
+        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=02b63130e0ad4462a904215858213ee7&level=12',
         url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=02b63130e0ad4462a904215858213ee7',
         height: 500,
       }
@@ -61,14 +75,27 @@ describe('arcgisResolveEmbed', () => {
       expect(arcgisResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep a story collection on its own player', () => {
+    it('should keep the item a story collection opens on', () => {
       const value =
-        'https://storymaps.arcgis.com/collections/984d18ba39934a2095bb793b28ad697e?item=2'
+        'https://storymaps.arcgis.com/collections/984d18ba39934a2095bb793b28ad697e?item=2&header=false'
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
         id: '984d18ba39934a2095bb793b28ad697e',
-        src: 'https://storymaps.arcgis.com/collections/984d18ba39934a2095bb793b28ad697e',
+        src: 'https://storymaps.arcgis.com/collections/984d18ba39934a2095bb793b28ad697e?item=2',
         url: 'https://storymaps.arcgis.com/collections/984d18ba39934a2095bb793b28ad697e',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the StoryMaps route word in any case', () => {
+      const value = 'https://storymaps.arcgis.com/Stories/ec8a4b675cac476380df910304a47547'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: 'ec8a4b675cac476380df910304a47547',
+        src: 'https://storymaps.arcgis.com/stories/ec8a4b675cac476380df910304a47547',
+        url: 'https://storymaps.arcgis.com/stories/ec8a4b675cac476380df910304a47547',
         height: 500,
       }
 
@@ -118,6 +145,20 @@ describe('arcgisResolveEmbed', () => {
 
     it('should keep a dashboard on its own player', () => {
       const value = 'https://www.arcgis.com/apps/dashboards/bda7594740fd40299423467b48e9ecf6'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: 'bda7594740fd40299423467b48e9ecf6',
+        src: 'https://www.arcgis.com/apps/dashboards/bda7594740fd40299423467b48e9ecf6',
+        url: 'https://www.arcgis.com/apps/dashboards/bda7594740fd40299423467b48e9ecf6',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the dashboard from the Dashboards app shell fragment', () => {
+      const value =
+        'https://www.arcgis.com/apps/dashboards/index.html#/bda7594740fd40299423467b48e9ecf6'
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
         id: 'bda7594740fd40299423467b48e9ecf6',
@@ -243,6 +284,12 @@ describe('arcgisResolveEmbed', () => {
 
     it('should ignore a dashboard path with a trailing segment', () => {
       const value = 'https://www.arcgis.com/apps/dashboards/bda7594740fd40299423467b48e9ecf6/extra'
+
+      expect(arcgisResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the Dashboards app shell with no dashboard in the fragment', () => {
+      const value = 'https://www.arcgis.com/apps/dashboards/index.html'
 
       expect(arcgisResolveEmbed(value)).toBeUndefined()
     })

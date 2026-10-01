@@ -1,7 +1,7 @@
-import { getPathSegments, isHostOf, isHostOrSubdomainOf, parseUrl } from 'trousse'
+import { getAnyOf, getPathSegments, isHostOf, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Item = {
@@ -21,18 +21,25 @@ const storyMapsHosts = ['storymaps.arcgis.com']
 const experienceHosts = ['experience.arcgis.com']
 
 // The portal answers 404 to these paths in any other case.
+const mapViewerPath = '/apps/mapviewer/index.html'
 const webMapPaths = [
   '/apps/Embed/index.html', // The Map Viewer Classic snippet
-  '/apps/mapviewer/index.html',
+  mapViewerPath,
   '/home/webmap/embedViewer.html', // The Map Viewer Classic snippet
 ]
+// The start position Map Viewer reads. The classic snippets write `scale=true` for a scale bar.
+const mapViewerPositionParams = ['center', 'scale', 'level']
+// StoryMaps answers either route word in any case.
 const storyRoutes = ['stories', 'collections']
+// `item` opens that item of a collection.
+const collectionPositionParams = ['item']
 
 const instantPathRegex = /^\/apps\/instant\/([^/]+)\/index\.html$/
 const dashboardPathRegex = /^\/apps\/dashboards\/([^/]+)$/
-const opsDashboardPath = '/apps/opsdashboard/index.html'
-// The retired Operations Dashboard names the dashboard in the fragment, which its 301 keeps.
-const opsDashboardFragmentRegex = /^#\/([^/?]+)/
+// The app shell names the dashboard in the fragment. The retired Operations Dashboard shell 301s
+// to the current one, which keeps the fragment.
+const dashboardShellPaths = ['/apps/dashboards/index.html', '/apps/opsdashboard/index.html']
+const dashboardFragmentRegex = /^#\/([^/?]+)/
 
 // The box Map Viewer's and StoryMaps' iframe snippets write.
 const snippetHeight = 500
@@ -42,11 +49,25 @@ const composeItem = (id: string, src: string): Item => {
 }
 
 const readDashboardId = (url: URL): string | undefined => {
-  if (url.pathname === opsDashboardPath) {
-    return url.hash.match(opsDashboardFragmentRegex)?.[1]
+  if (dashboardShellPaths.includes(url.pathname)) {
+    return url.hash.match(dashboardFragmentRegex)?.[1]
   }
 
   return url.pathname.match(dashboardPathRegex)?.[1]
+}
+
+// `configurableview` is what Map Viewer's iframe embed writes: the map without the viewer's
+// title, panels and sign-in bar.
+const composeWebMapSource = (url: URL, webMapId: string): string => {
+  const src = `https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=${webMapId}`
+
+  if (url.pathname !== mapViewerPath) {
+    return src
+  }
+
+  const position = filterUrlQuery(url, (name) => mapViewerPositionParams.includes(name))
+
+  return `${src}${position.replace('?', '&')}`
 }
 
 const readPortalItem = (url: URL): Item | undefined => {
@@ -57,11 +78,9 @@ const readPortalItem = (url: URL): Item | undefined => {
       return
     }
 
-    // `configurableview` is what Map Viewer's iframe embed writes: the map without the viewer's
-    // panels and sign-in bar.
     return {
       id: webMapId,
-      src: `https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=${webMapId}`,
+      src: composeWebMapSource(url, webMapId),
       url: `https://www.arcgis.com/apps/mapviewer/index.html?webmap=${webMapId}`,
     }
   }
@@ -100,8 +119,13 @@ const readItem = (url: URL): Item | undefined => {
     return
   }
 
-  if (isHostOf(url, storyMapsHosts) && storyRoutes.includes(route)) {
-    return composeItem(itemId, `https://storymaps.arcgis.com/${route}/${itemId}`)
+  const storyRoute = getAnyOf(route, storyRoutes)
+
+  if (isHostOf(url, storyMapsHosts) && storyRoute) {
+    const page = `https://storymaps.arcgis.com/${storyRoute}/${itemId}`
+    const position = filterUrlQuery(url, (name) => collectionPositionParams.includes(name))
+
+    return { id: itemId, src: `${page}${position}`, url: page }
   }
 
   if (isHostOf(url, experienceHosts) && route === 'experience') {
