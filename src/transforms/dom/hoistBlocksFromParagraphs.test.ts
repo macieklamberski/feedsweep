@@ -134,6 +134,50 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
     })
   })
 
+  describe('media fallback', () => {
+    it('should keep a video whose fallback holds a block', async () => {
+      const value = html`
+        <video controls>
+          <source src="https://example.com/clip.mp4">
+          <p>No video</p>
+        </video>
+      `
+      const expected = html`
+        <p>
+          <video controls>
+            <source src="https://example.com/clip.mp4">
+          </video>
+        </p>
+        <p>No video</p>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
+    it('should carry the rest of the fallback out of the video', async () => {
+      const value = html`
+        <video controls>
+          <source src="https://example.com/clip.mp4">
+          <p>No video</p>
+          <a href="https://example.com/clip.mp4">Download</a>
+        </video>
+      `
+      const expected = html`
+        <p>
+          <video controls>
+            <source src="https://example.com/clip.mp4">
+          </video>
+        </p>
+        <p>No video</p>
+        <p>
+          <a href="https://example.com/clip.mp4">Download</a>
+        </p>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('edge cases', () => {
     it('should leave a block outside any paragraph alone', async () => {
       const value = '<div><i class="marker">Block</i></div>'

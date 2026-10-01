@@ -1137,6 +1137,29 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
+  it('should keep a video whose fallback holds a paragraph', async () => {
+    const value = html`
+      <video controls>
+        <source src="https://example.com/clip.mp4">
+        <p>No video</p>
+      </video>
+    `
+    const expected = html`
+      <p>
+        <video controls>
+          <source src="https://example.com/clip.mp4">
+        </video>
+      </p>
+      <p>No video</p>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
   // The <code> holds a real newline, so it is promoted to a block <pre> rather than left
   // inline. The html tag collapses whitespace, which would drop the promotion.
   it('should leave no promoted code block inside a paragraph', async () => {
