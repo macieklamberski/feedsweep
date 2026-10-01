@@ -128,6 +128,7 @@ export { rebuildElementorVideoEmbeds } from './transforms/dom/rebuildElementorVi
 export { rebuildEmbedlyEmbeds } from './transforms/dom/rebuildEmbedlyEmbeds.js'
 export { rebuildEmbedPlusEmbeds } from './transforms/dom/rebuildEmbedPlusEmbeds.js'
 export { rebuildGettyImagesEmbeds } from './transforms/dom/rebuildGettyImagesEmbeds.js'
+export { rebuildIframelyEmbeds } from './transforms/dom/rebuildIframelyEmbeds.js'
 export { rebuildJsfiddleEmbeds } from './transforms/dom/rebuildJsfiddleEmbeds.js'
 export { rebuildLazyLoadForVideos } from './transforms/dom/rebuildLazyLoadForVideos.js'
 export { rebuildLazyYtEmbeds } from './transforms/dom/rebuildLazyYtEmbeds.js'
