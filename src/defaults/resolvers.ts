@@ -118,6 +118,7 @@ import {
   fliphtml5IframeEmbedResolver,
   fliphtml5LightBoxEmbedResolver,
 } from '../embeds/fliphtml5.js'
+import { flipsnackEmbedResolver } from '../embeds/flipsnack.js'
 import { flourishIframeEmbedResolver, flourishWidgetEmbedResolver } from '../embeds/flourish.js'
 import { foxnewsIframeEmbedResolver, foxnewsScriptEmbedResolver } from '../embeds/foxnews.js'
 import { ganjingworldEmbedResolver } from '../embeds/ganjingworld.js'
@@ -129,6 +130,7 @@ import { googlebooksEmbedResolver } from '../embeds/googlebooks.js'
 import { googledriveEmbedResolver } from '../embeds/googledrive.js'
 import { googleslidesEmbedResolver } from '../embeds/googleslides.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
+import { hearthisEmbedResolver } from '../embeds/hearthis.js'
 import { helloassoEmbedResolver } from '../embeds/helloasso.js'
 import { heyzineEmbedResolver } from '../embeds/heyzine.js'
 import {
@@ -461,6 +463,7 @@ const embedResolvers: Array<EmbedResolver> = [
   flickrEmbedResolver,
   fliphtml5IframeEmbedResolver,
   fliphtml5LightBoxEmbedResolver,
+  flipsnackEmbedResolver,
   flourishWidgetEmbedResolver,
   flourishIframeEmbedResolver,
   foxnewsScriptEmbedResolver,
@@ -475,6 +478,7 @@ const embedResolvers: Array<EmbedResolver> = [
   googledriveEmbedResolver,
   googleslidesEmbedResolver,
   guardianEmbedResolver,
+  hearthisEmbedResolver,
   helloassoEmbedResolver,
   heyzineEmbedResolver,
   imgurBlockquoteEmbedResolver,

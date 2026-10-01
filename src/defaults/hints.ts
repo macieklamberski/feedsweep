@@ -24,6 +24,7 @@ import { flickrRenderHint } from '../embeds/flickr.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
 import { foxbusinessRenderHint, foxnewsRenderHint } from '../embeds/foxnews.js'
 import { googledriveRenderHint } from '../embeds/googledrive.js'
+import { hearthisRenderHint } from '../embeds/hearthis.js'
 import { helloassoRenderHint } from '../embeds/helloasso.js'
 import { imgurRenderHint } from '../embeds/imgur.js'
 import { inaRenderHint } from '../embeds/ina.js'
@@ -103,6 +104,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   foxbusinessRenderHint,
   foxnewsRenderHint,
   googledriveRenderHint,
+  hearthisRenderHint,
   helloassoRenderHint,
   imgurRenderHint,
   inaRenderHint,
