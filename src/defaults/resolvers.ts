@@ -96,6 +96,7 @@ import { dailymotionEmbedResolver } from '../embeds/dailymotion.js'
 import { deezerEmbedResolver } from '../embeds/deezer.js'
 import { documentcloudEmbedResolver } from '../embeds/documentcloud.js'
 import { donorboxEmbedResolver } from '../embeds/donorbox.js'
+import { educaplayEmbedResolver } from '../embeds/educaplay.js'
 import {
   facebookAmpEmbedResolver,
   facebookBlockquoteEmbedResolver,
@@ -213,6 +214,7 @@ import {
 } from '../embeds/reddit.js'
 import { reverbnationEmbedResolver } from '../embeds/reverbnation.js'
 import { ridewithgpsEmbedResolver } from '../embeds/ridewithgps.js'
+import { rsscomEmbedResolver } from '../embeds/rsscom.js'
 import { rtveFlashEmbedResolver, rtveIframeEmbedResolver } from '../embeds/rtve.js'
 import { rutubeEmbedResolver } from '../embeds/rutube.js'
 import { scratchEmbedResolver } from '../embeds/scratch.js'
@@ -236,6 +238,7 @@ import { standfmEmbedResolver } from '../embeds/standfm.js'
 import { steamEmbedResolver } from '../embeds/steam.js'
 import { stravaIframeEmbedResolver, stravaPlaceholderEmbedResolver } from '../embeds/strava.js'
 import { swayEmbedResolver } from '../embeds/sway.js'
+import { symbalooEmbedResolver } from '../embeds/symbaloo.js'
 import {
   tableauIframeEmbedResolver,
   tableauObjectEmbedResolver,
@@ -459,6 +462,7 @@ const embedResolvers: Array<EmbedResolver> = [
   deezerEmbedResolver,
   documentcloudEmbedResolver,
   donorboxEmbedResolver,
+  educaplayEmbedResolver,
   facebookWidgetEmbedResolver,
   facebookIframeEmbedResolver,
   facebookS9eEmbedResolver,
@@ -572,6 +576,7 @@ const embedResolvers: Array<EmbedResolver> = [
   redditS9eEmbedResolver,
   reverbnationEmbedResolver,
   ridewithgpsEmbedResolver,
+  rsscomEmbedResolver,
   rtveIframeEmbedResolver,
   rtveFlashEmbedResolver,
   rutubeEmbedResolver,
@@ -595,6 +600,7 @@ const embedResolvers: Array<EmbedResolver> = [
   stravaIframeEmbedResolver,
   stravaPlaceholderEmbedResolver,
   swayEmbedResolver,
+  symbalooEmbedResolver,
   tableauWidgetEmbedResolver,
   tableauObjectEmbedResolver,
   tableauIframeEmbedResolver,
