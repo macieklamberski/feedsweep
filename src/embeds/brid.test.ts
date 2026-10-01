@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { bridEmbedResolver } from './brid.js'
+import { bridEmbedResolver, isBridReady } from './brid.js'
 
 const readPlaceholder = (
   result: string,
@@ -53,7 +53,7 @@ describeForEachParser('bridEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the older call form and its pixel box', async () => {
+    it('should read the older call form over its pixel box', async () => {
       const value = html`
         <script
           type="text/javascript"
@@ -72,8 +72,7 @@ describeForEachParser('bridEmbedResolver', (parseHtml) => {
         provider: 'brid',
         id: '26602/755958',
         src: 'https://services.brid.tv/services/iframe/video/755958/26602',
-        width: 540,
-        height: 300,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -94,6 +93,7 @@ describeForEachParser('bridEmbedResolver', (parseHtml) => {
         provider: 'brid',
         id: '26602/755958',
         src: 'https://services.brid.tv/services/iframe/video/755958/26602',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -113,7 +113,28 @@ describeForEachParser('bridEmbedResolver', (parseHtml) => {
         provider: 'brid',
         id: '26602/755958',
         src: 'https://services.brid.tv/services/iframe/video/755958/26602',
+        ratio: '16/9',
         title: '100%25%',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use malformed ids as written, even if the player answers an error', async () => {
+      const value = html`
+        <div
+          id="Brid_3"
+          class="brid"
+        ></div>
+        <script type="text/javascript">
+          $bp("Brid_3", {"id":"26602a","video":"x755958"});
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brid',
+        id: '26602a/x755958',
+        src: 'https://services.brid.tv/services/iframe/video/x755958/26602a',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -161,29 +182,9 @@ describeForEachParser('bridEmbedResolver', (parseHtml) => {
     })
   })
 
-  describe('the size the div states when the config does not', () => {
-    it('should read the unitless pair as the shape it spells', async () => {
-      const value = html`
-        <div
-          id="Brid_19464537"
-          class="brid"
-          style="width: 16; height: 9;"
-        ></div>
-        <script type="text/javascript">
-          $bp("Brid_19464537", {"id":"26602","video":"755958"});
-        </script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'brid',
-        id: '26602/755958',
-        src: 'https://services.brid.tv/services/iframe/video/755958/26602',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should read a length that carries its unit as the box it is', async () => {
+  describe('the size the div states', () => {
+    // The div's box is the carrier's, which shallow handling does not read.
+    it('should state the player ratio over the box the div states', async () => {
       const value = html`
         <div
           id="Brid_19464537"
@@ -198,8 +199,7 @@ describeForEachParser('bridEmbedResolver', (parseHtml) => {
         provider: 'brid',
         id: '26602/755958',
         src: 'https://services.brid.tv/services/iframe/video/755958/26602',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -236,8 +236,7 @@ describeForEachParser('brid facades through the pipeline', (parseHtml) => {
       provider: 'brid',
       id: '26602/755958',
       src: 'https://services.brid.tv/services/iframe/video/755958/26602',
-      width: '540',
-      height: '300',
+      ratio: '16/9',
     }
 
     expect(await placeholder(value)).toEqual(expected)
@@ -268,5 +267,23 @@ describeForEachParser('brid facades through the pipeline', (parseHtml) => {
     )
 
     expect(sources).toEqual(expected)
+  })
+})
+
+describe('isBridReady', () => {
+  it('should accept the message the player posts once it has loaded', () => {
+    expect(isBridReady('Brid|13663-264-1-0-1|trigger|ready')).toBe(true)
+  })
+
+  it('should refuse another player event', () => {
+    expect(isBridReady('Brid|13663-264-1-0-1|trigger|playerresize')).toBe(false)
+  })
+
+  it('should refuse a ready event from another sender', () => {
+    expect(isBridReady('13663-264-1-0-1|trigger|ready')).toBe(false)
+  })
+
+  it('should refuse a message that is not a string', () => {
+    expect(isBridReady({ event: 'ready' })).toBe(false)
   })
 })

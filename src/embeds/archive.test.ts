@@ -54,22 +54,17 @@ describe('extractArchiveIdentifier', () => {
     expect(extractArchiveIdentifier(value)).toBeUndefined()
   })
 
-  it('should return undefined for an identifier that is not the documented shape', () => {
+  it('should return undefined for a traversal that folds out of the item route', () => {
     const value = 'https://archive.org/embed/../../etc'
 
     expect(extractArchiveIdentifier(value)).toBeUndefined()
   })
 
-  it('should return undefined for an identifier behind an encoded traversal', () => {
+  it('should use a malformed identifier as written, even if the url answers an error', () => {
     const value = 'https://archive.org/embed/..%2Fsome_album'
+    const expected = '..%2Fsome_album'
 
-    expect(extractArchiveIdentifier(value)).toBeUndefined()
-  })
-
-  it('should return undefined for an identifier followed by an encoded slash', () => {
-    const value = 'https://archive.org/embed/some_album%2F..'
-
-    expect(extractArchiveIdentifier(value)).toBeUndefined()
+    expect(extractArchiveIdentifier(value)).toEqual(expected)
   })
 
   it('should return undefined for a url that cannot be parsed', () => {
@@ -221,11 +216,17 @@ describe('archiveResolveEmbed', () => {
       expect(archiveResolveEmbed(value)).toBeUndefined()
     })
 
-    // The stranded `&` keeps the dot segment out of `URL`'s reach, so nothing has folded it.
-    it('should refuse an identifier that is only dots', () => {
+    it('should use a malformed identifier as written, even if the player answers an error', () => {
       const value = 'https://archive.org/embed/..&playlist=1'
+      const expected: EmbedResolverResult = {
+        provider: 'archive',
+        id: '..',
+        src: 'https://archive.org/embed/..?playlist=1',
+        url: 'https://archive.org/details/..',
+        thumbnail: 'https://archive.org/services/img/..',
+      }
 
-      expect(archiveResolveEmbed(value)).toBeUndefined()
+      expect(archiveResolveEmbed(value)).toEqual(expected)
     })
   })
 })
@@ -480,16 +481,22 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // The config is raw text, so a dot segment in it reaches the mint unfolded.
-    it('should ignore a config whose identifier is only dots', async () => {
+    it('should use a malformed config identifier as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="http://www.archive.org/flow/flowplayer.commercial-3.2.1.swf"
           flashvars='config={"playlist":[{"url":"http://www.archive.org/download/../clip.mp4"}]}'
         />
       `
+      const expected: EmbedResolverResult = {
+        provider: 'archive',
+        id: '..',
+        src: 'https://archive.org/embed/..',
+        url: 'https://archive.org/details/..',
+        thumbnail: 'https://archive.org/services/img/..',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // A base url on its own names the download endpoint rather than any item under it.

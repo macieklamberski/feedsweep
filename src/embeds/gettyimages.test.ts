@@ -15,24 +15,18 @@ describe('readWidgetConfig', () => {
         et: 'iPo3qjCKSVJU-bRwLBwNoQ',
         sig: 'OOM9B40xxpnASE4yukj6V63Qa909rgGMxHZzru08p0c=',
         tld: 'com',
-        caption: 'true',
-        width: 594,
-        height: 395,
       }
 
       expect(readWidgetConfig(value)).toEqual(expected)
     })
 
-    it('should fall back to the com domain and no caption when neither is stated', () => {
+    it('should fall back to the com domain when none is stated', () => {
       const value = `gie.widgets.load({id:'abc',sig:'def=',w:'480px',h:'320px',items:'123456789'})`
       const expected = {
         items: '123456789',
         et: 'abc',
         sig: 'def=',
         tld: 'com',
-        caption: 'false',
-        width: 480,
-        height: 320,
       }
 
       expect(readWidgetConfig(value)).toEqual(expected)
@@ -45,9 +39,6 @@ describe('readWidgetConfig', () => {
         et: 'abc',
         sig: 'def=',
         tld: 'co.uk',
-        caption: 'false',
-        width: undefined,
-        height: undefined,
       }
 
       expect(readWidgetConfig(value)).toEqual(expected)
@@ -67,10 +58,16 @@ describe('readWidgetConfig', () => {
       expect(readWidgetConfig(value)).toBeUndefined()
     })
 
-    it('should refuse an item id that is not one', () => {
+    it('should use a malformed item id as written, even if the player answers an error', () => {
       const value = `gie.widgets.load({id:'abc',sig:'def=',items:'not-an-id'})`
+      const expected = {
+        items: 'not-an-id',
+        et: 'abc',
+        sig: 'def=',
+        tld: 'com',
+      }
 
-      expect(readWidgetConfig(value)).toBeUndefined()
+      expect(readWidgetConfig(value)).toEqual(expected)
     })
   })
 })
@@ -83,10 +80,9 @@ describe('composeWidgetEmbedUrl', () => {
         et: 'iPo3qjCKSVJU-bRwLBwNoQ',
         sig: 'OOM9B40x=',
         tld: 'com',
-        caption: 'true',
       }
       const expected =
-        'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&sig=OOM9B40x%3D&caption=true'
+        'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&sig=OOM9B40x%3D'
 
       expect(composeWidgetEmbedUrl(value)).toBe(expected)
     })
@@ -97,13 +93,13 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, gettyImagesEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the player iframe and keep its signed query whole', async () => {
+    it('should keep the signed query and drop the caption after it', async () => {
       const value =
         '<iframe src="https://embed.gettyimages.com/embed/492381322?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&viewMoreLink=on&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=&caption=true" width="594" height="395"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'gettyimages',
         id: '492381322',
-        src: 'https://embed.gettyimages.com/embed/492381322?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&viewMoreLink=on&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=&caption=true',
+        src: 'https://embed.gettyimages.com/embed/492381322?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&viewMoreLink=on&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=',
         url: 'https://www.gettyimages.com/detail/492381322',
         width: 594,
         height: 395,
@@ -118,8 +114,53 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'gettyimages',
         id: '83621',
-        src: 'https://embed.gettyimages.com/embed/83621?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=&caption=true',
+        src: 'https://embed.gettyimages.com/embed/83621?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=',
         url: 'https://www.gettyimages.com/detail/83621',
+        ratio: '3/2',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a signed flag before the signature as written', async () => {
+      const value = html`
+        <iframe
+          src="https://embed.gettyimages.com/embed/1179214625?et=c6v3oJKLRHl-sP1_Ytjj1g&amp;tld=co.uk&amp;sig=C3Ss6cEqvxD2EKAfIWt5vBh0z1hAqmd0p0OJ-7fcJJQ=&amp;caption=false&amp;ver=1"
+          width="594"
+          height="396"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'gettyimages',
+        id: '1179214625',
+        src: 'https://embed.gettyimages.com/embed/1179214625?et=c6v3oJKLRHl-sP1_Ytjj1g&tld=co.uk&sig=C3Ss6cEqvxD2EKAfIWt5vBh0z1hAqmd0p0OJ-7fcJJQ=',
+        url: 'https://www.gettyimages.com/detail/1179214625',
+        width: 594,
+        height: 396,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a display flag the signature covers', async () => {
+      const value = html`
+        <iframe
+          src="https://embed.gettyimages.com/embed/674950774?et=4AHdkSWcRDxQ4l2sDHBIOA&amp;tld=com&amp;viewMoreLink=on&amp;sig=5sVUWW_CnKTtYzfjDnnapRVqjnSK-3499ZUkhrnRc1g=&amp;caption=true"
+          width="594"
+          height="396"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'gettyimages',
+        id: '674950774',
+        src: 'https://embed.gettyimages.com/embed/674950774?et=4AHdkSWcRDxQ4l2sDHBIOA&tld=com&viewMoreLink=on&sig=5sVUWW_CnKTtYzfjDnnapRVqjnSK-3499ZUkhrnRc1g=',
+        url: 'https://www.gettyimages.com/detail/674950774',
+        width: 594,
+        height: 396,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -151,6 +192,51 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed item id as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://embed.gettyimages.com/embed/latest?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=&caption=true"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'gettyimages',
+        id: 'latest',
+        src: 'https://embed.gettyimages.com/embed/latest?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=',
+        url: 'https://www.gettyimages.com/detail/latest',
+        ratio: '3/2',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+// Only the pipeline repairs the doubled `&amp;amp;` the resolver reads as `amp;` pairs.
+describeForEachParser('gettyimages doubly escaped src', (parseHtml) => {
+  it('should keep the signed query', async () => {
+    const value = html`
+      <iframe
+        src="https://embed.gettyimages.com/embed/674950774?et=4AHdkSWcRDxQ4l2sDHBIOA&amp;amp;tld=com&amp;amp;viewMoreLink=on&amp;amp;sig=5sVUWW_CnKTtYzfjDnnapRVqjnSK-3499ZUkhrnRc1g=&amp;amp;caption=true"
+        width="594"
+        height="396"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://www.gettyimages.com/detail/674950774"
+        data-embed-id="674950774"
+        data-embed-provider="gettyimages"
+        data-embed-src="https://embed.gettyimages.com/embed/674950774?et=4AHdkSWcRDxQ4l2sDHBIOA&amp;tld=com&amp;viewMoreLink=on&amp;sig=5sVUWW_CnKTtYzfjDnnapRVqjnSK-3499ZUkhrnRc1g="
+        data-embed-width="594"
+        data-embed-height="396"
+      ></div>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 })
 

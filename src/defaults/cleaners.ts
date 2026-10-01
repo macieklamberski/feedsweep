@@ -55,8 +55,3 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...wistiaFieldCleaners,
   ...youtubeFieldCleaners,
 ]
-
-// The providers whose src goes through the caller's cleanUrlFn. A generic cleaner knows nothing
-// about player params and can strip one the frame needs, so only a resolver that hands the
-// publisher's own url on as the src, tracking params included, is listed.
-export const defaultCleanedSrcProviders: Array<string> = ['helloasso', 'patronite']

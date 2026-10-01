@@ -47,59 +47,29 @@ describeForEachParser('convertSmartframeEmbeds', (parseHtml) => {
 
   // Both halves go straight into a path, so a value that is not the shape the platform issues
   // is left where it is.
-  it('should leave a customer id that is not a hash alone', async () => {
+  it('should use a malformed customer id as written, even if the image answers an error', async () => {
     const value = html`
       <smartframe-embed
         customer-id="../../evil"
         image-id="WmOBDE33lTbF"
       ></smartframe-embed>
     `
+    const expected = '<img src="https://thumbs.smartframe.io/../../evil/WmOBDE33lTbF.webp">'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a customer id led by a path alone', async () => {
-    const value = html`
-      <smartframe-embed
-        customer-id="../b0c95bc04383cef69c6b47df872135cf"
-        image-id="WmOBDE33lTbF"
-      ></smartframe-embed>
-    `
-
-    expect(await transform(value)).toEqualHtml(value)
-  })
-
-  it('should leave a customer id trailed by a path alone', async () => {
-    const value = html`
-      <smartframe-embed
-        customer-id="b0c95bc04383cef69c6b47df872135cf/../x"
-        image-id="WmOBDE33lTbF"
-      ></smartframe-embed>
-    `
-
-    expect(await transform(value)).toEqualHtml(value)
-  })
-
-  it('should leave a customer id carrying an encoded slash alone', async () => {
-    const value = html`
-      <smartframe-embed
-        customer-id="b0c95bc04383cef69c6b47df87213%2f"
-        image-id="WmOBDE33lTbF"
-      ></smartframe-embed>
-    `
-
-    expect(await transform(value)).toEqualHtml(value)
-  })
-
-  it('should leave an image id carrying a path alone', async () => {
+  it('should use a malformed image id as written, even if the image answers an error', async () => {
     const value = html`
       <smartframe-embed
         customer-id="b0c95bc04383cef69c6b47df872135cf"
         image-id="a/b"
       ></smartframe-embed>
     `
+    const expected =
+      '<img src="https://thumbs.smartframe.io/b0c95bc04383cef69c6b47df872135cf/a/b.webp">'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   // The element arrives inside the paragraph the plugin wraps it in, and the picture has to

@@ -13,6 +13,7 @@ describe('canvaResolveEmbed', () => {
         id: 'DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw',
         src: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed',
         url: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view',
+        ratio: '16/9',
       }
 
       expect(canvaResolveEmbed(value)).toEqual(expected)
@@ -25,6 +26,7 @@ describe('canvaResolveEmbed', () => {
         id: 'DAG7JStv-4E/vdoj4TCbUUSC2j5QjhLCKw',
         src: 'https://www.canva.com/design/DAG7JStv-4E/vdoj4TCbUUSC2j5QjhLCKw/view?embed',
         url: 'https://www.canva.com/design/DAG7JStv-4E/vdoj4TCbUUSC2j5QjhLCKw/view',
+        ratio: '16/9',
       }
 
       expect(canvaResolveEmbed(value)).toEqual(expected)
@@ -37,6 +39,7 @@ describe('canvaResolveEmbed', () => {
         id: 'DAGKSUHAmr0/-mfI7II2OqwQHyy_Gfx62w',
         src: 'https://www.canva.com/design/DAGKSUHAmr0/-mfI7II2OqwQHyy_Gfx62w/view?embed',
         url: 'https://www.canva.com/design/DAGKSUHAmr0/-mfI7II2OqwQHyy_Gfx62w/view',
+        ratio: '16/9',
       }
 
       expect(canvaResolveEmbed(value)).toEqual(expected)
@@ -49,6 +52,7 @@ describe('canvaResolveEmbed', () => {
         id: 'DAG62mbEN8w/Qvs_ZzTGrVyXRpFtzi5plQ',
         src: 'https://www.canva.com/design/DAG62mbEN8w/Qvs_ZzTGrVyXRpFtzi5plQ/watch?embed',
         url: 'https://www.canva.com/design/DAG62mbEN8w/Qvs_ZzTGrVyXRpFtzi5plQ/watch',
+        ratio: '16/9',
       }
 
       expect(canvaResolveEmbed(value)).toEqual(expected)
@@ -61,19 +65,21 @@ describe('canvaResolveEmbed', () => {
         id: 'DAFTQwmk-7U',
         src: 'https://www.canva.com/design/DAFTQwmk-7U/view?embed',
         url: 'https://www.canva.com/design/DAFTQwmk-7U/view',
+        ratio: '16/9',
       }
 
       expect(canvaResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the meta layout the publisher chose', () => {
+    it('should drop the meta flag the oEmbed snippet writes', () => {
       const value =
         'https://www.canva.com/design/DAF_VGS3W3Y/EoSxKp1t6a1Sfsq9j-4_8A/view?embed&meta'
       const expected: EmbedResolverResult = {
         provider: 'canva',
         id: 'DAF_VGS3W3Y/EoSxKp1t6a1Sfsq9j-4_8A',
-        src: 'https://www.canva.com/design/DAF_VGS3W3Y/EoSxKp1t6a1Sfsq9j-4_8A/view?embed&meta',
+        src: 'https://www.canva.com/design/DAF_VGS3W3Y/EoSxKp1t6a1Sfsq9j-4_8A/view?embed',
         url: 'https://www.canva.com/design/DAF_VGS3W3Y/EoSxKp1t6a1Sfsq9j-4_8A/view',
+        ratio: '16/9',
       }
 
       expect(canvaResolveEmbed(value)).toEqual(expected)
@@ -87,6 +93,7 @@ describe('canvaResolveEmbed', () => {
         id: 'DAC3_5NqG20',
         src: 'https://www.canva.com/design/DAC3_5NqG20/view?embed',
         url: 'https://www.canva.com/design/DAC3_5NqG20/view',
+        ratio: '16/9',
       }
 
       expect(canvaResolveEmbed(value)).toEqual(expected)
@@ -99,6 +106,7 @@ describe('canvaResolveEmbed', () => {
         id: 'DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw',
         src: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed',
         url: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view',
+        ratio: '16/9',
       }
 
       expect(canvaResolveEmbed(value)).toEqual(expected)
@@ -126,10 +134,17 @@ describe('canvaResolveEmbed', () => {
       expect(canvaResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a share token carrying a dot', () => {
+    it('should use a malformed share token as written, even if the player answers an error', () => {
       const value = 'https://www.canva.com/design/DAHLowacSd4/token.with.dots/view?embed'
+      const expected: EmbedResolverResult = {
+        provider: 'canva',
+        id: 'DAHLowacSd4/token.with.dots',
+        src: 'https://www.canva.com/design/DAHLowacSd4/token.with.dots/view?embed',
+        url: 'https://www.canva.com/design/DAHLowacSd4/token.with.dots/view',
+        ratio: '16/9',
+      }
 
-      expect(canvaResolveEmbed(value)).toBeUndefined()
+      expect(canvaResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore a design route below another path', () => {
@@ -185,6 +200,7 @@ describeForEachParser('canvaIframeEmbedResolver', (parseHtml) => {
         id: 'DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw',
         src: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed',
         url: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -206,7 +222,7 @@ describeForEachParser('canvaWidgetEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, canvaWidgetEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the legacy loader mount with room for its byline bar', async () => {
+    it('should give the legacy loader mount the design ratio over its height ratio', async () => {
       const value = html`
         <div
           class="canva-embed"
@@ -220,21 +236,7 @@ describeForEachParser('canvaWidgetEmbedResolver', (parseHtml) => {
         id: 'DAC3_5NqG20',
         src: 'https://www.canva.com/design/DAC3_5NqG20/view?embed',
         url: 'https://www.canva.com/design/DAC3_5NqG20/view',
-        ratio: '250/298',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should state no size for a mount with no height ratio', async () => {
-      const value = html`
-        <div class="canva-embed" data-design-id="DAC3_5NqG20"></div>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'canva',
-        id: 'DAC3_5NqG20',
-        src: 'https://www.canva.com/design/DAC3_5NqG20/view?embed',
-        url: 'https://www.canva.com/design/DAC3_5NqG20/view',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -242,12 +244,19 @@ describeForEachParser('canvaWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a design id carrying a path separator', async () => {
+    it('should use a malformed design id as written, even if the player answers an error', async () => {
       const value = html`
         <div class="canva-embed" data-height-ratio="1" data-design-id="DAC3_5NqG20%2F..%2Fedit"></div>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'canva',
+        id: 'DAC3_5NqG20%2F..%2Fedit',
+        src: 'https://www.canva.com/design/DAC3_5NqG20%2F..%2Fedit/view?embed',
+        url: 'https://www.canva.com/design/DAC3_5NqG20%2F..%2Fedit/view',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

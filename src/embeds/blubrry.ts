@@ -1,5 +1,5 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 const provider = 'blubrry'
@@ -58,10 +58,14 @@ export const blubrryResolveEmbed: ResolveEmbed = (url, element) => {
   }
 }
 
-// No render hint: the player listens for a bare number and `-1` flips the button to playing, but
-// the audio never starts from it.
 export const blubrryEmbedResolver = createUrlEmbedResolver(blubrryHosts, blubrryResolveEmbed)
 
 export const blubrryFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Blubrry Podcast Player' },
 ]
+
+// The player posts no ready message.
+export const blubrryRenderHint: EmbedRenderHint = {
+  provider,
+  requestPlay: -1, // Clicks the player's play button
+}

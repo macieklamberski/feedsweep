@@ -7,7 +7,7 @@ describeForEachParser('figshareEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, figshareEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the widget and keep the size the share code stated', async () => {
+    it('should resolve the widget, drop its title bar and keep the size the share code stated', async () => {
       const value = html`
         <iframe
           width="568"
@@ -19,7 +19,7 @@ describeForEachParser('figshareEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'figshare',
         id: '21109066',
-        src: 'https://widgets.figshare.com/articles/21109066/embed?show_title=1',
+        src: 'https://widgets.figshare.com/articles/21109066/embed',
         width: 568,
         height: 351,
       }
@@ -27,12 +27,25 @@ describeForEachParser('figshareEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should resolve a widget served from an institutional portal host', async () => {
+    it('should mint the widget host for a widget served from an institutional portal host', async () => {
       const value = '<iframe src="https://wl.figshare.com/articles/6205541/embed"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'figshare',
         id: '6205541',
-        src: 'https://wl.figshare.com/articles/6205541/embed',
+        src: 'https://widgets.figshare.com/articles/6205541/embed',
+        ratio: '568/351',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed article id as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://widgets.figshare.com/articles/21109066x/embed"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'figshare',
+        id: '21109066x',
+        src: 'https://widgets.figshare.com/articles/21109066x/embed',
+        ratio: '568/351',
       }
 
       expect(await extract(value)).toEqual(expected)

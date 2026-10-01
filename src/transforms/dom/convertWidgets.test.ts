@@ -186,6 +186,60 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     expect(await transform(value, customContext)).toEqualHtml(expected)
   })
 
+  describe('a result with no usable src', () => {
+    const contextFor = (resolver: EmbedResolver | MediaResolver): TransformContext => {
+      return { ...baseContext, widgetResolvers: [resolver] }
+    }
+
+    it('should name an embed that only enrichment can play by its provider and id', async () => {
+      const resolver: EmbedResolver = {
+        kind: 'embed',
+        selector: 'div[data-live]',
+        extract: (element) => ({
+          provider: 'example',
+          id: element.getAttribute('data-live') ?? '',
+        }),
+      }
+      const value = '<div data-live="abc123"></div>'
+      const expected = '<div data-embed-id="abc123" data-embed-provider="example"></div>'
+
+      expect(await transform(value, contextFor(resolver))).toEqualHtml(expected)
+    })
+
+    it('should leave a carrier whose embed names neither a src nor an id', async () => {
+      const resolver: EmbedResolver = {
+        kind: 'embed',
+        selector: 'div[data-live]',
+        extract: () => ({ provider: 'example' }),
+      }
+      const value = '<div data-live="abc123"></div>'
+
+      expect(await transform(value, contextFor(resolver))).toEqualHtml(value)
+    })
+
+    it('should leave a carrier whose embed src resolves to nothing', async () => {
+      const resolver: EmbedResolver = {
+        kind: 'embed',
+        selector: 'div[data-live]',
+        extract: () => ({ provider: 'example', id: 'abc123', src: 'about:blank' }),
+      }
+      const value = '<div data-live="abc123"></div>'
+
+      expect(await transform(value, contextFor(resolver))).toEqualHtml(value)
+    })
+
+    it('should leave a carrier whose media src resolves to nothing', async () => {
+      const resolver: MediaResolver = {
+        kind: 'media',
+        selector: 'div[data-live]',
+        extract: () => ({ tag: 'audio', src: 'about:blank' }),
+      }
+      const value = '<div data-live="abc123"></div>'
+
+      expect(await transform(value, contextFor(resolver))).toEqualHtml(value)
+    })
+  })
+
   it('should fall back to resolver metadata dimensions when the iframe has none', async () => {
     const sizedResolver: EmbedResolver = {
       kind: 'embed',

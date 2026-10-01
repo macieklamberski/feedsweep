@@ -795,7 +795,9 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
   })
 
   describe('the Tumblr figure wrapper', () => {
-    it('should carry the size the wrapper states', async () => {
+    // The frame posts its height, and the figure's size is the carrier's, which shallow handling
+    // does not read.
+    it('should state no size over the size the wrapper states', async () => {
       const value = html`
         <figure
           class="tmblr-embed tmblr-full"
@@ -816,8 +818,6 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
         id: 'reel/DGPdABWz84n',
         src: 'https://www.instagram.com/reel/DGPdABWz84n/embed/',
         url: 'https://www.instagram.com/reel/DGPdABWz84n/',
-        width: 540,
-        height: 627,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -851,29 +851,6 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
           data-url="https://www.instagram.com/p/CaUsPbUquKV/?x=%ZZ"
         >
           <blockquote class="instagram-media"></blockquote>
-        </figure>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'instagram',
-        id: 'p/CaUsPbUquKV',
-        src: 'https://www.instagram.com/p/CaUsPbUquKV/embed/',
-        url: 'https://www.instagram.com/p/CaUsPbUquKV/',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should state no size when the wrapper gives only one dimension', async () => {
-      const value = html`
-        <figure
-          class="tmblr-embed"
-          data-provider="instagram"
-          data-orig-width="540"
-        >
-          <blockquote
-            class="instagram-media"
-            data-instgrm-permalink="https://www.instagram.com/p/CaUsPbUquKV/"
-          ></blockquote>
         </figure>
       `
       const expected: EmbedResolverResult = {
@@ -1017,16 +994,24 @@ describeForEachParser('instagramS9eEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
 
-    it('should ignore a fragment stepping out of the post path', async () => {
+  describe('edge cases', () => {
+    it('should keep a fragment holding slashes inside the shortcode segment', async () => {
       const value = html`
         <iframe
           data-s9e-mediaembed="instagram"
           src="https://s9e.github.io/iframe/2/instagram.min.html#x/../../reel/CdWN1jeOWr0"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/x%2F..%2F..%2Freel%2FCdWN1jeOWr0',
+        src: 'https://www.instagram.com/p/x%2F..%2F..%2Freel%2FCdWN1jeOWr0/embed/',
+        url: 'https://www.instagram.com/p/x%2F..%2F..%2Freel%2FCdWN1jeOWr0/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
@@ -1051,6 +1036,18 @@ describe('instagramResolveEmbed', () => {
       id: 'reel/DGPdABWz84n',
       src: 'https://www.instagram.com/reel/DGPdABWz84n/embed/captioned/',
       url: 'https://www.instagram.com/reel/DGPdABWz84n/',
+    }
+
+    expect(instagramResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should use a malformed shortcode as written, even if the player answers an error', () => {
+    const value = 'https://www.instagram.com/p/abc.def/embed/'
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/abc.def',
+      src: 'https://www.instagram.com/p/abc.def/embed/',
+      url: 'https://www.instagram.com/p/abc.def/',
     }
 
     expect(instagramResolveEmbed(value)).toEqual(expected)
@@ -1288,10 +1285,16 @@ describeForEachParser('instagramAmpEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should return undefined for a shortcode outside the url-safe alphabet', async () => {
+  it('should use a malformed shortcode as written, even if the player answers an error', async () => {
     const value = '<amp-instagram data-shortcode="../evil"></amp-instagram>'
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'p/../evil',
+      src: 'https://www.instagram.com/p/../evil/embed/',
+      url: 'https://www.instagram.com/p/../evil/',
+    }
 
-    expect(await extract(value)).toBeUndefined()
+    expect(await extract(value)).toEqual(expected)
   })
 
   it('should return undefined for an empty shortcode', async () => {
@@ -1583,10 +1586,16 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a shortcode outside the url-safe alphabet', async () => {
+    it('should use a malformed shortcode as written, even if the player answers an error', async () => {
       const value = makeContainer({ instagram_id: '../evil' })
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/../evil',
+        src: 'https://www.instagram.com/p/../evil/embed/',
+        url: 'https://www.instagram.com/p/../evil/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

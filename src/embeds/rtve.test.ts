@@ -61,10 +61,18 @@ describe('rtveResolveEmbed', () => {
       expect(rtveResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id outside the numeric shape', () => {
+    it('should use a malformed asset id as written, even if the player answers an error', () => {
       const value = 'https://www.rtve.es/drmn/embed/video/evil'
+      const expected: EmbedResolverResult = {
+        provider: 'rtve',
+        id: 'video/evil',
+        src: 'https://www.rtve.es/drmn/embed/video/evil/',
+        url: 'https://www.rtve.es/v/evil/',
+        thumbnail: 'https://img.rtve.es/v/evil/',
+        ratio: '16/9',
+      }
 
-      expect(rtveResolveEmbed(value)).toBeUndefined()
+      expect(rtveResolveEmbed(value)).toEqual(expected)
     })
 
     it('should return undefined for a player url naming no asset', () => {
@@ -342,20 +350,36 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for an asset outside the id grammar', async () => {
+    it('should use a malformed asset id as written, even if the player answers an error', async () => {
       const value = html`
         <embed src="http://www.rtve.es/swf/v2/RTVEPlayer.swf?assetID=../evil_es_videos" />
       `
+      const expected: EmbedResolverResult = {
+        provider: 'rtve',
+        id: 'video/../evil',
+        src: 'https://www.rtve.es/drmn/embed/video/../evil/',
+        url: 'https://www.rtve.es/v/../evil/',
+        thumbnail: 'https://img.rtve.es/v/../evil/',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for an asset id longer than the id band', async () => {
+    it('should use a malformed asset id longer than any minted as written, even if the player answers an error', async () => {
       const value = html`
         <embed src="http://www.rtve.es/swf/v2/RTVEPlayer.swf?assetID=1234567890123_es_videos" />
       `
+      const expected: EmbedResolverResult = {
+        provider: 'rtve',
+        id: 'video/1234567890123',
+        src: 'https://www.rtve.es/drmn/embed/video/1234567890123/',
+        url: 'https://www.rtve.es/v/1234567890123/',
+        thumbnail: 'https://img.rtve.es/v/1234567890123/',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for an asset with a segment after the kind', async () => {

@@ -86,10 +86,16 @@ describeForEachParser('ardmediathekEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id carrying a character no base64 id has', async () => {
+    it('should use a malformed id as written, even if the player answers an error', async () => {
       const value = html`<iframe src="https://www.ardmediathek.de/embed/Beitrag%20sophora.mp3"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'ardmediathek',
+        id: 'Beitrag%20sophora.mp3',
+        src: 'https://www.ardmediathek.de/embed/Beitrag%20sophora.mp3',
+        url: 'https://www.ardmediathek.de/video/Beitrag%20sophora.mp3',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 

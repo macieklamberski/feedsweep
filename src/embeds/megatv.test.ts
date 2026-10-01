@@ -109,12 +109,6 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id outside the numeric shape', async () => {
-      const value = '<iframe src="https://www.megatv.com/embed/?p=evil"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a megatv url that is not the player', async () => {
       const value = '<iframe src="https://www.megatv.com/?p=687366"></iframe>'
 
@@ -123,6 +117,18 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should use a malformed post id as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://www.megatv.com/embed/?p=evil"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'megatv',
+        id: 'evil',
+        src: 'https://www.megatv.com/embed/?p=evil',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // Five corpus embeds name posts under a mapping the prefix rule does not cover, so the
     // player is kept and no article page is guessed for them.
     it('should mint no page for an id without the post prefix', async () => {

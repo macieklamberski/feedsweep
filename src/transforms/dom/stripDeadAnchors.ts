@@ -1,4 +1,5 @@
 import type { DomTransform } from '../../types.js'
+import { stripUrlIgnorableChars } from '../../utils/urls.js'
 
 const javascriptSchemeRegex = /^javascript:/i
 
@@ -20,7 +21,8 @@ export const stripDeadAnchors: DomTransform = () => {
 
       const trimmed = href.trim()
 
-      const isDead = deadHrefs.includes(trimmed) || javascriptSchemeRegex.test(trimmed)
+      const normalized = stripUrlIgnorableChars(href)
+      const isDead = deadHrefs.includes(trimmed) || javascriptSchemeRegex.test(normalized)
 
       if (!isDead) {
         continue

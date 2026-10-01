@@ -1,18 +1,10 @@
-import { parseUrl } from 'trousse'
+import { parseUrl, trimObject } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { flashVars, keepIfMatches } from '../utils/dom.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { flashVars } from '../utils/dom.js'
+import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// A publication code is hex, and nothing else may reach a minted path.
-const safeCodeRegex = /^[0-9a-f]+$/
-
-// The viewer and the book page both read `langid` as a two-letter language.
-const languageRegex = /^[a-z]{2}$/
-
-// The layout, the opening page and the click action the publisher chose for this embed.
-// `autoflip` turns pages on a timer, so it is left to the reader like autoplay.
-const viewerParams = ['mode', 'view', 'page', 'clickto', 'clicktarget', 'showsharemenu']
+const viewerRatio = '300/194'
 
 // Calaméo's viewer, `v.calameo.com/?bkcode={code}`, and the retired Flash players before it,
 // `cviewer.swf` and `cmini.swf`, take the same code in the same query parameter, or in the
@@ -22,50 +14,41 @@ export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
   const params = urlParams?.has('bkcode') ? urlParams : new URLSearchParams(flashVars(element))
   const code = params.get('bkcode')
 
-  if (!code || !safeCodeRegex.test(code)) {
+  if (!code) {
     return
   }
 
-  // The viewer reads every name in any case, and the Flash players wrote `clickTo` and a
-  // private publication's token as `AuthID`.
+  // The viewer reads every name in any case, and the Flash players wrote a private publication's
+  // token as `AuthID`.
   const namedParams = new URLSearchParams()
 
   for (const [name, value] of params) {
     namedParams.append(name.toLowerCase(), value)
   }
 
-  const langId = keepIfMatches(params.get('langid'), languageRegex)
-  const authId = namedParams.get('authid')
-  const query = new URLSearchParams({ bkcode: code })
-
-  if (langId) {
-    query.set('langid', langId)
-  }
-
-  for (const [name, value] of Object.entries(
-    pickQueryParams(namedParams.toString(), viewerParams),
-  )) {
-    query.set(name, value)
-  }
+  const authId = namedParams.get('authid') ?? undefined
+  // The page the viewer opens on.
+  const page = namedParams.get('page') ?? undefined
+  const query = composeQuery(trimObject({ bkcode: code, page, authid: authId }, Boolean))
+  const src = `https://v.calameo.com/${query}`
 
   // The book page answers 404 without the token, and the token stays in the player url alone.
   if (authId) {
-    query.set('authid', authId)
-
     return {
       provider: 'calameo',
       id: code,
-      src: `https://v.calameo.com/?${query}`,
+      src,
+      ratio: viewerRatio,
     }
   }
-
-  const pageQuery = langId ? `?langid=${langId}` : ''
 
   return {
     provider: 'calameo',
     id: code,
-    src: `https://v.calameo.com/?${query}`,
-    url: `https://www.calameo.com/books/${code}${pageQuery}`,
+    src,
+    // The code comes out of a query decoded, and it goes into a path.
+    url: `https://www.calameo.com/books/${encodePathSegment(code)}`,
+    ratio: viewerRatio,
   }
 }
 

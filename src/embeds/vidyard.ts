@@ -1,6 +1,6 @@
 import { parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { attr, keepIfMatches } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -49,7 +49,7 @@ export const vidyardIframeEmbedResolver = createUrlEmbedResolver(vidyardHosts, v
 export const vidyardImageEmbedResolver = createMarkupEmbedResolver(
   'img.vidyard-player-embed[data-uuid]',
   (element) => {
-    const uuid = keepIfMatches(attr(element, 'data-uuid'), uuidRegex)
+    const uuid = attr(element, 'data-uuid')
 
     if (!uuid) {
       return
@@ -66,18 +66,18 @@ export const vidyardScriptEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     // The selector matches a substring any host can carry, so the host is checked here.
     const parsed = parseUrlOnHosts(attr(element, 'src'), vidyardHosts)
-    const uuid = keepIfMatches(parsed?.pathname.match(scriptPathRegex)?.[1], uuidRegex)
+    const uuid = parsed?.pathname.match(scriptPathRegex)?.[1]
 
     if (!uuid) {
       return
     }
 
-    // The loader draws a box of exactly `width` by `height` when the query states both, and
-    // scales a lone one by the video's own shape, which only Vidyard's server knows.
-    const width = parsePixelSize(parsed?.searchParams.get('width'))
-    const height = parsePixelSize(parsed?.searchParams.get('height'))
-    const result = composeEmbed(uuid)
-
-    return width && height ? { ...result, width, height } : result
+    return { ...composeEmbed(uuid), ratio: '16/9' }
   },
 )
+
+export const vidyardRenderHint: EmbedRenderHint = {
+  provider,
+  // `1` lets the browser start the video muted, and `2` starts it only with sound.
+  autoplayParams: { autoplay: '2' },
+}

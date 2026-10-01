@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, jsonAttrValue, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { spotifyEmbedResolver, spotifyResolveEmbed } from './spotify.js'
+import { isSpotifyReady, spotifyEmbedResolver, spotifyResolveEmbed } from './spotify.js'
 
 describe('spotifyResolveEmbed', () => {
   describe('happy paths', () => {
@@ -237,16 +237,17 @@ describe('spotifyResolveEmbed', () => {
       expect(spotifyResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id carrying a path after it', () => {
+    it('should use a malformed id as written, even if the player answers an error', () => {
       const value = 'https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT%2Fx'
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'track/4cOdK2wGLETKBW3PvgPWqT%2Fx',
+        src: 'https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT%2Fx',
+        url: 'https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT%2Fx',
+        height: 152,
+      }
 
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id carrying a path before it', () => {
-      const value = 'https://open.spotify.com/embed/track/x%2F4cOdK2wGLETKBW3PvgPWqT'
-
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
+      expect(spotifyResolveEmbed(value)).toEqual(expected)
     })
 
     it('should return undefined for a route prefix that only ends in embed', () => {
@@ -786,5 +787,40 @@ describeForEachParser('spotifyEmbedResolver carrier title', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describe('isSpotifyReady', () => {
+  it('should recognise the ready message the player posts', () => {
+    const value = { type: 'ready' }
+
+    expect(isSpotifyReady(value)).toBe(true)
+  })
+
+  it('should ignore the playback updates the player posts after it', () => {
+    const value = {
+      type: 'playback_update',
+      payload: {
+        isPaused: false,
+        isBuffering: true,
+        duration: 0,
+        position: 0,
+        playingURI: '',
+      },
+    }
+
+    expect(isSpotifyReady(value)).toBe(false)
+  })
+
+  it('should ignore the playback start the player posts once it plays', () => {
+    const value = { type: 'playback_started' }
+
+    expect(isSpotifyReady(value)).toBe(false)
+  })
+
+  it('should ignore the ready message spelled as a JSON string', () => {
+    const value = '{"type":"ready"}'
+
+    expect(isSpotifyReady(value)).toBe(false)
   })
 })

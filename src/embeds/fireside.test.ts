@@ -94,16 +94,18 @@ describe('extractFiresideToken', () => {
     expect(extractFiresideToken(value)).toBeUndefined()
   })
 
-  it('should return undefined for a token opening with an encoded slash', () => {
+  it('should use a malformed token opening with an encoded slash as written, even if the player answers an error', () => {
     const value = 'https://player.fireside.fm/v3/x%2FN8LaNbQY+MI2PkJ2g'
+    const expected = { version: 'v3', token: 'x/N8LaNbQY+MI2PkJ2g' }
 
-    expect(extractFiresideToken(value)).toBeUndefined()
+    expect(extractFiresideToken(value)).toEqual(expected)
   })
 
-  it('should return undefined for a token closing with an encoded slash', () => {
+  it('should use a malformed token closing with an encoded slash as written, even if the player answers an error', () => {
     const value = 'https://player.fireside.fm/v3/N8LaNbQY+MI2PkJ2g%2Fx'
+    const expected = { version: 'v3', token: 'N8LaNbQY+MI2PkJ2g/x' }
 
-    expect(extractFiresideToken(value)).toBeUndefined()
+    expect(extractFiresideToken(value)).toEqual(expected)
   })
 
   it('should return undefined for a token of the wrong shape', () => {

@@ -1,7 +1,6 @@
 import {
   defaultAllDomTransforms,
   defaultAvatarImageHosts,
-  defaultCleanedSrcProviders,
   defaultDeferredIframeSources,
   defaultEmojiResolvers,
   defaultFieldCleaners,
@@ -44,7 +43,6 @@ export const transformContent = async (
     nonContentSelectors: defaultNonContentSelectors,
     preservedPreClasses: defaultPreservedPreClasses,
     fieldCleaners: defaultFieldCleaners,
-    cleanedSrcProviders: defaultCleanedSrcProviders,
     resolveUrlFn: options.resolveUrlFn ?? defaultResolveUrlFn,
     cleanUrlFn: options.cleanUrlFn,
     assetProxyFn: options.assetProxyFn,
@@ -77,7 +75,6 @@ export const transformContent = async (
 
 export {
   defaultAllDomTransforms,
-  defaultCleanedSrcProviders,
   defaultEmbedRenderHints,
   defaultFieldCleaners,
   defaultHighlightFn,

@@ -394,10 +394,8 @@ describeForEachParser('readS9eFragment', (parseHtml) => {
   })
 })
 
-const exampleFragmentRegex = /^\w+$/
-
 describeForEachParser('createS9eEmbedResolver', (parseHtml) => {
-  const resolver = createS9eEmbedResolver('example', exampleFragmentRegex, (fragment) => {
+  const resolver = createS9eEmbedResolver('example', (fragment) => {
     return {
       provider: 'example',
       id: fragment,
@@ -422,15 +420,20 @@ describeForEachParser('createS9eEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should ignore a fragment holding a character outside the class', async () => {
+  it('should use a fragment holding a dot as written', async () => {
     const value = html`
       <iframe
         data-s9e-mediaembed="example"
         src="https://s9e.github.io/iframe/2/example.min.html#abc.123"
       ></iframe>
     `
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc.123',
+      src: 'https://player.example.com/abc.123',
+    }
 
-    expect(await extract(value)).toBeUndefined()
+    expect(await extract(value)).toEqual(expected)
   })
 })
 
@@ -1798,7 +1801,7 @@ describe('prepareEmbedMetadata', () => {
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
   })
 
-  it('should clean the src of a listed provider', () => {
+  it('should clean the src with the provided cleanUrlFn', () => {
     const value: Partial<EmbedResolverResult> = {
       provider: 'example',
       src: 'https://player.example/embed/abc?start=30&utm_source=feed',
@@ -1809,33 +1812,18 @@ describe('prepareEmbedMetadata', () => {
     }
     const context = {
       ...baseContext,
-      cleanedSrcProviders: ['example'],
       cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
     }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
   })
 
-  it('should keep the src of an unlisted provider as written', () => {
+  it('should keep the src as written when no cleaner is given', () => {
     const value: Partial<EmbedResolverResult> = {
       provider: 'example',
       src: 'https://player.example/embed/abc?start=30&utm_source=feed',
     }
-    const context = {
-      ...baseContext,
-      cleanedSrcProviders: ['other'],
-      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
-    }
-
-    expect(prepareEmbedMetadata(value, context)).toEqual(value)
-  })
-
-  it('should keep the src of a listed provider as written when no cleaner is given', () => {
-    const value: Partial<EmbedResolverResult> = {
-      provider: 'example',
-      src: 'https://player.example/embed/abc?start=30&utm_source=feed',
-    }
-    const context = { ...baseContext, cleanedSrcProviders: ['example'] }
+    const context = { ...baseContext }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(value)
   })

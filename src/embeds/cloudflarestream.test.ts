@@ -10,13 +10,13 @@ import {
 
 describe('cloudflarestreamResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should keep the poster and drop the playback parameters', () => {
+    it('should take the poster as the thumbnail and keep only the loop in the src', () => {
       const value =
         'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/iframe?controls=false&muted=true&preload=metadata&loop=true&autoplay=true&poster=https%3A%2F%2Fcustomer-qz3v4c7e4vfly110.cloudflarestream.com%2Fbeb50392b3f14f49b01fb75b20d4cef7%2Fthumbnails%2Fthumbnail.jpg%3Fheight%3D600'
       const expected: EmbedResolverResult = {
         provider: 'cloudflarestream',
         id: 'beb50392b3f14f49b01fb75b20d4cef7',
-        src: 'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/iframe?poster=https%3A%2F%2Fcustomer-qz3v4c7e4vfly110.cloudflarestream.com%2Fbeb50392b3f14f49b01fb75b20d4cef7%2Fthumbnails%2Fthumbnail.jpg%3Fheight%3D600',
+        src: 'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/iframe?loop=true',
         thumbnail:
           'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/thumbnails/thumbnail.jpg?height=600',
       }
@@ -24,13 +24,27 @@ describe('cloudflarestreamResolveEmbed', () => {
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep a poster stating its frame time', () => {
+    it('should keep the loop and drop the muting and preload', () => {
+      const value =
+        'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/b0f6489638fab333b9767877fbf92a8c/iframe?muted=true&preload=metadata&loop=true'
+      const expected: EmbedResolverResult = {
+        provider: 'cloudflarestream',
+        id: 'b0f6489638fab333b9767877fbf92a8c',
+        src: 'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/b0f6489638fab333b9767877fbf92a8c/iframe?loop=true',
+        thumbnail:
+          'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/b0f6489638fab333b9767877fbf92a8c/thumbnails/thumbnail.jpg',
+      }
+
+      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should take a poster stating its frame time as the thumbnail', () => {
       const value =
         'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/iframe?poster=https%3A%2F%2Fcustomer-2haawx7cuvbfttcn.cloudflarestream.com%2F35d8788a685e8cd8db81e6f3e2269e2a%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600'
       const expected: EmbedResolverResult = {
         provider: 'cloudflarestream',
         id: '35d8788a685e8cd8db81e6f3e2269e2a',
-        src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/iframe?poster=https%3A%2F%2Fcustomer-2haawx7cuvbfttcn.cloudflarestream.com%2F35d8788a685e8cd8db81e6f3e2269e2a%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600',
+        src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/iframe',
         thumbnail:
           'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg?time=&height=600',
       }
@@ -107,11 +121,18 @@ describe('cloudflarestreamResolveEmbed', () => {
       expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore an uppercase video id', () => {
+    it('should use a malformed video id as written, even if the player answers an error', () => {
       const value =
         'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35D8788A685E8CD8DB81E6F3E2269E2A/iframe'
+      const expected: EmbedResolverResult = {
+        provider: 'cloudflarestream',
+        id: '35D8788A685E8CD8DB81E6F3E2269E2A',
+        src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35D8788A685E8CD8DB81E6F3E2269E2A/iframe',
+        thumbnail:
+          'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35D8788A685E8CD8DB81E6F3E2269E2A/thumbnails/thumbnail.jpg',
+      }
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore the account host without the iframe route', () => {
@@ -134,18 +155,32 @@ describe('cloudflarestreamResolveEmbed', () => {
       expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a signed token on the account host', () => {
+    it('should use a signed token on the account host as written', () => {
       const value =
         'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5YzJlNDFhNyJ9.c2lnbmF0dXJl/iframe'
+      const expected: EmbedResolverResult = {
+        provider: 'cloudflarestream',
+        id: 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5YzJlNDFhNyJ9.c2lnbmF0dXJl',
+        src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5YzJlNDFhNyJ9.c2lnbmF0dXJl/iframe',
+        thumbnail:
+          'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5YzJlNDFhNyJ9.c2lnbmF0dXJl/thumbnails/thumbnail.jpg',
+      }
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should ignore a signed token on the shared player host', () => {
+    it('should use a signed token on the shared player host as written', () => {
       const value =
         'https://iframe.videodelivery.net/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0ZjdiMGM4ZSJ9.c2lnbmF0dXJl'
+      const expected: EmbedResolverResult = {
+        provider: 'cloudflarestream',
+        id: 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0ZjdiMGM4ZSJ9.c2lnbmF0dXJl',
+        src: 'https://iframe.videodelivery.net/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0ZjdiMGM4ZSJ9.c2lnbmF0dXJl',
+        thumbnail:
+          'https://videodelivery.net/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0ZjdiMGM4ZSJ9.c2lnbmF0dXJl/thumbnails/thumbnail.jpg',
+      }
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore the shared path on another delivery subdomain', () => {
@@ -210,7 +245,7 @@ describe('cloudflarestreamResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'cloudflarestream',
         id: '35d8788a685e8cd8db81e6f3e2269e2a',
-        src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/iframe?poster=%2Fthumb.jpg',
+        src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/iframe',
         thumbnail:
           'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg',
       }
@@ -325,18 +360,18 @@ describeForEachParser('cloudflarestreamScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should refuse a video id carrying a path of its own', async () => {
+    it('should use a malformed video id as written, even if the player answers an error', async () => {
       const value =
         '<script src="https://embed.videodelivery.net/embed/r4xu.fla9.latest.js?video=..%2F..%2F35d8788a685e8cd8db81e6f3e2269e2a"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'cloudflarestream',
+        id: '../../35d8788a685e8cd8db81e6f3e2269e2a',
+        src: 'https://iframe.videodelivery.net/..%2F..%2F35d8788a685e8cd8db81e6f3e2269e2a',
+        thumbnail:
+          'https://videodelivery.net/..%2F..%2F35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a video id followed by a path of its own', async () => {
-      const value =
-        '<script src="https://embed.videodelivery.net/embed/r4xu.fla9.latest.js?video=5653cfd537db1edbed98c5c0119f390c%2Fdownloads"></script>'
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

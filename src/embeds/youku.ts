@@ -1,12 +1,13 @@
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'youku'
 
 // Every Youku video id opens with a literal X, and without it a route word in the id position,
 // embed/about, reads as a video.
-// The rest is the base64 spelling of a number, padding kept: `XODczMzU0NTAw`, `XNDUyNTczMDEyOA==`.
-const safeVideoIdRegex = /^X[A-Za-z0-9=]+$/
+const videoIdRegex = /^X[^/]+$/
 
 const youkuHosts = ['player.youku.com', 'static.youku.com']
 
@@ -25,18 +26,27 @@ const readVideoId = (url: string): string | undefined => {
   const parsed = parseUrlOnHosts(url, youkuHosts)
 
   if (parsed?.hostname === 'static.youku.com') {
-    return staticFlashPathRegex.test(parsed.pathname)
-      ? keepIfMatches(parsed.searchParams.get('VideoIDS'), safeVideoIdRegex)
+    const videoIds = parsed.searchParams.get('VideoIDS')
+
+    // The query value comes out decoded, and it goes into the player path.
+    return staticFlashPathRegex.test(parsed.pathname) && videoIds
+      ? encodePathSegment(videoIds)
       : undefined
   }
 
   const videoId =
     parsed?.pathname.match(embedPathRegex)?.[1] ?? parsed?.pathname.match(flashPathRegex)?.[1]
 
-  return keepIfMatches(videoId, safeVideoIdRegex)
+  // The enclosure probe offers a file on the player host, such as `/embed/{id}.mp4`, to this
+  // resolver, and the file has to stay playable.
+  if (videoId && isFileName(videoId)) {
+    return
+  }
+
+  return keepIfMatches(videoId, videoIdRegex)
 }
 
-export const youkuResolveEmbed: ResolveEmbed = (url) => {
+const youkuResolveEmbed: ResolveEmbed = (url) => {
   const videoId = readVideoId(url)
 
   if (!videoId) {
@@ -46,7 +56,7 @@ export const youkuResolveEmbed: ResolveEmbed = (url) => {
   // The poster lives under a hash the id does not yield, and the player host serves the same
   // shell for any id.
   return {
-    provider: 'youku',
+    provider,
     id: videoId,
     src: `https://player.youku.com/embed/${videoId}`,
     url: `https://v.youku.com/v_show/id_${videoId}.html`,
@@ -58,3 +68,8 @@ export const youkuResolveEmbed: ResolveEmbed = (url) => {
 export const youkuEmbedResolver = createUrlEmbedResolver(youkuHosts, youkuResolveEmbed, {
   preferResolverSize: true,
 })
+
+export const youkuRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: 'true' },
+}

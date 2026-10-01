@@ -60,11 +60,9 @@ describe('extractWistiaEmbed', () => {
     expect(extractWistiaEmbed(value)).toEqual(expected)
   })
 
-  // The player serves the same media whatever case the id is spelled in, so the id is read in
-  // one spelling and the media reaches enrichment as one key.
-  it('should lowercase an id spelled in capitals', () => {
+  it('should keep the case the carrier spells the id in', () => {
     const value = 'https://fast.wistia.net/embed/iframe/2FG072PFTB'
-    const expected = { route: 'iframe', id: '2fg072pftb' }
+    const expected = { route: 'iframe', id: '2FG072PFTB' }
 
     expect(extractWistiaEmbed(value)).toEqual(expected)
   })
@@ -92,12 +90,11 @@ describe('extractWistiaEmbed', () => {
     expect(extractWistiaEmbed(value)).toEqual(expected)
   })
 
-  // A channel has no vanity slug: every route carries the 10-character hashed id, so a slug-shaped
-  // segment is not a channel and must not be interpolated into a player url.
-  it('should return undefined for a slug-shaped channel segment', () => {
+  it('should use a malformed channel id as written, even if the player answers an error', () => {
     const value = 'https://home.wistia.com/channels/talking-too-loud'
+    const expected = { route: 'channel', id: 'talking-too-loud' }
 
-    expect(extractWistiaEmbed(value)).toBeUndefined()
+    expect(extractWistiaEmbed(value)).toEqual(expected)
   })
 
   // The route is a path segment, so it can name a member every object inherits. That has to
@@ -108,8 +105,15 @@ describe('extractWistiaEmbed', () => {
     expect(extractWistiaEmbed(value)).toBeUndefined()
   })
 
-  it('should return undefined for an id carrying an encoded slash', () => {
+  it('should use a malformed media id as written, even if the player answers an error', () => {
     const value = 'https://fast.wistia.net/embed/iframe/2fg072pftb%2Fsapab9p6qd'
+    const expected = { route: 'iframe', id: '2fg072pftb%2Fsapab9p6qd' }
+
+    expect(extractWistiaEmbed(value)).toEqual(expected)
+  })
+
+  it('should return undefined for the media JSON file', () => {
+    const value = 'https://fast.wistia.com/embed/medias/2fg072pftb.json'
 
     expect(extractWistiaEmbed(value)).toBeUndefined()
   })
@@ -166,13 +170,13 @@ describe('wistiaResolveEmbed', () => {
     expect(wistiaResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should mint one key for an account media page spelled in capitals', () => {
+  it('should fold case in the key alone for an account media page spelled in capitals', () => {
     const value = 'https://acme.wistia.com/medias/2FG072PFTB'
     const expected: EmbedResolverResult = {
       provider: 'wistia',
       id: '2fg072pftb',
-      src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
-      url: 'https://acme.wistia.com/medias/2fg072pftb',
+      src: 'https://fast.wistia.net/embed/iframe/2FG072PFTB',
+      url: 'https://acme.wistia.com/medias/2FG072PFTB',
     }
 
     expect(wistiaResolveEmbed(value)).toEqual(expected)

@@ -134,16 +134,17 @@ describe('rutubeResolveEmbed', () => {
       expect(rutubeResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a playlist video carrying a path after the id', () => {
+    it('should use a malformed playlist video id as written, even if the player answers an error', () => {
       const value = 'https://rutube.ru/pl/?pl_video=20a54e4a6f61441d808db45f823a7809%2Fadd'
+      const expected: EmbedResolverResult = {
+        provider: 'rutube',
+        id: '20a54e4a6f61441d808db45f823a7809/add',
+        src: 'https://rutube.ru/play/embed/20a54e4a6f61441d808db45f823a7809%2Fadd',
+        url: 'https://rutube.ru/video/20a54e4a6f61441d808db45f823a7809%2Fadd/',
+        ratio: '16/9',
+      }
 
-      expect(rutubeResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a playlist video carrying a path before the id', () => {
-      const value = 'https://rutube.ru/pl/?pl_video=..%2F20a54e4a6f61441d808db45f823a7809'
-
-      expect(rutubeResolveEmbed(value)).toBeUndefined()
+      expect(rutubeResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore a playlist route that names no video', () => {

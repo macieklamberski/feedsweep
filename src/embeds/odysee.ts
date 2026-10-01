@@ -7,9 +7,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const odyseeHosts = ['odysee.com', 'lbry.tv', 'open.lbry.com']
 
 // A claim, `{name}:{hex claim id}`, with an optional leading `@` for a channel and an optional id.
-// A bare name addresses the winning claim for it. The parser folds a bare .. segment away, and a
-// path percent-encoded whole carries one past it.
-const claimRegex = /^@?(?!\.+(?::|$))[^\s/?#<>"'\\:]+(?::[0-9a-f]+)?$/i
+// A bare name addresses the winning claim for it.
+const claimRegex = /^[^:]+(?::[0-9a-f]+)?$/i
 
 const readClaimPath = (parsed: URL): string | undefined => {
   // The current share code percent-encodes the whole path, $ and / included.

@@ -13,19 +13,21 @@ describe('officeResolveEmbed', () => {
         provider: 'office',
         src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fsites.gatech.edu%2Fsga%2Ffiles%2F2021%2F12%2FOffering-Students-Flexibility-When-They-Are-Ill.docx',
         url: 'https://sites.gatech.edu/sga/files/2021/12/Offering-Students-Flexibility-When-They-Are-Ill.docx',
+        ratio: '8/5',
         title: 'Offering-Students-Flexibility-When-They-Are-Ill.docx',
       }
 
       expect(officeResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should read the share spelling of the same viewer', () => {
+    it('should mint the embed viewer for the share spelling', () => {
       const value =
         'https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
         url: 'https://slac.uconn.edu/files/GrantWritingSICSFLAGS.pptx',
+        ratio: '8/5',
         title: 'GrantWritingSICSFLAGS.pptx',
       }
 
@@ -39,19 +41,21 @@ describe('officeResolveEmbed', () => {
         provider: 'office',
         src: 'https://view.officeapps.live.com/op/embed.aspx?src=http%3A%2F%2Fcutsarah.blog.uma.ac.id%2Fwp-content%2Fuploads%2Fsites%2F405%2F2023%2F01%2FKuliah-APIO-1_PENGANTAR-1.pptx',
         url: 'http://cutsarah.blog.uma.ac.id/wp-content/uploads/sites/405/2023/01/Kuliah-APIO-1_PENGANTAR-1.pptx',
+        ratio: '8/5',
         title: 'Kuliah-APIO-1_PENGANTAR-1.pptx',
       }
 
       expect(officeResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the aspect ratio of the deck', () => {
+    it('should drop the aspect ratio of the deck', () => {
       const value =
         'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fc%2Es%2Dmicrosoft%2Ecom%3A443%2Fen%2Dus%2FCMSFiles%2Fcalldeck%2Epptx%3Fversion%3Df3eef72b%2D35d3%2D95b2%2D4fda%2D73a47f805c7f&wdAr=1.7777777777777777'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fc.s-microsoft.com%3A443%2Fen-us%2FCMSFiles%2Fcalldeck.pptx%3Fversion%3Df3eef72b-35d3-95b2-4fda-73a47f805c7f&wdAr=1.7777777777777777',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fc.s-microsoft.com%3A443%2Fen-us%2FCMSFiles%2Fcalldeck.pptx%3Fversion%3Df3eef72b-35d3-95b2-4fda-73a47f805c7f',
         url: 'https://c.s-microsoft.com:443/en-us/CMSFiles/calldeck.pptx?version=f3eef72b-35d3-95b2-4fda-73a47f805c7f',
+        ratio: '8/5',
         title: 'calldeck.pptx',
       }
 
@@ -63,8 +67,9 @@ describe('officeResolveEmbed', () => {
         'https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fwww.sba.gov%2Fsites%2Fdefault%2Ffiles%2F2025-05%2FSOP%252050%252010%25208%2520Technical%2520Updates%2520effective%25206.1.2025.docx&wdOrigin=BROWSELINK&utm_source=smallbusinessapproval.com&utm_medium=newsletter&utm_campaign=sba-loan-requirements-2025-guide'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fwww.sba.gov%2Fsites%2Fdefault%2Ffiles%2F2025-05%2FSOP%252050%252010%25208%2520Technical%2520Updates%2520effective%25206.1.2025.docx',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fwww.sba.gov%2Fsites%2Fdefault%2Ffiles%2F2025-05%2FSOP%252050%252010%25208%2520Technical%2520Updates%2520effective%25206.1.2025.docx',
         url: 'https://www.sba.gov/sites/default/files/2025-05/SOP%2050%2010%208%20Technical%20Updates%20effective%206.1.2025.docx',
+        ratio: '8/5',
         title: 'SOP 50 10 8 Technical Updates effective 6.1.2025.docx',
       }
 
@@ -79,6 +84,7 @@ describe('officeResolveEmbed', () => {
         provider: 'office',
         src: 'https://view.officeapps.live.com/op/embed.aspx?src=http%3A%2F%2Fcutsarah.blog.uma.ac.id%2Fwp-content%2Fuploads%2Fsites%2F405%2F2023%2F01%2FKuliah-APIO-1_PENGANTAR-1.pptx',
         url: 'http://cutsarah.blog.uma.ac.id/wp-content/uploads/sites/405/2023/01/Kuliah-APIO-1_PENGANTAR-1.pptx',
+        ratio: '8/5',
         title: 'Kuliah-APIO-1_PENGANTAR-1.pptx',
       }
 
@@ -122,26 +128,28 @@ describe('officeResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
-    it('should read the capitalised spelling of the viewer path', () => {
+    it('should mint the embed viewer for the capitalised spelling', () => {
       const value =
         'https://view.officeapps.live.com/op/View.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com/op/View.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
         url: 'https://slac.uconn.edu/files/GrantWritingSICSFLAGS.pptx',
+        ratio: '8/5',
         title: 'GrantWritingSICSFLAGS.pptx',
       }
 
       expect(officeResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should read a viewer path with a doubled leading slash', () => {
+    it('should mint the embed viewer for a doubled leading slash', () => {
       const value =
         'https://view.officeapps.live.com//op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com//op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
         url: 'https://slac.uconn.edu/files/GrantWritingSICSFLAGS.pptx',
+        ratio: '8/5',
         title: 'GrantWritingSICSFLAGS.pptx',
       }
 
@@ -155,6 +163,7 @@ describe('officeResolveEmbed', () => {
         provider: 'office',
         src: 'https://view.officeapps.live.com/op/embed.aspx?src=%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
         url: '//slac.uconn.edu/files/GrantWritingSICSFLAGS.pptx',
+        ratio: '8/5',
         title: 'GrantWritingSICSFLAGS.pptx',
       }
 
@@ -168,6 +177,7 @@ describe('officeResolveEmbed', () => {
         provider: 'office',
         src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fexample.com%2Fuc%3Fexport%3Ddownload%26id%3Dabc',
         url: 'https://example.com/uc?export=download&id=abc',
+        ratio: '8/5',
       }
 
       expect(officeResolveEmbed(value)).toEqual(expected)
@@ -180,6 +190,7 @@ describe('officeResolveEmbed', () => {
         provider: 'office',
         src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fexample.com%2FQ3%2520report.xlsx',
         url: 'https://example.com/Q3%20report.xlsx',
+        ratio: '8/5',
         title: 'Q3 report.xlsx',
       }
 
@@ -193,6 +204,7 @@ describe('officeResolveEmbed', () => {
         provider: 'office',
         src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fexample.com%2F100%25.xlsx',
         url: 'https://example.com/100%.xlsx',
+        ratio: '8/5',
         title: '100%.xlsx',
       }
 
@@ -267,6 +279,7 @@ describeForEachParser('the office viewer on an http feed', (parseHtml) => {
         data-embed-src="https://view.officeapps.live.com/op/embed.aspx?src=http%3A%2F%2Fcutsarah.blog.uma.ac.id%2Fwp-content%2Fuploads%2Fsites%2F405%2F2023%2F01%2FKuliah-APIO-1_PENGANTAR-1.pptx"
         data-embed-url="http://cutsarah.blog.uma.ac.id/wp-content/uploads/sites/405/2023/01/Kuliah-APIO-1_PENGANTAR-1.pptx"
         data-embed-title="Kuliah-APIO-1_PENGANTAR-1.pptx"
+        data-embed-ratio="8/5"
       ></div>
     `
 

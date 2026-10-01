@@ -120,13 +120,6 @@ describeForEachParser('glomexIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an integration id that could not be one', async () => {
-      const value =
-        '<iframe src="https://player.glomex.com/integration/1/integration.html?integrationId=../x&playlistId=v-debyi9cki6k1"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
         '<iframe src="https://evil.test/integration/1/integration.html?integrationId=40599x1hkkig7d8l"></iframe>'
@@ -146,6 +139,21 @@ describeForEachParser('glomexIframeEmbedResolver', (parseHtml) => {
         '<iframe src="https://player.glomex.com/integration/1/integration.html/extra?integrationId=40599x1hkkig7d8l"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed integration id as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://player.glomex.com/integration/1/integration.html?integrationId=../x&playlistId=v-debyi9cki6k1"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'glomex',
+        id: '../x/v-debyi9cki6k1',
+        src: 'https://player.glomex.com/integration/1/integration.html?integrationId=..%2Fx&playlistId=v-debyi9cki6k1',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
@@ -212,18 +220,7 @@ describeForEachParser('glomexElementEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore an integration id that could not be one', async () => {
-      const value = html`
-        <glomex-player
-          data-integration-id="40599x1hkkig7d8l/../evil"
-          data-playlist-id="v-d3gnqat8p95t"
-        ></glomex-player>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should drop a playlist id that could not be one and keep the integration', async () => {
+    it('should use a malformed playlist id as written, even if the player answers an error', async () => {
       const value = html`
         <glomex-player
           data-integration-id="40599x1hkkig7d8l"
@@ -232,8 +229,27 @@ describeForEachParser('glomexElementEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'glomex',
-        id: '40599x1hkkig7d8l',
-        src: 'https://player.glomex.com/integration/1/integration.html?integrationId=40599x1hkkig7d8l',
+        id: '40599x1hkkig7d8l/v-d3gnqat8p95t?x=1',
+        src: 'https://player.glomex.com/integration/1/integration.html?integrationId=40599x1hkkig7d8l&playlistId=v-d3gnqat8p95t%3Fx%3D1',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed integration id as written, even if the player answers an error', async () => {
+      const value = html`
+        <glomex-player
+          data-integration-id="40599x1hkkig7d8l/../evil"
+          data-playlist-id="v-d3gnqat8p95t"
+        ></glomex-player>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'glomex',
+        id: '40599x1hkkig7d8l/../evil/v-d3gnqat8p95t',
+        src: 'https://player.glomex.com/integration/1/integration.html?integrationId=40599x1hkkig7d8l%2F..%2Fevil&playlistId=v-d3gnqat8p95t',
         ratio: '16/9',
       }
 

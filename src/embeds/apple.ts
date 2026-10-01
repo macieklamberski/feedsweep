@@ -1,8 +1,11 @@
 import { getPathSegments, isHostOrSubdomainOf, type Nullish, parseUrl, toMap } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, keepIfMatches } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const musicProvider = 'applemusic'
+const podcastsProvider = 'applepodcasts'
 
 // Music and podcasts embed through the same player, served from `embed.music.apple.com` and
 // `embed.podcasts.apple.com`, so both resolve here and only the provider name differs.
@@ -13,8 +16,6 @@ const applePodcastsHosts = ['podcasts.apple.com']
 // optional. A music id is numeric, a playlist or station id carries a two-letter prefix
 // (`pl.`, `ra.`) and a podcast id an `id` one.
 const storefrontRegex = /^[a-z]{2}$/
-// A numeric music id, a two-letter prefixed playlist or station id, or an `id`-prefixed podcast id.
-const safeIdRegex = /^(?:id\d+|\d+|[a-z]{2}\.[a-z0-9-]+)$/i
 const podcastIdPrefixRegex = /^id/
 
 // The player is fluid-width. The podcast show player fills any frame and floors at 180 at 320
@@ -43,20 +44,23 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
   const [kind, ...rest] = storefrontRegex.test(segments[0] ?? '') ? segments.slice(1) : segments
   const pathId = rest[rest.length - 1]
 
-  if (!kind || !pathId || !appleHeights.has(kind) || !safeIdRegex.test(pathId)) {
+  // A segment past the id, such as an artist's `see-all`, names a page on the site, not a player.
+  if (rest.length > 2) {
+    return
+  }
+
+  if (!kind || !pathId || !appleHeights.has(kind)) {
     return
   }
 
   const isPodcast = isHostOrSubdomainOf(parsed, applePodcastsHosts)
   const host = isPodcast ? 'podcasts.apple.com' : 'music.apple.com'
-  const trackId = keepIfMatches(parsed.searchParams.get('i'), digitsRegex)
+  const trackId = parsed.searchParams.get('i') || undefined
   const id = trackId ?? pathId.replace(podcastIdPrefixRegex, '')
-  // A refused `i` is dropped from the player url as well: the resolver does not forward a value
-  // it would not put in the id, and the collection player is what the path names without it.
   const query = trackId ? pickUrlParams(url, ['i']) : ''
 
   return {
-    provider: isPodcast ? 'applepodcasts' : 'applemusic',
+    provider: isPodcast ? podcastsProvider : musicProvider,
     id: `${kind}/${id}`,
     src: `https://embed.${host}${parsed.pathname}${query}`,
     url: `https://${host}${parsed.pathname}${query}`,
@@ -158,9 +162,9 @@ export const appleToolsEmbedResolver = createUrlEmbedResolver(
 )
 
 export const appleFieldCleaners: Array<FieldCleaner> = [
-  { provider: 'applepodcasts', field: 'title', drop: 'Media player' },
+  { provider: podcastsProvider, field: 'title', drop: 'Media player' },
   // A copied YouTube snippet with the src swapped.
-  { provider: 'applepodcasts', field: 'title', drop: 'YouTube video player' },
-  { provider: 'applemusic', field: 'title', drop: 'Media player' },
-  { provider: 'applemusic', field: 'title', drop: 'メディアプレイヤー' },
+  { provider: podcastsProvider, field: 'title', drop: 'YouTube video player' },
+  { provider: musicProvider, field: 'title', drop: 'Media player' },
+  { provider: musicProvider, field: 'title', drop: 'メディアプレイヤー' },
 ]

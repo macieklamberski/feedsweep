@@ -184,13 +184,33 @@ describeForEachParser('crowdsignalScriptEmbedResolver', (parseHtml) => {
     })
   })
 
-  describe('sad paths', () => {
-    it('should ignore a loader naming no poll', async () => {
-      const value = '<script src="https://secure.polldaddy.com/p/embed.js"></script>'
+  describe('edge cases', () => {
+    it('should use a malformed poll id as written, even if the player answers an error', async () => {
+      const value = '<script src="https://secure.polldaddy.com/p/1333a.js"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: '1333a',
+        src: 'https://poll.fm/1333a/embed',
+        url: 'https://poll.fm/1333a',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
+    it('should use a loader naming no poll as written, even if the player answers an error', async () => {
+      const value = '<script src="https://secure.polldaddy.com/p/embed.js"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: 'embed',
+        src: 'https://poll.fm/embed/embed',
+        url: 'https://poll.fm/embed',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
     it('should ignore a foreign host serving the loader path', async () => {
       const value = '<script src="https://evil.test/p/13332507.js?polldaddy.com/p/"></script>'
 
@@ -241,6 +261,21 @@ describeForEachParser('crowdsignalScriptEmbedResolver', (parseHtml) => {
       await crowdsignalScriptEmbedResolver.extract(loader)
 
       expect(document.querySelector('noscript')).not.toBeNull()
+    })
+
+    it('should remove a noscript linking the same malformed poll on the retired page', async () => {
+      const value = html`
+        <div>
+          <script src="https://secure.polldaddy.com/p/1333a.js"></script>
+          <noscript><a href="https://polldaddy.com/poll/1333a/">Take the poll</a></noscript>
+        </div>
+      `
+      const document = parseHtml(value)
+      const loader = document.querySelector('script') as Element
+
+      await crowdsignalScriptEmbedResolver.extract(loader)
+
+      expect(document.querySelector('noscript')).toBeNull()
     })
   })
 })
@@ -314,26 +349,40 @@ describeForEachParser('crowdsignalFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a poll id that only ends in digits', async () => {
+    it('should use a malformed poll id as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="http://www.polldaddy.com/poll.swf"
           flashvars="p=poll132074"
         >
       `
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: 'poll132074',
+        src: 'https://poll.fm/poll132074/embed',
+        url: 'https://poll.fm/poll132074',
+        height: 473,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a poll id carrying a path separator', async () => {
+    it('should use a malformed poll id carrying a path separator as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="http://www.polldaddy.com/poll.swf"
           flashvars="p=132074%2Fresults"
         >
       `
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: '132074/results',
+        src: 'https://poll.fm/132074%2Fresults/embed',
+        url: 'https://poll.fm/132074%2Fresults',
+        height: 473,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

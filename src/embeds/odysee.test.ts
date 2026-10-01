@@ -120,7 +120,6 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // The encoded path decodes whole, so a `?` inside it would reach the minted src as a query.
     it('should ignore a claim id carrying an encoded query', async () => {
       const value = html`
         <iframe src="https://odysee.com/%24%2Fembed%2Fwebb-repersoning%3A7%3Fad%3D1"></iframe>
@@ -161,14 +160,6 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // The url parser folds a bare `..` segment away, but a path encoded whole hides it until
-    // the pathname is decoded here, and then the claim would be a dot segment.
-    it('should ignore a dot segment the encoded path decodes into', async () => {
-      const value = '<iframe src="https://odysee.com/%24%2Fembed%2F.."></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a foreign host carrying the same path', async () => {
       const value = html`
         <iframe
@@ -177,6 +168,20 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       `
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed claim as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://odysee.com/%24%2Fembed%2F.."></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'odysee',
+        id: '..',
+        src: 'https://odysee.com/$/embed/..',
+        url: 'https://odysee.com/..',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 

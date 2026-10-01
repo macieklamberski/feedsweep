@@ -1,5 +1,5 @@
 import { getPathSegments, toMap } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -10,7 +10,7 @@ const nbcnewsHosts = ['nbcnews.com', 'today.com']
 // NBC News and TODAY share one player and one `mmvo{digits}` id space. The widget route's bare
 // digits and the offsite route's trailing digits 301 onto `/embedded-video/mmvo{digits}`, so
 // every route keys to the prefixed form.
-const embeddedVideoIdRegex = /^mmvo(\d+)$/i
+const embeddedVideoIdRegex = /^mmvo(.+)$/i
 const offsiteIdRegex = /-(\d+)$/
 
 const idPrefix = 'mmvo'
@@ -35,7 +35,6 @@ const nbcnewsRoutes = toMap({
     isCaseInsensitive: true,
   },
   'widget/video-embed': {
-    idRegex: digitsRegex,
     srcPrefix: 'https://www.nbcnews.com/widget/video-embed/',
   },
 })
@@ -53,18 +52,21 @@ const nbcnewsResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const match = route.idRegex.exec(segments.at(-1) ?? '')
+  // The widget route names the video by the whole segment.
+  const segment = segments.at(-1) ?? ''
+  const value = route.idRegex ? route.idRegex.exec(segment)?.[1] : segment
 
-  if (!match) {
+  if (!value) {
     return
   }
 
-  const digits = match[1] ?? match[0]
+  // Only bare digits on the widget route redirect onto `mmvo{digits}`.
+  const hasKey = Boolean(route.idRegex) || digitsRegex.test(value)
 
   return {
     provider,
-    id: `${idPrefix}${digits}`,
-    src: `${route.srcPrefix}${digits}`,
+    id: hasKey ? `${idPrefix}${value}` : undefined,
+    src: `${route.srcPrefix}${value}`,
   }
 }
 
@@ -72,3 +74,8 @@ const nbcnewsResolveEmbed: ResolveEmbed = (url) => {
 // nbcnews.com/widget/video-embed/{id}, and the same player on today.com/today/embedded-video
 // and today.com/offsite/{slug}-{id}.
 export const nbcnewsEmbedResolver = createUrlEmbedResolver(nbcnewsHosts, nbcnewsResolveEmbed)
+
+export const nbcnewsRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: 'true' },
+}

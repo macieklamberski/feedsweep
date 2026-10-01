@@ -1,7 +1,13 @@
 import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches, parsePixelSize, text } from '../utils/dom.js'
-import { composeQuery, placeholderBaseUrl, urlSafeTokenRegex, uuidRegex } from '../utils/urls.js'
+import { attr, text } from '../utils/dom.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  isFileName,
+  placeholderBaseUrl,
+  uuidRegex,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codepen'
@@ -13,8 +19,6 @@ const codepenHosts = ['codepen.io']
 // Slugs come in three lengths: 5 on pens from around 2012, 7 since, and 32 hex on CodePen's own.
 // Pens saved in the 2.0 editor take a uuid instead.
 const slugRegex = /^[A-Za-z0-9]+$/
-// Theme ids are digits or a lowercase name, and panes a comma-joined list of lowercase names.
-const playerParamRegex = /^[a-z0-9,]{1,64}$/
 const leadingAtRegex = /^@/
 
 // Segments CodePen owns in the position a username sits in. `cpe` is the 2.0 editor's own path
@@ -42,22 +46,16 @@ type CodepenTarget = {
   // How the owner is addressed in a public url: `team/{name}` for a team, `{name}` for a person.
   // The player does not care, but the pen's page does.
   ownerPath?: string
+  // The username segment of a player url as written, route words such as `api` included. The
+  // player serves the pen under any word there.
+  playerOwner?: string
   // What opens a private pen: the share dialog's `key`, or the token the loader appends to the
   // slug as a path segment. Without either the placeholder would link to a pen the reader
   // cannot see.
   key?: string
   token?: string
-  // Which panes the player opens on and in what colours. The loader copies both into the query
-  // of the iframe it builds, so a placeholder minted from the block carries them too. Neither
-  // belongs on the pen's own page, which has no panes to choose.
-  defaultTab?: string
-  themeId?: string
   // A block from the 2.0 editor, whose player the loader builds under `/editor/`.
   isEditor?: boolean
-  // The height stated in the player's own query, which is where the loader puts it and where most
-  // iframe urls carry it. An attribute on the carrier outranks it, since that is the box the
-  // publisher actually laid out.
-  height?: number
   slug: string
 }
 
@@ -65,7 +63,7 @@ const readUser = (value: string | undefined): string | undefined => {
   // The share dialog writes the handle with its `@`, while the url path carries both spellings.
   const name = value?.trim().replace(leadingAtRegex, '')
 
-  if (!name || ownerlessUsers.has(name.toLowerCase()) || !urlSafeTokenRegex.test(name)) {
+  if (!name || ownerlessUsers.has(name.toLowerCase())) {
     return
   }
 
@@ -98,42 +96,31 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   // `embed/preview/{slug}` is the deferred-loading player, the same pen behind one more segment.
   const [slug, pathToken] = kind === 'embed' && rest[0] === 'preview' ? rest.slice(1) : rest
 
-  if (!slug || !(slugRegex.test(slug) || uuidRegex.test(slug))) {
+  // CodePen serves assets on its own host, so a file name is an enclosure.
+  if (!slug || isFileName(slug)) {
     return
   }
 
   const user = readUser(rawUser)
-  const token = pathToken ?? parsed.searchParams.get('token') ?? undefined
-  const height = parsePixelSize(parsed.searchParams.get('height'))
+  const queryToken = parsed.searchParams.get('token')
+  // A query token comes out decoded, and it goes into a path beside the raw path spelling.
+  const token = pathToken ?? (queryToken ? encodePathSegment(queryToken) : undefined)
 
   return {
     kind,
     slug,
-    ...trimObject(
-      {
-        user,
-        ownerPath: user && (isTeam ? `team/${user}` : user),
-        key: keepIfMatches(parsed.searchParams.get('key') ?? undefined, urlSafeTokenRegex),
-        token: keepIfMatches(token, urlSafeTokenRegex),
-        height,
-      },
-      Boolean,
-    ),
+    user,
+    ownerPath: user && (isTeam ? `team/${user}` : user),
+    playerOwner: isTeam ? `team/${rawUser}` : rawUser,
+    key: parsed.searchParams.get('key') ?? undefined,
+    token,
+    isEditor: allSegments[0] === 'editor',
   }
 }
 
-const composePenQuery = (target: CodepenTarget, forPlayer: boolean): string => {
-  const grants = trimObject({ key: target.key }, Boolean)
-
-  if (!forPlayer) {
-    return composeQuery(grants)
-  }
-
-  return composeQuery({
-    ...grants,
-    ...(target.defaultTab && { 'default-tab': target.defaultTab }),
-    ...(target.themeId && { 'theme-id': target.themeId }),
-  })
+// The key opens a private pen, so it travels with the player and the page alike.
+const composePenQuery = (target: CodepenTarget): string => {
+  return composeQuery(trimObject({ key: target.key }, Boolean))
 }
 
 const composeThumbnail = (target: CodepenTarget): string => {
@@ -147,7 +134,8 @@ const composeEmbed = (
   target: CodepenTarget,
   extra: Partial<EmbedResolverResult> = {},
 ): EmbedResolverResult => {
-  const owner = target.user ?? anonymousUser
+  // The share dialog spells a team's pen under `team/{name}/`, and the player serves it there.
+  const owner = target.playerOwner ?? target.ownerPath ?? anonymousUser
   const slugPath = target.token ? `${target.slug}/${target.token}` : target.slug
   const playerPath = target.isEditor ? `editor/${owner}` : owner
   let pageOwner = target.ownerPath
@@ -161,15 +149,15 @@ const composeEmbed = (
   return {
     provider,
     id: target.slug,
-    src: `https://codepen.io/${playerPath}/embed/${slugPath}${composePenQuery(target, true)}`,
+    src: `https://codepen.io/${playerPath}/embed/${slugPath}${composePenQuery(target)}`,
     ...(pageOwner && {
-      url: `https://codepen.io/${pageOwner}/pen/${slugPath}${composePenQuery(target, false)}`,
+      url: `https://codepen.io/${pageOwner}/pen/${slugPath}${composePenQuery(target)}`,
     }),
     // `shots.codepen.io` answers its 404 picture for a pen the 2.0 editor slugs with a uuid, and
     // a blank white one for a pen moved to that editor.
     ...(!target.isEditor &&
       !uuidRegex.test(target.slug) && { thumbnail: composeThumbnail(target) }),
-    height: target.height ?? defaultPenHeight,
+    height: defaultPenHeight,
     ...(target.user && { author: `@${target.user}` }),
     ...extra,
   }
@@ -180,7 +168,7 @@ const composeEmbed = (
 const readPenReference = (element: Element): CodepenTarget | undefined => {
   const slug = attr(element, 'data-slug-hash')
 
-  if (slug && slugRegex.test(slug)) {
+  if (slug) {
     return { kind: 'embed', slug }
   }
 
@@ -203,7 +191,7 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
   const { slug, key } = reference
   // The loader appends the block's token to the slug of the player it builds, so a private pen
   // embedded this way names its token here, not in a url.
-  const token = keepIfMatches(attr(element, 'data-token'), urlSafeTokenRegex) ?? reference.token
+  const token = attr(element, 'data-token') ?? reference.token
   let user = reference.user
   let ownerPath = reference.ownerPath
   let linkedTitle: string | undefined
@@ -227,21 +215,9 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
   ownerPath ??= user
 
   const title = attr(element, 'data-pen-title') ?? linkedTitle
-  // The height the author chose for the player, which the loader passes straight through. A
-  // block naming the pen by its whole url states it in that url's query instead, so the
-  // attribute is read first and the url is what answers when it is absent.
-  const height = parsePixelSize(attr(element, 'data-height')) ?? reference.height
-
-  // The panes and the theme the author picked for this player, which the loader would have put
-  // into the query of the iframe it built.
-  const defaultTab = keepIfMatches(attr(element, 'data-default-tab'), playerParamRegex)
-  const themeId = keepIfMatches(attr(element, 'data-theme-id'), playerParamRegex)
   const isEditor = attr(element, 'data-version') === '2'
 
-  return composeEmbed(
-    { kind: 'embed', user, ownerPath, key, token, slug, defaultTab, themeId, isEditor, height },
-    { title },
-  )
+  return composeEmbed({ kind: 'embed', user, ownerPath, key, token, slug, isEditor }, { title })
 }
 
 // CodePen's "See the Pen" paragraph, which only the ei.js loader feeds strip turns into a pen.
@@ -263,7 +239,7 @@ export const codepenResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  return composeEmbed(target, { src: url, title: attr(element, 'title') })
+  return composeEmbed(target, { title: attr(element, 'title') })
 }
 
 // CodePen's player iframe, written by hand or left behind by a CMS that ran ei.js on export.

@@ -1,18 +1,14 @@
 import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches } from '../utils/dom.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { attr } from '../utils/dom.js'
+import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const amebaHosts = ['static.blog-video.jp']
 const amebloHosts = ['ameblo.jp']
 
-// An id is letters and digits, with no length band: the ids in the corpus run to 26 characters
-// and a bound read off them would refuse the next generation.
-const safeVideoIdRegex = /^[A-Za-z0-9]+$/
-const blogIdRegex = /^[a-z0-9-]+$/
 const reblogCardPathRegex = /^\/s\/embed\/reblog-card\/([^/]+)\/entry-([^/]+)\.html$/
-const imagePagePathRegex = /^\/p\/embed\/([a-z0-9-]+\/image-\d+-\d+)\.html$/
+const imagePagePathRegex = /^\/p\/embed\/([^/]+\/image-[^/]+)\.html$/
 
 // Ameba's movie player, `static.blog-video.jp/?v={id}`, for a video uploaded into a blog post.
 // The id is the whole key the platform's own endpoint takes. Its thumbnails are pathed by the
@@ -20,14 +16,15 @@ const imagePagePathRegex = /^\/p\/embed\/([a-z0-9-]+\/image-\d+-\d+)\.html$/
 export const amebaResolveEmbed: ResolveEmbed = (url) => {
   const videoId = parseUrl(url, placeholderBaseUrl)?.searchParams.get('v')
 
-  if (!videoId || !safeVideoIdRegex.test(videoId)) {
+  if (!videoId) {
     return
   }
 
   return {
     provider: 'ameba',
     id: videoId,
-    src: `https://${amebaHosts[0]}/?v=${videoId}`,
+    src: `https://${amebaHosts[0]}/${composeQuery({ v: videoId })}`,
+    ratio: '16/9',
   }
 }
 
@@ -37,12 +34,11 @@ const readReblogCardId = (
   blogId: string | undefined,
   entryId: string | undefined,
 ): string | undefined => {
-  const safeBlogId = keepIfMatches(blogId, blogIdRegex)
-  const safeEntryId = keepIfMatches(entryId, digitsRegex)
-
-  if (safeBlogId && safeEntryId) {
-    return `${safeBlogId}/entry-${safeEntryId}`
+  if (!blogId || !entryId) {
+    return
   }
+
+  return `${blogId}/entry-${entryId}`
 }
 
 // Ameba's reblog card, `ameblo.jp/s/embed/reblog-card/{amebaId}/entry-{entryId}.html`, the iframe
@@ -68,6 +64,7 @@ export const amebaReblogCardEmbedResolver = createUrlEmbedResolver(amebloHosts, 
     id,
     src: `https://${amebloHosts[0]}/s/embed/reblog-card/${id}.html`,
     url: `https://${amebloHosts[0]}/${id}.html`,
+    height: 234,
   }
 })
 
@@ -86,5 +83,6 @@ export const amebaImagePageEmbedResolver = createUrlEmbedResolver(amebloHosts, (
     id: match[1],
     src: `https://${amebloHosts[0]}/p/embed/${match[1]}.html`,
     url: `https://${amebloHosts[0]}/${match[1]}.html`,
+    ratio: '360/416',
   }
 })

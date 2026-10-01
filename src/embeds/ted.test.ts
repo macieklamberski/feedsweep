@@ -56,22 +56,18 @@ describe('extractTedTalk', () => {
     expect(extractTedTalk(value)).toBe(expected)
   })
 
-  it('should return undefined for a slug led by an encoded slash', () => {
-    const value = 'https://embed.ted.com/talks/%2Fethan_zuckerman.html'
-
-    expect(extractTedTalk(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a slug followed by an encoded slash', () => {
+  it('should use a malformed slug as written, even if the player answers an error', () => {
     const value = 'https://embed.ted.com/talks/ethan_zuckerman%2F..%2Fx.html'
+    const expected = 'ethan_zuckerman%2F..%2Fx'
 
-    expect(extractTedTalk(value)).toBeUndefined()
+    expect(extractTedTalk(value)).toBe(expected)
   })
 
-  it('should return undefined for a slug whose suffix only starts with html', () => {
+  it('should use a malformed slug suffix as written, even if the player answers an error', () => {
     const value = 'https://embed.ted.com/talks/ethan_zuckerman.htmlx'
+    const expected = 'ethan_zuckerman.htmlx'
 
-    expect(extractTedTalk(value)).toBeUndefined()
+    expect(extractTedTalk(value)).toBe(expected)
   })
 
   it('should return undefined for a ted url that is not a talk', () => {
@@ -192,6 +188,40 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should use a malformed talk key as written, even if the url answers an error', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          flashvars="adKeys=talk=brene-brown.on_vulnerability;year=2010"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: 'brene-brown.on_vulnerability',
+        src: 'https://embed.ted.com/embed/brene-brown.on_vulnerability',
+        url: 'https://www.ted.com/talks/brene-brown.on_vulnerability',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a decoded talk key carrying a separator in one path segment', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          flashvars="adKeys=talk%3Dbrene_brown%2F..%2Fx%3Byear%3D2010"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: 'brene_brown%2F..%2Fx',
+        src: 'https://embed.ted.com/embed/brene_brown%2F..%2Fx',
+        url: 'https://www.ted.com/talks/brene_brown%2F..%2Fx',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The `<object>` dialect states the configuration in a sibling param rather than on the
     // carrier, and both spellings appear in the same snippet.
     it('should read the configuration out of a sibling param', async () => {
@@ -260,17 +290,21 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // A slug sitting at the truncation cap is a prefix of the real one two times in three, and
-    // refusing it leaves the generic placeholder rather than a TED one whose link does not serve.
-    it('should refuse a slug sitting at the truncation cap', async () => {
+    it('should use a slug cut at the truncation cap as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
           flashvars="adKeys=talk=nicholas_christakis_the_hidden_influence_of_social_netw;year=2010"
         />
       `
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: 'nicholas_christakis_the_hidden_influence_of_social_netw',
+        src: 'https://embed.ted.com/embed/nicholas_christakis_the_hidden_influence_of_social_netw',
+        url: 'https://www.ted.com/talks/nicholas_christakis_the_hidden_influence_of_social_netw',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should refuse a player whose configuration names no talk', async () => {

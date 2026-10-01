@@ -175,10 +175,15 @@ describe('mailruResolveEmbed', () => {
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a numeric route whose id is not a number', () => {
+    it('should use a malformed numeric id as written, even if the player answers an error', () => {
       const value = 'https://my.mail.ru/video/embed/latest'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'latest',
+        src: 'https://my.mail.ru/video/embed/latest',
+      }
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore the numeric route behind another segment', () => {
@@ -249,10 +254,17 @@ describe('mailruResolveEmbed', () => {
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should refuse a movieSrc whose segments climb out of the minted path', () => {
+    it('should use a malformed movieSrc as written, even if the player answers an error', () => {
       const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/../../885&autoplay=0'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/../../885',
+        src: 'https://my.mail.ru/mail/../video/embed/../885',
+        url: 'https://my.mail.ru/mail/../video/../885.html',
+        author: '..',
+      }
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(value)).toEqual(expected)
     })
 
     it('should refuse a movieSrc behind a dot segment', () => {
