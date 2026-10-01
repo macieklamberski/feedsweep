@@ -1,18 +1,20 @@
-import { getPathSegments, isPlainObject } from 'trousse'
+import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, parsePixelSize, text } from '../utils/dom.js'
+import { attr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createS9eEmbedResolver,
+  createUrlEmbedResolver,
+} from '../utils/widgets.js'
 
 const provider = 'reddit'
 
 const redditHosts = ['reddit.com', 'redditmedia.com']
 
-const safeNameRegex = /^[A-Za-z0-9_-]+$/
-// The post counter started at one base36 character in 2005, and two-character permalinks are still
-// linked from real feeds.
-const safeThingIdRegex = /^[a-z0-9]+$/i
+// A removed account's byline links `/user/[deleted]/`, which names nobody.
+const deletedAccountNames = ['[deleted]', '%5Bdeleted%5D']
 
 // What a permalink names. A post carries a title, a comment does not, and a subreddit names
 // neither, so the kind decides which fields the widget can fill.
@@ -43,7 +45,7 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
 
   const [scope, name, comments, postId] = segments
 
-  if ((scope !== 'r' && scope !== 'user') || !name || !safeNameRegex.test(name)) {
+  if ((scope !== 'r' && scope !== 'user') || !name) {
     return
   }
 
@@ -55,7 +57,7 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
     return scope === 'r' ? { kind: 'subreddit', path: `r/${name}`, publisher } : undefined
   }
 
-  if (comments !== 'comments' || !postId || !safeThingIdRegex.test(postId)) {
+  if (comments !== 'comments' || !postId) {
     return
   }
 
@@ -68,9 +70,7 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
   const commentId = segments[5]
 
   if (commentId) {
-    return safeThingIdRegex.test(commentId)
-      ? { kind: 'comment', path: `${post}/comment/${commentId}`, publisher }
-      : undefined
+    return { kind: 'comment', path: `${post}/comment/${commentId}`, publisher }
   }
 
   return { kind: 'post', path: post, publisher }
@@ -80,7 +80,7 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
 const parseAuthor = (value: string | undefined): string | undefined => {
   const [scope, name, rest] = parseRedditPath(value) ?? []
 
-  if (scope !== 'user' || rest !== undefined || !name || !safeNameRegex.test(name)) {
+  if (scope !== 'user' || rest !== undefined || !name || isAnyOf(name, deletedAccountNames)) {
     return
   }
 
@@ -132,11 +132,7 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
   // either into the player's `created` query beside `showedits`, which hides the edits made after
   // the embed code was generated. So both stamp the embed, and neither reaches `date`.
 
-  // data-embed-height is the height Reddit's dialog states, spelled as an inline style as well, and
-  // neither states a width.
-  const height = parsePixelSize(attr(element, 'data-embed-height'))
-
-  return composeEmbed(target, { title, author, height })
+  return composeEmbed(target, { title, author })
 }
 
 // Reddit's snippet: a blockquote of links that only the widgets.js loader turns into the card.
@@ -156,6 +152,12 @@ export const redditResolveEmbed: ResolveEmbed = (url, element) => {
 // The embed.reddit.com frame the loader builds, kept by exports that stored the rendered page.
 // redditmedia.com redirects to embed.reddit.com path for path.
 export const redditIframeEmbedResolver = createUrlEmbedResolver(redditHosts, redditResolveEmbed)
+
+// A forum's s9e MediaEmbed helper frame, naming the post as `{subreddit}/comments/{id}` in its
+// url fragment.
+export const redditS9eEmbedResolver = createS9eEmbedResolver('reddit', (fragment) => {
+  return redditResolveEmbed(`https://www.reddit.com/r/${fragment}`)
+})
 
 // The player reports its height under a `resize.embed` type, first as 0 and then as the rendered
 // value once the post is in, so the first message reads as nothing.

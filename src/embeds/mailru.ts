@@ -4,20 +4,19 @@ import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mailru'
+const playerRatio = '16/9'
 
 // `my.mail.ru` serves the player, `api.video.mail.ru` was the host of the older embed and no
 // longer resolves, and `img.mail.ru` served the Flash player.
 const mailruHosts = ['my.mail.ru', 'api.video.mail.ru', 'img.mail.ru']
 
-// The share dialog writes a negative id for some accounts, so the sign stays.
-const numericPathRegex = /^\/video\/embed\/(-?\d+)\/?$/
+const numericPathRegex = /^\/video\/embed\/([^/]+)\/?$/
 // api.video.mail.ru/videos/embed/{type}/{user}/{album}/{n}.html is dead, and the same path on
 // videoapi.my.mail.ru 301s to my.mail.ru/{type}/{user}/video/embed/{album}/{n}.
 const legacyPathRegex = /^\/videos\/embed\/(.+)\.html$/
-const modernPathRegex = /^\/([a-z]+)\/([\w.-]+)\/video\/embed\/([\w.-]+)\/(\d+)\/?$/
-// {type}/{user}/{album}/{counter}, with no segment made of dots alone: movieSrc arrives decoded,
-// so a dot segment would climb out of the minted path.
-const subjectRegex = /^([a-z]+)\/((?!\.+\/)[\w.-]+)\/((?!\.+\/)[\w.-]+)\/(\d+)$/
+const modernPathRegex = /^\/([^/]+)\/([^/]+)\/video\/embed\/([^/]+)\/([^/]+)\/?$/
+// {type}/{user}/{album}/{counter}.
+const subjectRegex = /^([^/]+)\/([^/]+)\/([^/]+)\/([^/]+)$/
 const flashPlayerPathRegex = /^\/r\/video2\/\w+\.swf$/
 
 const composeNumeric = (videoId: string): EmbedResolverResult => {
@@ -25,6 +24,7 @@ const composeNumeric = (videoId: string): EmbedResolverResult => {
     provider,
     id: videoId,
     src: `https://my.mail.ru/video/embed/${videoId}`,
+    ratio: playerRatio,
   }
 }
 
@@ -44,6 +44,7 @@ const composeSubject = (subject: string): EmbedResolverResult | undefined => {
     id: `${type}/${user}/${album}/${counter}`,
     src: `https://my.mail.ru/${type}/${user}/video/embed/${album}/${counter}`,
     url: `https://my.mail.ru/${type}/${user}/video/${album}/${counter}.html`,
+    ratio: playerRatio,
     author: user,
   }
 }

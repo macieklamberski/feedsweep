@@ -31,6 +31,18 @@ export const unwrapNestedCodeWrappers: DomTransform = () => {
         continue
       }
 
+      // The inner element often carries the language class, as in <code><code class="language-js">.
+      for (const { name, value } of Array.from(element.attributes)) {
+        if (name === 'class') {
+          parent.classList.add(...element.classList)
+          continue
+        }
+
+        if (!parent.hasAttribute(name)) {
+          parent.setAttribute(name, value)
+        }
+      }
+
       while (element.firstChild) {
         parent.insertBefore(element.firstChild, element)
       }

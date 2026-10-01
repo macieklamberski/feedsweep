@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -171,19 +172,17 @@ describeForEachParser('convertBreaksToParagraphs', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should not touch a loose container nested inside <code>', async () => {
+      const value = '<code><div>a<br><br>b</div></code>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should empty a container with only <br>s', async () => {
       const value = '<div><br><br><br></div>'
       const expected = '<div></div>'
 
       expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should be idempotent', async () => {
-      const value = '<div>First<br><br>Second<br><br>Third</div>'
-      const once = await transform(value)
-      const twice = await transform(once)
-
-      expect(twice).toEqualHtml(once)
     })
 
     it('should leave content alone when no <br><br> is present', async () => {
@@ -203,5 +202,26 @@ describeForEachParser('convertBreaksToParagraphs', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    it('should be idempotent', async () => {
+      const value = '<div>First<br><br>Second<br><br>Third</div>'
+      const once = await transform(value)
+      const twice = await transform(once)
+
+      expect(twice).toEqualHtml(once)
+    })
+  })
+})
+
+describeForEachParser('convertBreaksToParagraphs through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should split double-break prose into paragraphs', async () => {
+    const value = '<div>One<br><br>Two</div>'
+    const expected = '<p>One</p><p>Two</p>'
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

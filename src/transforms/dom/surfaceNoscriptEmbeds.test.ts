@@ -20,6 +20,20 @@ describeForEachParser('surfaceNoscriptEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should surface a protocol-relative video iframe resolved against the base url', async () => {
+    const value = html`
+      <noscript>
+        <iframe src="//www.youtube.com/embed/dQw4w9WgXcQ"></iframe>
+      </noscript>
+    `
+    const expected = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>'
+    const result = await applyDomTransforms(parseHtml(value), [
+      surfaceNoscriptEmbeds({ ...baseContext, baseUrl: 'https://example.com' }),
+    ])
+
+    expect(result).toEqualHtml(expected)
+  })
+
   it('should leave a Google Tag Manager noscript alone', async () => {
     const value = html`
       <noscript>
@@ -41,6 +55,30 @@ describeForEachParser('surfaceNoscriptEmbeds', (parseHtml) => {
     const value = html`
       <noscript>
         <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>
+      </noscript>
+    `
+    const expected = html`
+      <div
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
+        data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
+  it('should produce a youtube placeholder from a Drupal oEmbed route end to end', async () => {
+    const value = html`
+      <noscript>
+        <iframe src="/media/oembed?url=https%3A//www.youtube.com/watch%3Fv%3DdQw4w9WgXcQ&amp;hash=abc"></iframe>
       </noscript>
     `
     const expected = html`

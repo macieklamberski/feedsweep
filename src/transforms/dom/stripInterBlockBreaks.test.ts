@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { parseHtml } from '../../parsers/linkedom.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
@@ -352,5 +353,55 @@ describe('stripInterBlockBreaks in a colgroup', () => {
     const result = await applyDomTransforms(parseHtml(value), [stripInterBlockBreaks(baseContext)])
 
     expect(result).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('stripInterBlockBreaks after convertEmojis', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml })
+  }
+
+  it('should remove br between two block elements', async () => {
+    const value = html`
+      <p>First</p>
+      <br>
+      <p>Second</p>
+    `
+    const expected = html`
+      <p>First</p>
+      <p>Second</p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should preserve br after an emoji image convertEmojis marked', async () => {
+    const value = html`
+      <p>
+        Thanks
+        <img
+          src="https://forum.example.com/images/emoji/twitter/party_parrot.png?v=12"
+          class="emoji"
+          alt=":party_parrot:"
+        >
+        <br>
+        See you
+      </p>
+    `
+    const expected = html`
+      <p>
+        Thanks
+        <img
+          data-emoji=""
+          src="https://forum.example.com/images/emoji/twitter/party_parrot.png?v=12"
+          class="emoji"
+          alt=":party_parrot:"
+        >
+        <br>
+        See you
+      </p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

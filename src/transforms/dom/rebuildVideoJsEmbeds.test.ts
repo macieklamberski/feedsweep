@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { rebuildVideoJsEmbeds } from './rebuildVideoJsEmbeds.js'
@@ -43,6 +44,23 @@ describeForEachParser('rebuildVideoJsEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should prefer the poster attribute over the data-setup poster', async () => {
+      const config = JSON.stringify({
+        sources: [{ src: 'https://example.com/clip.mp4', type: 'video/mp4' }],
+        poster: 'https://example.com/setup-poster.jpg',
+      })
+      const value = `<video-js poster="https://example.com/poster.jpg" data-setup='${config}'></video-js>`
+      const expected = html`
+        <video
+          poster="https://example.com/poster.jpg"
+          controls
+          src="https://example.com/clip.mp4"
+        ></video>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should skip past a source it cannot play to one it can', async () => {
       const value = html`
         <video-js>
@@ -67,6 +85,20 @@ describeForEachParser('rebuildVideoJsEmbeds', (parseHtml) => {
       `
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave an element whose only data-setup source is a stream manifest', async () => {
+      const config = JSON.stringify({
+        sources: [{ src: 'https://example.com/live.m3u8', type: 'application/x-mpegURL' }],
+      })
+      const value = `<video-js data-setup='${config}'></video-js>`
+      const expected = html`
+        <video-js
+          data-setup="{&quot;sources&quot;:[{&quot;src&quot;:&quot;https://example.com/live.m3u8&quot;,&quot;type&quot;:&quot;application/x-mpegURL&quot;}]}"
+        ></video-js>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     // A hosted player's element names an id and no file, so it survives this pass untouched and
@@ -113,5 +145,28 @@ describeForEachParser('rebuildVideoJsEmbeds', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('video-js elements the pipeline would otherwise drop', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should hand the reader a native video', async () => {
+    const value = html`
+      <video-js class="vjs-fluid" poster="https://example.com/poster.jpg">
+        <source src="https://example.com/clip.mp4" type="video/mp4">
+      </video-js>
+    `
+    const expected = html`
+      <video
+        poster="https://example.com/poster.jpg"
+        controls
+        src="https://example.com/clip.mp4"
+      ></video>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

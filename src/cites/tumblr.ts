@@ -1,5 +1,5 @@
 import type { CiteResolver } from '../types.js'
-import { buildCite } from '../utils/cites.js'
+import { buildCite, trim } from '../utils/cites.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
 
@@ -16,11 +16,11 @@ type TumblrLinkData = {
 
 // Comparable form of a URL, or of anchor text showing one: Tumblr drops the scheme and may
 // truncate with an ellipsis when it renders a link as its own label.
-const urlScheme = /^https?:\/\//
-const urlTail = /[…/]+$/ // Trailing ellipsis (U+2026) or slash characters
+const urlSchemeRegex = /^https?:\/\//
+const urlTailRegex = /[…/]+$/ // Trailing ellipsis (U+2026) or slash characters
 
 const bareUrl = (value: string): string => {
-  return value.replace(urlScheme, '').replace(urlTail, '')
+  return value.replace(urlSchemeRegex, '').replace(urlTailRegex, '')
 }
 
 // Tumblr's NPF link block: a bare anchor with the card as JSON, or a painted card, poster in CSS.
@@ -47,25 +47,29 @@ export const tumblrCiteResolver: CiteResolver = {
     }
 
     const anchor = find(element, 'a')
-    const url = data.url?.trim() || attr(anchor, 'href')
+    const url = trim(data.url) ?? attr(anchor, 'href')
 
     // The anchor repeats the title when there is one and shows the link itself when there is
     // not, so it only works as a fallback once it is checked against the link.
     const anchorText = text(anchor)
     const isLinkText =
-      !!url && !!anchorText && bareUrl(data.display_url ?? url).startsWith(bareUrl(anchorText))
+      !!url &&
+      !!anchorText &&
+      bareUrl(trim(data.display_url) ?? url).startsWith(bareUrl(anchorText))
+
+    const posters = Array.isArray(data.poster) ? data.poster : []
 
     return buildCite({
       provider: 'tumblr',
       url,
       // The anchor shows the link itself when there is no title, so without the check that link
       // text becomes the title.
-      title: data.title?.trim() || (isLinkText ? undefined : anchorText),
+      title: trim(data.title) ?? (isLinkText ? undefined : anchorText),
       description: data.description,
       author: data.author,
       publisher: data.site_name,
       // Recent posts list posters by media_key only, so the first entry can carry no url.
-      thumbnail: data.poster?.find((poster) => poster.url)?.url,
+      thumbnail: posters.find((poster) => poster.url)?.url,
     })
   },
 }

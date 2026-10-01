@@ -3,8 +3,7 @@ import { removeWithEmptyWrappers, walkElements } from '../../utils/dom.js'
 import { getImageFingerprint } from '../../utils/images.js'
 import { enclosureMarker } from './injectEnclosures.js'
 
-const existingMediaSelector =
-  'audio[src], video[src], iframe[src], source[src], img[src], [data-embed-src]'
+const existingMediaSelector = 'audio[src], video[src], source[src], img[src], [data-embed-src]'
 
 // The image key drops the query, which is what tells podcast proxy episodes apart.
 // A podcast proxy's audio url is `…/play.mp3?url={episode}`, so its identity lives in the query.
@@ -54,7 +53,8 @@ export const stripDuplicateEnclosures: DomTransform = (context) => (document) =>
       continue
     }
 
-    // Keep it, but drop the marker so it doesn't leak into the output.
+    // The standard pipeline keeps the marker so a repeat run skips the enclosure. Here this pass
+    // does that job, since a repeat run's copy matches this one as inline media.
     element.removeAttribute(enclosureMarker)
   }
 }

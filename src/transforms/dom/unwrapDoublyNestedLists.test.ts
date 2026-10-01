@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -207,5 +208,27 @@ describeForEachParser('unwrapDoublyNestedLists', (parseHtml) => {
 
       expect(twice).toEqualHtml(once)
     })
+  })
+})
+
+describeForEachParser('unwrapDoublyNestedLists in the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml })
+  }
+
+  it('should unwrap a wp-block-list ul wrapper', async () => {
+    const value = html`
+      <ul class="wp-block-list">
+        <li style="list-style-type: none;">
+          <ul>
+            <li>A</li>
+            <li>B</li>
+          </ul>
+        </li>
+      </ul>
+    `
+    const expected = '<ul><li>A</li><li>B</li></ul>'
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

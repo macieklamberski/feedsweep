@@ -42,7 +42,7 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // Youku has minted ids of several lengths, so only the `X` and the alphabet are checked.
+    // Youku has minted ids of several lengths, so only the `X` is checked.
     it('should read an id longer than the ones minted so far', async () => {
       const value =
         '<iframe src="https://player.youku.com/embed/XNDUyNTczMDEyOFdvcmtpbmdMb25nZXI="></iframe>'
@@ -59,6 +59,19 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should use a malformed video id as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://player.youku.com/embed/XNDUy_NTcz-MDEyOA"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'youku',
+        id: 'XNDUy_NTcz-MDEyOA',
+        src: 'https://player.youku.com/embed/XNDUy_NTcz-MDEyOA',
+        url: 'https://v.youku.com/v_show/id_XNDUy_NTcz-MDEyOA.html',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore a video id that is not one', async () => {
       const value = '<iframe src="https://player.youku.com/embed/watch"></iframe>'
 
@@ -71,6 +84,34 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should use a malformed VideoIDS value as written, even if the player answers an error', async () => {
+      const value =
+        '<embed src="http://static.youku.com/v1.0.0080/v/swf/qplayer.swf?VideoIDS=MTE4Mzc2NTcy">'
+      const expected: EmbedResolverResult = {
+        provider: 'youku',
+        id: 'MTE4Mzc2NTcy',
+        src: 'https://player.youku.com/embed/MTE4Mzc2NTcy',
+        url: 'https://v.youku.com/v_show/id_MTE4Mzc2NTcy.html',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a VideoIDS value in one path segment and its padding as written', async () => {
+      const value =
+        '<embed src="http://static.youku.com/v1.0.0080/v/swf/qplayer.swf?VideoIDS=XMTI%2FNDk==">'
+      const expected: EmbedResolverResult = {
+        provider: 'youku',
+        id: 'XMTI%2FNDk==',
+        src: 'https://player.youku.com/embed/XMTI%2FNDk==',
+        url: 'https://v.youku.com/v_show/id_XMTI%2FNDk==.html',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore a static-host swf that is not a player', async () => {
       const value =
         '<embed src="http://static.youku.com/v1.0.0080/v/swf/loader.swf?VideoIDS=XMTE4Mzc2NTcy">'
@@ -79,7 +120,45 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/player.youku.com/embed/XODczMzU0NTAw"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/XODczMzU0NTAw"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the embed route below another segment', async () => {
+      const value = '<iframe src="https://player.youku.com/player/embed/XODczMzU0NTAw"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a segment after the embed id', async () => {
+      const value = '<iframe src="https://player.youku.com/embed/XODczMzU0NTAw/v.swf"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player.php swf below another segment', async () => {
+      const value = '<embed src="http://player.youku.com/v/player.php/sid/XODczMzU0NTAw/v.swf">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a segment after the player.php swf', async () => {
+      const value = '<embed src="http://player.youku.com/player.php/sid/XODczMzU0NTAw/v.swf/extra">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the static-host swf below another segment', async () => {
+      const value =
+        '<embed src="http://static.youku.com/x/v1.0.0080/v/swf/qplayer.swf?VideoIDS=XMTE4Mzc2NTcy">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a segment after the static-host swf', async () => {
+      const value =
+        '<embed src="http://static.youku.com/v1.0.0080/v/swf/qplayer.swf/extra?VideoIDS=XMTE4Mzc2NTcy">'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -130,7 +209,7 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
 })
 
 // The enclosure probe offers every attachment a feed carries to this resolver, and the player
-// hosts are the ones a Youku file would sit on, so the id alphabet is what keeps a file playable.
+// hosts are the ones a Youku file would sit on.
 describeForEachParser('youku through the pipeline', (parseHtml) => {
   it('should leave a video enclosure on the player host playable', async () => {
     const enclosures = [

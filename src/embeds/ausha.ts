@@ -1,22 +1,18 @@
-import { getPathSegments } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { getPathSegments, trimObject } from 'trousse'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'ausha'
 
 const aushaHost = 'ausha.co'
 
-// No length: every id is twelve characters today, and a bound would refuse the next id space.
-const safeIdRegex = /^[A-Za-z0-9]+$/
-
-// The v3 player is a fixed height on a fluid width: 220, and 501 with `display=vertical`.
+// The v3 player is a fixed height on a fluid width.
 const playerHeight = 220
-const verticalHeight = 501
 
-// The v2 widget on the other host has no one height. Its 33 frames state 400 (11), 495 (8),
-// 200 (8), 250, 470 and 201, because `playlist` and `mode=latest` change what it holds. Every one
-// of them declares a height, so there is nothing here the carrier does not already say.
-const widgetHosts = ['widget.ausha.co']
-const playerHosts = ['player.ausha.co']
+// The v2 widget takes the same ids as the v3 player, so both are minted as the v3 player.
+const playerHosts = ['player.ausha.co', 'widget.ausha.co']
 
 export const aushaResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, aushaHost)
@@ -25,12 +21,13 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const isPlayer = playerHosts.includes(parsed.hostname)
-  const isWidget = widgetHosts.includes(parsed.hostname)
   const segments = getPathSegments(parsed)
 
   // Both hosts serve their player from the root, spelled either bare or as `index.html`.
-  if ((!isPlayer && !isWidget) || (segments.length > 0 && segments[0] !== 'index.html')) {
+  if (
+    !playerHosts.includes(parsed.hostname) ||
+    (segments.length > 0 && segments[0] !== 'index.html')
+  ) {
     return
   }
 
@@ -40,7 +37,7 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
   const named = [
     ['podcast', podcast],
     ['show', show],
-  ].find(([, value]) => safeIdRegex.test(value as string))
+  ].find(([, value]) => value)
 
   if (!named) {
     return
@@ -48,18 +45,26 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
 
   const [kind, id] = named
 
-  const vertical = parsed.searchParams.get('display') === 'vertical'
+  // The spelling Ausha's share dialog writes, with the start position the frame names.
+  const start = parsed.searchParams.get('t') ?? undefined
+  const query = composeQuery(trimObject({ [`${kind}Id`]: id, v: '3', t: start }, Boolean))
 
   return {
-    provider: 'ausha',
+    provider,
     // `api.ausha.co/v1/podcasts/{id}` is key-free and answers with the episode's title, show,
     // publication date, description and audio url, and 404s on a fabricated id. There is no
     // matching route for a show, so the kind says which of the two an enricher is holding.
     id: `${kind}/${id}`,
-    src: url,
-    ...(isPlayer && { height: vertical ? verticalHeight : playerHeight }),
+    src: `https://player.ausha.co/${query}`,
+    height: playerHeight,
   }
 }
 
 // Ausha's v3 player iframe and the v2 widget, both naming the episode or show in the query.
 export const aushaEmbedResolver = createUrlEmbedResolver([aushaHost], aushaResolveEmbed)
+
+export const aushaRenderHint: EmbedRenderHint = {
+  provider,
+  isReady: isPlayerJsReady,
+  requestPlay: playerJsPlayRequest,
+}

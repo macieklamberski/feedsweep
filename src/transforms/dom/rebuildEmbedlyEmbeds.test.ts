@@ -54,6 +54,17 @@ describeForEachParser('rebuildEmbedlyEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should keep an unencoded query inside the inner src', async () => {
+    const value = html`
+      <iframe
+        src="https://cdn.embedly.com/widgets/media.html?src=https://www.youtube.com/embed/dQw4w9WgXcQ?start=30"
+      ></iframe>
+    `
+    const expected = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=30"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should omit data-thumbnail when there is no image param', async () => {
     const value = html`
       <iframe

@@ -7,7 +7,7 @@ describeForEachParser('Facebook', (parseHtml) => {
   // SDK widget div, facebookXfbmlEmbedResolver the pre-SDK `<fb:post>` tag,
   // facebookAmpEmbedResolver the AMP element, facebookIframeEmbedResolver the plugin url itself
   // and facebookBlockquoteEmbedResolver the dialog's fallback blockquote when the publisher kept
-  // only that. defaultEmojiImageHosts turns the emoji images a pasted post ships into their
+  // only that. facebookEmojiResolver turns the emoji images a pasted post ships into their
   // characters. A comment thread is page chrome, so `.fb-comments` is in
   // defaultNonContentSelectors and the AMP and plugin-url forms of it are refused; the like
   // button and the page timeline are refused for the same reason and disappear as empty tags.
@@ -48,6 +48,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-description="Caption text about the thing."
         data-embed-author="PageName"
         data-embed-date="Tuesday, 3 June 2026"
+        data-embed-height="646"
       ></div>
     `
 
@@ -72,6 +73,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/PageName/videos/123/"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F"
         data-embed-url="https://www.facebook.com/PageName/videos/123/"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -91,6 +93,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/PageName/posts/123"
         data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
+        data-embed-height="646"
       ></div>
       <p>Closing line.</p>
     `
@@ -99,9 +102,8 @@ describeForEachParser('Facebook', (parseHtml) => {
   })
 
   // The AMP element is empty too, and an unknown custom element survives the passes that drop
-  // empty tags, so the contract here is that the size AMP requires on the element reaches the
-  // placeholder.
-  it('should resolve an amp-facebook element and keep its declared size', async () => {
+  // empty tags. The size AMP requires on the element is not read: the post plugin's own height is.
+  it('should resolve an amp-facebook element and ignore its declared size', async () => {
     const value = html`
       <amp-facebook
         width="552"
@@ -112,12 +114,11 @@ describeForEachParser('Facebook', (parseHtml) => {
     `
     const expected = html`
       <div
+        data-embed-height="646"
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
         data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
-        data-embed-width="552"
-        data-embed-height="303"
       ></div>
     `
 
@@ -141,7 +142,7 @@ describeForEachParser('Facebook', (parseHtml) => {
 
   // A lazy loader parks the plugin url in its own attribute and points the frame at a blank
   // page, so the resolver only ever sees a Facebook url because fixLazyIframes puts it back
-  // first. The size the dialog wrote for a Reel is vertical and survives the round trip.
+  // first. The dialog's vertical box for a Reel is not read, so the Reel shows in the 16:9 player.
   it('should recover a plugin iframe parked in a lazy attribute', async () => {
     const value = html`
       <iframe
@@ -155,10 +156,9 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/reel/123/"
-        data-embed-src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F123%2F&show_text=false&width=267"
+        data-embed-ratio="16/9"
+        data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Freel%2F123%2F"
         data-embed-url="https://www.facebook.com/reel/123/"
-        data-embed-width="267"
-        data-embed-height="476"
       ></div>
     `
 
@@ -186,12 +186,14 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/PageName/posts/123"
         data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
+        data-embed-height="646"
       ></div>
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
-        data-embed-src="https://www.facebook.com/plugins/post.php?href=%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123&show_text=true"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
+        data-embed-height="646"
       ></div>
     `
 
@@ -218,6 +220,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/PageName/videos/123/"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F"
         data-embed-url="https://www.facebook.com/PageName/videos/123/"
+        data-embed-ratio="16/9"
         data-embed-description="A video caption."
         data-embed-author="PageName"
         data-embed-date="Wednesday, 4 June 2026"
@@ -282,6 +285,68 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should replace a Facebook emoji image with an empty alt by its filename', async () => {
+    const value = html`
+      <p>Great news
+        <img
+          class="_1ift"
+          src="https://static.xx.fbcdn.net/images/emoji.php/v9/t4/1/16/1f600.png"
+          alt=""
+        >
+        for everyone.</p>
+    `
+    const expected = '<p>Great news 😀 for everyone.</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should replace a Facebook emoji image served from the main host', async () => {
+    const value = html`
+      <p>See you there
+        <img
+          alt=""
+          class="img"
+          src="https://www.facebook.com/images/emoji.php/v9/f57/1/16/1f609.png"
+          width="16"
+        >
+      </p>
+    `
+    const expected = '<p>See you there 😉</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should replace a Facebook emoji painted as a span background', async () => {
+    const value = html`
+      <p>Congrats
+        <span
+          class="_6qdm"
+          style="background-image: url(&quot;https://static.xx.fbcdn.net/images/emoji.php/v9/fe5/1.5/16/1f389.png&quot;); height: 16px; width: 16px;"
+        ></span>
+        to the team.</p>
+    `
+    const expected = '<p>Congrats 🎉 to the team.</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // A post pasted from the classic site paints its emoticons from a sprite sheet the feed does
+  // not load, leaving empty spans that would be deleted as empty tags.
+  it('should replace a classic Facebook emoticon with its character', async () => {
+    const value = html`
+      <p>We are back
+        <span
+          class="emoticon emoticon_smile"
+          style="background-image: url(https://static.example.com/rsrc.php/v2/yO/r/rfFO0dqI-dD.png); display: inline-block; height: 16px; width: 16px;"
+          title=":)"
+        ></span>
+      </p>
+    `
+    const expected = '<p>We are back 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // Facebook refuses to be framed, so a carrier holding the page itself reaches a reader as a
   // blank frame. The plugin takes the page as its href, which is the repair the widget div and
   // the fallback blockquote already perform from their own attributes.
@@ -293,6 +358,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/watch/?v=1010445561578533"
         data-embed-provider="facebook"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1010445561578533"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -311,5 +377,27 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(hub, { parseHtmlFn: parseHtml })).toEqualHtml(
       '<div data-embed-src="https://www.facebook.com/watch"></div>',
     )
+  })
+
+  // A forum's s9e helper frame names a post in its fragment, and facebookS9eEmbedResolver reads
+  // it into the same plugin placeholder a pasted post gives.
+  it('should convert the s9e helper frame into the plugin placeholder', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="facebook"
+        src="https://s9e.github.io/iframe/2/facebook.min.html#example/posts/10150000000000001"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="facebook"
+        data-embed-id="https://www.facebook.com/example/posts/10150000000000001"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fexample%2Fposts%2F10150000000000001"
+        data-embed-url="https://www.facebook.com/example/posts/10150000000000001"
+        data-embed-height="646"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 })
