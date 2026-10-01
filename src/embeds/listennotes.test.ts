@@ -238,6 +238,47 @@ describe('listennotesResolveEmbed', () => {
       expect(listennotesResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep the start time on the episode player', () => {
+      const value =
+        'https://www.listennotes.com/podcasts/the-brighton-parkast/jj-allaire-open-source-JyKXirZS4nc/embed/?t=60&ref=paradoxpairs.com'
+      const expected: EmbedResolverResult = {
+        provider: 'listennotes',
+        id: 'episode/JyKXirZS4nc',
+        src: 'https://www.listennotes.com/podcasts/the-brighton-parkast/jj-allaire-open-source-JyKXirZS4nc/embed/?t=60',
+        url: 'https://www.listennotes.com/podcasts/the-brighton-parkast/jj-allaire-open-source-JyKXirZS4nc/',
+        height: 180,
+      }
+
+      expect(listennotesResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the start time on the hex episode route', () => {
+      const value = 'https://www.listennotes.com/embedded/e/698f97a6d5eb47e0a2ebbfa52b008065/?t=60'
+      const expected: EmbedResolverResult = {
+        provider: 'listennotes',
+        id: 'episode/698f97a6d5eb47e0a2ebbfa52b008065',
+        src: 'https://www.listennotes.com/embedded/e/698f97a6d5eb47e0a2ebbfa52b008065/?t=60',
+        url: 'https://www.listennotes.com/e/698f97a6d5eb47e0a2ebbfa52b008065/',
+        height: 180,
+      }
+
+      expect(listennotesResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the start time from the clip player, which ignores it', () => {
+      const value =
+        'https://www.listennotes.com/podcast-clips/cm-113-priya-parker-on-designing-better-meetings--QRZ_agez1A/embed/?t=60'
+      const expected: EmbedResolverResult = {
+        provider: 'listennotes',
+        id: 'clip/-QRZ_agez1A',
+        src: 'https://www.listennotes.com/podcast-clips/cm-113-priya-parker-on-designing-better-meetings--QRZ_agez1A/embed/',
+        url: 'https://www.listennotes.com/podcast-clips/cm-113-priya-parker-on-designing-better-meetings--QRZ_agez1A/',
+        height: 300,
+      }
+
+      expect(listennotesResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should drop the secret hash a WordPress oEmbed iframe carries', () => {
       const value =
         'https://www.listennotes.com/podcasts/na-het-applaus/rijnmond-big-band-show-maar-7rAmdhfoxbl/embed/#?secret=sGUUoUmeUf'

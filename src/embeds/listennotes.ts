@@ -1,7 +1,7 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'listennotes'
@@ -11,6 +11,9 @@ const listennotesHosts = ['listennotes.com']
 const listennotesOrigin = 'https://www.listennotes.com'
 
 const clipRouteWords = ['clips', 'podcast-clips']
+
+// The episode player starts at `t`, in seconds. The clip player ignores it for its own start.
+const episodeParams = ['t']
 
 // The embed dialog writes each player at a fixed height, and none of them grows with its width.
 const episodeHeight = 180
@@ -31,6 +34,7 @@ type Slugged = {
   pagePath: string
   height: number
   title: string | undefined
+  query?: string
 }
 
 const composeSlugged = (slugged: Slugged): EmbedResolverResult | undefined => {
@@ -43,7 +47,7 @@ const composeSlugged = (slugged: Slugged): EmbedResolverResult | undefined => {
   return {
     provider,
     id: `${slugged.kind}/${shortId}`,
-    src: `${listennotesOrigin}/${slugged.playerPath}/embed/`,
+    src: `${listennotesOrigin}/${slugged.playerPath}/embed/${slugged.query ?? ''}`,
     url: `${listennotesOrigin}/${slugged.pagePath}/`,
     height: slugged.height,
     title: slugged.title,
@@ -60,6 +64,7 @@ export const listennotesResolveEmbed: ResolveEmbed = (url, element) => {
 
   const [route = '', first = '', second, third] = segments
   const title = attr(element, 'title')
+  const episodeQuery = composeQuery(pickQueryParams(parsed?.search ?? '', episodeParams))
 
   if (!second) {
     return
@@ -70,7 +75,7 @@ export const listennotesResolveEmbed: ResolveEmbed = (url, element) => {
     return {
       provider,
       id: `episode/${second}`,
-      src: `${listennotesOrigin}/embedded/e/${second}/`,
+      src: `${listennotesOrigin}/embedded/e/${second}/${episodeQuery}`,
       url: `${listennotesOrigin}/e/${second}/`,
       height: episodeHeight,
       title,
@@ -100,6 +105,7 @@ export const listennotesResolveEmbed: ResolveEmbed = (url, element) => {
       pagePath: path,
       height: episodeHeight,
       title,
+      query: episodeQuery,
     })
   }
 
