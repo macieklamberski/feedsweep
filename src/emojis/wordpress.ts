@@ -2,6 +2,7 @@ import type { EmojiResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
   glyphFromShortcode,
+  isEmojiShaped,
   noEmojiNames,
   resolveEmojiElement,
   resolveEmojiImage,
@@ -31,8 +32,12 @@ export const wordpressEmojiResolver: EmojiResolver = {
 
     // Its smilie filenames are in the forum tables, since they are served from `/smilies/` too.
     const names = element.matches(classSelector) ? smiliesEmojiNames : noEmojiNames
+    // Core writes the glyph into the alt of every emoji, and a smilie carries its typed code, so
+    // the alt tells the emoji set from the smilies even behind a lazy placeholder.
+    const alt = attr(element, 'alt')
+    const isEmojiSet = src.includes(hosts[0]) || (alt !== undefined && isEmojiShaped(alt))
 
-    return resolveEmojiImage(element, { isStrong: true, names })
+    return resolveEmojiImage(element, { isStrong: true, names, keepsPictures: !isEmojiSet })
   },
 }
 

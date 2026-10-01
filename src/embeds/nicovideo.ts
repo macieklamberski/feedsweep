@@ -1,11 +1,10 @@
-import { getPathSegments, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { getPathSegments, isPlainObject } from 'trousse'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
-// A channel upload is addressed by a bare number, so the prefix is optional.
-const safeVideoIdRegex = /^(?:[a-z]{2})?\d+$/
+const provider = 'nicovideo'
 
 // lv names a live broadcast, which the video player answers 500 for and the live host serves as a
 // programme card even after the broadcast ends.
@@ -29,10 +28,14 @@ export const extractNicovideoId = (link: string): string | undefined => {
     return
   }
 
-  const segments = getPathSegments(parsed)
-  const marker = segments.findIndex((segment) => videoIdMarkers.includes(segment))
+  // Every player and card route opens the path, and a marker deeper in it is another page's.
+  const [marker, videoId] = getPathSegments(parsed)
 
-  return keepIfMatches(marker < 0 ? undefined : segments[marker + 1], safeVideoIdRegex)
+  if (!marker || !videoIdMarkers.includes(marker)) {
+    return
+  }
+
+  return videoId
 }
 
 export const nicovideoResolveEmbed: ResolveEmbed = (url) => {
@@ -46,7 +49,7 @@ export const nicovideoResolveEmbed: ResolveEmbed = (url) => {
   // player url. No size is stated for it: a guess would outrank the height the carrier states.
   if (liveIdRegex.test(videoId)) {
     return {
-      provider: 'nicovideo',
+      provider,
       id: videoId,
       src: `https://live.nicovideo.jp/embed/${videoId}`,
       url: `https://live.nicovideo.jp/watch/${videoId}`,
@@ -55,7 +58,7 @@ export const nicovideoResolveEmbed: ResolveEmbed = (url) => {
 
   // embed.nicovideo.jp/watch/{id} answers a real id 200 with the title and an invented one 500.
   return {
-    provider: 'nicovideo',
+    provider,
     id: videoId,
     src: `https://embed.nicovideo.jp/watch/${videoId}`,
     url: `https://www.nicovideo.jp/watch/${videoId}`,
@@ -80,15 +83,20 @@ export const nicovideoScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const parsed = parseUrl(source, placeholderBaseUrl)
-    const width = parsePixelSize(parsed?.searchParams.get('w'))
-    const height = parsePixelSize(parsed?.searchParams.get('h'))
-
-    // A lone height would claim a fixed box the fluid player does not have.
-    if (!width || !height) {
-      return result
-    }
-
-    return { ...result, width, height }
+    return { ...result, ratio: '16/9' }
   },
 )
+
+// The player posts `loadComplete` once it has loaded, and only when `jsapi` is on its url.
+export const isNicovideoReady = (data: unknown): boolean => {
+  return isPlainObject(data) && data.eventName === 'loadComplete'
+}
+
+// The player takes commands only from the origin of its `document.referrer`, and only for the
+// `playerId` on its url.
+export const nicovideoRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { jsapi: '1', playerId: '1' },
+  isReady: isNicovideoReady,
+  requestPlay: { sourceConnectorType: 1, playerId: '1', eventName: 'play' },
+}

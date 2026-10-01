@@ -122,14 +122,6 @@ describeForEachParser('wrapTablesForScroll', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should be idempotent', async () => {
-      const value = '<table><tbody><tr><td>Cell</td></tr></tbody></table>'
-      const once = await transform(value)
-      const twice = await transform(once)
-
-      expect(twice).toEqualHtml(once)
-    })
-
     it('should not stack wrappers when applied multiple times to the same document', async () => {
       const value = '<table><tbody><tr><td>Cell</td></tr></tbody></table>'
       const expected = html`
@@ -227,6 +219,14 @@ describeForEachParser('wrapTablesForScroll', (parseHtml) => {
       `
 
       expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should be idempotent', async () => {
+      const value = '<table><tbody><tr><td>Cell</td></tr></tbody></table>'
+      const once = await transform(value)
+      const twice = await transform(once)
+
+      expect(twice).toEqualHtml(once)
     })
   })
 })

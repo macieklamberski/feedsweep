@@ -87,9 +87,56 @@ describeForEachParser('peertubeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should carry over the subtitle track', async () => {
+      const value = html`
+        <iframe src="https://tube.funfacts.de/w/4RnoEXF5EfXb8iZCjnJsx9?subtitle=de"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'peertube',
+        id: '4RnoEXF5EfXb8iZCjnJsx9',
+        src: 'https://tube.funfacts.de/videos/embed/4RnoEXF5EfXb8iZCjnJsx9?subtitle=de',
+        url: 'https://tube.funfacts.de/w/4RnoEXF5EfXb8iZCjnJsx9',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
+    it('should ignore a slug that ends in a short id', async () => {
+      const value = '<iframe src="https://example.com/w/a-clip-4RnoEXF5EfXb8iZCjnJsx9"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a short id with characters after it', async () => {
+      const value = '<iframe src="https://example.com/w/4RnoEXF5EfXb8iZCjnJsx9-a-clip"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a slug that ends in a uuid', async () => {
+      const value = html`
+        <iframe
+          src="https://example.com/videos/watch/a-clip-1f300b16-b7bb-4d26-88c5-be7fc19ddd56"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a uuid with characters after it', async () => {
+      const value = html`
+        <iframe
+          src="https://example.com/videos/watch/1f300b16-b7bb-4d26-88c5-be7fc19ddd56-a-clip"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a javascript url whose path reads as a watch page', async () => {
       const value = '<iframe src="javascript:/w/4RnoEXF5EfXb8iZCjnJsx9"></iframe>'
 

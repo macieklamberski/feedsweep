@@ -1,11 +1,9 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const megatvHosts = ['megatv.com']
-
-const safeEmbedIdRegex = /^\d+$/
 
 // The 2020 is a fixed prefix the player plugin writes, not the year: a June 2026 article embeds
 // 20202420350 behind it, checked 2026-09-07.
@@ -21,7 +19,7 @@ const megatvResolveEmbed: ResolveEmbed = (url) => {
 
   const id = parsed.searchParams.get('p')
 
-  if (!id || !safeEmbedIdRegex.test(id)) {
+  if (!id) {
     return
   }
 
@@ -35,7 +33,7 @@ const megatvResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider: 'megatv',
     id,
-    src: `https://www.megatv.com/embed/?p=${id}`,
+    src: `https://www.megatv.com/embed/${composeQuery({ p: id })}`,
     url: post ? `https://www.megatv.com/?p=${post}` : undefined,
     // The player is Video.js in fluid mode, and the share dialog boxes it 560 by 315.
     ratio: '16/9',

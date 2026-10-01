@@ -99,6 +99,24 @@ describe('bbcResolveEmbed', () => {
       expect(bbcResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should return undefined for a pid behind a prefix', () => {
+      const value = 'https://www.bbc.com/news/av/embed/xp06sf6tr/46292361'
+
+      expect(bbcResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a pid opening on a percent sign', () => {
+      const value = 'https://www.bbc.com/news/av/embed/%06sf6tr/46292361'
+
+      expect(bbcResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a pid carrying an encoded slash', () => {
+      const value = 'https://www.bbc.com/news/av/embed/p06s%2fr/46292361'
+
+      expect(bbcResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should return undefined for a World Service player naming no pid', () => {
       const value = 'https://www.bbc.com/ws/av-embeds/articles/cy8k2nd7e9no/en-GB/'
 
@@ -166,8 +184,7 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/www.bbc.com/news/av/embed/p06sf6tr/46292361"></iframe>'
+      const value = '<iframe src="https://evil.test/news/av/embed/p06sf6tr/46292361"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

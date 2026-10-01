@@ -30,10 +30,11 @@ describe('extractBloggerToken', () => {
     expect(extractBloggerToken(value)).toBeUndefined()
   })
 
-  it('should return undefined for a token outside the url-safe base64 alphabet', () => {
+  it('should use a malformed token as written, even if the player answers an error', () => {
     const value = 'https://www.blogger.com/video.g?token=../../etc'
+    const expected = '../../etc'
 
-    expect(extractBloggerToken(value)).toBeUndefined()
+    expect(extractBloggerToken(value)).toEqual(expected)
   })
 
   it('should return undefined for an empty token', () => {
@@ -79,6 +80,17 @@ describe('bloggerResolveEmbed', () => {
 
       expect(bloggerResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should keep a token holding an ampersand as one query parameter', () => {
+      const value = 'https://www.blogger.com/video.g?token=AD6v%26x'
+      const expected: EmbedResolverResult = {
+        provider: 'blogger',
+        id: 'AD6v&x',
+        src: 'https://www.blogger.com/video.g?token=AD6v%26x',
+      }
+
+      expect(bloggerResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -117,9 +129,12 @@ describeForEachParser('bloggerEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a host that only carries blogger.com in its path', async () => {
+    it('should return undefined for a foreign host carrying the same path', async () => {
       const value = html`
-        <iframe class="b-hbp-video" src="https://evil.test/blogger.com/video.g?token=${token}"></iframe>
+        <iframe
+          class="b-hbp-video"
+          src="https://evil.test/video.g?token=${token}"
+        ></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()

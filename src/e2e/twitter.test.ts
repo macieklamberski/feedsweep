@@ -281,4 +281,28 @@ describeForEachParser('Twitter', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  // A forum's s9e helper frame names the status in its fragment, and twitterS9eEmbedResolver
+  // reads it into the same player placeholder a pasted frame gives.
+  it('should convert the s9e helper frame into the player placeholder', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="twitter"
+        data-s9e-mediaembed-api="2"
+        style="height:350px;width:550px"
+        src="https://s9e.github.io/iframe/2/twitter.min.html#123456789012345#theme=auto"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="twitter"
+        data-embed-id="123456789012345"
+        data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
+        data-embed-width="550"
+        data-embed-height="350"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })

@@ -4,8 +4,8 @@ import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const aparatHosts = ['aparat.com']
-const scriptPathRegex = /^\/embed\/([a-zA-Z0-9]+)$/
-const framePathRegex = /^\/video\/video\/embed\/videohash\/([a-zA-Z0-9]+)(?:\/vt\/frame)?\/?$/
+const scriptPathRegex = /^\/embed\/([^/]+)$/
+const framePathRegex = /^\/video\/video\/embed\/videohash\/([^/]+)(?:\/vt\/frame)?\/?$/
 
 // `aparat.com/etc/api/video/videohash/{hash}` answers with the title, the uploader, the duration
 // and a poster, with no key. The poster's asset url is signed with a `secret=` parameter.

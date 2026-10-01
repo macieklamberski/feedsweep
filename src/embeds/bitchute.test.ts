@@ -106,14 +106,20 @@ describeForEachParser('bitchuteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id of the wrong shape', async () => {
+    it('should use a malformed id as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://www.bitchute.com/embed/0fRr8eQ5hvv8.mp4/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bitchute',
+        id: '0fRr8eQ5hvv8.mp4',
+        src: 'https://www.bitchute.com/embed/0fRr8eQ5hvv8.mp4/',
+        url: 'https://www.bitchute.com/video/0fRr8eQ5hvv8.mp4/',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/bitchute.com/embed/0fRr8eQ5hvv8/"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/0fRr8eQ5hvv8/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

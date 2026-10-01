@@ -94,4 +94,19 @@ describeForEachParser('discuzEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should leave a photo whose smilieid holds a filename untouched', async () => {
+    const value = html`
+      <p>
+        <img
+          smilieid="presentacion.jpeg"
+          src="https://example.com/img/presentacion.jpeg"
+          width="632"
+          height="206"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
 })

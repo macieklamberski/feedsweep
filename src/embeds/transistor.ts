@@ -1,10 +1,10 @@
 import { getPathSegments } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
+import { isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-const safeIdRegex = /^[0-9a-z]+$/i
-// A show slug is the publisher's own words, so it hyphenates where an episode id never does.
-const safeSlugRegex = /^[0-9a-z][0-9a-z-]*$/i
+const provider = 'transistor'
 
 const transistorHosts = ['transistor.fm']
 
@@ -26,14 +26,15 @@ export const extractTransistorEmbed = (link: string): Subject | undefined => {
   const kind = segments[0]
   const subject = segments[1]
 
-  if ((kind !== 'e' && kind !== 's') || !subject) {
+  // Transistor serves the episode audio on the player host, so a file name is an enclosure.
+  if ((kind !== 'e' && kind !== 's') || !subject || isFileName(subject)) {
     return
   }
 
   const mode = showModes.find((named) => named === segments[2])
 
   if (kind === 'e' && mode) {
-    return safeSlugRegex.test(subject) ? { kind: mode, id: subject } : undefined
+    return { kind: mode, id: subject }
   }
 
   // A share page is `/s/{id}` and takes nothing after it. A third segment is a transcript:
@@ -42,7 +43,7 @@ export const extractTransistorEmbed = (link: string): Subject | undefined => {
     return
   }
 
-  return safeIdRegex.test(subject) ? { kind: 'e', id: subject } : undefined
+  return { kind: 'e', id: subject }
 }
 
 export const transistorResolveEmbed: ResolveEmbed = (url) => {
@@ -56,7 +57,7 @@ export const transistorResolveEmbed: ResolveEmbed = (url) => {
   const path = embed.kind === 'e' ? `e/${embed.id}` : `e/${embed.id}/${embed.kind}`
 
   return {
-    provider: 'transistor',
+    provider,
     id: `${subjectNames[embed.kind]}/${embed.id}`,
     src: `https://share.transistor.fm/${path}`,
     // A show mode has no page: the embed slug is not the show's subdomain, which 404s.
@@ -71,3 +72,9 @@ export const transistorEmbedResolver = createUrlEmbedResolver(
   transistorHosts,
   transistorResolveEmbed,
 )
+
+export const transistorRenderHint: EmbedRenderHint = {
+  provider,
+  isReady: isPlayerJsReady,
+  requestPlay: playerJsPlayRequest,
+}

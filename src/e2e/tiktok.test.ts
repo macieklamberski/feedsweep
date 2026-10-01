@@ -85,8 +85,7 @@ describeForEachParser('TikTok', (parseHtml) => {
   })
 
   // The pasted snippet states a landscape box on a player taller than it is wide, so the
-  // placeholder carries the height the player really has instead. The player url keeps the query
-  // the publisher chose.
+  // placeholder carries the height the player really has instead.
   it('should resolve a pasted player and drop the landscape box it declares', async () => {
     const value = html`
       <p>Watch this:</p>
@@ -103,7 +102,7 @@ describeForEachParser('TikTok', (parseHtml) => {
       <div
         data-embed-provider="tiktok"
         data-embed-id="7001234567890123456"
-        data-embed-src="https://www.tiktok.com/player/v1/7001234567890123456?music_info=1&description=1"
+        data-embed-src="https://www.tiktok.com/embed/v2/7001234567890123456"
         data-embed-height="738"
       ></div>
     `
@@ -161,6 +160,27 @@ describeForEachParser('TikTok', (parseHtml) => {
   it('should fall back a framed profile page to a generic placeholder', async () => {
     const value = '<iframe src="https://www.tiktok.com/@cookingwithlynja"></iframe>'
     const expected = '<div data-embed-src="https://www.tiktok.com/@cookingwithlynja"></div>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // A forum's s9e helper frame names the clip in its fragment, and tiktokS9eEmbedResolver reads
+  // it into the same player placeholder a pasted frame gives.
+  it('should convert the s9e helper frame into the player placeholder', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="tiktok"
+        src="https://s9e.github.io/iframe/2/tiktok.min.html#7000000000000000001"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="tiktok"
+        data-embed-id="7000000000000000001"
+        data-embed-src="https://www.tiktok.com/embed/v2/7000000000000000001"
+        data-embed-height="738"
+      ></div>
+    `
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })

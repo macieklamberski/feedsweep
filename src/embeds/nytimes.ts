@@ -3,12 +3,10 @@ import { attr } from '../utils/dom.js'
 
 const provider = 'nytimes'
 
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const nytimesHosts = ['nytimes.com']
-
-const safeIdRegex = /^\d+$/
 
 // The player pages: the current one, which `graphics8.nytimes.com` 301s onto `www`, and the
 // Brightcove-era `bcvideo` one, which answers 400 for every id today. Both name the video the
@@ -31,14 +29,14 @@ export const nytimesResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  if (!id || !safeIdRegex.test(id)) {
+  if (!id) {
     return
   }
 
   return {
     provider,
     id,
-    src: `https://www.nytimes.com${playerPath}?videoId=${id}`,
+    src: `https://www.nytimes.com${playerPath}${composeQuery({ videoId: id })}`,
     ratio: playerRatio,
     title: attr(element, 'title'),
   }
