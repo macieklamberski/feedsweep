@@ -263,6 +263,146 @@ describeForEachParser('archiveIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should state the audio bar height over a carrier sized for the 40 tall bar', async () => {
+    const value = html`
+      <iframe
+        src="https://archive.org/embed/afc1938009_2004B"
+        width="500"
+        height="40"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'afc1938009_2004B',
+      src: 'https://archive.org/embed/afc1938009_2004B',
+      url: 'https://archive.org/details/afc1938009_2004B',
+      thumbnail: 'https://archive.org/services/img/afc1938009_2004B',
+      height: 30,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should state the audio bar height over a carrier sized for the 60 tall bar', async () => {
+    const value = html`
+      <iframe
+        src="https://archive.org/embed/u_20231130"
+        width="400"
+        height="60"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'u_20231130',
+      src: 'https://archive.org/embed/u_20231130',
+      url: 'https://archive.org/details/u_20231130',
+      thumbnail: 'https://archive.org/services/img/u_20231130',
+      height: 30,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should state the audio bar height over a carrier declared just under 100 tall', async () => {
+    const value = html`
+      <iframe
+        src="https://archive.org/embed/em-transe-de-13-de-maio-de-2026"
+        width="500"
+        height="94"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'em-transe-de-13-de-maio-de-2026',
+      src: 'https://archive.org/embed/em-transe-de-13-de-maio-de-2026',
+      url: 'https://archive.org/details/em-transe-de-13-de-maio-de-2026',
+      thumbnail: 'https://archive.org/services/img/em-transe-de-13-de-maio-de-2026',
+      height: 30,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should state the audio bar height over a carrier sized for the 140 tall player', async () => {
+    const value = html`
+      <iframe
+        src="https://archive.org/embed/rocknrollrampage255"
+        width="500"
+        height="140"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'rocknrollrampage255',
+      src: 'https://archive.org/embed/rocknrollrampage255',
+      url: 'https://archive.org/details/rocknrollrampage255',
+      thumbnail: 'https://archive.org/services/img/rocknrollrampage255',
+      height: 30,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should state the audio bar height over a playlist carrier 150 tall', async () => {
+    const value = html`
+      <iframe
+        src="https://archive.org/embed/cmmonsbaby090_alternate&amp;playlist=1&amp;list_height=150"
+        width="100%"
+        height="150"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'cmmonsbaby090_alternate',
+      src: 'https://archive.org/embed/cmmonsbaby090_alternate?playlist=1&list_height=150',
+      url: 'https://archive.org/details/cmmonsbaby090_alternate',
+      thumbnail: 'https://archive.org/services/img/cmmonsbaby090_alternate',
+      height: 30,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should state the audio bar height over a playlist carrier 180 tall', async () => {
+    const value = html`
+      <iframe
+        src="http://archive.org/embed/hand_that_rocks_librivox&amp;playlist=1"
+        width="520"
+        height="180"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'hand_that_rocks_librivox',
+      src: 'https://archive.org/embed/hand_that_rocks_librivox?playlist=1',
+      url: 'https://archive.org/details/hand_that_rocks_librivox',
+      thumbnail: 'https://archive.org/services/img/hand_that_rocks_librivox',
+      height: 30,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should state the video ratio over a video carrier 270 tall', async () => {
+    const value = html`
+      <iframe
+        src="https://archive.org/embed/Muppet_Family_Christmas_ABC_WOC_1988-12-02"
+        width="480"
+        height="270"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'Muppet_Family_Christmas_ABC_WOC_1988-12-02',
+      src: 'https://archive.org/embed/Muppet_Family_Christmas_ABC_WOC_1988-12-02',
+      url: 'https://archive.org/details/Muppet_Family_Christmas_ABC_WOC_1988-12-02',
+      thumbnail: 'https://archive.org/services/img/Muppet_Family_Christmas_ABC_WOC_1988-12-02',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should state the video ratio over a video carrier box', async () => {
     const value = html`
       <iframe src="https://archive.org/embed/TheGoodOldGasMask" width="560" height="384"></iframe>
@@ -534,7 +674,7 @@ describeForEachParser('archive iframe embeds through the pipeline', (parseHtml) 
     })
   }
 
-  it('should place the item without the autoplay the publisher wrote', async () => {
+  it('should place the audio item without the autoplay the publisher wrote', async () => {
     const value = html`
       <iframe
         src="https://archive.org/embed/some_album?playlist=1&autoplay=1&utm_source=news"
@@ -547,7 +687,7 @@ describeForEachParser('archive iframe embeds through the pipeline', (parseHtml) 
         data-embed-src="https://archive.org/embed/some_album?playlist=1"
         data-embed-provider="archive"
         data-embed-id="some_album"
-        data-embed-ratio="16/9"
+        data-embed-height="30"
         data-embed-url="https://archive.org/details/some_album"
         data-embed-thumbnail="https://archive.org/services/img/some_album"
       ></div>
