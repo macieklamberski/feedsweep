@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
+import type { CleanUrlFn, EmbedResolverResult } from '../types.js'
 import { patroniteEmbedResolver, patroniteResolveEmbed } from './patronite.js'
+
+const utmParamRegex = /[?&]utm_\w+=\w+/g
 
 describe('patroniteResolveEmbed', () => {
   describe('happy paths', () => {
@@ -99,7 +101,7 @@ describeForEachParser('patroniteEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
-        '<iframe src="https://evil.test/patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8"></iframe>'
+        '<iframe src="https://evil.test/widget/strajk/114344/small/FF3E3E/FEFFF8"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -107,8 +109,12 @@ describeForEachParser('patroniteEmbedResolver', (parseHtml) => {
 })
 
 describeForEachParser('patronite widget through the pipeline', (parseHtml) => {
-  const convert = (value: string) => {
-    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  const convert = (value: string, cleanUrlFn?: CleanUrlFn) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      cleanUrlFn,
+    })
   }
 
   it('should surface the widget as a placeholder naming the creator page', async () => {
@@ -135,5 +141,28 @@ describeForEachParser('patronite widget through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it("should hand the carrier src to the caller's cleaner", async () => {
+    const value = html`
+      <iframe
+        src="https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8?utm_source=blog"
+        width="300"
+        height="450"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="patronite"
+        data-embed-id="114344"
+        data-embed-src="https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8"
+        data-embed-url="https://patronite.pl/strajk"
+        data-embed-width="300"
+        data-embed-height="450"
+      ></div>
+    `
+    const cleanUrlFn = (url: string) => url.replace(utmParamRegex, '')
+
+    expect(await convert(value, cleanUrlFn)).toEqualHtml(expected)
   })
 })

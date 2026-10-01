@@ -15,6 +15,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'design/UBVMSTz7mhvYogjfdeKcIB',
         src: 'https://embed.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0%3A2&embed-host=share',
         url: 'https://www.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0%3A2',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -41,7 +42,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the page, frame and scaling and drop the viewport and share token', async () => {
+    it('should keep the page and frame and drop the viewport, scaling and share token', async () => {
       const value = html`
         <iframe
           width="800"
@@ -52,7 +53,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'figma',
         id: 'proto/LBH1O9AxQLxp0ixZBd1Pxk',
-        src: 'https://embed.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0%3A1&scaling=contain&embed-host=share',
+        src: 'https://embed.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0%3A1&embed-host=share',
         url: 'https://www.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0%3A1',
         width: 800,
         height: 450,
@@ -69,12 +70,13 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'design/dU9A1ZzvtHiirRTBxtADnC',
         src: 'https://embed.figma.com/file/dU9A1ZzvtHiirRTBxtADnC/Lighting-Beetle-Figma-Fun?node-id=1%3A217&embed-host=share',
         url: 'https://www.figma.com/file/dU9A1ZzvtHiirRTBxtADnC/Lighting-Beetle-Figma-Fun?node-id=1%3A217',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should rebuild a deck and carry its scaling into the src', async () => {
+    it('should rebuild a deck without its scaling', async () => {
       const value = html`
         <iframe
           width="800"
@@ -85,10 +87,38 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'figma',
         id: 'deck/0txckPBPI1OqFNEa9VaKLP',
-        src: 'https://embed.figma.com/deck/0txckPBPI1OqFNEa9VaKLP/TacTik?node-id=1-540&scaling=min-zoom&embed-host=share',
+        src: 'https://embed.figma.com/deck/0txckPBPI1OqFNEa9VaKLP/TacTik?node-id=1-540&embed-host=share',
         url: 'https://www.figma.com/deck/0txckPBPI1OqFNEa9VaKLP/TacTik?node-id=1-540',
         width: 800,
         height: 450,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the node that starts the prototype flow', async () => {
+      const value =
+        '<iframe src="https://embed.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&starting-point-node-id=1%3A754&embed-host=share"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'figma',
+        id: 'proto/zMOWWSHAvmHWuk5UqiOchl',
+        src: 'https://embed.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&starting-point-node-id=1%3A754&embed-host=share',
+        url: 'https://www.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&starting-point-node-id=1%3A754',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the version a prototype names', async () => {
+      const value =
+        '<iframe src="https://embed.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&version-id=2215931418&embed-host=share"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'figma',
+        id: 'proto/zMOWWSHAvmHWuk5UqiOchl',
+        src: 'https://embed.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&version-id=2215931418&embed-host=share',
+        url: 'https://www.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&version-id=2215931418',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -102,6 +132,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'proto/zMOWWSHAvmHWuk5UqiOchl',
         src: 'https://embed.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&embed-host=share',
         url: 'https://www.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -115,6 +146,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'make/UBVMSTz7mhvYogjfdeKcIB',
         src: 'https://embed.figma.com/make/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?embed-host=share',
         url: 'https://www.figma.com/make/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -124,7 +156,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the wrapper path', async () => {
       const value =
-        '<iframe src="https://evil.test/www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2FUBVMSTz7mhvYogjfdeKcIB%2FRed_System_Color-0725"></iframe>'
+        '<iframe src="https://evil.test/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2FUBVMSTz7mhvYogjfdeKcIB%2FRed_System_Color-0725"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -178,8 +210,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the embed path', async () => {
-      const value =
-        '<iframe src="https://evil.test/embed.figma.com/deck/0txckPBPI1OqFNEa9VaKLP/TacTik"></iframe>'
+      const value = '<iframe src="https://evil.test/deck/0txckPBPI1OqFNEa9VaKLP/TacTik"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -235,6 +266,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'design/UBVMSTz7mhvYogjfdeKcIB',
         src: 'https://embed.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?embed-host=share',
         url: 'https://www.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -252,6 +284,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'board/0txckPBPI1OqFNEa9VaKLP',
         src: 'https://embed.figma.com/board/0txckPBPI1OqFNEa9VaKLP/TacTik?embed-host=share',
         url: 'https://www.figma.com/board/0txckPBPI1OqFNEa9VaKLP/TacTik',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

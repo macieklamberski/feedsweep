@@ -27,7 +27,6 @@ import {
   getStylePairRatio,
   getWrapperRatio,
   isPercentageSized,
-  keepIfMatches,
 } from './dom.js'
 import { cleanUrl, parseUrlOnHosts, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
 
@@ -94,18 +93,15 @@ export const createMarkupEmbedResolver = (
 }
 
 // A forum's s9e MediaEmbed helper frame for one platform, composed into that platform's own url.
-// A fragment holding a character the helper page strips, such as a dot, could step out of the
-// composed path, so it is refused.
 export const createS9eEmbedResolver = (
   platform: string,
-  fragmentRegex: RegExp,
   compose: (fragment: string) => EmbedResolverResult | undefined,
   options: ResolverOptions = {},
 ): EmbedResolver => {
   return createMarkupEmbedResolver(
     `iframe[data-s9e-mediaembed="${platform}"]`,
     (element) => {
-      const fragment = keepIfMatches(readS9eFragment(element), fragmentRegex)
+      const fragment = readS9eFragment(element)
 
       if (!fragment) {
         return
@@ -440,14 +436,15 @@ export const cleanResultFields = <Result extends CleanableResult>(
   }
 }
 
-// The src is never cleaned: a player src carries query the platform needs.
 export const prepareEmbedMetadata = (
   metadata: Partial<EmbedResolverResult>,
   context: TransformContext,
 ): Partial<EmbedResolverResult> => {
+  const src = resolveOrDropUrl(metadata.src, context)
+
   return {
     ...cleanResultFields(metadata, context),
-    src: resolveOrDropUrl(metadata.src, context),
+    src: cleanUrl(src, context),
     url: cleanUrl(resolveOrDropUrl(metadata.url, context), context),
     thumbnail: resolveOrKeepUrl(metadata.thumbnail, context),
     avatar: resolveOrKeepUrl(metadata.avatar, context),
@@ -457,7 +454,7 @@ export const prepareEmbedMetadata = (
 
 export const createEmbedPlaceholder = (
   document: Document,
-  metadata: Partial<EmbedResolverResult> & Pick<EmbedResolverResult, 'src'>,
+  metadata: Partial<EmbedResolverResult>,
 ): HTMLElement => {
   const element = document.createElement('div')
   updateEmbedPlaceholder(element, metadata)
@@ -509,7 +506,7 @@ export const updateCitePlaceholder = (
 
 export const createCitePlaceholder = (
   document: Document,
-  result: CiteResolverResult,
+  result: Partial<CiteResolverResult>,
 ): HTMLElement => {
   return createPlaceholder(document, 'cite', normalizeCiteFields(result))
 }

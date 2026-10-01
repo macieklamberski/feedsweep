@@ -1,8 +1,7 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, find, keepIfMatches, parsePixelSize, text, textNode } from '../utils/dom.js'
-import * as styles from '../utils/styles.js'
-import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { attr, find, text, textNode } from '../utils/dom.js'
+import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import {
   atUsername,
   createMarkupEmbedResolver,
@@ -12,10 +11,6 @@ import {
 
 const tiktokHosts = ['tiktok.com']
 
-// A handle is the character set TikTok allows at signup. The signup form's 24-character ceiling
-// is a rule about who can pick a name, not about what the namespace holds.
-const safeHandleRegex = /^[a-zA-Z0-9_.]+$/
-
 // Every player url TikTok has issued frames the clip by its numeric id: `/embed/{id}` and
 // `/embed/v2/{id}` from the oEmbed loader's eras, `/player/v1/{id}` from the current player.
 // All three still serve (probed 2026-08-15; both embed paths answer 400 on a fabricated id).
@@ -23,7 +18,7 @@ const playerPathRegex = /^\/(?:embed(?:\/v2)?|player\/v1)\/(\d+)\/?$/
 
 // A watch url names the clip's owner and the clip: `/@handle/video/{id}`. Sanitized copies
 // sometimes keep only the `/video/{id}` half, so the handle is optional.
-const watchPathRegex = /^(?:\/@([a-zA-Z0-9_.]+))?\/video\/(\d+)\/?$/
+const watchPathRegex = /^(?:\/@([^/]+))?\/video\/(\d+)\/?$/
 
 // Not a 9/16 ratio: the frame stays 738 tall at any width, and the ratio asks 1778 at 1000.
 // The clip is letterboxed inside a frame whose header, caption, sound row and action rail set
@@ -44,36 +39,6 @@ const readWatchUrl = (url: string | undefined): Clip => {
   return { handle, videoId }
 }
 
-const clipSize = (element: Element): { width?: number; height: number } => {
-  const { width, height } = hydratedSize(element)
-
-  return height ? { width, height } : { height: playerHeight }
-}
-
-// A blockquote declares only `max-width` and `min-width`, never a height. Where a CMS stored the
-// page after `embed.js` ran, the hydrated iframe keeps the height it rendered at in its inline
-// style.
-const hydratedSize = (element: Element): { width?: number; height?: number } => {
-  // The stored iframe is matched by the same player paths the direct carrier resolver claims,
-  // so a hydrated copy keeps its measurement whichever player url the CMS wrote.
-  const frame = find(element, 'iframe[src]', (iframe) => {
-    const parsed = parseUrlOnHosts(attr(iframe, 'src'), tiktokHosts)
-
-    return Boolean(parsed && playerPathRegex.test(parsed.pathname))
-  })
-  const height = parsePixelSize(styles.pixels(frame, 'height'))
-
-  if (!height) {
-    return {}
-  }
-
-  // The iframe is `width: 100%` inside the blockquote's own `max-width`, so that box is the
-  // width the height was measured against.
-  const width = parsePixelSize(styles.pixels(element, 'max-width'))
-
-  return width ? { width, height } : {}
-}
-
 const resolveClip = (element: Element): EmbedResolverResult | undefined => {
   const declared = attr(element, 'data-video-id')
   const cite = attr(element, 'cite')
@@ -91,8 +56,7 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
   }
 
   // Sanitizers empty or strip `data-video-id` while leaving the cite or a caption link intact.
-  const declaredId = keepIfMatches(declared, digitsRegex)
-  const videoId = declaredId ?? cited.videoId ?? linked.videoId
+  const videoId = declared ?? cited.videoId ?? linked.videoId
 
   if (!videoId) {
     return
@@ -107,8 +71,7 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
     return Boolean(value && value !== author && !value.startsWith('♬'))
   })
 
-  const authorHandle = author?.slice(1)
-  const handle = cited.handle ?? linked.handle ?? keepIfMatches(authorHandle, safeHandleRegex)
+  const handle = cited.handle ?? linked.handle ?? author?.slice(1)
 
   // The watch page is the path the id already spells, so it is mintable from the same two halves
   // wherever a handle survives: a blockquote whose only source is a body anchor names both. The
@@ -124,12 +87,12 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
     url: cited.videoId ? cite : watchPath && `https://www.tiktok.com/${watchPath}`,
     description: text(caption),
     author,
-    ...clipSize(element),
+    height: playerHeight,
   }
 }
 
 // A profile url and nothing else: `/@handle`, with no video segment after it.
-const profilePathRegex = /^\/@([a-zA-Z0-9_.]+)\/?$/
+const profilePathRegex = /^\/@([^/]+)\/?$/
 
 // The account a blockquote names, from `data-unique-id` where the creator widget declares it,
 // otherwise from the profile anchor. The half-encoded shape keeps no data attributes at all,
@@ -137,7 +100,7 @@ const profilePathRegex = /^\/@([a-zA-Z0-9_.]+)\/?$/
 const readHandle = (element: Element): string | undefined => {
   const declared = attr(element, 'data-unique-id')
 
-  if (declared && safeHandleRegex.test(declared)) {
+  if (declared) {
     return declared
   }
 
@@ -192,7 +155,7 @@ export const tiktokResolveEmbed: ResolveEmbed = (src) => {
     return {
       provider: 'tiktok',
       id: playerId,
-      src,
+      src: `https://www.tiktok.com/embed/v2/${playerId}`,
       height: playerHeight,
     }
   }
@@ -223,7 +186,6 @@ export const tiktokIframeEmbedResolver = createUrlEmbedResolver(
 // A forum's s9e MediaEmbed helper frame, naming the clip id in its url fragment.
 export const tiktokS9eEmbedResolver = createS9eEmbedResolver(
   'tiktok',
-  digitsRegex,
-  (videoId) => tiktokResolveEmbed(`https://www.tiktok.com/embed/v2/${videoId}`),
+  (videoId) => tiktokResolveEmbed(`https://www.tiktok.com/embed/v2/${encodePathSegment(videoId)}`),
   { preferResolverSize: true },
 )

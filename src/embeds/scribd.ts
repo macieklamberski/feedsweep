@@ -1,7 +1,13 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, flashVar, keepIfMatches, parseRatio } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { attr, flashVar } from '../utils/dom.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  parseUrlOnHosts,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The embed routes are the site's own. `scribdassets.com` served the Flash player and serves the
@@ -15,28 +21,37 @@ const documentIdMarkers = ['embeds', 'document', 'doc']
 
 const flashPlayerPathRegex = /\/scribdviewer\.swf$/i
 
-// The snippet states `height="500"` whatever the document's real shape is, which is why
-// third-party wrappers re-wrap it in a container with a computed padding. The iframe carries
-// the truth beside the wrong number, as a bare decimal width over height.
-const aspectRatioAttribute = 'data-aspect-ratio'
+// A private document opens only with its `access_key`, and `start_page` is where reading starts.
+const playerParams = ['access_key', 'start_page']
 
 // The embeds route answers 200 with an identical body for any id, rendering "Document deleted by
 // owner" for a Flash-era id and "Document Not Found" for an invented one.
-const composeEmbed = (document: string): EmbedResolverResult => {
+const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
+  const params = pickQueryParams(search, playerParams)
+  // The Flash `document_id` comes out of a query decoded, and it goes into a path.
+  const segment = encodePathSegment(document)
+
   return {
     provider: 'scribd',
     id: document,
-    src: `https://www.scribd.com/embeds/${document}/content`,
-    url: `https://www.scribd.com/document/${document}`,
+    src: `https://www.scribd.com/embeds/${segment}/content${composeQuery(params)}`,
+    // The document page takes no key, so a private document gets no page url.
+    url: params.access_key ? undefined : `https://www.scribd.com/document/${segment}`,
+    height: 600,
   }
 }
 
 const readDocumentId = (parsed: URL): string | undefined => {
   const segments = getPathSegments(parsed)
-  const marker = segments.findIndex((segment) => documentIdMarkers.includes(segment))
-  const document = marker < 0 ? undefined : segments[marker + 1]
+  // Feeds carry the same routes under `/mobile`, the mobile site's prefix.
+  const [marker, document] = segments[0] === 'mobile' ? segments.slice(1) : segments
 
-  return keepIfMatches(document, digitsRegex)
+  if (!marker || !documentIdMarkers.includes(marker) || !document) {
+    return
+  }
+
+  // Decoded here, like the Flash `document_id`, so the player url encodes it once.
+  return decodeSegment(document) ?? document
 }
 
 // The modern player, `scribd.com/embeds/{id}/content`. `/doc/{id}` is the pre-2018 spelling of
@@ -55,17 +70,10 @@ export const scribdResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const title = attr(element, 'title')
-  const result = { ...composeEmbed(document), title }
-  const ratio = parseRatio(attr(element, aspectRatioAttribute) ?? '')
-
-  // The ratio describes the document and the declared height is a constant, so where both are
-  // present the ratio wins. Where the snippet states no ratio, stating none here hands the
-  // question back to the factory, and the declared size is all there is.
-  return ratio ? { ...result, ratio } : result
+  return { ...composeEmbed(document, parsed.search), title: attr(element, 'title') }
 }
 
-// Scribd's player iframe, /embeds/{id}/content, declared 500 tall whatever the document's shape.
+// Scribd's player iframe, /embeds/{id}/content.
 export const scribdIframeEmbedResolver = createUrlEmbedResolver(scribdHosts, scribdResolveEmbed, {
   preferResolverSize: true,
 })
@@ -79,7 +87,11 @@ export const scribdFlashResolveEmbed: ResolveEmbed = (url, element) => {
 
   const document = parsed.searchParams.get('document_id') ?? flashVar(element, 'document_id')
 
-  return document && digitsRegex.test(document) ? composeEmbed(document) : undefined
+  if (!document) {
+    return
+  }
+
+  return composeEmbed(document)
 }
 
 // Scribd's Flash viewer, scribdviewer.swf, dead since 2020 and naming its document in document_id.

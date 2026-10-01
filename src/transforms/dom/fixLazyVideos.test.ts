@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -80,5 +81,30 @@ describeForEachParser('fixLazyVideos', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('fixLazyVideos through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should give a lazy video a playable src and a poster', async () => {
+    const value = html`
+      <video
+        data-src="https://example.com/clip.mp4"
+        data-poster="https://example.com/still.jpg"
+      ></video>
+    `
+    const expected = html`
+      <video
+        src="https://example.com/clip.mp4"
+        poster="https://example.com/still.jpg"
+        data-src="https://example.com/clip.mp4"
+        data-poster="https://example.com/still.jpg"
+      ></video>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

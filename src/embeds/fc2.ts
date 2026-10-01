@@ -1,8 +1,9 @@
 import { parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
+import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   composeQuery,
+  encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -12,37 +13,21 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'fc2'
 const videoHosts = ['video.fc2.com']
 
-// A content id is a date and letters, bounded only by its alphabet, since a shape read off
-// today's ids would refuse the next generation of them.
-const safeContentIdRegex = /^[A-Za-z0-9]+$/
-
-// The content page is `/content/{id}/`, behind a two-letter language on most snippets. The adult
-// site's `/a/content/` is refused, since the embed player cannot play it.
-const contentPageRegex = /^\/(?:([A-Za-z]{2})\/)?content\/([^/]+)\/?$/
+// The content page is `/content/{id}/`, behind a two-character language on most snippets. The
+// adult site's `/a/content/` is refused, since the embed player cannot play it.
+const contentPageRegex = /^\/(?:([A-Za-z0-9_]{2})\/)?content\/([^/]+)\/?$/
 const embedPlayerRegex = /^\/+embed\/player\/([^/]+)\/?$/i
 const flashPlayerRegex = /^\/flv2\.swf$/
 
 // A shape, not a list: FC2 answers a language it does not serve with the Japanese page, so any two
-// letters still open the video.
-const localeRegex = /^[A-Za-z]{2}$/
+// letters, digits or underscores still open the video.
+const localeRegex = /^[A-Za-z0-9_]{2}$/
 
 // The player reads `tg`, the embedding account's tag, and `sg=0`, which hides the suggestions
 // on its end screen.
 const playerParams = ['tg', 'sg']
 
 type ContentPage = { contentId: string; locale?: string }
-
-const readContentPage = (url: string | undefined): ContentPage | undefined => {
-  const parsed = parseUrlOnHosts(url, videoHosts)
-  const match = parsed?.pathname.match(contentPageRegex)
-  const contentId = keepIfMatches(match?.[2], safeContentIdRegex)
-
-  if (!contentId) {
-    return
-  }
-
-  return { contentId, locale: match?.[1] }
-}
 
 // `/embed/player/{id}/` is the route `outerplayer.min.js` composes. The content page is not a
 // frame target.
@@ -60,8 +45,7 @@ const composeEmbed = (
 
 const fc2IframeResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
-  const match = parsed?.pathname.match(embedPlayerRegex)
-  const contentId = keepIfMatches(match?.[1], safeContentIdRegex)
+  const contentId = parsed?.pathname.match(embedPlayerRegex)?.[1]
 
   if (!parsed || !contentId) {
     return
@@ -77,11 +61,14 @@ const fc2FlashResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const contentId = keepIfMatches(parsed.searchParams.get('i'), safeContentIdRegex)
+  const videoId = parsed.searchParams.get('i')
 
-  if (!contentId) {
+  if (!videoId) {
     return
   }
+
+  // The id comes out of the query decoded, and it goes into a path.
+  const contentId = encodePathSegment(videoId)
 
   // The Flash player names the same account tag `tk` as the loader does.
   const params = trimObject({ tg: parsed.searchParams.get('tk') }, Boolean)
@@ -103,10 +90,10 @@ export const fc2PlayerScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    // The loader plays `data-id` whenever it is present, whatever `url` names.
-    const dataId = attr(element, 'data-id')
-    const page = readContentPage(attr(element, 'url'))
-    const contentId = dataId ? keepIfMatches(dataId, safeContentIdRegex) : page?.contentId
+    // The loader plays `data-id` whenever it is present, whatever `url` names, and the language
+    // still comes from `url`.
+    const page = parseUrlOnHosts(attr(element, 'url'), videoHosts)?.pathname.match(contentPageRegex)
+    const contentId = attr(element, 'data-id') ?? page?.[2]
 
     if (!contentId) {
       return
@@ -120,20 +107,13 @@ export const fc2PlayerScriptEmbedResolver = createMarkupEmbedResolver(
       Boolean,
     )
 
-    // The loader keeps a stated width above 192 and a height above 108. Otherwise it draws the
-    // player 512 wide and 9/16 of the width tall.
-    const statedWidth = parsePixelSize(attr(element, 'w')) ?? 0
-    const statedHeight = parsePixelSize(attr(element, 'h')) ?? 0
-    const width = statedWidth > 192 ? statedWidth : 512
-    const height = statedHeight > 108 ? statedHeight : Math.floor((width * 9) / 16)
-
     // The loader states the length in whole seconds.
     const duration = Number(attr(element, 'd'))
 
     return {
-      ...composeEmbed({ contentId, locale: page?.locale }, params),
-      width,
-      height,
+      ...composeEmbed({ contentId, locale: page?.[1] }, params),
+      // The loader draws the player 9/16 of its width tall where the script states no box.
+      ratio: '16/9',
       title: attr(element, 'tl'),
       duration: duration > 0 ? duration : undefined,
     }
@@ -146,21 +126,22 @@ export const fc2BlogScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="admin.blog.fc2.com/fc2video2.php"]',
   (element) => {
     const loader = parseUrlOnHosts(attr(element, 'src'), 'admin.blog.fc2.com')
-    const contentId = keepIfMatches(loader?.searchParams.get('id'), safeContentIdRegex)
+    const videoId = loader?.searchParams.get('id')
 
-    if (!loader || !contentId) {
+    if (!loader || !videoId) {
       return
     }
 
-    // The shim writes `suggest="off"` on the loader unless `rel=1`, and a smaller box when `s`
-    // is present with any value. The account tag it writes is not derivable from the url.
+    // The id comes out of the query decoded, and it goes into a path.
+    const contentId = encodePathSegment(videoId)
+
+    // The shim writes `suggest="off"` on the loader unless `rel=1`. The account tag it writes is
+    // not derivable from the url.
     const params = loader.searchParams.get('rel') === '1' ? undefined : { sg: '0' }
-    const isSmall = loader.searchParams.has('s')
 
     return {
       ...composeEmbed({ contentId, locale: 'ja' }, params),
-      width: isSmall ? 320 : 446,
-      height: isSmall ? 273 : 380,
+      ratio: '16/9',
     }
   },
 )

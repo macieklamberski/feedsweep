@@ -118,12 +118,12 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should lowercase the two names and leave every other character as the server does', async () => {
+    it('should lowercase the two names and compose each as one parameter', async () => {
       const value = html`<iframe src="https://channel9.msdn.com/Shows/Going+Deep/Inside-Windows-8/player"></iframe>`
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'going+deep/inside-windows-8',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=going+deep&ep=inside-windows-8',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=going%2Bdeep&ep=inside-windows-8',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -162,22 +162,26 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse a show name carrying an ampersand', async () => {
+    it('should keep a show name carrying an ampersand as one parameter', async () => {
       const value = html`<iframe src="https://channel9.msdn.com/Shows/Azure&Friends/An-Episode/player"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'channel9',
+        id: 'azure&friends/an-episode',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=azure%26friends&ep=an-episode',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse an episode name carrying an equals sign', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Shows/Azure-Friday/show=stolen/player"></iframe>`
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse an event session that would add its own parameter to the query', async () => {
+    it('should keep an event session carrying a separator as one parameter', async () => {
       const value = html`<iframe src="https://channel9.msdn.com/Events/Build/2017/T6064&ev=stolen/player"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'channel9',
+        id: 'events/build-2017/t6064&ev=stolen',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?ev=build-2017&session=t6064%26ev%3Dstolen',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 

@@ -1,6 +1,6 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const podomaticHost = 'podomatic.com'
@@ -19,10 +19,6 @@ const html5Heights = toMap({
 // what Podomatic's own snippet writes on all 11 frames in the corpus, and it sits between the two.
 const currentHeight = 205
 
-// episode and podcast are the two kinds PodOmatic answers, and anything else under embed/html5
-// answers 404.
-const html5KindRegex = /^[a-z]+$/
-
 type Player = { kind: string; id: string; src: string; height: number }
 
 const readPlayer = (url: URL): Player | undefined => {
@@ -33,18 +29,19 @@ const readPlayer = (url: URL): Player | undefined => {
   }
 
   // `embed/html5/{episode|podcast}/{id}`, with an optional `style` selecting one of three
-  // player shapes. The style is kept because it is what chose the height.
-  if (segments[1] === 'html5' && html5KindRegex.test(segments[2] ?? '')) {
+  // player shapes. The style is kept because it is what chose the height. Any other kind answers
+  // 404.
+  if (segments[1] === 'html5' && segments[2]) {
     const style = url.searchParams.get('style') ?? ''
     const named = html5Heights.has(style) ? style : 'normal'
     const query = named === 'normal' ? '' : `?style=${named}`
-    const kind = segments[2] as string
+    const kind = segments[2]
     const id = segments[3] ?? ''
 
     return {
       kind,
       id,
-      src: `https://www.podomatic.com/embed/html5/${kind}/${id}${query}`,
+      src: `https://podomatic.com/embed/html5/${kind}/${id}${query}`,
       height: html5Heights.get(named) ?? defaultHtml5Height,
     }
   }
@@ -52,23 +49,22 @@ const readPlayer = (url: URL): Player | undefined => {
   // embed/v2/podcast/{podcast}?episode_id={episode}&theme={theme} is the snippet Podomatic hands
   // out today, and its episode_id is the id the html5 route takes in its path.
   if (segments[1] === 'v2' && segments[2] === 'podcast') {
-    const podcast = segments[3] ?? ''
+    const podcast = segments[3]
 
-    // The podcast segment is written into the src whichever id travels, and ..%2F.. never folds.
-    if (!digitsRegex.test(podcast)) {
+    if (!podcast) {
       return
     }
 
     const episode = url.searchParams.get('episode_id') ?? ''
     const theme = url.searchParams.get('theme')
-    const named = digitsRegex.test(episode) ? `?episode_id=${episode}` : ''
+    const named = episode ? composeQuery({ episode_id: episode }) : ''
     // The theme comes back decoded, so unencoded it could smuggle a second parameter.
     const themed = theme && named ? `&theme=${encodeURIComponent(theme)}` : ''
 
     return {
       kind: named ? 'episode' : 'podcast',
       id: named ? episode : podcast,
-      src: `https://www.podomatic.com/embed/v2/podcast/${podcast}${named}${themed}`,
+      src: `https://podomatic.com/embed/v2/podcast/${podcast}${named}${themed}`,
       height: currentHeight,
     }
   }
@@ -78,7 +74,7 @@ export const podomaticResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, podomaticHost)
   const player = parsed && readPlayer(parsed)
 
-  if (!player || !digitsRegex.test(player.id)) {
+  if (!player?.id) {
     return
   }
 

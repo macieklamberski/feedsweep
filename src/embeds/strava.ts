@@ -1,7 +1,7 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches } from '../utils/dom.js'
-import { digitsRegex, pickUrlParams } from '../utils/urls.js'
+import { attr } from '../utils/dom.js'
+import { pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'strava'
@@ -28,17 +28,16 @@ const composeEmbed = (
   query = '',
 ): EmbedResolverResult | undefined => {
   const embedKind = embedKinds.get(kind ?? '')
-  const embedId = keepIfMatches(id, digitsRegex)
 
-  if (!embedKind || !embedId) {
+  if (!embedKind || !id) {
     return
   }
 
   return {
     provider,
-    id: `${kind}/${embedId}`,
-    src: `https://strava-embeds.com/${kind}/${embedId}${query}`,
-    ...(!query && { url: `https://www.strava.com/${embedKind.page}/${embedId}` }),
+    id: `${kind}/${id}`,
+    src: `https://strava-embeds.com/${kind}/${id}${query}`,
+    ...(!query && { url: `https://www.strava.com/${embedKind.page}/${id}` }),
     ratio: embedKind.ratio,
   }
 }

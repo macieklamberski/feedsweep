@@ -1,7 +1,7 @@
 import { getPathSegments, isHttpUrl, parseUrl } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickUrlParams } from '../utils/urls.js'
+import { pickUrlParams, uuidRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'peertube'
@@ -15,7 +15,6 @@ type PeertubeVideo = {
 // short-uuid translator produces over the flickrBase58 alphabet, which holds no 0, O, I or l.
 // The shape is the whole guard, since the software runs on thousands of instances and there is no
 // host to key on: loosened, it claims any site's /w/{slug} and /videos/watch/{slug}.
-const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const shortIdRegex = /^[1-9A-HJ-NP-Za-km-z]{22}$/
 
 // `/videos/watch/{id}` is the watch page PeerTube served before 4.0 and still answers on.

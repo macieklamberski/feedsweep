@@ -1,6 +1,6 @@
 import { toMap } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'netease'
@@ -20,25 +20,23 @@ const typeRoutes = toMap({
 const playerPathRegex = /^\/+outchain\/player\/?$/
 const flashPlayerPathRegex = /^\/+style\/swf\/widget\.swf$/
 
-const composeResult = (
-  type: string,
-  id: string,
-  height: string | null,
-): EmbedResolverResult | undefined => {
+// Without `height` the player loads its list layout and fills its box. 250 shows the header, about
+// three tracks and the footer, so a playlist shows that it holds more than one.
+const playerHeight = 250
+
+const composeResult = (type: string, id: string): EmbedResolverResult | undefined => {
   const route = typeRoutes.get(type)
 
-  if (!route || !digitsRegex.test(id)) {
+  if (!route || !id) {
     return
   }
-
-  // The player picks its layout from `height`, so it names the form the publisher chose.
-  const params: Record<string, string> = height ? { type, id, height } : { type, id }
 
   return {
     provider,
     id: `${route}/${id}`,
-    src: `https://music.163.com/outchain/player${composeQuery(params)}`,
-    url: `https://music.163.com/${route}?id=${id}`,
+    src: `https://music.163.com/outchain/player${composeQuery({ type, id })}`,
+    url: `https://music.163.com/${route}${composeQuery({ id })}`,
+    height: playerHeight,
   }
 }
 
@@ -54,12 +52,19 @@ export const neteaseResolveEmbed: ResolveEmbed = (url) => {
   const query = parsed.searchParams
 
   if (playerPathRegex.test(parsed.pathname)) {
-    return composeResult(query.get('type') ?? '', query.get('id') ?? '', query.get('height'))
+    return composeResult(query.get('type') ?? '', query.get('id') ?? '')
   }
 
   if (flashPlayerPathRegex.test(parsed.pathname)) {
-    return composeResult(query.get('type') ?? '', query.get('sid') ?? '', query.get('height'))
+    return composeResult(query.get('type') ?? '', query.get('sid') ?? '')
   }
 }
 
-export const neteaseEmbedResolver = createUrlEmbedResolver(neteaseHosts, neteaseResolveEmbed)
+export const neteaseEmbedResolver = createUrlEmbedResolver(neteaseHosts, neteaseResolveEmbed, {
+  preferResolverSize: true,
+})
+
+export const neteaseRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { auto: '1' },
+}

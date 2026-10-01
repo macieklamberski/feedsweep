@@ -74,7 +74,7 @@ describe('extractMegaphoneEmbed', () => {
     expect(extractMegaphoneEmbed(url)).toBeUndefined()
   })
 
-  // An episode id is letters followed by exactly ten digits, so a bare number is not one.
+  // NPR writes its bare story number into ?e=, and an episode id opens with letters.
   it('should not read a bare number as an episode id', () => {
     const value = 'https://playlist.megaphone.fm/?e=510310'
 
@@ -146,6 +146,30 @@ describe('megaphoneResolveEmbed', () => {
       provider: 'megaphone',
       id: 'playlist/NSM7546490835',
       src: 'https://playlist.megaphone.fm/?p=NSM7546490835',
+      height: 482,
+    }
+
+    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should use a malformed episode id as written, even if the player answers an error', () => {
+    const value = 'https://playlist.megaphone.fm/?e=AUDD4761726018%26autoplay%3D1'
+    const expected: EmbedResolverResult = {
+      provider: 'megaphone',
+      id: 'episode/AUDD4761726018&autoplay=1',
+      src: 'https://playlist.megaphone.fm/?e=AUDD4761726018%26autoplay%3D1',
+      height: 200,
+    }
+
+    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should use a malformed playlist id as written, even if the player answers an error', () => {
+    const value = 'https://playlist.megaphone.fm/?p=NSM7546490835%26light%3Dtrue'
+    const expected: EmbedResolverResult = {
+      provider: 'megaphone',
+      id: 'playlist/NSM7546490835&light=true',
+      src: 'https://playlist.megaphone.fm/?p=NSM7546490835%26light%3Dtrue',
       height: 482,
     }
 

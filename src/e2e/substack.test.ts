@@ -943,7 +943,7 @@ describeForEachParser('Substack', (parseHtml) => {
   })
 
   it('should resolve a BandcampToDOM wrap into a bandcamp embed placeholder', async () => {
-    // The bandcamp resolver claims the player iframe and keeps the publisher's size preset.
+    // The bandcamp resolver claims the player iframe and mints the small artwork strip.
     const bandcampAttrs = jsonAttrValue({
       url: 'https://examplelabel.bandcamp.com/track/end-credits',
       thumbnail_url: 'https://substack-post-media.s3.amazonaws.com/public/images/b_700x700.jpeg',
@@ -971,8 +971,8 @@ describeForEachParser('Substack', (parseHtml) => {
       <div
         data-embed-provider="bandcamp"
         data-embed-id="track/1234567890"
-        data-embed-src="https://bandcamp.com/EmbeddedPlayer/track=1234567890/size=large/"
-        data-embed-height="470"
+        data-embed-src="https://bandcamp.com/EmbeddedPlayer/track=1234567890/size=large/tracklist=false/artwork=small/"
+        data-embed-height="120"
       ></div>
     `
     const result = await transformContent(value, { parseHtmlFn: parseHtml })
@@ -1010,7 +1010,7 @@ describeForEachParser('Substack', (parseHtml) => {
       <div
         data-embed-provider="soundcloud"
         data-embed-id="tracks/123456789"
-        data-embed-src="https://w.soundcloud.com/player/?auto_play=false&buying=false&liking=false&download=false&sharing=false&show_artwork=true&show_comments=false&show_playcount=false&show_user=true&hide_related=true&visual=false&start_track=0&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F123456789"
+        data-embed-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/123456789&start_track=0"
         data-embed-url="https://soundcloud.com/exampleradio/mix-4"
         data-embed-thumbnail="https://i1.sndcdn.com/artworks-abc-t500x500.jpg"
         data-embed-height="166"

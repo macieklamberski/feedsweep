@@ -16,7 +16,7 @@ export const pzlinkcardCiteResolver: CiteResolver = {
     return buildCite({
       provider: 'pzlinkcard',
       // A card with no wrapping anchor prints the target in .lkc-url.
-      url: attr(element.closest('a'), 'href') ?? text(element, '.lkc-url'),
+      url: attr(element, 'href') ?? text(element, '.lkc-url'),
       title: text(element, '.lkc-title-text') ?? text(element, '.lkc-title'),
       description: text(element, '.lkc-excerpt'),
       publisher: text(element, '.lkc-domain'),

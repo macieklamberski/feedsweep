@@ -25,6 +25,32 @@ describe('extractPodbeanId', () => {
     expect(extractPodbeanId(value)).toBeUndefined()
   })
 
+  it('should return undefined for an id query off the v2 player route', () => {
+    const value = 'https://www.podbean.com/site/about?i=yx4hr-f3d1e1'
+
+    expect(extractPodbeanId(value)).toBeUndefined()
+  })
+
+  it('should return undefined for the legacy audio post player', () => {
+    const value =
+      'http://www.podbean.com/media/player/audio/postId/5412166?url=http%3A%2F%2Fthetilehurstend.podbean.com%2Fe%2Fepisode-45%2F'
+
+    expect(extractPodbeanId(value)).toBeUndefined()
+  })
+
+  it('should return undefined for the legacy multi-episode player', () => {
+    const value = 'https://www.podbean.com/media/player/multi?playlist=abc'
+
+    expect(extractPodbeanId(value)).toBeUndefined()
+  })
+
+  it('should decode a legacy path id before it moves into the query', () => {
+    const value = 'https://www.podbean.com/media/player/yx4hr%2Ff3d1e1'
+    const expected = 'yx4hr/f3d1e1'
+
+    expect(extractPodbeanId(value)).toBe(expected)
+  })
+
   it('should return undefined for a url that cannot be parsed', () => {
     const value = 'https://['
 
@@ -58,13 +84,26 @@ describe('podbeanResolveEmbed', () => {
     expect(podbeanResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should prefer a height the url states', () => {
+  // The `size` query is the carrier's, which shallow handling does not read.
+  it('should state the player height over a height the url states', () => {
     const value = 'https://www.podbean.com/player-v2/?i=wyvke-1aefb6c-pb&size=315'
     const expected: EmbedResolverResult = {
       provider: 'podbean',
       id: 'wyvke-1aefb6c-pb',
       src: 'https://www.podbean.com/player-v2/?i=wyvke-1aefb6c-pb',
-      height: 315,
+      height: 150,
+    }
+
+    expect(podbeanResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should use a malformed id as written, even if the player answers an error', () => {
+    const value = 'https://www.podbean.com/player-v2/?i=wyvke%26x%3D1-1aefb6c-pb'
+    const expected: EmbedResolverResult = {
+      provider: 'podbean',
+      id: 'wyvke&x=1-1aefb6c-pb',
+      src: 'https://www.podbean.com/player-v2/?i=wyvke%26x%3D1-1aefb6c-pb',
+      height: 150,
     }
 
     expect(podbeanResolveEmbed(value)).toEqual(expected)

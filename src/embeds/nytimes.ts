@@ -3,7 +3,7 @@ import { attr } from '../utils/dom.js'
 
 const provider = 'nytimes'
 
-import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const nytimesHosts = ['nytimes.com']
@@ -29,14 +29,14 @@ export const nytimesResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  if (!id || !digitsRegex.test(id)) {
+  if (!id) {
     return
   }
 
   return {
     provider,
     id,
-    src: `https://www.nytimes.com${playerPath}?videoId=${id}`,
+    src: `https://www.nytimes.com${playerPath}${composeQuery({ videoId: id })}`,
     ratio: playerRatio,
     title: attr(element, 'title'),
   }

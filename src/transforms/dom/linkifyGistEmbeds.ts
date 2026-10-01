@@ -1,9 +1,7 @@
 import type { DomTransform } from '../../types.js'
-import { keepIfMatches } from '../../utils/dom.js'
 import { createLink } from '../../utils/widgets.js'
 
-const gistScriptRegex = /gist\.github\.com\/(?:([^/?"]+)\/)?([A-Za-z0-9]+)\.js/
-const gistIdRegex = /^[A-Za-z0-9]+$/
+const gistScriptRegex = /gist\.github\.com\/(?:([^/?"]+)\/)?([^/?"#]+)\.js/
 
 const gistCarrierSelector = 'script[src*="gist.github.com"], amp-gist[data-gistid]'
 
@@ -11,9 +9,7 @@ const readGistPath = (element: Element): string | undefined => {
   // <amp-gist> names the gist by id alone, with no owner. `gist.github.com/{id}` redirects to
   // the owned URL, so the bare id makes the same link the script form does.
   if (element.localName === 'amp-gist') {
-    const gistId = element.getAttribute('data-gistid')
-
-    return keepIfMatches(gistId, gistIdRegex)
+    return element.getAttribute('data-gistid') || undefined
   }
 
   const match = element.getAttribute('src')?.match(gistScriptRegex)

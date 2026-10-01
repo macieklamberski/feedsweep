@@ -219,6 +219,13 @@ describeForEachParser('convertEmojis', (parseHtml) => {
         expected,
       )
     })
+
+    it('should keep a relative url as written when there is no base url', async () => {
+      const value = '<p><gl-emoji data-fallback-src="/uploads/p.gif"></gl-emoji></p>'
+      const expected = '<p><img src="/uploads/p.gif" alt=":partyparrot:" data-emoji=""></p>'
+
+      expect(await transformWith(value, [imageResolver])).toEqualHtml(expected)
+    })
   })
 
   describe('alt-shape guard', () => {

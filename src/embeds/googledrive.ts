@@ -1,10 +1,9 @@
-import { getPathSegments } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { pickUrlParams } from '../utils/urls.js'
+import { decodeSegment, getPathSegments } from 'trousse'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// A file id is url-safe base64, and nothing else may reach a minted path.
-const fileIdRegex = /^[\w-]+$/
+const provider = 'googledrive'
 
 // A link-shared file from before 2021 answers only with its resource key.
 const accessParams = ['resourcekey']
@@ -20,7 +19,7 @@ export const googledriveResolveEmbed: ResolveEmbed = (url) => {
   const segments = getPathSegments(url)
   const fileId = segments[0] === 'file' && segments[1] === 'd' ? segments[2] : undefined
 
-  if (!fileId || !fileIdRegex.test(fileId)) {
+  if (!fileId) {
     return
   }
 
@@ -30,18 +29,20 @@ export const googledriveResolveEmbed: ResolveEmbed = (url) => {
   // The page and the thumbnail refuse a keyed file without its key, which stays in `src` alone.
   if (accessQuery) {
     return {
-      provider: 'googledrive',
+      provider,
       id: fileId,
       src: `${src}${accessQuery}`,
+      ratio: '4/3',
     }
   }
 
   return {
-    provider: 'googledrive',
+    provider,
     id: fileId,
     src,
     url: `https://drive.google.com/file/d/${fileId}/view`,
-    thumbnail: `https://drive.google.com/thumbnail?id=${fileId}&sz=w640`,
+    thumbnail: `https://drive.google.com/thumbnail${composeQuery({ id: decodeSegment(fileId) ?? fileId, sz: 'w640' })}`,
+    ratio: '4/3',
   }
 }
 
@@ -49,3 +50,8 @@ export const googledriveEmbedResolver = createUrlEmbedResolver(
   googledriveHosts,
   googledriveResolveEmbed,
 )
+
+export const googledriveRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: '1' },
+}

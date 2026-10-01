@@ -81,39 +81,6 @@ describeForEachParser('infogramWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a chart id carrying a separator', async () => {
-      const value = html`
-        <div
-          class="infogram-embed"
-          data-id="../other"
-        ></div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a dot segment after the editor prefix', async () => {
-      const value = html`
-        <div
-          class="infogram-embed"
-          data-id="_/.."
-        ></div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a chart id carrying a slash outside the editor prefix', async () => {
-      const value = html`
-        <div
-          class="infogram-embed"
-          data-id="abc/def"
-        ></div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a mount the loader already filled with its frame', async () => {
       const value = html`
         <div
@@ -133,6 +100,23 @@ describeForEachParser('infogramWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should use a malformed chart id as written, even if the player answers an error', async () => {
+      const value = html`
+        <div
+          class="infogram-embed"
+          data-id="../other"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'infogram',
+        id: '../other',
+        src: 'https://e.infogram.com/../other?src=embed',
+        url: 'https://infogram.com/../other',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should drop a tracker riding beside the live flag', async () => {
       const value = html`
         <div
@@ -268,26 +252,34 @@ describeForEachParser('infogramScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a chart id carrying a slash outside the editor prefix', async () => {
+    it('should ignore a script id that reaches the loader shape only after a prefix', async () => {
       const value = html`
         <script
-          id="infogram_0_abc/def"
+          id="infogram_x_infogram_0_ff7b6712-fc9f-408c-be33-88bc114f32ab"
           src="https://e.infogram.com/js/dist/embed.js"
         ></script>
       `
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
 
-    it('should ignore a dot segment after the editor prefix', async () => {
+  describe('edge cases', () => {
+    it('should use a malformed chart id as written, even if the player answers an error', async () => {
       const value = html`
         <script
-          id="infogram_0__/.."
+          id="infogram_0_abc/def"
           src="https://e.infogram.com/js/dist/embed.js"
         ></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'infogram',
+        id: 'abc/def',
+        src: 'https://e.infogram.com/abc/def?src=embed',
+        url: 'https://infogram.com/abc/def',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
@@ -442,6 +434,20 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should use a malformed chart id as written, even if the player answers an error', async () => {
+      const value = html`
+        <iframe src="https://e.infogram.com/_/xCt9tZZl.JeRza5h27e5F?src=embed"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'infogram',
+        id: '_/xCt9tZZl.JeRza5h27e5F',
+        src: 'https://e.infogram.com/_/xCt9tZZl.JeRza5h27e5F?src=embed',
+        url: 'https://infogram.com/_/xCt9tZZl.JeRza5h27e5F',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should drop a tracker riding beside the layout setting', async () => {
       const value = html`
         <iframe

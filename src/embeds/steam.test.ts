@@ -11,6 +11,7 @@ describe('steamResolveEmbed', () => {
         provider: 'steam',
         id: '355060',
         src: 'https://store.steampowered.com/widget/355060/',
+        params: {},
         url: 'https://store.steampowered.com/app/355060/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/355060/header.jpg',
         height: 190,
@@ -26,6 +27,7 @@ describe('steamResolveEmbed', () => {
         provider: 'steam',
         id: '249610',
         src: 'https://store.steampowered.com/widget/249610/30245/?t=Top-down%2C+2.5D+action+that+combines+elements+of+old-school+shooters+like+Star-Control+and+action-RPGs+like+Diablo+with+an+evolving+weapons+system%2C+32-player+dedicated+servers%2C+coop%2C+and+PVP.',
+        params: {},
         url: 'https://store.steampowered.com/app/249610/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/249610/header.jpg',
         height: 190,
@@ -43,6 +45,7 @@ describe('steamResolveEmbed', () => {
         provider: 'steam',
         id: '249610',
         src: 'https://store.steampowered.com/widget/249610/30245/?t=Top-down%2C+2.5D+action+that+combines+elements+of+old-school+shooters+like+Star-Control+and+action-RPGs+like+Diablo+with+an+evolving+weapons+system%2C+32-player+dedicated+servers%2C+coop%2C+and+PVP.',
+        params: {},
         url: 'https://store.steampowered.com/app/249610/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/249610/header.jpg',
         height: 190,
@@ -85,28 +88,34 @@ describe('steamResolveEmbed', () => {
       expect(steamResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a widget whose app id is not a number', () => {
+    it('should use a malformed app id as written, even if the widget answers an error', () => {
       const value = 'https://store.steampowered.com/widget/news'
+      const expected: EmbedResolverResult = {
+        provider: 'steam',
+        id: 'news',
+        src: 'https://store.steampowered.com/widget/news/',
+        params: {},
+        url: 'https://store.steampowered.com/app/news/',
+        thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/news/header.jpg',
+        height: 190,
+      }
 
-      expect(steamResolveEmbed(value)).toBeUndefined()
+      expect(steamResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should ignore an app id with a prefix before its digits', () => {
-      const value = 'https://store.steampowered.com/widget/x355060'
-
-      expect(steamResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an app id with an encoded path after its digits', () => {
-      const value = 'https://store.steampowered.com/widget/355060%2F..%2Fsearch'
-
-      expect(steamResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a purchase option that is not a number', () => {
+    it('should use a malformed purchase option as written, even if the widget answers an error', () => {
       const value = 'https://store.steampowered.com/widget/355060/abc'
+      const expected: EmbedResolverResult = {
+        provider: 'steam',
+        id: '355060',
+        src: 'https://store.steampowered.com/widget/355060/abc/',
+        params: {},
+        url: 'https://store.steampowered.com/app/355060/',
+        thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/355060/header.jpg',
+        height: 190,
+      }
 
-      expect(steamResolveEmbed(value)).toBeUndefined()
+      expect(steamResolveEmbed(value)).toEqual(expected)
     })
   })
 })
@@ -128,6 +137,7 @@ describeForEachParser('steamEmbedResolver', (parseHtml) => {
         provider: 'steam',
         id: '355060',
         src: 'https://store.steampowered.com/widget/355060/',
+        params: {},
         url: 'https://store.steampowered.com/app/355060/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/355060/header.jpg',
         width: 646,

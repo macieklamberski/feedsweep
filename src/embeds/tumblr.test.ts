@@ -7,19 +7,19 @@ describeForEachParser('tumblrIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, tumblrIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should read the post out of the frame the loader hydrated', async () => {
+    it('should drop the width, language and did the loader wrote on the frame', async () => {
       const value = html`
         <iframe
           class="tumblr-embed tumblr-embed-loaded"
-          src="https://embed.tumblr.com/embed/post/t:AbCdEfGhIjKlMnOpQrStUv/123456789012345678/v2?width=542&language=en_US&did=f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8"
+          src="https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2?width=542&language=en_US&did=f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8"
           height="1391"
           title="Tumblr post"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'tumblr',
-        id: 'AbCdEfGhIjKlMnOpQrStUv/123456789012345678',
-        src: 'https://embed.tumblr.com/embed/post/t:AbCdEfGhIjKlMnOpQrStUv/123456789012345678/v2?width=542&language=en_US&did=f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8',
+        id: '9NYQOutKOEXi4aopdzCr9A/144854447139',
+        src: 'https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2',
         height: 1391,
       }
 
@@ -31,7 +31,7 @@ describeForEachParser('tumblrIframeEmbedResolver', (parseHtml) => {
     it('should ignore the embed route on a foreign host', async () => {
       const value = html`
         <iframe
-          src="https://evil.test/embed/post/t:AbCd/123456789012345678/v2"
+          src="https://evil.test/embed/post/t:AbCd/144854447139/v2"
         ></iframe>
       `
 
@@ -48,38 +48,58 @@ describeForEachParser('tumblrPostEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="tumblr-post"
-          data-href="https://embed.tumblr.com/embed/post/t:AbCdEfGhIjKlMnOpQrStUv/123456789012345678/v2"
+          data-href="https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2"
           data-did="f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8"
         >
-          <a href="https://www.tumblr.com/exampleblog/123456789012345678"
-            >https://www.tumblr.com/exampleblog/123456789012345678</a
+          <a href="https://www.tumblr.com/exampleblog/144854447139"
+            >https://www.tumblr.com/exampleblog/144854447139</a
           >
         </div>
       `
       const expected: EmbedResolverResult = {
         provider: 'tumblr',
-        id: 'AbCdEfGhIjKlMnOpQrStUv/123456789012345678',
-        src: 'https://embed.tumblr.com/embed/post/t:AbCdEfGhIjKlMnOpQrStUv/123456789012345678/v2',
-        url: 'https://www.tumblr.com/exampleblog/123456789012345678',
+        id: '9NYQOutKOEXi4aopdzCr9A/144854447139',
+        src: 'https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2',
+        url: 'https://www.tumblr.com/exampleblog/144854447139',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the older route, which names the blog key bare', async () => {
+    it('should rebuild the older route, which names the blog key bare, on the current one', async () => {
       const value = html`
         <div
           class="tumblr-post"
-          data-href="https://embed.tumblr.com/embed/post/AbCdEfGhIjKlMnOpQrStUv/123456789012345678"
+          data-href="https://embed.tumblr.com/embed/post/9NYQOutKOEXi4aopdzCr9A/144854447139"
         >
-          <a href="https://exampleblog.tumblr.com/post/123456789012345678">A post</a>
+          <a href="https://exampleblog.tumblr.com/post/144854447139">A post</a>
         </div>
       `
       const expected: EmbedResolverResult = {
         provider: 'tumblr',
-        id: 'AbCdEfGhIjKlMnOpQrStUv/123456789012345678',
-        src: 'https://embed.tumblr.com/embed/post/AbCdEfGhIjKlMnOpQrStUv/123456789012345678',
-        url: 'https://exampleblog.tumblr.com/post/123456789012345678',
+        id: '9NYQOutKOEXi4aopdzCr9A/144854447139',
+        src: 'https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2',
+        url: 'https://exampleblog.tumblr.com/post/144854447139',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a blog key holding a dash', async () => {
+      const value = html`
+        <div
+          class="tumblr-post"
+          data-href="https://embed.tumblr.com/embed/post/t:_VkZm-01MMUpjze_q_nAXw/820542561034911744/v2"
+          data-did="f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8"
+        >
+          <a href="https://www.tumblr.com/moviegodsandgoddesses/820542561034911744">…</a>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tumblr',
+        id: '_VkZm-01MMUpjze_q_nAXw/820542561034911744',
+        src: 'https://embed.tumblr.com/embed/post/t:_VkZm-01MMUpjze_q_nAXw/820542561034911744/v2',
+        url: 'https://www.tumblr.com/moviegodsandgoddesses/820542561034911744',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -89,13 +109,13 @@ describeForEachParser('tumblrPostEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="tumblr-post"
-          data-href="//embed.tumblr.com/embed/post/t:AbCd/123456789012345678/v2"
+          data-href="//embed.tumblr.com/embed/post/t:AbCd/144854447139/v2"
         ></div>
       `
       const expected: EmbedResolverResult = {
         provider: 'tumblr',
-        id: 'AbCd/123456789012345678',
-        src: 'https://embed.tumblr.com/embed/post/t:AbCd/123456789012345678/v2',
+        id: 'AbCd/144854447139',
+        src: 'https://embed.tumblr.com/embed/post/t:AbCd/144854447139/v2',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -107,7 +127,7 @@ describeForEachParser('tumblrPostEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="tumblr-post"
-          data-href="https://evil.test/embed/post/t:AbCd/123456789012345678/v2"
+          data-href="https://evil.test/embed/post/t:AbCd/144854447139/v2"
         ></div>
       `
 
@@ -118,29 +138,34 @@ describeForEachParser('tumblrPostEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="tumblr-post"
-          data-href="https://embed.tumblr.com/share/post/t:AbCd/123456789012345678/v2"
+          data-href="https://embed.tumblr.com/share/post/t:AbCd/144854447139/v2"
         ></div>
       `
 
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a blog key carrying a separator', async () => {
+    it('should use a malformed blog key as written, even if the player answers an error', async () => {
       const value = html`
         <div
           class="tumblr-post"
-          data-href="https://embed.tumblr.com/embed/post/t:AbCd%2FEfGh/123456789012345678/v2"
+          data-href="https://embed.tumblr.com/embed/post/t:AbCd%2FEfGh/144854447139/v2"
         ></div>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'tumblr',
+        id: 'AbCd%2FEfGh/144854447139',
+        src: 'https://embed.tumblr.com/embed/post/t:AbCd%2FEfGh/144854447139/v2',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a frame url that stops at the blog key', async () => {
       const value = html`
         <div
           class="tumblr-post"
-          data-href="https://embed.tumblr.com/embed/post/t:AbCdEfGhIjKlMnOpQrStUv"
+          data-href="https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A"
         ></div>
       `
 
@@ -173,7 +198,7 @@ describeForEachParser('tumblrPostEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="tumblr-post"
-          data-href="https://embed.tumblr.com/embed/post/t:AbCd/123456789012345678abc/v2"
+          data-href="https://embed.tumblr.com/embed/post/t:AbCd/144854447139abc/v2"
         ></div>
       `
 
@@ -184,7 +209,7 @@ describeForEachParser('tumblrPostEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="tumblr-post"
-          data-href="https://embed.tumblr.com/embed/blog/t:AbCd/123456789012345678"
+          data-href="https://embed.tumblr.com/embed/blog/t:AbCd/144854447139"
         ></div>
       `
 
@@ -197,13 +222,13 @@ describeForEachParser('tumblrPostEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="tumblr-post"
-          data-href="https://embed.tumblr.com/embed/post/t:AbCd/123456789012345678/v2"
+          data-href="https://embed.tumblr.com/embed/post/t:AbCd/144854447139/v2"
         ></div>
       `
       const expected: EmbedResolverResult = {
         provider: 'tumblr',
-        id: 'AbCd/123456789012345678',
-        src: 'https://embed.tumblr.com/embed/post/t:AbCd/123456789012345678/v2',
+        id: 'AbCd/144854447139',
+        src: 'https://embed.tumblr.com/embed/post/t:AbCd/144854447139/v2',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -213,15 +238,15 @@ describeForEachParser('tumblrPostEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="tumblr-post"
-          data-href="https://embed.tumblr.com/embed/post/t:AbCd/123456789012345678/v2"
+          data-href="https://embed.tumblr.com/embed/post/t:AbCd/144854447139/v2"
         >
-          <a href="https://evil.test/exampleblog/123456789012345678">A post</a>
+          <a href="https://evil.test/exampleblog/144854447139">A post</a>
         </div>
       `
       const expected: EmbedResolverResult = {
         provider: 'tumblr',
-        id: 'AbCd/123456789012345678',
-        src: 'https://embed.tumblr.com/embed/post/t:AbCd/123456789012345678/v2',
+        id: 'AbCd/144854447139',
+        src: 'https://embed.tumblr.com/embed/post/t:AbCd/144854447139/v2',
       }
 
       expect(await extract(value)).toEqual(expected)

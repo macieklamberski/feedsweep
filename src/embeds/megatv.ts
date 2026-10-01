@@ -1,6 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const megatvHosts = ['megatv.com']
@@ -19,7 +19,7 @@ const megatvResolveEmbed: ResolveEmbed = (url) => {
 
   const id = parsed.searchParams.get('p')
 
-  if (!id || !digitsRegex.test(id)) {
+  if (!id) {
     return
   }
 
@@ -33,7 +33,7 @@ const megatvResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider: 'megatv',
     id,
-    src: `https://www.megatv.com/embed/?p=${id}`,
+    src: `https://www.megatv.com/embed/${composeQuery({ p: id })}`,
     url: post ? `https://www.megatv.com/?p=${post}` : undefined,
     // The player is Video.js in fluid mode, and the share dialog boxes it 560 by 315.
     ratio: '16/9',

@@ -3,11 +3,9 @@ import { describeForEachParser, html, jsonAttrValue, resolverExtractor } from '.
 import type { EmbedResolverResult } from '../types.js'
 import {
   blueskyBlockquoteEmbedResolver,
-  blueskyHosts,
   blueskyIframeEmbedResolver,
   blueskyPostElementEmbedResolver,
   blueskyS9eEmbedResolver,
-  readBlueskyHeight,
 } from './bluesky.js'
 
 describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
@@ -545,7 +543,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
       const value = html`
         <blockquote class="bluesky-embed">
           <p lang="en">A link that only looks like a permalink.</p>
-          <a href="https://evil.test/bsky.app/profile/did:plc:9hz4agnyzcrsvpnprxrbjrpa/post/3lyq7aeuwbg42">2025-11-12T13:14:15.016Z</a>
+          <a href="https://evil.test/profile/did:plc:9hz4agnyzcrsvpnprxrbjrpa/post/3lyq7aeuwbg42">2025-11-12T13:14:15.016Z</a>
         </blockquote>
       `
 
@@ -565,7 +563,20 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should refuse an authority that is neither a did nor a handle', async () => {
+    it('should refuse an at uri behind a prefix', async () => {
+      const value = html`
+        <blockquote
+          class="bluesky-embed"
+          data-bluesky-uri="xat://did:plc:9hz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3lzq7aeuwbg42"
+        >
+          <p lang="en">Not the documented scheme.</p>
+        </blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should use a malformed authority as written, even if the player answers an error', async () => {
       const value = html`
         <blockquote
           class="bluesky-embed"
@@ -574,11 +585,18 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
           <p lang="en">Nothing addressable here.</p>
         </blockquote>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'not an authority/3lzq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/not an authority/app.bsky.feed.post/3lzq7aeuwbg42',
+        url: 'https://bsky.app/profile/not an authority/post/3lzq7aeuwbg42',
+        description: 'Nothing addressable here.',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse a record key that is a dot segment', async () => {
+    it('should use a malformed record key as written, even if the player answers an error', async () => {
       const value = html`
         <blockquote
           class="bluesky-embed"
@@ -587,8 +605,15 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
           <p lang="en">The record key would climb out of the collection.</p>
         </blockquote>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:9hz4agnyzcrsvpnprxrbjrpa/..',
+        src: 'https://embed.bsky.app/embed/did:plc:9hz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/..',
+        url: 'https://bsky.app/profile/did:plc:9hz4agnyzcrsvpnprxrbjrpa/post/..',
+        description: 'The record key would climb out of the collection.',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return nothing for a blockquote naming no post at all', async () => {
@@ -742,11 +767,39 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep an avatar served from the older media host', async () => {
+      const payload = jsonAttrValue({
+        authorHandle: 'author.example',
+        authorAvatarUrl:
+          'https://cdn.bsky.social/img/avatar/plain/did:plc:bhz4agnyzcrsvpnprxrbjrpa/bafkreiavatar@jpeg',
+      })
+      const value = html`
+        <div
+          class="bluesky-wrap outer"
+          data-attrs="${payload}"
+          data-component-name="BlueskyCreateBlueskyEmbed"
+        >
+          <iframe src="https://embed.bsky.app/embed/did:plc:dhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mdq7aeuwbg42"></iframe>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:dhz4agnyzcrsvpnprxrbjrpa/3mdq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/did:plc:dhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mdq7aeuwbg42',
+        url: 'https://bsky.app/profile/did:plc:dhz4agnyzcrsvpnprxrbjrpa/post/3mdq7aeuwbg42',
+        author: '@author.example',
+        avatar:
+          'https://cdn.bsky.social/img/avatar/plain/did:plc:bhz4agnyzcrsvpnprxrbjrpa/bafkreiavatar@jpeg',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore media urls served from another host', async () => {
       const payload = jsonAttrValue({
         authorHandle: 'author.example',
-        authorAvatarUrl: 'https://evil.test/cdn.bsky.app/avatar.jpg',
-        imageUrls: ['https://evil.test/cdn.bsky.app/thumb.jpg'],
+        authorAvatarUrl: 'https://evil.test/img/avatar/plain/did:plc:bhz4/bafkreiavatar@jpeg',
+        imageUrls: ['https://evil.test/img/feed_thumbnail/plain/did:plc:bhz4/bafkreithumb@jpeg'],
       })
       const value = html`
         <div
@@ -817,11 +870,40 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
   })
 
   // Every accepted host serves the identical post path, and the minted player is
-  // `embed.bsky.app` whichever one the carrier names. Iterating the exported list keeps a new
-  // entry covered the moment it is added.
+  // `embed.bsky.app` whichever one the carrier names.
   describe('post pasted from an accepted host', () => {
-    it.each(blueskyHosts)('should resolve a post on %s', async (host) => {
-      const value = `<iframe src="https://${host}/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k"></iframe>`
+    it('should resolve a post on bsky.app', async () => {
+      const value = html`
+        <iframe src="https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:z72i7hdynmk6r22z27h6tvur/3kq7aeuwbg42k',
+        src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg42k',
+        url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve a post on deer.social', async () => {
+      const value = html`
+        <iframe src="https://deer.social/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:z72i7hdynmk6r22z27h6tvur/3kq7aeuwbg42k',
+        src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg42k',
+        url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve a post on main.bsky.dev', async () => {
+      const value = html`
+        <iframe src="https://main.bsky.dev/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k"></iframe>
+      `
       const expected: EmbedResolverResult = {
         provider: 'bluesky',
         id: 'did:plc:z72i7hdynmk6r22z27h6tvur/3kq7aeuwbg42k',
@@ -833,13 +915,140 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('authority forms a post url names', () => {
+    it('should read a did:web authority', async () => {
+      const value =
+        '<iframe src="https://bsky.app/profile/did:web:didweb.watch/post/3m6p3vi6mlw2r"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:web:didweb.watch/3m6p3vi6mlw2r',
+        src: 'https://embed.bsky.app/embed/did:web:didweb.watch/app.bsky.feed.post/3m6p3vi6mlw2r',
+        url: 'https://bsky.app/profile/did:web:didweb.watch/post/3m6p3vi6mlw2r',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a did:web authority carrying an encoded port', async () => {
+      const value =
+        '<iframe src="https://bsky.app/profile/did:web:localhost%3A2583/post/3mkq7aeuwbg42"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:web:localhost%3A2583/3mkq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/did:web:localhost%3A2583/app.bsky.feed.post/3mkq7aeuwbg42',
+        url: 'https://bsky.app/profile/did:web:localhost%3A2583/post/3mkq7aeuwbg42',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a did:web authority whose host carries a hyphen', async () => {
+      const value =
+        '<iframe src="https://bsky.app/profile/did:web:news-room.example/post/3mkq7aeuwbg42"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:web:news-room.example/3mkq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/did:web:news-room.example/app.bsky.feed.post/3mkq7aeuwbg42',
+        url: 'https://bsky.app/profile/did:web:news-room.example/post/3mkq7aeuwbg42',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a handle whose first label carries a digit', async () => {
+      const value =
+        '<iframe src="https://bsky.app/profile/news2day.example/post/3mkq7aeuwbg42"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'news2day.example/3mkq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/news2day.example/app.bsky.feed.post/3mkq7aeuwbg42',
+        url: 'https://bsky.app/profile/news2day.example/post/3mkq7aeuwbg42',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a handle whose first label carries a hyphen', async () => {
+      const value =
+        '<iframe src="https://bsky.app/profile/news-room.example/post/3mkq7aeuwbg42"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'news-room.example/3mkq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/news-room.example/app.bsky.feed.post/3mkq7aeuwbg42',
+        url: 'https://bsky.app/profile/news-room.example/post/3mkq7aeuwbg42',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a handle whose later label carries a digit', async () => {
+      const value =
+        '<iframe src="https://bsky.app/profile/alice.team2.example/post/3mkq7aeuwbg42"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'alice.team2.example/3mkq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/alice.team2.example/app.bsky.feed.post/3mkq7aeuwbg42',
+        url: 'https://bsky.app/profile/alice.team2.example/post/3mkq7aeuwbg42',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a handle whose later label carries a hyphen', async () => {
+      const value =
+        '<iframe src="https://bsky.app/profile/alice.news-room.example/post/3mkq7aeuwbg42"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'alice.news-room.example/3mkq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/alice.news-room.example/app.bsky.feed.post/3mkq7aeuwbg42',
+        url: 'https://bsky.app/profile/alice.news-room.example/post/3mkq7aeuwbg42',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   describe('guards', () => {
     it('should not read a player path spelled on another host', async () => {
       const value = html`
-        <iframe src="https://evil.test/embed.bsky.app/embed/did:plc:ghz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mgq7aeuwbg42"></iframe>
+        <iframe src="https://evil.test/embed/did:plc:ghz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mgq7aeuwbg42"></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return nothing for a player url naming no record key', async () => {
+      const value = html`
+        <iframe src="https://embed.bsky.app/embed/did:plc:ghz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should use a malformed handle as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://bsky.app/profile/@newsroom.example/post/3mkq7aeuwbg42"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: '@newsroom.example/3mkq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/@newsroom.example/app.bsky.feed.post/3mkq7aeuwbg42',
+        url: 'https://bsky.app/profile/@newsroom.example/post/3mkq7aeuwbg42',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed record key as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://bsky.app/profile/newsroom.example/post/..%2F3mkq7aeuwbg42"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'newsroom.example/..%2F3mkq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/newsroom.example/app.bsky.feed.post/..%2F3mkq7aeuwbg42',
+        url: 'https://bsky.app/profile/newsroom.example/post/..%2F3mkq7aeuwbg42',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return nothing for a bluesky url naming no post', async () => {
@@ -979,18 +1188,5 @@ describeForEachParser('blueskyPostElementEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
-  })
-})
-
-describe('readBlueskyHeight', () => {
-  it('should read the height out of the frame report', () => {
-    const value = { height: 687.125, id: '1' }
-
-    expect(readBlueskyHeight(value)).toBe(687.125)
-  })
-
-  it('should read nothing out of a message without a height', () => {
-    expect(readBlueskyHeight({ id: '1' })).toBeUndefined()
-    expect(readBlueskyHeight('ready')).toBeUndefined()
   })
 })

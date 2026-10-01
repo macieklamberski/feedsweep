@@ -29,6 +29,26 @@ const composeEmbed = (id: string, title?: string): EmbedResolverResult | undefin
     id,
     src: `https://form.typeform.com/to/${id}`,
     url: `https://form.typeform.com/to/${id}`,
+    height: 500,
+  }
+
+  return title ? { ...result, title } : result
+}
+
+// A live id is not a form id, and only Typeform's `single-embed` api maps one to the other, so the
+// placeholder names the embed for enrichment and carries no player. `data-tf-region` picks the
+// api host, so it leads the id.
+const composeLiveEmbed = (element: Element, title?: string): EmbedResolverResult | undefined => {
+  const liveId = attr(element, 'data-tf-live') ?? ''
+
+  if (!safeIdRegex.test(liveId)) {
+    return
+  }
+
+  const region = attr(element, 'data-tf-region')
+  const result: EmbedResolverResult = {
+    provider: 'typeform',
+    id: region ? `${region}/${liveId}` : liveId,
   }
 
   return title ? { ...result, title } : result
@@ -54,9 +74,7 @@ export const typeformWidgetEmbedResolver = createMarkupEmbedResolver(
     // in another: a block can carry all three, and only the last generation is ever complete.
     return (
       composeEmbed(attr(element, 'data-tf-widget') ?? '', title) ??
-      // A live id's /to/ url lands on the explore page, and enrichment maps it to the form id.
-      // `api.typeform.com/single-embed/<liveId>` answers key-free with the real form id.
-      composeEmbed(attr(element, 'data-tf-live') ?? '', title) ??
+      composeLiveEmbed(element, title) ??
       typeformResolveEmbed(attr(element, 'data-url') ?? '')
     )
   },

@@ -180,20 +180,29 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should refuse an mmvo id on the widget route', async () => {
+    it('should use an mmvo id on the widget route as written, even if the player answers an error', async () => {
       const value = html`
         <iframe src="https://www.nbcnews.com/widget/video-embed/mmvo265959493641"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'nbcnews',
+        src: 'https://www.nbcnews.com/widget/video-embed/mmvo265959493641',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse an mmvo id with a trailing suffix on the embedded-video route', async () => {
+    it('should use a malformed mmvo id as written, even if the player answers an error', async () => {
       const value = html`
         <iframe src="https://www.nbcnews.com/news/embedded-video/mmvo265959493641abc"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'nbcnews',
+        id: 'mmvo265959493641abc',
+        src: 'https://www.nbcnews.com/news/embedded-video/mmvo265959493641abc',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should refuse an mmvo id with a leading prefix on the embedded-video route', async () => {
@@ -204,12 +213,16 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should refuse digits with a trailing suffix on the widget route', async () => {
+    it('should use a malformed widget id as written, even if the player answers an error', async () => {
       const value = html`
         <iframe src="https://www.nbcnews.com/widget/video-embed/713265731534abc"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'nbcnews',
+        src: 'https://www.nbcnews.com/widget/video-embed/713265731534abc',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should refuse an offsite slug whose digits are followed by more text', async () => {

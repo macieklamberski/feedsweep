@@ -2,12 +2,12 @@ import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-const guardianHosts = ['theguardian.com']
+const guardianHosts = ['embed.theguardian.com']
 
 // `/embed/video/{section}/video/{yyyy}/{mon}/{dd}/{slug}`.
 // The video's page is the same path on `www`, and a real path answers 200 where a fabricated
 // slug 404s.
-const playerPathRegex = /^\/embed\/video\/([a-z0-9-]+\/video\/\d{4}\/[a-z]{3}\/\d{2}\/[a-z0-9-]+)$/
+const playerPathRegex = /^\/embed\/video\/([^/]+\/video\/[^/]+\/[^/]+\/[^/]+\/[^/]+)$/
 
 // The path dates the video, and the month is the three-letter English abbreviation on every
 // edition. A path states a day and not a moment, so `date` carries the calendar day alone, and
@@ -48,7 +48,7 @@ export const guardianResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, guardianHosts)
   const path = parsed?.pathname.match(playerPathRegex)?.[1]
 
-  if (parsed?.hostname !== 'embed.theguardian.com' || !path) {
+  if (!path) {
     return
   }
 

@@ -39,7 +39,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
         id: 'route/55848524',
-        src: 'https://ridewithgps.com/embeds?type=route&id=55848524&metricUnits=true&sampleGraph=true',
+        src: 'https://ridewithgps.com/embeds?type=route&id=55848524',
         url: 'https://ridewithgps.com/routes/55848524',
         thumbnail: 'https://ridewithgps.com/routes/55848524/thumb.png',
         height: 700,
@@ -48,7 +48,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the heading the publisher named as the title and keep the map layer', async () => {
+    it('should read the heading the publisher named as the title and keep it out of the src', async () => {
       const value = html`
         <iframe
           style="width: 1px; min-width: 100%; height: 540px; border: none;"
@@ -59,7 +59,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
         id: 'route/46929481',
-        src: 'https://ridewithgps.com/embeds?type=route&id=46929481&title=2023+Niseko+Classic&overlay=terrain&metricUnits=true&sampleGraph=true',
+        src: 'https://ridewithgps.com/embeds?type=route&id=46929481',
         url: 'https://ridewithgps.com/routes/46929481',
         thumbnail: 'https://ridewithgps.com/routes/46929481/thumb.png',
         height: 540,
@@ -69,7 +69,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the distance markers the publisher turned on', async () => {
+    it('should drop the distance markers the publisher turned on', async () => {
       const value = html`
         <iframe
           src="https://ridewithgps.com/embeds?type=route&id=54839074&metricUnits=true&sampleGraph=true&distanceMarkers=true"
@@ -80,9 +80,47 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
         id: 'route/54839074',
-        src: 'https://ridewithgps.com/embeds?type=route&id=54839074&metricUnits=true&sampleGraph=true&distanceMarkers=true',
+        src: 'https://ridewithgps.com/embeds?type=route&id=54839074',
         url: 'https://ridewithgps.com/routes/54839074',
         thumbnail: 'https://ridewithgps.com/routes/54839074/thumb.png',
+        height: 700,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the units and the elevation graph', async () => {
+      const value = html`
+        <iframe
+          src="https://ridewithgps.com/embeds?type=route&amp;id=39144102&amp;metricUnits=true&amp;sampleGraph=true"
+          style="width: 1px; min-width: 100%; height: 700px; border: none;"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ridewithgps',
+        id: 'route/39144102',
+        src: 'https://ridewithgps.com/embeds?type=route&id=39144102',
+        url: 'https://ridewithgps.com/routes/39144102',
+        thumbnail: 'https://ridewithgps.com/routes/39144102/thumb.png',
+        height: 700,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the privacy code a private route carries', async () => {
+      const value = html`
+        <iframe
+          style="width: 1px; min-width: 100%; height: 700px; border: none;"
+          src="https://ridewithgps.com/embeds?type=route&amp;id=38758142&amp;metricUnits=true&amp;sampleGraph=true&amp;privacyCode=gFIyoiFuxy3rYBFA"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ridewithgps',
+        id: 'route/38758142',
+        src: 'https://ridewithgps.com/embeds?type=route&id=38758142&privacyCode=gFIyoiFuxy3rYBFA',
         height: 700,
       }
 
@@ -98,6 +136,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         src: 'https://ridewithgps.com/embeds?type=trip&id=372416891',
         url: 'https://ridewithgps.com/trips/372416891',
         thumbnail: 'https://ridewithgps.com/trips/372416891/thumb.png',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -111,6 +150,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         src: 'https://ridewithgps.com/embeds?type=trip&id=372416891',
         url: 'https://ridewithgps.com/trips/372416891',
         thumbnail: 'https://ridewithgps.com/trips/372416891/thumb.png',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -122,17 +162,19 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         provider: 'ridewithgps',
         id: 'route/34497677',
         src: 'https://ridewithgps.com/embeds?type=route&id=34497677&privacyCode=Kq7WdN2hPzVmT4rY',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the title of a private route beside its privacy code', async () => {
+    it('should read the title of a private route and keep only its privacy code in the src', async () => {
       const value = html`<iframe src="https://ridewithgps.com/embeds?type=route&id=34497677&title=Loop&privacyCode=Kq7WdN2hPzVmT4rY"></iframe>`
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
         id: 'route/34497677',
-        src: 'https://ridewithgps.com/embeds?type=route&id=34497677&title=Loop&privacyCode=Kq7WdN2hPzVmT4rY',
+        src: 'https://ridewithgps.com/embeds?type=route&id=34497677&privacyCode=Kq7WdN2hPzVmT4rY',
+        height: 700,
         title: 'Loop',
       }
 
@@ -175,11 +217,19 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id carrying a path separator', async () => {
+    it('should use a malformed route id as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://ridewithgps.com/embeds?type=route&id=1%2F..%2F9"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ridewithgps',
+        id: 'route/1%2F..%2F9',
+        src: 'https://ridewithgps.com/embeds?type=route&id=1%2F..%2F9',
+        url: 'https://ridewithgps.com/routes/1%2F..%2F9',
+        thumbnail: 'https://ridewithgps.com/routes/1%2F..%2F9/thumb.png',
+        height: 700,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a route whose id sits in eventId', async () => {
@@ -197,8 +247,9 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
         id: 'event/215602',
-        src: 'https://ridewithgps.com/embeds?type=event&eventId=215602&sampleGraph=true',
+        src: 'https://ridewithgps.com/embeds?type=event&eventId=215602',
         url: 'https://ridewithgps.com/events/215602',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -212,7 +263,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
   })
 
   describe('the older per-resource embed path', () => {
-    it('should read a route and hand its url on as written', async () => {
+    it('should mint the query spelling for a route', async () => {
       const value = html`
         <iframe
           src="https://ridewithgps.com/routes/10953871/embed"
@@ -223,7 +274,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
         id: 'route/10953871',
-        src: 'https://ridewithgps.com/routes/10953871/embed',
+        src: 'https://ridewithgps.com/embeds?type=route&id=10953871',
         url: 'https://ridewithgps.com/routes/10953871',
         thumbnail: 'https://ridewithgps.com/routes/10953871/thumb.png',
         height: 500,
@@ -237,9 +288,23 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
         id: 'trip/372416891',
-        src: 'https://ridewithgps.com/trips/372416891/embed',
+        src: 'https://ridewithgps.com/embeds?type=trip&id=372416891',
         url: 'https://ridewithgps.com/trips/372416891',
         thumbnail: 'https://ridewithgps.com/trips/372416891/thumb.png',
+        height: 700,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the token of a private route in the src and mint no page', async () => {
+      const value =
+        '<iframe src="https://ridewithgps.com/routes/10953871/embed?privacyCode=AbC123"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ridewithgps',
+        id: 'route/10953871',
+        src: 'https://ridewithgps.com/embeds?type=route&id=10953871&privacyCode=AbC123',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -251,9 +316,10 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
         id: 'route/10953871',
-        src: 'https://ridewithgps.com/routes/10953871/embed?type=trip&id=372416891',
+        src: 'https://ridewithgps.com/embeds?type=route&id=10953871',
         url: 'https://ridewithgps.com/routes/10953871',
         thumbnail: 'https://ridewithgps.com/routes/10953871/thumb.png',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -277,10 +343,32 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id carrying an encoded path separator', async () => {
+    it('should use a malformed route id as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://ridewithgps.com/routes/1%2F..%2F9/embed"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ridewithgps',
+        id: 'route/1%2F..%2F9',
+        src: 'https://ridewithgps.com/embeds?type=route&id=1%2F..%2F9',
+        url: 'https://ridewithgps.com/routes/1%2F..%2F9',
+        thumbnail: 'https://ridewithgps.com/routes/1%2F..%2F9/thumb.png',
+        height: 700,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should carry a stray percent sign in the path id as written', async () => {
+      const value = '<iframe src="https://ridewithgps.com/routes/10953871%zz/embed"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ridewithgps',
+        id: 'route/10953871%zz',
+        src: 'https://ridewithgps.com/embeds?type=route&id=10953871%25zz',
+        url: 'https://ridewithgps.com/routes/10953871%zz',
+        thumbnail: 'https://ridewithgps.com/routes/10953871%zz/thumb.png',
+        height: 700,
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore an event framed on the embed path', async () => {
@@ -298,8 +386,12 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
 })
 
 describeForEachParser('ridewithgps shapes the pipeline repairs first', (parseHtml) => {
-  const convert = (value: string) => {
-    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
   }
   const placeholder = async (value: string) => {
     return readPlaceholder(await convert(value), parseHtml)
@@ -318,7 +410,7 @@ describeForEachParser('ridewithgps shapes the pipeline repairs first', (parseHtm
     const expected: Record<string, string> = {
       provider: 'ridewithgps',
       id: 'route/10953871',
-      src: 'https://ridewithgps.com/routes/10953871/embed',
+      src: 'https://ridewithgps.com/embeds?type=route&id=10953871',
       url: 'https://ridewithgps.com/routes/10953871',
       thumbnail: 'https://ridewithgps.com/routes/10953871/thumb.png',
       height: '500',
@@ -331,5 +423,21 @@ describeForEachParser('ridewithgps shapes the pipeline repairs first', (parseHtm
     const value = '<p>See <a href="https://ridewithgps.com/routes/38984773">the route</a>.</p>'
 
     expect(await convert(value)).toBe(value)
+  })
+
+  // ridewithgps.com serves the route thumbnail beside the embed, on the same route path.
+  it('should leave a route thumbnail enclosure an image', async () => {
+    const enclosures = [
+      { url: 'https://ridewithgps.com/routes/10953871/thumb.png', type: 'image/png' },
+    ]
+    const expected = html`
+      <img
+        data-enclosure=""
+        src="https://ridewithgps.com/routes/10953871/thumb.png"
+      >
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
