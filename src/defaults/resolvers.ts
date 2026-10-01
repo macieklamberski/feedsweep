@@ -207,7 +207,7 @@ import { podetizeIframeEmbedResolver, podetizeScriptEmbedResolver } from '../emb
 import { podigeeIframeEmbedResolver, podigeeScriptEmbedResolver } from '../embeds/podigee.js'
 import { podomaticEmbedResolver } from '../embeds/podomatic.js'
 import { preziEmbedResolver } from '../embeds/prezi.js'
-import { puzzlemeEmbedResolver } from '../embeds/puzzleme.js'
+import { puzzlemeEmbedResolver, puzzlemeWidgetEmbedResolver } from '../embeds/puzzleme.js'
 import { redcircleIframeEmbedResolver, redcircleScriptEmbedResolver } from '../embeds/redcircle.js'
 import {
   redditIframeEmbedResolver,
@@ -573,6 +573,7 @@ const embedResolvers: Array<EmbedResolver> = [
   podomaticEmbedResolver,
   preziEmbedResolver,
   puzzlemeEmbedResolver,
+  puzzlemeWidgetEmbedResolver,
   redcircleScriptEmbedResolver,
   redcircleIframeEmbedResolver,
   redditWidgetEmbedResolver,

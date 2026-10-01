@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { puzzlemeEmbedResolver, readPuzzlemeHeight } from './puzzleme.js'
+import { puzzlemeEmbedResolver, puzzlemeWidgetEmbedResolver } from './puzzleme.js'
 
 describeForEachParser('puzzlemeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, puzzlemeEmbedResolver)
@@ -24,6 +24,7 @@ describeForEachParser('puzzlemeEmbedResolver', (parseHtml) => {
         id: '66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7/e9f5e4db',
         src: 'https://puzzleme.amuselabs.com/pmm/crossword?id=e9f5e4db&set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7&embed=1',
         url: 'https://puzzleme.amuselabs.com/pmm/crossword?id=e9f5e4db&set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -44,6 +45,7 @@ describeForEachParser('puzzlemeEmbedResolver', (parseHtml) => {
         id: 'e96c1f278ea571cf05ab39a49b24c30f8353cc617eeef60291299f8abe19d07a/f6f7f0ec',
         src: 'https://puzzleme.amuselabs.com/pmm/crossword?id=f6f7f0ec&set=e96c1f278ea571cf05ab39a49b24c30f8353cc617eeef60291299f8abe19d07a&embed=1',
         url: 'https://puzzleme.amuselabs.com/pmm/crossword?id=f6f7f0ec&set=e96c1f278ea571cf05ab39a49b24c30f8353cc617eeef60291299f8abe19d07a',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -63,24 +65,7 @@ describeForEachParser('puzzlemeEmbedResolver', (parseHtml) => {
         id: '49ddb4785d8a7ccce44bf0bed910cb3b7a6381e27d9d9b450000ad33e7dc1593/e6a595e2',
         src: 'https://puzzleme.amuselabs.com/pmm/wordsearch?id=e6a595e2&set=49ddb4785d8a7ccce44bf0bed910cb3b7a6381e27d9d9b450000ad33e7dc1593&embed=1',
         url: 'https://puzzleme.amuselabs.com/pmm/wordsearch?id=e6a595e2&set=49ddb4785d8a7ccce44bf0bed910cb3b7a6381e27d9d9b450000ad33e7dc1593',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should read the stated title', async () => {
-      const value = html`
-        <iframe
-          src="https://amuselabs.com/pmm/crossword?id=e9f5e4db&amp;set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7&amp;embed=1"
-          title="Themeless 32"
-        ></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'puzzleme',
-        id: '66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7/e9f5e4db',
-        src: 'https://puzzleme.amuselabs.com/pmm/crossword?id=e9f5e4db&set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7&embed=1',
-        url: 'https://puzzleme.amuselabs.com/pmm/crossword?id=e9f5e4db&set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7',
-        title: 'Themeless 32',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -100,6 +85,7 @@ describeForEachParser('puzzlemeEmbedResolver', (parseHtml) => {
         id: '66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7/5b2817d0',
         src: 'https://puzzleme.amuselabs.com/pmm/crossword?id=5b2817d0&set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7&embed=1',
         url: 'https://puzzleme.amuselabs.com/pmm/crossword?id=5b2817d0&set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -113,6 +99,7 @@ describeForEachParser('puzzlemeEmbedResolver', (parseHtml) => {
         id: '66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7/e9f5e4db',
         src: 'https://puzzleme.amuselabs.com/pmm/crossword?id=e9f5e4db&set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7&embed=1',
         url: 'https://puzzleme.amuselabs.com/pmm/crossword?id=e9f5e4db&set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -155,6 +142,13 @@ describeForEachParser('puzzlemeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a subdomain that serves its own sets under the player path', async () => {
+      const value =
+        '<iframe src="https://cdn3.amuselabs.com/pmm/crossword?id=e9f5e4db&set=atlantic&embed=1"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore the separate app player, whose ids the puzzleme host does not serve', async () => {
       const value = html`
         <iframe
@@ -170,36 +164,69 @@ describeForEachParser('puzzlemeEmbedResolver', (parseHtml) => {
   })
 })
 
-describe('readPuzzlemeHeight', () => {
-  // What the player posts on its own at 800 wide in a 700 tall frame.
-  it('should read the height out of a size message', () => {
-    const value = { sentinel: 'amp', type: 'embed-size', height: 575 }
+describeForEachParser('puzzlemeWidgetEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, puzzlemeWidgetEmbedResolver)
 
-    expect(readPuzzlemeHeight(value)).toBe(575)
+  describe('happy paths', () => {
+    it('should build the placeholder from the loader mount', async () => {
+      const value = html`
+        <div
+          class="pm-embed-div"
+          data-id="54602d16"
+          data-set="5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48"
+          data-puzzletype="crossword"
+          data-height="700px"
+          data-mobilemargin="10px"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'puzzleme',
+        id: '5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48/54602d16',
+        src: 'https://puzzleme.amuselabs.com/pmm/crossword?id=54602d16&set=5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48&embed=1',
+        url: 'https://puzzleme.amuselabs.com/pmm/crossword?id=54602d16&set=5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48',
+        height: 700,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
-  it('should read nothing from the event message, whose height is the grid in squares', () => {
-    const value = JSON.stringify({
-      id: 'e9f5e4db',
-      puzzleType: 'crossword',
-      width: 15,
-      height: 15,
-      type: 'PUZZLE_SIZE_CHANGE',
+  describe('sad paths', () => {
+    it('should ignore a mount with no puzzle type', async () => {
+      const value = html`
+        <div
+          class="pm-embed-div"
+          data-id="54602d16"
+          data-set="5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48"
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
 
-    expect(readPuzzlemeHeight(value)).toBeUndefined()
-  })
+    it('should ignore a mount with no id', async () => {
+      const value = html`
+        <div
+          class="pm-embed-div"
+          data-set="5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48"
+          data-puzzletype="crossword"
+        ></div>
+      `
 
-  it('should read nothing from another object message carrying a height', () => {
-    const value = { type: 'PUZZLE_SIZE_CHANGE', height: 15 }
+      expect(await extract(value)).toBeUndefined()
+    })
 
-    expect(readPuzzlemeHeight(value)).toBeUndefined()
-  })
+    it('should ignore a mount with no set', async () => {
+      const value = html`
+        <div
+          class="pm-embed-div"
+          data-id="54602d16"
+          data-puzzletype="crossword"
+        ></div>
+      `
 
-  it('should read nothing from a size message with no height', () => {
-    const value = { sentinel: 'amp', type: 'embed-size', height: 0 }
-
-    expect(readPuzzlemeHeight(value)).toBeUndefined()
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
 
@@ -221,11 +248,35 @@ describeForEachParser('puzzleme through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
+        data-embed-height="700"
         data-embed-id="66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7/ef03f959"
         data-embed-provider="puzzleme"
         data-embed-src="https://puzzleme.amuselabs.com/pmm/crossword?id=ef03f959&amp;set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7&amp;embed=1"
         data-embed-url="https://puzzleme.amuselabs.com/pmm/crossword?id=ef03f959&amp;set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7"
       ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+  it('should replace the loader mount and keep the prose around it', async () => {
+    const value = html`
+      <p><code><br />
+      <script id="pm-script" src="https://puzzleme.amuselabs.com/pmm/js/puzzleme-embed.js"></script><br />
+      <!-- Specifies the puzzle to be embedded on the page. --></p>
+      <div class="pm-embed-div" data-id="54602d16" data-set="5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48" data-puzzletype="crossword" data-height="700px" data-mobilemargin="10px"></div>
+      <p></code></p>
+      <p>Today's mini crossword.</p>
+    `
+    const expected = html`
+      <p><code><script id="pm-script" src="https://puzzleme.amuselabs.com/pmm/js/puzzleme-embed.js"></script></code></p>
+      <div
+        data-embed-height="700"
+        data-embed-id="5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48/54602d16"
+        data-embed-provider="puzzleme"
+        data-embed-src="https://puzzleme.amuselabs.com/pmm/crossword?id=54602d16&amp;set=5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48&amp;embed=1"
+        data-embed-url="https://puzzleme.amuselabs.com/pmm/crossword?id=54602d16&amp;set=5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48"
+      ></div>
+      <p>Today's mini crossword.</p>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
