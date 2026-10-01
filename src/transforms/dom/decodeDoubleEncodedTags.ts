@@ -13,8 +13,14 @@ export const decodeDoubleEncodedTags: DomTransform = () => {
 
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
     let tempDiv: HTMLDivElement | null = null
+    // Collected first: jsdom ends the walk once replaceWith detaches its current node.
+    const nodes: Array<Node> = []
 
     for (let node = walker.nextNode(); node !== null; node = walker.nextNode()) {
+      nodes.push(node)
+    }
+
+    for (const node of nodes) {
       if (!isText(node) || !node.data.includes('<')) {
         continue
       }

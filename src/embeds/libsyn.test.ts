@@ -5,13 +5,12 @@ import type { EmbedResolverResult } from '../types.js'
 import { extractLibsynEmbed, libsynEmbedResolver, libsynResolveEmbed } from './libsyn.js'
 
 describe('extractLibsynEmbed', () => {
-  it('should read an episode id and its height from the path', () => {
+  it('should read an episode id from a path that names a height', () => {
     const value =
       'https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/width/700/theme/custom/'
     const expected = {
       kind: 'episode',
       id: '5508311',
-      height: 90,
     }
 
     expect(extractLibsynEmbed(value)).toEqual(expected)
@@ -23,7 +22,6 @@ describe('extractLibsynEmbed', () => {
     const expected = {
       kind: 'episode',
       id: '41612765',
-      height: 192,
     }
 
     expect(extractLibsynEmbed(value)).toEqual(expected)
@@ -34,7 +32,6 @@ describe('extractLibsynEmbed', () => {
     const expected = {
       kind: 'destination',
       id: '12345',
-      height: 200,
     }
 
     expect(extractLibsynEmbed(value)).toEqual(expected)
@@ -66,6 +63,12 @@ describe('extractLibsynEmbed', () => {
     expect(extractLibsynEmbed(value)).toBeUndefined()
   })
 
+  it('should return undefined for a player path under another first segment', () => {
+    const value = 'https://play.libsyn.com/player/episode/id/5508311/'
+
+    expect(extractLibsynEmbed(value)).toBeUndefined()
+  })
+
   it('should return undefined for a non-numeric id', () => {
     const value = 'https://play.libsyn.com/embed/episode/id/abc/'
 
@@ -82,24 +85,27 @@ describe('extractLibsynEmbed', () => {
 describe('libsynResolveEmbed', () => {
   // The old host answers 500 for older episodes while play.libsyn.com serves them, so the
   // rebuilt src is a repair rather than a cosmetic rewrite.
-  it('should mint the modern player host and carry the height', () => {
+  // The height option is the carrier's size, which shallow handling does not read or carry into
+  // the src.
+  it('should mint the modern player host over the height its path names', () => {
     const value = 'https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/theme/custom/'
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/5508311',
-      src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
-      height: 90,
+      src: 'https://play.libsyn.com/embed/episode/id/5508311/',
+      height: 128,
     }
 
     expect(libsynResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should leave the height out when the player does not state one', () => {
+  it('should state the player height when the path names none', () => {
     const value = 'https://play.libsyn.com/embed/episode/id/5508311/'
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/5508311',
       src: 'https://play.libsyn.com/embed/episode/id/5508311/',
+      height: 128,
     }
 
     expect(libsynResolveEmbed(value)).toEqual(expected)
@@ -122,8 +128,8 @@ describeForEachParser('libsynEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'libsyn',
         id: 'episode/5508311',
-        src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
-        height: 90,
+        src: 'https://play.libsyn.com/embed/episode/id/5508311/',
+        height: 128,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -142,9 +148,8 @@ describeForEachParser('libsynEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    // The publisher chose the box they embedded, so the carrier's size outranks the height the
-    // player url spells, and it lands whole rather than merging with it.
-    it('should take the size the carrier states over the height in the url', async () => {
+    // Neither the carrier's box nor the height the player url spells is read.
+    it('should keep the platform height over the size the carrier states', async () => {
       const value = html`
         <iframe
           src="https://play.libsyn.com/embed/episode/id/5508311/height/90/"
@@ -155,9 +160,8 @@ describeForEachParser('libsynEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'libsyn',
         id: 'episode/5508311',
-        src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
-        width: 640,
-        height: 200,
+        src: 'https://play.libsyn.com/embed/episode/id/5508311/',
+        height: 128,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -213,6 +217,39 @@ describeForEachParser('libsyn through the pipeline', (parseHtml) => {
 describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, libsynEmbedResolver)
 
+  it('should drop the label the current player writes in place of the name', async () => {
+    const value = html`
+      <iframe
+        title="Embed Player"
+        src="https://play.libsyn.com/embed/episode/id/41557470/height/192/theme/modern/size/large/thumbnail/yes/custom-color/a1a29c/time-start/00:00:00/playlist-height/200/direction/backward/download/yes/font-color/FFFFFF"
+        height="192"
+        width="100%"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'libsyn',
+      id: 'episode/41557470',
+      src: 'https://play.libsyn.com/embed/episode/id/41557470/',
+      height: 128,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the YouTube label a copied snippet carries', async () => {
+    const value = html`
+      <iframe src="https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/" title="YouTube video player"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'libsyn',
+      id: 'episode/5508311',
+      src: 'https://play.libsyn.com/embed/episode/id/5508311/',
+      height: 128,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should drop the label the player writes in place of the name', async () => {
     const value = html`
       <iframe src="https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/" title="Libsyn Player"></iframe>
@@ -220,8 +257,8 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/5508311',
-      src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
-      height: 90,
+      src: 'https://play.libsyn.com/embed/episode/id/5508311/',
+      height: 128,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -229,14 +266,21 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
 
   it('should read the name the carrier states', async () => {
     const value = html`
-      <iframe src="https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/" title="Episode 12: The Long Way Round"></iframe>
+      <iframe
+        title="Behind the Blue: May 21, 2026 - UK and the Artemis Project"
+        width="700px"
+        height="90px"
+        scrolling="no"
+        frameborder="no"
+        src="https://html5-player.libsyn.com/embed/episode/id/41382385/theme/custom/direction/forward/custom-color/87A93A/autonext/no/thumbnail/yes/autoplay/no/preload/no/no_addthis/no/render-playlist/no"
+      ></iframe>
     `
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
-      id: 'episode/5508311',
-      src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
-      height: 90,
-      title: 'Episode 12: The Long Way Round',
+      id: 'episode/41382385',
+      src: 'https://play.libsyn.com/embed/episode/id/41382385/',
+      height: 128,
+      title: 'Behind the Blue: May 21, 2026 - UK and the Artemis Project',
     }
 
     expect(await extract(value)).toEqual(expected)

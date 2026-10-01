@@ -195,6 +195,18 @@ describeForEachParser('ghostMediaResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined for a video with an empty src', async () => {
+      const value = html`
+        <figure class="kg-card kg-video-card">
+          <div class="kg-video-container">
+            <video src=""></video>
+          </div>
+        </figure>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should not match the cleaned form', async () => {
       const value = html`
         <figure class="kg-card kg-video-card">

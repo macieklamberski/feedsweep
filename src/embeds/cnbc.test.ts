@@ -30,13 +30,13 @@ describe('cnbcResolveEmbed', () => {
       expect(cnbcResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should build the placeholder from a player token past sixty-four characters', () => {
+    it('should mint the share snippet player for another player name', () => {
       const value =
         'https://player.cnbc.com/p/gZWlPC/cnbc_global_syndication_partner_player_for_long_form_video_and_live_streams?playertype=synd&byGuid=7000344703'
       const expected: EmbedResolverResult = {
         provider: 'cnbc',
         id: '7000344703',
-        src: 'https://player.cnbc.com/p/gZWlPC/cnbc_global_syndication_partner_player_for_long_form_video_and_live_streams?playertype=synd&byGuid=7000344703',
+        src: 'https://player.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&byGuid=7000344703',
         ratio: '16/9',
       }
 
@@ -58,22 +58,58 @@ describe('cnbcResolveEmbed', () => {
       expect(cnbcResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for a guid that is not numeric', () => {
+    it('should use a malformed guid as written, even if the player answers an error', () => {
       const value = 'https://player.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&byGuid=latest'
+      const expected: EmbedResolverResult = {
+        provider: 'cnbc',
+        id: 'latest',
+        src: 'https://player.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&byGuid=latest',
+        ratio: '16/9',
+      }
 
-      expect(cnbcResolveEmbed(value)).toBeUndefined()
+      expect(cnbcResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should return undefined for an account outside the token shape', () => {
+    it('should use a malformed account as written, even if the player answers an error', () => {
       const value =
         'https://player.cnbc.com/p/evil.test%2Fp%2FgZWlPC/cnbc_global?playertype=synd&byGuid=7000344703'
+      const expected: EmbedResolverResult = {
+        provider: 'cnbc',
+        id: '7000344703',
+        src: 'https://player.cnbc.com/p/evil.test%2Fp%2FgZWlPC/cnbc_global?playertype=synd&byGuid=7000344703',
+        ratio: '16/9',
+      }
+
+      expect(cnbcResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint the share snippet player over a malformed player name', () => {
+      const value =
+        'https://player.cnbc.com/p/gZWlPC/cnbc_global%3Fsrc%3Devil.test?playertype=synd&byGuid=7000344703'
+      const expected: EmbedResolverResult = {
+        provider: 'cnbc',
+        id: '7000344703',
+        src: 'https://player.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&byGuid=7000344703',
+        ratio: '16/9',
+      }
+
+      expect(cnbcResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should return undefined for the player path on another cnbc.com host', () => {
+      const value = 'https://www.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&byGuid=7000344703'
 
       expect(cnbcResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for a player outside the token shape', () => {
-      const value =
-        'https://player.cnbc.com/p/gZWlPC/cnbc_global%3Fsrc%3Devil.test?playertype=synd&byGuid=7000344703'
+    it('should return undefined for another route on the player host', () => {
+      const value = 'https://player.cnbc.com/x/gZWlPC/cnbc_global?playertype=synd&byGuid=7000344703'
+
+      expect(cnbcResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a player route naming no player', () => {
+      const value = 'https://player.cnbc.com/p/gZWlPC?byGuid=7000344703'
 
       expect(cnbcResolveEmbed(value)).toBeUndefined()
     })
@@ -135,7 +171,7 @@ describeForEachParser('cnbcIframeEmbedResolver', (parseHtml) => {
 
   it('should ignore a foreign host carrying the same path', async () => {
     const value =
-      '<iframe src="https://evil.test/player.cnbc.com/p/gZWlPC/cnbc_global?byGuid=7000313539"></iframe>'
+      '<iframe src="https://evil.test/p/gZWlPC/cnbc_global?playertype=synd&amp;byGuid=7000313539"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

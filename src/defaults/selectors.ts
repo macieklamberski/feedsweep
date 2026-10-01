@@ -1,4 +1,8 @@
 export const defaultNonContentSelectors = [
+  // The frame half of a WordPress post embed, whose blockquote `wordpressCiteResolver` converts.
+  // WordPress stamps the class on every oEmbed provider's frame, so only a frame paired with a
+  // blockquote is stripped.
+  'blockquote.wp-embedded-content + iframe.wp-embedded-content',
   // Subscribe and newsletter signup forms.
   '[data-component-name="SubscribeWidget"]', // Substack inline subscribe widget.
   '.subscription-widget-wrap-editor', // Substack paywall / subscribe CTA.
@@ -69,6 +73,10 @@ export const defaultNonContentSelectors = [
   // Survives as a live "Tweet" link in the output, usually with no other non-content selector
   // matching anywhere.
   'a.twitter-share-button',
+  // The rendered form of the same button, and of the follow button and the share counter beside
+  // it. Every class the corpus puts on one of these frames names a button, so the path is the
+  // whole platform's button namespace; the player lives under `/embed/` and is untouched.
+  'iframe[src*="platform.twitter.com/widgets/"]',
   // Drupal Easy Social. The widget is chrome, but the pipeline cannot tell, so its Facebook
   // Like iframe becomes an embed placeholder card and the chrome is promoted to content.
   'div.easy_social_box',
@@ -111,6 +119,7 @@ export const defaultNonContentSelectors = [
   'a[href*="digg.com/submit"]', // Digg submit button, and the badge image nested inside it.
   'img[src*="digg.com/img/badges"]', // The same badge pasted without its anchor.
   'iframe[src*="plusone.google.com"]', // Google+ +1 button, whose endpoint closed with the service.
+  'iframe[src*="tunein.com/embed/follow/"]', // TuneIn follow button for a station or a show.
   'img[src*="w.sharethis.com/"]', // ShareThis chicklet icons, the button row's pre-widget form.
   // Hatena Bookmark's add button. A bookmark comment carries an author's real text on a
   // blockquote of its own, so neither entry is widened to the class prefix.
@@ -157,21 +166,37 @@ export const defaultNonContentSelectors = [
   '.pf-button', // PrintFriendly button.
 
   // Giveaway widgets. Each is a script mount whose loader never runs in a reader, so what
-  // survives is the mount's own fallback, a boilerplate link to the entry form.
+  // survives is the mount's own fallback.
   'a.rcptr', // Rafflecopter giveaway mount, a link reading "a Rafflecopter giveaway".
   'a.rafl', // The same mount as Rafflecopter's earlier loader wrote it.
   // Gleam competition mount. The loader would replace it with the entry form; without it the
   // anchor survives as a bare link named after the competition.
   'a.e-widget',
+  // Goodreads giveaway widget: a static card with the cover, the title, the closing date and an
+  // "Enter Giveaway" button, wrapped in a div whose id the script targets. The card is the
+  // widget's own fallback and is also pasted on its own without the wrapper.
+  '[id^="goodreadsGiveawayWidget"]',
+  '.goodreadsGiveawayWidget',
+  // The card's "Enter Giveaway" button, which publishers also paste on its own beside the cover
+  // and title they copied out of the card.
+  'a.goodreadsGiveawayWidgetEnterLink[href*="goodreads.com/giveaway/"]',
 
-  // Ticketing, donation and membership widgets, which are chrome around a transaction rather
-  // than anything the item is about.
+  // Ticketing and payment widgets, which are chrome around a transaction rather than anything
+  // the item is about.
   'iframe[src*="eventbrite.com/tickets-external"]', // Eventbrite checkout frame.
   'iframe[src*="eventbrite.com/countdown-widget"]', // Eventbrite countdown widget.
-  'iframe[src*="patronite.pl/widget/"]', // Patronite membership widget.
-  'form[action*="paypal.com/cgi-bin/webscr"]', // PayPal donate and buy button form.
-  'img[src*="paypal.com/"][src*="/i/btn/"]', // The PayPal button image pasted without its form.
+  'form[action*="paypal.com/cgi-bin/webscr"]', // PayPal buy, cart or subscribe form, or a donate form naming no button.
+  'img[src*="paypal.com/"][src*="/i/btn/"]:not(a img)', // The PayPal button image pasted without its form.
 
+  // Affiliate booking widgets, which render a map or a form to sell the reader a stay or a
+  // ticket and carry none of the post.
+  'iframe[src*="stay22.com/embed"]', // Stay22 hotel map.
+  // GetYourGuide activity and availability widgets. The mount is an empty paragraph or div the
+  // partner script fills, or one holding only a "Powered by GetYourGuide" credit anchor.
+  // Publishers also paste the widget's whole attribute set onto their own heading or list of
+  // tours, so only a paragraph or div with no child element but anchors is claimed. Text is not
+  // checked, so a publisher's paragraph of prose carrying the attribute is claimed too.
+  ':is(p, div)[data-gyg-href]:not(:has(*:not(a)))',
   // Platform UI chrome and non-rendered scaffolding.
   // RedCircle's embed snippet ships a ten-pixel "Powered by RedCircle" line under the player.
   'p:has(> a.redcircle-link)',

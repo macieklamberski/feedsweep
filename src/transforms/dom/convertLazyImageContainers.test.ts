@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -19,6 +20,77 @@ describeForEachParser('convertLazyImageContainers', (parseHtml) => {
   it('should convert a figure container the same way', async () => {
     const value = '<figure data-lazy-src="https://example.com/photo.png"></figure>'
     const expected = '<img src="https://example.com/photo.png">'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should prepend the img to a div that holds content and keep that content', async () => {
+    const value = html`
+      <div data-src="https://example.com/bg.jpg">
+        <p>Important text</p>
+      </div>
+    `
+    const expected = html`
+      <div data-src="https://example.com/bg.jpg">
+        <img src="https://example.com/bg.jpg">
+        <p>Important text</p>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep the figcaption of a figure container', async () => {
+    const value = html`
+      <figure data-src="https://example.com/photo.jpg">
+        <figcaption>Caption</figcaption>
+      </figure>
+    `
+    const expected = html`
+      <figure data-src="https://example.com/photo.jpg">
+        <img src="https://example.com/photo.jpg">
+        <figcaption>Caption</figcaption>
+      </figure>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep bare text inside the container', async () => {
+    const value = html`
+      <div data-src="https://example.com/photo.jpg">
+        Caption
+      </div>
+    `
+    const expected = html`
+      <div data-src="https://example.com/photo.jpg">
+        <img src="https://example.com/photo.jpg">
+        Caption
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a textless child element inside the container', async () => {
+    const value = html`
+      <div data-src="https://example.com/photo.jpg">
+        <a href="https://example.com/photo-large.jpg"></a>
+      </div>
+    `
+    const expected = html`
+      <div data-src="https://example.com/photo.jpg">
+        <img src="https://example.com/photo.jpg">
+        <a href="https://example.com/photo-large.jpg"></a>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a container that holds only whitespace', async () => {
+    const value = '<div data-src="https://example.com/photo.jpg">\n  </div>'
+    const expected = '<img src="https://example.com/photo.jpg">'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
@@ -74,5 +146,30 @@ describeForEachParser('convertLazyImageContainers', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent on a container that holds content', async () => {
+    const value = html`
+      <div data-src="https://example.com/photo.jpg">
+        <p>Text</p>
+      </div>
+    `
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('convertLazyImageContainers through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should turn a gallery container into an image', async () => {
+    const value = '<div class="cesis_gallery_img" data-src="https://example.com/photo.jpg"></div>'
+    const expected = '<img src="https://example.com/photo.jpg">'
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

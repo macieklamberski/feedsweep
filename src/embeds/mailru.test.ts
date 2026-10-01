@@ -11,6 +11,7 @@ describe('mailruResolveEmbed', () => {
         provider: 'mailru',
         id: '253943806846567285',
         src: 'https://my.mail.ru/video/embed/253943806846567285',
+        ratio: '16/9',
       }
 
       expect(mailruResolveEmbed(value)).toEqual(expected)
@@ -22,6 +23,7 @@ describe('mailruResolveEmbed', () => {
         provider: 'mailru',
         id: '-16687799075863114',
         src: 'https://my.mail.ru/video/embed/-16687799075863114',
+        ratio: '16/9',
       }
 
       expect(mailruResolveEmbed(value)).toEqual(expected)
@@ -34,6 +36,7 @@ describe('mailruResolveEmbed', () => {
         id: 'corp/lady/86/753',
         src: 'https://my.mail.ru/corp/lady/video/embed/86/753',
         url: 'https://my.mail.ru/corp/lady/video/86/753.html',
+        ratio: '16/9',
         author: 'lady',
       }
 
@@ -47,6 +50,7 @@ describe('mailruResolveEmbed', () => {
         id: 'mail/eduspb.com/_myvideo/248',
         src: 'https://my.mail.ru/mail/eduspb.com/video/embed/_myvideo/248',
         url: 'https://my.mail.ru/mail/eduspb.com/video/_myvideo/248.html',
+        ratio: '16/9',
         author: 'eduspb.com',
       }
 
@@ -60,7 +64,95 @@ describe('mailruResolveEmbed', () => {
         id: 'mail/shels_1991/20/885',
         src: 'https://my.mail.ru/mail/shels_1991/video/embed/20/885',
         url: 'https://my.mail.ru/mail/shels_1991/video/20/885.html',
+        ratio: '16/9',
         author: 'shels_1991',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the path form whose user carries a dot', () => {
+      const value = 'https://my.mail.ru/mail/eduspb.com/video/embed/_myvideo/199'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/eduspb.com/_myvideo/199',
+        src: 'https://my.mail.ru/mail/eduspb.com/video/embed/_myvideo/199',
+        url: 'https://my.mail.ru/mail/eduspb.com/video/_myvideo/199.html',
+        ratio: '16/9',
+        author: 'eduspb.com',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the path form whose user carries a hyphen', () => {
+      const value = 'https://my.mail.ru/mail/art-ifact/video/embed/kvantovaya_realnost/382'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/art-ifact/kvantovaya_realnost/382',
+        src: 'https://my.mail.ru/mail/art-ifact/video/embed/kvantovaya_realnost/382',
+        url: 'https://my.mail.ru/mail/art-ifact/video/kvantovaya_realnost/382.html',
+        ratio: '16/9',
+        author: 'art-ifact',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should move the dead api host onto the player for an album carrying a hyphen', () => {
+      const value =
+        'http://api.video.mail.ru/videos/embed/corp/hitech/news_hi-tech_mail_ru/1263.html'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'corp/hitech/news_hi-tech_mail_ru/1263',
+        src: 'https://my.mail.ru/corp/hitech/video/embed/news_hi-tech_mail_ru/1263',
+        url: 'https://my.mail.ru/corp/hitech/video/news_hi-tech_mail_ru/1263.html',
+        ratio: '16/9',
+        author: 'hitech',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    // The player finds the video by its counter and serves it under any album spelling.
+    it('should move the dead api host onto the player for an album carrying a dot', () => {
+      const value =
+        'http://api.video.mail.ru/videos/embed/corp/hitech/news_hi.tech_mail_ru/1263.html'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'corp/hitech/news_hi.tech_mail_ru/1263',
+        src: 'https://my.mail.ru/corp/hitech/video/embed/news_hi.tech_mail_ru/1263',
+        url: 'https://my.mail.ru/corp/hitech/video/news_hi.tech_mail_ru/1263.html',
+        ratio: '16/9',
+        author: 'hitech',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the path form whose album carries a hyphen', () => {
+      const value = 'https://my.mail.ru/corp/hitech/video/embed/news_hi-tech_mail_ru/1263'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'corp/hitech/news_hi-tech_mail_ru/1263',
+        src: 'https://my.mail.ru/corp/hitech/video/embed/news_hi-tech_mail_ru/1263',
+        url: 'https://my.mail.ru/corp/hitech/video/news_hi-tech_mail_ru/1263.html',
+        ratio: '16/9',
+        author: 'hitech',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the path form whose album carries a dot', () => {
+      const value = 'https://my.mail.ru/corp/hitech/video/embed/news_hi.tech_mail_ru/1263'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'corp/hitech/news_hi.tech_mail_ru/1263',
+        src: 'https://my.mail.ru/corp/hitech/video/embed/news_hi.tech_mail_ru/1263',
+        url: 'https://my.mail.ru/corp/hitech/video/news_hi.tech_mail_ru/1263.html',
+        ratio: '16/9',
+        author: 'hitech',
       }
 
       expect(mailruResolveEmbed(value)).toEqual(expected)
@@ -74,6 +166,7 @@ describe('mailruResolveEmbed', () => {
         id: 'mail/anizm.com/4418/4427',
         src: 'https://my.mail.ru/mail/anizm.com/video/embed/4418/4427',
         url: 'https://my.mail.ru/mail/anizm.com/video/4418/4427.html',
+        ratio: '16/9',
         author: 'anizm.com',
       }
 
@@ -83,7 +176,7 @@ describe('mailruResolveEmbed', () => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/my.mail.ru/video/embed/253943806846567285'
+      const value = 'https://evil.test/video/embed/253943806846567285'
 
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
@@ -94,8 +187,51 @@ describe('mailruResolveEmbed', () => {
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a numeric route whose id is not a number', () => {
+    it('should use a malformed numeric id as written, even if the player answers an error', () => {
       const value = 'https://my.mail.ru/video/embed/latest'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'latest',
+        src: 'https://my.mail.ru/video/embed/latest',
+        ratio: '16/9',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should ignore the numeric route behind another segment', () => {
+      const value = 'https://my.mail.ru/x/video/embed/253943806846567285'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the numeric route followed by another segment', () => {
+      const value = 'https://my.mail.ru/video/embed/253943806846567285/extra'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the legacy route behind another segment', () => {
+      const value = 'https://videoapi.my.mail.ru/x/videos/embed/mail/eduspb.com/_myvideo/248.html'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the legacy route followed by another segment', () => {
+      const value =
+        'https://videoapi.my.mail.ru/videos/embed/mail/eduspb.com/_myvideo/248.html/extra'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the path form behind another segment', () => {
+      const value = 'https://my.mail.ru/x/mail/shels_1991/video/embed/20/885'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the path form followed by another segment', () => {
+      const value = 'https://my.mail.ru/mail/shels_1991/video/embed/20/885/extra'
 
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
@@ -112,14 +248,59 @@ describe('mailruResolveEmbed', () => {
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should ignore the Flash player path behind another segment', () => {
+      const value = 'http://img.mail.ru/x/r/video2/uvpv3.swf?2&movieSrc=mail/anizm.com/4418/4427'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the Flash player path followed by another segment', () => {
+      const value =
+        'http://img.mail.ru/r/video2/uvpv3.swf/extra?2&movieSrc=mail/anizm.com/4418/4427'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore the Flash player when nothing names a video', () => {
       const value = 'http://img.mail.ru/r/video2/uvpv3.swf?3'
 
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should refuse a movieSrc whose segments climb out of the minted path', () => {
+    it('should use a malformed movieSrc as written, even if the player answers an error', () => {
       const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/../../885&autoplay=0'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/../../885',
+        src: 'https://my.mail.ru/mail/../video/embed/../885',
+        url: 'https://my.mail.ru/mail/../video/../885.html',
+        ratio: '16/9',
+        author: '..',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should refuse a movieSrc behind a dot segment', () => {
+      const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=../mail/anizm.com/4418/4427'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a movieSrc followed by a dot segment', () => {
+      const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/anizm.com/4418/4427/..'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a movieSrc carrying an extra segment after the type', () => {
+      const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/x/anizm.com/4418/4427'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a movieSrc carrying an extra segment in the album', () => {
+      const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/anizm.com/44/18/4427'
 
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
@@ -130,7 +311,7 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, mailruEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the box the share dialog states', async () => {
+    it('should state the video ratio over the box the share dialog states', async () => {
       const value = html`
         <iframe
           src="https://my.mail.ru/video/embed/253943806846567285"
@@ -145,8 +326,7 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
         provider: 'mailru',
         id: '253943806846567285',
         src: 'https://my.mail.ru/video/embed/253943806846567285',
-        width: 626,
-        height: 367,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -166,8 +346,7 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
         id: 'corp/lady/86/753',
         src: 'https://my.mail.ru/corp/lady/video/embed/86/753',
         url: 'https://my.mail.ru/corp/lady/video/86/753.html',
-        width: 540,
-        height: 328,
+        ratio: '16/9',
         author: 'lady',
       }
 
@@ -177,8 +356,7 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/my.mail.ru/video/embed/253943806846567285"></iframe>'
+      const value = '<iframe src="https://evil.test/video/embed/253943806846567285"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -215,8 +393,7 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
         id: 'mail/alinavrik59/142/143',
         src: 'https://my.mail.ru/mail/alinavrik59/video/embed/142/143',
         url: 'https://my.mail.ru/mail/alinavrik59/video/142/143.html',
-        width: 626,
-        height: 367,
+        ratio: '16/9',
         author: 'alinavrik59',
       }
 
@@ -237,7 +414,7 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
         id: 'mail/anizm.com/4418/4427',
         src: 'https://my.mail.ru/mail/anizm.com/video/embed/4418/4427',
         url: 'https://my.mail.ru/mail/anizm.com/video/4418/4427.html',
-        height: 390,
+        ratio: '16/9',
         author: 'anizm.com',
       }
 
@@ -257,6 +434,7 @@ describeForEachParser('mailruEmbedResolver carrier title', (parseHtml) => {
       provider: 'mailru',
       id: '253943806846567285',
       src: 'https://my.mail.ru/video/embed/253943806846567285',
+      ratio: '16/9',
       title: 'Прогулка по Невскому',
     }
 

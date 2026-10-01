@@ -59,6 +59,19 @@ describe('buildCite', () => {
       expect(result?.publisher).toBeUndefined()
     })
 
+    it('should drop a non-string optional field from a JSON payload', () => {
+      const value = JSON.parse(
+        '{"provider":"stub","url":"https://example.com/post","title":"Page title","author":42,"thumbnail":["https://example.com/t.jpg"]}',
+      )
+      const expected: CiteResolverResult = {
+        provider: 'stub',
+        url: 'https://example.com/post',
+        title: 'Page title',
+      }
+
+      expect(buildCite(value)).toEqual(expected)
+    })
+
     it('should accept a null url or title from a raw DOM read', () => {
       const value = { provider: 'stub', url: null, title: null }
 
@@ -77,6 +90,14 @@ describe('buildCite', () => {
       const value = { provider: 'stub', url: 'https://example.com/post' }
 
       expect(buildCite(value)).toBeUndefined()
+    })
+
+    it('should return undefined when the url or the title is not a string', () => {
+      const url = JSON.parse('{"provider":"stub","url":42,"title":"Page title"}')
+      const title = JSON.parse('{"provider":"stub","url":"https://example.com","title":{}}')
+
+      expect(buildCite(url)).toBeUndefined()
+      expect(buildCite(title)).toBeUndefined()
     })
 
     it('should return undefined when the url or the title is blank', () => {
