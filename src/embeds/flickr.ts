@@ -216,6 +216,8 @@ const composePhotoEmbed = (src: string, photo: FlickrPhoto): EmbedResolverResult
       : composeShortPhotoUrl(photoId),
     thumbnail: secret ? composePhotoThumbnail(photoId, secret) : undefined,
     author: readOwnerAlias(owner),
+    // The player fills its frame, and photos come in every shape.
+    ratio: '4/3',
   }
 }
 

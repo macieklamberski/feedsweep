@@ -531,6 +531,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         src: 'https://www.flickr.com/photos/strictly.kev/15753890338/player/',
         url: 'https://www.flickr.com/photos/strictly.kev/15753890338/',
         author: 'strictly.kev',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -579,6 +580,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         src: 'https://www.flickr.com/photos/celesteh/15753890338/player/',
         url: 'https://www.flickr.com/photos/celesteh/15753890338/',
         author: 'celesteh',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -606,6 +608,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         url: 'https://www.flickr.com/photos/hankthetank/15637343340/',
         thumbnail: 'https://live.staticflickr.com/0/15637343340_2d3295bc6d_b.jpg',
         author: 'hankthetank',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -626,6 +629,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         src: 'https://www.flickr.com/photos/jackieboyslim/8740425686/player/',
         url: 'https://www.flickr.com/photos/jackieboyslim/8740425686/',
         author: 'jackieboyslim',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -648,6 +652,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         url: 'https://www.flickr.com/photos/kimim-photo/11616055053/',
         thumbnail: 'https://live.staticflickr.com/0/11616055053_c64480d113_b.jpg',
         author: 'kimim-photo',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -668,12 +673,13 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         url: 'https://www.flickr.com/photos/hankthetank/15637343340/',
         thumbnail: 'https://live.staticflickr.com/0/15637343340_2d3295bc6d%20_b.jpg',
         author: 'hankthetank',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should state no size when the carrier declares none', async () => {
+    it('should state 4/3 when the carrier declares no size', async () => {
       const value = html`
         <iframe
           src="https://www.flickr.com/photos/hankthetank/15591173770/player/542b374f55"
@@ -688,6 +694,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         url: 'https://www.flickr.com/photos/hankthetank/15591173770/',
         thumbnail: 'https://live.staticflickr.com/0/15591173770_542b374f55_b.jpg',
         author: 'hankthetank',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -706,6 +713,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'p/2qzuB4W',
         src: 'https://www.flickr.com/photos/_/54200280448/player/',
         url: 'https://flic.kr/p/2qzuB4W',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -730,6 +738,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'photos/20899351@N00/3786844985',
         src: 'https://www.flickr.com/photos/20899351@N00/3786844985/player/',
         url: 'https://www.flickr.com/photos/20899351@N00/3786844985/',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -758,6 +767,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         src: 'https://embedr.flickr.com/photos/5182695495',
         url: 'https://flic.kr/p/8TYENT',
         title: 'con Petrona',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1107,6 +1117,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         src: 'https://www.flickr.com/photos/kimim%2Fphoto/11616055053/player/',
         url: 'https://www.flickr.com/photos/kimim%2Fphoto/11616055053/',
         author: 'kimim/photo',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1239,6 +1250,7 @@ describeForEachParser('flickrEmbedResolver carrier title', (parseHtml) => {
       src: 'https://embedr.flickr.com/photos/5405676135',
       url: 'https://flic.kr/p/9eFvbF',
       title: '6 month Ampuversary',
+      ratio: '4/3',
     }
 
     expect(await extract(value)).toEqual(expected)
