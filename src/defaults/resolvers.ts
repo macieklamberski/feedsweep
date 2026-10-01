@@ -131,6 +131,7 @@ import { googleslidesEmbedResolver } from '../embeds/googleslides.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
 import { helloassoEmbedResolver } from '../embeds/helloasso.js'
 import { heyzineEmbedResolver } from '../embeds/heyzine.js'
+import { iheartEmbedResolver } from '../embeds/iheart.js'
 import {
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
@@ -477,6 +478,7 @@ const embedResolvers: Array<EmbedResolver> = [
   guardianEmbedResolver,
   helloassoEmbedResolver,
   heyzineEmbedResolver,
+  iheartEmbedResolver,
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
   imgurS9eEmbedResolver,
