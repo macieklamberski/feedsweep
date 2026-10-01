@@ -198,7 +198,7 @@ describeForEachParser('flipsnackEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a player hash that is not base64', async () => {
-      const value = '<iframe src="https://player.flipsnack.com?hash=dxnsuj1gvu"></iframe>'
+      const value = '<iframe src="https://player.flipsnack.com?hash=bad!!hash"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
