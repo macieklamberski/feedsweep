@@ -238,6 +238,7 @@ import { stackblitzIframeEmbedResolver } from '../embeds/stackblitz.js'
 import { standfmEmbedResolver } from '../embeds/standfm.js'
 import { steamEmbedResolver } from '../embeds/steam.js'
 import { stravaIframeEmbedResolver, stravaPlaceholderEmbedResolver } from '../embeds/strava.js'
+import { strawpollIframeEmbedResolver, strawpollMountEmbedResolver } from '../embeds/strawpoll.js'
 import { swayEmbedResolver } from '../embeds/sway.js'
 import { symbalooEmbedResolver } from '../embeds/symbaloo.js'
 import {
@@ -601,6 +602,8 @@ const embedResolvers: Array<EmbedResolver> = [
   steamEmbedResolver,
   stravaIframeEmbedResolver,
   stravaPlaceholderEmbedResolver,
+  strawpollIframeEmbedResolver,
+  strawpollMountEmbedResolver,
   swayEmbedResolver,
   symbalooEmbedResolver,
   tableauWidgetEmbedResolver,

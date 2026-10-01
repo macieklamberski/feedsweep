@@ -61,6 +61,7 @@ import { soundcloudRenderHint } from '../embeds/soundcloud.js'
 import { spotifyRenderHint } from '../embeds/spotify.js'
 import { spreakerRenderHint } from '../embeds/spreaker.js'
 import { srgplayRenderHint } from '../embeds/srgplay.js'
+import { strawpollRenderHint } from '../embeds/strawpoll.js'
 import { tableauRenderHint } from '../embeds/tableau.js'
 import { tedRenderHint } from '../embeds/ted.js'
 import { telegramRenderHint } from '../embeds/telegram.js'
@@ -147,6 +148,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   spotifyRenderHint,
   spreakerRenderHint,
   srgplayRenderHint,
+  strawpollRenderHint,
   tableauRenderHint,
   tedRenderHint,
   telegramRenderHint,
