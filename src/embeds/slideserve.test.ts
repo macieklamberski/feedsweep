@@ -68,6 +68,25 @@ describeForEachParser('slideserveEmbedResolver', (parseHtml) => {
         id: '12675',
         src: 'https://www.slideserve.com/embed/12675',
         ratio: '300/271',
+        title: 'GRADUACIO',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a title with spaces out of the Flash viewkey', async () => {
+      const value = html`
+        <embed
+          src="http://www.slideserve.com/player.swf?moviePath=http://www.slideserve.com/video/100125.swf"
+          FlashVars="viewkey=presentation/100125/Europe is a small continent Transylvania is an entire world"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideserve',
+        id: '100125',
+        src: 'https://www.slideserve.com/embed/100125',
+        ratio: '300/271',
+        title: 'Europe is a small continent Transylvania is an entire world',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -141,6 +160,23 @@ describeForEachParser('slideserveEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should leave the title out of a viewkey with no title', async () => {
+      const value = html`
+        <embed
+          src="http://www.slideserve.com/player.swf?moviePath=http://www.slideserve.com/video/12675.swf"
+          FlashVars="viewkey=presentation/12675"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideserve',
+        id: '12675',
+        src: 'https://www.slideserve.com/embed/12675',
+        ratio: '300/271',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should drop a trailing segment the server ignores', async () => {
       const value = '<iframe src="https://www.slideserve.com/embed/11734358/extra"></iframe>'
       const expected: EmbedResolverResult = {
@@ -204,6 +240,7 @@ describeForEachParser('slideserve through the pipeline', (parseHtml) => {
         data-embed-id="12675"
         data-embed-provider="slideserve"
         data-embed-src="https://www.slideserve.com/embed/12675"
+        data-embed-title="GRADUACIO"
       ></div>
     `
 
