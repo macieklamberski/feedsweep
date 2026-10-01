@@ -76,7 +76,9 @@ const readPageSegments = (anchor: Nullish<Element>): Array<string> => {
 // The caption's links all sit on the platform's own host: the deck's page is `/{account}/{slug}`
 // and its owner `/{account}`. The 2011 caption writes a bare `slideshare.net/` link in the same
 // sentence.
-const findCaptionLinks = (caption: Nullish<Element>): { page?: Element; owner?: Element } => {
+type CaptionLinks = { page?: Element; owner?: Element }
+
+const findCaptionLinks = (caption: Nullish<Element>): CaptionLinks => {
   const page = find(caption, captionLinkSelector, (anchor) => readPageSegments(anchor).length > 1)
   const account = readPageSegments(page)[0]
   // A route word has the shape of a handle: the 2008 caption offers `slideshare.net/upload` one
@@ -92,9 +94,7 @@ const findCaptionLinks = (caption: Nullish<Element>): { page?: Element; owner?: 
   return { page, owner }
 }
 
-const readCaption = (caption: Nullish<Element>): Partial<EmbedResolverResult> => {
-  const { page, owner } = findCaptionLinks(caption)
-
+const readCaption = ({ page, owner }: CaptionLinks): Partial<EmbedResolverResult> => {
   return {
     url: attr(page, 'href'),
     title: attr(page, 'title') ?? text(page),
@@ -137,11 +137,11 @@ const findCaption = (element: Element, wrapper: Nullish<Element>): Nullish<Eleme
     (parent?.lastElementChild === element ? skipEmptyBlocks(parent.nextElementSibling) : undefined)
 
   // A block naming a deck without its owner is prose about the next deck as often as a caption.
-  return readCaption(candidate).author ? candidate : undefined
+  return readCaption(findCaptionLinks(candidate)).author ? candidate : undefined
 }
 
 // Blogger lets a post run on inside the caption block, so only the run from the deck's link to
-// the owner's goes, with any other link to SlideShare in the block.
+// the owner's goes, with any link to SlideShare's home page in the block.
 const removeAttribution = (caption: Element, page: Element, owner: Element): void => {
   let container = page
 
@@ -158,7 +158,9 @@ const removeAttribution = (caption: Element, page: Element, owner: Element): voi
   }
 
   for (const anchor of Array.from(caption.querySelectorAll(captionLinkSelector))) {
-    if (parseUrlOnHosts(attr(anchor, 'href'), slideshareHosts)) {
+    const parsed = parseUrlOnHosts(attr(anchor, 'href'), slideshareHosts)
+
+    if (parsed && getPathSegments(parsed).length === 0) {
       anchor.remove()
     }
   }
@@ -173,11 +175,16 @@ const consumeCaption = (
   }
 
   const caption = findCaption(element, wrapper)
-  const fields = readCaption(caption)
+
+  if (!caption) {
+    return {}
+  }
+
   const { page, owner } = findCaptionLinks(caption)
+  const fields = readCaption({ page, owner })
 
   // Removing the __ss_{id} wrapper would take the player inside it with the caption.
-  if (!wrapper && caption && page && owner && fields.url && fields.author) {
+  if (!wrapper && page && owner && fields.author) {
     removeAttribution(caption, page, owner)
   }
 
