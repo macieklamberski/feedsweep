@@ -32,6 +32,7 @@ import { tistoryCiteResolver } from '../cites/tistory.js'
 import { tumblrCiteResolver } from '../cites/tumblr.js'
 import { wordpressCiteResolver } from '../cites/wordpress.js'
 import { xenforoCiteResolver } from '../cites/xenforo.js'
+import { threeSixtyCitiesEmbedResolver } from '../embeds/360cities.js'
 import { acastEmbedResolver } from '../embeds/acast.js'
 import {
   amebaImagePageEmbedResolver,
@@ -417,6 +418,7 @@ import type {
 // Order still matters when selectors overlap: each resolver runs in array order and a claimed
 // element can't be re-matched, so a broader selector leaves the alphabet and moves below.
 const embedResolvers: Array<EmbedResolver> = [
+  threeSixtyCitiesEmbedResolver,
   acastEmbedResolver,
   amebaImagePageEmbedResolver,
   amebaMoviePlayerEmbedResolver,
