@@ -24,14 +24,14 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the token the embed code carries', async () => {
+    it('should drop the token the embed code carries', async () => {
       const value = script(
         'https://redfield.podigee.io/183-r-183-mit-michaela-schneider-ceo-von-allgaeu-concerts/embed?context=external&amp;token=j0d6cKXw8sAaSGMikUmG5A',
       )
       const expected: EmbedResolverResult = {
         provider: 'podigee',
         id: 'redfield/183-r-183-mit-michaela-schneider-ceo-von-allgaeu-concerts',
-        src: 'https://redfield.podigee.io/183-r-183-mit-michaela-schneider-ceo-von-allgaeu-concerts/embed?context=external&token=j0d6cKXw8sAaSGMikUmG5A',
+        src: 'https://redfield.podigee.io/183-r-183-mit-michaela-schneider-ceo-von-allgaeu-concerts/embed?context=external',
         height: 145,
       }
 

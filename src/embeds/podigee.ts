@@ -1,8 +1,8 @@
-import { getPathSegments, isPlainObject, trimObject } from 'trousse'
+import { getPathSegments, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest, readPixels } from '../utils/hints.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podigee'
@@ -23,19 +23,16 @@ const safeEpisodeRegex = /^\d+-/
 const playerHeight = 145
 
 // The show is the subdomain and the episode the first path segment, which together make a
-// stable id without parsing the query. The player url is the one Podigee's embed code writes, and
-// the `token` it can carry stays with it.
+// stable id without parsing the query. The player url is the one Podigee's embed code writes.
 // A show's own `/embed`, with no episode, plays its latest one and is keyed `{show}/embed`.
 const composeEmbed = (parsed: URL, episode?: string): EmbedResolverResult => {
   const show = parsed.hostname.split('.')[0]
-  const token = parsed.searchParams.get('token') ?? undefined
-  const query = composeQuery(trimObject({ context: 'external', token }, Boolean))
   const path = episode ? `${episode}/embed` : 'embed'
 
   return {
     provider,
     id: `${show}/${episode ?? 'embed'}`,
-    src: `https://${parsed.hostname}/${path}${query}`,
+    src: `https://${parsed.hostname}/${path}?context=external`,
     height: playerHeight,
   }
 }
