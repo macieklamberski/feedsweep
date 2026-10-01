@@ -6,14 +6,28 @@ import { arcgisEmbedResolver, arcgisResolveEmbed } from './arcgis.js'
 
 describe('arcgisResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should rebuild an organization web map snippet onto the public Map Viewer embed', () => {
+    it('should keep a classic snippet on the classic player with its box', () => {
       const value =
         '//sonomaopenspace.maps.arcgis.com/apps/Embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7&extent=-123.0692,38.5233,-122.9947,38.5929&zoom=true&scale=true&disable_scroll=true&theme=light'
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
         id: '62bf87f7b2f64f15b48491d39242f4d7',
-        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=62bf87f7b2f64f15b48491d39242f4d7',
+        src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7&extent=-123.0692,38.5233,-122.9947,38.5929',
         url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the centre and level of a classic snippet', () => {
+      const value =
+        'https://www.arcgis.com/apps/Embed/index.html?webmap=84a606bfb3d848c69ca61321f3ac2e9f&center=-0.1985,51.5554&level=11&zoom=true&scale=true'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: '84a606bfb3d848c69ca61321f3ac2e9f',
+        src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=84a606bfb3d848c69ca61321f3ac2e9f&center=-0.1985,51.5554&level=11',
+        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=84a606bfb3d848c69ca61321f3ac2e9f',
         height: 500,
       }
 
@@ -362,7 +376,7 @@ describeForEachParser('arcgisEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, arcgisEmbedResolver)
 
   describe('happy paths', () => {
-    it('should take the map name from the stated title and drop the box', async () => {
+    it('should take the map name from the stated title and drop the frame box', async () => {
       const value = html`
         <iframe
           width="600"
@@ -374,7 +388,7 @@ describeForEachParser('arcgisEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
         id: '7bd57dbfa6e145df86268fd3e93b7766',
-        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=7bd57dbfa6e145df86268fd3e93b7766',
+        src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=7bd57dbfa6e145df86268fd3e93b7766',
         url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=7bd57dbfa6e145df86268fd3e93b7766',
         height: 500,
         title: 'Lifeform Map - Sonoma Veg Map',
