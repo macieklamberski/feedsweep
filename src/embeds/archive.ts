@@ -58,9 +58,14 @@ const composeEmbedResult = (identifier: string, query = ''): EmbedResolverResult
 const audioPlayerHeight = 30
 const videoPlayerRatio = '16/9'
 
-// `embed/{identifier}` serves audio and video alike. Nothing else the archive renders is 30 tall.
+// `embed/{identifier}` serves audio and video alike. Only an audio item is embedded under 100
+// tall: the modern bar at 30, and the 40 and 60 the older snippets wrote.
+const audioCarrierHeightLimit = 100
+
 const declaresAudioPlayer = (element: Element): boolean => {
-  return getEmbedSize(element, 0).height === audioPlayerHeight
+  const { height } = getEmbedSize(element, 0)
+
+  return height !== undefined && height < audioCarrierHeightLimit
 }
 
 export const archiveResolveEmbed: ResolveEmbed = (url, element) => {

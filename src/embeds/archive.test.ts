@@ -263,6 +263,46 @@ describeForEachParser('archiveIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should state the audio bar height over a carrier sized for the 40 tall bar', async () => {
+    const value = html`
+      <iframe
+        src="https://archive.org/embed/afc1938009_2004B"
+        width="500"
+        height="40"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'afc1938009_2004B',
+      src: 'https://archive.org/embed/afc1938009_2004B',
+      url: 'https://archive.org/details/afc1938009_2004B',
+      thumbnail: 'https://archive.org/services/img/afc1938009_2004B',
+      height: 30,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should state the audio bar height over a carrier sized for the 60 tall bar', async () => {
+    const value = html`
+      <iframe
+        src="https://archive.org/embed/u_20231130"
+        width="400"
+        height="60"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'u_20231130',
+      src: 'https://archive.org/embed/u_20231130',
+      url: 'https://archive.org/details/u_20231130',
+      thumbnail: 'https://archive.org/services/img/u_20231130',
+      height: 30,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should state the video ratio over a video carrier box', async () => {
     const value = html`
       <iframe src="https://archive.org/embed/TheGoodOldGasMask" width="560" height="384"></iframe>
