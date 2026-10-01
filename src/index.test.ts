@@ -185,6 +185,21 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
+  it('should drop an escaped paragraph pair wrapped around a real link', async () => {
+    const value = html`
+      <p>&lt;p&gt;Stretch the tight areas first. <a href="https://example.com/stretching">Getting in shape</a> will loosen them up.&lt;/p&gt;</p>
+    `
+    const expected = html`
+      <p>Stretch the tight areas first. <a href="https://example.com/stretching">Getting in shape</a> will loosen them up.</p>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
   it('should clean anchor urls with the provided cleanUrlFn', async () => {
     const value = '<p><a href="https://example.com?utm_source=feed">Link</a></p>'
     const expected = '<p><a href="https://example.com">Link</a></p>'

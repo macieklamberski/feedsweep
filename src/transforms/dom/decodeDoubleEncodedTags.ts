@@ -6,11 +6,10 @@ import { isEscapedHtmlFragment } from '../../utils/html.js'
 // `<img>`), so their descendants are left untouched.
 const opaqueTags = new Set(['code', 'pre', 'script', 'style', 'textarea', 'noscript'])
 
-// A paragraph escaped around real elements: the generator escaped the `<p>` pair and left the
-// links inside it as markup, so the tags arrive as text on either side of them,
-// `<p>&lt;p&gt;The post <a>…</a> first appeared on <a>…</a>.&lt;/p&gt;</p>`.
-const escapedParagraphOpenRegex = /^\s*<p>/i
-const escapedParagraphCloseRegex = /<\/p>\s*$/i
+// A paragraph whose `<p>` pair was escaped while the elements inside it were not, so the two tags
+// arrive as text on either side of them: `<p>&lt;p&gt;The post <a>…</a>.&lt;/p&gt;</p>`.
+const escapedParagraphOpenRegex = /^\s*<p>/
+const escapedParagraphCloseRegex = /<\/p>\s*$/
 
 // HTML a feed generator entity-escaped twice, so its tags ship as visible text.
 export const decodeDoubleEncodedTags: DomTransform = () => {
@@ -59,8 +58,6 @@ export const decodeDoubleEncodedTags: DomTransform = () => {
       node.replaceWith(...tempDiv.childNodes)
     }
 
-    // The escaped pair wraps the whole paragraph, which is the paragraph the real `<p>` around
-    // it already is, so the two tags are dropped and the elements between them stay.
     for (const paragraph of document.querySelectorAll('p')) {
       const first = paragraph.firstChild
       const last = paragraph.lastChild
