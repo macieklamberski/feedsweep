@@ -1,5 +1,11 @@
 import type { DomTransform } from '../../types.js'
-import { hasAncestorWithTagName, headingSelector } from '../../utils/dom.js'
+import {
+  hasAncestorWithTagName,
+  headingSelector,
+  isElement,
+  isMediaElement,
+  mediaSelector,
+} from '../../utils/dom.js'
 import { isSamePage } from '../../utils/urls.js'
 
 const supTags = new Set(['sup'])
@@ -35,8 +41,13 @@ const interactiveAttrRegex = /toggle|accordion|collapse/i
 // An anchor child is a decorative permalink marker, to be dropped and never kept as heading
 // text, when its text is empty, a lone glyph, or the inline `#fragment` form some generators
 // render (e.g. `<span class="anchor">#intro</span>`).
-const isGlyphMarker = (text: string, fragment: string): boolean => {
-  const trimmed = text.trim()
+const isGlyphMarker = (node: Node, fragment: string): boolean => {
+  // An image or player has no text but is content, never a marker.
+  if (isMediaElement(node) || (isElement(node) && node.querySelector(mediaSelector))) {
+    return false
+  }
+
+  const trimmed = (node.textContent ?? '').trim()
 
   return trimmed === '' || permalinkLabelRegex.test(trimmed) || trimmed === `#${fragment}`
 }
@@ -114,7 +125,7 @@ export const normalizeAnchoredHeadings: DomTransform = ({ baseUrl, resolveUrlFn 
           continue
         }
 
-        const isSymbolOnly = isGlyphMarker(visible, fragment)
+        const isSymbolOnly = isGlyphMarker(anchor, fragment)
         const hasKnownClass = className
           .split(whitespaceRegex)
           .some((token) => permalinkClasses.has(token.toLowerCase()))
@@ -150,7 +161,7 @@ export const normalizeAnchoredHeadings: DomTransform = ({ baseUrl, resolveUrlFn 
           while (anchor.firstChild) {
             const child = anchor.firstChild
 
-            if (isGlyphMarker(child.textContent ?? '', fragment)) {
+            if (isGlyphMarker(child, fragment)) {
               child.remove()
             } else {
               parent.insertBefore(child, anchor)
