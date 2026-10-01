@@ -10,7 +10,7 @@ describe('kindleResolveEmbed', () => {
         'https://read.amazon.com/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_dQVcnKwFnAcXcz&asin=B08DGQCKF3&tag=kpembed-20'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B08DGQCKF3',
+        id: 'read.amazon.com/B08DGQCKF3',
         src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -23,7 +23,7 @@ describe('kindleResolveEmbed', () => {
       const value = 'https://read.amazon.co.uk/kp/card?asin=B08DGQCKF3&preview=inline'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B08DGQCKF3',
+        id: 'read.amazon.co.uk/B08DGQCKF3',
         src: 'https://read.amazon.co.uk/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -36,7 +36,7 @@ describe('kindleResolveEmbed', () => {
       const value = 'https://read.amazon.ca/kp/card?asin=B08DGQCKF3&preview=inline'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B08DGQCKF3',
+        id: 'read.amazon.ca/B08DGQCKF3',
         src: 'https://read.amazon.ca/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -49,7 +49,7 @@ describe('kindleResolveEmbed', () => {
       const value = 'https://read.amazon.in/kp/card?asin=B08DGQCKF3&preview=inline'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B08DGQCKF3',
+        id: 'read.amazon.in/B08DGQCKF3',
         src: 'https://read.amazon.in/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -63,7 +63,7 @@ describe('kindleResolveEmbed', () => {
         'https://lesen.amazon.de/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_IWygh7LxwTfj6U&asin=B019C57GLO&tag=kpembed-20'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B019C57GLO',
+        id: 'lesen.amazon.de/B019C57GLO',
         src: 'https://lesen.amazon.de/kp/card?asin=B019C57GLO',
         thumbnail: 'https://m.media-amazon.com/images/P/B019C57GLO.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -77,7 +77,7 @@ describe('kindleResolveEmbed', () => {
         'https://leer.amazon.es/kp/card?preview=inline&linkCode=ll1&ref_=k4w_oembed_CkjSxBKKfyfasn&asin=B09GKYBZTJ&tag=juandedev-21'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B09GKYBZTJ',
+        id: 'leer.amazon.es/B09GKYBZTJ',
         src: 'https://leer.amazon.es/kp/card?asin=B09GKYBZTJ',
         thumbnail: 'https://m.media-amazon.com/images/P/B09GKYBZTJ.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -91,7 +91,7 @@ describe('kindleResolveEmbed', () => {
         'https://leggi.amazon.it/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_T6RnpneE6MeNc7&asin=B0FP373343&tag=kpembed-20'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B0FP373343',
+        id: 'leggi.amazon.it/B0FP373343',
         src: 'https://leggi.amazon.it/kp/card?asin=B0FP373343',
         thumbnail: 'https://m.media-amazon.com/images/P/B0FP373343.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -105,7 +105,7 @@ describe('kindleResolveEmbed', () => {
         'https://lire.amazon.fr/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_auKhYtfwzPejGc&asin=1549720864&tag=kpembed-20'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: '1549720864',
+        id: 'lire.amazon.fr/1549720864',
         src: 'https://lire.amazon.fr/kp/card?asin=1549720864',
         thumbnail: 'https://m.media-amazon.com/images/P/1549720864.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -119,7 +119,7 @@ describe('kindleResolveEmbed', () => {
         'https://read.amazon.com.au/kp/card?preview=inline&linkCode=ll1&ref_=k4w_oembed_y0sSritwWwbv0o&asin=B09SLB7V48&tag=yusukeblog00-22'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B09SLB7V48',
+        id: 'read.amazon.com.au/B09SLB7V48',
         src: 'https://read.amazon.com.au/kp/card?asin=B09SLB7V48',
         thumbnail: 'https://m.media-amazon.com/images/P/B09SLB7V48.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -140,7 +140,7 @@ describe('kindleResolveEmbed', () => {
       const value = 'https://read.amazon.com/kp/card?asin=../embed'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: '../embed',
+        id: 'read.amazon.com/../embed',
         src: 'https://read.amazon.com/kp/card?asin=..%2Fembed',
         thumbnail: 'https://m.media-amazon.com/images/P/..%2Fembed.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -163,11 +163,24 @@ describe('kindleResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
+    it('should lowercase an uppercase reader host in the key', () => {
+      const value = 'https://LEGGI.amazon.it/kp/card?asin=B0FP373343'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'leggi.amazon.it/B0FP373343',
+        src: 'https://leggi.amazon.it/kp/card?asin=B0FP373343',
+        thumbnail: 'https://m.media-amazon.com/images/P/B0FP373343.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should read the card route with a trailing slash', () => {
       const value = 'https://read.amazon.com/kp/card/?asin=B08DGQCKF3'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B08DGQCKF3',
+        id: 'read.amazon.com/B08DGQCKF3',
         src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -197,7 +210,7 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B08DGQCKF3',
+        id: 'read.amazon.com/B08DGQCKF3',
         src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -223,7 +236,7 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B019C57GLO',
+        id: 'lesen.amazon.de/B019C57GLO',
         src: 'https://lesen.amazon.de/kp/card?asin=B019C57GLO',
         thumbnail: 'https://m.media-amazon.com/images/P/B019C57GLO.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -247,7 +260,7 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B09KT8838X',
+        id: 'read.amazon.com/B09KT8838X',
         src: 'https://read.amazon.com/kp/card?asin=B09KT8838X',
         thumbnail: 'https://m.media-amazon.com/images/P/B09KT8838X.01._SCLZZZZZZZ_.jpg',
         height: 550,

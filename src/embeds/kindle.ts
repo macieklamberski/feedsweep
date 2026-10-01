@@ -34,10 +34,10 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   // The reader host picks the storefront: `read.amazon.com` answers "This book isn't available" for
-  // a book sold only on another store, so the card stays on the host the feed wrote.
+  // a book sold only on another store, and each host's oEmbed answers for its own store only.
   return {
     provider: 'kindle',
-    id: asin,
+    id: `${parsed.hostname}/${asin}`,
     src: `https://${parsed.hostname}/kp/card${composeQuery({ asin })}`,
     // The ASIN comes out of the query decoded, and it goes into a path.
     thumbnail: `https://m.media-amazon.com/images/P/${encodePathSegment(asin)}.01._SCLZZZZZZZ_.jpg`,
