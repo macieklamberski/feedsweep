@@ -79,6 +79,7 @@ import { vkRenderHint } from '../embeds/vk.js'
 import { wistiaRenderHint } from '../embeds/wistia.js'
 import { youkuRenderHint } from '../embeds/youku.js'
 import { youtubeRenderHint } from '../embeds/youtube.js'
+import { zohoworkdriveRenderHint } from '../embeds/zohoworkdrive.js'
 import type { EmbedRenderHint } from '../types.js'
 
 // What a reader needs from each provider once it turns the placeholder into a frame: how to
@@ -167,4 +168,5 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   wistiaRenderHint,
   youkuRenderHint,
   youtubeRenderHint,
+  zohoworkdriveRenderHint,
 ]
