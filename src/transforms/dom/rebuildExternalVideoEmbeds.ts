@@ -1,14 +1,11 @@
-import { coerceString, isString } from 'trousse'
+import { isString } from 'trousse'
 import { nicovideoResolveEmbed } from '../../embeds/nicovideo.js'
 import { readYoutubeEmbedSrc } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
-import { parsePixelSize } from '../../utils/dom.js'
-import { createIframe, setDimensions } from '../../utils/widgets.js'
+import { createIframe } from '../../utils/widgets.js'
 
 type ExternalVideoConfig = {
   url?: unknown
-  width?: unknown
-  height?: unknown
 }
 
 const loaderSelector = 'script[src*="/contents/js/external_video.js"]'
@@ -40,7 +37,7 @@ const findConfigScript = (loader: Element): Element | undefined => {
 
 // Seesaa's and Sakura's blog video block is an inline config beside a loader script that writes
 // the player client-side, so the pipeline drops the loader and no player is left. The config
-// names a YouTube or Nicovideo page and the box the publisher chose.
+// names a YouTube or Nicovideo page.
 export const rebuildExternalVideoEmbeds: DomTransform = () => {
   return (document) => {
     for (const loader of document.querySelectorAll(loaderSelector)) {
@@ -62,14 +59,8 @@ export const rebuildExternalVideoEmbeds: DomTransform = () => {
         continue
       }
 
-      const iframe = createIframe(document, src)
-
-      setDimensions(iframe, {
-        width: parsePixelSize(coerceString(config.width)),
-        height: parsePixelSize(coerceString(config.height)),
-      })
       script.remove()
-      loader.replaceWith(iframe)
+      loader.replaceWith(createIframe(document, src))
     }
   }
 }

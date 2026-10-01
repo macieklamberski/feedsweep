@@ -10,7 +10,7 @@ describeForEachParser('rebuildExternalVideoEmbeds', (parseHtml) => {
   }
 
   describe('happy paths', () => {
-    it('should rebuild a YouTube config as the player frame at its stated size', async () => {
+    it('should rebuild a YouTube config as the player frame without the box it states', async () => {
       const value = html`
         <div style="text-align:center;">
           <script type="text/javascript">extVideoConfig = {"width":"480","height":"320","url":"http://www.youtube.com/watch?feature=youtube_gdata&v=yoOT0NiydEA"};</script>
@@ -22,11 +22,7 @@ describeForEachParser('rebuildExternalVideoEmbeds', (parseHtml) => {
       `
       const expected = html`
         <div style="text-align:center;">
-          <iframe
-            src="https://www.youtube.com/embed/yoOT0NiydEA"
-            width="480"
-            height="320"
-          ></iframe>
+          <iframe src="https://www.youtube.com/embed/yoOT0NiydEA"></iframe>
         </div>
       `
 
@@ -42,11 +38,7 @@ describeForEachParser('rebuildExternalVideoEmbeds', (parseHtml) => {
         ></script>
       `
       const expected = html`
-        <iframe
-          src="https://embed.nicovideo.jp/watch/sm9"
-          width="480"
-          height="320"
-        ></iframe>
+        <iframe src="https://embed.nicovideo.jp/watch/sm9"></iframe>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -97,22 +89,6 @@ describeForEachParser('rebuildExternalVideoEmbeds', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should read a size written as a number', async () => {
-      const value = html`
-        <script>extVideoConfig = {"width":480,"height":320,"url":"https://www.youtube.com/watch?v=yoOT0NiydEA"};</script>
-        <script src="https://blog.seesaa.jp/contents/js/external_video.js"></script>
-      `
-      const expected = html`
-        <iframe
-          src="https://www.youtube.com/embed/yoOT0NiydEA"
-          width="480"
-          height="320"
-        ></iframe>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
     it('should be idempotent', async () => {
       const value = html`
         <script>extVideoConfig = {"width":"480","height":"320","url":"https://www.youtube.com/watch?v=yoOT0NiydEA"};</script>
@@ -126,8 +102,8 @@ describeForEachParser('rebuildExternalVideoEmbeds', (parseHtml) => {
   })
 })
 
-// The rebuilt frame is only worth its place once the YouTube resolver has claimed it, which is
-// what the lost video comes back as.
+// The rebuilt frame carries no size, so the YouTube or Nicovideo resolver that claims it is what
+// states one.
 describeForEachParser('rebuildExternalVideoEmbeds through the pipeline', (parseHtml) => {
   const convert = (value: string) => {
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
@@ -153,6 +129,27 @@ describeForEachParser('rebuildExternalVideoEmbeds through the pipeline', (parseH
         data-embed-src="https://www.youtube.com/embed/bG39BBff10E"
       ></div>
       <p>新米のおにぎりが待ちどおしいです</p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should bring the video back as a Nicovideo placeholder', async () => {
+    const value = html`
+      <script type="text/javascript">extVideoConfig = {"width":"480","url":"https://www.nicovideo.jp/watch/sm9","height":"320"};</script>
+      <script
+        type="text/javascript"
+        src="http://blog.sakura.ne.jp/contents/js/external_video.js"
+      ></script>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-url="https://www.nicovideo.jp/watch/sm9"
+        data-embed-id="sm9"
+        data-embed-provider="nicovideo"
+        data-embed-src="https://embed.nicovideo.jp/watch/sm9"
+      ></div>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
