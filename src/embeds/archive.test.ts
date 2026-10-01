@@ -303,6 +303,26 @@ describeForEachParser('archiveIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should state the audio bar height over a carrier declared just under 100 tall', async () => {
+    const value = html`
+      <iframe
+        src="https://archive.org/embed/em-transe-de-13-de-maio-de-2026"
+        width="500"
+        height="94"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'em-transe-de-13-de-maio-de-2026',
+      src: 'https://archive.org/embed/em-transe-de-13-de-maio-de-2026',
+      url: 'https://archive.org/details/em-transe-de-13-de-maio-de-2026',
+      thumbnail: 'https://archive.org/services/img/em-transe-de-13-de-maio-de-2026',
+      height: 30,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should state the video ratio over a video carrier box', async () => {
     const value = html`
       <iframe src="https://archive.org/embed/TheGoodOldGasMask" width="560" height="384"></iframe>
