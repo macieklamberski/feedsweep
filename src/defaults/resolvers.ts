@@ -198,9 +198,11 @@ import {
   pbsLegacyIframeEmbedResolver,
 } from '../embeds/pbs.js'
 import { peertubeEmbedResolver } from '../embeds/peertube.js'
+import { piktochartIframeEmbedResolver } from '../embeds/piktochart.js'
 import { pinecastEmbedResolver } from '../embeds/pinecast.js'
 import { pixivIframeEmbedResolver, pixivScriptEmbedResolver } from '../embeds/pixiv.js'
 import { podbeanEmbedResolver } from '../embeds/podbean.js'
+import { podcloudIframeEmbedResolver, podcloudWidgetEmbedResolver } from '../embeds/podcloud.js'
 import { podetizeIframeEmbedResolver, podetizeScriptEmbedResolver } from '../embeds/podetize.js'
 import { podigeeIframeEmbedResolver, podigeeScriptEmbedResolver } from '../embeds/podigee.js'
 import { podomaticEmbedResolver } from '../embeds/podomatic.js'
@@ -557,10 +559,13 @@ const embedResolvers: Array<EmbedResolver> = [
   pbsFlashEmbedResolver,
   pbsIframeEmbedResolver,
   pbsLegacyIframeEmbedResolver,
+  piktochartIframeEmbedResolver,
   pinecastEmbedResolver,
   pixivIframeEmbedResolver,
   pixivScriptEmbedResolver,
   podbeanEmbedResolver,
+  podcloudIframeEmbedResolver,
+  podcloudWidgetEmbedResolver,
   podetizeScriptEmbedResolver,
   podetizeIframeEmbedResolver,
   podigeeScriptEmbedResolver,

@@ -53,6 +53,7 @@ import { rebuildLazyLoadForVideos } from '../transforms/dom/rebuildLazyLoadForVi
 import { rebuildLazyYtEmbeds } from '../transforms/dom/rebuildLazyYtEmbeds.js'
 import { rebuildLiteVideoEmbeds } from '../transforms/dom/rebuildLiteVideoEmbeds.js'
 import { rebuildLyteEmbeds } from '../transforms/dom/rebuildLyteEmbeds.js'
+import { rebuildPiktochartEmbeds } from '../transforms/dom/rebuildPiktochartEmbeds.js'
 import { rebuildPublicalbumGalleries } from '../transforms/dom/rebuildPublicalbumGalleries.js'
 import { rebuildRocketYoutubePreviews } from '../transforms/dom/rebuildRocketYoutubePreviews.js'
 import { rebuildVideoJsEmbeds } from '../transforms/dom/rebuildVideoJsEmbeds.js'
@@ -177,6 +178,8 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   rebuildDeferredIframes,
   // Runs before stripEmptyTags, which deletes the empty widget div, and before convertWidgets.
   rebuildGofundmeEmbeds,
+  // Runs before stripEmptyTags, which deletes the emptied snippet div, and before convertWidgets.
+  rebuildPiktochartEmbeds,
   // Converts Datawrapper chart embeds (iframe, script/noscript, and link forms) into a
   // linked static <img> of the chart's published PNG render. Runs in this normalize
   // cluster so the emitted <img> is dimensioned and proxied by the image transforms below.

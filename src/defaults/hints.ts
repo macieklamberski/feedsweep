@@ -49,6 +49,7 @@ import { pbsRenderHint } from '../embeds/pbs.js'
 import { peertubeRenderHint } from '../embeds/peertube.js'
 import { pinecastRenderHint } from '../embeds/pinecast.js'
 import { podbeanRenderHint } from '../embeds/podbean.js'
+import { podcloudRenderHint } from '../embeds/podcloud.js'
 import { podigeeRenderHint } from '../embeds/podigee.js'
 import { redditRenderHint } from '../embeds/reddit.js'
 import { reverbnationRenderHint } from '../embeds/reverbnation.js'
@@ -135,6 +136,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   peertubeRenderHint,
   pinecastRenderHint,
   podbeanRenderHint,
+  podcloudRenderHint,
   podigeeRenderHint,
   redditRenderHint,
   reverbnationRenderHint,
