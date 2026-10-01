@@ -211,8 +211,7 @@ describeForEachParser('megaphoneEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    // The two kinds are separated so a playlist is not squeezed into the episode height, but a
-    // publisher who stated a box of their own outranks that measurement.
+    // The two kinds are separated so a playlist is not squeezed into the episode height.
     it('should keep the height the kind implies over the size the carrier states', async () => {
       const value = html`
         <iframe

@@ -1094,8 +1094,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The attribute is the box the publisher actually laid out, so it outranks the query.
-    it('should prefer the stated attribute over the query', async () => {
+    it('should state the platform height over both the attribute and the query', async () => {
       const value = html`
         <iframe
           height="450"
@@ -1130,9 +1129,6 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // A carrier that states a width and no height neither takes the default nor gets paired with
-    // it: 800 by the default height would describe a box the publisher never asked for, and 800
-    // on its own is a number the reader lays nothing out from.
     it('should keep the default height over a width the carrier stated', async () => {
       const value = '<iframe width="800" src="https://codepen.io/argyleink/embed/XJpKqXm"></iframe>'
       const expected: EmbedResolverResult = {
@@ -1148,10 +1144,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // A ratio inferred from an ancestor's responsive wrapper ranks below what a resolver states.
-    // The default height is a resolver statement, a corpus-typical value for a pen that declares
-    // none, so it stands over the wrapper the same as a measured height would. Only the carrier
-    // itself outranks the resolver, and a wrapper is not the carrier.
+    // A ratio inferred from an ancestor's responsive wrapper is not read, so the default height
+    // stands.
     it('should keep the default height over a ratio inferred from a wrapper', async () => {
       const value = html`
         <div style="padding-bottom:56.25%">

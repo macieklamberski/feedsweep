@@ -255,7 +255,7 @@ describeForEachParser('telegramIframeEmbedResolver', (parseHtml) => {
 
   describe('the rendered widget iframe', () => {
     // What the widget script builds, saved into the feed by a CMS that ran it: 34 corpus feeds
-    // carry a t.me iframe. `width="100%"` is not a pixel size, so only the height survives.
+    // carry a t.me iframe. Its box is not read: the post is sized from its height message.
     it('should claim the iframe the widget builds', async () => {
       const value = html`
         <iframe

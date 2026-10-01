@@ -263,7 +263,6 @@ describeForEachParser('archiveIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  // A video carrier's box measures the player it gets, so it stands whole.
   it('should state the video ratio over a video carrier box', async () => {
     const value = html`
       <iframe src="https://archive.org/embed/TheGoodOldGasMask" width="560" height="384"></iframe>
@@ -347,8 +346,7 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The carrier states the 26 pixels of the Flash bar, and the modern bar measures 30, so the
-    // resolver's height wins over it. The width is the carrier's business either way.
+    // The carrier states the 26 pixels of the Flash bar, and the modern bar measures 30.
     it('should replace the audio bar height with the modern player height', async () => {
       const value = html`
         <embed

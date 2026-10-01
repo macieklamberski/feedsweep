@@ -300,8 +300,8 @@ describeForEachParser('transistorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The publisher stretched the playlist player past the 390 the resolver measured, and the
-    // number they chose is the one their embed was laid out against.
+    // The publisher stretched the playlist player past the 390 the resolver measured, which is
+    // not read.
     it('should state the platform size over the size the carrier declares', async () => {
       const value = html`
         <iframe

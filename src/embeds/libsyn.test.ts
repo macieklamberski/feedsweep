@@ -148,8 +148,7 @@ describeForEachParser('libsynEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    // The publisher chose the box they embedded, so the carrier's size outranks the height the
-    // player url spells, and it lands whole rather than merging with it.
+    // Neither the carrier's box nor the height the player url spells is read.
     it('should keep the platform height over the size the carrier states', async () => {
       const value = html`
         <iframe

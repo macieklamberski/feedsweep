@@ -243,7 +243,7 @@ describeForEachParser('Instagram', (parseHtml) => {
   })
 
   // A copy stored after the loader ran: its query names the page the frame was embedded in, which
-  // the rebuilt src drops, while the height the loader measured is the one size this shape states.
+  // the rebuilt src drops. The height the loader measured is not read either.
   it('should rebuild a stored frame without the embedding page in its query', async () => {
     const value = html`
       <iframe

@@ -397,8 +397,8 @@ describeForEachParser('brightcoveIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('the size a publisher states', () => {
-    // Brightcove's player is whatever shape the account configured it to be, so the resolver
-    // states no size and the box on the carrier is the only measurement there is.
+    // Brightcove's player is whatever shape the account configured it to be, and the carrier's
+    // box is not read, so every player states 16:9.
     it('should state the video ratio over the box the carrier states', async () => {
       const value = html`
         <iframe

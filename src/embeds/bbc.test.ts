@@ -162,7 +162,6 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The programmes player states no size of its own, so the carrier's stands.
     it('should ignore the stated size on the programmes player', async () => {
       const value = html`
         <iframe

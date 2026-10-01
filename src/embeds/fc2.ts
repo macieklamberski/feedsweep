@@ -40,7 +40,7 @@ const composeEmbed = (
     id: contentId,
     src: `https://video.fc2.com/embed/player/${contentId}/${composeQuery(params)}`,
     url: `https://video.fc2.com/${locale ? `${locale}/` : ''}content/${contentId}/`,
-    // The loader draws the player 9/16 of its width tall where the script states no box.
+    // The loader draws the player 9/16 of its width tall.
     ratio: '16/9',
   }
 }

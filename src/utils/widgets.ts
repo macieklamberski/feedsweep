@@ -74,7 +74,8 @@ export const readCarrierUrl = (element: Element): string => {
 
 type ResolverOptions = {
   // Deep handling only: the carrier's declared box replaces the resolver's size. Pass it on a
-  // carrier the publisher sized for the player that loads, never on a retired tool's or dead route's.
+  // carrier the publisher sized for the player that loads, never on a retired tool's or dead
+  // route's.
   readCarrierSize?: boolean
 }
 
@@ -97,21 +98,16 @@ export const createMarkupEmbedResolver = (
 export const createS9eEmbedResolver = (
   platform: string,
   compose: (fragment: string) => EmbedResolverResult | undefined,
-  options: ResolverOptions = {},
 ): EmbedResolver => {
-  return createMarkupEmbedResolver(
-    `iframe[data-s9e-mediaembed="${platform}"]`,
-    (element) => {
-      const fragment = readS9eFragment(element)
+  return createMarkupEmbedResolver(`iframe[data-s9e-mediaembed="${platform}"]`, (element) => {
+    const fragment = readS9eFragment(element)
 
-      if (!fragment) {
-        return
-      }
+    if (!fragment) {
+      return
+    }
 
-      return compose(fragment)
-    },
-    options,
-  )
+    return compose(fragment)
+  })
 }
 
 // What a carrier says about its size: the dimensions it declares, or the ratio a responsive

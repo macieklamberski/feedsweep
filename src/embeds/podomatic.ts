@@ -89,5 +89,4 @@ export const podomaticResolveEmbed: ResolveEmbed = (url) => {
   }
 }
 
-// PodOmatic's html5 player iframe.
 export const podomaticEmbedResolver = createUrlEmbedResolver([podomaticHost], podomaticResolveEmbed)

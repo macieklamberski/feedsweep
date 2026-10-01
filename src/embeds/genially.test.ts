@@ -173,8 +173,8 @@ describeForEachParser('geniallyEmbedResolver', (parseHtml) => {
   })
 
   describe('the size a publisher states', () => {
-    // Genially presentations are authored at whatever canvas the author picked, so the resolver
-    // states no size and the publisher's box is the only measurement there is.
+    // Genially presentations are authored at whatever canvas the author picked, and the carrier's
+    // box is not read, so every presentation states 16:9.
     it('should state the platform size over the box the carrier states', async () => {
       const value = html`
         <iframe

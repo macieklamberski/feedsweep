@@ -7,8 +7,8 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, issuuWidgetEmbedResolver)
 
   describe('the config id div', () => {
-    // The shape 481 corpus feeds lose, copied from ecosistemaurbano.org (2026-08-14). The size
-    // lives in the inline style and is the document's own page ratio.
+    // The shape 481 corpus feeds lose, copied from ecosistemaurbano.org (2026-08-14). The inline
+    // style's size is not read.
     it('should mint the reader url from the config id', async () => {
       const value = html`
         <div

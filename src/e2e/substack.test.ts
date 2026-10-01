@@ -360,7 +360,8 @@ describeForEachParser('Substack', (parseHtml) => {
 
   it('should resolve a spotify-wrap iframe into a spotify embed placeholder', async () => {
     // The url-keyed spotify resolver claims the iframe and reads the card Substack hangs on it;
-    // the declared height wins. The description holds the type label, which the id already says.
+    // the player's own height replaces the declared one. The description holds the type label,
+    // which the id already says.
     const episodeAttrs = jsonAttrValue({
       image: 'https://i.scdn.co/image/ab6765630000ba8a0000000000000000000000ff',
       title: 'Episode 42: Field Recording',

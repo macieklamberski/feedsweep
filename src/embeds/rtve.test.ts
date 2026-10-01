@@ -183,8 +183,8 @@ describeForEachParser('rtveIframeEmbedResolver', (parseHtml) => {
 describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, rtveFlashEmbedResolver)
 
-  // The v2 player names the asset in the swf query, and its declared box stands: the modern
-  // player fills whatever it is given, so there is no measured shape to prefer over it.
+  // The v2 player names the asset in the swf query. The modern player fills whatever it is
+  // given, so it states 16:9 and the declared box is not read.
   describe('the v2 player', () => {
     it('should repair the dead player to the modern video embed', async () => {
       const value = html`

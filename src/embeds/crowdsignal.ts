@@ -12,8 +12,7 @@ const loaderPathRegex = /^\/p\/([^/]+)\.js$/
 const retiredPollPathRegex = /^\/poll\/([^/]+)\/?$/
 const flashPlayerPathRegex = /^\/poll\.swf$/
 
-// A poll's height follows its answer count and the frame posts none, so this is the tallest poll
-// measured, at its narrowest.
+// A poll's height follows its answer count, and the frame posts none.
 const pollHeight = 533
 
 const composeEmbed = (pollId: string): EmbedResolverResult => {

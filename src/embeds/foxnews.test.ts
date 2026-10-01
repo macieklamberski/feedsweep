@@ -212,7 +212,7 @@ describeForEachParser('foxnewsScriptEmbedResolver', (parseHtml) => {
 describeForEachParser('foxnewsIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, foxnewsIframeEmbedResolver)
 
-  // The pasted iframe states 640 by 360, which is the carrier's size and wins over the ratio.
+  // The pasted iframe states 640 by 360, which is not read.
   it('should resolve the pasted player iframe', async () => {
     const value = html`
       <iframe

@@ -127,8 +127,8 @@ describeForEachParser('Bluesky', (parseHtml) => {
   })
 
   // The helper page is hosted by the forum's markup library, not by Bluesky, and states the box
-  // it renders into as an inline style. That size survives to the placeholder, which makes this
-  // the one carrier giving the reader a shape to reserve.
+  // it renders into as an inline style. A post is sized from its height message, so that box is
+  // not read.
   it('should convert a forum helper iframe and ignore the box it states', async () => {
     const value = html`
       <iframe

@@ -190,8 +190,7 @@ describeForEachParser('simplecastEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    // 200 is the height every iframe in the corpus sample stated, and a publisher who stated a
-    // box of their own still outranks it.
+    // 200 is the height every iframe in the corpus sample stated.
     it('should keep the fixed player height over the size the carrier states', async () => {
       const value = html`
         <iframe

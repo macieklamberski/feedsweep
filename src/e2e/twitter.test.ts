@@ -107,8 +107,8 @@ describeForEachParser('Twitter', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
-  // The component carries no text at all, so the id and the size it states are everything
-  // there is to take, and unclaimed it reaches a reader as an element nothing renders.
+  // The component carries no text at all, so the id is everything there is to take, and
+  // unclaimed it reaches a reader as an element nothing renders.
   it('should convert an amp-twitter component that carries no text', async () => {
     const value = html`
       <amp-twitter

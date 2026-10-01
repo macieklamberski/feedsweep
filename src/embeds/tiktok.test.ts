@@ -497,10 +497,8 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
     })
   })
 
-  // The clip branch has measured the player better than the snippet a publisher pastes, so it
-  // outranks whatever box the blockquote states. The account branch states no size of its own,
-  // and a resolver stating none falls back to the carrier however the option is set, which is
-  // what keeps the option from producing a sizeless placeholder.
+  // Neither branch reads the box the blockquote states: a clip states the player's height and an
+  // account the profile card's.
   describe('a box the blockquote states over the player it holds', () => {
     it('should state the player height over a pixel box on the blockquote', async () => {
       const value = html`

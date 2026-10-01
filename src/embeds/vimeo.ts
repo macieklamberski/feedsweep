@@ -72,7 +72,6 @@ const readCollectionVideoId = (segments: Array<string>): string | undefined => {
 // `vimeo.com/album/{id}/embed` 301s onto the showcase player.
 const showcasePaths = new Set(['showcase', 'album'])
 
-// The showcase player is a grid whose shape is whatever box the publisher gave it, and
 // `vimeo.com/showcase/{id}` resolves through Vimeo's keyless oEmbed to a title, an author and a
 // thumbnail.
 const composeShowcaseEmbed = (showcaseId: string): EmbedResolverResult => {

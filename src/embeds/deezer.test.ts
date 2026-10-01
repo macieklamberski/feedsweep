@@ -394,9 +394,6 @@ describeForEachParser('deezerEmbedResolver', (parseHtml) => {
   })
 
   describe('the size a publisher states', () => {
-    // The box on the carrier is what the publisher chose for the player they embedded, so it
-    // outranks the corpus-typical height. Deezer's own share dialog writes a fluid width, and
-    // that is the shape the height alone describes.
     it('should keep the corpus-typical height over the carrier size', async () => {
       const value = html`
         <iframe

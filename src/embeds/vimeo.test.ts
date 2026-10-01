@@ -379,8 +379,7 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toBeUndefined()
   })
 
-  // Every corpus showcase carrier states a box, so the size the placeholder ends up with is the
-  // publisher's and the resolver states none of its own.
+  // Every corpus showcase carrier states a box, and none is read.
   it('should state the video ratio over the size a showcase iframe states', async () => {
     const value = html`
       <iframe

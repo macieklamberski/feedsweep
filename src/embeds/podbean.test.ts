@@ -165,8 +165,8 @@ describeForEachParser('podbeanEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    // Legacy markup states 122 for a player Podbean no longer serves, and the carrier still wins:
-    // the size a publisher wrote outranks both the url's `size=` and the v2 player's own height.
+    // Legacy markup states 122 for a player Podbean no longer serves. Neither it nor the url's
+    // `size=` is read.
     it('should keep the platform size over the size the carrier states', async () => {
       const value = html`
         <iframe

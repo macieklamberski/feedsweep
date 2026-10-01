@@ -91,7 +91,7 @@ describe('nytimesResolveEmbed', () => {
 describeForEachParser('nytimesIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, nytimesIframeEmbedResolver)
 
-  // The snippet states 480 by 321, which is the carrier's size and wins over the ratio.
+  // The snippet states 480 by 321, which is not read.
   it('should resolve the pasted player iframe', async () => {
     const value = html`
       <iframe

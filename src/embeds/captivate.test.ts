@@ -123,8 +123,7 @@ describeForEachParser('captivateEmbedResolver', (parseHtml) => {
   })
 
   describe('the size a publisher states', () => {
-    // The 200 the resolver states is the corpus-typical box, and the publisher's own choice
-    // outranks it: they sized the player they actually embedded.
+    // The 200 the resolver states is the corpus-typical box, and the carrier's height is not read.
     it('should keep the stated height over the carrier height', async () => {
       const value = html`
         <iframe

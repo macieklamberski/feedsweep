@@ -226,8 +226,7 @@ describeForEachParser('redcircleIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  // 170 is what the loader states, and a publisher who framed the player in a box of their own
-  // outranks it. Narrowing the query leaves that untouched.
+  // 170 is what the loader states, and the carrier's box is not read.
   it('should keep the player height over the size the carrier states', async () => {
     const value = html`
       <iframe

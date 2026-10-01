@@ -12,8 +12,7 @@ const pidRegex = /^[a-z](?=[0-9a-z]*\d)[0-9a-z]{7}$/
 // The news and World Service players render at 16:9 of their width. BBC's own embed code states
 // a 400 by 500 box, which pads them with blank below.
 const newsPlayerRatio = '16/9'
-// The programmes player's height tracks its width plus a fixed panel, so its ratio is taken at
-// 320 wide and errs tall above it.
+// The programmes player's height tracks its width plus a fixed panel.
 const programmesPlayerRatio = '320/374'
 
 const isPid = (segment: string | undefined): segment is string => {

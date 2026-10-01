@@ -215,7 +215,6 @@ describeForEachParser('jwplayerAmpEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  // A pair above the ceiling is a box the publisher laid out, and it stays one.
   it('should state the video ratio over a pixel box on the AMP element', async () => {
     const value = html`
       <amp-jwplayer

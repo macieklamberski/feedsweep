@@ -281,8 +281,7 @@ describeForEachParser('anchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The height the publisher pasted is the one their player was measured against, so the
-    // 102 Spotify's own snippet writes stands over the resolver's 100.
+    // The 102 Spotify's own snippet writes is not read, so the player's measured 100 stands.
     it('should state the platform size over the size the carrier declares', async () => {
       const value = html`
         <iframe

@@ -315,8 +315,6 @@ describeForEachParser('reverbnationEmbedResolver', (parseHtml) => {
   })
 
   describe('the size the widget does not have', () => {
-    // The widget reflows instead of scaling, so the resolver states nothing and whatever the
-    // publisher declared is what the placeholder reserves.
     it('should ignore the height the carrier states', async () => {
       const value = html`
         <iframe

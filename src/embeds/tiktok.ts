@@ -24,7 +24,6 @@ const watchPathRegex = /^(?:\/@([^/]+))?\/video\/(\d+)\/?$/
 // The clip is letterboxed inside a frame whose header, caption, sound row and action rail set
 // the height. TikTok's own oEmbed answers 739 for the same clip.
 const playerHeight = 738
-// The profile card stops growing at 480 wide, where it is 478 tall.
 const profileHeight = 478
 
 type Clip = { handle?: string; videoId?: string }

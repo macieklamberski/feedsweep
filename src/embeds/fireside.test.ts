@@ -233,8 +233,7 @@ describeForEachParser('firesideEmbedResolver', (parseHtml) => {
   })
 
   describe('the size a publisher states', () => {
-    // Every corpus iframe states 200, which is where the resolver's height came from, but the
-    // box a publisher chose for the player they embedded still outranks it.
+    // Every corpus iframe states 200, which is where the resolver's height came from.
     it('should keep the stated height over the carrier height', async () => {
       const value = html`
         <iframe

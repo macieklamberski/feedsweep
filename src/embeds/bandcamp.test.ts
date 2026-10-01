@@ -227,7 +227,7 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The video player is not the audio strip, so the box the publisher drew for it stays.
+    // The video player is not the audio strip, so it gets the video ratio, not the strip's height.
     it('should state the video ratio over the box a video embed declares', async () => {
       const value = html`
         <iframe

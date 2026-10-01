@@ -27,7 +27,6 @@ describeForEachParser('typeformWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'typeform',
         id: '01HCZ4DNW8JM6PEGNTQWF2PW87',
-        // The snippet's inline style states the height. Its width is a percentage, not pixels.
         title: 'User Satisfaction Survey',
       }
 
@@ -246,8 +245,7 @@ describe('typeformResolveEmbed', () => {
 describeForEachParser('typeformIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, typeformIframeEmbedResolver)
 
-  // The snippet states its size in an inline style rather than in width/height attributes, and
-  // the resolver reads both.
+  // The snippet states its size in an inline style, which is not read.
   it('should resolve the iframe the platform oembed emits at the platform size', async () => {
     const value = html`
       <iframe
