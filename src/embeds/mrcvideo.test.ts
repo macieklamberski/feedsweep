@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { mrcvideoEmbedResolver } from './mrcvideo.js'
+import { mrcvideoEmbedResolver, mrcvideoFlashEmbedResolver } from './mrcvideo.js'
 
 describeForEachParser('mrcvideoEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, mrcvideoEmbedResolver)
@@ -82,6 +82,12 @@ describeForEachParser('mrcvideoEmbedResolver', (parseHtml) => {
 
     it('should ignore a segment after the id', async () => {
       const value = '<iframe src="https://mrcvideo.org/embed/101728/extra"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the file host', async () => {
+      const value = '<iframe src="https://cdn.mrcvideo.org/embed/101728"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -173,8 +179,300 @@ describeForEachParser('mrcvideoEmbedResolver', (parseHtml) => {
   })
 })
 
-// Only the pipeline sees the resolver in the registry, and the cdn subdomain serves the video
-// files, so an enclosure there reaches the resolver too.
+describeForEachParser('mrcvideoFlashEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mrcvideoFlashEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the node id out of the sharing snippet', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;image=http://mrc-tv.s3.amazonaws.com/sites/default/files/video_thumbs/117304/117304_0001.jpg&amp;dock=false&amp;controlbar=over&amp;skin=http://www.mrctv.org/jwplayer/skins/modieus/modieus.zip&amp;logo.file=http://www.mrctv.org/sites/all/themes/mrctv/images/watermark.png&amp;logo.link=http://www.mrctv.org&amp;logo.hide=false&amp;logo.over=0.9&amp;logo.out=0.5&amp;logo.timeout=10&amp;logo.margin=5&amp;logo.position=top-left&amp;plugins=yourlytics-1,sharing-2&amp;yourlytics.callback=http://www.mrctv.org/postback/remoteview?nodeid=116586&amp;sharing.link=http://www.mrctv.org/videos/bill-warner-islam-1400-years-fear-english-titles&amp;sharing.code=%3Ciframe+title%3D%22MRC+TV+video+player%22+width%3D%22640%22+height%3D%22360%22+src%3D%22http%3A%2F%2Fwww.mrctv.org%2Fembed%2F116586+frameborder%3D%220%22+allowfullscreen%3E%3C%2Fiframe%3E&amp;autostart=false"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mrcvideo',
+        id: '116586',
+        src: 'https://mrcvideo.org/embed/116586',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the node id out of the view callback when there is no sharing snippet', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;image=http://mrc-tv.s3.amazonaws.com/sites/default/files/video_thumbs/117304/117304_0001.jpg&amp;dock=false&amp;controlbar=over&amp;skin=http://www.mrctv.org/jwplayer/skins/modieus/modieus.zip&amp;logo.file=http://www.mrctv.org/sites/all/themes/mrctv/images/watermark.png&amp;logo.link=http://www.mrctv.org&amp;logo.hide=false&amp;logo.over=0.9&amp;logo.out=0.5&amp;logo.timeout=10&amp;logo.margin=5&amp;logo.position=top-left&amp;plugins=yourlytics-1,sharing-2&amp;yourlytics.callback=http://www.mrctv.org/postback/remoteview?nodeid=116586&amp;sharing.link=http://www.mrctv.org/videos/bill-warner-islam-1400-years-fear-english-titles&amp;autostart=false"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mrcvideo',
+        id: '116586',
+        src: 'https://mrcvideo.org/embed/116586',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the node id out of the sharing snippet when there is no view callback', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;image=http://mrc-tv.s3.amazonaws.com/sites/default/files/video_thumbs/117304/117304_0001.jpg&amp;dock=false&amp;controlbar=over&amp;skin=http://www.mrctv.org/jwplayer/skins/modieus/modieus.zip&amp;logo.file=http://www.mrctv.org/sites/all/themes/mrctv/images/watermark.png&amp;logo.link=http://www.mrctv.org&amp;logo.hide=false&amp;logo.over=0.9&amp;logo.out=0.5&amp;logo.timeout=10&amp;logo.margin=5&amp;logo.position=top-left&amp;plugins=yourlytics-1,sharing-2&amp;sharing.link=http://www.mrctv.org/videos/bill-warner-islam-1400-years-fear-english-titles&amp;sharing.code=%3Ciframe+title%3D%22MRC+TV+video+player%22+width%3D%22640%22+height%3D%22360%22+src%3D%22http%3A%2F%2Fwww.mrctv.org%2Fembed%2F116586+frameborder%3D%220%22+allowfullscreen%3E%3C%2Fiframe%3E&amp;autostart=false"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mrcvideo',
+        id: '116586',
+        src: 'https://mrcvideo.org/embed/116586',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a sharing snippet whose src keeps its closing quote', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;sharing.code=%3Ciframe+src%3D%22http%3A%2F%2Fwww.mrctv.org%2Fembed%2F116586%22%3E%3C%2Fiframe%3E"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mrcvideo',
+        id: '116586',
+        src: 'https://mrcvideo.org/embed/116586',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a player naming no node id', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a sharing snippet on a foreign host', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;sharing.code=%3Ciframe+src%3D%22http%3A%2F%2Fevil.test%2Fembed%2F116586%22%3E%3C%2Fiframe%3E"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a sharing snippet naming a video page', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;sharing.code=%3Ciframe+src%3D%22http%3A%2F%2Fwww.mrctv.org%2Fvideos%2Fbill-warner%22%3E%3C%2Fiframe%3E"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a view callback on a foreign host', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;yourlytics.callback=http://evil.test/postback/remoteview?nodeid=116586"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a view callback with no node id', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;yourlytics.callback=http://www.mrctv.org/postback/remoteview"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the same player path', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="https://evil.test/jwplayer/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;image=http://mrc-tv.s3.amazonaws.com/sites/default/files/video_thumbs/117304/117304_0001.jpg&amp;dock=false&amp;controlbar=over&amp;skin=http://www.mrctv.org/jwplayer/skins/modieus/modieus.zip&amp;logo.file=http://www.mrctv.org/sites/all/themes/mrctv/images/watermark.png&amp;logo.link=http://www.mrctv.org&amp;logo.hide=false&amp;logo.over=0.9&amp;logo.out=0.5&amp;logo.timeout=10&amp;logo.margin=5&amp;logo.position=top-left&amp;plugins=yourlytics-1,sharing-2&amp;yourlytics.callback=http://www.mrctv.org/postback/remoteview?nodeid=116586&amp;sharing.link=http://www.mrctv.org/videos/bill-warner-islam-1400-years-fear-english-titles&amp;sharing.code=%3Ciframe+title%3D%22MRC+TV+video+player%22+width%3D%22640%22+height%3D%22360%22+src%3D%22http%3A%2F%2Fwww.mrctv.org%2Fembed%2F116586+frameborder%3D%220%22+allowfullscreen%3E%3C%2Fiframe%3E&amp;autostart=false"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore another file in the player directory', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/yt.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;image=http://mrc-tv.s3.amazonaws.com/sites/default/files/video_thumbs/117304/117304_0001.jpg&amp;dock=false&amp;controlbar=over&amp;skin=http://www.mrctv.org/jwplayer/skins/modieus/modieus.zip&amp;logo.file=http://www.mrctv.org/sites/all/themes/mrctv/images/watermark.png&amp;logo.link=http://www.mrctv.org&amp;logo.hide=false&amp;logo.over=0.9&amp;logo.out=0.5&amp;logo.timeout=10&amp;logo.margin=5&amp;logo.position=top-left&amp;plugins=yourlytics-1,sharing-2&amp;yourlytics.callback=http://www.mrctv.org/postback/remoteview?nodeid=116586&amp;sharing.link=http://www.mrctv.org/videos/bill-warner-islam-1400-years-fear-english-titles&amp;sharing.code=%3Ciframe+title%3D%22MRC+TV+video+player%22+width%3D%22640%22+height%3D%22360%22+src%3D%22http%3A%2F%2Fwww.mrctv.org%2Fembed%2F116586+frameborder%3D%220%22+allowfullscreen%3E%3C%2Fiframe%3E&amp;autostart=false"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player under another directory', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/flash/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;image=http://mrc-tv.s3.amazonaws.com/sites/default/files/video_thumbs/117304/117304_0001.jpg&amp;dock=false&amp;controlbar=over&amp;skin=http://www.mrctv.org/jwplayer/skins/modieus/modieus.zip&amp;logo.file=http://www.mrctv.org/sites/all/themes/mrctv/images/watermark.png&amp;logo.link=http://www.mrctv.org&amp;logo.hide=false&amp;logo.over=0.9&amp;logo.out=0.5&amp;logo.timeout=10&amp;logo.margin=5&amp;logo.position=top-left&amp;plugins=yourlytics-1,sharing-2&amp;yourlytics.callback=http://www.mrctv.org/postback/remoteview?nodeid=116586&amp;sharing.link=http://www.mrctv.org/videos/bill-warner-islam-1400-years-fear-english-titles&amp;sharing.code=%3Ciframe+title%3D%22MRC+TV+video+player%22+width%3D%22640%22+height%3D%22360%22+src%3D%22http%3A%2F%2Fwww.mrctv.org%2Fembed%2F116586+frameborder%3D%220%22+allowfullscreen%3E%3C%2Fiframe%3E&amp;autostart=false"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a segment after the player', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/player.swf/extra"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;image=http://mrc-tv.s3.amazonaws.com/sites/default/files/video_thumbs/117304/117304_0001.jpg&amp;dock=false&amp;controlbar=over&amp;skin=http://www.mrctv.org/jwplayer/skins/modieus/modieus.zip&amp;logo.file=http://www.mrctv.org/sites/all/themes/mrctv/images/watermark.png&amp;logo.link=http://www.mrctv.org&amp;logo.hide=false&amp;logo.over=0.9&amp;logo.out=0.5&amp;logo.timeout=10&amp;logo.margin=5&amp;logo.position=top-left&amp;plugins=yourlytics-1,sharing-2&amp;yourlytics.callback=http://www.mrctv.org/postback/remoteview?nodeid=116586&amp;sharing.link=http://www.mrctv.org/videos/bill-warner-islam-1400-years-fear-english-titles&amp;sharing.code=%3Ciframe+title%3D%22MRC+TV+video+player%22+width%3D%22640%22+height%3D%22360%22+src%3D%22http%3A%2F%2Fwww.mrctv.org%2Fembed%2F116586+frameborder%3D%220%22+allowfullscreen%3E%3C%2Fiframe%3E&amp;autostart=false"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should prefer the sharing snippet over the view callback', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;image=http://mrc-tv.s3.amazonaws.com/sites/default/files/video_thumbs/117304/117304_0001.jpg&amp;dock=false&amp;controlbar=over&amp;skin=http://www.mrctv.org/jwplayer/skins/modieus/modieus.zip&amp;logo.file=http://www.mrctv.org/sites/all/themes/mrctv/images/watermark.png&amp;logo.link=http://www.mrctv.org&amp;logo.hide=false&amp;logo.over=0.9&amp;logo.out=0.5&amp;logo.timeout=10&amp;logo.margin=5&amp;logo.position=top-left&amp;plugins=yourlytics-1,sharing-2&amp;yourlytics.callback=http://www.mrctv.org/postback/remoteview?nodeid=116000&amp;sharing.link=http://www.mrctv.org/videos/bill-warner-islam-1400-years-fear-english-titles&amp;sharing.code=%3Ciframe+title%3D%22MRC+TV+video+player%22+width%3D%22640%22+height%3D%22360%22+src%3D%22http%3A%2F%2Fwww.mrctv.org%2Fembed%2F116586+frameborder%3D%220%22+allowfullscreen%3E%3C%2Fiframe%3E&amp;autostart=false"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mrcvideo',
+        id: '116586',
+        src: 'https://mrcvideo.org/embed/116586',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+// Only the pipeline sees the resolvers in the registry, and it offers them every enclosure,
+// including the video files on `cdn.mrcvideo.org`.
 describeForEachParser('mrcvideo through the pipeline', (parseHtml) => {
   const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
     return transformContent(value, {
@@ -199,6 +497,32 @@ describeForEachParser('mrcvideo through the pipeline', (parseHtml) => {
         data-embed-id="109422"
         data-embed-provider="mrcvideo"
         data-embed-src="https://mrcvideo.org/embed/109422"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should claim the former MRCTV Flash player', async () => {
+    const value = html`
+      <embed
+        wmode="opaque"
+        id="player1"
+        width="640"
+        height="360"
+        type="application/x-shockwave-flash"
+        src="http://www.mrctv.org/jwplayer/player.swf"
+        flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;image=http://mrc-tv.s3.amazonaws.com/sites/default/files/video_thumbs/117304/117304_0001.jpg&amp;dock=false&amp;controlbar=over&amp;skin=http://www.mrctv.org/jwplayer/skins/modieus/modieus.zip&amp;logo.file=http://www.mrctv.org/sites/all/themes/mrctv/images/watermark.png&amp;logo.link=http://www.mrctv.org&amp;logo.hide=false&amp;logo.over=0.9&amp;logo.out=0.5&amp;logo.timeout=10&amp;logo.margin=5&amp;logo.position=top-left&amp;plugins=yourlytics-1,sharing-2&amp;yourlytics.callback=http://www.mrctv.org/postback/remoteview?nodeid=116586&amp;sharing.link=http://www.mrctv.org/videos/bill-warner-islam-1400-years-fear-english-titles&amp;sharing.code=%3Ciframe+title%3D%22MRC+TV+video+player%22+width%3D%22640%22+height%3D%22360%22+src%3D%22http%3A%2F%2Fwww.mrctv.org%2Fembed%2F116586+frameborder%3D%220%22+allowfullscreen%3E%3C%2Fiframe%3E&amp;autostart=false"
+        allowfullscreen="false"
+        allowscriptaccess="never"
+      >
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-id="116586"
+        data-embed-provider="mrcvideo"
+        data-embed-src="https://mrcvideo.org/embed/116586"
       ></div>
     `
 
