@@ -1,20 +1,16 @@
-import { isHostOf, parseUrl } from 'trousse'
+import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  embedCarrierSelector,
+  readCarrierUrl,
+} from '../utils/widgets.js'
 
-const kindleHosts = [
-  'read.amazon.com',
-  'read.amazon.com.au',
-  'read.amazon.co.uk',
-  'read.amazon.ca',
-  'read.amazon.in',
-  'lesen.amazon.de',
-  'leer.amazon.es',
-  'leggi.amazon.it',
-  'lire.amazon.fr',
-]
+// Each store serves the card on its own reader host, `{verb}.amazon.{store tld}`, such as
+// `read.amazon.co.uk`, `lesen.amazon.de` or `ler.amazon.com.br`.
+const readerHostRegex = /^[^.]+\.amazon\.(?:com|[a-z]{2}|com\.[a-z]{2}|co\.[a-z]{2})$/
 
 const cardPathRegex = /^\/kp\/card\/?$/
 
@@ -23,7 +19,7 @@ const cardPathRegex = /^\/kp\/card\/?$/
 export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  if (!parsed || !isHostOf(parsed, kindleHosts) || !cardPathRegex.test(parsed.pathname)) {
+  if (!parsed || !readerHostRegex.test(parsed.hostname) || !cardPathRegex.test(parsed.pathname)) {
     return
   }
 
@@ -47,4 +43,6 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
   }
 }
 
-export const kindleEmbedResolver = createUrlEmbedResolver(kindleHosts, kindleResolveEmbed)
+export const kindleEmbedResolver = createMarkupEmbedResolver(embedCarrierSelector, (element) => {
+  return kindleResolveEmbed(readCarrierUrl(element), element)
+})

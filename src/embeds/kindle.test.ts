@@ -114,6 +114,34 @@ describe('kindleResolveEmbed', () => {
       expect(kindleResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep a Brazilian storefront card on its reader host', () => {
+      const value =
+        'https://ler.amazon.com.br/kp/card?preview=inline&linkCode=ll1&ref_=k4w_oembed_xcnIwH1VawgI2d&asin=6587113036&tag=superliterari-20'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'ler.amazon.com.br/6587113036',
+        src: 'https://ler.amazon.com.br/kp/card?asin=6587113036',
+        thumbnail: 'https://m.media-amazon.com/images/P/6587113036.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a Mexican storefront card on its reader host', () => {
+      const value =
+        'https://leer.amazon.com.mx/kp/card?preview=inline&linkCode=sl1&ref_=k4w_oembed_TAJh4r2s9Dk3yw&asin=B079NXRP4H&tag=787735-20'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'leer.amazon.com.mx/B079NXRP4H',
+        src: 'https://leer.amazon.com.mx/kp/card?asin=B079NXRP4H',
+        thumbnail: 'https://m.media-amazon.com/images/P/B079NXRP4H.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
     it("should drop the publisher's associate tag and link code", () => {
       const value =
         'https://read.amazon.com.au/kp/card?preview=inline&linkCode=ll1&ref_=k4w_oembed_y0sSritwWwbv0o&asin=B09SLB7V48&tag=yusukeblog00-22'
@@ -149,6 +177,12 @@ describe('kindleResolveEmbed', () => {
       expect(kindleResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should ignore a url that does not parse', () => {
+      const value = 'https://read.amazon.com:abc/kp/card?asin=B08DGQCKF3'
+
+      expect(kindleResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore the card route under another path', () => {
       const value = 'https://read.amazon.com/x/kp/card?asin=B08DGQCKF3'
 
@@ -170,6 +204,19 @@ describe('kindleResolveEmbed', () => {
         id: 'leggi.amazon.it/B0FP373343',
         src: 'https://leggi.amazon.it/kp/card?asin=B0FP373343',
         thumbnail: 'https://m.media-amazon.com/images/P/B0FP373343.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint the card on any Amazon subdomain as written, even if it serves no card', () => {
+      const value = 'https://aws.amazon.com/kp/card?asin=B08DGQCKF3'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'aws.amazon.com/B08DGQCKF3',
+        src: 'https://aws.amazon.com/kp/card?asin=B08DGQCKF3',
+        thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
       }
 
@@ -273,6 +320,25 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore the card route on a foreign host', async () => {
       const value = '<iframe src="https://evil.test/kp/card?asin=B08DGQCKF3"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an amazon subdomain on a foreign domain', async () => {
+      const value = '<iframe src="https://x.amazon.evil.com/kp/card?asin=B08DGQCKF3"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an amazon domain inside a foreign domain', async () => {
+      const value = '<iframe src="https://amazon.com.evil.test/kp/card?asin=B08DGQCKF3"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a reader host inside a foreign domain', async () => {
+      const value =
+        '<iframe src="https://read.amazon.com.evil.test/kp/card?asin=B08DGQCKF3"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
