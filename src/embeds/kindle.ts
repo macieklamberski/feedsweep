@@ -1,16 +1,16 @@
-import { isHostOf, parseUrl } from 'trousse'
+import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  embedCarrierSelector,
+  readCarrierUrl,
+} from '../utils/widgets.js'
 
-const kindleHosts = [
-  'read.amazon.com',
-  'read.amazon.com.au',
-  'read.amazon.co.uk',
-  'read.amazon.ca',
-  'read.amazon.in',
-]
+// Each store serves the card on its own reader host, `{verb}.amazon.{store tld}`, such as
+// `read.amazon.co.uk`, `lesen.amazon.de` or `ler.amazon.com.br`.
+const readerHostRegex = /^[^.]+\.amazon\.(?:com|[a-z]{2}|com\.[a-z]{2}|co\.[a-z]{2})$/
 
 const cardPathRegex = /^\/kp\/card\/?$/
 
@@ -19,7 +19,7 @@ const cardPathRegex = /^\/kp\/card\/?$/
 export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  if (!parsed || !isHostOf(parsed, kindleHosts) || !cardPathRegex.test(parsed.pathname)) {
+  if (!parsed || !readerHostRegex.test(parsed.hostname) || !cardPathRegex.test(parsed.pathname)) {
     return
   }
 
@@ -29,12 +29,12 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  // `read.amazon.com` loads the card of a book from any storefront, so it serves every card and no
-  // one store's product page is the book's.
+  // The reader host picks the storefront: `read.amazon.com` answers "This book isn't available" for
+  // a book sold only on another store, and each host's oEmbed answers for its own store only.
   return {
     provider: 'kindle',
-    id: asin,
-    src: `https://read.amazon.com/kp/card${composeQuery({ asin })}`,
+    id: `${parsed.hostname}/${asin}`,
+    src: `https://${parsed.hostname}/kp/card${composeQuery({ asin })}`,
     // The ASIN comes out of the query decoded, and it goes into a path.
     thumbnail: `https://m.media-amazon.com/images/P/${encodePathSegment(asin)}.01._SCLZZZZZZZ_.jpg`,
     height: 550,
@@ -43,4 +43,6 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
   }
 }
 
-export const kindleEmbedResolver = createUrlEmbedResolver(kindleHosts, kindleResolveEmbed)
+export const kindleEmbedResolver = createMarkupEmbedResolver(embedCarrierSelector, (element) => {
+  return kindleResolveEmbed(readCarrierUrl(element), element)
+})

@@ -10,7 +10,7 @@ describe('kindleResolveEmbed', () => {
         'https://read.amazon.com/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_dQVcnKwFnAcXcz&asin=B08DGQCKF3&tag=kpembed-20'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B08DGQCKF3',
+        id: 'read.amazon.com/B08DGQCKF3',
         src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -19,12 +19,12 @@ describe('kindleResolveEmbed', () => {
       expect(kindleResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should mint a British storefront card on the US reader host', () => {
+    it('should keep a British storefront card on its reader host', () => {
       const value = 'https://read.amazon.co.uk/kp/card?asin=B08DGQCKF3&preview=inline'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
+        id: 'read.amazon.co.uk/B08DGQCKF3',
+        src: 'https://read.amazon.co.uk/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
       }
@@ -32,12 +32,12 @@ describe('kindleResolveEmbed', () => {
       expect(kindleResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should mint a Canadian storefront card on the US reader host', () => {
+    it('should keep a Canadian storefront card on its reader host', () => {
       const value = 'https://read.amazon.ca/kp/card?asin=B08DGQCKF3&preview=inline'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
+        id: 'read.amazon.ca/B08DGQCKF3',
+        src: 'https://read.amazon.ca/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
       }
@@ -45,13 +45,97 @@ describe('kindleResolveEmbed', () => {
       expect(kindleResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should mint an Indian storefront card on the US reader host', () => {
+    it('should keep an Indian storefront card on its reader host', () => {
       const value = 'https://read.amazon.in/kp/card?asin=B08DGQCKF3&preview=inline'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
+        id: 'read.amazon.in/B08DGQCKF3',
+        src: 'https://read.amazon.in/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a German storefront card on its reader host', () => {
+      const value =
+        'https://lesen.amazon.de/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_IWygh7LxwTfj6U&asin=B019C57GLO&tag=kpembed-20'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'lesen.amazon.de/B019C57GLO',
+        src: 'https://lesen.amazon.de/kp/card?asin=B019C57GLO',
+        thumbnail: 'https://m.media-amazon.com/images/P/B019C57GLO.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a Spanish storefront card on its reader host', () => {
+      const value =
+        'https://leer.amazon.es/kp/card?preview=inline&linkCode=ll1&ref_=k4w_oembed_CkjSxBKKfyfasn&asin=B09GKYBZTJ&tag=juandedev-21'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'leer.amazon.es/B09GKYBZTJ',
+        src: 'https://leer.amazon.es/kp/card?asin=B09GKYBZTJ',
+        thumbnail: 'https://m.media-amazon.com/images/P/B09GKYBZTJ.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep an Italian storefront card on its reader host', () => {
+      const value =
+        'https://leggi.amazon.it/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_T6RnpneE6MeNc7&asin=B0FP373343&tag=kpembed-20'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'leggi.amazon.it/B0FP373343',
+        src: 'https://leggi.amazon.it/kp/card?asin=B0FP373343',
+        thumbnail: 'https://m.media-amazon.com/images/P/B0FP373343.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a French storefront card on its reader host', () => {
+      const value =
+        'https://lire.amazon.fr/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_auKhYtfwzPejGc&asin=1549720864&tag=kpembed-20'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'lire.amazon.fr/1549720864',
+        src: 'https://lire.amazon.fr/kp/card?asin=1549720864',
+        thumbnail: 'https://m.media-amazon.com/images/P/1549720864.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a Brazilian storefront card on its reader host', () => {
+      const value =
+        'https://ler.amazon.com.br/kp/card?preview=inline&linkCode=ll1&ref_=k4w_oembed_xcnIwH1VawgI2d&asin=6587113036&tag=superliterari-20'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'ler.amazon.com.br/6587113036',
+        src: 'https://ler.amazon.com.br/kp/card?asin=6587113036',
+        thumbnail: 'https://m.media-amazon.com/images/P/6587113036.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a Mexican storefront card on its reader host', () => {
+      const value =
+        'https://leer.amazon.com.mx/kp/card?preview=inline&linkCode=sl1&ref_=k4w_oembed_TAJh4r2s9Dk3yw&asin=B079NXRP4H&tag=787735-20'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'leer.amazon.com.mx/B079NXRP4H',
+        src: 'https://leer.amazon.com.mx/kp/card?asin=B079NXRP4H',
+        thumbnail: 'https://m.media-amazon.com/images/P/B079NXRP4H.01._SCLZZZZZZZ_.jpg',
         height: 550,
       }
 
@@ -63,8 +147,8 @@ describe('kindleResolveEmbed', () => {
         'https://read.amazon.com.au/kp/card?preview=inline&linkCode=ll1&ref_=k4w_oembed_y0sSritwWwbv0o&asin=B09SLB7V48&tag=yusukeblog00-22'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B09SLB7V48',
-        src: 'https://read.amazon.com/kp/card?asin=B09SLB7V48',
+        id: 'read.amazon.com.au/B09SLB7V48',
+        src: 'https://read.amazon.com.au/kp/card?asin=B09SLB7V48',
         thumbnail: 'https://m.media-amazon.com/images/P/B09SLB7V48.01._SCLZZZZZZZ_.jpg',
         height: 550,
       }
@@ -84,13 +168,19 @@ describe('kindleResolveEmbed', () => {
       const value = 'https://read.amazon.com/kp/card?asin=../embed'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: '../embed',
+        id: 'read.amazon.com/../embed',
         src: 'https://read.amazon.com/kp/card?asin=..%2Fembed',
         thumbnail: 'https://m.media-amazon.com/images/P/..%2Fembed.01._SCLZZZZZZZ_.jpg',
         height: 550,
       }
 
       expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should ignore a url that does not parse', () => {
+      const value = 'https://read.amazon.com:abc/kp/card?asin=B08DGQCKF3'
+
+      expect(kindleResolveEmbed(value)).toBeUndefined()
     })
 
     it('should ignore the card route under another path', () => {
@@ -107,11 +197,37 @@ describe('kindleResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
+    it('should lowercase an uppercase reader host in the key', () => {
+      const value = 'https://LEGGI.amazon.it/kp/card?asin=B0FP373343'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'leggi.amazon.it/B0FP373343',
+        src: 'https://leggi.amazon.it/kp/card?asin=B0FP373343',
+        thumbnail: 'https://m.media-amazon.com/images/P/B0FP373343.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint the card on any Amazon subdomain as written, even if it serves no card', () => {
+      const value = 'https://aws.amazon.com/kp/card?asin=B08DGQCKF3'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'aws.amazon.com/B08DGQCKF3',
+        src: 'https://aws.amazon.com/kp/card?asin=B08DGQCKF3',
+        thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should read the card route with a trailing slash', () => {
       const value = 'https://read.amazon.com/kp/card/?asin=B08DGQCKF3'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B08DGQCKF3',
+        id: 'read.amazon.com/B08DGQCKF3',
         src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -141,11 +257,37 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B08DGQCKF3',
+        id: 'read.amazon.com/B08DGQCKF3',
         src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
         title: 'His Fake Wife: An Enemies to Lovers Billionaire Romance (Thorne Legacy Book 1)',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should take the book title from a German storefront card', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          title="Die gräulichen Drei und das X-Bollock: Bollock und die gräulichen Drei Teil 2"
+          type="text/html"
+          width="625"
+          height="550"
+          frameborder="0"
+          allowfullscreen
+          style="max-width:100%"
+          src="https://lesen.amazon.de/kp/card?preview=inline&#038;linkCode=kpd&#038;ref_=k4w_oembed_IWygh7LxwTfj6U&#038;asin=B019C57GLO&#038;tag=kpembed-20"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'lesen.amazon.de/B019C57GLO',
+        src: 'https://lesen.amazon.de/kp/card?asin=B019C57GLO',
+        thumbnail: 'https://m.media-amazon.com/images/P/B019C57GLO.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+        title: 'Die gräulichen Drei und das X-Bollock: Bollock und die gräulichen Drei Teil 2',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -165,7 +307,7 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'kindle',
-        id: 'B09KT8838X',
+        id: 'read.amazon.com/B09KT8838X',
         src: 'https://read.amazon.com/kp/card?asin=B09KT8838X',
         thumbnail: 'https://m.media-amazon.com/images/P/B09KT8838X.01._SCLZZZZZZZ_.jpg',
         height: 550,
@@ -178,6 +320,25 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore the card route on a foreign host', async () => {
       const value = '<iframe src="https://evil.test/kp/card?asin=B08DGQCKF3"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an amazon subdomain on a foreign domain', async () => {
+      const value = '<iframe src="https://x.amazon.evil.com/kp/card?asin=B08DGQCKF3"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an amazon domain inside a foreign domain', async () => {
+      const value = '<iframe src="https://amazon.com.evil.test/kp/card?asin=B08DGQCKF3"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a reader host inside a foreign domain', async () => {
+      const value =
+        '<iframe src="https://read.amazon.com.evil.test/kp/card?asin=B08DGQCKF3"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
