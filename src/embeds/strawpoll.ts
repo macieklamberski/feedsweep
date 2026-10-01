@@ -47,6 +47,28 @@ export const strawpollIframeEmbedResolver = createUrlEmbedResolver(
   strawpollResolveEmbed,
 )
 
+const emptyMountTags = ['br', 'script']
+
+// A publisher pastes its own images and text inside the wrapper, which a placeholder would delete.
+const isEmptyMount = (element: Element): boolean => {
+  for (const node of element.childNodes) {
+    if (node.nodeType === node.TEXT_NODE && !node.textContent?.trim()) {
+      continue
+    }
+
+    if (
+      node.nodeType === node.ELEMENT_NODE &&
+      emptyMountTags.includes(node.nodeName.toLowerCase())
+    ) {
+      continue
+    }
+
+    return false
+  }
+
+  return true
+}
+
 // The wrapper div the snippet puts around the frame, `div.strawpoll-embed#strawpoll_{id}`. A feed
 // that strips iframes leaves it empty, and it renders as nothing.
 export const strawpollMountEmbedResolver = createMarkupEmbedResolver(
@@ -67,7 +89,7 @@ export const strawpollMountEmbedResolver = createMarkupEmbedResolver(
       return placeholder.getAttribute('data-embed-id') === pollId
     })
 
-    if (hasPlaceholder) {
+    if (hasPlaceholder || !isEmptyMount(element)) {
       return
     }
 

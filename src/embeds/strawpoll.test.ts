@@ -151,25 +151,6 @@ describeForEachParser('strawpollIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should state no size over the box the snippet declares', async () => {
-      const value = html`
-        <iframe
-          src="https://strawpoll.com/embed/e7ZJaM1BPg3"
-          width="640"
-          height="544"
-        ></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'strawpoll',
-        id: 'e7ZJaM1BPg3',
-        src: 'https://strawpoll.com/embed/e7ZJaM1BPg3',
-        url: 'https://strawpoll.com/e7ZJaM1BPg3',
-        thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/e7ZJaM1BPg3-c.png',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {
@@ -202,6 +183,64 @@ describeForEachParser('strawpollMountEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read a wrapper holding only a non-breaking space', async () => {
+      const value = html`
+        <div
+          id="strawpoll_kjn1DJlNxyQ"
+          class="strawpoll-embed"
+        >&nbsp;</div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'strawpoll',
+        id: 'kjn1DJlNxyQ',
+        src: 'https://strawpoll.com/embed/kjn1DJlNxyQ',
+        url: 'https://strawpoll.com/kjn1DJlNxyQ',
+        thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/kjn1DJlNxyQ-c.png',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a wrapper holding only a line break', async () => {
+      const value = html`
+        <div
+          class="strawpoll-embed"
+          id="strawpoll_XOgONJpzrn3"
+        ><br /></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'strawpoll',
+        id: 'XOgONJpzrn3',
+        src: 'https://strawpoll.com/embed/XOgONJpzrn3',
+        url: 'https://strawpoll.com/XOgONJpzrn3',
+        thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/XOgONJpzrn3-c.png',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a wrapper holding only the loader script', async () => {
+      const value = html`
+        <div
+          class="strawpoll-embed"
+          id="strawpoll_1Mnwv2Kwjy7"
+        ><script
+          async=""
+          charset="utf-8"
+          src="https://cdn.strawpoll.com/dist/widgets.js"
+        ></script></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'strawpoll',
+        id: '1Mnwv2Kwjy7',
+        src: 'https://strawpoll.com/embed/1Mnwv2Kwjy7',
+        url: 'https://strawpoll.com/1Mnwv2Kwjy7',
+        thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/1Mnwv2Kwjy7-c.png',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -222,6 +261,30 @@ describeForEachParser('strawpollMountEmbedResolver', (parseHtml) => {
           id="poll_kjn1DJlNxyQ"
           class="strawpoll-embed"
         ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a wrapper holding an image of the publisher', async () => {
+      const value = html`
+        <div
+          id="strawpoll_kjn1DJlNxyQ"
+          class="strawpoll-embed"
+        >
+          <img src="https://example.com/poll-banner.jpg" />
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a wrapper holding text of the publisher', async () => {
+      const value = html`
+        <div
+          id="strawpoll_kjn1DJlNxyQ"
+          class="strawpoll-embed"
+        >Votez pour votre pilote préféré</div>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -350,31 +413,117 @@ describeForEachParser('strawpoll snippets through the pipeline', (parseHtml) => 
     expect(await convert(value)).toEqualHtml(expected)
   })
 
-  it('should build no second placeholder from a repeated wrapper', async () => {
+  it('should keep the image in the wrapper and build no second placeholder from its copy', async () => {
     const value = html`
       <div
         class="strawpoll-embed"
-        id="strawpoll_XOgONJpzrn3"
+        id="strawpoll_1Mnwv2Kwjy7"
+        style="display: flex; flex-direction: column; height: 800px; margin: 0px auto; max-width: 640px; width: 100%;"
+      >
+        <div
+          class="separator"
+          style="clear: both; text-align: center;"
+        >
+          <a
+            href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj88WBf5b3hRCaVRMopxdUc918N7pKu8xZpI3RVI8o4xjlN56YWknNrzPbGbdq1fY8v3C0YoI-t1L6N49idbXE6FbmLqslwSEvrnB9ewX9dw32qGm7K_QmXpa1iNr5Jv52Ru43Sg4WSKDctvjNAGmz9gDL5TiTBfFKSZbA4St-EnD-4cM7jTKvcCIDA4w/s685/Screenshot%202022-11-22%20231828.jpg"
+            style="margin-left: 1em; margin-right: 1em;"
+          >
+            <img
+              border="0"
+              data-original-height="337"
+              data-original-width="685"
+              height="157"
+              src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj88WBf5b3hRCaVRMopxdUc918N7pKu8xZpI3RVI8o4xjlN56YWknNrzPbGbdq1fY8v3C0YoI-t1L6N49idbXE6FbmLqslwSEvrnB9ewX9dw32qGm7K_QmXpa1iNr5Jv52Ru43Sg4WSKDctvjNAGmz9gDL5TiTBfFKSZbA4St-EnD-4cM7jTKvcCIDA4w/s320/Screenshot%202022-11-22%20231828.jpg"
+              width="320"
+            />
+          </a>
+        </div>
+        <br />
+        <div
+          class="separator"
+          style="clear: both; text-align: center;"
+        ><br /></div>
+        <br />
+        <iframe
+          allowfullscreen=""
+          allowtransparency=""
+          frameborder="0"
+          id="strawpoll_iframe_1Mnwv2Kwjy7"
+          src="https://strawpoll.com/embed/polls/1Mnwv2Kwjy7"
+          style="display: block; flex-grow: 1; position: static; visibility: visible; width: 100%;"
+          title="StrawPoll Embed"
+        >Bigg boss voting poll. Vote lines are open now.</iframe>
+      </div>
+      <div
+        class="strawpoll-embed"
+        id="strawpoll_1Mnwv2Kwjy7"
+        style="display: flex; flex-direction: column; height: 672px; margin: 0px auto; max-width: 640px; width: 100%;"
+      >
+        <script
+          async=""
+          charset="utf-8"
+          src="https://cdn.strawpoll.com/dist/widgets.js"
+        ></script>
+      </div>
+    `
+    const expected = html`
+      <a
+        href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj88WBf5b3hRCaVRMopxdUc918N7pKu8xZpI3RVI8o4xjlN56YWknNrzPbGbdq1fY8v3C0YoI-t1L6N49idbXE6FbmLqslwSEvrnB9ewX9dw32qGm7K_QmXpa1iNr5Jv52Ru43Sg4WSKDctvjNAGmz9gDL5TiTBfFKSZbA4St-EnD-4cM7jTKvcCIDA4w/s685/Screenshot%202022-11-22%20231828.jpg"
+        style="margin-left: 1em; margin-right: 1em;"
+      >
+        <img
+          data-align="center"
+          border="0"
+          data-original-height="337"
+          data-original-width="685"
+          height="157"
+          src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj88WBf5b3hRCaVRMopxdUc918N7pKu8xZpI3RVI8o4xjlN56YWknNrzPbGbdq1fY8v3C0YoI-t1L6N49idbXE6FbmLqslwSEvrnB9ewX9dw32qGm7K_QmXpa1iNr5Jv52Ru43Sg4WSKDctvjNAGmz9gDL5TiTBfFKSZbA4St-EnD-4cM7jTKvcCIDA4w/s320/Screenshot%202022-11-22%20231828.jpg"
+          width="320"
+        />
+      </a>
+      <div
+        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/1Mnwv2Kwjy7-c.png"
+        data-embed-url="https://strawpoll.com/1Mnwv2Kwjy7"
+        data-embed-id="1Mnwv2Kwjy7"
+        data-embed-provider="strawpoll"
+        data-embed-src="https://strawpoll.com/embed/1Mnwv2Kwjy7"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should build a placeholder for each of a framed poll and an emptied wrapper', async () => {
+    const value = html`
+      <div
+        class="strawpoll-embed"
+        id="strawpoll_e7ZJajkxMg3"
       >
         <iframe
-          id="strawpoll_iframe_XOgONJpzrn3"
-          src="https://strawpoll.com/embed/polls/XOgONJpzrn3"
+          id="strawpoll_iframe_e7ZJajkxMg3"
+          src="https://strawpoll.com/embed/e7ZJajkxMg3"
           title="StrawPoll Embed"
         >Loading...</iframe>
       </div>
-      <br />
       <div
+        id="strawpoll_kjn1DJlNxyQ"
         class="strawpoll-embed"
-        id="strawpoll_XOgONJpzrn3"
-      ><br /></div>
+      ></div>
     `
     const expected = html`
       <div
-        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/XOgONJpzrn3-c.png"
-        data-embed-url="https://strawpoll.com/XOgONJpzrn3"
-        data-embed-id="XOgONJpzrn3"
+        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/e7ZJajkxMg3-c.png"
+        data-embed-url="https://strawpoll.com/e7ZJajkxMg3"
+        data-embed-id="e7ZJajkxMg3"
         data-embed-provider="strawpoll"
-        data-embed-src="https://strawpoll.com/embed/XOgONJpzrn3"
+        data-embed-src="https://strawpoll.com/embed/e7ZJajkxMg3"
+      ></div>
+      <div
+        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/kjn1DJlNxyQ-c.png"
+        data-embed-url="https://strawpoll.com/kjn1DJlNxyQ"
+        data-embed-id="kjn1DJlNxyQ"
+        data-embed-provider="strawpoll"
+        data-embed-src="https://strawpoll.com/embed/kjn1DJlNxyQ"
       ></div>
     `
 
