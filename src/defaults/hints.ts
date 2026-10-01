@@ -26,6 +26,7 @@ import { foxbusinessRenderHint, foxnewsRenderHint } from '../embeds/foxnews.js'
 import { googledriveRenderHint } from '../embeds/googledrive.js'
 import { hearthisRenderHint } from '../embeds/hearthis.js'
 import { helloassoRenderHint } from '../embeds/helloasso.js'
+import { iheartRenderHint } from '../embeds/iheart.js'
 import { imgurRenderHint } from '../embeds/imgur.js'
 import { inaRenderHint } from '../embeds/ina.js'
 import { indavideoRenderHint } from '../embeds/indavideo.js'
@@ -34,6 +35,7 @@ import { instagramRenderHint } from '../embeds/instagram.js'
 import { kalturaRenderHint } from '../embeds/kaltura.js'
 import { mailruRenderHint } from '../embeds/mailru.js'
 import { mastodonRenderHint } from '../embeds/mastodon.js'
+import { matterportRenderHint } from '../embeds/matterport.js'
 import { megaphoneRenderHint } from '../embeds/megaphone.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
 import { nbcnewsRenderHint } from '../embeds/nbcnews.js'
@@ -107,6 +109,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   googledriveRenderHint,
   hearthisRenderHint,
   helloassoRenderHint,
+  iheartRenderHint,
   imgurRenderHint,
   inaRenderHint,
   indavideoRenderHint,
@@ -115,6 +118,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   kalturaRenderHint,
   mailruRenderHint,
   mastodonRenderHint,
+  matterportRenderHint,
   megaphoneRenderHint,
   mixcloudRenderHint,
   nbcnewsRenderHint,

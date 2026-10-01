@@ -133,6 +133,7 @@ import { guardianEmbedResolver } from '../embeds/guardian.js'
 import { hearthisEmbedResolver } from '../embeds/hearthis.js'
 import { helloassoEmbedResolver } from '../embeds/helloasso.js'
 import { heyzineEmbedResolver } from '../embeds/heyzine.js'
+import { iheartEmbedResolver } from '../embeds/iheart.js'
 import {
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
@@ -170,6 +171,7 @@ import { linkedinEmbedResolver } from '../embeds/linkedin.js'
 import { listennotesEmbedResolver } from '../embeds/listennotes.js'
 import { mailruEmbedResolver } from '../embeds/mailru.js'
 import { mastodonEmbedResolver } from '../embeds/mastodon.js'
+import { matterportEmbedResolver } from '../embeds/matterport.js'
 import { mediavineScriptEmbedResolver, mediavineWidgetEmbedResolver } from '../embeds/mediavine.js'
 import { megaphoneEmbedResolver } from '../embeds/megaphone.js'
 import { megatvEmbedResolver } from '../embeds/megatv.js'
@@ -487,6 +489,7 @@ const embedResolvers: Array<EmbedResolver> = [
   hearthisEmbedResolver,
   helloassoEmbedResolver,
   heyzineEmbedResolver,
+  iheartEmbedResolver,
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
   imgurS9eEmbedResolver,
@@ -519,6 +522,7 @@ const embedResolvers: Array<EmbedResolver> = [
   linkedinEmbedResolver,
   listennotesEmbedResolver,
   mailruEmbedResolver,
+  matterportEmbedResolver,
   mediavineWidgetEmbedResolver,
   mediavineScriptEmbedResolver,
   megaphoneEmbedResolver,
