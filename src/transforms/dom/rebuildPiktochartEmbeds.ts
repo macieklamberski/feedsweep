@@ -1,6 +1,6 @@
 import { composePiktochartEmbedUrl } from '../../embeds/piktochart.js'
 import type { DomTransform } from '../../types.js'
-import { attr } from '../../utils/dom.js'
+import { attr, isElement, isText } from '../../utils/dom.js'
 import { parseUrlOnHosts } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
@@ -23,9 +23,13 @@ const removeLoaderChrome = (element: Element): void => {
       continue
     }
 
-    const next = image.nextElementSibling
+    let next = image.nextSibling
 
-    if (next?.localName === 'br') {
+    while (isText(next) && !next.textContent?.trim()) {
+      next = next.nextSibling
+    }
+
+    if (isElement(next) && next.localName === 'br') {
       next.remove()
     }
 

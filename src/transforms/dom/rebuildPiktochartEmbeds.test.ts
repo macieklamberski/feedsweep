@@ -239,6 +239,34 @@ describeForEachParser('rebuildPiktochartEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should keep a line break with text between it and the loading gif', async () => {
+      const value =
+        '<div class="piktowrapper-embed" data-uid="25180247-creatividad_pensamiento-critico"><img src="https://create.piktochart.com/loading.gif">First line<br>Second line</div>'
+      const expected =
+        'First line<br>Second line<iframe src="https://create.piktochart.com/embed/25180247-creatividad_pensamiento-critico"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a div holding a publisher image beside the loading text', async () => {
+      const value = html`
+        <div
+          class="piktowrapper-embed"
+          data-uid="25180247-creatividad_pensamiento-critico"
+        >
+          <div class="embed-loading-overlay">
+            <div><img src="https://example.com/photo.jpg" />Loading...</div>
+          </div>
+        </div>
+      `
+      const expected = html`
+        <div><img src="https://example.com/photo.jpg">Loading...</div>
+        <iframe src="https://create.piktochart.com/embed/25180247-creatividad_pensamiento-critico"></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should keep a line break that does not follow the loading gif', async () => {
       const value = html`
         <div
