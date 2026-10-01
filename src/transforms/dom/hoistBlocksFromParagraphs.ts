@@ -2,6 +2,7 @@ import type { DomTransform } from '../../types.js'
 import { blockElements, hasText, mediaSelector } from '../../utils/dom.js'
 
 const blockInParagraphSelector = [...blockElements].map((tag) => `p ${tag}`).join(', ')
+const blockSelector = [...blockElements].join(', ')
 
 // A paragraph half left with neither text nor media renders as a blank line. One that
 // kept either stays.
@@ -54,7 +55,9 @@ const hoistBlockFromParagraph = (block: Element): void => {
 
   paragraph.after(block)
 
-  if (trailing && hasRenderableContent(trailing)) {
+  // A block left in the trailing half, such as an empty embed placeholder, gets its own turn
+  // and is hoisted out, so the half stays even with no text or media of its own.
+  if (trailing && (hasRenderableContent(trailing) || trailing.querySelector(blockSelector))) {
     block.after(trailing)
   }
 

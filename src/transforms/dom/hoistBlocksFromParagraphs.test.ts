@@ -22,6 +22,17 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
     return applyDomTransforms(document, [hoistBlocksFromParagraphs(baseContext)])
   }
 
+  // Moves parsed children into the paragraph through the DOM API, for blocks a marker
+  // cannot stand in for, such as an empty embed placeholder.
+  const transformParagraph = (children: string) => {
+    const document = parseHtml('<p></p>')
+    const holder = document.createElement('div')
+    holder.innerHTML = children
+    document.querySelector('p')?.append(...holder.childNodes)
+
+    return applyDomTransforms(document, [hoistBlocksFromParagraphs(baseContext)])
+  }
+
   describe('happy paths', () => {
     it('should hoist a block out of an otherwise empty paragraph', async () => {
       const value = '<p><i class="marker">Block</i></p>'
@@ -181,9 +192,65 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
       expect(result).toEqualHtml(expected)
     })
 
+    it('should keep an empty placeholder that follows another', async () => {
+      const value = html`
+        <div data-embed-src="https://www.youtube.com/embed/abc123"></div>
+        <div data-embed-src="https://www.youtube.com/embed/def456"></div>
+      `
+      const expected = html`
+        <div data-embed-src="https://www.youtube.com/embed/abc123"></div>
+        <div data-embed-src="https://www.youtube.com/embed/def456"></div>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
+    it('should keep an empty placeholder that follows a block with text', async () => {
+      const value = html`
+        <center>Subscribe</center>
+        <div data-embed-src="https://www.youtube.com/embed/abc123"></div>
+      `
+      const expected = html`
+        <center>Subscribe</center>
+        <div data-embed-src="https://www.youtube.com/embed/abc123"></div>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
+    it('should keep adjacent empty placeholders between text', async () => {
+      const value = html`
+        Intro
+        <div data-embed-src="https://www.youtube.com/embed/abc123"></div>
+        <div data-embed-src="https://www.youtube.com/embed/def456"></div>
+        outro
+      `
+      const expected = html`
+        <p>Intro </p>
+        <div data-embed-src="https://www.youtube.com/embed/abc123"></div>
+        <div data-embed-src="https://www.youtube.com/embed/def456"></div>
+        <p> outro</p>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
     it('should be idempotent', async () => {
       const value = '<p>Intro <i class="marker">Block</i> outro</p>'
       const once = await transform(value)
+      const twice = await applyDomTransforms(parseHtml(once), [
+        hoistBlocksFromParagraphs(baseContext),
+      ])
+
+      expect(twice).toEqualHtml(once)
+    })
+
+    it('should be idempotent with an empty placeholder in the trailing half', async () => {
+      const value = html`
+        <div data-embed-src="https://www.youtube.com/embed/abc123"></div>
+        <div data-embed-src="https://www.youtube.com/embed/def456"></div>
+      `
+      const once = await transformParagraph(value)
       const twice = await applyDomTransforms(parseHtml(once), [
         hoistBlocksFromParagraphs(baseContext),
       ])
