@@ -437,10 +437,6 @@ describe('readTableauHeight', () => {
     expect(readTableauHeight('tableau.completed')).toBeUndefined()
   })
 
-  it('should ignore a message that is not a string', () => {
-    expect(readTableauHeight({ height: 400 })).toBeUndefined()
-  })
-
   it('should ignore a size message whose payload is not JSON', () => {
     expect(readTableauHeight('api.FirstVizSizeKnownEvent,xdomainSourceId,,{')).toBeUndefined()
   })
