@@ -41,7 +41,7 @@ const readEmbedId = (url: string | undefined): string | undefined => {
 
   const [route, id, ...rest] = getPathSegments(parsed)
 
-  if (!isAnyOf(route, 'embed') || !id || rest.length > 0) {
+  if (!isAnyOf(route, 'embed') || rest.length > 0) {
     return
   }
 
