@@ -52,6 +52,7 @@ import { rebuildLazyLoadForVideos } from '../transforms/dom/rebuildLazyLoadForVi
 import { rebuildLazyYtEmbeds } from '../transforms/dom/rebuildLazyYtEmbeds.js'
 import { rebuildLiteVideoEmbeds } from '../transforms/dom/rebuildLiteVideoEmbeds.js'
 import { rebuildLyteEmbeds } from '../transforms/dom/rebuildLyteEmbeds.js'
+import { rebuildPublicalbumGalleries } from '../transforms/dom/rebuildPublicalbumGalleries.js'
 import { rebuildRocketYoutubePreviews } from '../transforms/dom/rebuildRocketYoutubePreviews.js'
 import { rebuildVideoJsEmbeds } from '../transforms/dom/rebuildVideoJsEmbeds.js'
 import { rebuildWistiaEmbeds } from '../transforms/dom/rebuildWistiaEmbeds.js'
@@ -111,6 +112,9 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // has to see it.
   surfaceParkedMarkup,
   stripComments,
+  // Runs before stripHiddenElements, which deletes the album div the plugin hides with inline
+  // `display:none`, and every photo url inside it.
+  rebuildPublicalbumGalleries,
   stripHiddenElements,
   // Normalize lazy-loaded video embeds into a plain <iframe> before the media/embed
   // transforms run, so each is placeholdered and any poster connected.
