@@ -38,6 +38,7 @@ import { mastodonRenderHint } from '../embeds/mastodon.js'
 import { matterportRenderHint } from '../embeds/matterport.js'
 import { megaphoneRenderHint } from '../embeds/megaphone.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
+import { mrcvideoRenderHint } from '../embeds/mrcvideo.js'
 import { nbcnewsRenderHint } from '../embeds/nbcnews.js'
 import { neteaseRenderHint } from '../embeds/netease.js'
 import { nicovideoRenderHint } from '../embeds/nicovideo.js'
@@ -61,6 +62,7 @@ import { soundcloudRenderHint } from '../embeds/soundcloud.js'
 import { spotifyRenderHint } from '../embeds/spotify.js'
 import { spreakerRenderHint } from '../embeds/spreaker.js'
 import { srgplayRenderHint } from '../embeds/srgplay.js'
+import { strawpollRenderHint } from '../embeds/strawpoll.js'
 import { tableauRenderHint } from '../embeds/tableau.js'
 import { tedRenderHint } from '../embeds/ted.js'
 import { telegramRenderHint } from '../embeds/telegram.js'
@@ -124,6 +126,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   matterportRenderHint,
   megaphoneRenderHint,
   mixcloudRenderHint,
+  mrcvideoRenderHint,
   nbcnewsRenderHint,
   neteaseRenderHint,
   nicovideoRenderHint,
@@ -147,6 +150,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   spotifyRenderHint,
   spreakerRenderHint,
   srgplayRenderHint,
+  strawpollRenderHint,
   tableauRenderHint,
   tedRenderHint,
   telegramRenderHint,

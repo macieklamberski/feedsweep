@@ -114,6 +114,7 @@ import {
 import { figmaEmbedResolver } from '../embeds/figma.js'
 import { figshareEmbedResolver } from '../embeds/figshare.js'
 import { firesideEmbedResolver } from '../embeds/fireside.js'
+import { firstoryEmbedResolver } from '../embeds/firstory.js'
 import { flickrEmbedResolver } from '../embeds/flickr.js'
 import {
   fliphtml5IframeEmbedResolver,
@@ -177,6 +178,7 @@ import { mediavineScriptEmbedResolver, mediavineWidgetEmbedResolver } from '../e
 import { megaphoneEmbedResolver } from '../embeds/megaphone.js'
 import { megatvEmbedResolver } from '../embeds/megatv.js'
 import { mixcloudEmbedResolver } from '../embeds/mixcloud.js'
+import { mrcvideoEmbedResolver, mrcvideoFlashEmbedResolver } from '../embeds/mrcvideo.js'
 import { nbcnewsEmbedResolver } from '../embeds/nbcnews.js'
 import { neteaseEmbedResolver } from '../embeds/netease.js'
 import { nicovideoIframeEmbedResolver, nicovideoScriptEmbedResolver } from '../embeds/nicovideo.js'
@@ -239,6 +241,8 @@ import { stackblitzIframeEmbedResolver } from '../embeds/stackblitz.js'
 import { standfmEmbedResolver } from '../embeds/standfm.js'
 import { steamEmbedResolver } from '../embeds/steam.js'
 import { stravaIframeEmbedResolver, stravaPlaceholderEmbedResolver } from '../embeds/strava.js'
+import { strawpollIframeEmbedResolver, strawpollMountEmbedResolver } from '../embeds/strawpoll.js'
+import { subsplashEmbedResolver } from '../embeds/subsplash.js'
 import { swayEmbedResolver } from '../embeds/sway.js'
 import { symbalooEmbedResolver } from '../embeds/symbaloo.js'
 import {
@@ -298,6 +302,7 @@ import {
 } from '../embeds/youtube.js'
 import { yumpuEmbedResolver } from '../embeds/yumpu.js'
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
+import { zenoEmbedResolver } from '../embeds/zeno.js'
 import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
 import { bitrixEmojiResolver } from '../emojis/bitrix.js'
@@ -478,6 +483,7 @@ const embedResolvers: Array<EmbedResolver> = [
   figmaEmbedResolver,
   figshareEmbedResolver,
   firesideEmbedResolver,
+  firstoryEmbedResolver,
   flickrEmbedResolver,
   fliphtml5IframeEmbedResolver,
   fliphtml5LightBoxEmbedResolver,
@@ -538,6 +544,8 @@ const embedResolvers: Array<EmbedResolver> = [
   megaphoneEmbedResolver,
   megatvEmbedResolver,
   mixcloudEmbedResolver,
+  mrcvideoEmbedResolver,
+  mrcvideoFlashEmbedResolver,
   nbcnewsEmbedResolver,
   neteaseEmbedResolver,
   nicovideoScriptEmbedResolver,
@@ -604,6 +612,9 @@ const embedResolvers: Array<EmbedResolver> = [
   steamEmbedResolver,
   stravaIframeEmbedResolver,
   stravaPlaceholderEmbedResolver,
+  strawpollIframeEmbedResolver,
+  strawpollMountEmbedResolver,
+  subsplashEmbedResolver,
   swayEmbedResolver,
   symbalooEmbedResolver,
   tableauWidgetEmbedResolver,
@@ -650,6 +661,7 @@ const embedResolvers: Array<EmbedResolver> = [
   yumpuEmbedResolver,
   zencastrBlockquoteEmbedResolver,
   zencastrIframeEmbedResolver,
+  zenoEmbedResolver,
   // Last, outside the alphabet: keyed on a path shape rather than a host, so every resolver
   // naming a host gets the carrier first.
   mastodonEmbedResolver,
