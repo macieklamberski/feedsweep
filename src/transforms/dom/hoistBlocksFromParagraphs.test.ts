@@ -176,6 +176,65 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
 
       expect(await transformParagraph(value)).toEqualHtml(expected)
     })
+
+    it('should keep the sources that follow the fallback in the video', async () => {
+      const value = html`
+        <video controls>
+          <p>Fallback first</p>
+          <source src="https://example.com/clip.mp4">
+        </video>
+      `
+      const expected = html`
+        <p>
+          <video controls>
+            <source src="https://example.com/clip.mp4">
+          </video>
+        </p>
+        <p>Fallback first</p>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
+    it('should keep an unclosed audio left open in a source paragraph', async () => {
+      const value = html`
+        <p>
+          <audio controls>
+            <source src="https://example.com/track.mp3">
+            <p>Subscribe here</p>
+      `
+      const expected = html`
+        <p>
+          <audio controls>
+            <source src="https://example.com/track.mp3">
+          </audio>
+        </p>
+        <p>Subscribe here</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep the params of an object whose fallback holds a block', async () => {
+      const value = html`
+        <object data="https://example.com/movie.swf">
+          <param name="movie" value="https://example.com/movie.swf">
+          <p>Flash is missing</p>
+          <param name="quality" value="high">
+        </object>
+      `
+      const expected = html`
+        <p>
+          <object data="https://example.com/movie.swf">
+            <param name="movie" value="https://example.com/movie.swf">
+            <param name="quality" value="high">
+          </object>
+        </p>
+        <p>Flash is missing</p>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
   })
 
   describe('edge cases', () => {

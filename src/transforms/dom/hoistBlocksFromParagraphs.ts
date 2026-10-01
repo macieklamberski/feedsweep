@@ -3,6 +3,7 @@ import { blockElements, hasText, mediaSelector } from '../../utils/dom.js'
 
 const blockInParagraphSelector = [...blockElements].map((tag) => `p ${tag}`).join(', ')
 const blockSelector = [...blockElements].join(', ')
+const playerChildTags = ['param', 'source', 'track']
 
 // A paragraph half left with neither text nor media renders as a blank line. One that
 // kept either stays, and so does a media element left holding only its <source>.
@@ -35,9 +36,16 @@ const hoistBlockFromParagraph = (block: Element): void => {
     // An empty clone is a husk: an inline wrapper whose only content was the block. It is
     // not carried into the trailing half.
     if (trailing && trailing.childNodes.length > 0) {
-      // The HTML parser closes an <audio> or <video> at a block's start tag, so the rest of
-      // its fallback lands after it. A cloned player would render a second, sourceless box.
+      // A block's start tag closes its paragraph and any <audio> or <video> open in it, and a
+      // dead <object> renders its fallback anyway. So the rest of any media element's fallback
+      // moves out bare, while the player keeps its sources, tracks and params.
       if (trailing.matches(mediaSelector)) {
+        for (const element of [...trailing.children]) {
+          if (playerChildTags.includes(element.localName)) {
+            child.appendChild(element)
+          }
+        }
+
         clone.prepend(...trailing.childNodes)
       } else {
         clone.insertBefore(trailing, clone.firstChild)
