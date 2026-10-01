@@ -82,7 +82,7 @@ const specimens: Record<string, string | [string, string]> = {
     '<img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate with PayPal">',
   'p:has(> a.redcircle-link)':
     '<p style="font-size: 10px; color: gray;">Powered by <a class="redcircle-link" href="https://example.com/?utm_source=rc_embedded_player">RedCircle</a></p>',
-  'iframe[src*="zeno.fm/player/"] + a:is([href$="zeno.fm/"], [href$="zeno.fm"], [href$="zenomedia.com/"])':
+  'iframe[src*="zeno.fm/player/"] + a:is([href$="//zeno.fm/"], [href$="//www.zeno.fm/"], [href$="//www.zeno.fm"], [href$="//www.zenomedia.com/"])':
     [
       '<iframe src="https://zeno.fm/player/halshack" width="575" height="250" frameborder="0" scrolling="no"></iframe><a href="https://zeno.fm/" target="_blank" style="display: block; font-size: 0.9em; line-height: 10px;">A Zeno.FM Station</a>',
       '<iframe src="https://zeno.fm/player/halshack" width="575" height="250" frameborder="0" scrolling="no"></iframe>',
@@ -298,6 +298,11 @@ const zenoHomeLinks: Array<[string, string, string]> = [
     'www.zeno.fm with no trailing slash',
     '<iframe src="//www.zeno.fm/player/straighttalkradio" width="575" height="240" frameborder="0" scrolling="no"></iframe><a href="https://www.zeno.fm" target="_blank" style="display: block; font-size: 0.9em; line-height: 10px;">Omnicast Media Station - Listen Live</a>',
     '<iframe src="//www.zeno.fm/player/straighttalkradio" width="575" height="240" frameborder="0" scrolling="no"></iframe>',
+  ],
+  [
+    'www.zeno.fm',
+    '<iframe frameborder="0" height="290" scrolling="no" src="//www.zeno.fm/player/Ranchos-de-Coahuila-online" width="768"></iframe><a href="https://www.zeno.fm/" style="display: block; font-size: 0.9em; line-height: 10px;" target="_blank">A Zeno Media Station</a>',
+    '<iframe frameborder="0" height="290" scrolling="no" src="//www.zeno.fm/player/Ranchos-de-Coahuila-online" width="768"></iframe>',
   ],
   [
     'zenomedia.com',
@@ -700,6 +705,15 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       const value = html`
         <iframe src="https://zeno.fm/player/halshack" width="575" height="250"></iframe>
         <p>Download the app from <a href="https://zeno.fm/">Zeno.FM</a> to listen on the go.</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep links to hosts ending in zeno.fm after the player', async () => {
+      const value = html`
+        <iframe src="https://zeno.fm/player/halshack" width="575" height="250"></iframe><a href="https://notzeno.fm">Not Zeno</a>
+        <iframe src="https://zeno.fm/player/halshack" width="575" height="250"></iframe><a href="https://notzeno.fm/">Not Zeno</a>
       `
 
       expect(await transform(value)).toEqualHtml(value)

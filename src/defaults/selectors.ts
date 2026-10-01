@@ -215,7 +215,7 @@ export const defaultNonContentSelectors = [
   'p:has(> a.redcircle-link)',
   // Zeno.FM's widget snippet writes a link to the Zeno home page right after the player. Matched
   // on that position and href only, since publishers rewrite its text.
-  'iframe[src*="zeno.fm/player/"] + a:is([href$="zeno.fm/"], [href$="zeno.fm"], [href$="zenomedia.com/"])',
+  'iframe[src*="zeno.fm/player/"] + a:is([href$="//zeno.fm/"], [href$="//www.zeno.fm/"], [href$="//www.zeno.fm"], [href$="//www.zenomedia.com/"])',
   '.image-link-expand', // Substack restack/zoom buttons next to images.
   'drupal-render-placeholder', // Drupal lazy-render markers for comments/forms/flag widgets.
   '.mcnPreviewText', // Mailchimp hidden email preheader text.
