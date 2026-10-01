@@ -258,12 +258,13 @@ describeForEachParser('vidyardScriptEmbedResolver', (parseHtml) => {
         src: 'https://play.vidyard.com/Bx22B6hw1HabD7rqhnwTBw.html',
         url: 'https://share.vidyard.com/watch/Bx22B6hw1HabD7rqhnwTBw',
         thumbnail: 'https://play.vidyard.com/Bx22B6hw1HabD7rqhnwTBw.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the box the loader query states', async () => {
+    it('should state the player ratio over the box the loader query states', async () => {
       const value = html`
         <script
           id="vidyard_embed_code_qAuip9KsKRgj4BUfn78FrQ"
@@ -277,8 +278,7 @@ describeForEachParser('vidyardScriptEmbedResolver', (parseHtml) => {
         src: 'https://play.vidyard.com/qAuip9KsKRgj4BUfn78FrQ.html',
         url: 'https://share.vidyard.com/watch/qAuip9KsKRgj4BUfn78FrQ',
         thumbnail: 'https://play.vidyard.com/qAuip9KsKRgj4BUfn78FrQ.jpg',
-        width: 570,
-        height: 334,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -307,6 +307,7 @@ describeForEachParser('vidyardScriptEmbedResolver', (parseHtml) => {
         src: 'https://play.vidyard.com/..%2F..%2Fstolen.html',
         url: 'https://share.vidyard.com/watch/..%2F..%2Fstolen',
         thumbnail: 'https://play.vidyard.com/..%2F..%2Fstolen.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -317,26 +318,6 @@ describeForEachParser('vidyardScriptEmbedResolver', (parseHtml) => {
         '<script src="https://play.vidyard.com/Bx22B6hw1HabD7rqhnwTBw.js/extra"></script>'
 
       expect(await extract(value)).toBeUndefined()
-    })
-  })
-
-  describe('edge cases', () => {
-    it('should state no size when the query gives only a width', async () => {
-      const value = html`
-        <script
-          id="vidyard_embed_code_Bx22B6hw1HabD7rqhnwTBw"
-          src="https://play.vidyard.com/Bx22B6hw1HabD7rqhnwTBw.js?v=3.1.1&amp;width=570"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'vidyard',
-        id: 'Bx22B6hw1HabD7rqhnwTBw',
-        src: 'https://play.vidyard.com/Bx22B6hw1HabD7rqhnwTBw.html',
-        url: 'https://share.vidyard.com/watch/Bx22B6hw1HabD7rqhnwTBw',
-        thumbnail: 'https://play.vidyard.com/Bx22B6hw1HabD7rqhnwTBw.jpg',
-      }
-
-      expect(await extract(value)).toEqual(expected)
     })
   })
 })
@@ -414,6 +395,7 @@ describeForEachParser('vidyard shapes the pipeline repairs first', (parseHtml) =
         data-embed-id="Bx22B6hw1HabD7rqhnwTBw"
         data-embed-provider="vidyard"
         data-embed-src="https://play.vidyard.com/Bx22B6hw1HabD7rqhnwTBw.html"
+        data-embed-ratio="16/9"
       ></div>
     `
 

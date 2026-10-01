@@ -3,7 +3,7 @@ import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../type
 import { attr, flashVar, flashVars, keepIfMatches } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
-import { createUrlEmbedResolver, getEmbedSize } from '../utils/widgets.js'
+import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flickr'
 
@@ -311,12 +311,7 @@ const resolveTarget = (
     return
   }
 
-  const declared = element ? getEmbedSize(element, 0) : undefined
-  // Both halves or neither: given one half, the endpoint uses its default for the other as is.
-  const { width, height } =
-    declared?.width && declared?.height
-      ? { width: declared.width, height: declared.height }
-      : dialogSize
+  const { width, height } = dialogSize
 
   // The size always travels in the src: with no query every image renders at NaN.
   return { ...result, src: `${result.src}?width=${width}&height=${height}`, width, height }
@@ -332,7 +327,7 @@ export const flickrResolveEmbed: ResolveEmbed = (url, element) => {
 // the two players for a single photo. Only `/player/` and `embedr.flickr.com` are served without
 // `x-frame-options: SAMEORIGIN`, so the rest name a frame that renders empty.
 export const flickrEmbedResolver = createUrlEmbedResolver(flickrHosts, flickrResolveEmbed, {
-  // The carrier's size is already folded into the src, and it is what the endpoint renders at.
+  // The size folded into the src is what the endpoint renders at.
   preferResolverSize: true,
 })
 

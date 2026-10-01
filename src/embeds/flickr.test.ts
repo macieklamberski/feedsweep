@@ -30,10 +30,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: '108534344@N02/72157637855752606',
-        src: 'https://embedr.flickr.com/photosets/72157637855752606?width=500&height=375',
+        src: 'https://embedr.flickr.com/photosets/72157637855752606?width=400&height=300',
         url: 'https://www.flickr.com/photos/108534344@N02/sets/72157637855752606',
-        width: 500,
-        height: 375,
+        width: 400,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -53,10 +53,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'yotchan/72157615334609433',
-        src: 'https://embedr.flickr.com/photosets/72157615334609433?width=500&height=375',
+        src: 'https://embedr.flickr.com/photosets/72157615334609433?width=400&height=300',
         url: 'https://www.flickr.com/photos/yotchan/sets/72157615334609433',
-        width: 500,
-        height: 375,
+        width: 400,
+        height: 300,
         author: 'yotchan',
       }
 
@@ -77,10 +77,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'e-governance/72157635557420286',
-        src: 'https://embedr.flickr.com/photosets/72157635557420286?width=200&height=150',
+        src: 'https://embedr.flickr.com/photosets/72157635557420286?width=400&height=300',
         url: 'https://www.flickr.com/photos/e-governance/sets/72157635557420286',
-        width: 200,
-        height: 150,
+        width: 400,
+        height: 300,
         author: 'e-governance',
       }
 
@@ -132,10 +132,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/77461019@N07',
-        src: 'https://embedr.flickr.com/photostreams/77461019@N07?width=500&height=500',
+        src: 'https://embedr.flickr.com/photostreams/77461019@N07?width=400&height=300',
         url: 'https://www.flickr.com/photos/77461019@N07/',
-        width: 500,
-        height: 500,
+        width: 400,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -226,10 +226,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: '35408001@N04/123/../../photos/x',
-        src: 'https://embedr.flickr.com/photosets/123%2F..%2F..%2Fphotos%2Fx?width=600&height=500',
+        src: 'https://embedr.flickr.com/photosets/123%2F..%2F..%2Fphotos%2Fx?width=400&height=300',
         url: 'https://www.flickr.com/photos/35408001@N04/sets/123%2F..%2F..%2Fphotos%2Fx',
-        width: 600,
-        height: 500,
+        width: 400,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -252,7 +252,8 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should map a set slideshow onto the album player', async () => {
+    // The 600x500 box is the carrier's, which shallow handling does not read or fold into the src.
+    it('should map a set slideshow onto the album player at the dialog size', async () => {
       const value = html`
         <iframe
           align="center"
@@ -261,89 +262,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
           scrolling="no"
           width="600"
           height="500"
-        ></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'flickr',
-        id: '35408001@N04/72157639642975434',
-        src: 'https://embedr.flickr.com/photosets/72157639642975434?width=600&height=500',
-        url: 'https://www.flickr.com/photos/35408001@N04/sets/72157639642975434',
-        width: 600,
-        height: 500,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should fall back to the dialog size when the carrier states a zero', async () => {
-      const value = html`
-        <iframe
-          src="http://www.flickr.com/slideShow/index.gne?user_id=35408001@N04&amp;set_id=72157639642975434&amp;detail=yes"
-          width="0"
-          height="0"
-        ></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'flickr',
-        id: '35408001@N04/72157639642975434',
-        src: 'https://embedr.flickr.com/photosets/72157639642975434?width=400&height=300',
-        url: 'https://www.flickr.com/photos/35408001@N04/sets/72157639642975434',
-        width: 400,
-        height: 300,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    // The query is honoured half by half, so a stated half beside a default would render a box
-    // nobody laid out. The pair moves together or not at all.
-    it('should fall back to the dialog size when a zero leaves only one half stated', async () => {
-      const value = html`
-        <iframe
-          src="http://www.flickr.com/slideShow/index.gne?user_id=35408001@N04&amp;set_id=72157639642975434&amp;detail=yes"
-          width="0"
-          height="360"
-        ></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'flickr',
-        id: '35408001@N04/72157639642975434',
-        src: 'https://embedr.flickr.com/photosets/72157639642975434?width=400&height=300',
-        url: 'https://www.flickr.com/photos/35408001@N04/sets/72157639642975434',
-        width: 400,
-        height: 300,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should fall back to the dialog size when the carrier states one dimension only', async () => {
-      const value = html`
-        <iframe
-          src="http://www.flickr.com/slideShow/index.gne?user_id=35408001@N04&amp;set_id=72157639642975434&amp;detail=yes"
-          width="640"
-        ></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'flickr',
-        id: '35408001@N04/72157639642975434',
-        src: 'https://embedr.flickr.com/photosets/72157639642975434?width=400&height=300',
-        url: 'https://www.flickr.com/photos/35408001@N04/sets/72157639642975434',
-        width: 400,
-        height: 300,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    // A style pair under the carrier tier's ceiling is a shape rather than a box, so it reaches
-    // here as nothing stated. This is what reading through `getEmbedSize` buys: the raw
-    // dimension read would have minted `?width=88&height=21`.
-    it('should fall back to the dialog size when the style pair is too small to be a box', async () => {
-      const value = html`
-        <iframe
-          src="http://www.flickr.com/slideShow/index.gne?user_id=35408001@N04&amp;set_id=72157639642975434&amp;detail=yes"
-          style="width: 88px; height: 21px;"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
@@ -373,10 +291,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/94397744@N03',
-        src: 'https://embedr.flickr.com/photostreams/94397744@N03?width=500&height=500',
+        src: 'https://embedr.flickr.com/photostreams/94397744@N03?width=400&height=300',
         url: 'https://www.flickr.com/photos/94397744@N03/',
-        width: 500,
-        height: 500,
+        width: 400,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -398,10 +316,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157613575700166',
-        src: 'https://embedr.flickr.com/photosets/72157613575700166?width=400&height=400',
+        src: 'https://embedr.flickr.com/photosets/72157613575700166?width=400&height=300',
         url: 'https://flic.kr/s/aHsj9KxCzU',
         width: 400,
-        height: 400,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -439,10 +357,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'groups/797770@N21',
-        src: 'https://embedr.flickr.com/groups/797770@N21?width=400&height=400',
+        src: 'https://embedr.flickr.com/groups/797770@N21?width=400&height=300',
         url: 'https://www.flickr.com/groups/797770@N21/',
         width: 400,
-        height: 400,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -471,10 +389,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/17367418@N03 ',
-        src: 'https://embedr.flickr.com/photostreams/17367418@N03%20?width=500&height=500',
+        src: 'https://embedr.flickr.com/photostreams/17367418@N03%20?width=400&height=300',
         url: 'https://www.flickr.com/photos/17367418@N03%20/',
-        width: 500,
-        height: 500,
+        width: 400,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -899,11 +817,11 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/8NKp7f',
-        src: 'https://embedr.flickr.com/photos/5123523742?width=400&height=225',
+        src: 'https://embedr.flickr.com/photos/5123523742?width=400&height=300',
         url: 'https://flic.kr/p/8NKp7f',
         thumbnail: 'https://live.staticflickr.com/0/5123523742_9f9359f01e_b.jpg',
         width: 400,
-        height: 225,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -922,11 +840,11 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/8NKp7f',
-        src: 'https://embedr.flickr.com/photos/5123523742?width=560&height=420',
+        src: 'https://embedr.flickr.com/photos/5123523742?width=400&height=300',
         url: 'https://flic.kr/p/8NKp7f',
         thumbnail: 'https://live.staticflickr.com/0/5123523742_9f9359f01e_b.jpg',
-        width: 560,
-        height: 420,
+        width: 400,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -945,10 +863,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/4Jm8J9',
-        src: 'https://embedr.flickr.com/photos/2448291368?width=400&height=225',
+        src: 'https://embedr.flickr.com/photos/2448291368?width=400&height=300',
         url: 'https://flic.kr/p/4Jm8J9',
         width: 400,
-        height: 225,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)

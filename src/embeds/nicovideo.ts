@@ -1,7 +1,7 @@
-import { getPathSegments, isPlainObject, parseUrl } from 'trousse'
+import { getPathSegments, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr, parsePixelSize } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { attr } from '../utils/dom.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'nicovideo'
@@ -83,16 +83,7 @@ export const nicovideoScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const parsed = parseUrl(source, placeholderBaseUrl)
-    const width = parsePixelSize(parsed?.searchParams.get('w'))
-    const height = parsePixelSize(parsed?.searchParams.get('h'))
-
-    // A lone height would claim a fixed box the fluid player does not have.
-    if (!width || !height) {
-      return result
-    }
-
-    return { ...result, width, height }
+    return { ...result, ratio: '16/9' }
   },
 )
 

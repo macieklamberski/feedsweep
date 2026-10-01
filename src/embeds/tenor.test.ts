@@ -74,7 +74,8 @@ describeForEachParser('tenorWidgetEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, tenorWidgetEmbedResolver)
 
   describe('happy paths', () => {
-    it('should read the post, the name and the shape off the share snippet', async () => {
+    // `data-aspect-ratio` is the carrier's, which shallow handling does not read.
+    it('should read the post and the name off the share snippet over its ratio', async () => {
       const value = html`
         <div
           class="tenor-gif-embed"
@@ -93,7 +94,7 @@ describeForEachParser('tenorWidgetEmbedResolver', (parseHtml) => {
         id: '16892698',
         src: 'https://tenor.com/embed/16892698',
         url: 'https://tenor.com/view/16892698',
-        ratio: '1.77778/1',
+        ratio: '1.33/1',
         title: 'Madam Cj Walker GIF',
       }
 

@@ -5,13 +5,12 @@ import type { EmbedResolverResult } from '../types.js'
 import { extractLibsynEmbed, libsynEmbedResolver, libsynResolveEmbed } from './libsyn.js'
 
 describe('extractLibsynEmbed', () => {
-  it('should read an episode id and its height from the path', () => {
+  it('should read an episode id from a path that names a height', () => {
     const value =
       'https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/width/700/theme/custom/'
     const expected = {
       kind: 'episode',
       id: '5508311',
-      height: 90,
     }
 
     expect(extractLibsynEmbed(value)).toEqual(expected)
@@ -23,7 +22,6 @@ describe('extractLibsynEmbed', () => {
     const expected = {
       kind: 'episode',
       id: '41612765',
-      height: 192,
     }
 
     expect(extractLibsynEmbed(value)).toEqual(expected)
@@ -34,7 +32,6 @@ describe('extractLibsynEmbed', () => {
     const expected = {
       kind: 'destination',
       id: '12345',
-      height: 200,
     }
 
     expect(extractLibsynEmbed(value)).toEqual(expected)
@@ -88,24 +85,26 @@ describe('extractLibsynEmbed', () => {
 describe('libsynResolveEmbed', () => {
   // The old host answers 500 for older episodes while play.libsyn.com serves them, so the
   // rebuilt src is a repair rather than a cosmetic rewrite.
-  it('should mint the modern player host and carry the height', () => {
+  // The height option is the carrier's size, which shallow handling does not read or carry into the src.
+  it('should mint the modern player host over the height its path names', () => {
     const value = 'https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/theme/custom/'
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/5508311',
-      src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
-      height: 90,
+      src: 'https://play.libsyn.com/embed/episode/id/5508311/',
+      height: 128,
     }
 
     expect(libsynResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should leave the height out when the player does not state one', () => {
+  it('should state the player height when the path names none', () => {
     const value = 'https://play.libsyn.com/embed/episode/id/5508311/'
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/5508311',
       src: 'https://play.libsyn.com/embed/episode/id/5508311/',
+      height: 128,
     }
 
     expect(libsynResolveEmbed(value)).toEqual(expected)
@@ -128,8 +127,8 @@ describeForEachParser('libsynEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'libsyn',
         id: 'episode/5508311',
-        src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
-        height: 90,
+        src: 'https://play.libsyn.com/embed/episode/id/5508311/',
+        height: 128,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -161,7 +160,7 @@ describeForEachParser('libsynEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'libsyn',
         id: 'episode/5508311',
-        src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
+        src: 'https://play.libsyn.com/embed/episode/id/5508311/',
         width: 640,
         height: 200,
       }
@@ -231,7 +230,7 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/41557470',
-      src: 'https://play.libsyn.com/embed/episode/id/41557470/height/192/',
+      src: 'https://play.libsyn.com/embed/episode/id/41557470/',
       height: 192,
     }
 
@@ -245,8 +244,8 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/5508311',
-      src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
-      height: 90,
+      src: 'https://play.libsyn.com/embed/episode/id/5508311/',
+      height: 128,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -259,8 +258,8 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/5508311',
-      src: 'https://play.libsyn.com/embed/episode/id/5508311/height/90/',
-      height: 90,
+      src: 'https://play.libsyn.com/embed/episode/id/5508311/',
+      height: 128,
     }
 
     expect(await extract(value)).toEqual(expected)

@@ -165,7 +165,7 @@ describeForEachParser('nicovideoScriptEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, nicovideoScriptEmbedResolver)
 
   describe('happy paths', () => {
-    it('should mint the modern player and carry both dimensions as a pair', async () => {
+    it('should mint the modern player and state the player ratio over the size the url names', async () => {
       const value = html`
         <script src="https://ext.nicovideo.jp/thumb_watch/sm9?w=490&amp;h=307"></script>
       `
@@ -174,8 +174,7 @@ describeForEachParser('nicovideoScriptEmbedResolver', (parseHtml) => {
         id: 'sm9',
         src: 'https://embed.nicovideo.jp/watch/sm9',
         url: 'https://www.nicovideo.jp/watch/sm9',
-        width: 490,
-        height: 307,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -189,31 +188,7 @@ describeForEachParser('nicovideoScriptEmbedResolver', (parseHtml) => {
         id: 'sm9',
         src: 'https://embed.nicovideo.jp/watch/sm9',
         url: 'https://www.nicovideo.jp/watch/sm9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should state no size when the script asks for none', async () => {
-      const value = '<script src="https://ext.nicovideo.jp/thumb_watch/sm9"></script>'
-      const expected: EmbedResolverResult = {
-        provider: 'nicovideo',
-        id: 'sm9',
-        src: 'https://embed.nicovideo.jp/watch/sm9',
-        url: 'https://www.nicovideo.jp/watch/sm9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    // A lone height reads as the fixed box this player is not, so it is both or neither.
-    it('should state no size when only one dimension is given', async () => {
-      const value = '<script src="https://ext.nicovideo.jp/thumb_watch/sm9?h=307"></script>'
-      const expected: EmbedResolverResult = {
-        provider: 'nicovideo',
-        id: 'sm9',
-        src: 'https://embed.nicovideo.jp/watch/sm9',
-        url: 'https://www.nicovideo.jp/watch/sm9',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -226,6 +201,7 @@ describeForEachParser('nicovideoScriptEmbedResolver', (parseHtml) => {
         id: 'sm9',
         src: 'https://embed.nicovideo.jp/watch/sm9',
         url: 'https://www.nicovideo.jp/watch/sm9',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -233,20 +209,6 @@ describeForEachParser('nicovideoScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should state no size when a dimension is not a pixel count', async () => {
-      const value = html`
-        <script src="https://ext.nicovideo.jp/thumb_watch/sm9?w=100%25&amp;h=307"></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'nicovideo',
-        id: 'sm9',
-        src: 'https://embed.nicovideo.jp/watch/sm9',
-        url: 'https://www.nicovideo.jp/watch/sm9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should return undefined for a nicovideo script naming no video', async () => {
       const value = '<script src="https://ext.nicovideo.jp/thumb_watch/"></script>'
 
@@ -374,8 +336,7 @@ describeForEachParser('nicovideo through the pipeline', (parseHtml) => {
       id: 'sm9',
       src: 'https://embed.nicovideo.jp/watch/sm9',
       url: 'https://www.nicovideo.jp/watch/sm9',
-      width: '490',
-      height: '307',
+      ratio: '16/9',
     }
 
     expect(await placeholder(value)).toEqual(expected)

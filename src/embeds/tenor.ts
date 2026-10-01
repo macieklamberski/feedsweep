@@ -1,6 +1,6 @@
 import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, parseRatio, text } from '../utils/dom.js'
+import { attr, text } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -55,8 +55,8 @@ export const tenorWidgetEmbedResolver = createMarkupEmbedResolver(
     // search link, which names a query and not this GIF.
     return {
       ...composeEmbed(postId),
-      // `embed.js` falls back to 1.33 when the snippet states no ratio.
-      ratio: parseRatio(attr(element, 'data-aspect-ratio') ?? '1.33'),
+      // The ratio `embed.js` falls back to when the snippet states none.
+      ratio: '1.33/1',
       title: text(element, 'a[href*="tenor.com/view/"]'),
     }
   },

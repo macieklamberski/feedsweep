@@ -1,6 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr, parsePixelSize } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -82,15 +82,12 @@ export const spreakerAnchorEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    // The anchor states its own size, e.g. `data-height="200px"`.
-    const stated = parsePixelSize(attr(element, 'data-height'))
     // The anchor text is a localized call to action around the title, not the title itself, and
     // the quote characters wrapping the title differ per language.
     const title = attr(element, 'data-title')
 
     return {
       ...result,
-      height: stated ?? result.height,
       title,
     }
   },

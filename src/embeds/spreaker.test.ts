@@ -228,8 +228,8 @@ describeForEachParser('spreakerAnchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The publisher sized this one, so their height wins over the documented constant.
-    it('should prefer the stated data-height', async () => {
+    // The anchor's `data-height` is the carrier's size, which shallow handling does not read.
+    it('should state the documented height over the stated data-height', async () => {
       const value = html`
         <a
           class="spreaker-player"
@@ -242,26 +242,7 @@ describeForEachParser('spreakerAnchorEmbedResolver', (parseHtml) => {
         id: 'episode/42',
         src: 'https://widget.spreaker.com/player?episode_id=42',
         url: 'https://www.spreaker.com/episode/42',
-        height: 350,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should accept a bare pixel count', async () => {
-      const value = html`
-        <a
-          class="spreaker-player"
-          data-resource="episode_id=42"
-          data-height="120"
-        >Listen to "An episode" on Spreaker.</a>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'spreaker',
-        id: 'episode/42',
-        src: 'https://widget.spreaker.com/player?episode_id=42',
-        url: 'https://www.spreaker.com/episode/42',
-        height: 120,
+        height: 200,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -269,25 +250,6 @@ describeForEachParser('spreakerAnchorEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should keep the constant when data-height is not a pixel count', async () => {
-      const value = html`
-        <a
-          class="spreaker-player"
-          data-resource="episode_id=42"
-          data-height="100%"
-        >Listen to "An episode" on Spreaker.</a>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'spreaker',
-        id: 'episode/42',
-        src: 'https://widget.spreaker.com/player?episode_id=42',
-        url: 'https://www.spreaker.com/episode/42',
-        height: 200,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should use a malformed episode id as written, even if the player answers an error', async () => {
       const value = html`
         <a
