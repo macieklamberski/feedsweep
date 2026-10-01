@@ -45,7 +45,9 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the height the dialog states as an attribute', async () => {
+    // The frame posts its height, and `data-embed-height` is the carrier's, which shallow handling
+    // does not read.
+    it('should state no size over the height the dialog states as an attribute', async () => {
       const value = html`
         <blockquote
           class="reddit-embed-bq"
@@ -59,7 +61,6 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/pics/comments/dq4m1v',
         src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
         url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
-        height: 740,
         title: 'My dog',
         publisher: 'r/pics',
       }

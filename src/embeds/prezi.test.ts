@@ -14,6 +14,7 @@ describe('preziResolveEmbed', () => {
         id: 'n3rtkeyhvckt',
         src: 'https://prezi.com/p/n3rtkeyhvckt/embed',
         url: 'https://prezi.com/p/n3rtkeyhvckt/',
+        ratio: '550/400',
       }
 
       expect(preziResolveEmbed(value)).toEqual(expected)
@@ -26,6 +27,7 @@ describe('preziResolveEmbed', () => {
         id: '07fqanglwhcw',
         src: 'https://prezi.com/p/07fqanglwhcw/embed',
         url: 'https://prezi.com/p/07fqanglwhcw/',
+        ratio: '550/400',
       }
 
       expect(preziResolveEmbed(value)).toEqual(expected)
@@ -38,6 +40,7 @@ describe('preziResolveEmbed', () => {
         id: '07fqanglwhcw',
         src: 'https://prezi.com/p/07fqanglwhcw/embed',
         url: 'https://prezi.com/p/07fqanglwhcw/',
+        ratio: '550/400',
       }
 
       expect(preziResolveEmbed(value)).toEqual(expected)
@@ -51,6 +54,7 @@ describe('preziResolveEmbed', () => {
         id: 'px__0uiyxndk',
         src: 'https://prezi.com/p/px__0uiyxndk/embed',
         url: 'https://prezi.com/p/px__0uiyxndk/',
+        ratio: '550/400',
       }
 
       expect(preziResolveEmbed(value)).toEqual(expected)
@@ -71,6 +75,7 @@ describe('preziResolveEmbed', () => {
         id: '..%2Fx',
         src: 'https://prezi.com/p/..%2Fx/embed',
         url: 'https://prezi.com/p/..%2Fx/',
+        ratio: '550/400',
       }
 
       expect(preziResolveEmbed(value)).toEqual(expected)
@@ -171,6 +176,7 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
         id: 'wfqsr9xleno5',
         src: 'https://prezi.com/p/wfqsr9xleno5/embed',
         url: 'https://prezi.com/p/wfqsr9xleno5/',
+        ratio: '550/400',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -241,6 +247,7 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
         id: 'testonly0001%2Fx',
         src: 'https://prezi.com/p/testonly0001%2Fx/embed',
         url: 'https://prezi.com/p/testonly0001%2Fx/',
+        ratio: '550/400',
       }
 
       expect(await extract(value)).toEqual(expected)

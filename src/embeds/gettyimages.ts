@@ -1,5 +1,4 @@
 import type { ResolveEmbed } from '../types.js'
-import { parsePixelSize } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -14,8 +13,6 @@ type WidgetConfig = {
   et: string
   sig: string
   tld: string
-  width?: number
-  height?: number
 }
 
 // Getty signs the query up to `sig` in the order written: a pair dropped or moved before it
@@ -46,6 +43,7 @@ const gettyImagesResolveEmbed: ResolveEmbed = (url) => {
     id: itemId,
     src: `https://embed.gettyimages.com/embed/${itemId}${readSignedQuery(parsed)}`,
     url: `https://www.gettyimages.com/detail/${itemId}`,
+    ratio: '3/2',
   }
 }
 
@@ -79,8 +77,6 @@ export const readWidgetConfig = (source: string): WidgetConfig | undefined => {
     et,
     sig,
     tld: readConfigValue(source, 'tld') ?? 'com',
-    width: parsePixelSize(readConfigValue(source, 'w')),
-    height: parsePixelSize(readConfigValue(source, 'h')),
   }
 }
 

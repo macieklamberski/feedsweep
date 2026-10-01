@@ -17,21 +17,27 @@ import { cnnRenderHint } from '../embeds/cnn.js'
 import { codesandboxRenderHint } from '../embeds/codesandbox.js'
 import { dailymotionRenderHint } from '../embeds/dailymotion.js'
 import { deezerRenderHint } from '../embeds/deezer.js'
+import { documentcloudRenderHint } from '../embeds/documentcloud.js'
 import { donorboxRenderHint } from '../embeds/donorbox.js'
 import { flickrRenderHint } from '../embeds/flickr.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
 import { foxbusinessRenderHint, foxnewsRenderHint } from '../embeds/foxnews.js'
 import { googledriveRenderHint } from '../embeds/googledrive.js'
+import { helloassoRenderHint } from '../embeds/helloasso.js'
 import { imgurRenderHint } from '../embeds/imgur.js'
 import { inaRenderHint } from '../embeds/ina.js'
+import { infogramRenderHint } from '../embeds/infogram.js'
 import { instagramRenderHint } from '../embeds/instagram.js'
 import { kalturaRenderHint } from '../embeds/kaltura.js'
 import { mailruRenderHint } from '../embeds/mailru.js'
 import { mastodonRenderHint } from '../embeds/mastodon.js'
 import { megaphoneRenderHint } from '../embeds/megaphone.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
+import { nbcnewsRenderHint } from '../embeds/nbcnews.js'
+import { neteaseRenderHint } from '../embeds/netease.js'
 import { nicovideoRenderHint } from '../embeds/nicovideo.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
+import { observableRenderHint } from '../embeds/observable.js'
 import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
 import { omnyRenderHint } from '../embeds/omny.js'
 import { pbsRenderHint } from '../embeds/pbs.js'
@@ -49,6 +55,7 @@ import { spreakerRenderHint } from '../embeds/spreaker.js'
 import { srgplayRenderHint } from '../embeds/srgplay.js'
 import { tedRenderHint } from '../embeds/ted.js'
 import { telegramRenderHint } from '../embeds/telegram.js'
+import { tencentRenderHint } from '../embeds/tencent.js'
 import { transistorRenderHint } from '../embeds/transistor.js'
 import { tumblrRenderHint } from '../embeds/tumblr.js'
 import { tuneinRenderHint } from '../embeds/tunein.js'
@@ -59,6 +66,7 @@ import { vidyardRenderHint } from '../embeds/vidyard.js'
 import { vimeoRenderHint } from '../embeds/vimeo.js'
 import { vkRenderHint } from '../embeds/vk.js'
 import { wistiaRenderHint } from '../embeds/wistia.js'
+import { youkuRenderHint } from '../embeds/youku.js'
 import { youtubeRenderHint } from '../embeds/youtube.js'
 import type { EmbedRenderHint } from '../types.js'
 
@@ -85,22 +93,28 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   codesandboxRenderHint,
   dailymotionRenderHint,
   deezerRenderHint,
+  documentcloudRenderHint,
   donorboxRenderHint,
   flickrRenderHint,
   flourishRenderHint,
   foxbusinessRenderHint,
   foxnewsRenderHint,
   googledriveRenderHint,
+  helloassoRenderHint,
   imgurRenderHint,
   inaRenderHint,
+  infogramRenderHint,
   instagramRenderHint,
   kalturaRenderHint,
   mailruRenderHint,
   mastodonRenderHint,
   megaphoneRenderHint,
   mixcloudRenderHint,
+  nbcnewsRenderHint,
+  neteaseRenderHint,
   nicovideoRenderHint,
   notecomRenderHint,
+  observableRenderHint,
   odnoklassnikiRenderHint,
   omnyRenderHint,
   pbsRenderHint,
@@ -118,6 +132,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   srgplayRenderHint,
   tedRenderHint,
   telegramRenderHint,
+  tencentRenderHint,
   transistorRenderHint,
   tumblrRenderHint,
   tuneinRenderHint,
@@ -128,5 +143,6 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   vimeoRenderHint,
   vkRenderHint,
   wistiaRenderHint,
+  youkuRenderHint,
   youtubeRenderHint,
 ]

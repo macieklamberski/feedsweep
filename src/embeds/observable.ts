@@ -1,6 +1,7 @@
 import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
+import { readIframeResizeHeight } from '../utils/hints.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'observable'
@@ -64,3 +65,12 @@ export const observableEmbedResolver = createUrlEmbedResolver(
   observableHosts,
   observableResolveEmbed,
 )
+
+// The notebook posts its rendered height unasked, again as each cell finishes.
+export const observableRenderHint: EmbedRenderHint = {
+  provider,
+  // Spelled out: `observablehq.com/embed/` redirects to `old.observablehq.com`, so every message
+  // arrives from there.
+  origin: 'https://old.observablehq.com',
+  readHeight: readIframeResizeHeight,
+}

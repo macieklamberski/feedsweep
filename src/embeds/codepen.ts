@@ -1,6 +1,6 @@
 import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, parsePixelSize, text } from '../utils/dom.js'
+import { attr, text } from '../utils/dom.js'
 import {
   composeQuery,
   encodePathSegment,
@@ -56,10 +56,6 @@ type CodepenTarget = {
   token?: string
   // A block from the 2.0 editor, whose player the loader builds under `/editor/`.
   isEditor?: boolean
-  // The height stated in the player's own query, which is where the loader puts it and where most
-  // iframe urls carry it. An attribute on the carrier outranks it, since that is the box the
-  // publisher actually laid out.
-  height?: number
   slug: string
 }
 
@@ -109,7 +105,6 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   const queryToken = parsed.searchParams.get('token')
   // A query token comes out decoded, and it goes into a path beside the raw path spelling.
   const token = pathToken ?? (queryToken ? encodePathSegment(queryToken) : undefined)
-  const height = parsePixelSize(parsed.searchParams.get('height'))
 
   return {
     kind,
@@ -120,7 +115,6 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
     key: parsed.searchParams.get('key') ?? undefined,
     token,
     isEditor: allSegments[0] === 'editor',
-    height,
   }
 }
 
@@ -163,7 +157,7 @@ const composeEmbed = (
     // a blank white one for a pen moved to that editor.
     ...(!target.isEditor &&
       !uuidRegex.test(target.slug) && { thumbnail: composeThumbnail(target) }),
-    height: target.height ?? defaultPenHeight,
+    height: defaultPenHeight,
     ...(target.user && { author: `@${target.user}` }),
     ...extra,
   }
@@ -221,17 +215,9 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
   ownerPath ??= user
 
   const title = attr(element, 'data-pen-title') ?? linkedTitle
-  // The height the author chose for the player, which the loader passes straight through. A
-  // block naming the pen by its whole url states it in that url's query instead, so the
-  // attribute is read first and the url is what answers when it is absent.
-  const height = parsePixelSize(attr(element, 'data-height')) ?? reference.height
-
   const isEditor = attr(element, 'data-version') === '2'
 
-  return composeEmbed(
-    { kind: 'embed', user, ownerPath, key, token, slug, isEditor, height },
-    { title },
-  )
+  return composeEmbed({ kind: 'embed', user, ownerPath, key, token, slug, isEditor }, { title })
 }
 
 // CodePen's "See the Pen" paragraph, which only the ei.js loader feeds strip turns into a pen.

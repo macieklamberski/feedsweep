@@ -1,6 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, parsePixelSize } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 
 const provider = 'libsyn'
 
@@ -12,6 +12,9 @@ const libsynHosts = ['libsyn.com']
 // `show` renders an error and `destination` is another id space, so a show carrier falls through.
 const embedKinds = ['episode', 'destination']
 
+// The player renders this tall at any width, whatever height option its path names.
+const playerHeight = 128
+
 // Libsyn spells its player options as path segments, not a query string:
 // `/embed/episode/id/{id}/height/{px}/theme/{name}/thumbnail/{yes|no}/…`.
 const readPathOption = (segments: Array<string>, name: string): string | undefined => {
@@ -20,9 +23,7 @@ const readPathOption = (segments: Array<string>, name: string): string | undefin
   return index >= 0 ? segments[index + 1] : undefined
 }
 
-export const extractLibsynEmbed = (
-  link: string,
-): { kind: string; id: string; height?: number } | undefined => {
+export const extractLibsynEmbed = (link: string): { kind: string; id: string } | undefined => {
   const parsed = parseUrl(link, placeholderBaseUrl)
 
   // An audio file on the player path would otherwise trade its audio element for a placeholder.
@@ -43,12 +44,9 @@ export const extractLibsynEmbed = (
     return
   }
 
-  const height = readPathOption(segments, 'height')
-
   return {
     kind: segments[1] as string,
     id,
-    height: parsePixelSize(height),
   }
 }
 
@@ -59,16 +57,14 @@ export const libsynResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const height = embed.height ? `height/${embed.height}/` : ''
-
   // No thumbnail and no canonical url: `oembed.libsyn.com` answers `No valid media found` to
   // `?item_id={id}` and an HTML page to `?url={player url}`, and artwork needs an authenticated
   // api call.
   return {
     provider,
     id: `${embed.kind}/${embed.id}`,
-    src: `https://play.libsyn.com/embed/${embed.kind}/id/${embed.id}/${height}`,
-    height: embed.height,
+    src: `https://play.libsyn.com/embed/${embed.kind}/id/${embed.id}/`,
+    height: playerHeight,
     title: attr(element, 'title'),
   }
 }

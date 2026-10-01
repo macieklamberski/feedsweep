@@ -142,6 +142,7 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
         provider: 'wordwall',
         id: 'd4e3c25ffe7545a19a8b0cd802f68f4d',
         src: 'https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d',
+        ratio: '500/380',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -153,6 +154,7 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
         provider: 'wordwall',
         id: 'play/65121/614/434',
         src: 'https://wordwall.net/embed/play/65121/614/434',
+        ratio: '500/380',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -211,6 +213,7 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
         provider: 'wordwall',
         id: 'play/65121/614/x434',
         src: 'https://wordwall.net/embed/play/65121/614/x434',
+        ratio: '500/380',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -242,6 +245,7 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
         provider: 'wordwall',
         id: 'd4e3c25ffe7545a19a8b0cd802f68f4d',
         src: 'https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d',
+        ratio: '500/380',
       }
 
       expect(await extract(value)).toEqual(expected)

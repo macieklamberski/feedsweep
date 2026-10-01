@@ -1,6 +1,6 @@
 import { decodeSegment, isPlainObject, parseUrl, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, find, jsonAttr, parsePixelSize, text } from '../utils/dom.js'
+import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import {
@@ -72,30 +72,13 @@ const composeEmbed = (
   }
 }
 
-// Tumblr wraps the quote in a figure that repeats the post url percent-encoded and states the
-// size the embed rendered at. That is the only size a blockquote ever comes with: the quote
-// itself declares a max-width and never a height, so the declared-size pass finds nothing on it.
+// Tumblr wraps the quote in a figure that repeats the post url percent-encoded.
 const wrapperSelector = 'figure[data-provider="instagram"]'
 
-const readWrapper = (
-  element: Element,
-): { post?: Post; size: { width?: number; height?: number } } => {
-  const figure = element.closest(wrapperSelector)
+const readWrapperPost = (element: Element): Post | undefined => {
+  const dataUrl = attr(element.closest(wrapperSelector), 'data-url')
 
-  if (!figure) {
-    return { size: {} }
-  }
-
-  const dataUrl = attr(figure, 'data-url')
-  const width = parsePixelSize(attr(figure, 'data-orig-width'))
-  const height = parsePixelSize(attr(figure, 'data-orig-height'))
-
-  return {
-    post: readPostUrl(decodeSegment(dataUrl) ?? dataUrl),
-    // Stated together or not at all: a lone height would claim a fixed box the embed does
-    // not have.
-    size: width && height ? { width, height } : {},
-  }
+  return readPostUrl(decodeSegment(dataUrl) ?? dataUrl)
 }
 
 // Where the post is named, in the order the shapes provide it: the attribute the dialog writes,
@@ -174,17 +157,13 @@ const readContent = (element: Element): Partial<EmbedResolverResult> => {
 export const instagramBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.instagram-media, blockquote[data-instgrm-permalink]',
   (element) => {
-    const wrapper = readWrapper(element)
-    const post = findPost(element) ?? wrapper.post
+    const post = findPost(element) ?? readWrapperPost(element)
 
     if (!post) {
       return
     }
 
-    return composeEmbed(post, element.hasAttribute('data-instgrm-captioned'), {
-      ...readContent(element),
-      ...wrapper.size,
-    })
+    return composeEmbed(post, element.hasAttribute('data-instgrm-captioned'), readContent(element))
   },
 )
 

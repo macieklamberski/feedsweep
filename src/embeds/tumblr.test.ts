@@ -7,7 +7,7 @@ describeForEachParser('tumblrIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, tumblrIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should read the post out of the frame the loader hydrated', async () => {
+    it('should drop the width, language and did the loader wrote on the frame', async () => {
       const value = html`
         <iframe
           class="tumblr-embed tumblr-embed-loaded"
@@ -19,7 +19,7 @@ describeForEachParser('tumblrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'tumblr',
         id: '9NYQOutKOEXi4aopdzCr9A/144854447139',
-        src: 'https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2?width=542&language=en_US&did=f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8',
+        src: 'https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2',
         height: 1391,
       }
 
@@ -66,7 +66,7 @@ describeForEachParser('tumblrPostEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the older route, which names the blog key bare', async () => {
+    it('should rebuild the older route, which names the blog key bare, on the current one', async () => {
       const value = html`
         <div
           class="tumblr-post"
@@ -78,7 +78,7 @@ describeForEachParser('tumblrPostEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'tumblr',
         id: '9NYQOutKOEXi4aopdzCr9A/144854447139',
-        src: 'https://embed.tumblr.com/embed/post/9NYQOutKOEXi4aopdzCr9A/144854447139',
+        src: 'https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2',
         url: 'https://exampleblog.tumblr.com/post/144854447139',
       }
 

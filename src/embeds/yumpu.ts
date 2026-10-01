@@ -58,6 +58,7 @@ const yumpuResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id: hash,
     src: `https://www.yumpu.com/${locale}/embed/view/${hash}`,
+    ratio: '4/3',
     ...readCompanion(element),
   }
 }

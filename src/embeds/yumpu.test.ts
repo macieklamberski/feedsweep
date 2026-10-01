@@ -19,6 +19,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
         src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -60,6 +61,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
         src: 'https://www.yumpu.com/fr/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -106,6 +108,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         provider: 'yumpu',
         id: 'z4xY%2F..%2Fevil',
         src: 'https://www.yumpu.com/de/embed/view/z4xY%2F..%2Fevil',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -145,6 +148,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
         src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -156,6 +160,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
         src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -168,6 +173,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
         src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -180,6 +186,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
         src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -197,6 +204,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         id: 'z4xYaRXnsDqwc2GE',
         src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         url: 'https://www.yumpu.com/de/document/view/71235096/sukultur-2026',
+        ratio: '4/3',
         title: 'SUKULTUR 2026',
       }
 
@@ -213,6 +221,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
         src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -230,6 +239,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
         src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -247,6 +257,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
         src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -264,6 +275,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
         src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -281,6 +293,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
         src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -371,6 +384,7 @@ describeForEachParser('yumpu through the pipeline', (parseHtml) => {
         data-embed-src="https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE"
         data-embed-title="SUKULTUR 2026"
         data-embed-url="https://www.yumpu.com/de/document/view/71235096/sukultur-2026"
+        data-embed-ratio="4/3"
       ></div>
     `
 

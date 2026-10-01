@@ -14,6 +14,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw',
         src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed?loop=true&delayms=3000',
         url: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -27,6 +28,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw',
         src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed?loop=false&delayms=3000',
         url: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -40,6 +42,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw',
         src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed',
         url: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -53,6 +56,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw',
         src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed#slide=id.p5',
         url: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -66,6 +70,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '1Hon1kkhjBilU1QXrpoC5TRK7vTqoGbYxvI1vFfuLtLM',
         src: 'https://docs.google.com/presentation/d/1Hon1kkhjBilU1QXrpoC5TRK7vTqoGbYxvI1vFfuLtLM/embed#slide=id.g117889fc3d_0_0',
         url: 'https://docs.google.com/presentation/d/1Hon1kkhjBilU1QXrpoC5TRK7vTqoGbYxvI1vFfuLtLM/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -79,6 +84,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '1OZRGyfKsSRX84MBi3LYPUkLkArsvevJV52Hm6zTd-9s',
         src: 'https://docs.google.com/presentation/d/1OZRGyfKsSRX84MBi3LYPUkLkArsvevJV52Hm6zTd-9s/embed?loop=false&delayms=3000',
         url: 'https://docs.google.com/presentation/d/1OZRGyfKsSRX84MBi3LYPUkLkArsvevJV52Hm6zTd-9s/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -92,6 +98,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '1GouoBUQy3gu2gK8RHe3mOJNf6VsuEVyahHSDDGyUQXM',
         src: 'https://docs.google.com/presentation/d/1GouoBUQy3gu2gK8RHe3mOJNf6VsuEVyahHSDDGyUQXM/embed',
         url: 'https://docs.google.com/presentation/d/1GouoBUQy3gu2gK8RHe3mOJNf6VsuEVyahHSDDGyUQXM/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -105,6 +112,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '1k5NXExE8IvVgEIAwhxzwNw93Kt6f8Yqp1K7TuSigXiE',
         src: 'https://docs.google.com/presentation/d/1k5NXExE8IvVgEIAwhxzwNw93Kt6f8Yqp1K7TuSigXiE/embed',
         url: 'https://docs.google.com/presentation/d/1k5NXExE8IvVgEIAwhxzwNw93Kt6f8Yqp1K7TuSigXiE/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -118,6 +126,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '1k5NXExE8IvVgEIAwhxzwNw93Kt6f8Yqp1K7TuSigXiE',
         src: 'https://docs.google.com/presentation/d/1k5NXExE8IvVgEIAwhxzwNw93Kt6f8Yqp1K7TuSigXiE/embed',
         url: 'https://docs.google.com/presentation/d/1k5NXExE8IvVgEIAwhxzwNw93Kt6f8Yqp1K7TuSigXiE/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -131,6 +140,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw',
         src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed?slide=id.p5',
         url: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -144,6 +154,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk',
         src: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/embed?loop=false&delayms=3000',
         url: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -206,6 +217,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '2PACX-1v%2F..%2Fx',
         src: 'https://docs.google.com/presentation/d/e/2PACX-1v%2F..%2Fx/embed',
         url: 'https://docs.google.com/presentation/d/e/2PACX-1v%2F..%2Fx/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -218,6 +230,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '../../document/d/x',
         src: 'https://docs.google.com/presentation/d/..%2F..%2Fdocument%2Fd%2Fx/embed',
         url: 'https://docs.google.com/presentation/d/..%2F..%2Fdocument%2Fd%2Fx/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -231,6 +244,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/x',
         src: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx/embed',
         url: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -246,6 +260,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231',
         src: 'https://docs.google.com/presentation/d/e/2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231/embed?loop=false&delayms=3000',
         url: 'https://docs.google.com/presentation/d/e/2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)
@@ -259,6 +274,7 @@ describe('googleslidesResolveEmbed', () => {
         id: '1elLlCMSHhJP-PbDoML8ytuWr0smzhBiXEfHIOBqnaHk',
         src: 'https://docs.google.com/presentation/d/1elLlCMSHhJP-PbDoML8ytuWr0smzhBiXEfHIOBqnaHk/embed',
         url: 'https://docs.google.com/presentation/d/1elLlCMSHhJP-PbDoML8ytuWr0smzhBiXEfHIOBqnaHk/pub',
+        ratio: '480/299',
       }
 
       expect(googleslidesResolveEmbed(value)).toEqual(expected)

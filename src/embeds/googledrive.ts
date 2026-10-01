@@ -32,6 +32,7 @@ export const googledriveResolveEmbed: ResolveEmbed = (url) => {
       provider,
       id: fileId,
       src: `${src}${accessQuery}`,
+      ratio: '4/3',
     }
   }
 
@@ -41,6 +42,7 @@ export const googledriveResolveEmbed: ResolveEmbed = (url) => {
     src,
     url: `https://drive.google.com/file/d/${fileId}/view`,
     thumbnail: `https://drive.google.com/thumbnail${composeQuery({ id: decodeSegment(fileId) ?? fileId, sz: 'w640' })}`,
+    ratio: '4/3',
   }
 }
 

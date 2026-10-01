@@ -24,6 +24,7 @@ export const amebaResolveEmbed: ResolveEmbed = (url) => {
     provider: 'ameba',
     id: videoId,
     src: `https://${amebaHosts[0]}/${composeQuery({ v: videoId })}`,
+    ratio: '16/9',
   }
 }
 
@@ -63,6 +64,7 @@ export const amebaReblogCardEmbedResolver = createUrlEmbedResolver(amebloHosts, 
     id,
     src: `https://${amebloHosts[0]}/s/embed/reblog-card/${id}.html`,
     url: `https://${amebloHosts[0]}/${id}.html`,
+    height: 234,
   }
 })
 
@@ -81,5 +83,6 @@ export const amebaImagePageEmbedResolver = createUrlEmbedResolver(amebloHosts, (
     id: match[1],
     src: `https://${amebloHosts[0]}/p/embed/${match[1]}.html`,
     url: `https://${amebloHosts[0]}/${match[1]}.html`,
+    ratio: '360/416',
   }
 })

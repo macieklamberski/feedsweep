@@ -17,11 +17,11 @@ const figshareResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // No `url`: the article page lives on its institutional portal, which only the API names.
-  // The widget fills the box it is given, and the share code sizes it 568x351.
   return {
     provider: 'figshare',
     id: articleId,
     src: `https://widgets.figshare.com/articles/${articleId}/embed`,
+    ratio: '568/351',
   }
 }
 

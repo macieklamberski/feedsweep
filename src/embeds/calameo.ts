@@ -4,6 +4,8 @@ import { flashVars } from '../utils/dom.js'
 import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const viewerRatio = '300/194'
+
 // Calaméo's viewer, `v.calameo.com/?bkcode={code}`, and the retired Flash players before it,
 // `cviewer.swf` and `cmini.swf`, take the same code in the same query parameter, or in the
 // player's flashvars when the `<embed src>` names a bare `cmini.swf`.
@@ -36,6 +38,7 @@ export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
       provider: 'calameo',
       id: code,
       src,
+      ratio: viewerRatio,
     }
   }
 
@@ -45,6 +48,7 @@ export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
     src,
     // The code comes out of a query decoded, and it goes into a path.
     url: `https://www.calameo.com/books/${encodePathSegment(code)}`,
+    ratio: viewerRatio,
   }
 }
 

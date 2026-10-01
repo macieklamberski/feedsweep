@@ -395,6 +395,8 @@ describeForEachParser('kalturaScriptEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, kalturaScriptEmbedResolver)
 
   describe('happy paths', () => {
+    // The 560x395 in the script's query is the carrier's size, which shallow handling does not
+    // read.
     it('should rebuild the iframe the auto-embed script would have written', async () => {
       const value = html`
         <div
@@ -410,20 +412,20 @@ describeForEachParser('kalturaScriptEmbedResolver', (parseHtml) => {
         src: 'https://cdnapisec.kaltura.com/p/1758271/sp/175827100/embedIframeJs/uiconf_id/29300931/partner_id/1758271?iframeembed=true&entry_id=1_jhjo10ru',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/1758271/thumbnail/entry_id/1_jhjo10ru/width/640',
-        width: 560,
-        height: 395,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should state no box where the script names none', async () => {
+    it('should state the player ratio where the script names no box', async () => {
       const value =
         '<script src="https://cdnapisec.kaltura.com/p/1770401/sp/177040100/embedIframeJs/uiconf_id/31308902/partner_id/1770401?autoembed=true&entry_id=0_y5wm5dnt&playerId=kaltura_player_1525192233"></script>'
       const expected: EmbedResolverResult = {
         provider: 'kaltura',
         id: '1770401/0_y5wm5dnt',
         src: 'https://cdnapisec.kaltura.com/p/1770401/sp/177040100/embedIframeJs/uiconf_id/31308902/partner_id/1770401?iframeembed=true&entry_id=0_y5wm5dnt',
+        ratio: '16/9',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/1770401/thumbnail/entry_id/0_y5wm5dnt/width/640',
       }

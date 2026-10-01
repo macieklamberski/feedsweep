@@ -27,7 +27,8 @@ const deliveryThumbnailHost = 'videodelivery.net'
 const playerPathRegex = /^\/([^/]+)\/iframe\/?$/
 const deliveryPathRegex = /^\/([^/]+)\/?$/
 
-const playerParams = ['poster', 'startTime']
+// The start position and whether the video repeats, the playback parameters the player reads.
+const playbackParams = ['startTime', 'loop']
 
 const composeThumbnail = (videoId: string, host: string): string => {
   return `https://${host}/${videoId}/thumbnails/thumbnail.jpg`
@@ -66,7 +67,7 @@ export const cloudflarestreamResolveEmbed: ResolveEmbed = (url) => {
     provider,
     // The bare `videodelivery.net` serves every account's video, so the id needs no account code.
     id: videoId,
-    src: `https://${parsed.hostname}${playerPath}${pickUrlParams(url, playerParams)}`,
+    src: `https://${parsed.hostname}${playerPath}${pickUrlParams(url, playbackParams)}`,
     thumbnail: poster ?? composeThumbnail(videoId, thumbnailHost),
   }
 }

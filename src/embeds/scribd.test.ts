@@ -20,6 +20,7 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
         id: '12 3',
         src: 'https://www.scribd.com/embeds/12%203/content',
         url: 'https://www.scribd.com/document/12%203',
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -27,9 +28,7 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('the current share-panel iframe', () => {
-    // The snippet states height="500" for every document. The ratio beside it is the one that
-    // describes this document, so the placeholder carries the ratio instead.
-    it('should prefer the stated ratio over the constant height', async () => {
+    it('should give the document the viewer height over the stated ratio and height', async () => {
       const value = html`
         <iframe
           class="scribd_iframe_embed"
@@ -47,27 +46,7 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
         id: '526446879',
         src: 'https://www.scribd.com/embeds/526446879/content',
         url: 'https://www.scribd.com/document/526446879',
-        ratio: '0.7729220222793488/1',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep the declared height when the snippet states no ratio', async () => {
-      const value = html`
-        <iframe
-          class="scribd_iframe_embed"
-          src="https://www.scribd.com/embeds/526446879/content"
-          width="100%"
-          height="500"
-        ></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'scribd',
-        id: '526446879',
-        src: 'https://www.scribd.com/embeds/526446879/content',
-        url: 'https://www.scribd.com/document/526446879',
-        height: 500,
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -88,28 +67,8 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
         id: '526446879',
         src: 'https://www.scribd.com/embeds/526446879/content',
         url: 'https://www.scribd.com/document/526446879',
-        height: 500,
+        height: 600,
         title: 'Vermont Cynic Drug Issue 2026',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should fall back to the declared height for a ratio that is not a number', async () => {
-      const value = html`
-        <iframe
-          class="scribd_iframe_embed"
-          src="https://www.scribd.com/embeds/526446879/content"
-          data-aspect-ratio="portrait"
-          height="500"
-        ></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'scribd',
-        id: '526446879',
-        src: 'https://www.scribd.com/embeds/526446879/content',
-        url: 'https://www.scribd.com/document/526446879',
-        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -124,6 +83,7 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
         provider: 'scribd',
         id: '488306777',
         src: 'https://www.scribd.com/embeds/488306777/content?access_key=key-ZJXG4sWak4icye8tCa8g&start_page=1',
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -138,6 +98,7 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
         id: '108992419',
         src: 'https://www.scribd.com/embeds/108992419/content',
         url: 'https://www.scribd.com/document/108992419',
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -152,6 +113,7 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
         id: '173385168',
         src: 'https://www.scribd.com/embeds/173385168/content',
         url: 'https://www.scribd.com/document/173385168',
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -164,6 +126,7 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
         id: '526446879',
         src: 'https://www.scribd.com/embeds/526446879/content',
         url: 'https://www.scribd.com/document/526446879',
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -180,6 +143,7 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
         id: '1089924191234567890',
         src: 'https://www.scribd.com/embeds/1089924191234567890/content',
         url: 'https://www.scribd.com/document/1089924191234567890',
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -208,6 +172,7 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
         id: 'my-document-slug',
         src: 'https://www.scribd.com/embeds/my-document-slug/content',
         url: 'https://www.scribd.com/document/my-document-slug',
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -343,6 +308,7 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
         id: '../evil',
         src: 'https://www.scribd.com/embeds/..%2Fevil/content',
         url: 'https://www.scribd.com/document/..%2Fevil',
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -450,6 +416,7 @@ describeForEachParser('scribd through the pipeline', (parseHtml) => {
         data-embed-id="108992419"
         data-embed-provider="scribd"
         data-embed-src="https://www.scribd.com/embeds/108992419/content"
+        data-embed-height="600"
       ></div>
     `
 

@@ -17,6 +17,7 @@ const composeEmbed = (id: string): EmbedResolverResult => {
     id,
     src: `https://prezi.com/p/${id}/embed`,
     url: `https://prezi.com/p/${id}/`,
+    ratio: '550/400',
   }
 }
 

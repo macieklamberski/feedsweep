@@ -46,6 +46,7 @@ const sketchfabResolveEmbed: ResolveEmbed = (url, element) => {
     // The slug is not derivable from the uid, and the site redirects the unslugged `/models/{uid}`
     // to the `/3d-models/{slug}-{uid}` page.
     url: `https://sketchfab.com/models/${uid}`,
+    ratio: '4/3',
     title: attr(element, 'title'),
   }
 }

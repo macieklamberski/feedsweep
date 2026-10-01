@@ -130,6 +130,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -144,6 +145,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -158,6 +160,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -174,6 +177,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -241,6 +245,7 @@ describeForEachParser('sketchfabEmbedResolver carrier title', (parseHtml) => {
       id: '00b8203bcdc2464bbac4b159be66e838',
       src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
       url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
+      ratio: '4/3',
     }
 
     expect(await extract(value)).toEqual(expected)

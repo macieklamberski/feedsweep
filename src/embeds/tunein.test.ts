@@ -13,6 +13,7 @@ describe('tuneinResolveEmbed', () => {
         src: 'https://tunein.com/embed/player/s285269/',
         url: 'https://tunein.com/radio/s285269/',
         thumbnail: 'https://cdn-radiotime-logos.tunein.com/s285269d.png',
+        height: 100,
       }
 
       expect(tuneinResolveEmbed(value)).toEqual(expected)
@@ -26,6 +27,7 @@ describe('tuneinResolveEmbed', () => {
         src: 'https://tunein.com/embed/player/p894940/',
         url: 'https://tunein.com/radio/p894940/',
         thumbnail: 'https://cdn-radiotime-logos.tunein.com/p894940d.png',
+        height: 100,
       }
 
       expect(tuneinResolveEmbed(value)).toEqual(expected)
@@ -37,6 +39,7 @@ describe('tuneinResolveEmbed', () => {
         provider: 'tunein',
         id: 't102877112',
         src: 'https://tunein.com/embed/player/t102877112/',
+        height: 100,
       }
 
       expect(tuneinResolveEmbed(value)).toEqual(expected)
@@ -56,6 +59,7 @@ describe('tuneinResolveEmbed', () => {
         provider: 'tunein',
         id: 'x285269',
         src: 'https://tunein.com/embed/player/x285269/',
+        height: 100,
       }
 
       expect(tuneinResolveEmbed(value)).toEqual(expected)
@@ -87,6 +91,7 @@ describe('tuneinResolveEmbed', () => {
         src: 'https://tunein.com/embed/player/s285269abc/',
         url: 'https://tunein.com/radio/s285269abc/',
         thumbnail: 'https://cdn-radiotime-logos.tunein.com/s285269abcd.png',
+        height: 100,
       }
 
       expect(tuneinResolveEmbed(value)).toEqual(expected)

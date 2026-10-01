@@ -1,5 +1,5 @@
 import { getPathSegments, toMap } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -74,3 +74,8 @@ const nbcnewsResolveEmbed: ResolveEmbed = (url) => {
 // nbcnews.com/widget/video-embed/{id}, and the same player on today.com/today/embedded-video
 // and today.com/offsite/{slug}-{id}.
 export const nbcnewsEmbedResolver = createUrlEmbedResolver(nbcnewsHosts, nbcnewsResolveEmbed)
+
+export const nbcnewsRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: 'true' },
+}

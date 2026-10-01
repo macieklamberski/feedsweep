@@ -1,6 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, parseRatio } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 import { composeQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -8,9 +8,6 @@ const provider = 'speakerdeck'
 
 // A few feeds fold the slide number into the id attribute itself.
 const slideSuffixRegex = /\?slide=([^&]+)$/
-
-// Speaker Deck's snippet always carries the ratio, and 16:9 is what decks mostly are.
-const defaultDeckRatio = '16/9'
 
 // One feed can embed the same deck at several slides. Without the slide those collapse into
 // identical placeholders, and the player url honours `?slide=`.
@@ -25,6 +22,7 @@ const composeEmbed = (
     provider,
     id: slide ? `${deckId}/${slide}` : deckId,
     src: `https://speakerdeck.com/player/${deckId}${query}`,
+    ratio: '16/9',
     title,
   }
 }
@@ -42,12 +40,8 @@ export const speakerdeckScriptEmbedResolver = createMarkupEmbedResolver(
     }
 
     const slide = inlineSlide ?? attr(element, 'data-slide') ?? undefined
-    const result = composeEmbed(deckId, { slide })
 
-    // The script carries the deck's aspect ratio as a bare decimal, e.g. `data-ratio="1.33"`.
-    const ratio = parseRatio(attr(element, 'data-ratio') ?? '') ?? defaultDeckRatio
-
-    return { ...result, ratio }
+    return composeEmbed(deckId, { slide })
   },
 )
 
@@ -63,10 +57,7 @@ export const speakerdeckResolveEmbed: ResolveEmbed = (url, element) => {
 
   const slide = parseUrl(url, placeholderBaseUrl)?.searchParams.get('slide') ?? undefined
 
-  return {
-    ...composeEmbed(deckId, { slide, title: attr(element, 'title') }),
-    ratio: defaultDeckRatio,
-  }
+  return composeEmbed(deckId, { slide, title: attr(element, 'title') })
 }
 
 export const speakerdeckIframeEmbedResolver = createUrlEmbedResolver(

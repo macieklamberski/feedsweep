@@ -13,6 +13,7 @@ describe('calameoResolveEmbed', () => {
         id: '0077756511c9c6e552299',
         src: 'https://v.calameo.com/?bkcode=0077756511c9c6e552299',
         url: 'https://www.calameo.com/books/0077756511c9c6e552299',
+        ratio: '300/194',
       }
 
       expect(calameoResolveEmbed(value)).toEqual(expected)
@@ -25,6 +26,7 @@ describe('calameoResolveEmbed', () => {
         id: '0077756511c9c6e552299',
         src: 'https://v.calameo.com/?bkcode=0077756511c9c6e552299',
         url: 'https://www.calameo.com/books/0077756511c9c6e552299',
+        ratio: '300/194',
       }
 
       expect(calameoResolveEmbed(value)).toEqual(expected)
@@ -36,6 +38,7 @@ describe('calameoResolveEmbed', () => {
         provider: 'calameo',
         id: '002574221fb7a74a40f7a',
         src: 'https://v.calameo.com/?bkcode=002574221fb7a74a40f7a&authid=WdhyTr98dSUk',
+        ratio: '300/194',
       }
 
       expect(calameoResolveEmbed(value)).toEqual(expected)
@@ -47,6 +50,7 @@ describe('calameoResolveEmbed', () => {
         provider: 'calameo',
         id: '002574221fb7a74a40f7a',
         src: 'https://v.calameo.com/?bkcode=002574221fb7a74a40f7a&authid=WdhyTr98dSUk',
+        ratio: '300/194',
       }
 
       expect(calameoResolveEmbed(value)).toEqual(expected)
@@ -59,6 +63,7 @@ describe('calameoResolveEmbed', () => {
         provider: 'calameo',
         id: '002574221fb7a74a40f7a',
         src: 'https://v.calameo.com/?bkcode=002574221fb7a74a40f7a&authid=WdhyTr98dSUk',
+        ratio: '300/194',
       }
 
       expect(calameoResolveEmbed(value)).toEqual(expected)
@@ -72,6 +77,7 @@ describe('calameoResolveEmbed', () => {
         id: '00725978727c6763c01b0',
         src: 'https://v.calameo.com/?bkcode=00725978727c6763c01b0',
         url: 'https://www.calameo.com/books/00725978727c6763c01b0',
+        ratio: '300/194',
       }
 
       expect(calameoResolveEmbed(value)).toEqual(expected)
@@ -92,6 +98,7 @@ describe('calameoResolveEmbed', () => {
         id: '../books',
         src: 'https://v.calameo.com/?bkcode=..%2Fbooks',
         url: 'https://www.calameo.com/books/..%2Fbooks',
+        ratio: '300/194',
       }
 
       expect(calameoResolveEmbed(value)).toEqual(expected)
@@ -105,6 +112,7 @@ describe('calameoResolveEmbed', () => {
         id: '0047347972d89219ca0ff',
         src: 'https://v.calameo.com/?bkcode=0047347972d89219ca0ff',
         url: 'https://www.calameo.com/books/0047347972d89219ca0ff',
+        ratio: '300/194',
       }
 
       expect(calameoResolveEmbed(value)).toEqual(expected)

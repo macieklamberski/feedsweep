@@ -18,11 +18,14 @@ const wrapperIdRegex = /^__ss[e_]?(\d+)$/
 // Two players, the presentation one and the document one, sharing a query.
 const flashPlayerPathRegex = /\/swf\/(?:ssplayer\d?|doc_player)\.swf$/
 
+const deckRatio = '595/485'
+
 const composeEmbed = (deck: string, fields?: Partial<EmbedResolverResult>): EmbedResolverResult => {
   return {
     provider: 'slideshare',
     id: deck,
     src: `https://www.slideshare.net/slideshow/embed_code/${deck}`,
+    ratio: deckRatio,
     ...fields,
   }
 }
@@ -57,6 +60,7 @@ export const slideshareResolveEmbed: ResolveEmbed = (url) => {
         provider: 'slideshare',
         id: deck,
         src: `https://www.slideshare.net/slideshow/embed_code/key/${deck}`,
+        ratio: deckRatio,
       }
     : composeEmbed(deck)
 }

@@ -1,5 +1,5 @@
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, parsePixelSize } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 import { composeQuery, encodePathSegment, filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -91,11 +91,7 @@ export const kalturaScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const width = parsePixelSize(entry.parsed.searchParams.get('width'))
-    const height = parsePixelSize(entry.parsed.searchParams.get('height'))
-    const result = composeEmbed(entry)
-
-    return width && height ? { ...result, width, height } : result
+    return { ...composeEmbed(entry), ratio: '16/9' }
   },
 )
 

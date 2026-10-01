@@ -63,6 +63,7 @@ describeForEachParser('typeformWidgetEmbedResolver', (parseHtml) => {
         id: 'MTt3Pw7K',
         src: 'https://form.typeform.com/to/MTt3Pw7K',
         url: 'https://form.typeform.com/to/MTt3Pw7K',
+        height: 500,
         title: 'Booking Form',
       }
 
@@ -78,6 +79,7 @@ describeForEachParser('typeformWidgetEmbedResolver', (parseHtml) => {
         id: 'MTt3Pw7K',
         src: 'https://form.typeform.com/to/MTt3Pw7K',
         url: 'https://form.typeform.com/to/MTt3Pw7K',
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -108,6 +110,7 @@ describeForEachParser('typeformWidgetEmbedResolver', (parseHtml) => {
         id: 'Xk2p',
         src: 'https://form.typeform.com/to/Xk2p',
         url: 'https://form.typeform.com/to/Xk2p',
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -195,6 +198,7 @@ describe('typeformResolveEmbed', () => {
       id: 'MTt3Pw7K',
       src: value,
       url: value,
+      height: 500,
     }
 
     expect(typeformResolveEmbed(value)).toEqual(expected)
@@ -207,6 +211,7 @@ describe('typeformResolveEmbed', () => {
       id: 'WCfVwJTK',
       src: 'https://form.typeform.com/to/WCfVwJTK',
       url: 'https://form.typeform.com/to/WCfVwJTK',
+      height: 500,
     }
 
     expect(typeformResolveEmbed(value)).toEqual(expected)
@@ -220,6 +225,7 @@ describe('typeformResolveEmbed', () => {
       id: 'MTt3Pw7K',
       src: 'https://form.typeform.com/to/MTt3Pw7K',
       url: 'https://form.typeform.com/to/MTt3Pw7K',
+      height: 500,
     }
 
     expect(typeformResolveEmbed(value)).toEqual(expected)
@@ -356,6 +362,7 @@ describeForEachParser('typeformIframeEmbedResolver carrier title', (parseHtml) =
       id: 'AbCdEf12',
       src: 'https://form.typeform.com/to/AbCdEf12',
       url: 'https://form.typeform.com/to/AbCdEf12',
+      height: 500,
       title: 'Reader survey 2026',
     }
 

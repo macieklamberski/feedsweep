@@ -97,57 +97,15 @@ describeForEachParser('telegramScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('the width the snippet states', () => {
-    it('should read a pixel width', async () => {
+    // The widget sizes itself from the post, and `data-width` is the carrier's size, which
+    // shallow handling does not read.
+    it('should state no size over a pixel width', async () => {
       const value = html`
         <script
           async
           src="https://telegram.org/js/telegram-widget.js?22"
           data-telegram-post="tochkapress/111424"
           data-width="480"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'telegram',
-        id: 'tochkapress/111424',
-        src: 'https://t.me/tochkapress/111424?embed=1',
-        url: 'https://t.me/tochkapress/111424',
-        width: 480,
-        author: '@tochkapress',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should read a width spelled in px', async () => {
-      const value = html`
-        <script
-          async
-          src="https://telegram.org/js/telegram-widget.js?22"
-          data-telegram-post="tochkapress/111424"
-          data-width="480px"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'telegram',
-        id: 'tochkapress/111424',
-        src: 'https://t.me/tochkapress/111424?embed=1',
-        url: 'https://t.me/tochkapress/111424',
-        width: 480,
-        author: '@tochkapress',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    // The post resolves without a size either way, so the whole result is stated: a percentage
-    // is not a pixel width, and the widget states no height at all.
-    it('should drop a percentage width', async () => {
-      const value = html`
-        <script
-          async
-          src="https://telegram.org/js/telegram-widget.js?22"
-          data-telegram-post="tochkapress/111424"
-          data-width="100%"
         ></script>
       `
       const expected: EmbedResolverResult = {

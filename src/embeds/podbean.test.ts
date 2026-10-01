@@ -84,13 +84,14 @@ describe('podbeanResolveEmbed', () => {
     expect(podbeanResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should prefer a height the url states', () => {
+  // The `size` query is the carrier's, which shallow handling does not read.
+  it('should state the player height over a height the url states', () => {
     const value = 'https://www.podbean.com/player-v2/?i=wyvke-1aefb6c-pb&size=315'
     const expected: EmbedResolverResult = {
       provider: 'podbean',
       id: 'wyvke-1aefb6c-pb',
       src: 'https://www.podbean.com/player-v2/?i=wyvke-1aefb6c-pb',
-      height: 315,
+      height: 150,
     }
 
     expect(podbeanResolveEmbed(value)).toEqual(expected)

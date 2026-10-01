@@ -41,6 +41,7 @@ describeForEachParser('mediavineWidgetEmbedResolver', (parseHtml) => {
         provider: 'mediavine',
         id: 't9z9zameefjmqvtghsvu',
         src: 'https://embed.mediavine.com/videos/t9z9zameefjmqvtghsvu/iframe',
+        ratio: '16/9',
         title: 'How to fold a fitted sheet',
       }
 
@@ -82,6 +83,7 @@ describeForEachParser('mediavineWidgetEmbedResolver', (parseHtml) => {
         provider: 'mediavine',
         id: '../../evil',
         src: 'https://embed.mediavine.com/videos/..%2F..%2Fevil/iframe',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -99,6 +101,7 @@ describeForEachParser('mediavineWidgetEmbedResolver', (parseHtml) => {
         provider: 'mediavine',
         id: 't9z9zameefjmqvtghsvu',
         src: 'https://embed.mediavine.com/videos/t9z9zameefjmqvtghsvu/iframe',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -138,6 +141,7 @@ describeForEachParser('mediavineScriptEmbedResolver', (parseHtml) => {
         provider: 'mediavine',
         id: 'dx6ydyrbrjbbu2tncqzi9',
         src: 'https://embed.mediavine.com/videos/dx6ydyrbrjbbu2tncqzi9/iframe',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -150,6 +154,7 @@ describeForEachParser('mediavineScriptEmbedResolver', (parseHtml) => {
         provider: 'mediavine',
         id: 'dx6ydyrbrjbbu2tncqzi',
         src: 'https://embed.mediavine.com/videos/dx6ydyrbrjbbu2tncqzi/iframe',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -211,6 +216,7 @@ describeForEachParser('mediavineScriptEmbedResolver', (parseHtml) => {
         provider: 'mediavine',
         id: 'dx6ydyrb%2Frjbbu2tncqzi',
         src: 'https://embed.mediavine.com/videos/dx6ydyrb%2Frjbbu2tncqzi/iframe',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
