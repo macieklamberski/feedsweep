@@ -118,6 +118,7 @@ import {
   fliphtml5IframeEmbedResolver,
   fliphtml5LightBoxEmbedResolver,
 } from '../embeds/fliphtml5.js'
+import { flipsnackEmbedResolver } from '../embeds/flipsnack.js'
 import { flourishIframeEmbedResolver, flourishWidgetEmbedResolver } from '../embeds/flourish.js'
 import { foxnewsIframeEmbedResolver, foxnewsScriptEmbedResolver } from '../embeds/foxnews.js'
 import { ganjingworldEmbedResolver } from '../embeds/ganjingworld.js'
@@ -129,8 +130,10 @@ import { googlebooksEmbedResolver } from '../embeds/googlebooks.js'
 import { googledriveEmbedResolver } from '../embeds/googledrive.js'
 import { googleslidesEmbedResolver } from '../embeds/googleslides.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
+import { hearthisEmbedResolver } from '../embeds/hearthis.js'
 import { helloassoEmbedResolver } from '../embeds/helloasso.js'
 import { heyzineEmbedResolver } from '../embeds/heyzine.js'
+import { iheartEmbedResolver } from '../embeds/iheart.js'
 import {
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
@@ -167,6 +170,7 @@ import { libsynEmbedResolver } from '../embeds/libsyn.js'
 import { linkedinEmbedResolver } from '../embeds/linkedin.js'
 import { mailruEmbedResolver } from '../embeds/mailru.js'
 import { mastodonEmbedResolver } from '../embeds/mastodon.js'
+import { matterportEmbedResolver } from '../embeds/matterport.js'
 import { mediavineScriptEmbedResolver, mediavineWidgetEmbedResolver } from '../embeds/mediavine.js'
 import { megaphoneEmbedResolver } from '../embeds/megaphone.js'
 import { megatvEmbedResolver } from '../embeds/megatv.js'
@@ -228,6 +232,11 @@ import { standfmEmbedResolver } from '../embeds/standfm.js'
 import { steamEmbedResolver } from '../embeds/steam.js'
 import { stravaIframeEmbedResolver, stravaPlaceholderEmbedResolver } from '../embeds/strava.js'
 import { swayEmbedResolver } from '../embeds/sway.js'
+import {
+  tableauIframeEmbedResolver,
+  tableauObjectEmbedResolver,
+  tableauWidgetEmbedResolver,
+} from '../embeds/tableau.js'
 import { tedEmbedResolver } from '../embeds/ted.js'
 import {
   telegramIframeEmbedResolver,
@@ -462,6 +471,7 @@ const embedResolvers: Array<EmbedResolver> = [
   flickrEmbedResolver,
   fliphtml5IframeEmbedResolver,
   fliphtml5LightBoxEmbedResolver,
+  flipsnackEmbedResolver,
   flourishWidgetEmbedResolver,
   flourishIframeEmbedResolver,
   foxnewsScriptEmbedResolver,
@@ -476,8 +486,10 @@ const embedResolvers: Array<EmbedResolver> = [
   googledriveEmbedResolver,
   googleslidesEmbedResolver,
   guardianEmbedResolver,
+  hearthisEmbedResolver,
   helloassoEmbedResolver,
   heyzineEmbedResolver,
+  iheartEmbedResolver,
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
   imgurS9eEmbedResolver,
@@ -509,6 +521,7 @@ const embedResolvers: Array<EmbedResolver> = [
   libsynEmbedResolver,
   linkedinEmbedResolver,
   mailruEmbedResolver,
+  matterportEmbedResolver,
   mediavineWidgetEmbedResolver,
   mediavineScriptEmbedResolver,
   megaphoneEmbedResolver,
@@ -573,6 +586,9 @@ const embedResolvers: Array<EmbedResolver> = [
   stravaIframeEmbedResolver,
   stravaPlaceholderEmbedResolver,
   swayEmbedResolver,
+  tableauWidgetEmbedResolver,
+  tableauObjectEmbedResolver,
+  tableauIframeEmbedResolver,
   tedEmbedResolver,
   telegramScriptEmbedResolver,
   telegramIframeEmbedResolver,

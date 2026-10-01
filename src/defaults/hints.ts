@@ -19,11 +19,14 @@ import { dailymotionRenderHint } from '../embeds/dailymotion.js'
 import { deezerRenderHint } from '../embeds/deezer.js'
 import { documentcloudRenderHint } from '../embeds/documentcloud.js'
 import { donorboxRenderHint } from '../embeds/donorbox.js'
+import { facebookRenderHint } from '../embeds/facebook.js'
 import { flickrRenderHint } from '../embeds/flickr.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
 import { foxbusinessRenderHint, foxnewsRenderHint } from '../embeds/foxnews.js'
 import { googledriveRenderHint } from '../embeds/googledrive.js'
+import { hearthisRenderHint } from '../embeds/hearthis.js'
 import { helloassoRenderHint } from '../embeds/helloasso.js'
+import { iheartRenderHint } from '../embeds/iheart.js'
 import { imgurRenderHint } from '../embeds/imgur.js'
 import { inaRenderHint } from '../embeds/ina.js'
 import { indavideoRenderHint } from '../embeds/indavideo.js'
@@ -32,6 +35,7 @@ import { instagramRenderHint } from '../embeds/instagram.js'
 import { kalturaRenderHint } from '../embeds/kaltura.js'
 import { mailruRenderHint } from '../embeds/mailru.js'
 import { mastodonRenderHint } from '../embeds/mastodon.js'
+import { matterportRenderHint } from '../embeds/matterport.js'
 import { megaphoneRenderHint } from '../embeds/megaphone.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
 import { nbcnewsRenderHint } from '../embeds/nbcnews.js'
@@ -54,6 +58,7 @@ import { soundcloudRenderHint } from '../embeds/soundcloud.js'
 import { spotifyRenderHint } from '../embeds/spotify.js'
 import { spreakerRenderHint } from '../embeds/spreaker.js'
 import { srgplayRenderHint } from '../embeds/srgplay.js'
+import { tableauRenderHint } from '../embeds/tableau.js'
 import { tedRenderHint } from '../embeds/ted.js'
 import { telegramRenderHint } from '../embeds/telegram.js'
 import { tencentRenderHint } from '../embeds/tencent.js'
@@ -96,12 +101,15 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   deezerRenderHint,
   documentcloudRenderHint,
   donorboxRenderHint,
+  facebookRenderHint,
   flickrRenderHint,
   flourishRenderHint,
   foxbusinessRenderHint,
   foxnewsRenderHint,
   googledriveRenderHint,
+  hearthisRenderHint,
   helloassoRenderHint,
+  iheartRenderHint,
   imgurRenderHint,
   inaRenderHint,
   indavideoRenderHint,
@@ -110,6 +118,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   kalturaRenderHint,
   mailruRenderHint,
   mastodonRenderHint,
+  matterportRenderHint,
   megaphoneRenderHint,
   mixcloudRenderHint,
   nbcnewsRenderHint,
@@ -132,6 +141,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   spotifyRenderHint,
   spreakerRenderHint,
   srgplayRenderHint,
+  tableauRenderHint,
   tedRenderHint,
   telegramRenderHint,
   tencentRenderHint,
