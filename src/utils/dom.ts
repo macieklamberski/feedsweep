@@ -120,8 +120,8 @@ export const attr = (element: Nullish<Element>, name: string): string | undefine
   return element?.getAttribute(name)?.trim() || undefined
 }
 
-// Keeps a value read out of an attribute or a url when it fits the shape expected of it, an id,
-// a handle or a token, and drops it otherwise, so nothing malformed reaches a minted url.
+// Keeps a value read out of an attribute or a url when its shape tells it apart, such as an id
+// from a route word, and drops it otherwise.
 export const keepIfMatches = (value: Nullish<string>, regex: RegExp): string | undefined => {
   return value && regex.test(value) ? value : undefined
 }
@@ -336,9 +336,15 @@ export const generatedWrapperTypes = ['embed', 'cite', 'file', 'table', 'pre'] a
 
 export type GeneratedWrapperType = (typeof generatedWrapperTypes)[number]
 
-const generatedWrapperPrefixes = generatedWrapperTypes.map((type) => `data-${type}`)
+// The trailing dash keeps a publisher's `data-preview` or `data-embedly-card` from matching.
+const generatedWrapperPrefixes = generatedWrapperTypes.map((type) => `data-${type}-`)
 
 export const isGeneratedWrapper = (element: Element): boolean => {
+  // wrapTablesForScroll marks its wrapper with a bare `data-table`.
+  if (element.hasAttribute('data-table')) {
+    return true
+  }
+
   return element.getAttributeNames().some((name) => startsWithAnyOf(name, generatedWrapperPrefixes))
 }
 

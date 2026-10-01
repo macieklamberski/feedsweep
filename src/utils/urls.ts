@@ -23,8 +23,19 @@ const queryOrHashRegex = /[?#]/
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
 
-export const urlSafeTokenRegex = /^[A-Za-z0-9_-]+$/
 export const digitsRegex = /^\d+$/
+
+// A browser trims C0 controls and spaces from both ends, so \x01javascript: runs. Inside the
+// url it drops only tabs and newlines: java\tscript: runs, java script: is a relative path.
+// See: https://url.spec.whatwg.org/#concept-basic-url-parser.
+const c0ControlOrSpaceClass = '[\\x00-\\x20]+' // C0 controls and space
+const urlEdgeCharsRegex = new RegExp(`^${c0ControlOrSpaceClass}|${c0ControlOrSpaceClass}$`, 'g')
+const urlTabOrNewlineRegex = /[\t\n\r]/g
+
+// The url as a browser reads its scheme, for testing it against a scheme regex.
+export const stripUrlIgnorableChars = (url: string): string => {
+  return url.replace(urlEdgeCharsRegex, '').replace(urlTabOrNewlineRegex, '')
+}
 
 // No m3u8 or mpd: only Safari plays them natively, so promoting one breaks the player elsewhere.
 export const imageFileRegex = /\.(avif|gif|jpe?g|png|svg|webp)(\?|#|$)/i
@@ -133,6 +144,13 @@ export const pickQueryParams = (
   return picked
 }
 
+// A decoded value written into a url path stays one segment. Only the characters that would open
+// a new segment, a query or a fragment, a literal `%` and whitespace are escaped, so an `@`, `=` or
+// `:` the value holds reads as written.
+export const encodePathSegment = (value: string): string => {
+  return value.replace(/[%/?#\s]/g, (character) => encodeURIComponent(character))
+}
+
 // The other half of `pickQueryParams`: the pairs it returns, back into a query ready to append.
 // A resolver that has nothing to carry over gets an empty string, so its src stays bare rather
 // than ending on a lone `?`.
@@ -160,6 +178,20 @@ export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): str
 // The query string an embed resolver carries over when it rebuilds a src from the video id:
 // only the parameters that change what plays. Returns it ready to append, so a src with
 // nothing worth keeping stays bare.
+// The url with the named query parameters removed and every other pair as written. A url that
+// names none of them comes back as it was.
+export const dropUrlParams = (url: string, names: ReadonlyArray<string>): string => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
+
+  if (!parsed || !names.some((name) => parsed.searchParams.has(name))) {
+    return url
+  }
+
+  parsed.search = filterUrlQuery(parsed, (name) => !names.includes(name))
+
+  return parsed.href
+}
+
 export const pickUrlParams = (url: string, names: ReadonlyArray<string>): string => {
   return composeQuery(pickQueryParams(parseUrl(url)?.search ?? '', names))
 }

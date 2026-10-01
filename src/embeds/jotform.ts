@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { digitsRegex, filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'jotform'
@@ -22,31 +22,19 @@ const jotformHosts = [
   'www.jotform.com',
 ]
 
-// The campaign tags a share link picks up. Any other name can be a prefill, which the form reads
-// off its own query, so the rest of the query goes to the frame as the loader sends it.
-const trackerParams = [
-  'fbclid',
-  'utm_campaign',
-  'utm_content',
-  'utm_id',
-  'utm_medium',
-  'utm_source',
-  'utm_term',
-]
-
-const loaderPathRegex = /^\/jsform\/(\d+)$/
+const loaderPathRegex = /^\/jsform\/([^/]+)$/
 
 // The loader's starting box, which the iframe snippet also states. A card form starts at 640, and
 // nothing in the markup tells a card form from a classic one.
 const formHeight = 539
 
+// Any name can be a prefill, which the form reads off its own query, so the query goes to the
+// frame as the carrier sends it.
 const composeEmbed = (formId: string, carrier: URL): EmbedResolverResult => {
-  const query = filterUrlQuery(carrier, (name) => !isAnyOf(name, trackerParams))
-
   return {
     provider,
     id: formId,
-    src: `https://form.jotform.com/${formId}${query}`,
+    src: `https://form.jotform.com/${formId}${carrier.search}`,
     url: `https://form.jotform.com/${formId}`,
     height: formHeight,
   }

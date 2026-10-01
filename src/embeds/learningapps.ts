@@ -1,12 +1,9 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { digitsRegex } from '../utils/urls.js'
+import { composeQuery, digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const learningappsHosts = ['learningapps.org']
-
-// Two id spaces share one exercise: a number and an alphanumeric string.
-const safeAppIdRegex = /^[a-z0-9]+$/i
 
 const exerciseRoutes = ['watch', 'show']
 const exerciseParams = ['app', 'v', 'id']
@@ -25,7 +22,7 @@ export const learningappsResolveEmbed: ResolveEmbed = (url) => {
   const param = exerciseParams.find((name) => parsed.searchParams.has(name))
   const appId = param ? parsed.searchParams.get(param) : undefined
 
-  if (!appId || !safeAppIdRegex.test(appId)) {
+  if (!appId) {
     return
   }
 
@@ -39,7 +36,8 @@ export const learningappsResolveEmbed: ResolveEmbed = (url) => {
   const result: EmbedResolverResult = {
     provider: 'learningapps',
     id: appId,
-    src: `https://learningapps.org/watch?app=${appId}`,
+    src: `https://learningapps.org/watch${composeQuery({ app: appId })}`,
+    height: 500,
   }
 
   return isNumericAppId

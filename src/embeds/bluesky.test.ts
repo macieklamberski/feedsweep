@@ -6,7 +6,6 @@ import {
   blueskyIframeEmbedResolver,
   blueskyPostElementEmbedResolver,
   blueskyS9eEmbedResolver,
-  readBlueskyHeight,
 } from './bluesky.js'
 
 describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
@@ -577,7 +576,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should refuse an authority that is neither a did nor a handle', async () => {
+    it('should use a malformed authority as written, even if the player answers an error', async () => {
       const value = html`
         <blockquote
           class="bluesky-embed"
@@ -586,11 +585,18 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
           <p lang="en">Nothing addressable here.</p>
         </blockquote>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'not an authority/3lzq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/not an authority/app.bsky.feed.post/3lzq7aeuwbg42',
+        url: 'https://bsky.app/profile/not an authority/post/3lzq7aeuwbg42',
+        description: 'Nothing addressable here.',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse a record key that is a dot segment', async () => {
+    it('should use a malformed record key as written, even if the player answers an error', async () => {
       const value = html`
         <blockquote
           class="bluesky-embed"
@@ -599,8 +605,15 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
           <p lang="en">The record key would climb out of the collection.</p>
         </blockquote>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:9hz4agnyzcrsvpnprxrbjrpa/..',
+        src: 'https://embed.bsky.app/embed/did:plc:9hz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/..',
+        url: 'https://bsky.app/profile/did:plc:9hz4agnyzcrsvpnprxrbjrpa/post/..',
+        description: 'The record key would climb out of the collection.',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return nothing for a blockquote naming no post at all', async () => {
@@ -1012,67 +1025,30 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should refuse a handle written with the at sign', async () => {
+    it('should use a malformed handle as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://bsky.app/profile/@newsroom.example/post/3mkq7aeuwbg42"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: '@newsroom.example/3mkq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/@newsroom.example/app.bsky.feed.post/3mkq7aeuwbg42',
+        url: 'https://bsky.app/profile/@newsroom.example/post/3mkq7aeuwbg42',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse a handle followed by an encoded slash', async () => {
-      const value =
-        '<iframe src="https://bsky.app/profile/newsroom.example%2F../post/3mkq7aeuwbg42"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a did method carrying a percent sign', async () => {
-      const value =
-        '<iframe src="https://bsky.app/profile/did:p%c:ghz4agnyzcrsvpnprxrbjrpa/post/3mkq7aeuwbg42"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a did carrying an encoded traversal', async () => {
-      const value =
-        '<iframe src="https://bsky.app/profile/did:plc:x%2F..%2F../post/3mkq7aeuwbg42"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a did:web path, which atproto does not resolve', async () => {
-      const value =
-        '<iframe src="https://bsky.app/profile/did:web:example.com:alice/post/3mkq7aeuwbg42"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a handle whose first label carries an encoded slash', async () => {
-      const value =
-        '<iframe src="https://bsky.app/profile/news%2Froom.example/post/3mkq7aeuwbg42"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a handle whose later label carries an encoded slash', async () => {
-      const value =
-        '<iframe src="https://bsky.app/profile/newsroom.exa%2Fmple/post/3mkq7aeuwbg42"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a record key behind an encoded traversal', async () => {
+    it('should use a malformed record key as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://bsky.app/profile/newsroom.example/post/..%2F3mkq7aeuwbg42"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'newsroom.example/..%2F3mkq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/newsroom.example/app.bsky.feed.post/..%2F3mkq7aeuwbg42',
+        url: 'https://bsky.app/profile/newsroom.example/post/..%2F3mkq7aeuwbg42',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a record key followed by an encoded slash', async () => {
-      const value =
-        '<iframe src="https://bsky.app/profile/newsroom.example/post/3mkq7aeuwbg42%2F.."></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return nothing for a bluesky url naming no post', async () => {
@@ -1105,9 +1081,6 @@ describeForEachParser('blueskyS9eEmbedResolver', (parseHtml) => {
         id: 'did:plc:hhz4agnyzcrsvpnprxrbjrpa/3mhq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mhq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:hhz4agnyzcrsvpnprxrbjrpa/post/3mhq7aeuwbg42',
-        // The helper page states the box it renders into as an inline style.
-        width: 600,
-        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1212,18 +1185,5 @@ describeForEachParser('blueskyPostElementEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
-  })
-})
-
-describe('readBlueskyHeight', () => {
-  it('should read the height out of the frame report', () => {
-    const value = { height: 687.125, id: '1' }
-
-    expect(readBlueskyHeight(value)).toBe(687.125)
-  })
-
-  it('should read nothing out of a message without a height', () => {
-    expect(readBlueskyHeight({ id: '1' })).toBeUndefined()
-    expect(readBlueskyHeight('ready')).toBeUndefined()
   })
 })

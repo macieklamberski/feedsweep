@@ -78,6 +78,7 @@ describeForEachParser('TikTok', (parseHtml) => {
         data-embed-url="https://www.tiktok.com/@cookingwithlynja"
         data-embed-description="Midnight pasta"
         data-embed-author="@cookingwithlynja"
+        data-embed-height="478"
       ></div>
     `
 
@@ -85,8 +86,7 @@ describeForEachParser('TikTok', (parseHtml) => {
   })
 
   // The pasted snippet states a landscape box on a player taller than it is wide, so the
-  // placeholder carries the height the player really has instead. The player url keeps the query
-  // the publisher chose.
+  // placeholder carries the height the player really has instead.
   it('should resolve a pasted player and drop the landscape box it declares', async () => {
     const value = html`
       <p>Watch this:</p>
@@ -103,7 +103,7 @@ describeForEachParser('TikTok', (parseHtml) => {
       <div
         data-embed-provider="tiktok"
         data-embed-id="7001234567890123456"
-        data-embed-src="https://www.tiktok.com/player/v1/7001234567890123456?music_info=1&description=1"
+        data-embed-src="https://www.tiktok.com/embed/v2/7001234567890123456"
         data-embed-height="738"
       ></div>
     `

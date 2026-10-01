@@ -121,11 +121,26 @@ describe('detectLanguage', () => {
     })
   })
 
+  // SyntaxHighlighter Evolved spells C# both ways across census feeds.
+  const brushLanguages = ['c#', 'c-sharp']
+
+  it.each(brushLanguages)('should detect the brush language %s', (language) => {
+    const { pre, code } = createElement(`<pre class="brush: ${language}"><code>x</code></pre>`)
+
+    expect(detectLanguage(pre, code)).toBe(language)
+  })
+
   describe('Crayon', () => {
     it('should detect Crayon lang: language', () => {
       const { pre, code } = createElement('<pre class="lang:ruby decode:true"><code>x</code></pre>')
 
       expect(detectLanguage(pre, code)).toBe('ruby')
+    })
+
+    it('should detect a Crayon language carrying a plus', () => {
+      const { pre, code } = createElement('<pre class="lang:c++ decode:true"><code>x</code></pre>')
+
+      expect(detectLanguage(pre, code)).toBe('c++')
     })
 
     it('should detect Crayon lang_ language', () => {
@@ -280,6 +295,14 @@ describe('detectLanguage', () => {
   })
 
   describe('GitHub / Sphinx wrapper class', () => {
+    it('should detect a Sphinx language carrying a digit', () => {
+      const { pre, code } = createElement(
+        '<div class="highlight-python3 notranslate"><div class="highlight"><pre>x</pre></div></div>',
+      )
+
+      expect(detectLanguage(pre, code)).toBe('python3')
+    })
+
     it('should detect a GitHub highlight-source-LANG wrapper class', () => {
       const { pre, code } = createElement(
         '<div class="highlight highlight-source-ruby"><pre><code>x</code></pre></div>',
@@ -719,14 +742,6 @@ describeForEachParser('highlightCode', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should be idempotent on a bare pre', async () => {
-    const value = '<pre class="language-js">const x = 1</pre>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
-  })
-
   it('should highlight a standalone multi-line code (no pre) with a data-language hint', async () => {
     const value = [
       '<div><code data-language="bash">curl -X POST https://api.example.com/posts \\',
@@ -796,14 +811,6 @@ describeForEachParser('highlightCode', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  it('should be idempotent on a standalone code', async () => {
-    const value = '<code class="language-python">def hello():\n    print("hi")</code>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
-  })
-
   it('should handle html with no code blocks', async () => {
     const value = '<p>No code here</p>'
 
@@ -860,15 +867,6 @@ describeForEachParser('highlightCode', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should be idempotent on a Jekyll/Rouge block', async () => {
-    const value =
-      '<div class="language-rb highlighter-rouge"><div class="highlight"><pre class="highlight"><code>def hello\n  puts "hi"\nend</code></pre></div></div>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
-  })
-
   it('should highlight an Expressive Code block via its figcaption filename', async () => {
     const value =
       '<figure><figcaption><span>biome.json</span></figcaption><pre><code>{\n  "linter": true\n}</code></pre></figure>'
@@ -876,15 +874,6 @@ describeForEachParser('highlightCode', (parseHtml) => {
       '<figure><figcaption><span>biome.json</span></figcaption><pre data-pre-language="json" data-pre-label="JSON"><code class="hljs"><span class="hljs-punctuation">{</span>\n  <span class="hljs-attr">"linter"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span>\n<span class="hljs-punctuation">}</span></code></pre></figure>'
 
     expect(await transform(value)).toEqualHtml(expected)
-  })
-
-  it('should be idempotent on an Expressive Code block', async () => {
-    const value =
-      '<figure><figcaption><span>biome.json</span></figcaption><pre><code>{\n  "linter": true\n}</code></pre></figure>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
   })
 
   it('should highlight an EnlighterJS bare pre via data-enlighter-language', async () => {
@@ -913,14 +902,6 @@ describeForEachParser('highlightCode', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should be idempotent on a Forem class="highlight LANG" block', async () => {
-    const value = '<pre class="highlight ruby"><code>def hello\n  puts "hi"\nend</code></pre>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
-  })
-
   it('should highlight a GitHub highlight-source-LANG block', async () => {
     const value =
       '<div class="highlight highlight-source-ruby"><pre><code>def hello\n  puts "hi"\nend</code></pre></div>'
@@ -928,23 +909,6 @@ describeForEachParser('highlightCode', (parseHtml) => {
       '<div class="highlight highlight-source-ruby"><pre data-pre-language="ruby" data-pre-label="Ruby"><code class="hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">hello</span>\n  puts <span class="hljs-string">"hi"</span>\n<span class="hljs-keyword">end</span></code></pre></div>'
 
     expect(await transform(value)).toEqualHtml(expected)
-  })
-
-  it('should be idempotent on a GitHub highlight-source-LANG block', async () => {
-    const value =
-      '<div class="highlight highlight-source-ruby"><pre><code>def hello\n  puts "hi"\nend</code></pre></div>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
-  })
-
-  it('should be idempotent', async () => {
-    const value = '<pre><code class="language-js">const x = 1</code></pre>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
   })
 
   describe('language attributes', () => {
@@ -960,6 +924,24 @@ describeForEachParser('highlightCode', (parseHtml) => {
       const value = '<pre><code class="language-js">const x = 1</code></pre>'
       const expected =
         '<pre data-pre-language="js" data-pre-label="JavaScript"><code class="language-js hljs"><span class="hljs-keyword">const</span> x = <span class="hljs-number">1</span></code></pre>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // Sphinx names Pygments' shell-session lexer in its wrapper class, 25 census feeds.
+    it('should highlight a Sphinx block whose language name carries a hyphen', async () => {
+      const value =
+        '<div class="highlight-shell-session notranslate"><div class="highlight"><pre>$ ls -la</pre></div></div>'
+      const expected =
+        '<div class="highlight-shell-session notranslate"><div class="highlight"><pre data-pre-label="Shell" data-pre-language="shell-session"><code class="hljs"><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">ls</span> -la</span></code></pre></div></div>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should highlight a brush that spells C# as c-sharp', async () => {
+      const value = '<pre class="brush: c-sharp"><code>var x = 1;</code></pre>'
+      const expected =
+        '<pre data-pre-label="C#" data-pre-language="c-sharp" class="brush: c-sharp"><code class="hljs"><span class="hljs-keyword">var</span> x = <span class="hljs-number">1</span>;</code></pre>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -985,6 +967,25 @@ describeForEachParser('highlightCode', (parseHtml) => {
         '<pre><code>Note: this matters; really, it does. See also: the docs.</code></pre>'
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+
+    const plaintextLanguages = ['plaintext', 'txt']
+
+    it.each(plaintextLanguages)(
+      'should leave a block declared as %s unlabeled',
+      async (language) => {
+        const value = `<pre><code class="language-${language}">just some plain text</code></pre>`
+
+        expect(await transform(value)).toEqualHtml(value)
+      },
+    )
+
+    it('should label a language the label map does not name by its capitalized token', async () => {
+      const value = '<pre><code class="language-docker">FROM node:22</code></pre>'
+      const expected =
+        '<pre data-pre-label="Docker" data-pre-language="docker"><code class="language-docker hljs"><span class="hljs-keyword">FROM</span> node:<span class="hljs-number">22</span></code></pre>'
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should leave a block declared as plain text unlabeled', async () => {
@@ -1023,6 +1024,16 @@ describeForEachParser('highlightCode', (parseHtml) => {
   })
 
   describe('pre>code structure', () => {
+    // google-code-prettify numbers its lines as the items of an ordered list, with no newline.
+    it('should read each item of a numbered list as a line of its own', async () => {
+      const value =
+        '<pre class="prettyprint linenums lang-js"><ol class="linenums"><li class="L0">const a = 1</li><li class="L1">const b = 2</li></ol></pre>'
+      const expected =
+        '<pre data-pre-label="JavaScript" data-pre-language="js" class="prettyprint linenums lang-js"><code class="hljs"><span class="hljs-keyword">const</span> a = <span class="hljs-number">1</span>\n<span class="hljs-keyword">const</span> b = <span class="hljs-number">2</span></code></pre>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should wrap a bare pre content in a code', async () => {
       const value = '<pre>plain preformatted text</pre>'
       const expected = '<pre><code>plain preformatted text</code></pre>'
@@ -1065,6 +1076,65 @@ describeForEachParser('highlightCode', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+  })
+
+  it('should be idempotent on a bare pre', async () => {
+    const value = '<pre class="language-js">const x = 1</pre>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent on a standalone code', async () => {
+    const value = '<code class="language-python">def hello():\n    print("hi")</code>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent on a Jekyll/Rouge block', async () => {
+    const value =
+      '<div class="language-rb highlighter-rouge"><div class="highlight"><pre class="highlight"><code>def hello\n  puts "hi"\nend</code></pre></div></div>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent on an Expressive Code block', async () => {
+    const value =
+      '<figure><figcaption><span>biome.json</span></figcaption><pre><code>{\n  "linter": true\n}</code></pre></figure>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent on a Forem class="highlight LANG" block', async () => {
+    const value = '<pre class="highlight ruby"><code>def hello\n  puts "hi"\nend</code></pre>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent on a GitHub highlight-source-LANG block', async () => {
+    const value =
+      '<div class="highlight highlight-source-ruby"><pre><code>def hello\n  puts "hi"\nend</code></pre></div>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
+  it('should be idempotent', async () => {
+    const value = '<pre><code class="language-js">const x = 1</code></pre>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
   })
 })
 

@@ -1,7 +1,7 @@
-import { type Nullish, parseUrl } from 'trousse'
+import { type Nullish, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, find, parsePixelSize, text } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { attr, find, text } from '../utils/dom.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -32,23 +32,29 @@ const readFallback = (blockquote: Nullish<Element>): Partial<EmbedResolverResult
 
 const fallbackSelector = '.fb-xfbml-parse-ignore blockquote, blockquote.fb-xfbml-parse-ignore'
 
-// A carrier that does not already hold a plugin url resolves to one built around the page it
-// named, which is the only form Facebook frames. The page is also the canonical url, so a caller
-// that knows a better id than the href states it in `extra`.
+const postHeight = 646
+
+// Every carrier resolves to a plugin url built around the page it names, which is the only form
+// Facebook frames. The page is also the canonical url, so a caller that knows a better id than
+// the href states it in `extra`. `t`, where a video starts, is kept as the carrier wrote it.
 const composePluginEmbed = (
   plugin: string,
   href: string,
   extra: Partial<EmbedResolverResult>,
+  t?: string,
 ): EmbedResolverResult => {
   // Absolutised here: `resolveUrlFn` never touches the id or a query, so a bare href would reach
   // enrichment with no scheme and address nothing.
   const absoluteHref = parseUrl(href, 'https://www.facebook.com')?.href ?? href
+  const query = composeQuery(trimObject({ href: absoluteHref, t }))
 
   return {
     provider: 'facebook',
     id: absoluteHref,
-    src: `https://www.facebook.com/plugins/${plugin}.php?href=${encodeURIComponent(absoluteHref)}`,
+    src: `https://www.facebook.com/plugins/${plugin}.php${query}`,
     url: href,
+    height: plugin === 'post' ? postHeight : undefined,
+    ratio: plugin === 'video' ? '16/9' : undefined,
     ...extra,
   }
 }
@@ -103,15 +109,6 @@ const pluginPathRegex = /^(?:\/v\d+(?:\.\d+)?)?\/plugins\/(?:post|video)\.php$/
 // The pre-plugins video frame from old posts, naming its video in `video_id`.
 const legacyVideoPathRegex = /^\/video\/embed$/
 
-// The dialog writes the chosen size into the query as well as onto the element. A Reel comes out
-// vertical, 267x476 or 304x540, and a landscape video 560x314.
-const querySize = (url: URL): { width?: number; height?: number } => {
-  return {
-    width: parsePixelSize(url.searchParams.get('width')),
-    height: parsePixelSize(url.searchParams.get('height')),
-  }
-}
-
 // Whole segments, not `\b`: `reel-big-fish` and `video.game.news` are page names.
 // A video, reel or watch path is the video player, and everything else Facebook frames is a post.
 const videoPathRegex = /(?:^|\/)(?:videos?|reel|watch)(?:\/|$)/i
@@ -124,7 +121,7 @@ const contentPathRegex = /^\/(?:reel\/[^/]+|[^/]+\/(?:posts|videos)\/[^/]+)/
 const watchPathRegex = /^\/watch\/?$/
 
 const isWatchPage = (url: URL): boolean => {
-  return watchPathRegex.test(url.pathname) && digitsRegex.test(url.searchParams.get('v') ?? '')
+  return watchPathRegex.test(url.pathname) && Boolean(url.searchParams.get('v'))
 }
 
 // A post has no name: its words go to `description`, and the frame titles itself
@@ -139,19 +136,19 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
   if (legacyVideoPathRegex.test(parsed.pathname)) {
     const videoId = parsed.searchParams.get('video_id')
 
-    if (!videoId || !digitsRegex.test(videoId)) {
+    if (!videoId) {
       return
     }
 
-    const watchUrl = `https://www.facebook.com/watch/?v=${videoId}`
+    const watchUrl = `https://www.facebook.com/watch/${composeQuery({ v: videoId })}`
 
-    return composePluginEmbed('video', watchUrl, { id: videoId, ...querySize(parsed) })
+    return composePluginEmbed('video', watchUrl, { id: videoId })
   }
 
   if (contentPathRegex.test(parsed.pathname) || isWatchPage(parsed)) {
     const plugin = videoPathRegex.test(parsed.pathname) ? 'video' : 'post'
 
-    return composePluginEmbed(plugin, url, querySize(parsed))
+    return composePluginEmbed(plugin, url, {})
   }
 
   if (!pluginPathRegex.test(parsed.pathname)) {
@@ -165,16 +162,11 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  // The src stays as the publisher wrote it. Rebuilding it from the href alone would drop
-  // `show_text`, which decides whether a video carries its caption.
-  return {
-    provider: 'facebook',
-    id: target.href,
-    // Kept as written: rebuilding it from the href would drop `show_text`, the caption toggle.
-    src: url,
-    url: href,
-    ...querySize(parsed),
-  }
+  // The plugin is rebuilt around the href it names. The caption toggle, the size the dialog wrote,
+  // the app id and a Graph API version in the path are the look.
+  const plugin = parsed.pathname.endsWith('/video.php') ? 'video' : 'post'
+
+  return composePluginEmbed(plugin, href, {}, parsed.searchParams.get('t') ?? undefined)
 }
 
 // Facebook's plugin iframe, or a pasted post, video or watch page, which x-frame-options blanks.

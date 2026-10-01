@@ -63,14 +63,6 @@ describeForEachParser('unwrapNestedCodeWrappers', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
-
-    it('should be idempotent', async () => {
-      const value = '<pre><code><code>x</code></code></pre>'
-      const once = await transform(value)
-      const twice = await transform(once)
-
-      expect(twice).toEqualHtml(once)
-    })
   })
 
   describe('styling wrapper between pre and code', () => {
@@ -112,5 +104,13 @@ describeForEachParser('unwrapNestedCodeWrappers', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+  })
+
+  it('should be idempotent', async () => {
+    const value = '<pre><span><code><code>x</code></code></span></pre>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
   })
 })

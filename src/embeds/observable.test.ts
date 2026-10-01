@@ -15,7 +15,6 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
         id: '@jakecoppinger/25t-1151-tfnsw-cbd-pedestrian-times-review-2017-11-24',
         src: 'https://observablehq.com/embed/@jakecoppinger/25t-1151-tfnsw-cbd-pedestrian-times-review-2017-11-24?cells=data1',
         url: 'https://observablehq.com/@jakecoppinger/25t-1151-tfnsw-cbd-pedestrian-times-review-2017-11-24',
-        height: 492.03125,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -59,45 +58,36 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
         provider: 'observable',
         id: '@neocartocnrs/borders',
         src: 'https://observablehq.com/embed/%40neocartocnrs/borders?cells=map',
-        url: 'https://observablehq.com/@neocartocnrs/borders',
+        url: 'https://observablehq.com/%40neocartocnrs/borders',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse a notebook segment that decodes to a second path', async () => {
+    it('should use a notebook segment that decodes to a second path as written', async () => {
       const value =
         '<iframe src="https://observablehq.com/embed/@neocartocnrs/borders%2Fmap?cells=map"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'observable',
+        id: '@neocartocnrs/borders/map',
+        src: 'https://observablehq.com/embed/@neocartocnrs/borders%2Fmap?cells=map',
+        url: 'https://observablehq.com/@neocartocnrs/borders%2Fmap',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse a handle segment that decodes to a second path', async () => {
-      const value =
-        '<iframe src="https://observablehq.com/embed/%40user%2Fx/notebook?cells=map"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a notebook segment that decodes to a parent segment', async () => {
-      const value =
-        '<iframe src="https://observablehq.com/embed/@neocartocnrs/%252E.?cells=map"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a notebook segment that decodes to a current segment', async () => {
-      const value =
-        '<iframe src="https://observablehq.com/embed/@neocartocnrs/%252e?cells=map"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should refuse a notebook segment carrying a malformed escape', async () => {
+    it('should keep a notebook segment carrying a malformed escape as written', async () => {
       const value =
         '<iframe src="https://observablehq.com/embed/@neocartocnrs/borders%E0%A4%A?cells=map"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'observable',
+        id: '@neocartocnrs/borders%E0%A4%A',
+        src: 'https://observablehq.com/embed/@neocartocnrs/borders%E0%A4%A?cells=map',
+        url: 'https://observablehq.com/@neocartocnrs/borders%E0%A4%A',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
@@ -132,7 +122,6 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
         id: '9ef3034e9ee8b8c1',
         src: 'https://observablehq.com/embed/9ef3034e9ee8b8c1?cells=chart',
         url: 'https://observablehq.com/d/9ef3034e9ee8b8c1',
-        height: 400,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -153,7 +142,6 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
         id: '3ac7dfcbdcb1dd2a',
         src: 'https://observablehq.com/embed/3ac7dfcbdcb1dd2a@248?cells=map,css',
         url: 'https://observablehq.com/d/3ac7dfcbdcb1dd2a',
-        height: 400,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -173,7 +161,6 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
         id: '4e1ffd6d2df015f9',
         src: 'https://observablehq.com/embed/4e1ffd6d2df015f9@latest?cell=*',
         url: 'https://observablehq.com/d/4e1ffd6d2df015f9',
-        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -217,13 +204,12 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
         id: '@d3/sortable-bar-chart',
         src: 'https://observablehq.com/embed/@d3/sortable-bar-chart?cell=viewof+order&cell=chart',
         url: 'https://observablehq.com/@d3/sortable-bar-chart',
-        height: 535,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the cells and drop the trackers from the src', async () => {
+    it('should keep the query in the src as published, trackers included', async () => {
       const value = html`
         <iframe
           width="75%"
@@ -235,29 +221,8 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'observable',
         id: '@d3/sortable-bar-chart',
-        src: 'https://observablehq.com/embed/@d3/sortable-bar-chart?cell=viewof+order&cell=chart',
+        src: 'https://observablehq.com/embed/@d3/sortable-bar-chart?cell=viewof+order&utm_source=feed&cell=chart&fbclid=IwAR0abc',
         url: 'https://observablehq.com/@d3/sortable-bar-chart',
-        height: 535,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should drop a campaign tag outside the standard set from the src', async () => {
-      const value = html`
-        <iframe
-          width="75%"
-          height="535"
-          frameborder="0"
-          src="https://observablehq.com/embed/@d3/sortable-bar-chart?utm_name=feed&cell=chart"
-        ></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'observable',
-        id: '@d3/sortable-bar-chart',
-        src: 'https://observablehq.com/embed/@d3/sortable-bar-chart?cell=chart',
-        url: 'https://observablehq.com/@d3/sortable-bar-chart',
-        height: 535,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -295,7 +260,6 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
         id: '@duckdb-projects/public-cloud-provider-ip-ranges',
         src: 'https://observablehq.com/embed/@duckdb-projects/public-cloud-provider-ip-ranges@latest?cells=Overall',
         url: 'https://observablehq.com/@duckdb-projects/public-cloud-provider-ip-ranges',
-        height: 514,
       }
 
       expect(await extract(value)).toEqual(expected)

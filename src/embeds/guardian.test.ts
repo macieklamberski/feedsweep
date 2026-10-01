@@ -138,13 +138,27 @@ describe('guardianResolveEmbed', () => {
 
       expect(guardianResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should use a malformed path as written, even if the player answers an error', () => {
+      const value =
+        'https://embed.theguardian.com/embed/video/Society/video/15/June/1st/superbugs_video'
+      const expected: EmbedResolverResult = {
+        provider: 'guardian',
+        id: 'Society/video/15/June/1st/superbugs_video',
+        src: 'https://embed.theguardian.com/embed/video/Society/video/15/June/1st/superbugs_video',
+        url: 'https://www.theguardian.com/Society/video/15/June/1st/superbugs_video',
+        ratio: '16/9',
+      }
+
+      expect(guardianResolveEmbed(value)).toEqual(expected)
+    })
   })
 })
 
 describeForEachParser('guardianEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, guardianEmbedResolver)
 
-  it('should keep the box the pasted player iframe states', async () => {
+  it('should state the platform size over the box the pasted player iframe states', async () => {
     const value = html`
       <iframe
         src="https://embed.theguardian.com/embed/video/world/video/2015/oct/08/ashton-carter-nato-russian-forces-behaving-unprofessionally-syria-video"
@@ -158,8 +172,7 @@ describeForEachParser('guardianEmbedResolver', (parseHtml) => {
       id: 'world/video/2015/oct/08/ashton-carter-nato-russian-forces-behaving-unprofessionally-syria-video',
       src: 'https://embed.theguardian.com/embed/video/world/video/2015/oct/08/ashton-carter-nato-russian-forces-behaving-unprofessionally-syria-video',
       url: 'https://www.theguardian.com/world/video/2015/oct/08/ashton-carter-nato-russian-forces-behaving-unprofessionally-syria-video',
-      width: 560,
-      height: 315,
+      ratio: '16/9',
       date: '2015-10-08',
     }
 

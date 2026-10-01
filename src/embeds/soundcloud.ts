@@ -17,14 +17,39 @@ const referenceRegex =
 // The widget takes a page url in place of a reference, which is what makes the repair possible.
 const widgetPlayerUrl = 'https://w.soundcloud.com/player/'
 
-const composeWidgetUrl = (target: string, secretToken?: string): string => {
-  const query: Record<string, string> = { url: target }
+// The spelling SoundCloud's own share snippet writes: the item's url with its colon escaped and its
+// slashes kept, then a private item's `secret_token` and a list's `start_track`. The colours, the
+// tabs, the visual layout and autoplay are the publisher's look and are left out.
+const composeWidgetUrl = (target: string, secretToken?: string, startTrack?: string): string => {
+  const pairs = [`url=${encodeURIComponent(target).replaceAll('%2F', '/')}`]
 
   if (secretToken) {
-    query.secret_token = secretToken
+    pairs.push(`secret_token=${encodeURIComponent(secretToken)}`)
   }
 
-  return `${widgetPlayerUrl}?${new URLSearchParams(query)}`
+  if (startTrack) {
+    pairs.push(`start_track=${encodeURIComponent(startTrack)}`)
+  }
+
+  return `${widgetPlayerUrl}?${pairs.join('&')}`
+}
+
+// A private item's token sits beside `url=` or inside the url it names.
+const readQueryToken = (
+  params: URLSearchParams | undefined,
+  inner: Nullish<string>,
+): string | undefined => {
+  const token = params?.get('secret_token')
+
+  if (token) {
+    return token
+  }
+
+  if (!inner) {
+    return
+  }
+
+  return parseUrl(inner, placeholderBaseUrl)?.searchParams.get('secret_token') ?? undefined
 }
 
 // spotlight and groups answer 410, but the platform still holds them and no track takes the slug.
@@ -113,9 +138,7 @@ const flashPlayerHostRegex = /^player\./
 const shortLinkHostRegex = /^on\./
 
 // The classic player is a bar for a single track and a scrolling list for anything holding
-// several, and `visual=true` swaps both for one big artwork box. These are the heights
-// SoundCloud's own embed config carries per player.
-const visualPlayerHeight = 450
+// several. These are the heights SoundCloud's own embed config carries per player.
 const classicPlayerHeights: Record<string, number | undefined> = {
   tracks: 166,
   playlists: 450,
@@ -159,7 +182,7 @@ const readSubstackTrack = (element: Nullish<Element>): Partial<EmbedResolverResu
 }
 
 // SoundCloud's widget iframe, the dead Flash player and a framed track page answering SAMEORIGIN.
-export const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
+const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
   // The factory has already matched the host, which means the url parsed, so there is no
   // unparseable case left to guard here.
   const parsed = parseUrl(url, placeholderBaseUrl)
@@ -167,10 +190,17 @@ export const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
   const inner = params?.get('url')
   const reference = inner?.match(referenceRegex)
   const streamTrackId = parsed?.pathname.match(streamPathRegex)?.[1]
+  const queryToken = readQueryToken(params, inner)
+  const startTrack = params?.get('start_track') ?? undefined
   const result: EmbedResolverResult = { provider, src: url }
 
   if (reference) {
     result.id = `${reference[1]}/${reference[2]}`
+    result.src = composeWidgetUrl(
+      `https://api.soundcloud.com/${reference[1]}/${reference[2]}`,
+      queryToken,
+      startTrack,
+    )
   } else if (streamTrackId) {
     // A track page is addressed by handle and slug, and the id does not yield either:
     // `soundcloud.com/tracks/{id}` redirects to a genre chart.
@@ -191,35 +221,32 @@ export const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
 
   if (pageKind) {
     result.url = `https://soundcloud.com/${permalink.join('/')}`
-
-    if (!inner) {
-      result.src = composeWidgetUrl(result.url, secretToken)
-    }
-  } else if (shortLink && !inner) {
-    result.src = composeWidgetUrl(shortLink.href)
+    // A share link's `#t=` is where playback starts, so it rides on the page the widget names.
+    result.src = composeWidgetUrl(
+      `${result.url}${page?.hash ?? ''}`,
+      secretToken ?? queryToken,
+      startTrack,
+    )
+  } else if (shortLink) {
+    result.src = composeWidgetUrl(shortLink.href, queryToken, startTrack)
+  } else if (inner && !reference) {
+    // A widget naming something the resolver does not read keeps that value in the same spelling.
+    result.src = composeWidgetUrl(inner, queryToken, startTrack)
   }
 
-  if (flashPlayerHostRegex.test(parsed?.hostname ?? '')) {
-    if (!inner) {
-      return
-    }
-
-    result.src = composeWidgetUrl(inner)
+  if (flashPlayerHostRegex.test(parsed?.hostname ?? '') && !inner) {
+    return
   }
 
   if (!result.id && !pageKind && isFileName(parsed?.pathname ?? '')) {
     return
   }
 
-  // The visual player is one height whatever it holds, so it needs no reference to size it.
-  const height =
-    params?.get('visual') === 'true'
-      ? visualPlayerHeight
-      : classicPlayerHeights[reference?.[1] ?? (streamTrackId && 'tracks') ?? pageKind ?? '']
-
-  if (height) {
-    result.height = height
-  }
+  // A kind the carrier does not name, such as a share link's, gets the single-track bar, which
+  // the classic player draws for a list too.
+  result.height =
+    classicPlayerHeights[reference?.[1] ?? (streamTrackId && 'tracks') ?? pageKind ?? ''] ??
+    classicPlayerHeights.tracks
 
   const title = attr(element, 'title')
 

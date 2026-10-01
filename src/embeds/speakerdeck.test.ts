@@ -71,7 +71,7 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a non-numeric slide', async () => {
+    it('should use a malformed slide as written, even if the player answers an error', async () => {
       const value = html`
         <script
           class="speakerdeck-embed"
@@ -82,8 +82,8 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'speakerdeck',
-        id: '40746bbd65b944eb848e90ab1be552c0',
-        src: 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0',
+        id: '40746bbd65b944eb848e90ab1be552c0/last',
+        src: 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0?slide=last',
         ratio: '16/9',
       }
 
@@ -106,13 +106,13 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
         provider: 'speakerdeck',
         id: '40746bbd65b944eb848e90ab1be552c0',
         src: 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0',
-        ratio: '1.77777777777778/1',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should carry a taller ratio the script states', async () => {
+    it('should give the deck the player ratio over a taller one the script states', async () => {
       const value = html`
         <script
           class="speakerdeck-embed"
@@ -125,7 +125,7 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
         provider: 'speakerdeck',
         id: '198d4fae73df442e89b76766b54e4773',
         src: 'https://speakerdeck.com/player/198d4fae73df442e89b76766b54e4773',
-        ratio: '1.33333333333333/1',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -133,44 +133,6 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should fall back to the default ratio for a malformed one', async () => {
-      const value = html`
-        <script
-          class="speakerdeck-embed"
-          data-id="198d4fae73df442e89b76766b54e4773"
-          data-ratio="wide"
-          src="//speakerdeck.com/assets/embed.js"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'speakerdeck',
-        id: '198d4fae73df442e89b76766b54e4773',
-        src: 'https://speakerdeck.com/player/198d4fae73df442e89b76766b54e4773',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should fall back to the default ratio for a zero one', async () => {
-      const value = html`
-        <script
-          class="speakerdeck-embed"
-          data-id="198d4fae73df442e89b76766b54e4773"
-          data-ratio="0"
-          src="//speakerdeck.com/assets/embed.js"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'speakerdeck',
-        id: '198d4fae73df442e89b76766b54e4773',
-        src: 'https://speakerdeck.com/player/198d4fae73df442e89b76766b54e4773',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should give the default ratio to a script carrying none', async () => {
       const value = html`
         <script
@@ -191,7 +153,7 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for an id outside the hex alphabet', async () => {
+    it('should use a malformed deck id as written, even if the player answers an error', async () => {
       const value = html`
         <script
           class="speakerdeck-embed"
@@ -199,23 +161,17 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
           src="//speakerdeck.com/assets/embed.js"
         ></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'speakerdeck',
+        id: '../decks/evil',
+        src: 'https://speakerdeck.com/player/../decks/evil',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for an id smuggling a query into the player url', async () => {
-      const value = html`
-        <script
-          class="speakerdeck-embed"
-          data-id="40746bbd65b944eb848e90ab1be552c0?ad=1"
-          src="//speakerdeck.com/assets/embed.js"
-        ></script>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a slide suffix that runs on past the number', async () => {
+    it('should use a malformed slide suffix as written, even if the player answers an error', async () => {
       const value = html`
         <script
           class="speakerdeck-embed"
@@ -223,8 +179,14 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
           src="//speakerdeck.com/assets/embed.js"
         ></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'speakerdeck',
+        id: '40746bbd65b944eb848e90ab1be552c0/69a',
+        src: 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0?slide=69a',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for an empty id', async () => {
@@ -285,12 +247,12 @@ describe('speakerdeckResolveEmbed', () => {
     expect(speakerdeckResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should ignore a slide that is not a number', () => {
+  it('should use a malformed slide as written, even if the player answers an error', () => {
     const value = 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0?slide=last'
     const expected: EmbedResolverResult = {
       provider: 'speakerdeck',
-      id: '40746bbd65b944eb848e90ab1be552c0',
-      src: 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0',
+      id: '40746bbd65b944eb848e90ab1be552c0/last',
+      src: 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0?slide=last',
       ratio: '16/9',
     }
 
@@ -303,10 +265,16 @@ describe('speakerdeckResolveEmbed', () => {
     expect(speakerdeckResolveEmbed(value)).toBeUndefined()
   })
 
-  it('should ignore a player id outside the hex alphabet', () => {
+  it('should use a malformed deck id as written, even if the player answers an error', () => {
     const value = 'https://speakerdeck.com/player/not-a-deck'
+    const expected: EmbedResolverResult = {
+      provider: 'speakerdeck',
+      id: 'not-a-deck',
+      src: 'https://speakerdeck.com/player/not-a-deck',
+      ratio: '16/9',
+    }
 
-    expect(speakerdeckResolveEmbed(value)).toBeUndefined()
+    expect(speakerdeckResolveEmbed(value)).toEqual(expected)
   })
 })
 
@@ -344,14 +312,14 @@ describeForEachParser('speakerdeckIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should ignore a slide that is not a number', async () => {
+  it('should use a malformed slide as written, even if the player answers an error', async () => {
     const value = html`
       <iframe src="https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0?slide=last"></iframe>
     `
     const expected: EmbedResolverResult = {
       provider: 'speakerdeck',
-      id: '40746bbd65b944eb848e90ab1be552c0',
-      src: 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0',
+      id: '40746bbd65b944eb848e90ab1be552c0/last',
+      src: 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0?slide=last',
       ratio: '16/9',
     }
 
@@ -364,10 +332,16 @@ describeForEachParser('speakerdeckIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toBeUndefined()
   })
 
-  it('should ignore a player id that is not hex', async () => {
+  it('should use a malformed deck id as written, even if the player answers an error', async () => {
     const value = '<iframe src="https://speakerdeck.com/player/not-a-deck"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'speakerdeck',
+      id: 'not-a-deck',
+      src: 'https://speakerdeck.com/player/not-a-deck',
+      ratio: '16/9',
+    }
 
-    expect(await extract(value)).toBeUndefined()
+    expect(await extract(value)).toEqual(expected)
   })
 
   it('should ignore a foreign host carrying the player path', async () => {
@@ -390,8 +364,7 @@ describeForEachParser('speakerdeckIframeEmbedResolver', (parseHtml) => {
       provider: 'speakerdeck',
       id: '40746bbd65b944eb848e90ab1be552c0',
       src: 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0',
-      width: 710,
-      height: 399,
+      ratio: '16/9',
       title: 'Designing for the unexpected',
     }
 
@@ -418,7 +391,7 @@ describeForEachParser('speakerdeckIframeEmbedResolver', (parseHtml) => {
 })
 
 // The enclosure probe offers every attachment a feed carries to this resolver, and the deck
-// route is on Speaker Deck's own host, so the id alphabet is what keeps a file playable.
+// route is on Speaker Deck's own host, so the file-name check is what keeps a file playable.
 describeForEachParser('speakerdeck through the pipeline', (parseHtml) => {
   it('should leave a video enclosure on the speakerdeck host playable', async () => {
     const enclosures = [

@@ -11,7 +11,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10076958',
-        src: 'https://www.podomatic.com/embed/html5/episode/10076958',
+        src: 'https://podomatic.com/embed/html5/episode/10076958',
         height: 208,
       }
 
@@ -23,7 +23,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'podcast/2295001',
-        src: 'https://www.podomatic.com/embed/html5/podcast/2295001',
+        src: 'https://podomatic.com/embed/html5/podcast/2295001',
         height: 208,
       }
 
@@ -52,10 +52,16 @@ describe('podomaticResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
-    it('should refuse an id that is not a podomatic id', () => {
+    it('should use a malformed episode id as written, even if the player answers an error', () => {
       const value = 'https://www.podomatic.com/embed/html5/episode/latest'
+      const expected: EmbedResolverResult = {
+        provider: 'podomatic',
+        id: 'episode/latest',
+        src: 'https://podomatic.com/embed/html5/episode/latest',
+        height: 208,
+      }
 
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
+      expect(podomaticResolveEmbed(value)).toEqual(expected)
     })
 
     it('should read a kind PodOmatic has not published yet', () => {
@@ -63,7 +69,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'channel/2295001',
-        src: 'https://www.podomatic.com/embed/html5/channel/2295001',
+        src: 'https://podomatic.com/embed/html5/channel/2295001',
         height: 208,
       }
 
@@ -82,16 +88,16 @@ describe('podomaticResolveEmbed', () => {
       expect(podomaticResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should refuse a kind carrying an encoded separator', () => {
-      const value = 'https://www.podomatic.com/embed/html5/episode%2F..%2F..%2Fadmin/10076958'
-
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should refuse a kind that starts with a digit', () => {
+    it('should use a malformed kind as written, even if the player answers an error', () => {
       const value = 'https://www.podomatic.com/embed/html5/2episode/10076958'
+      const expected: EmbedResolverResult = {
+        provider: 'podomatic',
+        id: '2episode/10076958',
+        src: 'https://podomatic.com/embed/html5/2episode/10076958',
+        height: 208,
+      }
 
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
+      expect(podomaticResolveEmbed(value)).toEqual(expected)
     })
   })
 
@@ -101,7 +107,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10076958',
-        src: 'https://www.podomatic.com/embed/html5/episode/10076958?style=small',
+        src: 'https://podomatic.com/embed/html5/episode/10076958?style=small',
         height: 97,
       }
 
@@ -113,7 +119,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10076958',
-        src: 'https://www.podomatic.com/embed/html5/episode/10076958?style=square',
+        src: 'https://podomatic.com/embed/html5/episode/10076958?style=square',
         height: 504,
       }
 
@@ -125,7 +131,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10198381',
-        src: 'https://www.podomatic.com/embed/html5/episode/10198381',
+        src: 'https://podomatic.com/embed/html5/episode/10198381',
         height: 208,
       }
 
@@ -137,7 +143,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10198381',
-        src: 'https://www.podomatic.com/embed/html5/episode/10198381',
+        src: 'https://podomatic.com/embed/html5/episode/10198381',
         height: 208,
       }
 
@@ -149,7 +155,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10198381',
-        src: 'https://www.podomatic.com/embed/html5/episode/10198381',
+        src: 'https://podomatic.com/embed/html5/episode/10198381',
         height: 208,
       }
 
@@ -161,7 +167,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10198381',
-        src: 'https://www.podomatic.com/embed/html5/episode/10198381',
+        src: 'https://podomatic.com/embed/html5/episode/10198381',
         height: 208,
       }
 
@@ -176,7 +182,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/11083318',
-        src: 'https://www.podomatic.com/embed/v2/podcast/5476235?episode_id=11083318&theme=light',
+        src: 'https://podomatic.com/embed/v2/podcast/5476235?episode_id=11083318&theme=light',
         height: 205,
       }
 
@@ -189,7 +195,7 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/11083318',
-        src: 'https://www.podomatic.com/embed/v2/podcast/5476235?episode_id=11083318&theme=light%26autoplay%3Dtrue',
+        src: 'https://podomatic.com/embed/v2/podcast/5476235?episode_id=11083318&theme=light%26autoplay%3Dtrue',
         height: 205,
       }
 
@@ -201,31 +207,35 @@ describe('podomaticResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'podcast/5476235',
-        src: 'https://www.podomatic.com/embed/v2/podcast/5476235',
+        src: 'https://podomatic.com/embed/v2/podcast/5476235',
         height: 205,
       }
 
       expect(podomaticResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should drop an episode parameter that is not an id', () => {
+    it('should use a malformed episode id as written, even if the player answers an error', () => {
       const value = 'https://www.podomatic.com/embed/v2/podcast/5476235?episode_id=latest'
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
-        id: 'podcast/5476235',
-        src: 'https://www.podomatic.com/embed/v2/podcast/5476235',
+        id: 'episode/latest',
+        src: 'https://podomatic.com/embed/v2/podcast/5476235?episode_id=latest',
         height: 205,
       }
 
       expect(podomaticResolveEmbed(value)).toEqual(expected)
     })
 
-    // The episode is a real id, so the podcast segment is the only thing standing between the
-    // feed and the minted path.
-    it('should refuse a podcast segment that is not an id', () => {
+    it('should use a malformed podcast id as written, even if the player answers an error', () => {
       const value = 'https://www.podomatic.com/embed/v2/podcast/..%2F..%2Fadmin?episode_id=11083318'
+      const expected: EmbedResolverResult = {
+        provider: 'podomatic',
+        id: 'episode/11083318',
+        src: 'https://podomatic.com/embed/v2/podcast/..%2F..%2Fadmin?episode_id=11083318',
+        height: 205,
+      }
 
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
+      expect(podomaticResolveEmbed(value)).toEqual(expected)
     })
   })
 
@@ -267,7 +277,7 @@ describeForEachParser('podomaticEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10076958',
-        src: 'https://www.podomatic.com/embed/html5/episode/10076958',
+        src: 'https://podomatic.com/embed/html5/episode/10076958',
         height: 208,
       }
 
@@ -297,7 +307,7 @@ describeForEachParser('podomaticEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10076958',
-        src: 'https://www.podomatic.com/embed/html5/episode/10076958',
+        src: 'https://podomatic.com/embed/html5/episode/10076958',
         height: 208,
       }
 
@@ -318,7 +328,7 @@ describeForEachParser('podomaticEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/10076958',
-        src: 'https://www.podomatic.com/embed/html5/episode/10076958?style=small',
+        src: 'https://podomatic.com/embed/html5/episode/10076958?style=small',
         height: 97,
       }
 
@@ -344,7 +354,7 @@ describeForEachParser('podomatic through the pipeline', (parseHtml) => {
       <div
         data-embed-id="episode/10076958"
         data-embed-provider="podomatic"
-        data-embed-src="https://www.podomatic.com/embed/html5/episode/10076958"
+        data-embed-src="https://podomatic.com/embed/html5/episode/10076958"
         data-embed-height="208"
       ></div>
     `

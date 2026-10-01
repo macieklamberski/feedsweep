@@ -79,10 +79,17 @@ describe('zencastrResolveEmbed', () => {
     expect(zencastrResolveEmbed(value)).toBeUndefined()
   })
 
-  it('should return undefined for an id holding a dot', () => {
+  it('should use a malformed id as written, even if the player answers an error', () => {
     const value = 'https://zencastr.com/embed/cK98nMcr.mp3'
+    const expected: EmbedResolverResult = {
+      provider: 'zencastr',
+      id: 'cK98nMcr.mp3',
+      src: 'https://zencastr.com/embed/cK98nMcr.mp3',
+      url: 'https://zencastr.com/z/cK98nMcr.mp3',
+      ratio: '1/1',
+    }
 
-    expect(zencastrResolveEmbed(value)).toBeUndefined()
+    expect(zencastrResolveEmbed(value)).toEqual(expected)
   })
 
   it('should return undefined for a lookalike host', () => {

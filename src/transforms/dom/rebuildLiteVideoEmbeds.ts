@@ -1,7 +1,7 @@
 import { composeEmbedUrl as composeVimeoUrl } from '../../embeds/vimeo.js'
 import { composeEmbedUrl as composeYoutubeUrl, youtubeEmbedParams } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
-import { digitsRegex, pickQueryParams } from '../../utils/urls.js'
+import { pickQueryParams } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 type EmbedSource = {
@@ -40,7 +40,7 @@ export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
     const params = pickQueryParams(element.getAttribute('params') ?? '', source.params)
     const start = element.getAttribute('start')
 
-    if (start && digitsRegex.test(start)) {
+    if (start) {
       params.start = start
     }
 

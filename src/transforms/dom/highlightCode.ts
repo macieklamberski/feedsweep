@@ -33,7 +33,7 @@ const filenameRegex = /^\S+\.(\w+)$/
 // source-/text- prefix is signal enough to trust a one-letter LANG like -c).
 const githubLanguageRegex = /^highlight-(?:source|text)-([a-z0-9+#]+)/
 // A one-letter highlight-c or highlight-r is a CSS utility class, not a language.
-const sphinxLanguageRegex = /^highlight-([a-z][a-z0-9+#]+)$/
+const sphinxLanguageRegex = /^highlight-([a-z][a-z0-9+#-]+)$/
 
 // The language a code block declares, in whichever highlighter or platform convention.
 export const detectLanguage = (pre: Element | null, code: Element | null): string | undefined => {

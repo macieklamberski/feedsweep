@@ -1,4 +1,4 @@
-import { composeEmbedUrl, readSrcMediaId, safeMediaIdRegex } from '../../embeds/wistia.js'
+import { composeEmbedUrl, readSrcMediaId } from '../../embeds/wistia.js'
 import type { DomTransform } from '../../types.js'
 import { attr, parseRatio } from '../../utils/dom.js'
 import { createIframe } from '../../utils/widgets.js'
@@ -24,18 +24,16 @@ const wistiaSelector = [
 // them on a substring, so nothing before `readSrcMediaId` has looked at the host.
 const srcCarrierTags = new Set(['script', 'iframe'])
 
-// Lowercased like the id the platform module reads out of a src, so a loader script still matches
-// the div or custom element that spells the same media in capitals.
 const readMediaId = (element: Element): string | undefined => {
   if (element.localName === 'wistia-player') {
-    return attr(element, 'media-id')?.toLowerCase()
+    return attr(element, 'media-id')
   }
 
   if (srcCarrierTags.has(element.localName)) {
     return readSrcMediaId(attr(element, 'src'))
   }
 
-  return element.className.match(wistiaIdRegex)?.[1]?.toLowerCase()
+  return element.className.match(wistiaIdRegex)?.[1]
 }
 
 // Wistia's async div, <wistia-player> element and loader script all render nothing without JS.
@@ -44,11 +42,12 @@ export const rebuildWistiaEmbeds: DomTransform = () => (document) => {
   const elements = Array.from(document.querySelectorAll(wistiaSelector))
 
   // An id already carried by a div, a custom element or a real iframe. Collected before any
-  // rebuilding because document order does not put the script last.
+  // rebuilding because document order does not put the script last. Wistia serves one media
+  // under any case of its id, so a loader script still matches a carrier spelling it in capitals.
   const carried = new Set(
     elements
       .filter((element) => element.localName !== 'script')
-      .map(readMediaId)
+      .map((element) => readMediaId(element)?.toLowerCase())
       .filter((mediaId): mediaId is string => mediaId !== undefined),
   )
 
@@ -59,11 +58,11 @@ export const rebuildWistiaEmbeds: DomTransform = () => (document) => {
 
     const mediaId = readMediaId(element)
 
-    if (!mediaId || !safeMediaIdRegex.test(mediaId)) {
+    if (!mediaId) {
       continue
     }
 
-    if (element.localName === 'script' && carried.has(mediaId)) {
+    if (element.localName === 'script' && carried.has(mediaId.toLowerCase())) {
       continue
     }
 

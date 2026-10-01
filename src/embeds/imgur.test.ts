@@ -32,6 +32,19 @@ const sitePaths = [
   'https://imgur.com/login',
   'https://imgur.com/trending',
   'https://imgur.com/download/abc12345',
+  'https://imgur.com/hot',
+  'https://imgur.com/top',
+  'https://imgur.com/jobs',
+  'https://imgur.com/removalrequest',
+  'https://imgur.com/blog',
+  'https://imgur.com/faq',
+  'https://imgur.com/help',
+  'https://imgur.com/ads',
+  'https://imgur.com/api',
+  'https://imgur.com/vote',
+  'https://imgur.com/notifications',
+  'https://imgur.com/dmca',
+  'https://imgur.com/Hot',
 ]
 
 describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
@@ -140,50 +153,6 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for an id outside the url-safe alphabet', async () => {
-      const value = html`
-        <blockquote
-          class="imgur-embed-pub"
-          data-id="../evil"
-        ></blockquote>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id behind a path step', async () => {
-      const value = html`
-        <blockquote
-          class="imgur-embed-pub"
-          data-id="../pVa2rXL"
-        ></blockquote>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id followed by a path step', async () => {
-      const value = html`
-        <blockquote
-          class="imgur-embed-pub"
-          data-id="pVa2rXL/.."
-        ></blockquote>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id carrying an encoded slash', async () => {
-      const value = html`
-        <blockquote
-          class="imgur-embed-pub"
-          data-id="pVa2%2FrXL"
-        ></blockquote>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should return undefined for an empty id', async () => {
       const value = html`
         <blockquote
@@ -199,6 +168,44 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
       const value = '<blockquote data-id="pVa2rXL"></blockquote>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed id as written, even if the player answers an error', async () => {
+      const value = html`
+        <blockquote
+          class="imgur-embed-pub"
+          data-id="../evil"
+        ></blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'imgur',
+        id: '../evil',
+        src: 'https://imgur.com/../evil/embed',
+        url: 'https://imgur.com/../evil',
+        thumbnail: 'https://i.imgur.com/../evilm.jpg',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed id carrying an encoded slash as written, even if the player answers an error', async () => {
+      const value = html`
+        <blockquote
+          class="imgur-embed-pub"
+          data-id="pVa2%2FrXL"
+        ></blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'imgur',
+        id: 'pVa2%2FrXL',
+        src: 'https://imgur.com/pVa2%2FrXL/embed',
+        url: 'https://imgur.com/pVa2%2FrXL',
+        thumbnail: 'https://i.imgur.com/pVa2%2FrXLm.jpg',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
@@ -327,6 +334,19 @@ describe('imgurResolveEmbed', () => {
     expect(imgurResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should use a malformed id as written, even if the player answers an error', () => {
+    const value = 'https://imgur.com/pVa2_rXL'
+    const expected: EmbedResolverResult = {
+      provider: 'imgur',
+      id: 'pVa2_rXL',
+      src: 'https://imgur.com/pVa2_rXL/embed',
+      url: 'https://imgur.com/pVa2_rXL',
+      thumbnail: 'https://i.imgur.com/pVa2_rXLm.jpg',
+    }
+
+    expect(imgurResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should ignore an imgur url that names no post', () => {
     const value = 'https://imgur.com/'
 
@@ -408,6 +428,8 @@ describe('imgurResolveEmbed', () => {
       'https://i.imgur.com/pVa2rXL.mp4',
       'https://s.imgur.com/min/embed.js',
       'https://i.stack.imgur.com/pVa2rXL.png',
+      'https://imgur.com/pVa2rXL.jpg',
+      'https://imgur.com/pVa2rXL.gifv',
     ]
 
     it.each(fileUrls)('should ignore %s, which names a file rather than a post', (value) => {
@@ -435,8 +457,6 @@ describeForEachParser('imgurIframeEmbedResolver', (parseHtml) => {
       src: 'https://imgur.com/pVa2rXL/embed',
       url: 'https://imgur.com/pVa2rXL',
       thumbnail: 'https://i.imgur.com/pVa2rXLm.jpg',
-      width: 540,
-      height: 500,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -536,16 +556,24 @@ describeForEachParser('imgurS9eEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
 
-    it('should ignore a fragment stepping out of the post path', async () => {
+  describe('edge cases', () => {
+    it('should resolve dot segments in the fragment as a browser does', async () => {
       const value = html`
         <iframe
           data-s9e-mediaembed="imgur"
           src="https://s9e.github.io/iframe/2/imgur.min.html#x/../../a/9L0qCYg"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'imgur',
+        id: 'a/9L0qCYg',
+        src: 'https://imgur.com/a/9L0qCYg/embed',
+        url: 'https://imgur.com/a/9L0qCYg',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
@@ -595,8 +623,8 @@ describe('readImgurHeight', () => {
     const value = JSON.stringify({
       message: 'resize_imgur',
       href: 'https://imgur.com/pVa2rXL/embed',
-      height: 595,
       width: 640,
+      height: 595,
       context: true,
     })
 

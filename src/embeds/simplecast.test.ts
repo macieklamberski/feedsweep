@@ -130,6 +130,30 @@ describe('simplecastResolveEmbed', () => {
     expect(simplecastResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should drop the display style from a legacy numeric url', () => {
+    const value = 'https://simplecast.com/e/144908?style=light'
+    const expected: EmbedResolverResult = {
+      provider: 'simplecast',
+      id: '144908',
+      src: 'https://simplecast.com/e/144908',
+      height: 200,
+    }
+
+    expect(simplecastResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should drop the display color from a legacy embed url', () => {
+    const value = 'https://embed.simplecast.com/a1b2c3d4?color=fff'
+    const expected: EmbedResolverResult = {
+      provider: 'simplecast',
+      id: 'a1b2c3d4',
+      src: 'https://embed.simplecast.com/a1b2c3d4',
+      height: 200,
+    }
+
+    expect(simplecastResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for a simplecast url naming no episode', () => {
     const value = 'https://simplecast.com/pricing'
 
@@ -166,9 +190,8 @@ describeForEachParser('simplecastEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    // 200 is the height every iframe in the corpus sample stated, and a publisher who stated a
-    // box of their own still outranks it.
-    it('should take the size the carrier states over the fixed player height', async () => {
+    // 200 is the height every iframe in the corpus sample stated.
+    it('should keep the fixed player height over the size the carrier states', async () => {
       const value = html`
         <iframe
           src="https://player.simplecast.com/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b"
@@ -180,8 +203,7 @@ describeForEachParser('simplecastEmbedResolver', (parseHtml) => {
         provider: 'simplecast',
         id: '7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b',
         src: 'https://player.simplecast.com/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b',
-        width: 640,
-        height: 52,
+        height: 200,
       }
 
       expect(await extract(value)).toEqual(expected)

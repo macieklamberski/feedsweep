@@ -27,15 +27,12 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1660622131/19521637001',
         src: 'https://players.brightcove.net/1660622131/default_default/index.html?videoId=19521637001',
-        width: 300,
-        height: 250,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The `federated_` path already names the platform, so the id shape is only keeping the two
-    // numbers safe to mint with.
     it('should read a short account and video id off a federated player', async () => {
       const value = html`
         <embed
@@ -47,6 +44,41 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1660/1952',
         src: 'https://players.brightcove.net/1660/default_default/index.html?videoId=1952',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed publisher id as written, even if the player answers an error', async () => {
+      const value = html`
+        <embed
+          src="http://c.brightcove.com/services/viewer/federated_f9/1951?isVid=1&publisherID=acme"
+          flashVars="@videoPlayer=1952&playerID=1951&domain=embed&"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: 'acme/1952',
+        src: 'https://players.brightcove.net/acme/default_default/index.html?videoId=1952',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a decoded publisher id carrying a separator in one path segment', async () => {
+      const value = html`
+        <embed
+          src="http://c.brightcove.com/services/viewer/federated_f9/1951?isVid=1&publisherID=1660%2F..%2F..%2F999"
+          flashVars="@videoPlayer=1952&playerID=1951&domain=embed&"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '1660/../../999/1952',
+        src: 'https://players.brightcove.net/1660%2F..%2F..%2F999/default_default/index.html?videoId=1952',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -64,15 +96,21 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a video id given as an account reference', async () => {
+    it('should key a reference id under its account', async () => {
       const value = html`
         <embed
           src="http://c.brightcove.com/services/viewer/federated_f9/1?publisherID=1660622131"
           flashVars="@videoPlayer=ref:my-video"
         >
       `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '1660622131/ref:my-video',
+        src: 'https://players.brightcove.net/1660622131/default_default/index.html?videoId=ref%3Amy-video',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a brightcove url that is not a federated player', async () => {
@@ -130,8 +168,7 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1265527910001/4188894097001',
         src: 'https://players.brightcove.net/1265527910001/default_default/index.html?videoId=4188894097001',
-        width: 486,
-        height: 412,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -158,8 +195,7 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1265527910001/4188894097001',
         src: 'https://players.brightcove.net/1265527910001/default_default/index.html?videoId=4188894097001',
-        width: 486,
-        height: 412,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -179,6 +215,7 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '85688293001/3758718092001',
         src: 'https://players.brightcove.net/85688293001/default_default/index.html?videoId=3758718092001',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -221,6 +258,7 @@ describe('brightcoveResolveEmbed', () => {
         provider: 'brightcove',
         id: '1234567890/6098765432',
         src: playerUrl,
+        ratio: '16/9',
       }
 
       expect(brightcoveResolveEmbed(value)).toEqual(expected)
@@ -233,6 +271,7 @@ describe('brightcoveResolveEmbed', () => {
         provider: 'brightcove',
         id: '1234567890/6098765432',
         src: 'https://players.brightcove.net/1234567890/AbCdEf123_custom/index.html?videoId=6098765432',
+        ratio: '16/9',
       }
 
       expect(brightcoveResolveEmbed(value)).toEqual(expected)
@@ -244,19 +283,19 @@ describe('brightcoveResolveEmbed', () => {
         provider: 'brightcove',
         id: '1234567890/6098765432',
         src: playerUrl,
+        ratio: '16/9',
       }
 
       expect(brightcoveResolveEmbed(value)).toEqual(expected)
     })
 
-    // The `players.` host, the `{player}_{embed}` segment and the `videoId` slot already pin the
-    // route, so the two numbers need only be safe to mint with.
     it('should read a short account and video id out of the player url', () => {
       const value = 'https://players.brightcove.net/1234/default_default/index.html?videoId=6098'
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '1234/6098',
         src: 'https://players.brightcove.net/1234/default_default/index.html?videoId=6098',
+        ratio: '16/9',
       }
 
       expect(brightcoveResolveEmbed(value)).toEqual(expected)
@@ -264,12 +303,17 @@ describe('brightcoveResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    // A reference id names the video for the account's own API, not the player.
-    it('should return undefined for a reference id', () => {
+    it('should key a reference id under its account', () => {
       const value =
         'https://players.brightcove.net/1234567890/default_default/index.html?videoId=ref:my-video'
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '1234567890/ref:my-video',
+        src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=ref%3Amy-video',
+        ratio: '16/9',
+      }
 
-      expect(brightcoveResolveEmbed(value)).toBeUndefined()
+      expect(brightcoveResolveEmbed(value)).toEqual(expected)
     })
 
     it('should return undefined when the url names no video', () => {
@@ -278,11 +322,17 @@ describe('brightcoveResolveEmbed', () => {
       expect(brightcoveResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined when the account segment is not a number', () => {
+    it('should use a malformed account as written, even if the player answers an error', () => {
       const value =
         'https://players.brightcove.net/acme/default_default/index.html?videoId=6098765432'
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: 'acme/6098765432',
+        src: 'https://players.brightcove.net/acme/default_default/index.html?videoId=6098765432',
+        ratio: '16/9',
+      }
 
-      expect(brightcoveResolveEmbed(value)).toBeUndefined()
+      expect(brightcoveResolveEmbed(value)).toEqual(expected)
     })
 
     // `{player}_{embed}` is one segment holding two ids.
@@ -328,6 +378,7 @@ describeForEachParser('brightcoveIframeEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1234567890/6098765432',
         src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=6098765432',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -346,9 +397,9 @@ describeForEachParser('brightcoveIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('the size a publisher states', () => {
-    // Brightcove's player is whatever shape the account configured it to be, so the resolver
-    // states no size and the box on the carrier is the only measurement there is.
-    it('should take the whole box the carrier states', async () => {
+    // Brightcove's player is whatever shape the account configured it to be, and the carrier's
+    // box is not read, so every player states 16:9.
+    it('should state the video ratio over the box the carrier states', async () => {
       const value = html`
         <iframe
           src="https://players.brightcove.net/1234567890/default_default/index.html?videoId=6098765432"
@@ -360,8 +411,7 @@ describeForEachParser('brightcoveIframeEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1234567890/6098765432',
         src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=6098765432',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -387,6 +437,7 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1234567890/6098765432',
         src: 'https://players.brightcove.net/1234567890/AbCdEf_custom/index.html?videoId=6098765432',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -403,6 +454,7 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1234567890/6098765432',
         src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=6098765432',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -418,6 +470,7 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1234567890/6098765432',
         src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=6098765432',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -440,6 +493,7 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1234567890/6098765432',
         src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=6098765432',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -473,7 +527,7 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
   describe('edge cases', () => {
     // Neither attribute is checked the way the two ids are, and unescaped the player id picks
     // the account: `../../999999/stolen` climbs out of the segment it was written into.
-    it('should keep a traversing player id inside its own path segment', async () => {
+    it('should use a malformed player id as written, even if the player answers an error', async () => {
       const value = html`
         <video-js
           data-account="1234567890"
@@ -485,12 +539,13 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1234567890/6098765432',
         src: 'https://players.brightcove.net/1234567890/..%2F..%2F999999%2Fstolen_default/index.html?videoId=6098765432',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a query the embed id states out of the minted url', async () => {
+    it('should use a malformed embed id as written, even if the player answers an error', async () => {
       const value = html`
         <video-js
           data-account="1234567890"
@@ -501,7 +556,8 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '1234567890/6098765432',
-        src: 'https://players.brightcove.net/1234567890/default_e%3Fautoplay%3D1/index.html?videoId=6098765432',
+        src: 'https://players.brightcove.net/1234567890/default_e%3Fautoplay=1/index.html?videoId=6098765432',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -550,18 +606,24 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined when the account is not a brightcove account', async () => {
+    it('should use a malformed account as written, even if the player answers an error', async () => {
       const value = html`
         <video-js
           data-account="acme"
           data-video-id="6098765432"
         ></video-js>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: 'acme/6098765432',
+        src: 'https://players.brightcove.net/acme/default_default/index.html?videoId=6098765432',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    // The carriers that name Brightcove take any run of digits. This element names nothing, so
+    // The carriers that name Brightcove take any id. This element names nothing, so
     // the floor stands here and hand-numbered ids stay with whoever emitted them.
     it('should return undefined for hand-numbered ids the other carriers would take', async () => {
       const value = html`
@@ -597,6 +659,7 @@ describeForEachParser('brightcove video-js through the pipeline', (parseHtml) =>
         data-embed-src="https://players.brightcove.net/1234567890/default_default/index.html?videoId=6098765432"
         data-embed-provider="brightcove"
         data-embed-id="1234567890/6098765432"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -625,8 +688,7 @@ describeForEachParser('brightcoveExperienceEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1265527910001/4188894097001',
         src: 'https://players.brightcove.net/1265527910001/default_default/index.html?videoId=4188894097001',
-        width: 638,
-        height: 361,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -643,6 +705,7 @@ describeForEachParser('brightcoveExperienceEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1265527910001/4188894097001',
         src: 'https://players.brightcove.net/1265527910001/default_default/index.html?videoId=4188894097001',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -696,15 +759,21 @@ describeForEachParser('brightcoveExperienceEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a video id given as an account reference', async () => {
+    it('should key a reference id under its account', async () => {
       const value = html`
         <object class="BrightcoveExperience">
           <param name="playerKey" value="AQ~~,AAABJqdXbnE~,swSdm6mQzrHdUAncp0a9cwAjGy8zF2fs">
           <param name="@videoPlayer" value="ref:my-video">
         </object>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '1265527910001/ref:my-video',
+        src: 'https://players.brightcove.net/1265527910001/default_default/index.html?videoId=ref%3Amy-video',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
@@ -731,6 +800,7 @@ describeForEachParser('brightcove experience through the pipeline', (parseHtml) 
         data-embed-src="https://players.brightcove.net/1265527910001/default_default/index.html?videoId=4188894097001"
         data-embed-provider="brightcove"
         data-embed-id="1265527910001/4188894097001"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -749,6 +819,7 @@ describeForEachParser('brightcoveIframeEmbedResolver carrier title', (parseHtml)
       provider: 'brightcove',
       id: '1234567890/6001',
       src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=6001',
+      ratio: '16/9',
       title: 'Q3 earnings call',
     }
 

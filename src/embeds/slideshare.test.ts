@@ -15,6 +15,20 @@ describe('slideshareResolveEmbed', () => {
       provider: 'slideshare',
       id: '6435157',
       src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+      ratio: '595/485',
+    }
+
+    expect(slideshareResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should cut a numeric id at the query a feed wrote into the path', () => {
+    const value =
+      'https://www.slideshare.net/slideshow/embed_code/17382857&doc=random-130319172534-phpapp02'
+    const expected: EmbedResolverResult = {
+      provider: 'slideshare',
+      id: '17382857',
+      src: 'https://www.slideshare.net/slideshow/embed_code/17382857',
+      ratio: '595/485',
     }
 
     expect(slideshareResolveEmbed(value)).toEqual(expected)
@@ -27,6 +41,7 @@ describe('slideshareResolveEmbed', () => {
       provider: 'slideshare',
       id: '6PCWPGFw9SwsAYlongerkey',
       src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAYlongerkey',
+      ratio: '595/485',
     }
 
     expect(slideshareResolveEmbed(value)).toEqual(expected)
@@ -38,6 +53,7 @@ describe('slideshareResolveEmbed', () => {
       provider: 'slideshare',
       id: '6435157123456',
       src: 'https://www.slideshare.net/slideshow/embed_code/6435157123456',
+      ratio: '595/485',
     }
 
     expect(slideshareResolveEmbed(value)).toEqual(expected)
@@ -67,15 +83,26 @@ describe('slideshareResolveEmbed', () => {
     expect(slideshareResolveEmbed(value)).toBeUndefined()
   })
 
-  it('should ignore a key outside the url-safe alphabet', () => {
+  it('should use a malformed key as written, even if the player answers an error', () => {
     const value = 'https://www.slideshare.net/slideshow/embed_code/key/6PCW.PGFw9SwsAY'
+    const expected: EmbedResolverResult = {
+      provider: 'slideshare',
+      id: '6PCW.PGFw9SwsAY',
+      src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCW.PGFw9SwsAY',
+      ratio: '595/485',
+    }
 
-    expect(slideshareResolveEmbed(value)).toBeUndefined()
+    expect(slideshareResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should ignore a key carrying an encoded slash', () => {
-    const value = 'https://www.slideshare.net/slideshow/embed_code/key/6PCW%2FPGFw9SwsAY'
+  // SlideShare serves files on slidesharecdn.com, and the file-name check is what keeps one from
+  // reading as a deck.
+  const fileUrls: Array<string> = [
+    'https://www.slidesharecdn.com/embed_code/6435157.mp3',
+    'https://www.slidesharecdn.com/embed_code/key/6PCWPGFw9SwsAY.mp3',
+  ]
 
+  it.each(fileUrls)('should ignore a file on the host at %s', (value) => {
     expect(slideshareResolveEmbed(value)).toBeUndefined()
   })
 
@@ -120,8 +147,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
         url: 'http://www.slideshare.net/haraldf/business-quotes-for-2011',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
         title: 'Business Quotes for 2011',
       }
 
@@ -143,8 +169,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157123456',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157123456',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -168,8 +193,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -191,6 +215,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
         url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -227,8 +252,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '13408892',
         src: 'https://www.slideshare.net/slideshow/embed_code/13408892',
         url: 'https://www.slideshare.net/Neusvn/diari-tea-concepcion-arenal',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -264,8 +288,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6141159',
         src: 'https://www.slideshare.net/slideshow/embed_code/6141159',
         url: 'https://www.slideshare.net/IC_Agency/online-advertising-strategy-for-a-luxury-watch-brand',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -301,16 +324,13 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '5543828',
         src: 'https://www.slideshare.net/slideshow/embed_code/5543828',
         url: 'https://www.slideshare.net/asierra.re/internet-patrimoni-i-arqueologia',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    // `searchParams` hands the owner and slug back decoded, so a separator written encoded
-    // reaches the composed page url as a path of the feed's choosing.
-    it('should drop a composed page whose owner smuggles a separator', async () => {
+    it('should use a malformed page owner as written, even if the url answers an error', async () => {
       const value = html`
         <div id="__ss_6435157">
           <object id="__sse6435157">
@@ -325,26 +345,8 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should drop a composed page whose owner and slug are dot segments', async () => {
-      const value = html`
-        <div id="__ss_6435157">
-          <object id="__sse6435157">
-            <embed
-              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=110103quotes&amp;stripped_title=..&amp;userName=.."
-              type="application/x-shockwave-flash"
-            ></embed>
-          </object>
-        </div>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'slideshare',
-        id: '6435157',
-        src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+        url: 'https://www.slideshare.net/..%2F..%2Fadmin/business-quotes-for-2011',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -369,8 +371,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -392,6 +393,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
         url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -426,6 +428,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
         url: 'http://www.slideshare.net/haraldf/business-quotes-for-2011',
+        ratio: '595/485',
         title: 'Business Quotes for 2011',
         author: 'Harald Felgner',
       }
@@ -456,6 +459,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -487,6 +491,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '755576',
         src: 'https://www.slideshare.net/slideshow/embed_code/755576',
         url: 'http://www.slideshare.net/darugar/cloud-computing-hadoop-presentation',
+        ratio: '595/485',
         title: 'presentation',
       }
 
@@ -519,6 +524,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -537,6 +543,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -636,8 +643,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
       provider: 'slideshare',
       id: '6PCWPGFw9SwsAY',
       src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY',
-      width: 427,
-      height: 356,
+      ratio: '595/485',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -651,6 +657,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
       provider: 'slideshare',
       id: '6435157',
       src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+      ratio: '595/485',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -674,8 +681,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
       provider: 'slideshare',
       id: 'hK2vDqTQ0Nz9Wm',
       src: 'https://www.slideshare.net/slideshow/embed_code/key/hK2vDqTQ0Nz9Wm',
-      width: 476,
-      height: 400,
+      ratio: '595/485',
       title: 'Designing Accessible Forms',
     }
 
@@ -702,12 +708,18 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toBeUndefined()
   })
 
-  it('should ignore a key outside the url-safe alphabet', async () => {
+  it('should use a malformed key as written, even if the player answers an error', async () => {
     const value = html`
       <iframe src="https://www.slideshare.net/slideshow/embed_code/key/6PCW.PGFw9SwsAY"></iframe>
     `
+    const expected: EmbedResolverResult = {
+      provider: 'slideshare',
+      id: '6PCW.PGFw9SwsAY',
+      src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCW.PGFw9SwsAY',
+      ratio: '595/485',
+    }
 
-    expect(await extract(value)).toBeUndefined()
+    expect(await extract(value)).toEqual(expected)
   })
 
   // A lookalike host carries the embed path but is not the platform.
@@ -755,8 +767,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         id: '6PCWPGFw9SwsAY',
         src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY',
         url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
-        width: 427,
-        height: 356,
+        ratio: '595/485',
         title: 'Business Quotes for 2011',
         author: 'Harald Felgner',
       }
@@ -792,8 +803,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         id: '10579166',
         src: 'https://www.slideshare.net/slideshow/embed_code/10579166',
         url: 'http://www.slideshare.net/null0x00/make-profit-with-uiredressing-attacks',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
         title: 'Make profit with UI-Redressing attacks.',
         author: 'n|u - The Open Security Community',
       }
@@ -825,6 +835,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         id: '23660334',
         src: 'https://www.slideshare.net/slideshow/embed_code/23660334',
         url: 'http://www.slideshare.net/commonplace0807/java-23660334',
+        ratio: '595/485',
         title: 'Shibuya Java',
         author: 'commonplace0807',
       }
@@ -856,6 +867,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         id: '2nCJtB7MpHuSpf',
         src: 'https://www.slideshare.net/slideshow/embed_code/key/2nCJtB7MpHuSpf',
         url: 'https://de.slideshare.net/BLM_Bayern/christian-sieh',
+        ratio: '595/485',
         title: 'Christian Sieh',
         author: 'BLM Bayern',
       }
@@ -886,6 +898,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: 'hmqg4DDLz9bf1k',
         src: 'https://www.slideshare.net/slideshow/embed_code/key/hmqg4DDLz9bf1k',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -915,6 +928,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         id: '6PCWPGFw9SwsAY',
         src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY',
         url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
+        ratio: '595/485',
         title: 'Business Quotes for 2011',
         author: 'Harald Felgner',
       }
@@ -1004,6 +1018,7 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
         data-embed-id="hK2vDqTQ0Nz9Wm"
         data-embed-provider="slideshare"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/hK2vDqTQ0Nz9Wm"
+        data-embed-ratio="595/485"
       ></div>
     `
 
@@ -1038,6 +1053,7 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
         data-embed-id="6PCWPGFw9SwsAY"
         data-embed-provider="slideshare"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY"
+        data-embed-ratio="595/485"
       ></div>
     `
 
@@ -1067,6 +1083,7 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
         data-embed-id="6PCWPGFw9SwsAY"
         data-embed-provider="slideshare"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY"
+        data-embed-ratio="595/485"
       ></div>
       <p>
         Slides for
@@ -1113,6 +1130,7 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
         data-embed-id="10579166"
         data-embed-provider="slideshare"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/10579166"
+        data-embed-ratio="595/485"
       ></div>
     `
 

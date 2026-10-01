@@ -1,21 +1,7 @@
-import type { DomTransform, WidgetResolver } from '../../types.js'
+import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { resolveOrKeepUrl } from '../../utils/urls.js'
-
-// True when one of the widget resolvers claims the iframe, which is the same test convertWidgets
-// makes, so only iframes that would become a placeholder or a recovered media element pass.
-const isResolvedIframe = async (
-  iframe: Element,
-  resolvers: ReadonlyArray<WidgetResolver>,
-): Promise<boolean> => {
-  for (const resolver of resolvers) {
-    if (iframe.matches(resolver.selector) && (await resolver.extract(iframe))) {
-      return true
-    }
-  }
-
-  return false
-}
+import { isResolvedIframe } from '../../utils/widgets.js'
 
 // A lazy-load plugin's <noscript> fallback iframe, which a reader hides along with the noscript.
 // WP Rocket LazyLoad and a3 Lazy Load wrap the original video <iframe> this way.

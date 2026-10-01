@@ -7,7 +7,7 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, megatvEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the share dialog snippet and keep the box it states', async () => {
+    it('should resolve the share dialog snippet and ignore the box it states', async () => {
       const value = html`
         <iframe
           src="https://www.megatv.com/embed/?p=2020687366"
@@ -24,8 +24,7 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
         id: '2020687366',
         src: 'https://www.megatv.com/embed/?p=2020687366',
         url: 'https://www.megatv.com/?p=687366',
-        width: 560,
-        height: 315,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -109,12 +108,6 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id outside the numeric shape', async () => {
-      const value = '<iframe src="https://www.megatv.com/embed/?p=evil"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a megatv url that is not the player', async () => {
       const value = '<iframe src="https://www.megatv.com/?p=687366"></iframe>'
 
@@ -123,6 +116,18 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should use a malformed post id as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://www.megatv.com/embed/?p=evil"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'megatv',
+        id: 'evil',
+        src: 'https://www.megatv.com/embed/?p=evil',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // Five corpus embeds name posts under a mapping the prefix rule does not cover, so the
     // player is kept and no article page is guessed for them.
     it('should mint no page for an id without the post prefix', async () => {

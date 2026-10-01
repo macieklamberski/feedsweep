@@ -81,39 +81,6 @@ describeForEachParser('infogramWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a chart id carrying a separator', async () => {
-      const value = html`
-        <div
-          class="infogram-embed"
-          data-id="../other"
-        ></div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a dot segment after the editor prefix', async () => {
-      const value = html`
-        <div
-          class="infogram-embed"
-          data-id="_/.."
-        ></div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a chart id carrying a slash outside the editor prefix', async () => {
-      const value = html`
-        <div
-          class="infogram-embed"
-          data-id="abc/def"
-        ></div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a mount the loader already filled with its frame', async () => {
       const value = html`
         <div
@@ -133,6 +100,23 @@ describeForEachParser('infogramWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should use a malformed chart id as written, even if the player answers an error', async () => {
+      const value = html`
+        <div
+          class="infogram-embed"
+          data-id="../other"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'infogram',
+        id: '../other',
+        src: 'https://e.infogram.com/../other?src=embed',
+        url: 'https://infogram.com/../other',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should drop a tracker riding beside the live flag', async () => {
       const value = html`
         <div
@@ -278,27 +262,24 @@ describeForEachParser('infogramScriptEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
 
-    it('should ignore a chart id carrying a slash outside the editor prefix', async () => {
+  describe('edge cases', () => {
+    it('should use a malformed chart id as written, even if the player answers an error', async () => {
       const value = html`
         <script
           id="infogram_0_abc/def"
           src="https://e.infogram.com/js/dist/embed.js"
         ></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'infogram',
+        id: 'abc/def',
+        src: 'https://e.infogram.com/abc/def?src=embed',
+        url: 'https://infogram.com/abc/def',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a dot segment after the editor prefix', async () => {
-      const value = html`
-        <script
-          id="infogram_0__/.."
-          src="https://e.infogram.com/js/dist/embed.js"
-        ></script>
-      `
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
@@ -342,7 +323,7 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the declared box of a chart frame', async () => {
+    it('should ignore the declared box of a chart frame', async () => {
       const value = html`
         <iframe
           title="Evolució passatgers aeroport"
@@ -358,8 +339,6 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
         id: '43292ecb-8a6f-48dd-8cfe-ebf1501154b7',
         src: 'https://e.infogram.com/43292ecb-8a6f-48dd-8cfe-ebf1501154b7?src=embed',
         url: 'https://infogram.com/43292ecb-8a6f-48dd-8cfe-ebf1501154b7',
-        width: 1024,
-        height: 576,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -380,8 +359,6 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
         id: 'lobby_w_ue-168048',
         src: 'https://e.infogram.com/lobby_w_ue-168048?src=embed',
         url: 'https://infogram.com/lobby_w_ue-168048',
-        width: 600,
-        height: 1620,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -402,8 +379,6 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
         id: '89c927075b35-2930',
         src: 'https://e.infogram.com/89c927075b35-2930?src=embed',
         url: 'https://infogram.com/89c927075b35-2930',
-        width: 550,
-        height: 924,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -453,6 +428,20 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should use a malformed chart id as written, even if the player answers an error', async () => {
+      const value = html`
+        <iframe src="https://e.infogram.com/_/xCt9tZZl.JeRza5h27e5F?src=embed"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'infogram',
+        id: '_/xCt9tZZl.JeRza5h27e5F',
+        src: 'https://e.infogram.com/_/xCt9tZZl.JeRza5h27e5F?src=embed',
+        url: 'https://infogram.com/_/xCt9tZZl.JeRza5h27e5F',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should drop a tracker riding beside the layout setting', async () => {
       const value = html`
         <iframe
@@ -543,15 +532,13 @@ describeForEachParser('infogram charts through the pipeline', (parseHtml) => {
         data-embed-id="galaxy_s6_memoria"
         data-embed-src="https://e.infogram.com/galaxy_s6_memoria?src=embed"
         data-embed-url="https://infogram.com/galaxy_s6_memoria"
-        data-embed-width="550"
-        data-embed-height="600"
       ></div>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
   })
 
-  it('should leave a filled mount to the frame it holds, keeping its size', async () => {
+  it('should leave a filled mount to the frame it holds', async () => {
     const value = html`
       <div
         class="infogram-embed"
@@ -570,8 +557,6 @@ describeForEachParser('infogram charts through the pipeline', (parseHtml) => {
         data-embed-id="e8eda814-7ea2-4d8f-b8ab-1010d45de70e"
         data-embed-src="https://e.infogram.com/e8eda814-7ea2-4d8f-b8ab-1010d45de70e?src=embed"
         data-embed-url="https://infogram.com/e8eda814-7ea2-4d8f-b8ab-1010d45de70e"
-        data-embed-width="777"
-        data-embed-height="615"
       ></div>
     `
 

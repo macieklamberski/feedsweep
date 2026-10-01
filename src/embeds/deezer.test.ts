@@ -73,10 +73,30 @@ describe('deezerResolveEmbed', () => {
       expect(deezerResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should refuse an id that is not a deezer id', () => {
+    it('should use a malformed id as written, even if the player answers an error', () => {
       const value = 'https://widget.deezer.com/widget/dark/track/harder-better'
+      const expected: EmbedResolverResult = {
+        provider: 'deezer',
+        id: 'track/harder-better',
+        src: 'https://widget.deezer.com/widget/dark/track/harder-better',
+        url: 'https://www.deezer.com/track/harder-better',
+        height: 150,
+      }
 
-      expect(deezerResolveEmbed(value)).toBeUndefined()
+      expect(deezerResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a decoded plugin id carrying a separator in one path segment', () => {
+      const value = 'https://www.deezer.com/plugins/player?type=album&id=75337%2F..%2F1&app_id=1'
+      const expected: EmbedResolverResult = {
+        provider: 'deezer',
+        id: 'album/75337%2F..%2F1',
+        src: 'https://widget.deezer.com/widget/dark/album/75337%2F..%2F1',
+        url: 'https://www.deezer.com/album/75337%2F..%2F1',
+        height: 300,
+      }
+
+      expect(deezerResolveEmbed(value)).toEqual(expected)
     })
 
     it('should refuse an artist, which the widget serves as a blank page', () => {
@@ -358,8 +378,7 @@ describeForEachParser('deezerEmbedResolver', (parseHtml) => {
         id: 'track/293366',
         src: 'https://widget.deezer.com/widget/dark/track/293366',
         url: 'https://www.deezer.com/track/293366',
-        width: 220,
-        height: 55,
+        height: 150,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -375,10 +394,7 @@ describeForEachParser('deezerEmbedResolver', (parseHtml) => {
   })
 
   describe('the size a publisher states', () => {
-    // The box on the carrier is what the publisher chose for the player they embedded, so it
-    // outranks the corpus-typical height. Deezer's own share dialog writes a fluid width, and
-    // that is the shape the height alone describes.
-    it('should let the carrier size win over the corpus-typical height', async () => {
+    it('should keep the corpus-typical height over the carrier size', async () => {
       const value = html`
         <iframe
           src="https://widget.deezer.com/widget/dark/playlist/57888101"
@@ -391,8 +407,7 @@ describeForEachParser('deezerEmbedResolver', (parseHtml) => {
         id: 'playlist/57888101',
         src: 'https://widget.deezer.com/widget/dark/playlist/57888101',
         url: 'https://www.deezer.com/playlist/57888101',
-        width: 400,
-        height: 352,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)

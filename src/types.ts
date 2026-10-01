@@ -28,7 +28,7 @@ export type ResolveUrlFn = (url: string, baseUrl: string | undefined) => string 
 export type EmbedResolverResult = {
   provider: string
   id?: string
-  src: string
+  src?: string
   // Settings the publisher chose for this one embed that a reader may override, such as the
   // language of a widget's labels. They stay off `src`, so a reader can apply its own instead.
   params?: Record<string, string>
@@ -51,8 +51,8 @@ export type ResolveEmbed = (url: string, element?: Element) => EmbedResolverResu
 export type EmbedRenderHint = {
   provider: string
   // The origin the player's messages arrive from, for a reader to check `event.origin` against.
-  // Absent where the player is served from the publisher's own host, a Mastodon instance or a
-  // Podigee show, and the frame's own origin is the one to match.
+  // Absent where the player is served from the publisher's own host or a Mastodon instance, and
+  // the frame's own origin is the one to match.
   origin?: string
   // Query parameters the player wants on every load, not only the one after a click. A reader
   // sets each over whatever the placeholder's url carries. They stay off the url itself, since a
@@ -61,6 +61,9 @@ export type EmbedRenderHint = {
   // Query parameters that start playback, for a load that follows a person's click. They never
   // go on the placeholder's url, since a placeholder must not start on page load.
   autoplayParams?: Record<string, string>
+  // The `name` a reader gives the frame before it loads. A player that reads `window.name` to
+  // open its message channel posts no ready message without it.
+  frameName?: string
   isReady?: (data: unknown) => boolean
   // Posted once: a second post pauses a player whose play command toggles.
   requestPlay?: unknown
@@ -222,7 +225,6 @@ export type TransformContext = {
   nonContentSelectors: Array<string>
   preservedPreClasses: Array<string>
   fieldCleaners: Array<FieldCleaner>
-  cleanedSrcProviders: Array<string>
   resolveUrlFn: ResolveUrlFn
   cleanUrlFn?: CleanUrlFn
   assetProxyFn?: AssetProxyFn

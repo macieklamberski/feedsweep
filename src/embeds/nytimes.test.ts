@@ -65,12 +65,6 @@ describe('nytimesResolveEmbed', () => {
       expect(nytimesResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id that is not numeric', () => {
-      const value = 'https://www.nytimes.com/video/players/offsite/index.html?videoId=latest'
-
-      expect(nytimesResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a lookalike host', () => {
       const value =
         'https://www.nytimes.com.evil.test/video/players/offsite/index.html?videoId=100000004460561'
@@ -78,12 +72,26 @@ describe('nytimesResolveEmbed', () => {
       expect(nytimesResolveEmbed(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should use a malformed video id as written, even if the player answers an error', () => {
+      const value = 'https://www.nytimes.com/video/players/offsite/index.html?videoId=latest'
+      const expected: EmbedResolverResult = {
+        provider: 'nytimes',
+        id: 'latest',
+        src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=latest',
+        ratio: '16/9',
+      }
+
+      expect(nytimesResolveEmbed(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('nytimesIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, nytimesIframeEmbedResolver)
 
-  // The snippet states 480 by 321, which is the carrier's size and wins over the ratio.
+  // The snippet states 480 by 321, which is not read.
   it('should resolve the pasted player iframe', async () => {
     const value = html`
       <iframe
@@ -98,8 +106,7 @@ describeForEachParser('nytimesIframeEmbedResolver', (parseHtml) => {
       provider: 'nytimes',
       id: '100000007370133',
       src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=100000007370133',
-      width: 480,
-      height: 321,
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)

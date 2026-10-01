@@ -163,8 +163,7 @@ describeForEachParser('Tumblr', (parseHtml) => {
       <div
         data-embed-provider="tumblr"
         data-embed-id="9NYQOutKOEXi4aopdzCr9A/144854447139"
-        data-embed-src="https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2?width=542&amp;language=en_US&amp;did=f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8"
-        data-embed-height="1391"
+        data-embed-src="https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2"
       ></div>
     `
 

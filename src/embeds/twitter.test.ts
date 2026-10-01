@@ -327,22 +327,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id that is not numeric', async () => {
-      const value = html`
-        <blockquote
-          class="twitter-tweet"
-          data-twitter-tweet-id="../evil"
-        >
-          <p>Text.</p>
-        </blockquote>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    // A block copied between platforms carries several generations of the attribute, and only
-    // the later one is intact, so each is validated rather than the first present one winning.
-    it('should read a later id attribute when an earlier one is malformed', async () => {
+    it('should use the first id attribute present as written, even if the player answers an error', async () => {
       const value = html`
         <blockquote
           class="twitter-tweet"
@@ -354,8 +339,8 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'twitter',
-        id: statusId,
-        src: `https://platform.twitter.com/embed/Tweet.html?id=${statusId}`,
+        id: '../evil',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=..%2Fevil',
         description: 'Text.',
       }
 
@@ -914,7 +899,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
 describeForEachParser('twitterAmpEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, twitterAmpEmbedResolver)
 
-  it('should carry the id, the player and the size the component states', async () => {
+  it('should carry the id and the player the component states', async () => {
     const value = html`
       <amp-twitter
         width="375"
@@ -927,8 +912,6 @@ describeForEachParser('twitterAmpEmbedResolver', (parseHtml) => {
       provider: 'twitter',
       id: statusId,
       src: playerUrl,
-      width: 375,
-      height: 472,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -1272,6 +1255,17 @@ describe('twitterResolveEmbed', () => {
     expect(twitterResolveEmbed('https://platform.twitter.com/embed/Tweet.html')).toBeUndefined()
   })
 
+  it('should use a malformed player id as written, even if the player answers an error', () => {
+    const value = 'https://platform.twitter.com/embed/Tweet.html?id=20x'
+    const expected: EmbedResolverResult = {
+      provider: 'twitter',
+      id: '20x',
+      src: 'https://platform.twitter.com/embed/Tweet.html?id=20x',
+    }
+
+    expect(twitterResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for an invalid url', () => {
     expect(twitterResolveEmbed('not a url')).toBeUndefined()
   })
@@ -1439,8 +1433,6 @@ describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
         provider: 'twitter',
         id: '2073030328415858798',
         src: 'https://platform.twitter.com/embed/Tweet.html?id=2073030328415858798',
-        width: 550,
-        height: 350,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1474,16 +1466,23 @@ describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
 
-    it('should ignore a fragment that is not a status id', async () => {
+  describe('edge cases', () => {
+    it('should keep a fragment holding an ampersand whole in the id parameter', async () => {
       const value = html`
         <iframe
           data-s9e-mediaembed="twitter"
-          src="https://s9e.github.io/iframe/2/twitter.min.html#not-a-status"
+          src="https://s9e.github.io/iframe/2/twitter.min.html#123&lang=en"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: '123&lang=en',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=123%26lang%3Den',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

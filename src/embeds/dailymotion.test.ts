@@ -4,6 +4,7 @@ import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   dailymotionEmbedResolver,
+  dailymotionRenderHint,
   dailymotionResolveEmbed,
   extractDailymotionId,
   readDailymotionEmbedSrc,
@@ -105,16 +106,18 @@ describe('extractDailymotionId', () => {
     expect(extractDailymotionId(value)).toBeUndefined()
   })
 
-  it('should extract no id from a segment carrying an encoded slash after the id', () => {
+  it('should use a malformed id with an encoded slash after it as written, even if the player answers an error', () => {
     const value = 'https://www.dailymotion.com/video/x7tgad0%2F'
+    const expected = 'x7tgad0/'
 
-    expect(extractDailymotionId(value)).toBeUndefined()
+    expect(extractDailymotionId(value)).toEqual(expected)
   })
 
-  it('should extract no id from a segment carrying an encoded slash before the id', () => {
+  it('should use a malformed id with an encoded slash before it as written, even if the player answers an error', () => {
     const value = 'https://www.dailymotion.com/video/%2Fx7tgad0'
+    const expected = '/x7tgad0'
 
-    expect(extractDailymotionId(value)).toBeUndefined()
+    expect(extractDailymotionId(value)).toEqual(expected)
   })
 
   it('should extract no id behind a three-letter segment where the locale sits', () => {
@@ -140,6 +143,32 @@ describe('dailymotionResolveEmbed', () => {
       url: 'https://www.dailymotion.com/video/x7tgad0',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
       ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should encode a path id carrying an encoded slash once', () => {
+    const value = 'https://www.dailymotion.com/embed/video/x8abc%2Fdef'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x8abc/def',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8abc%2Fdef',
+      url: 'https://www.dailymotion.com/video/x8abc%2Fdef',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8abc%2Fdef',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should encode a playlist path id carrying an encoded slash once', () => {
+    const value = 'https://www.dailymotion.com/embed/playlist/x6zq%2Fmk'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'playlist/x6zq/mk',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x6zq%2Fmk',
+      url: 'https://www.dailymotion.com/playlist/x6zq%2Fmk',
     }
 
     expect(dailymotionResolveEmbed(value)).toEqual(expected)
@@ -173,15 +202,57 @@ describe('dailymotionResolveEmbed', () => {
     expect(dailymotionResolveEmbed(value)).toEqual(expected)
   })
 
-  // A publisher's own player id plays on any site, while the generic player answers 403.
-  it('should keep the url of a player the publisher created', () => {
+  it('should rebuild a player the publisher created on the player id', () => {
     const value = 'https://geo.dailymotion.com/player/xiqhk.html?video=x8pq78m'
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
       id: 'x8pq78m',
-      src: 'https://geo.dailymotion.com/player/xiqhk.html?video=x8pq78m',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8pq78m',
       url: 'https://www.dailymotion.com/video/x8pq78m',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8pq78m',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep the start and playlist of a player the publisher created', () => {
+    const value =
+      'https://geo.dailymotion.com/player/xe1o3.html?video=xak3lrq&startTime=0&playlist=x6zqmk'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'xak3lrq',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=xak3lrq&playlist=x6zqmk&startTime=0',
+      url: 'https://www.dailymotion.com/video/xak3lrq',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/xak3lrq',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep the loop of a player the publisher created', () => {
+    const value = 'https://geo.dailymotion.com/player/xiqhk.html?video=x8pq78m&loop=true'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x8pq78m',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8pq78m&loop=true',
+      url: 'https://www.dailymotion.com/video/x8pq78m',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8pq78m',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should drop the settings of a player the publisher created', () => {
+    const value = 'https://geo.dailymotion.com/player/x8zbz.html?video=x83gvxa&mute=true'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x83gvxa',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x83gvxa',
+      url: 'https://www.dailymotion.com/video/x83gvxa',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x83gvxa',
       ratio: '16/9',
     }
 
@@ -297,6 +368,32 @@ describe('dailymotionResolveEmbed', () => {
       url: 'https://www.dailymotion.com/video/x7tgad0',
       thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
       ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep a decoded video id carrying a separator in one path segment', () => {
+    const value = 'https://geo.dailymotion.com/player.html?video=x7tgad0%2F..%2Fx'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'x7tgad0/../x',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0%2F..%2Fx',
+      url: 'https://www.dailymotion.com/video/x7tgad0%2F..%2Fx',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0%2F..%2Fx',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep a decoded playlist id carrying a separator in one path segment', () => {
+    const value = 'https://geo.dailymotion.com/player.html?playlist=x6zqmk%2F..%2Fx'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'playlist/x6zqmk/../x',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x6zqmk%2F..%2Fx',
+      url: 'https://www.dailymotion.com/playlist/x6zqmk%2F..%2Fx',
     }
 
     expect(dailymotionResolveEmbed(value)).toEqual(expected)
@@ -479,5 +576,35 @@ describeForEachParser('dailymotionEmbedResolver carrier title', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describe('dailymotionRenderHint', () => {
+  it('should name the frame the way the player reads its message channel back', () => {
+    const value = JSON.parse(decodeURIComponent(dailymotionRenderHint.frameName ?? ''))
+    const expected = { dmInternalData: { iframeId: 'dm1' } }
+
+    expect(value).toEqual(expected)
+  })
+
+  // Captured from `geo.dailymotion.com/player/xpiw2.html` framed with the hint's name.
+  it('should recognise the ready event the player posts', () => {
+    expect(dailymotionRenderHint.isReady?.('{"event":"apiready","id":"dm1"}')).toBe(true)
+  })
+
+  it('should ignore the ready event of a frame given another id', () => {
+    expect(dailymotionRenderHint.isReady?.('{"event":"apiready","id":"dm2"}')).toBe(false)
+  })
+
+  it('should ignore the other events the player posts', () => {
+    expect(dailymotionRenderHint.isReady?.('{"event":"playerstate","id":"dm1"}')).toBe(false)
+  })
+
+  it('should ignore a ready event posted as an object', () => {
+    expect(dailymotionRenderHint.isReady?.({ event: 'apiready', id: 'dm1' })).toBe(false)
+  })
+
+  it('should ignore a string that is not JSON', () => {
+    expect(dailymotionRenderHint.isReady?.('apiready')).toBe(false)
   })
 })

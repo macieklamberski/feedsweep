@@ -1,7 +1,7 @@
-import { getPathSegments, isPlainObject } from 'trousse'
+import { getPathSegments, isPlainObject, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'donorbox'
@@ -23,16 +23,18 @@ export const donorboxResolveEmbed: ResolveEmbed = (url) => {
 
   const [kind, slug, ...rest] = getPathSegments(parsed)
 
-  // A campaign slug as Donorbox writes it: one run of word characters and hyphens.
-  if (kind !== 'embed' || !slug || rest.length > 0 || !urlSafeTokenRegex.test(slug)) {
+  if (kind !== 'embed' || !slug || rest.length > 0) {
     return
   }
+
+  // The amount prefills the donation. The rest of the query is the form's look.
+  const amount = parsed.searchParams.get('amount') ?? undefined
+  const query = composeQuery(trimObject({ amount }, Boolean))
 
   return {
     provider,
     id: slug,
-    // The publisher's query picks the default interval, amount and meter.
-    src: url,
+    src: `https://donorbox.org/embed/${slug}${query}`,
     url: `https://donorbox.org/${slug}`,
     height: formHeight,
   }

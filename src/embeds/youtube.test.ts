@@ -535,18 +535,45 @@ describe('youtubeResolveEmbed', () => {
     expect(youtubeResolveEmbed(value)).toBeUndefined()
   })
 
-  it('should return undefined for a playlist id carrying an encoded ampersand', () => {
+  it('should use a malformed playlist id as written, even if the player answers an error', () => {
     const value =
       'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index%3D2'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'playlist/PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf&index=2',
+      src: 'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index%3D2',
+      url: 'https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index%3D2',
+      ratio: '16/9',
+    }
 
-    expect(youtubeResolveEmbed(value)).toBeUndefined()
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should return undefined for a live_stream channel carrying an encoded ampersand', () => {
+  it('should use a malformed channel id as written, even if the player answers an error', () => {
     const value =
       'https://www.youtube.com/embed/live_stream?channel=UCuAXFkgsw1L7xaCfnd5JJOw%26autoplay%3D1'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'channel/UCuAXFkgsw1L7xaCfnd5JJOw&autoplay=1',
+      src: 'https://www.youtube.com/embed/live_stream?channel=UCuAXFkgsw1L7xaCfnd5JJOw%26autoplay%3D1',
+      url: 'https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw&autoplay=1',
+      ratio: '16/9',
+    }
 
-    expect(youtubeResolveEmbed(value)).toBeUndefined()
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep a decoded uploads username carrying a separator in one path segment', () => {
+    const value = 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser%2F..%2Fx'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'user/SomeUser/../x',
+      src: 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser%2F..%2Fx',
+      url: 'https://www.youtube.com/user/SomeUser%2F..%2Fx',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
   })
 
   it('should return undefined for a user_uploads embed with no list', () => {
@@ -567,8 +594,8 @@ describe('youtubeResolveEmbed', () => {
     expect(youtubeResolveEmbed(value)).toBeUndefined()
   })
 
-  // The Flash player took its playlist on `/p/{id}`, and its 16 hex characters are the modern
-  // `list=PL{id}` without the prefix. The swf is dead, so these render nothing today.
+  // The Flash player took its playlist on `/p/{id}`, the modern `list=PL{id}` without the prefix.
+  // The swf is dead, so these render nothing today.
   describe('the Flash-era playlist player', () => {
     it('should resolve a /p/ playlist to the playlist embed, posterless', () => {
       const value = 'http://www.youtube.com/p/7BE4DDAC0A0D31AF?hl=es_ES&fs=1'
@@ -577,6 +604,19 @@ describe('youtubeResolveEmbed', () => {
         id: 'playlist/PL7BE4DDAC0A0D31AF',
         src: 'https://www.youtube.com/embed/videoseries?list=PL7BE4DDAC0A0D31AF',
         url: 'https://www.youtube.com/playlist?list=PL7BE4DDAC0A0D31AF',
+        ratio: '16/9',
+      }
+
+      expect(youtubeResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should decode a /p/ playlist id before it moves into the query', () => {
+      const value = 'http://www.youtube.com/p/7BE4DDAC0A0D%2F3?hl=en'
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'playlist/PL7BE4DDAC0A0D/3',
+        src: 'https://www.youtube.com/embed/videoseries?list=PL7BE4DDAC0A0D%2F3',
+        url: 'https://www.youtube.com/playlist?list=PL7BE4DDAC0A0D%2F3',
         ratio: '16/9',
       }
 
@@ -598,35 +638,17 @@ describe('youtubeResolveEmbed', () => {
       expect(youtubeResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should refuse a /p/ id that is not 16 hex characters', () => {
+    it('should use a malformed /p/ id as written, even if the player answers an error', () => {
       const value = 'http://www.youtube.com/p/somechannelname'
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'playlist/PLsomechannelname',
+        src: 'https://www.youtube.com/embed/videoseries?list=PLsomechannelname',
+        url: 'https://www.youtube.com/playlist?list=PLsomechannelname',
+        ratio: '16/9',
+      }
 
-      expect(youtubeResolveEmbed(value)).toBeUndefined()
-    })
-
-    // A playlist id is case sensitive, so a lowercase spelling would mint a url that 404s.
-    it('should refuse a /p/ id that already carries the PL prefix', () => {
-      const value = 'http://www.youtube.com/p/PL7BE4DDAC0A0D31AF'
-
-      expect(youtubeResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should refuse a /p/ id longer than 16 hex characters', () => {
-      const value = 'http://www.youtube.com/p/7BE4DDAC0A0D31AF7BE4DDAC0A0D31AF'
-
-      expect(youtubeResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should refuse a /p/ id carrying an encoded slash', () => {
-      const value = 'http://www.youtube.com/p/7BE4DDAC0A0D%2F3'
-
-      expect(youtubeResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should refuse a lowercase /p/ id', () => {
-      const value = 'http://www.youtube.com/p/7be4ddac0a0d31af'
-
-      expect(youtubeResolveEmbed(value)).toBeUndefined()
+      expect(youtubeResolveEmbed(value)).toEqual(expected)
     })
 
     it('should refuse a bare /p/ path naming no playlist', () => {
@@ -1053,24 +1075,37 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // A bogus id would mint a bogus player url and a bogus enrichment key, so the element is
-    // left for the generic handling instead, exactly as the url form treats a malformed id.
-    it('should return undefined for a malformed videoid', async () => {
-      const value = '<amp-youtube data-videoid="../../evil"></amp-youtube>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an embed path word in the videoid', async () => {
+    it('should return undefined for a videoid holding a route word', async () => {
       const value = '<amp-youtube data-videoid="videoseries"></amp-youtube>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a malformed live channel id', async () => {
-      const value = '<amp-youtube data-live-channelid="../../evil"></amp-youtube>'
+    it('should use a malformed videoid as written, even if the player answers an error', async () => {
+      const value = '<amp-youtube data-videoid="../../evil"></amp-youtube>'
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: '../../evil',
+        src: 'https://www.youtube.com/embed/../../evil',
+        url: 'https://www.youtube.com/watch?v=..%2F..%2Fevil',
+        thumbnail: 'https://i.ytimg.com/vi/../../evil/hqdefault.jpg',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed live channel id as written, even if the player answers an error', async () => {
+      const value = '<amp-youtube data-live-channelid="../../evil"></amp-youtube>'
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'channel/../../evil',
+        src: 'https://www.youtube.com/embed/live_stream?channel=..%2F..%2Fevil',
+        url: 'https://www.youtube.com/channel/../../evil',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
@@ -1138,7 +1173,7 @@ describeForEachParser('youtubeFc2EmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the id attribute when the query names a route word', async () => {
+    it('should use a malformed query id as written, even if the player answers an error', async () => {
       const value = html`
         <iframe
           src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?id=playlist"
@@ -1147,10 +1182,10 @@ describeForEachParser('youtubeFc2EmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'youtube',
-        id: 'NBwJR7X3krE',
-        src: 'https://www.youtube.com/embed/NBwJR7X3krE',
-        url: 'https://www.youtube.com/watch?v=NBwJR7X3krE',
-        thumbnail: 'https://i.ytimg.com/vi/NBwJR7X3krE/hqdefault.jpg',
+        id: 'playlist',
+        src: 'https://www.youtube.com/embed/playlist',
+        url: 'https://www.youtube.com/watch?v=playlist',
+        thumbnail: 'https://i.ytimg.com/vi/playlist/hqdefault.jpg',
         ratio: '16/9',
       }
 
@@ -1205,14 +1240,6 @@ describeForEachParser('youtubeFc2EmbedResolver', (parseHtml) => {
     it('should ignore a path going on past the shell', async () => {
       const value = html`
         <iframe src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html/x?id=dQw4w9WgXcQ"></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a shell naming no video', async () => {
-      const value = html`
-        <iframe src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?id=playlist"></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()
