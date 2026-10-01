@@ -11,7 +11,7 @@ describeForEachParser('rebuildGettyImagesEmbeds', (parseHtml) => {
   }
 
   describe('happy paths', () => {
-    it('should replace the anchor with the player the config describes', async () => {
+    it('should replace the anchor with the player the config describes, without its box', async () => {
       const value = html`
         <a
           id="iPo3qjCKSVJU-bRwLBwNoQ"
@@ -21,7 +21,7 @@ describeForEachParser('rebuildGettyImagesEmbeds', (parseHtml) => {
         <script>gie.widgets.load({id:'iPo3qjCKSVJU-bRwLBwNoQ',sig:'OOM9B40x=',w:'594px',h:'395px',items:'491183014',caption: true ,tld:'com',is360: false })</script>
       `
       const expected =
-        '<iframe src="https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&amp;tld=com&amp;sig=OOM9B40x%3D&amp;caption=true" width="594" height="395"></iframe>'
+        '<iframe src="https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&amp;tld=com&amp;sig=OOM9B40x%3D"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -29,7 +29,7 @@ describeForEachParser('rebuildGettyImagesEmbeds', (parseHtml) => {
     it('should replace the script in place when no anchor carries the token', async () => {
       const value = `<script>gie.widgets.load({id:'abc',sig:'def=',w:'480px',h:'320px',items:'123456789'})</script>`
       const expected =
-        '<iframe src="https://embed.gettyimages.com/embed/123456789?et=abc&amp;tld=com&amp;sig=def%3D&amp;caption=false" width="480" height="320"></iframe>'
+        '<iframe src="https://embed.gettyimages.com/embed/123456789?et=abc&amp;tld=com&amp;sig=def%3D"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -44,11 +44,7 @@ describeForEachParser('rebuildGettyImagesEmbeds', (parseHtml) => {
       `
       const expected = html`
         <a id="tokenA" class="gie-single" href="http://www.gettyimages.com/detail/111111111">One</a>
-        <iframe
-          src="https://embed.gettyimages.com/embed/222222222?et=tokenB&amp;tld=com&amp;sig=sigB%3D&amp;caption=false"
-          width="300"
-          height="200"
-        ></iframe>
+        <iframe src="https://embed.gettyimages.com/embed/222222222?et=tokenB&amp;tld=com&amp;sig=sigB%3D"></iframe>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -110,8 +106,7 @@ describeForEachParser('the getty facade the pipeline used to leave as a link', (
 
     expect(result).toContain('data-embed-provider="gettyimages"')
     expect(result).toContain('data-embed-id="491183014"')
-    expect(result).toContain('data-embed-width="594"')
-    expect(result).toContain('data-embed-height="395"')
+    expect(result).toContain('data-embed-ratio="3/2"')
     expect(result).not.toContain('Embed from Getty Images')
   })
 })

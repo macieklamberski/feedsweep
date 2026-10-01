@@ -66,16 +66,15 @@ describeForEachParser('yahooEmojiResolver', (parseHtml) => {
     })
   })
 
-  describe('exact hints', () => {
-    it('should replace a number by its universal code alt', async () => {
+  describe('kept pictures', () => {
+    it('should mark a number despite its universal code alt', async () => {
       const value = '<p><img alt=":)" src="https://s.yimg.com/lq/i/mesg/emoticons7/1.gif"></p>'
-      const expected = '<p>🙂</p>'
+      const expected =
+        '<p><img alt=":)" src="https://s.yimg.com/lq/i/mesg/emoticons7/1.gif" data-emoji=""></p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
-  })
 
-  describe('kept pictures', () => {
     // Chatterbox, which the review kept as a picture.
     it('should mark a number decided to keep its picture', async () => {
       const value = html`
@@ -165,10 +164,12 @@ describeForEachParser('yahooEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(`<p><img src="${src}" data-emoji=""></p>`)
   })
 
-  it('should replace an emoticon from the smaller set by its universal code alt', async () => {
+  it('should mark an emoticon from the smaller set despite its universal code alt', async () => {
     const value =
       '<p><img src="http://us.i1.yimg.com/us.yimg.com/i/mesg/tsmileys2/01.gif" alt=":)"></p>'
+    const expected =
+      '<p><img src="http://us.i1.yimg.com/us.yimg.com/i/mesg/tsmileys2/01.gif" alt=":)" data-emoji=""></p>'
 
-    expect(await transform(value)).toEqualHtml('<p>🙂</p>')
+    expect(await transform(value)).toEqualHtml(expected)
   })
 })

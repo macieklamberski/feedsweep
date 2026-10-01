@@ -23,6 +23,9 @@ export type EmojiImageMatch = {
   isBlank?: boolean
   // The filename as the engine's table keys it, where the engine adds a marker of its own.
   stem?: string
+  // The set ships a name no glyph stands for. Implied by a `false` entry in `names`, and passed
+  // by a resolver that reads its own table into `glyph` or shares one table across two sets.
+  keepsPictures?: boolean
 }
 
 const emojiSequenceParts = [
@@ -262,8 +265,63 @@ const getVocabularyGlyph = (
   return names.get(stem) ?? code
 }
 
+const hasFalseName = (names: Map<string, EmojiGlyph> | undefined): boolean => {
+  if (!names) {
+    return false
+  }
+
+  for (const glyph of names.values()) {
+    if (glyph === false) {
+      return true
+    }
+  }
+
+  return false
+}
+
+// A codepoint filename names its picture exactly, and forms a set of its own even inside a set
+// that keeps its pictures. Base64 can contain `/`, and forum packs ship `ae.gif` as their own face.
+const isCodepointFile = (src: string, stem: string, alt: string | undefined): boolean => {
+  if (src.startsWith('data:')) {
+    return false
+  }
+
+  const character = alt?.replace(variationRegex, '')
+
+  // A filename spelling its own alt is exact at any length, Twemoji's `ae.png` for ® included.
+  if (character && getCodepointText(stem) === character) {
+    return true
+  }
+
+  return !shortCodepointRegex.test(stem) && glyphFromCodepoints(stem) !== undefined
+}
+
+// A set with a name no glyph stands for keeps every picture, so a post never mixes glyphs with
+// the set's own drawings.
+const resolveKeptPicture = (
+  element: Element,
+  match: EmojiImageMatch,
+): EmojiResolverResult | undefined => {
+  const src = element.getAttribute('src') ?? ''
+  const stem = match.stem ?? getNameStem(src)
+  const token = attr(element, 'data-shortname') ?? attr(element, 'alt')
+
+  if (token && (match.isBlank || rendersNothing(src))) {
+    return { text: token }
+  }
+
+  const isKnown =
+    match.glyph !== undefined ||
+    (match.names?.has(stem) ?? false) ||
+    getShortcode(token) !== undefined
+
+  if (match.isStrong || isKnown) {
+    return { custom: true }
+  }
+}
+
 // An image converts whenever one hint names its picture exactly: an emoji alt, a codepoint or
-// byte filename, a universal code or a stock name. A false or unknown hint never blocks one.
+// byte filename, a universal code or a stock name, unless the set keeps its pictures.
 // The title attribute is prose on every platform, never a glyph, so it is not read.
 export const resolveEmojiImage = (
   element: Element,
@@ -272,6 +330,12 @@ export const resolveEmojiImage = (
   const src = element.getAttribute('src') ?? ''
   const alt = attr(element, 'alt')
   const shortname = attr(element, 'data-shortname')
+
+  const keepsPictures = match.keepsPictures ?? hasFalseName(match.names)
+
+  if (keepsPictures && !isCodepointFile(src, match.stem ?? getNameStem(src), alt)) {
+    return resolveKeptPicture(element, match)
+  }
 
   // The alt is preferred over the tables, so an image matched by two resolvers resolves the
   // same either way.

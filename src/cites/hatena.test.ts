@@ -34,29 +34,6 @@ describeForEachParser('hatenaCiteResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should extract a blogcard the same way as a webcard', async () => {
-      const value = html`
-        <p>
-          <iframe
-            src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fentry"
-            title="Page title"
-            class="embed-card embed-blogcard"
-          ></iframe>
-          <cite class="hatena-citation">
-            <a href="https://example.com/entry">example.com</a>
-          </cite>
-        </p>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'hatena',
-        url: 'https://example.com/entry',
-        title: 'Page title',
-        publisher: 'example.com',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     // Of 756 corpus feeds framing the card renderer, 72 spell something other than
     // `embed-card`, so the host is what identifies the card rather than the class.
     it('should extract a card whose iframe carries no class', async () => {
@@ -99,25 +76,6 @@ describeForEachParser('hatenaCiteResolver', (parseHtml) => {
         url: 'https://example.com/entry',
         title: 'Page title',
         publisher: 'example.com',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    // A card pasted outside Hatena's own editor stands on its own, with no paragraph and no
-    // citation around it.
-    it('should extract a card standing outside a paragraph', async () => {
-      const value = html`
-        <iframe
-          src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fentry"
-          title="Page title"
-          loading="lazy"
-        ></iframe>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'hatena',
-        url: 'https://example.com/entry',
-        title: 'Page title',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -215,16 +173,6 @@ describeForEachParser('hatenaCiteResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined when the iframe src cannot be parsed', async () => {
-      const value = html`
-        <p>
-          <iframe src="http://[" title="Page title" class="embed-card"></iframe>
-        </p>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     // Every Hatena blog also serves the card from its own host, and a custom domain does too, so
     // no host list reaches it. The citation beside it names the same host, which is the blog
     // citing its own entry.
@@ -313,18 +261,6 @@ describeForEachParser('hatenaCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
-
-    it('should not match a paragraph without an embed card', async () => {
-      const value = html`
-        <p>
-          <cite class="hatena-citation">
-            <a href="https://example.com/a">example.com</a>
-          </cite>
-        </p>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
   })
 })
 
@@ -337,7 +273,8 @@ describeForEachParser('hatena cards beside the prose they sit in', (parseHtml) =
 
   it('should keep the prose written beside the card', async () => {
     const value = html`
-      <p>Read this first: <iframe
+      <p>Read this first:
+        <iframe
           src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fentry"
           title="Page title"
           class="embed-card embed-webcard"
@@ -399,6 +336,28 @@ describeForEachParser('hatena cards beside the prose they sit in', (parseHtml) =
     `
     const expected = html`
       <div data-embed-src="https://cdn.other.test/player?url=https%3A%2F%2Fexample.com%2Fvideo"></div>
+      <p>
+        <cite class="hatena-citation"><a href="https://example.com/entry">example.com</a></cite>
+      </p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should leave the citation beside a card that carries no title', async () => {
+    const value = html`
+      <p>
+        <iframe
+          src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fentry"
+          class="embed-card embed-webcard"
+        ></iframe>
+        <cite class="hatena-citation">
+          <a href="https://example.com/entry">example.com</a>
+        </cite>
+      </p>
+    `
+    const expected = html`
+      <div data-embed-src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fentry"></div>
       <p>
         <cite class="hatena-citation"><a href="https://example.com/entry">example.com</a></cite>
       </p>

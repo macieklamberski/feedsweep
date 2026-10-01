@@ -28,6 +28,12 @@ describeForEachParser('decodeDoubleEncodedTags', (parseHtml) => {
       expect(await transform(value)).toEqualHtml('<p>One.</p><p>Two.</p>')
     })
 
+    it('should decode escaped fragments in separate real elements', async () => {
+      const value = '<p>&lt;b&gt;One&lt;/b&gt;</p><p>&lt;b&gt;Two&lt;/b&gt;</p>'
+
+      expect(await transform(value)).toEqualHtml('<p><b>One</b></p><p><b>Two</b></p>')
+    })
+
     it('should decode an escaped link with attributes and text', async () => {
       const value = '&lt;p&gt;&lt;a href="https://example.com"&gt;link&lt;/a&gt;&lt;/p&gt;'
 

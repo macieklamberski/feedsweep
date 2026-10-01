@@ -7,7 +7,7 @@ import {
   parseUrl,
   videoExtensions,
 } from 'trousse'
-import type { ResolveUrlFn, TransformContext } from '../types.js'
+import type { AssetType, ResolveUrlFn, TransformContext, UrlRole } from '../types.js'
 
 // Each helper names the slice of the context it actually reads, so a caller holding only a
 // cleaner can still reach the cleaning step, and a whole context satisfies either one.
@@ -22,6 +22,20 @@ const queryOrHashRegex = /[?#]/
 
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
+
+export const digitsRegex = /^\d+$/
+
+// A browser trims C0 controls and spaces from both ends, so \x01javascript: runs. Inside the
+// url it drops only tabs and newlines: java\tscript: runs, java script: is a relative path.
+// See: https://url.spec.whatwg.org/#concept-basic-url-parser.
+const c0ControlOrSpaceClass = '[\\x00-\\x20]+' // C0 controls and space
+const urlEdgeCharsRegex = new RegExp(`^${c0ControlOrSpaceClass}|${c0ControlOrSpaceClass}$`, 'g')
+const urlTabOrNewlineRegex = /[\t\n\r]/g
+
+// The url as a browser reads its scheme, for testing it against a scheme regex.
+export const stripUrlIgnorableChars = (url: string): string => {
+  return url.replace(urlEdgeCharsRegex, '').replace(urlTabOrNewlineRegex, '')
+}
 
 // No m3u8 or mpd: only Safari plays them natively, so promoting one breaks the player elsewhere.
 export const imageFileRegex = /\.(avif|gif|jpe?g|png|svg|webp)(\?|#|$)/i
@@ -78,6 +92,66 @@ export const parseMediaWikiFileName = (value: string): string | undefined => {
 // Exact on purpose: Simplecast tells a current id from a legacy eight-hex one by this shape.
 export const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
+// One attribute carrying one url, on one element. neutralizeUnsafeUrls and proxyAssetUrls each
+// filter the table below for their own list, so an attribute is declared once for both.
+export type UrlAttribute = {
+  // Element carrying the attribute. Absent where any element can carry it: an embed or cite
+  // placeholder parks its urls on data-* attributes of whatever element it replaced.
+  tag?: string
+  attribute: string
+  // Safety class of the value, which picks the sentinel neutralizeUnsafeUrls swaps an unsafe
+  // url for.
+  role: UrlRole
+  // Kind of asset proxyAssetUrls hands to the caller's proxy, absent where the value is not an
+  // asset a proxy can serve. `fromParent` reads the kind off the parent of a <source> or <track>,
+  // a video track inside a <video> and an audio one inside an <audio>.
+  asset?: AssetType | 'fromParent'
+}
+
+// The url-carrying attributes of the two passes. The tag-less rows come first: they are the embed
+// and cite placeholder attributes, which sit on whatever element the placeholder replaced, so a
+// pass reads them on every element it visits.
+export const urlAttributes: Array<UrlAttribute> = [
+  { attribute: 'data-embed-url', role: 'link' },
+  { attribute: 'data-cite-url', role: 'link' },
+  { attribute: 'data-file-url', role: 'link' },
+  { attribute: 'formaction', role: 'link' },
+  { attribute: 'data-embed-src', role: 'media' },
+  { attribute: 'data-embed-thumbnail', role: 'media', asset: 'image' },
+  { attribute: 'data-embed-avatar', role: 'media', asset: 'image' },
+  { attribute: 'data-cite-icon', role: 'media', asset: 'image' },
+  { attribute: 'data-cite-thumbnail', role: 'media', asset: 'image' },
+  { tag: 'a', attribute: 'href', role: 'link' },
+  { tag: 'area', attribute: 'href', role: 'link' },
+  { tag: 'form', attribute: 'action', role: 'link' },
+  { tag: 'img', attribute: 'src', role: 'media', asset: 'image' },
+  { tag: 'video', attribute: 'src', role: 'media', asset: 'video' },
+  { tag: 'video', attribute: 'poster', role: 'media', asset: 'image' },
+  { tag: 'audio', attribute: 'src', role: 'media', asset: 'audio' },
+  { tag: 'source', attribute: 'src', role: 'media', asset: 'fromParent' },
+  { tag: 'track', attribute: 'src', role: 'media', asset: 'fromParent' },
+  { tag: 'iframe', attribute: 'src', role: 'media' },
+  { tag: 'embed', attribute: 'src', role: 'media' },
+  { tag: 'object', attribute: 'data', role: 'media' },
+  { tag: 'image', attribute: 'href', role: 'media', asset: 'image' },
+]
+
+// The rows that name a tag, keyed by that tag. Tag-less rows are left out: a pass reads those on
+// every element.
+export const groupUrlAttributesByTag = <Attribute extends UrlAttribute>(
+  attributes: ReadonlyArray<Attribute>,
+): ReadonlyMap<string, Array<Attribute>> => {
+  const grouped = new Map<string, Array<Attribute>>()
+
+  for (const attribute of attributes) {
+    if (attribute.tag) {
+      grouped.set(attribute.tag, [...(grouped.get(attribute.tag) ?? []), attribute])
+    }
+  }
+
+  return grouped
+}
+
 // A real, loadable src, not empty and not the `about:blank` lazy placeholder.
 export const isUsableSrc = (src: string | null): src is string => {
   const trimmed = src?.trim()
@@ -130,6 +204,13 @@ export const pickQueryParams = (
   return picked
 }
 
+// A decoded value written into a url path stays one segment. Only the characters that would open
+// a new segment, a query or a fragment, a literal `%` and whitespace are escaped, so an `@`, `=` or
+// `:` the value holds reads as written.
+export const encodePathSegment = (value: string): string => {
+  return value.replace(/[%/?#\s]/g, (character) => encodeURIComponent(character))
+}
+
 // The other half of `pickQueryParams`: the pairs it returns, back into a query ready to append.
 // A resolver that has nothing to carry over gets an empty string, so its src stays bare rather
 // than ending on a lone `?`.
@@ -139,9 +220,38 @@ export const composeQuery = (params?: Record<string, string>): string => {
   return query ? `?${query}` : ''
 }
 
+// The publisher's query with only the parameters a player reads left in it. Each pair stays as
+// written, so a repeated name and a bracketed one such as `pwc[size]` reach the player unchanged.
+export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): string => {
+  const pairs = url.search
+    .slice(1)
+    .split('&')
+    .filter((pair) => {
+      const [name] = [...new URLSearchParams(pair).keys()]
+
+      return !!name && isKept(name)
+    })
+
+  return pairs.length > 0 ? `?${pairs.join('&')}` : ''
+}
+
 // The query string an embed resolver carries over when it rebuilds a src from the video id:
 // only the parameters that change what plays. Returns it ready to append, so a src with
 // nothing worth keeping stays bare.
+// The url with the named query parameters removed and every other pair as written. A url that
+// names none of them comes back as it was.
+export const dropUrlParams = (url: string, names: ReadonlyArray<string>): string => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
+
+  if (!parsed || !names.some((name) => parsed.searchParams.has(name))) {
+    return url
+  }
+
+  parsed.search = filterUrlQuery(parsed, (name) => !names.includes(name))
+
+  return parsed.href
+}
+
 export const pickUrlParams = (url: string, names: ReadonlyArray<string>): string => {
   return composeQuery(pickQueryParams(parseUrl(url)?.search ?? '', names))
 }
@@ -179,8 +289,18 @@ type CleanUrl = {
 }
 
 export const cleanUrl: CleanUrl = ((url, context: CleanContext) => {
-  // biome-ignore lint/nursery/useNullishCoalescing: An empty cleaned url keeps the input url.
-  return url ? context.cleanUrlFn?.(url) || url : undefined
+  if (!url) {
+    return
+  }
+
+  const cleaned = context.cleanUrlFn?.(url)
+
+  // An empty cleaned url keeps the input url.
+  if (!cleaned) {
+    return url
+  }
+
+  return cleaned
 }) as CleanUrl
 
 export const isSamePage = (

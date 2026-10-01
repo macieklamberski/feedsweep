@@ -2,7 +2,8 @@ import type { DomTransform } from '../../types.js'
 import { hasText, isElement, isText } from '../../utils/dom.js'
 
 const trailingBrRegex = /<br\s*\/?>\s*$/i
-const surroundingNewlinesRegex = /^\n+|\n+$/g
+// A trailing match starts only at the head of a run, so a long run before text fails once.
+const surroundingNewlinesRegex = /^\n+|(?<!\n)\n+$/g
 const classTokenSeparatorRegex = /\s+/
 
 const contentElement = (element: Element): Element => {

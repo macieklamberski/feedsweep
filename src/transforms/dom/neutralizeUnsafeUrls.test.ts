@@ -71,9 +71,7 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should see through a leading C0 control byte that \\s does not match', async () => {
-      // A leading \x01 survives HTML parsing and a browser strips it before reading the
-      // scheme, so `\x01javascript:` runs, but \s never matched it.
+    it('should see through a leading C0 control byte', async () => {
       const value = '<a href="\x01javascript:alert(1)">x</a>'
       const expected = '<a href="#unsafe-link">x</a>'
 
@@ -85,6 +83,39 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       const expected = '<a href="#unsafe-link">x</a>'
 
       expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // Each href's scheme as `new URL(href, 'https://a.test/').protocol` reads it in Bun.
+    const hiddenSchemeHrefs: Array<[string, string]> = [
+      ['a newline inside javascript:', 'java\nscript:alert(1)'],
+      ['a carriage return inside javascript:', 'java\rscript:alert(1)'],
+      ['a leading space before javascript:', ' javascript:alert(1)'],
+      ['a tab inside uppercase JAVASCRIPT:', 'JAVA\tSCRIPT:alert(1)'],
+      ['a leading control before VBScript:', '\x1fVBScript:msgbox(1)'],
+      ['a newline inside vbscript:', 'vb\nscript:msgbox(1)'],
+      ['a leading space before uppercase DATA:text/html', ' DATA:text/html,hello'],
+      ['a tab inside data:text/html', 'da\tta:text/html,hello'],
+    ]
+
+    it.each(hiddenSchemeHrefs)('should neutralize a link with %s', async (_name, href) => {
+      const value = `<a href="${href}">x</a>`
+      const expected = '<a href="#unsafe-link">x</a>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // A browser resolves each of these as a relative path, not as a javascript: url.
+    const relativeLookalikeHrefs: Array<[string, string]> = [
+      ['a space inside javascript:', 'java script:x'],
+      ['a no-break space inside javascript:', 'java script:x'],
+      ['a leading no-break space before javascript:', ' javascript:x'],
+      ['a control inside javascript:', 'java\x01script:x'],
+    ]
+
+    it.each(relativeLookalikeHrefs)('should leave a link with %s', async (_name, href) => {
+      const value = `<a href="${href}">x</a>`
+
+      expect(await transform(value)).toEqualHtml(value)
     })
 
     it('should leave a safe http link untouched', async () => {
@@ -158,6 +189,63 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
 
     it('should leave a safe form action untouched', async () => {
       const value = '<form action="https://ok.test/submit"><button>go</button></form>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should neutralize a data:text/html embed to the media sentinel', async () => {
+      const value = '<embed src="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==">'
+      const expected = '<embed src="about:blank">'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should neutralize a javascript: embed src to the media sentinel', async () => {
+      const value = '<embed src="javascript:alert(1)">'
+      const expected = '<embed src="about:blank">'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should neutralize a javascript: object data to the media sentinel', async () => {
+      const value = '<object data="javascript:alert(1)"></object>'
+      const expected = '<object data="about:blank"></object>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should neutralize a javascript: video src to the media sentinel', async () => {
+      const value = '<video src="javascript:alert(1)"></video>'
+      const expected = '<video src="about:blank"></video>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should neutralize a javascript: audio src to the media sentinel', async () => {
+      const value = '<audio src="javascript:alert(1)"></audio>'
+      const expected = '<audio src="about:blank"></audio>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should neutralize a javascript: source src to the media sentinel', async () => {
+      const value = '<video><source src="javascript:alert(1)"></video>'
+      const expected = '<video><source src="about:blank"></video>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should neutralize a javascript: track src to the media sentinel', async () => {
+      const value = '<video><track src="javascript:alert(1)"></video>'
+      const expected = '<video><track src="about:blank"></video>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // A scheme is dangerous only at the start: this lab url carries one inside a mangled id.
+    it('should keep a url that carries a scheme word past its start', async () => {
+      const value =
+        '<iframe src="https://www.youtube.com/embed/mmRtQ4javascript:void(0)tHSug"></iframe>'
 
       expect(await transform(value)).toEqualHtml(value)
     })
@@ -277,8 +365,8 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    // Every element is walked and its tag name looked up in the role maps, so a feed naming a
-    // tag after a member every object inherits reaches those maps with it. It has to answer the
+    // Every element is walked and its tag name looked up in the url attribute table, so a feed
+    // naming a tag after a member every object inherits reaches that lookup with it. It has to answer the
     // way it answers a tag it does not know.
     it('should leave an element named after an inherited member untouched', async () => {
       const value = '<constructor href="javascript:alert(1)">text</constructor>'
@@ -292,16 +380,9 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    // genericAttributeRoles restates by hand the url-carrying field names minted in
-    // utils/widgets.ts, so a url field added there and not here ships unchecked and nothing
-    // fails. The next two derive both sides instead of listing them a third time: the field set
-    // from normalizeEmbedFields/normalizeCiteFields, which of them are urls from
-    // prepareEmbedMetadata/prepareCiteMetadata being the pass that resolves one, and the
-    // attribute names from the placeholder the mint path actually builds.
-    //
-    // Every field is handed the same non-url marker and the context resolver answers with the
-    // unsafe url, so whatever the placeholder ends up carrying it is exactly what the mint path
-    // treats as a url. Anything still carrying it after the pass is a url the pass never saw.
+    // A url field added to utils/widgets.ts and missing from urlAttributes fails the next two.
+    // Every field gets a non-url marker and the resolver answers with the unsafe url, so any
+    // attribute still carrying it after the pass is a url the pass never saw.
     const unsafeUrl = 'javascript:alert(1)'
     const mintContext: TransformContext = { ...baseContext, resolveUrlFn: () => unsafeUrl }
 

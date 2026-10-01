@@ -3,6 +3,8 @@ import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed }
 import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   composeQuery,
+  digitsRegex,
+  encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -10,10 +12,10 @@ import {
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'vimeo'
-
-const safeVideoIdRegex = /^\d+$/
+const playerRatio = '16/9'
 
 // An unlisted video's privacy hash is ten lowercase hex characters, and case-sensitive.
+const whitespaceRegex = /\s/
 const unlistedHashRegex = /^[0-9a-f]{10}$/
 
 const vimeoHosts = ['vimeo.com']
@@ -70,7 +72,6 @@ const readCollectionVideoId = (segments: Array<string>): string | undefined => {
 // `vimeo.com/album/{id}/embed` 301s onto the showcase player.
 const showcasePaths = new Set(['showcase', 'album'])
 
-// The showcase player is a grid whose shape is whatever box the publisher gave it, and
 // `vimeo.com/showcase/{id}` resolves through Vimeo's keyless oEmbed to a title, an author and a
 // thumbnail.
 const composeShowcaseEmbed = (showcaseId: string): EmbedResolverResult => {
@@ -79,6 +80,7 @@ const composeShowcaseEmbed = (showcaseId: string): EmbedResolverResult => {
     id: `showcase/${showcaseId}`,
     src: `https://vimeo.com/showcase/${showcaseId}/embed`,
     url: `https://vimeo.com/showcase/${showcaseId}`,
+    ratio: playerRatio,
   }
 }
 
@@ -90,7 +92,7 @@ const resolveShowcaseEmbed = (link: string): EmbedResolverResult | undefined => 
     return
   }
 
-  const showcaseId = keepIfMatches(segments[1], safeVideoIdRegex)
+  const showcaseId = keepIfMatches(segments[1], digitsRegex)
 
   return showcaseId ? composeShowcaseEmbed(showcaseId) : undefined
 }
@@ -112,9 +114,7 @@ const readReference = (link: string): VimeoReference | undefined => {
   const clipId = url.searchParams.get('clip_id')
 
   if (clipId) {
-    const id = keepIfMatches(clipId, safeVideoIdRegex)
-
-    return id ? { id } : undefined
+    return { id: clipId }
   }
 
   if (sitePathSegments.has(segments[0])) {
@@ -122,35 +122,41 @@ const readReference = (link: string): VimeoReference | undefined => {
   }
 
   if (collectionPaths.has(segments[0])) {
-    const id = keepIfMatches(readCollectionVideoId(segments), safeVideoIdRegex)
+    const id = keepIfMatches(readCollectionVideoId(segments), digitsRegex)
 
     return id ? { id } : undefined
   }
 
   // A ten-digit video id matches the hash shape, so only a segment after an id counts as one.
   const hashIndex = segments.findIndex((segment, index) => {
-    return (
-      index > 0 && unlistedHashRegex.test(segment) && safeVideoIdRegex.test(segments[index - 1])
-    )
+    return index > 0 && unlistedHashRegex.test(segment) && digitsRegex.test(segments[index - 1])
   })
   // The last numeric segment, which is the video in every remaining spelling: `/{id}`,
   // `/video/{id}` and the review pages.
   const path = hashIndex === -1 ? segments : segments.slice(0, hashIndex)
   const id = keepIfMatches(
-    path.findLast((segment) => safeVideoIdRegex.test(segment)),
-    safeVideoIdRegex,
+    path.findLast((segment) => digitsRegex.test(segment)),
+    digitsRegex,
   )
 
   if (!id) {
     return
   }
 
+  if (hashIndex !== -1) {
+    return {
+      id,
+      hash: segments[hashIndex],
+    }
+  }
+
+  // A feed that lost the `&` before the next parameter leaves it after a space. A hash is hex and
+  // never holds one, so the cut repairs what the feed did.
+  const queryHash = url.searchParams.get('h')?.split(whitespaceRegex)[0]
+
   return {
     id,
-    hash:
-      hashIndex === -1
-        ? keepIfMatches(url.searchParams.get('h'), unlistedHashRegex)
-        : segments[hashIndex],
+    hash: queryHash || undefined,
   }
 }
 
@@ -178,7 +184,7 @@ export const readVimeoEmbedSrc = (link: string): string | undefined => {
   const url = parseUrlOnHosts(link, vimeoHosts)
   const videoId = url && extractVimeoId(url.href)
 
-  return videoId ? composeEmbedUrl(videoId) : undefined
+  return videoId ? composeEmbedUrl(encodePathSegment(videoId)) : undefined
 }
 
 // `t` is the start offset, in Vimeo's `{n}s` form.
@@ -195,6 +201,8 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const { id: videoId, hash } = reference
+  // A `clip_id` comes out of the query decoded, and it goes into a path.
+  const segment = encodePathSegment(videoId)
   const title = element ? attr(element, 'title') : undefined
   const params = {
     // The player takes the hash only as h=: the /video/{id}/{hash} path spelling is a 404.
@@ -206,9 +214,10 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     // The hash travels in the id: an oEmbed lookup for the bare id answers 404.
     id: hash ? `${videoId}:${hash}` : videoId,
-    src: composeEmbedUrl(videoId, params),
-    // Without the hash the page loses its title and its poster, so it stays on the url too.
-    url: `https://vimeo.com/${videoId}${hash ? `/${hash}` : ''}`,
+    src: composeEmbedUrl(segment, params),
+    // Without the hash the page loses its title and its video, so it stays on the url too.
+    url: `https://vimeo.com/${segment}${hash ? `/${encodePathSegment(hash)}` : ''}`,
+    ratio: playerRatio,
     title,
     // TODO: no thumbnail. Vimeo posters are not derivable from the id and need an oEmbed lookup.
   }

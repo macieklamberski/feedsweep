@@ -3,8 +3,6 @@ import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
-const safeIdRegex = /^[A-Za-z0-9_-]+$/
-
 const podetizeHosts = ['player.podetize.com']
 
 // Fluid in width and fixed in height: every iframe the corpus carries states 200, which is
@@ -34,7 +32,7 @@ export const podetizeResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, podetizeHosts)
   const id = parsed?.searchParams.get('id')
 
-  if (parsed?.pathname !== '/' || !id || !safeIdRegex.test(id)) {
+  if (parsed?.pathname !== '/' || !id) {
     return
   }
 
@@ -45,12 +43,10 @@ export const podetizeResolveEmbed: ResolveEmbed = (url) => {
 export const podetizeScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="player.podetize.com/loadShowcasePlayer.js"][data]',
   (element) => {
-    // The selector only proves the src contains the host substring, which a foreign host
-    // carrying the same path satisfies too, so the host is checked on the parsed url.
     const id = attr(element, 'data')
 
     // The selector matches a substring any host can carry, so the host is checked here.
-    if (!parseUrlOnHosts(attr(element, 'src'), podetizeHosts) || !id || !safeIdRegex.test(id)) {
+    if (!parseUrlOnHosts(attr(element, 'src'), podetizeHosts) || !id) {
       return
     }
 

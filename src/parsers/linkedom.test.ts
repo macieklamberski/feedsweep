@@ -97,6 +97,19 @@ describe('parseHtml', () => {
       expect(image.getAttribute('src')).toBe('a.png')
     })
 
+    it('should keep a single br inside foreignObject', () => {
+      const document = parseHtml('<svg><foreignObject><p>a<br/>b</p></foreignObject></svg>')
+
+      expect(document.querySelectorAll('br').length).toBe(1)
+    })
+
+    it('should expand a self-closing tag next to a br inside foreignObject', () => {
+      const document = parseHtml('<svg><title /><foreignObject><br/></foreignObject></svg>')
+      const parentTagName = queryElement(document, 'foreignObject').parentElement?.localName
+
+      expect(parentTagName).toBe('svg')
+    })
+
     it('should expand a self-closing tag with whitespace before the slash', () => {
       const document = parseHtml('<svg><path d="M0 0"   /></svg>')
       const parentTagName = queryElement(document, 'path').parentElement?.tagName.toLowerCase()
@@ -104,7 +117,21 @@ describe('parseHtml', () => {
       expect(parentTagName).toBe('svg')
     })
 
-    // The svg region regex stops at the first `</svg>`, even inside an attribute
+    it('should expand an svg before an unclosed one', () => {
+      const document = parseHtml('<svg><title /><path d="M0 0" /></svg><svg><title />')
+      const parentTagName = queryElement(document, 'path').parentElement?.tagName.toLowerCase()
+
+      expect(parentTagName).toBe('svg')
+    })
+
+    it('should expand an svg before an unterminated svg tag', () => {
+      const document = parseHtml('<svg><title /><path d="M0 0" /></svg><svg')
+      const parentTagName = queryElement(document, 'path').parentElement?.tagName.toLowerCase()
+
+      expect(parentTagName).toBe('svg')
+    })
+
+    // The svg region stops at the first `</svg>`, even inside an attribute
     // value, so expansion is skipped for the rest of the element. Linkedom still
     // nests the unexpanded `<path />` under its anchor parent, so the structure
     // happens to survive. Pinned actual behavior.

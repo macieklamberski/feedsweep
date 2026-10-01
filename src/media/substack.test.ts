@@ -79,10 +79,14 @@ describeForEachParser('substackMediaResolver', (parseHtml) => {
 
     // The id is interpolated straight into a url, so a value that is not the shape Substack
     // emits is dropped rather than used to build one.
-    it('should return undefined when mediaUploadId is not a uuid', async () => {
+    it('should use a malformed upload id as written, even if the url answers an error', async () => {
       const value = makeContainer('native-video-embed', { mediaUploadId: '../../etc/passwd' })
+      const expected: MediaResolverResult = {
+        tag: 'video',
+        src: 'https://api.substack.com/api/v1/video/upload/../../etc/passwd/src',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined when mediaUploadId is empty', async () => {

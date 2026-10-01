@@ -1,7 +1,7 @@
-import { getPathSegments, isPlainObject, type Nullish } from 'trousse'
+import { getPathSegments, type Nullish } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find, isBlockElement, isBr, isElement, jsonAttr, text } from '../utils/dom.js'
-import { readPixels } from '../utils/hints.js'
+import { readObjectHeight } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -22,11 +22,6 @@ const blueskyMediaHosts = ['bsky.app', 'bsky.social']
 const postCollection = 'app.bsky.feed.post'
 // at://{authority}/{collection}/{rkey}.
 const atUriRegex = /^at:\/\/([^/]+)\/([^/]+)\/([^/?#]+)/
-
-// A DID or a handle, which is a domain name.
-const safeAuthorityRegex = /^(?:did:[a-z]+:[\w.:%-]+|[a-z\d-]+(?:\.[a-z\d-]+)+)$/i
-// A record key, never `.` or `..`: the protocol forbids them and they would climb out of the path.
-const safeRecordKeyRegex = /^(?!\.{1,2}$)[\w.~-]+$/
 
 // Whitespace, an en dash, an em dash or a hyphen.
 const authorSeparatorRegex = /^[\s–—-]+/
@@ -49,12 +44,6 @@ type SubstackPostAttributes = {
   imageUrls?: Array<string>
 }
 
-const composePost = (authority: string, rkey: string): BlueskyPost | undefined => {
-  if (safeAuthorityRegex.test(authority) && safeRecordKeyRegex.test(rkey)) {
-    return { authority, rkey }
-  }
-}
-
 const extractBlueskyPost = (uri: string): BlueskyPost | undefined => {
   // Not `new URL`: it reads the colon in a DID authority as a port and fails.
   const match = uri.match(atUriRegex)
@@ -63,7 +52,7 @@ const extractBlueskyPost = (uri: string): BlueskyPost | undefined => {
     return
   }
 
-  return composePost(match[1], match[3])
+  return { authority: match[1], rkey: match[3] }
 }
 
 const extractBlueskyPostFromUrl = (link: string): BlueskyPost | undefined => {
@@ -85,7 +74,7 @@ const extractBlueskyPostFromUrl = (link: string): BlueskyPost | undefined => {
     (root === 'profile' && collection === 'post') ||
     (root === 'embed' && collection === postCollection)
   ) {
-    return composePost(authority, rkey)
+    return { authority, rkey }
   }
 }
 
@@ -270,12 +259,8 @@ export const blueskyPostElementEmbedResolver = createMarkupEmbedResolver(
 )
 
 // The player posts its height whenever the post's size changes.
-export const readBlueskyHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) ? readPixels(data.height) : undefined
-}
-
 export const blueskyRenderHint: EmbedRenderHint = {
   provider,
   origin: 'https://embed.bsky.app',
-  readHeight: readBlueskyHeight,
+  readHeight: readObjectHeight,
 }

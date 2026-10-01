@@ -1,5 +1,6 @@
 import { coerceNumber, isNonEmptyString, type Nullish, startsWithAnyOf } from 'trousse'
 import * as styles from './styles.js'
+import { isUrlShaped } from './urls.js'
 
 // Linkedom mis-types Node as `() => void` in facades.d.ts (WebReflection/linkedom#167).
 export const Node = { ELEMENT_NODE: 1, TEXT_NODE: 3, COMMENT_NODE: 8 } as const
@@ -119,8 +120,8 @@ export const attr = (element: Nullish<Element>, name: string): string | undefine
   return element?.getAttribute(name)?.trim() || undefined
 }
 
-// Keeps a value read out of an attribute or a url when it fits the shape expected of it, an id,
-// a handle or a token, and drops it otherwise, so nothing malformed reaches a minted url.
+// Keeps a value read out of an attribute or a url when its shape tells it apart, such as an id
+// from a route word, and drops it otherwise.
 export const keepIfMatches = (value: Nullish<string>, regex: RegExp): string | undefined => {
   return value && regex.test(value) ? value : undefined
 }
@@ -218,8 +219,10 @@ export const isEmptyElement = (element: Element): boolean => {
   return element.children.length === 0 && !hasText(element)
 }
 
-// Remove an element along with any wrapper (a/figure) it leaves empty, so a
-// removed image doesn't leave a dangling link or empty figure behind.
+const removableWrappers = ['a', 'figure']
+
+// Remove an element along with any wrapper it leaves empty, so a removed image doesn't leave a
+// dangling link or empty figure behind.
 export const removeWithEmptyWrappers = (element: Element): void => {
   let current: Element | null = element
 
@@ -227,7 +230,7 @@ export const removeWithEmptyWrappers = (element: Element): void => {
     const parent: Element | null = current.parentElement
     current.remove()
 
-    if (!parent || (parent.tagName !== 'A' && parent.tagName !== 'FIGURE')) {
+    if (!parent || !removableWrappers.includes(parent.localName)) {
       break
     }
 
@@ -251,12 +254,20 @@ export const mediaElements = new Set([
   'video',
 ])
 
+export const mediaSelector = [...mediaElements].join(', ')
+
+export const headingSelector = 'h1, h2, h3, h4, h5, h6'
+
+// Flow containers whose direct children a paragraph pass regroups.
+export const processContainersSelector =
+  'body, div, blockquote, td, li, article, section, main, header, footer, aside'
+
 export const isMediaElement = (node: Node): boolean => {
   return isElement(node) && mediaElements.has(node.localName)
 }
 
 // No img or picture here: a poster beside a parked media url would otherwise count as a player.
-export const playableElements = new Set(['audio', 'embed', 'iframe', 'object', 'source', 'video'])
+export const playableElements = ['audio', 'embed', 'iframe', 'object', 'source', 'video']
 
 export const collectTextNodes = (
   root: Node,
@@ -325,9 +336,15 @@ export const generatedWrapperTypes = ['embed', 'cite', 'file', 'table', 'pre'] a
 
 export type GeneratedWrapperType = (typeof generatedWrapperTypes)[number]
 
-const generatedWrapperPrefixes = generatedWrapperTypes.map((type) => `data-${type}`)
+// The trailing dash keeps a publisher's `data-preview` or `data-embedly-card` from matching.
+const generatedWrapperPrefixes = generatedWrapperTypes.map((type) => `data-${type}-`)
 
 export const isGeneratedWrapper = (element: Element): boolean => {
+  // wrapTablesForScroll marks its wrapper with a bare `data-table`.
+  if (element.hasAttribute('data-table')) {
+    return true
+  }
+
   return element.getAttributeNames().some((name) => startsWithAnyOf(name, generatedWrapperPrefixes))
 }
 
@@ -362,8 +379,15 @@ export const parsePixelSize = (value: Nullish<string>): number | undefined => {
 // Nothing is matched ahead of the unit: an unbounded run there is quadratic on a long attribute.
 const trailingUnitRegex = /[a-z]{1,6}\s*$/i
 
+// A browser ignores a negative size. Zero stays: removeTrackingPixels reads a 0x0 image.
 const dimensionAttribute = (element: Element, name: string): number | undefined => {
-  return coerceNumber(element.getAttribute(name)?.replace(trailingUnitRegex, ''))
+  const size = coerceNumber(element.getAttribute(name)?.replace(trailingUnitRegex, ''))
+
+  if (size === undefined || size < 0) {
+    return
+  }
+
+  return size
 }
 
 // Squarespace stamps `data-image-dimensions="2500x1695"`, and on its gallery `img.thumb-image`
@@ -371,7 +395,9 @@ const dimensionAttribute = (element: Element, name: string): number | undefined 
 const imageDimensionsRegex = /^\s*([0-9]+)\s*x\s*([0-9]+)\s*$/i
 
 export const getElementDimensions = (element: Element): { width?: number; height?: number } => {
-  const width = dimensionAttribute(element, 'width')
+  // `width: 1px; min-width: 100%` fills the container, so the stated width names no size.
+  const isContainerWide = styles.declarations(element)['min-width'] === '100%'
+  const width = isContainerWide ? undefined : dimensionAttribute(element, 'width')
   const height = dimensionAttribute(element, 'height')
 
   if (width !== undefined && height !== undefined) {
@@ -379,9 +405,10 @@ export const getElementDimensions = (element: Element): { width?: number; height
   }
 
   const dimensions = imageDimensionsRegex.exec(element.getAttribute('data-image-dimensions') ?? '')
+  const styleWidth = isContainerWide ? undefined : styles.pixels(element, 'width')
 
   return {
-    width: width ?? coerceNumber(dimensions?.[1]) ?? coerceNumber(styles.pixels(element, 'width')),
+    width: width ?? coerceNumber(dimensions?.[1]) ?? coerceNumber(styleWidth),
     height:
       height ?? coerceNumber(dimensions?.[2]) ?? coerceNumber(styles.pixels(element, 'height')),
   }
@@ -393,9 +420,9 @@ const paddingPercentRegex = /^([\d.]+)%$/
 const whitespaceRegex = /\s+/
 const wpEmbedAspectRegex = /wp-embed-aspect-(\d+)-(\d+)/
 
-// Some embed wrappers write the hack as `padding: 0 0 56.25%`, where only the three and four
-// value forms give the bottom a value of its own.
-const shorthandBottom = (declarations: styles.Declarations): string | undefined => {
+// Some embed wrappers write the hack as `padding: 0 0 56.25%` or `padding: 56.25% 0 0 0`, where
+// only the three and four value forms give the top and the bottom values of their own.
+const shorthandSide = (declarations: styles.Declarations, index: 0 | 2): string | undefined => {
   const padding = declarations.padding
 
   if (!padding || padding.includes('(')) {
@@ -404,7 +431,7 @@ const shorthandBottom = (declarations: styles.Declarations): string | undefined 
 
   const sides = padding.split(whitespaceRegex)
 
-  return sides.length >= 3 ? sides[2] : undefined
+  return sides.length >= 3 ? sides[index] : undefined
 }
 
 // Ordered by trust, the max-width pair last: it infers a ratio the others state outright.
@@ -431,11 +458,19 @@ const elementRatioSources: Array<(element: Element) => string | undefined> = [
   },
 
   // The legacy inline padding hack (`padding-bottom:56.25%`): the percent is the
-  // inverse of the ratio, bounded to keep a stray value from encoding nonsense.
+  // inverse of the ratio, bounded to keep a stray value from encoding nonsense. A wrapper that
+  // pads the top zeroes the bottom (`0`, `0%`, `0px`), so only a zero bottom yields to the top.
   (element) => {
+    // `parseStyles` drops a longhand that a later shorthand resets, so a longhand still present
+    // wins over the shorthand, as it does in the browser's cascade.
     const declarations = styles.declarations(element)
-    const padding =
-      declarations['padding-bottom'] ?? declarations['padding-top'] ?? shorthandBottom(declarations)
+    const top = declarations['padding-top'] ?? shorthandSide(declarations, 0)
+    let padding = declarations['padding-bottom'] ?? shorthandSide(declarations, 2)
+
+    if (padding === undefined || Number.parseFloat(padding) === 0) {
+      padding = top
+    }
+
     const percent = Number(padding?.match(paddingPercentRegex)?.[1])
 
     if (percent > 0 && percent < 1000) {
@@ -625,4 +660,20 @@ export const walkElements = (
   }
 
   return false
+}
+
+// The first value among lazy attributes that names a url, which a lazy-load library parks
+// where the real attribute belongs.
+export const getLazyValue = (
+  element: Element,
+  attributes: ReadonlyArray<string>,
+  isUsable: (value: string) => boolean = isUrlShaped,
+): string | undefined => {
+  for (const attribute of attributes) {
+    const value = element.getAttribute(attribute)
+
+    if (value && isUsable(value)) {
+      return value
+    }
+  }
 }

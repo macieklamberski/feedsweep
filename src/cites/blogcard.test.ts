@@ -189,32 +189,12 @@ describeForEachParser('blogCardCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should leave optional fields undefined when only the title link is present', async () => {
-      const value = html`
-        <div class="blog-card">
-          <div class="blog-card-title">
-            <a href="https://example.com/post">Page title</a>
-          </div>
-        </div>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'blogcard',
-        url: 'https://example.com/post',
-        title: 'Page title',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {
-    it('should return undefined when the title link has no href', async () => {
+    it('should return undefined when there is no title', async () => {
       const value = html`
         <div class="blog-card">
-          <div class="blog-card-title">
-            <a>Page title</a>
-          </div>
           <div class="blog-card-excerpt">Preview text</div>
         </div>
       `
@@ -222,11 +202,41 @@ describeForEachParser('blogCardCiteResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined when there is no title', async () => {
+    it('should not take the url from the Hatena bookmark button when the title has no link', async () => {
       const value = html`
-        <div class="blog-card">
-          <div class="blog-card-excerpt">Preview text</div>
+        <div class="blog-card internal-blog-card blog-card-thumbnail-left cf">
+          <div class="blog-card-content">
+            <div class="blog-card-title">Page title</div>
+            <div class="blog-card-excerpt">Preview text</div>
+          </div>
+          <div class="blog-card-footer">
+            <div class="blog-card-site">example.com</div>
+            <div class="blog-card-hatebu">
+              <a href="//b.hatena.ne.jp/entry/https://example.com/post" rel="nofollow">
+                <img src="//b.hatena.ne.jp/entry/image/https://example.com/post" alt="">
+              </a>
+            </div>
+          </div>
         </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('shapes that are not a blog card', () => {
+    // A Shopify blog listing that reuses the class for its own post tiles.
+    it('should ignore a listing tile carrying the class with no card title', async () => {
+      const value = html`
+        <article class="blog-card">
+          <a href="/blogs/news/faux-vs-real-sheepskin-5-surprising-truths-1">
+            <h2>Faux vs Real Sheepskin: 5 Surprising Truths (2026 Guide) <span class="new-badge">FEATURED</span></h2>
+          </a>
+          <div class="blog-meta">
+            <span>March 18, 2026</span>
+          </div>
+          <p class="blog-description">Thinking real sheepskin is better? Think again.</p>
+        </article>
       `
 
       expect(await extract(value)).toBeUndefined()

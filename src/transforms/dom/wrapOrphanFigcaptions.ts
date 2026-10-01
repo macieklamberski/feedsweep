@@ -94,7 +94,10 @@ export const wrapOrphanFigcaptions: DomTransform = () => {
         continue
       }
 
-      if (previous.querySelectorAll(mediaSelector).length !== 1) {
+      const isMedia =
+        previous.matches(mediaSelector) || previous.querySelectorAll(mediaSelector).length === 1
+
+      if (!isMedia) {
         continue
       }
 
@@ -107,6 +110,7 @@ export const wrapOrphanFigcaptions: DomTransform = () => {
       parent.insertBefore(figure, previous)
       figure.appendChild(previous)
       figure.appendChild(figcaption)
+      discardEmptyAnchor(anchor, figcaption)
     }
   }
 }

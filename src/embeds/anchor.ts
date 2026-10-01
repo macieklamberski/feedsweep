@@ -1,9 +1,6 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-
-const safeSegmentRegex = /^[A-Za-z0-9._-]+$/
 
 // One service, three host generations, all still live in feeds: `anchor.fm` became
 // `podcasters.spotify.com` became `creators.spotify.com`. The Spotify resolver matches the
@@ -29,30 +26,61 @@ export const extractAnchorEpisode = (link: string): string | undefined => {
   const show = segments[marker - 1]
   const episode = segments[marker + 2]
 
-  if (!show || !episode || ![show, episode].every((part) => safeSegmentRegex.test(part))) {
+  if (!episode) {
     return
   }
 
   return `${show}/${episode}`
 }
 
-export const anchorResolveEmbed: ResolveEmbed = (url) => {
-  const episode = extractAnchorEpisode(url)
-  const parsed = parseUrl(url, placeholderBaseUrl)
+const anchorShowPathRegex = /^\/([^/]+)\/embed\/?$/
+const spotifyShowPathRegex = /^\/pod\/(?:show|profile)\/([^/]+)\/embed\/?$/
 
-  if (!episode || !parsed) {
+// `anchor.fm/{show}/embed`, `podcasters.spotify.com/pod/show/{show}/embed`,
+// `creators.spotify.com/pod/profile/{show}/embed`.
+const extractAnchorShow = (link: string): string | undefined => {
+  const parsed = parseUrl(link)
+
+  if (!parsed) {
     return
   }
 
-  // The player carries no metadata, and Anchor's old oEmbed endpoint is gone.
+  const pathRegex = isHostOrSubdomainOf(parsed, ['anchor.fm'])
+    ? anchorShowPathRegex
+    : spotifyShowPathRegex
+
+  return parsed.pathname.match(pathRegex)?.[1]
+}
+
+// The player carries no metadata, and Anchor's old oEmbed endpoint is gone.
+export const anchorResolveEmbed: ResolveEmbed = (url) => {
+  const episode = extractAnchorEpisode(url)
+
+  if (episode) {
+    const [show, slug] = episode.split('/')
+
+    return {
+      provider: 'anchor',
+      id: episode,
+      src: `https://creators.spotify.com/pod/profile/${show}/embed/episodes/${slug}`,
+      height: playerHeight,
+    }
+  }
+
+  const show = extractAnchorShow(url)
+
+  if (!show) {
+    return
+  }
+
   return {
     provider: 'anchor',
-    id: episode,
-    // The host is kept: the three generations are not known to be interchangeable.
-    src: parsed.href,
+    id: show,
+    src: `https://creators.spotify.com/pod/profile/${show}/embed`,
     height: playerHeight,
   }
 }
 
-// Anchor's episode player iframe, on the anchor.fm host and the two Spotify hosts it became.
+// Anchor's episode and show player iframes, on the anchor.fm host and the two Spotify hosts it
+// became.
 export const anchorEmbedResolver = createUrlEmbedResolver(anchorHosts, anchorResolveEmbed)

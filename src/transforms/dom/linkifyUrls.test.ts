@@ -125,13 +125,28 @@ describeForEachParser('linkifyUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should not link protocol-less URL beside a linked one', async () => {
+    const value = '<p>Visit example.com or https://example.org</p>'
+    const expected = html`
+      <p>Visit example.com or <a href="https://example.org">https://example.org</a></p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should not link ftp URL', async () => {
+    const value = '<p>Mirror at ftp://example.com/file.zip</p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should not link email address', async () => {
     const value = '<p>Contact user@example.com</p>'
 
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  const unlinkableTags: Array<string> = ['pre', 'code', 'kbd', 'samp', 'var', 'script']
+  const unlinkableTags: Array<string> = ['pre', 'code', 'kbd', 'samp', 'var', 'script', 'noscript']
 
   it.each(unlinkableTags)('should not link URL inside %s tag', async (tag) => {
     const value = `<${tag}>https://example.com</${tag}>`

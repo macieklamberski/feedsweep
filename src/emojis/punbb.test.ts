@@ -4,9 +4,10 @@ import { describeForEachParser, emojiConverters } from '../tests.js'
 describeForEachParser('punbbEmojiResolver', (parseHtml) => {
   const { transform } = emojiConverters(parseHtml)
 
-  it('should replace a pack image by its shortcode alt', async () => {
+  it('should mark a pack image despite its universal code alt', async () => {
     const value = '<p><img src="https://example.com/extensions/nya_smiles/img/ad.gif" alt=";)"></p>'
-    const expected = '<p>😉</p>'
+    const expected =
+      '<p><img data-emoji="" src="https://example.com/extensions/nya_smiles/img/ad.gif" alt=";)"></p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })

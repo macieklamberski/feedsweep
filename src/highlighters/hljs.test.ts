@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'bun:test'
+import sharedHljs from 'highlight.js/lib/common'
+import coffeescript from 'highlight.js/lib/languages/coffeescript'
 import { extraLanguages, hljsHighlightFn, languageAliases } from './hljs.js'
 
 const registeredLanguages = Object.keys(extraLanguages)
@@ -22,5 +24,29 @@ describe('hljsHighlightFn', () => {
 
   it('should return undefined for an unknown language', () => {
     expect(hljsHighlightFn('x', 'not-a-language')).toBeUndefined()
+  })
+
+  it('should resolve a grammar of the common build', () => {
+    expect(hljsHighlightFn('x', 'python')).toBeDefined()
+  })
+
+  it('should ignore a grammar registered on the shared instance', () => {
+    sharedHljs.registerLanguage('coffeescript', coffeescript)
+
+    try {
+      expect(hljsHighlightFn('x', 'coffeescript')).toBeUndefined()
+    } finally {
+      sharedHljs.unregisterLanguage('coffeescript')
+    }
+  })
+})
+
+describe('shared highlight.js instance', () => {
+  it('should not carry a feedsweep grammar', () => {
+    expect(sharedHljs.getLanguage('haskell')).toBeUndefined()
+  })
+
+  it('should not carry a feedsweep alias', () => {
+    expect(sharedHljs.getLanguage('python3')).toBeUndefined()
   })
 })

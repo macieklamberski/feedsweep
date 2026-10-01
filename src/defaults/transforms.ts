@@ -4,6 +4,7 @@ import { assignVideoPosters } from '../transforms/dom/assignVideoPosters.js'
 import { canonicalizeAlignment } from '../transforms/dom/canonicalizeAlignment.js'
 import { cleanAnchorUrls } from '../transforms/dom/cleanAnchorUrls.js'
 import { convertAmpNativeElements } from '../transforms/dom/convertAmpNativeElements.js'
+import { convertAsciinemaEmbeds } from '../transforms/dom/convertAsciinemaEmbeds.js'
 import { convertBreaksToParagraphs } from '../transforms/dom/convertBreaksToParagraphs.js'
 import { convertCiteCards } from '../transforms/dom/convertCiteCards.js'
 import { convertDatawrapperEmbeds } from '../transforms/dom/convertDatawrapperEmbeds.js'
@@ -17,6 +18,7 @@ import { decodeDoubleEncodedTags } from '../transforms/dom/decodeDoubleEncodedTa
 import { demoteHeadings } from '../transforms/dom/demoteHeadings.js'
 import { enrichCitePlaceholders } from '../transforms/dom/enrichCitePlaceholders.js'
 import { enrichEmbedPlaceholders } from '../transforms/dom/enrichEmbedPlaceholders.js'
+import { fixDropboxMediaUrls } from '../transforms/dom/fixDropboxMediaUrls.js'
 import { fixLazyAudios } from '../transforms/dom/fixLazyAudios.js'
 import { fixLazyIframes } from '../transforms/dom/fixLazyIframes.js'
 import { fixLazyImages } from '../transforms/dom/fixLazyImages.js'
@@ -29,6 +31,7 @@ import { hoistBlocksFromParagraphs } from '../transforms/dom/hoistBlocksFromPara
 import { hoistFigcaptionFromAnchor } from '../transforms/dom/hoistFigcaptionFromAnchor.js'
 import { injectEnclosures } from '../transforms/dom/injectEnclosures.js'
 import { linkifyGistEmbeds } from '../transforms/dom/linkifyGistEmbeds.js'
+import { linkifyPaypalDonateForms } from '../transforms/dom/linkifyPaypalDonateForms.js'
 import { linkifyUrls } from '../transforms/dom/linkifyUrls.js'
 import { markTimestamps } from '../transforms/dom/markTimestamps.js'
 import { mergeConsecutiveOneLinerPres } from '../transforms/dom/mergeConsecutiveOneLinerPres.js'
@@ -41,11 +44,17 @@ import { rebuildDeferredIframes } from '../transforms/dom/rebuildDeferredIframes
 import { rebuildElementorVideoEmbeds } from '../transforms/dom/rebuildElementorVideoEmbeds.js'
 import { rebuildEmbedlyEmbeds } from '../transforms/dom/rebuildEmbedlyEmbeds.js'
 import { rebuildEmbedPlusEmbeds } from '../transforms/dom/rebuildEmbedPlusEmbeds.js'
+import { rebuildExternalVideoEmbeds } from '../transforms/dom/rebuildExternalVideoEmbeds.js'
 import { rebuildGettyImagesEmbeds } from '../transforms/dom/rebuildGettyImagesEmbeds.js'
+import { rebuildGofundmeEmbeds } from '../transforms/dom/rebuildGofundmeEmbeds.js'
+import { rebuildIframelyEmbeds } from '../transforms/dom/rebuildIframelyEmbeds.js'
+import { rebuildJsfiddleEmbeds } from '../transforms/dom/rebuildJsfiddleEmbeds.js'
 import { rebuildLazyLoadForVideos } from '../transforms/dom/rebuildLazyLoadForVideos.js'
 import { rebuildLazyYtEmbeds } from '../transforms/dom/rebuildLazyYtEmbeds.js'
 import { rebuildLiteVideoEmbeds } from '../transforms/dom/rebuildLiteVideoEmbeds.js'
 import { rebuildLyteEmbeds } from '../transforms/dom/rebuildLyteEmbeds.js'
+import { rebuildPiktochartEmbeds } from '../transforms/dom/rebuildPiktochartEmbeds.js'
+import { rebuildPublicalbumGalleries } from '../transforms/dom/rebuildPublicalbumGalleries.js'
 import { rebuildRocketYoutubePreviews } from '../transforms/dom/rebuildRocketYoutubePreviews.js'
 import { rebuildVideoJsEmbeds } from '../transforms/dom/rebuildVideoJsEmbeds.js'
 import { rebuildWistiaEmbeds } from '../transforms/dom/rebuildWistiaEmbeds.js'
@@ -105,16 +114,25 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // has to see it.
   surfaceParkedMarkup,
   stripComments,
+  // Runs before stripHiddenElements, which deletes the album div the plugin hides with inline
+  // `display:none`, and every photo url inside it.
+  rebuildPublicalbumGalleries,
   stripHiddenElements,
   // Normalize lazy-loaded video embeds into a plain <iframe> before the media/embed
   // transforms run, so each is placeholdered and any poster connected.
   surfaceTemplateEmbeds,
+  // Points a Drupal media oEmbed frame at the page url it wraps, so the provider resolvers
+  // below see the video and not the site's proxy route. Runs before surfaceNoscriptEmbeds,
+  // which surfaces only a frame a resolver claims.
+  unwrapDrupalOembedIframes,
   surfaceNoscriptEmbeds,
   rebuildEmbedPlusEmbeds,
+  rebuildIframelyEmbeds,
   rebuildLiteVideoEmbeds,
   rebuildLyteEmbeds,
   rebuildRocketYoutubePreviews,
   rebuildVideoJsEmbeds,
+  rebuildExternalVideoEmbeds,
   rebuildWmakerEmbeds,
   rebuildWistiaEmbeds,
   rebuildLazyLoadForVideos,
@@ -126,13 +144,13 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Runs before convertCiteCards so a payload naming `link` still reaches the cite pass, and
   // before stripEmptyTags, which is what deletes an empty carrier nothing has claimed.
   rebuildEmbedlyEmbeds,
-  // Points a Drupal media oEmbed frame at the page url it wraps, so the provider resolvers
-  // below see the video and not the site's proxy route.
-  unwrapDrupalOembedIframes,
   rebuildGettyImagesEmbeds,
+  rebuildJsfiddleEmbeds,
   // A GitHub Gist embed is a JS-only <script> that renders nothing in a reader. Replace it
   // with a link to the gist so the content is at least reachable.
   linkifyGistEmbeds,
+  // Runs before stripNonContentElements, which strips the `/cgi-bin/webscr` forms this leaves.
+  linkifyPaypalDonateForms,
   // A Substack @-mention is an empty span whose name lives only in its data-attrs JSON;
   // rebuild the anchor before stripEmptyTags deletes the span and the name with it.
   fixSubstackMentions,
@@ -158,10 +176,15 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // placeholdered downstream. Runs before convertDatawrapperEmbeds so a data-frame-src
   // Datawrapper div becomes an iframe that convertDatawrapperEmbeds turns into a static image.
   rebuildDeferredIframes,
+  // Runs before stripEmptyTags, which deletes the empty widget div, and before convertWidgets.
+  rebuildGofundmeEmbeds,
+  // Runs before stripEmptyTags, which deletes the emptied snippet div, and before convertWidgets.
+  rebuildPiktochartEmbeds,
   // Converts Datawrapper chart embeds (iframe, script/noscript, and link forms) into a
   // linked static <img> of the chart's published PNG render. Runs in this normalize
   // cluster so the emitted <img> is dimensioned and proxied by the image transforms below.
   convertDatawrapperEmbeds,
+  convertAsciinemaEmbeds,
   convertGiphyEmbeds,
   convertSmartframeEmbeds,
   unwrapDoublyNestedLists,
@@ -192,8 +215,8 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   stripNonContentElements,
   resolveRelativeUrls,
   cleanAnchorUrls,
-  // Runs after resolveRelativeUrls/cleanAnchorUrls so hrefs are absolute and cleaned,
-  // and before normalizeAnchoredHeadings so heading permalinks are already bare
+  // Runs after cleanAnchorUrls, whose cleanUrlFn can unwrap a redirect around a link to this
+  // same page, and before normalizeAnchoredHeadings so heading permalinks are already bare
   // `#fragment` when the canonical `<a name>` is built.
   shortenSamePageLinkFragments,
   // Runs after cleanAnchorUrls so the href it inspects is already cleaned/resolved,
@@ -245,6 +268,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   fixLazyIframes,
   convertWidgets,
   injectEnclosures,
+  // Runs after injectEnclosures, and so after the heuristic stripDuplicateEnclosures folded in
+  // beside it, which matches an injected enclosure against the body on the exact src. Before
+  // neutralizeUnsafeUrls and proxyAssetUrls, so the repaired url is the one they see.
+  fixDropboxMediaUrls,
   // Fills embed placeholder metadata via the caller's enrichEmbedFn. No-ops when that
   // option is unset. Runs after placeholders exist and before neutralize/proxy so any
   // enriched URLs are still neutralized and proxied.
@@ -290,8 +317,8 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
 export const heuristicDomTransforms: Array<DomTransform> = [
   assignVideoPosters,
   stripDuplicateEnclosures,
-  // After stripDuplicateEnclosures: an injected enclosure that duplicates the first
-  // content image is already gone by then, so this only sees publisher-authored repeats.
+  // An image enclosure is injected only into a body with no image of its own, so no injected
+  // image repeats a content image for either pass to remove.
   stripDuplicateLeadingImages,
 ]
 
@@ -304,7 +331,7 @@ export const defaultAllDomTransforms: Array<DomTransform> = defaultStandardDomTr
   },
 )
 
-export const defaultResolveUrlFn: ResolveUrlFn = (url, baseUrl) => resolveUrl(url, baseUrl)
+export const defaultResolveUrlFn: ResolveUrlFn = resolveUrl
 
 // Default code highlighter: highlight.js. Swap it via the highlightFn option.
 export const defaultHighlightFn = hljsHighlightFn
