@@ -27,7 +27,6 @@ import {
   getStylePairRatio,
   getWrapperRatio,
   isPercentageSized,
-  keepIfMatches,
 } from './dom.js'
 import { cleanUrl, parseUrlOnHosts, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
 
@@ -74,8 +73,10 @@ export const readCarrierUrl = (element: Element): string => {
 }
 
 type ResolverOptions = {
-  // Scribd states `height="500"` on every document and keeps the ratio in `data-aspect-ratio`.
-  preferResolverSize?: boolean
+  // Deep handling only: the carrier's declared box replaces the resolver's size. Pass it on a
+  // carrier the publisher sized for the player that loads, never on a retired tool's or dead
+  // route's.
+  readCarrierSize?: boolean
 }
 
 // A resolver whose selector names the platform's own markup.
@@ -88,33 +89,25 @@ export const createMarkupEmbedResolver = (
     kind: 'embed',
     selector,
     extract: (element) => {
-      return decideSize(element, extract(element), options.preferResolverSize)
+      return decideSize(element, extract(element), options.readCarrierSize)
     },
   }
 }
 
 // A forum's s9e MediaEmbed helper frame for one platform, composed into that platform's own url.
-// A fragment holding a character the helper page strips, such as a dot, could step out of the
-// composed path, so it is refused.
 export const createS9eEmbedResolver = (
   platform: string,
-  fragmentRegex: RegExp,
   compose: (fragment: string) => EmbedResolverResult | undefined,
-  options: ResolverOptions = {},
 ): EmbedResolver => {
-  return createMarkupEmbedResolver(
-    `iframe[data-s9e-mediaembed="${platform}"]`,
-    (element) => {
-      const fragment = keepIfMatches(readS9eFragment(element), fragmentRegex)
+  return createMarkupEmbedResolver(`iframe[data-s9e-mediaembed="${platform}"]`, (element) => {
+    const fragment = readS9eFragment(element)
 
-      if (!fragment) {
-        return
-      }
+    if (!fragment) {
+      return
+    }
 
-      return compose(fragment)
-    },
-    options,
-  )
+    return compose(fragment)
+  })
 }
 
 // What a carrier says about its size: the dimensions it declares, or the ratio a responsive
@@ -135,13 +128,9 @@ const hasSize = (size: SizeFields): boolean => {
 const decideSize = (
   element: Element,
   result: EmbedResolverResult | undefined,
-  preferResolverSize?: boolean,
+  readCarrierSize?: boolean,
 ): EmbedResolverResult | undefined => {
-  if (!result) {
-    return
-  }
-
-  if (preferResolverSize && hasSize(result)) {
+  if (!result || !readCarrierSize) {
     return result
   }
 
@@ -221,7 +210,7 @@ export const createUrlEmbedResolver = (
         return
       }
 
-      return decideSize(element, extract(src, element), options.preferResolverSize)
+      return decideSize(element, extract(src, element), options.readCarrierSize)
     },
   }
 }
@@ -307,6 +296,21 @@ export const createImage = (document: Document, fields: ImageFields): HTMLElemen
   setDimensions(image, fields)
 
   return image
+}
+
+// An <img>, an <audio> and a <video> have nowhere of their own to show a human-readable caption.
+export const createCaptionedFigure = (
+  document: Document,
+  element: HTMLElement,
+  caption: string,
+): HTMLElement => {
+  const figure = document.createElement('figure')
+  const figcaption = document.createElement('figcaption')
+
+  figcaption.textContent = caption
+  figure.append(element, figcaption)
+
+  return figure
 }
 
 export const createLink = (document: Document, href: string, text = href): HTMLElement => {
@@ -455,14 +459,15 @@ export const cleanResultFields = <Result extends CleanableResult>(
   }
 }
 
-// The src is never cleaned: a player src carries query the platform needs.
 export const prepareEmbedMetadata = (
   metadata: Partial<EmbedResolverResult>,
   context: TransformContext,
 ): Partial<EmbedResolverResult> => {
+  const src = resolveOrDropUrl(metadata.src, context)
+
   return {
     ...cleanResultFields(metadata, context),
-    src: resolveOrDropUrl(metadata.src, context),
+    src: cleanUrl(src, context),
     url: cleanUrl(resolveOrDropUrl(metadata.url, context), context),
     thumbnail: resolveOrKeepUrl(metadata.thumbnail, context),
     avatar: resolveOrKeepUrl(metadata.avatar, context),
@@ -472,7 +477,7 @@ export const prepareEmbedMetadata = (
 
 export const createEmbedPlaceholder = (
   document: Document,
-  metadata: Partial<EmbedResolverResult> & Pick<EmbedResolverResult, 'src'>,
+  metadata: Partial<EmbedResolverResult>,
 ): HTMLElement => {
   const element = document.createElement('div')
   updateEmbedPlaceholder(element, metadata)
@@ -524,7 +529,7 @@ export const updateCitePlaceholder = (
 
 export const createCitePlaceholder = (
   document: Document,
-  result: CiteResolverResult,
+  result: Partial<CiteResolverResult>,
 ): HTMLElement => {
   return createPlaceholder(document, 'cite', normalizeCiteFields(result))
 }

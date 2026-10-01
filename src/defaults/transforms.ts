@@ -202,8 +202,8 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   stripNonContentElements,
   resolveRelativeUrls,
   cleanAnchorUrls,
-  // Runs after resolveRelativeUrls/cleanAnchorUrls so hrefs are absolute and cleaned,
-  // and before normalizeAnchoredHeadings so heading permalinks are already bare
+  // Runs after cleanAnchorUrls, whose cleanUrlFn can unwrap a redirect around a link to this
+  // same page, and before normalizeAnchoredHeadings so heading permalinks are already bare
   // `#fragment` when the canonical `<a name>` is built.
   shortenSamePageLinkFragments,
   // Runs after cleanAnchorUrls so the href it inspects is already cleaned/resolved,
@@ -300,8 +300,8 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
 export const heuristicDomTransforms: Array<DomTransform> = [
   assignVideoPosters,
   stripDuplicateEnclosures,
-  // After stripDuplicateEnclosures: an injected enclosure that duplicates the first
-  // content image is already gone by then, so this only sees publisher-authored repeats.
+  // An image enclosure is injected only into a body with no image of its own, so no injected
+  // image repeats a content image for either pass to remove.
   stripDuplicateLeadingImages,
 ]
 

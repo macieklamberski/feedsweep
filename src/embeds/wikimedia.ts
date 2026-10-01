@@ -12,10 +12,6 @@ import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
 const extensionRegex = /\.[^.]+$/
 const underscoreRegex = /_/g
 
-// The same address without it answers with the file's description page, 101 KB of navigation and
-// licensing against the player's 7 KB.
-const playerParam = 'embedplayer=yes'
-
 // `Special:FilePath` snaps a width to a fixed set and serves a request for 640 at 960. A width on
 // an audio file answers with a generic 3 KB icon rather than the file, so only video asks for one.
 const posterWidth = 960
@@ -41,8 +37,12 @@ export const composeFilePathUrl = (
   return origin && `${origin}/wiki/Special:FilePath/${fileName}${query}`
 }
 
-const composePlayerUrl = (url: string): string => {
-  return url.includes(playerParam) ? url : `${url}${url.includes('?') ? '&' : '?'}${playerParam}`
+// The url Commons' "Embed this file" dialog writes. Without `embedplayer` the same address answers
+// with the file's description page. `File:` is the namespace name every wiki answers to.
+const composePlayerUrl = (url: string, fileName: string): string => {
+  const host = parseUrl(url, placeholderBaseUrl)?.host ?? ''
+
+  return `https://${host}/wiki/File:${fileName}?embedplayer=yes`
 }
 
 // MediaWiki's TimedMediaHandler frames its own player for a freely licensed file, and that player
@@ -65,9 +65,7 @@ export const wikimediaEmbedResolver: EmbedResolver = createMarkupEmbedResolver(
     const result: EmbedResolverResult = {
       provider: 'wikimedia',
       id: fileName,
-      src: composePlayerUrl(source),
-      // Commons carries a lot of 4:3 archive footage, so this stands only where the frame
-      // declares no size of its own.
+      src: composePlayerUrl(source, fileName),
       ratio: '16/9',
     }
 

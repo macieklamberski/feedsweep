@@ -55,16 +55,34 @@ describe('scratchResolveEmbed', () => {
       expect(scratchResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a project id that is not a number', () => {
+    it('should use a malformed project id as written, even if the player answers an error', () => {
       const value = 'https://scratch.mit.edu/projects/latest/embed'
+      const expected: EmbedResolverResult = {
+        provider: 'scratch',
+        id: 'latest',
+        src: 'https://scratch.mit.edu/projects/latest/embed',
+        url: 'https://scratch.mit.edu/projects/latest/',
+        thumbnail: 'https://cdn2.scratch.mit.edu/get_image/project/latest_480x360.png',
+        width: 485,
+        height: 402,
+      }
 
-      expect(scratchResolveEmbed(value)).toBeUndefined()
+      expect(scratchResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should ignore a legacy project id that is not a number', () => {
+    it('should use a malformed legacy project id as written, even if the player answers an error', () => {
       const value = 'https://scratch.mit.edu/projects/embed/latest/'
+      const expected: EmbedResolverResult = {
+        provider: 'scratch',
+        id: 'latest',
+        src: 'https://scratch.mit.edu/projects/latest/embed',
+        url: 'https://scratch.mit.edu/projects/latest/',
+        thumbnail: 'https://cdn2.scratch.mit.edu/get_image/project/latest_480x360.png',
+        width: 485,
+        height: 402,
+      }
 
-      expect(scratchResolveEmbed(value)).toBeUndefined()
+      expect(scratchResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore a file host, which answers the player route with an image', () => {
@@ -141,8 +159,8 @@ describeForEachParser('scratchEmbedResolver', (parseHtml) => {
         src: 'https://scratch.mit.edu/projects/10007053/embed',
         url: 'https://scratch.mit.edu/projects/10007053/',
         thumbnail: 'https://cdn2.scratch.mit.edu/get_image/project/10007053_480x360.png',
-        width: 602,
-        height: 502,
+        width: 485,
+        height: 402,
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -1,6 +1,6 @@
 import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type FlipBook = {
@@ -16,31 +16,28 @@ const heyzineHosts = ['heyzine.com', 'www.heyzine.com', 'cdn.heyzine.com']
 // The embed id is ten hexadecimal characters, with or without the `.html` the snippet writes.
 // The viewer answers the id in either case.
 const flipBookIdRegex = /^([0-9a-f]{10})(?:\.html)?$/i
-// The viewer serves a longer bare hexadecimal name as the book its first ten characters name.
-const hexNameRegex = /^[0-9a-f]+$/i
-// The viewer opens on the page a `#page/{n}` fragment names, framed or not.
-const pageFragmentRegex = /^#page\/\d+$/
-
 // A custom slug is served only without `.html`, in either case.
+const htmlExtensionRegex = /\.html$/i
+// The viewer opens on the page a `#page/{n}` fragment names, framed or not.
+const pageFragmentRegex = /^#page\/[^/]+$/
+
 const readFlipBook = (name: string): FlipBook | undefined => {
-  const flipBookId = name.match(flipBookIdRegex)?.[1]?.toLowerCase()
+  const flipBookId = name.match(flipBookIdRegex)?.[1]
 
   if (flipBookId) {
     return {
-      id: flipBookId,
+      id: flipBookId.toLowerCase(),
       path: `${flipBookId}.html`,
     }
   }
 
-  if (hexNameRegex.test(name) || !urlSafeTokenRegex.test(name)) {
+  if (!name || htmlExtensionRegex.test(name)) {
     return
   }
 
-  const slug = name.toLowerCase()
-
   return {
-    id: slug,
-    path: slug,
+    id: name.toLowerCase(),
+    path: name,
   }
 }
 
@@ -67,6 +64,7 @@ export const heyzineResolveEmbed: ResolveEmbed = (url) => {
     id: flipBook.id,
     src,
     url: src,
+    ratio: '490/600',
   }
 }
 

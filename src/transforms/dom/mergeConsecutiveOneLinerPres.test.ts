@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -233,5 +234,34 @@ describeForEachParser('mergeConsecutiveOneLinerPres', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('pre runs the pipeline reaches after replacePreLineBreaks', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should merge Medium-style code lines into one block', async () => {
+    const value = html`
+      <pre>- name: Upgrade packages<br></pre>
+      <pre>  yum:</pre>
+      <pre>    name: '*'</pre>
+      <pre>    state: latest</pre>
+    `
+    const expected =
+      "<pre><code>- name: Upgrade packages\n  yum:\n    name: '*'\n    state: latest</code></pre>"
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a block whose lines are split by br apart from the next', async () => {
+    const value = html`
+      <pre>line 1<br>line 2</pre>
+      <pre>line 3</pre>
+    `
+    const expected = '<pre><code>line 1\nline 2</code></pre><pre><code>line 3</code></pre>'
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

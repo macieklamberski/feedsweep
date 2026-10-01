@@ -1,12 +1,16 @@
-import { parseUrl, toMap } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { composeQuery, digitsRegex, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { isPlainObject, parseUrl, toMap } from 'trousse'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-const vkHosts = ['vk.com', 'vk.ru', 'vkontakte.ru', 'vkvideo.ru']
+const provider = 'vk'
 
-// An owner id is negative for a community.
-const safeOwnerIdRegex = /^-?\d+$/
+const vkHosts = ['vk.com', 'vk.ru', 'vkontakte.ru', 'vkvideo.ru']
 
 // The page a player opens is spelled with the endpoint's own word, on the host vk.com redirects
 // videos to. A clip page on vk.com redirects to an unsupported-browser page instead.
@@ -33,20 +37,38 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
   const ownerId = parsed.searchParams.get('oid') ?? ''
   const videoId = parsed.searchParams.get('id') ?? ''
 
-  if (!player || !safeOwnerIdRegex.test(ownerId) || !digitsRegex.test(videoId)) {
+  if (!player || !ownerId || !videoId) {
     return
   }
 
   const params = pickQueryParams(parsed.search, playerParams)
   const id = `${ownerId}_${videoId}`
-  const src = `https://${parsed.hostname}${player.path}${composeQuery(params)}`
+  // See: https://dev.vk.com/ru/widgets/video, which writes the player on vk.ru.
+  const src = `https://vk.ru${player.path}${composeQuery(params)}`
 
   return {
-    provider: 'vk',
+    provider,
     id,
     src,
-    url: `https://vkvideo.ru/${player.kind}${id}`,
+    // Both ids come out of the query decoded, and they go into a path.
+    url: `https://vkvideo.ru/${player.kind}${encodePathSegment(id)}`,
+    ratio: '16/9',
   }
 }
 
 export const vkEmbedResolver = createUrlEmbedResolver(vkHosts, vkResolveEmbed)
+
+// The player posts its state with `event: 'inited'` once it has loaded, and only when `js_api` is
+// on its url.
+export const isVkReady = (data: unknown): boolean => {
+  return isPlainObject(data) && data.event === 'inited'
+}
+
+// See: https://vk.com/js/api/videoplayer.js.
+// `autoplay=1` starts the player muted, while a play command starts it with sound.
+export const vkRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { js_api: '1' },
+  isReady: isVkReady,
+  requestPlay: { method: 'play' },
+}

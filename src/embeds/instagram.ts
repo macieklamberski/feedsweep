@@ -1,8 +1,8 @@
 import { decodeSegment, isPlainObject, parseUrl, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, find, jsonAttr, parsePixelSize, text } from '../utils/dom.js'
+import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts, placeholderBaseUrl, urlSafeTokenRegex } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import {
   atUsername,
   createMarkupEmbedResolver,
@@ -19,24 +19,13 @@ const instagramHosts = ['instagram.com', 'instagr.am']
 const nonShortcodeSegments = new Set(['audio'])
 
 // Instagram's own routes sit where an account does: `share/p/{token}` carries a redirect
-// token, not a shortcode, and reading it as one mints a frame that cannot load.
-const sitePathSegments = new Set([
-  'about',
-  'accounts',
-  'api',
-  'challenge',
-  'developer',
-  'direct',
-  'explore',
-  'legal',
-  'share',
-  'stories',
-  'web',
-])
+// token, not a shortcode, and reading it as one mints a frame that cannot load. `explore`,
+// `accounts` and the other routes redirect `{route}/p/{code}` to the post, so they read as one.
+const sitePathSegments = new Set(['challenge', 'developer', 'share', 'stories'])
 
 // The account names the poster, not the post, so it is matched and dropped.
 // `tv` is the retired IGTV route and `reels` the plural spelling of the reel.
-const postPathRegex = /^\/(?:([A-Za-z0-9_.]+)\/)?(p|reel|reels|tv)\/([A-Za-z0-9_-]+)/
+const postPathRegex = /^\/(?:([A-Za-z0-9_.]+)\/)?(p|reel|reels|tv)\/([^/]+)/
 
 type Post = { kind: string; shortcode: string }
 
@@ -83,30 +72,13 @@ const composeEmbed = (
   }
 }
 
-// Tumblr wraps the quote in a figure that repeats the post url percent-encoded and states the
-// size the embed rendered at. That is the only size a blockquote ever comes with: the quote
-// itself declares a max-width and never a height, so the declared-size pass finds nothing on it.
+// Tumblr wraps the quote in a figure that repeats the post url percent-encoded.
 const wrapperSelector = 'figure[data-provider="instagram"]'
 
-const readWrapper = (
-  element: Element,
-): { post?: Post; size: { width?: number; height?: number } } => {
-  const figure = element.closest(wrapperSelector)
+const readWrapperPost = (element: Element): Post | undefined => {
+  const dataUrl = attr(element.closest(wrapperSelector), 'data-url')
 
-  if (!figure) {
-    return { size: {} }
-  }
-
-  const dataUrl = attr(figure, 'data-url')
-  const width = parsePixelSize(attr(figure, 'data-orig-width'))
-  const height = parsePixelSize(attr(figure, 'data-orig-height'))
-
-  return {
-    post: readPostUrl(decodeSegment(dataUrl) ?? dataUrl),
-    // Stated together or not at all: a lone height would claim a fixed box the embed does
-    // not have.
-    size: width && height ? { width, height } : {},
-  }
+  return readPostUrl(decodeSegment(dataUrl) ?? dataUrl)
 }
 
 // Where the post is named, in the order the shapes provide it: the attribute the dialog writes,
@@ -185,17 +157,13 @@ const readContent = (element: Element): Partial<EmbedResolverResult> => {
 export const instagramBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.instagram-media, blockquote[data-instgrm-permalink]',
   (element) => {
-    const wrapper = readWrapper(element)
-    const post = findPost(element) ?? wrapper.post
+    const post = findPost(element) ?? readWrapperPost(element)
 
     if (!post) {
       return
     }
 
-    return composeEmbed(post, element.hasAttribute('data-instgrm-captioned'), {
-      ...readContent(element),
-      ...wrapper.size,
-    })
+    return composeEmbed(post, element.hasAttribute('data-instgrm-captioned'), readContent(element))
   },
 )
 
@@ -205,7 +173,7 @@ export const instagramAmpEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     const shortcode = attr(element, 'data-shortcode') ?? attr(element, 'shortcode')
 
-    if (!shortcode || !urlSafeTokenRegex.test(shortcode)) {
+    if (!shortcode) {
       return
     }
 
@@ -264,7 +232,7 @@ export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
     const attributes = jsonAttr<SubstackPostAttributes>(element, 'data-attrs')
     const shortcode = attributes?.instagram_id
 
-    if (!shortcode || !urlSafeTokenRegex.test(shortcode)) {
+    if (!shortcode) {
       return
     }
 
@@ -305,11 +273,9 @@ export const instagramIframeEmbedResolver = createUrlEmbedResolver(
 )
 
 // A forum's s9e MediaEmbed helper frame, naming the post's shortcode in its url fragment.
-export const instagramS9eEmbedResolver = createS9eEmbedResolver(
-  'instagram',
-  /^[-\w]+$/,
-  (shortcode) => instagramResolveEmbed(`https://www.instagram.com/p/${shortcode}/`),
-)
+export const instagramS9eEmbedResolver = createS9eEmbedResolver('instagram', (shortcode) => {
+  return instagramResolveEmbed(`https://www.instagram.com/p/${encodePathSegment(shortcode)}/`)
+})
 
 // The player measures itself once mounted and reports it under a `MEASURE` type. `LOADING`
 // and `MOUNTED` come through the same channel without a size.

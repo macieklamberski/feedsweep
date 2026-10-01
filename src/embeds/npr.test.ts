@@ -137,12 +137,6 @@ describe('nprResolveEmbed', () => {
       expect(nprResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore an id carrying an encoded query', () => {
-      const value = 'https://www.npr.org/player/embed/550179668/551339989%3Fautoplay%3D1'
-
-      expect(nprResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore an episode file', () => {
       const value = 'https://ondemand.npr.org/anon.npr-mp3/npr/me/2026/09/20260928_me_01.mp3'
 
@@ -157,18 +151,6 @@ describe('nprResolveEmbed', () => {
 
     it('should ignore a video player naming no story', () => {
       const value = 'https://www.npr.org/embedded-video?mediaId=141398010'
-
-      expect(nprResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a video media id carrying an encoded query', () => {
-      const value = 'https://www.npr.org/embedded-video?storyId=141331825&mediaId=141398010%26x%3D1'
-
-      expect(nprResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a video story id carrying an encoded slash', () => {
-      const value = 'https://www.npr.org/embedded-video?storyId=141331825%2Fx&mediaId=141398010'
 
       expect(nprResolveEmbed(value)).toBeUndefined()
     })
@@ -195,6 +177,32 @@ describe('nprResolveEmbed', () => {
       const value = 'https://evil.test/embedded-video?storyId=141331825&mediaId=141398010'
 
       expect(nprResolveEmbed(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed media id as written, even if the player answers an error', () => {
+      const value = 'https://www.npr.org/player/embed/550179668/551339989%3Fautoplay%3D1'
+      const expected: EmbedResolverResult = {
+        provider: 'npr',
+        id: '550179668/551339989%3Fautoplay%3D1',
+        src: 'https://www.npr.org/player/embed/550179668/551339989%3Fautoplay%3D1',
+        height: 290,
+      }
+
+      expect(nprResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should use a malformed video media id as written, even if the player answers an error', () => {
+      const value = 'https://www.npr.org/embedded-video?storyId=141331825&mediaId=141398010%26x%3D1'
+      const expected: EmbedResolverResult = {
+        provider: 'npr',
+        id: 'video/141331825/141398010&x=1',
+        src: 'https://www.npr.org/embedded-video?storyId=141331825&mediaId=141398010%26x%3D1',
+        ratio: '16/9',
+      }
+
+      expect(nprResolveEmbed(value)).toEqual(expected)
     })
   })
 })
@@ -293,28 +301,24 @@ describe('nprFlashResolveEmbed', () => {
       expect(nprFlashResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a media id carrying a path', () => {
-      const value = 'http://www.npr.org/v2/?i=340005056&m=340005057/../../stolen&t=audio'
-
-      expect(nprFlashResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a media id carrying an encoded slash', () => {
-      const value = 'http://www.npr.org/v2/?i=340005056&m=340005057%2Fx&t=audio'
-
-      expect(nprFlashResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a story id carrying a path', () => {
-      const value = 'http://www.npr.org/v2/?i=340005056/../../stolen&m=340005057&t=audio'
-
-      expect(nprFlashResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore the story player', () => {
       const value = 'https://www.npr.org/player/embed/550179668/551339989'
 
       expect(nprFlashResolveEmbed(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed Flash media id as written, even if the player answers an error', () => {
+      const value = 'http://www.npr.org/v2/?i=340005056&m=340005057/../../stolen&t=audio'
+      const expected: EmbedResolverResult = {
+        provider: 'npr',
+        id: '340005056/340005057%2F..%2F..%2Fstolen',
+        src: 'https://www.npr.org/player/embed/340005056/340005057%2F..%2F..%2Fstolen',
+        height: 290,
+      }
+
+      expect(nprFlashResolveEmbed(value)).toEqual(expected)
     })
   })
 })
@@ -368,8 +372,8 @@ describeForEachParser('nprFlashEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host naming the Flash player in its path', async () => {
-      const value = '<embed src="https://evil.test/npr.org/v2/?i=1&m=2&t=audio" />'
+    it('should ignore a foreign host carrying the Flash player path', async () => {
+      const value = '<embed src="https://evil.test/v2/?i=340005056&m=340005057&t=audio" />'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -400,7 +404,7 @@ describeForEachParser('nprIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the box of the retired video template iframe', async () => {
+    it('should ignore the box of the retired video template iframe', async () => {
       const value = html`
         <iframe
           frameborder="0"
@@ -414,8 +418,7 @@ describeForEachParser('nprIframeEmbedResolver', (parseHtml) => {
         provider: 'npr',
         id: 'video/673291531/673300770',
         src: 'https://www.npr.org/embedded-video?storyId=673291531&mediaId=673300770',
-        width: 600,
-        height: 338,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -448,8 +451,8 @@ describeForEachParser('nprIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host naming the player in its path', async () => {
-      const value = '<iframe src="https://evil.test/npr.org/player/embed/1/2"></iframe>'
+    it('should ignore a foreign host carrying the player path', async () => {
+      const value = '<iframe src="https://evil.test/player/embed/550179668/551339989"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

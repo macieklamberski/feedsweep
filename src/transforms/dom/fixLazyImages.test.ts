@@ -110,6 +110,17 @@ describeForEachParser('fixLazyImages', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should not extract noscript when a srcset-only sibling names a different image', async () => {
+    const value = html`
+      <img srcset="https://example.com/photo-640.jpg 640w, https://example.com/photo-1280.jpg 1280w">
+      <noscript>
+        <img src="https://example.com/pixel.gif">
+      </noscript>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should not extract noscript when sibling is not an image', async () => {
     const value = html`
       <div>text</div>

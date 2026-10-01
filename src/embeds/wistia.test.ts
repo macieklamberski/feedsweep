@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
 import { convertWidgets } from '../transforms/dom/convertWidgets.js'
 import { rebuildWistiaEmbeds } from '../transforms/dom/rebuildWistiaEmbeds.js'
@@ -59,6 +60,13 @@ describe('extractWistiaEmbed', () => {
     expect(extractWistiaEmbed(value)).toEqual(expected)
   })
 
+  it('should keep the case the carrier spells the id in', () => {
+    const value = 'https://fast.wistia.net/embed/iframe/2FG072PFTB'
+    const expected = { route: 'iframe', id: '2FG072PFTB' }
+
+    expect(extractWistiaEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for a wistia url naming no media', () => {
     const value = 'https://wistia.com/pricing'
 
@@ -82,18 +90,30 @@ describe('extractWistiaEmbed', () => {
     expect(extractWistiaEmbed(value)).toEqual(expected)
   })
 
-  // A channel has no vanity slug: every route carries the 10-character hashed id, so a slug-shaped
-  // segment is not a channel and must not be interpolated into a player url.
-  it('should return undefined for a slug-shaped channel segment', () => {
+  it('should use a malformed channel id as written, even if the player answers an error', () => {
     const value = 'https://home.wistia.com/channels/talking-too-loud'
+    const expected = { route: 'channel', id: 'talking-too-loud' }
 
-    expect(extractWistiaEmbed(value)).toBeUndefined()
+    expect(extractWistiaEmbed(value)).toEqual(expected)
   })
 
   // The route is a path segment, so it can name a member every object inherits. That has to
   // read as no route at all, the way any word the player does not serve does.
   it('should return undefined for a route naming an inherited member', () => {
     const value = 'https://fast.wistia.net/embed/constructor/sapab9p6qd'
+
+    expect(extractWistiaEmbed(value)).toBeUndefined()
+  })
+
+  it('should use a malformed media id as written, even if the player answers an error', () => {
+    const value = 'https://fast.wistia.net/embed/iframe/2fg072pftb%2Fsapab9p6qd'
+    const expected = { route: 'iframe', id: '2fg072pftb%2Fsapab9p6qd' }
+
+    expect(extractWistiaEmbed(value)).toEqual(expected)
+  })
+
+  it('should return undefined for the media JSON file', () => {
+    const value = 'https://fast.wistia.com/embed/medias/2fg072pftb.json'
 
     expect(extractWistiaEmbed(value)).toBeUndefined()
   })
@@ -121,6 +141,7 @@ describe('wistiaResolveEmbed', () => {
       provider: 'wistia',
       id: 'channel/sapab9p6qd',
       src: 'https://fast.wistia.net/embed/channel/sapab9p6qd',
+      ratio: '16/9',
     }
 
     expect(wistiaResolveEmbed(value)).toEqual(expected)
@@ -132,6 +153,7 @@ describe('wistiaResolveEmbed', () => {
       provider: 'wistia',
       id: 'playlists/aodt9etokc',
       src: 'https://fast.wistia.net/embed/playlists/aodt9etokc',
+      ratio: '16/9',
     }
 
     expect(wistiaResolveEmbed(value)).toEqual(expected)
@@ -145,6 +167,20 @@ describe('wistiaResolveEmbed', () => {
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
       url: 'https://acme.wistia.com/medias/2fg072pftb',
+      ratio: '16/9',
+    }
+
+    expect(wistiaResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should fold case in the key alone for an account media page spelled in capitals', () => {
+    const value = 'https://acme.wistia.com/medias/2FG072PFTB'
+    const expected: EmbedResolverResult = {
+      provider: 'wistia',
+      id: '2fg072pftb',
+      src: 'https://fast.wistia.net/embed/iframe/2FG072PFTB',
+      url: 'https://acme.wistia.com/medias/2FG072PFTB',
+      ratio: '16/9',
     }
 
     expect(wistiaResolveEmbed(value)).toEqual(expected)
@@ -156,6 +192,7 @@ describe('wistiaResolveEmbed', () => {
       provider: 'wistia',
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      ratio: '16/9',
     }
 
     expect(wistiaResolveEmbed(value)).toEqual(expected)
@@ -176,6 +213,7 @@ describeForEachParser('wistiaEmbedResolver', (parseHtml) => {
       provider: 'wistia',
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -194,6 +232,7 @@ describeForEachParser('wistiaEmbedResolver', (parseHtml) => {
       provider: 'wistia',
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      ratio: '16/9',
       title: 'Behind the scenes at the office Video',
     }
 
@@ -202,6 +241,12 @@ describeForEachParser('wistiaEmbedResolver', (parseHtml) => {
 
   it('should leave a non-media wistia url to the generic placeholder', async () => {
     const value = '<iframe src="https://wistia.com/pricing"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore a foreign host carrying the player path', async () => {
+    const value = '<iframe src="https://evil.test/embed/iframe/2fg072pftb"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })
@@ -233,6 +278,7 @@ describeForEachParser('wistia facades the rebuild pass materializes', (parseHtml
         data-embed-src="https://fast.wistia.net/embed/iframe/2fg072pftb"
         data-embed-provider="wistia"
         data-embed-id="2fg072pftb"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -251,6 +297,7 @@ describeForEachParser('wistiaEmbedResolver carrier title', (parseHtml) => {
       provider: 'wistia',
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -264,9 +311,35 @@ describeForEachParser('wistiaEmbedResolver carrier title', (parseHtml) => {
       provider: 'wistia',
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      ratio: '16/9',
       title: 'Calcific Tendonitis Video',
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+// Wistia serves the media files themselves from its own subdomains, and `injectEnclosures` offers
+// every attachment to every url-keyed resolver.
+describeForEachParser('wistia enclosures through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a wistia video enclosure playable', async () => {
+    const enclosures = [
+      { url: 'https://embed-ssl.wistia.com/deliveries/abc123.bin', type: 'video/mp4' },
+    ]
+
+    const expected = html`
+      <video data-enclosure="" controls src="https://embed-ssl.wistia.com/deliveries/abc123.bin"></video>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })

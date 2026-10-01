@@ -56,17 +56,25 @@ describeForEachParser('wechatMediaResolver', (parseHtml) => {
     })
 
     // Both would move the mint off the query slot the id belongs in.
-    it('should return undefined when the id is not the shape WeChat emits', async () => {
+    it('should use a malformed id as written, even if the url answers an error', async () => {
       const value = '<mpvoice voice_encode_fileid="../../etc/passwd"></mpvoice>'
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'https://res.wx.qq.com/voice/getvoice?mediaid=..%2F..%2Fetc%2Fpasswd',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined when the id carries a query separator', async () => {
+    it('should keep an id carrying a query separator as one parameter', async () => {
       const value =
         '<mpvoice voice_encode_fileid="MjM5NjYyMjM0MF8yNjUwOTc3MjQy&mediaid=stolen"></mpvoice>'
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'https://res.wx.qq.com/voice/getvoice?mediaid=MjM5NjYyMjM0MF8yNjUwOTc3MjQy%26mediaid%3Dstolen',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 

@@ -1,7 +1,7 @@
-import { getPathSegments, isHostOf, type Nullish, toMap, trimObject } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { getPathSegments, isHostOf, type Nullish, toMap } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
-import { parseUrlOnHosts, pickQueryParams, pickUrlParams } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pbs'
@@ -27,18 +27,8 @@ const idSpaces = toMap({
   partnerplayer: 'partnerplayer',
 })
 
-const safeVideoIdRegex = /^[\w-]+={0,2}$/
-
-// The parameters the player reads besides the id: the clip bounds and chapter, and the layout.
-// `autoplay` and `muted` are the reader's to set.
-const playerParams = ['start', 'end', 'chapter', 'h', 'topbar', 'endscreen', 'previewLayout']
-
-// Settings the publisher chose for this one embed, which a reader may override.
-const publisherParams = [
-  'unsafeDisableUpsellHref',
-  'unsafeDisableSponsorship',
-  'unsafeDisableContinuousPlay',
-]
+// The clip bounds and the chapter, the playback parameters the player reads besides the id.
+const playbackParams = ['start', 'end', 'chapter']
 
 // A 16:9 video above a control bar of fixed height, so the ratio errs tall at narrow widths.
 const playerRatio = '13/9'
@@ -49,11 +39,10 @@ const composeEmbed = (
   route: string,
   videoId: Nullish<string>,
   query = '',
-  params?: Record<string, string>,
 ): EmbedResolverResult | undefined => {
   const idSpace = idSpaces.get(route)
 
-  if (!videoId || !idSpace || !safeVideoIdRegex.test(videoId)) {
+  if (!videoId || !idSpace) {
     return
   }
 
@@ -61,7 +50,6 @@ const composeEmbed = (
     provider,
     id: `${idSpace}/${videoId}`,
     src: `https://${playerHost}/${route}/${videoId}/${query}`,
-    params,
     ratio: playerRatio,
   }
 }
@@ -75,7 +63,10 @@ const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | un
     return
   }
 
-  return composeEmbed('viralplayer', params.get('video'))
+  const videoId = params.get('video')
+
+  // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
+  return composeEmbed('viralplayer', videoId ? encodePathSegment(videoId) : undefined)
 }
 
 // PBS's offsite player, which renders on its own but names no page and no poster.
@@ -98,22 +89,20 @@ export const pbsResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const query = pickUrlParams(url, playerParams)
-  const params = trimObject(pickQueryParams(parsed.search, publisherParams))
-
-  return composeEmbed(route, segments.at(-1), query, params)
+  return composeEmbed(route, segments.at(-1), pickUrlParams(url, playbackParams))
 }
 
 export const pbsIframeEmbedResolver = createUrlEmbedResolver([playerHost], pbsResolveEmbed)
 
-// The retired host's box was sized for the retired player, not the viral player it redirects to.
 export const pbsLegacyIframeEmbedResolver = createUrlEmbedResolver(
   [legacyPlayerHost],
   pbsResolveEmbed,
-  { preferResolverSize: true },
 )
 
-// The Flash box was sized for the retired player, not the viral player it now loads.
-export const pbsFlashEmbedResolver = createUrlEmbedResolver([flashHost], pbsResolveEmbed, {
-  preferResolverSize: true,
-})
+export const pbsFlashEmbedResolver = createUrlEmbedResolver([flashHost], pbsResolveEmbed)
+
+export const pbsRenderHint: EmbedRenderHint = {
+  provider,
+  // The player reads `autoplay` as true for the string `true` alone, so `autoplay=1` stays paused.
+  autoplayParams: { autoplay: 'true' },
+}

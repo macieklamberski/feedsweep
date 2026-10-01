@@ -15,7 +15,6 @@ export const notecomCiteResolver: CiteResolver = {
     const ems = Array.from(element.querySelectorAll('a > em'))
     // The stripped shape's host is always the last `em`, so a lone `em` has no description.
     const hostEm = ems.at(-1)
-    // A lone em is the host, not a description.
     const descriptionEm = ems.length > 1 ? ems[0] : undefined
 
     return buildCite({
