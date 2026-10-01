@@ -1137,7 +1137,7 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
-  it('should keep a video whose fallback holds a paragraph', async () => {
+  it('should drop the fallback of a video that has a source', async () => {
     const value = html`
       <video controls>
         <source src="https://example.com/clip.mp4">
@@ -1145,10 +1145,27 @@ describeForEachParser('transformContent', (parseHtml) => {
       </video>
     `
     const expected = html`
+      <video controls>
+        <source src="https://example.com/clip.mp4">
+      </video>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
+  it('should keep a sourceless video whose fallback holds a paragraph', async () => {
+    const value = html`
+      <video controls>
+        <p>No video</p>
+      </video>
+    `
+    const expected = html`
       <p>
-        <video controls>
-          <source src="https://example.com/clip.mp4">
-        </video>
+        <video controls></video>
       </p>
       <p>No video</p>
     `

@@ -77,6 +77,7 @@ import { stripInterBlockBreaks } from '../transforms/dom/stripInterBlockBreaks.j
 import { stripLeadingIndentation } from '../transforms/dom/stripLeadingIndentation.js'
 import { stripMarkdownEscapeBackslashes } from '../transforms/dom/stripMarkdownEscapeBackslashes.js'
 import { stripNonContentElements } from '../transforms/dom/stripNonContentElements.js'
+import { stripPlayableMediaFallbacks } from '../transforms/dom/stripPlayableMediaFallbacks.js'
 import { stripWordBreaks } from '../transforms/dom/stripWordBreaks.js'
 import { surfaceNoscriptEmbeds } from '../transforms/dom/surfaceNoscriptEmbeds.js'
 import { surfaceParkedMarkup } from '../transforms/dom/surfaceParkedMarkup.js'
@@ -205,6 +206,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // the promoted src/poster is dimensioned, neutralized, and proxied like any other.
   fixLazyVideos,
   fixLazyAudios,
+  // Runs after the lazy passes so a promoted src counts as a source, and before
+  // wrapBareInlineInParagraphs and hoistBlocksFromParagraphs, which would split a block fallback
+  // out of its player and show it under the working player.
+  stripPlayableMediaFallbacks,
   // Runs after the lazy passes so a beacon is judged on its real src, and before
   // resolveMediaDimensions, which drops any width/height that is not a positive integer. A
   // declared `0` is what marks the dominant beacon shape, so reading it has to happen first.
