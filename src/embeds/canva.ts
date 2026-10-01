@@ -30,13 +30,11 @@ export const canvaResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const [, id, route] = match
-  // `meta` is a layout the publisher picked in Canva's snippet, so it stays in the src.
-  const query = parsed.searchParams.has('meta') ? '?embed&meta' : '?embed'
 
   return {
     provider: 'canva',
     id,
-    src: `https://www.canva.com/design/${id}/${route}${query}`,
+    src: `https://www.canva.com/design/${id}/${route}?embed`,
     url: `https://www.canva.com/design/${id}/${route}`,
   }
 }

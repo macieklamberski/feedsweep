@@ -39,12 +39,12 @@ describe('thinglinkResolveEmbed', () => {
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the viewer the publisher framed', () => {
+    it('should mint the card viewer for a scene framed on the view route', () => {
       const value = 'https://www.thinglink.com/view/scene/1681632338456346625'
       const expected: EmbedResolverResult = {
         provider: 'thinglink',
         id: '1681632338456346625',
-        src: 'https://www.thinglink.com/view/scene/1681632338456346625',
+        src: 'https://www.thinglink.com/card/1681632338456346625',
         url: 'https://www.thinglink.com/card/1681632338456346625',
       }
 
@@ -111,12 +111,12 @@ describe('thinglinkResolveEmbed', () => {
   })
 
   describe('the four viewer routes, which share one scene id space', () => {
-    it('should read a mediacard', () => {
+    it('should mint the card viewer for a mediacard', () => {
       const value = 'https://www.thinglink.com/mediacard/794327401873014786'
       const expected: EmbedResolverResult = {
         provider: 'thinglink',
         id: '794327401873014786',
-        src: 'https://www.thinglink.com/mediacard/794327401873014786',
+        src: 'https://www.thinglink.com/card/794327401873014786',
         url: 'https://www.thinglink.com/card/794327401873014786',
         thumbnail: 'https://cdn.thinglink.me/api/image/794327401873014786/1024/10/scaletowidth',
       }
@@ -124,12 +124,12 @@ describe('thinglinkResolveEmbed', () => {
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should read a videocard', () => {
+    it('should mint the card viewer for a videocard', () => {
       const value = 'https://www.thinglink.com/videocard/1349876451188408322'
       const expected: EmbedResolverResult = {
         provider: 'thinglink',
         id: '1349876451188408322',
-        src: 'https://www.thinglink.com/videocard/1349876451188408322',
+        src: 'https://www.thinglink.com/card/1349876451188408322',
         url: 'https://www.thinglink.com/card/1349876451188408322',
       }
 
@@ -143,7 +143,7 @@ describe('thinglinkResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'thinglink',
         id: '794327401873014786',
-        src: 'https://www.thinglink.com/mediacard/794327401873014786',
+        src: 'https://www.thinglink.com/card/794327401873014786',
         url: 'https://www.thinglink.com/card/794327401873014786',
         thumbnail: 'https://cdn.thinglink.me/api/image/794327401873014786/1024/10/scaletowidth',
       }
@@ -164,12 +164,12 @@ describe('thinglinkResolveEmbed', () => {
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the path the publisher framed past the scene id', () => {
+    it('should mint the card viewer for the accessibility viewer', () => {
       const value = 'https://www.thinglink.com/view/scene/1681632338456346625/accessibility'
       const expected: EmbedResolverResult = {
         provider: 'thinglink',
         id: '1681632338456346625',
-        src: 'https://www.thinglink.com/view/scene/1681632338456346625/accessibility',
+        src: 'https://www.thinglink.com/card/1681632338456346625',
         url: 'https://www.thinglink.com/card/1681632338456346625',
       }
 
@@ -274,7 +274,7 @@ describeForEachParser('thinglinkEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'thinglink',
         id: '1681632338456346625',
-        src: 'https://www.thinglink.com/view/scene/1681632338456346625',
+        src: 'https://www.thinglink.com/card/1681632338456346625',
         url: 'https://www.thinglink.com/card/1681632338456346625',
         width: 960,
         height: 540,
@@ -290,7 +290,7 @@ describeForEachParser('thinglinkEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'thinglink',
         id: '1318748169202302978',
-        src: 'https://www.thinglink.com/videocard/1318748169202302978',
+        src: 'https://www.thinglink.com/card/1318748169202302978',
         url: 'https://www.thinglink.com/card/1318748169202302978',
       }
 

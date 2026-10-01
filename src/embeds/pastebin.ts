@@ -1,15 +1,12 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pastebin'
 
 const pastebinHosts = ['pastebin.com']
-
-// The snippet's dark variant, a publisher layout choice the frame honours.
-const pastebinEmbedParams = ['theme']
 
 // Both carriers in both generations. The `.php?i={id}` spelling answers 404 for every id,
 // including one whose paste is alive on the path form, so the two share an id space.
@@ -52,7 +49,7 @@ export const pastebinResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider,
     id: pasteId,
-    src: `https://pastebin.com/embed_iframe/${pasteId}${pickUrlParams(url, pastebinEmbedParams)}`,
+    src: `https://pastebin.com/embed_iframe/${pasteId}`,
     url: `https://pastebin.com/${pasteId}`,
   }
 }
