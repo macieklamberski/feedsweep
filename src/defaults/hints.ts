@@ -19,6 +19,7 @@ import { dailymotionRenderHint } from '../embeds/dailymotion.js'
 import { deezerRenderHint } from '../embeds/deezer.js'
 import { documentcloudRenderHint } from '../embeds/documentcloud.js'
 import { donorboxRenderHint } from '../embeds/donorbox.js'
+import { facebookRenderHint } from '../embeds/facebook.js'
 import { flickrRenderHint } from '../embeds/flickr.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
 import { foxbusinessRenderHint, foxnewsRenderHint } from '../embeds/foxnews.js'
@@ -95,6 +96,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   deezerRenderHint,
   documentcloudRenderHint,
   donorboxRenderHint,
+  facebookRenderHint,
   flickrRenderHint,
   flourishRenderHint,
   foxbusinessRenderHint,
