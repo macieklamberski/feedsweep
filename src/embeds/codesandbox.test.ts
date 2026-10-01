@@ -415,19 +415,15 @@ describe('readCodesandboxHeight', () => {
     expect(readCodesandboxHeight('{"context":"iframe.resize",')).toBeUndefined()
   })
 
-  it('should read the height out of a resize message as an object', () => {
-    const value = {
-      src: 'https://codesandbox.io/embed/ng-accordion-ssscp',
-      context: 'iframe.resize',
-      height: 664,
-    }
+  it('should read nothing from a resize message posted as an object', () => {
+    const value = { context: 'iframe.resize', height: 664 }
 
-    expect(readCodesandboxHeight(value)).toBe(664)
+    expect(readCodesandboxHeight(value)).toBeUndefined()
   })
 
   it('should read nothing from another message or an unrendered player', () => {
-    expect(readCodesandboxHeight({ context: 'iframe.resize', height: 0 })).toBeUndefined()
-    expect(readCodesandboxHeight({ context: 'iframe.ready', height: 500 })).toBeUndefined()
+    expect(readCodesandboxHeight('{"context":"iframe.resize","height":0}')).toBeUndefined()
+    expect(readCodesandboxHeight('{"context":"iframe.ready","height":500}')).toBeUndefined()
     expect(readCodesandboxHeight('iframe.resize')).toBeUndefined()
   })
 })
