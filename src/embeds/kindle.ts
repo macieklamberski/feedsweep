@@ -10,6 +10,10 @@ const kindleHosts = [
   'read.amazon.co.uk',
   'read.amazon.ca',
   'read.amazon.in',
+  'lesen.amazon.de',
+  'leer.amazon.es',
+  'leggi.amazon.it',
+  'lire.amazon.fr',
 ]
 
 const cardPathRegex = /^\/kp\/card\/?$/
@@ -29,12 +33,12 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  // `read.amazon.com` loads the card of a book from any storefront, so it serves every card and no
-  // one store's product page is the book's.
+  // The reader host picks the storefront: `read.amazon.com` answers "This book isn't available" for
+  // a book sold only on another store, so the card stays on the host the feed wrote.
   return {
     provider: 'kindle',
     id: asin,
-    src: `https://read.amazon.com/kp/card${composeQuery({ asin })}`,
+    src: `https://${parsed.hostname}/kp/card${composeQuery({ asin })}`,
     // The ASIN comes out of the query decoded, and it goes into a path.
     thumbnail: `https://m.media-amazon.com/images/P/${encodePathSegment(asin)}.01._SCLZZZZZZZ_.jpg`,
     height: 550,

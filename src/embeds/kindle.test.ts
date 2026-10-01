@@ -19,12 +19,12 @@ describe('kindleResolveEmbed', () => {
       expect(kindleResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should mint a British storefront card on the US reader host', () => {
+    it('should keep a British storefront card on its reader host', () => {
       const value = 'https://read.amazon.co.uk/kp/card?asin=B08DGQCKF3&preview=inline'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
+        src: 'https://read.amazon.co.uk/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
       }
@@ -32,12 +32,12 @@ describe('kindleResolveEmbed', () => {
       expect(kindleResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should mint a Canadian storefront card on the US reader host', () => {
+    it('should keep a Canadian storefront card on its reader host', () => {
       const value = 'https://read.amazon.ca/kp/card?asin=B08DGQCKF3&preview=inline'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
+        src: 'https://read.amazon.ca/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
       }
@@ -45,13 +45,69 @@ describe('kindleResolveEmbed', () => {
       expect(kindleResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should mint an Indian storefront card on the US reader host', () => {
+    it('should keep an Indian storefront card on its reader host', () => {
       const value = 'https://read.amazon.in/kp/card?asin=B08DGQCKF3&preview=inline'
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B08DGQCKF3',
-        src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
+        src: 'https://read.amazon.in/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a German storefront card on its reader host', () => {
+      const value =
+        'https://lesen.amazon.de/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_IWygh7LxwTfj6U&asin=B019C57GLO&tag=kpembed-20'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'B019C57GLO',
+        src: 'https://lesen.amazon.de/kp/card?asin=B019C57GLO',
+        thumbnail: 'https://m.media-amazon.com/images/P/B019C57GLO.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a Spanish storefront card on its reader host', () => {
+      const value =
+        'https://leer.amazon.es/kp/card?preview=inline&linkCode=ll1&ref_=k4w_oembed_CkjSxBKKfyfasn&asin=B09GKYBZTJ&tag=juandedev-21'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'B09GKYBZTJ',
+        src: 'https://leer.amazon.es/kp/card?asin=B09GKYBZTJ',
+        thumbnail: 'https://m.media-amazon.com/images/P/B09GKYBZTJ.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep an Italian storefront card on its reader host', () => {
+      const value =
+        'https://leggi.amazon.it/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_T6RnpneE6MeNc7&asin=B0FP373343&tag=kpembed-20'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'B0FP373343',
+        src: 'https://leggi.amazon.it/kp/card?asin=B0FP373343',
+        thumbnail: 'https://m.media-amazon.com/images/P/B0FP373343.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+      }
+
+      expect(kindleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a French storefront card on its reader host', () => {
+      const value =
+        'https://lire.amazon.fr/kp/card?preview=inline&linkCode=kpd&ref_=k4w_oembed_auKhYtfwzPejGc&asin=1549720864&tag=kpembed-20'
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: '1549720864',
+        src: 'https://lire.amazon.fr/kp/card?asin=1549720864',
+        thumbnail: 'https://m.media-amazon.com/images/P/1549720864.01._SCLZZZZZZZ_.jpg',
         height: 550,
       }
 
@@ -64,7 +120,7 @@ describe('kindleResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'B09SLB7V48',
-        src: 'https://read.amazon.com/kp/card?asin=B09SLB7V48',
+        src: 'https://read.amazon.com.au/kp/card?asin=B09SLB7V48',
         thumbnail: 'https://m.media-amazon.com/images/P/B09SLB7V48.01._SCLZZZZZZZ_.jpg',
         height: 550,
       }
@@ -146,6 +202,32 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
         height: 550,
         title: 'His Fake Wife: An Enemies to Lovers Billionaire Romance (Thorne Legacy Book 1)',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should take the book title from a German storefront card', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          title="Die gräulichen Drei und das X-Bollock: Bollock und die gräulichen Drei Teil 2"
+          type="text/html"
+          width="625"
+          height="550"
+          frameborder="0"
+          allowfullscreen
+          style="max-width:100%"
+          src="https://lesen.amazon.de/kp/card?preview=inline&#038;linkCode=kpd&#038;ref_=k4w_oembed_IWygh7LxwTfj6U&#038;asin=B019C57GLO&#038;tag=kpembed-20"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'kindle',
+        id: 'B019C57GLO',
+        src: 'https://lesen.amazon.de/kp/card?asin=B019C57GLO',
+        thumbnail: 'https://m.media-amazon.com/images/P/B019C57GLO.01._SCLZZZZZZZ_.jpg',
+        height: 550,
+        title: 'Die gräulichen Drei und das X-Bollock: Bollock und die gräulichen Drei Teil 2',
       }
 
       expect(await extract(value)).toEqual(expected)
