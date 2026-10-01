@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -70,5 +71,18 @@ describeForEachParser('stripMarkdownEscapeBackslashes', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('stripMarkdownEscapeBackslashes before stripEmptyTags', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml })
+  }
+
+  it('should remove a lone-backslash paragraph', async () => {
+    const value = '<p>First</p><p>\\</p><p>Second</p>'
+    const expected = '<p>First</p><p>Second</p>'
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

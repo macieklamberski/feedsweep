@@ -77,7 +77,9 @@ describe('widestSrcsetUrl', () => {
     expect(widestSrcsetUrl(value)).toBeUndefined()
   })
 
-  it.each([[''], [null], [undefined]])('should return undefined for %p', (value) => {
+  const emptyValues: Array<[string | null | undefined]> = [[''], [null], [undefined]]
+
+  it.each(emptyValues)('should return undefined for %p', (value) => {
     expect(widestSrcsetUrl(value)).toBeUndefined()
   })
 })

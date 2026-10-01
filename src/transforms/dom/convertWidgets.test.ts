@@ -71,7 +71,7 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should preserve iframe dimensions as data attributes', async () => {
+  it('should state the platform size over the box a resolved iframe declares', async () => {
     const customContext: TransformContext = {
       ...baseContext,
       widgetResolvers: defaultWidgetResolvers,
@@ -85,12 +85,11 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-width="640"
         data-embed-url="https://vimeo.com/76979871"
         data-embed-src="https://player.vimeo.com/video/76979871"
         data-embed-provider="vimeo"
         data-embed-id="76979871"
-        data-embed-height="360"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -158,6 +157,86 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     const result = await transform(value, withNoResolvers)
 
     expect(result).toEqualHtml(expected)
+  })
+
+  it('should carry the per-embed params onto the placeholder', async () => {
+    const paramsResolver: EmbedResolver = {
+      kind: 'embed',
+      selector: 'iframe[src*="example.com"]',
+      extract: (element) => ({
+        provider: 'example',
+        src: element.getAttribute('src') ?? '',
+        params: { l: 'german' },
+      }),
+    }
+    const customContext: TransformContext = {
+      ...baseContext,
+      widgetResolvers: [paramsResolver],
+    }
+    const value = '<iframe src="https://example.com/player/xyz"></iframe>'
+    const expected = html`
+      <div
+        data-embed-provider="example"
+        data-embed-src="https://example.com/player/xyz"
+        data-embed-params="l=german"
+      ></div>
+    `
+
+    expect(await transform(value, customContext)).toEqualHtml(expected)
+  })
+
+  describe('a result with no usable src', () => {
+    const contextFor = (resolver: EmbedResolver | MediaResolver): TransformContext => {
+      return { ...baseContext, widgetResolvers: [resolver] }
+    }
+
+    it('should name an embed that only enrichment can play by its provider and id', async () => {
+      const resolver: EmbedResolver = {
+        kind: 'embed',
+        selector: 'div[data-live]',
+        extract: (element) => ({
+          provider: 'example',
+          id: element.getAttribute('data-live') ?? '',
+        }),
+      }
+      const value = '<div data-live="abc123"></div>'
+      const expected = '<div data-embed-id="abc123" data-embed-provider="example"></div>'
+
+      expect(await transform(value, contextFor(resolver))).toEqualHtml(expected)
+    })
+
+    it('should leave a carrier whose embed names neither a src nor an id', async () => {
+      const resolver: EmbedResolver = {
+        kind: 'embed',
+        selector: 'div[data-live]',
+        extract: () => ({ provider: 'example' }),
+      }
+      const value = '<div data-live="abc123"></div>'
+
+      expect(await transform(value, contextFor(resolver))).toEqualHtml(value)
+    })
+
+    it('should leave a carrier whose embed src resolves to nothing', async () => {
+      const resolver: EmbedResolver = {
+        kind: 'embed',
+        selector: 'div[data-live]',
+        extract: () => ({ provider: 'example', id: 'abc123', src: 'about:blank' }),
+      }
+      const value = '<div data-live="abc123"></div>'
+
+      expect(await transform(value, contextFor(resolver))).toEqualHtml(value)
+    })
+
+    it('should leave a carrier whose media src resolves to nothing', async () => {
+      const resolver: MediaResolver = {
+        kind: 'media',
+        selector: 'div[data-live]',
+        extract: () => ({ tag: 'audio', src: 'about:blank' }),
+      }
+      const value = '<div data-live="abc123"></div>'
+
+      expect(await transform(value, contextFor(resolver))).toEqualHtml(value)
+    })
   })
 
   it('should fall back to resolver metadata dimensions when the iframe has none', async () => {
@@ -719,11 +798,10 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       const expected = html`
         <div id="__ss_6435157">
           <div
-            data-embed-width="425"
             data-embed-src="https://www.slideshare.net/slideshow/embed_code/6435157"
             data-embed-provider="slideshare"
             data-embed-id="6435157"
-            data-embed-height="355"
+            data-embed-ratio="595/485"
           ></div>
         </div>
       `
@@ -1128,11 +1206,10 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       const expected = html`
         <div
           data-embed-title="Example"
-          data-embed-height="360"
-          data-embed-width="640"
           data-embed-thumbnail="https://commons.wikimedia.org/wiki/Special:FilePath/Example.webm?width=960"
           data-embed-id="Example.webm"
           data-embed-provider="wikimedia"
+          data-embed-ratio="16/9"
           data-embed-src="https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes"
         ></div>
       `

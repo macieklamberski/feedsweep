@@ -1,8 +1,7 @@
 import type { DomTransform } from '../../types.js'
-import { hasAncestorWithTagName } from '../../utils/dom.js'
+import { hasAncestorWithTagName, headingSelector } from '../../utils/dom.js'
 import { isSamePage } from '../../utils/urls.js'
 
-const headingSelector = 'h1, h2, h3, h4, h5, h6'
 const supTags = new Set(['sup'])
 
 // Anchor class tokens that static-site generators attach to heading permalinks
@@ -142,9 +141,12 @@ export const normalizeAnchoredHeadings: DomTransform = ({ baseUrl, resolveUrlFn 
           continue
         }
 
+        // A generator-class anchor beside the title carries a label like "link", not heading
+        // text. Any other qualifying anchor holds the title itself, so its text stays.
         const wrapsHeading = (heading.textContent ?? '').trim() === visible
+        const isLabelledMarker = hasKnownClass && !wrapsHeading
 
-        if (!isSymbolOnly && wrapsHeading) {
+        if (!isSymbolOnly && !isLabelledMarker) {
           while (anchor.firstChild) {
             const child = anchor.firstChild
 

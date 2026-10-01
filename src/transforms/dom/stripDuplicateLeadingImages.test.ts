@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -266,5 +267,29 @@ describeForEachParser('stripDuplicateLeadingImages', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('stripDuplicateLeadingImages under heuristics', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, heuristics: true })
+  }
+
+  it('should remove a leading image repeated as the next image', async () => {
+    const value = html`
+      <img src="https://example.com/uploads/photo.jpg">
+      <p>
+        <img src="https://example.com/uploads/photo.jpg">
+      </p>
+      <p>Content</p>
+    `
+    const expected = html`
+      <p>
+        <img src="https://example.com/uploads/photo.jpg">
+      </p>
+      <p>Content</p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

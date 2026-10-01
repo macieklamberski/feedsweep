@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import { baseContext, html } from '../../tests.js'
+import { transformContent } from '../../index.js'
+import { baseContext, describeForEachParser, html } from '../../tests.js'
 import { unwrapCdataComments } from './unwrapCdataComments.js'
 
 describe('unwrapCdataComments', () => {
@@ -102,6 +103,13 @@ describe('unwrapCdataComments', () => {
     expect(transform(value)).toBe(value)
   })
 
+  it('should unwrap a wrapper before an unterminated one', () => {
+    const value = '<!--[CDATA[<p>article</p>]]--><!--[CDATA[unterminated'
+    const expected = '<p>article</p><!--[CDATA[unterminated'
+
+    expect(transform(value)).toBe(expected)
+  })
+
   it('should handle empty CDATA wrapper', () => {
     expect(transform('<!--[CDATA[]]-->')).toBe('')
   })
@@ -120,5 +128,18 @@ describe('unwrapCdataComments', () => {
     const once = await transform('<!--[CDATA[<p>article</p>]]-->')
 
     expect(await transform(once)).toBe(once)
+  })
+})
+
+describeForEachParser('unwrapCdataComments before comment stripping', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should keep the content of a CDATA comment', async () => {
+    const value = '<!--[CDATA[<p>Kept text</p>]]-->'
+    const expected = '<p>Kept text</p>'
+
+    expect(await convert(value)).toBe(expected)
   })
 })

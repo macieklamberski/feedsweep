@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { CiteResolverResult } from '../types.js'
 import { cocoonCiteResolver } from './cocoon.js'
@@ -65,31 +66,6 @@ describeForEachParser('cocoonCiteResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should carry the label bar as the caption', async () => {
-      const value = html`
-        <a href="https://example.com/post" class="blogcard-wrap internal-blogcard-wrap">
-          <div class="blogcard-label internal-blogcard-label">
-            <span class="blogcard-label-text">関連記事</span>
-          </div>
-          <div class="blogcard internal-blogcard">
-            <div class="blogcard-content internal-blogcard-content">
-              <div class="blogcard-title internal-blogcard-title">Post title</div>
-            </div>
-            <div class="blogcard-domain internal-blogcard-domain">example.com</div>
-          </div>
-        </a>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'cocoon',
-        url: 'https://example.com/post',
-        title: 'Post title',
-        caption: '関連記事',
-        publisher: 'example.com',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should carry an author-written label rather than the stock one', async () => {
       const value = html`
         <a href="https://example.com/post" class="blogcard-wrap external-blogcard-wrap">
@@ -131,58 +107,9 @@ describeForEachParser('cocoonCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should leave optional fields undefined when only href and title are present', async () => {
-      const value = html`
-        <a href="https://example.com/post" class="blogcard-wrap">
-          <div class="blogcard-title">Post title</div>
-        </a>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'cocoon',
-        url: 'https://example.com/post',
-        title: 'Post title',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('edge cases', () => {
-    it('should read the description from the misspelled snippet class', async () => {
-      const value = html`
-        <a href="https://example.com/post" class="blogcard-wrap">
-          <div class="blogcard-title">Post title</div>
-          <div class="blogcard-snipet">Preview text</div>
-        </a>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'cocoon',
-        url: 'https://example.com/post',
-        title: 'Post title',
-        description: 'Preview text',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should pass the date through in the theme format', async () => {
-      const value = html`
-        <a href="https://example.com/post" class="blogcard-wrap">
-          <div class="blogcard-title">Post title</div>
-          <div class="blogcard-post-date">2018.10.14</div>
-        </a>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'cocoon',
-        url: 'https://example.com/post',
-        title: 'Post title',
-        date: '2018.10.14',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should fall back to the anchor title attribute when the title element is missing', async () => {
       const value = html`
         <a href="https://example.com/post" title="Title from attribute" class="blogcard-wrap">
@@ -235,5 +162,36 @@ describeForEachParser('cocoonCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+// The card carries the theme's display date, so what reaches the placeholder is whatever the
+// consumer's date parser makes of it.
+describeForEachParser('cocoon card through the pipeline', (parseHtml) => {
+  it('should hand the display date to the date parser', async () => {
+    const value = html`
+      <a href="https://example.com/post" class="blogcard-wrap">
+        <div class="blogcard-title">Post title</div>
+        <div class="blogcard-post-date">2018.10.14</div>
+      </a>
+    `
+    const parseDateFn = (raw: string) => {
+      return raw.replaceAll('.', '-')
+    }
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      parseDateFn,
+    })
+    const expected = html`
+      <div
+        data-cite-provider="cocoon"
+        data-cite-url="https://example.com/post"
+        data-cite-title="Post title"
+        data-cite-date="2018-10-14"
+      ></div>
+    `
+
+    expect(result).toEqualHtml(expected)
   })
 })

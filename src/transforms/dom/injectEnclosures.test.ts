@@ -18,6 +18,19 @@ const withEnclosures = (enclosures: Array<Enclosure>): TransformContext => {
   return { ...withResolver, enclosures }
 }
 
+const nonCaptionDescriptions: Array<string> = [
+  'thumbnail',
+  'Main image',
+  'GetAssetsMediaFromRepository',
+  'undefined',
+  '   ',
+  'somoscomarca_20260060120630_obarco_cortetrafico',
+  '870x489_sans-titre',
+  'harbour.JPG',
+]
+
+const shortCaptions: Array<string> = ['Madrid.', 'Ana Tijoux', '東京タワー']
+
 describeForEachParser('injectEnclosures', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
     return applyDomTransforms(parseHtml(value), [injectEnclosures(context)])
@@ -44,7 +57,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
         data-embed-height="166"
         data-embed-id="tracks/2386923495"
         data-embed-provider="soundcloud"
-        data-embed-src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F2386923495"
+        data-embed-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2386923495"
       ></div>
       <p>Episode notes</p>
     `
@@ -266,7 +279,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
   })
 
   // A placeholder built from an enclosure carries its urls on the same terms as one built from
-  // the markup: every url resolved, and the canonical one cleaned.
+  // the markup: every url resolved, the canonical one cleaned, and a listed provider's src cleaned.
   describe('placeholder fields', () => {
     const exampleResolver: EmbedResolver = {
       kind: 'embed',
@@ -321,6 +334,29 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           data-embed-src="https://example.com/e/x"
           data-embed-provider="example"
           data-embed-url="https://example.com/watch/x"
+          data-enclosure=""
+        ></div>
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should clean the src with the provided cleanUrlFn', async () => {
+      const value = '<p>Content</p>'
+      const trackedResolver: EmbedResolver = {
+        ...exampleResolver,
+        extract: () => ({ provider: 'example', src: 'https://example.com/e/x?utm_source=feed' }),
+      }
+      const context: TransformContext = {
+        ...withExampleResolver([{ url: 'https://example.com/e/x', medium: 'video' }]),
+        widgetResolvers: [trackedResolver],
+        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+      }
+      const expected = html`
+        <div
+          data-embed-src="https://example.com/e/x"
+          data-embed-provider="example"
           data-enclosure=""
         ></div>
         <p>Content</p>
@@ -404,6 +440,151 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       `
 
       expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should hang the description of an image enclosure in a figcaption', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        {
+          url: 'https://example.com/photo.jpg',
+          type: 'image/jpeg',
+          title: 'A comedian poses on the red carpet.',
+          description: 'The comedian, seen here in March 2026, denies the claims. Getty Images',
+        },
+      ])
+      const expected = html`
+        <figure>
+          <img src="https://example.com/photo.jpg" alt="A comedian poses on the red carpet." data-enclosure="">
+          <figcaption>The comedian, seen here in March 2026, denies the claims. Getty Images</figcaption>
+        </figure>
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should caption each image enclosure with its own description', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        {
+          url: 'https://example.com/first.jpg',
+          type: 'image/jpeg',
+          description: 'The harbour at dawn.',
+        },
+        { url: 'https://example.com/second.jpg', type: 'image/jpeg' },
+      ])
+      const expected = html`
+        <figure>
+          <img src="https://example.com/first.jpg" data-enclosure="">
+          <figcaption>The harbour at dawn.</figcaption>
+        </figure>
+        <img src="https://example.com/second.jpg" data-enclosure="">
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should not caption an image enclosure whose description repeats its title', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        {
+          url: 'https://example.com/photo.jpg',
+          type: 'image/jpeg',
+          title: 'The harbour at dawn.',
+          description: ' the Harbour  at dawn. ',
+        },
+      ])
+      const expected = html`
+        <img src="https://example.com/photo.jpg" alt="The harbour at dawn." data-enclosure="">
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should not caption an image enclosure whose description repeats the item title', async () => {
+      const value = '<p>Content</p>'
+      const context: TransformContext = {
+        ...withEnclosures([
+          {
+            url: 'https://example.com/photo.jpg',
+            type: 'image/jpeg',
+            description: 'Harbour reopens after the storm',
+          },
+        ]),
+        articleTitle: 'Harbour reopens after the storm',
+      }
+      const expected = html`
+        <img src="https://example.com/photo.jpg" data-enclosure="">
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should not caption an image enclosure whose description the content already carries', async () => {
+      const value = '<p>The harbour reopened on Monday. Boats returned by noon.</p>'
+      const context = withEnclosures([
+        {
+          url: 'https://example.com/photo.jpg',
+          type: 'image/jpeg',
+          description: 'The harbour reopened on Monday.',
+        },
+      ])
+      const expected = html`
+        <img src="https://example.com/photo.jpg" data-enclosure="">
+        <p>The harbour reopened on Monday. Boats returned by noon.</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it.each(nonCaptionDescriptions)(
+      'should not caption an image enclosure described as %s',
+      async (description) => {
+        const value = '<p>Content</p>'
+        const context = withEnclosures([
+          { url: 'https://example.com/photo.jpg', type: 'image/jpeg', description },
+        ])
+        const expected = html`
+          <img src="https://example.com/photo.jpg" data-enclosure="">
+          <p>Content</p>
+        `
+
+        expect(await transform(value, context)).toEqualHtml(expected)
+      },
+    )
+
+    it.each(shortCaptions)('should keep a short caption such as %s', async (description) => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        { url: 'https://example.com/photo.jpg', type: 'image/jpeg', description },
+      ])
+      const expected = html`
+        <figure>
+          <img src="https://example.com/photo.jpg" data-enclosure="">
+          <figcaption>${description}</figcaption>
+        </figure>
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should be idempotent over a captioned image enclosure', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        {
+          url: 'https://example.com/photo.jpg',
+          type: 'image/jpeg',
+          description: 'The harbour at dawn.',
+        },
+      ])
+      const once = await transform(value, context)
+      const twice = await transform(once, context)
+
+      expect(twice).toEqualHtml(once)
     })
 
     it('should resolve a relative image enclosure url against the base url', async () => {
@@ -1000,7 +1181,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
   // Untrusted feed data doesn't honor the required-`url` type.
   it('should skip an enclosure without a url instead of throwing', async () => {
     const value = '<p>Episode notes</p>'
-    const result = await transform(value, withEnclosures([{ type: 'image/png' } as Enclosure]))
+    const result = await transform(value, withEnclosures([{ type: 'image/png' }]))
 
     expect(result).toEqualHtml(value)
   })
@@ -1008,7 +1189,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
   it('should skip a malformed enclosure while still injecting valid ones', async () => {
     const value = '<p>Episode notes</p>'
     const context = withEnclosures([
-      { type: 'image/png' } as Enclosure,
+      { type: 'image/png' },
       { url: 'https://example.com/episode.mp3', type: 'audio/mpeg' },
     ])
     const expected = html`
