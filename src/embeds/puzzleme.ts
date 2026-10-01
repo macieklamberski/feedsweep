@@ -1,6 +1,6 @@
 import { isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, isEmptyElement } from '../utils/dom.js'
 import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -55,6 +55,10 @@ export const puzzlemeEmbedResolver = createUrlEmbedResolver(puzzlemeHosts, puzzl
 export const puzzlemeWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.pm-embed-div',
   (element) => {
+    if (!isEmptyElement(element)) {
+      return
+    }
+
     const kind = attr(element, 'data-puzzletype')
     const id = attr(element, 'data-id')
     const set = attr(element, 'data-set')

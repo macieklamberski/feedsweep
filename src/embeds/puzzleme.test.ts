@@ -216,6 +216,21 @@ describeForEachParser('puzzlemeWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should leave a mount that holds the publisher content', async () => {
+      const value = html`
+        <div
+          class="pm-embed-div"
+          data-id="54602d16"
+          data-set="5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48"
+          data-puzzletype="crossword"
+        >
+          <p>Play today's <a href="https://example.com/mini">mini crossword</a>.</p>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a mount with no set', async () => {
       const value = html`
         <div
@@ -258,6 +273,7 @@ describeForEachParser('puzzleme through the pipeline', (parseHtml) => {
 
     expect(await convert(value)).toEqualHtml(expected)
   })
+
   it('should replace the loader mount and keep the prose around it', async () => {
     const value = html`
       <p><code><br />
@@ -277,6 +293,24 @@ describeForEachParser('puzzleme through the pipeline', (parseHtml) => {
         data-embed-url="https://puzzleme.amuselabs.com/pmm/crossword?id=54602d16&amp;set=5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48"
       ></div>
       <p>Today's mini crossword.</p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep the publisher content a mount holds as main renders it', async () => {
+    const value = html`
+      <div
+        class="pm-embed-div"
+        data-id="54602d16"
+        data-set="5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48"
+        data-puzzletype="crossword"
+      >
+        <p>Play today's <a href="https://example.com/mini">mini crossword</a>.</p>
+      </div>
+    `
+    const expected = html`
+      <p>Play today's <a href="https://example.com/mini">mini crossword</a>.</p>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
