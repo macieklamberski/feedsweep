@@ -710,6 +710,13 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should keep a Zeno.FM home link that follows the player at a distance', async () => {
+      const value =
+        '<iframe src="https://zeno.fm/player/halshack" width="575" height="250"></iframe><br><a href="https://zeno.fm/">Zeno.FM</a>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should keep links to hosts ending in zeno.fm after the player', async () => {
       const value = html`
         <iframe src="https://zeno.fm/player/halshack" width="575" height="250"></iframe><a href="https://notzeno.fm">Not Zeno</a>
