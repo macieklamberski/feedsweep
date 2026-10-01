@@ -137,6 +137,7 @@ import {
   imgurS9eEmbedResolver,
 } from '../embeds/imgur.js'
 import { inaEmbedResolver, inaScriptEmbedResolver } from '../embeds/ina.js'
+import { indavideoEmbedResolver } from '../embeds/indavideo.js'
 import {
   infogramIframeEmbedResolver,
   infogramScriptEmbedResolver,
@@ -481,6 +482,7 @@ const embedResolvers: Array<EmbedResolver> = [
   imgurS9eEmbedResolver,
   inaEmbedResolver,
   inaScriptEmbedResolver,
+  indavideoEmbedResolver,
   infogramIframeEmbedResolver,
   infogramScriptEmbedResolver,
   infogramWidgetEmbedResolver,
