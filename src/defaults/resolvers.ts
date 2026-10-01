@@ -170,6 +170,7 @@ import { libsynEmbedResolver } from '../embeds/libsyn.js'
 import { linkedinEmbedResolver } from '../embeds/linkedin.js'
 import { mailruEmbedResolver } from '../embeds/mailru.js'
 import { mastodonEmbedResolver } from '../embeds/mastodon.js'
+import { matterportEmbedResolver } from '../embeds/matterport.js'
 import { mediavineScriptEmbedResolver, mediavineWidgetEmbedResolver } from '../embeds/mediavine.js'
 import { megaphoneEmbedResolver } from '../embeds/megaphone.js'
 import { megatvEmbedResolver } from '../embeds/megatv.js'
@@ -519,6 +520,7 @@ const embedResolvers: Array<EmbedResolver> = [
   libsynEmbedResolver,
   linkedinEmbedResolver,
   mailruEmbedResolver,
+  matterportEmbedResolver,
   mediavineWidgetEmbedResolver,
   mediavineScriptEmbedResolver,
   megaphoneEmbedResolver,
