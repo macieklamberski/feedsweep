@@ -28,7 +28,7 @@ describeForEachParser('educaplayEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should rebuild the Spanish game onto the current one', async () => {
+    it('should rebuild the Spanish dialog url onto the English one', async () => {
       const value = html`
         <iframe
           allow="fullscreen; autoplay;"
@@ -50,7 +50,7 @@ describeForEachParser('educaplayEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should rebuild the French game onto the current one', async () => {
+    it('should rebuild the French dialog url onto the English one', async () => {
       const value = html`
         <iframe
           allow="fullscreen; autoplay; allow-top-navigation-by-user-activation"
@@ -72,7 +72,7 @@ describeForEachParser('educaplayEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the name out of the stated title', async () => {
+    it('should read the stated title', async () => {
       const value = html`
         <iframe
           src="https://www.educaplay.com/game/5225243-profissoes.html"
