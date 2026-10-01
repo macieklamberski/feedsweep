@@ -29,7 +29,7 @@ const webMapPaths = [
   mapViewerPath,
   embedViewerPath, // The Map Viewer Classic snippet
 ]
-// The start position Map Viewer reads. The classic snippets write `scale=true` for a scale bar.
+// The start position Map Viewer reads.
 const mapViewerPositionParams = ['center', 'scale', 'level']
 // The start position and navigation the classic player reads, `marker` centring on a pin.
 const classicEmbedPositionParams = ['extent', 'center', 'level', 'marker', 'find', 'feature']
@@ -85,11 +85,6 @@ const composeWebMapSource = (url: URL, webMapId: string): string => {
   }
 
   const src = `https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=${webMapId}`
-
-  if (url.pathname !== mapViewerPath) {
-    return src
-  }
-
   const position = filterUrlQuery(url, (name) => mapViewerPositionParams.includes(name))
 
   return `${src}${position.replace('?', '&')}`
