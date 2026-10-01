@@ -8,6 +8,7 @@ import { blubrryFieldCleaners } from '../embeds/blubrry.js'
 import { codepenFieldCleaners } from '../embeds/codepen.js'
 import { dailymotionFieldCleaners } from '../embeds/dailymotion.js'
 import { deezerFieldCleaners } from '../embeds/deezer.js'
+import { firstoryFieldCleaners } from '../embeds/firstory.js'
 import { flourishFieldCleaners } from '../embeds/flourish.js'
 import { indavideoFieldCleaners } from '../embeds/indavideo.js'
 import { instagramFieldCleaners } from '../embeds/instagram.js'
@@ -40,6 +41,7 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...codepenFieldCleaners,
   ...dailymotionFieldCleaners,
   ...deezerFieldCleaners,
+  ...firstoryFieldCleaners,
   ...flourishFieldCleaners,
   ...indavideoFieldCleaners,
   ...instagramFieldCleaners,
