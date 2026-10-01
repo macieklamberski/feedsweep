@@ -197,6 +197,10 @@ import {
   pbsLegacyIframeEmbedResolver,
 } from '../embeds/pbs.js'
 import { peertubeEmbedResolver } from '../embeds/peertube.js'
+import {
+  piktochartIframeEmbedResolver,
+  piktochartWidgetEmbedResolver,
+} from '../embeds/piktochart.js'
 import { pinecastEmbedResolver } from '../embeds/pinecast.js'
 import { pixivIframeEmbedResolver, pixivScriptEmbedResolver } from '../embeds/pixiv.js'
 import { podbeanEmbedResolver } from '../embeds/podbean.js'
@@ -552,6 +556,8 @@ const embedResolvers: Array<EmbedResolver> = [
   pbsFlashEmbedResolver,
   pbsIframeEmbedResolver,
   pbsLegacyIframeEmbedResolver,
+  piktochartIframeEmbedResolver,
+  piktochartWidgetEmbedResolver,
   pinecastEmbedResolver,
   pixivIframeEmbedResolver,
   pixivScriptEmbedResolver,
