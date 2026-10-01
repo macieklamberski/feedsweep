@@ -236,6 +236,7 @@ import { standfmEmbedResolver } from '../embeds/standfm.js'
 import { steamEmbedResolver } from '../embeds/steam.js'
 import { stravaIframeEmbedResolver, stravaPlaceholderEmbedResolver } from '../embeds/strava.js'
 import { swayEmbedResolver } from '../embeds/sway.js'
+import { symbalooEmbedResolver } from '../embeds/symbaloo.js'
 import {
   tableauIframeEmbedResolver,
   tableauObjectEmbedResolver,
@@ -594,6 +595,7 @@ const embedResolvers: Array<EmbedResolver> = [
   stravaIframeEmbedResolver,
   stravaPlaceholderEmbedResolver,
   swayEmbedResolver,
+  symbalooEmbedResolver,
   tableauWidgetEmbedResolver,
   tableauObjectEmbedResolver,
   tableauIframeEmbedResolver,
