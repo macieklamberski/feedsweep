@@ -87,9 +87,56 @@ describeForEachParser('peertubeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should carry over the subtitle track', async () => {
+      const value = html`
+        <iframe src="https://tube.funfacts.de/w/4RnoEXF5EfXb8iZCjnJsx9?subtitle=de"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'peertube',
+        id: '4RnoEXF5EfXb8iZCjnJsx9',
+        src: 'https://tube.funfacts.de/videos/embed/4RnoEXF5EfXb8iZCjnJsx9?subtitle=de',
+        url: 'https://tube.funfacts.de/w/4RnoEXF5EfXb8iZCjnJsx9',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
+    it('should ignore a slug that ends in a short id', async () => {
+      const value = '<iframe src="https://example.com/w/a-clip-4RnoEXF5EfXb8iZCjnJsx9"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a short id with characters after it', async () => {
+      const value = '<iframe src="https://example.com/w/4RnoEXF5EfXb8iZCjnJsx9-a-clip"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a slug that ends in a uuid', async () => {
+      const value = html`
+        <iframe
+          src="https://example.com/videos/watch/a-clip-1f300b16-b7bb-4d26-88c5-be7fc19ddd56"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a uuid with characters after it', async () => {
+      const value = html`
+        <iframe
+          src="https://example.com/videos/watch/1f300b16-b7bb-4d26-88c5-be7fc19ddd56-a-clip"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a javascript url whose path reads as a watch page', async () => {
       const value = '<iframe src="javascript:/w/4RnoEXF5EfXb8iZCjnJsx9"></iframe>'
 
@@ -112,14 +159,16 @@ describeForEachParser('peertubeEmbedResolver', (parseHtml) => {
   // Every host the 2026-09-03 corpus sample found on one of the three paths without being
   // PeerTube, with the id it carries. None puts a video id straight after the route.
   describe('sites serving the same paths', () => {
-    it.each([
+    const lookalikePathUrls: Array<string> = [
       'https://marvel.com/videos/watch/5016',
       'https://www.europe1.fr/videos/embed/941392',
       'https://tv.libertaddigital.com/videos/embed/3-x9q1btk.html',
       'https://www.bing.com/videos/watch/video/a-clip-slug/8e0e7a18',
       'https://fortune.com/videos/watch/a-clip-slug/1f300b16-b7bb-4d26-88c5-be7fc19ddd56',
       'https://videoapi.my.mail.ru/videos/embed/mail/someone/_myvideo/10.html',
-    ])('should return undefined for %s', async (source) => {
+    ]
+
+    it.each(lookalikePathUrls)('should return undefined for %s', async (source) => {
       const value = `<iframe src="${source}"></iframe>`
 
       expect(await extract(value)).toBeUndefined()

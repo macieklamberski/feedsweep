@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type {
   DomTransform,
   EmbedResolverResult,
@@ -8,8 +8,15 @@ import type {
 } from '../../types.js'
 import { isAvatarEnclosure, isEnclosureKind, prepareEnclosures } from '../../utils/enclosures.js'
 import { getImageFingerprint } from '../../utils/images.js'
-import { cleanUrl, flashFileRegex, resolveOrDropUrl, resolveOrKeepUrl } from '../../utils/urls.js'
 import {
+  cleanUrl,
+  flashFileRegex,
+  imageFileRegex,
+  resolveOrDropUrl,
+  resolveOrKeepUrl,
+} from '../../utils/urls.js'
+import {
+  createCaptionedFigure,
   createEmbedPlaceholder,
   createFilePlaceholder,
   createImage,
@@ -24,6 +31,17 @@ import {
 // opt-in heuristic) can tell it from the item's own inline content. Exported because
 // stripDuplicateEnclosures and assignVideoPosters both read it.
 export const enclosureMarker = 'data-enclosure'
+
+// Text a publishing tool wrote where a description would go, lowercased.
+const placeholderCaptions = [
+  'thumbnail', // Duda
+  'main image', // Duda
+  'getassetsmediafromrepository', // Newsweek Polska
+  'undefined', // A Mastodon client posting an image with no alt text
+]
+
+// A single token holding a digit, an underscore or a hyphen: an upload's file name.
+const fileNameRegex = /^[\w.-]*[\d_-][\w.-]*$/
 
 const resolveEnclosure = async (
   url: string,
@@ -88,6 +106,39 @@ const injectImageEnclosure = (
   })
 }
 
+// A media:description on an image is the photo's caption on most feeds that send one. The rest
+// repeat the title, the item's title or the item's own text, which a caption would show twice.
+const readImageCaption = (
+  enclosure: Enclosure,
+  document: Document,
+  context: TransformContext,
+): string | undefined => {
+  const normalize = (value: string | null | undefined): string => {
+    return (value ?? '').trim().toLowerCase().replace(/\s+/g, ' ')
+  }
+
+  const caption = enclosure.description?.trim()
+  const normalized = normalize(caption)
+
+  if (!caption || placeholderCaptions.includes(normalized)) {
+    return
+  }
+
+  if (fileNameRegex.test(caption) || imageFileRegex.test(caption)) {
+    return
+  }
+
+  if (normalized === normalize(enclosure.title) || normalized === normalize(context.articleTitle)) {
+    return
+  }
+
+  if (normalize(document.body.textContent).includes(normalized)) {
+    return
+  }
+
+  return caption
+}
+
 // The feed carries the publisher's real thumbnail, title and duration, where a resolver only
 // composes a thumbnail from the url, like YouTube's hqdefault.
 const mergeEnclosureMetadata = (
@@ -121,17 +172,13 @@ const getFileName = (enclosure: Enclosure, url: string): string => {
   }
 
   const parsed = parseUrl(url)
-  const segment = parsed?.pathname.split('/').filter(Boolean).pop()
+  const segment = getPathSegments(url).pop()
 
   if (!segment) {
     return parsed?.hostname ?? url
   }
 
-  try {
-    return decodeURIComponent(segment)
-  } catch {}
-
-  return segment
+  return decodeSegment(segment) ?? segment
 }
 
 // An enclosure rides outside the item body, so the content alone never shows its media.
@@ -149,6 +196,7 @@ export const injectEnclosures: DomTransform = (context) => {
   return async (document) => {
     const created: Array<HTMLElement> = []
     const files: Array<HTMLElement> = []
+    const captions = new Map<HTMLElement, string>()
 
     const hasContentImage = !!document.querySelector('img[src], picture, [data-embed-thumbnail]')
 
@@ -190,9 +238,9 @@ export const injectEnclosures: DomTransform = (context) => {
 
         // A resolver rebuilds the src from the parsed id. Without one the enclosure's own
         // URL stands in.
-        const prepared = prepareEmbedMetadata(metadata, context)
+        const prepared = prepareEmbedMetadata({ ...metadata, src: metadata.src ?? src }, context)
 
-        created.push(createEmbedPlaceholder(document, { ...prepared, src: metadata.src ?? src }))
+        created.push(createEmbedPlaceholder(document, { ...prepared, src: prepared.src ?? src }))
         continue
       }
 
@@ -245,8 +293,16 @@ export const injectEnclosures: DomTransform = (context) => {
       }
 
       const imageElement = injectImageEnclosure(document, enclosure, mediaSource)
-      if (imageElement) {
-        created.push(imageElement)
+
+      if (!imageElement) {
+        continue
+      }
+
+      const caption = readImageCaption(enclosure, document, context)
+      created.push(imageElement)
+
+      if (caption) {
+        captions.set(imageElement, caption)
       }
     }
 
@@ -293,7 +349,10 @@ export const injectEnclosures: DomTransform = (context) => {
 
     // A forward loop of prepends reverses the enclosure order.
     for (let index = injected.length - 1; index >= 0; index--) {
-      document.body.prepend(injected[index])
+      const element = injected[index]
+      const caption = captions.get(element)
+
+      document.body.prepend(caption ? createCaptionedFigure(document, element, caption) : element)
     }
 
     // Players open the item, files close it: a download is what the reader reaches for after

@@ -1,13 +1,11 @@
-import { getPathSegments, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr, parsePixelSize } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'spreaker'
-
-const safeIdRegex = /^\d+$/
 
 const spreakerHosts = ['spreaker.com']
 
@@ -31,7 +29,7 @@ export const extractSpreakerEmbed = (
   for (const [param, kind] of Object.entries(embedKinds)) {
     const id = parsed.searchParams.get(param)
 
-    if (id && safeIdRegex.test(id)) {
+    if (id) {
       return { kind, param, id }
     }
   }
@@ -56,7 +54,7 @@ export const spreakerResolveEmbed: ResolveEmbed = (url, element) => {
     src: `https://widget.spreaker.com/player?${embed.param}=${embed.id}`,
     url: `https://www.spreaker.com/${embed.kind}/${embed.id}`,
     height: playerHeight,
-    ...trimObject({ title }, Boolean),
+    title,
   }
 }
 
@@ -84,15 +82,13 @@ export const spreakerAnchorEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    // The anchor states its own size, e.g. `data-height="200px"`.
-    const stated = parsePixelSize(attr(element, 'data-height'))
     // The anchor text is a localized call to action around the title, not the title itself, and
     // the quote characters wrapping the title differ per language.
     const title = attr(element, 'data-title')
 
     return {
       ...result,
-      ...trimObject({ height: stated, title }, Boolean),
+      title,
     }
   },
 )

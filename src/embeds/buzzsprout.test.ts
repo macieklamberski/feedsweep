@@ -34,6 +34,12 @@ describe('buzzsproutResolveEmbed', () => {
 
     expect(buzzsproutResolveEmbed(value)).toBeUndefined()
   })
+
+  it('should return undefined for an episode path under another segment', () => {
+    const value = 'https://www.buzzsprout.com/x/1735722/8166676'
+
+    expect(buzzsproutResolveEmbed(value)).toBeUndefined()
+  })
 })
 
 describeForEachParser('buzzsproutScriptEmbedResolver', (parseHtml) => {
@@ -106,6 +112,30 @@ describeForEachParser('buzzsproutScriptEmbedResolver', (parseHtml) => {
 
     it('should return undefined for a non-numeric episode segment', async () => {
       const value = '<script src="https://www.buzzsprout.com/231452/about.js"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an episode script under another segment', async () => {
+      const value = '<script src="https://www.buzzsprout.com/x/231452/19565923.js"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an episode path ending in another extension', async () => {
+      const value = '<script src="https://www.buzzsprout.com/231452/19565923.json"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a show script under another segment', async () => {
+      const value = '<script src="https://www.buzzsprout.com/x/231452.js"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a show path ending in another extension', async () => {
+      const value = '<script src="https://www.buzzsprout.com/231452.json"></script>'
 
       expect(await extract(value)).toBeUndefined()
     })

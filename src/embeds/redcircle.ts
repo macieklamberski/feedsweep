@@ -1,7 +1,7 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts, pickQueryParams, uuidRegex } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The loader is served from `api.podcache.net` and the player it builds from `redcircle.com`, on
@@ -35,7 +35,7 @@ const readSubject = (
   // Only the webplayer spells the show id bare; the two loader paths put `sh` in front of it.
   const show = route === 'embedded-show-webplayer' ? rest[0] : rest[1]
 
-  if (!show || !uuidRegex.test(show) || (route !== 'embedded-show-webplayer' && rest[0] !== 'sh')) {
+  if (!show || (route !== 'embedded-show-webplayer' && rest[0] !== 'sh')) {
     return
   }
 
@@ -45,14 +45,12 @@ const readSubject = (
 
   const episode = rest[2] === 'ep' ? rest[3] : undefined
 
-  if (!episode || !uuidRegex.test(episode)) {
+  if (!episode) {
     return
   }
 
   return { kind, show, episode }
 }
-
-const redcircleEmbedParams = ['theme']
 
 export const redcircleResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, redcircleHosts)
@@ -62,13 +60,11 @@ export const redcircleResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const query = composeQuery(pickQueryParams(parsed.search, redcircleEmbedParams))
-
   if (subject.kind === 'show') {
     return {
       provider: 'redcircle',
       id: `show/${subject.show}`,
-      src: `https://redcircle.com/embedded-show-webplayer/${subject.show}${query}`,
+      src: `https://redcircle.com/embedded-show-webplayer/${subject.show}`,
       url: `https://redcircle.com/shows/${subject.show}`,
       height: playerHeights.show,
     }
@@ -77,7 +73,7 @@ export const redcircleResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider: 'redcircle',
     id: `episode/${subject.show}/${subject.episode}`,
-    src: `https://redcircle.com/embedded-player/sh/${subject.show}/ep/${subject.episode}${query}`,
+    src: `https://redcircle.com/embedded-player/sh/${subject.show}/ep/${subject.episode}`,
     url: `https://redcircle.com/shows/${subject.show}/episodes/${subject.episode}`,
     height: playerHeights.episode,
   }

@@ -7,11 +7,6 @@ import { attr, find, keepIfMatches, text, textNode } from '../utils/dom.js'
 // dates spelling a year ("Aug 21, 2025", "Nov 6 '22") are worth passing through.
 const yearRegex = /\b(19|20)\d{2}\b|'\d{2}\b/
 
-// A yearless "Jul 25" is one whose year matched the save year, which nothing can recover.
-const dateWithYear = (value: string | undefined): string | undefined => {
-  return keepIfMatches(value, yearRegex)
-}
-
 // Forem's embed card for an external link, compiled into the stored body as bare divs.
 // The feed sanitizer's allowlist keeps div, class and id intact.
 export const devtoLinkCiteResolver: CiteResolver = {
@@ -57,7 +52,7 @@ export const devtoPostCiteResolver: CiteResolver = {
       // Forem always renders the author anchor and wraps the organization's in a "for <org>" span.
       author: text(element, 'a.crayons-story__secondary'),
       publisher: text(element, 'span > a.crayons-story__secondary'),
-      date: dateWithYear(text(element, 'time')),
+      date: keepIfMatches(text(element, 'time'), yearRegex),
       icon: attr(find(element, '.crayons-story__author-pic img'), 'src'),
     })
   },
@@ -84,7 +79,7 @@ export const devtoLegacyPostCiteResolver: CiteResolver = {
       // card has a tag list, writing the article's host into it. Everything else it renders is
       // in the same place, so the card reads whole and the service is the publisher.
       publisher: text(element, '.ltag__link__servicename'),
-      date: dateWithYear(date),
+      date: keepIfMatches(date, yearRegex),
       icon: attr(find(element, '.ltag__link__pic img'), 'src'),
     })
   },

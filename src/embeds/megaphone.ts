@@ -1,19 +1,18 @@
 import { parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
+import { composeQuery, digitsRegex, isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// The letters keep NPR's bare story number, written into ?e=, from reading as an episode.
-const safeEpisodeIdRegex = /^[A-Z]+\d+$/i
-const safePlaylistIdRegex = /^[A-Z0-9]+$/i
+const provider = 'megaphone'
 
 const megaphoneHosts = ['megaphone.fm']
 
 const embedKinds = {
   // Both players are fixed in height whatever their width: the episode player draws 200 and the
   // playlist 481 at 640 wide and wider.
-  e: { kind: 'episode', height: 200, safeIdRegex: safeEpisodeIdRegex },
-  p: { kind: 'playlist', height: 482, safeIdRegex: safePlaylistIdRegex },
+  e: { kind: 'episode', height: 200 },
+  p: { kind: 'playlist', height: 482 },
 }
 
 export const extractMegaphoneEmbed = (
@@ -27,12 +26,19 @@ export const extractMegaphoneEmbed = (
     return
   }
 
-  for (const [param, { kind, height, safeIdRegex }] of Object.entries(embedKinds)) {
+  for (const [param, { kind, height }] of Object.entries(embedKinds)) {
     const id = parsed.searchParams.get(param)
 
-    if (id && safeIdRegex.test(id)) {
-      return { param, kind, id, height }
+    if (!id) {
+      continue
     }
+
+    // NPR writes its bare story number into ?e=, and an episode id opens with letters.
+    if (param === 'e' && digitsRegex.test(id)) {
+      continue
+    }
+
+    return { param, kind, id, height }
   }
 }
 
@@ -46,12 +52,18 @@ export const megaphoneResolveEmbed: ResolveEmbed = (url) => {
   }
 
   return {
-    provider: 'megaphone',
+    provider,
     id: `${embed.kind}/${embed.id}`,
-    src: `https://playlist.megaphone.fm/?${embed.param}=${embed.id}`,
+    src: `https://playlist.megaphone.fm/${composeQuery({ [embed.param]: embed.id })}`,
     height: embed.height,
   }
 }
 
 // Megaphone's player iframe, ?e= for an episode or ?p= for a playlist, some with no height at all.
 export const megaphoneEmbedResolver = createUrlEmbedResolver(megaphoneHosts, megaphoneResolveEmbed)
+
+export const megaphoneRenderHint: EmbedRenderHint = {
+  provider,
+  isReady: isPlayerJsReady,
+  requestPlay: playerJsPlayRequest,
+}

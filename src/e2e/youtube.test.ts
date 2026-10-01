@@ -5,7 +5,8 @@ import { describeForEachParser, html } from '../tests.js'
 describeForEachParser('YouTube', (parseHtml) => {
   // The widest spread. youtubeIframeEmbedResolver and youtubeAmpEmbedResolver claim the
   // carriers and amp-youtube elements (youtubeHosts includes youtube.googleapis.com, the
-  // Flash-era host Blogger feeds still ship). Each plugin facade has its own rebuild:
+  // Flash-era host Blogger feeds still ship), and youtubeFc2EmbedResolver claims the FC2 blog
+  // player shell. Each plugin facade has its own rebuild:
   // rebuildLazyYtEmbeds, rebuildLyteEmbeds, rebuildRocketYoutubePreviews,
   // rebuildLiteVideoEmbeds, rebuildEmbedPlusEmbeds, rebuildElementorVideoEmbeds and
   // rebuildLazyLoadForVideos. surfaceParkedMarkup recovers iframes parked percent-encoded
@@ -24,6 +25,30 @@ describeForEachParser('YouTube', (parseHtml) => {
         data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should resolve a carrier uCoz wrote behind the site host', async () => {
+    const value = html`
+      <iframe
+        allowfullscreen=""
+        frameborder="0"
+        height="315"
+        src="https://ahtary-city.ucoz.com//www.youtube.com/embed/MLANv9VJ5Ws"
+        width="560"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="youtube"
+        data-embed-id="MLANv9VJ5Ws"
+        data-embed-src="https://www.youtube.com/embed/MLANv9VJ5Ws"
+        data-embed-url="https://www.youtube.com/watch?v=MLANv9VJ5Ws"
+        data-embed-thumbnail="https://i.ytimg.com/vi/MLANv9VJ5Ws/hqdefault.jpg"
         data-embed-ratio="16/9"
       ></div>
     `
@@ -56,6 +81,28 @@ describeForEachParser('YouTube', (parseHtml) => {
 
   // The snippet YouTube's own oEmbed returns, which is what a WordPress oEmbed cache stores and
   // republishes into the feed.
+  it('should keep the start offset an oEmbed snippet states', async () => {
+    const value = html`
+      <iframe
+        width="560"
+        height="315"
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=90&amp;feature=oembed"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=90"
+        data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   it('should carry a title an oEmbed snippet states onto the placeholder', async () => {
     const value = html`
       <iframe
@@ -249,5 +296,66 @@ describeForEachParser('YouTube', (parseHtml) => {
     `
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // A description copied from YouTube carries its emoji as images of YouTube's chat set.
+  it('should replace a YouTube chat emoji image with its character', async () => {
+    const value = html`
+      <p>Location
+        <img
+          height="23"
+          width="23"
+          src="https://www.youtube.com/s/gaming/emoji/7ff574f2/emoji_u1f4cd.png"
+          class="yt-core-image yt-core-attributed-string__image-element"
+          alt=""
+        >
+      </p>
+    `
+    const expected = '<p>Location 📍</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should resolve the FC2 blog player shell into the YouTube video it wraps', async () => {
+    const value = html`
+      <iframe
+        src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?autoplay=1&id=NBwJR7X3krE&width=640&height=360&title=Soyoichi"
+        width="640"
+        height="360"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen=""
+        data-id="NBwJR7X3krE"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="youtube"
+        data-embed-id="NBwJR7X3krE"
+        data-embed-src="https://www.youtube.com/embed/NBwJR7X3krE"
+        data-embed-url="https://www.youtube.com/watch?v=NBwJR7X3krE"
+        data-embed-thumbnail="https://i.ytimg.com/vi/NBwJR7X3krE/hqdefault.jpg"
+        data-embed-ratio="16/9"
+        data-embed-title="Soyoichi"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // static.fc2.com also serves FC2's images and scripts, and every enclosure is offered to the
+  // shell resolver on its way to becoming a native element.
+  it('should leave a static.fc2.com image enclosure an image', async () => {
+    const enclosures = [
+      { url: 'https://static.fc2.com/image/portal/social/blog_logo200x200.gif', type: 'image/gif' },
+    ]
+    const expected = html`
+      <img data-enclosure="" src="https://static.fc2.com/image/portal/social/blog_logo200x200.gif">
+      <p>Body</p>
+    `
+
+    expect(
+      await transformContent('<p>Body</p>', { parseHtmlFn: parseHtml, enclosures }),
+    ).toEqualHtml(expected)
   })
 })

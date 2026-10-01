@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { isGeneratedWrapper } from '../../utils/dom.js'
+import { isGeneratedWrapper, isNonWhitespaceText } from '../../utils/dom.js'
 
 const wrapperSelectors = [
   'div',
@@ -37,6 +37,33 @@ const collectReferencedFragments = (document: Document): Set<string> => {
   return fragments
 }
 
+const textAttributes = ['dir', 'lang']
+
+// False when bare text sits directly in the wrapper, which cannot carry the attributes itself.
+const carryTextAttributes = (element: Element): boolean => {
+  const attributes = textAttributes.filter((name) => element.hasAttribute(name))
+
+  if (attributes.length === 0) {
+    return true
+  }
+
+  for (let node = element.firstChild; node; node = node.nextSibling) {
+    if (isNonWhitespaceText(node)) {
+      return false
+    }
+  }
+
+  for (const child of element.children) {
+    for (const name of attributes) {
+      if (!child.hasAttribute(name)) {
+        child.setAttribute(name, element.getAttribute(name) ?? '')
+      }
+    }
+  }
+
+  return true
+}
+
 // Purely presentational containers around content, which add nesting a reader cannot style.
 export const unwrapWrappers: DomTransform = () => {
   return (document) => {
@@ -62,6 +89,11 @@ export const unwrapWrappers: DomTransform = () => {
 
         // Dissolving a fragment link's target drops its id and breaks the link.
         if (id && referencedFragments.has(id)) {
+          continue
+        }
+
+        // Direction and language apply to the wrapper's text, so each child inherits them.
+        if (!carryTextAttributes(element)) {
           continue
         }
 

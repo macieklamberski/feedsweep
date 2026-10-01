@@ -34,9 +34,61 @@ describe('guardianResolveEmbed', () => {
 
       expect(guardianResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read a hyphenated section and a day in the thirties', () => {
+      const value =
+        'https://embed.theguardian.com/embed/video/us-news/video/2015/apr/30/freddie-gray-neighbors-baltimore-video'
+      const expected: EmbedResolverResult = {
+        provider: 'guardian',
+        id: 'us-news/video/2015/apr/30/freddie-gray-neighbors-baltimore-video',
+        src: 'https://embed.theguardian.com/embed/video/us-news/video/2015/apr/30/freddie-gray-neighbors-baltimore-video',
+        url: 'https://www.theguardian.com/us-news/video/2015/apr/30/freddie-gray-neighbors-baltimore-video',
+        ratio: '16/9',
+        date: '2015-04-30',
+      }
+
+      expect(guardianResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read a slug carrying digits and a day in the twenties', () => {
+      const value =
+        'https://embed.theguardian.com/embed/video/world/video/2015/sep/21/viola-davis-speech-2015-emmys-video'
+      const expected: EmbedResolverResult = {
+        provider: 'guardian',
+        id: 'world/video/2015/sep/21/viola-davis-speech-2015-emmys-video',
+        src: 'https://embed.theguardian.com/embed/video/world/video/2015/sep/21/viola-davis-speech-2015-emmys-video',
+        url: 'https://www.theguardian.com/world/video/2015/sep/21/viola-davis-speech-2015-emmys-video',
+        ratio: '16/9',
+        date: '2015-09-21',
+      }
+
+      expect(guardianResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
+    // The www host serves the same path with `x-frame-options: SAMEORIGIN`, so it frames nothing.
+    it('should return undefined for the player path on the www host', () => {
+      const value =
+        'https://www.theguardian.com/embed/video/world/video/2015/sep/21/viola-davis-speech-2015-emmys-video'
+
+      expect(guardianResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the player path below a leading segment', () => {
+      const value =
+        'https://embed.theguardian.com/x/embed/video/world/video/2015/sep/21/viola-davis-speech-2015-emmys-video'
+
+      expect(guardianResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the player path followed by a trailing segment', () => {
+      const value =
+        'https://embed.theguardian.com/embed/video/world/video/2015/sep/21/viola-davis-speech-2015-emmys-video/extra'
+
+      expect(guardianResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should return undefined for the video page itself', () => {
       const value =
         'https://www.theguardian.com/society/video/2015/jun/18/superbugs-la-mrsa-pigs-antibiotics-video'
@@ -86,13 +138,27 @@ describe('guardianResolveEmbed', () => {
 
       expect(guardianResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should use a malformed path as written, even if the player answers an error', () => {
+      const value =
+        'https://embed.theguardian.com/embed/video/Society/video/15/June/1st/superbugs_video'
+      const expected: EmbedResolverResult = {
+        provider: 'guardian',
+        id: 'Society/video/15/June/1st/superbugs_video',
+        src: 'https://embed.theguardian.com/embed/video/Society/video/15/June/1st/superbugs_video',
+        url: 'https://www.theguardian.com/Society/video/15/June/1st/superbugs_video',
+        ratio: '16/9',
+      }
+
+      expect(guardianResolveEmbed(value)).toEqual(expected)
+    })
   })
 })
 
 describeForEachParser('guardianEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, guardianEmbedResolver)
 
-  it('should keep the box the pasted player iframe states', async () => {
+  it('should state the platform size over the box the pasted player iframe states', async () => {
     const value = html`
       <iframe
         src="https://embed.theguardian.com/embed/video/world/video/2015/oct/08/ashton-carter-nato-russian-forces-behaving-unprofessionally-syria-video"
@@ -106,8 +172,7 @@ describeForEachParser('guardianEmbedResolver', (parseHtml) => {
       id: 'world/video/2015/oct/08/ashton-carter-nato-russian-forces-behaving-unprofessionally-syria-video',
       src: 'https://embed.theguardian.com/embed/video/world/video/2015/oct/08/ashton-carter-nato-russian-forces-behaving-unprofessionally-syria-video',
       url: 'https://www.theguardian.com/world/video/2015/oct/08/ashton-carter-nato-russian-forces-behaving-unprofessionally-syria-video',
-      width: 560,
-      height: 315,
+      ratio: '16/9',
       date: '2015-10-08',
     }
 
@@ -134,7 +199,7 @@ describeForEachParser('guardianEmbedResolver', (parseHtml) => {
 
   it('should ignore a foreign host carrying the same path', async () => {
     const value =
-      '<iframe src="https://evil.test/embed.theguardian.com/embed/video/world/video/2015/oct/08/syria-video"></iframe>'
+      '<iframe src="https://evil.test/embed/video/world/video/2015/oct/08/syria-video"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })
