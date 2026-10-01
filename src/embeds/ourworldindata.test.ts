@@ -185,6 +185,23 @@ describeForEachParser('ourworldindataEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should keep a view param whose name only contains a tracker prefix', async () => {
+      const value =
+        '<iframe src="https://ourworldindata.org/grapher/religious-composition?share_utm_rank=1"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ourworldindata',
+        id: 'grapher/religious-composition',
+        src: 'https://ourworldindata.org/grapher/religious-composition?share_utm_rank=1',
+        url: 'https://ourworldindata.org/grapher/religious-composition?share_utm_rank=1',
+        thumbnail: 'https://ourworldindata.org/grapher/religious-composition.png?share_utm_rank=1',
+        height: 600,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('ourworldindata through the pipeline', (parseHtml) => {
