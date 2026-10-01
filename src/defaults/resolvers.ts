@@ -374,7 +374,7 @@ import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
 import { tumblrMediaResolver } from '../media/tumblr.js'
 import { wechatMediaResolver } from '../media/wechat.js'
-import { weeblyMediaResolver } from '../media/weebly.js'
+import { weeblyFlashMediaResolver, weeblyMediaResolver } from '../media/weebly.js'
 import { wikimediaMediaResolver } from '../media/wikimedia.js'
 import type {
   CiteResolver,
@@ -629,6 +629,7 @@ const mediaResolvers: Array<MediaResolver> = [
   tumblrMediaResolver,
   wechatMediaResolver,
   weeblyMediaResolver,
+  weeblyFlashMediaResolver,
   wikimediaMediaResolver,
 ]
 
