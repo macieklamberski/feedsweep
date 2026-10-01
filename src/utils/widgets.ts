@@ -283,6 +283,21 @@ export const createImage = (document: Document, fields: ImageFields): HTMLElemen
   return image
 }
 
+// An <img>, an <audio> and a <video> have nowhere of their own to show a human-readable caption.
+export const createCaptionedFigure = (
+  document: Document,
+  element: HTMLElement,
+  caption: string,
+): HTMLElement => {
+  const figure = document.createElement('figure')
+  const figcaption = document.createElement('figcaption')
+
+  figcaption.textContent = caption
+  figure.append(element, figcaption)
+
+  return figure
+}
+
 export const createLink = (document: Document, href: string, text = href): HTMLElement => {
   const link = document.createElement('a')
   link.setAttribute('href', href)
