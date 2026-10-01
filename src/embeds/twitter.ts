@@ -2,8 +2,12 @@ import { isHostOrSubdomainOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  createMarkupEmbedResolver,
+  createS9eEmbedResolver,
+  createUrlEmbedResolver,
+} from '../utils/widgets.js'
 
 const provider = 'twitter'
 
@@ -48,7 +52,6 @@ const handleStandIn = 'i'
 // The byline reads "— Display Name (@user)" beside a dated anchor to the status. A skeleton
 // blockquote keeps the byline's punctuation and fills in neither half, so it holds `—  (@)`.
 const bylineRegex = /^[—–-]\s*(.*?)\s*\(@[a-zA-Z0-9_]*\)\s*$/
-const safeStatusIdRegex = /^\d+$/
 
 type Status = { handle: string; id: string }
 
@@ -88,14 +91,11 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
   // iframe a publisher nested in the quote would otherwise name the tweet.
   const frame = parseUrl(attr(find(element, 'iframe[src]'), 'src') ?? '', placeholderBaseUrl)
   const framed = frame && isTweetUrl(frame) ? frame.searchParams.get('id') : undefined
-  // Each id is validated on its own, because the attributes disagree: a block copied between
-  // platforms carries several generations of them and only one is guaranteed to be intact.
-  const declared = [
-    attr(element, 'data-twitter-tweet-id'),
-    attr(element, 'data-tweet-id'),
-    attr(element, 'data-tweetid'),
-    framed,
-  ].find((id) => id && safeStatusIdRegex.test(id))
+  const declared =
+    attr(element, 'data-twitter-tweet-id') ??
+    attr(element, 'data-tweet-id') ??
+    attr(element, 'data-tweetid') ??
+    framed
 
   return declared ? { status: { handle: '', id: declared } } : undefined
 }
@@ -136,7 +136,7 @@ const composeEmbed = (status: Status, extra: Partial<EmbedResolverResult>): Embe
   return {
     provider,
     id: status.id,
-    src: `https://platform.twitter.com/embed/Tweet.html?id=${status.id}`,
+    src: `https://platform.twitter.com/embed/Tweet.html${composeQuery({ id: status.id })}`,
     url: status.handle ? `https://x.com/${status.handle}/status/${status.id}` : undefined,
     ...extra,
   }
@@ -248,7 +248,7 @@ export const twitterResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
   const id = parsed && playerPaths.has(parsed.pathname) ? parsed.searchParams.get('id') : undefined
 
-  if (id && safeStatusIdRegex.test(id)) {
+  if (id) {
     return composeEmbed({ handle: '', id }, {})
   }
 
@@ -264,6 +264,11 @@ export const twitterIframeEmbedResolver = createUrlEmbedResolver(
   ['twitter.com', 'x.com'],
   twitterResolveEmbed,
 )
+
+// A forum's s9e MediaEmbed helper frame, naming the status id in its url fragment.
+export const twitterS9eEmbedResolver = createS9eEmbedResolver('twitter', (id) => {
+  return twitterResolveEmbed(`https://platform.twitter.com/embed/Tweet.html${composeQuery({ id })}`)
+})
 
 // The player reports its rendered height in a JSON-RPC envelope, unprompted, once the frame is
 // in view, and again when a reader expands a truncated post. The other calls in the same

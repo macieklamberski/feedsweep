@@ -69,6 +69,6 @@ export const bitrixEmojiResolver: EmojiResolver = {
   extract: (element) => {
     const glyph = getGlyph([attr(element, 'data-code'), attr(element, 'alt')])
 
-    return resolveEmojiImage(element, { isStrong: true, glyph })
+    return resolveEmojiImage(element, { isStrong: true, glyph, keepsPictures: true })
   },
 }

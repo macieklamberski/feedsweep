@@ -1,7 +1,7 @@
 import { parseSrcset, stringifySrcset } from 'srcset'
 import type { DomTransform, IsSafeUrlFn, UrlRole } from '../../types.js'
 import { svgHrefAttribute, walkElements } from '../../utils/dom.js'
-import { groupUrlAttributesByTag, urlAttributes } from '../../utils/urls.js'
+import { groupUrlAttributesByTag, stripUrlIgnorableChars, urlAttributes } from '../../utils/urls.js'
 
 // Inert replacements that keep the element but render nothing: a same-page no-op for
 // links, the empty document for media (about:blank loads nothing and runs nothing).
@@ -10,13 +10,6 @@ const sentinels: Record<UrlRole, string> = {
   media: 'about:blank',
 }
 
-// A browser strips C0 controls before reading the scheme, so \x01javascript: runs.
-// Whitespace inside the scheme is dropped as well, so java\tscript: runs too.
-const urlIgnorableRanges = [
-  '\\s', // ASCII and Unicode whitespace
-  '\\x00-\\x1F', // C0 controls
-]
-const urlIgnorableCharsRegex = new RegExp(`[${urlIgnorableRanges.join('')}]+`, 'g')
 // The dangerous-scheme floor: schemes that execute or render markup. Always enforced,
 // regardless of isSafeUrlFn: the scheme floor, not consumer policy.
 const dangerousSchemeRegex = /^(?:javascript:|vbscript:|data:text\/html)/i
@@ -25,7 +18,7 @@ const dangerousSchemeRegex = /^(?:javascript:|vbscript:|data:text\/html)/i
 const dangerousLinkSchemeRegex = /^data:image\/svg\+xml/i
 
 const hasDangerousScheme = (url: string, role: UrlRole): boolean => {
-  const normalized = url.replace(urlIgnorableCharsRegex, '').toLowerCase()
+  const normalized = stripUrlIgnorableChars(url)
 
   return (
     dangerousSchemeRegex.test(normalized) ||

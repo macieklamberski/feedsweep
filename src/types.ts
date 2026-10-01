@@ -1,5 +1,3 @@
-import type { DiscoverResolveUrlFn } from 'feedscout'
-
 import type { MaybePromise, Pattern } from 'trousse'
 
 export type EnclosureThumbnail = {
@@ -25,12 +23,15 @@ export type Enclosure = {
   groupIndex?: number
 }
 
-export type ResolveUrlFn = DiscoverResolveUrlFn
+export type ResolveUrlFn = (url: string, baseUrl: string | undefined) => string | undefined
 
 export type EmbedResolverResult = {
   provider: string
   id?: string
-  src: string
+  src?: string
+  // Settings the publisher chose for this one embed that a reader may override, such as the
+  // language of a widget's labels. They stay off `src`, so a reader can apply its own instead.
+  params?: Record<string, string>
   url?: string
   thumbnail?: string
   width?: number
@@ -50,8 +51,8 @@ export type ResolveEmbed = (url: string, element?: Element) => EmbedResolverResu
 export type EmbedRenderHint = {
   provider: string
   // The origin the player's messages arrive from, for a reader to check `event.origin` against.
-  // Absent where the player is served from the publisher's own host, a Mastodon instance or a
-  // Podigee show, and the frame's own origin is the one to match.
+  // Absent where the player is served from the publisher's own host or a Mastodon instance, and
+  // the frame's own origin is the one to match.
   origin?: string
   // Query parameters the player wants on every load, not only the one after a click. A reader
   // sets each over whatever the placeholder's url carries. They stay off the url itself, since a
@@ -60,6 +61,9 @@ export type EmbedRenderHint = {
   // Query parameters that start playback, for a load that follows a person's click. They never
   // go on the placeholder's url, since a placeholder must not start on page load.
   autoplayParams?: Record<string, string>
+  // The `name` a reader gives the frame before it loads. A player that reads `window.name` to
+  // open its message channel posts no ready message without it.
+  frameName?: string
   isReady?: (data: unknown) => boolean
   // Posted once: a second post pauses a player whose play command toggles.
   requestPlay?: unknown
@@ -78,9 +82,8 @@ export type FieldCleaner = {
   field: 'title' | 'description'
   // The whole value is chrome, so the field is dropped. A regex is anchored at both ends.
   drop?: Pattern
-  // A wrapper the platform puts around a real value. A string is a prefix, and a regex is
-  // whatever it matches, removed in place.
-  strip?: Pattern
+  // A prefix the platform puts in front of a real value, matched whatever its case.
+  strip?: string
 }
 
 // What the pipeline hands an enricher. The url is what a platform's oEmbed endpoint is keyed by,

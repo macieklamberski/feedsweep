@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { CiteResolverResult } from '../types.js'
-import { discourseCiteResolver, omittedOneboxClasses, socialPostHosts } from './discourse.js'
+import { discourseCiteResolver } from './discourse.js'
 
 describeForEachParser('discourseCiteResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, discourseCiteResolver)
@@ -362,6 +362,77 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
     })
   })
 
+  describe('code oneboxes (omitted)', () => {
+    it('should not match the githubblob onebox', async () => {
+      const value = html`
+        <aside class="onebox githubblob" data-onebox-src="https://github.com/owner/repo/blob/master/check_config.py">
+          <header class="source">
+            <a href="https://github.com/owner/repo/blob/master/check_config.py" target="_blank" rel="noopener nofollow ugc">github.com</a>
+          </header>
+          <article class="onebox-body">
+            <h4><a href="https://github.com/owner/repo/blob/master/check_config.py" target="_blank" rel="noopener nofollow ugc">owner/repo/blob/master/check_config.py</a></h4>
+            <pre><code class="lang-py">#!/usr/bin/python3</code></pre>
+            This file has been truncated. <a href="https://github.com/owner/repo/blob/master/check_config.py" target="_blank" rel="noopener nofollow ugc">show original</a>
+          </article>
+        </aside>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should not match the githubgist onebox', async () => {
+      const value = html`
+        <aside class="onebox githubgist" data-onebox-src="https://gist.github.com/owner/0123456789abcdef0123456789abcdef">
+          <header class="source">
+            <a href="https://gist.github.com/owner/0123456789abcdef0123456789abcdef" target="_blank" rel="noopener nofollow ugc">gist.github.com</a>
+          </header>
+          <article class="onebox-body">
+            <h4><a href="https://gist.github.com/owner/0123456789abcdef0123456789abcdef" target="_blank" rel="noopener nofollow ugc">https://gist.github.com/owner/0123456789abcdef0123456789abcdef</a></h4>
+            <h5>readme-template.md</h5>
+            <pre><code class="Markdown">## Project Name &amp; Pitch</code></pre>
+          </article>
+        </aside>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should not match the gitlabblob onebox', async () => {
+      const value = html`
+        <aside class="onebox gitlabblob" data-onebox-src="https://gitlab.com/owner/repo/-/blob/main/setup.sh">
+          <header class="source">
+            <a href="https://gitlab.com/owner/repo/-/blob/main/setup.sh" target="_blank" rel="noopener">gitlab.com</a>
+          </header>
+          <article class="onebox-body">
+            <h4><a href="https://gitlab.com/owner/repo/-/blob/main/setup.sh" target="_blank" rel="noopener">owner/repo/-/blob/main/setup.sh</a></h4>
+            <div class="git-blob-info">
+              <a href="https://gitlab.com/owner/repo/-/blob/main/setup.sh" rel="noopener"><code>main</code></a>
+            </div>
+            <pre><code class="lang-sh">#!/bin/sh</code></pre>
+          </article>
+        </aside>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should not match the pastebin onebox', async () => {
+      const value = html`
+        <aside class="onebox pastebin" data-onebox-src="https://pastebin.com/Ab12Cd34">
+          <header class="source">
+            <a href="https://pastebin.com/Ab12Cd34" target="_blank" rel="noopener nofollow ugc">pastebin.com</a>
+          </header>
+          <article class="onebox-body">
+            <h4><a href="https://pastebin.com/Ab12Cd34" target="_blank" rel="noopener nofollow ugc">https://pastebin.com/Ab12Cd34</a></h4>
+            <pre><code class="lang-auto">opkg update</code></pre>
+          </article>
+        </aside>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
   describe('Stack Exchange oneboxes', () => {
     it('should extract the author, date and avatar from a Stack Exchange onebox', async () => {
       const value = html`
@@ -468,16 +539,18 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
   })
 
   describe('omitted oneboxes', () => {
-    // Iterates the real exclusion list, so every entry is exercised and a new entry is
-    // covered automatically.
-    it.each(omittedOneboxClasses)('should not match the %s onebox', async (engine) => {
+    it('should not match the threadsstatus onebox', async () => {
       const value = html`
-        <aside class="onebox ${engine}" data-onebox-src="https://example.com/post/1">
+        <aside class="onebox threadsstatus" data-onebox-src="https://www.threads.net/@handle/post/C1a2b3c4d5e">
           <header class="source">
-            <a href="https://example.com/post/1" target="_blank" rel="noopener">example.com</a>
+            <a href="https://www.threads.net/@handle/post/C1a2b3c4d5e" target="_blank" rel="noopener">threads.net</a>
           </header>
           <article class="onebox-body">
-            <h4><a href="https://example.com/post/1" target="_blank" rel="noopener">Author name on Platform</a></h4>
+            <h4><a href="https://www.threads.net/@handle/post/C1a2b3c4d5e" target="_blank" rel="noopener">Display name</a></h4>
+            <div class="threads-screen-name"><a href="https://www.threads.net/@handle/post/C1a2b3c4d5e" target="_blank" rel="noopener">@handle</a></div>
+            <div class="thread-contents">
+              <span class="thread-description">Post text</span>
+            </div>
           </article>
         </aside>
       `
@@ -485,14 +558,90 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it.each(socialPostHosts)('should not cite a generic onebox of a %s post', async (host) => {
+    it('should not match the instagram onebox', async () => {
       const value = html`
-        <aside class="onebox allowlistedgeneric" data-onebox-src="https://${host}/profile/user/post/1">
+        <aside class="onebox instagram" data-onebox-src="https://www.instagram.com/p/CdWN1jeOWr0/embed">
           <header class="source">
-            <a href="https://${host}/profile/user/post/1" target="_blank" rel="noopener">${host}</a>
+            <a href="https://www.instagram.com/p/CdWN1jeOWr0/embed" target="_blank" rel="noopener">instagram.com</a>
           </header>
           <article class="onebox-body">
-            <h3><a href="https://${host}/profile/user/post/1">Author name (@handle)</a></h3>
+            <h3><a href="https://www.instagram.com/p/CdWN1jeOWr0/embed" target="_blank" rel="noopener">@handle</a></h3>
+            <div class="instagram-description">Post text</div>
+          </article>
+        </aside>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should not match the googlemeet onebox', async () => {
+      const value = html`
+        <aside class="onebox googlemeet" data-onebox-src="https://meet.google.com/abc-defg-hij">
+          <header class="source">
+            <a href="https://meet.google.com/abc-defg-hij" target="_blank" rel="noopener">Google Meet</a>
+          </header>
+          <article class="onebox-body">
+            <div class="google-meet-onebox">
+              <div class="google-meet-onebox__content">
+                <h3 class="google-meet-onebox__title">
+                  <a href="https://meet.google.com/abc-defg-hij" target="_blank" rel="noopener">Google Meet meeting</a>
+                </h3>
+                <p class="google-meet-onebox__code">
+                  <span class="google-meet-onebox__code-label">Code:</span>
+                  <code class="google-meet-onebox__code-value">abc-defg-hij</code>
+                </p>
+                <a class="google-meet-onebox__join" href="https://meet.google.com/abc-defg-hij" target="_blank" rel="noopener">Join meeting</a>
+              </div>
+            </div>
+          </article>
+        </aside>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should not cite a generic onebox of a bsky.app post', async () => {
+      const value = html`
+        <aside class="onebox allowlistedgeneric" data-onebox-src="https://bsky.app/profile/user/post/1">
+          <header class="source">
+            <a href="https://bsky.app/profile/user/post/1" target="_blank" rel="noopener">bsky.app</a>
+          </header>
+          <article class="onebox-body">
+            <h3><a href="https://bsky.app/profile/user/post/1">Author name (@handle)</a></h3>
+            <p>Post text</p>
+          </article>
+        </aside>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    // The threadsstatus engine claims only /t/ paths on threads.net, so a profile-path post
+    // arrives as a generic onebox.
+    it('should not cite a generic onebox of a threads.net post', async () => {
+      const value = html`
+        <aside class="onebox allowlistedgeneric" data-onebox-src="https://www.threads.net/@handle/post/C1a2b3c4d5e">
+          <header class="source">
+            <a href="https://www.threads.net/@handle/post/C1a2b3c4d5e" target="_blank" rel="noopener">threads.net</a>
+          </header>
+          <article class="onebox-body">
+            <h3><a href="https://www.threads.net/@handle/post/C1a2b3c4d5e">Author name (@handle)</a></h3>
+            <p>Post text</p>
+          </article>
+        </aside>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should not cite a generic onebox of a threads.com post', async () => {
+      const value = html`
+        <aside class="onebox allowlistedgeneric" data-onebox-src="https://www.threads.com/@handle/post/C1a2b3c4d5e">
+          <header class="source">
+            <a href="https://www.threads.com/@handle/post/C1a2b3c4d5e" target="_blank" rel="noopener">threads.com</a>
+          </header>
+          <article class="onebox-body">
+            <h3><a href="https://www.threads.com/@handle/post/C1a2b3c4d5e">Author name (@handle)</a></h3>
             <p>Post text</p>
           </article>
         </aside>
@@ -503,24 +652,44 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
 
     // `data-onebox-src` reaches the resolver as the feed wrote it, so the protocol-relative
     // spelling is the one the host check has to answer for on its own.
-    it.each(socialPostHosts)(
-      'should not cite a generic onebox of a protocol-relative %s post',
-      async (host) => {
-        const value = html`
-          <aside class="onebox allowlistedgeneric" data-onebox-src="//${host}/profile/user/post/1">
-            <header class="source">
-              <a href="//${host}/profile/user/post/1" target="_blank" rel="noopener">${host}</a>
-            </header>
-            <article class="onebox-body">
-              <h3><a href="//${host}/profile/user/post/1">Author name (@handle)</a></h3>
-              <p>Post text</p>
-            </article>
-          </aside>
-        `
+    it('should not cite a generic onebox of a protocol-relative bsky.app post', async () => {
+      const value = html`
+        <aside class="onebox allowlistedgeneric" data-onebox-src="//bsky.app/profile/user/post/1">
+          <header class="source">
+            <a href="//bsky.app/profile/user/post/1" target="_blank" rel="noopener">bsky.app</a>
+          </header>
+          <article class="onebox-body">
+            <h3><a href="//bsky.app/profile/user/post/1">Author name (@handle)</a></h3>
+            <p>Post text</p>
+          </article>
+        </aside>
+      `
 
-        expect(await extract(value)).toBeUndefined()
-      },
-    )
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should cite a generic onebox of the same post path on another host', async () => {
+      const value = html`
+        <aside class="onebox allowlistedgeneric" data-onebox-src="https://evil.test/profile/user/post/1">
+          <header class="source">
+            <a href="https://evil.test/profile/user/post/1" target="_blank" rel="noopener">evil.test</a>
+          </header>
+          <article class="onebox-body">
+            <h3><a href="https://evil.test/profile/user/post/1">Page title</a></h3>
+            <p>Post text</p>
+          </article>
+        </aside>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'discourse',
+        url: 'https://evil.test/profile/user/post/1',
+        title: 'Page title',
+        description: 'Post text',
+        publisher: 'evil.test',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
 
     // The title carries no fediverse handle, so the status url is the only signal left and it
     // has to be parsed against a base to name an instance at all.
@@ -540,24 +709,6 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should not cite a generic onebox of a Mastodon status, recognized by its url shape', async () => {
-      const value = html`
-        <aside class="onebox allowlistedgeneric" data-onebox-src="https://mastodon.social/@Gargron/117060465546524768">
-          <header class="source">
-            <a href="https://mastodon.social/@Gargron/117060465546524768" target="_blank" rel="noopener">mastodon.social</a>
-          </header>
-          <article class="onebox-body">
-            <h3>
-              <a href="https://mastodon.social/@Gargron/117060465546524768">Eugen Rochko (@Gargron@mastodon.social)</a>
-            </h3>
-            <p>Post text</p>
-          </article>
-        </aside>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should not cite a generic onebox whose title carries a fediverse handle', async () => {
       const value = html`
         <aside class="onebox allowlistedgeneric" data-onebox-src="https://mastodon.example/users/author/statuses/117060465546524768">
@@ -566,6 +717,54 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
           </header>
           <article class="onebox-body">
             <h3>Author name (@author@mastodon.example)</h3>
+            <p>Post text</p>
+          </article>
+        </aside>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should not cite a generic onebox whose fediverse handle has a dotted user', async () => {
+      const value = html`
+        <aside class="onebox allowlistedgeneric" data-onebox-src="https://akkoma.example/users/first.last/statuses/117060465546524768">
+          <header class="source">
+            <a href="https://akkoma.example/users/first.last/statuses/117060465546524768" target="_blank">akkoma.example</a>
+          </header>
+          <article class="onebox-body">
+            <h3>Author name (@first.last@akkoma.example)</h3>
+            <p>Post text</p>
+          </article>
+        </aside>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should not cite a generic onebox whose fediverse handle has a hyphenated user', async () => {
+      const value = html`
+        <aside class="onebox allowlistedgeneric" data-onebox-src="https://akkoma.example/users/first-last/statuses/117060465546524768">
+          <header class="source">
+            <a href="https://akkoma.example/users/first-last/statuses/117060465546524768" target="_blank">akkoma.example</a>
+          </header>
+          <article class="onebox-body">
+            <h3>Author name (@first-last@akkoma.example)</h3>
+            <p>Post text</p>
+          </article>
+        </aside>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should not cite a generic onebox whose fediverse handle has a hyphenated instance', async () => {
+      const value = html`
+        <aside class="onebox allowlistedgeneric" data-onebox-src="https://mastodon-belgium.be/users/author/statuses/117060465546524768">
+          <header class="source">
+            <a href="https://mastodon-belgium.be/users/author/statuses/117060465546524768" target="_blank">mastodon-belgium.be</a>
+          </header>
+          <article class="onebox-body">
+            <h3>Author name (@author@mastodon-belgium.be)</h3>
             <p>Post text</p>
           </article>
         </aside>

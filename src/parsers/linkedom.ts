@@ -52,13 +52,75 @@ const normalizeAttributeCase = (document: Document): void => {
 // https://github.com/WebReflection/linkedom/issues/326: a self-closed tag in <svg> eats siblings.
 // The parse stays in HTML mode inside <svg>, where `<title />` is an open tag and the `<path>`
 // after it lands inside the title.
-const svgRegionRegex = /<svg\b[^>]*>[\s\S]*?<\/svg>/gi
+const svgOpenRegex = /<svg\b/gi
+const svgCloseRegex = /<\/svg>/gi
 const svgSelfCloseRegex = /<([a-z][a-z0-9-]*)((?:\s[^>]*)?)\s*\/>/gi
 
+// Void HTML elements per the HTML spec. Inside <foreignObject> a `</br>` parses as a second <br>.
+const voidElements = [
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'source',
+  'track',
+  'wbr',
+]
+
 const expandSvgSelfClose = (html: string): string => {
-  return html.replace(svgRegionRegex, (svgBlock) => {
-    return svgBlock.replace(svgSelfCloseRegex, '<$1$2></$1>')
-  })
+  let result = ''
+  let position = 0
+
+  svgOpenRegex.lastIndex = 0
+
+  while (true) {
+    const open = svgOpenRegex.exec(html)
+
+    if (!open) {
+      break
+    }
+
+    const openEnd = html.indexOf('>', svgOpenRegex.lastIndex)
+
+    // No later <svg> has a `>` or a `</svg>` either. A lazy regex would rescan to the end from
+    // each one.
+    if (openEnd === -1) {
+      break
+    }
+
+    svgCloseRegex.lastIndex = openEnd + 1
+
+    const close = svgCloseRegex.exec(html)
+
+    if (!close) {
+      break
+    }
+
+    const svgBlock = html.slice(open.index, svgCloseRegex.lastIndex)
+
+    const expanded = svgBlock.replace(
+      svgSelfCloseRegex,
+      (tag, name: string, attributes: string) => {
+        if (voidElements.includes(name.toLowerCase())) {
+          return tag
+        }
+
+        return `<${name}${attributes}></${name}>`
+      },
+    )
+
+    result += `${html.slice(position, open.index)}${expanded}`
+    position = svgCloseRegex.lastIndex
+    svgOpenRegex.lastIndex = position
+  }
+
+  return `${result}${html.slice(position)}`
 }
 
 // The HTML-mode parse also lowercases `<linearGradient>` and `<clipPath>`, which a browser does

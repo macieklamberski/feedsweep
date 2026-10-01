@@ -1,8 +1,15 @@
-import { type Nullish, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, find, parsePixelSize, text } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import { type Nullish, parseUrl, trimObject } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { attr, find, text } from '../utils/dom.js'
+import { readPixels } from '../utils/hints.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readS9eFragment,
+} from '../utils/widgets.js'
+
+const provider = 'facebook'
 
 // `fb.watch` is the short-link host the mobile app hands out, found inside both widget divs.
 // Posts live on the apex and on `web.`, `m.` and `business.` alike.
@@ -28,23 +35,26 @@ const readFallback = (blockquote: Nullish<Element>): Partial<EmbedResolverResult
 
 const fallbackSelector = '.fb-xfbml-parse-ignore blockquote, blockquote.fb-xfbml-parse-ignore'
 
-// A carrier that does not already hold a plugin url resolves to one built around the page it
-// named, which is the only form Facebook frames. The page is also the canonical url, so a caller
-// that knows a better id than the href states it in `extra`.
+// Every carrier resolves to a plugin url built around the page it names, which is the only form
+// Facebook frames. The page is also the canonical url, so a caller that knows a better id than
+// the href states it in `extra`. `t`, where a video starts, is kept as the carrier wrote it.
 const composePluginEmbed = (
   plugin: string,
   href: string,
   extra: Partial<EmbedResolverResult>,
+  t?: string,
 ): EmbedResolverResult => {
   // Absolutised here: `resolveUrlFn` never touches the id or a query, so a bare href would reach
   // enrichment with no scheme and address nothing.
   const absoluteHref = parseUrl(href, 'https://www.facebook.com')?.href ?? href
+  const query = composeQuery(trimObject({ href: absoluteHref, t }))
 
   return {
-    provider: 'facebook',
+    provider,
     id: absoluteHref,
-    src: `https://www.facebook.com/plugins/${plugin}.php?href=${encodeURIComponent(absoluteHref)}`,
+    src: `https://www.facebook.com/plugins/${plugin}.php${query}`,
     url: href,
+    ratio: plugin === 'video' ? '16/9' : undefined,
     ...extra,
   }
 }
@@ -98,16 +108,6 @@ export const facebookAmpEmbedResolver = createMarkupEmbedResolver(
 const pluginPathRegex = /^(?:\/v\d+(?:\.\d+)?)?\/plugins\/(?:post|video)\.php$/
 // The pre-plugins video frame from old posts, naming its video in `video_id`.
 const legacyVideoPathRegex = /^\/video\/embed$/
-const safeVideoIdRegex = /^\d+$/
-
-// The dialog writes the chosen size into the query as well as onto the element. A Reel comes out
-// vertical, 267x476 or 304x540, and a landscape video 560x314.
-const querySize = (url: URL): { width?: number; height?: number } => {
-  return {
-    width: parsePixelSize(url.searchParams.get('width')),
-    height: parsePixelSize(url.searchParams.get('height')),
-  }
-}
 
 // Whole segments, not `\b`: `reel-big-fish` and `video.game.news` are page names.
 // A video, reel or watch path is the video player, and everything else Facebook frames is a post.
@@ -120,13 +120,8 @@ const contentPathRegex = /^\/(?:reel\/[^/]+|[^/]+\/(?:posts|videos)\/[^/]+)/
 // The bare `/watch` hub is Facebook's video front page, where every visitor sees something else.
 const watchPathRegex = /^\/watch\/?$/
 
-// A Watch video id is numeric, in every spelling the corpus and the platform's own share urls
-// carry. Junk in `v` would otherwise mint a plugin frame that cannot load, where the generic
-// placeholder at least holds the url the publisher wrote.
-const safeWatchIdRegex = /^\d+$/
-
 const isWatchPage = (url: URL): boolean => {
-  return watchPathRegex.test(url.pathname) && safeWatchIdRegex.test(url.searchParams.get('v') ?? '')
+  return watchPathRegex.test(url.pathname) && Boolean(url.searchParams.get('v'))
 }
 
 // A post has no name: its words go to `description`, and the frame titles itself
@@ -141,19 +136,19 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
   if (legacyVideoPathRegex.test(parsed.pathname)) {
     const videoId = parsed.searchParams.get('video_id')
 
-    if (!videoId || !safeVideoIdRegex.test(videoId)) {
+    if (!videoId) {
       return
     }
 
-    const watchUrl = `https://www.facebook.com/watch/?v=${videoId}`
+    const watchUrl = `https://www.facebook.com/watch/${composeQuery({ v: videoId })}`
 
-    return composePluginEmbed('video', watchUrl, { id: videoId, ...querySize(parsed) })
+    return composePluginEmbed('video', watchUrl, { id: videoId })
   }
 
   if (contentPathRegex.test(parsed.pathname) || isWatchPage(parsed)) {
     const plugin = videoPathRegex.test(parsed.pathname) ? 'video' : 'post'
 
-    return composePluginEmbed(plugin, url, querySize(parsed))
+    return composePluginEmbed(plugin, url, {})
   }
 
   if (!pluginPathRegex.test(parsed.pathname)) {
@@ -167,22 +162,54 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  // The src stays as the publisher wrote it. Rebuilding it from the href alone would drop
-  // `show_text`, which decides whether a video carries its caption.
-  return {
-    provider: 'facebook',
-    id: target.href,
-    // Kept as written: rebuilding it from the href would drop `show_text`, the caption toggle.
-    src: url,
-    url: href,
-    ...querySize(parsed),
-  }
+  // The plugin is rebuilt around the href it names. The caption toggle, the size the dialog wrote,
+  // the app id and a Graph API version in the path are the look.
+  const plugin = parsed.pathname.endsWith('/video.php') ? 'video' : 'post'
+
+  return composePluginEmbed(plugin, href, {}, parsed.searchParams.get('t') ?? undefined)
 }
 
 // Facebook's plugin iframe, or a pasted post, video or watch page, which x-frame-options blanks.
 export const facebookIframeEmbedResolver = createUrlEmbedResolver(
   facebookHosts,
   facebookResolveEmbed,
+)
+
+// The helper frame's fragment spells the content four ways: `{page}/posts/{id}` or
+// `{page}/videos/{id}`, `{page}/{id}`, a numeric id behind a kind letter or word such as `p{id}`
+// or `video{id}`, and a bare numeric id. Each spelling captures page, kind and id in that order.
+const s9eFragmentRegexes = [
+  /^([.\w]+)\/([prv])\w*\/(\w+)$/,
+  /^([.\w]+)\/()(\w+)$/,
+  /^()([prv])(?:ideo|ost)?(\d+)$/,
+  /^()()(\d+)$/,
+]
+
+// A bare id names no page, and the helper frames it under a placeholder page name, which
+// Facebook's plugin resolves to the post all the same.
+const s9ePlaceholderPage = 'Bob'
+
+// `v` for a video and `r` for a reel play on the watch page. `p` and no kind are a post.
+const s9eWatchKindRegex = /[rv]/
+
+// A forum's s9e MediaEmbed helper frame, naming a post or a video in its url fragment.
+export const facebookS9eEmbedResolver = createMarkupEmbedResolver(
+  'iframe[data-s9e-mediaembed="facebook"]',
+  (element) => {
+    const fragment = readS9eFragment(element) ?? ''
+    const match = s9eFragmentRegexes.map((regex) => regex.exec(fragment)).find(Boolean)
+
+    if (!match) {
+      return
+    }
+
+    const [, page, kind, id] = match
+    const href = s9eWatchKindRegex.test(kind)
+      ? `https://www.facebook.com/watch/?v=${id}`
+      : `https://www.facebook.com/${page || s9ePlaceholderPage}/posts/${id}`
+
+    return facebookResolveEmbed(href)
+  },
 )
 
 // The embed dialog's fallback blockquote, kept by the publisher without its widget div.
@@ -201,3 +228,30 @@ export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(
     return composePluginEmbed(plugin, cite, readFallback(element))
   },
 )
+
+// The post plugin posts its rendered height as a query string,
+// `type=resize&cb=&width=500&height=421`, and only when its url carries the SDK's `sdk` flag and a
+// `channel`. The video plugin posts nothing.
+export const readFacebookHeight = (data: unknown): number | undefined => {
+  if (typeof data !== 'string') {
+    return
+  }
+
+  const message = new URLSearchParams(data)
+
+  if (message.get('type') !== 'resize') {
+    return
+  }
+
+  return readPixels(message.get('height'))
+}
+
+export const facebookRenderHint: EmbedRenderHint = {
+  provider,
+  origin: 'https://www.facebook.com',
+  params: {
+    sdk: 'joey',
+    channel: 'https://staticxx.facebook.com/x/connect/xd_arbiter/?version=46',
+  },
+  readHeight: readFacebookHeight,
+}

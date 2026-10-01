@@ -1,6 +1,7 @@
+import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cnn'
@@ -8,7 +9,7 @@ const provider = 'cnn'
 // The path of the video's page, `{section}/{yyyy}/{mm}/{dd}/{slug}.cnn`. The suffix keeps the
 // other Turner properties on the same CDN out.
 // Every player since the Flash one carries it, and the other Turner properties use numeric ids.
-const videoIdRegex = /^(?:[a-z0-9-]+\/)+\d{4}\/\d{2}\/\d{2}\/[\w.-]+\.cnn$/
+const videoIdRegex = /^(?:[^/]+\/)+\d{4}\/\d{2}\/\d{2}\/[^/]+\.cnn$/
 
 // The three segments in front of the slug date the video. A path states a day and not a moment,
 // so `date` carries the calendar day alone, and a month or a day outside the calendar leaves it
@@ -28,14 +29,15 @@ const cdnHosts = ['cdn.turner.com']
 // The fave shell is a `padding-bottom: 56.25%` box, and ids of this form have 16:9 renditions.
 const playerRatio = '16/9'
 
-// The player answers 200 for any id, but `fave.api.cnn.io/v1/video?id={id}&customer=cnn` answers
-// with the headline, duration, renditions and posters for a real id and 404 for a fabricated one,
-// and `cnn.com/videos/{id}` discriminates the same way.
+// The player answers 200 for any id. `cnn.com/videos/{id}` answers 200 for a real id and 404 for a
+// fabricated one.
 const composeEmbed = (id: string): EmbedResolverResult => {
+  const query = composeQuery({ video: id, customer: 'cnn', edition: 'domestic', env: 'prod' })
+
   return {
     provider,
     id,
-    src: `https://fave.api.cnn.io/v1/fav/?video=${id}&customer=cnn&edition=domestic&env=prod`,
+    src: `https://fave.api.cnn.io/v1/fav/${query}`,
     url: `https://www.cnn.com/videos/${id}`,
     ratio: playerRatio,
     date: readDate(id),
@@ -52,7 +54,7 @@ const resolveVideoId = (value: string | null | undefined): EmbedResolverResult |
 }
 
 const resolveTarget = (url: string): EmbedResolverResult | undefined => {
-  const parsed = parseUrlOnHosts(url, cnnHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (parsed?.pathname === '/v1/fav/') {
     return resolveVideoId(parsed.searchParams.get('video'))
@@ -82,7 +84,7 @@ export const cnnIframeEmbedResolver = createUrlEmbedResolver(cnnHosts, cnnResolv
 const flashPlayerPathRegex = /^\/cnn\/\.element\/apps\/cvp\/.*\.swf$/
 
 export const cnnFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, cdnHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
     return
@@ -92,10 +94,7 @@ export const cnnFlashResolveEmbed: ResolveEmbed = (url, element) => {
 }
 
 // CNN's Flash player swf as an <embed> or an <object>, which no browser runs today.
-// The swf carriers state the 416 by 374 box the old chrome made, not the clip's shape.
-export const cnnFlashEmbedResolver = createUrlEmbedResolver(cdnHosts, cnnFlashResolveEmbed, {
-  preferResolverSize: true,
-})
+export const cnnFlashEmbedResolver = createUrlEmbedResolver(cdnHosts, cnnFlashResolveEmbed)
 
 // CNN's 2009 share snippet: a loader script that is gone, beside a <noscript> link.
 export const cnnScriptEmbedResolver = createMarkupEmbedResolver(

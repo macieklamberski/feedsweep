@@ -19,6 +19,28 @@ describeForEachParser('bgImage', (parseHtml) => {
     expect(styles.bgImage(queryElement(document, 'a'))).toBe('https://example.com/cover.jpg')
   })
 
+  it('should return the url from a quoted background-image padded with whitespace', () => {
+    const document = parseHtml(
+      `<a style="background-image: url( 'https://example.com/cover.jpg' )"></a>`,
+    )
+
+    expect(styles.bgImage(queryElement(document, 'a'))).toBe('https://example.com/cover.jpg')
+  })
+
+  it('should return the url from an unquoted background-image padded with whitespace', () => {
+    const document = parseHtml(
+      '<a style="background-image: url( https://example.com/cover.jpg )"></a>',
+    )
+
+    expect(styles.bgImage(queryElement(document, 'a'))).toBe('https://example.com/cover.jpg')
+  })
+
+  it('should return undefined for an empty url', () => {
+    const document = parseHtml('<a style="background-image: url( )"></a>')
+
+    expect(styles.bgImage(queryElement(document, 'a'))).toBeUndefined()
+  })
+
   it('should return the url from a background shorthand', () => {
     const document = parseHtml(
       '<a style="background: #fff url(https://example.com/c.png) no-repeat"></a>',

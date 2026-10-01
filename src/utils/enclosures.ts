@@ -1,4 +1,4 @@
-import { isHostOrSubdomainOf, parseUrl } from 'trousse'
+import { parseUrl } from 'trousse'
 import type { CleanUrlFn, Enclosure, TransformContext } from '../types.js'
 import { getImageFingerprint, getSizeKeywordRank, getUrlSizeHint } from './images.js'
 import { absoluteUrlRegex, cleanUrl, resolveOrKeepUrl } from './urls.js'
@@ -20,10 +20,6 @@ export const isEnclosureKind = (
   }
 
   return enclosure.medium === kind
-}
-
-export const isAvatarEnclosure = (url: string, avatarHosts: ReadonlyArray<string>): boolean => {
-  return isHostOrSubdomainOf(url, avatarHosts)
 }
 
 const isPreferredVariant = (incoming: Enclosure, kept: Enclosure): boolean => {

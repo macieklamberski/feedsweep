@@ -88,16 +88,14 @@ describeForEachParser('notecomIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    // A percent-encoded segment survives the url parse intact, so the id shape is what stops it
-    // reaching the minted player path.
-    it('should state nothing for an id that is not a note id', async () => {
-      const value = html`<iframe src="https://note.com/katayuma/n/%2e%2e%2fetc"></iframe>`
+    it('should state nothing for an id with a character before the n', async () => {
+      const value = html`<iframe src="https://note.com/embed/notes/xnf938ce640465"></iframe>`
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should state nothing for a foreign host carrying the path', async () => {
-      const value = html`<iframe src="https://evil.test/note.com/n/nf938ce640465"></iframe>`
+      const value = html`<iframe src="https://evil.test/katayuma/n/nf938ce640465"></iframe>`
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -115,14 +113,35 @@ describeForEachParser('notecomIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // The player route names its id in the third segment too, so a path running past it does not
-    // hand the trailing segment over as the note.
     it('should state nothing for a player path whose id is not a note id', async () => {
       const value = html`
         <iframe src="https://note.com/embed/notes/katayuma/nf938ce640465"></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()
+    })
+
+    // The player route ends on its id, so a user segment opening with `n` is not read as the note.
+    it('should state nothing for a player path running past its id', async () => {
+      const value = html`
+        <iframe src="https://note.com/embed/notes/nishida/nf938ce640465"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed note id as written, even if the player answers an error', async () => {
+      const value = html`<iframe src="https://note.com/embed/notes/nf938ce640465z"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'notecom',
+        id: 'nf938ce640465z',
+        src: 'https://note.com/embed/notes/nf938ce640465z',
+        url: 'https://note.com/notes/nf938ce640465z',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
@@ -132,6 +151,18 @@ describe('readNotecomHeight', () => {
     const value = 'height::https://note.com/embed/notes/ne5fc6bd602c8::234'
 
     expect(readNotecomHeight(value)).toBe(234)
+  })
+
+  it('should read nothing out of a message with text before the height prefix', () => {
+    const value = 'xheight::https://note.com/embed/notes/ne5fc6bd602c8::234'
+
+    expect(readNotecomHeight(value)).toBeUndefined()
+  })
+
+  it('should read nothing out of a message with a unit after the pixels', () => {
+    const value = 'height::https://note.com/embed/notes/ne5fc6bd602c8::234px'
+
+    expect(readNotecomHeight(value)).toBeUndefined()
   })
 
   it('should read nothing out of another string or a non-string', () => {

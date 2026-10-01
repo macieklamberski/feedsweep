@@ -217,6 +217,31 @@ describeForEachParser('getElementDimensions', (parseHtml) => {
     expect(getElementDimensions(image)).toEqual({ width: 50, height: 25 })
   })
 
+  it('should drop a width that a container-wide min-width overrides', () => {
+    const document = parseHtml(
+      '<iframe style="width: 1px; min-width: 100%; height: 700px; border: none;"></iframe>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(iframe)).toEqual({ width: undefined, height: 700 })
+  })
+
+  it('should drop a width attribute that a container-wide min-width overrides', () => {
+    const document = parseHtml('<iframe width="1" height="700" style="min-width: 100%"></iframe>')
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(iframe)).toEqual({ width: undefined, height: 700 })
+  })
+
+  it('should keep a width beside a min-width narrower than the container', () => {
+    const document = parseHtml(
+      '<iframe style="width: 640px; min-width: 50%; height: 360px"></iframe>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(iframe)).toEqual({ width: 640, height: 360 })
+  })
+
   it('should fall back to style when attribute is non-numeric', () => {
     const document = parseHtml('<img width="auto" style="width: 200px">')
     const image = queryElement(document, 'img')
@@ -250,6 +275,20 @@ describeForEachParser('getElementDimensions', (parseHtml) => {
     const image = queryElement(document, 'img')
 
     expect(getElementDimensions(image)).toEqual({ width: undefined, height: undefined })
+  })
+
+  it('should treat a negative attribute as absent', () => {
+    const document = parseHtml('<iframe width="560" height="-315"></iframe>')
+    const frame = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(frame)).toEqual({ width: 560, height: undefined })
+  })
+
+  it('should keep a zero attribute', () => {
+    const document = parseHtml('<img width="0" height="0">')
+    const image = queryElement(document, 'img')
+
+    expect(getElementDimensions(image)).toEqual({ width: 0, height: 0 })
   })
 
   it('should fall back to style when the attribute is empty', () => {
@@ -559,6 +598,34 @@ describeForEachParser('getWrapperRatio reading only the element itself', (parseH
     expect(getWrapperRatio(div, 0)).toBe('100/56.25')
   })
 
+  it('should read the padding hack from the top-only shorthand', () => {
+    const document = parseHtml('<div style="padding:56.25% 0 0 0;position:relative;"></div>')
+    const div = queryElement(document, 'div')
+
+    expect(getWrapperRatio(div, 0)).toBe('100/56.25')
+  })
+
+  it('should read the padding hack from the three-value top-only shorthand', () => {
+    const document = parseHtml('<div style="padding: 56.25% 0 0"></div>')
+    const div = queryElement(document, 'div')
+
+    expect(getWrapperRatio(div, 0)).toBe('100/56.25')
+  })
+
+  it('should ignore a shorthand bottom that a later longhand zeroes', () => {
+    const document = parseHtml('<div style="padding: 0 0 56.25%; padding-bottom: 0"></div>')
+    const div = queryElement(document, 'div')
+
+    expect(getWrapperRatio(div, 0)).toBeUndefined()
+  })
+
+  it('should ignore a shorthand top that a later longhand zeroes', () => {
+    const document = parseHtml('<div style="padding: 56.25% 0 0; padding-top: 0"></div>')
+    const div = queryElement(document, 'div')
+
+    expect(getWrapperRatio(div, 0)).toBeUndefined()
+  })
+
   // One or two values pad every side alike, which is spacing and says nothing about shape.
   it('should ignore a shorthand padding that states no bottom of its own', () => {
     const document = parseHtml('<div style="padding: 5%"></div>')
@@ -604,6 +671,42 @@ describeForEachParser('getWrapperRatio', (parseHtml) => {
     const iframe = queryElement(document, 'iframe')
 
     expect(getWrapperRatio(iframe)).toBe('100/50')
+  })
+
+  it('should read a padding-top hack beside a zero padding-bottom', () => {
+    const document = parseHtml(
+      '<div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0;"><iframe></iframe></div>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getWrapperRatio(iframe)).toBe('100/56.25')
+  })
+
+  it('should read a padding-top hack beside a zero-percent padding-bottom', () => {
+    const document = parseHtml(
+      '<div style="padding-top: 75%; padding-bottom: 0%"><iframe></iframe></div>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getWrapperRatio(iframe)).toBe('100/75')
+  })
+
+  it('should not read a padding-top hack beside a pixel padding-bottom', () => {
+    const document = parseHtml(
+      '<div style="padding-top: 10%; padding-bottom: 20px"><iframe></iframe></div>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getWrapperRatio(iframe)).toBeUndefined()
+  })
+
+  it('should not read a padding-top hack beside an em padding-bottom', () => {
+    const document = parseHtml(
+      '<div style="padding-top: 5%; padding-bottom: 1em"><iframe></iframe></div>',
+    )
+    const iframe = queryElement(document, 'iframe')
+
+    expect(getWrapperRatio(iframe)).toBeUndefined()
   })
 
   it('should return undefined when no ancestor carries an aspect signal', () => {

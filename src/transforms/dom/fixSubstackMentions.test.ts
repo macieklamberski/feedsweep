@@ -88,6 +88,14 @@ describeForEachParser('fixSubstackMentions', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should not interpolate a fractional id', async () => {
+      const mention = makeMention({ name: 'Ana', id: 1.5, type: 'user', url: null })
+      const value = `<p>${mention}</p>`
+      const expected = '<p>@Ana</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('leave-alone cases', () => {

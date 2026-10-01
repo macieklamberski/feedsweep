@@ -72,6 +72,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/PageName/videos/123/"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F"
         data-embed-url="https://www.facebook.com/PageName/videos/123/"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -99,9 +100,8 @@ describeForEachParser('Facebook', (parseHtml) => {
   })
 
   // The AMP element is empty too, and an unknown custom element survives the passes that drop
-  // empty tags, so the contract here is that the size AMP requires on the element reaches the
-  // placeholder.
-  it('should resolve an amp-facebook element and keep its declared size', async () => {
+  // empty tags. The size AMP requires on the element is not read: the post plugin's own height is.
+  it('should resolve an amp-facebook element and ignore its declared size', async () => {
     const value = html`
       <amp-facebook
         width="552"
@@ -116,8 +116,6 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/PageName/posts/123"
         data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
-        data-embed-width="552"
-        data-embed-height="303"
       ></div>
     `
 
@@ -141,7 +139,7 @@ describeForEachParser('Facebook', (parseHtml) => {
 
   // A lazy loader parks the plugin url in its own attribute and points the frame at a blank
   // page, so the resolver only ever sees a Facebook url because fixLazyIframes puts it back
-  // first. The size the dialog wrote for a Reel is vertical and survives the round trip.
+  // first. The dialog's vertical box for a Reel is not read, so the Reel shows in the 16:9 player.
   it('should recover a plugin iframe parked in a lazy attribute', async () => {
     const value = html`
       <iframe
@@ -155,10 +153,9 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/reel/123/"
-        data-embed-src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F123%2F&show_text=false&width=267"
+        data-embed-ratio="16/9"
+        data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Freel%2F123%2F"
         data-embed-url="https://www.facebook.com/reel/123/"
-        data-embed-width="267"
-        data-embed-height="476"
       ></div>
     `
 
@@ -190,7 +187,7 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
-        data-embed-src="https://www.facebook.com/plugins/post.php?href=%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123&show_text=true"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
       ></div>
     `
@@ -218,6 +215,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/PageName/videos/123/"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F"
         data-embed-url="https://www.facebook.com/PageName/videos/123/"
+        data-embed-ratio="16/9"
         data-embed-description="A video caption."
         data-embed-author="PageName"
         data-embed-date="Wednesday, 4 June 2026"
@@ -355,6 +353,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/watch/?v=1010445561578533"
         data-embed-provider="facebook"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1010445561578533"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -373,5 +372,26 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(hub, { parseHtmlFn: parseHtml })).toEqualHtml(
       '<div data-embed-src="https://www.facebook.com/watch"></div>',
     )
+  })
+
+  // A forum's s9e helper frame names a post in its fragment, and facebookS9eEmbedResolver reads
+  // it into the same plugin placeholder a pasted post gives.
+  it('should convert the s9e helper frame into the plugin placeholder', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="facebook"
+        src="https://s9e.github.io/iframe/2/facebook.min.html#example/posts/10150000000000001"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="facebook"
+        data-embed-id="https://www.facebook.com/example/posts/10150000000000001"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fexample%2Fposts%2F10150000000000001"
+        data-embed-url="https://www.facebook.com/example/posts/10150000000000001"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 })

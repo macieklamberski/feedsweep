@@ -48,6 +48,7 @@ describe('bbcResolveEmbed', () => {
         provider: 'bbc',
         id: 'p01tclqw',
         src: 'https://www.bbc.co.uk/programmes/p01tclqw/player',
+        ratio: '320/374',
       }
 
       expect(bbcResolveEmbed(value)).toEqual(expected)
@@ -99,6 +100,24 @@ describe('bbcResolveEmbed', () => {
       expect(bbcResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should return undefined for a pid behind a prefix', () => {
+      const value = 'https://www.bbc.com/news/av/embed/xp06sf6tr/46292361'
+
+      expect(bbcResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a pid opening on a percent sign', () => {
+      const value = 'https://www.bbc.com/news/av/embed/%06sf6tr/46292361'
+
+      expect(bbcResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a pid carrying an encoded slash', () => {
+      const value = 'https://www.bbc.com/news/av/embed/p06s%2fr/46292361'
+
+      expect(bbcResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should return undefined for a World Service player naming no pid', () => {
       const value = 'https://www.bbc.com/ws/av-embeds/articles/cy8k2nd7e9no/en-GB/'
 
@@ -143,8 +162,7 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The programmes player states no size of its own, so the carrier's stands.
-    it('should keep the stated size on the programmes player', async () => {
+    it('should ignore the stated size on the programmes player', async () => {
       const value = html`
         <iframe
           src="https://www.bbc.co.uk/programmes/p08s3bnj/player"
@@ -156,8 +174,7 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
         provider: 'bbc',
         id: 'p08s3bnj',
         src: 'https://www.bbc.co.uk/programmes/p08s3bnj/player',
-        width: 640,
-        height: 360,
+        ratio: '320/374',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -166,8 +183,7 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/www.bbc.com/news/av/embed/p06sf6tr/46292361"></iframe>'
+      const value = '<iframe src="https://evil.test/news/av/embed/p06sf6tr/46292361"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

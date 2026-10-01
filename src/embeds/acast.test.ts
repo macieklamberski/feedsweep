@@ -159,21 +159,33 @@ describeForEachParser('acastEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a traversal in the episode', async () => {
+    it('should use a malformed episode as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://embed.acast.com/homebrewshow/..%2Fevil"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'acast',
+        id: 'homebrewshow/..%2Fevil',
+        src: 'https://embed.acast.com/homebrewshow/..%2Fevil',
+        height: 190,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for an id holding a dot', async () => {
+    it('should use a malformed show as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://embed.acast.com/show.name/episode"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'acast',
+        id: 'show.name/episode',
+        src: 'https://embed.acast.com/show.name/episode',
+        height: 190,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should not claim another host spelling the embed host in its path', async () => {
+    it('should not claim a foreign host carrying the same path', async () => {
       const value = html`
-        <iframe src="https://evil.test/embed.acast.com/63d3cb7a675193001164ef5d/67ceebb0d64d9d8e86dcddea"></iframe>
+        <iframe src="https://evil.test/63d3cb7a675193001164ef5d/67ceebb0d64d9d8e86dcddea"></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()

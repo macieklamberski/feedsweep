@@ -10,6 +10,7 @@ import {
   videoFileRegex,
 } from '../../utils/urls.js'
 import {
+  createCaptionedFigure,
   createEmbedPlaceholder,
   createMediaElement,
   embedCarrierSelector,
@@ -20,7 +21,7 @@ import {
   readCarrierUrl,
 } from '../../utils/widgets.js'
 
-const playableSelector = [...playableElements].join(', ')
+const playableSelector = playableElements.join(', ')
 
 const getMediaTag = (url: string): MediaResolverResult['tag'] | undefined => {
   if (isMediaWikiFilePage(url)) {
@@ -73,9 +74,8 @@ const carrierOrShell = (element: Element): Element => {
   return others.length ? element : parent
 }
 
-// A native <audio> or <video> has nowhere of its own to put a human-readable title, so one is hung
-// in a <figcaption> beside the player. Ghost's video card already lands inside a figure carrying
-// the author's own caption, which is the case the ancestor check leaves alone.
+// Ghost's video card already lands inside a figure carrying the author's own caption, which is
+// the case the ancestor check leaves alone.
 const captionMedia = (
   document: Document,
   media: HTMLElement,
@@ -88,13 +88,7 @@ const captionMedia = (
     return media
   }
 
-  const figure = document.createElement('figure')
-  const caption = document.createElement('figcaption')
-
-  caption.textContent = text
-  figure.append(media, caption)
-
-  return figure
+  return createCaptionedFigure(document, media, text)
 }
 
 // Embed carriers as shipped: third-party iframes, dead Flash objects, media urls parked in data-*.
@@ -120,15 +114,15 @@ export const convertWidgets: DomTransform = (context) => {
 
     // Runs before the tiers below, which replace the iframes the playable guard relies on.
     for (const element of document.querySelectorAll('div, figure, span, li')) {
-      // A container that already wraps something playable is chrome around a real player,
-      // and the attribute belongs to that player, not to a missing element.
-      if (element.querySelector(playableSelector)) {
-        continue
-      }
-
       const parked = findParkedMedia(element, mediaSrcAttributes)
 
       if (!parked) {
+        continue
+      }
+
+      // A container that already wraps something playable is chrome around a real player,
+      // and the attribute belongs to that player, not to a missing element.
+      if (element.querySelector(playableSelector)) {
         continue
       }
 
@@ -158,16 +152,22 @@ export const convertWidgets: DomTransform = (context) => {
 
         const src = resolveOrDropUrl(metadata.src, context)
 
-        if (!src) {
-          continue
-        }
-
         if (isMediaResult(metadata)) {
+          if (!src) {
+            continue
+          }
+
           const poster = resolveOrKeepUrl(metadata.poster, context)
           const mediaElement = createMediaElement(document, { ...metadata, src, poster })
           const target = carrierOrShell(element)
 
           target.replaceWith(captionMedia(document, mediaElement, target, metadata.title))
+          continue
+        }
+
+        // A src that resolves to nothing drops the embed. No src at all names a player only a
+        // fetch can find, which enrichment fills in from the provider and id.
+        if (metadata.src ? !src : !metadata.id) {
           continue
         }
 
@@ -177,7 +177,10 @@ export const convertWidgets: DomTransform = (context) => {
           { ...metadata, thumbnail: carriedThumbnail ?? metadata.thumbnail },
           context,
         )
-        const placeholder = createEmbedPlaceholder(document, { ...prepared, src })
+        const placeholder = createEmbedPlaceholder(document, {
+          ...prepared,
+          src: prepared.src ?? src,
+        })
 
         carrierOrShell(element).replaceWith(placeholder)
       }
@@ -203,9 +206,13 @@ export const convertWidgets: DomTransform = (context) => {
         continue
       }
 
-      // A .swf carrier stays: a placeholder reads as resolved and drops the object's fallback.
-      // No browser runs one since 2021, and a browser then shows the object's fallback children.
+      // No browser runs a .swf since 2021. An <object> stays, since a browser then shows its
+      // fallback children and a placeholder would drop them. A bare <embed> has none and goes.
       if (flashFileRegex.test(cleaned)) {
+        if (element.localName === 'embed' && !element.closest('object')) {
+          element.remove()
+        }
+
         continue
       }
 
