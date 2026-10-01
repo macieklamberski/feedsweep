@@ -137,6 +137,126 @@ describe('anchorResolveEmbed', () => {
 
     expect(anchorResolveEmbed(value)).toBeUndefined()
   })
+
+  it('should mint the creators show player from an anchor.fm show', () => {
+    const value = 'https://anchor.fm/turpentine-productions/embed'
+    const expected: EmbedResolverResult = {
+      provider: 'anchor',
+      id: 'turpentine-productions',
+      src: 'https://creators.spotify.com/pod/profile/turpentine-productions/embed',
+      height: 100,
+    }
+
+    expect(anchorResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should drop the secret WordPress writes into the hash of a show player', () => {
+    const value = 'https://anchor.fm/conexion-de-fe/embed#?secret=43SNhczkc1'
+    const expected: EmbedResolverResult = {
+      provider: 'anchor',
+      id: 'conexion-de-fe',
+      src: 'https://creators.spotify.com/pod/profile/conexion-de-fe/embed',
+      height: 100,
+    }
+
+    expect(anchorResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should mint the creators show player from a podcasters.spotify.com show', () => {
+    const value = 'https://podcasters.spotify.com/pod/show/turpentine-productions/embed'
+    const expected: EmbedResolverResult = {
+      provider: 'anchor',
+      id: 'turpentine-productions',
+      src: 'https://creators.spotify.com/pod/profile/turpentine-productions/embed',
+      height: 100,
+    }
+
+    expect(anchorResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should mint the profile route from a creators.spotify.com show player on the show route', () => {
+    const value = 'https://creators.spotify.com/pod/show/conexion-de-fe/embed'
+    const expected: EmbedResolverResult = {
+      provider: 'anchor',
+      id: 'conexion-de-fe',
+      src: 'https://creators.spotify.com/pod/profile/conexion-de-fe/embed',
+      height: 100,
+    }
+
+    expect(anchorResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read the creators.spotify.com show player it mints', () => {
+    const value = 'https://creators.spotify.com/pod/profile/turpentine-productions/embed'
+    const expected: EmbedResolverResult = {
+      provider: 'anchor',
+      id: 'turpentine-productions',
+      src: 'https://creators.spotify.com/pod/profile/turpentine-productions/embed',
+      height: 100,
+    }
+
+    expect(anchorResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should return undefined for an episode page rather than its player', () => {
+    const value = 'https://anchor.fm/myshow/episodes/my-title-e123'
+
+    expect(anchorResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a url that cannot be parsed', () => {
+    const value = 'https://['
+
+    expect(anchorResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a player naming no show', () => {
+    const value = 'https://anchor.fm/embed'
+
+    expect(anchorResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for an anchor.fm show player under a prefixed path', () => {
+    const value = 'https://anchor.fm/x/turpentine-productions/embed'
+
+    expect(anchorResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for an anchor.fm show player with a trailing segment', () => {
+    const value = 'https://anchor.fm/turpentine-productions/embed/extra'
+
+    expect(anchorResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for an embed segment after an episode page', () => {
+    const value = 'https://anchor.fm/show/episodes/foo-e1/embed'
+
+    expect(anchorResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for the anchor.fm shape on a Spotify host', () => {
+    const value = 'https://podcasters.spotify.com/pod/embed'
+
+    expect(anchorResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a Spotify route other than a show or profile', () => {
+    const value = 'https://creators.spotify.com/pod/dashboard/embed'
+
+    expect(anchorResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a Spotify show player under a prefixed path', () => {
+    const value = 'https://creators.spotify.com/x/pod/profile/turpentine-productions/embed'
+
+    expect(anchorResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a Spotify show player with a trailing segment', () => {
+    const value = 'https://creators.spotify.com/pod/profile/turpentine-productions/embed/extra'
+
+    expect(anchorResolveEmbed(value)).toBeUndefined()
+  })
 })
 
 describeForEachParser('anchorEmbedResolver', (parseHtml) => {
@@ -196,6 +316,32 @@ describeForEachParser('anchorEmbedResolver', (parseHtml) => {
         provider: 'anchor',
         id: 'myshow/my-title-e123',
         src: 'https://creators.spotify.com/pod/profile/myshow/embed/episodes/my-title-e123',
+        width: 400,
+        height: 102,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the show player WordPress writes', async () => {
+      const value = html`
+        <iframe
+          class="wp-embedded-content"
+          sandbox="allow-scripts"
+          security="restricted"
+          title="The Pilgrimage Saga"
+          src="https://anchor.fm/turpentine-productions/embed#?secret=TBoS2x00Eq"
+          data-secret="TBoS2x00Eq"
+          height="102px"
+          width="400px"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'anchor',
+        id: 'turpentine-productions',
+        src: 'https://creators.spotify.com/pod/profile/turpentine-productions/embed',
         width: 400,
         height: 102,
       }

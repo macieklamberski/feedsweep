@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -33,23 +33,54 @@ export const extractAnchorEpisode = (link: string): string | undefined => {
   return `${show}/${episode}`
 }
 
-export const anchorResolveEmbed: ResolveEmbed = (url) => {
-  const episode = extractAnchorEpisode(url)
+const anchorShowPathRegex = /^\/([^/]+)\/embed\/?$/
+const spotifyShowPathRegex = /^\/pod\/(?:show|profile)\/([^/]+)\/embed\/?$/
 
-  if (!episode) {
+// `anchor.fm/{show}/embed`, `podcasters.spotify.com/pod/show/{show}/embed`,
+// `creators.spotify.com/pod/profile/{show}/embed`.
+const extractAnchorShow = (link: string): string | undefined => {
+  const parsed = parseUrl(link)
+
+  if (!parsed) {
     return
   }
 
-  const [show, slug] = episode.split('/')
+  const pathRegex = isHostOrSubdomainOf(parsed, ['anchor.fm'])
+    ? anchorShowPathRegex
+    : spotifyShowPathRegex
 
-  // The player carries no metadata, and Anchor's old oEmbed endpoint is gone.
+  return parsed.pathname.match(pathRegex)?.[1]
+}
+
+// The player carries no metadata, and Anchor's old oEmbed endpoint is gone.
+export const anchorResolveEmbed: ResolveEmbed = (url) => {
+  const episode = extractAnchorEpisode(url)
+
+  if (episode) {
+    const [show, slug] = episode.split('/')
+
+    return {
+      provider: 'anchor',
+      id: episode,
+      src: `https://creators.spotify.com/pod/profile/${show}/embed/episodes/${slug}`,
+      height: playerHeight,
+    }
+  }
+
+  const show = extractAnchorShow(url)
+
+  if (!show) {
+    return
+  }
+
   return {
     provider: 'anchor',
-    id: episode,
-    src: `https://creators.spotify.com/pod/profile/${show}/embed/episodes/${slug}`,
+    id: show,
+    src: `https://creators.spotify.com/pod/profile/${show}/embed`,
     height: playerHeight,
   }
 }
 
-// Anchor's episode player iframe, on the anchor.fm host and the two Spotify hosts it became.
+// Anchor's episode and show player iframes, on the anchor.fm host and the two Spotify hosts it
+// became.
 export const anchorEmbedResolver = createUrlEmbedResolver(anchorHosts, anchorResolveEmbed)
