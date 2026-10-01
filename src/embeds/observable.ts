@@ -1,7 +1,7 @@
 import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { filterUrlQuery } from '../utils/urls.js'
+import { readIframeResizeHeight } from '../utils/hints.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'observable'
@@ -10,18 +10,7 @@ const observableHosts = ['observablehq.com']
 
 // Observable serves the hex id in lowercase only, and answers 404 to an uppercase spelling.
 const notebookIdRegex = /^[0-9a-f]{16}$/
-// Both segments are spliced into the notebook's page url, where a dot segment, `%2e` included,
-// would resolve out of the notebook.
-const handleRegex = /^@[^\s/?#]+$/
-const notebookRegex = /^(?!(?:\.|%2e){1,2}$)[^\s/?#]+$/i
 const versionSuffixRegex = /@[^@/]*$/
-
-// The campaign tags a share link picks up, the only part of the query the frame does not get.
-const isKeptParam = (name: string): boolean => {
-  const lowercased = name.toLowerCase()
-
-  return lowercased !== 'fbclid' && !lowercased.startsWith('utm_')
-}
 
 // Observable's notebook frame, observablehq.com/embed/@{user}/{notebook}[@{version}]?cells={names},
 // or embed/{16 hex}[@{version}] for a notebook addressed by its id.
@@ -34,8 +23,7 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // The query names which cells the frame renders, in `cells` or a repeated `cell`, and the frame
-  // hands the rest to the notebook's own code, so all of it but the trackers is kept.
-  parsed.search = filterUrlQuery(parsed, isKeptParam)
+  // hands the rest to the notebook's own code, so all of it is kept.
   const src = parsed.href
 
   // `@{version}` pins one revision of a notebook rather than naming another one, and the document
@@ -51,11 +39,17 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
     }
   }
 
-  const handle = keepIfMatches(decodeSegment(segments[1]), handleRegex)
-  const slug = decodeSegment(segments[2])?.replace(versionSuffixRegex, '')
-  const notebook = keepIfMatches(slug, notebookRegex)
+  const [, rawHandle, rawSlug] = segments
 
-  if (!handle || !notebook) {
+  if (!rawHandle || !rawSlug) {
+    return
+  }
+
+  // The decoded names serve the `@` check and the key, and the written segments the page path.
+  const handle = decodeSegment(rawHandle) ?? rawHandle
+  const notebook = (decodeSegment(rawSlug) ?? rawSlug).replace(versionSuffixRegex, '')
+
+  if (!handle.startsWith('@') || !notebook) {
     return
   }
 
@@ -63,7 +57,7 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
     provider,
     id: `${handle}/${notebook}`,
     src,
-    url: `https://observablehq.com/${handle}/${notebook}`,
+    url: `https://observablehq.com/${rawHandle}/${rawSlug.replace(versionSuffixRegex, '')}`,
   }
 }
 
@@ -71,3 +65,12 @@ export const observableEmbedResolver = createUrlEmbedResolver(
   observableHosts,
   observableResolveEmbed,
 )
+
+// The notebook posts its rendered height unasked, again as each cell finishes.
+export const observableRenderHint: EmbedRenderHint = {
+  provider,
+  // Spelled out: `observablehq.com/embed/` redirects to `old.observablehq.com`, so every message
+  // arrives from there.
+  origin: 'https://old.observablehq.com',
+  readHeight: readIframeResizeHeight,
+}

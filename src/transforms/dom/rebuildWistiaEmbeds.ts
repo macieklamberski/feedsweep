@@ -1,4 +1,4 @@
-import { composeEmbedUrl, readSrcMediaId, safeMediaIdRegex } from '../../embeds/wistia.js'
+import { composeEmbedUrl, readSrcMediaId } from '../../embeds/wistia.js'
 import type { DomTransform } from '../../types.js'
 import { attr, parseRatio } from '../../utils/dom.js'
 import { createIframe } from '../../utils/widgets.js'
@@ -42,11 +42,12 @@ export const rebuildWistiaEmbeds: DomTransform = () => (document) => {
   const elements = Array.from(document.querySelectorAll(wistiaSelector))
 
   // An id already carried by a div, a custom element or a real iframe. Collected before any
-  // rebuilding because document order does not put the script last.
+  // rebuilding because document order does not put the script last. Wistia serves one media
+  // under any case of its id, so a loader script still matches a carrier spelling it in capitals.
   const carried = new Set(
     elements
       .filter((element) => element.localName !== 'script')
-      .map(readMediaId)
+      .map((element) => readMediaId(element)?.toLowerCase())
       .filter((mediaId): mediaId is string => mediaId !== undefined),
   )
 
@@ -57,11 +58,11 @@ export const rebuildWistiaEmbeds: DomTransform = () => (document) => {
 
     const mediaId = readMediaId(element)
 
-    if (!mediaId || !safeMediaIdRegex.test(mediaId)) {
+    if (!mediaId) {
       continue
     }
 
-    if (element.localName === 'script' && carried.has(mediaId)) {
+    if (element.localName === 'script' && carried.has(mediaId.toLowerCase())) {
       continue
     }
 

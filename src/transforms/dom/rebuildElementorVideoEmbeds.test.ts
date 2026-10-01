@@ -114,7 +114,7 @@ describeForEachParser('rebuildElementorVideoEmbeds', (parseHtml) => {
     const expected = html`
       <div class="elementor-widget elementor-widget-video">
         <div class="elementor-widget-container">
-          <iframe src="https://www.dailymotion.com/embed/video/x7tgad0"></iframe>
+          <iframe src="https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0"></iframe>
         </div>
       </div>
     `
@@ -138,7 +138,7 @@ describeForEachParser('rebuildElementorVideoEmbeds', (parseHtml) => {
     const expected = html`
       <div class="elementor-widget elementor-widget-video">
         <div class="elementor-widget-container">
-          <iframe src="https://videopress.com/embed/kUJmAcSf"></iframe>
+          <iframe src="https://video.wordpress.com/embed/kUJmAcSf"></iframe>
         </div>
       </div>
     `

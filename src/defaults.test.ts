@@ -6,7 +6,11 @@ import {
   defaultWidgetResolvers,
 } from './defaults.js'
 import { parseHtml } from './parsers/linkedom.js'
-import { createCitePlaceholder } from './utils/widgets.js'
+import {
+  createCitePlaceholder,
+  createEmbedPlaceholder,
+  createMediaElement,
+} from './utils/widgets.js'
 
 describe('defaults', () => {
   // convertCiteCards hands every resolver the same document, in registration order, with
@@ -35,6 +39,47 @@ describe('defaults', () => {
     const wrapper = document.createElement('div')
     wrapper.appendChild(placeholder)
     document.body.appendChild(wrapper)
+
+    const matched = defaultWidgetResolvers
+      .filter((resolver) => document.querySelectorAll(resolver.selector).length > 0)
+      .map((resolver) => resolver.selector)
+
+    expect(matched).toEqual([])
+  })
+
+  // The same for what convertWidgets itself writes: a later resolver claiming an embed
+  // placeholder, a minted player or a linked chart image would convert finished work twice.
+  it('should not match an embed placeholder, a minted player or a linked image', () => {
+    const document = parseHtml('<div></div>')
+    const outputs = [
+      createEmbedPlaceholder(document, {
+        provider: 'youtube',
+        id: 'SeDnERmDjms',
+        src: 'https://www.youtube.com/embed/SeDnERmDjms',
+        url: 'https://www.youtube.com/watch?v=SeDnERmDjms',
+        thumbnail: 'https://i.ytimg.com/vi/SeDnERmDjms/hqdefault.jpg',
+        ratio: '16/9',
+      }),
+      createEmbedPlaceholder(document, {
+        provider: 'vimeo',
+        id: '76979871',
+        src: 'https://player.vimeo.com/video/76979871',
+        url: 'https://vimeo.com/76979871',
+      }),
+      createMediaElement(document, { tag: 'video', src: 'https://example.com/clip.mp4' }),
+    ]
+    const link = document.createElement('a')
+    link.setAttribute('href', 'https://datawrapper.dwcdn.net/5AYa4/')
+    const image = document.createElement('img')
+    image.setAttribute('src', 'https://datawrapper.dwcdn.net/5AYa4/full.png')
+    link.appendChild(image)
+    outputs.push(link)
+
+    for (const output of outputs) {
+      const wrapper = document.createElement('div')
+      wrapper.appendChild(output)
+      document.body.appendChild(wrapper)
+    }
 
     const matched = defaultWidgetResolvers
       .filter((resolver) => document.querySelectorAll(resolver.selector).length > 0)

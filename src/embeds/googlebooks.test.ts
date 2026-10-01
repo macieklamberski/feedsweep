@@ -4,13 +4,11 @@ import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { googlebooksEmbedResolver } from './googlebooks.js'
 
-const malformedLocales = ['en%26output%3Dtext', 'e%2Fn', 'en-a%2Fb']
-
 describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, googlebooksEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the page the publisher anchored the volume on', async () => {
+    it('should keep the page the viewer opens and drop the landing page', async () => {
       const value = html`
         <iframe
           frameborder="0"
@@ -24,10 +22,35 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlebooks',
         id: 'Fp1ct-bKYdcC',
-        src: 'https://books.google.com/books?id=Fp1ct-bKYdcC&pg=PA433&lpg=PA433&output=embed',
-        url: 'https://books.google.com/books?id=Fp1ct-bKYdcC&pg=PA433&lpg=PA433',
+        src: 'https://books.google.com/books?id=Fp1ct-bKYdcC&pg=PA433&output=embed',
+        url: 'https://books.google.com/books?id=Fp1ct-bKYdcC&pg=PA433',
         thumbnail:
           'https://books.google.com/books/content?id=Fp1ct-bKYdcC&printsec=frontcover&img=1&zoom=1',
+        width: 500,
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a page that differs from the landing page', async () => {
+      const value = html`
+        <iframe
+          frameborder="0"
+          height="1200"
+          scrolling="yes"
+          src="http://books.google.com/books?id=pXG-Mw4cxa0C&amp;lpg=PA57&amp;dq=scientology%20short%20stock&amp;pg=PA52&amp;output=embed"
+          style="border: 0px;"
+          width="500"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googlebooks',
+        id: 'pXG-Mw4cxa0C',
+        src: 'https://books.google.com/books?id=pXG-Mw4cxa0C&pg=PA52&dq=scientology+short+stock&output=embed',
+        url: 'https://books.google.com/books?id=pXG-Mw4cxa0C&pg=PA52',
+        thumbnail:
+          'https://books.google.com/books/content?id=pXG-Mw4cxa0C&printsec=frontcover&img=1&zoom=1',
         width: 500,
         height: 500,
       }
@@ -50,8 +73,8 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
         url: 'https://books.google.com/books?id=pz5KDwAAQBAJ',
         thumbnail:
           'https://books.google.com/books/content?id=pz5KDwAAQBAJ&printsec=frontcover&img=1&zoom=1',
-        width: 900,
-        height: 700,
+        width: 500,
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -106,8 +129,8 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlebooks',
         id: 'IpNDAQAAMAAJ',
-        src: 'https://books.google.com/books?id=IpNDAQAAMAAJ&pg=PA4&lpg=PA4&dq=Loyalsock+Boom+Company&output=embed',
-        url: 'https://books.google.com/books?id=IpNDAQAAMAAJ&pg=PA4&lpg=PA4',
+        src: 'https://books.google.com/books?id=IpNDAQAAMAAJ&pg=PA4&dq=Loyalsock+Boom+Company&output=embed',
+        url: 'https://books.google.com/books?id=IpNDAQAAMAAJ&pg=PA4',
         thumbnail:
           'https://books.google.com/books/content?id=IpNDAQAAMAAJ&printsec=frontcover&img=1&zoom=1',
         width: 500,
@@ -124,8 +147,8 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlebooks',
         id: 'ELieXMxR1h4C',
-        src: 'https://books.google.com/books?id=ELieXMxR1h4C&pg=PP1&lpg=PA154&hl=es&dq=Weber%2C+S.+%282004%29%2C+The+Success+of+Open+Source%2C&vq=antirival&output=embed',
-        url: 'https://books.google.com/books?id=ELieXMxR1h4C&pg=PP1&lpg=PA154&hl=es',
+        src: 'https://books.google.com/books?id=ELieXMxR1h4C&pg=PP1&dq=Weber%2C+S.+%282004%29%2C+The+Success+of+Open+Source%2C&vq=antirival&output=embed',
+        url: 'https://books.google.com/books?id=ELieXMxR1h4C&pg=PP1',
         thumbnail:
           'https://books.google.com/books/content?id=ELieXMxR1h4C&printsec=frontcover&img=1&zoom=1',
         width: 500,
@@ -153,62 +176,30 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a locale that differs from the country domain', async () => {
+    it('should drop the locale the viewer works without', async () => {
       const value = html`
-        <iframe src="https://books.google.fr/books?id=Fp1ct-bKYdcC&hl=pt-BR&output=embed"></iframe>
+        <iframe
+          frameborder="0"
+          scrolling="no"
+          style="border:0px"
+          src="http://books.google.com/books?id=Gqz3UF5FbI0C&lpg=PP1&dq=mcafee&hl=de&pg=PP1&output=embed"
+          width=500
+          height=600
+        ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'googlebooks',
-        id: 'Fp1ct-bKYdcC',
-        src: 'https://books.google.fr/books?id=Fp1ct-bKYdcC&hl=pt-BR&output=embed',
-        url: 'https://books.google.fr/books?id=Fp1ct-bKYdcC&hl=pt-BR',
+        id: 'Gqz3UF5FbI0C',
+        src: 'https://books.google.com/books?id=Gqz3UF5FbI0C&pg=PP1&dq=mcafee&output=embed',
+        url: 'https://books.google.com/books?id=Gqz3UF5FbI0C&pg=PP1',
         thumbnail:
-          'https://books.google.fr/books/content?id=Fp1ct-bKYdcC&printsec=frontcover&img=1&zoom=1',
+          'https://books.google.com/books/content?id=Gqz3UF5FbI0C&printsec=frontcover&img=1&zoom=1',
         width: 500,
         height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should keep a locale naming a numeric region', async () => {
-      const value = html`
-        <iframe src="https://books.google.com/books?id=Fp1ct-bKYdcC&hl=es-419&output=embed"></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'googlebooks',
-        id: 'Fp1ct-bKYdcC',
-        src: 'https://books.google.com/books?id=Fp1ct-bKYdcC&hl=es-419&output=embed',
-        url: 'https://books.google.com/books?id=Fp1ct-bKYdcC&hl=es-419',
-        thumbnail:
-          'https://books.google.com/books/content?id=Fp1ct-bKYdcC&printsec=frontcover&img=1&zoom=1',
-        width: 500,
-        height: 500,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it.each(malformedLocales)(
-      'should drop a locale that is not a language tag: %s',
-      async (locale) => {
-        const value = html`
-        <iframe src="https://books.google.com/books?id=Fp1ct-bKYdcC&hl=${locale}&output=embed"></iframe>
-      `
-        const expected: EmbedResolverResult = {
-          provider: 'googlebooks',
-          id: 'Fp1ct-bKYdcC',
-          src: 'https://books.google.com/books?id=Fp1ct-bKYdcC&output=embed',
-          url: 'https://books.google.com/books?id=Fp1ct-bKYdcC',
-          thumbnail:
-            'https://books.google.com/books/content?id=Fp1ct-bKYdcC&printsec=frontcover&img=1&zoom=1',
-          width: 500,
-          height: 500,
-        }
-
-        expect(await extract(value)).toEqual(expected)
-      },
-    )
 
     it('should resolve a carrier spelling the host in uppercase', async () => {
       const value = html`
@@ -228,27 +219,37 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a volume id carrying a path separator', async () => {
+    it('should use a malformed volume id as written, even if the player answers an error', async () => {
       const value = html`
         <iframe src="https://books.google.com/books?id=3bm6g7DHDjAC%2Fstolen&output=embed"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'googlebooks',
+        id: '3bm6g7DHDjAC/stolen',
+        src: 'https://books.google.com/books?id=3bm6g7DHDjAC%2Fstolen&output=embed',
+        url: 'https://books.google.com/books?id=3bm6g7DHDjAC%2Fstolen',
+        thumbnail:
+          'https://books.google.com/books/content?id=3bm6g7DHDjAC%2Fstolen&printsec=frontcover&img=1&zoom=1',
+        width: 500,
+        height: 500,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
-  describe('the country domains Google serves the viewer from', () => {
-    it('should resolve a volume on books.google.de', async () => {
+  describe('the country domains, minted onto the host the embed code writes', () => {
+    it('should mint a volume on books.google.de onto books.google.com', async () => {
       const value = html`
         <iframe src="https://books.google.de/books?id=WZdCAwAAQBAJ&pg=PA12&output=embed"></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'googlebooks',
         id: 'WZdCAwAAQBAJ',
-        src: 'https://books.google.de/books?id=WZdCAwAAQBAJ&pg=PA12&output=embed',
-        url: 'https://books.google.de/books?id=WZdCAwAAQBAJ&pg=PA12',
+        src: 'https://books.google.com/books?id=WZdCAwAAQBAJ&pg=PA12&output=embed',
+        url: 'https://books.google.com/books?id=WZdCAwAAQBAJ&pg=PA12',
         thumbnail:
-          'https://books.google.de/books/content?id=WZdCAwAAQBAJ&printsec=frontcover&img=1&zoom=1',
+          'https://books.google.com/books/content?id=WZdCAwAAQBAJ&printsec=frontcover&img=1&zoom=1',
         width: 500,
         height: 500,
       }
@@ -256,17 +257,17 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should resolve a volume on books.google.co.uk', async () => {
+    it('should mint a volume on books.google.co.uk onto books.google.com', async () => {
       const value = html`
         <iframe src="https://books.google.co.uk/books?id=Fp1ct-bKYdcC&output=embed"></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'googlebooks',
         id: 'Fp1ct-bKYdcC',
-        src: 'https://books.google.co.uk/books?id=Fp1ct-bKYdcC&output=embed',
-        url: 'https://books.google.co.uk/books?id=Fp1ct-bKYdcC',
+        src: 'https://books.google.com/books?id=Fp1ct-bKYdcC&output=embed',
+        url: 'https://books.google.com/books?id=Fp1ct-bKYdcC',
         thumbnail:
-          'https://books.google.co.uk/books/content?id=Fp1ct-bKYdcC&printsec=frontcover&img=1&zoom=1',
+          'https://books.google.com/books/content?id=Fp1ct-bKYdcC&printsec=frontcover&img=1&zoom=1',
         width: 500,
         height: 500,
       }
@@ -274,17 +275,17 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should resolve a volume on books.google.com.au', async () => {
+    it('should mint a volume on books.google.com.au onto books.google.com', async () => {
       const value = html`
         <iframe src="https://books.google.com.au/books?id=3bm6g7DHDjAC&output=embed"></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'googlebooks',
         id: '3bm6g7DHDjAC',
-        src: 'https://books.google.com.au/books?id=3bm6g7DHDjAC&output=embed',
-        url: 'https://books.google.com.au/books?id=3bm6g7DHDjAC',
+        src: 'https://books.google.com/books?id=3bm6g7DHDjAC&output=embed',
+        url: 'https://books.google.com/books?id=3bm6g7DHDjAC',
         thumbnail:
-          'https://books.google.com.au/books/content?id=3bm6g7DHDjAC&printsec=frontcover&img=1&zoom=1',
+          'https://books.google.com/books/content?id=3bm6g7DHDjAC&printsec=frontcover&img=1&zoom=1',
         width: 500,
         height: 500,
       }

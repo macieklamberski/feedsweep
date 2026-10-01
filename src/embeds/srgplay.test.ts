@@ -19,9 +19,9 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:srf:video:cfb39f35-b1f7-4937-a806-68bea0e611d3',
-        src: 'https://www.srf.ch/play/embed?urn=urn:srf:video:cfb39f35-b1f7-4937-a806-68bea0e611d3',
-        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn:srf:video:cfb39f35-b1f7-4937-a806-68bea0e611d3',
-        height: 351,
+        src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3Acfb39f35-b1f7-4937-a806-68bea0e611d3',
+        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3Acfb39f35-b1f7-4937-a806-68bea0e611d3',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -33,8 +33,9 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:srf:ais:video:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1',
-        src: 'https://www.srf.ch/play/embed?urn=urn:srf:ais:video:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1',
-        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn:srf:ais:video:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1',
+        src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Aais%3Avideo%3Ab47f4c3d-890a-4fe7-beb4-9a99e995d8c1',
+        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Aais%3Avideo%3Ab47f4c3d-890a-4fe7-beb4-9a99e995d8c1',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -46,8 +47,9 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c',
-        src: 'https://www.rts.ch/play/embed?urn=urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c&subdivisions=false',
-        url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c',
+        src: 'https://www.rts.ch/play/embed?urn=urn%3Arts%3Avideo%3Aa15ce9d3-7446-3deb-a710-70bddfd5239c&subdivisions=false',
+        url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn%3Arts%3Avideo%3Aa15ce9d3-7446-3deb-a710-70bddfd5239c',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -59,8 +61,8 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:srf:video:620986d4-4b67-4c35-9be7-e80ef4baa706',
-        src: 'https://www.srf.ch/play/embed?urn=urn:srf:video:620986d4-4b67-4c35-9be7-e80ef4baa706',
-        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn:srf:video:620986d4-4b67-4c35-9be7-e80ef4baa706',
+        src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3A620986d4-4b67-4c35-9be7-e80ef4baa706',
+        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3A620986d4-4b67-4c35-9be7-e80ef4baa706',
         ratio: '16/9',
       }
 
@@ -78,9 +80,9 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:srf:video:09c4a927-c156-46b7-8f53-c6a6302bfd88',
-        src: 'https://www.srf.ch/play/embed?urn=urn:srf:video:09c4a927-c156-46b7-8f53-c6a6302bfd88&startTime=22.597',
-        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn:srf:video:09c4a927-c156-46b7-8f53-c6a6302bfd88',
-        height: 480,
+        src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3A09c4a927-c156-46b7-8f53-c6a6302bfd88&startTime=22.597',
+        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3A09c4a927-c156-46b7-8f53-c6a6302bfd88',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -91,8 +93,9 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:rts:video:5590499',
-        src: 'https://www.rts.ch/play/embed?urn=urn:rts:video:5590499',
-        url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn:rts:video:5590499',
+        src: 'https://www.rts.ch/play/embed?urn=urn%3Arts%3Avideo%3A5590499',
+        url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn%3Arts%3Avideo%3A5590499',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -104,8 +107,9 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:rtr:video:4096750a-35ed-46e4-a367-007096fd0167',
-        src: 'https://www.rtr.ch/play/embed?urn=urn:rtr:video:4096750a-35ed-46e4-a367-007096fd0167',
-        url: 'https://www.rtr.ch/play/tv/-/video/-?urn=urn:rtr:video:4096750a-35ed-46e4-a367-007096fd0167',
+        src: 'https://www.rtr.ch/play/embed?urn=urn%3Artr%3Avideo%3A4096750a-35ed-46e4-a367-007096fd0167',
+        url: 'https://www.rtr.ch/play/tv/-/video/-?urn=urn%3Artr%3Avideo%3A4096750a-35ed-46e4-a367-007096fd0167',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -115,7 +119,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the player path', async () => {
       const value =
-        '<iframe src="https://evil.test/tp.srgssr.ch/p/srf/embed?urn=urn:srf:video:cfb39f35-b1f7-4937-a806-68bea0e611d3"></iframe>'
+        '<iframe src="https://evil.test/p/srf/embed?urn=urn:srf:video:cfb39f35-b1f7-4937-a806-68bea0e611d3"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -128,11 +132,9 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
     })
 
     // Every one of these reaches the player path and is refused on the urn: an unknown business
-    // unit has no host to mint, and a urn holding a separator would choose the query itself.
+    // unit has no host to mint.
     const refusedUrns: Array<string> = [
       '<iframe src="https://tp.srgssr.ch/p/srf/embed?urn=urn:zzz:video:cfb39f35-b1f7-4937"></iframe>',
-      '<iframe src="https://tp.srgssr.ch/p/srf/embed?urn=urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1"></iframe>',
-      '<iframe src="https://tp.srgssr.ch/p/srf/embed?urn=urn%3Asrf%3Avideo%3Aabc%2F..%2Fother"></iframe>',
       '<iframe src="https://tp.srgssr.ch/p/srf/embed?urn=x%26autoplay%3Dtrue%26foo%3Dbar%23urn:srf:video:cfb39f35-b1f7-4937-a806-68bea0e611d3"></iframe>',
       '<iframe src="https://tp.srgssr.ch/p/srf/embed?urn=cfb39f35-b1f7-4937"></iframe>',
       '<iframe src="https://tp.srgssr.ch/p/srf/embed"></iframe>',
@@ -142,17 +144,41 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // The id of a page player is written into a urn and then into a url, so a value holding a
-    // separator would choose the query. The shared host names no business unit, so a page player
-    // answering there has nothing to compose the urn from.
-    const refusedMediaIds: Array<string> = [
-      '<iframe src="https://www.srf.ch/play/tv/popupvideoplayer?id=abc%26autoplay%3D1"></iframe>',
-      '<iframe src="https://www.srf.ch/play/tv/popupvideoplayer?id=abc%2F..%2Fother"></iframe>',
-      '<iframe src="https://tp.srgssr.ch/play/tv/popupvideoplayer?id=09c4a927-c156-46b7-8f53-c6a6302bfd88"></iframe>',
-    ]
+    // The shared host names no business unit, so a page player answering there has nothing to
+    // compose the urn from.
+    it('should return undefined for a page player on the shared host', async () => {
+      const value =
+        '<iframe src="https://tp.srgssr.ch/play/tv/popupvideoplayer?id=09c4a927-c156-46b7-8f53-c6a6302bfd88"></iframe>'
 
-    it.each(refusedMediaIds)('should return undefined for %s', async (value) => {
       expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should use a malformed urn as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://tp.srgssr.ch/p/srf/embed?urn=urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'srgplay',
+        id: 'urn:srf:video:abc&autoplay=1',
+        src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1',
+        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed media id as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://www.srf.ch/play/tv/popupvideoplayer?id=abc%26autoplay%3D1"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'srgplay',
+        id: 'urn:srf:video:abc&autoplay=1',
+        src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1',
+        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     const playerPathLookalikes: Array<string> = [
@@ -189,8 +215,8 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:srf:video:620986d4-4b67-4c35-9be7-e80ef4baa706',
-        src: 'https://www.srf.ch/play/embed?urn=urn:srf:video:620986d4-4b67-4c35-9be7-e80ef4baa706',
-        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn:srf:video:620986d4-4b67-4c35-9be7-e80ef4baa706',
+        src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3A620986d4-4b67-4c35-9be7-e80ef4baa706',
+        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3A620986d4-4b67-4c35-9be7-e80ef4baa706',
         ratio: '16/9',
       }
 
@@ -203,8 +229,9 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:rts:video:5590499',
-        src: 'https://www.rts.ch/play/embed?urn=urn:rts:video:5590499',
-        url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn:rts:video:5590499',
+        src: 'https://www.rts.ch/play/embed?urn=urn%3Arts%3Avideo%3A5590499',
+        url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn%3Arts%3Avideo%3A5590499',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -216,8 +243,9 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:rts:video:5590499',
-        src: 'https://www.rts.ch/play/embed?urn=urn:rts:video:5590499',
-        url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn:rts:video:5590499',
+        src: 'https://www.rts.ch/play/embed?urn=urn%3Arts%3Avideo%3A5590499',
+        url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn%3Arts%3Avideo%3A5590499',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -229,7 +257,8 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:rsi:audio:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1',
-        src: 'https://www.rsi.ch/play/embed?urn=urn:rsi:audio:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1',
+        src: 'https://www.rsi.ch/play/embed?urn=urn%3Arsi%3Aaudio%3Ab47f4c3d-890a-4fe7-beb4-9a99e995d8c1',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -248,8 +277,9 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:rts:video:5590499',
-        src: 'https://www.rts.ch/play/embed?urn=urn:rts:video:5590499',
-        url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn:rts:video:5590499',
+        src: 'https://www.rts.ch/play/embed?urn=urn%3Arts%3Avideo%3A5590499',
+        url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn%3Arts%3Avideo%3A5590499',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -261,8 +291,9 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c',
-        src: 'https://www.rts.ch/play/embed?urn=urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c',
-        url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c',
+        src: 'https://www.rts.ch/play/embed?urn=urn%3Arts%3Avideo%3Aa15ce9d3-7446-3deb-a710-70bddfd5239c',
+        url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn%3Arts%3Avideo%3Aa15ce9d3-7446-3deb-a710-70bddfd5239c',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -303,10 +334,11 @@ describeForEachParser('srgplay through the pipeline', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-url="https://www.srf.ch/play/tv/-/video/-?urn=urn:srf:ais:video:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1"
+        data-embed-url="https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Aais%3Avideo%3Ab47f4c3d-890a-4fe7-beb4-9a99e995d8c1"
         data-embed-id="urn:srf:ais:video:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1"
         data-embed-provider="srgplay"
-        data-embed-src="https://www.srf.ch/play/embed?urn=urn:srf:ais:video:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1"
+        data-embed-ratio="16/9"
+        data-embed-src="https://www.srf.ch/play/embed?urn=urn%3Asrf%3Aais%3Avideo%3Ab47f4c3d-890a-4fe7-beb4-9a99e995d8c1"
       ></div>
     `
 

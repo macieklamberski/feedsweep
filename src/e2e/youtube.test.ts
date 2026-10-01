@@ -81,6 +81,28 @@ describeForEachParser('YouTube', (parseHtml) => {
 
   // The snippet YouTube's own oEmbed returns, which is what a WordPress oEmbed cache stores and
   // republishes into the feed.
+  it('should keep the start offset an oEmbed snippet states', async () => {
+    const value = html`
+      <iframe
+        width="560"
+        height="315"
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=90&amp;feature=oembed"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=90"
+        data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   it('should carry a title an oEmbed snippet states onto the placeholder', async () => {
     const value = html`
       <iframe

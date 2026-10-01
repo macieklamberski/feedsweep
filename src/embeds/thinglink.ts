@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const thinglinkHost = 'thinglink.com'
 
 // The four viewer routes share one snowflake id space, so an id taken off any of them addresses
-// the same scene under `card`.
+// the same scene under `card`, the viewer ThingLink's oEmbed writes for every kind.
 const cardRoutes = new Set(['card', 'mediacard', 'videocard'])
 
 const readSceneId = (url: URL): string | undefined => {
@@ -24,7 +24,7 @@ const readSceneId = (url: URL): string | undefined => {
 const posterIdCeiling = 1200000000000000000n
 
 const composePosterUrl = (id: string): string | undefined => {
-  if (BigInt(id) >= posterIdCeiling) {
+  if (!digitsRegex.test(id) || BigInt(id) >= posterIdCeiling) {
     return
   }
 
@@ -35,16 +35,17 @@ export const thinglinkResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, thinglinkHost)
   const id = parsed && readSceneId(parsed)
 
-  if (!id || !digitsRegex.test(id)) {
+  if (!id) {
     return
   }
 
   return {
     provider: 'thinglink',
     id,
-    src: `https://www.thinglink.com${parsed.pathname}`,
+    src: `https://www.thinglink.com/card/${id}`,
     url: `https://www.thinglink.com/card/${id}`,
     thumbnail: composePosterUrl(id),
+    ratio: '3/2',
   }
 }
 

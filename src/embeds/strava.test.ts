@@ -77,7 +77,7 @@ describeForEachParser('stravaPlaceholderEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id that is not digits', async () => {
+    it('should use a malformed id as written, even if the player answers an error', async () => {
       const value = html`
         <div
           class="strava-embed-placeholder"
@@ -85,20 +85,15 @@ describeForEachParser('stravaPlaceholderEmbedResolver', (parseHtml) => {
           data-embed-id="../../route/1"
         ></div>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'strava',
+        id: 'activity/../../route/1',
+        src: 'https://strava-embeds.com/activity/../../route/1',
+        url: 'https://www.strava.com/activities/../../route/1',
+        ratio: '300/472',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore an id that starts with digits and carries a path after them', async () => {
-      const value = html`
-        <div
-          class="strava-embed-placeholder"
-          data-embed-type="activity"
-          data-embed-id="17975533403/../../route/1"
-        ></div>
-      `
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // The bare attribute pair is also the placeholder feedsweep itself writes.
@@ -137,10 +132,17 @@ describe('stravaResolveEmbed', () => {
       expect(stravaResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore an activity id that is not digits', () => {
+    it('should use a malformed activity id as written, even if the player answers an error', () => {
       const value = 'https://www.strava.com/activities/my-morning-ride/embed/ca9c763ae38ff1185ef'
+      const expected: EmbedResolverResult = {
+        provider: 'strava',
+        id: 'activity/my-morning-ride',
+        src: 'https://strava-embeds.com/activity/my-morning-ride',
+        url: 'https://www.strava.com/activities/my-morning-ride',
+        ratio: '300/472',
+      }
 
-      expect(stravaResolveEmbed(value)).toBeUndefined()
+      expect(stravaResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore the site root', () => {

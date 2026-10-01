@@ -1,15 +1,12 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const nprHosts = ['www.npr.org']
 
-// Current ids read `nx-s1-{n}`, and the media half can be `nx-s1-{uuid}` or `nx-s1-{n}-1`.
-const safeIdRegex = /^[a-z0-9-]+$/
-
 const composeEmbed = (storyId: string, mediaId: string): EmbedResolverResult | undefined => {
-  if (!safeIdRegex.test(storyId) || !safeIdRegex.test(mediaId)) {
+  if (!storyId || !mediaId) {
     return
   }
 
@@ -23,7 +20,7 @@ const composeEmbed = (storyId: string, mediaId: string): EmbedResolverResult | u
 
 // NPR's video player. The two retired routes redirect to it or name the same pair.
 const composeVideoEmbed = (storyId: string, mediaId: string): EmbedResolverResult | undefined => {
-  if (!safeIdRegex.test(storyId) || !safeIdRegex.test(mediaId)) {
+  if (!storyId || !mediaId) {
     return
   }
 
@@ -89,17 +86,18 @@ export const nprFlashResolveEmbed: ResolveEmbed = (url) => {
   // Some carriers join the query with `;`, so `m` would read `365995120;t=audio`.
   const params = new URLSearchParams(parsed.search.replaceAll(';', '&'))
 
+  const storyId = params.get('i') ?? ''
+  const mediaId = params.get('m') ?? ''
+
   // A video pair plays on the video player only.
   if (params.get('t') === 'video') {
-    return composeVideoEmbed(params.get('i') ?? '', params.get('m') ?? '')
+    return composeVideoEmbed(storyId, mediaId)
   }
 
-  return composeEmbed(params.get('i') ?? '', params.get('m') ?? '')
+  // The pair comes out of the query decoded, and it goes into a path beside the raw path spelling.
+  return composeEmbed(encodePathSegment(storyId), encodePathSegment(mediaId))
 }
 
-// The Flash carriers state the box of the retired Flash player.
-export const nprFlashEmbedResolver = createUrlEmbedResolver(nprHosts, nprFlashResolveEmbed, {
-  preferResolverSize: true,
-})
+export const nprFlashEmbedResolver = createUrlEmbedResolver(nprHosts, nprFlashResolveEmbed)
 
 export const nprIframeEmbedResolver = createUrlEmbedResolver(nprHosts, nprResolveEmbed)
