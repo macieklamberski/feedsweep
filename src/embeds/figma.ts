@@ -17,11 +17,10 @@ const kindRegex = /^[a-z]+$/
 // A file key is base62, so a hyphenated marketing slug sitting in the same position is not one.
 const fileKeyRegex = /^[A-Za-z0-9]+$/
 
-// `node-id` names the frame the embed opens on, and `page-id` the page that holds it.
-const contentParams = ['node-id', 'page-id']
-
-// `scaling` is how the publisher fit the canvas to the frame, and only the player reads it.
-const layoutParams = ['scaling']
+// `node-id` names the frame the embed opens on, `page-id` the page that holds it,
+// `starting-point-node-id` the node that starts a prototype's flow, and `version-id` the version.
+// See: https://developers.figma.com/docs/embeds/embed-figma-prototype/.
+const contentParams = ['node-id', 'page-id', 'starting-point-node-id', 'version-id']
 
 // The community catalogue spells `community/file/{numeric id}`, which fills the same three
 // segments a file url does and reads as kind `community` over key `file`. That pair is identical
@@ -42,7 +41,6 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
   }
 
   const params = pickQueryParams(url.search, contentParams)
-  const layout = pickQueryParams(url.search, layoutParams)
   const path = `${kind}/${key}/${name}`
   // Figma renamed the `file` route to `design`, and both name one file, so they share one key.
   const idKind = kind === 'file' ? 'design' : kind
@@ -53,7 +51,7 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
     // oEmbed url it rebuilds is `figma.com/{kind}/{key}`.
     id: `${idKind}/${key}`,
     // `embed-host` is what makes the route serve a player at all, not a reader's preference.
-    src: `https://${figmaEmbedHost}/${path}${composeQuery({ ...params, ...layout, 'embed-host': 'share' })}`,
+    src: `https://${figmaEmbedHost}/${path}${composeQuery({ ...params, 'embed-host': 'share' })}`,
     url: `https://www.${figmaHost}/${path}${composeQuery(params)}`,
   }
 }
