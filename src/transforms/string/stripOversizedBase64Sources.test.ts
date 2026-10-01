@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import { baseContext, html } from '../../tests.js'
+import { transformContent } from '../../index.js'
+import { baseContext, describeForEachParser, html } from '../../tests.js'
 import { stripOversizedBase64Sources } from './stripOversizedBase64Sources.js'
 
 describe('stripOversizedBase64Sources', () => {
@@ -113,5 +114,19 @@ describe('stripOversizedBase64Sources', () => {
     const twice = await transform(once)
 
     expect(twice).toBe(once)
+  })
+})
+
+describeForEachParser('stripOversizedBase64Sources before parsing', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should drop an oversized payload before the parser holds it', async () => {
+    const largeData = 'A'.repeat(60 * 1024)
+    const value = `<img src="data:image/png;base64,${largeData}">`
+    const expected = '<img src="">'
+
+    expect(await convert(value)).toBe(expected)
   })
 })

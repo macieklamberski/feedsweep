@@ -154,6 +154,27 @@ describeForEachParser('surfaceParkedMarkup', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should append the container url when a url sits only inside a style value', async () => {
+      const value = html`
+        <div
+          class="load-later load-later-vendor-wwwinstagramcom"
+          data-url="https://www.instagram.com/p/ABC123/"
+          data-content="%3Cblockquote%20class%3D%22instagram-media%22%20data-instgrm-version%3D%2214%22%3E%3Cdiv%20style%3D%22background%3Aurl(https%3A%2F%2Fwww.instagram.com%2Fp%2FABC123%2Fmedia%2F%3Fsize%3Dl)%3B%22%3E%3C%2Fdiv%3E%3C%2Fblockquote%3E"
+        ></div>
+      `
+      const expected = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-version="14"
+        >
+          <div style="background:url(https://www.instagram.com/p/ABC123/media/?size=l);"></div>
+        </blockquote>
+        <a href="https://www.instagram.com/p/ABC123/">https://www.instagram.com/p/ABC123/</a>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should leave the recovered markup alone when it states a url of its own', async () => {
       const value = html`
         <div

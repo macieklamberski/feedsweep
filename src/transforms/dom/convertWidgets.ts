@@ -120,15 +120,15 @@ export const convertWidgets: DomTransform = (context) => {
 
     // Runs before the tiers below, which replace the iframes the playable guard relies on.
     for (const element of document.querySelectorAll('div, figure, span, li')) {
-      // A container that already wraps something playable is chrome around a real player,
-      // and the attribute belongs to that player, not to a missing element.
-      if (element.querySelector(playableSelector)) {
-        continue
-      }
-
       const parked = findParkedMedia(element, mediaSrcAttributes)
 
       if (!parked) {
+        continue
+      }
+
+      // A container that already wraps something playable is chrome around a real player,
+      // and the attribute belongs to that player, not to a missing element.
+      if (element.querySelector(playableSelector)) {
         continue
       }
 
@@ -158,16 +158,22 @@ export const convertWidgets: DomTransform = (context) => {
 
         const src = resolveOrDropUrl(metadata.src, context)
 
-        if (!src) {
-          continue
-        }
-
         if (isMediaResult(metadata)) {
+          if (!src) {
+            continue
+          }
+
           const poster = resolveOrKeepUrl(metadata.poster, context)
           const mediaElement = createMediaElement(document, { ...metadata, src, poster })
           const target = carrierOrShell(element)
 
           target.replaceWith(captionMedia(document, mediaElement, target, metadata.title))
+          continue
+        }
+
+        // A src that resolves to nothing drops the embed. No src at all names a player only a
+        // fetch can find, which enrichment fills in from the provider and id.
+        if (metadata.src ? !src : !metadata.id) {
           continue
         }
 
@@ -177,7 +183,10 @@ export const convertWidgets: DomTransform = (context) => {
           { ...metadata, thumbnail: carriedThumbnail ?? metadata.thumbnail },
           context,
         )
-        const placeholder = createEmbedPlaceholder(document, { ...prepared, src })
+        const placeholder = createEmbedPlaceholder(document, {
+          ...prepared,
+          src: prepared.src ?? src,
+        })
 
         carrierOrShell(element).replaceWith(placeholder)
       }

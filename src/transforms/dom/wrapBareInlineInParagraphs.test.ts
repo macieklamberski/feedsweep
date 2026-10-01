@@ -294,6 +294,12 @@ describeForEachParser('wrapBareInlineInParagraphs', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should leave a comment-only wrapper untouched', async () => {
+      const value = '<div><!-- note --></div>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should not create an empty paragraph from a br-only run', async () => {
       const value = '<div><br></div>'
 

@@ -12,12 +12,9 @@ const rtveHosts = ['rtve.es', 'irtve.es']
 
 type Kind = 'audio' | 'video'
 
-const safeAssetIdRegex = /^\d+$/
-
-// The player is retired, so the band can never refuse a real id and only narrows the mint.
 // The asset is {id}_{locale}_{audios|videos}, in the swf query on v2 and the flashvars on 4.x.
-// The locale says nothing about the asset, and RTVE's ids start above a million.
-const flashAssetRegex = /^(\d{4,12})_[a-z]{2}_(audios|videos)$/
+// The locale says nothing about the asset.
+const flashAssetRegex = /^([^_]+)_[^_]+_(audios|videos)$/
 
 const flashPlayerPathRegex = /^\/swf\/.*\.swf$/i
 
@@ -33,11 +30,11 @@ const composeEmbed = (kind: Kind, id: string): EmbedResolverResult => {
     id: `${kind}/${id}`,
     src: `https://www.rtve.es/drmn/embed/${kind}/${id}/`,
     url: `https://www.rtve.es/${kind === 'video' ? 'v' : 'a'}/${id}/`,
+    ratio: playerRatio,
   }
 
   if (kind === 'video') {
     result.thumbnail = `https://img.rtve.es/v/${id}/`
-    result.ratio = playerRatio
   }
 
   return result
@@ -56,7 +53,7 @@ export const rtveResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  if (!id || !safeAssetIdRegex.test(id)) {
+  if (!id) {
     return
   }
 
@@ -69,7 +66,7 @@ export const rtveResolveEmbed: ResolveEmbed = (url, element) => {
 // RTVE's player iframe, rtve.es/drmn/embed/{audio|video}/{id}/.
 export const rtveIframeEmbedResolver = createUrlEmbedResolver(rtveHosts, rtveResolveEmbed)
 
-export const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
+const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {

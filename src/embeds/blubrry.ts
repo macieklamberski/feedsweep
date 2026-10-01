@@ -1,13 +1,11 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 const provider = 'blubrry'
 
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-
-const safeIdRegex = /^\d+$/
 
 // PowerPress, Blubrry's WordPress plugin, renders the same player on the publisher's own domain
 // as `{site}/?powerpress_embed={postId}-{feed}`, with no Blubrry host in the url at all.
@@ -29,7 +27,7 @@ export const extractBlubrryEmbed = (link: string): string | undefined => {
 
   const segments = getPathSegments(parsed)
 
-  if (segments[0] === 'id' && segments[1] && safeIdRegex.test(segments[1])) {
+  if (segments[0] === 'id' && segments[1] && digitsRegex.test(segments[1])) {
     return segments[1]
   }
 
@@ -47,7 +45,7 @@ export const blubrryResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const isEpisodeId = safeIdRegex.test(id)
+  const isEpisodeId = digitsRegex.test(id)
 
   return {
     provider,
@@ -60,10 +58,14 @@ export const blubrryResolveEmbed: ResolveEmbed = (url, element) => {
   }
 }
 
-// No render hint: the player listens for a bare number and `-1` flips the button to playing, but
-// the audio never starts from it.
 export const blubrryEmbedResolver = createUrlEmbedResolver(blubrryHosts, blubrryResolveEmbed)
 
 export const blubrryFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Blubrry Podcast Player' },
 ]
+
+// The player posts no ready message.
+export const blubrryRenderHint: EmbedRenderHint = {
+  provider,
+  requestPlay: -1, // Clicks the player's play button
+}

@@ -7,11 +7,6 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'acast'
 
-// A show is a 24-hex object id, a UUID or the alias the publisher chose. An episode is an
-// object id or a slug. Every form is one run of word characters and hyphens, so a single class
-// covers them all and keeps `..` and `/` out of the minted path.
-const safeIdRegex = /^[\w-]+$/
-
 const acastHosts = ['embed.acast.com', 'player.acast.com']
 
 // Acast's share code writes `height="190px"` and its pages state `twitter:player:height` 190.
@@ -28,15 +23,11 @@ const extractAcastEmbed = (link: string): { show: string; episode?: string } | u
   const show = segments[0]
   const episode = isPlayerHost ? segments[2] : segments[1]
 
-  if (!show || !safeIdRegex.test(show)) {
+  if (!show) {
     return
   }
 
   if (isPlayerHost && (segments[1] !== 'episodes' || !episode)) {
-    return
-  }
-
-  if (episode !== undefined && !safeIdRegex.test(episode)) {
     return
   }
 
@@ -62,10 +53,7 @@ const acastResolveEmbed: ResolveEmbed = (url, element) => {
 }
 
 // Acast's player iframe, spelled three ways across the embed host and the retired player host.
-export const acastEmbedResolver = createUrlEmbedResolver(acastHosts, acastResolveEmbed, {
-  // Carriers state 110 and 120 for players that no longer exist, and the current one is 190.
-  preferResolverSize: true,
-})
+export const acastEmbedResolver = createUrlEmbedResolver(acastHosts, acastResolveEmbed)
 
 export const acastFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Embed Player' },

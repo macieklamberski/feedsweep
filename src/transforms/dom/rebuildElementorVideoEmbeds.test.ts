@@ -31,6 +31,28 @@ describeForEachParser('rebuildElementorVideoEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should carry the watch link offset into the rebuilt youtube iframe', async () => {
+    const value = html`
+      <div
+        class="elementor-widget elementor-widget-video"
+        data-settings='{"youtube_url":"https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1m30s","video_type":"youtube"}'
+      >
+        <div class="elementor-widget-container">
+          <div class="elementor-video"></div>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <div class="elementor-widget elementor-widget-video">
+        <div class="elementor-widget-container">
+          <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=90"></iframe>
+        </div>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   // `data-settings` is a JSON payload, so resolveRelativeUrls never reaches inside it and a url
   // the publisher wrote protocol-relative arrives naming no host of its own. With no base to
   // parse it against there is no id, and the empty player div goes with the rest of the widget.
@@ -92,7 +114,7 @@ describeForEachParser('rebuildElementorVideoEmbeds', (parseHtml) => {
     const expected = html`
       <div class="elementor-widget elementor-widget-video">
         <div class="elementor-widget-container">
-          <iframe src="https://www.dailymotion.com/embed/video/x7tgad0"></iframe>
+          <iframe src="https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0"></iframe>
         </div>
       </div>
     `
@@ -116,7 +138,7 @@ describeForEachParser('rebuildElementorVideoEmbeds', (parseHtml) => {
     const expected = html`
       <div class="elementor-widget elementor-widget-video">
         <div class="elementor-widget-container">
-          <iframe src="https://videopress.com/embed/kUJmAcSf"></iframe>
+          <iframe src="https://video.wordpress.com/embed/kUJmAcSf"></iframe>
         </div>
       </div>
     `

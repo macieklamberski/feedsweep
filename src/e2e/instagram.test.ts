@@ -113,10 +113,9 @@ describeForEachParser('Instagram', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
-  // The only size a quote ever comes with sits on the Tumblr figure, one level above it, so the
-  // widget pass has to run while that wrapper is still in the document. The figure is dissolved
-  // afterwards, once the size it carried has been read into the placeholder.
-  it('should take the size off the Tumblr figure the quote sits in', async () => {
+  // The Tumblr figure states the size the embed rendered at, which is the carrier's. The
+  // placeholder states none, since the frame posts its height.
+  it('should state no size over the size of the Tumblr figure the quote sits in', async () => {
     const value = html`
       <figure
         class="tmblr-embed tmblr-full"
@@ -138,8 +137,6 @@ describeForEachParser('Instagram', (parseHtml) => {
         data-embed-id="reel/DGPdABWz84n"
         data-embed-src="https://www.instagram.com/reel/DGPdABWz84n/embed/"
         data-embed-url="https://www.instagram.com/reel/DGPdABWz84n/"
-        data-embed-width="540"
-        data-embed-height="627"
       ></div>
     `
 
@@ -164,8 +161,6 @@ describeForEachParser('Instagram', (parseHtml) => {
         data-embed-id="p/CaUsPbUquKV"
         data-embed-src="https://www.instagram.com/p/CaUsPbUquKV/embed/captioned/"
         data-embed-url="https://www.instagram.com/p/CaUsPbUquKV/"
-        data-embed-width="320"
-        data-embed-height="392"
       ></div>
     `
 
@@ -203,7 +198,7 @@ describeForEachParser('Instagram', (parseHtml) => {
         data-embed-id="p/DZmgID9Eawg"
         data-embed-src="https://www.instagram.com/p/DZmgID9Eawg/embed/"
         data-embed-url="https://www.instagram.com/p/DZmgID9Eawg/"
-       
+        data-embed-description="The caption, as the post page titles it."
         data-embed-author="@somebakery"
         data-embed-avatar="https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-profile-pic-DZmgID9Eawg.png"
         data-embed-thumbnail="https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-snapshot-DZmgID9Eawg.jpg"
@@ -248,7 +243,7 @@ describeForEachParser('Instagram', (parseHtml) => {
   })
 
   // A copy stored after the loader ran: its query names the page the frame was embedded in, which
-  // the rebuilt src drops, while the height the loader measured is the one size this shape states.
+  // the rebuilt src drops. The height the loader measured is not read either.
   it('should rebuild a stored frame without the embedding page in its query', async () => {
     const value = html`
       <iframe
@@ -266,7 +261,6 @@ describeForEachParser('Instagram', (parseHtml) => {
         data-embed-id="p/CaUsPbUquKV"
         data-embed-src="https://www.instagram.com/p/CaUsPbUquKV/embed/captioned/"
         data-embed-url="https://www.instagram.com/p/CaUsPbUquKV/"
-        data-embed-height="640"
       ></div>
     `
 
@@ -371,6 +365,27 @@ describeForEachParser('Instagram', (parseHtml) => {
   it('should leave a share link to the generic placeholder', async () => {
     const value = '<iframe src="https://www.instagram.com/share/p/BAJ0RmC0Vq/"></iframe>'
     const expected = '<div data-embed-src="https://www.instagram.com/share/p/BAJ0RmC0Vq/"></div>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // A forum's s9e helper frame names the shortcode in its fragment, and instagramS9eEmbedResolver
+  // reads it into the same frame a pasted permalink gives.
+  it('should convert the s9e helper frame into the post placeholder', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="instagram"
+        src="https://s9e.github.io/iframe/2/instagram.min.html#CdWN1jeOWr0#theme=auto"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="instagram"
+        data-embed-id="p/CdWN1jeOWr0"
+        data-embed-src="https://www.instagram.com/p/CdWN1jeOWr0/embed/"
+        data-embed-url="https://www.instagram.com/p/CdWN1jeOWr0/"
+      ></div>
+    `
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import { describeForEachParser, resolverExtractor } from '../tests.js'
+import { transformContent } from '../index.js'
+import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { composeWidgetEmbedUrl, gettyImagesEmbedResolver, readWidgetConfig } from './gettyimages.js'
 
@@ -14,24 +15,18 @@ describe('readWidgetConfig', () => {
         et: 'iPo3qjCKSVJU-bRwLBwNoQ',
         sig: 'OOM9B40xxpnASE4yukj6V63Qa909rgGMxHZzru08p0c=',
         tld: 'com',
-        caption: 'true',
-        width: 594,
-        height: 395,
       }
 
       expect(readWidgetConfig(value)).toEqual(expected)
     })
 
-    it('should fall back to the com domain and no caption when neither is stated', () => {
+    it('should fall back to the com domain when none is stated', () => {
       const value = `gie.widgets.load({id:'abc',sig:'def=',w:'480px',h:'320px',items:'123456789'})`
       const expected = {
         items: '123456789',
         et: 'abc',
         sig: 'def=',
         tld: 'com',
-        caption: 'false',
-        width: 480,
-        height: 320,
       }
 
       expect(readWidgetConfig(value)).toEqual(expected)
@@ -44,9 +39,6 @@ describe('readWidgetConfig', () => {
         et: 'abc',
         sig: 'def=',
         tld: 'co.uk',
-        caption: 'false',
-        width: undefined,
-        height: undefined,
       }
 
       expect(readWidgetConfig(value)).toEqual(expected)
@@ -60,10 +52,22 @@ describe('readWidgetConfig', () => {
       expect(readWidgetConfig(value)).toBeUndefined()
     })
 
-    it('should refuse an item id that is not one', () => {
-      const value = `gie.widgets.load({id:'abc',sig:'def=',items:'not-an-id'})`
+    it('should refuse a config with no embed token, which the player rejects with a 400', () => {
+      const value = `gie.widgets.load({sig:'def=',w:'594px',h:'395px',items:'491183014'})`
 
       expect(readWidgetConfig(value)).toBeUndefined()
+    })
+
+    it('should use a malformed item id as written, even if the player answers an error', () => {
+      const value = `gie.widgets.load({id:'abc',sig:'def=',items:'not-an-id'})`
+      const expected = {
+        items: 'not-an-id',
+        et: 'abc',
+        sig: 'def=',
+        tld: 'com',
+      }
+
+      expect(readWidgetConfig(value)).toEqual(expected)
     })
   })
 })
@@ -76,10 +80,9 @@ describe('composeWidgetEmbedUrl', () => {
         et: 'iPo3qjCKSVJU-bRwLBwNoQ',
         sig: 'OOM9B40x=',
         tld: 'com',
-        caption: 'true',
       }
       const expected =
-        'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&sig=OOM9B40x%3D&caption=true'
+        'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&sig=OOM9B40x%3D'
 
       expect(composeWidgetEmbedUrl(value)).toBe(expected)
     })
@@ -90,16 +93,15 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, gettyImagesEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the player iframe and keep its signed query whole', async () => {
+    it('should keep the signed query and drop the caption after it', async () => {
       const value =
         '<iframe src="https://embed.gettyimages.com/embed/492381322?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&viewMoreLink=on&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=&caption=true" width="594" height="395"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'gettyimages',
         id: '492381322',
-        src: 'https://embed.gettyimages.com/embed/492381322?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&viewMoreLink=on&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=&caption=true',
+        src: 'https://embed.gettyimages.com/embed/492381322?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&viewMoreLink=on&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=',
         url: 'https://www.gettyimages.com/detail/492381322',
-        width: 594,
-        height: 395,
+        ratio: '3/2',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -111,8 +113,51 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'gettyimages',
         id: '83621',
-        src: 'https://embed.gettyimages.com/embed/83621?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=&caption=true',
+        src: 'https://embed.gettyimages.com/embed/83621?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=',
         url: 'https://www.gettyimages.com/detail/83621',
+        ratio: '3/2',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a signed flag before the signature as written', async () => {
+      const value = html`
+        <iframe
+          src="https://embed.gettyimages.com/embed/1179214625?et=c6v3oJKLRHl-sP1_Ytjj1g&amp;tld=co.uk&amp;sig=C3Ss6cEqvxD2EKAfIWt5vBh0z1hAqmd0p0OJ-7fcJJQ=&amp;caption=false&amp;ver=1"
+          width="594"
+          height="396"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'gettyimages',
+        id: '1179214625',
+        src: 'https://embed.gettyimages.com/embed/1179214625?et=c6v3oJKLRHl-sP1_Ytjj1g&tld=co.uk&sig=C3Ss6cEqvxD2EKAfIWt5vBh0z1hAqmd0p0OJ-7fcJJQ=',
+        url: 'https://www.gettyimages.com/detail/1179214625',
+        ratio: '3/2',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a display flag the signature covers', async () => {
+      const value = html`
+        <iframe
+          src="https://embed.gettyimages.com/embed/674950774?et=4AHdkSWcRDxQ4l2sDHBIOA&amp;tld=com&amp;viewMoreLink=on&amp;sig=5sVUWW_CnKTtYzfjDnnapRVqjnSK-3499ZUkhrnRc1g=&amp;caption=true"
+          width="594"
+          height="396"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'gettyimages',
+        id: '674950774',
+        src: 'https://embed.gettyimages.com/embed/674950774?et=4AHdkSWcRDxQ4l2sDHBIOA&tld=com&viewMoreLink=on&sig=5sVUWW_CnKTtYzfjDnnapRVqjnSK-3499ZUkhrnRc1g=',
+        url: 'https://www.gettyimages.com/detail/674950774',
+        ratio: '3/2',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -127,10 +172,96 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/embed.gettyimages.com/embed/491183014?sig=x"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/491183014?sig=x"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore the player route below a leading segment', async () => {
+      const value = '<iframe src="https://embed.gettyimages.com/x/embed/491183014?sig=x"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player route followed by a trailing segment', async () => {
+      const value =
+        '<iframe src="https://embed.gettyimages.com/embed/491183014/extra?sig=x"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed item id as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://embed.gettyimages.com/embed/latest?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=&caption=true"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'gettyimages',
+        id: 'latest',
+        src: 'https://embed.gettyimages.com/embed/latest?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=',
+        url: 'https://www.gettyimages.com/detail/latest',
+        ratio: '3/2',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+// Only the pipeline repairs the doubled `&amp;amp;` the resolver reads as `amp;` pairs.
+describeForEachParser('gettyimages doubly escaped src', (parseHtml) => {
+  it('should keep the signed query', async () => {
+    const value = html`
+      <iframe
+        src="https://embed.gettyimages.com/embed/674950774?et=4AHdkSWcRDxQ4l2sDHBIOA&amp;amp;tld=com&amp;amp;viewMoreLink=on&amp;amp;sig=5sVUWW_CnKTtYzfjDnnapRVqjnSK-3499ZUkhrnRc1g=&amp;amp;caption=true"
+        width="594"
+        height="396"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://www.gettyimages.com/detail/674950774"
+        data-embed-id="674950774"
+        data-embed-provider="gettyimages"
+        data-embed-ratio="3/2"
+        data-embed-src="https://embed.gettyimages.com/embed/674950774?et=4AHdkSWcRDxQ4l2sDHBIOA&amp;tld=com&amp;viewMoreLink=on&amp;sig=5sVUWW_CnKTtYzfjDnnapRVqjnSK-3499ZUkhrnRc1g="
+      ></div>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+})
+
+// Only the pipeline shows what the host's enclosures become, since injectEnclosures offers each
+// one to every url-keyed resolver.
+describeForEachParser('gettyimages enclosures', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a photo file on the media host an image', async () => {
+    const enclosures = [
+      {
+        url: 'https://media.gettyimages.com/id/2207912631/photo/person-playing-slot-machines-in-a-vibrant-casino-environment.jpg?s=612x612&w=0&k=20&c=VfjZJAwq_UnkAmMXEyOyUs-HpLnX1d6OlN2khiRTTn4=',
+        type: 'image/jpeg',
+      },
+    ]
+    const expected = html`
+      <img
+        src="https://media.gettyimages.com/id/2207912631/photo/person-playing-slot-machines-in-a-vibrant-casino-environment.jpg?s=612x612&amp;w=0&amp;k=20&amp;c=VfjZJAwq_UnkAmMXEyOyUs-HpLnX1d6OlN2khiRTTn4="
+        data-enclosure=""
+      />
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })

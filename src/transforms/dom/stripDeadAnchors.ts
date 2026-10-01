@@ -1,6 +1,9 @@
 import type { DomTransform } from '../../types.js'
+import { stripUrlIgnorableChars } from '../../utils/urls.js'
 
 const javascriptSchemeRegex = /^javascript:/i
+
+const deadHrefs = ['', '#']
 
 // An anchor with an empty, bare # or javascript: href looks clickable and goes nowhere.
 // A javascript: href is left over from an interactive widget whose script context is gone.
@@ -18,7 +21,8 @@ export const stripDeadAnchors: DomTransform = () => {
 
       const trimmed = href.trim()
 
-      const isDead = trimmed === '' || trimmed === '#' || javascriptSchemeRegex.test(trimmed)
+      const normalized = stripUrlIgnorableChars(href)
+      const isDead = deadHrefs.includes(trimmed) || javascriptSchemeRegex.test(normalized)
 
       if (!isDead) {
         continue

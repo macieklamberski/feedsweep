@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { linkifyGistEmbeds } from './linkifyGistEmbeds.js'
@@ -25,6 +26,18 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
       <a
         href="https://gist.github.com/6cad326836d38bd3a7ae"
       >https://gist.github.com/6cad326836d38bd3a7ae</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  // gist.github.com answers an uppercase id on the user-less route with a redirect to the gist.
+  it('should link a user-less gist script whose id is uppercase', async () => {
+    const value = '<script src="https://gist.github.com/6CAD326836D38BD3A7AE.js"></script>'
+    const expected = html`
+      <a
+        href="https://gist.github.com/6CAD326836D38BD3A7AE"
+      >https://gist.github.com/6CAD326836D38BD3A7AE</a>
     `
 
     expect(await transform(value)).toEqualHtml(expected)
@@ -60,10 +73,41 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave an amp-gist with a malformed gist id untouched', async () => {
-    const value = '<amp-gist data-gistid="../../evil"></amp-gist>'
+  it('should link an amp-gist whose gist id is uppercase', async () => {
+    const value = '<amp-gist data-gistid="B9BB35BC68DF68259AF94430F012425F"></amp-gist>'
+    const expected = html`
+      <a
+        href="https://gist.github.com/B9BB35BC68DF68259AF94430F012425F"
+      >https://gist.github.com/B9BB35BC68DF68259AF94430F012425F</a>
+    `
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should use a malformed gist id as written, even if the link answers an error', async () => {
+    const value = '<amp-gist data-gistid="../../evil"></amp-gist>'
+    const expected =
+      '<a href="https://gist.github.com/../../evil">https://gist.github.com/../../evil</a>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should use a gist id carrying a trailing path as written', async () => {
+    const value = '<amp-gist data-gistid="b9bb35bc68df68259af94430f012425f/raw"></amp-gist>'
+    const expected =
+      '<a href="https://gist.github.com/b9bb35bc68df68259af94430f012425f/raw">https://gist.github.com/b9bb35bc68df68259af94430f012425f/raw</a>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should use a malformed gist script id as written, even if the link answers an error', async () => {
+    const value = html`
+      <script src="https://gist.github.com/octocat/6cad326836d38bd3a7ae%2Fraw.js"></script>
+    `
+    const expected =
+      '<a href="https://gist.github.com/octocat/6cad326836d38bd3a7ae%2Fraw">https://gist.github.com/octocat/6cad326836d38bd3a7ae%2Fraw</a>'
+
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should leave an amp-gist with an empty gist id untouched', async () => {
@@ -92,5 +136,24 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     const twice = await applyDomTransforms(parseHtml(once), [linkifyGistEmbeds(baseContext)])
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('gist scripts the pipeline would otherwise delete', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should keep a gist script as a link to the gist', async () => {
+    const value = '<script src="https://gist.github.com/octocat/6cad326836d38bd3a7ae.js"></script>'
+    const expected = html`
+      <p>
+        <a
+          href="https://gist.github.com/octocat/6cad326836d38bd3a7ae"
+        >https://gist.github.com/octocat/6cad326836d38bd3a7ae</a>
+      </p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

@@ -8,7 +8,8 @@ const hasHtmlRegex = /<[a-z][a-z0-9]*(?:[:-][a-z0-9]+)*[\s/>]/i
 const carriageReturnRegex = /\r\n|\r/g
 const paragraphSeparatorRegex = /\n\s*\n/
 const edgeNewlinesRegex = /^\n+|\n+$/g
-const lineBreakRegex = /[ \t]*\n/g
+// A match starts only at the head of a run, so a long run with no newline after it fails once.
+const lineBreakRegex = /(?<![ \t])[ \t]*\n/g
 
 // Plain-text content with no tags, whose newlines and blank lines collapse when rendered as HTML.
 export const paragraphizePlainText: StringTransform = () => {

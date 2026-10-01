@@ -1,4 +1,4 @@
-import { composeEmbedUrl, isVideoId } from '../../embeds/youtube.js'
+import { composeEmbedUrl } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import { attr, parsePixelSize } from '../../utils/dom.js'
 import { createIframe, setDimensions } from '../../utils/widgets.js'
@@ -19,7 +19,7 @@ export const rebuildLazyYtEmbeds: DomTransform = () => (document) => {
     for (const element of document.querySelectorAll(selector)) {
       const videoId = attr(element, attribute)
 
-      if (!videoId || !isVideoId(videoId) || !element.parentNode) {
+      if (!videoId || !element.parentNode) {
         continue
       }
 

@@ -61,6 +61,36 @@ describeForEachParser('unwrapWrappers', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should move dir and lang onto the children of an unwrapped wrapper', async () => {
+    const value = html`
+      <div
+        dir="rtl"
+        lang="he"
+      >
+        <p>שלום</p>
+        <p lang="en">Hello</p>
+      </div>
+    `
+    const expected = html`
+      <p
+        dir="rtl"
+        lang="he"
+      >שלום</p>
+      <p
+        lang="en"
+        dir="rtl"
+      >Hello</p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a dir wrapper holding bare text', async () => {
+    const value = '<div dir="rtl">שלום</div>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should unwrap wrapper with attribute values containing > characters', async () => {
     // Tailwind-style arbitrary-value selectors carry a `>` inside the class
     // attribute, which linkedom parses as one unit.
@@ -209,10 +239,37 @@ describeForEachParser('unwrapWrappers', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  it('should preserve a div carrying a data-pre attribute', async () => {
-    const value = '<div data-pre=""><pre>const x = 1</pre></div>'
+  it('should preserve a div carrying data-file attributes', async () => {
+    const value = html`
+      <div data-file-url="https://example.com/file.pdf">
+        <a href="https://example.com/file.pdf">file.pdf</a>
+      </div>
+    `
 
     expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should unwrap a div carrying a bare data-pre attribute', async () => {
+    const value = '<div data-pre=""><pre>const x = 1</pre></div>'
+    const expected = '<pre>const x = 1</pre>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should unwrap a div whose data attributes only start like a placeholder type', async () => {
+    const value = html`
+      <div
+        data-preview="true"
+        data-filename="a.txt"
+        data-citation="1"
+        data-embedly-card="1"
+      >
+        <p>Content</p>
+      </div>
+    `
+    const expected = '<p>Content</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should preserve a wrapper that is the target of an in-page fragment link', async () => {

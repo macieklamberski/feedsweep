@@ -2,7 +2,7 @@ import type { DomTransform } from '../../types.js'
 import { isText } from '../../utils/dom.js'
 
 // The lookahead keeps `\(`, `\textbf` and `\n` at a paragraph start, which are real content.
-const leadingBlockBackslash = /^(\s*)\\(?=\s|$)/
+const leadingBlockBackslashRegex = /^(\s*)\\(?=\s|$)/
 
 // Markdown's escape backslash leaked to the start of a paragraph, where it renders as a stray `\`.
 // One mid-text or before a <br> is real content: a Windows path, a shell continuation, LaTeX.
@@ -14,7 +14,7 @@ export const stripMarkdownEscapeBackslashes: DomTransform = () => {
       const first = block.firstChild
 
       if (isText(first)) {
-        const match = first.data.match(leadingBlockBackslash)
+        const match = first.data.match(leadingBlockBackslashRegex)
 
         if (match) {
           const backslashIndex = match[1].length
