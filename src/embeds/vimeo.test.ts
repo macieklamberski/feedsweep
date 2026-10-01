@@ -454,6 +454,24 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should ignore the flashvars of a carrier that is not a Flash player', async () => {
+      const value = html`
+        <embed
+          src="https://vimeo.com/showcase/5371408/embed"
+          flashvars="clip_id=2610675"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: 'showcase/5371408',
+        src: 'https://vimeo.com/showcase/5371408/embed',
+        url: 'https://vimeo.com/showcase/5371408',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore a moogaloop_local.swf embed with no clip in its flashvars', async () => {
       const value = html`
         <embed
