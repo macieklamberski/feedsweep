@@ -28,7 +28,6 @@ describeForEachParser('typeformWidgetEmbedResolver', (parseHtml) => {
         provider: 'typeform',
         id: '01HCZ4DNW8JM6PEGNTQWF2PW87',
         // The snippet's inline style states the height. Its width is a percentage, not pixels.
-        height: 500,
         title: 'User Satisfaction Survey',
       }
 
@@ -249,7 +248,7 @@ describeForEachParser('typeformIframeEmbedResolver', (parseHtml) => {
 
   // The snippet states its size in an inline style rather than in width/height attributes, and
   // the resolver reads both.
-  it('should resolve the iframe the platform oembed emits, carrying its stated size', async () => {
+  it('should resolve the iframe the platform oembed emits at the platform size', async () => {
     const value = html`
       <iframe
         src="https://form.typeform.com/to/MTt3Pw7K?typeform-embed=oembed&amp;typeform-medium=embed-oembed"
@@ -262,8 +261,7 @@ describeForEachParser('typeformIframeEmbedResolver', (parseHtml) => {
       id: 'MTt3Pw7K',
       src: 'https://form.typeform.com/to/MTt3Pw7K',
       url: 'https://form.typeform.com/to/MTt3Pw7K',
-      width: 900,
-      height: 600,
+      height: 500,
     }
 
     expect(await extract(value)).toEqual(expected)

@@ -69,6 +69,7 @@ const odyseeResolveEmbed: ResolveEmbed = (url) => {
     id: claimPath,
     src: `https://odysee.com/$/embed/${claimPath}`,
     url: `https://odysee.com/${claimPath}`,
+    ratio: '16/9',
     author,
   }
 }

@@ -345,7 +345,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
   })
 
   describe('the size a publisher states', () => {
-    it('should let the carrier size win over the corpus-typical height', async () => {
+    it('should keep the corpus-typical height over the carrier size', async () => {
       const value = html`
         <iframe
           src="https://audiomack.com/embed/chuuwee/album/cool-world"
@@ -359,8 +359,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
         src: 'https://audiomack.com/embed/chuuwee/album/cool-world',
         params: {},
         url: 'https://audiomack.com/chuuwee/album/cool-world',
-        width: 649,
-        height: 1200,
+        height: 400,
         author: 'chuuwee',
       }
 

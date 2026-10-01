@@ -31,8 +31,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
-        width: 800,
-        height: 600,
+        ratio: '4/3',
         title: 'Borodyanka. Ukraine. War. Banksy.',
       }
 
@@ -58,8 +57,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
-        width: 640,
-        height: 360,
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -225,8 +223,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
       id: '00b8203bcdc2464bbac4b159be66e838',
       src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
       url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
-      width: 640,
-      height: 480,
+      ratio: '4/3',
     }
 
     expect(await extract(value)).toEqual(expected)

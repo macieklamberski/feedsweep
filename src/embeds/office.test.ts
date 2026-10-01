@@ -230,7 +230,7 @@ describeForEachParser('officeEmbedResolver', (parseHtml) => {
         provider: 'office',
         src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Falarm.engr.uconn.edu%2Fwp-content%2Fuploads%2Fsites%2F2733%2F2019%2F10%2FAnnounce-Marrakesh-CSCS-2019-PLENARY-LECTURE.docx',
         url: 'https://alarm.engr.uconn.edu/wp-content/uploads/sites/2733/2019/10/Announce-Marrakesh-CSCS-2019-PLENARY-LECTURE.docx',
-        height: 500,
+        ratio: '8/5',
         title: 'Announce-Marrakesh-CSCS-2019-PLENARY-LECTURE.docx',
       }
 

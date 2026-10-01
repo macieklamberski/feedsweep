@@ -213,7 +213,7 @@ describeForEachParser('megaphoneEmbedResolver', (parseHtml) => {
   describe('edge cases', () => {
     // The two kinds are separated so a playlist is not squeezed into the episode height, but a
     // publisher who stated a box of their own outranks that measurement.
-    it('should take the size the carrier states over the height the kind implies', async () => {
+    it('should keep the height the kind implies over the size the carrier states', async () => {
       const value = html`
         <iframe
           src="https://playlist.megaphone.fm/?p=NSM7546490835"
@@ -225,8 +225,7 @@ describeForEachParser('megaphoneEmbedResolver', (parseHtml) => {
         provider: 'megaphone',
         id: 'playlist/NSM7546490835',
         src: 'https://playlist.megaphone.fm/?p=NSM7546490835',
-        width: 640,
-        height: 200,
+        height: 482,
       }
 
       expect(await extract(value)).toEqual(expected)

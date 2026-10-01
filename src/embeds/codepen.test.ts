@@ -566,7 +566,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         id: 'azpLzvW',
         src: 'https://codepen.io/editor/sturobson/embed/azpLzvW',
         url: 'https://codepen.io/sturobson/pen/azpLzvW',
-        height: 700,
+        height: 300,
         title: 'Theme and Mode Toggle Demo',
         author: '@sturobson',
       }
@@ -602,7 +602,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/sturobson/embed/azpLzvW',
         url: 'https://codepen.io/sturobson/pen/azpLzvW',
         thumbnail: 'https://shots.codepen.io/sturobson/pen/azpLzvW-512.jpg',
-        height: 700,
+        height: 300,
         title: 'Theme and Mode Toggle Demo',
         author: '@sturobson',
       }
@@ -1047,7 +1047,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 400,
+        height: 300,
         title: 'Parallax Card',
         author: '@argyleink',
       }
@@ -1071,7 +1071,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/anon/embed/XJpKqXm',
         url: 'https://codepen.io/anon/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/anon/pen/XJpKqXm-512.jpg',
-        height: 331,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1108,7 +1108,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 450,
+        height: 300,
         author: '@argyleink',
       }
 
@@ -1195,7 +1195,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/miriamsuzanne/embed/KKEXQKr',
         url: 'https://codepen.io/miriamsuzanne/pen/KKEXQKr',
         thumbnail: 'https://shots.codepen.io/miriamsuzanne/pen/KKEXQKr-512.jpg',
-        height: 400,
+        height: 300,
         title: 'Custom element, two ways',
         author: '@miriamsuzanne',
       }
@@ -1246,7 +1246,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 331,
+        height: 300,
         author: '@argyleink',
       }
 
@@ -1276,7 +1276,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         id: '019dcdfc-1e41-77c8-afdf-810ebc6f2480',
         src: 'https://codepen.io/editor/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f2480',
         url: 'https://codepen.io/anon/pen/019dcdfc-1e41-77c8-afdf-810ebc6f2480',
-        height: 450,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1416,7 +1416,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc123XYZ',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc123XYZ',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 400,
+        height: 300,
         author: '@argyleink',
       }
 
@@ -1436,7 +1436,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc%26autoplay%3D1',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc%26autoplay%3D1',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 400,
+        height: 300,
         author: '@argyleink',
       }
 
@@ -1474,7 +1474,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         id: 'XJpKqXm',
         src: 'https://codepen.io/anon/embed/XJpKqXm?key=abc123XYZ',
         thumbnail: 'https://shots.codepen.io/anon/pen/XJpKqXm-512.jpg',
-        height: 400,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1493,7 +1493,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc123XYZ',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc123XYZ',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 400,
+        height: 300,
         author: '@argyleink',
       }
 
@@ -1677,7 +1677,7 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
         id: 'xbggQgj',
         src: 'https://codepen.io/anon/embed/xbggQgj/f8fd92ac42f4d00a63df914c70439a39',
         thumbnail: 'https://shots.codepen.io/anon/pen/xbggQgj-512.jpg',
-        height: '450',
+        height: '300',
       }
 
       expect(await placeholder(value)).toEqual(expected)
@@ -1734,7 +1734,7 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
         id: '019e2c40-99c5-7617-8163-23c489a628b5',
         src: 'https://codepen.io/editor/anon/embed/019e2c40-99c5-7617-8163-23c489a628b5',
         url: 'https://codepen.io/anon/pen/019e2c40-99c5-7617-8163-23c489a628b5',
-        height: '450',
+        height: '300',
       }
 
       expect(await placeholder(value)).toEqual(expected)

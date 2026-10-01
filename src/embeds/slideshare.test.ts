@@ -147,8 +147,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
         url: 'http://www.slideshare.net/haraldf/business-quotes-for-2011',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
         title: 'Business Quotes for 2011',
       }
 
@@ -170,8 +169,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157123456',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157123456',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -195,8 +193,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -255,8 +252,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '13408892',
         src: 'https://www.slideshare.net/slideshow/embed_code/13408892',
         url: 'https://www.slideshare.net/Neusvn/diari-tea-concepcion-arenal',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -292,8 +288,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6141159',
         src: 'https://www.slideshare.net/slideshow/embed_code/6141159',
         url: 'https://www.slideshare.net/IC_Agency/online-advertising-strategy-for-a-luxury-watch-brand',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -329,8 +324,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '5543828',
         src: 'https://www.slideshare.net/slideshow/embed_code/5543828',
         url: 'https://www.slideshare.net/asierra.re/internet-patrimoni-i-arqueologia',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -377,8 +371,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -650,8 +643,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
       provider: 'slideshare',
       id: '6PCWPGFw9SwsAY',
       src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY',
-      width: 427,
-      height: 356,
+      ratio: '595/485',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -689,8 +681,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
       provider: 'slideshare',
       id: 'hK2vDqTQ0Nz9Wm',
       src: 'https://www.slideshare.net/slideshow/embed_code/key/hK2vDqTQ0Nz9Wm',
-      width: 476,
-      height: 400,
+      ratio: '595/485',
       title: 'Designing Accessible Forms',
     }
 
@@ -776,8 +767,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         id: '6PCWPGFw9SwsAY',
         src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY',
         url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
-        width: 427,
-        height: 356,
+        ratio: '595/485',
         title: 'Business Quotes for 2011',
         author: 'Harald Felgner',
       }
@@ -813,8 +803,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         id: '10579166',
         src: 'https://www.slideshare.net/slideshow/embed_code/10579166',
         url: 'http://www.slideshare.net/null0x00/make-profit-with-uiredressing-attacks',
-        width: 425,
-        height: 355,
+        ratio: '595/485',
         title: 'Make profit with UI-Redressing attacks.',
         author: 'n|u - The Open Security Community',
       }

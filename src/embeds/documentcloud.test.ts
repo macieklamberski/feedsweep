@@ -124,7 +124,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the box the carrier declares, stating none of its own', async () => {
+    it('should state no size over the box the carrier declares', async () => {
       const value = html`
         <iframe
           src="https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/"
@@ -139,8 +139,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/',
         thumbnail:
           'https://s3.documentcloud.org/documents/3694123/pages/Feedback-on-the-Nakshe-Portal-p1-normal.gif',
-        width: 474,
-        height: 711,
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -182,8 +181,6 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         provider: 'documentcloud',
         id: '28200073/pages/1',
         src: 'https://embed.documentcloud.org/documents/28200073/pages/1/',
-        width: 596,
-        height: 842,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -205,8 +202,6 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         provider: 'documentcloud',
         id: '4104638/annotations/380631',
         src: 'https://embed.documentcloud.org/documents/4104638/annotations/380631/',
-        width: 420.48,
-        height: 148.32,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -307,8 +302,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/28266454-june-2026-botm/',
         thumbnail:
           'https://s3.documentcloud.org/documents/28266454/pages/june-2026-botm-p1-normal.gif',
-        width: 2676,
-        height: 3336,
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -362,11 +356,10 @@ describeForEachParser('documentcloud shapes the pipeline strips first', (parseHt
     `
     const expected = html`
       <div
-        data-embed-height="711"
-        data-embed-width="474"
         data-embed-thumbnail="https://s3.documentcloud.org/documents/3694123/pages/Feedback-on-the-Nakshe-Portal-p1-normal.gif"
         data-embed-id="3694123"
         data-embed-provider="documentcloud"
+        data-embed-ratio="17/22"
         data-embed-src="https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/"
       ></div>
     `

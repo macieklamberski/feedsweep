@@ -192,7 +192,7 @@ describeForEachParser('simplecastEmbedResolver', (parseHtml) => {
   describe('edge cases', () => {
     // 200 is the height every iframe in the corpus sample stated, and a publisher who stated a
     // box of their own still outranks it.
-    it('should take the size the carrier states over the fixed player height', async () => {
+    it('should keep the fixed player height over the size the carrier states', async () => {
       const value = html`
         <iframe
           src="https://player.simplecast.com/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b"
@@ -204,8 +204,7 @@ describeForEachParser('simplecastEmbedResolver', (parseHtml) => {
         provider: 'simplecast',
         id: '7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b',
         src: 'https://player.simplecast.com/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b',
-        width: 640,
-        height: 52,
+        height: 200,
       }
 
       expect(await extract(value)).toEqual(expected)

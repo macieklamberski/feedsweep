@@ -378,8 +378,7 @@ describeForEachParser('deezerEmbedResolver', (parseHtml) => {
         id: 'track/293366',
         src: 'https://widget.deezer.com/widget/dark/track/293366',
         url: 'https://www.deezer.com/track/293366',
-        width: 220,
-        height: 55,
+        height: 150,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -398,7 +397,7 @@ describeForEachParser('deezerEmbedResolver', (parseHtml) => {
     // The box on the carrier is what the publisher chose for the player they embedded, so it
     // outranks the corpus-typical height. Deezer's own share dialog writes a fluid width, and
     // that is the shape the height alone describes.
-    it('should let the carrier size win over the corpus-typical height', async () => {
+    it('should keep the corpus-typical height over the carrier size', async () => {
       const value = html`
         <iframe
           src="https://widget.deezer.com/widget/dark/playlist/57888101"
@@ -411,8 +410,7 @@ describeForEachParser('deezerEmbedResolver', (parseHtml) => {
         id: 'playlist/57888101',
         src: 'https://widget.deezer.com/widget/dark/playlist/57888101',
         url: 'https://www.deezer.com/playlist/57888101',
-        width: 400,
-        height: 352,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)

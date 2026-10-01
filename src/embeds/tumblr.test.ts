@@ -20,7 +20,6 @@ describeForEachParser('tumblrIframeEmbedResolver', (parseHtml) => {
         provider: 'tumblr',
         id: '9NYQOutKOEXi4aopdzCr9A/144854447139',
         src: 'https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2',
-        height: 1391,
       }
 
       expect(await extract(value)).toEqual(expected)

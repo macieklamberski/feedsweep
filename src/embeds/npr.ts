@@ -98,9 +98,6 @@ export const nprFlashResolveEmbed: ResolveEmbed = (url) => {
   return composeEmbed(encodePathSegment(storyId), encodePathSegment(mediaId))
 }
 
-// The Flash carriers state the box of the retired Flash player.
-export const nprFlashEmbedResolver = createUrlEmbedResolver(nprHosts, nprFlashResolveEmbed, {
-  preferResolverSize: true,
-})
+export const nprFlashEmbedResolver = createUrlEmbedResolver(nprHosts, nprFlashResolveEmbed)
 
 export const nprIframeEmbedResolver = createUrlEmbedResolver(nprHosts, nprResolveEmbed)

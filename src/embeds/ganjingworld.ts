@@ -58,11 +58,12 @@ const ganjingworldResolveEmbed: ResolveEmbed = (url) => {
     id: video.id,
     src: `https://www.ganjingworld.com${prefix}/embed/${video.id}`,
     url: `https://www.ganjingworld.com${prefix}/video/${video.id}`,
+    ratio: '16/9',
   }
 }
 
 // Gan Jing World's share iframe on the canonical host and on the `ganjing.com` mirror, with or
-// without a locale segment. No size: every carrier states its own.
+// without a locale segment.
 export const ganjingworldEmbedResolver = createUrlEmbedResolver(
   ganjingworldHosts,
   ganjingworldResolveEmbed,

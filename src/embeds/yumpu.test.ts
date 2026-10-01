@@ -47,8 +47,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
         id: 'z4xYaRXnsDqwc2GE',
         src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         url: 'https://www.yumpu.com/de/document/view/71235096/sukultur-2026',
-        width: 940,
-        height: 812,
+        ratio: '4/3',
         title: 'SUKULTUR 2026',
       }
 
@@ -306,7 +305,7 @@ describeForEachParser('yumpu through the pipeline', (parseHtml) => {
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
   }
 
-  it('should keep the box the publisher declared and drop the resizer script', async () => {
+  it('should state the platform size over the box the publisher declared and drop the resizer script', async () => {
     const value = html`
       <iframe
         width="940px"
@@ -319,10 +318,9 @@ describeForEachParser('yumpu through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="812"
-        data-embed-width="940"
         data-embed-id="z4xYaRXnsDqwc2GE"
         data-embed-provider="yumpu"
+        data-embed-ratio="4/3"
         data-embed-src="https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE"
       ></div>
     `
@@ -357,10 +355,9 @@ describeForEachParser('yumpu through the pipeline', (parseHtml) => {
         <a href="https://www.yumpu.com/de/document/view/71235096/sukultur-2026">catalogue</a>.
       </p>
       <div
-        data-embed-height="812"
-        data-embed-width="940"
         data-embed-id="z4xYaRXnsDqwc2GE"
         data-embed-provider="yumpu"
+        data-embed-ratio="4/3"
         data-embed-src="https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE"
         data-embed-title="SUKULTUR 2026"
         data-embed-url="https://www.yumpu.com/de/document/view/71235096/sukultur-2026"

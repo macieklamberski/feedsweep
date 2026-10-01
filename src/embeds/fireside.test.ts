@@ -235,7 +235,7 @@ describeForEachParser('firesideEmbedResolver', (parseHtml) => {
   describe('the size a publisher states', () => {
     // Every corpus iframe states 200, which is where the resolver's height came from, but the
     // box a publisher chose for the player they embedded still outranks it.
-    it('should let the carrier height win over the stated one', async () => {
+    it('should keep the stated height over the carrier height', async () => {
       const value = html`
         <iframe
           src="https://player.fireside.fm/v3/I-2by1pi+kf-gXAOz"
@@ -247,7 +247,7 @@ describeForEachParser('firesideEmbedResolver', (parseHtml) => {
         provider: 'fireside',
         id: 'I-2by1pi+kf-gXAOz',
         src: 'https://player.fireside.fm/v3/I-2by1pi+kf-gXAOz',
-        height: 180,
+        height: 200,
       }
 
       expect(await extract(value)).toEqual(expected)

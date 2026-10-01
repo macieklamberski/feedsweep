@@ -73,8 +73,9 @@ export const readCarrierUrl = (element: Element): string => {
 }
 
 type ResolverOptions = {
-  // Scribd states `height="500"` on every document and keeps the ratio in `data-aspect-ratio`.
-  preferResolverSize?: boolean
+  // Deep handling only: the carrier's declared box replaces the resolver's size. Pass it on a
+  // carrier the publisher sized for the player that loads, never on a retired tool's or dead route's.
+  readCarrierSize?: boolean
 }
 
 // A resolver whose selector names the platform's own markup.
@@ -87,7 +88,7 @@ export const createMarkupEmbedResolver = (
     kind: 'embed',
     selector,
     extract: (element) => {
-      return decideSize(element, extract(element), options.preferResolverSize)
+      return decideSize(element, extract(element), options.readCarrierSize)
     },
   }
 }
@@ -131,13 +132,9 @@ const hasSize = (size: SizeFields): boolean => {
 const decideSize = (
   element: Element,
   result: EmbedResolverResult | undefined,
-  preferResolverSize?: boolean,
+  readCarrierSize?: boolean,
 ): EmbedResolverResult | undefined => {
-  if (!result) {
-    return
-  }
-
-  if (preferResolverSize && hasSize(result)) {
+  if (!result || !readCarrierSize) {
     return result
   }
 
@@ -217,7 +214,7 @@ export const createUrlEmbedResolver = (
         return
       }
 
-      return decideSize(element, extract(src, element), options.preferResolverSize)
+      return decideSize(element, extract(src, element), options.readCarrierSize)
     },
   }
 }

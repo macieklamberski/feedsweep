@@ -6,6 +6,7 @@ import { composeQuery, digitsRegex, encodePathSegment, placeholderBaseUrl } from
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brightcove'
+const playerRatio = '16/9'
 
 // The minimum length is the only check on the id: `AQ~~` decodes to the number 1.
 // A real Brightcove id runs to ten digits and more.
@@ -104,6 +105,7 @@ export const brightcoveVideoJsEmbedResolver = createMarkupEmbedResolver(
         attr(element, 'data-player'),
         attr(element, 'data-embed'),
       ),
+      ratio: playerRatio,
     }
   },
 )
@@ -141,6 +143,7 @@ const brightcoveFlashResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id: `${account}/${videoId}`,
     src: composePlayerUrl(account, videoId),
+    ratio: playerRatio,
   }
 }
 
@@ -169,6 +172,7 @@ export const brightcoveExperienceEmbedResolver = createMarkupEmbedResolver(
       provider,
       id: `${account}/${videoId}`,
       src: composePlayerUrl(account, videoId),
+      ratio: playerRatio,
     }
   },
 )
@@ -201,6 +205,7 @@ export const brightcoveResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id: `${account}/${videoId}`,
     src: `https://players.brightcove.net/${account}/${player}/index.html${composeQuery({ videoId })}`,
+    ratio: playerRatio,
     title: attr(element, 'title'),
   }
 }

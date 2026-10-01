@@ -132,15 +132,13 @@ const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
       : `https://bandcamp.com/EmbeddedPlayer/${head}${playerLayout}${tail}${start}`,
     url: pageUrl,
     height: isVideo ? undefined : playerHeight,
+    ratio: isVideo ? '16/9' : undefined,
     title,
   }
 }
 
 // Bandcamp's player iframe, whose fallback anchor is the only place the release page appears.
-// The strip outranks a box drawn for a layout it no longer loads, such as `size=small`.
-export const bandcampEmbedResolver = createUrlEmbedResolver(bandcampHosts, bandcampResolveEmbed, {
-  preferResolverSize: true,
-})
+export const bandcampEmbedResolver = createUrlEmbedResolver(bandcampHosts, bandcampResolveEmbed)
 
 export const bandcampFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'YouTube video player' },

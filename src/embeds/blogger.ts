@@ -33,6 +33,7 @@ export const bloggerResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id: token,
     src: `https://www.blogger.com/video.g${composeQuery({ token })}`,
+    ratio: '16/9',
     title: attr(element, 'title'),
   }
 }

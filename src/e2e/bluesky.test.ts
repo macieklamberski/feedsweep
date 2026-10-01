@@ -129,7 +129,7 @@ describeForEachParser('Bluesky', (parseHtml) => {
   // The helper page is hosted by the forum's markup library, not by Bluesky, and states the box
   // it renders into as an inline style. That size survives to the placeholder, which makes this
   // the one carrier giving the reader a shape to reserve.
-  it('should convert a forum helper iframe and keep the box it states', async () => {
+  it('should convert a forum helper iframe and ignore the box it states', async () => {
     const value = html`
       <iframe
         data-s9e-mediaembed="bluesky"
@@ -146,8 +146,6 @@ describeForEachParser('Bluesky', (parseHtml) => {
         data-embed-id="did:plc:hhz4agnyzcrsvpnprxrbjrpa/3mhq7aeuwbg42"
         data-embed-src="https://embed.bsky.app/embed/did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mhq7aeuwbg42"
         data-embed-url="https://bsky.app/profile/did:plc:hhz4agnyzcrsvpnprxrbjrpa/post/3mhq7aeuwbg42"
-        data-embed-width="600"
-        data-embed-height="600"
       ></div>
     `
 

@@ -271,7 +271,6 @@ describeForEachParser('telegramIframeEmbedResolver', (parseHtml) => {
         id: 'rvvoenkor/12345',
         src: 'https://t.me/rvvoenkor/12345?embed=1',
         url: 'https://t.me/rvvoenkor/12345',
-        height: 500,
         author: '@rvvoenkor',
       }
 

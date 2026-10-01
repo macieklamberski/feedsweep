@@ -124,7 +124,7 @@ describeForEachParser('steamEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, steamEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the box the widget declares', async () => {
+    it('should state the platform size over the box the widget declares', async () => {
       const value = html`
         <iframe
           src="https://store.steampowered.com/widget/355060"
@@ -140,7 +140,6 @@ describeForEachParser('steamEmbedResolver', (parseHtml) => {
         params: {},
         url: 'https://store.steampowered.com/app/355060/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/355060/header.jpg',
-        width: 646,
         height: 190,
       }
 

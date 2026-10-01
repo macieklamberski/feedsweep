@@ -7,7 +7,7 @@ describeForEachParser('arteEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, arteEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the share snippet and take the title and box it states', async () => {
+    it('should resolve the share snippet and take the title it states', async () => {
       const value = html`
         <iframe
           title="Tracks 2022 - Marchand &amp; Meffre"
@@ -25,8 +25,7 @@ describeForEachParser('arteEmbedResolver', (parseHtml) => {
         id: 'fr/095172-005-A',
         src: 'https://www.arte.tv/embeds/fr/095172-005-A',
         url: 'https://www.arte.tv/fr/videos/095172-005-A/',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
         title: 'Tracks 2022 - Marchand & Meffre',
       }
 
@@ -152,8 +151,7 @@ describeForEachParser('arteEmbedResolver', (parseHtml) => {
         id: 'es/051485-024-A',
         src: 'https://www.arte.tv/embeds/es/051485-024-A',
         url: 'https://www.arte.tv/es/videos/051485-024-A/',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
         title: '360° GEO: París, Blitz Motorcycle',
       }
 
@@ -175,8 +173,7 @@ describeForEachParser('arteEmbedResolver', (parseHtml) => {
         id: 'fr/025816-000-A',
         src: 'https://www.arte.tv/embeds/fr/025816-000-A',
         url: 'https://www.arte.tv/fr/videos/025816-000-A/',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

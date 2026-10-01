@@ -78,6 +78,7 @@ describeForEachParser('TikTok', (parseHtml) => {
         data-embed-url="https://www.tiktok.com/@cookingwithlynja"
         data-embed-description="Midnight pasta"
         data-embed-author="@cookingwithlynja"
+        data-embed-height="478"
       ></div>
     `
 

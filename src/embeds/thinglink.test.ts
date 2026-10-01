@@ -246,7 +246,7 @@ describeForEachParser('thinglinkEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, thinglinkEmbedResolver)
 
   describe('happy paths', () => {
-    it('should let the carrier state the size', async () => {
+    it('should ignore the size the carrier states', async () => {
       const value = html`
         <iframe
           width="549"
@@ -263,14 +263,13 @@ describeForEachParser('thinglinkEmbedResolver', (parseHtml) => {
         src: 'https://www.thinglink.com/card/853609259307368449',
         url: 'https://www.thinglink.com/card/853609259307368449',
         thumbnail: 'https://cdn.thinglink.me/api/image/853609259307368449/1024/10/scaletowidth',
-        width: 549,
-        height: 480,
+        ratio: '3/2',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the declared box over the original image size', async () => {
+    it('should ignore the declared box beside the original image size', async () => {
       const value = html`
         <iframe
           loading="lazy"
@@ -288,8 +287,7 @@ describeForEachParser('thinglinkEmbedResolver', (parseHtml) => {
         id: '1681632338456346625',
         src: 'https://www.thinglink.com/card/1681632338456346625',
         url: 'https://www.thinglink.com/card/1681632338456346625',
-        width: 960,
-        height: 540,
+        ratio: '3/2',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -348,8 +346,7 @@ describeForEachParser('thinglink shapes the pipeline repairs first', (parseHtml)
       src: 'https://www.thinglink.com/card/853609259307368449',
       url: 'https://www.thinglink.com/card/853609259307368449',
       thumbnail: 'https://cdn.thinglink.me/api/image/853609259307368449/1024/10/scaletowidth',
-      width: '549',
-      height: '480',
+      ratio: '3/2',
     }
 
     expect(await placeholder(value)).toEqual(expected)

@@ -258,7 +258,7 @@ describeForEachParser('heyzineEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, heyzineEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the height the snippet states in its style', async () => {
+    it('should state the platform size over the height the snippet states in its style', async () => {
       const value = html`
         <iframe
           src="https://heyzine.com/flip-book/4db16f598c.html"
@@ -271,7 +271,7 @@ describeForEachParser('heyzineEmbedResolver', (parseHtml) => {
         id: '4db16f598c',
         src: 'https://heyzine.com/flip-book/4db16f598c.html',
         url: 'https://heyzine.com/flip-book/4db16f598c.html',
-        height: 400,
+        ratio: '490/600',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -293,7 +293,7 @@ describeForEachParser('heyzineEmbedResolver', (parseHtml) => {
         id: 'throughtheprism',
         src: 'https://heyzine.com/flip-book/ThroughThePrism',
         url: 'https://heyzine.com/flip-book/ThroughThePrism',
-        height: 600,
+        ratio: '490/600',
       }
 
       expect(await extract(value)).toEqual(expected)

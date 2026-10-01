@@ -62,6 +62,7 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult 
     thumbnail: hasToken
       ? undefined
       : `https://${host}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
+    ratio: '16/9',
   }
 }
 
@@ -91,7 +92,7 @@ export const kalturaScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return { ...composeEmbed(entry), ratio: '16/9' }
+    return composeEmbed(entry)
   },
 )
 

@@ -18,6 +18,7 @@ describe('kalturaResolveEmbed', () => {
         id: '520801/1_w0bwzism',
         src: 'https://cdnapisec.kaltura.com/p/520801/sp/52080100/embedIframeJs/uiconf_id/31230141/partner_id/520801?iframeembed=true&entry_id=1_w0bwzism',
         thumbnail: 'https://cdnapisec.kaltura.com/p/520801/thumbnail/entry_id/1_w0bwzism/width/640',
+        ratio: '16/9',
       }
 
       expect(kalturaResolveEmbed(value)).toEqual(expected)
@@ -30,6 +31,7 @@ describe('kalturaResolveEmbed', () => {
         provider: 'kaltura',
         id: '1660902/1_txx4an1j',
         src: 'https://cdnapisec.kaltura.com/p/1660902/sp/166090200/embedIframeJs/uiconf_id/25717641/partner_id/1660902?iframeembed=true&entry_id=1_txx4an1j&flashvars[ks]=djJ8MTY2MDkwMnx',
+        ratio: '16/9',
       }
 
       expect(kalturaResolveEmbed(value)).toEqual(expected)
@@ -44,6 +46,7 @@ describe('kalturaResolveEmbed', () => {
         src: 'https://cdnapisec.kaltura.com/p/2296822/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_bs3s0fie',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/2296822/thumbnail/entry_id/1_bs3s0fie/width/640',
+        ratio: '16/9',
       }
 
       expect(kalturaResolveEmbed(value)).toEqual(expected)
@@ -57,6 +60,7 @@ describe('kalturaResolveEmbed', () => {
         id: '483511/0_hjiuf078',
         src: 'https://cdnapisec.kaltura.com/p/483511/sp/48351100/embedIframeJs/uiconf_id/5590821/partner_id/483511?iframeembed=true&entry_id=0_hjiuf078',
         thumbnail: 'https://cdnapisec.kaltura.com/p/483511/thumbnail/entry_id/0_hjiuf078/width/640',
+        ratio: '16/9',
       }
 
       expect(kalturaResolveEmbed(value)).toEqual(expected)
@@ -70,6 +74,7 @@ describe('kalturaResolveEmbed', () => {
         id: '148/0_gs5r8b3x',
         src: 'https://api.ca.kaltura.com/p/148/sp/14800/embedIframeJs/uiconf_id/23449759/partner_id/148?iframeembed=true&entry_id=0_gs5r8b3x',
         thumbnail: 'https://api.ca.kaltura.com/p/148/thumbnail/entry_id/0_gs5r8b3x/width/640',
+        ratio: '16/9',
       }
 
       expect(kalturaResolveEmbed(value)).toEqual(expected)
@@ -84,6 +89,7 @@ describe('kalturaResolveEmbed', () => {
         src: 'https://cdnapisec.kaltura.com/p/2296822/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_bs3s0fie9',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/2296822/thumbnail/entry_id/1_bs3s0fie9/width/640',
+        ratio: '16/9',
       }
 
       expect(kalturaResolveEmbed(value)).toEqual(expected)
@@ -98,6 +104,7 @@ describe('kalturaResolveEmbed', () => {
         src: 'https://cdnapisec.kaltura.com/p/2851211/embedPlaykitJs/uiconf_id/53021102?iframeembed=true&entry_id=2_rq4nfd7g',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/2851211/thumbnail/entry_id/2_rq4nfd7g/width/640',
+        ratio: '16/9',
       }
 
       expect(kalturaResolveEmbed(value)).toEqual(expected)
@@ -113,6 +120,7 @@ describe('kalturaResolveEmbed', () => {
         src: 'https://cdnapisec.kaltura.com/p/2851211/embedPlaykitJs/uiconf_id/53021102?iframeembed=true&entry_id=12_rq4nfd7g',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/2851211/thumbnail/entry_id/12_rq4nfd7g/width/640',
+        ratio: '16/9',
       }
 
       expect(kalturaResolveEmbed(value)).toEqual(expected)
@@ -149,6 +157,7 @@ describe('kalturaResolveEmbed', () => {
         id: '520801/latest',
         src: 'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=latest',
         thumbnail: 'https://cdnapisec.kaltura.com/p/520801/thumbnail/entry_id/latest/width/640',
+        ratio: '16/9',
       }
 
       expect(kalturaResolveEmbed(value)).toEqual(expected)
@@ -163,6 +172,7 @@ describe('kalturaResolveEmbed', () => {
         src: 'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bwzism%2F..%2F..%2Fx',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/520801/thumbnail/entry_id/1_w0bwzism%2F..%2F..%2Fx/width/640',
+        ratio: '16/9',
       }
 
       expect(kalturaResolveEmbed(value)).toEqual(expected)
@@ -195,7 +205,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, kalturaIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should take the title and the box the publisher states and drop the player id', async () => {
+    it('should take the title the publisher states and drop the player id', async () => {
       const value = html`
         <iframe
           title="Calendar Appointments (Exam Makeups)"
@@ -211,8 +221,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
         src: 'https://cdnapisec.kaltura.com/p/1660902/sp/166090200/embedIframeJs/uiconf_id/25717641/partner_id/1660902?iframeembed=true&entry_id=1_1pavfxkg',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/1660902/thumbnail/entry_id/1_1pavfxkg/width/640',
-        width: 560,
-        height: 395,
+        ratio: '16/9',
         title: 'Calendar Appointments (Exam Makeups)',
       }
 
@@ -237,8 +246,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
         src: 'https://cdnapisec.kaltura.com/p/2346171/sp/234617100/embedIframeJs/uiconf_id/42601131/partner_id/2346171?iframeembed=true&entry_id=0_bg4o7fhu',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/2346171/thumbnail/entry_id/0_bg4o7fhu/width/640',
-        width: 1024,
-        height: 170,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -258,8 +266,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
         src: 'https://cdnapisec.kaltura.com/p/1660902/sp/166090200/embedIframeJs/uiconf_id/25717641/partner_id/1660902?iframeembed=true&entry_id=1_txx4an1j&flashvars%5BmediaProxy.mediaPlayFrom%5D=0',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/1660902/thumbnail/entry_id/1_txx4an1j/width/640',
-        width: 560,
-        height: 395,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -279,8 +286,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
         src: 'https://cdnapisec.kaltura.com/p/2503451/embedPlaykitJs/uiconf_id/49754663?iframeembed=true&entry_id=1_wyxnidl5&kalturaSeekFrom=95',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/2503451/thumbnail/entry_id/1_wyxnidl5/width/640',
-        width: 560,
-        height: 315,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -300,7 +306,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
         src: 'https://cdnapisec.kaltura.com/p/2375811/sp/237581100/embedIframeJs/uiconf_id/41951101/partner_id/2375811?iframeembed=true&entry_id=1_vni6k5wu&flashvars[mediaProxy.mediaPlayTo]=120',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/2375811/thumbnail/entry_id/1_vni6k5wu/width/640',
-        height: 790,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -320,8 +326,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
         src: 'https://cdnapisec.kaltura.com/p/2503451/embedPlaykitJs/uiconf_id/49754663?iframeembed=true&entry_id=1_wyxnidl5&kalturaClipTo=120',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/2503451/thumbnail/entry_id/1_wyxnidl5/width/640',
-        width: 560,
-        height: 315,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -342,8 +347,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
         src: 'https://cdnapisec.kaltura.com/p/2503451/embedPlaykitJs/uiconf_id/49754663?iframeembed=true&entry_id=1_csldgzsc',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/2503451/thumbnail/entry_id/1_csldgzsc/width/640',
-        width: 528,
-        height: 297,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -362,6 +366,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
         src: 'https://cdnapisec.kaltura.com/p/2296822/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_bs3s0fie',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/2296822/thumbnail/entry_id/1_bs3s0fie/width/640',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

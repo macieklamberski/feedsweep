@@ -12,6 +12,7 @@ import {
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'vimeo'
+const playerRatio = '16/9'
 
 // An unlisted video's privacy hash is ten lowercase hex characters, and case-sensitive.
 const whitespaceRegex = /\s/
@@ -80,6 +81,7 @@ const composeShowcaseEmbed = (showcaseId: string): EmbedResolverResult => {
     id: `showcase/${showcaseId}`,
     src: `https://vimeo.com/showcase/${showcaseId}/embed`,
     url: `https://vimeo.com/showcase/${showcaseId}`,
+    ratio: playerRatio,
   }
 }
 
@@ -216,6 +218,7 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
     src: composeEmbedUrl(segment, params),
     // Without the hash the page loses its title and its video, so it stays on the url too.
     url: `https://vimeo.com/${segment}${hash ? `/${encodePathSegment(hash)}` : ''}`,
+    ratio: playerRatio,
     title,
     // TODO: no thumbnail. Vimeo posters are not derivable from the id and need an oEmbed lookup.
   }

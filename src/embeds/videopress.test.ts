@@ -25,8 +25,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
         id: 'FLEAXUMB',
         src: 'https://video.wordpress.com/embed/FLEAXUMB',
         url: 'https://videopress.com/v/FLEAXUMB',
-        width: 800,
-        height: 450,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -47,8 +46,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
         id: 'bDC13L49',
         src: 'https://video.wordpress.com/embed/bDC13L49',
         url: 'https://videopress.com/v/bDC13L49',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -74,8 +72,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
         id: 'xcCfesgJ',
         src: 'https://video.wordpress.com/embed/xcCfesgJ?loop=1',
         url: 'https://videopress.com/v/xcCfesgJ',
-        width: 500,
-        height: 375,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -90,6 +87,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
         id: 'FLEAXUMB',
         src: 'https://video.wordpress.com/embed/FLEAXUMB?at=42&loop=1',
         url: 'https://videopress.com/v/FLEAXUMB',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -102,6 +100,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
         id: 'bDC13L49x',
         src: 'https://video.wordpress.com/embed/bDC13L49x',
         url: 'https://videopress.com/v/bDC13L49x',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -114,6 +113,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
         id: 'FLEAXUMB',
         src: 'https://video.wordpress.com/embed/FLEAXUMB',
         url: 'https://videopress.com/v/FLEAXUMB',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -128,6 +128,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
         id: 'FLEAXUMB-extra',
         src: 'https://video.wordpress.com/embed/FLEAXUMB-extra',
         url: 'https://videopress.com/v/FLEAXUMB-extra',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -167,6 +168,7 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
         id: 'FLEAXUMB',
         src: 'https://video.wordpress.com/embed/FLEAXUMB',
         url: 'https://videopress.com/v/FLEAXUMB',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -198,8 +200,7 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
         id: 'TxdSIdpO',
         src: 'https://video.wordpress.com/embed/TxdSIdpO',
         url: 'https://videopress.com/v/TxdSIdpO',
-        width: 450,
-        height: 274,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -219,8 +220,7 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
         id: 'TxdSIdpO',
         src: 'https://video.wordpress.com/embed/TxdSIdpO',
         url: 'https://videopress.com/v/TxdSIdpO',
-        width: 400,
-        height: 224,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -243,8 +243,7 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
         id: 'TxdSIdpO',
         src: 'https://video.wordpress.com/embed/TxdSIdpO',
         url: 'https://videopress.com/v/TxdSIdpO',
-        width: 450,
-        height: 274,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -270,6 +269,7 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
         id: '../etc',
         src: 'https://video.wordpress.com/embed/../etc',
         url: 'https://videopress.com/v/../etc',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -287,6 +287,7 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
         id: 'TxdSIdpO',
         src: 'https://video.wordpress.com/embed/TxdSIdpO',
         url: 'https://videopress.com/v/TxdSIdpO',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -328,6 +329,7 @@ describeForEachParser('videopressIframeEmbedResolver carrier title', (parseHtml)
       id: 'TxdSIdpO',
       src: 'https://video.wordpress.com/embed/TxdSIdpO',
       url: 'https://videopress.com/v/TxdSIdpO',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -342,6 +344,7 @@ describeForEachParser('videopressIframeEmbedResolver carrier title', (parseHtml)
       id: 'TxdSIdpO',
       src: 'https://video.wordpress.com/embed/TxdSIdpO',
       url: 'https://videopress.com/v/TxdSIdpO',
+      ratio: '16/9',
       title: 'WordPress Category Hierarchy',
     }
 

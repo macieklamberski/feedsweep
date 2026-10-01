@@ -285,7 +285,7 @@ describeForEachParser('reverbnationEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the Flash player out of an embed and keep its box', async () => {
+    it('should take the Flash player out of an embed at the platform size', async () => {
       const value = html`
         <embed
           src="http://cache.reverbnation.com/widgets/swf/40/pro_widget.swf?id=artist_1354004&amp;skin_id=PWAS1006"
@@ -298,8 +298,7 @@ describeForEachParser('reverbnationEmbedResolver', (parseHtml) => {
         provider: 'reverbnation',
         id: 'artist_1354004',
         src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1354004',
-        width: 411,
-        height: 326,
+        height: 265,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -318,7 +317,7 @@ describeForEachParser('reverbnationEmbedResolver', (parseHtml) => {
   describe('the size the widget does not have', () => {
     // The widget reflows instead of scaling, so the resolver states nothing and whatever the
     // publisher declared is what the placeholder reserves.
-    it('should take the height from the carrier alone', async () => {
+    it('should ignore the height the carrier states', async () => {
       const value = html`
         <iframe
           src="https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55"
@@ -330,7 +329,7 @@ describeForEachParser('reverbnationEmbedResolver', (parseHtml) => {
         provider: 'reverbnation',
         id: 'artist_1018382',
         src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55',
-        height: 520,
+        height: 265,
       }
 
       expect(await extract(value)).toEqual(expected)

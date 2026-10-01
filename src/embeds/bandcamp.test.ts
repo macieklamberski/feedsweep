@@ -221,13 +221,14 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
         provider: 'bandcamp',
         id: 'track/1959185434',
         src: 'https://bandcamp.com/VideoEmbed?track=1959185434',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
     // The video player is not the audio strip, so the box the publisher drew for it stays.
-    it('should keep the box a video embed declares', async () => {
+    it('should state the video ratio over the box a video embed declares', async () => {
       const value = html`
         <iframe
           style="width: 400px; height: 225px;"
@@ -238,8 +239,7 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
         provider: 'bandcamp',
         id: 'track/2729551355',
         src: 'https://bandcamp.com/VideoEmbed?track=2729551355',
-        width: 400,
-        height: 225,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -39,8 +39,8 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
         id: 'tracks/1597257306',
         src: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1597257306',
         url: 'https://soundcloud.com/anjunadeep/the-anjunadeep-edition-586',
+        height: 166,
         // The iframe states 300, which outranks the 166 the track player defaults to.
-        height: 300,
         title: 'The Anjunadeep Edition 586',
         author: 'Anjunadeep',
       }
@@ -63,9 +63,9 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
           data-embed-provider="soundcloud"
           data-embed-id="tracks/1"
           data-embed-url="https://soundcloud.com/artist/track"
-          data-embed-height="300"
           data-embed-title="Track title"
           data-embed-author="Artist"
+          data-embed-height="166"
         ></div>
       `
 
@@ -519,6 +519,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
         src: 'https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy/s-vd94Qjk1b3m%2Fx',
+        height: 166,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -534,6 +535,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
         src: 'https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy/s-vd94-jk1b3m',
+        height: 166,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -629,7 +631,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
 
     it.each(siteSectionUrls)('should not read a site section as user content (%s)', async (url) => {
       const value = `<iframe src="${url}"></iframe>`
-      const expected: EmbedResolverResult = { provider: 'soundcloud', src: url }
+      const expected: EmbedResolverResult = { provider: 'soundcloud', src: url, height: 166 }
 
       expect(await extract(value)).toEqual(expected)
     })
@@ -641,6 +643,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
         src: 'https://w.soundcloud.com/player/?url=https%3A//on.soundcloud.com/AbCdEf',
+        height: 166,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -672,6 +675,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
         src: 'https://w.soundcloud.com/player/?visual=true&color=ff5500',
+        height: 166,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -686,6 +690,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
         src: 'https://w.soundcloud.com/player/?amp;url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F293',
+        height: 166,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -846,6 +851,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
         src: 'https://w.soundcloud.com/player/?url=https%3A//example.com/x',
+        height: 166,
       }
 
       expect(await extract(value)).toEqual(expected)

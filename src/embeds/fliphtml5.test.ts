@@ -182,7 +182,7 @@ describeForEachParser('fliphtml5IframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, fliphtml5IframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the box the embed block declares', async () => {
+    it('should state the platform size over the box the embed block declares', async () => {
       const value = html`
         <iframe
           src="https://online.fliphtml5.com/mzsro/jvuq/#?secret=t5CbQCavWG"
@@ -196,8 +196,7 @@ describeForEachParser('fliphtml5IframeEmbedResolver', (parseHtml) => {
         src: 'https://online.fliphtml5.com/mzsro/jvuq/',
         url: 'https://online.fliphtml5.com/mzsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
-        width: 640,
-        height: 360,
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)

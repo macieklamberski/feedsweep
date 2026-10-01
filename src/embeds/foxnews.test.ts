@@ -226,8 +226,7 @@ describeForEachParser('foxnewsIframeEmbedResolver', (parseHtml) => {
       id: '6178327154001',
       src: 'https://video.foxnews.com/v/video-embed.html?video_id=6178327154001',
       url: 'https://www.foxnews.com/video/6178327154001',
-      width: 640,
-      height: 360,
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)

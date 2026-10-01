@@ -19,6 +19,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         src: 'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/iframe?loop=true',
         thumbnail:
           'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/thumbnails/thumbnail.jpg?height=600',
+        ratio: '16/9',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
@@ -33,6 +34,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         src: 'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/b0f6489638fab333b9767877fbf92a8c/iframe?loop=true',
         thumbnail:
           'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/b0f6489638fab333b9767877fbf92a8c/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
@@ -47,6 +49,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/iframe',
         thumbnail:
           'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg?time=&height=600',
+        ratio: '16/9',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
@@ -61,6 +64,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         src: 'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/12d9fb47f8bf1560187d3b57c26816f1/iframe',
         thumbnail:
           'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/12d9fb47f8bf1560187d3b57c26816f1/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
@@ -75,6 +79,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         src: 'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/12d9fb47f8bf1560187d3b57c26816f1/iframe?startTime=90',
         thumbnail:
           'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/12d9fb47f8bf1560187d3b57c26816f1/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
@@ -88,6 +93,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         src: 'https://iframe.videodelivery.net/5653cfd537db1edbed98c5c0119f390c',
         thumbnail:
           'https://videodelivery.net/5653cfd537db1edbed98c5c0119f390c/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
@@ -101,6 +107,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         src: 'https://videodelivery.net/5653cfd537db1edbed98c5c0119f390c/iframe',
         thumbnail:
           'https://videodelivery.net/5653cfd537db1edbed98c5c0119f390c/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
@@ -130,6 +137,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35D8788A685E8CD8DB81E6F3E2269E2A/iframe',
         thumbnail:
           'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35D8788A685E8CD8DB81E6F3E2269E2A/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
@@ -164,6 +172,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5YzJlNDFhNyJ9.c2lnbmF0dXJl/iframe',
         thumbnail:
           'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5YzJlNDFhNyJ9.c2lnbmF0dXJl/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
@@ -178,6 +187,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         src: 'https://iframe.videodelivery.net/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0ZjdiMGM4ZSJ9.c2lnbmF0dXJl',
         thumbnail:
           'https://videodelivery.net/eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0ZjdiMGM4ZSJ9.c2lnbmF0dXJl/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
@@ -220,6 +230,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/iframe',
         thumbnail:
           'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
@@ -234,6 +245,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/iframe',
         thumbnail:
           'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
@@ -248,6 +260,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/iframe',
         thumbnail:
           'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
@@ -268,6 +281,7 @@ describeForEachParser('cloudflarestreamIframeEmbedResolver', (parseHtml) => {
         src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/iframe',
         thumbnail:
           'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -297,6 +311,7 @@ describeForEachParser('cloudflarestreamIframeEmbedResolver', (parseHtml) => {
         src: 'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/iframe',
         thumbnail:
           'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -323,6 +338,7 @@ describeForEachParser('cloudflarestreamScriptEmbedResolver', (parseHtml) => {
         src: 'https://iframe.videodelivery.net/5653cfd537db1edbed98c5c0119f390c',
         thumbnail:
           'https://videodelivery.net/5653cfd537db1edbed98c5c0119f390c/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -337,6 +353,7 @@ describeForEachParser('cloudflarestreamScriptEmbedResolver', (parseHtml) => {
         src: 'https://iframe.videodelivery.net/5653cfd537db1edbed98c5c0119f390c',
         thumbnail:
           'https://videodelivery.net/5653cfd537db1edbed98c5c0119f390c/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -369,6 +386,7 @@ describeForEachParser('cloudflarestreamScriptEmbedResolver', (parseHtml) => {
         src: 'https://iframe.videodelivery.net/..%2F..%2F35d8788a685e8cd8db81e6f3e2269e2a',
         thumbnail:
           'https://videodelivery.net/..%2F..%2F35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -399,6 +417,7 @@ describeForEachParser('the empty div the loader script writes into', (parseHtml)
       <div
         data-embed-provider="cloudflarestream"
         data-embed-id="5653cfd537db1edbed98c5c0119f390c"
+        data-embed-ratio="16/9"
         data-embed-src="https://iframe.videodelivery.net/5653cfd537db1edbed98c5c0119f390c"
         data-embed-thumbnail="https://videodelivery.net/5653cfd537db1edbed98c5c0119f390c/thumbnails/thumbnail.jpg"
       ></div>
@@ -422,6 +441,7 @@ describeForEachParser('the empty div the loader script writes into', (parseHtml)
       <div
         data-embed-provider="cloudflarestream"
         data-embed-id="5653cfd537db1edbed98c5c0119f390c"
+        data-embed-ratio="16/9"
         data-embed-src="https://iframe.videodelivery.net/5653cfd537db1edbed98c5c0119f390c"
         data-embed-thumbnail="https://videodelivery.net/5653cfd537db1edbed98c5c0119f390c/thumbnails/thumbnail.jpg"
       ></div>

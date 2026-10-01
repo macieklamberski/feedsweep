@@ -167,7 +167,7 @@ describeForEachParser('inaEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, inaEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the box the carrier declares', async () => {
+    it('should state the platform size over the box the carrier declares', async () => {
       const value = html`
         <iframe
           src="https://player.ina.fr/player/embed/I04224962/1/1b0bd203fbcd702f9bc9b10ac3d0fc21/460/259"
@@ -180,14 +180,13 @@ describeForEachParser('inaEmbedResolver', (parseHtml) => {
         id: 'I04224962',
         src: 'https://player.ina.fr/embed/I04224962?pid=1&key=1b0bd203fbcd702f9bc9b10ac3d0fc21',
         url: 'https://www.ina.fr/video/I04224962',
-        width: 460,
-        height: 259,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should repair the Flash embed and keep its box', async () => {
+    it('should repair the Flash embed at the platform size', async () => {
       const value = html`
         <embed
           width="512"
@@ -209,8 +208,7 @@ describeForEachParser('inaEmbedResolver', (parseHtml) => {
         id: 'CAA8100705501',
         src: 'https://player.ina.fr/embed/CAA8100705501?pid=931283&key=f8770ed3512822b3bf031b7b2b17050f',
         url: 'https://www.ina.fr/video/CAA8100705501',
-        width: 512,
-        height: 384,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -248,8 +246,7 @@ describeForEachParser('inaEmbedResolver', (parseHtml) => {
         id: '00034548',
         src: 'https://player.ina.fr/embed/00034548?pid=1&key=1b0bd203fbcd702f9bc9b10ac3d0fc21',
         url: 'https://www.ina.fr/video/00034548',
-        width: 560,
-        height: 315,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

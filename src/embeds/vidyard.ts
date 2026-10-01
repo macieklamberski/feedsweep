@@ -26,6 +26,7 @@ const composeEmbed = (uuid: string, thumbnail?: string): EmbedResolverResult => 
     // 404s for a deleted one, where the player page serves the same shell for any uuid at all.
     url: `https://share.vidyard.com/watch/${uuid}`,
     thumbnail: thumbnail ?? `https://play.vidyard.com/${uuid}.jpg`,
+    ratio: '16/9',
   }
 }
 
@@ -72,7 +73,7 @@ export const vidyardScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return { ...composeEmbed(uuid), ratio: '16/9' }
+    return composeEmbed(uuid)
   },
 )
 

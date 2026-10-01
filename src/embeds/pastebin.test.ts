@@ -120,7 +120,7 @@ describeForEachParser('pastebinIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, pastebinIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the height the snippet states in its style', async () => {
+    it('should state the platform size over the height the snippet states in its style', async () => {
       const value = html`
         <iframe
           src="https://pastebin.com/embed_iframe/jFp3Y1wP"
@@ -132,7 +132,7 @@ describeForEachParser('pastebinIframeEmbedResolver', (parseHtml) => {
         id: 'jFp3Y1wP',
         src: 'https://pastebin.com/embed_iframe/jFp3Y1wP',
         url: 'https://pastebin.com/jFp3Y1wP',
-        height: 300,
+        height: 150,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -234,11 +234,11 @@ describeForEachParser('pastebin through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
+        data-embed-height="150"
         data-embed-src="https://pastebin.com/embed_iframe/kiDpUViY"
         data-embed-provider="pastebin"
         data-embed-id="kiDpUViY"
         data-embed-url="https://pastebin.com/kiDpUViY"
-        data-embed-height="300"
       ></div>
     `
 

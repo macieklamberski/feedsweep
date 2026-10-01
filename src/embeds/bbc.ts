@@ -12,6 +12,9 @@ const pidRegex = /^[a-z](?=[0-9a-z]*\d)[0-9a-z]{7}$/
 // The news and World Service players render at 16:9 of their width. BBC's own embed code states
 // a 400 by 500 box, which pads them with blank below.
 const newsPlayerRatio = '16/9'
+// The programmes player's height tracks its width plus a fixed panel, so its ratio is taken at
+// 320 wide and errs tall above it.
+const programmesPlayerRatio = '320/374'
 
 const isPid = (segment: string | undefined): segment is string => {
   return segment !== undefined && pidRegex.test(segment)
@@ -73,10 +76,9 @@ export const bbcResolveEmbed: ResolveEmbed = (url) => {
       provider: 'bbc',
       id: second,
       src: `https://www.bbc.co.uk/programmes/${second}/player`,
+      ratio: programmesPlayerRatio,
     }
   }
 }
 
-export const bbcIframeEmbedResolver = createUrlEmbedResolver(bbcHosts, bbcResolveEmbed, {
-  preferResolverSize: true,
-})
+export const bbcIframeEmbedResolver = createUrlEmbedResolver(bbcHosts, bbcResolveEmbed)

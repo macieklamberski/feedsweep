@@ -336,10 +336,7 @@ export const flickrResolveEmbed: ResolveEmbed = (url, element) => {
 // Flickr's slideshow swf, its video swf, the legacy iframe, a framed album or stream page, and
 // the two players for a single photo. Only `/player/` and `embedr.flickr.com` are served without
 // `x-frame-options: SAMEORIGIN`, so the rest name a frame that renders empty.
-export const flickrEmbedResolver = createUrlEmbedResolver(flickrHosts, flickrResolveEmbed, {
-  // The size folded into the src is what the endpoint renders at.
-  preferResolverSize: true,
-})
+export const flickrEmbedResolver = createUrlEmbedResolver(flickrHosts, flickrResolveEmbed)
 
 // Only embedr's video player answers player.js. A photo and the page player post no ready message.
 export const flickrRenderHint: EmbedRenderHint = {

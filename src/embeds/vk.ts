@@ -52,6 +52,7 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
     src,
     // Both ids come out of the query decoded, and they go into a path.
     url: `https://vkvideo.ru/${player.kind}${encodePathSegment(id)}`,
+    ratio: '16/9',
   }
 }
 

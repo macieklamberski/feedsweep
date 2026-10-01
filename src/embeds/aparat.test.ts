@@ -8,7 +8,7 @@ describeForEachParser('aparatIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, aparatIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the player frame and keep the size the publisher stated', async () => {
+    it('should resolve the player frame and ignore the size the publisher stated', async () => {
       const value = html`
         <iframe
           src="https://www.aparat.com/video/video/embed/videohash/9o8zZ/vt/frame"
@@ -22,8 +22,7 @@ describeForEachParser('aparatIframeEmbedResolver', (parseHtml) => {
         id: '9o8zZ',
         src: 'https://www.aparat.com/video/video/embed/videohash/9o8zZ/vt/frame',
         url: 'https://www.aparat.com/v/9o8zZ',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

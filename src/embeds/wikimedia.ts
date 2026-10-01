@@ -66,8 +66,6 @@ export const wikimediaEmbedResolver: EmbedResolver = createMarkupEmbedResolver(
       provider: 'wikimedia',
       id: fileName,
       src: composePlayerUrl(source, fileName),
-      // Commons carries a lot of 4:3 archive footage, so this stands only where the frame
-      // declares no size of its own.
       ratio: '16/9',
     }
 

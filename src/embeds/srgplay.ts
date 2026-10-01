@@ -58,6 +58,9 @@ const composeEmbed = (urn: string | null, search: string): EmbedResolverResult |
     id: urn,
     src: `https://www.${host}/play/embed${query}`,
     url: page,
+    // The player fills its frame, audio included, but never shrinks below 16:9 of its width, so a
+    // shorter frame crops its controls.
+    ratio: '16/9',
   }
 }
 
@@ -85,26 +88,13 @@ const srgplayResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // The shared host names no business unit, so its urn names none either and has no host.
-  const embed = composeEmbed(`urn:${readBusinessUnit(parsed)}:video:${mediaId}`, parsed.search)
-
-  if (!embed || !isRetired) {
-    return embed
-  }
-
-  // The retired player's box was drawn for another player. The current one fills its frame but
-  // never shrinks below 16:9 of its width, so a shorter frame crops its controls.
-  return {
-    ...embed,
-    ratio: '16/9',
-  }
+  return composeEmbed(`urn:${readBusinessUnit(parsed)}:video:${mediaId}`, parsed.search)
 }
 
 // SRG SSR's shared player, serving SRF, RTS, RSI and RTR. The retired per-show player is
 // dead markup whose own `id` still plays on the current one, and `rts.ch/embed/{code}` is a short
 // code in an id space only the platform's own 301 can read, so it keeps the generic placeholder.
-export const srgplayEmbedResolver = createUrlEmbedResolver(srgplayHosts, srgplayResolveEmbed, {
-  preferResolverSize: true,
-})
+export const srgplayEmbedResolver = createUrlEmbedResolver(srgplayHosts, srgplayResolveEmbed)
 
 export const srgplayRenderHint: EmbedRenderHint = {
   provider,

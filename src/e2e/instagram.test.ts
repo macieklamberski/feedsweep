@@ -161,8 +161,6 @@ describeForEachParser('Instagram', (parseHtml) => {
         data-embed-id="p/CaUsPbUquKV"
         data-embed-src="https://www.instagram.com/p/CaUsPbUquKV/embed/captioned/"
         data-embed-url="https://www.instagram.com/p/CaUsPbUquKV/"
-        data-embed-width="320"
-        data-embed-height="392"
       ></div>
     `
 
@@ -263,7 +261,6 @@ describeForEachParser('Instagram', (parseHtml) => {
         data-embed-id="p/CaUsPbUquKV"
         data-embed-src="https://www.instagram.com/p/CaUsPbUquKV/embed/captioned/"
         data-embed-url="https://www.instagram.com/p/CaUsPbUquKV/"
-        data-embed-height="640"
       ></div>
     `
 

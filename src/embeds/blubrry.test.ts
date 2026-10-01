@@ -103,7 +103,7 @@ describeForEachParser('blubrryEmbedResolver', (parseHtml) => {
     // 13,001 of 13,604 corpus iframes state 165, one more than the player measures, and that
     // publisher's number is the one a reader gets: the measured 164 only reaches the carrier
     // that states nothing.
-    it('should let the carrier height win over the measured one', async () => {
+    it('should keep the measured height over the carrier height', async () => {
       const value = html`
         <iframe
           src="https://player.blubrry.com/id/153989314/"
@@ -115,7 +115,7 @@ describeForEachParser('blubrryEmbedResolver', (parseHtml) => {
         provider: 'blubrry',
         id: '153989314',
         src: 'https://player.blubrry.com/id/153989314/',
-        height: 165,
+        height: 164,
       }
 
       expect(await extract(value)).toEqual(expected)

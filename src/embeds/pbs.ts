@@ -94,17 +94,12 @@ export const pbsResolveEmbed: ResolveEmbed = (url, element) => {
 
 export const pbsIframeEmbedResolver = createUrlEmbedResolver([playerHost], pbsResolveEmbed)
 
-// The retired host's box was sized for the retired player, not the viral player it redirects to.
 export const pbsLegacyIframeEmbedResolver = createUrlEmbedResolver(
   [legacyPlayerHost],
   pbsResolveEmbed,
-  { preferResolverSize: true },
 )
 
-// The Flash box was sized for the retired player, not the viral player it now loads.
-export const pbsFlashEmbedResolver = createUrlEmbedResolver([flashHost], pbsResolveEmbed, {
-  preferResolverSize: true,
-})
+export const pbsFlashEmbedResolver = createUrlEmbedResolver([flashHost], pbsResolveEmbed)
 
 export const pbsRenderHint: EmbedRenderHint = {
   provider,

@@ -899,7 +899,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
 describeForEachParser('twitterAmpEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, twitterAmpEmbedResolver)
 
-  it('should carry the id, the player and the size the component states', async () => {
+  it('should carry the id and the player the component states', async () => {
     const value = html`
       <amp-twitter
         width="375"
@@ -912,8 +912,6 @@ describeForEachParser('twitterAmpEmbedResolver', (parseHtml) => {
       provider: 'twitter',
       id: statusId,
       src: playerUrl,
-      width: 375,
-      height: 472,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -1435,8 +1433,6 @@ describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
         provider: 'twitter',
         id: '2073030328415858798',
         src: 'https://platform.twitter.com/embed/Tweet.html?id=2073030328415858798',
-        width: 550,
-        height: 350,
       }
 
       expect(await extract(value)).toEqual(expected)

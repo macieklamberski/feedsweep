@@ -21,6 +21,7 @@ const composeEmbed = (guid: string, query = ''): EmbedResolverResult => {
     id: guid,
     src: `https://video.wordpress.com/embed/${guid}${query}`,
     url: `https://videopress.com/v/${guid}`,
+    ratio: '16/9',
   }
 }
 

@@ -67,6 +67,7 @@ const nbcnewsResolveEmbed: ResolveEmbed = (url) => {
     provider,
     id: hasKey ? `${idPrefix}${value}` : undefined,
     src: `${route.srcPrefix}${value}`,
+    ratio: '16/9',
   }
 }
 

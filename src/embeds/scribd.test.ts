@@ -218,7 +218,7 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
         id: '108992419',
         src: 'https://www.scribd.com/embeds/108992419/content',
         url: 'https://www.scribd.com/document/108992419',
-        height: 500,
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -238,7 +238,7 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
         id: '55715',
         src: 'https://www.scribd.com/embeds/55715/content',
         url: 'https://www.scribd.com/document/55715',
-        height: 500,
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)

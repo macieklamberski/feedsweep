@@ -167,7 +167,7 @@ describeForEachParser('podbeanEmbedResolver', (parseHtml) => {
   describe('edge cases', () => {
     // Legacy markup states 122 for a player Podbean no longer serves, and the carrier still wins:
     // the size a publisher wrote outranks both the url's `size=` and the v2 player's own height.
-    it('should take the size the carrier states over the one the url spells', async () => {
+    it('should keep the platform size over the size the carrier states', async () => {
       const value = html`
         <iframe
           src="https://www.podbean.com/player-v2/?i=wyvke-1aefb6c-pb&size=315"
@@ -179,8 +179,7 @@ describeForEachParser('podbeanEmbedResolver', (parseHtml) => {
         provider: 'podbean',
         id: 'wyvke-1aefb6c-pb',
         src: 'https://www.podbean.com/player-v2/?i=wyvke-1aefb6c-pb',
-        width: 640,
-        height: 122,
+        height: 150,
       }
 
       expect(await extract(value)).toEqual(expected)

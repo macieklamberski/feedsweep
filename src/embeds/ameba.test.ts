@@ -75,7 +75,7 @@ describeForEachParser('amebaMoviePlayerEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, amebaMoviePlayerEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the box the carrier declares', async () => {
+    it('should state the platform size over the box the carrier declares', async () => {
       const value = html`
         <iframe
           src="https://static.blog-video.jp/?v=MCLP3ViBJRfW3clSWW5saxnjA5"
@@ -87,8 +87,7 @@ describeForEachParser('amebaMoviePlayerEmbedResolver', (parseHtml) => {
         provider: 'ameba',
         id: 'MCLP3ViBJRfW3clSWW5saxnjA5',
         src: 'https://static.blog-video.jp/?v=MCLP3ViBJRfW3clSWW5saxnjA5',
-        width: 276,
-        height: 276,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

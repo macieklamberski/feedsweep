@@ -293,7 +293,7 @@ describeForEachParser('googleslidesEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, googleslidesEmbedResolver)
 
   describe('happy paths', () => {
-    it('should take the box the carrier declares', async () => {
+    it('should state the platform size over the box the carrier declares', async () => {
       const value = html`
         <iframe
           src="https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed?start=true&loop=true&delayms=3000"
@@ -308,8 +308,7 @@ describeForEachParser('googleslidesEmbedResolver', (parseHtml) => {
         id: '2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw',
         src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed?loop=true&delayms=3000',
         url: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/pub',
-        width: 1280,
-        height: 749,
+        ratio: '480/299',
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -62,7 +62,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         src: 'https://ridewithgps.com/embeds?type=route&id=46929481',
         url: 'https://ridewithgps.com/routes/46929481',
         thumbnail: 'https://ridewithgps.com/routes/46929481/thumb.png',
-        height: 540,
+        height: 700,
         title: '2023 Niseko Classic',
       }
 
@@ -277,7 +277,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         src: 'https://ridewithgps.com/embeds?type=route&id=10953871',
         url: 'https://ridewithgps.com/routes/10953871',
         thumbnail: 'https://ridewithgps.com/routes/10953871/thumb.png',
-        height: 500,
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -413,7 +413,7 @@ describeForEachParser('ridewithgps shapes the pipeline repairs first', (parseHtm
       src: 'https://ridewithgps.com/embeds?type=route&id=10953871',
       url: 'https://ridewithgps.com/routes/10953871',
       thumbnail: 'https://ridewithgps.com/routes/10953871/thumb.png',
-      height: '500',
+      height: '700',
     }
 
     expect(await placeholder(value)).toEqual(expected)

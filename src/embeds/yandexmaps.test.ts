@@ -374,8 +374,7 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
         src: 'https://yandex.ru/map-widget/v1/?um=constructor%3Ae4b22aa7bfb87876b4821a8ea1ec86773f720ba6a4818bb58e0e073c50bc9dde&source=constructor',
         thumbnail:
           'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3Ae4b22aa7bfb87876b4821a8ea1ec86773f720ba6a4818bb58e0e073c50bc9dde&width=650&height=400',
-        width: 616,
-        height: 589,
+        height: 400,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -471,8 +470,7 @@ describeForEachParser('yandexmaps through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="589"
-        data-embed-width="616"
+        data-embed-height="400"
         data-embed-thumbnail="https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3Ae4b22aa7bfb87876b4821a8ea1ec86773f720ba6a4818bb58e0e073c50bc9dde&amp;width=650&amp;height=400"
         data-embed-id="constructor:e4b22aa7bfb87876b4821a8ea1ec86773f720ba6a4818bb58e0e073c50bc9dde"
         data-embed-provider="yandexmaps"

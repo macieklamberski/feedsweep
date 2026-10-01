@@ -28,7 +28,7 @@ describeForEachParser('padletEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the height an older share code stated', async () => {
+    it('should state the platform size over the height an older share code stated', async () => {
       const value = html`
         <iframe
           frameborder="0"
@@ -42,7 +42,7 @@ describeForEachParser('padletEmbedResolver', (parseHtml) => {
         id: '1xv3ivvmg3zf',
         src: 'https://padlet.com/embed/1xv3ivvmg3zf',
         thumbnail: 'https://padlet.net/social-previews/board/1xv3ivvmg3zf/opengraph.jpg',
-        height: 480,
+        height: 608,
       }
 
       expect(await extract(value)).toEqual(expected)

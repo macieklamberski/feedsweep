@@ -28,7 +28,6 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
         id: 'mastodon.social/116535232552529093',
         src: 'https://mastodon.social/@Gargron/116535232552529093/embed',
         url: 'https://mastodon.social/@Gargron/116535232552529093',
-        width: 400,
         author: '@Gargron@mastodon.social',
         publisher: 'mastodon.social',
       }
@@ -50,7 +49,6 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
         id: 'octodon.social/109734012345678901',
         src: 'https://octodon.social/@author/109734012345678901/embed',
         url: 'https://octodon.social/@author/109734012345678901',
-        width: 550,
         author: '@author@octodon.social',
         publisher: 'octodon.social',
       }
@@ -151,8 +149,6 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
         id: 'chaos.social/109500123456789012',
         src: 'https://chaos.social/@writer/109500123456789012/embed',
         url: 'https://chaos.social/@writer/109500123456789012',
-        width: 600,
-        height: 333,
         author: '@writer@chaos.social',
         publisher: 'chaos.social',
       }
@@ -177,7 +173,6 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
         id: 'vmst.io/111234567890123456',
         src: 'https://vmst.io/@admin/111234567890123456/embed',
         url: 'https://vmst.io/@admin/111234567890123456',
-        width: 400,
         author: '@admin@vmst.io',
         publisher: 'vmst.io',
       }
@@ -319,7 +314,6 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
         id: 'mastodon.green/116798038528869495',
         src: 'https://mastodon.green/@pvonhellermannn/116798038528869495/embed',
         url: 'https://mastodon.green/@pvonhellermannn/116798038528869495',
-        width: 400,
         author: '@pvonhellermannn@mastodon.green',
         publisher: 'mastodon.green',
       }
@@ -336,7 +330,6 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
         id: 'mastodon.social/116535232552529093',
         src: 'https://mastodon.social/@Gargron/116535232552529093/embed',
         url: 'https://mastodon.social/@Gargron/116535232552529093',
-        width: 400,
         author: '@Gargron@mastodon.social',
         publisher: 'mastodon.social',
       }

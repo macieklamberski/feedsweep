@@ -123,8 +123,6 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-provider="twitter"
         data-embed-id="123456789012345"
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
-        data-embed-width="375"
-        data-embed-height="472"
       ></div>
     `
 
@@ -298,8 +296,6 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-provider="twitter"
         data-embed-id="123456789012345"
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
-        data-embed-width="550"
-        data-embed-height="350"
       ></div>
     `
 

@@ -24,6 +24,8 @@ const watchPathRegex = /^(?:\/@([^/]+))?\/video\/(\d+)\/?$/
 // The clip is letterboxed inside a frame whose header, caption, sound row and action rail set
 // the height. TikTok's own oEmbed answers 739 for the same clip.
 const playerHeight = 738
+// The profile card stops growing at 480 wide, where it is 478 tall.
+const profileHeight = 478
 
 type Clip = { handle?: string; videoId?: string }
 
@@ -132,6 +134,7 @@ const resolveAccount = (element: Element): EmbedResolverResult | undefined => {
     id: atUsername(handle),
     src: `https://www.tiktok.com/embed/@${handle}`,
     url: isCitedProfile ? cite : `https://www.tiktok.com/@${handle}`,
+    height: profileHeight,
     description: textNode(element),
     author: atUsername(handle),
   }
@@ -141,9 +144,6 @@ const resolveAccount = (element: Element): EmbedResolverResult | undefined => {
 export const tiktokBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.tiktok-embed',
   (element) => resolveClip(element) ?? resolveAccount(element),
-  // A blockquote that states a box states the snippet's landscape one, 560x400 in the wild, on a
-  // player taller than it is wide.
-  { preferResolverSize: true },
 )
 
 // A post has no name: its words go to `description`, and the frame's title is not read.
@@ -176,16 +176,9 @@ export const tiktokResolveEmbed: ResolveEmbed = (src) => {
 }
 
 // A pasted TikTok player iframe, or a frame of the watch page, which refuses framing.
-export const tiktokIframeEmbedResolver = createUrlEmbedResolver(
-  tiktokHosts,
-  tiktokResolveEmbed,
-  // The pasted snippets state a landscape box, 560x400 in the wild, on a player taller than wide.
-  { preferResolverSize: true },
-)
+export const tiktokIframeEmbedResolver = createUrlEmbedResolver(tiktokHosts, tiktokResolveEmbed)
 
 // A forum's s9e MediaEmbed helper frame, naming the clip id in its url fragment.
-export const tiktokS9eEmbedResolver = createS9eEmbedResolver(
-  'tiktok',
-  (videoId) => tiktokResolveEmbed(`https://www.tiktok.com/embed/v2/${encodePathSegment(videoId)}`),
-  { preferResolverSize: true },
-)
+export const tiktokS9eEmbedResolver = createS9eEmbedResolver('tiktok', (videoId) => {
+  return tiktokResolveEmbed(`https://www.tiktok.com/embed/v2/${encodePathSegment(videoId)}`)
+})

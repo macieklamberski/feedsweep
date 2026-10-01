@@ -15,6 +15,8 @@ const composeEmbed = (postId: string): EmbedResolverResult => {
     id: postId,
     src: `https://tenor.com/embed/${postId}`,
     url: `https://tenor.com/view/${postId}`,
+    // The ratio `embed.js` falls back to when the snippet states none.
+    ratio: '1.33/1',
   }
 }
 
@@ -55,8 +57,6 @@ export const tenorWidgetEmbedResolver = createMarkupEmbedResolver(
     // search link, which names a query and not this GIF.
     return {
       ...composeEmbed(postId),
-      // The ratio `embed.js` falls back to when the snippet states none.
-      ratio: '1.33/1',
       title: text(element, 'a[href*="tenor.com/view/"]'),
     }
   },

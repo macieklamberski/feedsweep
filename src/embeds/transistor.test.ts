@@ -302,7 +302,7 @@ describeForEachParser('transistorEmbedResolver', (parseHtml) => {
 
     // The publisher stretched the playlist player past the 390 the resolver measured, and the
     // number they chose is the one their embed was laid out against.
-    it('should keep the size the carrier declares', async () => {
+    it('should state the platform size over the size the carrier declares', async () => {
       const value = html`
         <iframe
           src="https://share.transistor.fm/e/build-your-saas/playlist"
@@ -314,8 +314,7 @@ describeForEachParser('transistorEmbedResolver', (parseHtml) => {
         provider: 'transistor',
         id: 'playlist/build-your-saas',
         src: 'https://share.transistor.fm/e/build-your-saas/playlist',
-        width: 600,
-        height: 440,
+        height: 390,
       }
 
       expect(await extract(value)).toEqual(expected)

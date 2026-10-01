@@ -59,9 +59,7 @@ const tencentResolveEmbed: ResolveEmbed = (url) => {
   }
 }
 
-export const tencentEmbedResolver = createUrlEmbedResolver(tencentHosts, tencentResolveEmbed, {
-  preferResolverSize: true,
-})
+export const tencentEmbedResolver = createUrlEmbedResolver(tencentHosts, tencentResolveEmbed)
 
 // The player reads a boolean setting as the string `true`, so `autoplay=1` stays paused.
 export const tencentRenderHint: EmbedRenderHint = {

@@ -127,7 +127,7 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, googledriveEmbedResolver)
 
   describe('happy paths', () => {
-    it('should take the box the carrier declares', async () => {
+    it('should state the platform size over the box the carrier declares', async () => {
       const value = html`
         <iframe
           src="https://drive.google.com/file/d/1y5iOrW7Epj-cNdscnRAVDzUCKaMjjo6r/preview"
@@ -142,8 +142,7 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
         url: 'https://drive.google.com/file/d/1y5iOrW7Epj-cNdscnRAVDzUCKaMjjo6r/view',
         thumbnail:
           'https://drive.google.com/thumbnail?id=1y5iOrW7Epj-cNdscnRAVDzUCKaMjjo6r&sz=w640',
-        width: 640,
-        height: 480,
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -163,8 +162,7 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
         src: 'https://drive.google.com/file/d/0ByrtauTmPYKtR3dPN0lxY2hwdFE/preview',
         url: 'https://drive.google.com/file/d/0ByrtauTmPYKtR3dPN0lxY2hwdFE/view',
         thumbnail: 'https://drive.google.com/thumbnail?id=0ByrtauTmPYKtR3dPN0lxY2hwdFE&sz=w640',
-        width: 520,
-        height: 480,
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -126,7 +126,7 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, kindleEmbedResolver)
 
   describe('happy paths', () => {
-    it('should take the book title and keep the box WordPress declares', async () => {
+    it('should take the book title and ignore the box WordPress declares', async () => {
       const value = html`
         <iframe
           title="His Fake Wife: An Enemies to Lovers Billionaire Romance (Thorne Legacy Book 1)"
@@ -144,7 +144,6 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
         id: 'B08DGQCKF3',
         src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
-        width: 1080,
         height: 550,
         title: 'His Fake Wife: An Enemies to Lovers Billionaire Romance (Thorne Legacy Book 1)',
       }
@@ -152,7 +151,7 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it("should keep the share snippet's box and drop its new-tab preview", async () => {
+    it("should ignore the share snippet's box and drop its new-tab preview", async () => {
       const value = html`
         <iframe
           allowfullscreen=""
@@ -169,8 +168,7 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
         id: 'B09KT8838X',
         src: 'https://read.amazon.com/kp/card?asin=B09KT8838X',
         thumbnail: 'https://m.media-amazon.com/images/P/B09KT8838X.01._SCLZZZZZZZ_.jpg',
-        width: 212,
-        height: 362,
+        height: 550,
       }
 
       expect(await extract(value)).toEqual(expected)

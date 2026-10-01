@@ -128,6 +128,7 @@ describe('vimeoResolveEmbed', () => {
       id: '76979871',
       src: 'https://player.vimeo.com/video/76979871',
       url: 'https://vimeo.com/76979871',
+      ratio: '16/9',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -142,6 +143,7 @@ describe('vimeoResolveEmbed', () => {
       id: '76979871:a52724358e',
       src: 'https://player.vimeo.com/video/76979871?h=a52724358e',
       url: 'https://vimeo.com/76979871/a52724358e',
+      ratio: '16/9',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -154,6 +156,7 @@ describe('vimeoResolveEmbed', () => {
       id: '76979871:../../showcase/1',
       src: 'https://player.vimeo.com/video/76979871?h=..%2F..%2Fshowcase%2F1',
       url: 'https://vimeo.com/76979871/..%2F..%2Fshowcase%2F1',
+      ratio: '16/9',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -167,6 +170,7 @@ describe('vimeoResolveEmbed', () => {
       id: '664725670:04acf91ce2',
       src: 'https://player.vimeo.com/video/664725670?h=04acf91ce2',
       url: 'https://vimeo.com/664725670/04acf91ce2',
+      ratio: '16/9',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -179,6 +183,7 @@ describe('vimeoResolveEmbed', () => {
       id: '4775093/',
       src: 'https://player.vimeo.com/video/4775093%2F',
       url: 'https://vimeo.com/4775093%2F',
+      ratio: '16/9',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -193,6 +198,7 @@ describe('vimeoResolveEmbed', () => {
       id: '76979871:a52724358e',
       src: 'https://player.vimeo.com/video/76979871?h=a52724358e',
       url: 'https://vimeo.com/76979871/a52724358e',
+      ratio: '16/9',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -206,6 +212,7 @@ describe('vimeoResolveEmbed', () => {
       id: '76979871:a52724358e',
       src: 'https://player.vimeo.com/video/76979871?h=a52724358e',
       url: 'https://vimeo.com/76979871/a52724358e',
+      ratio: '16/9',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -218,6 +225,7 @@ describe('vimeoResolveEmbed', () => {
       id: '76979871:a52724358e',
       src: 'https://player.vimeo.com/video/76979871?h=a52724358e&t=30s',
       url: 'https://vimeo.com/76979871/a52724358e',
+      ratio: '16/9',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -230,6 +238,7 @@ describe('vimeoResolveEmbed', () => {
       id: '76979871',
       src: 'https://player.vimeo.com/video/76979871?t=30s',
       url: 'https://vimeo.com/76979871',
+      ratio: '16/9',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -242,6 +251,7 @@ describe('vimeoResolveEmbed', () => {
       id: '76979871',
       src: 'https://player.vimeo.com/video/76979871',
       url: 'https://vimeo.com/76979871',
+      ratio: '16/9',
     }
 
     expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -263,6 +273,7 @@ describe('vimeoResolveEmbed', () => {
         id: 'showcase/5371408',
         src: 'https://vimeo.com/showcase/5371408/embed',
         url: 'https://vimeo.com/showcase/5371408',
+        ratio: '16/9',
       }
 
       expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -277,6 +288,7 @@ describe('vimeoResolveEmbed', () => {
         id: 'showcase/5480258',
         src: 'https://vimeo.com/showcase/5480258/embed',
         url: 'https://vimeo.com/showcase/5480258',
+        ratio: '16/9',
       }
 
       expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -289,6 +301,7 @@ describe('vimeoResolveEmbed', () => {
         id: 'showcase/5371408',
         src: 'https://vimeo.com/showcase/5371408/embed',
         url: 'https://vimeo.com/showcase/5371408',
+        ratio: '16/9',
       }
 
       expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -302,6 +315,7 @@ describe('vimeoResolveEmbed', () => {
         id: '76979871',
         src: 'https://player.vimeo.com/video/76979871',
         url: 'https://vimeo.com/76979871',
+        ratio: '16/9',
       }
 
       expect(vimeoResolveEmbed(value)).toEqual(expected)
@@ -347,6 +361,7 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
       id: '76979871',
       src: 'https://player.vimeo.com/video/76979871',
       url: 'https://vimeo.com/76979871',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -366,7 +381,7 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
 
   // Every corpus showcase carrier states a box, so the size the placeholder ends up with is the
   // publisher's and the resolver states none of its own.
-  it('should keep the size a showcase iframe states', async () => {
+  it('should state the video ratio over the size a showcase iframe states', async () => {
     const value = html`
       <iframe
         src="https://vimeo.com/showcase/5371408/embed"
@@ -379,8 +394,7 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
       id: 'showcase/5371408',
       src: 'https://vimeo.com/showcase/5371408/embed',
       url: 'https://vimeo.com/showcase/5371408',
-      width: 525,
-      height: 295,
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -403,8 +417,7 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
         id: '76979871',
         src: 'https://player.vimeo.com/video/76979871',
         url: 'https://vimeo.com/76979871',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
         title: 'Scott M. Graffius - Speaker Reel',
       }
 
@@ -423,6 +436,7 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
         id: '76979871',
         src: 'https://player.vimeo.com/video/76979871',
         url: 'https://vimeo.com/76979871',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -442,6 +456,7 @@ describeForEachParser('vimeoEmbedResolver carrier title', (parseHtml) => {
       id: '76979871',
       src: 'https://player.vimeo.com/video/76979871',
       url: 'https://vimeo.com/76979871',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -456,6 +471,7 @@ describeForEachParser('vimeoEmbedResolver carrier title', (parseHtml) => {
       id: '76979871',
       src: 'https://player.vimeo.com/video/76979871',
       url: 'https://vimeo.com/76979871',
+      ratio: '16/9',
       title: 'The Mountain',
     }
 

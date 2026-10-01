@@ -11,6 +11,7 @@ import {
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cloudflarestream'
+const playerRatio = '16/9'
 
 const cloudflarestreamHosts = [
   'cloudflarestream.com', // Every publisher's own `customer-{accountCode}` subdomain
@@ -69,6 +70,7 @@ export const cloudflarestreamResolveEmbed: ResolveEmbed = (url) => {
     id: videoId,
     src: `https://${parsed.hostname}${playerPath}${pickUrlParams(url, playbackParams)}`,
     thumbnail: poster ?? composeThumbnail(videoId, thumbnailHost),
+    ratio: playerRatio,
   }
 }
 
@@ -101,6 +103,7 @@ export const cloudflarestreamScriptEmbedResolver = createMarkupEmbedResolver(
       id: videoId,
       src: `https://${deliveryPlayerHost}/${segment}`,
       thumbnail: composeThumbnail(segment, deliveryThumbnailHost),
+      ratio: playerRatio,
     }
   },
 )

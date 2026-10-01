@@ -71,7 +71,7 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should preserve iframe dimensions as data attributes', async () => {
+  it('should state the platform size over the box a resolved iframe declares', async () => {
     const customContext: TransformContext = {
       ...baseContext,
       widgetResolvers: defaultWidgetResolvers,
@@ -85,12 +85,11 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-width="640"
         data-embed-url="https://vimeo.com/76979871"
         data-embed-src="https://player.vimeo.com/video/76979871"
         data-embed-provider="vimeo"
         data-embed-id="76979871"
-        data-embed-height="360"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -799,11 +798,10 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       const expected = html`
         <div id="__ss_6435157">
           <div
-            data-embed-width="425"
             data-embed-src="https://www.slideshare.net/slideshow/embed_code/6435157"
             data-embed-provider="slideshare"
             data-embed-id="6435157"
-            data-embed-height="355"
+            data-embed-ratio="595/485"
           ></div>
         </div>
       `
@@ -1208,11 +1206,10 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       const expected = html`
         <div
           data-embed-title="Example"
-          data-embed-height="360"
-          data-embed-width="640"
           data-embed-thumbnail="https://commons.wikimedia.org/wiki/Special:FilePath/Example.webm?width=960"
           data-embed-id="Example.webm"
           data-embed-provider="wikimedia"
+          data-embed-ratio="16/9"
           data-embed-src="https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes"
         ></div>
       `

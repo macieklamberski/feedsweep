@@ -18,6 +18,7 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
         provider: 'nbcnews',
         id: 'mmvo265959493641',
         src: 'https://www.nbcnews.com/news/embedded-video/mmvo265959493641',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -31,6 +32,7 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
         provider: 'nbcnews',
         id: 'mmvo713265731534',
         src: 'https://www.nbcnews.com/widget/video-embed/713265731534',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -51,6 +53,7 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
         provider: 'nbcnews',
         id: 'mmvo265371205585',
         src: 'https://www.today.com/today/embedded-video/mmvo265371205585',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -69,6 +72,7 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
         provider: 'nbcnews',
         id: 'mmvo1244547139528',
         src: 'https://www.today.com/embedded-video/mmvo1244547139528',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -112,6 +116,7 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
         provider: 'nbcnews',
         id: 'mmvo265959493641',
         src: 'https://www.nbcnews.com/news/embedded-video/mmvo265959493641',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -125,6 +130,7 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
         provider: 'nbcnews',
         id: 'mmvo265460805743',
         src: 'https://www.nbcnews.com/news/embedded-video/mmvo265460805743',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -138,6 +144,7 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
         provider: 'nbcnews',
         id: 'mmvo265460805743',
         src: 'https://www.nbcnews.com/news/embedded-video/mmvo265460805743',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -151,6 +158,7 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
         provider: 'nbcnews',
         id: 'mmvo265460805743',
         src: 'https://www.today.com/today/embedded-video/mmvo265460805743',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -187,6 +195,7 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'nbcnews',
         src: 'https://www.nbcnews.com/widget/video-embed/mmvo265959493641',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -200,6 +209,7 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
         provider: 'nbcnews',
         id: 'mmvo265959493641abc',
         src: 'https://www.nbcnews.com/news/embedded-video/mmvo265959493641abc',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -220,6 +230,7 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'nbcnews',
         src: 'https://www.nbcnews.com/widget/video-embed/713265731534abc',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

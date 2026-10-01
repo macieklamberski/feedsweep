@@ -576,8 +576,7 @@ describeForEachParser('fc2IframeEmbedResolver', (parseHtml) => {
         id: '20200926MmXGa7y7',
         src: 'https://video.fc2.com/embed/player/20200926MmXGa7y7/',
         url: 'https://video.fc2.com/content/20200926MmXGa7y7/',
-        width: 560,
-        height: 315,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -598,8 +597,7 @@ describeForEachParser('fc2IframeEmbedResolver', (parseHtml) => {
         id: '20201116TN305VJr',
         src: 'https://video.fc2.com/embed/player/20201116TN305VJr/',
         url: 'https://video.fc2.com/content/20201116TN305VJr/',
-        width: 560,
-        height: 315,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -620,8 +618,7 @@ describeForEachParser('fc2IframeEmbedResolver', (parseHtml) => {
         id: '20210528p7G2xWt4',
         src: 'https://video.fc2.com/embed/player/20210528p7G2xWt4/?tg=TWpFek1ETTBOVEE9&sg=0',
         url: 'https://video.fc2.com/content/20210528p7G2xWt4/',
-        width: 446,
-        height: 380,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -655,6 +652,7 @@ describeForEachParser('fc2IframeEmbedResolver', (parseHtml) => {
         id: '2020.09.26',
         src: 'https://video.fc2.com/embed/player/2020.09.26/',
         url: 'https://video.fc2.com/content/2020.09.26/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -667,6 +665,7 @@ describeForEachParser('fc2IframeEmbedResolver', (parseHtml) => {
         id: '2020&x=0926',
         src: 'https://video.fc2.com/embed/player/2020&x=0926/',
         url: 'https://video.fc2.com/content/2020&x=0926/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -687,6 +686,7 @@ describeForEachParser('fc2IframeEmbedResolver', (parseHtml) => {
         id: '20200926MmXGa7y7',
         src: 'https://video.fc2.com/embed/player/20200926MmXGa7y7/',
         url: 'https://video.fc2.com/content/20200926MmXGa7y7/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -720,8 +720,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
         id: '20120101QN5FVkv4',
         src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/?tg=TXpBNE9ERTVOVFU9',
         url: 'https://video.fc2.com/content/20120101QN5FVkv4/',
-        width: 448,
-        height: 284,
+        ratio: '16/9',
         duration: 4942,
       }
 
@@ -747,8 +746,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
         id: '20140101rnmrPW9W',
         src: 'https://video.fc2.com/embed/player/20140101rnmrPW9W/?tg=T1RVMk1UZzJNVEE9',
         url: 'https://video.fc2.com/ja/content/20140101rnmrPW9W/',
-        width: 448,
-        height: 284,
+        ratio: '16/9',
         title: 'ガキの使いじゃあらへんで 　大晦日SP―②',
         duration: 5774,
       }
@@ -789,6 +787,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
         id: '..%2F20120101QN5FVkv4',
         src: 'https://video.fc2.com/embed/player/..%2F20120101QN5FVkv4/',
         url: 'https://video.fc2.com/content/..%2F20120101QN5FVkv4/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -801,6 +800,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
         id: '2012%2F0101QN5FVkv4',
         src: 'https://video.fc2.com/embed/player/2012%2F0101QN5FVkv4/',
         url: 'https://video.fc2.com/content/2012%2F0101QN5FVkv4/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -821,8 +821,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
         id: '20120101QN5FVkv4',
         src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
         url: 'https://video.fc2.com/content/20120101QN5FVkv4/',
-        width: 448,
-        height: 284,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -835,6 +834,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
         id: '20120101QN5FVkv4',
         src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
         url: 'https://video.fc2.com/zh/content/20120101QN5FVkv4/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -847,6 +847,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
         id: '20120101QN5FVkv4',
         src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
         url: 'https://video.fc2.com/JA/content/20120101QN5FVkv4/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -859,6 +860,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
         id: '20120101QN5FVkv4',
         src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
         url: 'https://video.fc2.com/12/content/20120101QN5FVkv4/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -871,6 +873,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
         id: '20120101QN5FVkv4',
         src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
         url: 'https://video.fc2.com/__/content/20120101QN5FVkv4/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -883,6 +886,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
         id: '20120101QN5FVkv4',
         src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
         url: 'https://video.fc2.com/content/20120101QN5FVkv4/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -895,6 +899,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
         id: '20120101QN5FVkv4',
         src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
         url: 'https://video.fc2.com/content/20120101QN5FVkv4/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -907,6 +912,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
         id: '20120101QN5FVkv4',
         src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
         url: 'https://video.fc2.com/content/20120101QN5FVkv4/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

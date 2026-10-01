@@ -106,8 +106,7 @@ describeForEachParser('nytimesIframeEmbedResolver', (parseHtml) => {
       provider: 'nytimes',
       id: '100000007370133',
       src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=100000007370133',
-      width: 480,
-      height: 321,
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)

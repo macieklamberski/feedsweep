@@ -21,7 +21,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         id: 'urn:srf:video:cfb39f35-b1f7-4937-a806-68bea0e611d3',
         src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3Acfb39f35-b1f7-4937-a806-68bea0e611d3',
         url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3Acfb39f35-b1f7-4937-a806-68bea0e611d3',
-        height: 351,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -35,6 +35,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         id: 'urn:srf:ais:video:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1',
         src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Aais%3Avideo%3Ab47f4c3d-890a-4fe7-beb4-9a99e995d8c1',
         url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Aais%3Avideo%3Ab47f4c3d-890a-4fe7-beb4-9a99e995d8c1',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -48,6 +49,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         id: 'urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c',
         src: 'https://www.rts.ch/play/embed?urn=urn%3Arts%3Avideo%3Aa15ce9d3-7446-3deb-a710-70bddfd5239c&subdivisions=false',
         url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn%3Arts%3Avideo%3Aa15ce9d3-7446-3deb-a710-70bddfd5239c',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -80,7 +82,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         id: 'urn:srf:video:09c4a927-c156-46b7-8f53-c6a6302bfd88',
         src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3A09c4a927-c156-46b7-8f53-c6a6302bfd88&startTime=22.597',
         url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3A09c4a927-c156-46b7-8f53-c6a6302bfd88',
-        height: 480,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -93,6 +95,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         id: 'urn:rts:video:5590499',
         src: 'https://www.rts.ch/play/embed?urn=urn%3Arts%3Avideo%3A5590499',
         url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn%3Arts%3Avideo%3A5590499',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -106,6 +109,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         id: 'urn:rtr:video:4096750a-35ed-46e4-a367-007096fd0167',
         src: 'https://www.rtr.ch/play/embed?urn=urn%3Artr%3Avideo%3A4096750a-35ed-46e4-a367-007096fd0167',
         url: 'https://www.rtr.ch/play/tv/-/video/-?urn=urn%3Artr%3Avideo%3A4096750a-35ed-46e4-a367-007096fd0167',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -157,6 +161,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         id: 'urn:srf:video:abc&autoplay=1',
         src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1',
         url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -170,6 +175,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         id: 'urn:srf:video:abc&autoplay=1',
         src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1',
         url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -225,6 +231,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         id: 'urn:rts:video:5590499',
         src: 'https://www.rts.ch/play/embed?urn=urn%3Arts%3Avideo%3A5590499',
         url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn%3Arts%3Avideo%3A5590499',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -238,6 +245,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         id: 'urn:rts:video:5590499',
         src: 'https://www.rts.ch/play/embed?urn=urn%3Arts%3Avideo%3A5590499',
         url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn%3Arts%3Avideo%3A5590499',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -250,6 +258,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         provider: 'srgplay',
         id: 'urn:rsi:audio:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1',
         src: 'https://www.rsi.ch/play/embed?urn=urn%3Arsi%3Aaudio%3Ab47f4c3d-890a-4fe7-beb4-9a99e995d8c1',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -270,6 +279,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         id: 'urn:rts:video:5590499',
         src: 'https://www.rts.ch/play/embed?urn=urn%3Arts%3Avideo%3A5590499',
         url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn%3Arts%3Avideo%3A5590499',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -283,6 +293,7 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         id: 'urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c',
         src: 'https://www.rts.ch/play/embed?urn=urn%3Arts%3Avideo%3Aa15ce9d3-7446-3deb-a710-70bddfd5239c',
         url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn%3Arts%3Avideo%3Aa15ce9d3-7446-3deb-a710-70bddfd5239c',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -326,6 +337,7 @@ describeForEachParser('srgplay through the pipeline', (parseHtml) => {
         data-embed-url="https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Aais%3Avideo%3Ab47f4c3d-890a-4fe7-beb4-9a99e995d8c1"
         data-embed-id="urn:srf:ais:video:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1"
         data-embed-provider="srgplay"
+        data-embed-ratio="16/9"
         data-embed-src="https://www.srf.ch/play/embed?urn=urn%3Asrf%3Aais%3Avideo%3Ab47f4c3d-890a-4fe7-beb4-9a99e995d8c1"
       ></div>
     `

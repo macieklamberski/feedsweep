@@ -141,6 +141,7 @@ describe('wistiaResolveEmbed', () => {
       provider: 'wistia',
       id: 'channel/sapab9p6qd',
       src: 'https://fast.wistia.net/embed/channel/sapab9p6qd',
+      ratio: '16/9',
     }
 
     expect(wistiaResolveEmbed(value)).toEqual(expected)
@@ -152,6 +153,7 @@ describe('wistiaResolveEmbed', () => {
       provider: 'wistia',
       id: 'playlists/aodt9etokc',
       src: 'https://fast.wistia.net/embed/playlists/aodt9etokc',
+      ratio: '16/9',
     }
 
     expect(wistiaResolveEmbed(value)).toEqual(expected)
@@ -165,6 +167,7 @@ describe('wistiaResolveEmbed', () => {
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
       url: 'https://acme.wistia.com/medias/2fg072pftb',
+      ratio: '16/9',
     }
 
     expect(wistiaResolveEmbed(value)).toEqual(expected)
@@ -177,6 +180,7 @@ describe('wistiaResolveEmbed', () => {
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2FG072PFTB',
       url: 'https://acme.wistia.com/medias/2FG072PFTB',
+      ratio: '16/9',
     }
 
     expect(wistiaResolveEmbed(value)).toEqual(expected)
@@ -188,6 +192,7 @@ describe('wistiaResolveEmbed', () => {
       provider: 'wistia',
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      ratio: '16/9',
     }
 
     expect(wistiaResolveEmbed(value)).toEqual(expected)
@@ -208,6 +213,7 @@ describeForEachParser('wistiaEmbedResolver', (parseHtml) => {
       provider: 'wistia',
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -226,6 +232,7 @@ describeForEachParser('wistiaEmbedResolver', (parseHtml) => {
       provider: 'wistia',
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      ratio: '16/9',
       title: 'Behind the scenes at the office Video',
     }
 
@@ -271,6 +278,7 @@ describeForEachParser('wistia facades the rebuild pass materializes', (parseHtml
         data-embed-src="https://fast.wistia.net/embed/iframe/2fg072pftb"
         data-embed-provider="wistia"
         data-embed-id="2fg072pftb"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -289,6 +297,7 @@ describeForEachParser('wistiaEmbedResolver carrier title', (parseHtml) => {
       provider: 'wistia',
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -302,6 +311,7 @@ describeForEachParser('wistiaEmbedResolver carrier title', (parseHtml) => {
       provider: 'wistia',
       id: '2fg072pftb',
       src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      ratio: '16/9',
       title: 'Calcific Tendonitis Video',
     }
 

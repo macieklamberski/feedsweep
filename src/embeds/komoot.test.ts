@@ -235,7 +235,7 @@ describeForEachParser('komootEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, komootEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the height the carrier declares', async () => {
+    it('should state the platform size over the height the carrier declares', async () => {
       const value = html`
         <iframe
           src="https://www.komoot.com/tour/727321743/embed?profile=1"
@@ -249,7 +249,7 @@ describeForEachParser('komootEmbedResolver', (parseHtml) => {
         id: '727321743',
         src: 'https://www.komoot.com/tour/727321743/embed',
         url: 'https://www.komoot.com/tour/727321743',
-        height: 880,
+        height: 440,
       }
 
       expect(await extract(value)).toEqual(expected)

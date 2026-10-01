@@ -65,9 +65,7 @@ const youkuResolveEmbed: ResolveEmbed = (url) => {
 }
 
 // A Youku player iframe, or a Flash player embed whose swf now redirects to the homepage.
-export const youkuEmbedResolver = createUrlEmbedResolver(youkuHosts, youkuResolveEmbed, {
-  preferResolverSize: true,
-})
+export const youkuEmbedResolver = createUrlEmbedResolver(youkuHosts, youkuResolveEmbed)
 
 export const youkuRenderHint: EmbedRenderHint = {
   provider,

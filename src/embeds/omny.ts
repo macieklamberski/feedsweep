@@ -66,10 +66,7 @@ export const omnyResolveEmbed: ResolveEmbed = (url, element) => {
 }
 
 // The omny.fm/shows/{show}/{clip}/embed player iframe, often pasted without a height.
-// The player's own box outranks one drawn for the square or artwork layout.
-export const omnyEmbedResolver = createUrlEmbedResolver(omnyHosts, omnyResolveEmbed, {
-  preferResolverSize: true,
-})
+export const omnyEmbedResolver = createUrlEmbedResolver(omnyHosts, omnyResolveEmbed)
 
 // Starts playback on the click that loads the player.
 export const omnyRenderHint: EmbedRenderHint = {

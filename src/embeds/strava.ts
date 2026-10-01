@@ -68,5 +68,4 @@ export const stravaResolveEmbed: ResolveEmbed = (url) => {
 export const stravaIframeEmbedResolver = createUrlEmbedResolver(
   ['strava.com', 'strava-embeds.com'],
   stravaResolveEmbed,
-  { preferResolverSize: true },
 )

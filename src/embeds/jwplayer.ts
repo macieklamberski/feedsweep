@@ -37,6 +37,7 @@ const composeJwplayerEmbed = (id: string, isPlaylist = false): EmbedResolverResu
     src: `https://cdn.jwplayer.com/players/${id}.html`,
     // A playlist id 404s on the poster endpoint, so the thumbnail is gated on the kind.
     ...(!isPlaylist && { thumbnail: `https://cdn.jwplayer.com/v2/media/${id}/poster.jpg` }),
+    ratio: '16/9',
   }
 }
 

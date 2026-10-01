@@ -39,7 +39,4 @@ const linkedinResolveEmbed: ResolveEmbed = (url) => {
 }
 
 // LinkedIn's post iframe, linkedin.com/embed/feed/update/{urn}, the platform's only embed form.
-// A carrier's height fits the `collapsed` or `compact` layout the mint drops, or one post's length.
-export const linkedinEmbedResolver = createUrlEmbedResolver(linkedinHosts, linkedinResolveEmbed, {
-  preferResolverSize: true,
-})
+export const linkedinEmbedResolver = createUrlEmbedResolver(linkedinHosts, linkedinResolveEmbed)

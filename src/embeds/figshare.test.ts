@@ -7,7 +7,7 @@ describeForEachParser('figshareEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, figshareEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the widget, drop its title bar and keep the size the share code stated', async () => {
+    it('should resolve the widget, drop its title bar and ignore the size the share code stated', async () => {
       const value = html`
         <iframe
           width="568"
@@ -20,8 +20,7 @@ describeForEachParser('figshareEmbedResolver', (parseHtml) => {
         provider: 'figshare',
         id: '21109066',
         src: 'https://widgets.figshare.com/articles/21109066/embed',
-        width: 568,
-        height: 351,
+        ratio: '568/351',
       }
 
       expect(await extract(value)).toEqual(expected)

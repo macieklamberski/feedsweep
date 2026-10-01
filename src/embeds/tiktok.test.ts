@@ -234,6 +234,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user',
         src: 'https://www.tiktok.com/embed/@user',
         url: 'https://www.tiktok.com/@user',
+        height: 478,
         author: '@user',
       }
 
@@ -258,6 +259,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@averylonghandlepastwhatsignupallows',
         src: 'https://www.tiktok.com/embed/@averylonghandlepastwhatsignupallows',
         url: 'https://www.tiktok.com/@averylonghandlepastwhatsignupallows',
+        height: 478,
         author: '@averylonghandlepastwhatsignupallows',
       }
 
@@ -275,6 +277,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@averylonghandlepastwhatsignupallows',
         src: 'https://www.tiktok.com/embed/@averylonghandlepastwhatsignupallows',
         url: 'https://www.tiktok.com/@averylonghandlepastwhatsignupallows',
+        height: 478,
         author: '@averylonghandlepastwhatsignupallows',
       }
 
@@ -295,6 +298,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user',
         src: 'https://www.tiktok.com/embed/@user',
         url: 'https://www.tiktok.com/@user',
+        height: 478,
         description: 'caption text',
         author: '@user',
       }
@@ -317,6 +321,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@401kgoldirarollovers',
         src: 'https://www.tiktok.com/embed/@401kgoldirarollovers',
         url: 'https://www.tiktok.com/@401kgoldirarollovers',
+        height: 478,
         author: '@401kgoldirarollovers',
       }
 
@@ -338,6 +343,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@ott_races',
         src: 'https://www.tiktok.com/embed/@ott_races',
         url: 'https://www.tiktok.com/@ott_races',
+        height: 478,
         author: '@ott_races',
       }
 
@@ -359,6 +365,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@.a.u00',
         src: 'https://www.tiktok.com/embed/@.a.u00',
         url: 'https://www.tiktok.com/@.a.u00',
+        height: 478,
         author: '@.a.u00',
       }
 
@@ -381,6 +388,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@NBA',
         src: 'https://www.tiktok.com/embed/@NBA',
         url: 'https://www.tiktok.com/@NBA',
+        height: 478,
         author: '@NBA',
       }
 
@@ -398,6 +406,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@401kgoldirarollovers',
         src: 'https://www.tiktok.com/embed/@401kgoldirarollovers',
         url: 'https://www.tiktok.com/@401kgoldirarollovers',
+        height: 478,
         author: '@401kgoldirarollovers',
       }
 
@@ -415,6 +424,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@ott_races',
         src: 'https://www.tiktok.com/embed/@ott_races',
         url: 'https://www.tiktok.com/@ott_races',
+        height: 478,
         author: '@ott_races',
       }
 
@@ -432,6 +442,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@.a.u00',
         src: 'https://www.tiktok.com/embed/@.a.u00',
         url: 'https://www.tiktok.com/@.a.u00',
+        height: 478,
         author: '@.a.u00',
       }
 
@@ -448,6 +459,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@NBA',
         src: 'https://www.tiktok.com/embed/@NBA',
         url: 'https://www.tiktok.com/@NBA',
+        height: 478,
         author: '@NBA',
       }
 
@@ -517,7 +529,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should let the account shape keep the box the blockquote states', async () => {
+    it('should ignore the box the blockquote states on the account shape', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -532,8 +544,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user',
         src: 'https://www.tiktok.com/embed/@user',
         url: 'https://www.tiktok.com/@user',
-        width: 605,
-        height: 400,
+        height: 478,
         author: '@user',
       }
 
@@ -585,6 +596,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user%2Fx',
         src: 'https://www.tiktok.com/embed/@user%2Fx',
         url: 'https://www.tiktok.com/@user%2Fx',
+        height: 478,
         author: '@user%2Fx',
       }
 
@@ -685,6 +697,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@../evil',
         src: 'https://www.tiktok.com/embed/@../evil',
         url: 'https://www.tiktok.com/@user',
+        height: 478,
         author: '@../evil',
       }
 

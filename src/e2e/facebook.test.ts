@@ -104,7 +104,7 @@ describeForEachParser('Facebook', (parseHtml) => {
   // The AMP element is empty too, and an unknown custom element survives the passes that drop
   // empty tags, so the contract here is that the size AMP requires on the element reaches the
   // placeholder.
-  it('should resolve an amp-facebook element and keep its declared size', async () => {
+  it('should resolve an amp-facebook element and ignore its declared size', async () => {
     const value = html`
       <amp-facebook
         width="552"
@@ -115,12 +115,11 @@ describeForEachParser('Facebook', (parseHtml) => {
     `
     const expected = html`
       <div
+        data-embed-height="646"
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
         data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
-        data-embed-width="552"
-        data-embed-height="303"
       ></div>
     `
 
@@ -158,10 +157,9 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/reel/123/"
+        data-embed-ratio="16/9"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Freel%2F123%2F"
         data-embed-url="https://www.facebook.com/reel/123/"
-        data-embed-width="267"
-        data-embed-height="476"
       ></div>
     `
 

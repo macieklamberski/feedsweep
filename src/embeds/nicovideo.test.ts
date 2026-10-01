@@ -104,7 +104,7 @@ describeForEachParser('nicovideoIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, nicovideoIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should rewrite the thumb card and keep the box it declares', async () => {
+    it('should rewrite the thumb card at the video ratio', async () => {
       const value = html`
         <iframe
           scrolling="no"
@@ -120,8 +120,7 @@ describeForEachParser('nicovideoIframeEmbedResolver', (parseHtml) => {
         id: 'sm12692698',
         src: 'https://embed.nicovideo.jp/watch/sm12692698',
         url: 'https://www.nicovideo.jp/watch/sm12692698',
-        width: 312,
-        height: 176,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -144,8 +143,7 @@ describeForEachParser('nicovideoIframeEmbedResolver', (parseHtml) => {
         id: 'sm28553330',
         src: 'https://embed.nicovideo.jp/watch/sm28553330',
         url: 'https://www.nicovideo.jp/watch/sm28553330',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -243,6 +241,7 @@ describe('nicovideoResolveEmbed', () => {
       id: 'sm9',
       src: 'https://embed.nicovideo.jp/watch/sm9',
       url: 'https://www.nicovideo.jp/watch/sm9',
+      ratio: '16/9',
     }
 
     expect(nicovideoResolveEmbed(value)).toEqual(expected)
@@ -255,6 +254,7 @@ describe('nicovideoResolveEmbed', () => {
       id: 'sm9',
       src: 'https://embed.nicovideo.jp/watch/sm9',
       url: 'https://www.nicovideo.jp/watch/sm9',
+      ratio: '16/9',
     }
 
     expect(nicovideoResolveEmbed(value)).toEqual(expected)
@@ -267,6 +267,7 @@ describe('nicovideoResolveEmbed', () => {
       id: '1576909203',
       src: 'https://embed.nicovideo.jp/watch/1576909203',
       url: 'https://www.nicovideo.jp/watch/1576909203',
+      ratio: '16/9',
     }
 
     expect(nicovideoResolveEmbed(value)).toEqual(expected)
@@ -279,6 +280,7 @@ describe('nicovideoResolveEmbed', () => {
       id: 's&9',
       src: 'https://embed.nicovideo.jp/watch/s&9',
       url: 'https://www.nicovideo.jp/watch/s&9',
+      ratio: '16/9',
     }
 
     expect(nicovideoResolveEmbed(value)).toEqual(expected)
@@ -298,6 +300,7 @@ describe('nicovideoResolveEmbed', () => {
       id: 'lv346883570',
       src: 'https://live.nicovideo.jp/embed/lv346883570',
       url: 'https://live.nicovideo.jp/watch/lv346883570',
+      ratio: '16/9',
     }
 
     expect(nicovideoResolveEmbed(value)).toEqual(expected)
@@ -311,6 +314,7 @@ describe('nicovideoResolveEmbed', () => {
       id: 'lv346883570',
       src: 'https://live.nicovideo.jp/embed/lv346883570',
       url: 'https://live.nicovideo.jp/watch/lv346883570',
+      ratio: '16/9',
     }
 
     expect(nicovideoResolveEmbed(value)).toEqual(expected)

@@ -30,8 +30,7 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
         src: 'https://commons.wikimedia.org/wiki/File:Sidang_Tahunan.webm?embedplayer=yes',
         thumbnail:
           'https://commons.wikimedia.org/wiki/Special:FilePath/Sidang_Tahunan.webm?width=960',
-        width: 512,
-        height: 288,
+        ratio: '16/9',
         title: 'Sidang Tahunan',
       }
 
@@ -52,8 +51,7 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
         src: 'https://commons.wikimedia.org/wiki/File:DesignThinking.ogv?embedplayer=yes',
         thumbnail:
           'https://commons.wikimedia.org/wiki/Special:FilePath/DesignThinking.ogv?width=960',
-        width: 700,
-        height: 393,
+        ratio: '16/9',
         title: 'DesignThinking',
       }
 
@@ -74,8 +72,7 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
         id: 'Beispiel.webm',
         src: 'https://de.wikipedia.org/wiki/File:Beispiel.webm?embedplayer=yes',
         thumbnail: 'https://de.wikipedia.org/wiki/Special:FilePath/Beispiel.webm?width=960',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
         title: 'Beispiel',
       }
 
@@ -97,8 +94,7 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
         src: 'https://commons.wikimedia.org/wiki/File:Wikipedians_speak_-_Konkani_Wikipedian_Frania_Pereira.webm?embedplayer=yes',
         thumbnail:
           'http://commons.wikimedia.org/wiki/Special:FilePath/Wikipedians_speak_-_Konkani_Wikipedian_Frania_Pereira.webm?width=960',
-        width: 534,
-        height: 300,
+        ratio: '16/9',
         title: 'Wikipedians speak - Konkani Wikipedian Frania Pereira',
       }
 
@@ -119,8 +115,7 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
         src: 'https://commons.wikimedia.org/wiki/File:NIH_robotic_exoskeleton.webm?embedplayer=yes',
         thumbnail:
           'https://commons.wikimedia.org/wiki/Special:FilePath/NIH_robotic_exoskeleton.webm?width=960',
-        width: 640,
-        height: 480,
+        ratio: '16/9',
         title: 'NIH robotic exoskeleton',
       }
 
@@ -190,8 +185,7 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
         id: 'Example.webm',
         src: 'https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes',
         thumbnail: 'https://commons.wikimedia.org/wiki/Special:FilePath/Example.webm?width=960',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
         title: 'Example',
       }
 

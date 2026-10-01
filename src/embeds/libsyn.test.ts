@@ -150,7 +150,7 @@ describeForEachParser('libsynEmbedResolver', (parseHtml) => {
   describe('edge cases', () => {
     // The publisher chose the box they embedded, so the carrier's size outranks the height the
     // player url spells, and it lands whole rather than merging with it.
-    it('should take the size the carrier states over the height in the url', async () => {
+    it('should keep the platform height over the size the carrier states', async () => {
       const value = html`
         <iframe
           src="https://play.libsyn.com/embed/episode/id/5508311/height/90/"
@@ -162,8 +162,7 @@ describeForEachParser('libsynEmbedResolver', (parseHtml) => {
         provider: 'libsyn',
         id: 'episode/5508311',
         src: 'https://play.libsyn.com/embed/episode/id/5508311/',
-        width: 640,
-        height: 200,
+        height: 128,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -232,7 +231,7 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
       provider: 'libsyn',
       id: 'episode/41557470',
       src: 'https://play.libsyn.com/embed/episode/id/41557470/',
-      height: 192,
+      height: 128,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -281,8 +280,7 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
       provider: 'libsyn',
       id: 'episode/41382385',
       src: 'https://play.libsyn.com/embed/episode/id/41382385/',
-      width: 700,
-      height: 90,
+      height: 128,
       title: 'Behind the Blue: May 21, 2026 - UK and the Artemis Project',
     }
 

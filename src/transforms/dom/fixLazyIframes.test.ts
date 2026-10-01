@@ -222,9 +222,8 @@ describeForEachParser('fixLazyIframes through the pipeline', (parseHtml) => {
         data-embed-src="https://player.vimeo.com/video/41629603"
         data-embed-provider="vimeo"
         data-embed-id="41629603"
+        data-embed-ratio="16/9"
         data-embed-url="https://vimeo.com/41629603"
-        data-embed-width="1280"
-        data-embed-height="720"
       ></div>
     `
 
