@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type {
   DomTransform,
   EmbedResolverResult,
@@ -121,17 +121,13 @@ const getFileName = (enclosure: Enclosure, url: string): string => {
   }
 
   const parsed = parseUrl(url)
-  const segment = parsed?.pathname.split('/').filter(Boolean).pop()
+  const segment = getPathSegments(url).pop()
 
   if (!segment) {
     return parsed?.hostname ?? url
   }
 
-  try {
-    return decodeURIComponent(segment)
-  } catch {}
-
-  return segment
+  return decodeSegment(segment) ?? segment
 }
 
 // An enclosure rides outside the item body, so the content alone never shows its media.
@@ -190,9 +186,9 @@ export const injectEnclosures: DomTransform = (context) => {
 
         // A resolver rebuilds the src from the parsed id. Without one the enclosure's own
         // URL stands in.
-        const prepared = prepareEmbedMetadata(metadata, context)
+        const prepared = prepareEmbedMetadata({ ...metadata, src: metadata.src ?? src }, context)
 
-        created.push(createEmbedPlaceholder(document, { ...prepared, src: metadata.src ?? src }))
+        created.push(createEmbedPlaceholder(document, { ...prepared, src: prepared.src ?? src }))
         continue
       }
 

@@ -1,12 +1,11 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { uuidRegex } from '../utils/urls.js'
+import { digitsRegex, uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `embed.simplecast.com/{8hex}` and `simplecast.com/e/{numeric}` are legacy spellings of the
 // episode, and `play.simplecast.com/{uuid}` is the share host.
 const legacyIdRegex = /^[0-9a-f]{8}$/i
-const numericIdRegex = /^\d+$/
 
 const simplecastHosts = ['simplecast.com']
 
@@ -27,17 +26,21 @@ export const extractSimplecastEpisode = (
     return { id, isCurrent: true }
   }
 
-  if (legacyIdRegex.test(id) || numericIdRegex.test(id)) {
+  if (legacyIdRegex.test(id) || digitsRegex.test(id)) {
     return { id, isCurrent: false }
   }
 }
 
 export const simplecastResolveEmbed: ResolveEmbed = (url) => {
+  const parsed = parseUrl(url)
   const episode = extractSimplecastEpisode(url)
 
-  if (!episode) {
+  if (!parsed || !episode) {
     return
   }
+
+  // The legacy query holds only display values, such as `style` and `color`.
+  const legacySource = `${parsed.origin}${parsed.pathname}`
 
   return {
     provider: 'simplecast',
@@ -45,7 +48,7 @@ export const simplecastResolveEmbed: ResolveEmbed = (url) => {
     // Minting a legacy id onto the player host names no episode: the redirect assigns a new uuid.
     // `player.simplecast.com/{anything}` answers 200 with the same app shell, since the id is
     // resolved by javascript. Only the legacy host validates, answering 404 for an unknown id.
-    src: episode.isCurrent ? `https://player.simplecast.com/${episode.id}` : url,
+    src: episode.isCurrent ? `https://player.simplecast.com/${episode.id}` : legacySource,
     height: playerHeight,
   }
 }

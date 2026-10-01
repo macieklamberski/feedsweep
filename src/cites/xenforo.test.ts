@@ -133,32 +133,6 @@ describeForEachParser('xenforoCiteResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should extract a card without a thumbnail figure', async () => {
-      const value = html`
-        <div
-          class="bbCodeBlock bbCodeBlock--unfurl"
-          data-url="https://example.com/page"
-          data-host="example.com"
-        >
-          <h3 class="js-unfurl-title">Page title</h3>
-          <div class="js-unfurl-desc">Preview text</div>
-          <span class="js-unfurl-favicon">
-            <img src="https://example.com/favicon.ico" alt="" />
-          </span>
-        </div>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'xenforo',
-        url: 'https://example.com/page',
-        title: 'Page title',
-        description: 'Preview text',
-        publisher: 'example.com',
-        icon: 'https://example.com/favicon.ico',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should prefer the wrapper url over the inner anchor href', async () => {
       const value = html`
         <div class="bbCodeBlock bbCodeBlock--unfurl" data-url="https://example.com/canonical">

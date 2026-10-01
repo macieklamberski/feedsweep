@@ -360,7 +360,8 @@ describeForEachParser('Substack', (parseHtml) => {
 
   it('should resolve a spotify-wrap iframe into a spotify embed placeholder', async () => {
     // The url-keyed spotify resolver claims the iframe and reads the card Substack hangs on it;
-    // the declared height wins. The description holds the type label, which the id already says.
+    // the player's own height replaces the declared one. The description holds the type label,
+    // which the id already says.
     const episodeAttrs = jsonAttrValue({
       image: 'https://i.scdn.co/image/ab6765630000ba8a0000000000000000000000ff',
       title: 'Episode 42: Field Recording',
@@ -384,6 +385,7 @@ describeForEachParser('Substack', (parseHtml) => {
     `
     const expected = html`
       <div
+        data-embed-height="152"
         data-embed-provider="spotify"
         data-embed-id="episode/aB3dEfGhIjKlMnOpQrStUv"
         data-embed-src="https://open.spotify.com/embed/episode/aB3dEfGhIjKlMnOpQrStUv"
@@ -391,7 +393,6 @@ describeForEachParser('Substack', (parseHtml) => {
         data-embed-title="Episode 42: Field Recording"
         data-embed-publisher="Casey Host"
         data-embed-thumbnail="https://i.scdn.co/image/ab6765630000ba8a0000000000000000000000ff"
-        data-embed-height="232"
       ></div>
     `
     const result = await transformContent(value, { parseHtmlFn: parseHtml })
@@ -851,6 +852,7 @@ describeForEachParser('Substack', (parseHtml) => {
       <div
         data-embed-provider="vimeo"
         data-embed-id="123456789"
+        data-embed-ratio="16/9"
         data-embed-src="https://player.vimeo.com/video/123456789"
         data-embed-url="https://vimeo.com/123456789"
       ></div>
@@ -943,7 +945,7 @@ describeForEachParser('Substack', (parseHtml) => {
   })
 
   it('should resolve a BandcampToDOM wrap into a bandcamp embed placeholder', async () => {
-    // The bandcamp resolver claims the player iframe and keeps the publisher's size preset.
+    // The bandcamp resolver claims the player iframe and mints the small artwork strip.
     const bandcampAttrs = jsonAttrValue({
       url: 'https://examplelabel.bandcamp.com/track/end-credits',
       thumbnail_url: 'https://substack-post-media.s3.amazonaws.com/public/images/b_700x700.jpeg',
@@ -971,8 +973,8 @@ describeForEachParser('Substack', (parseHtml) => {
       <div
         data-embed-provider="bandcamp"
         data-embed-id="track/1234567890"
-        data-embed-src="https://bandcamp.com/EmbeddedPlayer/track=1234567890/size=large/"
-        data-embed-height="470"
+        data-embed-src="https://bandcamp.com/EmbeddedPlayer/track=1234567890/size=large/tracklist=false/artwork=small/"
+        data-embed-height="120"
       ></div>
     `
     const result = await transformContent(value, { parseHtmlFn: parseHtml })
@@ -1010,7 +1012,7 @@ describeForEachParser('Substack', (parseHtml) => {
       <div
         data-embed-provider="soundcloud"
         data-embed-id="tracks/123456789"
-        data-embed-src="https://w.soundcloud.com/player/?auto_play=false&buying=false&liking=false&download=false&sharing=false&show_artwork=true&show_comments=false&show_playcount=false&show_user=true&hide_related=true&visual=false&start_track=0&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F123456789"
+        data-embed-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/123456789&start_track=0"
         data-embed-url="https://soundcloud.com/exampleradio/mix-4"
         data-embed-thumbnail="https://i1.sndcdn.com/artworks-abc-t500x500.jpg"
         data-embed-height="166"

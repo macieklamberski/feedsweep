@@ -6,10 +6,20 @@ import {
   composeThumbnailUrl,
   extractVideoId,
   isVideoId,
+  readYoutubeEmbedSrc,
   youtubeAmpEmbedResolver,
+  youtubeFc2EmbedResolver,
   youtubeIframeEmbedResolver,
   youtubeResolveEmbed,
 } from './youtube.js'
+
+const watchOffsetCases: Array<[string, string]> = [
+  ['90', '90'],
+  ['90s', '90'],
+  ['1m30s', '90'],
+  ['1h2m3s', '3723'],
+  ['1:02:03', '3723'],
+]
 
 // Every url spelling that names a single video, current and legacy. All extract the same id,
 // so a deleted row is a format that silently lost support.
@@ -72,6 +82,12 @@ describe('extractVideoId', () => {
     expect(extractVideoId(value)).toBeUndefined()
   })
 
+  it('should return undefined for a url that cannot be parsed', () => {
+    const value = 'https://['
+
+    expect(extractVideoId(value)).toBeUndefined()
+  })
+
   it('should reject video id with unsafe characters', () => {
     const value = 'https://www.youtube.com/watch?v=<script>alert(1)</script>'
 
@@ -102,11 +118,42 @@ describe('extractVideoId', () => {
     expect(extractVideoId(value)).toBeUndefined()
   })
 
+  // These endpoints name the video in the query. `/watch_popup/{id}` answers 303 to a different
+  // video, and the other two answer 404.
+  const pathSpellingUrls: Array<string> = [
+    'https://www.youtube.com/watch_popup/dQw4w9WgXcQ',
+    'http://www.youtube.com/apiplayer/dQw4w9WgXcQ',
+    'http://www.youtube.com/get_video_info/dQw4w9WgXcQ',
+  ]
+
+  it.each(pathSpellingUrls)('should return undefined for the path spelling %s', (value) => {
+    expect(extractVideoId(value)).toBeUndefined()
+  })
+
+  // Every 2010 AJAX url puts the video first in the fragment.
+  it('should return undefined for a hashbang naming the video after another parameter', () => {
+    const value = 'http://www.youtube.com/watch#!feature=related&v=dQw4w9WgXcQ'
+
+    expect(extractVideoId(value)).toBeUndefined()
+  })
+
   // The 16-char segment is a legacy playlist id, so the grid link names no video.
   it('should return undefined for a profile-grid playlist link with no video id', () => {
     const value = 'http://www.youtube.com/user/SomeUser#p/c/C791A17F9108460C'
 
     expect(extractVideoId(value)).toBeUndefined()
+  })
+
+  it('should extract a profile-grid video id carrying an underscore', () => {
+    const value = 'http://www.youtube.com/user/SomeUser#p/u/1/hT_nvWreIhg'
+
+    expect(extractVideoId(value)).toBe('hT_nvWreIhg')
+  })
+
+  it('should extract a profile-grid video id carrying a hyphen', () => {
+    const value = 'http://www.youtube.com/user/SomeUser#p/u/1/e-ORhEE9VVg'
+
+    expect(extractVideoId(value)).toBe('e-ORhEE9VVg')
   })
 
   it('should reject id shorter than 11 chars', () => {
@@ -131,6 +178,31 @@ describe('extractVideoId', () => {
     const value = 'https://www.youtube.com/embed/live_stream?channel=UCabc123'
 
     expect(extractVideoId(value)).toBeUndefined()
+  })
+})
+
+describe('readYoutubeEmbedSrc', () => {
+  describe('happy paths', () => {
+    it('should carry the share link offset into the player url', () => {
+      const value = 'https://youtu.be/QeVsMPBbBhY?si=DzWjantVNcWOd7kn&t=260'
+      const expected = 'https://www.youtube.com/embed/QeVsMPBbBhY?start=260'
+
+      expect(readYoutubeEmbedSrc(value)).toBe(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a youtube url that names no video', () => {
+      const value = 'https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw'
+
+      expect(readYoutubeEmbedSrc(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying a video path', () => {
+      const value = 'https://evil.test/watch?v=QeVsMPBbBhY'
+
+      expect(readYoutubeEmbedSrc(value)).toBeUndefined()
+    })
   })
 })
 
@@ -171,6 +243,125 @@ describe('youtubeResolveEmbed', () => {
       src: 'https://www.youtube.com/embed/dQw4w9WgXcQ?start=90',
       url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should carry a share link offset over as the start', () => {
+    const value = 'https://youtu.be/dQw4w9WgXcQ?t=42'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ?start=42',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it.each(watchOffsetCases)('should read the offset t=%s as %s seconds', (t, start) => {
+    const value = `https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=${t}`
+    const expected = `https://www.youtube.com/embed/dQw4w9WgXcQ?start=${start}`
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should let a stated start win over the watch link offset', () => {
+    const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&start=10&t=42'
+    const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ?start=10'
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should ignore a watch link offset that is not a duration', () => {
+    const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=abc'
+    const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should ignore a watch link offset with a trailing word', () => {
+    const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=90x'
+    const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should ignore a watch link offset with a leading word', () => {
+    const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=x90'
+    const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should ignore a clock offset with a trailing word', () => {
+    const value = 'https://www.youtube.com/embed/vy9FEjsBVvY#t=24:09x'
+    const expected = 'https://www.youtube.com/embed/vy9FEjsBVvY'
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should ignore a clock offset with a leading word', () => {
+    const value = 'https://www.youtube.com/embed/vy9FEjsBVvY#t=x24:09'
+    const expected = 'https://www.youtube.com/embed/vy9FEjsBVvY'
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
+  it('should carry the offset the Flash-era path spelling leaves after the id', () => {
+    const value = 'http://www.youtube.com/embed/OgiAa5Xi6ok&t=6s'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'OgiAa5Xi6ok',
+      src: 'https://www.youtube.com/embed/OgiAa5Xi6ok?start=6',
+      url: 'https://www.youtube.com/watch?v=OgiAa5Xi6ok',
+      thumbnail: 'https://i.ytimg.com/vi/OgiAa5Xi6ok/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should carry a fragment offset over as the start', () => {
+    const value = 'https://www.youtube.com/embed/1sJnSoSb_SE#t=220'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: '1sJnSoSb_SE',
+      src: 'https://www.youtube.com/embed/1sJnSoSb_SE?start=220',
+      url: 'https://www.youtube.com/watch?v=1sJnSoSb_SE',
+      thumbnail: 'https://i.ytimg.com/vi/1sJnSoSb_SE/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a fragment offset spelled in minutes and seconds', () => {
+    const value = 'http://www.youtube.com/embed/7gkKkXopPB8#t=54m11s'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: '7gkKkXopPB8',
+      src: 'https://www.youtube.com/embed/7gkKkXopPB8?start=3251',
+      url: 'https://www.youtube.com/watch?v=7gkKkXopPB8',
+      thumbnail: 'https://i.ytimg.com/vi/7gkKkXopPB8/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a fragment offset spelled as a clock', () => {
+    const value = 'https://www.youtube.com/embed/vy9FEjsBVvY#t=24:09'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'vy9FEjsBVvY',
+      src: 'https://www.youtube.com/embed/vy9FEjsBVvY?start=1449',
+      url: 'https://www.youtube.com/watch?v=vy9FEjsBVvY',
+      thumbnail: 'https://i.ytimg.com/vi/vy9FEjsBVvY/hqdefault.jpg',
       ratio: '16/9',
     }
 
@@ -339,9 +530,50 @@ describe('youtubeResolveEmbed', () => {
   // `listType=search` named a query, not an id, and YouTube removed it in 2020: deliberately
   // left for the generic handling, which keeps whatever the publisher wrote.
   it('should not claim a listType=search embed', () => {
-    const value = 'https://www.youtube.com/embed?listType=search&list=sunrise+timelapse'
+    const value = 'https://www.youtube.com/embed?listType=search&list=timelapse'
 
     expect(youtubeResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should use a malformed playlist id as written, even if the player answers an error', () => {
+    const value =
+      'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index%3D2'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'playlist/PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf&index=2',
+      src: 'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index%3D2',
+      url: 'https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index%3D2',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should use a malformed channel id as written, even if the player answers an error', () => {
+    const value =
+      'https://www.youtube.com/embed/live_stream?channel=UCuAXFkgsw1L7xaCfnd5JJOw%26autoplay%3D1'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'channel/UCuAXFkgsw1L7xaCfnd5JJOw&autoplay=1',
+      src: 'https://www.youtube.com/embed/live_stream?channel=UCuAXFkgsw1L7xaCfnd5JJOw%26autoplay%3D1',
+      url: 'https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw&autoplay=1',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep a decoded uploads username carrying a separator in one path segment', () => {
+    const value = 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser%2F..%2Fx'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'user/SomeUser/../x',
+      src: 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser%2F..%2Fx',
+      url: 'https://www.youtube.com/user/SomeUser%2F..%2Fx',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
   })
 
   it('should return undefined for a user_uploads embed with no list', () => {
@@ -362,8 +594,8 @@ describe('youtubeResolveEmbed', () => {
     expect(youtubeResolveEmbed(value)).toBeUndefined()
   })
 
-  // The Flash player took its playlist on `/p/{id}`, and its 16 hex characters are the modern
-  // `list=PL{id}` without the prefix. The swf is dead, so these render nothing today.
+  // The Flash player took its playlist on `/p/{id}`, the modern `list=PL{id}` without the prefix.
+  // The swf is dead, so these render nothing today.
   describe('the Flash-era playlist player', () => {
     it('should resolve a /p/ playlist to the playlist embed, posterless', () => {
       const value = 'http://www.youtube.com/p/7BE4DDAC0A0D31AF?hl=es_ES&fs=1'
@@ -372,6 +604,19 @@ describe('youtubeResolveEmbed', () => {
         id: 'playlist/PL7BE4DDAC0A0D31AF',
         src: 'https://www.youtube.com/embed/videoseries?list=PL7BE4DDAC0A0D31AF',
         url: 'https://www.youtube.com/playlist?list=PL7BE4DDAC0A0D31AF',
+        ratio: '16/9',
+      }
+
+      expect(youtubeResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should decode a /p/ playlist id before it moves into the query', () => {
+      const value = 'http://www.youtube.com/p/7BE4DDAC0A0D%2F3?hl=en'
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'playlist/PL7BE4DDAC0A0D/3',
+        src: 'https://www.youtube.com/embed/videoseries?list=PL7BE4DDAC0A0D%2F3',
+        url: 'https://www.youtube.com/playlist?list=PL7BE4DDAC0A0D%2F3',
         ratio: '16/9',
       }
 
@@ -393,17 +638,17 @@ describe('youtubeResolveEmbed', () => {
       expect(youtubeResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should refuse a /p/ id that is not 16 hex characters', () => {
+    it('should use a malformed /p/ id as written, even if the player answers an error', () => {
       const value = 'http://www.youtube.com/p/somechannelname'
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'playlist/PLsomechannelname',
+        src: 'https://www.youtube.com/embed/videoseries?list=PLsomechannelname',
+        url: 'https://www.youtube.com/playlist?list=PLsomechannelname',
+        ratio: '16/9',
+      }
 
-      expect(youtubeResolveEmbed(value)).toBeUndefined()
-    })
-
-    // A playlist id is case sensitive, so a lowercase spelling would mint a url that 404s.
-    it('should refuse a lowercase /p/ id', () => {
-      const value = 'http://www.youtube.com/p/7be4ddac0a0d31af'
-
-      expect(youtubeResolveEmbed(value)).toBeUndefined()
+      expect(youtubeResolveEmbed(value)).toEqual(expected)
     })
 
     it('should refuse a bare /p/ path naming no playlist', () => {
@@ -608,6 +853,25 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should drop the label the AllVideos Joomla plugin writes', async () => {
+    const value = html`
+      <iframe
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        title="JoomlaWorks AllVideos Player"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should read the name the playlist carrier states', async () => {
     const value = html`
       <iframe
@@ -622,6 +886,39 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
       url: 'https://www.youtube.com/playlist?list=PLabc123',
       ratio: '16/9',
       title: 'Ambient works, 1992',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should extract metadata from a youtube-nocookie iframe', async () => {
+    const value = '<iframe src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should extract metadata from a Flash embed on the googleapis host', async () => {
+    const value = html`
+      <embed
+        src="http://youtube.googleapis.com/v/dQw4w9WgXcQ&hl=en_US"
+        type="application/x-shockwave-flash"
+      />
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -778,24 +1075,37 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // A bogus id would mint a bogus player url and a bogus enrichment key, so the element is
-    // left for the generic handling instead, exactly as the url form treats a malformed id.
-    it('should return undefined for a malformed videoid', async () => {
-      const value = '<amp-youtube data-videoid="../../evil"></amp-youtube>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an embed path word in the videoid', async () => {
+    it('should return undefined for a videoid holding a route word', async () => {
       const value = '<amp-youtube data-videoid="videoseries"></amp-youtube>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a malformed live channel id', async () => {
-      const value = '<amp-youtube data-live-channelid="../../evil"></amp-youtube>'
+    it('should use a malformed videoid as written, even if the player answers an error', async () => {
+      const value = '<amp-youtube data-videoid="../../evil"></amp-youtube>'
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: '../../evil',
+        src: 'https://www.youtube.com/embed/../../evil',
+        url: 'https://www.youtube.com/watch?v=..%2F..%2Fevil',
+        thumbnail: 'https://i.ytimg.com/vi/../../evil/hqdefault.jpg',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed live channel id as written, even if the player answers an error', async () => {
+      const value = '<amp-youtube data-live-channelid="../../evil"></amp-youtube>'
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'channel/../../evil',
+        src: 'https://www.youtube.com/embed/live_stream?channel=..%2F..%2Fevil',
+        url: 'https://www.youtube.com/channel/../../evil',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
@@ -819,6 +1129,143 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
           data-videoid="dQw4w9WgXcQ"
           data-live-channelid="UCuAXFkgsw1L7xaCfnd5JJOw"
         ></amp-youtube>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'dQw4w9WgXcQ',
+        src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+describeForEachParser('youtubeFc2EmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, youtubeFc2EmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the video and its title out of the shell query', async () => {
+      const value = html`
+        <iframe
+          width="560"
+          height="315"
+          src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?autoplay=1&id=WpKmsv98HlI&width=560&height=315&title=Fun%20day%20for%20Longers"
+          frameborder="0"
+          allowfullscreen=""
+          allow="autoplay; encrypted-media"
+          data-id="WpKmsv98HlI"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'WpKmsv98HlI',
+        src: 'https://www.youtube.com/embed/WpKmsv98HlI',
+        url: 'https://www.youtube.com/watch?v=WpKmsv98HlI',
+        thumbnail: 'https://i.ytimg.com/vi/WpKmsv98HlI/hqdefault.jpg',
+        ratio: '16/9',
+        title: 'Fun day for Longers',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed query id as written, even if the player answers an error', async () => {
+      const value = html`
+        <iframe
+          src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?id=playlist"
+          data-id="NBwJR7X3krE"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'playlist',
+        src: 'https://www.youtube.com/embed/playlist',
+        url: 'https://www.youtube.com/watch?v=playlist',
+        thumbnail: 'https://i.ytimg.com/vi/playlist/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should prefer the query id over a differing id attribute', async () => {
+      const value = html`
+        <iframe
+          src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?id=NBwJR7X3krE"
+          data-id="xXRA58sQuZE"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'NBwJR7X3krE',
+        src: 'https://www.youtube.com/embed/NBwJR7X3krE',
+        url: 'https://www.youtube.com/watch?v=NBwJR7X3krE',
+        thumbnail: 'https://i.ytimg.com/vi/NBwJR7X3krE/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore the shell path on a foreign host', async () => {
+      const value = html`
+        <iframe src="https://evil.test/misc/blog/view/ext_youtube_player.html?id=dQw4w9WgXcQ"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the shell path on another FC2 host', async () => {
+      const value = html`
+        <iframe src="https://blog.fc2.com/misc/blog/view/ext_youtube_player.html?id=dQw4w9WgXcQ"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore another page on the asset host', async () => {
+      const value = html`
+        <iframe src="https://static.fc2.com/misc/blog/view/other.html?id=dQw4w9WgXcQ"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a path going on past the shell', async () => {
+      const value = html`
+        <iframe src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html/x?id=dQw4w9WgXcQ"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should leave the title unset when the query title is empty', async () => {
+      const value = html`
+        <iframe src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?id=dQw4w9WgXcQ&title="></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'dQw4w9WgXcQ',
+        src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave the title unset when the query title is the string undefined', async () => {
+      const value = html`
+        <iframe src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?id=dQw4w9WgXcQ&title=undefined"></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'youtube',

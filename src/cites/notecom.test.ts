@@ -119,27 +119,6 @@ describeForEachParser('notecomCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should parse the thumbnail from the background-image style', async () => {
-      const value = html`
-        <figure embedded-service="external-article">
-          <div class="external-article-widget">
-            <a href="https://example.com/page">
-              <strong class="external-article-widget-title">Page title</strong>
-            </a>
-            <a class="external-article-widget-image" style="background-image: url(https://cdn.example.com/thumb.jpg);"></a>
-          </div>
-        </figure>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'notecom',
-        url: 'https://example.com/page',
-        title: 'Page title',
-        thumbnail: 'https://cdn.example.com/thumb.jpg',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {

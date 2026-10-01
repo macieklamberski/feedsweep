@@ -67,15 +67,16 @@ describeForEachParser('rebuildRocketYoutubePreviews', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave the element untouched when data-id is not a video id', async () => {
+  it('should use a malformed data-id as written, even if the player answers an error', async () => {
     const value = html`
       <div
         class="rll-youtube-player"
         data-id="watch"
       ></div>
     `
+    const expected = '<iframe src="https://www.youtube.com/embed/watch"></iframe>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should leave the element untouched when it states no video at all', async () => {

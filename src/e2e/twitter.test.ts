@@ -107,8 +107,8 @@ describeForEachParser('Twitter', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
-  // The component carries no text at all, so the id and the size it states are everything
-  // there is to take, and unclaimed it reaches a reader as an element nothing renders.
+  // The component carries no text at all, so the id is everything there is to take, and
+  // unclaimed it reaches a reader as an element nothing renders.
   it('should convert an amp-twitter component that carries no text', async () => {
     const value = html`
       <amp-twitter
@@ -123,8 +123,6 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-provider="twitter"
         data-embed-id="123456789012345"
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
-        data-embed-width="375"
-        data-embed-height="472"
       ></div>
     `
 
@@ -277,6 +275,28 @@ describeForEachParser('Twitter', (parseHtml) => {
       <p>
         <a href="https://example.com/news/story.html">Read more</a>
       </p>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // A forum's s9e helper frame names the status in its fragment, and twitterS9eEmbedResolver
+  // reads it into the same player placeholder a pasted frame gives.
+  it('should convert the s9e helper frame into the player placeholder', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="twitter"
+        data-s9e-mediaembed-api="2"
+        style="height:350px;width:550px"
+        src="https://s9e.github.io/iframe/2/twitter.min.html#123456789012345#theme=auto"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="twitter"
+        data-embed-id="123456789012345"
+        data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
+      ></div>
     `
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)

@@ -14,6 +14,9 @@ const postIdRegex = /^(\d+)(?:-[^.]*)?$/
 // `audioboo.fm` is the pre-rename host.
 const audioboomHosts = ['audioboom.com', 'audioboo.fm']
 
+// `/posts/{id}/embed[/v4]` is current. `/boos/{id}/embed` is the pre-rename spelling.
+const postIdMarkers = ['posts', 'boos']
+
 // `/embed/v4` is the full player at 300, and `/posts/{id}/embed` is the compact bar at 95. Both
 // fill whatever frame they get, so these are the smallest box each accepts.
 const playerHeights = { v4: 300, legacy: 95 }
@@ -22,8 +25,7 @@ export const extractAudioboomPost = (
   link: string,
 ): { id: string; isCurrent: boolean } | undefined => {
   const segments = getPathSegments(link)
-  // `/posts/{id}/embed[/v4]` is current. `/boos/{id}/embed` is the pre-rename spelling.
-  const marker = segments.findIndex((segment) => segment === 'posts' || segment === 'boos')
+  const marker = segments.findIndex((segment) => postIdMarkers.includes(segment))
   const id = marker >= 0 ? segments[marker + 1]?.match(postIdRegex)?.[1] : undefined
 
   if (!id) {

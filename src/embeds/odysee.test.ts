@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { odyseeEmbedResolver } from './odysee.js'
@@ -42,9 +43,30 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@OsasunaLibertad:9/Como-Proteger-a-los-Menores:9',
         src: 'https://odysee.com/$/embed/@OsasunaLibertad:9/Como-Proteger-a-los-Menores:9',
         url: 'https://odysee.com/@OsasunaLibertad:9/Como-Proteger-a-los-Menores:9',
-        width: 1200,
-        height: 675,
+        ratio: '16/9',
         author: '@OsasunaLibertad',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve claim ids spelled with hex letters', async () => {
+      const value = html`
+        <iframe
+          id="odysee-iframe"
+          width="853"
+          height="480"
+          src="https://odysee.com/$/embed/@AldebaranVideo:b/Jorge-Katar-Race-and-Reason:f?r=3C8TK1mXmpDyhxa88xE22aLhsdpQwK49"
+          allowfullscreen
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'odysee',
+        id: '@AldebaranVideo:b/Jorge-Katar-Race-and-Reason:f',
+        src: 'https://odysee.com/$/embed/@AldebaranVideo:b/Jorge-Katar-Race-and-Reason:f',
+        url: 'https://odysee.com/@AldebaranVideo:b/Jorge-Katar-Race-and-Reason:f',
+        ratio: '16/9',
+        author: '@AldebaranVideo',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -66,8 +88,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
         src: 'https://odysee.com/$/embed/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
         url: 'https://odysee.com/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
-        width: 560,
-        height: 315,
+        ratio: '16/9',
         author: '@Impfschaden.info',
       }
 
@@ -78,6 +99,28 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore an odysee path that is not the player', async () => {
       const value = '<iframe src="https://odysee.com/$/signin"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the embed route under a segment that is not the marker', async () => {
+      const value = '<iframe src="https://odysee.com/x/embed/webb-repersoning:7"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the download route, which serves the file', async () => {
+      const value = html`
+        <iframe src="https://odysee.com/$/download/vinnie-paz-on-the-rockefellers/7"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a claim id carrying an encoded query', async () => {
+      const value = html`
+        <iframe src="https://odysee.com/%24%2Fembed%2Fwebb-repersoning%3A7%3Fad%3D1"></iframe>
+      `
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -114,22 +157,29 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // The url parser folds a bare `..` segment away, but a path encoded whole hides it until
-    // the pathname is decoded here, and then the claim would be a dot segment.
-    it('should ignore a dot segment the encoded path decodes into', async () => {
-      const value = '<iframe src="https://odysee.com/%24%2Fembed%2F.."></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a foreign host carrying the same path', async () => {
       const value = html`
         <iframe
-          src="https://evil.test/odysee.com/$/embed/@corbettreport:0/webb-repersoning:7"
+          src="https://evil.test/$/embed/@corbettreport:0/webb-repersoning:7"
         ></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed claim as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://odysee.com/%24%2Fembed%2F.."></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'odysee',
+        id: '..',
+        src: 'https://odysee.com/$/embed/..',
+        url: 'https://odysee.com/..',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
@@ -143,6 +193,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: 'webb-repersoning:7',
         src: 'https://odysee.com/$/embed/webb-repersoning:7',
         url: 'https://odysee.com/webb-repersoning:7',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -155,6 +206,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: 'webb-repersoning:7',
         src: 'https://odysee.com/$/embed/webb-repersoning:7',
         url: 'https://odysee.com/webb-repersoning:7',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -175,8 +227,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: 'webb-repersoning:7',
         src: 'https://odysee.com/$/embed/webb-repersoning:7',
         url: 'https://odysee.com/webb-repersoning:7',
-        width: 560,
-        height: 315,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -192,6 +243,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: 'webb-repersoning:7',
         src: 'https://odysee.com/$/embed/webb-repersoning:7',
         url: 'https://odysee.com/webb-repersoning:7',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -208,6 +260,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: 'webb-repersoning',
         src: 'https://odysee.com/$/embed/webb-repersoning',
         url: 'https://odysee.com/webb-repersoning',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -220,6 +273,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@corbettreport',
         src: 'https://odysee.com/$/embed/@corbettreport',
         url: 'https://odysee.com/@corbettreport',
+        ratio: '16/9',
         author: '@corbettreport',
       }
 
@@ -235,6 +289,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@corbettreport:0/webb-repersoning',
         src: 'https://odysee.com/$/embed/@corbettreport:0/webb-repersoning',
         url: 'https://odysee.com/@corbettreport:0/webb-repersoning',
+        ratio: '16/9',
         author: '@corbettreport',
       }
 
@@ -252,6 +307,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@corbettreport/webb-repersoning',
         src: 'https://odysee.com/$/embed/@corbettreport/webb-repersoning',
         url: 'https://odysee.com/@corbettreport/webb-repersoning',
+        ratio: '16/9',
         author: '@corbettreport',
       }
 
@@ -267,5 +323,30 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+// odysee.com serves the file on the same host as the player, and injectEnclosures offers every
+// attachment to every url-keyed resolver.
+describeForEachParser('odysee through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave an odysee audio enclosure playable', async () => {
+    const enclosures = [
+      { url: 'https://odysee.com/$/download/vinnie-paz-on-the-rockefellers/7', type: 'audio/mpeg' },
+    ]
+
+    const expected = html`
+      <audio data-enclosure="" controls src="https://odysee.com/$/download/vinnie-paz-on-the-rockefellers/7"></audio>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })

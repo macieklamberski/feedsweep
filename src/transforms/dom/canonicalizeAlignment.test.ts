@@ -93,6 +93,34 @@ describeForEachParser('canonicalizeAlignment', (parseHtml) => {
       expect(await transform(value)).toContainHtml('data-align="center"')
     })
 
+    it('should read a media-primary paragraph text-align past a trailing line break', async () => {
+      const value = html`
+        <p style="text-align: center;">
+          <img src="https://example.com/files/Page_21.jpg?v=1760420592" alt="">
+          <br>
+        </p>
+      `
+      const expected = html`
+        <p style="text-align: center;">
+          <img src="https://example.com/files/Page_21.jpg?v=1760420592" alt="" data-align="center">
+          <br>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should read a media-primary paragraph text-align through a click-through link', async () => {
+      const value = '<p style="text-align: center"><a href="x.jpg"><img src="a.jpg"></a></p>'
+      const expected = html`
+        <p style="text-align: center">
+          <a href="x.jpg"><img src="a.jpg" data-align="center"></a>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should read a center wrapping an image, leaving the center in place', async () => {
       const value = '<center><img src="a.jpg"></center>'
       const expected = '<center><img src="a.jpg" data-align="center"></center>'
@@ -126,6 +154,44 @@ describeForEachParser('canonicalizeAlignment', (parseHtml) => {
         <div class="aligncenter">
           <img src="a.jpg" data-align="center">
           <img src="b.jpg" data-align="center">
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should stamp an image beside a sibling video in a media-primary wrapper', async () => {
+      const value = '<div class="aligncenter"><img src="a.jpg"><video src="b.mp4"></video></div>'
+      const expected = html`
+        <div class="aligncenter">
+          <img src="a.jpg" data-align="center">
+          <video src="b.mp4" data-align="center"></video>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should stamp an image beside a sibling audio in a media-primary wrapper', async () => {
+      const value = '<div class="aligncenter"><img src="a.jpg"><audio src="b.mp3"></audio></div>'
+      const expected = html`
+        <div class="aligncenter">
+          <img src="a.jpg" data-align="center">
+          <audio src="b.mp3" data-align="center"></audio>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should stamp an image beside a sibling iframe in a media-primary wrapper', async () => {
+      const value = html`
+        <div class="aligncenter"><img src="a.jpg"><iframe src="https://example.com"></iframe></div>
+      `
+      const expected = html`
+        <div class="aligncenter">
+          <img src="a.jpg" data-align="center">
+          <iframe src="https://example.com" data-align="center"></iframe>
         </div>
       `
 
@@ -224,6 +290,26 @@ describeForEachParser('canonicalizeAlignment', (parseHtml) => {
 
     it('should leave a media element that already carries data-align unchanged', async () => {
       const value = '<img class="aligncenter" src="a.jpg" data-align="left">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should not stamp a figure whose image already carries data-align', async () => {
+      const value = html`
+        <figure class="aligncenter">
+          <img src="a.jpg" data-align="left">
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a figure that already carries data-align unchanged', async () => {
+      const value = html`
+        <figure class="aligncenter" data-align="left">
+          <img src="a.jpg">
+        </figure>
+      `
 
       expect(await transform(value)).toEqualHtml(value)
     })

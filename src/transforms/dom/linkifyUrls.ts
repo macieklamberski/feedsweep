@@ -3,7 +3,17 @@ import type { DomTransform } from '../../types.js'
 import { collectTextNodes } from '../../utils/dom.js'
 
 const urlProtocolRegex = /^https?:\/\//i
-const linkifyIgnoreTags = new Set(['a', 'pre', 'code', 'kbd', 'samp', 'var', 'script', 'style'])
+const linkifyIgnoreTags = new Set([
+  'a',
+  'pre',
+  'code',
+  'kbd',
+  'samp',
+  'var',
+  'script',
+  'style',
+  'noscript',
+])
 
 const shouldSkipElement = (element: Element): boolean => {
   return linkifyIgnoreTags.has(element.tagName.toLowerCase())
