@@ -368,6 +368,7 @@ import { yahooEmojiResolver } from '../emojis/yahoo.js'
 import { yahooJapanEmojiResolver } from '../emojis/yahoojapan.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { ghostMediaResolver } from '../media/ghost.js'
+import { odeoMediaResolver } from '../media/odeo.js'
 import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
 import { tumblrMediaResolver } from '../media/tumblr.js'
@@ -620,6 +621,7 @@ const embedResolvers: Array<EmbedResolver> = [
 const mediaResolvers: Array<MediaResolver> = [
   discourseMediaResolver,
   ghostMediaResolver,
+  odeoMediaResolver,
   podloveMediaResolver,
   substackMediaResolver,
   tumblrMediaResolver,
