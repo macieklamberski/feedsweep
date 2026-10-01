@@ -1,10 +1,9 @@
 import type { MediaResolver } from '../types.js'
-import { flashVars, parsePixelSize } from '../utils/dom.js'
-import { audioFileRegex, imageFileRegex, parseUrlOnHosts, videoFileRegex } from '../utils/urls.js'
+import { flashVars } from '../utils/dom.js'
+import { audioFileRegex, imageFileRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
 const weeblyHost = 'weebly.com'
-const videoAppPath = '/weebly/apps/generateVideo.php'
 const audioPlayerPath = '/weebly/apps/audioPlayer2.swf'
 
 // The upload path is /uploads/b/{user}-{pathId}/{name}, which only the poster url carries.
@@ -13,9 +12,6 @@ const posterUrlRegex = /url\(\s*['"]?([^'")]*\/uploads\/[^'")]+)['"]?\s*\)/
 // Some posters arrive as //www.weebly.comhttp://{site}/uploads/…, the site origin concatenated
 // onto an absolute url. The url after the prefix is the one that serves.
 const mangledPosterPrefixRegex = /^\/\/www\.weebly\.com(?=https?:\/\/)/
-
-// The first class admits no dot, so `..` never reaches a minted path.
-const safeUploadPathRegex = /^[\w-][\w.-]*(?:\/[\w-][\w.-]*)*$/
 
 // A wrapper already holding a real player is a third-party embed sitting in Weebly's video
 // block, not an upload facade. Replacing it would destroy whatever resolved it.
@@ -51,38 +47,6 @@ export const weeblyMediaResolver: MediaResolver = {
       // Weebly writes the poster protocol-relative, //www.weebly.com/uploads/…, and
       // convertWidgets gives it a scheme.
       poster: posterUrl,
-    }
-  },
-}
-
-// The video block before the wrapper: an iframe onto a player page whose query names the upload
-// and its poster by path. Both files serve from www.weebly.com under /uploads/, whatever site
-// they belong to. The map block sits beside it at generateMap.php and stays a frame.
-export const weeblyIframeMediaResolver: MediaResolver = {
-  kind: 'media',
-  selector: `iframe[src*="${weeblyHost}${videoAppPath}"]`,
-  extract: (element) => {
-    const page = parseUrlOnHosts(readCarrierUrl(element), weeblyHost)
-
-    if (page?.pathname !== videoAppPath) {
-      return
-    }
-
-    const video = page.searchParams.get('video') ?? ''
-    const image = page.searchParams.get('image') ?? ''
-
-    if (!safeUploadPathRegex.test(video) || !videoFileRegex.test(video)) {
-      return
-    }
-
-    return {
-      tag: 'video',
-      src: `https://www.${weeblyHost}/uploads/${video}`,
-      poster:
-        safeUploadPathRegex.test(image) && imageFileRegex.test(image)
-          ? `https://www.${weeblyHost}/uploads/${image}`
-          : undefined,
-      height: parsePixelSize(page.searchParams.get('height')),
     }
   },
 }
