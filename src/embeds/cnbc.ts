@@ -30,7 +30,9 @@ export const cnbcResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider: 'cnbc',
     id: guid,
-    src: `https://player.cnbc.com/p/${account}/${player}${query}`,
+    // Any player name plays the guid, and `cnbc_global` is the one CNBC's share snippet writes.
+    // Another account answers 404, so the account stays as written.
+    src: `https://player.cnbc.com/p/${account}/cnbc_global${query}`,
     ratio: playerRatio,
   }
 }

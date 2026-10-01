@@ -186,7 +186,7 @@ export const tiktokResolveEmbed: ResolveEmbed = (src) => {
     return {
       provider: 'tiktok',
       id: playerId,
-      src,
+      src: `https://www.tiktok.com/embed/v2/${playerId}`,
       height: playerHeight,
     }
   }

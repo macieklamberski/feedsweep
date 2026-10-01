@@ -403,20 +403,27 @@ describeForEachParser('codesandbox shapes the pipeline repairs first', (parseHtm
 })
 
 describe('readCodesandboxHeight', () => {
-  // What the editor posts as it settles, unasked.
-  it('should read the height out of a resize message', () => {
-    const value = {
-      src: 'https://codesandbox.io/embed/ng-accordion-ssscp',
-      context: 'iframe.resize',
-      height: 664,
-    }
+  // Captured from `codesandbox.io/embed/1-uncontrolled-components-qhm6t?autoresize=1` in Chrome.
+  it('should read the height out of the resize message the editor posts as a string', () => {
+    const value =
+      '{"src":"https://codesandbox.io/embed/1-uncontrolled-components-qhm6t?autoresize=1","context":"iframe.resize","height":612}'
 
-    expect(readCodesandboxHeight(value)).toBe(664)
+    expect(readCodesandboxHeight(value)).toBe(612)
+  })
+
+  it('should read nothing from a string that is not JSON', () => {
+    expect(readCodesandboxHeight('{"context":"iframe.resize",')).toBeUndefined()
+  })
+
+  it('should read nothing from a resize message posted as an object', () => {
+    const value = { context: 'iframe.resize', height: 664 }
+
+    expect(readCodesandboxHeight(value)).toBeUndefined()
   })
 
   it('should read nothing from another message or an unrendered player', () => {
-    expect(readCodesandboxHeight({ context: 'iframe.resize', height: 0 })).toBeUndefined()
-    expect(readCodesandboxHeight({ context: 'iframe.ready', height: 500 })).toBeUndefined()
+    expect(readCodesandboxHeight('{"context":"iframe.resize","height":0}')).toBeUndefined()
+    expect(readCodesandboxHeight('{"context":"iframe.ready","height":500}')).toBeUndefined()
     expect(readCodesandboxHeight('iframe.resize')).toBeUndefined()
   })
 })
