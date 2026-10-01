@@ -118,6 +118,7 @@ import {
   fliphtml5IframeEmbedResolver,
   fliphtml5LightBoxEmbedResolver,
 } from '../embeds/fliphtml5.js'
+import { flipsnackEmbedResolver } from '../embeds/flipsnack.js'
 import { flourishIframeEmbedResolver, flourishWidgetEmbedResolver } from '../embeds/flourish.js'
 import { foxnewsIframeEmbedResolver, foxnewsScriptEmbedResolver } from '../embeds/foxnews.js'
 import { ganjingworldEmbedResolver } from '../embeds/ganjingworld.js'
@@ -461,6 +462,7 @@ const embedResolvers: Array<EmbedResolver> = [
   flickrEmbedResolver,
   fliphtml5IframeEmbedResolver,
   fliphtml5LightBoxEmbedResolver,
+  flipsnackEmbedResolver,
   flourishWidgetEmbedResolver,
   flourishIframeEmbedResolver,
   foxnewsScriptEmbedResolver,
