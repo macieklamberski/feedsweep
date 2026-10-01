@@ -223,6 +223,21 @@ export const isEmbedOrMediaResolver = (
   return playerResolverKinds.includes(resolver.kind)
 }
 
+// True when one of the resolvers claims the iframe, the same test convertWidgets makes, so only
+// an iframe that would become a placeholder or a recovered media element passes.
+export const isResolvedIframe = async (
+  iframe: Element,
+  resolvers: ReadonlyArray<WidgetResolver>,
+): Promise<boolean> => {
+  for (const resolver of resolvers) {
+    if (iframe.matches(resolver.selector) && (await resolver.extract(iframe))) {
+      return true
+    }
+  }
+
+  return false
+}
+
 export const isMediaResult = (result: WidgetResolverResult): result is MediaResolverResult => {
   return 'tag' in result
 }
@@ -281,6 +296,21 @@ export const createImage = (document: Document, fields: ImageFields): HTMLElemen
   setDimensions(image, fields)
 
   return image
+}
+
+// An <img>, an <audio> and a <video> have nowhere of their own to show a human-readable caption.
+export const createCaptionedFigure = (
+  document: Document,
+  element: HTMLElement,
+  caption: string,
+): HTMLElement => {
+  const figure = document.createElement('figure')
+  const figcaption = document.createElement('figcaption')
+
+  figcaption.textContent = caption
+  figure.append(element, figcaption)
+
+  return figure
 }
 
 export const createLink = (document: Document, href: string, text = href): HTMLElement => {
