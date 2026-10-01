@@ -58,9 +58,14 @@ const composeEmbedResult = (identifier: string, query = ''): EmbedResolverResult
 const audioPlayerHeight = 30
 const videoPlayerRatio = '16/9'
 
-// `embed/{identifier}` serves audio and video alike. Nothing else the archive renders is 30 tall.
+// `embed/{identifier}` serves every kind of item, so the declared box only picks the kind. Every
+// item declared under 200 tall is audio, and the bar it gets is 30 tall whatever the box.
+const audioCarrierHeightLimit = 200
+
 const declaresAudioPlayer = (element: Element): boolean => {
-  return getEmbedSize(element, 0).height === audioPlayerHeight
+  const { height } = getEmbedSize(element, 0)
+
+  return height !== undefined && height < audioCarrierHeightLimit
 }
 
 export const archiveResolveEmbed: ResolveEmbed = (url, element) => {
