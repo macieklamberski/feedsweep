@@ -1,6 +1,6 @@
 import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, parsePixelSize, text } from '../utils/dom.js'
+import { attr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import {
@@ -132,11 +132,7 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
   // either into the player's `created` query beside `showedits`, which hides the edits made after
   // the embed code was generated. So both stamp the embed, and neither reaches `date`.
 
-  // data-embed-height is the height Reddit's dialog states, spelled as an inline style as well, and
-  // neither states a width.
-  const height = parsePixelSize(attr(element, 'data-embed-height'))
-
-  return composeEmbed(target, { title, author, height })
+  return composeEmbed(target, { title, author })
 }
 
 // Reddit's snippet: a blockquote of links that only the widgets.js loader turns into the card.

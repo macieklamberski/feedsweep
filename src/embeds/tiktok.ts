@@ -1,7 +1,6 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, find, parsePixelSize, text, textNode } from '../utils/dom.js'
-import * as styles from '../utils/styles.js'
+import { attr, find, text, textNode } from '../utils/dom.js'
 import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import {
   atUsername,
@@ -38,36 +37,6 @@ const readWatchUrl = (url: string | undefined): Clip => {
   const [, handle, videoId] = parsed.pathname.match(watchPathRegex) ?? []
 
   return { handle, videoId }
-}
-
-const clipSize = (element: Element): { width?: number; height: number } => {
-  const { width, height } = hydratedSize(element)
-
-  return height ? { width, height } : { height: playerHeight }
-}
-
-// A blockquote declares only `max-width` and `min-width`, never a height. Where a CMS stored the
-// page after `embed.js` ran, the hydrated iframe keeps the height it rendered at in its inline
-// style.
-const hydratedSize = (element: Element): { width?: number; height?: number } => {
-  // The stored iframe is matched by the same player paths the direct carrier resolver claims,
-  // so a hydrated copy keeps its measurement whichever player url the CMS wrote.
-  const frame = find(element, 'iframe[src]', (iframe) => {
-    const parsed = parseUrlOnHosts(attr(iframe, 'src'), tiktokHosts)
-
-    return Boolean(parsed && playerPathRegex.test(parsed.pathname))
-  })
-  const height = parsePixelSize(styles.pixels(frame, 'height'))
-
-  if (!height) {
-    return {}
-  }
-
-  // The iframe is `width: 100%` inside the blockquote's own `max-width`, so that box is the
-  // width the height was measured against.
-  const width = parsePixelSize(styles.pixels(element, 'max-width'))
-
-  return width ? { width, height } : {}
 }
 
 const resolveClip = (element: Element): EmbedResolverResult | undefined => {
@@ -118,7 +87,7 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
     url: cited.videoId ? cite : watchPath && `https://www.tiktok.com/${watchPath}`,
     description: text(caption),
     author,
-    ...clipSize(element),
+    height: playerHeight,
   }
 }
 

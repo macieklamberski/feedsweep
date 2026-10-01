@@ -181,11 +181,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The other shapes state the player's fixed height. The hydrated iframe rendered at this
-    // height against the blockquote's own max-width, so the pair is a real measurement of this
-    // clip and wins over it. The text is gone, replaced by the frame, so there is no caption or
-    // author left to take.
-    it('should keep the size the hydrated player rendered at', async () => {
+    // The hydrated iframe's inline height is the carrier's box, which shallow handling does not
+    // read. The text is gone, replaced by the frame, so there is no caption or author left to take.
+    it('should state the player height over the size the hydrated player rendered at', async () => {
       const value = html`
         <blockquote
           id="v25421583374779120"
@@ -199,37 +197,6 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
               name="__tt_embed__v25421583374779120"
               src="https://www.tiktok.com/embed/v2/7000000000000000000?lang=es-ES"
               style="width: 100%;height: 758px;max-height: 758px"
-            ></iframe>
-          </p>
-        </blockquote>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'tiktok',
-        id: '@user/video/7000000000000000000',
-        src: 'https://www.tiktok.com/embed/v2/7000000000000000000',
-        url: 'https://www.tiktok.com/@user/video/7000000000000000000',
-        width: 605,
-        height: 758,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    // The style is read with parsePixelSize, which bounds a declared pixel size to 10..9999 and
-    // rejects a fraction. A hydrated height of `758.53px` is not a measurement a reader can put
-    // in a width/height attribute, and a `1px` or `99999px` box is not one the player rendered.
-    it('should ignore a hydrated size outside the pixel bounds', async () => {
-      const value = html`
-        <blockquote
-          class="tiktok-embed"
-          cite="https://www.tiktok.com/@user/video/7000000000000000000"
-          data-video-id="7000000000000000000"
-          style="max-width: 605px;"
-        >
-          <p>
-            <iframe
-              src="https://www.tiktok.com/embed/v2/7000000000000000000"
-              style="width: 100%;height: 758.53px"
             ></iframe>
           </p>
         </blockquote>
@@ -785,36 +752,6 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    // The measurement must not depend on which player url the CMS stored, so the hydrated
-    // iframe is matched by the same paths the direct carrier resolver claims.
-    it('should keep the hydrated measurement when the stored iframe uses the first-generation path', async () => {
-      const value = html`
-        <blockquote
-          class="tiktok-embed"
-          cite="https://www.tiktok.com/@user/video/7000000000000000000"
-          data-video-id="7000000000000000000"
-          style="max-width: 605px;"
-        >
-          <p>
-            <iframe
-              src="https://www.tiktok.com/embed/7000000000000000000"
-              style="width: 100%;height: 758px"
-            ></iframe>
-          </p>
-        </blockquote>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'tiktok',
-        id: '@user/video/7000000000000000000',
-        src: 'https://www.tiktok.com/embed/v2/7000000000000000000',
-        url: 'https://www.tiktok.com/@user/video/7000000000000000000',
-        width: 605,
-        height: 758,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   // What only the whole pipeline shows: the snippet arrives as a blockquote plus a loader
@@ -900,8 +837,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
           data-embed-id="@user/video/7000000000000000000"
           data-embed-src="https://www.tiktok.com/embed/v2/7000000000000000000"
           data-embed-url="https://www.tiktok.com/@user/video/7000000000000000000"
-          data-embed-width="605"
-          data-embed-height="758"
+          data-embed-height="738"
         ></div>
       `
 

@@ -278,7 +278,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 437,
+        height: 300,
         title: 'Parallax Card',
         author: '@argyleink',
       }
@@ -504,7 +504,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/wesbos/embed/pFzlJ',
         url: 'https://codepen.io/wesbos/pen/pFzlJ',
         thumbnail: 'https://shots.codepen.io/wesbos/pen/pFzlJ-512.jpg',
-        height: 268,
+        height: 300,
         title: 'Flexbox Demo',
         author: '@wesbos',
       }
@@ -665,9 +665,9 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The url in `data-href` is the player's own, so the height the author picked can sit in its
-    // query with no `data-height` beside it.
-    it('should take the height from the url when the block states none', async () => {
+    // The url in `data-href` is the player's own, and the height in its query is the carrier's,
+    // which shallow handling does not read.
+    it('should state the default height over the height the url names', async () => {
       const value = html`
         <p
           class="codepen"
@@ -680,7 +680,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 600,
+        height: 300,
         author: '@argyleink',
       }
 
@@ -1078,10 +1078,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
     })
   })
 
-  // Three sources, in the order the publisher's own intent runs out: the box they laid out, the
-  // number the loader put in the query, then CodePen's own default for a player that says nothing.
   describe('how tall the player is', () => {
-    it('should take the height stated in the query when no attribute states one', async () => {
+    it('should state the default height over the height the query names', async () => {
       const value = '<iframe src="https://codepen.io/argyleink/embed/XJpKqXm?height=600"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'codepen',
@@ -1089,7 +1087,7 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 600,
+        height: 300,
         author: '@argyleink',
       }
 
@@ -1119,22 +1117,6 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
 
     it('should fall back to the height CodePen defaults to', async () => {
       const value = '<iframe src="https://codepen.io/argyleink/embed/XJpKqXm"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'codepen',
-        id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
-        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
-        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: 300,
-        author: '@argyleink',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    // A zero is a height nobody laid out, so the player takes the default as if it stated none.
-    it('should treat a height of zero as no height at all', async () => {
-      const value = '<iframe src="https://codepen.io/argyleink/embed/XJpKqXm?height=0"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
@@ -1666,7 +1648,7 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
-        height: '437',
+        height: '300',
         title: 'Parallax Card',
         author: '@argyleink',
       }
@@ -1720,7 +1702,7 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
         src: 'https://codepen.io/argyleink/embed/XJpKqXm',
         url: 'https://codepen.io/argyleink/pen/XJpKqXm',
         thumbnail: 'https://assets.codepen.io/2869/internal/screenshots/pens/XJpKqXm.default.png',
-        height: '600',
+        height: '300',
         author: '@argyleink',
       }
 

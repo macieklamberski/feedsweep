@@ -795,7 +795,9 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
   })
 
   describe('the Tumblr figure wrapper', () => {
-    it('should carry the size the wrapper states', async () => {
+    // The frame posts its height, and the figure's size is the carrier's, which shallow handling
+    // does not read.
+    it('should state no size over the size the wrapper states', async () => {
       const value = html`
         <figure
           class="tmblr-embed tmblr-full"
@@ -816,8 +818,6 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
         id: 'reel/DGPdABWz84n',
         src: 'https://www.instagram.com/reel/DGPdABWz84n/embed/',
         url: 'https://www.instagram.com/reel/DGPdABWz84n/',
-        width: 540,
-        height: 627,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -851,29 +851,6 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
           data-url="https://www.instagram.com/p/CaUsPbUquKV/?x=%ZZ"
         >
           <blockquote class="instagram-media"></blockquote>
-        </figure>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'instagram',
-        id: 'p/CaUsPbUquKV',
-        src: 'https://www.instagram.com/p/CaUsPbUquKV/embed/',
-        url: 'https://www.instagram.com/p/CaUsPbUquKV/',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should state no size when the wrapper gives only one dimension', async () => {
-      const value = html`
-        <figure
-          class="tmblr-embed"
-          data-provider="instagram"
-          data-orig-width="540"
-        >
-          <blockquote
-            class="instagram-media"
-            data-instgrm-permalink="https://www.instagram.com/p/CaUsPbUquKV/"
-          ></blockquote>
         </figure>
       `
       const expected: EmbedResolverResult = {

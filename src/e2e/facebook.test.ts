@@ -73,6 +73,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/PageName/videos/123/"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F"
         data-embed-url="https://www.facebook.com/PageName/videos/123/"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -222,6 +223,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/PageName/videos/123/"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F"
         data-embed-url="https://www.facebook.com/PageName/videos/123/"
+        data-embed-ratio="16/9"
         data-embed-description="A video caption."
         data-embed-author="PageName"
         data-embed-date="Wednesday, 4 June 2026"
@@ -359,6 +361,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/watch/?v=1010445561578533"
         data-embed-provider="facebook"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1010445561578533"
+        data-embed-ratio="16/9"
       ></div>
     `
 

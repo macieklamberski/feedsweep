@@ -54,6 +54,7 @@ const composePluginEmbed = (
     src: `https://www.facebook.com/plugins/${plugin}.php${query}`,
     url: href,
     height: plugin === 'post' ? postHeight : undefined,
+    ratio: plugin === 'video' ? '16/9' : undefined,
     ...extra,
   }
 }

@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
-import { codesandboxIframeEmbedResolver, codesandboxResolveEmbed } from './codesandbox.js'
+import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import { readIframeResizeHeight } from '../utils/hints.js'
+import {
+  codesandboxIframeEmbedResolver,
+  codesandboxRenderHint,
+  codesandboxResolveEmbed,
+} from './codesandbox.js'
 
 // Every `data-embed-*` field the placeholder carries, for the shapes that only resolve once the
 // pipeline has repaired them and so cannot be asserted on the resolver alone.
@@ -52,12 +57,12 @@ describe('codesandboxResolveEmbed', () => {
       expect(codesandboxResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should build the placeholder from an embed url on the www host', () => {
+    it('should mint the apex host for an embed url on the www host', () => {
       const value = 'https://www.codesandbox.io/embed/83wzkj'
       const expected: EmbedResolverResult = {
         provider: 'codesandbox',
         id: '83wzkj',
-        src: 'https://www.codesandbox.io/embed/83wzkj',
+        src: 'https://codesandbox.io/embed/83wzkj',
         url: 'https://codesandbox.io/s/83wzkj',
         height: 500,
       }
@@ -65,14 +70,42 @@ describe('codesandboxResolveEmbed', () => {
       expect(codesandboxResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the query that chooses the pane and the file', () => {
+    it('should drop the font size, the navigation and the theme', () => {
       const value =
         'https://codesandbox.io/embed/column-layout-3ihtm?fontsize=14&hidenavigation=1&theme=light'
       const expected: EmbedResolverResult = {
         provider: 'codesandbox',
         id: '3ihtm',
-        src: 'https://codesandbox.io/embed/column-layout-3ihtm?fontsize=14&hidenavigation=1&theme=light',
+        src: 'https://codesandbox.io/embed/column-layout-3ihtm',
         url: 'https://codesandbox.io/s/column-layout-3ihtm',
+        height: 500,
+      }
+
+      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the file the editor opens on', () => {
+      const value =
+        'https://codesandbox.io/embed/NkB6R6O2L?module=wRo98&autoresize=1&hidenavigation=1'
+      const expected: EmbedResolverResult = {
+        provider: 'codesandbox',
+        id: 'NkB6R6O2L',
+        src: 'https://codesandbox.io/embed/NkB6R6O2L?module=wRo98',
+        url: 'https://codesandbox.io/s/NkB6R6O2L',
+        height: 500,
+      }
+
+      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the pane and the module view', () => {
+      const value =
+        'https://codesandbox.io/embed/smarter-dumb-breadcrumb-part-two-jvi14?autoresize=1&fontsize=13&hidenavigation=1&view=editor&moduleview=1'
+      const expected: EmbedResolverResult = {
+        provider: 'codesandbox',
+        id: 'jvi14',
+        src: 'https://codesandbox.io/embed/smarter-dumb-breadcrumb-part-two-jvi14',
+        url: 'https://codesandbox.io/s/smarter-dumb-breadcrumb-part-two-jvi14',
         height: 500,
       }
 
@@ -170,12 +203,12 @@ describe('codesandboxResolveEmbed', () => {
       expect(codesandboxResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should read the legacy user url, which CodeSandbox rewrites when it is framed', () => {
+    it('should mint the embed renderer for the legacy user url', () => {
       const value = 'https://codesandbox.io/s/react-new-7yncj'
       const expected: EmbedResolverResult = {
         provider: 'codesandbox',
         id: '7yncj',
-        src: 'https://codesandbox.io/s/react-new-7yncj',
+        src: 'https://codesandbox.io/embed/react-new-7yncj',
         url: 'https://codesandbox.io/s/react-new-7yncj',
         height: 500,
       }
@@ -190,6 +223,20 @@ describe('codesandboxResolveEmbed', () => {
         id: '544ck6',
         src: 'https://codesandbox.io/p/devbox/optimistic-nova-544ck6?embed=1',
         url: 'https://codesandbox.io/p/devbox/optimistic-nova-544ck6',
+        height: 500,
+      }
+
+      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the file and the embed flag on a DevBox route', () => {
+      const value =
+        'https://codesandbox.io/p/sandbox/wizardly-wildflower-nrhln8?file=%2Fsrc%2Findex.js&embed=1&theme=dark'
+      const expected: EmbedResolverResult = {
+        provider: 'codesandbox',
+        id: 'nrhln8',
+        src: 'https://codesandbox.io/p/sandbox/wizardly-wildflower-nrhln8?file=%2Fsrc%2Findex.js&embed=1',
+        url: 'https://codesandbox.io/p/sandbox/wizardly-wildflower-nrhln8',
         height: 500,
       }
 
@@ -258,7 +305,7 @@ describeForEachParser('codesandboxIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codesandbox',
         id: 'y722d',
-        src: 'https://codesandbox.io/embed/lazy-loading-composable-state-y722d?fontsize=14&theme=dark',
+        src: 'https://codesandbox.io/embed/lazy-loading-composable-state-y722d',
         url: 'https://codesandbox.io/s/lazy-loading-composable-state-y722d',
         height: 500,
         title: 'Lazy loading composable state',
@@ -356,7 +403,7 @@ describeForEachParser('codesandbox shapes the pipeline repairs first', (parseHtm
     const expected: Record<string, string> = {
       provider: 'codesandbox',
       id: 'x86xtf',
-      src: 'https://codesandbox.io/embed/x86xtf?codemirror=1&theme=light',
+      src: 'https://codesandbox.io/embed/x86xtf',
       url: 'https://codesandbox.io/s/x86xtf',
       height: '500',
     }
@@ -395,6 +442,20 @@ describeForEachParser('codesandbox shapes the pipeline repairs first', (parseHtm
     `
 
     expect(await convert(value)).not.toContain('cdn.embedly.com')
+  })
+})
+
+describe('codesandboxRenderHint', () => {
+  // The minted src carries no `autoresize`, and without it the editor posts a constant 500.
+  it('should ask every load for the height the editor renders at', () => {
+    const expected: EmbedRenderHint = {
+      provider: 'codesandbox',
+      origin: 'https://codesandbox.io',
+      params: { autoresize: '1' },
+      readHeight: readIframeResizeHeight,
+    }
+
+    expect(codesandboxRenderHint).toEqual(expected)
   })
 })
 

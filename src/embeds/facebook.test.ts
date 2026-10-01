@@ -90,6 +90,7 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/WillowbankRaceway/videos/732638203506014/',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FWillowbankRaceway%2Fvideos%2F732638203506014%2F',
         url: 'https://www.facebook.com/WillowbankRaceway/videos/732638203506014/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -108,6 +109,7 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
         id: 'https://fb.watch/abcDEF123/',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Ffb.watch%2FabcDEF123%2F',
         url: 'https://fb.watch/abcDEF123/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -302,6 +304,7 @@ describeForEachParser('facebookAmpEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/videos/123/',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F',
         url: 'https://www.facebook.com/PageName/videos/123/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -355,6 +358,7 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/videos/123/',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F',
         url: 'https://www.facebook.com/PageName/videos/123/',
+        ratio: '16/9',
         description: 'A video caption.',
         author: 'PageName',
         date: 'Wednesday, 4 June 2026',
@@ -451,7 +455,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should rebuild a post plugin iframe around its href and drop the caption toggle', async () => {
+    it('should rebuild a post plugin iframe around its href and drop the caption toggle and the width', async () => {
       const value = html`
         <iframe
           src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123&show_text=true&width=500"
@@ -499,6 +503,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/dale.ghent/videos/1547460739144960/',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fdale.ghent%2Fvideos%2F1547460739144960%2F&t=1',
         url: 'https://www.facebook.com/dale.ghent/videos/1547460739144960/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -515,6 +520,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/nolimitblades/videos/835543906514182/',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fnolimitblades%2Fvideos%2F835543906514182%2F&t=0',
         url: 'https://www.facebook.com/nolimitblades/videos/835543906514182/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -531,6 +537,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/seantierney/videos/10153391162780883/',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fseantierney%2Fvideos%2F10153391162780883%2F',
         url: 'https://www.facebook.com/seantierney/videos/10153391162780883/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -547,6 +554,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/videos/123/',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F',
         url: 'https://www.facebook.com/PageName/videos/123/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -582,6 +590,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/videos/123/',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F',
         url: 'https://www.facebook.com/PageName/videos/123/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -596,14 +605,56 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: '123456',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D123456',
         url: 'https://www.facebook.com/watch/?v=123456',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
   })
 
+  // The size a Facebook embed gets depends on which shape it arrived as, so each one is
+  // asserted separately.
   describe('size sources', () => {
-    it('should drop the size a Reel states in the plugin query', async () => {
+    it('should take the size off the element when the url states none', async () => {
+      const value = html`
+        <iframe
+          src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
+          width="500"
+          height="500"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/PageName/posts/123',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
+        url: 'https://www.facebook.com/PageName/posts/123',
+        width: 500,
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state the video ratio over the size the plugin query names', async () => {
+      const value = html`
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F&show_text=false&width=560"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/PageName/videos/123/',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F',
+        url: 'https://www.facebook.com/PageName/videos/123/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // The query's 267x476 is the carrier's size, which shallow handling does not read, so a Reel
+    // shows in the video player's box.
+    it('should state the video ratio over the vertical size a Reel query names', async () => {
       const value = html`
         <iframe
           src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F123%2F&show_text=false&width=267"
@@ -614,6 +665,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/reel/123/',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Freel%2F123%2F',
         url: 'https://www.facebook.com/reel/123/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -748,6 +800,7 @@ describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/watch/?v=506931837457674',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D506931837457674',
         url: 'https://www.facebook.com/watch/?v=506931837457674',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -819,6 +872,7 @@ describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/watch/?v=1574979536826284',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1574979536826284',
         url: 'https://www.facebook.com/watch/?v=1574979536826284',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -836,6 +890,7 @@ describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/watch/?v=1574979536826284',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1574979536826284',
         url: 'https://www.facebook.com/watch/?v=1574979536826284',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -887,6 +942,7 @@ describe('facebookResolveEmbed', () => {
       id: '../etc',
       src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D..%252Fetc',
       url: 'https://www.facebook.com/watch/?v=..%2Fetc',
+      ratio: '16/9',
     }
 
     expect(facebookResolveEmbed(value)).toEqual(expected)
@@ -899,6 +955,7 @@ describe('facebookResolveEmbed', () => {
       id: 'https://www.facebook.com/watch/?v=banana',
       src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3Dbanana',
       url: 'https://www.facebook.com/watch/?v=banana',
+      ratio: '16/9',
     }
 
     expect(facebookResolveEmbed(value)).toEqual(expected)
@@ -911,6 +968,7 @@ describe('facebookResolveEmbed', () => {
       id: 'https://www.facebook.com/watch/?v=%20',
       src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D%2520',
       url: 'https://www.facebook.com/watch/?v=%20',
+      ratio: '16/9',
     }
 
     expect(facebookResolveEmbed(value)).toEqual(expected)
@@ -958,30 +1016,31 @@ describe('facebookResolveEmbed', () => {
   // Facebook refuses to be framed, so each of these has to become a plugin url or the reader
   // gets a blank frame. The path decides which plugin: the watch page, a page's video and a
   // reel are the player, a page's post is the post.
-  const videoAddressUrls: Array<string> = [
+  const videoPageUrls = [
     'https://www.facebook.com/watch/?v=1010445561578533',
     'https://www.facebook.com/100067727304035/videos/797784661900446/',
     'https://www.facebook.com/balloonspider/videos/vb.609918550/10153047276/',
     'https://www.facebook.com/reel/873906321076441',
   ]
 
-  it.each(videoAddressUrls)('should mint the video plugin url from %s', (value) => {
-    const expected: EmbedResolverResult = {
+  it.each(videoPageUrls)('should mint the video plugin url from %s', (value) => {
+    const expected = {
       provider: 'facebook',
       id: value,
       src: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(value)}`,
       url: value,
+      ratio: '16/9',
     }
 
     expect(facebookResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should mint the post plugin url from a page post address', () => {
+  it('should mint the post plugin url from a page post', () => {
     const value = 'https://www.facebook.com/xyzcontagion/posts/pfbid02XbT4GZsmw5Azhi'
-    const expected: EmbedResolverResult = {
+    const expected = {
       provider: 'facebook',
       id: value,
-      src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fxyzcontagion%2Fposts%2Fpfbid02XbT4GZsmw5Azhi',
+      src: `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(value)}`,
       url: value,
       height: 646,
     }
