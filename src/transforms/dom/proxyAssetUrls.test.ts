@@ -1,4 +1,4 @@
-import { expect, it } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import { baseContext as defaultContext, describeForEachParser, html } from '../../tests.js'
 import type {
   AssetProxyFn,
@@ -457,14 +457,6 @@ describeForEachParser('proxyAssetUrls', (parseHtml) => {
     expect(await transform(value, wrapProxy)).toEqualHtml(value)
   })
 
-  it('should be idempotent given an idempotent assetProxyFn', async () => {
-    const value = '<img src="https://cdn.example.com/photo.jpg">'
-    const once = await transform(value, idempotentProxy)
-    const twice = await transform(once, idempotentProxy)
-
-    expect(twice).toEqualHtml(once)
-  })
-
   it('should await an async assetProxyFn on a src attribute', async () => {
     const value = html`<img src="https://cdn.example.com/photo.jpg">`
     const expected = html`
@@ -506,63 +498,74 @@ describeForEachParser('proxyAssetUrls', (parseHtml) => {
 
     expect(twice).toEqualHtml(expected)
   })
-  // A url field added to utils/widgets.ts and never classified in urlAttributes fails the next
-  // two: the pass leaves it alone and the table does not declare it as carrying no asset.
-  const assetUrl = 'https://cdn.example.com/asset.jpg'
-  // Every field gets a non-url marker and this resolver maps any url to the asset url, so an
-  // attribute holding the asset url is one the mint path treats as a url.
-  const mintContext: TransformContext = {
-    ...defaultContext,
-    resolveUrlFn: () => assetUrl,
-    assetProxyFn: wrapProxy,
-  }
-  // Attributes the table declares carry a url but no asset, so the pass is right to skip them.
-  const unproxyableAttributes = urlAttributes
-    .filter(({ tag, asset }) => !tag && !asset)
-    .map(({ attribute }) => attribute)
 
-  // Stands in for a result with every field populated. The point is to fill each field the mint
-  // path knows, not to be a valid result, so the declared field types are asserted away.
-  const markerFields = <Type>(names: Array<string>): Type => {
-    return Object.fromEntries(names.map((name) => [name, 'not-a-url'])) as Type
-  }
+  describe('coverage', () => {
+    // A url field added to utils/widgets.ts and never classified in urlAttributes fails the next
+    // two: the pass leaves it alone and the table does not declare it as carrying no asset.
+    const assetUrl = 'https://cdn.example.com/asset.jpg'
+    // Every field gets a non-url marker and this resolver maps any url to the asset url, so an
+    // attribute holding the asset url is one the mint path treats as a url.
+    const mintContext: TransformContext = {
+      ...defaultContext,
+      resolveUrlFn: () => assetUrl,
+      assetProxyFn: wrapProxy,
+    }
+    // Attributes the table declares carry a url but no asset, so the pass is right to skip them.
+    const unproxyableAttributes = urlAttributes
+      .filter(({ tag, asset }) => !tag && !asset)
+      .map(({ attribute }) => attribute)
 
-  // Read against the names the placeholder was minted with, since a proxied attribute leaves its
-  // original url behind on a `data-proxied-*` companion, which would otherwise read as unproxied.
-  const unproxied = async (document: Document, placeholder: Element): Promise<Array<string>> => {
-    const names = placeholder.getAttributeNames()
+    // Stands in for a result with every field populated. The point is to fill each field the mint
+    // path knows, not to be a valid result, so the declared field types are asserted away.
+    const markerFields = <Type>(names: Array<string>): Type => {
+      return Object.fromEntries(names.map((name) => [name, 'not-a-url'])) as Type
+    }
 
-    document.body.appendChild(placeholder)
-    await proxyAssetUrls(mintContext)(document)
+    // Read against the names the placeholder was minted with, since a proxied attribute leaves its
+    // original url behind on a `data-proxied-*` companion, which would otherwise read as unproxied.
+    const unproxied = async (document: Document, placeholder: Element): Promise<Array<string>> => {
+      const names = placeholder.getAttributeNames()
 
-    return names.filter((name) => placeholder.getAttribute(name) === assetUrl)
-  }
+      document.body.appendChild(placeholder)
+      await proxyAssetUrls(mintContext)(document)
 
-  it('should proxy every asset url an embed placeholder can mint', async () => {
-    const document = parseHtml('')
-    const metadata = markerFields<EmbedResolverResult>(Object.keys(normalizeEmbedFields({})))
-    const placeholder = createEmbedPlaceholder(
-      document,
-      prepareEmbedMetadata(metadata, mintContext) as EmbedResolverResult,
-    )
-    const expected = placeholder
-      .getAttributeNames()
-      .filter((name) => unproxyableAttributes.includes(name))
+      return names.filter((name) => placeholder.getAttribute(name) === assetUrl)
+    }
 
-    expect(await unproxied(document, placeholder)).toEqual(expected)
+    it('should proxy every asset url an embed placeholder can mint', async () => {
+      const document = parseHtml('')
+      const metadata = markerFields<EmbedResolverResult>(Object.keys(normalizeEmbedFields({})))
+      const placeholder = createEmbedPlaceholder(
+        document,
+        prepareEmbedMetadata(metadata, mintContext) as EmbedResolverResult,
+      )
+      const expected = placeholder
+        .getAttributeNames()
+        .filter((name) => unproxyableAttributes.includes(name))
+
+      expect(await unproxied(document, placeholder)).toEqual(expected)
+    })
+
+    it('should proxy every asset url a cite placeholder can mint', async () => {
+      const document = parseHtml('')
+      const metadata = markerFields<CiteResolverResult>(Object.keys(normalizeCiteFields({})))
+      const placeholder = createCitePlaceholder(
+        document,
+        prepareCiteMetadata(metadata, mintContext) as CiteResolverResult,
+      )
+      const expected = placeholder
+        .getAttributeNames()
+        .filter((name) => unproxyableAttributes.includes(name))
+
+      expect(await unproxied(document, placeholder)).toEqual(expected)
+    })
   })
 
-  it('should proxy every asset url a cite placeholder can mint', async () => {
-    const document = parseHtml('')
-    const metadata = markerFields<CiteResolverResult>(Object.keys(normalizeCiteFields({})))
-    const placeholder = createCitePlaceholder(
-      document,
-      prepareCiteMetadata(metadata, mintContext) as CiteResolverResult,
-    )
-    const expected = placeholder
-      .getAttributeNames()
-      .filter((name) => unproxyableAttributes.includes(name))
+  it('should be idempotent given an idempotent assetProxyFn', async () => {
+    const value = '<img src="https://cdn.example.com/photo.jpg">'
+    const once = await transform(value, idempotentProxy)
+    const twice = await transform(once, idempotentProxy)
 
-    expect(await unproxied(document, placeholder)).toEqual(expected)
+    expect(twice).toEqualHtml(once)
   })
 })
