@@ -8,9 +8,9 @@ const provider = 'canalu'
 // The apex has no DNS, and `vod.canal-u.tv` serves the video files.
 const canaluHosts = ['www.canal-u.tv']
 
-// Canal-U's video player, `/chaines/{channel}/embed/{id}`. The id is the video's node id, which
-// `/node/{id}` and `/embed/{id}` serve without the channel, so the key is the id alone. The
-// player reads `t` as the start position and nothing else from its query.
+// Canal-U's video player, `/chaines/{channel}/embed/{id}` today and `/embed/{id}` before, which
+// redirects to the channel the id belongs to. The id is the video's node id, so it is the key on
+// both routes. The player reads `t` as the start position and nothing else from its query.
 export const canaluResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, canaluHosts)
 
@@ -19,24 +19,36 @@ export const canaluResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const segments = getPathSegments(parsed)
-
-  if (segments.length !== 4) {
-    return
-  }
-
-  const [chaines, channel, embed, id] = segments
-
-  if (!isAnyOf(chaines, 'chaines') || !isAnyOf(embed, 'embed')) {
-    return
-  }
-
   const query = pickUrlParams(parsed.href, ['t'])
 
-  return {
-    provider,
-    id,
-    src: `https://www.canal-u.tv/chaines/${channel}/embed/${id}${query}`,
-    ratio: '16/9',
+  if (segments.length === 4) {
+    const [chaines, channel, embed, id] = segments
+
+    if (!isAnyOf(chaines, 'chaines') || !isAnyOf(embed, 'embed')) {
+      return
+    }
+
+    return {
+      provider,
+      id,
+      src: `https://www.canal-u.tv/chaines/${channel}/embed/${id}${query}`,
+      ratio: '16/9',
+    }
+  }
+
+  if (segments.length === 2) {
+    const [embed, id] = segments
+
+    if (!isAnyOf(embed, 'embed')) {
+      return
+    }
+
+    return {
+      provider,
+      id,
+      src: `https://www.canal-u.tv/embed/${id}${query}`,
+      ratio: '16/9',
+    }
   }
 }
 

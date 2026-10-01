@@ -66,6 +66,18 @@ describe('canaluResolveEmbed', () => {
 
       expect(canaluResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should keep the route with no channel and key it by the same id', () => {
+      const value = 'https://www.canal-u.tv/embed/117403?t=0'
+      const expected: EmbedResolverResult = {
+        provider: 'canalu',
+        id: '117403',
+        src: 'https://www.canal-u.tv/embed/117403?t=0',
+        ratio: '16/9',
+      }
+
+      expect(canaluResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -104,18 +116,24 @@ describe('canaluResolveEmbed', () => {
 
       expect(canaluResolveEmbed(value)).toBeUndefined()
     })
+
+    it('should ignore a short path under another route word', () => {
+      const value = 'https://www.canal-u.tv/x/117403'
+
+      expect(canaluResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a short path with a trailing segment', () => {
+      const value = 'https://www.canal-u.tv/embed/117403/extra'
+
+      expect(canaluResolveEmbed(value)).toBeUndefined()
+    })
   })
 
   describe('shapes left to the generic fallback', () => {
     it('should ignore the video page', () => {
       const value =
         'https://www.canal-u.tv/chaines/univ-bordeaux/externalisation-de-l-activite-dans-l-agriculture-de-l-opportunite-migratoire'
-
-      expect(canaluResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the player route with no channel', () => {
-      const value = 'https://www.canal-u.tv/embed/117403?t=0'
 
       expect(canaluResolveEmbed(value)).toBeUndefined()
     })
@@ -152,6 +170,27 @@ describeForEachParser('canaluEmbedResolver', (parseHtml) => {
         provider: 'canalu',
         id: '150235',
         src: 'https://www.canal-u.tv/chaines/univ-bordeaux/embed/150235?t=0',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the size written into the query', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          src="https://www.canal-u.tv/embed/79251?width=100%&amp;height=100%"
+          width="550"
+          height="306"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'canalu',
+        id: '79251',
+        src: 'https://www.canal-u.tv/embed/79251',
         ratio: '16/9',
       }
 
