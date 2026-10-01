@@ -1,6 +1,6 @@
 import { getPathSegments, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, parsePixelSize } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import {
   atUsername,
@@ -42,28 +42,28 @@ const readPost = (value: string | undefined): EmbedResolverResult | undefined =>
   return composePost(match[1], match[2])
 }
 
+// The attribute holds only the `{channel}/{id}` pair, so no route word can stand in either half.
+const readDeclaredPost = (value: string | undefined): EmbedResolverResult | undefined => {
+  const [channel, messageId, ...rest] = value?.split('/') ?? []
+
+  if (!channel || !messageId || rest.length) {
+    return
+  }
+
+  return composePost(channel, messageId)
+}
+
 // Telegram ships a post as a bare <script data-telegram-post> whose widget.js builds the iframe.
 // Feeds carrying the script almost never hold a t.me iframe anywhere.
 export const telegramScriptEmbedResolver = createMarkupEmbedResolver(
   'script[data-telegram-post]',
   (element) => {
-    const result = readPost(attr(element, 'data-telegram-post'))
-
-    if (!result) {
-      return
-    }
-
-    // The widget resizes itself to fit the post, so the snippet states no height at all and
-    // `data-width` is the only size it carries. The usual value is `100%`, which is not a pixel
-    // size and is dropped here.
-    const width = parsePixelSize(attr(element, 'data-width'))
-
-    return width ? { ...result, width } : result
+    return readDeclaredPost(attr(element, 'data-telegram-post'))
   },
 )
 
 // The post iframe that script builds, saved into the feed by a CMS that ran it first.
-export const telegramResolveEmbed: ResolveEmbed = (url) => {
+const telegramResolveEmbed: ResolveEmbed = (url) => {
   return readPost(getPathSegments(url).join('/'))
 }
 
@@ -76,13 +76,9 @@ export const telegramIframeEmbedResolver = createUrlEmbedResolver(
 )
 
 // A forum's s9e MediaEmbed helper frame, naming the post as `{channel}/{id}` in its url fragment.
-export const telegramS9eEmbedResolver = createS9eEmbedResolver(
-  'telegram',
-  /^[\w/]+$/,
-  (fragment) => {
-    return telegramResolveEmbed(`https://t.me/${fragment}`)
-  },
-)
+export const telegramS9eEmbedResolver = createS9eEmbedResolver('telegram', (fragment) => {
+  return telegramResolveEmbed(`https://t.me/${fragment}`)
+})
 
 // The player reports a `resize` event with its height, `null` for a post it could not load,
 // which reads as nothing.

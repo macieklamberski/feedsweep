@@ -73,14 +73,6 @@ describeForEachParser('unwrapHeadingBold', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should be idempotent', async () => {
-      const value = '<h2><strong>Title</strong></h2>'
-      const once = await transform(value)
-      const twice = await transform(once)
-
-      expect(twice).toEqualHtml(once)
-    })
-
     it('should leave a heading where bold does not wrap the whole content', async () => {
       const value = '<h2><strong>Part</strong> and more</h2>'
 
@@ -157,6 +149,14 @@ describeForEachParser('unwrapHeadingBold', (parseHtml) => {
       `
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should be idempotent', async () => {
+      const value = '<h2><strong>Title</strong></h2>'
+      const once = await transform(value)
+      const twice = await transform(once)
+
+      expect(twice).toEqualHtml(once)
     })
   })
 })

@@ -18,6 +18,7 @@ import { decodeDoubleEncodedTags } from '../transforms/dom/decodeDoubleEncodedTa
 import { demoteHeadings } from '../transforms/dom/demoteHeadings.js'
 import { enrichCitePlaceholders } from '../transforms/dom/enrichCitePlaceholders.js'
 import { enrichEmbedPlaceholders } from '../transforms/dom/enrichEmbedPlaceholders.js'
+import { fixDropboxMediaUrls } from '../transforms/dom/fixDropboxMediaUrls.js'
 import { fixLazyAudios } from '../transforms/dom/fixLazyAudios.js'
 import { fixLazyIframes } from '../transforms/dom/fixLazyIframes.js'
 import { fixLazyImages } from '../transforms/dom/fixLazyImages.js'
@@ -43,13 +44,16 @@ import { rebuildDeferredIframes } from '../transforms/dom/rebuildDeferredIframes
 import { rebuildElementorVideoEmbeds } from '../transforms/dom/rebuildElementorVideoEmbeds.js'
 import { rebuildEmbedlyEmbeds } from '../transforms/dom/rebuildEmbedlyEmbeds.js'
 import { rebuildEmbedPlusEmbeds } from '../transforms/dom/rebuildEmbedPlusEmbeds.js'
+import { rebuildExternalVideoEmbeds } from '../transforms/dom/rebuildExternalVideoEmbeds.js'
 import { rebuildGettyImagesEmbeds } from '../transforms/dom/rebuildGettyImagesEmbeds.js'
 import { rebuildGofundmeEmbeds } from '../transforms/dom/rebuildGofundmeEmbeds.js'
+import { rebuildIframelyEmbeds } from '../transforms/dom/rebuildIframelyEmbeds.js'
 import { rebuildJsfiddleEmbeds } from '../transforms/dom/rebuildJsfiddleEmbeds.js'
 import { rebuildLazyLoadForVideos } from '../transforms/dom/rebuildLazyLoadForVideos.js'
 import { rebuildLazyYtEmbeds } from '../transforms/dom/rebuildLazyYtEmbeds.js'
 import { rebuildLiteVideoEmbeds } from '../transforms/dom/rebuildLiteVideoEmbeds.js'
 import { rebuildLyteEmbeds } from '../transforms/dom/rebuildLyteEmbeds.js'
+import { rebuildPublicalbumGalleries } from '../transforms/dom/rebuildPublicalbumGalleries.js'
 import { rebuildRocketYoutubePreviews } from '../transforms/dom/rebuildRocketYoutubePreviews.js'
 import { rebuildVideoJsEmbeds } from '../transforms/dom/rebuildVideoJsEmbeds.js'
 import { rebuildWistiaEmbeds } from '../transforms/dom/rebuildWistiaEmbeds.js'
@@ -109,6 +113,9 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // has to see it.
   surfaceParkedMarkup,
   stripComments,
+  // Runs before stripHiddenElements, which deletes the album div the plugin hides with inline
+  // `display:none`, and every photo url inside it.
+  rebuildPublicalbumGalleries,
   stripHiddenElements,
   // Normalize lazy-loaded video embeds into a plain <iframe> before the media/embed
   // transforms run, so each is placeholdered and any poster connected.
@@ -119,10 +126,12 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   unwrapDrupalOembedIframes,
   surfaceNoscriptEmbeds,
   rebuildEmbedPlusEmbeds,
+  rebuildIframelyEmbeds,
   rebuildLiteVideoEmbeds,
   rebuildLyteEmbeds,
   rebuildRocketYoutubePreviews,
   rebuildVideoJsEmbeds,
+  rebuildExternalVideoEmbeds,
   rebuildWmakerEmbeds,
   rebuildWistiaEmbeds,
   rebuildLazyLoadForVideos,
@@ -202,8 +211,8 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   stripNonContentElements,
   resolveRelativeUrls,
   cleanAnchorUrls,
-  // Runs after resolveRelativeUrls/cleanAnchorUrls so hrefs are absolute and cleaned,
-  // and before normalizeAnchoredHeadings so heading permalinks are already bare
+  // Runs after cleanAnchorUrls, whose cleanUrlFn can unwrap a redirect around a link to this
+  // same page, and before normalizeAnchoredHeadings so heading permalinks are already bare
   // `#fragment` when the canonical `<a name>` is built.
   shortenSamePageLinkFragments,
   // Runs after cleanAnchorUrls so the href it inspects is already cleaned/resolved,
@@ -255,6 +264,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   fixLazyIframes,
   convertWidgets,
   injectEnclosures,
+  // Runs after injectEnclosures, and so after the heuristic stripDuplicateEnclosures folded in
+  // beside it, which matches an injected enclosure against the body on the exact src. Before
+  // neutralizeUnsafeUrls and proxyAssetUrls, so the repaired url is the one they see.
+  fixDropboxMediaUrls,
   // Fills embed placeholder metadata via the caller's enrichEmbedFn. No-ops when that
   // option is unset. Runs after placeholders exist and before neutralize/proxy so any
   // enriched URLs are still neutralized and proxied.
@@ -300,8 +313,8 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
 export const heuristicDomTransforms: Array<DomTransform> = [
   assignVideoPosters,
   stripDuplicateEnclosures,
-  // After stripDuplicateEnclosures: an injected enclosure that duplicates the first
-  // content image is already gone by then, so this only sees publisher-authored repeats.
+  // An image enclosure is injected only into a body with no image of its own, so no injected
+  // image repeats a content image for either pass to remove.
   stripDuplicateLeadingImages,
 ]
 

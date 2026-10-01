@@ -45,15 +45,19 @@ describeForEachParser('discourseMediaResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined when the src is not a video file', async () => {
+    it('should use a stream url as written, even if only some readers play it', async () => {
       const value = html`
         <div
           class="video-placeholder-container"
           data-video-src="https://forum.example.com/uploads/stream.m3u8"
         ></div>
       `
+      const expected: MediaResolverResult = {
+        tag: 'video',
+        src: 'https://forum.example.com/uploads/stream.m3u8',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined when the src is empty', async () => {

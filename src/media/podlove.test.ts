@@ -164,6 +164,42 @@ describeForEachParser('podloveMediaResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should skip opus for an mp3 listed after it', async () => {
+      const config = JSON.stringify([
+        {
+          data: {
+            audio: [
+              { url: 'https://example.com/e.opus', mimeType: 'audio/opus' },
+              { url: 'https://example.com/e.mp3', mimeType: 'audio/mpeg' },
+            ],
+          },
+        },
+      ])
+      const value = html`
+        <div
+          id="player-6a7b24b4e645d"
+          class="podlove-web-player"
+        >
+          <root>
+            <tab-chapters></tab-chapters>
+            <subscribe-button></subscribe-button>
+          </root>
+        </div>
+        <script>
+          document.addEventListener("DOMContentLoaded", function() {
+            var player = document.getElementById("player-6a7b24b4e645d");
+            podlovePlayerCache.add(${config})
+          })
+        </script>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'https://example.com/e.mp3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // Nothing preferred is on offer, so the config's own order stands.
     it('should fall back to the first entry when no preferred format is offered', async () => {
       const config = JSON.stringify([

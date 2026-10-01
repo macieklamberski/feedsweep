@@ -24,8 +24,7 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
         id: '1fv8993v57oI3UiHioRJzFV1L1cq1c',
         src: 'https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c',
         url: 'https://www.ganjingworld.com/video/1fv8993v57oI3UiHioRJzFV1L1cq1c',
-        width: 560,
-        height: 315,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -49,8 +48,7 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
         id: '1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
         src: 'https://www.ganjingworld.com/vi-VN/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
         url: 'https://www.ganjingworld.com/vi-VN/video/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -64,6 +62,7 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
         id: '1fces8rds302s3r8592ibpeNH1lm1c',
         src: 'https://www.ganjingworld.com/embed/1fces8rds302s3r8592ibpeNH1lm1c',
         url: 'https://www.ganjingworld.com/video/1fces8rds302s3r8592ibpeNH1lm1c',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -98,20 +97,6 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id of the wrong shape', async () => {
-      const value =
-        '<iframe src="https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1.mp4"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore an id of the wrong shape behind a locale', async () => {
-      const value =
-        '<iframe src="https://www.ganjingworld.com/vi-VN/embed/1fv8993v57oI3UiHioRJzFV1.mp4"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a segment in front of the route that is not a locale', async () => {
       const value =
         '<iframe src="https://www.ganjingworld.com/live/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
@@ -122,6 +107,20 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
     it('should ignore a lowercase locale', async () => {
       const value =
         '<iframe src="https://www.ganjingworld.com/zh-cn/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a locale whose language code carries a separator', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/z=-CN/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a locale whose region code carries a separator', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/zh-C=/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -141,8 +140,7 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -156,6 +154,48 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should use a malformed id as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1.mp4"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ganjingworld',
+        id: '1fv8993v57oI3UiHioRJzFV1.mp4',
+        src: 'https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1.mp4',
+        url: 'https://www.ganjingworld.com/video/1fv8993v57oI3UiHioRJzFV1.mp4',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed id behind a locale as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/vi-VN/embed/1fv8993v57oI3UiHioRJzFV1.mp4"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ganjingworld',
+        id: '1fv8993v57oI3UiHioRJzFV1.mp4',
+        src: 'https://www.ganjingworld.com/vi-VN/embed/1fv8993v57oI3UiHioRJzFV1.mp4',
+        url: 'https://www.ganjingworld.com/vi-VN/video/1fv8993v57oI3UiHioRJzFV1.mp4',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed id carrying an encoded slash as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/embed/1fv8993v57oI%2F3UiHioRJzFV1L1cq1c"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ganjingworld',
+        id: '1fv8993v57oI%2F3UiHioRJzFV1L1cq1c',
+        src: 'https://www.ganjingworld.com/embed/1fv8993v57oI%2F3UiHioRJzFV1L1cq1c',
+        url: 'https://www.ganjingworld.com/video/1fv8993v57oI%2F3UiHioRJzFV1L1cq1c',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should pass a 13-character legacy id through', async () => {
       const value = '<iframe src="https://www.ganjingworld.com/embed/Vvuz8d7kgQ5aw"></iframe>'
       const expected: EmbedResolverResult = {
@@ -163,6 +203,7 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
         id: 'Vvuz8d7kgQ5aw',
         src: 'https://www.ganjingworld.com/embed/Vvuz8d7kgQ5aw',
         url: 'https://www.ganjingworld.com/video/Vvuz8d7kgQ5aw',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -176,6 +217,26 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
         id: '1fv8993v57oI3UiHioRJzFV1L1cq1c',
         src: 'https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c',
         url: 'https://www.ganjingworld.com/video/1fv8993v57oI3UiHioRJzFV1L1cq1c',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the tracker the publisher carried', async () => {
+      const value = html`
+        <iframe
+          width="728"
+          height="410"
+          src="https://www.ganjingworld.com/zh-CN/embed/1ilf5kdso911p2vxVOvfx6VqW1ld1c?utm_source=bannedbook.org"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ganjingworld',
+        id: '1ilf5kdso911p2vxVOvfx6VqW1ld1c',
+        src: 'https://www.ganjingworld.com/zh-CN/embed/1ilf5kdso911p2vxVOvfx6VqW1ld1c',
+        url: 'https://www.ganjingworld.com/zh-CN/video/1ilf5kdso911p2vxVOvfx6VqW1ld1c',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

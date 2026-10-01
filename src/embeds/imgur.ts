@@ -1,8 +1,8 @@
-import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
@@ -27,39 +27,52 @@ const albumRoutes = new Set(['a', 'gallery'])
 // front of a post one segment deeper. `imgur.com/t/{tag}` alone names no post.
 const tagRoute = 't'
 
-// `r` and `user` fail the id length today and stay so dropping the band cannot make them posts.
 // Imgur's own pages sit at the same depth as a post. `memes`, `tools` and `viral` are posts a
 // person uploaded, and `topics` serves the not-found shell an untaken id does.
-const sitePathSegments = new Set([
+const sitePathSegments = [
   'about',
   'account',
+  'ads',
+  'api',
   'apps',
+  'blog',
   'contact',
+  'dmca',
   'download',
   'emerald',
+  'faq',
+  'help',
+  'hot',
+  'jobs',
   'login',
   'memegen',
   'new',
+  'notifications',
   'privacy',
   'r',
   'register',
+  'removalrequest',
   'rules',
   'search',
   'signin',
+  'top',
   'tos',
   'trending',
   'upload',
   'user',
   'vidgif',
-])
+  'vote',
+]
 
 // The gallery's own listings, sitting where an album id would. `trending` also passes the id shape.
 const galleryListingSegments = new Set(['hot', 'new', 'top', 'trending'])
 
-// Post ids are short alphanumerics. The album form is the same id behind an `a/` prefix, which
-// is how the platform's own script tells the two apart.
-const safePostIdRegex = /^[a-zA-Z0-9]{5,12}$/
+// The album form is the same id behind an `a/` prefix, which is how the platform's own script
+// tells the two apart.
 const albumPrefix = 'a/'
+
+// `imgur.com/{id}.gifv` redirects to the video on i.imgur.com, and no file list names `gifv`.
+const gifvFileRegex = /\.gifv$/i
 
 // The hyphen pins the id: without it a longer word reads as its own last twelve characters.
 // A share link is `gallery/{slug}-{id}`, and the slug alone redirects to the home page.
@@ -74,7 +87,7 @@ const parsePost = (value: string): ImgurPost | undefined => {
   const isAlbum = value.startsWith(albumPrefix)
   const id = isAlbum ? value.slice(albumPrefix.length) : value
 
-  if (safePostIdRegex.test(id)) {
+  if (id) {
     return { id, isAlbum }
   }
 }
@@ -150,7 +163,12 @@ export const imgurResolveEmbed: ResolveEmbed = (url) => {
     return composeAlbumEmbed(second)
   }
 
-  if (!route || sitePathSegments.has(route)) {
+  if (!route || isAnyOf(route, sitePathSegments)) {
+    return
+  }
+
+  // imgur.com redirects a file name to the file on i.imgur.com, so it is an image or a video.
+  if (isFileName(route) || gifvFileRegex.test(route)) {
     return
   }
 
@@ -163,7 +181,7 @@ export const imgurIframeEmbedResolver = createUrlEmbedResolver(imgurHosts, imgur
 
 // A forum's s9e MediaEmbed helper frame, naming the post or album in its url fragment. The helper
 // page reads an encoded `%2F` as the slash it stands for.
-export const imgurS9eEmbedResolver = createS9eEmbedResolver('imgur', /^(?:%2F|[\w/])+$/, (path) => {
+export const imgurS9eEmbedResolver = createS9eEmbedResolver('imgur', (path) => {
   return imgurResolveEmbed(`https://imgur.com/${path.replaceAll('%2F', '/')}`)
 })
 

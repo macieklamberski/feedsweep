@@ -1,7 +1,7 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `zen.ai` 301s every zencastr.com path, the episode files on `redirect.zen.ai` included.
@@ -16,8 +16,8 @@ export const zencastrResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, zencastrHosts)
   const [route, id, ...rest] = parsed ? getPathSegments(parsed) : []
 
-  // An id is url-safe base64, and the `embed` route serves neither a file nor a deeper route.
-  if (route !== 'embed' || !id || rest.length || !urlSafeTokenRegex.test(id)) {
+  // The `embed` route serves no deeper route.
+  if (route !== 'embed' || !id || rest.length) {
     return
   }
 
@@ -39,12 +39,10 @@ export const zencastrBlockquoteEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     return zencastrResolveEmbed(attr(element, 'data-episode-href') ?? '')
   },
-  { preferResolverSize: true },
 )
 
 // A Zencastr episode player iframe, which renders on its own but names no poster or page.
 export const zencastrIframeEmbedResolver = createUrlEmbedResolver(
   zencastrHosts,
   zencastrResolveEmbed,
-  { preferResolverSize: true },
 )

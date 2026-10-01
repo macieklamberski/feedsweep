@@ -224,15 +224,16 @@ describeForEachParser('rebuildLazyYtEmbeds', (parseHtml) => {
   })
 
   // The id goes straight into a url, so what counts as one stays embeds/youtube.ts's answer.
-  it('should leave a facade whose id is not a youtube id', async () => {
+  it('should use a malformed video id as written, even if the player answers an error', async () => {
     const value = html`
       <div
         class="youtube-embed"
         data-video_id="../../etc"
       ></div>
     `
+    const expected = '<iframe src="https://www.youtube.com/embed/../../etc"></iframe>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should be idempotent', async () => {

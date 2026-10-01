@@ -8,20 +8,13 @@ const provider = 'arte'
 
 const arteHosts = ['arte.tv']
 
-// A program id is `{6 digits}-{3 digits}-{version letter}`, the same in every language.
-const programIdRegex = /^\d{6}-\d{3}-[A-Z]$/
-
-// A shape, not a list: ARTE keeps adding languages and a list would refuse the next one.
-// The embed page serves the same shell whatever the language, so a wrong one is not visibly wrong.
-const languageRegex = /^[a-z]{2}$/
-
 // The retired players, `player/v{3..7}/index.{php,html}`, and `player/index.*` they redirect to.
 const legacyPlayerPathRegex = /^\/player\/(?:v\d+\/)?index\.(?:php|html)$/
 
 type Program = { language: string; id: string }
 
 const readProgram = (language: string | undefined, id: string | undefined): Program | undefined => {
-  if (!language || !id || !languageRegex.test(language) || !programIdRegex.test(id)) {
+  if (!language || !id) {
     return
   }
 

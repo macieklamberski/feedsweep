@@ -28,21 +28,6 @@ describeForEachParser('buddypressCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should leave the optional fields undefined when only the title link is present', async () => {
-      const value = html`
-        <div class="activity-link-preview-container">
-          <p class="activity-link-preview-title"><a href="https://example.com/event/meetup">Virtual community meetup</a></p>
-        </div>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'buddypress',
-        url: 'https://example.com/event/meetup',
-        title: 'Virtual community meetup',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {

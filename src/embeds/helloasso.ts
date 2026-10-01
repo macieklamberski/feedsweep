@@ -1,18 +1,12 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { readObjectHeight } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'helloasso'
 
 const helloassoHosts = ['helloasso.com']
-
-// The box HelloAsso's snippet reserves for each kind. The full form grows to fit its steps.
-const widgetSizes: Record<string, Pick<EmbedResolverResult, 'width' | 'height'>> = {
-  widget: { height: 750 },
-  'widget-bouton': { height: 70 },
-  'widget-vignette': { width: 350, height: 450 },
-}
 
 // A donation, membership, ticketing or shop form, framed from
 // `/associations/{org}/{type}/{slug}/{kind}`, where the kind is `widget` or a `widget-` variant
@@ -30,15 +24,20 @@ export const helloassoResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
+  // Every variant is minted as the full form.
   return {
     provider,
     id: `${org}/${type}/${slug}`,
-    // The kind segment picks the button, the card or the full form the publisher chose.
-    src: url,
+    src: `https://www.helloasso.com/associations/${org}/${type}/${slug}/widget`,
     url: `https://www.helloasso.com/associations/${org}/${type}/${slug}`,
-    ...widgetSizes[kind],
   }
 }
 
 // HelloAsso's form widget iframe.
 export const helloassoEmbedResolver = createUrlEmbedResolver(helloassoHosts, helloassoResolveEmbed)
+
+// The form posts its rendered height unasked as `{ height }`, again on each step it grows to.
+export const helloassoRenderHint: EmbedRenderHint = {
+  provider,
+  readHeight: readObjectHeight,
+}

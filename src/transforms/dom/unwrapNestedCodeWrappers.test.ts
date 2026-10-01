@@ -37,6 +37,21 @@ describeForEachParser('unwrapNestedCodeWrappers', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should keep the language class carried only by the inner code', async () => {
+      const value = '<pre><code><code class="language-python">x = 1</code></code></pre>'
+      const expected = '<pre><code class="language-python">x = 1</code></pre>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should merge the classes of both codes and keep the outer attributes', async () => {
+      const value =
+        '<pre><code class="block" data-lang="js"><code class="language-python" data-lang="py">x = 1</code></code></pre>'
+      const expected = '<pre><code class="block language-python" data-lang="js">x = 1</code></pre>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should not collapse when the parent also holds meaningful text', async () => {
       const value = '<code>before <code>inner</code></code>'
 
@@ -47,14 +62,6 @@ describeForEachParser('unwrapNestedCodeWrappers', (parseHtml) => {
       const value = '<code><code>a</code><span>b</span></code>'
 
       expect(await transform(value)).toEqualHtml(value)
-    })
-
-    it('should be idempotent', async () => {
-      const value = '<pre><code><code>x</code></code></pre>'
-      const once = await transform(value)
-      const twice = await transform(once)
-
-      expect(twice).toEqualHtml(once)
     })
   })
 
@@ -97,5 +104,13 @@ describeForEachParser('unwrapNestedCodeWrappers', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+  })
+
+  it('should be idempotent', async () => {
+    const value = '<pre><span><code><code>x</code></code></span></pre>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
   })
 })

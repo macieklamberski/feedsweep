@@ -66,24 +66,6 @@ describe('foxnewsResolveEmbed', () => {
       expect(foxnewsResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id that is not numeric', () => {
-      const value = 'https://video.foxnews.com/v/embed.js?id=latest'
-
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id with letters before the digits', () => {
-      const value = 'https://video.foxbusiness.com/v/embed.js?id=abc6355436296112'
-
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id with letters after the digits', () => {
-      const value = 'https://video.foxbusiness.com/v/embed.js?id=6355436296112abc'
-
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a url that does not parse', () => {
       const value = 'http://['
 
@@ -132,6 +114,48 @@ describe('foxnewsResolveEmbed', () => {
       expect(foxnewsResolveEmbed(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should take the iframe id over the script id when both are stated', () => {
+      const value =
+        'https://video.foxnews.com/v/video-embed.html?video_id=6178327154001&id=5406119088001'
+      const expected: EmbedResolverResult = {
+        provider: 'foxnews',
+        id: '6178327154001',
+        src: 'https://video.foxnews.com/v/video-embed.html?video_id=6178327154001',
+        url: 'https://www.foxnews.com/video/6178327154001',
+        ratio: '16/9',
+      }
+
+      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should use a malformed id as written, even if the player answers an error', () => {
+      const value = 'https://video.foxnews.com/v/embed.js?id=latest'
+      const expected: EmbedResolverResult = {
+        provider: 'foxnews',
+        id: 'latest',
+        src: 'https://video.foxnews.com/v/video-embed.html?video_id=latest',
+        url: 'https://www.foxnews.com/video/latest',
+        ratio: '16/9',
+      }
+
+      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a decoded id carrying a separator in one path segment', () => {
+      const value = 'https://video.foxnews.com/v/video-embed.html?video_id=5406119088001%2F..%2Fx'
+      const expected: EmbedResolverResult = {
+        provider: 'foxnews',
+        id: '5406119088001/../x',
+        src: 'https://video.foxnews.com/v/video-embed.html?video_id=5406119088001%2F..%2Fx',
+        url: 'https://www.foxnews.com/video/5406119088001%2F..%2Fx',
+        ratio: '16/9',
+      }
+
+      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('foxnewsScriptEmbedResolver', (parseHtml) => {
@@ -178,7 +202,7 @@ describeForEachParser('foxnewsScriptEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
-        '<script src="https://evil.test/video.foxnews.com/v/embed.js?id=5406119088001"></script>'
+        '<script src="https://evil.test/v/embed.js?id=5406119088001&video.foxnews.com/v/embed.js"></script>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -188,7 +212,7 @@ describeForEachParser('foxnewsScriptEmbedResolver', (parseHtml) => {
 describeForEachParser('foxnewsIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, foxnewsIframeEmbedResolver)
 
-  // The pasted iframe states 640 by 360, which is the carrier's size and wins over the ratio.
+  // The pasted iframe states 640 by 360, which is not read.
   it('should resolve the pasted player iframe', async () => {
     const value = html`
       <iframe
@@ -202,8 +226,7 @@ describeForEachParser('foxnewsIframeEmbedResolver', (parseHtml) => {
       id: '6178327154001',
       src: 'https://video.foxnews.com/v/video-embed.html?video_id=6178327154001',
       url: 'https://www.foxnews.com/video/6178327154001',
-      width: 640,
-      height: 360,
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)

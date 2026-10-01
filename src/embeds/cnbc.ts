@@ -1,10 +1,9 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { digitsRegex, parseUrlOnHosts, urlSafeTokenRegex } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-const cnbcHosts = ['cnbc.com']
-const playerHost = 'player.cnbc.com'
+const cnbcHosts = ['player.cnbc.com']
 
 // The JW player runs in aspect mode with a 56.25% spacer and its title band inside the picture.
 // CNBC's own snippet states 560 by 349, which leaves 34 pixels blank at that width.
@@ -18,27 +17,24 @@ export const cnbcResolveEmbed: ResolveEmbed = (url) => {
   const [route, account, player, extra] = parsed ? getPathSegments(parsed) : []
   const guid = parsed?.searchParams.get('byGuid')
 
-  if (parsed?.hostname !== playerHost || route !== 'p' || !account || !player || extra) {
+  if (route !== 'p' || !player || extra) {
     return
   }
 
-  // No width: a band would refuse the next account CNBC opens.
-  if (!urlSafeTokenRegex.test(account) || !urlSafeTokenRegex.test(player)) {
+  if (!guid) {
     return
   }
 
-  if (!guid || !digitsRegex.test(guid)) {
-    return
-  }
+  const query = composeQuery({ playertype: 'synd', byGuid: guid })
 
   return {
     provider: 'cnbc',
     id: guid,
-    src: `https://player.cnbc.com/p/${account}/${player}?playertype=synd&byGuid=${guid}`,
+    // Any player name plays the guid, and `cnbc_global` is the one CNBC's share snippet writes.
+    // Another account answers 404, so the account stays as written.
+    src: `https://player.cnbc.com/p/${account}/cnbc_global${query}`,
     ratio: playerRatio,
   }
 }
 
-export const cnbcIframeEmbedResolver = createUrlEmbedResolver(cnbcHosts, cnbcResolveEmbed, {
-  preferResolverSize: true,
-})
+export const cnbcIframeEmbedResolver = createUrlEmbedResolver(cnbcHosts, cnbcResolveEmbed)

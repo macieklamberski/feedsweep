@@ -7,9 +7,8 @@ const provider = 'ardmediathek'
 
 const ardmediathekHosts = ['ardmediathek.de']
 
-// The id is unpadded url-safe base64 of a crid or a uuid. The alphabet holds no `%` and no `.`,
-// so a minted path cannot step out of `/embed/`. The legacy `/{channel}/embed/{id}` route 404s.
-const embedPathRegex = /^\/(?:\w+\/)?embed\/([\w-]+)\/?$/
+// The legacy `/{channel}/embed/{id}` route 404s.
+const embedPathRegex = /^\/(?:\w+\/)?embed\/([^/]+)\/?$/
 
 const ardmediathekResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
@@ -26,6 +25,7 @@ const ardmediathekResolveEmbed: ResolveEmbed = (url) => {
     id,
     src: `https://www.ardmediathek.de/embed/${id}${pickUrlParams(url, ['startTime'])}`,
     url: `https://www.ardmediathek.de/video/${id}`,
+    ratio: '16/9',
   }
 }
 

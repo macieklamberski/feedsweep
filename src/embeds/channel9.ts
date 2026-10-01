@@ -1,8 +1,10 @@
-import { getPathSegments, isAnyOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { decodeSegment, getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'channel9'
+const playerRatio = '16/9'
 
 const channel9Hosts = ['channel9.msdn.com']
 
@@ -11,9 +13,6 @@ const embedUrl =
 
 // Channel 9 is retired and cannot mint a new section.
 const episodeSections = ['shows', 'blogs', 'series']
-
-// A name carrying `&` or `=` would add its own parameter to the minted query.
-const queryUnsafeRegex = /[&=]/
 
 const channel9ResolveEmbed: ResolveEmbed = (url) => {
   const segments = getPathSegments(url)
@@ -24,12 +23,9 @@ const channel9ResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  // Channel 9's first redirect only lowercases the names, so a `+` stays a `+` in the query.
-  const names = segments.slice(1, -1).map((name) => name.toLowerCase())
-
-  if (names.some((name) => queryUnsafeRegex.test(name))) {
-    return
-  }
+  // Channel 9's first redirect lowercases the names. They move from path segments into the query,
+  // so they are decoded first and composed as one parameter each.
+  const names = segments.slice(1, -1).map((name) => (decodeSegment(name) ?? name).toLowerCase())
 
   if (isAnyOf(section, episodeSections) && names.length === 2) {
     const [show, episode] = names
@@ -38,7 +34,8 @@ const channel9ResolveEmbed: ResolveEmbed = (url) => {
     return {
       provider,
       id: `${show}/${episode}`,
-      src: `${embedUrl}?show=${show}&ep=${episode}`,
+      src: `${embedUrl}${composeQuery({ show, ep: episode })}`,
+      ratio: playerRatio,
     }
   }
 
@@ -49,7 +46,8 @@ const channel9ResolveEmbed: ResolveEmbed = (url) => {
     return {
       provider,
       id: `events/${event}-${edition}/${session}`,
-      src: `${embedUrl}?ev=${event}-${edition}&session=${session}`,
+      src: `${embedUrl}${composeQuery({ ev: `${event}-${edition}`, session })}`,
+      ratio: playerRatio,
     }
   }
 }
@@ -58,3 +56,11 @@ const channel9ResolveEmbed: ResolveEmbed = (url) => {
 // Microsoft Learn carries `x-frame-options: SAMEORIGIN`, while the embed page it ends on carries
 // neither that nor a `frame-ancestors` list.
 export const channel9EmbedResolver = createUrlEmbedResolver(channel9Hosts, channel9ResolveEmbed)
+
+// The embed page starts the video only on an `autoplay-request` message, and only when
+// `autoplay=true` is on its url. It posts nothing to say it is ready, so the message goes on load.
+export const channel9RenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: 'true' },
+  requestPlay: { type: 'autoplay-request' },
+}

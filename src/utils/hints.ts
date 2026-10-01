@@ -30,3 +30,24 @@ export const isPlayerJsReady = (data: unknown): boolean => {
     return false
   }
 }
+
+// The height several embeds post unasked as an object, `{ height }`, beside fields of their own.
+export const readObjectHeight = (data: unknown): number | undefined => {
+  return isPlainObject(data) ? readPixels(data.height) : undefined
+}
+
+// The resize message several embeds post unasked, `{ src, context: 'iframe.resize', height }`
+// serialised to a JSON string.
+export const readIframeResizeHeight = (data: unknown): number | undefined => {
+  if (typeof data !== 'string') {
+    return
+  }
+
+  try {
+    const message: unknown = JSON.parse(data)
+
+    if (isPlainObject(message) && message.context === 'iframe.resize') {
+      return readPixels(message.height)
+    }
+  } catch {}
+}

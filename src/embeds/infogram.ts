@@ -1,15 +1,18 @@
 import { parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
+import { readIframeResizeHeight } from '../utils/hints.js'
 import { parseUrlOnHosts, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'infogram'
+
 // The current editor issues a chart id under `_/`, older ones a slug or a uuid.
-const chartIdRegex = /^(?:_\/)?[\w-]+$/
+const chartIdRegex = /^(?:_\/)?[^/]+$/
 // A live chart's mount id ends in `?live`, which the loader appends to the frame url as written.
-const mountIdRegex = /^((?:_\/)?[\w-]+)(?:\?(.*))?$/
+const mountIdRegex = /^([^?]+)(?:\?(.*))?$/
 // The loader's script id, `infogram_{width}_{chart id}`.
-const scriptIdRegex = /^infogram_\d+_((?:_\/)?[\w-]+)$/
+const scriptIdRegex = /^infogram_\d+_(.+)$/
 
 const infogramHosts = [
   'e.infogram.com',
@@ -30,7 +33,7 @@ const composeInfogramEmbed = (
   const live = new URLSearchParams(query).has('live') ? '&live' : ''
 
   return {
-    provider: 'infogram',
+    provider,
     id: chartId,
     src: `https://e.infogram.com/${chartId}?${params}${live}`,
     url: `https://infogram.com/${chartId}`,
@@ -90,3 +93,9 @@ export const infogramIframeEmbedResolver = createUrlEmbedResolver(
   infogramHosts,
   infogramResolveEmbed,
 )
+
+// The chart posts its rendered height unasked, again whenever its width changes it.
+export const infogramRenderHint: EmbedRenderHint = {
+  provider,
+  readHeight: readIframeResizeHeight,
+}

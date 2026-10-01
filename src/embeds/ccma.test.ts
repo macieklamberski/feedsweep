@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { ccmaEmbedResolver } from './ccma.js'
@@ -75,37 +76,22 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a video id that would step out of the embed route', async () => {
+    it('should use a malformed video id as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="https://www.tv3.cat/ria/players/3ac/evp/Main.swf"
           flashvars="videoid=..%2F..%2Fx"
         />
       `
+      const expected: EmbedResolverResult = {
+        provider: 'ccma',
+        id: '..%2F..%2Fx',
+        src: 'https://www.3cat.cat/3cat/video/..%2F..%2Fx/embed/',
+        url: 'https://www.ccma.cat/video/..%2F..%2Fx/',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a video id followed by a path that steps out of the embed route', async () => {
-      const value = html`
-        <embed
-          src="https://www.tv3.cat/ria/players/3ac/evp/Main.swf"
-          flashvars="videoid=1234567%2F..%2F..%2Fx"
-        />
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a video id preceded by a path that steps out of the embed route', async () => {
-      const value = html`
-        <embed
-          src="https://www.tv3.cat/ria/players/3ac/evp/Main.swf"
-          flashvars="videoid=..%2F..%2F1234567"
-        />
-      `
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore the player path below another segment', async () => {
@@ -134,6 +120,24 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
         id: '723529',
         src: 'https://www.3cat.cat/3cat/video/723529/embed/',
         url: 'https://www.ccma.cat/video/723529/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a decoded video id carrying a separator in one path segment', async () => {
+      const value = html`
+        <embed
+          src="https://www.tv3.cat/svp2/svp2.swf"
+          flashvars="VIDEO_ID=723529%2F..%2Fx"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ccma',
+        id: '723529%2F..%2Fx',
+        src: 'https://www.3cat.cat/3cat/video/723529%2F..%2Fx/embed/',
+        url: 'https://www.ccma.cat/video/723529%2F..%2Fx/',
         ratio: '16/9',
       }
 
@@ -309,6 +313,19 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should use a malformed frame video id as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://www.3cat.cat/3cat/video/abc/embed/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ccma',
+        id: 'abc',
+        src: 'https://www.3cat.cat/3cat/video/abc/embed/',
+        url: 'https://www.ccma.cat/video/abc/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore the article page, which refuses to be framed', async () => {
       const value = '<iframe src="https://www.3cat.cat/3cat/video/1234567/"></iframe>'
 
@@ -387,7 +404,7 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
   })
 
   describe('the CCMA audio frame', () => {
-    it('should key the audio frame apart from video ids and keep its declared box', async () => {
+    it('should key the audio frame apart from video ids', async () => {
       const value = html`
         <iframe
           allowfullscreen=""
@@ -402,8 +419,17 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
         provider: 'ccma',
         id: 'audio/859074',
         src: 'https://www.3cat.cat/3cat/audio/859074/embed/',
-        width: 500,
-        height: 281,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed audio id as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://www.ccma.cat/audio/embed/abc"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ccma',
+        id: 'audio/abc',
+        src: 'https://www.3cat.cat/3cat/audio/abc/embed/',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -450,5 +476,29 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+describeForEachParser('ccma through the pipeline', (parseHtml) => {
+  it('should leave a video enclosure on the 3cat host playable', async () => {
+    const enclosures = [
+      {
+        url: 'https://mp4-high-dwn.3cat.cat/2024/01/15/1234567/1234567_1080.mp4',
+        type: 'video/mp4',
+      },
+    ]
+
+    const expected = html`
+      <video data-enclosure="" controls src="https://mp4-high-dwn.3cat.cat/2024/01/15/1234567/1234567_1080.mp4"></video>
+      <p>Body</p>
+    `
+
+    expect(
+      await transformContent('<p>Body</p>', {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://example.com/post',
+        enclosures,
+      }),
+    ).toEqualHtml(expected)
   })
 })

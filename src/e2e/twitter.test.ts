@@ -107,8 +107,8 @@ describeForEachParser('Twitter', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
-  // The component carries no text at all, so the id and the size it states are everything
-  // there is to take, and unclaimed it reaches a reader as an element nothing renders.
+  // The component carries no text at all, so the id is everything there is to take, and
+  // unclaimed it reaches a reader as an element nothing renders.
   it('should convert an amp-twitter component that carries no text', async () => {
     const value = html`
       <amp-twitter
@@ -123,8 +123,6 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-provider="twitter"
         data-embed-id="123456789012345"
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
-        data-embed-width="375"
-        data-embed-height="472"
       ></div>
     `
 
@@ -298,8 +296,6 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-provider="twitter"
         data-embed-id="123456789012345"
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
-        data-embed-width="550"
-        data-embed-height="350"
       ></div>
     `
 

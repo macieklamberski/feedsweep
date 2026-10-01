@@ -39,6 +39,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `fixLazyIframes` | Promote a lazy or consent-parked iframe `src` (real URL in a `data-*` attribute) to real `src`, skipping placeholder pages |
 | `fixLazyVideos` | Promote a lazy `<video>` src and `data-poster` to real attributes |
 | `fixLazyAudios` | Promote a lazy `<audio>` src to real `src` |
+| `fixDropboxMediaUrls` | Force `raw=1` on a Dropbox share URL used as a media `src`, so it serves the file and not the preview page |
 | `convertLazyImageContainers` | Convert a container parking an image URL in a lazy attribute into a real `<img>` |
 | `flattenPictureElements` | Collapse `<picture>` to one `<img>`, keeping the best modern-format source |
 | `hoistFigcaptionFromAnchor` | Move a `<figcaption>` out of the figure's click-through link |
@@ -64,12 +65,14 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `wrapBareInlineInParagraphs` | Wrap loose inline content in `<p>` blocks |
 | `hoistBlocksFromParagraphs` | Hoist block elements out of enclosing paragraphs, keeping only halves that still render |
 | `wrapCargoGalleryImages` | Wrap Cargo portfolio captions and images in `<figure>` blocks so they stay apart |
-| `injectEnclosures` | Inject feed enclosures as native media or embed placeholders, collapsing a media group to one rendition and merging a player page entry with its media file; an image enclosure injects only when the content has no image of its own; anything else becomes a `data-file-*` placeholder, after the content |
+| `injectEnclosures` | Inject feed enclosures as native media or embed placeholders, collapsing a media group to one rendition and merging a player page entry with its media file; an image enclosure injects only when the content has no image of its own, captioned with its description; anything else becomes a `data-file-*` placeholder, after the content |
 | `surfaceParkedMarkup` | Dissolve a lazy-loader container (`div.load-later[data-content]`) into the percent-encoded embed markup it holds, whatever platform that turns out to be |
+| `rebuildPublicalbumGalleries` | Rebuild a Publicalbum Google Photos album widget into its photos as linked images under a captioned `<figure>` |
 | `surfaceTemplateEmbeds` | Hoist a video embed out of a lazy-load `<template>` (e.g. Better Core Video Embeds) so it renders in a reader |
 | `unwrapDrupalOembedIframes` | Point a Drupal media oEmbed proxy frame (`/media/oembed?url=`) at the page url it wraps |
 | `surfaceNoscriptEmbeds` | Hoist a video `<iframe>` out of a `<noscript>` lazy-load fallback (e.g. WP Rocket, a3 Lazy Load); ignores non-video noscript iframes like Google Tag Manager |
 | `rebuildEmbedPlusEmbeds` | Rebuild a real `<iframe>` from an "Embed Plus for YouTube" facade (`.epyt-facade[data-facadesrc]`) |
+| `rebuildIframelyEmbeds` | Rebuild an Iframely anchor facade (an empty `a[data-iframely-url]`) into the destination's frame or a plain link |
 | `rebuildLiteVideoEmbeds` | Rebuild a real `<iframe>` from a `lite-youtube` / `lite-vimeo` web component's `videoid`, carrying over `start` and `videotitle` |
 | `rebuildLyteEmbeds` | Rebuild a real `<iframe>` from a WP YouTube Lyte facade (`WYL_`/`lyte_` id) |
 | `rebuildRocketYoutubePreviews` | Rebuild a real `<iframe>` from a WP Rocket YouTube preview facade (`.rll-youtube-player[data-id]`), carrying over `data-query` |
@@ -81,6 +84,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildElementorVideoEmbeds` | Rebuild a real `<iframe>` from an Elementor video widget's deferred `data-settings` (YouTube / Vimeo / Dailymotion / VideoPress) |
 | `rebuildEmbedlyEmbeds` | Unwrap an Embedly media widget to the inner provider iframe, carrying the poster as `data-thumbnail` |
 | `rebuildGettyImagesEmbeds` | Rebuild a real `<iframe>` from a Getty Images `gie` widget facade, composing the player URL from the inline config the loader script never runs |
+| `rebuildExternalVideoEmbeds` | Rebuild a real `<iframe>` from a Seesaa or Sakura blog's `external_video.js` block onto the YouTube or Nicovideo video it names |
 | `rebuildJsfiddleEmbeds` | Rebuild a real `<iframe>` from a JSFiddle loader script onto the fiddle's own page |
 | `rebuildDeferredIframes` | Rebuild a real `<iframe>` from a URL parked in a `<div>` attribute (Pym.js `data-pym-src`, @newswire/frames `data-frame-src`) |
 | `rebuildGofundmeEmbeds` | Rebuild a real `<iframe>` from a GoFundMe campaign widget's empty `div.gfm-embed[data-url]` |
@@ -128,7 +132,11 @@ Inventory of every transform exported from the package. Most are enabled by defa
 
 An embed placeholder states how big it is in one of two ways, never both. Where something really measured the player, it carries `data-embed-width` and `data-embed-height` in pixels, or just one of them where that is all the platform states (a podcast player 200 pixels tall has no width worth naming). Where nothing measured it and only the shape is known, from a responsive wrapper or the platform's own ratio attribute, it carries `data-embed-ratio` instead: a CSS aspect-ratio value written from the numbers the source stated, such as `16/9`, `800/600` or `1.7777777777777777/1`, and ready to assign to `style.aspectRatio` as it stands. Nothing is reduced or rounded, so the value traces back to what the markup said.
 
+A placeholder can lack `data-embed-src` when only a fetch can find the player, such as a Typeform live embed, whose id Typeform's api maps to the form. It still carries `data-embed-provider` and `data-embed-id`, so an `enrichEmbedFn` can fill the player in, and a reader shows nothing for it until then.
+
 A placeholder may also carry `data-embed-params`: settings the publisher chose for that one embed that a reader may override, such as the language of a widget's labels, written as a query string like `l=german`. They are kept off `data-embed-src`, so a reader appends them when it builds the frame, or sets its own in their place.
+
+`data-embed-src` keeps the scheme the feed wrote, so an older embed can still point at an `http:` player. A browser blocks an `http:` frame on an `https:` page as mixed content, so a reader served over `https:` should send `Content-Security-Policy: upgrade-insecure-requests`. Chromium, Firefox and WebKit then load the frame over `https:`, which plays wherever the platform still serves the player there.
 
 ## Options
 
@@ -146,7 +154,7 @@ const result = transformContent(html, {
   sameSiteUrls: ['https://example.com/?p=1'],
   // Resolve a relative URL against the base URL (defaults to standard URL resolution).
   resolveUrlFn: (url, baseUrl) => resolve(url, baseUrl),
-  // Rewrite anchor hrefs: unwrap redirects and strip tracking params.
+  // Rewrite anchor hrefs: unwrap redirects and strip tracking params, also on the url and the src of embed placeholders.
   cleanUrlFn: cleanUrl,
   // Feed item enclosures (audio/video/image), injected into the content.
   enclosures: [{ url: 'https://example.com/audio.mp3', type: 'audio/mpeg' }],
