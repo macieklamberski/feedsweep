@@ -94,6 +94,19 @@ describe('spreakerResolveEmbed', () => {
     expect(spreakerResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should use a malformed episode id as written over a named show, even if the player answers an error', () => {
+    const value = 'https://widget.spreaker.com/player?episode_id=abc&show_id=1433865'
+    const expected: EmbedResolverResult = {
+      provider: 'spreaker',
+      id: 'episode/abc',
+      src: 'https://widget.spreaker.com/player?episode_id=abc',
+      url: 'https://www.spreaker.com/episode/abc',
+      height: 200,
+    }
+
+    expect(spreakerResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for a spreaker url naming no episode', () => {
     const value = 'https://widget.spreaker.com/player?x=1'
 
@@ -121,6 +134,12 @@ describeForEachParser('spreakerIframeEmbedResolver', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should ignore a foreign host carrying the player path', async () => {
+    const value = '<iframe src="https://evil.test/player?episode_id=52842990"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
   })
 })
 
@@ -209,8 +228,8 @@ describeForEachParser('spreakerAnchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The publisher sized this one, so their height wins over the documented constant.
-    it('should prefer the stated data-height', async () => {
+    // The anchor's `data-height` is the carrier's size, which shallow handling does not read.
+    it('should state the documented height over the stated data-height', async () => {
       const value = html`
         <a
           class="spreaker-player"
@@ -223,26 +242,7 @@ describeForEachParser('spreakerAnchorEmbedResolver', (parseHtml) => {
         id: 'episode/42',
         src: 'https://widget.spreaker.com/player?episode_id=42',
         url: 'https://www.spreaker.com/episode/42',
-        height: 350,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should accept a bare pixel count', async () => {
-      const value = html`
-        <a
-          class="spreaker-player"
-          data-resource="episode_id=42"
-          data-height="120"
-        >Listen to "An episode" on Spreaker.</a>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'spreaker',
-        id: 'episode/42',
-        src: 'https://widget.spreaker.com/player?episode_id=42',
-        url: 'https://www.spreaker.com/episode/42',
-        height: 120,
+        height: 200,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -250,34 +250,22 @@ describeForEachParser('spreakerAnchorEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should keep the constant when data-height is not a pixel count', async () => {
-      const value = html`
-        <a
-          class="spreaker-player"
-          data-resource="episode_id=42"
-          data-height="100%"
-        >Listen to "An episode" on Spreaker.</a>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'spreaker',
-        id: 'episode/42',
-        src: 'https://widget.spreaker.com/player?episode_id=42',
-        url: 'https://www.spreaker.com/episode/42',
-        height: 200,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should return undefined when the resource names no id', async () => {
+    it('should use a malformed episode id as written, even if the player answers an error', async () => {
       const value = html`
         <a
           class="spreaker-player"
           data-resource="episode_id=abc"
         >Listen to "An episode" on Spreaker.</a>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'spreaker',
+        id: 'episode/abc',
+        src: 'https://widget.spreaker.com/player?episode_id=abc',
+        url: 'https://www.spreaker.com/episode/abc',
+        height: 200,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // A user player is documented and dead, and nothing else names a resource this resolver

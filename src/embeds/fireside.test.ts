@@ -82,6 +82,32 @@ describe('extractFiresideToken', () => {
     expect(extractFiresideToken(value)).toBeUndefined()
   })
 
+  it('should return undefined for a version segment with a leading prefix', () => {
+    const value = 'https://player.fireside.fm/xv3/N8LaNbQY+MI2PkJ2g'
+
+    expect(extractFiresideToken(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a version segment with a trailing suffix', () => {
+    const value = 'https://player.fireside.fm/v3x/N8LaNbQY+MI2PkJ2g'
+
+    expect(extractFiresideToken(value)).toBeUndefined()
+  })
+
+  it('should use a malformed token opening with an encoded slash as written, even if the player answers an error', () => {
+    const value = 'https://player.fireside.fm/v3/x%2FN8LaNbQY+MI2PkJ2g'
+    const expected = { version: 'v3', token: 'x/N8LaNbQY+MI2PkJ2g' }
+
+    expect(extractFiresideToken(value)).toEqual(expected)
+  })
+
+  it('should use a malformed token closing with an encoded slash as written, even if the player answers an error', () => {
+    const value = 'https://player.fireside.fm/v3/N8LaNbQY+MI2PkJ2g%2Fx'
+    const expected = { version: 'v3', token: 'N8LaNbQY+MI2PkJ2g/x' }
+
+    expect(extractFiresideToken(value)).toEqual(expected)
+  })
+
   it('should return undefined for a token of the wrong shape', () => {
     const value = 'https://fireside.fm/player/v2/onlyoneside'
 

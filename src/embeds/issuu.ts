@@ -1,27 +1,25 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, isAnyOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 
 const provider = 'issuu'
 
 import { attr } from '../utils/dom.js'
-import { composeQuery, isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const issuuHosts = ['issuu.com']
 
-// A config id is a pair of counters, `1016421/47623369`, addressing the reader through the url
-// hash, and a publisher and document name pair addresses it through the query.
-// A name of only dots is refused on purpose: `u=..&d=..` would mint `issuu.com/../docs/..`.
-const configIdRegex = /^\d+\/\d+$/
-const safeNameRegex = /^(?!\.+$)[\w.-]+$/
-
-const pageNumberRegex = /^\d+$/
+// `issuu.com/{publisher}/docs/{document}/s/{story}` names a story, not a page, in the page's
+// position.
+const storyRoute = 's'
 
 // Only `embed.html` is minted: `anonymous-embed.html` answers 403 for every document.
 const embedPaths = ['embed.html', 'anonymous-embed.html']
 
+const documentRatio = '5/3'
+
 const composeConfigEmbed = (configId: string | undefined): EmbedResolverResult | undefined => {
-  if (!configId || !configIdRegex.test(configId)) {
+  if (!configId) {
     return
   }
 
@@ -29,6 +27,7 @@ const composeConfigEmbed = (configId: string | undefined): EmbedResolverResult |
     provider,
     id: configId,
     src: `https://e.issuu.com/embed.html#${configId}`,
+    ratio: documentRatio,
   }
 }
 
@@ -43,18 +42,15 @@ const composeDocumentEmbed = (
     return
   }
 
-  if (!safeNameRegex.test(publisher) || !safeNameRegex.test(documentName)) {
-    return
-  }
-
-  const safePage = page && pageNumberRegex.test(page) ? { p: page } : undefined
-  const query = composeQuery({ u: publisher, d: documentName, ...safePage })
+  const query = composeQuery(trimObject({ u: publisher, d: documentName, p: page }))
 
   return {
     provider,
     id: `${publisher}/${documentName}`,
     src: `https://e.issuu.com/embed.html${query}`,
-    url: `https://issuu.com/${publisher}/docs/${documentName}`,
+    // The iframe's `u` and `d` come out of the query decoded, and each goes into a path segment.
+    url: `https://issuu.com/${encodePathSegment(publisher)}/docs/${encodePathSegment(documentName)}`,
+    ratio: documentRatio,
   }
 }
 
@@ -72,7 +68,12 @@ const readDocumentUrl = (url: string): EmbedResolverResult | undefined => {
     return
   }
 
-  return composeDocumentEmbed(publisher, documentName, page)
+  // Decoded here, so the url and the reader encode them once.
+  return composeDocumentEmbed(
+    decodeSegment(publisher) ?? publisher,
+    decodeSegment(documentName) ?? documentName,
+    page === storyRoute ? undefined : page,
+  )
 }
 
 // Issuu ships a document as an empty div only its `embed.js` loader hydrates into the reader.
@@ -91,7 +92,7 @@ export const issuuWidgetEmbedResolver = createMarkupEmbedResolver(
 // The reader iframe, at `e.issuu.com/embed.html` or the document page pasted from the address bar.
 // The Flash viewer `static.issuu.com/webembed/…/IssuuReader.swf` names its document in a
 // `documentId` flashvar, a third id space neither url form accepts.
-export const issuuResolveEmbed: ResolveEmbed = (url, element) => {
+const issuuResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
 
   if (!parsed) {

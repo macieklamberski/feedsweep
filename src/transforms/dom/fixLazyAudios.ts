@@ -1,5 +1,6 @@
 import type { DomTransform } from '../../types.js'
-import { isUrlShaped, isUsableSrc } from '../../utils/urls.js'
+import { getLazyValue } from '../../utils/dom.js'
+import { isUsableSrc } from '../../utils/urls.js'
 
 // An <audio> whose clip url sits in a lazy data-* attribute, so nothing plays without JS.
 export const fixLazyAudios: DomTransform = (context) => (document) => {
@@ -10,13 +11,10 @@ export const fixLazyAudios: DomTransform = (context) => (document) => {
       continue
     }
 
-    for (const attribute of context.lazySrcAttributes) {
-      const value = audio.getAttribute(attribute)
+    const src = getLazyValue(audio, context.lazySrcAttributes)
 
-      if (value && isUrlShaped(value)) {
-        audio.setAttribute('src', value)
-        break
-      }
+    if (src) {
+      audio.setAttribute('src', src)
     }
   }
 }

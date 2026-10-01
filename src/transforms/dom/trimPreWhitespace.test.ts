@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -196,5 +197,18 @@ describeForEachParser('trimPreWhitespace', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('trimPreWhitespace in the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml })
+  }
+
+  it('should strip the common indent and trailing whitespace of a code block', async () => {
+    const value = '<pre><code>    line 1\n    line 2  \n</code></pre>'
+    const expected = '<pre><code>line 1\nline 2</code></pre>'
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

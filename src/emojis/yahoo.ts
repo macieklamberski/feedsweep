@@ -120,6 +120,11 @@ export const yahooEmojiResolver: EmojiResolver = {
   extract: (element) => {
     const glyph = yahooEmoticons.get(getFileStem(element.getAttribute('src') ?? ''))
 
-    return resolveEmojiImage(element, { isStrong: true, names: noEmojiNames, glyph })
+    return resolveEmojiImage(element, {
+      isStrong: true,
+      names: noEmojiNames,
+      glyph,
+      keepsPictures: true,
+    })
   },
 }

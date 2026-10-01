@@ -2,10 +2,19 @@ import { stringifySrcset } from 'srcset'
 import type { DomTransform, ResolveUrlFn } from '../../types.js'
 import { svgHrefAttribute } from '../../utils/dom.js'
 import { countSrcsetCandidates, parseSrcset } from '../../utils/images.js'
-import { absoluteUrlRegex } from '../../utils/urls.js'
+import { absoluteUrlRegex, resolveOrKeepUrl } from '../../utils/urls.js'
 
-// An absolute value is left byte-identical, and a relative one with no `baseUrl` resolves to
-// nothing and stays as written.
+const hostPrefixedUrlRegex = /^(https?:)\/\/[^/?#]+(?=\/\/(?:[a-z0-9-]+\.)+[a-z]{2,}\/)/i
+const hostPrefixedSrcTags = ['iframe', 'embed', 'script']
+
+// A protocol-relative src resolved against the page lands behind the site's own host,
+// `{scheme}//{site}//{host}/{path}`, which the site does not serve.
+const stripSiteHostPrefix = (url: string): string => {
+  return url.replace(hostPrefixedUrlRegex, '$1')
+}
+
+// An absolute value other than a host-prefixed player or script src is left byte-identical, and a
+// relative one with no `baseUrl` resolves to nothing and stays as written.
 const resolveAttribute = (
   element: Element,
   attribute: string,
@@ -14,15 +23,19 @@ const resolveAttribute = (
 ): void => {
   const value = element.getAttribute(attribute)
 
-  if (!value || absoluteUrlRegex.test(value)) {
+  if (!value) {
     return
   }
 
-  const resolved = resolveUrlFn(value, baseUrl)
+  const resolved = resolveOrKeepUrl(value, { baseUrl, resolveUrlFn })
 
-  if (resolved) {
-    element.setAttribute(attribute, resolved)
+  if (attribute === 'src' && hostPrefixedSrcTags.includes(element.localName)) {
+    element.setAttribute(attribute, stripSiteHostPrefix(resolved))
+
+    return
   }
+
+  element.setAttribute(attribute, resolved)
 }
 
 const resolveSrcset = (

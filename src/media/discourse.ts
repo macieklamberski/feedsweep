@@ -1,6 +1,5 @@
 import type { MediaResolver, MediaResolverResult } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { videoFileRegex } from '../utils/urls.js'
 
 // Discourse 3.2 and later ships an uploaded video as an empty div only its web client hydrates.
 // The div carries the upload's file url and thumbnail, never dimensions or an aspect ratio.
@@ -10,7 +9,7 @@ export const discourseMediaResolver: MediaResolver = {
   extract: (element) => {
     const source = attr(element, 'data-video-src')
 
-    if (!source || !videoFileRegex.test(source)) {
+    if (!source) {
       return
     }
 

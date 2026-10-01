@@ -10,25 +10,17 @@ const provider = 'flourish'
 // with a shim whose only job is to rewrite the location to it.
 const flourishHosts = ['flo.uri.sh', 'public.flourish.studio']
 
-// Any resource, not a list: a kind refused here is deleted as an empty div, chart and all.
-// `visualisation` and `story` are the two kinds feeds carry, and the endpoint validates the pair:
-// a real id answers 200 and a wrong kind, an unknown kind or a fabricated id all answer 403.
-const safeResourceRegex = /^[a-z][a-z-]*$/
-const safeIdRegex = /^\d+$/
-
 // `template` has no embed form: its `/embed` answers 403 for a real id.
 const nonEmbeddableResource = 'template'
 
 // The div names its chart by a relative `{resource}/{id}` path, at most with a cache-busting
 // query. A full URL or any other shape is dropped.
-const widgetSrcRegex = /^([a-z]+)\/(\d+)(?:\?.*)?$/
+const widgetSrcRegex = /^([^/]+)\/([^/?]+)(?:\?.*)?$/
 
+// `visualisation` and `story` are the two kinds feeds carry. The endpoint answers 403 for a wrong
+// kind, an unknown kind or a fabricated id.
 const composeEmbed = (resource: string, id: string): EmbedResolverResult | undefined => {
-  if (!safeResourceRegex.test(resource) || resource === nonEmbeddableResource) {
-    return
-  }
-
-  if (!safeIdRegex.test(id)) {
+  if (!resource || resource === nonEmbeddableResource || !id) {
     return
   }
 

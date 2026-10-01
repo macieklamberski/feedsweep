@@ -43,9 +43,11 @@ describe('extractMixcloudShow', () => {
   const sitePageUrls: Array<string> = [
     'https://www.mixcloud.com/discover/house/',
     'https://www.mixcloud.com/genres/house/',
+    'https://www.mixcloud.com/Genres/house/',
     'https://www.mixcloud.com/categories/house/',
     'https://www.mixcloud.com/tag/house/',
     'https://www.mixcloud.com/live/photogmusic/',
+    'https://www.mixcloud.com/upload/photogmusic/',
     'https://www.mixcloud.com/photogmusic/uploads/',
     'https://www.mixcloud.com/photogmusic/favorites/',
     'https://www.mixcloud.com/photogmusic/listens/',
@@ -64,6 +66,28 @@ describe('extractMixcloudShow', () => {
 
   it.each(sitePageUrls)('should return undefined for the site page %s', (value) => {
     expect(extractMixcloudShow(value)).toBeUndefined()
+  })
+
+  // `MEDIA` and `Search` are real users, answered in any case, so a missing show under either
+  // word reads as a show too.
+  const siteWordUserUrls: Array<[string, string]> = [
+    ['https://www.mixcloud.com/MEDIA/swcmx-vs-trkto-dembowlrd/', 'MEDIA/swcmx-vs-trkto-dembowlrd'],
+    ['https://www.mixcloud.com/media/swcmx-vs-trkto-dembowlrd/', 'media/swcmx-vs-trkto-dembowlrd'],
+    ['https://www.mixcloud.com/Search/millers-mega-mix/', 'Search/millers-mega-mix'],
+    ['https://www.mixcloud.com/search/millers-mega-mix/', 'search/millers-mega-mix'],
+    ['https://www.mixcloud.com/media/swf/', 'media/swf'],
+    ['https://www.mixcloud.com/search/house/', 'search/house'],
+  ]
+
+  it.each(siteWordUserUrls)('should read the site-word user in %s', (value, expected) => {
+    expect(extractMixcloudShow(value)).toBe(expected)
+  })
+
+  it('should use a malformed slug as written, even if the player answers an error', () => {
+    const value = 'https://www.mixcloud.com/FakeIDRadio/.4-natty-champs/'
+    const expected = 'FakeIDRadio/.4-natty-champs'
+
+    expect(extractMixcloudShow(value)).toBe(expected)
   })
 
   // The section words are matched whole, so a show whose title starts with one is still a show.
@@ -114,22 +138,36 @@ describe('extractMixcloudShow', () => {
     expect(extractMixcloudShow(value)).toBe(expected)
   })
 
+  it('should return undefined for a show path followed by another segment', () => {
+    const value = 'https://www.mixcloud.com/photogmusic/no-filter/extra/'
+
+    expect(extractMixcloudShow(value)).toBeUndefined()
+  })
+
+  it('should decode a user segment carrying an encoded slash for the key', () => {
+    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2F..%252Fetc%2Fno-filter%2F'
+    const expected = '../etc/no-filter'
+
+    expect(extractMixcloudShow(value)).toBe(expected)
+  })
+
+  it('should return undefined for a feed parameter that cannot be parsed', () => {
+    const value = 'https://www.mixcloud.com/widget/iframe/?feed=http%3A%2F%2F%5B'
+
+    expect(extractMixcloudShow(value)).toBeUndefined()
+  })
+
   it('should return undefined for a segment that climbs out of the path', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fuser%2F..%2F'
 
     expect(extractMixcloudShow(value)).toBeUndefined()
   })
 
-  it('should return undefined for a malformed escape', () => {
+  it('should keep a malformed escape as written', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fuser%2F%E0%A4%A%2F'
+    const expected = 'user/%EF%BF%BD%A'
 
-    expect(extractMixcloudShow(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a segment outside the url charset', () => {
-    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fuser%2F..%252Fetc%2F'
-
-    expect(extractMixcloudShow(value)).toBeUndefined()
+    expect(extractMixcloudShow(value)).toBe(expected)
   })
 
   // The audio, the artwork and their subdomains are all on the host list, and each file path
@@ -153,59 +191,38 @@ describe('mixcloudResolveEmbed', () => {
       id: 'photogmusic/no-filter',
       src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F',
       url: 'https://www.mixcloud.com/photogmusic/no-filter/',
-      height: 160,
+      height: 120,
       author: 'photogmusic',
     }
 
     expect(mixcloudResolveEmbed(value)).toEqual(expected)
   })
 
-  // The display options pick the player, so they ride through and the height follows them.
-  it('should carry the display options and size the mini player by them', () => {
+  it('should key and query a show by its decoded names and link it by the written path', () => {
+    const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2F..%252Fetc%2Fno-filter%2F'
+    const expected: EmbedResolverResult = {
+      provider: 'mixcloud',
+      id: '../etc/no-filter',
+      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2F..%2Fetc%2Fno-filter%2F',
+      url: 'https://www.mixcloud.com/..%2Fetc/no-filter/',
+      height: 120,
+      author: '..',
+    }
+
+    expect(mixcloudResolveEmbed(value)).toEqual(expected)
+  })
+
+  // The display options pick another look, so the widget is minted as the cover player.
+  it('should drop the display options and state the cover player box', () => {
     const value =
-      'https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&light=1&mini=1&feed=%2Fdjgavinboyd%2Fsoul-has-no-tempo%2F'
+      'https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&light=1&mini=1&hide_artwork=1&feed=%2Fdjgavinboyd%2Fsoul-has-no-tempo%2F'
     const expected: EmbedResolverResult = {
       provider: 'mixcloud',
       id: 'djgavinboyd/soul-has-no-tempo',
-      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fdjgavinboyd%2Fsoul-has-no-tempo%2F&mini=1&hide_cover=1&light=1',
+      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fdjgavinboyd%2Fsoul-has-no-tempo%2F',
       url: 'https://www.mixcloud.com/djgavinboyd/soul-has-no-tempo/',
-      height: 60,
+      height: 120,
       author: 'djgavinboyd',
-    }
-
-    expect(mixcloudResolveEmbed(value)).toEqual(expected)
-  })
-
-  // The bar shrinks to the mini height only with the cover hidden: with it on, the artwork
-  // player is what `mini` selects, and that one fills whatever height it gets.
-  it('should keep the full height for a mini player showing its cover', () => {
-    const value =
-      'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F&mini=1'
-    const expected: EmbedResolverResult = {
-      provider: 'mixcloud',
-      id: 'photogmusic/no-filter',
-      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F&mini=1',
-      url: 'https://www.mixcloud.com/photogmusic/no-filter/',
-      height: 160,
-      author: 'photogmusic',
-    }
-
-    expect(mixcloudResolveEmbed(value)).toEqual(expected)
-  })
-
-  // Only a flag set to `1` is a display option. Anything else in the query, the legacy
-  // `embed_type` or a flag switched off, is not written back.
-  it('should drop a display option that is not switched on', () => {
-    const value =
-      'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F&mini=0&autoplay=1'
-
-    const expected: EmbedResolverResult = {
-      provider: 'mixcloud',
-      id: 'photogmusic/no-filter',
-      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F',
-      url: 'https://www.mixcloud.com/photogmusic/no-filter/',
-      height: 160,
-      author: 'photogmusic',
     }
 
     expect(mixcloudResolveEmbed(value)).toEqual(expected)
@@ -229,7 +246,7 @@ describeForEachParser('mixcloudEmbedResolver', (parseHtml) => {
       id: 'photogmusic/no-filter',
       src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F',
       url: 'https://www.mixcloud.com/photogmusic/no-filter/',
-      height: 160,
+      height: 120,
       author: 'photogmusic',
     }
 
@@ -246,9 +263,9 @@ describeForEachParser('mixcloudEmbedResolver', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'mixcloud',
       id: 'djselarom/dark-synthesis-25',
-      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fdjselarom%2Fdark-synthesis-25%2F&hide_cover=1',
+      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fdjselarom%2Fdark-synthesis-25%2F',
       url: 'https://www.mixcloud.com/djselarom/dark-synthesis-25/',
-      height: 160,
+      height: 120,
       title: 'Dark Synthesis #25',
       author: 'djselarom',
     }
@@ -270,11 +287,18 @@ describeForEachParser('mixcloudEmbedResolver', (parseHtml) => {
       id: 'FakeIDRadio/4-natty-champs',
       src: 'https://www.mixcloud.com/widget/iframe/?feed=%2FFakeIDRadio%2F4-natty-champs%2F',
       url: 'https://www.mixcloud.com/FakeIDRadio/4-natty-champs/',
-      height: 160,
+      height: 120,
       author: 'FakeIDRadio',
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should ignore the widget path on a foreign host', async () => {
+    const value =
+      '<iframe src="https://evil.test/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
   })
 
   it('should leave a non-show mixcloud url to the generic placeholder', async () => {
@@ -292,7 +316,7 @@ describeForEachParser('mixcloudEmbedResolver', (parseHtml) => {
       id: 'photogmusic/no-filter',
       src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F',
       url: 'https://www.mixcloud.com/photogmusic/no-filter/',
-      height: 160,
+      height: 120,
       author: 'photogmusic',
     }
 
@@ -319,7 +343,7 @@ describeForEachParser('mixcloud through the pipeline', (parseHtml) => {
         data-embed-provider="mixcloud"
         data-embed-id="photogmusic/no-filter"
         data-embed-url="https://www.mixcloud.com/photogmusic/no-filter/"
-        data-embed-height="160"
+        data-embed-height="120"
         data-embed-author="photogmusic"
       ></div>
     `

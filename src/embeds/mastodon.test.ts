@@ -326,6 +326,23 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should resolve a classless iframe whose embed suffix ends in a slash', async () => {
+      const value = html`
+        <iframe src="https://mastodon.social/@Gargron/116535232552529093/embed/" width="400"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mastodon',
+        id: 'mastodon.social/116535232552529093',
+        src: 'https://mastodon.social/@Gargron/116535232552529093/embed',
+        url: 'https://mastodon.social/@Gargron/116535232552529093',
+        width: 400,
+        author: '@Gargron@mastodon.social',
+        publisher: 'mastodon.social',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   // Mastodon's username route constraint excludes `@`, so this path never reaches the embed

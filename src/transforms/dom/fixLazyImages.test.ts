@@ -110,6 +110,17 @@ describeForEachParser('fixLazyImages', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should not extract noscript when a srcset-only sibling names a different image', async () => {
+    const value = html`
+      <img srcset="https://example.com/photo-640.jpg 640w, https://example.com/photo-1280.jpg 1280w">
+      <noscript>
+        <img src="https://example.com/pixel.gif">
+      </noscript>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should not extract noscript when sibling is not an image', async () => {
     const value = html`
       <div>text</div>
@@ -269,6 +280,72 @@ describeForEachParser('fixLazyImages', (parseHtml) => {
     const expected = '<img src="real.jpg" data-src="real.jpg">'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should drop pixel-sized dimensions of the placeholder when promoting', async () => {
+    const value = html`
+      <img
+        src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
+        data-src="photo.jpg"
+        width="1"
+        height="1"
+      >
+    `
+    const expected = '<img src="photo.jpg" data-src="photo.jpg">'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should drop pixel-sized style dimensions of the placeholder when promoting', async () => {
+    const value = html`
+      <img
+        src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
+        data-src="photo.jpg"
+        style="width:1px;height:1px"
+      >
+    `
+    const expected = '<img src="photo.jpg" data-src="photo.jpg">'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep the other style rules when dropping pixel-sized style dimensions', async () => {
+    const value = html`
+      <img
+        src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
+        data-src="photo.jpg"
+        style="border:0;width:1px;max-width:100%;height:1px"
+      >
+    `
+    const expected = '<img src="photo.jpg" data-src="photo.jpg" style="border:0;max-width:100%">'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a content-sized style dimension when dropping a pixel-sized one', async () => {
+    const value = html`
+      <img
+        src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
+        data-src="photo.jpg"
+        style="width:1px;height:600px"
+      >
+    `
+    const expected = '<img src="photo.jpg" data-src="photo.jpg" style="height:600px">'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep content-sized dimensions when promoting', async () => {
+    const value = '<img data-src="photo.jpg" width="800" height="600">'
+    const expected = '<img data-src="photo.jpg" width="800" height="600" src="photo.jpg">'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep pixel-sized dimensions when there is nothing to promote', async () => {
+    const value = '<img src="pixel.gif" width="1" height="1">'
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 
   it('should handle html with no images', async () => {

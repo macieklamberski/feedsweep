@@ -335,6 +335,13 @@ describeForEachParser('resolveMediaDimensions', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should drop a negative width', async () => {
+      const value = '<img src="https://example.com/p.jpg" width="-640">'
+      const expected = '<img src="https://example.com/p.jpg">'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should backfill from the URL after dropping an auto width', async () => {
       const value = '<img src="https://example.com/photo-800x600.jpg" width="auto">'
       const expected = '<img src="https://example.com/photo-800x600.jpg" width="800" height="600">'
@@ -344,6 +351,11 @@ describeForEachParser('resolveMediaDimensions', (parseHtml) => {
 
     it('should keep valid integer attributes', async () => {
       const value = '<img src="https://example.com/p.jpg" width="800" height="600">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+    it('should keep a valid integer padded with spaces', async () => {
+      const value = '<img src="https://example.com/p.jpg" width=" 800 " height="600">'
 
       expect(await transform(value)).toEqualHtml(value)
     })

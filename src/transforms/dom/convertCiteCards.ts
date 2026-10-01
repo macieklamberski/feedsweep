@@ -14,10 +14,7 @@ export const convertCiteCards: DomTransform = (context) => {
           continue
         }
 
-        // Prepared alone types every field optional and loses the url the placeholder needs.
-        const prepared = { ...result, ...prepareCiteMetadata(result, context) }
-
-        element.replaceWith(createCitePlaceholder(document, prepared))
+        element.replaceWith(createCitePlaceholder(document, prepareCiteMetadata(result, context)))
       }
     }
   }

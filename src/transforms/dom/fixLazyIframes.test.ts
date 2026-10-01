@@ -151,6 +151,18 @@ describeForEachParser('fixLazyIframes', (parseHtml) => {
     expect(await transform(value, context)).toEqualHtml(expected)
   })
 
+  it('should promote a relative parked url as written when there is no base', async () => {
+    const value = '<iframe src="about:blank" data-src="/embed/x"></iframe>'
+    const expected = html`
+      <iframe
+        src="/embed/x"
+        data-src="/embed/x"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should leave the Invision placeholder src when nothing is parked', async () => {
     const value = html`
       <iframe src="https://forum.example.com/applications/core/interface/index.html"></iframe>
