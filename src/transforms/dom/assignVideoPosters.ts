@@ -89,6 +89,14 @@ const moveImageToVideoPoster = (image: Element, video: Element, overwrite = fals
     }
   }
 
+  // injectEnclosures hangs a captioned image in a figure, and the caption describes the image.
+  const figure = image.parentElement
+
+  if (image.hasAttribute(enclosureMarker) && figure?.localName === 'figure') {
+    figure.remove()
+    return
+  }
+
   removeWithEmptyWrappers(image)
 }
 

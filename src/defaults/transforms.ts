@@ -43,7 +43,9 @@ import { rebuildDeferredIframes } from '../transforms/dom/rebuildDeferredIframes
 import { rebuildElementorVideoEmbeds } from '../transforms/dom/rebuildElementorVideoEmbeds.js'
 import { rebuildEmbedlyEmbeds } from '../transforms/dom/rebuildEmbedlyEmbeds.js'
 import { rebuildEmbedPlusEmbeds } from '../transforms/dom/rebuildEmbedPlusEmbeds.js'
+import { rebuildExternalVideoEmbeds } from '../transforms/dom/rebuildExternalVideoEmbeds.js'
 import { rebuildGettyImagesEmbeds } from '../transforms/dom/rebuildGettyImagesEmbeds.js'
+import { rebuildIframelyEmbeds } from '../transforms/dom/rebuildIframelyEmbeds.js'
 import { rebuildJsfiddleEmbeds } from '../transforms/dom/rebuildJsfiddleEmbeds.js'
 import { rebuildLazyLoadForVideos } from '../transforms/dom/rebuildLazyLoadForVideos.js'
 import { rebuildLazyYtEmbeds } from '../transforms/dom/rebuildLazyYtEmbeds.js'
@@ -118,10 +120,12 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   unwrapDrupalOembedIframes,
   surfaceNoscriptEmbeds,
   rebuildEmbedPlusEmbeds,
+  rebuildIframelyEmbeds,
   rebuildLiteVideoEmbeds,
   rebuildLyteEmbeds,
   rebuildRocketYoutubePreviews,
   rebuildVideoJsEmbeds,
+  rebuildExternalVideoEmbeds,
   rebuildWmakerEmbeds,
   rebuildWistiaEmbeds,
   rebuildLazyLoadForVideos,

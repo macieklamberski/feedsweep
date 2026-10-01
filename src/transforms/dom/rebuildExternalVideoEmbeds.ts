@@ -1,0 +1,66 @@
+import { isString } from 'trousse'
+import { nicovideoResolveEmbed } from '../../embeds/nicovideo.js'
+import { readYoutubeEmbedSrc } from '../../embeds/youtube.js'
+import type { DomTransform } from '../../types.js'
+import { createIframe } from '../../utils/widgets.js'
+
+type ExternalVideoConfig = {
+  url?: unknown
+}
+
+const loaderSelector = 'script[src*="/contents/js/external_video.js"]'
+
+// The inline script assigns one global: extVideoConfig = {"width":"480","height":"320","url":"…"};
+const configRegex = /extVideoConfig\s*=\s*(\{[^}]*\})/
+
+const readConfig = (script: Element): ExternalVideoConfig | undefined => {
+  const json = script.textContent?.match(configRegex)?.[1]
+
+  if (!json) {
+    return
+  }
+
+  try {
+    return JSON.parse(json)
+  } catch {}
+}
+
+// Each loader follows its own config, so the nearest inline script before it is the one that
+// names its video when an item holds several players.
+const findConfigScript = (loader: Element): Element | undefined => {
+  for (let node = loader.previousElementSibling; node; node = node.previousElementSibling) {
+    if (node.localName === 'script' && node.textContent?.includes('extVideoConfig')) {
+      return node
+    }
+  }
+}
+
+// Seesaa's and Sakura's blog video block is an inline config beside a loader script that writes
+// the player client-side, so the pipeline drops the loader and no player is left. The config
+// names a YouTube or Nicovideo page.
+export const rebuildExternalVideoEmbeds: DomTransform = () => {
+  return (document) => {
+    for (const loader of document.querySelectorAll(loaderSelector)) {
+      const script = findConfigScript(loader)
+
+      if (!script) {
+        continue
+      }
+
+      const config = readConfig(script)
+
+      if (!isString(config?.url)) {
+        continue
+      }
+
+      const src = readYoutubeEmbedSrc(config.url) ?? nicovideoResolveEmbed(config.url)?.src
+
+      if (!src) {
+        continue
+      }
+
+      script.remove()
+      loader.replaceWith(createIframe(document, src))
+    }
+  }
+}

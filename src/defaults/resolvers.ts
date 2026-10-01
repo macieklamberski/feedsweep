@@ -367,13 +367,14 @@ import { xenforoEmojiResolver } from '../emojis/xenforo.js'
 import { yahooEmojiResolver } from '../emojis/yahoo.js'
 import { yahooJapanEmojiResolver } from '../emojis/yahoojapan.js'
 import { discourseMediaResolver } from '../media/discourse.js'
+import { flashMp3PlayerMediaResolver } from '../media/flashmp3player.js'
 import { ghostMediaResolver } from '../media/ghost.js'
 import { odeoMediaResolver } from '../media/odeo.js'
 import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
 import { tumblrMediaResolver } from '../media/tumblr.js'
 import { wechatMediaResolver } from '../media/wechat.js'
-import { weeblyMediaResolver } from '../media/weebly.js'
+import { weeblyFlashMediaResolver, weeblyMediaResolver } from '../media/weebly.js'
 import { wikimediaMediaResolver } from '../media/wikimedia.js'
 import type {
   CiteResolver,
@@ -620,6 +621,7 @@ const embedResolvers: Array<EmbedResolver> = [
 // resolver gets the carrier first.
 const mediaResolvers: Array<MediaResolver> = [
   discourseMediaResolver,
+  flashMp3PlayerMediaResolver,
   ghostMediaResolver,
   odeoMediaResolver,
   podloveMediaResolver,
@@ -627,6 +629,7 @@ const mediaResolvers: Array<MediaResolver> = [
   tumblrMediaResolver,
   wechatMediaResolver,
   weeblyMediaResolver,
+  weeblyFlashMediaResolver,
   wikimediaMediaResolver,
 ]
 
