@@ -187,6 +187,7 @@ import { odnoklassnikiEmbedResolver } from '../embeds/odnoklassniki.js'
 import { odyseeEmbedResolver } from '../embeds/odysee.js'
 import { officeEmbedResolver } from '../embeds/office.js'
 import { omnyEmbedResolver } from '../embeds/omny.js'
+import { ourworldindataEmbedResolver } from '../embeds/ourworldindata.js'
 import { padletEmbedResolver } from '../embeds/padlet.js'
 import { pastebinIframeEmbedResolver, pastebinScriptEmbedResolver } from '../embeds/pastebin.js'
 import { patroniteEmbedResolver } from '../embeds/patronite.js'
@@ -541,6 +542,7 @@ const embedResolvers: Array<EmbedResolver> = [
   odyseeEmbedResolver,
   officeEmbedResolver,
   omnyEmbedResolver,
+  ourworldindataEmbedResolver,
   padletEmbedResolver,
   pastebinIframeEmbedResolver,
   pastebinScriptEmbedResolver,
