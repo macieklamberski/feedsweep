@@ -168,6 +168,7 @@ import { komootEmbedResolver } from '../embeds/komoot.js'
 import { learningappsEmbedResolver } from '../embeds/learningapps.js'
 import { libsynEmbedResolver } from '../embeds/libsyn.js'
 import { linkedinEmbedResolver } from '../embeds/linkedin.js'
+import { listennotesEmbedResolver } from '../embeds/listennotes.js'
 import { mailruEmbedResolver } from '../embeds/mailru.js'
 import { mastodonEmbedResolver } from '../embeds/mastodon.js'
 import { matterportEmbedResolver } from '../embeds/matterport.js'
@@ -519,6 +520,7 @@ const embedResolvers: Array<EmbedResolver> = [
   learningappsEmbedResolver,
   libsynEmbedResolver,
   linkedinEmbedResolver,
+  listennotesEmbedResolver,
   mailruEmbedResolver,
   matterportEmbedResolver,
   mediavineWidgetEmbedResolver,
