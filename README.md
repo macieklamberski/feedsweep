@@ -82,6 +82,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildElementorVideoEmbeds` | Rebuild a real `<iframe>` from an Elementor video widget's deferred `data-settings` (YouTube / Vimeo / Dailymotion / VideoPress) |
 | `rebuildEmbedlyEmbeds` | Unwrap an Embedly media widget to the inner provider iframe, carrying the poster as `data-thumbnail` |
 | `rebuildGettyImagesEmbeds` | Rebuild a real `<iframe>` from a Getty Images `gie` widget facade, composing the player URL from the inline config the loader script never runs |
+| `rebuildExternalVideoEmbeds` | Rebuild a real `<iframe>` from a Seesaa or Sakura blog's `external_video.js` block onto the YouTube or Nicovideo video it names |
 | `rebuildJsfiddleEmbeds` | Rebuild a real `<iframe>` from a JSFiddle loader script onto the fiddle's own page |
 | `rebuildDeferredIframes` | Rebuild a real `<iframe>` from a URL parked in a `<div>` attribute (Pym.js `data-pym-src`, @newswire/frames `data-frame-src`) |
 | `linkifyGistEmbeds` | Replace a GitHub Gist script embed or `<amp-gist>` with a link to the gist |
