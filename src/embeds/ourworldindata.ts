@@ -10,13 +10,10 @@ const ourworldindataHosts = ['ourworldindata.org']
 // The site serves the route words in lowercase only, and answers 404 to `/GRAPHER/{slug}`.
 const chartPathRegex = /^\/(grapher|explorers)\/([^/]+)$/
 
-// See: https://github.com/owid/owid-grapher/blob/master/packages/@ourworldindata/types/src/grapherTypes/GrapherTypes.ts.
-// The grapher migrates a legacy `year` onto `time` itself.
-const chartParams = ['country', 'tab', 'time', 'year']
-
 // See: https://github.com/owid/owid-grapher/blob/master/packages/@ourworldindata/explorer/src/ExplorerConstants.ts.
-// An explorer names its views by its own choice params, so only the standard display params go.
-const explorerDisplayParams = [
+// An explorer and a multi-dimensional chart pick their view with params of their own, so only the
+// standard display params go.
+const displayParams = [
   'endpointsOnly',
   'facet',
   'focus',
@@ -40,10 +37,12 @@ const explorerDisplayParams = [
   'yScale',
   'zoomToSelection',
 ]
+const trackingParamRegex = /^(?:utm_|fbclid$)/
 
-// The embed dialog's snippet frames the chart page itself, 600 pixels tall, and the chart fills
-// whatever box it gets.
+// The embed dialog's snippet frames the page 600 pixels tall, and 696 for an explorer, whose
+// controls take the extra height. The chart fills whatever box it gets.
 const chartHeight = 600
+const explorerHeight = 696
 
 const ourworldindataResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
@@ -62,7 +61,7 @@ const ourworldindataResolveEmbed: ResolveEmbed = (url) => {
 
   const isChart = kind === 'grapher'
   const query = filterUrlQuery(parsed, (name) => {
-    return isChart ? chartParams.includes(name) : !explorerDisplayParams.includes(name)
+    return !displayParams.includes(name) && !trackingParamRegex.test(name)
   })
   const src = `https://ourworldindata.org/${kind}/${slug}${query}`
 
@@ -74,7 +73,7 @@ const ourworldindataResolveEmbed: ResolveEmbed = (url) => {
     url: src,
     // An explorer's image shows its default view whatever the query names.
     thumbnail: isChart ? `https://ourworldindata.org/grapher/${slug}.png${query}` : undefined,
-    height: chartHeight,
+    height: isChart ? chartHeight : explorerHeight,
   }
 }
 

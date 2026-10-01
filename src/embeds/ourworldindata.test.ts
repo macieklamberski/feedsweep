@@ -90,22 +90,38 @@ describeForEachParser('ourworldindataEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop a tracker from a chart', async () => {
+    it('should drop the trackers from a chart and keep the rest of the query', async () => {
       const value =
-        '<iframe src="https://ourworldindata.org/grapher/co2-by-source?utm_source=newsletter"></iframe>'
+        '<iframe src="https://ourworldindata.org/grapher/co2-by-source?utm_source=newsletter&amp;time=1900..2017&amp;fbclid=IwAR0abc"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'ourworldindata',
         id: 'grapher/co2-by-source',
-        src: 'https://ourworldindata.org/grapher/co2-by-source',
-        url: 'https://ourworldindata.org/grapher/co2-by-source',
-        thumbnail: 'https://ourworldindata.org/grapher/co2-by-source.png',
+        src: 'https://ourworldindata.org/grapher/co2-by-source?time=1900..2017',
+        url: 'https://ourworldindata.org/grapher/co2-by-source?time=1900..2017',
+        thumbnail: 'https://ourworldindata.org/grapher/co2-by-source.png?time=1900..2017',
         height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the view of an explorer and drop its display settings', async () => {
+    it('should keep the view params of a multi-dimensional chart', async () => {
+      const value =
+        '<iframe src="https://ourworldindata.org/grapher/religious-composition?tab=map&amp;religion=muslims&amp;indicator=share"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ourworldindata',
+        id: 'grapher/religious-composition',
+        src: 'https://ourworldindata.org/grapher/religious-composition?tab=map&religion=muslims&indicator=share',
+        url: 'https://ourworldindata.org/grapher/religious-composition?tab=map&religion=muslims&indicator=share',
+        thumbnail:
+          'https://ourworldindata.org/grapher/religious-composition.png?tab=map&religion=muslims&indicator=share',
+        height: 600,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the view of an explorer, drop its display settings and state its height', async () => {
       const value = html`
         <iframe
           loading="lazy"
@@ -119,7 +135,7 @@ describeForEachParser('ourworldindataEmbedResolver', (parseHtml) => {
         src: 'https://ourworldindata.org/explorers/coronavirus-data-explorer?time=346..latest&Metric=Vaccinations&Interval=Cumulative&Relative+to+Population=true&Align+outbreaks=false&country=USA~ISR~GBR~ARE~OWID_WRL~EuropeanUnion~CHL~CHE',
         url: 'https://ourworldindata.org/explorers/coronavirus-data-explorer?time=346..latest&Metric=Vaccinations&Interval=Cumulative&Relative+to+Population=true&Align+outbreaks=false&country=USA~ISR~GBR~ARE~OWID_WRL~EuropeanUnion~CHL~CHE',
         thumbnail: undefined,
-        height: 600,
+        height: 696,
       }
 
       expect(await extract(value)).toEqual(expected)
