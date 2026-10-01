@@ -272,7 +272,7 @@ describeForEachParser('facebookAmpEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, facebookAmpEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve a post to the post plugin and keep the declared size', async () => {
+    it('should resolve a post to the post plugin and ignore the declared size', async () => {
       const value = html`
         <amp-facebook
           width="552"
@@ -285,8 +285,7 @@ describeForEachParser('facebookAmpEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
-        width: 552,
-        height: 303,
+        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -615,7 +614,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
   // The size a Facebook embed gets depends on which shape it arrived as, so each one is
   // asserted separately.
   describe('size sources', () => {
-    it('should take the size off the element when the url states none', async () => {
+    it('should ignore the size the element states', async () => {
       const value = html`
         <iframe
           src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
@@ -628,8 +627,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
-        width: 500,
-        height: 500,
+        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)

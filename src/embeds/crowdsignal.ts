@@ -12,6 +12,9 @@ const loaderPathRegex = /^\/p\/([^/]+)\.js$/
 const retiredPollPathRegex = /^\/poll\/([^/]+)\/?$/
 const flashPlayerPathRegex = /^\/poll\.swf$/
 
+// A poll's height follows its answer count, and the frame posts none.
+const pollHeight = 533
+
 const composeEmbed = (pollId: string): EmbedResolverResult => {
   // The Flash flashvar `p` comes out decoded, and it goes into a path.
   const segment = encodePathSegment(pollId)
@@ -21,6 +24,7 @@ const composeEmbed = (pollId: string): EmbedResolverResult => {
     id: pollId,
     src: `https://poll.fm/${segment}/embed`,
     url: `https://poll.fm/${segment}`,
+    height: pollHeight,
   }
 }
 
@@ -103,12 +107,11 @@ const crowdsignalFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  return { ...composeEmbed(pollId), height: 473 }
+  return composeEmbed(pollId)
 }
 
 // Polldaddy's retired Flash poll, `www.polldaddy.com/poll.swf`, naming the poll in flashvars `p`.
 export const crowdsignalFlashEmbedResolver = createUrlEmbedResolver(
   ['www.polldaddy.com'],
   crowdsignalFlashResolveEmbed,
-  { preferResolverSize: true },
 )

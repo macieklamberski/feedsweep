@@ -124,7 +124,7 @@ describeForEachParser('calameoEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, calameoEmbedResolver)
 
   describe('happy paths', () => {
-    it('should read the viewer iframe at its declared box without its options', async () => {
+    it('should read the viewer iframe at the platform size without its options', async () => {
       const value = html`
         <iframe
           style="margin: 0 auto;"
@@ -141,8 +141,7 @@ describeForEachParser('calameoEmbedResolver', (parseHtml) => {
         id: '0047347972d89219ca0ff',
         src: 'https://v.calameo.com/?bkcode=0047347972d89219ca0ff',
         url: 'https://www.calameo.com/books/0047347972d89219ca0ff',
-        width: 560,
-        height: 350,
+        ratio: '300/194',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -167,14 +166,13 @@ describeForEachParser('calameoEmbedResolver', (parseHtml) => {
         id: '000108536974e8b083351',
         src: 'https://v.calameo.com/?bkcode=000108536974e8b083351&page=1',
         url: 'https://www.calameo.com/books/000108536974e8b083351',
-        width: 240,
-        height: 147,
+        ratio: '300/194',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the Flash viewer object at its declared box', async () => {
+    it('should read the Flash viewer object at the platform size', async () => {
       const value = html`
         <object
           id="calameo-viewer-0077756511c9c6e552299-1324375075"
@@ -194,7 +192,7 @@ describeForEachParser('calameoEmbedResolver', (parseHtml) => {
         id: '0077756511c9c6e552299',
         src: 'https://v.calameo.com/?bkcode=0077756511c9c6e552299',
         url: 'https://www.calameo.com/books/0077756511c9c6e552299',
-        height: 500,
+        ratio: '300/194',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -225,8 +223,7 @@ describeForEachParser('calameoEmbedResolver', (parseHtml) => {
         id: '0077756511c9c6e552299',
         src: 'https://v.calameo.com/?bkcode=0077756511c9c6e552299',
         url: 'https://www.calameo.com/books/0077756511c9c6e552299',
-        width: 240,
-        height: 147,
+        ratio: '300/194',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -247,8 +244,7 @@ describeForEachParser('calameoEmbedResolver', (parseHtml) => {
         id: '000247364f239153fcb2f',
         src: 'https://v.calameo.com/?bkcode=000247364f239153fcb2f&page=1',
         url: 'https://www.calameo.com/books/000247364f239153fcb2f',
-        width: 240,
-        height: 147,
+        ratio: '300/194',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -290,8 +286,7 @@ describeForEachParser('calameoEmbedResolver', (parseHtml) => {
         id: '0077756511c9c6e552299',
         src: 'https://v.calameo.com/?bkcode=0077756511c9c6e552299',
         url: 'https://www.calameo.com/books/0077756511c9c6e552299',
-        width: 240,
-        height: 147,
+        ratio: '300/194',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -327,9 +322,9 @@ describeForEachParser('calameoEmbedResolver through the pipeline', (parseHtml) =
       <div
         data-embed-provider="calameo"
         data-embed-id="0077756511c9c6e552299"
+        data-embed-ratio="300/194"
         data-embed-src="https://v.calameo.com/?bkcode=0077756511c9c6e552299"
         data-embed-url="https://www.calameo.com/books/0077756511c9c6e552299"
-        data-embed-height="500"
       ></div>
     `
 
@@ -353,9 +348,8 @@ describeForEachParser('calameoEmbedResolver through the pipeline', (parseHtml) =
       <div
         data-embed-provider="calameo"
         data-embed-id="002574221fb7a74a40f7a"
+        data-embed-ratio="300/194"
         data-embed-src="https://v.calameo.com/?bkcode=002574221fb7a74a40f7a&amp;authid=WdhyTr98dSUk"
-        data-embed-width="300"
-        data-embed-height="194"
       ></div>
     `
 

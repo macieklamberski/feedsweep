@@ -52,5 +52,4 @@ export const fliphtml5LightBoxEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     return fliphtml5ResolveEmbed(attr(element, 'data-href') ?? '')
   },
-  { preferResolverSize: true },
 )

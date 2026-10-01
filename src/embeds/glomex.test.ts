@@ -8,7 +8,7 @@ describeForEachParser('glomexIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, glomexIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the player frame and keep the size the publisher stated', async () => {
+    it('should resolve the player frame and ignore the size the publisher stated', async () => {
       const value = html`
         <iframe
           src="https://player.glomex.com/integration/1/integration.html?integrationId=40599x1hkkig7d8l&playlistId=v-debyi9cki6k1"
@@ -20,8 +20,7 @@ describeForEachParser('glomexIframeEmbedResolver', (parseHtml) => {
         provider: 'glomex',
         id: '40599x1hkkig7d8l/v-debyi9cki6k1',
         src: 'https://player.glomex.com/integration/1/integration.html?integrationId=40599x1hkkig7d8l&playlistId=v-debyi9cki6k1',
-        width: 640,
-        height: 350,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

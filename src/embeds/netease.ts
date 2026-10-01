@@ -60,9 +60,7 @@ export const neteaseResolveEmbed: ResolveEmbed = (url) => {
   }
 }
 
-export const neteaseEmbedResolver = createUrlEmbedResolver(neteaseHosts, neteaseResolveEmbed, {
-  preferResolverSize: true,
-})
+export const neteaseEmbedResolver = createUrlEmbedResolver(neteaseHosts, neteaseResolveEmbed)
 
 export const neteaseRenderHint: EmbedRenderHint = {
   provider,

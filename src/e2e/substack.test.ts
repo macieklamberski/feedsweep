@@ -360,7 +360,8 @@ describeForEachParser('Substack', (parseHtml) => {
 
   it('should resolve a spotify-wrap iframe into a spotify embed placeholder', async () => {
     // The url-keyed spotify resolver claims the iframe and reads the card Substack hangs on it;
-    // the declared height wins. The description holds the type label, which the id already says.
+    // the player's own height replaces the declared one. The description holds the type label,
+    // which the id already says.
     const episodeAttrs = jsonAttrValue({
       image: 'https://i.scdn.co/image/ab6765630000ba8a0000000000000000000000ff',
       title: 'Episode 42: Field Recording',
@@ -384,6 +385,7 @@ describeForEachParser('Substack', (parseHtml) => {
     `
     const expected = html`
       <div
+        data-embed-height="152"
         data-embed-provider="spotify"
         data-embed-id="episode/aB3dEfGhIjKlMnOpQrStUv"
         data-embed-src="https://open.spotify.com/embed/episode/aB3dEfGhIjKlMnOpQrStUv"
@@ -391,7 +393,6 @@ describeForEachParser('Substack', (parseHtml) => {
         data-embed-title="Episode 42: Field Recording"
         data-embed-publisher="Casey Host"
         data-embed-thumbnail="https://i.scdn.co/image/ab6765630000ba8a0000000000000000000000ff"
-        data-embed-height="232"
       ></div>
     `
     const result = await transformContent(value, { parseHtmlFn: parseHtml })
@@ -851,6 +852,7 @@ describeForEachParser('Substack', (parseHtml) => {
       <div
         data-embed-provider="vimeo"
         data-embed-id="123456789"
+        data-embed-ratio="16/9"
         data-embed-src="https://player.vimeo.com/video/123456789"
         data-embed-url="https://vimeo.com/123456789"
       ></div>

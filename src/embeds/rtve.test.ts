@@ -27,6 +27,7 @@ describe('rtveResolveEmbed', () => {
         id: 'audio/1925451',
         src: 'https://www.rtve.es/drmn/embed/audio/1925451/',
         url: 'https://www.rtve.es/a/1925451/',
+        ratio: '16/9',
       }
 
       expect(rtveResolveEmbed(value)).toEqual(expected)
@@ -130,7 +131,7 @@ describeForEachParser('rtveIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a declared size over the default ratio', async () => {
+    it('should keep the default ratio over a declared size', async () => {
       const value = html`
         <iframe
           src="https://secure-embed.rtve.es/drmn/embed/video/5544716"
@@ -144,14 +145,13 @@ describeForEachParser('rtveIframeEmbedResolver', (parseHtml) => {
         src: 'https://www.rtve.es/drmn/embed/video/5544716/',
         url: 'https://www.rtve.es/v/5544716/',
         thumbnail: 'https://img.rtve.es/v/5544716/',
-        width: 300,
-        height: 150,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the declared height of an audio frame', async () => {
+    it('should ignore the declared height of an audio frame', async () => {
       const value = html`
         <iframe
           src="http://www.rtve.es/drmn/embed/audio/2518208"
@@ -164,8 +164,7 @@ describeForEachParser('rtveIframeEmbedResolver', (parseHtml) => {
         id: 'audio/2518208',
         src: 'https://www.rtve.es/drmn/embed/audio/2518208/',
         url: 'https://www.rtve.es/a/2518208/',
-        width: 425,
-        height: 37,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -184,8 +183,8 @@ describeForEachParser('rtveIframeEmbedResolver', (parseHtml) => {
 describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, rtveFlashEmbedResolver)
 
-  // The v2 player names the asset in the swf query, and its declared box stands: the modern
-  // player fills whatever it is given, so there is no measured shape to prefer over it.
+  // The v2 player names the asset in the swf query. The modern player fills whatever it is
+  // given, so it states 16:9 and the declared box is not read.
   describe('the v2 player', () => {
     it('should repair the dead player to the modern video embed', async () => {
       const value = html`
@@ -208,14 +207,13 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
         src: 'https://www.rtve.es/drmn/embed/video/309749/',
         url: 'https://www.rtve.es/v/309749/',
         thumbnail: 'https://img.rtve.es/v/309749/',
-        width: 425,
-        height: 300,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the declared bar of an audio player', async () => {
+    it('should ignore the declared bar of an audio player', async () => {
       const value = html`
         <embed
           src="http://www.rtve.es/swf/v2/RTVEPlayer.swf?assetID=1025053_es_audios&amp;location=embed"
@@ -229,8 +227,7 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
         id: 'audio/1025053',
         src: 'https://www.rtve.es/drmn/embed/audio/1025053/',
         url: 'https://www.rtve.es/a/1025053/',
-        width: 650,
-        height: 45,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -257,8 +254,7 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
         src: 'https://www.rtve.es/drmn/embed/video/1081934/',
         url: 'https://www.rtve.es/v/1081934/',
         thumbnail: 'https://img.rtve.es/v/1081934/',
-        width: 425,
-        height: 239,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -310,8 +306,7 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
         src: 'https://www.rtve.es/drmn/embed/video/1429661/',
         url: 'https://www.rtve.es/v/1429661/',
         thumbnail: 'https://img.rtve.es/v/1429661/',
-        width: 425,
-        height: 239,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -331,8 +326,7 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
         id: 'audio/1251286',
         src: 'https://www.rtve.es/drmn/embed/audio/1251286/',
         url: 'https://www.rtve.es/a/1251286/',
-        width: 425,
-        height: 37,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -15,6 +15,7 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
         provider: 'ultimedia',
         id: '01357940/ml3ffr',
         src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -33,8 +34,7 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
         provider: 'ultimedia',
         id: '01357940/ml3ffr',
         src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/',
-        width: 600,
-        height: 336,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -47,6 +47,7 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
         provider: 'ultimedia',
         id: '01357940/ml3ffr',
         src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -82,6 +83,7 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
         provider: 'ultimedia',
         id: '01357940/ML3FFR',
         src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ML3FFR/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -123,8 +125,7 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
         provider: 'ultimedia',
         id: '01999636/83vrlm',
         src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01999636/src/83vrlm/',
-        width: 430,
-        height: 300,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -137,6 +138,7 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
         provider: 'ultimedia',
         id: '01999636/83vrlm',
         src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01999636/src/83vrlm/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -149,6 +151,7 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
         provider: 'ultimedia',
         id: '01999636/83vrlm',
         src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01999636/src/83vrlm/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -161,6 +164,7 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
         provider: 'ultimedia',
         id: '01999636/83vrlm',
         src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01999636/src/83vrlm/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -197,10 +201,9 @@ describeForEachParser('ultimedia urls the pipeline absolutises first', (parseHtm
     `
     const expected = html`
       <div
-        data-embed-height="336"
-        data-embed-width="600"
         data-embed-id="01357940/ml3ffr"
         data-embed-provider="ultimedia"
+        data-embed-ratio="16/9"
         data-embed-src="https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/"
       ></div>
     `

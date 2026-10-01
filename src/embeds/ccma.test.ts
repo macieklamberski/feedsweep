@@ -404,7 +404,7 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
   })
 
   describe('the CCMA audio frame', () => {
-    it('should key the audio frame apart from video ids and keep its declared box', async () => {
+    it('should key the audio frame apart from video ids', async () => {
       const value = html`
         <iframe
           allowfullscreen=""
@@ -419,8 +419,6 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
         provider: 'ccma',
         id: 'audio/859074',
         src: 'https://www.3cat.cat/3cat/audio/859074/embed/',
-        width: 500,
-        height: 281,
       }
 
       expect(await extract(value)).toEqual(expected)

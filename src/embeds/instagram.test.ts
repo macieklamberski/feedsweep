@@ -947,7 +947,6 @@ describeForEachParser('instagramIframeEmbedResolver', (parseHtml) => {
         id: 'p/CaUsPbUquKV',
         src: 'https://www.instagram.com/p/CaUsPbUquKV/embed/captioned/',
         url: 'https://www.instagram.com/p/CaUsPbUquKV/',
-        height: 640,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1258,8 +1257,6 @@ describeForEachParser('instagramAmpEmbedResolver', (parseHtml) => {
       id: 'p/CaUsPbUquKV',
       src: 'https://www.instagram.com/p/CaUsPbUquKV/embed/captioned/',
       url: 'https://www.instagram.com/p/CaUsPbUquKV/',
-      width: 320,
-      height: 392,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -1278,8 +1275,6 @@ describeForEachParser('instagramAmpEmbedResolver', (parseHtml) => {
       id: 'p/CaUsPbUquKV',
       src: 'https://www.instagram.com/p/CaUsPbUquKV/embed/',
       url: 'https://www.instagram.com/p/CaUsPbUquKV/',
-      width: 320,
-      height: 392,
     }
 
     expect(await extract(value)).toEqual(expected)

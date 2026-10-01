@@ -112,7 +112,7 @@ describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the height the snippet states with its px unit', async () => {
+    it('should ignore the height the snippet states with its px unit', async () => {
       const value = html`
         <iframe
           style="max-width: 500px; min-width: 250px; max-height: none!important;"
@@ -130,7 +130,7 @@ describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
         id: 'donation-form-248',
         src: 'https://donorbox.org/embed/donation-form-248',
         url: 'https://donorbox.org/donation-form-248',
-        height: 640,
+        height: 900,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -158,7 +158,7 @@ describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
         id: 'kde-community',
         src: 'https://donorbox.org/embed/kde-community',
         url: 'https://donorbox.org/kde-community',
-        height: 550,
+        height: 900,
       }
 
       expect(await extract(value)).toEqual(expected)

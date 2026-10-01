@@ -30,11 +30,11 @@ const composeEmbed = (kind: Kind, id: string): EmbedResolverResult => {
     id: `${kind}/${id}`,
     src: `https://www.rtve.es/drmn/embed/${kind}/${id}/`,
     url: `https://www.rtve.es/${kind === 'video' ? 'v' : 'a'}/${id}/`,
+    ratio: playerRatio,
   }
 
   if (kind === 'video') {
     result.thumbnail = `https://img.rtve.es/v/${id}/`
-    result.ratio = playerRatio
   }
 
   return result

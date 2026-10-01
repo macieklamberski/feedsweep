@@ -101,9 +101,7 @@ export const ccmaResolveEmbed: ResolveEmbed = (url, element) => {
   }
 }
 
-export const ccmaEmbedResolver = createUrlEmbedResolver(ccmaHosts, ccmaResolveEmbed, {
-  preferResolverSize: true,
-})
+export const ccmaEmbedResolver = createUrlEmbedResolver(ccmaHosts, ccmaResolveEmbed)
 
 export const ccmaRenderHint: EmbedRenderHint = {
   provider,

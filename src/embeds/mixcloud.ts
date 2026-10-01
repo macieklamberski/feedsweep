@@ -111,10 +111,7 @@ export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {
 }
 
 // Mixcloud's widget iframe, its Flash player and a bare mixcloud.com/{user}/{slug} show url.
-export const mixcloudEmbedResolver = createUrlEmbedResolver(mixcloudHosts, mixcloudResolveEmbed, {
-  // Carriers state the heights of earlier players, so the measured one outranks them.
-  preferResolverSize: true,
-})
+export const mixcloudEmbedResolver = createUrlEmbedResolver(mixcloudHosts, mixcloudResolveEmbed)
 
 export const mixcloudRenderHint: EmbedRenderHint = {
   provider,

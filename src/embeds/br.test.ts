@@ -13,6 +13,7 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
         provider: 'br',
         id: 'av:5dc03b7808e85c001af059a0',
         src: 'https://www.br.de/mediathek/embed/av:5dc03b7808e85c001af059a0',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -29,6 +30,7 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
         provider: 'br',
         id: 'av:5d3a1510906784001320f781',
         src: 'https://www.br.de/mediathek/embed/av:5d3a1510906784001320f781',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -47,6 +49,7 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
         provider: 'br',
         id: 'av:5dc03b7808e85c001af059a0',
         src: 'https://www.br.de/mediathek/embed/av:5dc03b7808e85c001af059a0',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -90,6 +93,7 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
         provider: 'br',
         id: 'av:zz5dc03b7808e85c001af059',
         src: 'https://www.br.de/mediathek/embed/av:zz5dc03b7808e85c001af059',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -115,6 +119,7 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
         provider: 'br',
         id: 'av:5d2cb1e4ca9c9700134580d2',
         src: 'https://www.br.de/mediathek/embed/av:5d2cb1e4ca9c9700134580d2',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -126,6 +131,7 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
         provider: 'br',
         id: 'av:5dc03b7808e85c001af059a0',
         src: 'https://www.br.de/mediathek/embed/av:5dc03b7808e85c001af059a0',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -137,6 +143,7 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
         provider: 'br',
         id: 'av:6929a0fc6be9690008c09f76',
         src: 'https://www.br.de/mediathek/embed/av:6929a0fc6be9690008c09f76',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

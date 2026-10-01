@@ -74,9 +74,7 @@ export const scribdResolveEmbed: ResolveEmbed = (url, element) => {
 }
 
 // Scribd's player iframe, /embeds/{id}/content.
-export const scribdIframeEmbedResolver = createUrlEmbedResolver(scribdHosts, scribdResolveEmbed, {
-  preferResolverSize: true,
-})
+export const scribdIframeEmbedResolver = createUrlEmbedResolver(scribdHosts, scribdResolveEmbed)
 
 export const scribdFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)

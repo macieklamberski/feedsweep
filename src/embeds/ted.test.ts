@@ -104,6 +104,7 @@ describe('tedResolveEmbed', () => {
       id: 'ethan_zuckerman',
       src: 'https://embed.ted.com/embed/ethan_zuckerman',
       url: 'https://www.ted.com/talks/ethan_zuckerman',
+      ratio: '16/9',
     }
 
     expect(tedResolveEmbed(value)).toEqual(expected)
@@ -127,6 +128,7 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
         id: 'ethan_zuckerman',
         src: 'https://embed.ted.com/embed/ethan_zuckerman',
         url: 'https://www.ted.com/talks/ethan_zuckerman',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -145,6 +147,7 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
         id: 'ethan_zuckerman',
         src: 'https://embed.ted.com/embed/ethan_zuckerman',
         url: 'https://www.ted.com/talks/ethan_zuckerman',
+        ratio: '16/9',
         title: 'Ethan Zuckerman: Listening to global voices',
       }
 
@@ -183,6 +186,7 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
         url: 'https://www.ted.com/talks/brene_brown_on_vulnerability',
         thumbnail:
           'http://images.ted.com/images/ted/tedindex/embed-posters/BreneBrown-2010X.embed_thumbnail.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -200,6 +204,7 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
         id: 'brene-brown.on_vulnerability',
         src: 'https://embed.ted.com/embed/brene-brown.on_vulnerability',
         url: 'https://www.ted.com/talks/brene-brown.on_vulnerability',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -217,6 +222,7 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
         id: 'brene_brown%2F..%2Fx',
         src: 'https://embed.ted.com/embed/brene_brown%2F..%2Fx',
         url: 'https://www.ted.com/talks/brene_brown%2F..%2Fx',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -246,6 +252,7 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
         id: 'eben_bayer_are_mushrooms_the_new_plastic',
         src: 'https://embed.ted.com/embed/eben_bayer_are_mushrooms_the_new_plastic',
         url: 'https://www.ted.com/talks/eben_bayer_are_mushrooms_the_new_plastic',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -263,6 +270,7 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
         id: 'diana_laufenberg_3_ways_to_teach',
         src: 'https://embed.ted.com/embed/diana_laufenberg_3_ways_to_teach',
         url: 'https://www.ted.com/talks/diana_laufenberg_3_ways_to_teach',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -302,6 +310,7 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
         id: 'nicholas_christakis_the_hidden_influence_of_social_netw',
         src: 'https://embed.ted.com/embed/nicholas_christakis_the_hidden_influence_of_social_netw',
         url: 'https://www.ted.com/talks/nicholas_christakis_the_hidden_influence_of_social_netw',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -337,6 +346,7 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
         id: 'ethan_zuckerman',
         src: 'https://embed.ted.com/embed/ethan_zuckerman',
         url: 'https://www.ted.com/talks/ethan_zuckerman',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

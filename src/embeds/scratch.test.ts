@@ -159,8 +159,8 @@ describeForEachParser('scratchEmbedResolver', (parseHtml) => {
         src: 'https://scratch.mit.edu/projects/10007053/embed',
         url: 'https://scratch.mit.edu/projects/10007053/',
         thumbnail: 'https://cdn2.scratch.mit.edu/get_image/project/10007053_480x360.png',
-        width: 602,
-        height: 502,
+        width: 485,
+        height: 402,
       }
 
       expect(await extract(value)).toEqual(expected)

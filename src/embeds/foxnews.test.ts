@@ -212,7 +212,7 @@ describeForEachParser('foxnewsScriptEmbedResolver', (parseHtml) => {
 describeForEachParser('foxnewsIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, foxnewsIframeEmbedResolver)
 
-  // The pasted iframe states 640 by 360, which is the carrier's size and wins over the ratio.
+  // The pasted iframe states 640 by 360, which is not read.
   it('should resolve the pasted player iframe', async () => {
     const value = html`
       <iframe
@@ -226,8 +226,7 @@ describeForEachParser('foxnewsIframeEmbedResolver', (parseHtml) => {
       id: '6178327154001',
       src: 'https://video.foxnews.com/v/video-embed.html?video_id=6178327154001',
       url: 'https://www.foxnews.com/video/6178327154001',
-      width: 640,
-      height: 360,
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)

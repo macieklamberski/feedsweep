@@ -40,6 +40,8 @@ const composeEmbed = (
     id: contentId,
     src: `https://video.fc2.com/embed/player/${contentId}/${composeQuery(params)}`,
     url: `https://video.fc2.com/${locale ? `${locale}/` : ''}content/${contentId}/`,
+    // The loader draws the player 9/16 of its width tall.
+    ratio: '16/9',
   }
 }
 
@@ -112,8 +114,6 @@ export const fc2PlayerScriptEmbedResolver = createMarkupEmbedResolver(
 
     return {
       ...composeEmbed({ contentId, locale: page?.[1] }, params),
-      // The loader draws the player 9/16 of its width tall where the script states no box.
-      ratio: '16/9',
       title: attr(element, 'tl'),
       duration: duration > 0 ? duration : undefined,
     }
@@ -139,10 +139,7 @@ export const fc2BlogScriptEmbedResolver = createMarkupEmbedResolver(
     // not derivable from the url.
     const params = loader.searchParams.get('rel') === '1' ? undefined : { sg: '0' }
 
-    return {
-      ...composeEmbed({ contentId, locale: 'ja' }, params),
-      ratio: '16/9',
-    }
+    return composeEmbed({ contentId, locale: 'ja' }, params)
   },
 )
 

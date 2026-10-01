@@ -314,7 +314,7 @@ describeForEachParser('codesandboxIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the height the publisher laid out over the share dialog default', async () => {
+    it('should ignore the height the publisher laid out', async () => {
       const value = html`
         <iframe
           src="https://codesandbox.io/embed/83wzkj"
@@ -327,7 +327,7 @@ describeForEachParser('codesandboxIframeEmbedResolver', (parseHtml) => {
         id: '83wzkj',
         src: 'https://codesandbox.io/embed/83wzkj',
         url: 'https://codesandbox.io/s/83wzkj',
-        height: 700,
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)

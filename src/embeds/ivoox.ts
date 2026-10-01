@@ -21,8 +21,7 @@ const showPlayerRegex = /\/player_es_podcast_([^_/]+)(?:_[^_/]+)?_(\d+)\.html$/
 
 const ivooxHosts = ['ivoox.com']
 
-// The heights iVoox's embed dialog states for the current episode and show players. A box the
-// carrier states was drawn for a skin, a generation or a legacy player the mint no longer loads.
+// The heights iVoox's embed dialog states for the current episode and show players.
 const episodeHeight = 200
 const showHeight = 400
 
@@ -90,9 +89,7 @@ export const ivooxResolveEmbed: ResolveEmbed = (url, element) => {
   }
 }
 
-export const ivooxEmbedResolver = createUrlEmbedResolver(ivooxHosts, ivooxResolveEmbed, {
-  preferResolverSize: true,
-})
+export const ivooxEmbedResolver = createUrlEmbedResolver(ivooxHosts, ivooxResolveEmbed)
 
 export const ivooxFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'YouTube video player' },

@@ -200,7 +200,6 @@ describeForEachParser('learningappsEmbedResolver', (parseHtml) => {
         provider: 'learningapps',
         id: 'pxg4kgd2a23',
         src: 'https://learningapps.org/watch?app=pxg4kgd2a23',
-        width: 950,
         height: 500,
       }
 

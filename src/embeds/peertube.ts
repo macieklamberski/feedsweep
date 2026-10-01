@@ -83,7 +83,6 @@ export const peertubeEmbedResolver = createMarkupEmbedResolver(
       title: attr(element, 'title'),
     }
   },
-  { preferResolverSize: true },
 )
 
 // `p2p=0` keeps the player off the peer-to-peer swarm, which the embed page's own notice warns

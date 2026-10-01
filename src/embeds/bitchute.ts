@@ -26,6 +26,7 @@ const bitchuteResolveEmbed: ResolveEmbed = (url, element) => {
     id,
     src: `https://www.bitchute.com/embed/${id}/`,
     url: `https://www.bitchute.com/video/${id}/`,
+    ratio: '16/9',
     title,
   }
 }

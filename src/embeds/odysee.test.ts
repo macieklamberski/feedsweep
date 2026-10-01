@@ -43,8 +43,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@OsasunaLibertad:9/Como-Proteger-a-los-Menores:9',
         src: 'https://odysee.com/$/embed/@OsasunaLibertad:9/Como-Proteger-a-los-Menores:9',
         url: 'https://odysee.com/@OsasunaLibertad:9/Como-Proteger-a-los-Menores:9',
-        width: 1200,
-        height: 675,
+        ratio: '16/9',
         author: '@OsasunaLibertad',
       }
 
@@ -66,8 +65,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@AldebaranVideo:b/Jorge-Katar-Race-and-Reason:f',
         src: 'https://odysee.com/$/embed/@AldebaranVideo:b/Jorge-Katar-Race-and-Reason:f',
         url: 'https://odysee.com/@AldebaranVideo:b/Jorge-Katar-Race-and-Reason:f',
-        width: 853,
-        height: 480,
+        ratio: '16/9',
         author: '@AldebaranVideo',
       }
 
@@ -90,8 +88,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
         src: 'https://odysee.com/$/embed/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
         url: 'https://odysee.com/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
-        width: 560,
-        height: 315,
+        ratio: '16/9',
         author: '@Impfschaden.info',
       }
 
@@ -179,6 +176,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '..',
         src: 'https://odysee.com/$/embed/..',
         url: 'https://odysee.com/..',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -195,6 +193,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: 'webb-repersoning:7',
         src: 'https://odysee.com/$/embed/webb-repersoning:7',
         url: 'https://odysee.com/webb-repersoning:7',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -207,6 +206,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: 'webb-repersoning:7',
         src: 'https://odysee.com/$/embed/webb-repersoning:7',
         url: 'https://odysee.com/webb-repersoning:7',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -227,8 +227,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: 'webb-repersoning:7',
         src: 'https://odysee.com/$/embed/webb-repersoning:7',
         url: 'https://odysee.com/webb-repersoning:7',
-        width: 560,
-        height: 315,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -244,6 +243,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: 'webb-repersoning:7',
         src: 'https://odysee.com/$/embed/webb-repersoning:7',
         url: 'https://odysee.com/webb-repersoning:7',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -260,6 +260,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: 'webb-repersoning',
         src: 'https://odysee.com/$/embed/webb-repersoning',
         url: 'https://odysee.com/webb-repersoning',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -272,6 +273,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@corbettreport',
         src: 'https://odysee.com/$/embed/@corbettreport',
         url: 'https://odysee.com/@corbettreport',
+        ratio: '16/9',
         author: '@corbettreport',
       }
 
@@ -287,6 +289,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@corbettreport:0/webb-repersoning',
         src: 'https://odysee.com/$/embed/@corbettreport:0/webb-repersoning',
         url: 'https://odysee.com/@corbettreport:0/webb-repersoning',
+        ratio: '16/9',
         author: '@corbettreport',
       }
 
@@ -304,6 +307,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '@corbettreport/webb-repersoning',
         src: 'https://odysee.com/$/embed/@corbettreport/webb-repersoning',
         url: 'https://odysee.com/@corbettreport/webb-repersoning',
+        ratio: '16/9',
         author: '@corbettreport',
       }
 

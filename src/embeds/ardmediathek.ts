@@ -25,6 +25,7 @@ const ardmediathekResolveEmbed: ResolveEmbed = (url) => {
     id,
     src: `https://www.ardmediathek.de/embed/${id}${pickUrlParams(url, ['startTime'])}`,
     url: `https://www.ardmediathek.de/video/${id}`,
+    ratio: '16/9',
   }
 }
 

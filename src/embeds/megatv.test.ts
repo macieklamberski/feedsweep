@@ -7,7 +7,7 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, megatvEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the share dialog snippet and keep the box it states', async () => {
+    it('should resolve the share dialog snippet and ignore the box it states', async () => {
       const value = html`
         <iframe
           src="https://www.megatv.com/embed/?p=2020687366"
@@ -24,8 +24,7 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
         id: '2020687366',
         src: 'https://www.megatv.com/embed/?p=2020687366',
         url: 'https://www.megatv.com/?p=687366',
-        width: 560,
-        height: 315,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -139,27 +139,22 @@ const toolsPathRegex = /^\/embed\/v1\/([a-z]+)\/([^/]+)$/
 // The same album, playlist or song as the modern player, reached through the retired tool's url.
 // The tool wrote the storefront as `country`. A missing or malformed `country` drops the segment,
 // and Apple serves a storefront-less url from the US store.
-export const appleToolsEmbedResolver = createUrlEmbedResolver(
-  appleToolsHosts,
-  (url) => {
-    const parsed = parseUrl(url, placeholderBaseUrl)
-    const match = parsed?.pathname.match(toolsPathRegex)
+export const appleToolsEmbedResolver = createUrlEmbedResolver(appleToolsHosts, (url) => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
+  const match = parsed?.pathname.match(toolsPathRegex)
 
-    if (!match) {
-      return
-    }
+  if (!match) {
+    return
+  }
 
-    const [, kind, pathId] = match
+  const [, kind, pathId] = match
 
-    const country = parsed?.searchParams.get('country')?.toLowerCase()
-    const storefront = keepIfMatches(country, storefrontRegex)
-    const modernUrl = `https://music.apple.com/${storefront ? `${storefront}/` : ''}${kind}/${pathId}`
+  const country = parsed?.searchParams.get('country')?.toLowerCase()
+  const storefront = keepIfMatches(country, storefrontRegex)
+  const modernUrl = `https://music.apple.com/${storefront ? `${storefront}/` : ''}${kind}/${pathId}`
 
-    return appleResolveEmbed(modernUrl)
-  },
-  // The tool's snippet states 110 for a song and 500 for an album, sized for its retired player.
-  { preferResolverSize: true },
-)
+  return appleResolveEmbed(modernUrl)
+})
 
 export const appleFieldCleaners: Array<FieldCleaner> = [
   { provider: podcastsProvider, field: 'title', drop: 'Media player' },

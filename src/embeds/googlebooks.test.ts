@@ -52,7 +52,7 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
         thumbnail:
           'https://books.google.com/books/content?id=pXG-Mw4cxa0C&printsec=frontcover&img=1&zoom=1',
         width: 500,
-        height: 1200,
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -73,8 +73,8 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
         url: 'https://books.google.com/books?id=pz5KDwAAQBAJ',
         thumbnail:
           'https://books.google.com/books/content?id=pz5KDwAAQBAJ&printsec=frontcover&img=1&zoom=1',
-        width: 900,
-        height: 700,
+        width: 500,
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -195,7 +195,7 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
         thumbnail:
           'https://books.google.com/books/content?id=Gqz3UF5FbI0C&printsec=frontcover&img=1&zoom=1',
         width: 500,
-        height: 600,
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)

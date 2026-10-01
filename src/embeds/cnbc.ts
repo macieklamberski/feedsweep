@@ -37,6 +37,4 @@ export const cnbcResolveEmbed: ResolveEmbed = (url) => {
   }
 }
 
-export const cnbcIframeEmbedResolver = createUrlEmbedResolver(cnbcHosts, cnbcResolveEmbed, {
-  preferResolverSize: true,
-})
+export const cnbcIframeEmbedResolver = createUrlEmbedResolver(cnbcHosts, cnbcResolveEmbed)

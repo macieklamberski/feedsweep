@@ -80,6 +80,7 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
         data-embed-src="https://fast.wistia.net/embed/iframe/u3gz5bka6b"
         data-embed-provider="wistia"
         data-embed-id="u3gz5bka6b"
+        data-embed-ratio="16/9"
       ></div>
     `
     const result = await transformContent(value, {

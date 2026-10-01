@@ -66,7 +66,7 @@ describeForEachParser('odnoklassnikiEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, odnoklassnikiEmbedResolver)
 
   describe('happy paths', () => {
-    it('should take the box the carrier declares over the player ratio', async () => {
+    it('should keep the player ratio over the box the carrier declares', async () => {
       const value = html`
         <iframe
           src="http://ok.ru/videoembed/36463446577"
@@ -80,8 +80,7 @@ describeForEachParser('odnoklassnikiEmbedResolver', (parseHtml) => {
         id: '36463446577',
         src: 'https://ok.ru/videoembed/36463446577',
         url: 'https://ok.ru/video/36463446577',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

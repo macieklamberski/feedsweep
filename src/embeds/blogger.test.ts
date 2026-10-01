@@ -65,6 +65,7 @@ describe('bloggerResolveEmbed', () => {
         provider: 'blogger',
         id: token,
         src: `https://www.blogger.com/video.g?token=${token}`,
+        ratio: '16/9',
       }
 
       expect(bloggerResolveEmbed(value)).toEqual(expected)
@@ -76,6 +77,7 @@ describe('bloggerResolveEmbed', () => {
         provider: 'blogger',
         id: token,
         src: `https://www.blogger.com/video.g?token=${token}`,
+        ratio: '16/9',
       }
 
       expect(bloggerResolveEmbed(value)).toEqual(expected)
@@ -87,6 +89,7 @@ describe('bloggerResolveEmbed', () => {
         provider: 'blogger',
         id: 'AD6v&x',
         src: 'https://www.blogger.com/video.g?token=AD6v%26x',
+        ratio: '16/9',
       }
 
       expect(bloggerResolveEmbed(value)).toEqual(expected)
@@ -122,6 +125,7 @@ describeForEachParser('bloggerEmbedResolver', (parseHtml) => {
         provider: 'blogger',
         id: token,
         src: `https://www.blogger.com/video.g?token=${token}`,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -159,6 +163,7 @@ describeForEachParser('bloggerEmbedResolver carrier title', (parseHtml) => {
       provider: 'blogger',
       id: 'AD6v5dz1',
       src: 'https://www.blogger.com/video.g?token=AD6v5dz1',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -172,6 +177,7 @@ describeForEachParser('bloggerEmbedResolver carrier title', (parseHtml) => {
       provider: 'blogger',
       id: 'AD6v5dz1',
       src: 'https://www.blogger.com/video.g?token=AD6v5dz1',
+      ratio: '16/9',
       title: 'Garden tour, June',
     }
 

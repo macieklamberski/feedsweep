@@ -404,7 +404,7 @@ describeForEachParser('nprIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the box of the retired video template iframe', async () => {
+    it('should ignore the box of the retired video template iframe', async () => {
       const value = html`
         <iframe
           frameborder="0"
@@ -418,8 +418,7 @@ describeForEachParser('nprIframeEmbedResolver', (parseHtml) => {
         provider: 'npr',
         id: 'video/673291531/673300770',
         src: 'https://www.npr.org/embedded-video?storyId=673291531&mediaId=673300770',
-        width: 600,
-        height: 338,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

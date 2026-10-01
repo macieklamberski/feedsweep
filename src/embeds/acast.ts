@@ -53,10 +53,7 @@ const acastResolveEmbed: ResolveEmbed = (url, element) => {
 }
 
 // Acast's player iframe, spelled three ways across the embed host and the retired player host.
-export const acastEmbedResolver = createUrlEmbedResolver(acastHosts, acastResolveEmbed, {
-  // Carriers state 110 and 120 for players that no longer exist, and the current one is 190.
-  preferResolverSize: true,
-})
+export const acastEmbedResolver = createUrlEmbedResolver(acastHosts, acastResolveEmbed)
 
 export const acastFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Embed Player' },

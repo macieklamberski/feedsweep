@@ -56,6 +56,7 @@ const composeEmbedResult = (identifier: string, query = ''): EmbedResolverResult
 
 // The modern audio player is a controls bar 30 tall at every width, and it fills any width.
 const audioPlayerHeight = 30
+const videoPlayerRatio = '16/9'
 
 // `embed/{identifier}` serves audio and video alike. Nothing else the archive renders is 30 tall.
 const declaresAudioPlayer = (element: Element): boolean => {
@@ -83,15 +84,15 @@ export const archiveResolveEmbed: ResolveEmbed = (url, element) => {
   const result = { ...composeEmbedResult(identifier, query), title: attr(element, 'title') }
 
   // Height alone: a width beside it reads as a ratio, and the box grows while the bar stays 30.
-  return element && declaresAudioPlayer(element) ? { ...result, height: audioPlayerHeight } : result
+  if (element && declaresAudioPlayer(element)) {
+    return { ...result, height: audioPlayerHeight }
+  }
+
+  return { ...result, ratio: videoPlayerRatio }
 }
 
 // The Internet Archive's player iframe, which renders on its own but names no poster or page link.
-export const archiveIframeEmbedResolver = createUrlEmbedResolver(
-  archiveHosts,
-  archiveResolveEmbed,
-  { preferResolverSize: true },
-)
+export const archiveIframeEmbedResolver = createUrlEmbedResolver(archiveHosts, archiveResolveEmbed)
 
 const flashPlayerPathRegex = /^\/+flow\//
 // The segment after `archive.org/download/` on any subdomain.
@@ -126,15 +127,17 @@ const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
 
   const result = composeEmbedResult(identifier)
 
-  return namesAudioFile(config) ? { ...result, height: audioPlayerHeight } : result
+  if (namesAudioFile(config)) {
+    return { ...result, height: audioPlayerHeight }
+  }
+
+  return { ...result, ratio: videoPlayerRatio }
 }
 
 // The archive's retired Flowplayer swf, which names its item only in the Flash config.
-// An audio carrier declares the 26 pixels of the Flash bar it replaced, a player that is gone.
 export const archiveFlashEmbedResolver = createUrlEmbedResolver(
   archiveHosts,
   archiveFlashResolveEmbed,
-  { preferResolverSize: true },
 )
 
 export const archiveFieldCleaners: Array<FieldCleaner> = [

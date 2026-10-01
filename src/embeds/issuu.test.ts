@@ -7,8 +7,8 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, issuuWidgetEmbedResolver)
 
   describe('the config id div', () => {
-    // The shape 481 corpus feeds lose, copied from ecosistemaurbano.org (2026-08-14). The size
-    // lives in the inline style and is the document's own page ratio.
+    // The shape 481 corpus feeds lose, copied from ecosistemaurbano.org (2026-08-14). The inline
+    // style's size is not read.
     it('should mint the reader url from the config id', async () => {
       const value = html`
         <div
@@ -21,8 +21,7 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
         provider: 'issuu',
         id: '1016421/47623369',
         src: 'https://e.issuu.com/embed.html#1016421/47623369',
-        width: 640,
-        height: 452,
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -60,8 +59,7 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
         id: 'ecosistemaurbano/paisaje_transversal',
         src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal',
         url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
-        width: 525,
-        height: 340,
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -195,8 +193,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         provider: 'issuu',
         id: '1016421/67761615',
         src: 'https://e.issuu.com/embed.html#1016421/67761615',
-        width: 620,
-        height: 439,
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -215,8 +212,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'ecosistemaurbano/paisaje_transversal',
         src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal',
         url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
-        width: 525,
-        height: 340,
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -272,8 +268,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'ecosistemaurbano/180309-idea_hermosillo',
         src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=180309-idea_hermosillo',
         url: 'https://issuu.com/ecosistemaurbano/docs/180309-idea_hermosillo',
-        width: 620,
-        height: 400,
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)

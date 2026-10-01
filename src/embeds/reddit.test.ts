@@ -36,7 +36,6 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/',
-        height: 500,
         title: 'Birdwatching Rising Poster',
         author: 'u/sample_reader',
         publisher: 'r/Birdwatching',
@@ -137,7 +136,6 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'user/photo_poster/comments/hj7k2p',
         src: 'https://embed.reddit.com/user/photo_poster/comments/hj7k2p/',
         url: 'https://www.reddit.com/user/photo_poster/comments/hj7k2p/',
-        height: 500,
         title: 'Everything in balance',
         author: 'u/photo_poster',
         publisher: 'u/photo_poster',
@@ -611,8 +609,6 @@ describeForEachParser('redditIframeEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/',
-        width: 640,
-        height: 500,
         publisher: 'r/Birdwatching',
       }
 
@@ -633,7 +629,6 @@ describeForEachParser('redditIframeEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
-        height: 316,
         publisher: 'r/Birdwatching',
       }
 

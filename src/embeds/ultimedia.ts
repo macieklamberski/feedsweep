@@ -31,6 +31,7 @@ export const ultimediaEmbedResolver = createMarkupEmbedResolver(
       id: `${accountKey}/${videoId}`,
       // A path without `zone` loads zone 1, the placement the platform's oEmbed answer writes.
       src: `https://www.ultimedia.com/deliver/generic/iframe/mdtk/${accountKey}/src/${videoId}/`,
+      ratio: '16/9',
     }
   },
 )

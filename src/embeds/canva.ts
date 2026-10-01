@@ -58,5 +58,4 @@ export const canvaWidgetEmbedResolver = createMarkupEmbedResolver(
       ratio: designRatio,
     }
   },
-  { preferResolverSize: true },
 )

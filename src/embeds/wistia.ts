@@ -76,6 +76,7 @@ export const wistiaResolveEmbed: ResolveEmbed = (url, element) => {
     id: embed.route === 'iframe' ? key : `${embed.route}/${key}`,
     src: composeEmbedUrl(embed.route, embed.id),
     url: embed.page,
+    ratio: '16/9',
     // Wistia's own snippet writes the media's name here with the word `Video` appended.
     title: element ? attr(element, 'title') : undefined,
   }

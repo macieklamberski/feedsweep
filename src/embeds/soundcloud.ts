@@ -242,12 +242,11 @@ const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const height =
-    classicPlayerHeights[reference?.[1] ?? (streamTrackId && 'tracks') ?? pageKind ?? '']
-
-  if (height) {
-    result.height = height
-  }
+  // A kind the carrier does not name, such as a share link's, gets the single-track bar, which
+  // the classic player draws for a list too.
+  result.height =
+    classicPlayerHeights[reference?.[1] ?? (streamTrackId && 'tracks') ?? pageKind ?? ''] ??
+    classicPlayerHeights.tracks
 
   const title = attr(element, 'title')
 

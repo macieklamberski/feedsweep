@@ -39,12 +39,10 @@ export const zencastrBlockquoteEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     return zencastrResolveEmbed(attr(element, 'data-episode-href') ?? '')
   },
-  { preferResolverSize: true },
 )
 
 // A Zencastr episode player iframe, which renders on its own but names no poster or page.
 export const zencastrIframeEmbedResolver = createUrlEmbedResolver(
   zencastrHosts,
   zencastrResolveEmbed,
-  { preferResolverSize: true },
 )

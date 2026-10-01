@@ -281,9 +281,8 @@ describeForEachParser('anchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The height the publisher pasted is the one their player was measured against, so the
-    // 102 Spotify's own snippet writes stands over the resolver's 100.
-    it('should keep the size the carrier declares', async () => {
+    // The 102 Spotify's own snippet writes is not read, so the player's measured 100 stands.
+    it('should state the platform size over the size the carrier declares', async () => {
       const value = html`
         <iframe
           src="https://creators.spotify.com/pod/profile/me/embed/episodes/my-title-e1/a-abc"
@@ -295,8 +294,7 @@ describeForEachParser('anchorEmbedResolver', (parseHtml) => {
         provider: 'anchor',
         id: 'me/my-title-e1',
         src: 'https://creators.spotify.com/pod/profile/me/embed/episodes/my-title-e1',
-        width: 400,
-        height: 102,
+        height: 100,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -316,8 +314,7 @@ describeForEachParser('anchorEmbedResolver', (parseHtml) => {
         provider: 'anchor',
         id: 'myshow/my-title-e123',
         src: 'https://creators.spotify.com/pod/profile/myshow/embed/episodes/my-title-e123',
-        width: 400,
-        height: 102,
+        height: 100,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -342,8 +339,7 @@ describeForEachParser('anchorEmbedResolver', (parseHtml) => {
         provider: 'anchor',
         id: 'turpentine-productions',
         src: 'https://creators.spotify.com/pod/profile/turpentine-productions/embed',
-        width: 400,
-        height: 102,
+        height: 100,
       }
 
       expect(await extract(value)).toEqual(expected)

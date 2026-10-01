@@ -578,8 +578,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'photos/celesteh/15753890338',
         src: 'https://www.flickr.com/photos/celesteh/15753890338/player/',
         url: 'https://www.flickr.com/photos/celesteh/15753890338/',
-        width: 500,
-        height: 97,
         author: 'celesteh',
       }
 
@@ -607,8 +605,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         src: 'https://www.flickr.com/photos/hankthetank/15637343340/player/',
         url: 'https://www.flickr.com/photos/hankthetank/15637343340/',
         thumbnail: 'https://live.staticflickr.com/0/15637343340_2d3295bc6d_b.jpg',
-        width: 560,
-        height: 640,
         author: 'hankthetank',
       }
 
@@ -629,8 +625,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'photos/jackieboyslim/8740425686',
         src: 'https://www.flickr.com/photos/jackieboyslim/8740425686/player/',
         url: 'https://www.flickr.com/photos/jackieboyslim/8740425686/',
-        width: 500,
-        height: 375,
         author: 'jackieboyslim',
       }
 
@@ -653,8 +647,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         src: 'https://www.flickr.com/photos/kimim-photo/11616055053/player/',
         url: 'https://www.flickr.com/photos/kimim-photo/11616055053/',
         thumbnail: 'https://live.staticflickr.com/0/11616055053_c64480d113_b.jpg',
-        width: 640,
-        height: 480,
         author: 'kimim-photo',
       }
 
@@ -675,8 +667,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         src: 'https://www.flickr.com/photos/hankthetank/15637343340/player/',
         url: 'https://www.flickr.com/photos/hankthetank/15637343340/',
         thumbnail: 'https://live.staticflickr.com/0/15637343340_2d3295bc6d%20_b.jpg',
-        width: 560,
-        height: 640,
         author: 'hankthetank',
       }
 
@@ -740,8 +730,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'photos/20899351@N00/3786844985',
         src: 'https://www.flickr.com/photos/20899351@N00/3786844985/player/',
         url: 'https://www.flickr.com/photos/20899351@N00/3786844985/',
-        width: 640,
-        height: 329,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -769,8 +757,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'p/8TYENT',
         src: 'https://embedr.flickr.com/photos/5182695495',
         url: 'https://flic.kr/p/8TYENT',
-        width: 500,
-        height: 281,
         title: 'con Petrona',
       }
 
@@ -1252,8 +1238,6 @@ describeForEachParser('flickrEmbedResolver carrier title', (parseHtml) => {
       id: 'p/9eFvbF',
       src: 'https://embedr.flickr.com/photos/5405676135',
       url: 'https://flic.kr/p/9eFvbF',
-      width: 500,
-      height: 281,
       title: '6 month Ampuversary',
     }
 

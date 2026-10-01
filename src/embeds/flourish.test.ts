@@ -218,8 +218,6 @@ describeForEachParser('flourishIframeEmbedResolver', (parseHtml) => {
         id: 'visualisation/29132382',
         src: 'https://flo.uri.sh/visualisation/29132382/embed',
         url: 'https://public.flourish.studio/visualisation/29132382/',
-        width: 600,
-        height: 400,
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -61,7 +61,7 @@ describeForEachParser('patroniteEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, patroniteEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the box the snippet states', async () => {
+    it('should state the platform size over the box the snippet states', async () => {
       const value = html`
         <iframe
           src="https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8"
@@ -76,8 +76,7 @@ describeForEachParser('patroniteEmbedResolver', (parseHtml) => {
         id: '114344',
         src: 'https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8',
         url: 'https://patronite.pl/strajk',
-        width: 300,
-        height: 450,
+        height: 306,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -131,12 +130,11 @@ describeForEachParser('patronite widget through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
+        data-embed-height="306"
         data-embed-provider="patronite"
         data-embed-id="114344"
         data-embed-src="https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8"
         data-embed-url="https://patronite.pl/strajk"
-        data-embed-width="300"
-        data-embed-height="450"
       ></div>
     `
 
@@ -153,12 +151,11 @@ describeForEachParser('patronite widget through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
+        data-embed-height="306"
         data-embed-provider="patronite"
         data-embed-id="114344"
         data-embed-src="https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8"
         data-embed-url="https://patronite.pl/strajk"
-        data-embed-width="300"
-        data-embed-height="450"
       ></div>
     `
     const cleanUrlFn = (url: string) => url.replace(utmParamRegex, '')

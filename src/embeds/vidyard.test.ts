@@ -20,6 +20,7 @@ describeForEachParser('vidyardIframeEmbedResolver', (parseHtml) => {
         src: 'https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.html',
         url: 'https://share.vidyard.com/watch/gdoa8386mue3jppdkpZc9A',
         thumbnail: 'https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -38,6 +39,7 @@ describeForEachParser('vidyardIframeEmbedResolver', (parseHtml) => {
         src: 'https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.html',
         url: 'https://share.vidyard.com/watch/gdoa8386mue3jppdkpZc9A',
         thumbnail: 'https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -57,6 +59,7 @@ describeForEachParser('vidyardIframeEmbedResolver', (parseHtml) => {
         src: 'https://play.vidyard.com/uetcXuN6F2qR4MPRmjXESt.html',
         url: 'https://share.vidyard.com/watch/uetcXuN6F2qR4MPRmjXESt',
         thumbnail: 'https://play.vidyard.com/uetcXuN6F2qR4MPRmjXESt.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -114,6 +117,7 @@ describeForEachParser('vidyardIframeEmbedResolver', (parseHtml) => {
         src: 'https://play.vidyard.com/E7rMoLPPjKbkLhggEQYkLi.html',
         url: 'https://share.vidyard.com/watch/E7rMoLPPjKbkLhggEQYkLi',
         thumbnail: 'https://play.vidyard.com/E7rMoLPPjKbkLhggEQYkLi.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -142,6 +146,7 @@ describeForEachParser('vidyardImageEmbedResolver', (parseHtml) => {
         src: 'https://play.vidyard.com/mbaLFAg2MYJXZtKtHPY2sH.html',
         url: 'https://share.vidyard.com/watch/mbaLFAg2MYJXZtKtHPY2sH',
         thumbnail: 'https://cdn.vidyard.com/thumbnails/mbaLFAg2MYJXZtKtHPY2sH/full.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -160,6 +165,7 @@ describeForEachParser('vidyardImageEmbedResolver', (parseHtml) => {
         src: 'https://play.vidyard.com/usZcdjA3ec9sxvixST7xKf.html',
         url: 'https://share.vidyard.com/watch/usZcdjA3ec9sxvixST7xKf',
         thumbnail: 'https://play.vidyard.com/usZcdjA3ec9sxvixST7xKf.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -192,6 +198,7 @@ describeForEachParser('vidyardImageEmbedResolver', (parseHtml) => {
         src: 'https://play.vidyard.com/../../stolen.html',
         url: 'https://share.vidyard.com/watch/../../stolen',
         thumbnail: 'https://play.vidyard.com/../../stolen.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -212,6 +219,7 @@ describeForEachParser('vidyardImageEmbedResolver', (parseHtml) => {
         src: 'https://play.vidyard.com/usZcdjA3ec9sxvixST7xKf.html',
         url: 'https://share.vidyard.com/watch/usZcdjA3ec9sxvixST7xKf',
         thumbnail: 'https://play.vidyard.com/usZcdjA3ec9sxvixST7xKf.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -233,6 +241,7 @@ describeForEachParser('vidyardImageEmbedResolver', (parseHtml) => {
         src: 'https://play.vidyard.com/E7rMoLPPjKbkLhggEQYkLi.html',
         url: 'https://share.vidyard.com/watch/E7rMoLPPjKbkLhggEQYkLi',
         thumbnail: 'https://play.vidyard.com/E7rMoLPPjKbkLhggEQYkLi.jpg',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -339,6 +348,7 @@ describeForEachParser('vidyard shapes the pipeline repairs first', (parseHtml) =
         data-embed-url="https://share.vidyard.com/watch/gdoa8386mue3jppdkpZc9A"
         data-embed-id="gdoa8386mue3jppdkpZc9A"
         data-embed-provider="vidyard"
+        data-embed-ratio="16/9"
         data-embed-src="https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.html"
       ></div>
     `
@@ -371,6 +381,7 @@ describeForEachParser('vidyard shapes the pipeline repairs first', (parseHtml) =
         data-embed-url="https://share.vidyard.com/watch/usZcdjA3ec9sxvixST7xKf"
         data-embed-id="usZcdjA3ec9sxvixST7xKf"
         data-embed-provider="vidyard"
+        data-embed-ratio="16/9"
         data-embed-src="https://play.vidyard.com/usZcdjA3ec9sxvixST7xKf.html"
       ></div>
     `

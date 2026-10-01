@@ -457,8 +457,6 @@ describeForEachParser('imgurIframeEmbedResolver', (parseHtml) => {
       src: 'https://imgur.com/pVa2rXL/embed',
       url: 'https://imgur.com/pVa2rXL',
       thumbnail: 'https://i.imgur.com/pVa2rXLm.jpg',
-      width: 540,
-      height: 500,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -625,8 +623,8 @@ describe('readImgurHeight', () => {
     const value = JSON.stringify({
       message: 'resize_imgur',
       href: 'https://imgur.com/pVa2rXL/embed',
-      height: 595,
       width: 640,
+      height: 595,
       context: true,
     })
 

@@ -13,6 +13,7 @@ describe('tenorResolveEmbed', () => {
         id: '16892698',
         src: 'https://tenor.com/embed/16892698',
         url: 'https://tenor.com/view/16892698',
+        ratio: '1.33/1',
       }
 
       expect(tenorResolveEmbed(value)).toEqual(expected)
@@ -25,6 +26,7 @@ describe('tenorResolveEmbed', () => {
         id: '16892698',
         src: 'https://tenor.com/embed/16892698',
         url: 'https://tenor.com/view/16892698',
+        ratio: '1.33/1',
       }
 
       expect(tenorResolveEmbed(value)).toEqual(expected)
@@ -63,6 +65,7 @@ describe('tenorResolveEmbed', () => {
         id: 'embed.js',
         src: 'https://tenor.com/embed/embed.js',
         url: 'https://tenor.com/view/embed.js',
+        ratio: '1.33/1',
       }
 
       expect(tenorResolveEmbed(value)).toEqual(expected)
@@ -175,6 +178,7 @@ describeForEachParser('tenorIframeEmbedResolver', (parseHtml) => {
         id: '16892698',
         src: 'https://tenor.com/embed/16892698',
         url: 'https://tenor.com/view/16892698',
+        ratio: '1.33/1',
       }
 
       expect(await extract(value)).toEqual(expected)

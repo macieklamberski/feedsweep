@@ -101,8 +101,7 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
         id: '492381322',
         src: 'https://embed.gettyimages.com/embed/492381322?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&viewMoreLink=on&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=',
         url: 'https://www.gettyimages.com/detail/492381322',
-        width: 594,
-        height: 395,
+        ratio: '3/2',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -137,8 +136,7 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
         id: '1179214625',
         src: 'https://embed.gettyimages.com/embed/1179214625?et=c6v3oJKLRHl-sP1_Ytjj1g&tld=co.uk&sig=C3Ss6cEqvxD2EKAfIWt5vBh0z1hAqmd0p0OJ-7fcJJQ=',
         url: 'https://www.gettyimages.com/detail/1179214625',
-        width: 594,
-        height: 396,
+        ratio: '3/2',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -159,8 +157,7 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
         id: '674950774',
         src: 'https://embed.gettyimages.com/embed/674950774?et=4AHdkSWcRDxQ4l2sDHBIOA&tld=com&viewMoreLink=on&sig=5sVUWW_CnKTtYzfjDnnapRVqjnSK-3499ZUkhrnRc1g=',
         url: 'https://www.gettyimages.com/detail/674950774',
-        width: 594,
-        height: 396,
+        ratio: '3/2',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -226,9 +223,8 @@ describeForEachParser('gettyimages doubly escaped src', (parseHtml) => {
         data-embed-url="https://www.gettyimages.com/detail/674950774"
         data-embed-id="674950774"
         data-embed-provider="gettyimages"
+        data-embed-ratio="3/2"
         data-embed-src="https://embed.gettyimages.com/embed/674950774?et=4AHdkSWcRDxQ4l2sDHBIOA&amp;tld=com&amp;viewMoreLink=on&amp;sig=5sVUWW_CnKTtYzfjDnnapRVqjnSK-3499ZUkhrnRc1g="
-        data-embed-width="594"
-        data-embed-height="396"
       ></div>
     `
     const result = await transformContent(value, {

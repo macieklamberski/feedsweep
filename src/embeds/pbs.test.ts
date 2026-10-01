@@ -179,7 +179,7 @@ describeForEachParser('pbsIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, pbsIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the box the carrier declares', async () => {
+    it('should state the platform size over the box the carrier declares', async () => {
       const value = html`
         <iframe
           src="https://player.pbs.org/viralplayer/3005825044/"
@@ -191,8 +191,7 @@ describeForEachParser('pbsIframeEmbedResolver', (parseHtml) => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/',
-        width: 512,
-        height: 332,
+        ratio: '13/9',
       }
 
       expect(await extract(value)).toEqual(expected)

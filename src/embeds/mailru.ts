@@ -4,6 +4,7 @@ import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mailru'
+const playerRatio = '16/9'
 
 // `my.mail.ru` serves the player, `api.video.mail.ru` was the host of the older embed and no
 // longer resolves, and `img.mail.ru` served the Flash player.
@@ -23,6 +24,7 @@ const composeNumeric = (videoId: string): EmbedResolverResult => {
     provider,
     id: videoId,
     src: `https://my.mail.ru/video/embed/${videoId}`,
+    ratio: playerRatio,
   }
 }
 
@@ -42,6 +44,7 @@ const composeSubject = (subject: string): EmbedResolverResult | undefined => {
     id: `${type}/${user}/${album}/${counter}`,
     src: `https://my.mail.ru/${type}/${user}/video/embed/${album}/${counter}`,
     url: `https://my.mail.ru/${type}/${user}/video/${album}/${counter}.html`,
+    ratio: playerRatio,
     author: user,
   }
 }

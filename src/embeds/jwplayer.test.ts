@@ -95,6 +95,7 @@ describe('jwplayerResolveEmbed', () => {
       id: 'H4GXr873',
       src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
       thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
+      ratio: '16/9',
     }
 
     expect(jwplayerResolveEmbed(value)).toEqual(expected)
@@ -108,6 +109,7 @@ describe('jwplayerResolveEmbed', () => {
       id: 'H4GXr873',
       src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
       thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
+      ratio: '16/9',
     }
 
     expect(jwplayerResolveEmbed(value)).toEqual(expected)
@@ -130,6 +132,7 @@ describeForEachParser('jwplayerIframeEmbedResolver', (parseHtml) => {
       id: 'H4GXr873',
       src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
       thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -143,6 +146,7 @@ describeForEachParser('jwplayerIframeEmbedResolver', (parseHtml) => {
       id: 'H4GXr873',
       src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
       thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -170,6 +174,7 @@ describeForEachParser('jwplayerScriptEmbedResolver', (parseHtml) => {
       id: 'H4GXr873',
       src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
       thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -210,8 +215,7 @@ describeForEachParser('jwplayerAmpEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  // A pair above the ceiling is a box the publisher laid out, and it stays one.
-  it('should keep a stated pixel box on the AMP element', async () => {
+  it('should state the video ratio over a pixel box on the AMP element', async () => {
     const value = html`
       <amp-jwplayer
         data-media-id="H4GXr873"
@@ -225,8 +229,7 @@ describeForEachParser('jwplayerAmpEmbedResolver', (parseHtml) => {
       id: 'H4GXr873',
       src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
       thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
-      width: 640,
-      height: 360,
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -241,6 +244,7 @@ describeForEachParser('jwplayerAmpEmbedResolver', (parseHtml) => {
       id: '../../evil',
       src: 'https://cdn.jwplayer.com/players/../../evil.html',
       thumbnail: 'https://cdn.jwplayer.com/v2/media/../../evil/poster.jpg',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -265,6 +269,7 @@ describeForEachParser('jwplayerAmpEmbedResolver', (parseHtml) => {
       provider: 'jwplayer',
       id: 'playlist/482jsTAr',
       src: 'https://cdn.jwplayer.com/players/482jsTAr.html',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -283,6 +288,7 @@ describeForEachParser('jwplayerAmpEmbedResolver', (parseHtml) => {
       provider: 'jwplayer',
       id: 'playlist/482jsTAr',
       src: 'https://cdn.jwplayer.com/players/482jsTAr.html',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -304,6 +310,7 @@ describeForEachParser('jwplayerSetupEmbedResolver', (parseHtml) => {
       id: 'hwhuyhFf',
       src: 'https://cdn.jwplayer.com/players/hwhuyhFf.html',
       thumbnail: 'https://cdn.jwplayer.com/v2/media/hwhuyhFf/poster.jpg',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -323,6 +330,7 @@ describeForEachParser('jwplayerSetupEmbedResolver', (parseHtml) => {
       id: 'hwhuyhFf',
       src: 'https://cdn.jwplayer.com/players/hwhuyhFf.html',
       thumbnail: 'https://cdn.jwplayer.com/v2/media/hwhuyhFf/poster.jpg',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -340,6 +348,7 @@ describeForEachParser('jwplayerSetupEmbedResolver', (parseHtml) => {
       id: 'H4GXr873',
       src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
       thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -357,6 +366,7 @@ describeForEachParser('jwplayerSetupEmbedResolver', (parseHtml) => {
       id: 'hwhuyhFf',
       src: 'https://cdn.jwplayer.com/players/hwhuyhFf.html',
       thumbnail: 'https://cdn.jwplayer.com/v2/media/hwhuyhFf/poster.jpg',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)

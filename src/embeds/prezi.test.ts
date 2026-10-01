@@ -147,8 +147,7 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
         id: 'wfqsr9xleno5',
         src: 'https://prezi.com/p/wfqsr9xleno5/embed',
         url: 'https://prezi.com/p/wfqsr9xleno5/',
-        width: 500,
-        height: 400,
+        ratio: '550/400',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -200,8 +199,7 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
         id: 'y-d6h8h4rpox',
         src: 'https://prezi.com/p/y-d6h8h4rpox/embed',
         url: 'https://prezi.com/p/y-d6h8h4rpox/',
-        width: 550,
-        height: 400,
+        ratio: '550/400',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -226,8 +224,7 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
         id: '07fqanglwhcw',
         src: 'https://prezi.com/p/07fqanglwhcw/embed',
         url: 'https://prezi.com/p/07fqanglwhcw/',
-        width: 560,
-        height: 315,
+        ratio: '550/400',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -341,10 +338,9 @@ describeForEachParser('the Flash object other Flash readers could claim first', 
       <div
         data-embed-provider="prezi"
         data-embed-id="bsno4idxinyc"
+        data-embed-ratio="550/400"
         data-embed-src="https://prezi.com/p/bsno4idxinyc/embed"
         data-embed-url="https://prezi.com/p/bsno4idxinyc/"
-        data-embed-width="550"
-        data-embed-height="400"
       ></div>
     `
 

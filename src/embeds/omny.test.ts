@@ -238,7 +238,7 @@ describeForEachParser('omnyEmbedResolver', (parseHtml) => {
   })
 
   describe('playlists', () => {
-    it('should keep the box the carrier states', async () => {
+    it('should state the platform size over the box the carrier states', async () => {
       const value = html`
         <iframe
           src="https://omny.fm/shows/the-show/playlists/highlights/embed"
@@ -250,7 +250,6 @@ describeForEachParser('omnyEmbedResolver', (parseHtml) => {
         provider: 'omny',
         id: 'the-show/playlists/highlights',
         src: 'https://omny.fm/shows/the-show/playlists/highlights/embed',
-        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)

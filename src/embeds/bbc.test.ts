@@ -48,6 +48,7 @@ describe('bbcResolveEmbed', () => {
         provider: 'bbc',
         id: 'p01tclqw',
         src: 'https://www.bbc.co.uk/programmes/p01tclqw/player',
+        ratio: '320/374',
       }
 
       expect(bbcResolveEmbed(value)).toEqual(expected)
@@ -161,8 +162,7 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The programmes player states no size of its own, so the carrier's stands.
-    it('should keep the stated size on the programmes player', async () => {
+    it('should ignore the stated size on the programmes player', async () => {
       const value = html`
         <iframe
           src="https://www.bbc.co.uk/programmes/p08s3bnj/player"
@@ -174,8 +174,7 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
         provider: 'bbc',
         id: 'p08s3bnj',
         src: 'https://www.bbc.co.uk/programmes/p08s3bnj/player',
-        width: 640,
-        height: 360,
+        ratio: '320/374',
       }
 
       expect(await extract(value)).toEqual(expected)

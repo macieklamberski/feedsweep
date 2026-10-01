@@ -334,15 +334,10 @@ export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
       title: title && title !== 'undefined' ? title : undefined,
     }
   },
-  { preferResolverSize: true },
 )
 
 // A YouTube player iframe, a frame of a watch, shorts or playlist page, or the Flash player.
-export const youtubeIframeEmbedResolver = createUrlEmbedResolver(
-  youtubeHosts,
-  youtubeResolveEmbed,
-  { preferResolverSize: true },
-)
+export const youtubeIframeEmbedResolver = createUrlEmbedResolver(youtubeHosts, youtubeResolveEmbed)
 
 // AMP's amp-youtube names the video in data-videoid and renders nothing without the AMP runtime.
 export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
@@ -377,7 +372,6 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
 
     return composeVideoEmbed(videoId, params)
   },
-  { preferResolverSize: true },
 )
 
 export const youtubeFieldCleaners: Array<FieldCleaner> = [

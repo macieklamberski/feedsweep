@@ -35,8 +35,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'proto/lGZklLSlFA2yjPxmcyykud',
         src: 'https://embed.figma.com/proto/lGZklLSlFA2yjPxmcyykud/Karwaan?node-id=1-2318&embed-host=share',
         url: 'https://www.figma.com/proto/lGZklLSlFA2yjPxmcyykud/Karwaan?node-id=1-2318',
-        width: 450,
-        height: 800,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -55,8 +54,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'proto/LBH1O9AxQLxp0ixZBd1Pxk',
         src: 'https://embed.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0%3A1&embed-host=share',
         url: 'https://www.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0%3A1',
-        width: 800,
-        height: 450,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -89,8 +87,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'deck/0txckPBPI1OqFNEa9VaKLP',
         src: 'https://embed.figma.com/deck/0txckPBPI1OqFNEa9VaKLP/TacTik?node-id=1-540&embed-host=share',
         url: 'https://www.figma.com/deck/0txckPBPI1OqFNEa9VaKLP/TacTik?node-id=1-540',
-        width: 800,
-        height: 450,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

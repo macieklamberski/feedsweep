@@ -356,7 +356,7 @@ describeForEachParser('stackblitzIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the pane and keep the height the publisher laid out', async () => {
+    it('should drop the pane and ignore the height the publisher laid out', async () => {
       const value = html`
         <iframe
           class="iframe-full-w"
@@ -369,7 +369,7 @@ describeForEachParser('stackblitzIframeEmbedResolver', (parseHtml) => {
         id: 'angular-editable-textbox',
         src: 'https://stackblitz.com/edit/angular-editable-textbox?embed=1',
         url: 'https://stackblitz.com/edit/angular-editable-textbox',
-        height: 423,
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -226,9 +226,8 @@ describeForEachParser('redcircleIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  // 170 is what the loader states, and a publisher who framed the player in a box of their own
-  // outranks it. Narrowing the query leaves that untouched.
-  it('should take the size the carrier states over the player height', async () => {
+  // 170 is what the loader states, and the carrier's box is not read.
+  it('should keep the player height over the size the carrier states', async () => {
     const value = html`
       <iframe
         src="https://redcircle.com/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5?utm_source=rss"
@@ -241,8 +240,7 @@ describeForEachParser('redcircleIframeEmbedResolver', (parseHtml) => {
       id: 'episode/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/cb6cd735-0017-48dd-b387-ecc8a20818e5',
       src: 'https://redcircle.com/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5',
       url: 'https://redcircle.com/shows/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/episodes/cb6cd735-0017-48dd-b387-ecc8a20818e5',
-      width: 640,
-      height: 200,
+      height: 170,
     }
 
     expect(await extract(value)).toEqual(expected)

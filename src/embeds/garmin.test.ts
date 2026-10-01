@@ -110,7 +110,7 @@ describeForEachParser('garminEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, garminEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the box the carrier declares', async () => {
+    it('should state the platform size over the box the carrier declares', async () => {
       const value = html`
         <iframe
           src="https://connect.garmin.com/modern/activity/embed/1393315994"
@@ -123,8 +123,7 @@ describeForEachParser('garminEmbedResolver', (parseHtml) => {
         id: '1393315994',
         src: 'https://connect.garmin.com/embed/activity/1393315994',
         url: 'https://connect.garmin.com/app/activity/1393315994',
-        width: 465,
-        height: 500,
+        height: 548,
       }
 
       expect(await extract(value)).toEqual(expected)

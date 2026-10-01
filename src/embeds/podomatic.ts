@@ -89,9 +89,4 @@ export const podomaticResolveEmbed: ResolveEmbed = (url) => {
   }
 }
 
-// PodOmatic's html5 player iframe, pasted with a 504 by 208 box the fluid player never keeps.
-export const podomaticEmbedResolver = createUrlEmbedResolver(
-  [podomaticHost],
-  podomaticResolveEmbed,
-  { preferResolverSize: true },
-)
+export const podomaticEmbedResolver = createUrlEmbedResolver([podomaticHost], podomaticResolveEmbed)

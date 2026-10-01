@@ -94,10 +94,7 @@ export const cnnFlashResolveEmbed: ResolveEmbed = (url, element) => {
 }
 
 // CNN's Flash player swf as an <embed> or an <object>, which no browser runs today.
-// The swf carriers state the 416 by 374 box the old chrome made, not the clip's shape.
-export const cnnFlashEmbedResolver = createUrlEmbedResolver(cdnHosts, cnnFlashResolveEmbed, {
-  preferResolverSize: true,
-})
+export const cnnFlashEmbedResolver = createUrlEmbedResolver(cdnHosts, cnnFlashResolveEmbed)
 
 // CNN's 2009 share snippet: a loader script that is gone, beside a <noscript> link.
 export const cnnScriptEmbedResolver = createMarkupEmbedResolver(

@@ -85,6 +85,7 @@ describe('archiveResolveEmbed', () => {
         src: 'https://archive.org/embed/gov.archives.arc.1257628',
         url: 'https://archive.org/details/gov.archives.arc.1257628',
         thumbnail: 'https://archive.org/services/img/gov.archives.arc.1257628',
+        ratio: '16/9',
       }
 
       expect(archiveResolveEmbed(value)).toEqual(expected)
@@ -99,6 +100,7 @@ describe('archiveResolveEmbed', () => {
         src: 'https://archive.org/embed/some_album?playlist=1&start=42',
         url: 'https://archive.org/details/some_album',
         thumbnail: 'https://archive.org/services/img/some_album',
+        ratio: '16/9',
       }
 
       expect(archiveResolveEmbed(value)).toEqual(expected)
@@ -112,6 +114,7 @@ describe('archiveResolveEmbed', () => {
         src: 'https://archive.org/embed/commute?start=60&end=90',
         url: 'https://archive.org/details/commute',
         thumbnail: 'https://archive.org/services/img/commute',
+        ratio: '16/9',
       }
 
       expect(archiveResolveEmbed(value)).toEqual(expected)
@@ -127,6 +130,7 @@ describe('archiveResolveEmbed', () => {
         src: 'https://archive.org/embed/some_album?playlist=1',
         url: 'https://archive.org/details/some_album',
         thumbnail: 'https://archive.org/services/img/some_album',
+        ratio: '16/9',
       }
 
       expect(archiveResolveEmbed(value)).toEqual(expected)
@@ -140,6 +144,7 @@ describe('archiveResolveEmbed', () => {
         src: 'https://archive.org/embed/some_album?playlist=1&list_height=150',
         url: 'https://archive.org/details/some_album',
         thumbnail: 'https://archive.org/services/img/some_album',
+        ratio: '16/9',
       }
 
       expect(archiveResolveEmbed(value)).toEqual(expected)
@@ -156,6 +161,7 @@ describe('archiveResolveEmbed', () => {
         src: 'https://archive.org/embed/some_album?playlist=1',
         url: 'https://archive.org/details/some_album',
         thumbnail: 'https://archive.org/services/img/some_album',
+        ratio: '16/9',
       }
 
       expect(archiveResolveEmbed(value)).toEqual(expected)
@@ -171,6 +177,7 @@ describe('archiveResolveEmbed', () => {
         src: 'https://archive.org/embed/minitel_follies',
         url: 'https://archive.org/details/minitel_follies',
         thumbnail: 'https://archive.org/services/img/minitel_follies',
+        ratio: '16/9',
       }
 
       expect(archiveResolveEmbed(value)).toEqual(expected)
@@ -184,6 +191,7 @@ describe('archiveResolveEmbed', () => {
         src: 'https://archive.org/embed/nasa_hubble',
         url: 'https://archive.org/details/nasa_hubble',
         thumbnail: 'https://archive.org/services/img/nasa_hubble',
+        ratio: '16/9',
       }
 
       expect(archiveResolveEmbed(value)).toEqual(expected)
@@ -197,6 +205,7 @@ describe('archiveResolveEmbed', () => {
         src: 'https://archive.org/embed/hoursofdevotionb00neudrich',
         url: 'https://archive.org/details/hoursofdevotionb00neudrich',
         thumbnail: 'https://archive.org/services/img/hoursofdevotionb00neudrich',
+        ratio: '16/9',
       }
 
       expect(archiveResolveEmbed(value)).toEqual(expected)
@@ -224,6 +233,7 @@ describe('archiveResolveEmbed', () => {
         src: 'https://archive.org/embed/..?playlist=1',
         url: 'https://archive.org/details/..',
         thumbnail: 'https://archive.org/services/img/..',
+        ratio: '16/9',
       }
 
       expect(archiveResolveEmbed(value)).toEqual(expected)
@@ -253,8 +263,7 @@ describeForEachParser('archiveIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  // A video carrier's box measures the player it gets, so it stands whole.
-  it('should keep a video carrier box whole', async () => {
+  it('should state the video ratio over a video carrier box', async () => {
     const value = html`
       <iframe src="https://archive.org/embed/TheGoodOldGasMask" width="560" height="384"></iframe>
     `
@@ -264,8 +273,7 @@ describeForEachParser('archiveIframeEmbedResolver', (parseHtml) => {
       src: 'https://archive.org/embed/TheGoodOldGasMask',
       url: 'https://archive.org/details/TheGoodOldGasMask',
       thumbnail: 'https://archive.org/services/img/TheGoodOldGasMask',
-      width: 560,
-      height: 384,
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -290,6 +298,7 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
         src: 'https://archive.org/embed/TheGoodOldGasMask',
         url: 'https://archive.org/details/TheGoodOldGasMask',
         thumbnail: 'https://archive.org/services/img/TheGoodOldGasMask',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -337,8 +346,7 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The carrier states the 26 pixels of the Flash bar, and the modern bar measures 30, so the
-    // resolver's height wins over it. The width is the carrier's business either way.
+    // The carrier states the 26 pixels of the Flash bar, and the modern bar measures 30.
     it('should replace the audio bar height with the modern player height', async () => {
       const value = html`
         <embed
@@ -361,7 +369,7 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the declared size for a video item', async () => {
+    it('should state the video ratio over the declared size of a video item', async () => {
       const value = html`
         <embed
           type="application/x-shockwave-flash"
@@ -377,8 +385,7 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
         src: 'https://archive.org/embed/TheGoodOldGasMask',
         url: 'https://archive.org/details/TheGoodOldGasMask',
         thumbnail: 'https://archive.org/services/img/TheGoodOldGasMask',
-        width: 640,
-        height: 504,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -399,6 +406,7 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
         src: 'https://archive.org/embed/nasa_hubble',
         url: 'https://archive.org/details/nasa_hubble',
         thumbnail: 'https://archive.org/services/img/nasa_hubble',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -417,6 +425,7 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
         src: 'https://archive.org/embed/markofzorro-1920',
         url: 'https://archive.org/details/markofzorro-1920',
         thumbnail: 'https://archive.org/services/img/markofzorro-1920',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -494,6 +503,7 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
         src: 'https://archive.org/embed/..',
         url: 'https://archive.org/details/..',
         thumbnail: 'https://archive.org/services/img/..',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -537,10 +547,9 @@ describeForEachParser('archive iframe embeds through the pipeline', (parseHtml) 
         data-embed-src="https://archive.org/embed/some_album?playlist=1"
         data-embed-provider="archive"
         data-embed-id="some_album"
+        data-embed-ratio="16/9"
         data-embed-url="https://archive.org/details/some_album"
         data-embed-thumbnail="https://archive.org/services/img/some_album"
-        data-embed-width="500"
-        data-embed-height="140"
       ></div>
     `
 
@@ -587,10 +596,9 @@ describeForEachParser('archive flash embed through the pipeline', (parseHtml) =>
         data-embed-src="https://archive.org/embed/nasa_hubble"
         data-embed-provider="archive"
         data-embed-id="nasa_hubble"
+        data-embed-ratio="16/9"
         data-embed-url="https://archive.org/details/nasa_hubble"
         data-embed-thumbnail="https://archive.org/services/img/nasa_hubble"
-        data-embed-width="640"
-        data-embed-height="504"
       ></div>
     `
 
@@ -611,6 +619,7 @@ describeForEachParser('archiveIframeEmbedResolver carrier title', (parseHtml) =>
       src: 'https://archive.org/embed/TheGoodOldGasMask',
       url: 'https://archive.org/details/TheGoodOldGasMask',
       thumbnail: 'https://archive.org/services/img/TheGoodOldGasMask',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -629,6 +638,7 @@ describeForEachParser('archiveIframeEmbedResolver carrier title', (parseHtml) =>
       src: 'https://archive.org/embed/TheGoodOldGasMask',
       url: 'https://archive.org/details/TheGoodOldGasMask',
       thumbnail: 'https://archive.org/services/img/TheGoodOldGasMask',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -647,6 +657,7 @@ describeForEachParser('archiveIframeEmbedResolver carrier title', (parseHtml) =>
       src: 'https://archive.org/embed/TheGoodOldGasMask',
       url: 'https://archive.org/details/TheGoodOldGasMask',
       thumbnail: 'https://archive.org/services/img/TheGoodOldGasMask',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -662,6 +673,7 @@ describeForEachParser('archiveIframeEmbedResolver carrier title', (parseHtml) =>
       src: 'https://archive.org/embed/TheGoodOldGasMask',
       url: 'https://archive.org/details/TheGoodOldGasMask',
       thumbnail: 'https://archive.org/services/img/TheGoodOldGasMask',
+      ratio: '16/9',
       title: 'The Good Old Gas Mask',
     }
 

@@ -164,7 +164,6 @@ describeForEachParser('Tumblr', (parseHtml) => {
         data-embed-provider="tumblr"
         data-embed-id="9NYQOutKOEXi4aopdzCr9A/144854447139"
         data-embed-src="https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2"
-        data-embed-height="1391"
       ></div>
     `
 

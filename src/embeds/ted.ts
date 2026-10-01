@@ -87,6 +87,7 @@ export const tedResolveEmbed: ResolveEmbed = (url, element) => {
     src: `https://embed.ted.com/embed/${talk.slug}`,
     url: `https://www.ted.com/talks/${talk.slug}`,
     thumbnail: talk.thumbnail,
+    ratio: '16/9',
     title,
   }
 }

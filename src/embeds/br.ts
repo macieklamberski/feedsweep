@@ -23,6 +23,7 @@ const brResolveEmbed: ResolveEmbed = (url) => {
     provider,
     id: token,
     src: `https://www.br.de/mediathek/embed/${token}`,
+    ratio: '16/9',
   }
 }
 

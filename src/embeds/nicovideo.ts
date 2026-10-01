@@ -46,13 +46,14 @@ export const nicovideoResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // A broadcast is served by the live host and nothing else, so the two kinds do not share a
-  // player url. No size is stated for it: a guess would outrank the height the carrier states.
+  // player url.
   if (liveIdRegex.test(videoId)) {
     return {
       provider,
       id: videoId,
       src: `https://live.nicovideo.jp/embed/${videoId}`,
       url: `https://live.nicovideo.jp/watch/${videoId}`,
+      ratio: '16/9',
     }
   }
 
@@ -62,6 +63,7 @@ export const nicovideoResolveEmbed: ResolveEmbed = (url) => {
     id: videoId,
     src: `https://embed.nicovideo.jp/watch/${videoId}`,
     url: `https://www.nicovideo.jp/watch/${videoId}`,
+    ratio: '16/9',
   }
 }
 
@@ -76,14 +78,7 @@ export const nicovideoIframeEmbedResolver = createUrlEmbedResolver(
 export const nicovideoScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="nicovideo.jp/thumb_watch"], script[src*="embed.nicovideo.jp/watch"]',
   (element) => {
-    const source = attr(element, 'src') ?? ''
-    const result = nicovideoResolveEmbed(source)
-
-    if (!result) {
-      return
-    }
-
-    return { ...result, ratio: '16/9' }
+    return nicovideoResolveEmbed(attr(element, 'src') ?? '')
   },
 )
 

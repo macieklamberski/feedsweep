@@ -150,7 +150,6 @@ describeForEachParser('helloasso widget through the pipeline', (parseHtml) => {
         data-embed-id="cine-club-du-quartier/formulaires/1"
         data-embed-src="https://www.helloasso.com/associations/cine-club-du-quartier/formulaires/1/widget"
         data-embed-url="https://www.helloasso.com/associations/cine-club-du-quartier/formulaires/1"
-        data-embed-height="70"
       ></div>
     `
 

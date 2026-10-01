@@ -91,7 +91,7 @@ describe('nytimesResolveEmbed', () => {
 describeForEachParser('nytimesIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, nytimesIframeEmbedResolver)
 
-  // The snippet states 480 by 321, which is the carrier's size and wins over the ratio.
+  // The snippet states 480 by 321, which is not read.
   it('should resolve the pasted player iframe', async () => {
     const value = html`
       <iframe
@@ -106,8 +106,7 @@ describeForEachParser('nytimesIframeEmbedResolver', (parseHtml) => {
       provider: 'nytimes',
       id: '100000007370133',
       src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=100000007370133',
-      width: 480,
-      height: 321,
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
