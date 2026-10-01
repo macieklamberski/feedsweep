@@ -205,6 +205,34 @@ describeForEachParser('stripEmptyTags', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should keep the column widths a table declares', async () => {
+    const value =
+      '<table><colgroup><col width="30%"><col width="70%"></colgroup><tbody><tr><td>a</td><td>b</td></tr></tbody></table>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep the regions of an image map', async () => {
+    const value =
+      '<img src="map.png" usemap="#m"><map name="m"><area shape="rect" coords="0,0,10,10" href="https://example.com/a" alt="A"></map>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep the captions track of a video', async () => {
+    const value =
+      '<video src="clip.mp4" controls><track kind="captions" src="clip.vtt" srclang="en"></video>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a childless embed', async () => {
+    const value =
+      '<embed wmode="opaque" width="598" height="471" type="application/x-shockwave-flash" src="http://static.ning.com/socialnetworkmain/widgets/photo/slideshowplayer/slideshowplayer.swf?xn_version=3150304127">'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should preserve div that wraps an iframe (div is non-empty)', async () => {
     const value = '<div><iframe src="https://www.youtube-nocookie.com/embed/abc123"></iframe></div>'
 

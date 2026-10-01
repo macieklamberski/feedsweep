@@ -192,6 +192,21 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    it('should neutralize a data:text/html embed to the media sentinel', async () => {
+      const value = '<embed src="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==">'
+      const expected = '<embed src="about:blank">'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // A scheme is dangerous only at the start: this lab url carries one inside a mangled id.
+    it('should keep a url that carries a scheme word past its start', async () => {
+      const value =
+        '<iframe src="https://www.youtube.com/embed/mmRtQ4javascript:void(0)tHSug"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
   })
 
   describe('with a caller isSafeUrlFn', () => {
