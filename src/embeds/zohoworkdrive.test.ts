@@ -57,7 +57,7 @@ describeForEachParser('zohoworkdriveEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should rebuild the European public host onto its external domain', async () => {
+    it('should state a video ratio for a frame the dialog marks as a video', async () => {
       const value = html`
         <iframe
           class="zpvideo "
@@ -71,11 +71,11 @@ describeForEachParser('zohoworkdriveEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'zohoworkdrive',
         id: 'embed/cp48bb8302fb39e9d4e65b0e31dc6f6de9fd9',
-        src: 'https://workdrive.zohoexternal.eu/embed/cp48bb8302fb39e9d4e65b0e31dc6f6de9fd9',
-        url: 'https://workdrive.zohoexternal.eu/embed/cp48bb8302fb39e9d4e65b0e31dc6f6de9fd9',
+        src: 'https://workdrive.zohopublic.eu/embed/cp48bb8302fb39e9d4e65b0e31dc6f6de9fd9',
+        url: 'https://workdrive.zohopublic.eu/embed/cp48bb8302fb39e9d4e65b0e31dc6f6de9fd9',
         thumbnail:
-          'https://previewengine.zohoexternal.eu/thumbnail/WD/cp48bb8302fb39e9d4e65b0e31dc6f6de9fd9?size=l',
-        ratio: '4/3',
+          'https://previewengine.zohopublic.eu/thumbnail/WD/cp48bb8302fb39e9d4e65b0e31dc6f6de9fd9?size=l',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -99,13 +99,13 @@ describeForEachParser('zohoworkdriveEmbedResolver', (parseHtml) => {
         url: 'https://workdrive.zohoexternal.com/embed/nyn890d57781aad364bac82edd53e2a1d6b36',
         thumbnail:
           'https://previewengine.zohoexternal.com/thumbnail/WD/nyn890d57781aad364bac82edd53e2a1d6b36?size=l',
-        ratio: '4/3',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the Indian external domain', async () => {
+    it('should keep the Indian external domain and state a document ratio', async () => {
       const value = html`
         <iframe
           class="zpiframe "
@@ -162,6 +162,19 @@ describeForEachParser('zohoworkdriveEmbedResolver', (parseHtml) => {
         id: 'external/b8c94010215e9f50b3809aa3171a89ced5a60318b6c73663eca74e7ffae86d81',
         src: 'https://workdrive.zohoexternal.com/external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D81',
         url: 'https://workdrive.zohoexternal.com/external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D81',
+        ratio: '4/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the case of a link id that is not 64 hex digits', async () => {
+      const value = '<iframe src="https://workdrive.zohoexternal.com/external/AbC123"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'zohoworkdrive',
+        id: 'external/AbC123',
+        src: 'https://workdrive.zohoexternal.com/external/AbC123',
+        url: 'https://workdrive.zohoexternal.com/external/AbC123',
         ratio: '4/3',
       }
 
@@ -277,7 +290,7 @@ describeForEachParser('zohoworkdrive through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="4/3"
+        data-embed-ratio="16/9"
         data-embed-thumbnail="https://previewengine.zohoexternal.com/thumbnail/WD/nyn890d57781aad364bac82edd53e2a1d6b36?size=l"
         data-embed-url="https://workdrive.zohoexternal.com/embed/nyn890d57781aad364bac82edd53e2a1d6b36"
         data-embed-id="embed/nyn890d57781aad364bac82edd53e2a1d6b36"

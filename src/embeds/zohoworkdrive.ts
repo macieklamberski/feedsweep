@@ -5,14 +5,15 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'zohoworkdrive'
 
-// A file lives in one data centre, and only that centre's domain serves it. Each older spelling
-// maps onto the `zohoexternal` domain of its centre, which the embed dialog writes today.
+// A file lives in one data centre, and only that centre's domain serves it. Each spelling maps
+// onto the public domain its centre's app host redirects `/embed/{id}` to: `zohoexternal.com`
+// and `zohopublic.eu`. The Indian centre is claimed only on the `zohoexternal.in` it is seen on.
 const zohoworkdriveDomains = toMap({
   'workdrive.zoho.com': 'zohoexternal.com',
   'workdrive.zohoexternal.com': 'zohoexternal.com',
   'workdrive.zohoexternal.in': 'zohoexternal.in',
   'workdrive.zohopublic.com': 'zohoexternal.com',
-  'workdrive.zohopublic.eu': 'zohoexternal.eu',
+  'workdrive.zohopublic.eu': 'zohopublic.eu',
 })
 
 const zohoworkdriveHosts = [...zohoworkdriveDomains.keys()]
@@ -25,7 +26,16 @@ const externalPathRegex = /^\/external\/([^/]+)(?:\/embed)?$/
 // The only playback setting the dialog writes besides autoplay.
 const playbackParams = ['loop']
 
-export const zohoworkdriveResolveEmbed: ResolveEmbed = (url) => {
+// A link id is 64 hex digits, which the server reads in any case.
+const linkIdRegex = /^[0-9a-f]{64}$/i
+
+// The dialog marks a video's frame with `zpvideo`, and a document's with `zpiframe` or `embedcon`.
+// The video player fills the frame, and a document page scrolls under a 64px header.
+const readRatio = (element: Element | undefined): string => {
+  return element?.classList.contains('zpvideo') ? '16/9' : '4/3'
+}
+
+export const zohoworkdriveResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
   const domain = parsed ? zohoworkdriveDomains.get(parsed.hostname) : undefined
 
@@ -44,7 +54,7 @@ export const zohoworkdriveResolveEmbed: ResolveEmbed = (url) => {
       src: `${page}${pickUrlParams(url, playbackParams)}`,
       url: page,
       thumbnail: `https://previewengine.${domain}/thumbnail/WD/${fileId}?size=l`,
-      ratio: '4/3',
+      ratio: readRatio(element),
     }
   }
 
@@ -58,11 +68,10 @@ export const zohoworkdriveResolveEmbed: ResolveEmbed = (url) => {
 
   return {
     provider,
-    // The server reads a link id in any case, and a file id in one only.
-    id: `external/${linkId.toLowerCase()}`,
+    id: `external/${linkIdRegex.test(linkId) ? linkId.toLowerCase() : linkId}`,
     src: page,
     url: page,
-    ratio: '4/3',
+    ratio: readRatio(element),
   }
 }
 
