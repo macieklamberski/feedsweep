@@ -142,21 +142,11 @@ const findCaption = (element: Element, wrapper: Nullish<Element>): Nullish<Eleme
 
 // Blogger lets a post run on inside the caption block, so only the run from the deck's link to
 // the owner's goes, with any other link to SlideShare in the block.
-const removeAttribution = (caption: Element): void => {
-  const { page, owner } = findCaptionLinks(caption)
+const removeAttribution = (caption: Element, page: Element, owner: Element): void => {
+  let container = page
 
-  if (!page || !owner) {
-    return
-  }
-
-  let container = page.parentElement
-
-  while (container && !container.contains(owner)) {
+  while (!container.contains(owner) && container.parentElement) {
     container = container.parentElement
-  }
-
-  if (!container) {
-    return
   }
 
   const nodes = Array.from(container.childNodes)
@@ -184,10 +174,11 @@ const consumeCaption = (
 
   const caption = findCaption(element, wrapper)
   const fields = readCaption(caption)
+  const { page, owner } = findCaptionLinks(caption)
 
   // Removing the __ss_{id} wrapper would take the player inside it with the caption.
-  if (!wrapper && caption && fields.url && fields.author) {
-    removeAttribution(caption)
+  if (!wrapper && caption && page && owner && fields.url && fields.author) {
+    removeAttribution(caption, page, owner)
   }
 
   return fields
