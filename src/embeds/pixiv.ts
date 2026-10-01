@@ -23,11 +23,12 @@ const loaderSizes = ['small', 'medium', 'large']
 const frameWidth = 600
 const frameHeight = 315
 
-// See: https://embed.pixiv.net/oembed.php?url=https://www.pixiv.net/artworks/149288339.
-// The frame draws nothing for the `{number}_{hash}` id the loader takes, so it gets the number.
-const composeFrameUrl = (workId: string): string => {
-  const illustId = workId.match(illustIdRegex)?.[1] ?? workId
+const readIllustId = (workId: string): string => {
+  return workId.match(illustIdRegex)?.[1] ?? workId
+}
 
+// See: https://embed.pixiv.net/oembed.php?url=https://www.pixiv.net/artworks/149288339.
+const composeFrameUrl = (illustId: string): string => {
   return `https://embed.pixiv.net/oembed_iframe.php${composeQuery({ type: 'illust', id: illustId })}`
 }
 
@@ -53,8 +54,8 @@ const pixivResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const illustId = workId.match(illustIdRegex)?.[1]
-  const page = illustId ? `https://www.pixiv.net/artworks/${illustId}` : undefined
+  const illustId = readIllustId(workId)
+  const page = illustIdRegex.test(workId) ? `https://www.pixiv.net/artworks/${illustId}` : undefined
 
   // `type` picks the id space, and a novel's number reads the same as an illustration's.
   if (route === 'oembed_iframe' && parsed.searchParams.get('type') !== 'illust') {
@@ -63,8 +64,8 @@ const pixivResolveEmbed: ResolveEmbed = (url) => {
 
   return {
     provider,
-    id: workId,
-    src: composeFrameUrl(workId),
+    id: illustId,
+    src: composeFrameUrl(illustId),
     url: page,
     width: frameWidth,
     height: frameHeight,
@@ -103,7 +104,7 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
       }
     }
 
-    const illustId = workId.match(illustIdRegex)?.[1]
+    const illustId = readIllustId(workId)
     const fallback = element.nextElementSibling
     const anchors =
       fallback?.localName === 'noscript' ? Array.from(fallback.querySelectorAll('a[href]')) : []
@@ -116,9 +117,9 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
     const artist = isPixivBlock ? findAnchor(anchors, artistPathRegex) : undefined
     const result: EmbedResolverResult = {
       provider,
-      id: workId,
-      src: composeFrameUrl(workId),
-      url: illustId ? `https://www.pixiv.net/artworks/${illustId}` : undefined,
+      id: illustId,
+      src: composeFrameUrl(illustId),
+      url: illustIdRegex.test(workId) ? `https://www.pixiv.net/artworks/${illustId}` : undefined,
       width: frameWidth,
       height: frameHeight,
       title: text(work),
