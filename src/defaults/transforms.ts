@@ -46,6 +46,7 @@ import { rebuildEmbedlyEmbeds } from '../transforms/dom/rebuildEmbedlyEmbeds.js'
 import { rebuildEmbedPlusEmbeds } from '../transforms/dom/rebuildEmbedPlusEmbeds.js'
 import { rebuildExternalVideoEmbeds } from '../transforms/dom/rebuildExternalVideoEmbeds.js'
 import { rebuildGettyImagesEmbeds } from '../transforms/dom/rebuildGettyImagesEmbeds.js'
+import { rebuildGofundmeEmbeds } from '../transforms/dom/rebuildGofundmeEmbeds.js'
 import { rebuildIframelyEmbeds } from '../transforms/dom/rebuildIframelyEmbeds.js'
 import { rebuildJsfiddleEmbeds } from '../transforms/dom/rebuildJsfiddleEmbeds.js'
 import { rebuildLazyLoadForVideos } from '../transforms/dom/rebuildLazyLoadForVideos.js'
@@ -174,6 +175,8 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // placeholdered downstream. Runs before convertDatawrapperEmbeds so a data-frame-src
   // Datawrapper div becomes an iframe that convertDatawrapperEmbeds turns into a static image.
   rebuildDeferredIframes,
+  // Runs before stripEmptyTags, which deletes the empty widget div, and before convertWidgets.
+  rebuildGofundmeEmbeds,
   // Converts Datawrapper chart embeds (iframe, script/noscript, and link forms) into a
   // linked static <img> of the chart's published PNG render. Runs in this normalize
   // cluster so the emitted <img> is dimensioned and proxied by the image transforms below.
