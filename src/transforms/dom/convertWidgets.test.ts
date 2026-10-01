@@ -732,20 +732,94 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     })
   })
 
-  // Flash has been unplayable in every browser since 2021, so a placeholder pointing at a
-  // `.swf` is a click-to-load button for a file that can never run, and minting it would also
-  // discard the object's fallback content. The carrier is left alone instead: a browser
-  // renders an object's fallback children when it cannot run the object, and an allowlist
-  // sanitizer that drops the shell keeps them the same way. The Flash resolvers run first and
-  // still claim what they can repair.
+  // No browser runs a `.swf` since 2021. An object keeps the fallback children a browser shows
+  // in its place, a bare embed has none, and the Flash resolvers run first either way.
   describe('dead Flash carriers', () => {
-    it('should not frame an <embed> pointing at a .swf', async () => {
-      const value = '<embed src="https://example.com/player.swf">'
+    it('should drop a bare <embed> pointing at a .swf', async () => {
+      const value = html`
+        <p>Before</p>
+        <embed src="https://example.com/player.swf" />
+        <p>After</p>
+      `
       const expected = html`
-        <embed src="https://example.com/player.swf"></embed>
+        <p>Before</p>
+        <p>After</p>
       `
 
       expect(await transform(value, withNoResolvers)).toEqualHtml(expected)
+    })
+
+    it('should keep an <embed> nested in an object shell', async () => {
+      const value = html`
+        <object
+          width="400"
+          height="300"
+        >
+          <param
+            name="movie"
+            value="https://example.com/player.swf"
+          />
+          <embed
+            src="https://example.com/player.swf"
+            width="400"
+            height="300"
+          />
+        </object>
+      `
+      const expected = html`
+        <object
+          width="400"
+          height="300"
+        >
+          <param
+            value="https://example.com/player.swf"
+            name="movie"
+          ></param>
+          <embed
+            src="https://example.com/player.swf"
+            width="400"
+            height="300"
+          ></embed>
+        </object>
+      `
+
+      expect(await transform(value, withNoResolvers)).toEqualHtml(expected)
+    })
+
+    it('should keep an <embed> wrapped deeper inside an object', async () => {
+      const value = html`
+        <object>
+          <param name="movie" value="https://example.com/player.swf" />
+          <div>
+            <embed src="https://example.com/player.swf" />
+          </div>
+        </object>
+      `
+      const expected = html`
+        <object>
+          <param value="https://example.com/player.swf" name="movie"></param>
+          <div>
+            <embed src="https://example.com/player.swf"></embed>
+          </div>
+        </object>
+      `
+
+      expect(await transform(value, withNoResolvers)).toEqualHtml(expected)
+    })
+
+    it('should let a resolver claim a bare .swf <embed> before the drop', async () => {
+      const value = '<embed src="http://vimeo.com/moogaloop.swf?clip_id=76979871">'
+      const expected = html`
+        <div
+          data-embed-url="https://vimeo.com/76979871"
+          data-embed-src="https://player.vimeo.com/video/76979871"
+          data-embed-ratio="16/9"
+          data-embed-provider="vimeo"
+          data-embed-id="76979871"
+        ></div>
+      `
+
+      expect(await transform(value, baseContext)).toEqualHtml(expected)
     })
 
     it('should leave an object and the fallback it holds untouched', async () => {
