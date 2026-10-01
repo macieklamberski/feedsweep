@@ -445,6 +445,24 @@ describeForEachParser('mrcvideoFlashEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should keep a view callback node id holding a slash inside the path', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;yourlytics.callback=http://www.mrctv.org/postback/remoteview?nodeid=../../x"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mrcvideo',
+        id: '../../x',
+        src: 'https://mrcvideo.org/embed/..%2F..%2Fx',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should prefer the sharing snippet over the view callback', async () => {
       const value = html`
         <embed

@@ -1,7 +1,7 @@
 import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mrcvideo'
@@ -18,7 +18,7 @@ const composeEmbed = (id: string): EmbedResolverResult => {
   return {
     provider,
     id,
-    src: `https://mrcvideo.org/embed/${id}`,
+    src: `https://mrcvideo.org/embed/${encodePathSegment(id)}`,
     ratio: '16/9',
   }
 }
