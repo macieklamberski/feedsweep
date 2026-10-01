@@ -70,12 +70,12 @@ export const reverbnationResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // No page url: reverbnation.com/artist/{id} and its siblings all 404 for the numeric id.
-  // No size either: the widget reflows, 500 tall at 1200 wide and 400 tall at 400 wide, neither a
-  // fixed height nor a ratio. The widget page carries the slug that names the artist's page.
+  // The widget page carries the slug that names the artist's page.
   return {
     provider,
     id,
     src: composeSource(id, widget ? filterUrlQuery(parsed, isWidgetParam) : ''),
+    height: 265,
   }
 }
 

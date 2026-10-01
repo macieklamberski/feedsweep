@@ -136,6 +136,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         src: 'https://ridewithgps.com/embeds?type=trip&id=372416891',
         url: 'https://ridewithgps.com/trips/372416891',
         thumbnail: 'https://ridewithgps.com/trips/372416891/thumb.png',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -149,6 +150,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         src: 'https://ridewithgps.com/embeds?type=trip&id=372416891',
         url: 'https://ridewithgps.com/trips/372416891',
         thumbnail: 'https://ridewithgps.com/trips/372416891/thumb.png',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -160,6 +162,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         provider: 'ridewithgps',
         id: 'route/34497677',
         src: 'https://ridewithgps.com/embeds?type=route&id=34497677&privacyCode=Kq7WdN2hPzVmT4rY',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -171,6 +174,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         provider: 'ridewithgps',
         id: 'route/34497677',
         src: 'https://ridewithgps.com/embeds?type=route&id=34497677&privacyCode=Kq7WdN2hPzVmT4rY',
+        height: 700,
         title: 'Loop',
       }
 
@@ -222,6 +226,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         src: 'https://ridewithgps.com/embeds?type=route&id=1%2F..%2F9',
         url: 'https://ridewithgps.com/routes/1%2F..%2F9',
         thumbnail: 'https://ridewithgps.com/routes/1%2F..%2F9/thumb.png',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -244,6 +249,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         id: 'event/215602',
         src: 'https://ridewithgps.com/embeds?type=event&eventId=215602',
         url: 'https://ridewithgps.com/events/215602',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -285,6 +291,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         src: 'https://ridewithgps.com/embeds?type=trip&id=372416891',
         url: 'https://ridewithgps.com/trips/372416891',
         thumbnail: 'https://ridewithgps.com/trips/372416891/thumb.png',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -297,6 +304,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         provider: 'ridewithgps',
         id: 'route/10953871',
         src: 'https://ridewithgps.com/embeds?type=route&id=10953871&privacyCode=AbC123',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -311,6 +319,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         src: 'https://ridewithgps.com/embeds?type=route&id=10953871',
         url: 'https://ridewithgps.com/routes/10953871',
         thumbnail: 'https://ridewithgps.com/routes/10953871/thumb.png',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -342,6 +351,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         src: 'https://ridewithgps.com/embeds?type=route&id=1%2F..%2F9',
         url: 'https://ridewithgps.com/routes/1%2F..%2F9',
         thumbnail: 'https://ridewithgps.com/routes/1%2F..%2F9/thumb.png',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -355,6 +365,7 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         src: 'https://ridewithgps.com/embeds?type=route&id=10953871%25zz',
         url: 'https://ridewithgps.com/routes/10953871%zz',
         thumbnail: 'https://ridewithgps.com/routes/10953871%zz/thumb.png',
+        height: 700,
       }
 
       expect(await extract(value)).toEqual(expected)

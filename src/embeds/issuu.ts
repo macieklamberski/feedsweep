@@ -16,6 +16,8 @@ const storyRoute = 's'
 // Only `embed.html` is minted: `anonymous-embed.html` answers 403 for every document.
 const embedPaths = ['embed.html', 'anonymous-embed.html']
 
+const documentRatio = '5/3'
+
 const composeConfigEmbed = (configId: string | undefined): EmbedResolverResult | undefined => {
   if (!configId) {
     return
@@ -25,6 +27,7 @@ const composeConfigEmbed = (configId: string | undefined): EmbedResolverResult |
     provider,
     id: configId,
     src: `https://e.issuu.com/embed.html#${configId}`,
+    ratio: documentRatio,
   }
 }
 
@@ -47,6 +50,7 @@ const composeDocumentEmbed = (
     src: `https://e.issuu.com/embed.html${query}`,
     // The iframe's `u` and `d` come out of the query decoded, and each goes into a path segment.
     url: `https://issuu.com/${encodePathSegment(publisher)}/docs/${encodePathSegment(documentName)}`,
+    ratio: documentRatio,
   }
 }
 

@@ -37,6 +37,7 @@ export const learningappsResolveEmbed: ResolveEmbed = (url) => {
     provider: 'learningapps',
     id: appId,
     src: `https://learningapps.org/watch${composeQuery({ app: appId })}`,
+    height: 500,
   }
 
   return isNumericAppId

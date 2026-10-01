@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'bun:test'
-import { isPlayerJsReady, playerJsPlayRequest, readPixels } from './hints.js'
+import {
+  isPlayerJsReady,
+  playerJsPlayRequest,
+  readIframeResizeHeight,
+  readPixels,
+} from './hints.js'
 
 describe('readPixels', () => {
   it('should keep a positive number', () => {
@@ -42,5 +47,31 @@ describe('playerJsPlayRequest', () => {
       version: '0.0.11',
       method: 'play',
     })
+  })
+})
+
+describe('readIframeResizeHeight', () => {
+  // Captured from `codesandbox.io/embed/1-uncontrolled-components-qhm6t?autoresize=1` in Chrome.
+  it('should read the height out of a resize message posted as a string', () => {
+    const value =
+      '{"src":"https://codesandbox.io/embed/1-uncontrolled-components-qhm6t?autoresize=1","context":"iframe.resize","height":612}'
+
+    expect(readIframeResizeHeight(value)).toBe(612)
+  })
+
+  it('should read nothing from a string that is not JSON', () => {
+    expect(readIframeResizeHeight('{"context":"iframe.resize",')).toBeUndefined()
+  })
+
+  it('should read nothing from a resize message posted as an object', () => {
+    const value = { context: 'iframe.resize', height: 664 }
+
+    expect(readIframeResizeHeight(value)).toBeUndefined()
+  })
+
+  it('should read nothing from another message or an unrendered player', () => {
+    expect(readIframeResizeHeight('{"context":"iframe.resize","height":0}')).toBeUndefined()
+    expect(readIframeResizeHeight('{"context":"iframe.ready","height":500}')).toBeUndefined()
+    expect(readIframeResizeHeight('iframe.resize')).toBeUndefined()
   })
 })

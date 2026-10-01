@@ -30,3 +30,19 @@ export const isPlayerJsReady = (data: unknown): boolean => {
     return false
   }
 }
+
+// The resize message several embeds post unasked, `{ src, context: 'iframe.resize', height }`
+// serialised to a JSON string.
+export const readIframeResizeHeight = (data: unknown): number | undefined => {
+  if (typeof data !== 'string') {
+    return
+  }
+
+  try {
+    const message: unknown = JSON.parse(data)
+
+    if (isPlainObject(message) && message.context === 'iframe.resize') {
+      return readPixels(message.height)
+    }
+  } catch {}
+}

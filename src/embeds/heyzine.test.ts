@@ -13,6 +13,7 @@ describe('heyzineResolveEmbed', () => {
         id: '4db16f598c',
         src: 'https://heyzine.com/flip-book/4db16f598c.html',
         url: 'https://heyzine.com/flip-book/4db16f598c.html',
+        ratio: '490/600',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -25,6 +26,7 @@ describe('heyzineResolveEmbed', () => {
         id: '4db16f598c',
         src: 'https://heyzine.com/flip-book/4db16f598c.html',
         url: 'https://heyzine.com/flip-book/4db16f598c.html',
+        ratio: '490/600',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -37,6 +39,7 @@ describe('heyzineResolveEmbed', () => {
         id: '4db16f598c',
         src: 'https://heyzine.com/flip-book/4db16f598c.html#page/4',
         url: 'https://heyzine.com/flip-book/4db16f598c.html#page/4',
+        ratio: '490/600',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -49,6 +52,7 @@ describe('heyzineResolveEmbed', () => {
         id: '4db16f598c',
         src: 'https://heyzine.com/flip-book/4DB16F598C.html',
         url: 'https://heyzine.com/flip-book/4DB16F598C.html',
+        ratio: '490/600',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -61,6 +65,7 @@ describe('heyzineResolveEmbed', () => {
         id: 'throughtheprism',
         src: 'https://heyzine.com/flip-book/ThroughThePrism',
         url: 'https://heyzine.com/flip-book/ThroughThePrism',
+        ratio: '490/600',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -73,6 +78,7 @@ describe('heyzineResolveEmbed', () => {
         id: '695b82b89c',
         src: 'https://heyzine.com/flip-book/695b82b89c.html',
         url: 'https://heyzine.com/flip-book/695b82b89c.html',
+        ratio: '490/600',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -85,6 +91,7 @@ describe('heyzineResolveEmbed', () => {
         id: '695b82b89c',
         src: 'https://heyzine.com/flip-book/695b82b89c.html',
         url: 'https://heyzine.com/flip-book/695b82b89c.html',
+        ratio: '490/600',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -174,6 +181,7 @@ describe('heyzineResolveEmbed', () => {
         id: 'brochure2026',
         src: 'https://heyzine.com/flip-book/Brochure2026',
         url: 'https://heyzine.com/flip-book/Brochure2026',
+        ratio: '490/600',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -186,6 +194,7 @@ describe('heyzineResolveEmbed', () => {
         id: '4db16f598c5',
         src: 'https://heyzine.com/flip-book/4db16f598c5',
         url: 'https://heyzine.com/flip-book/4db16f598c5',
+        ratio: '490/600',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -198,6 +207,7 @@ describe('heyzineResolveEmbed', () => {
         id: 'through%2ftheprism',
         src: 'https://heyzine.com/flip-book/Through%2FThePrism',
         url: 'https://heyzine.com/flip-book/Through%2FThePrism',
+        ratio: '490/600',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -210,6 +220,7 @@ describe('heyzineResolveEmbed', () => {
         id: '4db16f598c',
         src: 'https://heyzine.com/flip-book/4db16f598c.html',
         url: 'https://heyzine.com/flip-book/4db16f598c.html',
+        ratio: '490/600',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -222,6 +233,7 @@ describe('heyzineResolveEmbed', () => {
         id: '4db16f598c',
         src: 'https://heyzine.com/flip-book/4db16f598c.html#page/cover',
         url: 'https://heyzine.com/flip-book/4db16f598c.html#page/cover',
+        ratio: '490/600',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)
@@ -234,6 +246,7 @@ describe('heyzineResolveEmbed', () => {
         id: '4db16f598c',
         src: 'https://heyzine.com/flip-book/4db16f598c.html',
         url: 'https://heyzine.com/flip-book/4db16f598c.html',
+        ratio: '490/600',
       }
 
       expect(heyzineResolveEmbed(value)).toEqual(expected)

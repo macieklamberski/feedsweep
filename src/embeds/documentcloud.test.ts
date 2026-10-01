@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { documentcloudEmbedResolver } from './documentcloud.js'
+import { documentcloudEmbedResolver, readDocumentcloudHeight } from './documentcloud.js'
 
 describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, documentcloudEmbedResolver)
@@ -17,6 +17,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/?embed=1',
         thumbnail:
           'https://s3.documentcloud.org/documents/3694123/pages/Feedback-on-the-Nakshe-Portal-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -31,6 +32,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/20705673-open-letter-acj-moud-051021/',
         thumbnail:
           'https://s3.documentcloud.org/documents/20705673/pages/open-letter-acj-moud-051021-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -45,6 +47,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://www.documentcloud.org/documents/2702333-Appropriate-and-Responsible-Practices-for.html',
         thumbnail:
           'https://s3.documentcloud.org/documents/2702333/pages/Appropriate-and-Responsible-Practices-for-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -115,6 +118,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/20470115-208-emergency-restraint-chair/',
         thumbnail:
           'https://s3.documentcloud.org/documents/20470115/pages/208-emergency-restraint-chair-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -157,6 +161,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/',
         thumbnail:
           'https://s3.documentcloud.org/documents/3694123/pages/Feedback-on-the-Nakshe-Portal-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -318,6 +323,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/1015756-restraint-seclusions-report-ct-2012-13/?embed=1&fullscreen=1&onlyshoworg=0&pdf=0',
         thumbnail:
           'https://s3.documentcloud.org/documents/1015756/pages/restraint-seclusions-report-ct-2012-13-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -332,6 +338,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/?embed=1',
         thumbnail:
           'https://s3.documentcloud.org/documents/3694123/pages/Feedback-on-the-Nakshe-Portal-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -365,5 +372,27 @@ describeForEachParser('documentcloud shapes the pipeline strips first', (parseHt
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describe('readDocumentcloudHeight', () => {
+  // Captured from `embed.documentcloud.org/documents/28200073/pages/1/?embed=1` in Chrome.
+  it('should read the height out of the message a page embed posts', () => {
+    const value = {
+      width: 600,
+      height: 882,
+      updateStyleProps: false,
+      href: 'https://embed.documentcloud.org/documents/28200073/pages/1/?embed=1',
+    }
+
+    expect(readDocumentcloudHeight(value)).toBe(882)
+  })
+
+  it('should read nothing from a message posted as a string', () => {
+    expect(readDocumentcloudHeight('{"height":882}')).toBeUndefined()
+  })
+
+  it('should read nothing from an embed that has not rendered', () => {
+    expect(readDocumentcloudHeight({ width: 600, height: 0 })).toBeUndefined()
   })
 })

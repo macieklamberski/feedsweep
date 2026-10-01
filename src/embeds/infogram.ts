@@ -1,8 +1,11 @@
 import { parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
+import { readIframeResizeHeight } from '../utils/hints.js'
 import { parseUrlOnHosts, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'infogram'
 
 // The current editor issues a chart id under `_/`, older ones a slug or a uuid.
 const chartIdRegex = /^(?:_\/)?[^/]+$/
@@ -30,7 +33,7 @@ const composeInfogramEmbed = (
   const live = new URLSearchParams(query).has('live') ? '&live' : ''
 
   return {
-    provider: 'infogram',
+    provider,
     id: chartId,
     src: `https://e.infogram.com/${chartId}?${params}${live}`,
     url: `https://infogram.com/${chartId}`,
@@ -90,3 +93,9 @@ export const infogramIframeEmbedResolver = createUrlEmbedResolver(
   infogramHosts,
   infogramResolveEmbed,
 )
+
+// The chart posts its rendered height unasked, again whenever its width changes it.
+export const infogramRenderHint: EmbedRenderHint = {
+  provider,
+  readHeight: readIframeResizeHeight,
+}

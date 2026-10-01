@@ -17,6 +17,7 @@ describe('amebaResolveEmbed', () => {
         provider: 'ameba',
         id: 'MCLP3ViBJRfW3clSWW5saxnjA5',
         src: 'https://static.blog-video.jp/?v=MCLP3ViBJRfW3clSWW5saxnjA5',
+        ratio: '16/9',
       }
 
       expect(amebaResolveEmbed(value)).toEqual(expected)
@@ -36,6 +37,7 @@ describe('amebaResolveEmbed', () => {
         provider: 'ameba',
         id: 'MCLP3ViB&autoplay=1',
         src: 'https://static.blog-video.jp/?v=MCLP3ViB%26autoplay%3D1',
+        ratio: '16/9',
       }
 
       expect(amebaResolveEmbed(value)).toEqual(expected)
@@ -49,6 +51,7 @@ describe('amebaResolveEmbed', () => {
         provider: 'ameba',
         id: 't4RyJ77EsGURDnTBfbpkBe1P',
         src: 'https://static.blog-video.jp/?v=t4RyJ77EsGURDnTBfbpkBe1P',
+        ratio: '16/9',
       }
 
       expect(amebaResolveEmbed(value)).toEqual(expected)
@@ -60,6 +63,7 @@ describe('amebaResolveEmbed', () => {
         provider: 'ameba',
         id: 'MCLP3ViBJRfW3clSWW5saxnjA5',
         src: 'https://static.blog-video.jp/?v=MCLP3ViBJRfW3clSWW5saxnjA5',
+        ratio: '16/9',
       }
 
       expect(amebaResolveEmbed(value)).toEqual(expected)
@@ -138,6 +142,7 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
         id: 'ncbar/entry-12423195042',
         src: 'https://ameblo.jp/s/embed/reblog-card/ncbar/entry-12423195042.html',
         url: 'https://ameblo.jp/ncbar/entry-12423195042.html',
+        height: 234,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -207,6 +212,7 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
         id: 'ncbar/entry-latest',
         src: 'https://ameblo.jp/s/embed/reblog-card/ncbar/entry-latest.html',
         url: 'https://ameblo.jp/ncbar/entry-latest.html',
+        height: 234,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -225,6 +231,7 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
         id: 'ncbar/entry-12423195042/../1',
         src: 'https://ameblo.jp/s/embed/reblog-card/ncbar/entry-12423195042/../1.html',
         url: 'https://ameblo.jp/ncbar/entry-12423195042/../1.html',
+        height: 234,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -245,6 +252,7 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
         id: 'sd-milk/entry-12806733695',
         src: 'https://ameblo.jp/s/embed/reblog-card/sd-milk/entry-12806733695.html',
         url: 'https://ameblo.jp/sd-milk/entry-12806733695.html',
+        height: 234,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -263,6 +271,7 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
         id: '../hijacked/entry-12423195042',
         src: 'https://ameblo.jp/s/embed/reblog-card/../hijacked/entry-12423195042.html',
         url: 'https://ameblo.jp/../hijacked/entry-12423195042.html',
+        height: 234,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -281,6 +290,7 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
         id: 'ncbar/entry-12423195042',
         src: 'https://ameblo.jp/s/embed/reblog-card/ncbar/entry-12423195042.html',
         url: 'https://ameblo.jp/ncbar/entry-12423195042.html',
+        height: 234,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -353,6 +363,7 @@ describeForEachParser('amebaImagePageEmbedResolver', (parseHtml) => {
         id: 'sd-milk/image-12806733695-15295885078',
         src: 'https://ameblo.jp/p/embed/sd-milk/image-12806733695-15295885078.html',
         url: 'https://ameblo.jp/sd-milk/image-12806733695-15295885078.html',
+        ratio: '360/416',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -367,6 +378,7 @@ describeForEachParser('amebaImagePageEmbedResolver', (parseHtml) => {
         id: 'tony-9/image-12854455300-15446105444',
         src: 'https://ameblo.jp/p/embed/tony-9/image-12854455300-15446105444.html',
         url: 'https://ameblo.jp/tony-9/image-12854455300-15446105444.html',
+        ratio: '360/416',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -389,6 +401,7 @@ describeForEachParser('amebaImagePageEmbedResolver', (parseHtml) => {
         id: 'sd%2Fmilk/image-1-2',
         src: 'https://ameblo.jp/p/embed/sd%2Fmilk/image-1-2.html',
         url: 'https://ameblo.jp/sd%2Fmilk/image-1-2.html',
+        ratio: '360/416',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -427,6 +440,7 @@ describeForEachParser('amebaImagePageEmbedResolver', (parseHtml) => {
         id: 'sd-milk/image-latest-cover',
         src: 'https://ameblo.jp/p/embed/sd-milk/image-latest-cover.html',
         url: 'https://ameblo.jp/sd-milk/image-latest-cover.html',
+        ratio: '360/416',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -453,6 +467,7 @@ describeForEachParser('amebaImagePageEmbedResolver', (parseHtml) => {
         id: 'sd-milk/image-12806733695-15295885078',
         src: 'https://ameblo.jp/p/embed/sd-milk/image-12806733695-15295885078.html',
         url: 'https://ameblo.jp/sd-milk/image-12806733695-15295885078.html',
+        ratio: '360/416',
       }
 
       expect(await extract(value)).toEqual(expected)

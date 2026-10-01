@@ -15,6 +15,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'design/UBVMSTz7mhvYogjfdeKcIB',
         src: 'https://embed.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0%3A2&embed-host=share',
         url: 'https://www.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0%3A2',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -69,6 +70,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'design/dU9A1ZzvtHiirRTBxtADnC',
         src: 'https://embed.figma.com/file/dU9A1ZzvtHiirRTBxtADnC/Lighting-Beetle-Figma-Fun?node-id=1%3A217&embed-host=share',
         url: 'https://www.figma.com/file/dU9A1ZzvtHiirRTBxtADnC/Lighting-Beetle-Figma-Fun?node-id=1%3A217',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -102,6 +104,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'proto/zMOWWSHAvmHWuk5UqiOchl',
         src: 'https://embed.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&embed-host=share',
         url: 'https://www.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -115,6 +118,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'make/UBVMSTz7mhvYogjfdeKcIB',
         src: 'https://embed.figma.com/make/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?embed-host=share',
         url: 'https://www.figma.com/make/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -234,6 +238,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'design/UBVMSTz7mhvYogjfdeKcIB',
         src: 'https://embed.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?embed-host=share',
         url: 'https://www.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -251,6 +256,7 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
         id: 'board/0txckPBPI1OqFNEa9VaKLP',
         src: 'https://embed.figma.com/board/0txckPBPI1OqFNEa9VaKLP/TacTik?embed-host=share',
         url: 'https://www.figma.com/board/0txckPBPI1OqFNEa9VaKLP/TacTik',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

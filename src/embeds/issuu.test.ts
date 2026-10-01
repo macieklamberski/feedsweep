@@ -39,6 +39,7 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
         provider: 'issuu',
         id: '1016421/47623369',
         src: 'https://e.issuu.com/embed.html#1016421/47623369',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -73,6 +74,7 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
         id: 'pub/do/c',
         src: 'https://e.issuu.com/embed.html?u=pub&d=do%2Fc',
         url: 'https://issuu.com/pub/docs/do%2Fc',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -90,6 +92,7 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
         id: 'ecosistemaurbano/paisaje_transversal',
         src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal&p=12',
         url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -107,6 +110,7 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
         provider: 'issuu',
         id: 'not-a-config-id',
         src: 'https://e.issuu.com/embed.html#not-a-config-id',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -125,6 +129,7 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
         provider: 'issuu',
         id: '../evil/1',
         src: 'https://e.issuu.com/embed.html#../evil/1',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -228,6 +233,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'ecosistemaurbano/paisaje_transversal',
         src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal&p=7',
         url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -244,6 +250,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'ecosistemaurbano/paisaje_transversal',
         src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal&p=cover',
         url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -281,6 +288,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'swissgolf.ch/swiss_golf_02-26_de',
         src: 'https://e.issuu.com/embed.html?u=swissgolf.ch&d=swiss_golf_02-26_de',
         url: 'https://issuu.com/swissgolf.ch/docs/swiss_golf_02-26_de',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -309,6 +317,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: '../paisaje_transversal',
         src: 'https://e.issuu.com/embed.html?u=..&d=paisaje_transversal',
         url: 'https://issuu.com/../docs/paisaje_transversal',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -331,6 +340,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'ecosistemaurbano/../../evil',
         src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=..%2F..%2Fevil',
         url: 'https://issuu.com/ecosistemaurbano/docs/..%2F..%2Fevil',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -367,6 +377,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'thebeastmag/the_beast_-_july_2026',
         src: 'https://e.issuu.com/embed.html?u=thebeastmag&d=the_beast_-_july_2026',
         url: 'https://issuu.com/thebeastmag/docs/the_beast_-_july_2026',
+        ratio: '5/3',
         title: 'The Beast - July 2026',
       }
 
@@ -385,6 +396,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         provider: 'issuu',
         id: '1016421/47623369',
         src: 'https://e.issuu.com/embed.html#1016421/47623369',
+        ratio: '5/3',
         title: 'Vermont Cynic Drug Issue 2026',
       }
 
@@ -403,6 +415,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'thebeastmag/the_beast_-_july_2026',
         src: 'https://e.issuu.com/embed.html?u=thebeastmag&d=the_beast_-_july_2026',
         url: 'https://issuu.com/thebeastmag/docs/the_beast_-_july_2026',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -421,6 +434,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'basilikimetatroulou/xyz_9_1_final',
         src: 'https://e.issuu.com/embed.html?u=basilikimetatroulou&d=xyz_9_1_final',
         url: 'https://issuu.com/basilikimetatroulou/docs/xyz_9_1_final',
+        ratio: '5/3',
         title: 'The Beast',
       }
 
@@ -436,6 +450,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'basilikimetatroulou/xyz_9_1_final',
         src: 'https://e.issuu.com/embed.html?u=basilikimetatroulou&d=xyz_9_1_final&p=1',
         url: 'https://issuu.com/basilikimetatroulou/docs/xyz_9_1_final',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -449,6 +464,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'basilikimetatroulou/xyz_9_1_final',
         src: 'https://e.issuu.com/embed.html?u=basilikimetatroulou&d=xyz_9_1_final',
         url: 'https://issuu.com/basilikimetatroulou/docs/xyz_9_1_final',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -507,6 +523,7 @@ describeForEachParser('issuuIframeEmbedResolver carrier title', (parseHtml) => {
       provider: 'issuu',
       id: '1016421/47623369',
       src: 'https://e.issuu.com/embed.html#1016421/47623369',
+      ratio: '5/3',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -520,6 +537,7 @@ describeForEachParser('issuuIframeEmbedResolver carrier title', (parseHtml) => {
       provider: 'issuu',
       id: '1016421/47623369',
       src: 'https://e.issuu.com/embed.html#1016421/47623369',
+      ratio: '5/3',
       title: 'Cathedral News 07.06.26',
     }
 

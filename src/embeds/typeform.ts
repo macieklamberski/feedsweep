@@ -29,6 +29,7 @@ const composeEmbed = (id: string, title?: string): EmbedResolverResult | undefin
     id,
     src: `https://form.typeform.com/to/${id}`,
     url: `https://form.typeform.com/to/${id}`,
+    height: 500,
   }
 
   return title ? { ...result, title } : result

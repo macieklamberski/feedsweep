@@ -45,6 +45,7 @@ export const thinglinkResolveEmbed: ResolveEmbed = (url) => {
     src: `https://www.thinglink.com/card/${id}`,
     url: `https://www.thinglink.com/card/${id}`,
     thumbnail: composePosterUrl(id),
+    ratio: '3/2',
   }
 }
 

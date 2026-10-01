@@ -64,6 +64,7 @@ const wordwallResolveEmbed: ResolveEmbed = (url) => {
     provider: 'wordwall',
     id: activityId,
     src: `https://wordwall.net/embed/${activityId}${pickUrlParams(url, playParams)}`,
+    ratio: '500/380',
   }
 }
 

@@ -37,6 +37,7 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
     src: `https://read.amazon.com/kp/card${composeQuery({ asin })}`,
     // The ASIN comes out of the query decoded, and it goes into a path.
     thumbnail: `https://m.media-amazon.com/images/P/${encodePathSegment(asin)}.01._SCLZZZZZZZ_.jpg`,
+    height: 550,
     // The oEmbed writes the book's name here, never a player label.
     title: attr(element, 'title'),
   }

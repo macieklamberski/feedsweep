@@ -12,6 +12,7 @@ describe('komootResolveEmbed', () => {
         id: '178118403',
         src: 'https://www.komoot.com/tour/178118403/embed',
         url: 'https://www.komoot.com/tour/178118403',
+        height: 440,
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
@@ -24,6 +25,7 @@ describe('komootResolveEmbed', () => {
         id: '2011745032',
         src: 'https://www.komoot.com/tour/2011745032/embed',
         url: 'https://www.komoot.com/tour/2011745032',
+        height: 440,
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
@@ -36,6 +38,7 @@ describe('komootResolveEmbed', () => {
         provider: 'komoot',
         id: '3055667226',
         src: 'https://www.komoot.com/tour/3055667226/embed?share_token=aFCLXUxhhEfqsWzhS25hO07CKF8AD7IEY8jdgcSp24c6iS2cR0',
+        height: 440,
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
@@ -48,6 +51,7 @@ describe('komootResolveEmbed', () => {
         id: '528636996',
         src: 'https://www.komoot.com/tour/528636996/embed',
         url: 'https://www.komoot.com/tour/528636996',
+        height: 440,
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
@@ -61,6 +65,7 @@ describe('komootResolveEmbed', () => {
         id: 'collection/3965053',
         src: 'https://www.komoot.com/collection/3965053/best-of-national-cycling-routes-of-estonian-islands/embed',
         url: 'https://www.komoot.com/collection/3965053/best-of-national-cycling-routes-of-estonian-islands',
+        height: 440,
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
@@ -94,6 +99,7 @@ describe('komootResolveEmbed', () => {
         id: 'collection/3965053',
         src: 'https://www.komoot.com/collection/3965053/best&layout=x/embed',
         url: 'https://www.komoot.com/collection/3965053/best&layout=x',
+        height: 440,
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
@@ -107,6 +113,7 @@ describe('komootResolveEmbed', () => {
         id: 'collection/latest',
         src: 'https://www.komoot.com/collection/latest/best-of-national-cycling-routes-of-estonian-islands/embed',
         url: 'https://www.komoot.com/collection/latest/best-of-national-cycling-routes-of-estonian-islands',
+        height: 440,
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
@@ -126,6 +133,7 @@ describe('komootResolveEmbed', () => {
         id: 'latest',
         src: 'https://www.komoot.com/tour/latest/embed',
         url: 'https://www.komoot.com/tour/latest',
+        height: 440,
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
@@ -176,6 +184,7 @@ describe('komootResolveEmbed', () => {
         provider: 'komoot',
         id: '2011745032',
         src: 'https://www.komoot.com/tour/2011745032/embed?share_token=aBTJUZkJPE0Q0fxRFmoCr1AfWEChEEtXO4Bm57ZbsAKrVDvgb8',
+        height: 440,
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
@@ -188,6 +197,7 @@ describe('komootResolveEmbed', () => {
         id: '727321743',
         src: 'https://www.komoot.com/tour/727321743/embed',
         url: 'https://www.komoot.com/tour/727321743',
+        height: 440,
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
@@ -200,6 +210,7 @@ describe('komootResolveEmbed', () => {
         id: '727321743',
         src: 'https://www.komoot.com/tour/727321743/embed',
         url: 'https://www.komoot.com/tour/727321743',
+        height: 440,
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)
@@ -212,6 +223,7 @@ describe('komootResolveEmbed', () => {
         id: '14022454',
         src: 'https://www.komoot.com/tour/14022454/embed',
         url: 'https://www.komoot.com/tour/14022454',
+        height: 440,
       }
 
       expect(komootResolveEmbed(value)).toEqual(expected)

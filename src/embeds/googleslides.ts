@@ -11,6 +11,8 @@ const deckRoutes = new Set(['edit', 'embed', 'preview', 'pub', 'pubembed'])
 // position. `start` autoplays the deck, which is the reader's call, so it goes with the trackers.
 const deckParams = ['loop', 'delayms', 'slide']
 
+const deckRatio = '480/299'
+
 // A share link can write its slide in the fragment, beside flags for the toolbar and where the
 // file was opened from. Only the slide the deck opens on is kept.
 const readDeckFragment = (parsed: URL): string => {
@@ -46,6 +48,7 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
       id: fileId,
       src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(parsed)}`,
       url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
+      ratio: deckRatio,
     }
   }
 
@@ -74,6 +77,7 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
     id: deckId,
     src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(parsed)}`,
     url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
+    ratio: deckRatio,
   }
 }
 

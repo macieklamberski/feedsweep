@@ -55,6 +55,7 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
     // `embed-host` is what makes the route serve a player at all, not a reader's preference.
     src: `https://${figmaEmbedHost}/${path}${composeQuery({ ...params, ...layout, 'embed-host': 'share' })}`,
     url: `https://www.${figmaHost}/${path}${composeQuery(params)}`,
+    ratio: '16/9',
   }
 }
 

@@ -48,6 +48,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-description="Caption text about the thing."
         data-embed-author="PageName"
         data-embed-date="Tuesday, 3 June 2026"
+        data-embed-height="646"
       ></div>
     `
 
@@ -91,6 +92,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/PageName/posts/123"
         data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
+        data-embed-height="646"
       ></div>
       <p>Closing line.</p>
     `
@@ -186,12 +188,14 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/PageName/posts/123"
         data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
+        data-embed-height="646"
       ></div>
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
         data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
+        data-embed-height="646"
       ></div>
     `
 
@@ -390,6 +394,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-id="https://www.facebook.com/example/posts/10150000000000001"
         data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fexample%2Fposts%2F10150000000000001"
         data-embed-url="https://www.facebook.com/example/posts/10150000000000001"
+        data-embed-height="646"
       ></div>
     `
 

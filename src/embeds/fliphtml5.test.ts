@@ -18,6 +18,7 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/mzsro/jvuq/',
         url: 'https://online.fliphtml5.com/mzsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -31,6 +32,7 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/mzsro/jvuq/',
         url: 'https://online.fliphtml5.com/mzsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -44,6 +46,7 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/mnzqa/bbjl/#p=1',
         url: 'https://online.fliphtml5.com/mnzqa/bbjl/',
         thumbnail: 'https://online.fliphtml5.com/mnzqa/bbjl/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -57,6 +60,7 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/mzsro/jvuq/#p=1',
         url: 'https://online.fliphtml5.com/mzsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -70,6 +74,7 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/mzsro/jvuq/',
         url: 'https://online.fliphtml5.com/mzsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -83,6 +88,7 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/revku/JUNIO-2026-EDICION-224/',
         url: 'https://online.fliphtml5.com/revku/JUNIO-2026-EDICION-224/',
         thumbnail: 'https://online.fliphtml5.com/revku/JUNIO-2026-EDICION-224/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -96,6 +102,7 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/ActuSF/wgas/',
         url: 'https://online.fliphtml5.com/ActuSF/wgas/',
         thumbnail: 'https://online.fliphtml5.com/ActuSF/wgas/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -109,6 +116,7 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/revku/MARZO_2026_EDICION_221/',
         url: 'https://online.fliphtml5.com/revku/MARZO_2026_EDICION_221/',
         thumbnail: 'https://online.fliphtml5.com/revku/MARZO_2026_EDICION_221/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -142,6 +150,7 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/mz%2Fsro/jvuq/',
         url: 'https://online.fliphtml5.com/mz%2Fsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mz%2Fsro/jvuq/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -155,6 +164,7 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/mzsro/jv%2Fuq/',
         url: 'https://online.fliphtml5.com/mzsro/jv%2Fuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jv%2Fuq/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -207,7 +217,7 @@ describeForEachParser('fliphtml5LightBoxEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, fliphtml5LightBoxEmbedResolver)
 
   describe('happy paths', () => {
-    it('should open the book the cover links to in the box the snippet declares', async () => {
+    it('should open the book the cover links to in the viewer ratio over the declared box', async () => {
       const value = html`
         <img
           data-height="600"
@@ -225,8 +235,7 @@ describeForEachParser('fliphtml5LightBoxEmbedResolver', (parseHtml) => {
         src: 'https://online.fliphtml5.com/nasgwb/smle/',
         url: 'https://online.fliphtml5.com/nasgwb/smle/',
         thumbnail: 'https://online.fliphtml5.com/nasgwb/smle/files/shot.jpg',
-        width: 800,
-        height: 600,
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -258,30 +267,7 @@ describeForEachParser('fliphtml5LightBoxEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should read a box the snippet declares other than the default', async () => {
-      const value = html`
-        <img
-          data-height="480"
-          data-href="https://online.fliphtml5.com/nasgwb/smle/"
-          data-rel="fh5-light-box-demo"
-          data-width="640"
-          src="https://online.fliphtml5.com/nasgwb/smle/files/shot.jpg"
-        />
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'fliphtml5',
-        id: 'nasgwb/smle',
-        src: 'https://online.fliphtml5.com/nasgwb/smle/',
-        url: 'https://online.fliphtml5.com/nasgwb/smle/',
-        thumbnail: 'https://online.fliphtml5.com/nasgwb/smle/files/shot.jpg',
-        width: 640,
-        height: 480,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should open the frame the script opens when the snippet declares no box', async () => {
+    it('should open the book in the viewer ratio over the cover image box', async () => {
       const value = html`
         <img
           data-href="https://online.fliphtml5.com/nasgwb/smle/"
@@ -296,8 +282,7 @@ describeForEachParser('fliphtml5LightBoxEmbedResolver', (parseHtml) => {
         src: 'https://online.fliphtml5.com/nasgwb/smle/',
         url: 'https://online.fliphtml5.com/nasgwb/smle/',
         thumbnail: 'https://online.fliphtml5.com/nasgwb/smle/files/shot.jpg',
-        width: 800,
-        height: 600,
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -326,6 +311,7 @@ describeForEachParser('fliphtml5 enclosures', (parseHtml) => {
         data-embed-url="https://online.fliphtml5.com/mzsro/jvuq/"
         data-embed-thumbnail="https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg"
         data-enclosure=""
+        data-embed-ratio="4/3"
       ></div>
       <p>Body</p>
     `

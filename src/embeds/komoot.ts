@@ -56,6 +56,7 @@ export const komootResolveEmbed: ResolveEmbed = (url) => {
     provider: 'komoot',
     id: resource.id,
     src: `https://www.komoot.com/${resource.path}/embed${composeQuery(params)}`,
+    height: 440,
   }
 
   // A share token grants access to a tour, so it stays in the src and is not copied into a url.

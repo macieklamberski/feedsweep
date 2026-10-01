@@ -1,6 +1,6 @@
 import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, flashVar, parseRatio } from '../utils/dom.js'
+import { attr, flashVar } from '../utils/dom.js'
 import {
   composeQuery,
   encodePathSegment,
@@ -21,11 +21,6 @@ const documentIdMarkers = ['embeds', 'document', 'doc']
 
 const flashPlayerPathRegex = /\/scribdviewer\.swf$/i
 
-// The snippet states `height="500"` whatever the document's real shape is, which is why
-// third-party wrappers re-wrap it in a container with a computed padding. The iframe carries
-// the truth beside the wrong number, as a bare decimal width over height.
-const aspectRatioAttribute = 'data-aspect-ratio'
-
 // A private document opens only with its `access_key`, and `start_page` is where reading starts.
 const playerParams = ['access_key', 'start_page']
 
@@ -42,6 +37,7 @@ const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
     src: `https://www.scribd.com/embeds/${segment}/content${composeQuery(params)}`,
     // The document page takes no key, so a private document gets no page url.
     url: params.access_key ? undefined : `https://www.scribd.com/document/${segment}`,
+    height: 600,
   }
 }
 
@@ -74,17 +70,10 @@ export const scribdResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const title = attr(element, 'title')
-  const result = { ...composeEmbed(document, parsed.search), title }
-  const ratio = parseRatio(attr(element, aspectRatioAttribute) ?? '')
-
-  // The ratio describes the document and the declared height is a constant, so where both are
-  // present the ratio wins. Where the snippet states no ratio, stating none here hands the
-  // question back to the factory, and the declared size is all there is.
-  return ratio ? { ...result, ratio } : result
+  return { ...composeEmbed(document, parsed.search), title: attr(element, 'title') }
 }
 
-// Scribd's player iframe, /embeds/{id}/content, declared 500 tall whatever the document's shape.
+// Scribd's player iframe, /embeds/{id}/content.
 export const scribdIframeEmbedResolver = createUrlEmbedResolver(scribdHosts, scribdResolveEmbed, {
   preferResolverSize: true,
 })

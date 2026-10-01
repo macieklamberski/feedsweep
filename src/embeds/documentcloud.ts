@@ -1,6 +1,10 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
+import type { EmbedRenderHint } from '../types.js'
+import { readPixels } from '../utils/hints.js'
 import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'documentcloud'
 
 const legacyHosts = ['www.documentcloud.org']
 
@@ -47,7 +51,7 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
     const [, id, part, number] = partMatch
 
     return {
-      provider: 'documentcloud',
+      provider,
       id: `${id}/${part}/${number}`,
       src,
     }
@@ -68,9 +72,23 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
   }
 
   return {
-    provider: 'documentcloud',
+    provider,
     id,
     src,
     thumbnail: `https://s3.documentcloud.org/documents/${id}/pages/${slug}-p1-normal.gif`,
+    ratio: '17/22',
   }
 })
+
+// A page or note embed posts its rendered height unasked, as `{ width, height, href }`. The
+// document viewer posts nothing.
+export const readDocumentcloudHeight = (data: unknown): number | undefined => {
+  return isPlainObject(data) ? readPixels(data.height) : undefined
+}
+
+export const documentcloudRenderHint: EmbedRenderHint = {
+  provider,
+  // Spelled out: a legacy `www.` note 301s to the embed host, so every message arrives from here.
+  origin: 'https://embed.documentcloud.org',
+  readHeight: readDocumentcloudHeight,
+}
