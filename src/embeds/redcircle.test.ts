@@ -32,7 +32,7 @@ describe('redcircleResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'redcircle',
         id: 'show/7bc4f231-9280-445a-a62b-b5727083ddca',
-        src: 'https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca?theme=light',
+        src: 'https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca',
         url: 'https://redcircle.com/shows/7bc4f231-9280-445a-a62b-b5727083ddca',
         height: 320,
       }
@@ -40,13 +40,13 @@ describe('redcircleResolveEmbed', () => {
       expect(redcircleResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the show webplayer url as written', () => {
+    it('should drop the theme from the show webplayer', () => {
       const value =
         'https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca?theme=dark'
       const expected: EmbedResolverResult = {
         provider: 'redcircle',
         id: 'show/7bc4f231-9280-445a-a62b-b5727083ddca',
-        src: value,
+        src: 'https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca',
         url: 'https://redcircle.com/shows/7bc4f231-9280-445a-a62b-b5727083ddca',
         height: 320,
       }
@@ -54,15 +54,13 @@ describe('redcircleResolveEmbed', () => {
       expect(redcircleResolveEmbed(value)).toEqual(expected)
     })
 
-    // The theme is picked per embed, so it is the one thing the query says about which player
-    // this is; anything beside it would be forced on every consumer of the feed.
-    it('should keep the theme and drop the rest of the show query', () => {
+    it('should drop the theme and the rest of the show query', () => {
       const value =
         'https://api.podcache.net/embedded-show-player/sh/7bc4f231-9280-445a-a62b-b5727083ddca?theme=dark&utm_source=newsletter&rc_share=1'
       const expected: EmbedResolverResult = {
         provider: 'redcircle',
         id: 'show/7bc4f231-9280-445a-a62b-b5727083ddca',
-        src: 'https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca?theme=dark',
+        src: 'https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca',
         url: 'https://redcircle.com/shows/7bc4f231-9280-445a-a62b-b5727083ddca',
         height: 320,
       }
@@ -92,14 +90,43 @@ describe('redcircleResolveEmbed', () => {
       expect(redcircleResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id that is not a uuid', () => {
-      const value = 'https://redcircle.com/embedded-player/sh/my-show/ep/latest'
+    it('should use a malformed episode id as written, even if the player answers an error', () => {
+      const value =
+        'https://redcircle.com/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/latest'
+      const expected: EmbedResolverResult = {
+        provider: 'redcircle',
+        id: 'episode/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/latest',
+        src: 'https://redcircle.com/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/latest',
+        url: 'https://redcircle.com/shows/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/episodes/latest',
+        height: 170,
+      }
+
+      expect(redcircleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should use a malformed show id as written, even if the player answers an error', () => {
+      const value = 'https://redcircle.com/embedded-show-webplayer/my-show'
+      const expected: EmbedResolverResult = {
+        provider: 'redcircle',
+        id: 'show/my-show',
+        src: 'https://redcircle.com/embedded-show-webplayer/my-show',
+        url: 'https://redcircle.com/shows/my-show',
+        height: 320,
+      }
+
+      expect(redcircleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should return undefined for the player path under a route that is not a player', () => {
+      const value =
+        'https://redcircle.com/embedded-podcast/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5'
 
       expect(redcircleResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for a show id that is not a uuid', () => {
-      const value = 'https://redcircle.com/embedded-show-webplayer/my-show'
+    it('should return undefined for an episode player missing the sh marker', () => {
+      const value =
+        'https://redcircle.com/embedded-player/show/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5'
 
       expect(redcircleResolveEmbed(value)).toBeUndefined()
     })
@@ -155,7 +182,7 @@ describeForEachParser('redcircleScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'redcircle',
         id: 'show/7bc4f231-9280-445a-a62b-b5727083ddca',
-        src: 'https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca?theme=light',
+        src: 'https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca',
         url: 'https://redcircle.com/shows/7bc4f231-9280-445a-a62b-b5727083ddca',
         height: 320,
       }
@@ -166,8 +193,11 @@ describeForEachParser('redcircleScriptEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<script src="https://evil.test/api.podcache.net/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5"></script>'
+      const value = html`
+        <script
+          src="https://evil.test/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5?podcache.net/embedded-"
+        ></script>
+      `
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -196,9 +226,8 @@ describeForEachParser('redcircleIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  // 170 is what the loader states, and a publisher who framed the player in a box of their own
-  // outranks it. Narrowing the query leaves that untouched.
-  it('should take the size the carrier states over the player height', async () => {
+  // 170 is what the loader states, and the carrier's box is not read.
+  it('should keep the player height over the size the carrier states', async () => {
     const value = html`
       <iframe
         src="https://redcircle.com/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5?utm_source=rss"
@@ -211,8 +240,7 @@ describeForEachParser('redcircleIframeEmbedResolver', (parseHtml) => {
       id: 'episode/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/cb6cd735-0017-48dd-b387-ecc8a20818e5',
       src: 'https://redcircle.com/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5',
       url: 'https://redcircle.com/shows/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/episodes/cb6cd735-0017-48dd-b387-ecc8a20818e5',
-      width: 640,
-      height: 200,
+      height: 170,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -247,7 +275,7 @@ describeForEachParser('redcircle through the pipeline', (parseHtml) => {
       <div
         data-embed-id="show/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-provider="redcircle"
-        data-embed-src="https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca?theme=light"
+        data-embed-src="https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-url="https://redcircle.com/shows/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-height="320"
       ></div>
@@ -268,7 +296,7 @@ describeForEachParser('redcircle through the pipeline', (parseHtml) => {
       <div
         data-embed-id="show/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-provider="redcircle"
-        data-embed-src="https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca?theme=light"
+        data-embed-src="https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-url="https://redcircle.com/shows/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-height="320"
       ></div>

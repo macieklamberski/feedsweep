@@ -73,9 +73,33 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should keep a 0x0 image whose raster src carries a query', async () => {
+      const value = html`
+        <img src="https://img.cdn.example.com/abc.jpg?w=800" width="0" height="0">
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a 0x0 image whose raster src carries a fragment', async () => {
+      const value = html`
+        <img src="https://img.cdn.example.com/abc.jpg#main" width="0" height="0">
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should keep a 0x0 image whose src carries a raster format query', async () => {
       const value = html`
         <img src="https://img.cdn.example.com/abc?width=1300&format=jpeg" width="0" height="0">
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a 0x0 image whose raster format query comes first', async () => {
+      const value = html`
+        <img src="https://img.cdn.example.com/abc?format=png" width="0" height="0">
       `
 
       expect(await transform(value)).toEqualHtml(value)

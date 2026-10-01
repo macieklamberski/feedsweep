@@ -44,7 +44,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
         data-embed-height="166"
         data-embed-id="tracks/2386923495"
         data-embed-provider="soundcloud"
-        data-embed-src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F2386923495"
+        data-embed-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2386923495"
       ></div>
       <p>Episode notes</p>
     `
@@ -266,7 +266,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
   })
 
   // A placeholder built from an enclosure carries its urls on the same terms as one built from
-  // the markup: every url resolved, and the canonical one cleaned.
+  // the markup: every url resolved, the canonical one cleaned, and a listed provider's src cleaned.
   describe('placeholder fields', () => {
     const exampleResolver: EmbedResolver = {
       kind: 'embed',
@@ -321,6 +321,29 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           data-embed-src="https://example.com/e/x"
           data-embed-provider="example"
           data-embed-url="https://example.com/watch/x"
+          data-enclosure=""
+        ></div>
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should clean the src with the provided cleanUrlFn', async () => {
+      const value = '<p>Content</p>'
+      const trackedResolver: EmbedResolver = {
+        ...exampleResolver,
+        extract: () => ({ provider: 'example', src: 'https://example.com/e/x?utm_source=feed' }),
+      }
+      const context: TransformContext = {
+        ...withExampleResolver([{ url: 'https://example.com/e/x', medium: 'video' }]),
+        widgetResolvers: [trackedResolver],
+        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+      }
+      const expected = html`
+        <div
+          data-embed-src="https://example.com/e/x"
+          data-embed-provider="example"
           data-enclosure=""
         ></div>
         <p>Content</p>
@@ -1000,7 +1023,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
   // Untrusted feed data doesn't honor the required-`url` type.
   it('should skip an enclosure without a url instead of throwing', async () => {
     const value = '<p>Episode notes</p>'
-    const result = await transform(value, withEnclosures([{ type: 'image/png' } as Enclosure]))
+    const result = await transform(value, withEnclosures([{ type: 'image/png' }]))
 
     expect(result).toEqualHtml(value)
   })
@@ -1008,7 +1031,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
   it('should skip a malformed enclosure while still injecting valid ones', async () => {
     const value = '<p>Episode notes</p>'
     const context = withEnclosures([
-      { type: 'image/png' } as Enclosure,
+      { type: 'image/png' },
       { url: 'https://example.com/episode.mp3', type: 'audio/mpeg' },
     ])
     const expected = html`

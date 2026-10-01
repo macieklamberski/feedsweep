@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   readRedditHeight,
   redditIframeEmbedResolver,
   redditResolveEmbed,
+  redditS9eEmbedResolver,
   redditWidgetEmbedResolver,
 } from './reddit.js'
 
@@ -34,7 +36,6 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/',
-        height: 500,
         title: 'Birdwatching Rising Poster',
         author: 'u/sample_reader',
         publisher: 'r/Birdwatching',
@@ -43,7 +44,9 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the height the dialog states as an attribute', async () => {
+    // The frame posts its height, and `data-embed-height` is the carrier's, which shallow handling
+    // does not read.
+    it('should state no size over the height the dialog states as an attribute', async () => {
       const value = html`
         <blockquote
           class="reddit-embed-bq"
@@ -57,7 +60,6 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'r/pics/comments/dq4m1v',
         src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
         url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
-        height: 740,
         title: 'My dog',
         publisher: 'r/pics',
       }
@@ -134,7 +136,6 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
         id: 'user/photo_poster/comments/hj7k2p',
         src: 'https://embed.reddit.com/user/photo_poster/comments/hj7k2p/',
         url: 'https://www.reddit.com/user/photo_poster/comments/hj7k2p/',
-        height: 500,
         title: 'Everything in balance',
         author: 'u/photo_poster',
         publisher: 'u/photo_poster',
@@ -277,6 +278,107 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('the byline naming the author', () => {
+    it('should state no author when the only account link is the profile post itself', async () => {
+      const value = html`
+        <blockquote class="reddit-embed-bq">
+          <a href="https://www.reddit.com/user/photo_poster/comments/hj7k2p/a_long_exposure_test/">Everything in balance</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'user/photo_poster/comments/hj7k2p',
+        src: 'https://embed.reddit.com/user/photo_poster/comments/hj7k2p/',
+        url: 'https://www.reddit.com/user/photo_poster/comments/hj7k2p/',
+        title: 'Everything in balance',
+        publisher: 'u/photo_poster',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state no author when the byline links the profile root with no name', async () => {
+      const value = html`
+        <blockquote class="reddit-embed-bq">
+          <a href="https://www.reddit.com/r/pics/comments/dq4m1v/my_garden/">My dog</a>
+          by
+          <a href="https://www.reddit.com/user/">u/</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/pics/comments/dq4m1v',
+        src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
+        url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
+        title: 'My dog',
+        publisher: 'r/pics',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use an author name as written', async () => {
+      const value = html`
+        <blockquote class="reddit-embed-bq">
+          <a href="https://www.reddit.com/r/pics/comments/dq4m1v/my_garden/">My dog</a>
+          by
+          <a href="https://www.reddit.com/user/some.one/">u/some.one</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/pics/comments/dq4m1v',
+        src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
+        url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
+        title: 'My dog',
+        author: 'u/some.one',
+        publisher: 'r/pics',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state no author when the byline names a deleted account unencoded', async () => {
+      const value = html`
+        <blockquote class="reddit-embed-bq">
+          <a href="https://www.reddit.com/r/pics/comments/dq4m1v/my_garden/">My dog</a>
+          by
+          <a href="https://www.reddit.com/user/[deleted]/">u/[deleted]</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/pics/comments/dq4m1v',
+        src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
+        url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
+        title: 'My dog',
+        publisher: 'r/pics',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state no author when the byline names a deleted account', async () => {
+      const value = html`
+        <blockquote class="reddit-embed-bq">
+          <a href="https://www.reddit.com/r/pics/comments/dq4m1v/my_garden/">My dog</a>
+          by
+          <a href="https://www.reddit.com/user/%5Bdeleted%5D/">u/[deleted]</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/pics/comments/dq4m1v',
+        src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/',
+        url: 'https://www.reddit.com/r/pics/comments/dq4m1v/',
+        title: 'My dog',
+        publisher: 'r/pics',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   describe('sad paths', () => {
     it('should return undefined for a widget naming only an account', async () => {
       const value = html`
@@ -308,14 +410,22 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a post id outside the base36 alphabet', async () => {
+    it('should use a malformed post id as written, even if the player answers an error', async () => {
       const value = html`
         <blockquote class="reddit-embed-bq">
           <a href="https://www.reddit.com/r/pics/comments/..%2Fevil/my_garden/">My dog</a>
         </blockquote>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/pics/comments/..%2Fevil',
+        src: 'https://embed.reddit.com/r/pics/comments/..%2Fevil/',
+        url: 'https://www.reddit.com/r/pics/comments/..%2Fevil/',
+        title: 'My dog',
+        publisher: 'r/pics',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for another host carrying the permalink path', async () => {
@@ -415,10 +525,55 @@ describe('redditResolveEmbed', () => {
     expect(redditResolveEmbed(value)).toBeUndefined()
   })
 
-  it('should ignore a comment id outside the base36 alphabet', () => {
-    const value = 'https://www.reddit.com/r/pics/comments/dq4m1v/my_garden/..%2Fevil/'
+  it('should ignore a permalink under a scope that is neither a subreddit nor an account', () => {
+    const value = 'https://www.reddit.com/x/pics/comments/dq4m1v/my_garden/'
 
     expect(redditResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should ignore a subreddit route naming no subreddit', () => {
+    const value = 'https://www.reddit.com/r/'
+
+    expect(redditResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should use a malformed subreddit name as written, even if the player answers an error', () => {
+    const value = 'https://www.reddit.com/r/pics%2F..%2Fadmin/comments/dq4m1v/my_garden/'
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'r/pics%2F..%2Fadmin/comments/dq4m1v',
+      src: 'https://embed.reddit.com/r/pics%2F..%2Fadmin/comments/dq4m1v/',
+      url: 'https://www.reddit.com/r/pics%2F..%2Fadmin/comments/dq4m1v/',
+      publisher: 'r/pics%2F..%2Fadmin',
+    }
+
+    expect(redditResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should use a malformed post id as written, even if the player answers an error', () => {
+    const value = 'https://www.reddit.com/r/pics/comments/dq4m1v%2Fevil/my_garden/'
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'r/pics/comments/dq4m1v%2Fevil',
+      src: 'https://embed.reddit.com/r/pics/comments/dq4m1v%2Fevil/',
+      url: 'https://www.reddit.com/r/pics/comments/dq4m1v%2Fevil/',
+      publisher: 'r/pics',
+    }
+
+    expect(redditResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should use a malformed comment id as written, even if the player answers an error', () => {
+    const value = 'https://www.reddit.com/r/pics/comments/dq4m1v/my_garden/..%2Fevil/'
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'r/pics/comments/dq4m1v/comment/..%2Fevil',
+      src: 'https://embed.reddit.com/r/pics/comments/dq4m1v/comment/..%2Fevil/',
+      url: 'https://www.reddit.com/r/pics/comments/dq4m1v/comment/..%2Fevil/',
+      publisher: 'r/pics',
+    }
+
+    expect(redditResolveEmbed(value)).toEqual(expected)
   })
 
   it('should ignore the media host serving a post its attachments', () => {
@@ -454,8 +609,6 @@ describeForEachParser('redditIframeEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/',
-        width: 640,
-        height: 500,
         publisher: 'r/Birdwatching',
       }
 
@@ -476,7 +629,6 @@ describeForEachParser('redditIframeEmbedResolver', (parseHtml) => {
         id: 'r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz',
         src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
         url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/comment/wq8t4nz/',
-        height: 316,
         publisher: 'r/Birdwatching',
       }
 
@@ -488,6 +640,90 @@ describeForEachParser('redditIframeEmbedResolver', (parseHtml) => {
     const value = '<iframe src="https://evil.test/r/pics/comments/dq4m1v/my_garden/"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
+  })
+})
+
+describeForEachParser('redditS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, redditS9eEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the post out of the helper frame', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="reddit"
+          src="https://s9e.github.io/iframe/2/reddit.min.html#UFOs/comments/1ud4vfe#theme=light"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/UFOs/comments/1ud4vfe',
+        src: 'https://embed.reddit.com/r/UFOs/comments/1ud4vfe/',
+        url: 'https://www.reddit.com/r/UFOs/comments/1ud4vfe/',
+        publisher: 'r/UFOs',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host carrying the helper path', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="reddit"
+          src="https://evil.test/iframe/2/reddit.min.html#UFOs/comments/1ud4vfe"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should resolve dot segments in the fragment as a browser does', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="reddit"
+          src="https://s9e.github.io/iframe/2/reddit.min.html#x/../../../r/other/comments/abc12"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/other/comments/abc12',
+        src: 'https://embed.reddit.com/r/other/comments/abc12/',
+        url: 'https://www.reddit.com/r/other/comments/abc12/',
+        publisher: 'r/other',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+// redditmedia.com is listed for its legacy player frame, and its g. subdomain serves the files
+// a post attaches.
+describeForEachParser('reddit through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a redditmedia image enclosure an image', async () => {
+    const enclosures = [
+      { url: 'https://g.redditmedia.com/f1cqmjhrnoshoediji58x/poster.jpg', type: 'image/jpeg' },
+    ]
+    const expected = html`
+      <img
+        data-enclosure=""
+        src="https://g.redditmedia.com/f1cqmjhrnoshoediji58x/poster.jpg"
+      >
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
 

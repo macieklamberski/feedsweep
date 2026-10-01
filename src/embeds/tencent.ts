@@ -1,10 +1,8 @@
-import type { ResolveEmbed } from '../types.js'
-import { keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// A Tencent Video id is a run of lowercase letters and digits, eleven characters in the wild.
-const safeVideoIdRegex = /^[a-z0-9]+$/
+const provider = 'tencent'
 
 // A vid of cover is an unfilled snippet's route word, and it mints a grey poster and a dead link.
 // The word is Tencent's own, from `v.qq.com/x/cover/{cid}/{vid}.html`.
@@ -30,13 +28,18 @@ const readVideoId = (url: string): string | undefined => {
     return
   }
 
-  const videoId = keepIfMatches(parsed.searchParams.get('vid'), safeVideoIdRegex)
+  const videoId = parsed.searchParams.get('vid')
 
-  return videoId && !nonVideoWords.has(videoId) ? videoId : undefined
+  // Tencent serves video on the player host, so a file name in vid is an enclosure.
+  if (!videoId || isFileName(videoId) || nonVideoWords.has(videoId)) {
+    return
+  }
+
+  return videoId
 }
 
 // Tencent Video's player iframe and the dead Flash TPout.swf carrier, both naming the video in vid.
-export const tencentResolveEmbed: ResolveEmbed = (url) => {
+const tencentResolveEmbed: ResolveEmbed = (url) => {
   const videoId = readVideoId(url)
 
   if (!videoId) {
@@ -44,7 +47,7 @@ export const tencentResolveEmbed: ResolveEmbed = (url) => {
   }
 
   return {
-    provider: 'tencent',
+    provider,
     id: videoId,
     src: `https://v.qq.com/txp/iframe/player.html?vid=${videoId}`,
     url: `https://v.qq.com/x/page/${videoId}.html`,
@@ -56,6 +59,10 @@ export const tencentResolveEmbed: ResolveEmbed = (url) => {
   }
 }
 
-export const tencentEmbedResolver = createUrlEmbedResolver(tencentHosts, tencentResolveEmbed, {
-  preferResolverSize: true,
-})
+export const tencentEmbedResolver = createUrlEmbedResolver(tencentHosts, tencentResolveEmbed)
+
+// The player reads a boolean setting as the string `true`, so `autoplay=1` stays paused.
+export const tencentRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoplay: 'true' },
+}

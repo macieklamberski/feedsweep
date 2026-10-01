@@ -9,7 +9,7 @@ const configRegex = /podlovePlayerCache\.add\(\s*(\[[\s\S]*?\])\s*\)/
 // Podlove offers the same episode in several formats and the order is the publisher's, not a
 // ranking. Safari plays neither ogg nor opus, so a config that lists those first would hand
 // some readers a file they cannot play while an mp3 sat second in the same array.
-const preferredMimeTypes = ['audio/mpeg', 'audio/mp3', 'audio/mp4']
+const preferredMimeTypes = ['audio/mpeg', 'audio/mp4']
 
 // The config also carries episode and show posters, which an <audio> has no attribute for.
 type PodloveConfig = Array<{
@@ -48,7 +48,6 @@ export const podloveMediaResolver: MediaResolver = {
       (audio): audio is { url: string; mimeType: string } =>
         audio.url !== undefined && audio.mimeType?.startsWith('audio/') === true,
     )
-    // The config's order is the publisher's, not a ranking, and Safari plays neither ogg nor opus.
     const file = files?.find((audio) => isAnyOf(audio.mimeType, preferredMimeTypes)) ?? files?.[0]
     const source = file?.url
 

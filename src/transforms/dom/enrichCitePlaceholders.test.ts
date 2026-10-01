@@ -259,7 +259,9 @@ describeForEachParser('enrichCitePlaceholders', (parseHtml) => {
       throw new Error('boom')
     }
 
-    await expect(transform(value, withFn(fn))).rejects.toThrow('boom')
+    const throwing = () => transform(value, withFn(fn))
+
+    await expect(throwing()).rejects.toThrow('boom')
   })
 
   // The answer is positional, so nothing found for a placeholder is an undefined in its slot.

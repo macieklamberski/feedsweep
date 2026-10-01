@@ -82,6 +82,32 @@ describe('extractFiresideToken', () => {
     expect(extractFiresideToken(value)).toBeUndefined()
   })
 
+  it('should return undefined for a version segment with a leading prefix', () => {
+    const value = 'https://player.fireside.fm/xv3/N8LaNbQY+MI2PkJ2g'
+
+    expect(extractFiresideToken(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a version segment with a trailing suffix', () => {
+    const value = 'https://player.fireside.fm/v3x/N8LaNbQY+MI2PkJ2g'
+
+    expect(extractFiresideToken(value)).toBeUndefined()
+  })
+
+  it('should use a malformed token opening with an encoded slash as written, even if the player answers an error', () => {
+    const value = 'https://player.fireside.fm/v3/x%2FN8LaNbQY+MI2PkJ2g'
+    const expected = { version: 'v3', token: 'x/N8LaNbQY+MI2PkJ2g' }
+
+    expect(extractFiresideToken(value)).toEqual(expected)
+  })
+
+  it('should use a malformed token closing with an encoded slash as written, even if the player answers an error', () => {
+    const value = 'https://player.fireside.fm/v3/N8LaNbQY+MI2PkJ2g%2Fx'
+    const expected = { version: 'v3', token: 'N8LaNbQY+MI2PkJ2g/x' }
+
+    expect(extractFiresideToken(value)).toEqual(expected)
+  })
+
   it('should return undefined for a token of the wrong shape', () => {
     const value = 'https://fireside.fm/player/v2/onlyoneside'
 
@@ -207,9 +233,8 @@ describeForEachParser('firesideEmbedResolver', (parseHtml) => {
   })
 
   describe('the size a publisher states', () => {
-    // Every corpus iframe states 200, which is where the resolver's height came from, but the
-    // box a publisher chose for the player they embedded still outranks it.
-    it('should let the carrier height win over the stated one', async () => {
+    // Every corpus iframe states 200, which is where the resolver's height came from.
+    it('should keep the stated height over the carrier height', async () => {
       const value = html`
         <iframe
           src="https://player.fireside.fm/v3/I-2by1pi+kf-gXAOz"
@@ -221,7 +246,7 @@ describeForEachParser('firesideEmbedResolver', (parseHtml) => {
         provider: 'fireside',
         id: 'I-2by1pi+kf-gXAOz',
         src: 'https://player.fireside.fm/v3/I-2by1pi+kf-gXAOz',
-        height: 180,
+        height: 200,
       }
 
       expect(await extract(value)).toEqual(expected)

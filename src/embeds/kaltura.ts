@@ -1,25 +1,29 @@
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { attr } from '../utils/dom.js'
+import { composeQuery, encodePathSegment, filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'kaltura'
 
-// An entry id is a namespace counter, an underscore and lowercase letters or digits,
-// `1_w0bwzism`. The shape is what makes it safe to mint into the thumbnail path. Neither half
-// carries a width, because that would refuse the next id space.
-const safeEntryIdRegex = /^\d+_[a-z0-9]+$/
-const partnerPathRegex = /^\/p\/(\d+)\//
+const partnerPathRegex = /^\/p\/([^/]+)\//
 
 const kalturaHost = 'kaltura.com'
 
-// The SaaS hosts all serve the thumbnail route from `cdnapisec.kaltura.com`; a regional API
-// host (`api.ca.kaltura.com`) serves it only itself, so the carrier's host is kept there.
+// The SaaS hosts all serve the player and the thumbnail from `cdnapisec.kaltura.com`; a regional
+// API host (`api.ca.kaltura.com`) serves them only itself, so the carrier's host is kept there.
 const saasHosts = new Set(['kaltura.com', 'www.kaltura.com', 'cdnapi.kaltura.com'])
 
-// The parameters the auto-embed script takes for itself: the div it writes into and the box it
-// gives the iframe. The player options in `flashvars[…]` travel with the rebuilt url.
-const scriptOnlyParams = ['autoembed', 'playerId', 'cache_st', 'width', 'height']
+// The clip's start and end, as the embedIframeJs player and the embedPlaykitJs player read them.
+const playbackParams = [
+  'flashvars[mediaProxy.mediaPlayFrom]',
+  'flashvars[mediaProxy.mediaPlayTo]',
+  'kalturaSeekFrom',
+  'kalturaClipTo',
+]
+
+// The session token an access-controlled entry plays with. It stays in `src` as written, and an
+// entry that needs it gets no thumbnail, since the poster would need it too.
+const tokenParam = 'flashvars[ks]'
 
 type Entry = {
   partner: string
@@ -30,22 +34,35 @@ type Entry = {
 const readEntry = (url: string | undefined): Entry | undefined => {
   const parsed = parseUrlOnHosts(url, kalturaHost)
   const partner = parsed?.pathname.match(partnerPathRegex)?.[1]
-  const entryId = keepIfMatches(parsed?.searchParams.get('entry_id'), safeEntryIdRegex)
+  const entryId = parsed?.searchParams.get('entry_id')
 
   return parsed && partner && entryId ? { partner, entryId, parsed } : undefined
 }
 
-const composeEmbed = ({ partner, entryId, parsed }: Entry, src: string): EmbedResolverResult => {
-  // A regional host serves its thumbnails itself, so the carrier's host is kept there.
-  const thumbnailHost = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
+// The player path names the partner and the player config. Without `iframeembed=true` the same
+// route answers the auto-embed script, not a player.
+const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult => {
+  const host = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
+  const query = composeQuery({ iframeembed: 'true', entry_id: entryId })
+  const hasToken = parsed.searchParams.has(tokenParam)
+  const kept = filterUrlQuery(
+    parsed,
+    (name) => name === tokenParam || playbackParams.includes(name),
+  )
+  const playback = kept.replace('?', '&')
+  // The entry comes out of the query decoded, and it goes into a path.
+  const entrySegment = encodePathSegment(entryId)
 
   return {
     provider,
     // Title and metadata sit behind a session key.
     id: `${partner}/${entryId}`,
-    src,
+    src: `https://${host}${parsed.pathname}${query}${playback}`,
     // The poster answers 200 `image/jpeg` for a real entry, 404 for an invented or a deleted one.
-    thumbnail: `https://${thumbnailHost}/p/${partner}/thumbnail/entry_id/${entryId}/width/640`,
+    thumbnail: hasToken
+      ? undefined
+      : `https://${host}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
+    ratio: '16/9',
   }
 }
 
@@ -56,7 +73,7 @@ export const kalturaResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  return { ...composeEmbed(entry, url), title: attr(element, 'title') }
+  return { ...composeEmbed(entry), title: attr(element, 'title') }
 }
 
 // Kaltura's embedIframeJs and embedPlaykitJs iframes, which render and only lack a poster.
@@ -75,20 +92,7 @@ export const kalturaScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const src = new URL(entry.parsed)
-    const width = parsePixelSize(src.searchParams.get('width'))
-    const height = parsePixelSize(src.searchParams.get('height'))
-
-    for (const name of scriptOnlyParams) {
-      src.searchParams.delete(name)
-    }
-
-    // The same url with `iframeembed=true` for `autoembed=true` is the iframe the script writes.
-    src.searchParams.set('iframeembed', 'true')
-
-    const result = composeEmbed(entry, src.toString())
-
-    return width && height ? { ...result, width, height } : result
+    return composeEmbed(entry)
   },
 )
 
