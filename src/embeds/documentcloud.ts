@@ -1,17 +1,18 @@
 import { getPathSegments, isHostOf, parseUrl } from 'trousse'
-import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const legacyHosts = ['www.documentcloud.org']
 
 const documentcloudHosts = ['embed.documentcloud.org', ...legacyHosts]
 
-const documentcloudEmbedParams = ['embed', 'fullscreen', 'mode', 'onlyshoworg', 'pdf', 'title']
-
 // s3.documentcloud.org serves the page image under the slug in the exact case the path spells it.
 const documentSegmentRegex = /^(\d+)-(.+?)(\.html)?$/
 const partPathRegex = /^\/documents\/(\d+)\/(annotations|pages)\/([^/]+)\/?$/
 const legacyNotePathRegex = /^\/documents\/(\d+)-[^/]+\/(annotations)\/([^/]+)\.html$/
+
+// The embed host renders every route as an embed, so the `embed=1` the dialog writes restates it.
+// See: https://github.com/MuckRock/documentcloud-frontend/blob/main/src/lib/utils/embed.ts.
+const embedBaseUrl = 'https://embed.documentcloud.org/documents'
 
 // DocumentCloud's viewer iframe, `embed.documentcloud.org/documents/{id}-{slug}/`, and the older
 // `www.documentcloud.org/documents/{id}-{slug}.html`, which redirects to it. The carrier `title`
@@ -24,7 +25,6 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
   }
 
   const isLegacyHost = isHostOf(url, legacyHosts)
-  const src = `${parsed.origin}${parsed.pathname}${pickUrlParams(url, documentcloudEmbedParams)}`
   const [route, documentSegment, partSegment] = getPathSegments(url)
 
   // A project id lands in the documents id space, so without this route check
@@ -49,7 +49,7 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
     return {
       provider: 'documentcloud',
       id: `${id}/${part}/${number}`,
-      src,
+      src: `${embedBaseUrl}/${id}/${part}/${number}/`,
     }
   }
 
@@ -70,7 +70,7 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
   return {
     provider: 'documentcloud',
     id,
-    src,
+    src: `${embedBaseUrl}/${id}-${slug}/`,
     thumbnail: `https://s3.documentcloud.org/documents/${id}/pages/${slug}-p1-normal.gif`,
   }
 })
