@@ -1,14 +1,13 @@
 import { decodeSegment } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, paramValue } from '../utils/dom.js'
+import { attr, paramValue, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
-type StaticImage = {
+type View = {
   workbook: string
   sheet: string
-  thumbnail: string
 }
 
 type SizeMessage = {
@@ -40,15 +39,17 @@ const viewNameRegex = /^([^/]+)\/([^/]+)$/
 // `/static/images/{first two letters}/{workbook}/{sheet}/{file}`. A shared viz has no workbook
 // and writes `/static/images/{first two letters}/{key}/{file}`.
 const staticImagePathRegex = /^\/static\/images\/[^/]+\/([^/]+)\/([^/]+)\/[^/]+$/
+// Blogger escapes the `<noscript>` content to text and doubles the `&` of each `&#47;` it holds.
+const escapedSlashRegex = /&(?:amp;)*#47;/g
+const imageUrlRegex = /https?:\/\/[^\s"'<>]+/
 const sizeMessageRegex = /^api\.FirstVizSizeKnownEvent,[^,]*,[^,]*,(.*)/s
 
-// `viz_v1.js` loads `views/{workbook}/{sheet}` with `:embed=y` and `:showVizHome=no`, which make
-// the route an embed and not the gallery page.
+// `viz_v1.js` loads `views/{workbook}/{sheet}` with `:embed=y` and `:showVizHome=no`. Without
+// `:showVizHome=no` the route redirects to the viz page on the author's profile.
 const composeTableauEmbed = (
   workbook: string,
   sheet: string,
   title: string | undefined,
-  thumbnail: string | undefined,
 ): EmbedResolverResult => {
   return {
     provider,
@@ -56,12 +57,12 @@ const composeTableauEmbed = (
     src: `https://public.tableau.com/views/${workbook}/${sheet}?:embed=y&:showVizHome=no`,
     url: `https://public.tableau.com/views/${workbook}/${sheet}`,
     title,
-    thumbnail,
   }
 }
 
-// The snippet's image of the viz, written from the same workbook and sheet as the viz.
-const readStaticImage = (url: string | undefined): StaticImage | undefined => {
+// The snippet's image of the viz, written from the same workbook and sheet as the viz. Its
+// public.tableau.com copy is a blank 1x1 png for most workbooks that still exist.
+const readStaticImage = (url: string | undefined): View | undefined => {
   const match = parseUrlOnHosts(url, staticImageHosts)?.pathname.match(staticImagePathRegex)
 
   if (!match) {
@@ -71,8 +72,6 @@ const readStaticImage = (url: string | undefined): StaticImage | undefined => {
   return {
     workbook: match[1],
     sheet: match[2],
-    // The retired hosts redirect an image to a 404 page, and public.tableau.com serves the path.
-    thumbnail: `https://public.tableau.com${match[0]}`,
   }
 }
 
@@ -82,16 +81,16 @@ const readStaticImage = (url: string | undefined): StaticImage | undefined => {
 export const tableauWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.tableauPlaceholder',
   (element) => {
-    const image = element.querySelector('noscript img')
-    const staticImage = readStaticImage(attr(image, 'src'))
+    const noscript = element.querySelector('noscript')
+    const image = noscript?.querySelector('img')
+    const escapedSrc = text(noscript)?.replace(escapedSlashRegex, '/').match(imageUrlRegex)?.[0]
+    const view = readStaticImage(attr(image, 'src') ?? escapedSrc)
 
-    if (!staticImage) {
+    if (!view) {
       return
     }
 
-    const { workbook, sheet, thumbnail } = staticImage
-
-    return composeTableauEmbed(workbook, sheet, attr(image, 'alt'), thumbnail)
+    return composeTableauEmbed(view.workbook, view.sheet, attr(image, 'alt'))
   },
 )
 
@@ -107,9 +106,7 @@ export const tableauObjectEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const thumbnail = readStaticImage(paramValue(element, 'static_image'))?.thumbnail
-
-    return composeTableauEmbed(match[1], match[2], undefined, thumbnail)
+    return composeTableauEmbed(match[1], match[2], undefined)
   },
 )
 
@@ -121,7 +118,7 @@ const tableauResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  return composeTableauEmbed(match[1], match[2], attr(element, 'title'), undefined)
+  return composeTableauEmbed(match[1], match[2], attr(element, 'title'))
 }
 
 export const tableauIframeEmbedResolver = createUrlEmbedResolver(tableauHosts, tableauResolveEmbed)
@@ -134,14 +131,8 @@ export const readTableauHeight = (data: unknown): number | undefined => {
     return
   }
 
-  const payload = data.match(sizeMessageRegex)?.[1]
-
-  if (!payload) {
-    return
-  }
-
   try {
-    const message: SizeMessage = JSON.parse(payload)
+    const message: SizeMessage = JSON.parse(data.match(sizeMessageRegex)?.[1] ?? '')
     const command: SizeCommand = JSON.parse(message['api.commandData'] ?? '')
     const constraints = command.sizeConstraints
     const vizHeight = readPixels(constraints?.maxHeight) ?? readPixels(constraints?.minHeight)

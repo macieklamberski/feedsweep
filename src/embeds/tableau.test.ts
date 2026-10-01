@@ -48,8 +48,6 @@ describeForEachParser('tableauWidgetEmbedResolver', (parseHtml) => {
         src: 'https://public.tableau.com/views/IndustrialDevelopmentSubsidies_11-15/Dashboard1?:embed=y&:showVizHome=no',
         url: 'https://public.tableau.com/views/IndustrialDevelopmentSubsidies_11-15/Dashboard1',
         title: 'Dashboard 1',
-        thumbnail:
-          'https://public.tableau.com/static/images/In/IndustrialDevelopmentSubsidies_11-15/Dashboard1/1_rss.png',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -87,7 +85,6 @@ describeForEachParser('tableauWidgetEmbedResolver', (parseHtml) => {
         src: 'https://public.tableau.com/views/BillsData2025/FTEDash?:embed=y&:showVizHome=no',
         url: 'https://public.tableau.com/views/BillsData2025/FTEDash',
         title: 'FTE Dash',
-        thumbnail: 'https://public.tableau.com/static/images/Bi/BillsData2025/FTEDash/1.png',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -115,8 +112,6 @@ describeForEachParser('tableauWidgetEmbedResolver', (parseHtml) => {
         id: 'ViewingBigDatawithaMap',
         src: 'https://public.tableau.com/views/ViewingBigDatawithaMap/PuttingBigDatainaMap?:embed=y&:showVizHome=no',
         url: 'https://public.tableau.com/views/ViewingBigDatawithaMap/PuttingBigDatainaMap',
-        thumbnail:
-          'https://public.tableau.com/static/images/Vi/ViewingBigDatawithaMap/PuttingBigDatainaMap/1_rss.png',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -141,7 +136,35 @@ describeForEachParser('tableauWidgetEmbedResolver', (parseHtml) => {
         id: 'WorldEnergy_3',
         src: 'https://public.tableau.com/views/WorldEnergy_3/Energy?:embed=y&:showVizHome=no',
         url: 'https://public.tableau.com/views/WorldEnergy_3/Energy',
-        thumbnail: 'https://public.tableau.com/static/images/Wo/WorldEnergy_3/Energy/1_rss.png',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+    it('should read the image Blogger escaped to text inside the noscript', async () => {
+      const value = html`
+        <div
+          class="tableauPlaceholder"
+          style="height: 609px; width: 544px;"
+        >
+          <div style="text-align: center;">
+            <noscript>&amp;amp;amp;lt;a href="#"&amp;amp;amp;gt;&amp;amp;amp;lt;img alt=" " src="http:&amp;amp;amp;amp;#47;&amp;amp;amp;amp;#47;public.tableausoftware.com&amp;amp;amp;amp;#47;static&amp;amp;amp;amp;#47;images&amp;amp;amp;amp;#47;Li&amp;amp;amp;amp;#47;LivingRoom&amp;amp;amp;amp;#47;LivingRoom&amp;amp;amp;amp;#47;1_rss.png" style="border: none" /&amp;amp;amp;gt;&amp;amp;amp;lt;/a&amp;amp;amp;gt;</noscript>
+            <object
+              class="tableauViz"
+              height="609"
+              style="display: none;"
+              width="544"
+            >
+              <param name="host_url" value="http%3A%2F%2Fpublic.tableausoftware.com%2F" />
+              <param name="name" value="LivingRoom&#47;LivingRoom" />
+            </object>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tableau',
+        id: 'LivingRoom',
+        src: 'https://public.tableau.com/views/LivingRoom/LivingRoom?:embed=y&:showVizHome=no',
+        url: 'https://public.tableau.com/views/LivingRoom/LivingRoom',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -233,25 +256,6 @@ describeForEachParser('tableauObjectEmbedResolver', (parseHtml) => {
         id: 'NumbersofInternationalTheatrePerformanceandMulti-ArtsFestivalsbyCountry',
         src: 'https://public.tableau.com/views/NumbersofInternationalTheatrePerformanceandMulti-ArtsFestivalsbyCountry/Sheet1?:embed=y&:showVizHome=no',
         url: 'https://public.tableau.com/views/NumbersofInternationalTheatrePerformanceandMulti-ArtsFestivalsbyCountry/Sheet1',
-        thumbnail:
-          'https://public.tableau.com/static/images/Nu/NumbersofInternationalTheatrePerformanceandMulti-ArtsFestivalsbyCountry/Sheet1/1.png',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should build the viz frame without a static image', async () => {
-      const value = html`
-        <object class="tableauViz">
-          <param name="host_url" value="https%3A%2F%2Fpublic.tableau.com%2F" />
-          <param name="name" value="BillsData2025/FTEDash" />
-        </object>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'tableau',
-        id: 'BillsData2025',
-        src: 'https://public.tableau.com/views/BillsData2025/FTEDash?:embed=y&:showVizHome=no',
-        url: 'https://public.tableau.com/views/BillsData2025/FTEDash',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -423,6 +427,12 @@ describe('readTableauHeight', () => {
     expect(readTableauHeight(value)).toBeUndefined()
   })
 
+  it('should ignore a message that only carries the size event further in', () => {
+    const value = String.raw`x api.FirstVizSizeKnownEvent,xdomainSourceId,,{"api.workbookName":"BillsData2025","api.worksheetName":"","api.commandData":"{\"sizeConstraints\":{\"maxHeight\":860,\"maxWidth\":650,\"minHeight\":560,\"minWidth\":420},\"chromeHeight\":27}"}`
+
+    expect(readTableauHeight(value)).toBeUndefined()
+  })
+
   it('should ignore the other messages the viz posts', () => {
     expect(readTableauHeight('tableau.completed')).toBeUndefined()
   })
@@ -479,13 +489,13 @@ describeForEachParser('tableau snippets through the pipeline', (parseHtml) => {
         data-embed-id="IndustrialDevelopmentSubsidies_11-15"
         data-embed-src="https://public.tableau.com/views/IndustrialDevelopmentSubsidies_11-15/Dashboard1?:embed=y&amp;:showVizHome=no"
         data-embed-url="https://public.tableau.com/views/IndustrialDevelopmentSubsidies_11-15/Dashboard1"
-        data-embed-thumbnail="https://public.tableau.com/static/images/In/IndustrialDevelopmentSubsidies_11-15/Dashboard1/1_rss.png"
         data-embed-title="Dashboard 1"
       ></div>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
   })
+
   it('should replace an object left visible', async () => {
     const value = html`
       <object class="tableauViz">
