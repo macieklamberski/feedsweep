@@ -1111,6 +1111,32 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(result).toBe(expected)
   })
 
+  it('should keep a player that follows another player in one paragraph', async () => {
+    const value = html`
+      <p>Listen:
+        <iframe src="https://www.youtube.com/embed/abc123"></iframe>
+        <iframe src="https://zeno.fm/player/example-radio"></iframe>
+      </p>
+    `
+    const expected = html`
+      <p>Listen: </p>
+      <div data-embed-src="https://www.youtube.com/embed/abc123"></div>
+      <div
+        data-embed-height="250"
+        data-embed-url="https://zeno.fm/radio/example-radio/"
+        data-embed-id="example-radio"
+        data-embed-provider="zeno"
+        data-embed-src="https://zeno.fm/player/example-radio"
+      ></div>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
   // The <code> holds a real newline, so it is promoted to a block <pre> rather than left
   // inline. The html tag collapses whitespace, which would drop the promotion.
   it('should leave no promoted code block inside a paragraph', async () => {
