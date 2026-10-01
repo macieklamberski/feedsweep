@@ -56,7 +56,6 @@ export const iheartEmbedResolver = createUrlEmbedResolver(iheartHosts, iheartRes
 
 export const iheartRenderHint: EmbedRenderHint = {
   provider,
-  origin: 'https://www.iheart.com',
   isReady: isPlayerJsReady,
   requestPlay: playerJsPlayRequest,
 }
