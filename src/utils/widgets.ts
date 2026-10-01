@@ -2,7 +2,6 @@ import {
   isAnyOf,
   isHostOrSubdomainOf,
   type MaybePromise,
-  type Pattern,
   startsWithAnyOf,
   trimObject,
 } from 'trousse'
@@ -411,14 +410,8 @@ export const updateEmbedPlaceholder = (
 
 type CleanableResult = { provider?: string; title?: string; description?: string }
 
-// The wrapper removed from the front of a value. A regex runs against the value as written, so
-// one that ignores case says so itself.
-const stripWrapper = (value: string, pattern: Pattern): string => {
-  if (typeof pattern === 'string') {
-    return startsWithAnyOf(value, [pattern]) ? value.slice(pattern.length) : value
-  }
-
-  return value.replace(pattern, '')
+const stripPrefix = (value: string, prefix: string): string => {
+  return startsWithAnyOf(value, [prefix]) ? value.slice(prefix.length) : value
 }
 
 // A field the platform's snippet may have filled with its own label rather than the item's.
@@ -439,7 +432,7 @@ const cleanField = (
     }
 
     if (cleaner.strip) {
-      value = stripWrapper(value, cleaner.strip).trim() || undefined
+      value = stripPrefix(value, cleaner.strip).trim() || undefined
     }
   }
 
@@ -534,7 +527,7 @@ export const createCitePlaceholder = (
   return createPlaceholder(document, 'cite', normalizeCiteFields(result))
 }
 
-export type FileFields = {
+type FileFields = {
   url: string
   name: string
   type?: string

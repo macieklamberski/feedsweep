@@ -97,6 +97,19 @@ describe('parseHtml', () => {
       expect(image.getAttribute('src')).toBe('a.png')
     })
 
+    it('should keep a single br inside foreignObject', () => {
+      const document = parseHtml('<svg><foreignObject><p>a<br/>b</p></foreignObject></svg>')
+
+      expect(document.querySelectorAll('br').length).toBe(1)
+    })
+
+    it('should expand a self-closing tag next to a br inside foreignObject', () => {
+      const document = parseHtml('<svg><title /><foreignObject><br/></foreignObject></svg>')
+      const parentTagName = queryElement(document, 'foreignObject').parentElement?.localName
+
+      expect(parentTagName).toBe('svg')
+    })
+
     it('should expand a self-closing tag with whitespace before the slash', () => {
       const document = parseHtml('<svg><path d="M0 0"   /></svg>')
       const parentTagName = queryElement(document, 'path').parentElement?.tagName.toLowerCase()

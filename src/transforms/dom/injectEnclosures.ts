@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type {
   DomTransform,
   EmbedResolverResult,
@@ -6,7 +6,7 @@ import type {
   TransformContext,
   WidgetResolver,
 } from '../../types.js'
-import { isAvatarEnclosure, isEnclosureKind, prepareEnclosures } from '../../utils/enclosures.js'
+import { isEnclosureKind, prepareEnclosures } from '../../utils/enclosures.js'
 import { getImageFingerprint } from '../../utils/images.js'
 import {
   cleanUrl,
@@ -281,7 +281,7 @@ export const injectEnclosures: DomTransform = (context) => {
       // WordPress attaches the author's gravatar as a per-item media:content image, and Substack
       // fills the enclosure of a post with no cover with the publication logo.
       if (
-        isAvatarEnclosure(embedSource, context.avatarImageHosts) ||
+        isHostOrSubdomainOf(embedSource, context.avatarImageHosts) ||
         feedImageFingerprints.has(getImageFingerprint(embedSource, context.cleanUrlFn))
       ) {
         continue

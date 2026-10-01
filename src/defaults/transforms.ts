@@ -325,7 +325,7 @@ export const defaultAllDomTransforms: Array<DomTransform> = defaultStandardDomTr
   },
 )
 
-export const defaultResolveUrlFn: ResolveUrlFn = (url, baseUrl) => resolveUrl(url, baseUrl)
+export const defaultResolveUrlFn: ResolveUrlFn = resolveUrl
 
 // Default code highlighter: highlight.js. Swap it via the highlightFn option.
 export const defaultHighlightFn = hljsHighlightFn

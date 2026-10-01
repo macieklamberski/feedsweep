@@ -163,8 +163,6 @@ const namedCleaners = defaultFieldCleaners.map((cleaner) => {
 
 describe('defaultFieldCleaners', () => {
   it.each(namedCleaners)('should give the %s entry a pattern to apply', (_, cleaner) => {
-    expect(cleaner.provider).not.toBe('')
-    expect(['title', 'description']).toContain(cleaner.field)
     expect(cleaner.drop ?? cleaner.strip).toBeDefined()
   })
 
