@@ -1,15 +1,17 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import {
   facebookAmpEmbedResolver,
   facebookBlockquoteEmbedResolver,
   facebookIframeEmbedResolver,
+  facebookRenderHint,
   facebookResolveEmbed,
   facebookS9eEmbedResolver,
   facebookWidgetEmbedResolver,
   facebookXfbmlEmbedResolver,
+  readFacebookHeight,
 } from './facebook.js'
 
 describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
@@ -29,7 +31,6 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/BlowflyOfficial/posts/10153426898243990:0',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FBlowflyOfficial%2Fposts%2F10153426898243990%3A0',
         url: 'https://www.facebook.com/BlowflyOfficial/posts/10153426898243990:0',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -47,7 +48,6 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/renodancecompany/photos/317243261734291/?type=1',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Frenodancecompany%2Fphotos%2F317243261734291%2F%3Ftype%3D1',
         url: 'https://www.facebook.com/renodancecompany/photos/317243261734291/?type=1',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -68,7 +68,6 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: '//www.facebook.com/PageName/posts/123',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -136,7 +135,6 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
-        height: 646,
         description: 'Caption text about the thing.',
         author: 'PageName',
         date: 'Tuesday, 3 June 2026',
@@ -162,7 +160,6 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
-        height: 646,
         description: 'Caption only, no byline anchors.',
       }
 
@@ -252,7 +249,6 @@ describeForEachParser('facebookXfbmlEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -285,7 +281,6 @@ describeForEachParser('facebookAmpEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -380,7 +375,6 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
-        height: 646,
         description: 'A post caption.',
       }
 
@@ -403,7 +397,6 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: '//www.facebook.com/PageName/posts/123',
-        height: 646,
         description: 'A post caption.',
       }
 
@@ -448,7 +441,6 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -465,7 +457,6 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -485,7 +476,6 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: '//www.facebook.com/PageName/posts/123',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -572,7 +562,6 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -627,7 +616,6 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -669,7 +657,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should state the post plugin height when neither the element nor the url states one', async () => {
+    it('should state no size for a post, whose frame reports its own height', async () => {
       const value = html`
         <iframe
           src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
@@ -680,7 +668,6 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/PageName/posts/123',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
         url: 'https://www.facebook.com/PageName/posts/123',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -762,7 +749,6 @@ describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/Bob/posts/1699244425543753',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FBob%2Fposts%2F1699244425543753',
         url: 'https://www.facebook.com/Bob/posts/1699244425543753',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -780,7 +766,6 @@ describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/Bob/posts/783697877354329',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FBob%2Fposts%2F783697877354329',
         url: 'https://www.facebook.com/Bob/posts/783697877354329',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -816,7 +801,6 @@ describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/batterymooch/posts/2091705384452370',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fbatterymooch%2Fposts%2F2091705384452370',
         url: 'https://www.facebook.com/batterymooch/posts/2091705384452370',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -834,7 +818,6 @@ describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/john.doe/posts/2091705384452370',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fjohn.doe%2Fposts%2F2091705384452370',
         url: 'https://www.facebook.com/john.doe/posts/2091705384452370',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -852,7 +835,6 @@ describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
         id: 'https://www.facebook.com/example/posts/1699244425543753',
         src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fexample%2Fposts%2F1699244425543753',
         url: 'https://www.facebook.com/example/posts/1699244425543753',
-        height: 646,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1040,7 +1022,6 @@ describe('facebookResolveEmbed', () => {
       id: value,
       src: `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(value)}`,
       url: value,
-      height: 646,
     }
 
     expect(facebookResolveEmbed(value)).toEqual(expected)
@@ -1059,7 +1040,6 @@ describe('facebookResolveEmbed', () => {
       id: value,
       src: `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(value)}`,
       url: value,
-      height: 646,
     }
 
     expect(facebookResolveEmbed(value)).toEqual(expected)
@@ -1092,6 +1072,40 @@ describe('facebookResolveEmbed', () => {
   })
 })
 
+describe('readFacebookHeight', () => {
+  it('should read the height out of the post plugin resize message', () => {
+    expect(readFacebookHeight('type=resize&cb=&width=500&height=421')).toBe(421)
+  })
+
+  it('should read nothing out of the plugin ready message', () => {
+    const value =
+      'xd_action=plugin_ready&name=&cb=f1a2b3c4&domain=example.com&is_canvas=false&origin=https%3A%2F%2Fexample.com%2Ff5d6e7&relation=parent.parent'
+
+    expect(readFacebookHeight(value)).toBeUndefined()
+  })
+
+  it('should read nothing out of a message that is not a string', () => {
+    expect(readFacebookHeight({ type: 'resize', height: 421 })).toBeUndefined()
+  })
+})
+
+describe('facebookRenderHint', () => {
+  // Without both parameters the post plugin posts no height to the parent.
+  it('should ask every load for the height the post renders at', () => {
+    const expected: EmbedRenderHint = {
+      provider: 'facebook',
+      origin: 'https://www.facebook.com',
+      params: {
+        sdk: 'joey',
+        channel: 'https://staticxx.facebook.com/x/connect/xd_arbiter/?version=46',
+      },
+      readHeight: readFacebookHeight,
+    }
+
+    expect(facebookRenderHint).toEqual(expected)
+  })
+})
+
 // The three contracts no single resolver can state, because each one is a handoff between
 // passes that know nothing about each other.
 describeForEachParser('facebook through the pipeline', (parseHtml) => {
@@ -1109,7 +1123,6 @@ describeForEachParser('facebook through the pipeline', (parseHtml) => {
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
-        data-embed-height="646"
       ></div>
     `
 
@@ -1127,7 +1140,6 @@ describeForEachParser('facebook through the pipeline', (parseHtml) => {
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
-        data-embed-height="646"
       ></div>
     `
     const result = await convert(value)

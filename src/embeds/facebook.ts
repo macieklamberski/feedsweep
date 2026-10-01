@@ -1,12 +1,15 @@
 import { type Nullish, parseUrl, trimObject } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
+import { readPixels } from '../utils/hints.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
   readS9eFragment,
 } from '../utils/widgets.js'
+
+const provider = 'facebook'
 
 // `fb.watch` is the short-link host the mobile app hands out, found inside both widget divs.
 // Posts live on the apex and on `web.`, `m.` and `business.` alike.
@@ -32,8 +35,6 @@ const readFallback = (blockquote: Nullish<Element>): Partial<EmbedResolverResult
 
 const fallbackSelector = '.fb-xfbml-parse-ignore blockquote, blockquote.fb-xfbml-parse-ignore'
 
-const postHeight = 646
-
 // Every carrier resolves to a plugin url built around the page it names, which is the only form
 // Facebook frames. The page is also the canonical url, so a caller that knows a better id than
 // the href states it in `extra`. `t`, where a video starts, is kept as the carrier wrote it.
@@ -49,11 +50,10 @@ const composePluginEmbed = (
   const query = composeQuery(trimObject({ href: absoluteHref, t }))
 
   return {
-    provider: 'facebook',
+    provider,
     id: absoluteHref,
     src: `https://www.facebook.com/plugins/${plugin}.php${query}`,
     url: href,
-    height: plugin === 'post' ? postHeight : undefined,
     ratio: plugin === 'video' ? '16/9' : undefined,
     ...extra,
   }
@@ -228,3 +228,30 @@ export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(
     return composePluginEmbed(plugin, cite, readFallback(element))
   },
 )
+
+// The post plugin posts its rendered height as a query string,
+// `type=resize&cb=&width=500&height=421`, and only when its url carries the SDK's `sdk` flag and a
+// `channel`. The video plugin posts nothing.
+export const readFacebookHeight = (data: unknown): number | undefined => {
+  if (typeof data !== 'string') {
+    return
+  }
+
+  const message = new URLSearchParams(data)
+
+  if (message.get('type') !== 'resize') {
+    return
+  }
+
+  return readPixels(message.get('height'))
+}
+
+export const facebookRenderHint: EmbedRenderHint = {
+  provider,
+  origin: 'https://www.facebook.com',
+  params: {
+    sdk: 'joey',
+    channel: 'https://staticxx.facebook.com/x/connect/xd_arbiter/?version=46',
+  },
+  readHeight: readFacebookHeight,
+}
