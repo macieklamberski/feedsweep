@@ -20,7 +20,8 @@ const embedRatio = '1/2'
 const composePiktochartEmbed = (uid: string, title?: string): EmbedResolverResult => {
   return {
     provider,
-    id: uid,
+    // The server folds the uid's case, and its og:url spells it in lowercase.
+    id: uid.toLowerCase(),
     src: `https://create.piktochart.com/embed/${uid}`,
     url: `https://create.piktochart.com/output/${uid}`,
     ratio: embedRatio,

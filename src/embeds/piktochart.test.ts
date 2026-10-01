@@ -207,12 +207,12 @@ describeForEachParser('piktochartIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should pass the uid on as written', async () => {
+    it('should fold the case of the uid in the key only', async () => {
       const value =
         '<iframe src="https://create.piktochart.com/embed/30289406-NEW-PIKTOCHART-COPY"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'piktochart',
-        id: '30289406-NEW-PIKTOCHART-COPY',
+        id: '30289406-new-piktochart-copy',
         src: 'https://create.piktochart.com/embed/30289406-NEW-PIKTOCHART-COPY',
         url: 'https://create.piktochart.com/output/30289406-NEW-PIKTOCHART-COPY',
         ratio: '1/2',
