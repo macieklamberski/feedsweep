@@ -484,6 +484,14 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should strip the site host from a src prefixed with three slashes', async () => {
+    const value =
+      '<iframe src="https://www.example.com///e.issuu.com/embed.html?d=catalogue"></iframe>'
+    const expected = '<iframe src="https://e.issuu.com/embed.html?d=catalogue"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it.each(hostPrefixedKeptCarriers)('should keep a host-prefixed %s', async (_carrier, value) => {
     expect(await transform(value)).toEqualHtml(value)
   })

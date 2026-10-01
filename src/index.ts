@@ -1,22 +1,10 @@
+import { defaultContext } from './defaults/context.js'
 import {
   defaultAllDomTransforms,
-  defaultAvatarImageHosts,
-  defaultDeferredIframeSources,
-  defaultEmojiResolvers,
-  defaultFieldCleaners,
   defaultHighlightFn,
-  defaultLazyIframeAttributes,
-  defaultLazySrcAttributes,
-  defaultLazySrcsetAttributes,
-  defaultMediaSrcAttributes,
-  defaultNonContentSelectors,
-  defaultPreservedPreClasses,
   defaultResolveUrlFn,
   defaultStandardDomTransforms,
   defaultStringTransforms,
-  defaultTrackingHosts,
-  defaultTrackingPathSegments,
-  defaultWidgetResolvers,
 } from './defaults.js'
 import type { TransformContentOptions, TransformContext } from './types.js'
 import { applyDomTransforms, applyStringTransforms } from './utils/transforms.js'
@@ -26,23 +14,11 @@ export const transformContent = async (
   options: TransformContentOptions,
 ): Promise<string> => {
   const context: TransformContext = {
+    ...defaultContext,
     baseUrl: options.baseUrl,
     sameSiteUrls: options.sameSiteUrls,
     feedImageUrls: options.feedImageUrls,
     enclosures: options.enclosures,
-    widgetResolvers: defaultWidgetResolvers,
-    mediaSrcAttributes: defaultMediaSrcAttributes,
-    lazySrcAttributes: defaultLazySrcAttributes,
-    lazySrcsetAttributes: defaultLazySrcsetAttributes,
-    lazyIframeAttributes: defaultLazyIframeAttributes,
-    deferredIframeSources: defaultDeferredIframeSources,
-    trackingHosts: defaultTrackingHosts,
-    trackingPathSegments: defaultTrackingPathSegments,
-    emojiResolvers: defaultEmojiResolvers,
-    avatarImageHosts: defaultAvatarImageHosts,
-    nonContentSelectors: defaultNonContentSelectors,
-    preservedPreClasses: defaultPreservedPreClasses,
-    fieldCleaners: defaultFieldCleaners,
     resolveUrlFn: options.resolveUrlFn ?? defaultResolveUrlFn,
     cleanUrlFn: options.cleanUrlFn,
     assetProxyFn: options.assetProxyFn,
@@ -102,6 +78,7 @@ export { decodeDoubleEncodedTags } from './transforms/dom/decodeDoubleEncodedTag
 export { demoteHeadings } from './transforms/dom/demoteHeadings.js'
 export { enrichCitePlaceholders } from './transforms/dom/enrichCitePlaceholders.js'
 export { enrichEmbedPlaceholders } from './transforms/dom/enrichEmbedPlaceholders.js'
+export { fixDropboxMediaUrls } from './transforms/dom/fixDropboxMediaUrls.js'
 export { fixLazyAudios } from './transforms/dom/fixLazyAudios.js'
 export { fixLazyIframes } from './transforms/dom/fixLazyIframes.js'
 export { fixLazyImages } from './transforms/dom/fixLazyImages.js'
@@ -127,12 +104,16 @@ export { rebuildDeferredIframes } from './transforms/dom/rebuildDeferredIframes.
 export { rebuildElementorVideoEmbeds } from './transforms/dom/rebuildElementorVideoEmbeds.js'
 export { rebuildEmbedlyEmbeds } from './transforms/dom/rebuildEmbedlyEmbeds.js'
 export { rebuildEmbedPlusEmbeds } from './transforms/dom/rebuildEmbedPlusEmbeds.js'
+export { rebuildExternalVideoEmbeds } from './transforms/dom/rebuildExternalVideoEmbeds.js'
 export { rebuildGettyImagesEmbeds } from './transforms/dom/rebuildGettyImagesEmbeds.js'
+export { rebuildGofundmeEmbeds } from './transforms/dom/rebuildGofundmeEmbeds.js'
+export { rebuildIframelyEmbeds } from './transforms/dom/rebuildIframelyEmbeds.js'
 export { rebuildJsfiddleEmbeds } from './transforms/dom/rebuildJsfiddleEmbeds.js'
 export { rebuildLazyLoadForVideos } from './transforms/dom/rebuildLazyLoadForVideos.js'
 export { rebuildLazyYtEmbeds } from './transforms/dom/rebuildLazyYtEmbeds.js'
 export { rebuildLiteVideoEmbeds } from './transforms/dom/rebuildLiteVideoEmbeds.js'
 export { rebuildLyteEmbeds } from './transforms/dom/rebuildLyteEmbeds.js'
+export { rebuildPublicalbumGalleries } from './transforms/dom/rebuildPublicalbumGalleries.js'
 export { rebuildRocketYoutubePreviews } from './transforms/dom/rebuildRocketYoutubePreviews.js'
 export { rebuildVideoJsEmbeds } from './transforms/dom/rebuildVideoJsEmbeds.js'
 export { rebuildWistiaEmbeds } from './transforms/dom/rebuildWistiaEmbeds.js'
@@ -182,12 +163,16 @@ export type {
   CiteResolver,
   CiteResolverResult,
   CleanUrlFn,
+  DeferredIframeSource,
   DomTransform,
   EmbedRef,
   EmbedRenderHint,
   EmbedResolver,
   EmbedResolverResult,
+  EmojiResolver,
+  EmojiResolverResult,
   Enclosure,
+  EnclosureThumbnail,
   EnrichCiteFn,
   EnrichEmbedFn,
   FieldCleaner,
@@ -197,6 +182,7 @@ export type {
   MediaResolverResult,
   ParseDateFn,
   ParseHtmlFn,
+  ResolveEmbed,
   ResolveUrlFn,
   StringTransform,
   TransformContentOptions,

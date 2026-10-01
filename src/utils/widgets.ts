@@ -2,7 +2,6 @@ import {
   isAnyOf,
   isHostOrSubdomainOf,
   type MaybePromise,
-  type Pattern,
   startsWithAnyOf,
   trimObject,
 } from 'trousse'
@@ -223,6 +222,21 @@ export const isEmbedOrMediaResolver = (
   return playerResolverKinds.includes(resolver.kind)
 }
 
+// True when one of the resolvers claims the iframe, the same test convertWidgets makes, so only
+// an iframe that would become a placeholder or a recovered media element passes.
+export const isResolvedIframe = async (
+  iframe: Element,
+  resolvers: ReadonlyArray<WidgetResolver>,
+): Promise<boolean> => {
+  for (const resolver of resolvers) {
+    if (iframe.matches(resolver.selector) && (await resolver.extract(iframe))) {
+      return true
+    }
+  }
+
+  return false
+}
+
 export const isMediaResult = (result: WidgetResolverResult): result is MediaResolverResult => {
   return 'tag' in result
 }
@@ -281,6 +295,21 @@ export const createImage = (document: Document, fields: ImageFields): HTMLElemen
   setDimensions(image, fields)
 
   return image
+}
+
+// An <img>, an <audio> and a <video> have nowhere of their own to show a human-readable caption.
+export const createCaptionedFigure = (
+  document: Document,
+  element: HTMLElement,
+  caption: string,
+): HTMLElement => {
+  const figure = document.createElement('figure')
+  const figcaption = document.createElement('figcaption')
+
+  figcaption.textContent = caption
+  figure.append(element, figcaption)
+
+  return figure
 }
 
 export const createLink = (document: Document, href: string, text = href): HTMLElement => {
@@ -381,14 +410,8 @@ export const updateEmbedPlaceholder = (
 
 type CleanableResult = { provider?: string; title?: string; description?: string }
 
-// The wrapper removed from the front of a value. A regex runs against the value as written, so
-// one that ignores case says so itself.
-const stripWrapper = (value: string, pattern: Pattern): string => {
-  if (typeof pattern === 'string') {
-    return startsWithAnyOf(value, [pattern]) ? value.slice(pattern.length) : value
-  }
-
-  return value.replace(pattern, '')
+const stripPrefix = (value: string, prefix: string): string => {
+  return startsWithAnyOf(value, [prefix]) ? value.slice(prefix.length) : value
 }
 
 // A field the platform's snippet may have filled with its own label rather than the item's.
@@ -409,7 +432,7 @@ const cleanField = (
     }
 
     if (cleaner.strip) {
-      value = stripWrapper(value, cleaner.strip).trim() || undefined
+      value = stripPrefix(value, cleaner.strip).trim() || undefined
     }
   }
 
@@ -504,7 +527,7 @@ export const createCitePlaceholder = (
   return createPlaceholder(document, 'cite', normalizeCiteFields(result))
 }
 
-export type FileFields = {
+type FileFields = {
   url: string
   name: string
   type?: string

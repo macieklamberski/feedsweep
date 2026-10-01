@@ -9,6 +9,7 @@ import { codepenFieldCleaners } from '../embeds/codepen.js'
 import { dailymotionFieldCleaners } from '../embeds/dailymotion.js'
 import { deezerFieldCleaners } from '../embeds/deezer.js'
 import { flourishFieldCleaners } from '../embeds/flourish.js'
+import { indavideoFieldCleaners } from '../embeds/indavideo.js'
 import { instagramFieldCleaners } from '../embeds/instagram.js'
 import { issuuFieldCleaners } from '../embeds/issuu.js'
 import { ivooxFieldCleaners } from '../embeds/ivoox.js'
@@ -40,6 +41,7 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...dailymotionFieldCleaners,
   ...deezerFieldCleaners,
   ...flourishFieldCleaners,
+  ...indavideoFieldCleaners,
   ...instagramFieldCleaners,
   ...issuuFieldCleaners,
   ...ivooxFieldCleaners,

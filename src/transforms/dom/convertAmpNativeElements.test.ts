@@ -123,6 +123,28 @@ describeForEachParser('convertAmpNativeElements', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should carry the sources of amp-video and drop its fallback children', async () => {
+    const value = html`
+      <amp-video controls>
+        <source
+          src="clip.mp4"
+          type="video/mp4"
+        >
+        <div fallback>Your browser does not support HTML5 video.</div>
+      </amp-video>
+    `
+    const expected = html`
+      <video controls>
+        <source
+          src="clip.mp4"
+          type="video/mp4"
+        >
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should convert amp-audio into audio and carry its sources', async () => {
     const value = html`
       <amp-audio>

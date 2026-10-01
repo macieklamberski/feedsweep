@@ -56,6 +56,23 @@ const svgOpenRegex = /<svg\b/gi
 const svgCloseRegex = /<\/svg>/gi
 const svgSelfCloseRegex = /<([a-z][a-z0-9-]*)((?:\s[^>]*)?)\s*\/>/gi
 
+// Void HTML elements per the HTML spec. Inside <foreignObject> a `</br>` parses as a second <br>.
+const voidElements = [
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'source',
+  'track',
+  'wbr',
+]
+
 const expandSvgSelfClose = (html: string): string => {
   let result = ''
   let position = 0
@@ -87,7 +104,18 @@ const expandSvgSelfClose = (html: string): string => {
 
     const svgBlock = html.slice(open.index, svgCloseRegex.lastIndex)
 
-    result += `${html.slice(position, open.index)}${svgBlock.replace(svgSelfCloseRegex, '<$1$2></$1>')}`
+    const expanded = svgBlock.replace(
+      svgSelfCloseRegex,
+      (tag, name: string, attributes: string) => {
+        if (voidElements.includes(name.toLowerCase())) {
+          return tag
+        }
+
+        return `<${name}${attributes}></${name}>`
+      },
+    )
+
+    result += `${html.slice(position, open.index)}${expanded}`
     position = svgCloseRegex.lastIndex
     svgOpenRegex.lastIndex = position
   }

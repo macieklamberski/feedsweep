@@ -277,6 +277,20 @@ describeForEachParser('getElementDimensions', (parseHtml) => {
     expect(getElementDimensions(image)).toEqual({ width: undefined, height: undefined })
   })
 
+  it('should treat a negative attribute as absent', () => {
+    const document = parseHtml('<iframe width="560" height="-315"></iframe>')
+    const frame = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(frame)).toEqual({ width: 560, height: undefined })
+  })
+
+  it('should keep a zero attribute', () => {
+    const document = parseHtml('<img width="0" height="0">')
+    const image = queryElement(document, 'img')
+
+    expect(getElementDimensions(image)).toEqual({ width: 0, height: 0 })
+  })
+
   it('should fall back to style when the attribute is empty', () => {
     const document = parseHtml('<img width="" style="width: 300px; height: 200px">')
     const image = queryElement(document, 'img')
