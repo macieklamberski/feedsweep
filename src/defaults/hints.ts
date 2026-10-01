@@ -52,6 +52,7 @@ import { podbeanRenderHint } from '../embeds/podbean.js'
 import { podigeeRenderHint } from '../embeds/podigee.js'
 import { redditRenderHint } from '../embeds/reddit.js'
 import { reverbnationRenderHint } from '../embeds/reverbnation.js'
+import { rsscomRenderHint } from '../embeds/rsscom.js'
 import { rtveRenderHint } from '../embeds/rtve.js'
 import { rutubeRenderHint } from '../embeds/rutube.js'
 import { sketchfabRenderHint } from '../embeds/sketchfab.js'
@@ -136,6 +137,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   podigeeRenderHint,
   redditRenderHint,
   reverbnationRenderHint,
+  rsscomRenderHint,
   rtveRenderHint,
   rutubeRenderHint,
   sketchfabRenderHint,
