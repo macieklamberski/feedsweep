@@ -813,6 +813,7 @@ describeForEachParser('convertWidgets', (parseHtml) => {
         <div
           data-embed-url="https://vimeo.com/76979871"
           data-embed-src="https://player.vimeo.com/video/76979871"
+          data-embed-ratio="16/9"
           data-embed-provider="vimeo"
           data-embed-id="76979871"
         ></div>
