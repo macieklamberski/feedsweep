@@ -11,7 +11,8 @@ describeForEachParser('WordPress', (parseHtml) => {
   // rebuildLazyLoadForVideos, rebuildEmbedPlusEmbeds and rebuildElementorVideoEmbeds.
   // An oEmbed block whose provider call failed ships the bare url alone. LinkifyUrls makes it a
   // link and unwrapWrappers drops the figure shell around it.
-  // wp-embedded-content post embeds are in open PR #361; add that clause when it merges.
+  // A post embed's blockquote becomes a cite through wordpressCiteResolver, and
+  // stripNonContentElements drops the frame paired with it.
 
   it('should reduce a failed oEmbed block to its linkified url', async () => {
     const value = html`
@@ -25,6 +26,39 @@ describeForEachParser('WordPress', (parseHtml) => {
     const expected = html`
       <p>Look:</p>
       <p> <a href="https://twitter.com/someone/status/1234567890123456789">https://twitter.com/someone/status/1234567890123456789</a> </p>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should turn a post embed into one cite and drop its paired frame', async () => {
+    const value = html`
+      <p>Read also:</p>
+      <blockquote class="wp-embedded-content" data-secret="hDl4S8YwKz">
+        <a href="https://www.e-startupindia.com/learn/gstr-1/">GSTR-1 Return Filing</a>
+      </blockquote>
+      <iframe
+        class="wp-embedded-content"
+        sandbox="allow-scripts"
+        security="restricted"
+        title="&#8220;GSTR-1 Return Filing&#8221; &#8212; E-Startup India"
+        src="https://www.e-startupindia.com/learn/gstr-1/embed/#?secret=hDl4S8YwKz"
+        data-secret="hDl4S8YwKz"
+        width="600"
+        height="338"
+        frameborder="0"
+        marginwidth="0"
+        marginheight="0"
+        scrolling="no"
+      ></iframe>
+    `
+    const expected = html`
+      <p>Read also:</p>
+      <div
+        data-cite-provider="wordpress"
+        data-cite-url="https://www.e-startupindia.com/learn/gstr-1/"
+        data-cite-title="GSTR-1 Return Filing"
+      ></div>
     `
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
@@ -108,6 +142,117 @@ describeForEachParser('WordPress', (parseHtml) => {
           <p><a href="https://example.com/source" target="_blank">Credit</a>: NASA/JPL</p>
         </figcaption>
       </figure>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // A "?" alt is WordPress failing to encode the emoji it meant, and the file is named by the
+  // codepoint.
+  it('should replace a core emoji image whose alt is "?" by its filename', async () => {
+    const value = html`
+      <p>Thanks
+        <img
+          draggable="false"
+          role="img"
+          class="emoji"
+          alt="?"
+          src="https://s.w.org/images/core/emoji/2.4/72x72/1f642.png"
+        >
+      </p>
+    `
+    const expected = '<p>Thanks 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // WordPress.com serves its smileys from s1 and s2 too, and one outside the Twemoji folder has
+  // no glyph, so it keeps its picture.
+  it('should mark a WordPress.com smiley served from s1', async () => {
+    const value = html`
+      <p>Ha
+        <img
+          src="https://s1.wp.com/wp-content/mu-plugins/wpcom-smileys/rolling-on-the-floor-laughing.png"
+          alt=""
+        >
+      </p>
+    `
+    const expected = html`
+      <p>Ha
+        <img
+          data-emoji=""
+          src="https://s1.wp.com/wp-content/mu-plugins/wpcom-smileys/rolling-on-the-floor-laughing.png"
+          alt=""
+        >
+      </p>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // Core binds :evil: to icon_evil.gif, an angry devil, where other engines draw a grinning one.
+  it('should mark an :evil: smiley, which engines draw as different devils', async () => {
+    const value = html`
+      <p>Grr
+        <img
+          src="https://example.com/wp-includes/images/smilies/icon_evil.gif"
+          alt=":evil:"
+          class="wp-smiley"
+          style="height: 1em; max-height: 1em;"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>Grr
+        <img
+          data-emoji=""
+          src="https://example.com/wp-includes/images/smilies/icon_evil.gif"
+          alt=":evil:"
+          class="wp-smiley"
+          style="height: 1em; max-height: 1em;"
+        >
+      </p>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should replace a WP Emoji One image with its character', async () => {
+    const value = html`
+      <p>Party
+        <img
+          decoding="async"
+          style="margin-left: 3px; margin-right: 3px; vertical-align: middle;"
+          src="https://example.com/wp-content/plugins/wp-emoji-one/icons/1F389.png"
+          width="16"
+          height="16"
+        >
+      </p>
+    `
+    const expected = '<p>Party 🎉</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should mark a pictogram from the TypePad Emoji for TinyMCE plugin', async () => {
+    const value = html`
+      <p>Sunny
+        <img
+          src="https://example.com/wp-content/plugins/typepad-emoji-for-tinymce/icons/01/sun.gif"
+          width="16"
+          height="16"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>Sunny
+        <img
+          data-emoji=""
+          src="https://example.com/wp-content/plugins/typepad-emoji-for-tinymce/icons/01/sun.gif"
+          width="16"
+          height="16"
+        >
+      </p>
     `
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)

@@ -50,6 +50,17 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should use a malformed chart id as written, even if the url answers an error', async () => {
+    const value = '<iframe src="https://datawrapper.dwcdn.net/ab_cd/1/"></iframe>'
+    const expected = html`
+      <a href="https://datawrapper.dwcdn.net/ab_cd/">
+        <img src="https://datawrapper.dwcdn.net/ab_cd/full.png">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should remove the sibling resize listener script', async () => {
     const value = html`
       <iframe src="https://datawrapper.dwcdn.net/bdqZJ/2/" title="Egg prices"></iframe>
@@ -100,6 +111,21 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should use a malformed wrapper chart id as written, even if the image answers an error', async () => {
+    const value = html`
+      <div id="datawrapper-vis-ab_cd">
+        <script src="https://datawrapper.dwcdn.net/ab_cd/embed.js"></script>
+      </div>
+    `
+    const expected = html`
+      <a href="https://datawrapper.dwcdn.net/ab_cd/">
+        <img src="https://datawrapper.dwcdn.net/ab_cd/full.png">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should recover the script form even when the noscript fallback is absent', async () => {
     const value = html`
       <div id="datawrapper-vis-CmrER" style="min-height:441px">
@@ -109,6 +135,21 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     const expected = html`
       <a href="https://datawrapper.dwcdn.net/CmrER/">
         <img src="https://datawrapper.dwcdn.net/CmrER/full.png">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should recover the script form of a chart whose id carries a digit', async () => {
+    const value = html`
+      <div id="datawrapper-vis-5AYa4">
+        <script type="text/javascript" defer src="https://datawrapper.dwcdn.net/5AYa4/embed.js" data-target="#datawrapper-vis-5AYa4"></script>
+      </div>
+    `
+    const expected = html`
+      <a href="https://datawrapper.dwcdn.net/5AYa4/">
+        <img src="https://datawrapper.dwcdn.net/5AYa4/full.png">
       </a>
     `
 

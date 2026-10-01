@@ -2,8 +2,8 @@ import { decodeSegment, getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// `{show}+{episode}`, both halves base64url.
-const safeTokenRegex = /^[A-Za-z0-9_-]+\+[A-Za-z0-9_-]+$/
+// `{show}+{episode}`: the `+` tells a token from a single word in the same slot.
+const tokenRegex = /^[^+]+\+[^+]+$/
 
 // A shape, not a version list: refusing a later version silently drops the height and the id.
 const playerVersionRegex = /^v\d$/
@@ -34,7 +34,7 @@ export const extractFiresideToken = (link: string): FiresidePlayer | undefined =
   // before it is tested. A malformed escape throws, and an unreadable token is no token.
   const token = decodeSegment(encodedToken)
 
-  if (token && safeTokenRegex.test(token)) {
+  if (token && tokenRegex.test(token)) {
     return { version, token }
   }
 }

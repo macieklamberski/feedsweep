@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -379,5 +380,25 @@ describeForEachParser('mergeFragmentedLists', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('fragmented lists the pipeline hands a reader', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should number a list shipped one ol per item as one list', async () => {
+    const value = html`
+      <ol>
+        <li>a</li>
+      </ol>
+      <ol>
+        <li>b</li>
+      </ol>
+    `
+    const expected = '<ol><li>a</li><li>b</li></ol>'
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

@@ -119,6 +119,15 @@ describeForEachParser('stripBoundaryBreaks', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    const lowerHeadingTags = ['h3', 'h4', 'h5', 'h6']
+
+    it.each(lowerHeadingTags)('should strip boundary br from %s', async (tag) => {
+      const value = `<${tag}><br>Heading<br></${tag}>`
+      const expected = `<${tag}>Heading</${tag}>`
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should strip boundary br from figcaption', async () => {
       const value = '<figure><figcaption><br>Caption<br></figcaption></figure>'
       const expected = '<figure><figcaption>Caption</figcaption></figure>'
@@ -317,6 +326,19 @@ describeForEachParser('stripBoundaryBreaks', (parseHtml) => {
       const expected = '<p>Something <span>one</span></p>'
 
       expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should strip a br before an empty inline wrapper at the block edge', async () => {
+      const value = '<p>Line one<br><span></span></p>'
+      const expected = '<p>Line one<span></span></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should preserve a br before an image at the block edge', async () => {
+      const value = '<p>Line one<br><img data-emoji="x"></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
     })
   })
 })

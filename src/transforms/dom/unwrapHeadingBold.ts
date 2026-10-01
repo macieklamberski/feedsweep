@@ -1,17 +1,15 @@
 import type { DomTransform } from '../../types.js'
 import {
   hasText,
+  headingSelector,
   isComment,
   isElement,
   isMediaElement,
   isWhitespaceText,
-  mediaElements,
+  mediaSelector,
 } from '../../utils/dom.js'
 
-const headingSelector = 'h1, h2, h3, h4, h5, h6'
 const boldTags = new Set(['b', 'strong'])
-
-const mediaSelector = [...mediaElements].join(', ')
 
 // A whitespace-only anchor beside the bold is gone by stripEmptyTags, so it must not block this.
 const isIgnorableNode = (node: Node): boolean => {

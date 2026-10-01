@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -104,5 +105,18 @@ describeForEachParser('stripLeadingIndentation', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('stripLeadingIndentation in the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml })
+  }
+
+  it('should strip a leading nbsp run from a paragraph', async () => {
+    const value = '<p>&nbsp;&nbsp;&nbsp;Lorem ipsum</p>'
+    const expected = '<p>Lorem ipsum</p>'
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
