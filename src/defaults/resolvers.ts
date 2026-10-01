@@ -133,6 +133,7 @@ import { guardianEmbedResolver } from '../embeds/guardian.js'
 import { hearthisEmbedResolver } from '../embeds/hearthis.js'
 import { helloassoEmbedResolver } from '../embeds/helloasso.js'
 import { heyzineEmbedResolver } from '../embeds/heyzine.js'
+import { iheartEmbedResolver } from '../embeds/iheart.js'
 import {
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
@@ -486,6 +487,7 @@ const embedResolvers: Array<EmbedResolver> = [
   hearthisEmbedResolver,
   helloassoEmbedResolver,
   heyzineEmbedResolver,
+  iheartEmbedResolver,
   imgurBlockquoteEmbedResolver,
   imgurIframeEmbedResolver,
   imgurS9eEmbedResolver,
