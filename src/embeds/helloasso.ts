@@ -1,6 +1,6 @@
-import { getPathSegments, isPlainObject } from 'trousse'
+import { getPathSegments } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { readPixels } from '../utils/hints.js'
+import { readObjectHeight } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -37,11 +37,7 @@ export const helloassoResolveEmbed: ResolveEmbed = (url) => {
 export const helloassoEmbedResolver = createUrlEmbedResolver(helloassoHosts, helloassoResolveEmbed)
 
 // The form posts its rendered height unasked as `{ height }`, again on each step it grows to.
-export const readHelloassoHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) ? readPixels(data.height) : undefined
-}
-
 export const helloassoRenderHint: EmbedRenderHint = {
   provider,
-  readHeight: readHelloassoHeight,
+  readHeight: readObjectHeight,
 }

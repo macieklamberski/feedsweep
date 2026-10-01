@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { helloassoEmbedResolver, helloassoResolveEmbed, readHelloassoHeight } from './helloasso.js'
+import { helloassoEmbedResolver, helloassoResolveEmbed } from './helloasso.js'
 
 describe('helloassoResolveEmbed', () => {
   describe('happy paths', () => {
@@ -155,20 +155,5 @@ describeForEachParser('helloasso widget through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
-  })
-})
-
-describe('readHelloassoHeight', () => {
-  // Captured from a HelloAsso event form framed on a cross-origin page in Chrome.
-  it('should read the height out of the message the form posts', () => {
-    expect(readHelloassoHeight({ height: 604 })).toBe(604)
-  })
-
-  it('should read nothing from a message posted as a string', () => {
-    expect(readHelloassoHeight('{"height":604}')).toBeUndefined()
-  })
-
-  it('should read nothing from a form that has not rendered', () => {
-    expect(readHelloassoHeight({ height: 0 })).toBeUndefined()
   })
 })

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { documentcloudEmbedResolver, readDocumentcloudHeight } from './documentcloud.js'
+import { documentcloudEmbedResolver } from './documentcloud.js'
 
 describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, documentcloudEmbedResolver)
@@ -372,27 +372,5 @@ describeForEachParser('documentcloud shapes the pipeline strips first', (parseHt
     `
 
     expect(await convert(value)).toEqualHtml(expected)
-  })
-})
-
-describe('readDocumentcloudHeight', () => {
-  // Captured from `embed.documentcloud.org/documents/28200073/pages/1/?embed=1` in Chrome.
-  it('should read the height out of the message a page embed posts', () => {
-    const value = {
-      width: 600,
-      height: 882,
-      updateStyleProps: false,
-      href: 'https://embed.documentcloud.org/documents/28200073/pages/1/?embed=1',
-    }
-
-    expect(readDocumentcloudHeight(value)).toBe(882)
-  })
-
-  it('should read nothing from a message posted as a string', () => {
-    expect(readDocumentcloudHeight('{"height":882}')).toBeUndefined()
-  })
-
-  it('should read nothing from an embed that has not rendered', () => {
-    expect(readDocumentcloudHeight({ width: 600, height: 0 })).toBeUndefined()
   })
 })

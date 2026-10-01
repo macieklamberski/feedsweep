@@ -3,6 +3,7 @@ import {
   isPlayerJsReady,
   playerJsPlayRequest,
   readIframeResizeHeight,
+  readObjectHeight,
   readPixels,
 } from './hints.js'
 
@@ -73,5 +74,41 @@ describe('readIframeResizeHeight', () => {
     expect(readIframeResizeHeight('{"context":"iframe.resize","height":0}')).toBeUndefined()
     expect(readIframeResizeHeight('{"context":"iframe.ready","height":500}')).toBeUndefined()
     expect(readIframeResizeHeight('iframe.resize')).toBeUndefined()
+  })
+})
+
+describe('readObjectHeight', () => {
+  // Captured from a Bluesky post frame in Chrome.
+  it('should read the height out of the message a Bluesky post posts', () => {
+    expect(readObjectHeight({ height: 687.125, id: '1' })).toBe(687.125)
+  })
+
+  // Captured from `embed.documentcloud.org/documents/28200073/pages/1/?embed=1` in Chrome.
+  it('should read the height out of the message a DocumentCloud page posts', () => {
+    const value = {
+      width: 600,
+      height: 882,
+      updateStyleProps: false,
+      href: 'https://embed.documentcloud.org/documents/28200073/pages/1/?embed=1',
+    }
+
+    expect(readObjectHeight(value)).toBe(882)
+  })
+
+  // Captured from a HelloAsso event form framed on a cross-origin page in Chrome.
+  it('should read the height out of the message a HelloAsso form posts', () => {
+    expect(readObjectHeight({ height: 604 })).toBe(604)
+  })
+
+  it('should read nothing out of a message without a height', () => {
+    expect(readObjectHeight({ id: '1' })).toBeUndefined()
+  })
+
+  it('should read nothing from a message posted as a string', () => {
+    expect(readObjectHeight('{"height":604}')).toBeUndefined()
+  })
+
+  it('should read nothing from a frame that has not rendered', () => {
+    expect(readObjectHeight({ height: 0 })).toBeUndefined()
   })
 })

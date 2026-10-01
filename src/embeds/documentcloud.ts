@@ -1,6 +1,6 @@
-import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
+import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
-import { readPixels } from '../utils/hints.js'
+import { readObjectHeight } from '../utils/hints.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'documentcloud'
@@ -82,11 +82,7 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
 
 // A page or note embed posts its rendered height unasked, as `{ width, height, href }`. The
 // document viewer posts nothing.
-export const readDocumentcloudHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) ? readPixels(data.height) : undefined
-}
-
 export const documentcloudRenderHint: EmbedRenderHint = {
   provider,
-  readHeight: readDocumentcloudHeight,
+  readHeight: readObjectHeight,
 }
