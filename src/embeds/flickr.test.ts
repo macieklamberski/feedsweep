@@ -817,11 +817,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/8NKp7f',
-        src: 'https://embedr.flickr.com/photos/5123523742?width=400&height=300',
+        src: 'https://embedr.flickr.com/photos/5123523742?width=640&height=360',
         url: 'https://flic.kr/p/8NKp7f',
         thumbnail: 'https://live.staticflickr.com/0/5123523742_9f9359f01e_b.jpg',
-        width: 400,
-        height: 300,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -840,11 +839,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/8NKp7f',
-        src: 'https://embedr.flickr.com/photos/5123523742?width=400&height=300',
+        src: 'https://embedr.flickr.com/photos/5123523742?width=640&height=360',
         url: 'https://flic.kr/p/8NKp7f',
         thumbnail: 'https://live.staticflickr.com/0/5123523742_9f9359f01e_b.jpg',
-        width: 400,
-        height: 300,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -863,16 +861,15 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/4Jm8J9',
-        src: 'https://embedr.flickr.com/photos/2448291368?width=400&height=300',
+        src: 'https://embedr.flickr.com/photos/2448291368?width=640&height=360',
         url: 'https://flic.kr/p/4Jm8J9',
-        width: 400,
-        height: 300,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should fall back to the dialog size when the carrier states none', async () => {
+    it('should ask the video player for its 16:9 box when the carrier states none', async () => {
       const value = html`
         <embed
           src="https://www.flickr.com/apps/video/stewart.swf"
@@ -882,11 +879,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/4Jm8J9',
-        src: 'https://embedr.flickr.com/photos/2448291368?width=400&height=300',
+        src: 'https://embedr.flickr.com/photos/2448291368?width=640&height=360',
         url: 'https://flic.kr/p/4Jm8J9',
         thumbnail: 'https://live.staticflickr.com/0/2448291368_3dfa305404_b.jpg',
-        width: 400,
-        height: 300,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -902,11 +898,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/4Jm8J9',
-        src: 'https://embedr.flickr.com/photos/2448291368?width=400&height=300',
+        src: 'https://embedr.flickr.com/photos/2448291368?width=640&height=360',
         url: 'https://flic.kr/p/4Jm8J9',
         thumbnail: 'https://live.staticflickr.com/0/2448291368_3dfa305404%2F..%2Fx_b.jpg',
-        width: 400,
-        height: 300,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

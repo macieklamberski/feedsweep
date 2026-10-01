@@ -135,15 +135,13 @@ export const fc2BlogScriptEmbedResolver = createMarkupEmbedResolver(
     // The id comes out of the query decoded, and it goes into a path.
     const contentId = encodePathSegment(videoId)
 
-    // The shim writes `suggest="off"` on the loader unless `rel=1`, and a smaller box when `s`
-    // is present with any value. The account tag it writes is not derivable from the url.
+    // The shim writes `suggest="off"` on the loader unless `rel=1`. The account tag it writes is
+    // not derivable from the url.
     const params = loader.searchParams.get('rel') === '1' ? undefined : { sg: '0' }
-    const isSmall = loader.searchParams.has('s')
 
     return {
       ...composeEmbed({ contentId, locale: 'ja' }, params),
-      width: isSmall ? 320 : 446,
-      height: isSmall ? 273 : 380,
+      ratio: '16/9',
     }
   },
 )

@@ -432,8 +432,7 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
         id: '20230116F3WJd7kn',
         src: 'https://video.fc2.com/embed/player/20230116F3WJd7kn/?sg=0',
         url: 'https://video.fc2.com/ja/content/20230116F3WJd7kn/',
-        width: 446,
-        height: 380,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -451,14 +450,14 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
         id: '20150612T5yKXfrt',
         src: 'https://video.fc2.com/embed/player/20150612T5yKXfrt/',
         url: 'https://video.fc2.com/ja/content/20150612T5yKXfrt/',
-        width: 446,
-        height: 380,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should state the smaller box for a shim carrying s', async () => {
+    // The `s` flag picks the box the shim writes, which counts as the carrier's size.
+    it('should state the player ratio over the smaller box a shim carrying s asks for', async () => {
       const value = html`
         <script
           type="text/javascript"
@@ -470,8 +469,7 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
         id: '20101012GXMya76M',
         src: 'https://video.fc2.com/embed/player/20101012GXMya76M/',
         url: 'https://video.fc2.com/ja/content/20101012GXMya76M/',
-        width: 320,
-        height: 273,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -486,8 +484,7 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
         id: '20180204VvaeWBM9',
         src: 'https://video.fc2.com/embed/player/20180204VvaeWBM9/',
         url: 'https://video.fc2.com/ja/content/20180204VvaeWBM9/',
-        width: 446,
-        height: 380,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -520,8 +517,7 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
         id: '2023-01-16',
         src: 'https://video.fc2.com/embed/player/2023-01-16/?sg=0',
         url: 'https://video.fc2.com/ja/content/2023-01-16/',
-        width: 446,
-        height: 380,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -536,8 +532,7 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
         id: '2023%2F0116',
         src: 'https://video.fc2.com/embed/player/2023%2F0116/?sg=0',
         url: 'https://video.fc2.com/ja/content/2023%2F0116/',
-        width: 446,
-        height: 380,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -554,24 +549,7 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
         id: '20230116F3WJd7kn',
         src: 'https://video.fc2.com/embed/player/20230116F3WJd7kn/?sg=0',
         url: 'https://video.fc2.com/ja/content/20230116F3WJd7kn/',
-        width: 446,
-        height: 380,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should state the smaller box for an empty s', async () => {
-      const value = html`
-        <script src="https://admin.blog.fc2.com/fc2video2.php?id=20230116F3WJd7kn&s=&rel=1&uno=12879754"></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'fc2',
-        id: '20230116F3WJd7kn',
-        src: 'https://video.fc2.com/embed/player/20230116F3WJd7kn/',
-        url: 'https://video.fc2.com/ja/content/20230116F3WJd7kn/',
-        width: 320,
-        height: 273,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)

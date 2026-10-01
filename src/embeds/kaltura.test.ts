@@ -395,7 +395,8 @@ describeForEachParser('kalturaScriptEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, kalturaScriptEmbedResolver)
 
   describe('happy paths', () => {
-    // The 560x395 in the script's query is the carrier's size, which shallow handling does not read.
+    // The 560x395 in the script's query is the carrier's size, which shallow handling does not
+    // read.
     it('should rebuild the iframe the auto-embed script would have written', async () => {
       const value = html`
         <div

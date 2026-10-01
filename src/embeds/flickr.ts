@@ -102,6 +102,10 @@ const composePhotoThumbnail = (photoId: string, secret: string): string => {
 // names, so there is no rendered height to measure against.
 const dialogSize = { width: 400, height: 300 }
 
+// embedr draws its box at the size the query names, whatever the frame, so the video player is
+// asked for 16:9.
+const videoSize = { width: 640, height: 360 }
+
 // What a page path names, whether it arrived in the flashvars or as the framed page itself.
 // A value read out of a path is decoded, so each is held in one form and only the urls encode it.
 const decodePathValue = (owner: string): string => {
@@ -311,9 +315,15 @@ const resolveTarget = (
     return
   }
 
+  // The size always travels in the src: with no query every image renders at NaN.
+  if (flashVideoPathRegex.test(parsed.pathname)) {
+    const { width, height } = videoSize
+
+    return { ...result, src: `${result.src}?width=${width}&height=${height}`, ratio: '16/9' }
+  }
+
   const { width, height } = dialogSize
 
-  // The size always travels in the src: with no query every image renders at NaN.
   return { ...result, src: `${result.src}?width=${width}&height=${height}`, width, height }
 }
 

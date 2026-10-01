@@ -85,7 +85,8 @@ describe('extractLibsynEmbed', () => {
 describe('libsynResolveEmbed', () => {
   // The old host answers 500 for older episodes while play.libsyn.com serves them, so the
   // rebuilt src is a repair rather than a cosmetic rewrite.
-  // The height option is the carrier's size, which shallow handling does not read or carry into the src.
+  // The height option is the carrier's size, which shallow handling does not read or carry into
+  // the src.
   it('should mint the modern player host over the height its path names', () => {
     const value = 'https://html5-player.libsyn.com/embed/episode/id/5508311/height/90/theme/custom/'
     const expected: EmbedResolverResult = {
