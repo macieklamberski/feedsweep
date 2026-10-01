@@ -200,6 +200,48 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should neutralize a javascript: embed src to the media sentinel', async () => {
+      const value = '<embed src="javascript:alert(1)">'
+      const expected = '<embed src="about:blank">'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should neutralize a javascript: object data to the media sentinel', async () => {
+      const value = '<object data="javascript:alert(1)"></object>'
+      const expected = '<object data="about:blank"></object>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should neutralize a javascript: video src to the media sentinel', async () => {
+      const value = '<video src="javascript:alert(1)"></video>'
+      const expected = '<video src="about:blank"></video>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should neutralize a javascript: audio src to the media sentinel', async () => {
+      const value = '<audio src="javascript:alert(1)"></audio>'
+      const expected = '<audio src="about:blank"></audio>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should neutralize a javascript: source src to the media sentinel', async () => {
+      const value = '<video><source src="javascript:alert(1)"></video>'
+      const expected = '<video><source src="about:blank"></video>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should neutralize a javascript: track src to the media sentinel', async () => {
+      const value = '<video><track src="javascript:alert(1)"></video>'
+      const expected = '<video><track src="about:blank"></video>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     // A scheme is dangerous only at the start: this lab url carries one inside a mangled id.
     it('should keep a url that carries a scheme word past its start', async () => {
       const value =
@@ -323,8 +365,8 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    // Every element is walked and its tag name looked up in the role maps, so a feed naming a
-    // tag after a member every object inherits reaches those maps with it. It has to answer the
+    // Every element is walked and its tag name looked up in the url attribute table, so a feed
+    // naming a tag after a member every object inherits reaches that lookup with it. It has to answer the
     // way it answers a tag it does not know.
     it('should leave an element named after an inherited member untouched', async () => {
       const value = '<constructor href="javascript:alert(1)">text</constructor>'
