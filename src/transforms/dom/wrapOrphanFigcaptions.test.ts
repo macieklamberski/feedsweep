@@ -160,6 +160,38 @@ describeForEachParser('wrapOrphanFigcaptions', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should wrap a bare image and its trailing figcaption', async () => {
+    const value = html`
+      <img src="chart.png">
+      <figcaption>The device listing.</figcaption>
+    `
+    const expected = html`
+      <figure>
+        <img src="chart.png">
+        <figcaption>The device listing.</figcaption>
+      </figure>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should drop the wrapper a caption after a bare image leaves empty', async () => {
+    const value = html`
+      <img src="chart.png">
+      <div>
+        <figcaption>The device listing.</figcaption>
+      </div>
+    `
+    const expected = html`
+      <figure>
+        <img src="chart.png">
+        <figcaption>The device listing.</figcaption>
+      </figure>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should wrap a video and its trailing figcaption', async () => {
     const value = html`
       <div><video src="clip.mp4"></video></div>

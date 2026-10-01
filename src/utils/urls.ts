@@ -25,6 +25,18 @@ export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
 
 export const digitsRegex = /^\d+$/
 
+// A browser trims C0 controls and spaces from both ends, so \x01javascript: runs. Inside the
+// url it drops only tabs and newlines: java\tscript: runs, java script: is a relative path.
+// See: https://url.spec.whatwg.org/#concept-basic-url-parser.
+const c0ControlOrSpaceClass = '[\\x00-\\x20]+' // C0 controls and space
+const urlEdgeCharsRegex = new RegExp(`^${c0ControlOrSpaceClass}|${c0ControlOrSpaceClass}$`, 'g')
+const urlTabOrNewlineRegex = /[\t\n\r]/g
+
+// The url as a browser reads its scheme, for testing it against a scheme regex.
+export const stripUrlIgnorableChars = (url: string): string => {
+  return url.replace(urlEdgeCharsRegex, '').replace(urlTabOrNewlineRegex, '')
+}
+
 // No m3u8 or mpd: only Safari plays them natively, so promoting one breaks the player elsewhere.
 export const imageFileRegex = /\.(avif|gif|jpe?g|png|svg|webp)(\?|#|$)/i
 export const videoFileRegex = /\.(mp4|m4v|webm|mov|ogv)(\?|#|$)/i

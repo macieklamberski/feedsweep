@@ -23,6 +23,46 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should drop the token the embed code carries', async () => {
+      const value = script(
+        'https://redfield.podigee.io/183-r-183-mit-michaela-schneider-ceo-von-allgaeu-concerts/embed?context=external&amp;token=j0d6cKXw8sAaSGMikUmG5A',
+      )
+      const expected: EmbedResolverResult = {
+        provider: 'podigee',
+        id: 'redfield/183-r-183-mit-michaela-schneider-ceo-von-allgaeu-concerts',
+        src: 'https://redfield.podigee.io/183-r-183-mit-michaela-schneider-ceo-von-allgaeu-concerts/embed?context=external',
+        height: 145,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the show-level player, which plays the latest episode', async () => {
+      const value = script('https://theshow.podigee.io/embed?context=external')
+      const expected: EmbedResolverResult = {
+        provider: 'podigee',
+        id: 'theshow/embed',
+        src: 'https://theshow.podigee.io/embed?context=external',
+        height: 145,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the campaign source from the player url', async () => {
+      const value = script(
+        'https://theshow.podigee.io/42-an-episode/embed?context=external&amp;source=spring-campaign',
+      )
+      const expected: EmbedResolverResult = {
+        provider: 'podigee',
+        id: 'theshow/42-an-episode',
+        src: 'https://theshow.podigee.io/42-an-episode/embed?context=external',
+        height: 145,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -36,6 +76,25 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
     it('should ignore an inline configuration reference', async () => {
       expect(await extract(script('podigee'))).toBeUndefined()
       expect(await extract(script('playerConfiguration'))).toBeUndefined()
+    })
+
+    // The company host answers `/embed` with a 301 to its marketing site.
+    it('should ignore the show-level player path on the company host', async () => {
+      const value = script('https://www.podigee.io/embed?context=external')
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an unnumbered page that does not name the player', async () => {
+      const value = script('https://theshow.podigee.io/about-the-show')
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the show-level player path', async () => {
+      const value = script('https://evil.test/embed?context=external')
+
+      expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the player path', async () => {
@@ -69,7 +128,7 @@ describe('podigeeResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'podigee',
       id: 'cloudonaut/72-serverless-and-devops-a-match',
-      src: 'https://cloudonaut.podigee.io/72-serverless-and-devops-a-match/embed',
+      src: 'https://cloudonaut.podigee.io/72-serverless-and-devops-a-match/embed?context=external',
       height: 145,
     }
 
@@ -81,7 +140,7 @@ describe('podigeeResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'podigee',
       id: 'diepresse1848/100-neue-episode',
-      src: 'https://diepresse1848.podigee.io/100-neue-episode/embed',
+      src: 'https://diepresse1848.podigee.io/100-neue-episode/embed?context=external',
       height: 145,
     }
 
@@ -114,14 +173,13 @@ describe('podigeeResolveEmbed', () => {
     expect(podigeeResolveEmbed(value)).toBeUndefined()
   })
 
-  // A carrier already framing the player is left as the publisher wrote it, so Podigee's own
-  // `context=external` survives.
-  it('should keep the query on a url that already names the player', () => {
-    const value = 'https://cloudonaut.podigee.io/72-an-episode/embed?context=external'
+  it('should mint the embed code url over a player url carrying other parameters', () => {
+    const value =
+      'https://cloudonaut.podigee.io/72-an-episode/embed?context=external&utm_source=feed'
     const expected: EmbedResolverResult = {
       provider: 'podigee',
       id: 'cloudonaut/72-an-episode',
-      src: value,
+      src: 'https://cloudonaut.podigee.io/72-an-episode/embed?context=external',
       height: 145,
     }
 
@@ -134,7 +192,7 @@ describe('podigeeResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'podigee',
       id: 'cloudonaut/an-unnumbered-episode',
-      src: value,
+      src: 'https://cloudonaut.podigee.io/an-unnumbered-episode/embed?context=external',
       height: 145,
     }
 
@@ -155,7 +213,7 @@ describe('podigeeResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'podigee',
       id: 'cloudonaut/72-an-episode',
-      src: 'https://cloudonaut.podigee.io/72-an-episode/embed',
+      src: 'https://cloudonaut.podigee.io/72-an-episode/embed?context=external',
       height: 145,
     }
 
@@ -211,7 +269,7 @@ describeForEachParser('podigee through the pipeline', (parseHtml) => {
       <div
         data-embed-id="cloudonaut/72-an-episode"
         data-embed-provider="podigee"
-        data-embed-src="https://cloudonaut.podigee.io/72-an-episode/embed"
+        data-embed-src="https://cloudonaut.podigee.io/72-an-episode/embed?context=external"
         data-embed-height="145"
       ></div>
     `

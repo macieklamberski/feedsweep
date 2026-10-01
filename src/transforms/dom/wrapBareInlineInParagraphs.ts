@@ -3,6 +3,7 @@ import {
   hasAncestorWithTagName,
   hasText,
   isBlockElement,
+  isComment,
   isElement,
   isText,
   mediaSelector,
@@ -100,20 +101,21 @@ export const wrapBareInlineInParagraphs: DomTransform = () => {
           return
         }
 
-        const bufferHasText = buffer.some(hasText)
+        // A comment's textContent is its body, which renders nothing.
+        const bufferHasText = buffer.some((node) => !isComment(node) && hasText(node))
 
         if (bufferHasText) {
           let start = 0
           let end = buffer.length - 1
 
-          while (isMediaBoundary(buffer[start])) {
+          while (start <= end && isMediaBoundary(buffer[start])) {
             newChildren.push(buffer[start])
             start++
           }
 
           const trailing: Array<Node> = []
 
-          while (isMediaBoundary(buffer[end])) {
+          while (end >= start && isMediaBoundary(buffer[end])) {
             trailing.unshift(buffer[end])
             end--
           }
