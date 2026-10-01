@@ -71,6 +71,7 @@ import {
   buzzsproutScriptEmbedResolver,
 } from '../embeds/buzzsprout.js'
 import { calameoEmbedResolver } from '../embeds/calameo.js'
+import { canaluEmbedResolver } from '../embeds/canalu.js'
 import { canvaIframeEmbedResolver, canvaWidgetEmbedResolver } from '../embeds/canva.js'
 import { captivateEmbedResolver } from '../embeds/captivate.js'
 import { ccmaEmbedResolver } from '../embeds/ccma.js'
@@ -96,6 +97,7 @@ import { dailymotionEmbedResolver } from '../embeds/dailymotion.js'
 import { deezerEmbedResolver } from '../embeds/deezer.js'
 import { documentcloudEmbedResolver } from '../embeds/documentcloud.js'
 import { donorboxEmbedResolver } from '../embeds/donorbox.js'
+import { educaplayEmbedResolver } from '../embeds/educaplay.js'
 import {
   facebookAmpEmbedResolver,
   facebookBlockquoteEmbedResolver,
@@ -113,6 +115,7 @@ import {
 import { figmaEmbedResolver } from '../embeds/figma.js'
 import { figshareEmbedResolver } from '../embeds/figshare.js'
 import { firesideEmbedResolver } from '../embeds/fireside.js'
+import { firstoryEmbedResolver } from '../embeds/firstory.js'
 import { flickrEmbedResolver } from '../embeds/flickr.js'
 import {
   fliphtml5IframeEmbedResolver,
@@ -177,6 +180,7 @@ import { mediavineScriptEmbedResolver, mediavineWidgetEmbedResolver } from '../e
 import { megaphoneEmbedResolver } from '../embeds/megaphone.js'
 import { megatvEmbedResolver } from '../embeds/megatv.js'
 import { mixcloudEmbedResolver } from '../embeds/mixcloud.js'
+import { mrcvideoEmbedResolver, mrcvideoFlashEmbedResolver } from '../embeds/mrcvideo.js'
 import { nbcnewsEmbedResolver } from '../embeds/nbcnews.js'
 import { neteaseEmbedResolver } from '../embeds/netease.js'
 import { nicovideoIframeEmbedResolver, nicovideoScriptEmbedResolver } from '../embeds/nicovideo.js'
@@ -188,6 +192,7 @@ import { odnoklassnikiEmbedResolver } from '../embeds/odnoklassniki.js'
 import { odyseeEmbedResolver } from '../embeds/odysee.js'
 import { officeEmbedResolver } from '../embeds/office.js'
 import { omnyEmbedResolver } from '../embeds/omny.js'
+import { opendriveEmbedResolver } from '../embeds/opendrive.js'
 import { ourworldindataEmbedResolver } from '../embeds/ourworldindata.js'
 import { padletEmbedResolver } from '../embeds/padlet.js'
 import { pastebinIframeEmbedResolver, pastebinScriptEmbedResolver } from '../embeds/pastebin.js'
@@ -198,12 +203,16 @@ import {
   pbsLegacyIframeEmbedResolver,
 } from '../embeds/pbs.js'
 import { peertubeEmbedResolver } from '../embeds/peertube.js'
+import { piktochartIframeEmbedResolver } from '../embeds/piktochart.js'
+import { pinecastEmbedResolver } from '../embeds/pinecast.js'
 import { pixivIframeEmbedResolver, pixivScriptEmbedResolver } from '../embeds/pixiv.js'
 import { podbeanEmbedResolver } from '../embeds/podbean.js'
+import { podcloudIframeEmbedResolver, podcloudWidgetEmbedResolver } from '../embeds/podcloud.js'
 import { podetizeIframeEmbedResolver, podetizeScriptEmbedResolver } from '../embeds/podetize.js'
 import { podigeeIframeEmbedResolver, podigeeScriptEmbedResolver } from '../embeds/podigee.js'
 import { podomaticEmbedResolver } from '../embeds/podomatic.js'
 import { preziEmbedResolver } from '../embeds/prezi.js'
+import { puzzlemeEmbedResolver, puzzlemeWidgetEmbedResolver } from '../embeds/puzzleme.js'
 import { redcircleIframeEmbedResolver, redcircleScriptEmbedResolver } from '../embeds/redcircle.js'
 import {
   redditIframeEmbedResolver,
@@ -212,12 +221,14 @@ import {
 } from '../embeds/reddit.js'
 import { reverbnationEmbedResolver } from '../embeds/reverbnation.js'
 import { ridewithgpsEmbedResolver } from '../embeds/ridewithgps.js'
+import { rsscomEmbedResolver } from '../embeds/rsscom.js'
 import { rtveFlashEmbedResolver, rtveIframeEmbedResolver } from '../embeds/rtve.js'
 import { rutubeEmbedResolver } from '../embeds/rutube.js'
 import { scratchEmbedResolver } from '../embeds/scratch.js'
 import { scribdFlashEmbedResolver, scribdIframeEmbedResolver } from '../embeds/scribd.js'
 import { simplecastEmbedResolver } from '../embeds/simplecast.js'
 import { sketchfabEmbedResolver } from '../embeds/sketchfab.js'
+import { slideserveEmbedResolver } from '../embeds/slideserve.js'
 import {
   slideshareFlashEmbedResolver,
   slideshareIframeEmbedResolver,
@@ -234,7 +245,10 @@ import { stackblitzIframeEmbedResolver } from '../embeds/stackblitz.js'
 import { standfmEmbedResolver } from '../embeds/standfm.js'
 import { steamEmbedResolver } from '../embeds/steam.js'
 import { stravaIframeEmbedResolver, stravaPlaceholderEmbedResolver } from '../embeds/strava.js'
+import { strawpollIframeEmbedResolver, strawpollMountEmbedResolver } from '../embeds/strawpoll.js'
+import { subsplashEmbedResolver } from '../embeds/subsplash.js'
 import { swayEmbedResolver } from '../embeds/sway.js'
+import { symbalooEmbedResolver } from '../embeds/symbaloo.js'
 import {
   tableauIframeEmbedResolver,
   tableauObjectEmbedResolver,
@@ -292,6 +306,7 @@ import {
 } from '../embeds/youtube.js'
 import { yumpuEmbedResolver } from '../embeds/yumpu.js'
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
+import { zenoEmbedResolver } from '../embeds/zeno.js'
 import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
 import { bitrixEmojiResolver } from '../emojis/bitrix.js'
@@ -437,6 +452,7 @@ const embedResolvers: Array<EmbedResolver> = [
   buzzsproutIframeEmbedResolver,
   buzzsproutScriptEmbedResolver,
   calameoEmbedResolver,
+  canaluEmbedResolver,
   canvaIframeEmbedResolver,
   canvaWidgetEmbedResolver,
   captivateEmbedResolver,
@@ -458,6 +474,7 @@ const embedResolvers: Array<EmbedResolver> = [
   deezerEmbedResolver,
   documentcloudEmbedResolver,
   donorboxEmbedResolver,
+  educaplayEmbedResolver,
   facebookWidgetEmbedResolver,
   facebookIframeEmbedResolver,
   facebookS9eEmbedResolver,
@@ -471,6 +488,7 @@ const embedResolvers: Array<EmbedResolver> = [
   figmaEmbedResolver,
   figshareEmbedResolver,
   firesideEmbedResolver,
+  firstoryEmbedResolver,
   flickrEmbedResolver,
   fliphtml5IframeEmbedResolver,
   fliphtml5LightBoxEmbedResolver,
@@ -532,6 +550,8 @@ const embedResolvers: Array<EmbedResolver> = [
   megaphoneEmbedResolver,
   megatvEmbedResolver,
   mixcloudEmbedResolver,
+  mrcvideoEmbedResolver,
+  mrcvideoFlashEmbedResolver,
   nbcnewsEmbedResolver,
   neteaseEmbedResolver,
   nicovideoScriptEmbedResolver,
@@ -545,6 +565,7 @@ const embedResolvers: Array<EmbedResolver> = [
   odyseeEmbedResolver,
   officeEmbedResolver,
   omnyEmbedResolver,
+  opendriveEmbedResolver,
   ourworldindataEmbedResolver,
   padletEmbedResolver,
   pastebinIframeEmbedResolver,
@@ -553,15 +574,21 @@ const embedResolvers: Array<EmbedResolver> = [
   pbsFlashEmbedResolver,
   pbsIframeEmbedResolver,
   pbsLegacyIframeEmbedResolver,
+  piktochartIframeEmbedResolver,
+  pinecastEmbedResolver,
   pixivIframeEmbedResolver,
   pixivScriptEmbedResolver,
   podbeanEmbedResolver,
+  podcloudIframeEmbedResolver,
+  podcloudWidgetEmbedResolver,
   podetizeScriptEmbedResolver,
   podetizeIframeEmbedResolver,
   podigeeScriptEmbedResolver,
   podigeeIframeEmbedResolver,
   podomaticEmbedResolver,
   preziEmbedResolver,
+  puzzlemeEmbedResolver,
+  puzzlemeWidgetEmbedResolver,
   redcircleScriptEmbedResolver,
   redcircleIframeEmbedResolver,
   redditWidgetEmbedResolver,
@@ -569,6 +596,7 @@ const embedResolvers: Array<EmbedResolver> = [
   redditS9eEmbedResolver,
   reverbnationEmbedResolver,
   ridewithgpsEmbedResolver,
+  rsscomEmbedResolver,
   rtveIframeEmbedResolver,
   rtveFlashEmbedResolver,
   rutubeEmbedResolver,
@@ -577,6 +605,7 @@ const embedResolvers: Array<EmbedResolver> = [
   scribdIframeEmbedResolver,
   simplecastEmbedResolver,
   sketchfabEmbedResolver,
+  slideserveEmbedResolver,
   slideshareFlashEmbedResolver,
   slideshareIframeEmbedResolver,
   soundcloudEmbedResolver,
@@ -591,7 +620,11 @@ const embedResolvers: Array<EmbedResolver> = [
   steamEmbedResolver,
   stravaIframeEmbedResolver,
   stravaPlaceholderEmbedResolver,
+  strawpollIframeEmbedResolver,
+  strawpollMountEmbedResolver,
+  subsplashEmbedResolver,
   swayEmbedResolver,
+  symbalooEmbedResolver,
   tableauWidgetEmbedResolver,
   tableauObjectEmbedResolver,
   tableauIframeEmbedResolver,
@@ -636,6 +669,7 @@ const embedResolvers: Array<EmbedResolver> = [
   yumpuEmbedResolver,
   zencastrBlockquoteEmbedResolver,
   zencastrIframeEmbedResolver,
+  zenoEmbedResolver,
   // Last, outside the alphabet: keyed on a path shape rather than a host, so every resolver
   // naming a host gets the carrier first.
   mastodonEmbedResolver,
