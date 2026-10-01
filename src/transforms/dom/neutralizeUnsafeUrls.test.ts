@@ -380,16 +380,9 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    // The tag-less rows of urlAttributes restate by hand the url-carrying field names minted in
-    // utils/widgets.ts, so a url field added there and not in the table ships unchecked and nothing
-    // fails. The next two derive both sides instead of listing them a third time: the field set
-    // from normalizeEmbedFields/normalizeCiteFields, which of them are urls from
-    // prepareEmbedMetadata/prepareCiteMetadata being the pass that resolves one, and the
-    // attribute names from the placeholder the mint path actually builds.
-    //
-    // Every field is handed the same non-url marker and the context resolver answers with the
-    // unsafe url, so whatever the placeholder ends up carrying it is exactly what the mint path
-    // treats as a url. Anything still carrying it after the pass is a url the pass never saw.
+    // A url field added to utils/widgets.ts and missing from urlAttributes fails the next two.
+    // Every field gets a non-url marker and the resolver answers with the unsafe url, so any
+    // attribute still carrying it after the pass is a url the pass never saw.
     const unsafeUrl = 'javascript:alert(1)'
     const mintContext: TransformContext = { ...baseContext, resolveUrlFn: () => unsafeUrl }
 
