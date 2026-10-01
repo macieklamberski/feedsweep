@@ -58,9 +58,9 @@ const composeEmbedResult = (identifier: string, query = ''): EmbedResolverResult
 const audioPlayerHeight = 30
 const videoPlayerRatio = '16/9'
 
-// `embed/{identifier}` serves audio and video alike. Almost every item embedded under 100 tall is
-// audio: the modern bar at 30, and the 40 and 60 the older snippets wrote.
-const audioCarrierHeightLimit = 100
+// `embed/{identifier}` serves every kind of item, so the declared box only picks the kind. Every
+// item declared under 200 tall is audio, and the bar it gets is 30 tall whatever the box.
+const audioCarrierHeightLimit = 200
 
 const declaresAudioPlayer = (element: Element): boolean => {
   const { height } = getEmbedSize(element, 0)
