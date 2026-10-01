@@ -51,6 +51,7 @@ import { pinecastRenderHint } from '../embeds/pinecast.js'
 import { podbeanRenderHint } from '../embeds/podbean.js'
 import { podcloudRenderHint } from '../embeds/podcloud.js'
 import { podigeeRenderHint } from '../embeds/podigee.js'
+import { puzzlemeRenderHint } from '../embeds/puzzleme.js'
 import { redditRenderHint } from '../embeds/reddit.js'
 import { reverbnationRenderHint } from '../embeds/reverbnation.js'
 import { rsscomRenderHint } from '../embeds/rsscom.js'
@@ -137,6 +138,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   podbeanRenderHint,
   podcloudRenderHint,
   podigeeRenderHint,
+  puzzlemeRenderHint,
   redditRenderHint,
   reverbnationRenderHint,
   rsscomRenderHint,
