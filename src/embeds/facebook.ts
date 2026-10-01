@@ -239,7 +239,11 @@ export const readFacebookHeight = (data: unknown): number | undefined => {
 
   const message = new URLSearchParams(data)
 
-  return message.get('type') === 'resize' ? readPixels(message.get('height')) : undefined
+  if (message.get('type') !== 'resize') {
+    return
+  }
+
+  return readPixels(message.get('height'))
 }
 
 export const facebookRenderHint: EmbedRenderHint = {

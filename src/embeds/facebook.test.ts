@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import {
   facebookAmpEmbedResolver,
   facebookBlockquoteEmbedResolver,
   facebookIframeEmbedResolver,
+  facebookRenderHint,
   facebookResolveEmbed,
   facebookS9eEmbedResolver,
   facebookWidgetEmbedResolver,
@@ -1071,8 +1072,6 @@ describe('facebookResolveEmbed', () => {
   })
 })
 
-// The three contracts no single resolver can state, because each one is a handoff between
-// passes that know nothing about each other.
 describe('readFacebookHeight', () => {
   it('should read the height out of the post plugin resize message', () => {
     expect(readFacebookHeight('type=resize&cb=&width=500&height=421')).toBe(421)
@@ -1090,6 +1089,25 @@ describe('readFacebookHeight', () => {
   })
 })
 
+describe('facebookRenderHint', () => {
+  // Without both parameters the post plugin posts no height to the parent.
+  it('should ask every load for the height the post renders at', () => {
+    const expected: EmbedRenderHint = {
+      provider: 'facebook',
+      origin: 'https://www.facebook.com',
+      params: {
+        sdk: 'joey',
+        channel: 'https://staticxx.facebook.com/x/connect/xd_arbiter/?version=46',
+      },
+      readHeight: readFacebookHeight,
+    }
+
+    expect(facebookRenderHint).toEqual(expected)
+  })
+})
+
+// The three contracts no single resolver can state, because each one is a handoff between
+// passes that know nothing about each other.
 describeForEachParser('facebook through the pipeline', (parseHtml) => {
   const convert = (value: string) => {
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
