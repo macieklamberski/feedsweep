@@ -114,6 +114,7 @@ import {
 import { figmaEmbedResolver } from '../embeds/figma.js'
 import { figshareEmbedResolver } from '../embeds/figshare.js'
 import { firesideEmbedResolver } from '../embeds/fireside.js'
+import { firstoryEmbedResolver } from '../embeds/firstory.js'
 import { flickrEmbedResolver } from '../embeds/flickr.js'
 import {
   fliphtml5IframeEmbedResolver,
@@ -479,6 +480,7 @@ const embedResolvers: Array<EmbedResolver> = [
   figmaEmbedResolver,
   figshareEmbedResolver,
   firesideEmbedResolver,
+  firstoryEmbedResolver,
   flickrEmbedResolver,
   fliphtml5IframeEmbedResolver,
   fliphtml5LightBoxEmbedResolver,
