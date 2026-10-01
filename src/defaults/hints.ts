@@ -70,6 +70,7 @@ import { videopressRenderHint } from '../embeds/videopress.js'
 import { vidyardRenderHint } from '../embeds/vidyard.js'
 import { vimeoRenderHint } from '../embeds/vimeo.js'
 import { vkRenderHint } from '../embeds/vk.js'
+import { wakeletRenderHint } from '../embeds/wakelet.js'
 import { wistiaRenderHint } from '../embeds/wistia.js'
 import { youkuRenderHint } from '../embeds/youku.js'
 import { youtubeRenderHint } from '../embeds/youtube.js'
@@ -152,6 +153,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   vidyardRenderHint,
   vimeoRenderHint,
   vkRenderHint,
+  wakeletRenderHint,
   wistiaRenderHint,
   youkuRenderHint,
   youtubeRenderHint,
