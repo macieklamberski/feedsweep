@@ -1,15 +1,15 @@
 import { getPathSegments, type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, find, keepIfMatches, text } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { attr, find, text } from '../utils/dom.js'
+import {
+  encodePathSegment,
+  isFileName,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const slideshareHosts = ['slideshare.net', 'slidesharecdn.com']
-
-// The modern embed names a deck by an opaque key, the pre-2015 one by the deck's numeric id, and
-// both still serve: `/slideshow/embed_code/6435157` lands on the key form and renders the deck.
-const safeDeckKeyRegex = /^[A-Za-z0-9]+$/
-const safeDeckIdRegex = /^\d+$/
 
 // The Flash wrapper spells its id `__ss_{id}` on the div and `__sse{id}` on the object inside.
 // Many carriers name the deck on the div alone.
@@ -18,14 +18,14 @@ const wrapperIdRegex = /^__ss[e_]?(\d+)$/
 // Two players, the presentation one and the document one, sharing a query.
 const flashPlayerPathRegex = /\/swf\/(?:ssplayer\d?|doc_player)\.swf$/
 
-// A url-safe path segment that is not `.` or `..`.
-const safePageSegmentRegex = /^(?!\.+$)[A-Za-z0-9_.-]+$/
+const deckRatio = '595/485'
 
 const composeEmbed = (deck: string, fields?: Partial<EmbedResolverResult>): EmbedResolverResult => {
   return {
     provider: 'slideshare',
     id: deck,
     src: `https://www.slideshare.net/slideshow/embed_code/${deck}`,
+    ratio: deckRatio,
     ...fields,
   }
 }
@@ -45,16 +45,13 @@ export const slideshareResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // `/slideshow/embed_code/key/{key}` is the current form and `/slideshow/embed_code/{id}` the
-  // one it replaced. The key form is left as it stands. The numeric one is already canonical.
+  // one it replaced, which still serves by redirecting to the key form.
   const isKeyed = segments[marker + 1] === 'key'
-  const deck = isKeyed ? segments[marker + 2] : segments[marker + 1]
-  const safeDeckRegex = isKeyed ? safeDeckKeyRegex : safeDeckIdRegex
+  // Some feeds put `&doc=` where the `?` belonged, so the id is cut at the `&`: an id never holds one.
+  const deck = (isKeyed ? segments[marker + 2] : segments[marker + 1])?.split('&')[0]
 
-  if (!deck) {
-    return
-  }
-
-  if (!safeDeckRegex.test(deck)) {
+  // SlideShare serves files on slidesharecdn.com, so a file name is an enclosure.
+  if (!deck || isFileName(deck)) {
     return
   }
 
@@ -63,6 +60,7 @@ export const slideshareResolveEmbed: ResolveEmbed = (url) => {
         provider: 'slideshare',
         id: deck,
         src: `https://www.slideshare.net/slideshow/embed_code/key/${deck}`,
+        ratio: deckRatio,
       }
     : composeEmbed(deck)
 }
@@ -199,7 +197,7 @@ export const slideshareIframeEmbedResolver = createUrlEmbedResolver(
 // Flash died in 2020 and these embeds have rendered nothing since, but the markup is still in
 // old posts and their feeds. The numeric id in the wrapper is the same id the modern embed
 // route accepts, so the dead player can be replaced by one that works.
-export const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
+const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
@@ -217,9 +215,13 @@ export const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
   // The swf query names the deck's owner and slug, which compose the same page the wrapper
   // links to. It is the fallback for a snippet that kept the player and dropped the wrapper's
   // anchor.
-  const account = keepIfMatches(parsed.searchParams.get('userName'), safePageSegmentRegex)
-  const slug = keepIfMatches(parsed.searchParams.get('stripped_title'), safePageSegmentRegex)
-  const composed = account && slug ? `https://www.slideshare.net/${account}/${slug}` : undefined
+  const account = parsed.searchParams.get('userName')
+  const slug = parsed.searchParams.get('stripped_title')
+  // Both come out of the query decoded, and each goes into a path segment of its own.
+  const composed =
+    account && slug
+      ? `https://www.slideshare.net/${encodePathSegment(account)}/${encodePathSegment(slug)}`
+      : undefined
 
   return composeEmbed(deck, { ...caption, url: caption.url ?? composed })
 }

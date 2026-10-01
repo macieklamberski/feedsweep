@@ -54,10 +54,17 @@ describe('extractArchiveIdentifier', () => {
     expect(extractArchiveIdentifier(value)).toBeUndefined()
   })
 
-  it('should return undefined for an identifier that is not the documented shape', () => {
+  it('should return undefined for a traversal that folds out of the item route', () => {
     const value = 'https://archive.org/embed/../../etc'
 
     expect(extractArchiveIdentifier(value)).toBeUndefined()
+  })
+
+  it('should use a malformed identifier as written, even if the url answers an error', () => {
+    const value = 'https://archive.org/embed/..%2Fsome_album'
+    const expected = '..%2Fsome_album'
+
+    expect(extractArchiveIdentifier(value)).toEqual(expected)
   })
 
   it('should return undefined for a url that cannot be parsed', () => {
@@ -92,6 +99,19 @@ describe('archiveResolveEmbed', () => {
         src: 'https://archive.org/embed/some_album?playlist=1&start=42',
         url: 'https://archive.org/details/some_album',
         thumbnail: 'https://archive.org/services/img/some_album',
+      }
+
+      expect(archiveResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the end of the span that plays', () => {
+      const value = 'https://archive.org/embed/commute?start=60&end=90'
+      const expected: EmbedResolverResult = {
+        provider: 'archive',
+        id: 'commute',
+        src: 'https://archive.org/embed/commute?start=60&end=90',
+        url: 'https://archive.org/details/commute',
+        thumbnail: 'https://archive.org/services/img/commute',
       }
 
       expect(archiveResolveEmbed(value)).toEqual(expected)
@@ -196,11 +216,17 @@ describe('archiveResolveEmbed', () => {
       expect(archiveResolveEmbed(value)).toBeUndefined()
     })
 
-    // The stranded `&` keeps the dot segment out of `URL`'s reach, so nothing has folded it.
-    it('should refuse an identifier that is only dots', () => {
+    it('should use a malformed identifier as written, even if the player answers an error', () => {
       const value = 'https://archive.org/embed/..&playlist=1'
+      const expected: EmbedResolverResult = {
+        provider: 'archive',
+        id: '..',
+        src: 'https://archive.org/embed/..?playlist=1',
+        url: 'https://archive.org/details/..',
+        thumbnail: 'https://archive.org/services/img/..',
+      }
 
-      expect(archiveResolveEmbed(value)).toBeUndefined()
+      expect(archiveResolveEmbed(value)).toEqual(expected)
     })
   })
 })
@@ -285,6 +311,26 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
         src: 'https://archive.org/embed/EndCameTooSoon',
         url: 'https://archive.org/details/EndCameTooSoon',
         thumbnail: 'https://archive.org/services/img/EndCameTooSoon',
+        height: 30,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read an audio file from a config written with double quotes', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://www.archive.org/flow/flowplayer.commercial-3.0.3.swf"
+          flashvars='config={"key":"#$b6eb72a0f2f1e29f3d4","playlist":[{"url":"http://www.archive.org/download/RayDangerTributeToDeeDeeRamone2/TributeToDeeDeeRamone.mp3","autoPlay":false}]}'
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'archive',
+        id: 'RayDangerTributeToDeeDeeRamone2',
+        src: 'https://archive.org/embed/RayDangerTributeToDeeDeeRamone2',
+        url: 'https://archive.org/details/RayDangerTributeToDeeDeeRamone2',
+        thumbnail: 'https://archive.org/services/img/RayDangerTributeToDeeDeeRamone2',
         height: 30,
       }
 
@@ -418,22 +464,39 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore the flash player path behind a prefix', async () => {
+      const value = html`
+        <embed
+          src="http://www.archive.org/x/flow/flowplayer.commercial-3.2.1.swf"
+          flashvars='config={"playlist":[{"url":"http://www.archive.org/download/nasa_hubble/clip.mp4"}]}'
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a player carrying no config', async () => {
       const value = '<embed src="http://www.archive.org/flow/flowplayer.commercial-3.2.1.swf">'
 
       expect(await extract(value)).toBeUndefined()
     })
 
-    // The config is raw text, so a dot segment in it reaches the mint unfolded.
-    it('should ignore a config whose identifier is only dots', async () => {
+    it('should use a malformed config identifier as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="http://www.archive.org/flow/flowplayer.commercial-3.2.1.swf"
           flashvars='config={"playlist":[{"url":"http://www.archive.org/download/../clip.mp4"}]}'
         />
       `
+      const expected: EmbedResolverResult = {
+        provider: 'archive',
+        id: '..',
+        src: 'https://archive.org/embed/..',
+        url: 'https://archive.org/details/..',
+        thumbnail: 'https://archive.org/services/img/..',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     // A base url on its own names the download endpoint rather than any item under it.
@@ -453,10 +516,11 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
 // The placeholder's src is what every consumer of the feed gets, so what the query carries has
 // to be asserted where it lands rather than one step earlier.
 describeForEachParser('archive iframe embeds through the pipeline', (parseHtml) => {
-  const convert = (value: string) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
     return transformContent(value, {
       parseHtmlFn: parseHtml,
       baseUrl: 'https://example.com/post',
+      enclosures,
     })
   }
 
@@ -481,6 +545,19 @@ describeForEachParser('archive iframe embeds through the pipeline', (parseHtml) 
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  // An enclosure is offered to every url resolver, and the archive serves the item's files too.
+  it('should leave an archive audio enclosure playable', async () => {
+    const enclosures = [
+      { url: 'https://archive.org/download/nasa_hubble/nasa_hubble.mp3', type: 'audio/mpeg' },
+    ]
+    const expected = html`
+      <audio data-enclosure="" controls src="https://archive.org/download/nasa_hubble/nasa_hubble.mp3"></audio>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
 
@@ -527,6 +604,42 @@ describeForEachParser('archiveIframeEmbedResolver carrier title', (parseHtml) =>
   it('should drop the label the share dialog writes in place of the name', async () => {
     const value = html`
       <iframe src="https://archive.org/embed/TheGoodOldGasMask" title="Embedded digital audio resource"></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'TheGoodOldGasMask',
+      src: 'https://archive.org/embed/TheGoodOldGasMask',
+      url: 'https://archive.org/details/TheGoodOldGasMask',
+      thumbnail: 'https://archive.org/services/img/TheGoodOldGasMask',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the site name the carrier writes in place of the name', async () => {
+    const value = html`
+      <iframe
+        src="https://archive.org/embed/TheGoodOldGasMask"
+        title="Archive.org"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'archive',
+      id: 'TheGoodOldGasMask',
+      src: 'https://archive.org/embed/TheGoodOldGasMask',
+      url: 'https://archive.org/details/TheGoodOldGasMask',
+      thumbnail: 'https://archive.org/services/img/TheGoodOldGasMask',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the label a copied YouTube snippet writes', async () => {
+    const value = html`
+      <iframe
+        src="https://archive.org/embed/TheGoodOldGasMask"
+        title="YouTube video player"
+      ></iframe>
     `
     const expected: EmbedResolverResult = {
       provider: 'archive',

@@ -1,6 +1,6 @@
 import { composeWidgetEmbedUrl, readWidgetConfig } from '../../embeds/gettyimages.js'
 import type { DomTransform } from '../../types.js'
-import { createIframe, setDimensions } from '../../utils/widgets.js'
+import { createIframe } from '../../utils/widgets.js'
 
 // Matching on the host would also catch the loader script, which carries no configuration.
 const widgetCallRegex = /gie\.widgets\.load\s*\(/
@@ -22,7 +22,6 @@ export const rebuildGettyImagesEmbeds: DomTransform = () => (document) => {
     }
 
     const iframe = createIframe(document, composeWidgetEmbedUrl(config))
-    setDimensions(iframe, config)
 
     // Getty writes one token into the config's et and onto the <a> id, which pairs the two when a
     // post carries several photos.

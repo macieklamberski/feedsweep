@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { wikimediaEmbedResolver } from './wikimedia.js'
+import { composeFileTitle, wikimediaEmbedResolver } from './wikimedia.js'
+
+describe('composeFileTitle', () => {
+  it('should keep a percent sign that starts no escape', () => {
+    const value = '100%_x.webm'
+    const expected = '100% x'
+
+    expect(composeFileTitle(value)).toBe(expected)
+  })
+})
 
 describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, wikimediaEmbedResolver)
@@ -29,9 +38,7 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The carrier's src is handed on as written and resolved by the pass, while the poster is
-    // composed here and so takes a scheme.
-    it('should keep a protocol-relative carrier and mint an absolute poster', async () => {
+    it('should mint the https player and poster for a protocol-relative carrier', async () => {
       const value = html`
         <iframe
           src="//commons.wikimedia.org/wiki/File:DesignThinking.ogv?embedplayer=yes"
@@ -42,7 +49,7 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'wikimedia',
         id: 'DesignThinking.ogv',
-        src: '//commons.wikimedia.org/wiki/File:DesignThinking.ogv?embedplayer=yes',
+        src: 'https://commons.wikimedia.org/wiki/File:DesignThinking.ogv?embedplayer=yes',
         thumbnail:
           'https://commons.wikimedia.org/wiki/Special:FilePath/DesignThinking.ogv?width=960',
         width: 700,
@@ -53,8 +60,8 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The poster is served by whichever wiki framed the file, Commons upload or not.
-    it('should mint the poster from the framing wiki', async () => {
+    // The player and the poster are served by whichever wiki framed the file, Commons upload or not.
+    it('should mint the player and the poster on the framing wiki', async () => {
       const value = html`
         <iframe
           src="https://de.wikipedia.org/wiki/Datei:Beispiel.webm?embedplayer=yes"
@@ -65,11 +72,71 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'wikimedia',
         id: 'Beispiel.webm',
-        src: 'https://de.wikipedia.org/wiki/Datei:Beispiel.webm?embedplayer=yes',
+        src: 'https://de.wikipedia.org/wiki/File:Beispiel.webm?embedplayer=yes',
         thumbnail: 'https://de.wikipedia.org/wiki/Special:FilePath/Beispiel.webm?width=960',
         width: 640,
         height: 360,
         title: 'Beispiel',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the https player for an http carrier', async () => {
+      const value = html`
+        <iframe
+          frameborder="0"
+          height="300"
+          src="http://commons.wikimedia.org/wiki/File:Wikipedians_speak_-_Konkani_Wikipedian_Frania_Pereira.webm?embedplayer=yes"
+          width="534"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'wikimedia',
+        id: 'Wikipedians_speak_-_Konkani_Wikipedian_Frania_Pereira.webm',
+        src: 'https://commons.wikimedia.org/wiki/File:Wikipedians_speak_-_Konkani_Wikipedian_Frania_Pereira.webm?embedplayer=yes',
+        thumbnail:
+          'http://commons.wikimedia.org/wiki/Special:FilePath/Wikipedians_speak_-_Konkani_Wikipedian_Frania_Pereira.webm?width=960',
+        width: 534,
+        height: 300,
+        title: 'Wikipedians speak - Konkani Wikipedian Frania Pereira',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the dialog spelling of the player parameter', async () => {
+      const value = html`
+        <iframe
+          width="640"
+          height="480"
+          src="https://commons.wikimedia.org/wiki/File:NIH_robotic_exoskeleton.webm?embedplayer=true"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'wikimedia',
+        id: 'NIH_robotic_exoskeleton.webm',
+        src: 'https://commons.wikimedia.org/wiki/File:NIH_robotic_exoskeleton.webm?embedplayer=yes',
+        thumbnail:
+          'https://commons.wikimedia.org/wiki/Special:FilePath/NIH_robotic_exoskeleton.webm?width=960',
+        width: 640,
+        height: 480,
+        title: 'NIH robotic exoskeleton',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the other parameters the carrier writes', async () => {
+      const value =
+        '<iframe src="https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes&amp;uselang=de&amp;utm_source=feed"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'wikimedia',
+        id: 'Example.webm',
+        src: 'https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes',
+        thumbnail: 'https://commons.wikimedia.org/wiki/Special:FilePath/Example.webm?width=960',
+        ratio: '16/9',
+        title: 'Example',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -137,7 +204,7 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'wikimedia',
         id: 'Example.webm',
-        src: 'https://commons.wikimedia.org/wiki/File%3AExample.webm?embedplayer=yes',
+        src: 'https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes',
         thumbnail: 'https://commons.wikimedia.org/wiki/Special:FilePath/Example.webm?width=960',
         ratio: '16/9',
         title: 'Example',

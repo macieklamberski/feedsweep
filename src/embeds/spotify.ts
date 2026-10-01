@@ -1,5 +1,5 @@
-import { getPathSegments, toMap } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import { getPathSegments, isPlainObject, toMap } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -16,10 +16,6 @@ const spotifyHeights = toMap({
   artist: 352,
 })
 
-// Base62 with no separator, since the id is written into the player path and the `type/id`
-// key. The length is not checked: a wrong id fails the same whether it is minted or passed
-// through, and a bound would refuse the next id space.
-const safeIdRegex = /^[a-zA-Z0-9]+$/
 // `embed` opens a player path, `embed-podcast` its older podcast-only twin, `intl-{lang}` a
 // localized page path. Whatever follows the id (`/video` on a video podcast) is decorative.
 const pathPrefixRegex = /^(?:embed|embed-podcast|intl-[a-z]{2})$/
@@ -105,7 +101,7 @@ export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
     (legacy ? [legacy[1], legacy[2]] : readPathPair(parseUrlOnHosts(uri, spotifyHosts)))
   const [type, id] = pair ?? []
 
-  if (!type || !id || !spotifyHeights.has(type) || !safeIdRegex.test(id)) {
+  if (!type || !id || !spotifyHeights.has(type)) {
     return
   }
 
@@ -134,3 +130,15 @@ export const spotifyFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'YouTube video player' },
   { provider, field: 'description', drop: /^(?:album|episode|playlist|podcast|podcast episode)$/ },
 ]
+
+// The player posts its ready message as an object, and takes the play command as one too: the
+// same command as a JSON string is ignored.
+export const isSpotifyReady = (data: unknown): boolean => {
+  return isPlainObject(data) && data.type === 'ready'
+}
+
+export const spotifyRenderHint: EmbedRenderHint = {
+  provider,
+  isReady: isSpotifyReady,
+  requestPlay: { command: 'play' },
+}

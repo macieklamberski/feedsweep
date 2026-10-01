@@ -1,7 +1,6 @@
 import type { DomTransform } from '../../types.js'
-import { isElement, isNonWhitespaceText, NodeFilter } from '../../utils/dom.js'
+import { headingSelector, isElement, isNonWhitespaceText, NodeFilter } from '../../utils/dom.js'
 
-const headingSelector = 'h1, h2, h3, h4, h5, h6'
 const mediaSelector = 'img, picture, video, audio, iframe, svg'
 
 const normalize = (value: string): string => value.trim().toLowerCase().replace(/\s+/g, ' ')

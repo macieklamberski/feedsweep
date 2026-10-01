@@ -1,5 +1,12 @@
 import type { DomTransform } from '../../types.js'
-import { isBlockElement, isBr, isComment, isElement, isWhitespaceText } from '../../utils/dom.js'
+import {
+  isBlockElement,
+  isBr,
+  isComment,
+  isElement,
+  isMediaElement,
+  isWhitespaceText,
+} from '../../utils/dom.js'
 
 // Adding td, th, dt or dd empties cells that stripEmptyTags then deletes, misaligning the table.
 // An emptied dt or dd breaks its dl pair the same way.
@@ -20,8 +27,9 @@ const boundaryBreakSelectors = [
   'section',
 ]
 
+// A childless img, such as an emoji, is content and not an emptied wrapper.
 const isInlineWrapper = (node: Node): boolean => {
-  return isElement(node) && !isBlockElement(node) && !isBr(node)
+  return isElement(node) && !isBlockElement(node) && !isBr(node) && !isMediaElement(node)
 }
 
 // True when only whitespace/comments/<br> remain, so the wrapper carries no

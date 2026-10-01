@@ -1,8 +1,8 @@
-import { getPathSegments, isHostOf, isPlainObject, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { readPixels } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { readIframeResizeHeight } from '../utils/hints.js'
+import { composeQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codesandbox'
@@ -10,11 +10,8 @@ const provider = 'codesandbox'
 // Listed exactly, not by subdomain: sse.codesandbox.io and blog.codesandbox.io name no sandbox.
 const codesandboxHosts = ['codesandbox.io', 'www.codesandbox.io']
 
-// No length bound: hashes run 3 to 10 characters, and `/embed/vue` is a real sandbox.
-const idRegex = /^[A-Za-z0-9]+$/
-
-// Words CodeSandbox owns where a slug sits. `github` is the one that bites, being spelled in the
-// hash's own alphabet. `new` opens a starter template with nothing saved behind it.
+// Words CodeSandbox owns where a slug sits. `new` opens a starter template with nothing saved
+// behind it.
 // `/embed/github/…` carries no hash and meets a Cloudflare challenge on every server-side
 // request.
 const reservedSlugSegments = new Set(['github', 'github.com', 'fork', 'new'])
@@ -35,13 +32,14 @@ type CodesandboxTarget = {
   // only the `/embed/` and `/s/` forms are rewritten onto the `/s/{slug}` route CodeSandbox
   // declares canonical in its own `og:url`.
   pagePath: string
+  // The player. CodeSandbox's own `/embed/` redirects a DevBox-era sandbox to `/p/sandbox/`, a
+  // DevBox included, so a `/p/` carrier keeps its route.
+  src: string
 }
 
 // The slug in front of the hash is renamable, so only the hash identifies a sandbox.
-const readId = (slug: string): string | undefined => {
-  const id = slug.slice(slug.lastIndexOf('-') + 1)
-
-  return idRegex.test(id) ? id : undefined
+const readId = (slug: string): string => {
+  return slug.slice(slug.lastIndexOf('-') + 1)
 }
 
 const parseTarget = (value: string | undefined): CodesandboxTarget | undefined => {
@@ -52,9 +50,9 @@ const parseTarget = (value: string | undefined): CodesandboxTarget | undefined =
   }
 
   const [first, second, third] = getPathSegments(parsed)
-  // `/embed/{slug}` is the embed renderer and `/s/{slug}` the legacy user url, which CodeSandbox
-  // rewrites to the renderer when it is framed. `/p/sandbox/` and `/p/devbox/` are the DevBox-era
-  // routes, which take `?embed=1` on the page's own address.
+  // `/embed/{slug}` is the embed renderer and `/s/{slug}` the legacy user url for the same sandbox.
+  // `/p/sandbox/` and `/p/devbox/` are the DevBox-era routes, which take `?embed=1` on the page's
+  // own address.
   const isProject = first === 'p' && projectKinds.includes(second)
   const isPlayer = playerRoutes.includes(first)
   let slug: string | undefined
@@ -65,7 +63,8 @@ const parseTarget = (value: string | undefined): CodesandboxTarget | undefined =
     slug = second
   }
 
-  if (!slug || reservedSlugSegments.has(slug.toLowerCase())) {
+  // CodeSandbox serves files on its own host, so a file name is an enclosure.
+  if (!slug || reservedSlugSegments.has(slug.toLowerCase()) || isFileName(slug)) {
     return
   }
 
@@ -75,7 +74,20 @@ const parseTarget = (value: string | undefined): CodesandboxTarget | undefined =
     return
   }
 
-  return { slug, id, pagePath: isProject ? `p/${second}/${slug}` : `s/${slug}` }
+  // The file the editor opens on, spelled `file` on the DevBox-era routes and `module` on the
+  // embed renderer. The rest of the query is the editor's look.
+  if (isProject) {
+    const pagePath = `p/${second}/${slug}`
+    const file = parsed.searchParams.get('file') ?? undefined
+    const query = composeQuery(trimObject({ file, embed: '1' }, Boolean))
+
+    return { slug, id, pagePath, src: `https://codesandbox.io/${pagePath}${query}` }
+  }
+
+  const module = parsed.searchParams.get('module') ?? undefined
+  const query = composeQuery(trimObject({ module }, Boolean))
+
+  return { slug, id, pagePath: `s/${slug}`, src: `https://codesandbox.io/embed/${slug}${query}` }
 }
 
 export const codesandboxResolveEmbed: ResolveEmbed = (url, element) => {
@@ -93,12 +105,10 @@ export const codesandboxResolveEmbed: ResolveEmbed = (url, element) => {
   return {
     provider,
     id: target.id,
-    // The publisher's url whole: their query is what opens the editor on the file and the pane they
-    // meant, and CodeSandbox serves every one of these routes as a player.
-    src: url,
+    src: target.src,
     url: `https://codesandbox.io/${target.pagePath}`,
     height: defaultSandboxHeight,
-    ...trimObject({ title }, Boolean),
+    title,
   }
 }
 
@@ -108,17 +118,12 @@ export const codesandboxIframeEmbedResolver = createUrlEmbedResolver(
   codesandboxResolveEmbed,
 )
 
-// The editor posts its rendered height unasked, as `{ src, context: 'iframe.resize', height }`.
-// Without `autoresize=1` in the query it posts a constant 500.
-export const readCodesandboxHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) && data.context === 'iframe.resize'
-    ? readPixels(data.height)
-    : undefined
-}
-
+// The editor posts its rendered height unasked.
 export const codesandboxRenderHint: EmbedRenderHint = {
   provider,
   // Spelled out: a `www.` src 301s to the apex, so every message arrives from here.
   origin: 'https://codesandbox.io',
-  readHeight: readCodesandboxHeight,
+  // Without it the editor posts a constant 500, whatever it holds.
+  params: { autoresize: '1' },
+  readHeight: readIframeResizeHeight,
 }

@@ -44,6 +44,12 @@ describe('extractJwplayerId', () => {
     expect(extractJwplayerId(value)).toBe(expected)
   })
 
+  it('should return undefined for the player route naming no media', () => {
+    const value = 'https://cdn.jwplayer.com/players'
+
+    expect(extractJwplayerId(value)).toBeUndefined()
+  })
+
   it('should return undefined for an invalid url', () => {
     const value = 'not a url'
 
@@ -73,10 +79,11 @@ describe('extractJwplayerId', () => {
 
   // An underscore is outside the alphabet a media id is written in, and it is what tells a
   // malformed id from a short one, since a short id fails the same whether minted or passed through.
-  it('should return undefined when the media id is malformed', () => {
+  it('should use a malformed media id as written, even if the player answers an error', () => {
     const value = 'https://cdn.jwplayer.com/players/H4GX_r873-abc12345.html'
+    const expected = 'H4GX_r873'
 
-    expect(extractJwplayerId(value)).toBeUndefined()
+    expect(extractJwplayerId(value)).toEqual(expected)
   })
 })
 
@@ -128,6 +135,19 @@ describeForEachParser('jwplayerIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should resolve a jwplatform iframe', async () => {
+    const value =
+      '<iframe src="https://content.jwplatform.com/players/H4GXr873-abc12345.html"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'jwplayer',
+      id: 'H4GXr873',
+      src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should ignore a non-jwplayer iframe', async () => {
     const value = '<iframe src="https://example.com/video"></iframe>'
 
@@ -157,7 +177,7 @@ describeForEachParser('jwplayerScriptEmbedResolver', (parseHtml) => {
 
   it('should return undefined for a foreign host carrying the player path', async () => {
     const value = html`
-      <script src="https://evil.test/jwplayer.com/players/H4GXr873-abc12345.js"></script>
+      <script src="https://evil.test/players/H4GXr873-abc12345.js?jwplayer.com/players/"></script>
     `
 
     expect(await extract(value)).toBeUndefined()
@@ -212,9 +232,23 @@ describeForEachParser('jwplayerAmpEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should return undefined for a malformed media id', async () => {
+  it('should use a malformed media id as written, even if the player answers an error', async () => {
     const value = html`
       <amp-jwplayer data-media-id="../../evil" data-player-id="abc12345"></amp-jwplayer>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'jwplayer',
+      id: '../../evil',
+      src: 'https://cdn.jwplayer.com/players/../../evil.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/../../evil/poster.jpg',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should return undefined for an empty media id', async () => {
+    const value = html`
+      <amp-jwplayer data-media-id="" data-player-id="abc12345"></amp-jwplayer>
     `
 
     expect(await extract(value)).toBeUndefined()
@@ -282,6 +316,40 @@ describeForEachParser('jwplayerSetupEmbedResolver', (parseHtml) => {
       <p>Between the two.</p>
       <script>
         jwplayer("botr_hwhuyhFf_h5bP9bKQ_div").setup({"playlist":"https://cdn.jwplayer.com/v2/media/hwhuyhFf"});
+      </script>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'jwplayer',
+      id: 'hwhuyhFf',
+      src: 'https://cdn.jwplayer.com/players/hwhuyhFf.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/hwhuyhFf/poster.jpg',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read a media id carrying digits', async () => {
+    const value = html`
+      <div class="jwplayer" id="botr_H4GXr873_abc12345_div"></div>
+      <script>
+        jwplayer("botr_H4GXr873_abc12345_div").setup({"playlist":"https://cdn.jwplayer.com/v2/media/H4GXr873"});
+      </script>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'jwplayer',
+      id: 'H4GXr873',
+      src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should stop the media id at the query of the playlist url', async () => {
+    const value = html`
+      <div class="jwplayer" id="botr_hwhuyhFf_h5bP9bKQ_div"></div>
+      <script>
+        jwplayer("botr_hwhuyhFf_h5bP9bKQ_div").setup({"playlist":"https://cdn.jwplayer.com/v2/media/hwhuyhFf?poster_width=640"});
       </script>
     `
     const expected: EmbedResolverResult = {

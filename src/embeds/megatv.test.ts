@@ -98,19 +98,13 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/www.megatv.com/embed/?p=2020687366"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/?p=2020687366"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a player url naming no post', async () => {
       const value = '<iframe src="https://www.megatv.com/embed/"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore an id outside the numeric shape', async () => {
-      const value = '<iframe src="https://www.megatv.com/embed/?p=evil"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -123,6 +117,18 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should use a malformed post id as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://www.megatv.com/embed/?p=evil"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'megatv',
+        id: 'evil',
+        src: 'https://www.megatv.com/embed/?p=evil',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // Five corpus embeds name posts under a mapping the prefix rule does not cover, so the
     // player is kept and no article page is guessed for them.
     it('should mint no page for an id without the post prefix', async () => {
@@ -146,6 +152,18 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
         provider: 'megatv',
         id: '202037945',
         src: 'https://www.megatv.com/embed/?p=202037945',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint no page for an id carrying the prefix only past its start', async () => {
+      const value = '<iframe src="https://www.megatv.com/embed/?p=12020687366"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'megatv',
+        id: '12020687366',
+        src: 'https://www.megatv.com/embed/?p=12020687366',
         ratio: '16/9',
       }
 

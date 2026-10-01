@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -45,5 +46,23 @@ describeForEachParser('fixLazyAudios', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('fixLazyAudios through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should give a lazy audio a playable src', async () => {
+    const value = '<audio data-src="https://example.com/track.mp3"></audio>'
+    const expected = html`
+      <audio
+        src="https://example.com/track.mp3"
+        data-src="https://example.com/track.mp3"
+      ></audio>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

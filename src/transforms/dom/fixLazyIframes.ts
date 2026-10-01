@@ -1,6 +1,7 @@
 import { isAnyOf } from 'trousse'
 import type { DomTransform } from '../../types.js'
-import { isUrlShaped, isUsableSrc } from '../../utils/urls.js'
+import { getLazyValue } from '../../utils/dom.js'
+import { isUsableSrc } from '../../utils/urls.js'
 
 // Blank pages a platform points a deferred iframe's src at while the real URL sits in a
 // lazy attribute: a src matching one of these is a placeholder, not content.
@@ -23,14 +24,11 @@ export const fixLazyIframes: DomTransform = (context) => {
         continue
       }
 
-      for (const attribute of lazyIframeAttributes) {
-        const value = iframe.getAttribute(attribute)
+      const value = getLazyValue(iframe, lazyIframeAttributes)
 
-        if (value && isUrlShaped(value)) {
-          // resolveRelativeUrls already ran, so a protocol-relative value resolves here or never.
-          iframe.setAttribute('src', resolveUrlFn(value, baseUrl) ?? value)
-          break
-        }
+      if (value) {
+        // resolveRelativeUrls already ran, so a protocol-relative value resolves here or never.
+        iframe.setAttribute('src', resolveUrlFn(value, baseUrl) ?? value)
       }
     }
   }

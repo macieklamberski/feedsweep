@@ -66,7 +66,6 @@ describeForEachParser('padletEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // Padlet has minted twelve and sixteen character ids, so only the alphabet is checked.
     it('should resolve a board id longer than the ones minted so far', async () => {
       const value =
         '<iframe src="https://padlet.com/embed/a61rwkel0vfblmszlongerthanbeforeandthensome"></iframe>'
@@ -98,24 +97,54 @@ describeForEachParser('padletEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a board id that could not be one', async () => {
-      const value = '<iframe src="https://padlet.com/embed/New%20Board"></iframe>'
+    it('should ignore the embed route under another segment', async () => {
+      const value = '<iframe src="https://padlet.com/x/embed/228qqr1n7d19"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the preview route under another segment', async () => {
+      const value = html`
+        <iframe src="https://padlet.com/x/padlets/5r949isxqdhfcca7/embeds/preview_embed"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a path below the preview route', async () => {
+      const value = html`
+        <iframe src="https://padlet.com/padlets/5r949isxqdhfcca7/embeds/preview_embed/extra"></iframe>
+      `
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/padlet.com/embed/228qqr1n7d19"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/228qqr1n7d19"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed board id as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://padlet.com/embed/New%20Board"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'padlet',
+        id: 'New%20Board',
+        src: 'https://padlet.com/embed/New%20Board',
+        thumbnail: 'https://padlet.net/social-previews/board/New%20Board/opengraph.jpg',
+        height: 608,
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
 
 // The enclosure probe offers every attachment a feed carries to this resolver, and Padlet serves
 // uploads on the same domain as the board. The url is written onto the embed route so the route
-// regex admits it and the id alphabet is the thing that refuses it, which is the guard the module
-// credits with keeping a file playable.
+// regex admits it and only the file name refuses it.
 describeForEachParser('padlet through the pipeline', (parseHtml) => {
   it('should leave an audio enclosure on the padlet host playable', async () => {
     const enclosures = [{ url: 'https://padlet.com/embed/track.mp3', type: 'audio/mpeg' }]

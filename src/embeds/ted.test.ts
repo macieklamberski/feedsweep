@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { extractTedTalk, tedEmbedResolver, tedResolveEmbed } from './ted.js'
@@ -26,8 +27,64 @@ describe('extractTedTalk', () => {
     expect(extractTedTalk(value)).toBe(expected)
   })
 
+  it('should read a talk slug from the embed-ssl player', () => {
+    const value =
+      'https://embed-ssl.ted.com/talks/carol_dweck_the_power_of_believing_that_you_can_improve.html'
+    const expected = 'carol_dweck_the_power_of_believing_that_you_can_improve'
+
+    expect(extractTedTalk(value)).toBe(expected)
+  })
+
+  it('should read a talk slug from the talk page', () => {
+    const value = 'https://www.ted.com/talks/diana_laufenberg_3_ways_to_teach'
+    const expected = 'diana_laufenberg_3_ways_to_teach'
+
+    expect(extractTedTalk(value)).toBe(expected)
+  })
+
+  it('should read a talk slug from the talk page on the bare host', () => {
+    const value = 'https://ted.com/talks/diana_laufenberg_3_ways_to_teach'
+    const expected = 'diana_laufenberg_3_ways_to_teach'
+
+    expect(extractTedTalk(value)).toBe(expected)
+  })
+
+  it('should read a talk slug carrying a digit', () => {
+    const value = 'https://embed.ted.com/talks/julian_treasure_5_ways_to_listen_better'
+    const expected = 'julian_treasure_5_ways_to_listen_better'
+
+    expect(extractTedTalk(value)).toBe(expected)
+  })
+
+  it('should use a malformed slug as written, even if the player answers an error', () => {
+    const value = 'https://embed.ted.com/talks/ethan_zuckerman%2F..%2Fx.html'
+    const expected = 'ethan_zuckerman%2F..%2Fx'
+
+    expect(extractTedTalk(value)).toBe(expected)
+  })
+
+  it('should use a malformed slug suffix as written, even if the player answers an error', () => {
+    const value = 'https://embed.ted.com/talks/ethan_zuckerman.htmlx'
+    const expected = 'ethan_zuckerman.htmlx'
+
+    expect(extractTedTalk(value)).toBe(expected)
+  })
+
   it('should return undefined for a ted url that is not a talk', () => {
     const value = 'https://www.ted.com/playlists/123/something'
+
+    expect(extractTedTalk(value)).toBeUndefined()
+  })
+
+  // The talk video file sits under `/talks/` too, and its folder is not a talk.
+  it('should return undefined for a talk file on the video host', () => {
+    const value = 'http://video.ted.com/talks/dynamic/DianaLaufenberg_2010X-medium.flv'
+
+    expect(extractTedTalk(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a foreign host carrying a talk path', () => {
+    const value = 'https://evil.test/talks/ethan_zuckerman.html'
 
     expect(extractTedTalk(value)).toBeUndefined()
   })
@@ -96,12 +153,10 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    // The selector matches on the carrier rather than on a substring, but a lookalike host is
-    // still what the host guard exists to refuse.
     it('should ignore a foreign host serving the same player path', async () => {
       const value = html`
         <embed
-          src="https://evil.test/video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          src="https://evil.test/assets/player/swf/EmbedPlayer.swf"
           flashvars="adKeys=talk=ethan_zuckerman;year=2010"
         />
       `
@@ -128,6 +183,40 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
         url: 'https://www.ted.com/talks/brene_brown_on_vulnerability',
         thumbnail:
           'http://images.ted.com/images/ted/tedindex/embed-posters/BreneBrown-2010X.embed_thumbnail.jpg',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed talk key as written, even if the url answers an error', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          flashvars="adKeys=talk=brene-brown.on_vulnerability;year=2010"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: 'brene-brown.on_vulnerability',
+        src: 'https://embed.ted.com/embed/brene-brown.on_vulnerability',
+        url: 'https://www.ted.com/talks/brene-brown.on_vulnerability',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a decoded talk key carrying a separator in one path segment', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          flashvars="adKeys=talk%3Dbrene_brown%2F..%2Fx%3Byear%3D2010"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: 'brene_brown%2F..%2Fx',
+        src: 'https://embed.ted.com/embed/brene_brown%2F..%2Fx',
+        url: 'https://www.ted.com/talks/brene_brown%2F..%2Fx',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -162,17 +251,60 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // A slug sitting at the truncation cap is a prefix of the real one two times in three, and
-    // refusing it leaves the generic placeholder rather than a TED one whose link does not serve.
-    it('should refuse a slug sitting at the truncation cap', async () => {
+    it('should recover a talk whose slug carries a digit', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          flashvars="vw=432&vh=240&adKeys=talk=diana_laufenberg_3_ways_to_teach;year=2010;theme=how_we_learn"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: 'diana_laufenberg_3_ways_to_teach',
+        src: 'https://embed.ted.com/embed/diana_laufenberg_3_ways_to_teach',
+        url: 'https://www.ted.com/talks/diana_laufenberg_3_ways_to_teach',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should refuse ad keys on a ted.com swf that is not the player', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/AdPlayer.swf"
+          flashvars="adKeys=talk=diana_laufenberg_3_ways_to_teach;year=2010"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should refuse ad keys on a path that only starts with the player file', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf/extra"
+          flashvars="adKeys=talk=diana_laufenberg_3_ways_to_teach;year=2010"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should use a slug cut at the truncation cap as written, even if the player answers an error', async () => {
       const value = html`
         <embed
           src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
           flashvars="adKeys=talk=nicholas_christakis_the_hidden_influence_of_social_netw;year=2010"
         />
       `
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: 'nicholas_christakis_the_hidden_influence_of_social_netw',
+        src: 'https://embed.ted.com/embed/nicholas_christakis_the_hidden_influence_of_social_netw',
+        url: 'https://www.ted.com/talks/nicholas_christakis_the_hidden_influence_of_social_netw',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should refuse a player whose configuration names no talk', async () => {
@@ -209,5 +341,36 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
+})
+
+// Only an enclosure reaches the path where claiming a talk file would cost a reader the video.
+describeForEachParser('ted through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a talk video enclosure playable', async () => {
+    const enclosures = [
+      {
+        url: 'http://video.ted.com/talks/dynamic/DianaLaufenberg_2010X-medium.flv',
+        type: 'video/x-flv',
+      },
+    ]
+
+    const expected = html`
+      <video
+        data-enclosure=""
+        controls
+        src="http://video.ted.com/talks/dynamic/DianaLaufenberg_2010X-medium.flv"
+      ></video>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })

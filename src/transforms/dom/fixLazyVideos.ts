@@ -1,13 +1,14 @@
 import type { DomTransform } from '../../types.js'
-import { isUrlShaped, isUsableSrc } from '../../utils/urls.js'
+import { getLazyValue } from '../../utils/dom.js'
+import { isUsableSrc } from '../../utils/urls.js'
 
 // A <video> whose clip and poster urls sit in lazy data-* attributes, so nothing shows without JS.
 export const fixLazyVideos: DomTransform = (context) => (document) => {
   for (const video of document.querySelectorAll('video')) {
     if (!isUsableSrc(video.getAttribute('poster'))) {
-      const poster = video.getAttribute('data-poster')
+      const poster = getLazyValue(video, ['data-poster'])
 
-      if (poster && isUrlShaped(poster)) {
+      if (poster) {
         video.setAttribute('poster', poster)
       }
     }
@@ -18,13 +19,10 @@ export const fixLazyVideos: DomTransform = (context) => (document) => {
       continue
     }
 
-    for (const attribute of context.lazySrcAttributes) {
-      const value = video.getAttribute(attribute)
+    const src = getLazyValue(video, context.lazySrcAttributes)
 
-      if (value && isUrlShaped(value)) {
-        video.setAttribute('src', value)
-        break
-      }
+    if (src) {
+      video.setAttribute('src', src)
     }
   }
 }
