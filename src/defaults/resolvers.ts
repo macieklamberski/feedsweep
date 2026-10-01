@@ -227,6 +227,7 @@ import { stackblitzIframeEmbedResolver } from '../embeds/stackblitz.js'
 import { standfmEmbedResolver } from '../embeds/standfm.js'
 import { steamEmbedResolver } from '../embeds/steam.js'
 import { stravaIframeEmbedResolver, stravaPlaceholderEmbedResolver } from '../embeds/strava.js'
+import { swayEmbedResolver } from '../embeds/sway.js'
 import { tedEmbedResolver } from '../embeds/ted.js'
 import {
   telegramIframeEmbedResolver,
@@ -571,6 +572,7 @@ const embedResolvers: Array<EmbedResolver> = [
   steamEmbedResolver,
   stravaIframeEmbedResolver,
   stravaPlaceholderEmbedResolver,
+  swayEmbedResolver,
   tedEmbedResolver,
   telegramScriptEmbedResolver,
   telegramIframeEmbedResolver,
