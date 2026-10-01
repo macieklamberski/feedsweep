@@ -18,19 +18,21 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/mzsro/jvuq/',
         url: 'https://online.fliphtml5.com/mzsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the secret WordPress stamps on the frame', () => {
+    it('should drop the secret WordPress stamps on the frame', () => {
       const value = 'https://online.fliphtml5.com/mzsro/jvuq/#?secret=t5CbQCavWG'
       const expected: EmbedResolverResult = {
         provider: 'fliphtml5',
         id: 'mzsro/jvuq',
-        src: 'https://online.fliphtml5.com/mzsro/jvuq/#?secret=t5CbQCavWG',
+        src: 'https://online.fliphtml5.com/mzsro/jvuq/',
         url: 'https://online.fliphtml5.com/mzsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -44,6 +46,7 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/mnzqa/bbjl/#p=1',
         url: 'https://online.fliphtml5.com/mnzqa/bbjl/',
         thumbnail: 'https://online.fliphtml5.com/mnzqa/bbjl/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -57,19 +60,21 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/mzsro/jvuq/#p=1',
         url: 'https://online.fliphtml5.com/mzsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the scheme of an http carrier', () => {
+    it('should mint the https viewer from an http carrier', () => {
       const value = 'http://online.fliphtml5.com/mzsro/jvuq/'
       const expected: EmbedResolverResult = {
         provider: 'fliphtml5',
         id: 'mzsro/jvuq',
-        src: 'http://online.fliphtml5.com/mzsro/jvuq/',
+        src: 'https://online.fliphtml5.com/mzsro/jvuq/',
         url: 'https://online.fliphtml5.com/mzsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -83,6 +88,21 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/revku/JUNIO-2026-EDICION-224/',
         url: 'https://online.fliphtml5.com/revku/JUNIO-2026-EDICION-224/',
         thumbnail: 'https://online.fliphtml5.com/revku/JUNIO-2026-EDICION-224/files/shot.jpg',
+        ratio: '4/3',
+      }
+
+      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the case of an account', () => {
+      const value = 'https://online.fliphtml5.com/ActuSF/wgas/'
+      const expected: EmbedResolverResult = {
+        provider: 'fliphtml5',
+        id: 'ActuSF/wgas',
+        src: 'https://online.fliphtml5.com/ActuSF/wgas/',
+        url: 'https://online.fliphtml5.com/ActuSF/wgas/',
+        thumbnail: 'https://online.fliphtml5.com/ActuSF/wgas/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -96,6 +116,7 @@ describe('fliphtml5ResolveEmbed', () => {
         src: 'https://online.fliphtml5.com/revku/MARZO_2026_EDICION_221/',
         url: 'https://online.fliphtml5.com/revku/MARZO_2026_EDICION_221/',
         thumbnail: 'https://online.fliphtml5.com/revku/MARZO_2026_EDICION_221/files/shot.jpg',
+        ratio: '4/3',
       }
 
       expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
@@ -121,16 +142,32 @@ describe('fliphtml5ResolveEmbed', () => {
       expect(fliphtml5ResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a separator hidden in the account segment', () => {
+    it('should use a malformed account as written, even if the player answers an error', () => {
       const value = 'https://online.fliphtml5.com/mz%2Fsro/jvuq/'
+      const expected: EmbedResolverResult = {
+        provider: 'fliphtml5',
+        id: 'mz%2Fsro/jvuq',
+        src: 'https://online.fliphtml5.com/mz%2Fsro/jvuq/',
+        url: 'https://online.fliphtml5.com/mz%2Fsro/jvuq/',
+        thumbnail: 'https://online.fliphtml5.com/mz%2Fsro/jvuq/files/shot.jpg',
+        ratio: '4/3',
+      }
 
-      expect(fliphtml5ResolveEmbed(value)).toBeUndefined()
+      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should ignore a separator hidden in the book segment', () => {
+    it('should use a malformed book as written, even if the player answers an error', () => {
       const value = 'https://online.fliphtml5.com/mzsro/jv%2Fuq/'
+      const expected: EmbedResolverResult = {
+        provider: 'fliphtml5',
+        id: 'mzsro/jv%2Fuq',
+        src: 'https://online.fliphtml5.com/mzsro/jv%2Fuq/',
+        url: 'https://online.fliphtml5.com/mzsro/jv%2Fuq/',
+        thumbnail: 'https://online.fliphtml5.com/mzsro/jv%2Fuq/files/shot.jpg',
+        ratio: '4/3',
+      }
 
-      expect(fliphtml5ResolveEmbed(value)).toBeUndefined()
+      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
     })
 
     it('should ignore the shelf on the apex host', () => {
@@ -145,7 +182,7 @@ describeForEachParser('fliphtml5IframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, fliphtml5IframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the box the embed block declares', async () => {
+    it('should state the platform size over the box the embed block declares', async () => {
       const value = html`
         <iframe
           src="https://online.fliphtml5.com/mzsro/jvuq/#?secret=t5CbQCavWG"
@@ -156,11 +193,10 @@ describeForEachParser('fliphtml5IframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'fliphtml5',
         id: 'mzsro/jvuq',
-        src: 'https://online.fliphtml5.com/mzsro/jvuq/#?secret=t5CbQCavWG',
+        src: 'https://online.fliphtml5.com/mzsro/jvuq/',
         url: 'https://online.fliphtml5.com/mzsro/jvuq/',
         thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
-        width: 640,
-        height: 360,
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -180,7 +216,7 @@ describeForEachParser('fliphtml5LightBoxEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, fliphtml5LightBoxEmbedResolver)
 
   describe('happy paths', () => {
-    it('should open the book the cover links to in the box the snippet declares', async () => {
+    it('should open the book the cover links to in the viewer ratio over the declared box', async () => {
       const value = html`
         <img
           data-height="600"
@@ -198,8 +234,7 @@ describeForEachParser('fliphtml5LightBoxEmbedResolver', (parseHtml) => {
         src: 'https://online.fliphtml5.com/nasgwb/smle/',
         url: 'https://online.fliphtml5.com/nasgwb/smle/',
         thumbnail: 'https://online.fliphtml5.com/nasgwb/smle/files/shot.jpg',
-        width: 800,
-        height: 600,
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -231,30 +266,7 @@ describeForEachParser('fliphtml5LightBoxEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should read a box the snippet declares other than the default', async () => {
-      const value = html`
-        <img
-          data-height="480"
-          data-href="https://online.fliphtml5.com/nasgwb/smle/"
-          data-rel="fh5-light-box-demo"
-          data-width="640"
-          src="https://online.fliphtml5.com/nasgwb/smle/files/shot.jpg"
-        />
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'fliphtml5',
-        id: 'nasgwb/smle',
-        src: 'https://online.fliphtml5.com/nasgwb/smle/',
-        url: 'https://online.fliphtml5.com/nasgwb/smle/',
-        thumbnail: 'https://online.fliphtml5.com/nasgwb/smle/files/shot.jpg',
-        width: 640,
-        height: 480,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should open the frame the script opens when the snippet declares no box', async () => {
+    it('should open the book in the viewer ratio over the cover image box', async () => {
       const value = html`
         <img
           data-href="https://online.fliphtml5.com/nasgwb/smle/"
@@ -269,8 +281,7 @@ describeForEachParser('fliphtml5LightBoxEmbedResolver', (parseHtml) => {
         src: 'https://online.fliphtml5.com/nasgwb/smle/',
         url: 'https://online.fliphtml5.com/nasgwb/smle/',
         thumbnail: 'https://online.fliphtml5.com/nasgwb/smle/files/shot.jpg',
-        width: 800,
-        height: 600,
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -299,6 +310,7 @@ describeForEachParser('fliphtml5 enclosures', (parseHtml) => {
         data-embed-url="https://online.fliphtml5.com/mzsro/jvuq/"
         data-embed-thumbnail="https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg"
         data-enclosure=""
+        data-embed-ratio="4/3"
       ></div>
       <p>Body</p>
     `

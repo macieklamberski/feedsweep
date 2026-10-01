@@ -9,7 +9,8 @@ const garminHosts = ['connect.garmin.com']
 
 // The spellings publishers pasted. Garmin chains them onto `embed/activity/{id}`, which is what
 // the mint takes, and that route 404s for an activity that does not exist.
-const activityEmbedRegex = /^\/+(?:(?:modern|app)\/)?(?:activity\/embed|embed\/activity)\/(\d+)\/?$/
+const activityEmbedRegex =
+  /^\/+(?:(?:modern|app)\/)?(?:activity\/embed|embed\/activity)\/([^/]+)\/?$/
 
 // Garmin Connect's activity embed, an interactive map and stats panel for one recorded activity.
 export const garminResolveEmbed: ResolveEmbed = (url) => {
@@ -25,6 +26,7 @@ export const garminResolveEmbed: ResolveEmbed = (url) => {
     id: activityId,
     src: `https://connect.garmin.com/embed/activity/${activityId}`,
     url: `https://connect.garmin.com/app/activity/${activityId}`,
+    height: 548,
   }
 }
 

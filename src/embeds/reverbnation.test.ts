@@ -6,13 +6,14 @@ import { reverbnationEmbedResolver, reverbnationResolveEmbed } from './reverbnat
 
 describe('reverbnationResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should keep the query a widget frame already carries', () => {
+    it('should keep the widget id and drop the design and size', () => {
       const value =
         'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=50&pwc[design]=default&pwc[size]=fit'
       const expected: EmbedResolverResult = {
         provider: 'reverbnation',
         id: 'artist_1018382',
-        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=50&pwc[design]=default&pwc[size]=fit',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=50',
+        height: 265,
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
@@ -24,7 +25,8 @@ describe('reverbnationResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'reverbnation',
         id: 'artist_1018382',
-        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55&pwc[size]=fit',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55',
+        height: 265,
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
@@ -36,7 +38,60 @@ describe('reverbnationResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'reverbnation',
         id: 'artist_1018382',
-        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55&pwc[size]=fit',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55',
+        height: 265,
+      }
+
+      expect(reverbnationResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the song a widget plays', () => {
+      const value =
+        'https://www.reverbnation.com/widget_code/html_widget/artist_5181346?widget_id=55&pwc[song_ids]=25061544&context_type=song&pwc[size]=small'
+      const expected: EmbedResolverResult = {
+        provider: 'reverbnation',
+        id: 'artist_5181346',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_5181346?widget_id=55&pwc[song_ids]=25061544',
+        height: 265,
+      }
+
+      expect(reverbnationResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the whole list a widget includes', () => {
+      const value =
+        'https://www.reverbnation.com/widget_code/html_widget/playlist_3560811?widget_id=55&pwc[included_songs]=1&context_type=playlist&pwc[size]=small'
+      const expected: EmbedResolverResult = {
+        provider: 'reverbnation',
+        id: 'playlist_3560811',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/playlist_3560811?widget_id=55&pwc[included_songs]=1',
+        height: 265,
+      }
+
+      expect(reverbnationResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a single song on the older widget', () => {
+      const value =
+        'http://www.reverbnation.com/widget_code/html_widget/artist_175461?widget_id=50&posted_by=fan_1899577&pwc[design]=default&pwc[background_color]=%23333333&pwc[included_songs]=0&pwc[song_ids]=7025881&pwc[photo]=1%2C0&pwc[size]=fit'
+      const expected: EmbedResolverResult = {
+        provider: 'reverbnation',
+        id: 'artist_175461',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_175461?widget_id=50&pwc[included_songs]=0&pwc[song_ids]=7025881',
+        height: 265,
+      }
+
+      expect(reverbnationResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the colour, the branding and the promoter', () => {
+      const value =
+        'https://www.reverbnation.com/widget_code/html_widget/artist_3930057?widget_id=55&pwc[song_ids]=34482761&context_type=song&spoid=promoter_2740&pwc[size]=small&pwc[branded]=1&pwc[color]=dark'
+      const expected: EmbedResolverResult = {
+        provider: 'reverbnation',
+        id: 'artist_3930057',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/artist_3930057?widget_id=55&pwc[song_ids]=34482761',
+        height: 265,
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
@@ -49,6 +104,7 @@ describe('reverbnationResolveEmbed', () => {
         provider: 'reverbnation',
         id: 'artist_1123149',
         src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1123149?widget_id=55',
+        height: 265,
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
@@ -57,7 +113,7 @@ describe('reverbnationResolveEmbed', () => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/reverbnation.com/widget_code/html_widget/artist_1018382'
+      const value = 'https://evil.test/widget_code/html_widget/artist_1018382'
 
       expect(reverbnationResolveEmbed(value)).toBeUndefined()
     })
@@ -96,6 +152,7 @@ describe('reverbnationResolveEmbed', () => {
         provider: 'reverbnation',
         id: 'Playlist_957851',
         src: 'https://www.reverbnation.com/widget_code/html_widget/Playlist_957851',
+        height: 265,
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
@@ -107,7 +164,8 @@ describe('reverbnationResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'reverbnation',
         id: 'Album_170738',
-        src: 'https://www.reverbnation.com/widget_code/html_widget/Album_170738?widget_id=55&context_type=album',
+        src: 'https://www.reverbnation.com/widget_code/html_widget/Album_170738?widget_id=55',
+        height: 265,
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
@@ -122,6 +180,7 @@ describe('reverbnationResolveEmbed', () => {
         provider: 'reverbnation',
         id: 'artist_1354004',
         src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1354004',
+        height: 265,
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
@@ -134,6 +193,7 @@ describe('reverbnationResolveEmbed', () => {
         provider: 'reverbnation',
         id: 'Playlist_957851',
         src: 'https://www.reverbnation.com/widget_code/html_widget/Playlist_957851',
+        height: 265,
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
@@ -145,6 +205,7 @@ describe('reverbnationResolveEmbed', () => {
         provider: 'reverbnation',
         id: 'artist_164003',
         src: 'https://www.reverbnation.com/widget_code/html_widget/artist_164003',
+        height: 265,
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
@@ -157,9 +218,31 @@ describe('reverbnationResolveEmbed', () => {
         provider: 'reverbnation',
         id: 'artist_351836',
         src: 'https://www.reverbnation.com/widget_code/html_widget/artist_351836',
+        height: 265,
       }
 
       expect(reverbnationResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should refuse an id parameter carrying a path after the number', () => {
+      const value =
+        'http://cache.reverbnation.com/widgets/swf/40/pro_widget.swf?id=artist_1354004%2F..%2F..%2Fadmin'
+
+      expect(reverbnationResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse an id parameter carrying a path before the kind', () => {
+      const value =
+        'http://cache.reverbnation.com/widgets/swf/40/pro_widget.swf?id=admin%2Fartist_1354004'
+
+      expect(reverbnationResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a swf outside the widgets directory', () => {
+      const value =
+        'http://cache.reverbnation.com/assets/widgets/swf/40/pro_widget.swf?id=artist_1354004'
+
+      expect(reverbnationResolveEmbed(value)).toBeUndefined()
     })
 
     it('should refuse a swf naming nothing', () => {
@@ -196,12 +279,13 @@ describeForEachParser('reverbnationEmbedResolver', (parseHtml) => {
         provider: 'reverbnation',
         id: 'artist_1018382',
         src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55',
+        height: 265,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the Flash player out of an embed and keep its box', async () => {
+    it('should take the Flash player out of an embed at the platform size', async () => {
       const value = html`
         <embed
           src="http://cache.reverbnation.com/widgets/swf/40/pro_widget.swf?id=artist_1354004&amp;skin_id=PWAS1006"
@@ -214,8 +298,7 @@ describeForEachParser('reverbnationEmbedResolver', (parseHtml) => {
         provider: 'reverbnation',
         id: 'artist_1354004',
         src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1354004',
-        width: 411,
-        height: 326,
+        height: 265,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -225,16 +308,14 @@ describeForEachParser('reverbnationEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
-        '<iframe src="https://evil.test/reverbnation.com/widget_code/html_widget/artist_1018382"></iframe>'
+        '<iframe src="https://evil.test/widget_code/html_widget/artist_1018382"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
   })
 
   describe('the size the widget does not have', () => {
-    // The widget reflows instead of scaling, so the resolver states nothing and whatever the
-    // publisher declared is what the placeholder reserves.
-    it('should take the height from the carrier alone', async () => {
+    it('should ignore the height the carrier states', async () => {
       const value = html`
         <iframe
           src="https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55"
@@ -246,7 +327,7 @@ describeForEachParser('reverbnationEmbedResolver', (parseHtml) => {
         provider: 'reverbnation',
         id: 'artist_1018382',
         src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=55',
-        height: 520,
+        height: 265,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -279,6 +360,7 @@ describeForEachParser('reverbnation through the pipeline', (parseHtml) => {
         data-embed-id="artist_1018382"
         data-embed-provider="reverbnation"
         data-embed-src="https://www.reverbnation.com/widget_code/html_widget/artist_1018382"
+        data-embed-height="265"
       ></div>
     `
 

@@ -1,11 +1,7 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { keepIfMatches } from '../utils/dom.js'
-import { pickUrlParams } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-
-// Nothing but the id's own alphabet may reach a minted path.
-const deckIdRegex = /^[\w-]+$/
 
 // The page routes a deck frame names. `/export` serves the deck as a file, which stays an
 // enclosure.
@@ -14,6 +10,16 @@ const deckRoutes = new Set(['edit', 'embed', 'preview', 'pub', 'pubembed'])
 // `loop` and `delayms` are the publisher's own slideshow settings and `slide` is the start
 // position. `start` autoplays the deck, which is the reader's call, so it goes with the trackers.
 const deckParams = ['loop', 'delayms', 'slide']
+
+const deckRatio = '480/299'
+
+// A share link can write its slide in the fragment, beside flags for the toolbar and where the
+// file was opened from. Only the slide the deck opens on is kept.
+const readDeckFragment = (parsed: URL): string => {
+  const query = composeQuery(pickQueryParams(parsed.hash.slice(1), ['slide']))
+
+  return query.replace('?', '#')
+}
 
 // `/presentation/d/e/{id}` names a deck published to the web and `/presentation/d/{id}` names it
 // by its Drive file id. The legacy `/presentation/embed?id={id}` 301s onto the second.
@@ -28,17 +34,21 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
   }
 
   if (segments[1] === 'embed') {
-    const fileId = keepIfMatches(parsed.searchParams.get('id'), deckIdRegex)
+    const fileId = parsed.searchParams.get('id')
 
     if (!fileId) {
       return
     }
 
+    // The file id comes out of the query decoded, and it goes into a path.
+    const deckPath = encodePathSegment(fileId)
+
     return {
       provider: 'googleslides',
       id: fileId,
-      src: `https://docs.google.com/presentation/embed${pickUrlParams(url, ['id', ...deckParams])}${parsed.hash}`,
-      url: `https://docs.google.com/presentation/d/${fileId}/pub`,
+      src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(parsed)}`,
+      url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
+      ratio: deckRatio,
     }
   }
 
@@ -47,7 +57,7 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const isPublished = segments[2] === 'e'
-  const deckId = keepIfMatches(isPublished ? segments[3] : segments[2], deckIdRegex)
+  const deckId = isPublished ? segments[3] : segments[2]
 
   if (!deckId) {
     return
@@ -65,8 +75,9 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider: 'googleslides',
     id: deckId,
-    src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${parsed.hash}`,
+    src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(parsed)}`,
     url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
+    ratio: deckRatio,
   }
 }
 

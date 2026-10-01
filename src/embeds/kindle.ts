@@ -1,7 +1,7 @@
 import { isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const kindleHosts = [
@@ -12,15 +12,6 @@ const kindleHosts = [
   'read.amazon.in',
 ]
 
-// `read.amazon.com.au` also serves cards for books sold only on `amazon.co.jp`.
-const sharedStoreHosts = ['read.amazon.com.au']
-
-// `preview=newtab` opens the sample in a new tab. The card's script sets `tag` and `linkCode` on
-// every store link it opens when a tag is present.
-const cardParams = ['preview', 'tag', 'linkCode']
-
-// An ASIN is uppercase alphanumeric, the ISBN-10 check letter included.
-const safeAsinRegex = /^[0-9A-Z]+$/
 const cardPathRegex = /^\/kp\/card\/?$/
 
 // The Kindle preview card WordPress writes for an Amazon book, `read.amazon.com/kp/card?asin=…`.
@@ -28,32 +19,25 @@ const cardPathRegex = /^\/kp\/card\/?$/
 export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  // The reader host is exact: a subdomain of one would mint a page on a storefront that is not there.
   if (!parsed || !isHostOf(parsed, kindleHosts) || !cardPathRegex.test(parsed.pathname)) {
     return
   }
 
   const asin = parsed.searchParams.get('asin')
 
-  if (!asin || !safeAsinRegex.test(asin)) {
+  if (!asin) {
     return
   }
 
-  const query = composeQuery({
-    asin,
-    preview: 'inline',
-    linkCode: 'kpd',
-    ...pickQueryParams(parsed.search, cardParams),
-  })
-  const storefront = parsed.hostname.slice('read.'.length)
-  const isSharedStore = sharedStoreHosts.includes(parsed.hostname)
-
+  // `read.amazon.com` loads the card of a book from any storefront, so it serves every card and no
+  // one store's product page is the book's.
   return {
     provider: 'kindle',
     id: asin,
-    src: `https://${parsed.hostname}/kp/card${query}`,
-    url: isSharedStore ? undefined : `https://www.${storefront}/dp/${asin}`,
-    thumbnail: `https://m.media-amazon.com/images/P/${asin}.01._SCLZZZZZZZ_.jpg`,
+    src: `https://read.amazon.com/kp/card${composeQuery({ asin })}`,
+    // The ASIN comes out of the query decoded, and it goes into a path.
+    thumbnail: `https://m.media-amazon.com/images/P/${encodePathSegment(asin)}.01._SCLZZZZZZZ_.jpg`,
+    height: 550,
     // The oEmbed writes the book's name here, never a player label.
     title: attr(element, 'title'),
   }

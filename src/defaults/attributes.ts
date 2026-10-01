@@ -107,6 +107,7 @@ export const defaultLazyIframeAttributes = [
   // rebuildEmbedPlusEmbeds.
   'data-ep-src', // EmbedPlus YouTube deferred player.
   'data-lazy-load', // JetElements / Woodmart / Elementor lazy video widgets.
+  'data-tally-src', // Tally forms: the iframe ships with no src at all.
 ]
 
 export const defaultDeferredIframeSources: Array<DeferredIframeSource> = [

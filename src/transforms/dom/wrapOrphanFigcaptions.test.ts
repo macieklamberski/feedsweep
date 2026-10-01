@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -160,6 +161,38 @@ describeForEachParser('wrapOrphanFigcaptions', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should wrap a bare image and its trailing figcaption', async () => {
+    const value = html`
+      <img src="chart.png">
+      <figcaption>The device listing.</figcaption>
+    `
+    const expected = html`
+      <figure>
+        <img src="chart.png">
+        <figcaption>The device listing.</figcaption>
+      </figure>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should drop the wrapper a caption after a bare image leaves empty', async () => {
+    const value = html`
+      <img src="chart.png">
+      <div>
+        <figcaption>The device listing.</figcaption>
+      </div>
+    `
+    const expected = html`
+      <figure>
+        <img src="chart.png">
+        <figcaption>The device listing.</figcaption>
+      </figure>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should wrap a video and its trailing figcaption', async () => {
     const value = html`
       <div><video src="clip.mp4"></video></div>
@@ -173,5 +206,38 @@ describeForEachParser('wrapOrphanFigcaptions', (parseHtml) => {
     `
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should be idempotent', async () => {
+    const value = html`
+      <p><img src="checks-catalog.png"></p>
+      <figcaption>The new Checks are not enabled by default for existing customers.</figcaption>
+    `
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('wrapOrphanFigcaptions through the pipeline', (parseHtml) => {
+  it('should wrap a paragraph image and the caption the feed left beside it', async () => {
+    const value = html`
+      <p><img src="https://www.kolide.com/images/checks-catalog.png"></p>
+      <figcaption>The new Checks are not enabled by default for existing customers.</figcaption>
+    `
+    const expected = html`
+      <figure>
+        <p><img src="https://www.kolide.com/images/checks-catalog.png"></p>
+        <figcaption>The new Checks are not enabled by default for existing customers.</figcaption>
+      </figure>
+    `
+
+    expect(
+      await transformContent(value, {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://www.kolide.com/blog/post',
+      }),
+    ).toEqualHtml(expected)
   })
 })

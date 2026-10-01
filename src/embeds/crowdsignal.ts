@@ -1,23 +1,30 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { attr, flashVar } from '../utils/dom.js'
+import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'crowdsignal'
 
 // `/results` is the poll's own tally page, a different thing from the poll.
 const pollPathRegex = /^\/(\d+)(?:\/embed)?\/?$/
-const loaderPathRegex = /^\/p\/(\d+)\.js$/
-const retiredPollPathRegex = /^\/poll\/(\d+)\/?$/
+const loaderPathRegex = /^\/p\/([^/]+)\.js$/
+const retiredPollPathRegex = /^\/poll\/([^/]+)\/?$/
 const flashPlayerPathRegex = /^\/poll\.swf$/
 
+// A poll's height follows its answer count, and the frame posts none.
+const pollHeight = 533
+
 const composeEmbed = (pollId: string): EmbedResolverResult => {
+  // The Flash flashvar `p` comes out decoded, and it goes into a path.
+  const segment = encodePathSegment(pollId)
+
   return {
     provider,
     id: pollId,
-    src: `https://poll.fm/${pollId}/embed`,
-    url: `https://poll.fm/${pollId}`,
+    src: `https://poll.fm/${segment}/embed`,
+    url: `https://poll.fm/${segment}`,
+    height: pollHeight,
   }
 }
 
@@ -65,10 +72,15 @@ export const crowdsignalScriptEmbedResolver = createMarkupEmbedResolver(
     }
 
     // The frame resolver runs first, so a snippet whose <noscript> held the frame already stands
-    // as this poll's placeholder and the loader has nothing left to add. The id is digits.
-    const placeholder = `[data-embed-provider="${provider}"][data-embed-id="${pollId}"]`
+    // as this poll's placeholder and the loader has nothing left to add.
+    const placeholders = element.ownerDocument?.querySelectorAll(
+      `[data-embed-provider="${provider}"]`,
+    )
+    const hasPlaceholder = [...(placeholders ?? [])].some((placeholder) => {
+      return placeholder.getAttribute('data-embed-id') === pollId
+    })
 
-    if (element.ownerDocument?.querySelector(placeholder)) {
+    if (hasPlaceholder) {
       return
     }
 
@@ -89,18 +101,17 @@ const crowdsignalFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const pollId = keepIfMatches(flashVar(element, 'p'), digitsRegex)
+  const pollId = flashVar(element, 'p')
 
   if (!pollId) {
     return
   }
 
-  return { ...composeEmbed(pollId), height: 473 }
+  return composeEmbed(pollId)
 }
 
 // Polldaddy's retired Flash poll, `www.polldaddy.com/poll.swf`, naming the poll in flashvars `p`.
 export const crowdsignalFlashEmbedResolver = createUrlEmbedResolver(
   ['www.polldaddy.com'],
   crowdsignalFlashResolveEmbed,
-  { preferResolverSize: true },
 )

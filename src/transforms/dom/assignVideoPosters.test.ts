@@ -69,6 +69,50 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  // Each host a video-led item's placeholder can point at, from a lab player url.
+  const videoHostSrcs = [
+    'https://www.youtube.com/embed/SeDnERmDjms',
+    'https://www.dailymotion.com/embed/video/x4mo9k5',
+    'https://fast.wistia.net/embed/iframe/y2oc2r9hkp',
+    'https://videopress.com/embed/gRb7trlt',
+    'https://players.brightcove.net/6178286496001/default_default/index.html?videoId=6278923408001',
+    'https://streamable.com/e/qun2ij',
+  ]
+
+  it.each(videoHostSrcs)('should move an image enclosure onto a player on %s', async (src) => {
+    const value = html`
+      <img src="https://media.beehiiv.com/uploads/poster.png" data-enclosure="">
+      <div data-embed-src="${src}"></div>
+    `
+    const expected = html`
+      <div
+        data-embed-src="${src}"
+        data-embed-thumbnail="https://media.beehiiv.com/uploads/poster.png"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  // Lab YouTube ids carry both punctuation marks the id alphabet allows.
+  const punctuatedVideoIds = ['Ld9q4HFv-2w', 'h41Rrk_6rzs']
+
+  it.each(punctuatedVideoIds)('should move an inline poster onto the embed of %s', async (id) => {
+    const value = html`
+      <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg">
+      <div data-embed-id="${id}" data-embed-src="https://www.youtube.com/embed/${id}"></div>
+    `
+    const expected = html`
+      <div
+        data-embed-id="${id}"
+        data-embed-src="https://www.youtube.com/embed/${id}"
+        data-embed-thumbnail="https://i.ytimg.com/vi/${id}/hqdefault.jpg"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should keep an image enclosure when the item has an inline image of its own', async () => {
     const value = html`
       <img src="https://example.com/poster.png" data-enclosure="">

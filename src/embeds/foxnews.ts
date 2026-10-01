@@ -1,7 +1,7 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type FoxBrand = {
@@ -40,8 +40,9 @@ const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult => {
   return {
     provider: brand.provider,
     id,
-    src: `https://${brand.playerHost}/v/video-embed.html?video_id=${id}`,
-    url: `https://${brand.pageHost}/video/${id}`,
+    src: `https://${brand.playerHost}/v/video-embed.html${composeQuery({ video_id: id })}`,
+    // The id comes out of the query decoded, and it goes into a path.
+    url: `https://${brand.pageHost}/video/${encodePathSegment(id)}`,
     ratio: playerRatio,
   }
 }
@@ -64,7 +65,7 @@ export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  if (!id || !digitsRegex.test(id)) {
+  if (!id) {
     return
   }
 

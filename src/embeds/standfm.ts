@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, parseUrl, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -10,10 +10,9 @@ const safeIdRegex = /^[0-9a-f]{24}$/
 // the page url answered anyway.
 const playerKindRegex = /^[a-z]+$/
 
-// stand.fm's own snippet sizes the iframe with a `<style>` beside it, 190 on a desktop and 230 on
-// a phone, which is stripped before the iframe reaches a reader. A channel embed is a scrolling
-// list of episodes with no height of its own.
-const episodePlayerHeight = 190
+// stand.fm's own snippet sizes the iframe with a `<style>` beside it, which is stripped before the
+// iframe reaches a reader. A channel embed scrolls its list of episodes inside a fixed card.
+const playerHeights = toMap({ episodes: 190, channels: 390 })
 
 // stand.fm's player iframe, or a framed page url, which answers SAMEORIGIN and shows nothing.
 export const standfmResolveEmbed: ResolveEmbed = (url) => {
@@ -30,7 +29,7 @@ export const standfmResolveEmbed: ResolveEmbed = (url) => {
     id: `${kind}/${id}`,
     src: `https://stand.fm/embed/${kind}/${id}`,
     url: `https://stand.fm/${kind}/${id}`,
-    ...(kind === 'episodes' && { height: episodePlayerHeight }),
+    height: playerHeights.get(kind),
   }
 }
 
