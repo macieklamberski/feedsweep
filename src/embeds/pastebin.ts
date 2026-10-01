@@ -51,6 +51,7 @@ export const pastebinResolveEmbed: ResolveEmbed = (url) => {
     id: pasteId,
     src: `https://pastebin.com/embed_iframe/${pasteId}`,
     url: `https://pastebin.com/${pasteId}`,
+    height: 150,
   }
 }
 

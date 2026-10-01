@@ -42,6 +42,7 @@ export const officeResolveEmbed: ResolveEmbed = (url) => {
     provider,
     src: `https://view.officeapps.live.com/op/embed.aspx${composeQuery({ src: documentUrl })}`,
     url: documentUrl,
+    ratio: '8/5',
     title: readFileName(documentUrl),
   }
 }

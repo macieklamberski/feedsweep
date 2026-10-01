@@ -1,12 +1,8 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
-import { attr, parsePixelSize } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
-import {
-  createMarkupEmbedResolver,
-  createUrlEmbedResolver,
-  getEmbedSize,
-} from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'yandexmaps'
 
@@ -21,19 +17,12 @@ const constructorIdRegex = /^constructor:(.+)/
 
 const spacedQueryRegex = /\/js\/%20(.+)/
 
-// The static render answers 400 unless both dimensions are stated, and 400 again above 650 by
-// 450, so a larger carrier box is scaled into that range on the way into the url.
-const maximumStaticWidth = 650
-const maximumStaticHeight = 450
+const mapHeight = 400
 
-// Composed from the id alone, with no key and no expiry.
-const composeStatic = (um: string, width: number, height: number): string => {
-  const scale = Math.min(maximumStaticWidth / width, maximumStaticHeight / height, 1)
-  const query = composeQuery({
-    um,
-    width: `${Math.round(width * scale)}`,
-    height: `${Math.round(height * scale)}`,
-  })
+// Composed from the id alone, with no key and no expiry. The static render answers 400 unless
+// both dimensions are stated, and 400 again above 650 by 450.
+const composeStatic = (um: string): string => {
+  const query = composeQuery({ um, width: '650', height: `${mapHeight}` })
 
   return `https://api-maps.yandex.ru/services/constructor/1.0/static/${query}`
 }
@@ -44,11 +33,7 @@ const composeWidget = (um: string): string => {
   return `https://yandex.ru${widgetPath}${query}`
 }
 
-const resolveConstructorMap = (
-  query: URLSearchParams,
-  width: number | undefined,
-  height: number | undefined,
-): EmbedResolverResult | undefined => {
+const resolveConstructorMap = (query: URLSearchParams): EmbedResolverResult | undefined => {
   const constructorId = query.get('um')?.match(constructorIdRegex)?.[1] ?? query.get('sid')
 
   if (!constructorId) {
@@ -56,20 +41,14 @@ const resolveConstructorMap = (
   }
 
   const um = `constructor:${constructorId}`
-  const src = composeWidget(um)
 
-  if (!height) {
-    return { provider, id: um, src }
+  return {
+    provider,
+    id: um,
+    src: composeWidget(um),
+    thumbnail: composeStatic(um),
+    height: mapHeight,
   }
-
-  // The Constructor writes `width=100%` for a map that fills the column.
-  if (!width) {
-    return { provider, id: um, src, height }
-  }
-
-  const thumbnail = composeStatic(um, width, height)
-
-  return { provider, id: um, src, thumbnail, width, height }
 }
 
 // Some feeds carry the script with a space where the `?` was, which leaves the query in the path
@@ -85,7 +64,7 @@ const readScriptQuery = (url: URL): URLSearchParams => {
 }
 
 // The Constructor's script injects the map where it stands, so a reader strips it and the map
-// renders as nothing. Its own query states the id and the size the publisher chose.
+// renders as nothing. Its own query states the id.
 export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="api-maps.yandex.ru/services/constructor/"]',
   (element): EmbedResolverResult | undefined => {
@@ -96,28 +75,20 @@ export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const query = readScriptQuery(url)
-
-    return resolveConstructorMap(
-      query,
-      parsePixelSize(query.get('width')),
-      parsePixelSize(query.get('height')),
-    )
+    return resolveConstructorMap(readScriptQuery(url))
   },
 )
 
 // The frame the Constructor's iframe snippet writes, which names the map by `um` alone.
 export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
   yandexMapsWidgetHosts,
-  (url, element) => {
+  (url) => {
     const parsed = parseUrl(url)
 
     if (parsed?.pathname !== widgetPath) {
       return
     }
 
-    const declared = element ? getEmbedSize(element, 0) : {}
-
-    return resolveConstructorMap(parsed.searchParams, declared.width, declared.height)
+    return resolveConstructorMap(parsed.searchParams)
   },
 )

@@ -1,5 +1,9 @@
 import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import type { EmbedRenderHint } from '../types.js'
+import { readObjectHeight } from '../utils/hints.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'documentcloud'
 
 const legacyHosts = ['www.documentcloud.org']
 
@@ -47,7 +51,7 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
     const [, id, part, number] = partMatch
 
     return {
-      provider: 'documentcloud',
+      provider,
       id: `${id}/${part}/${number}`,
       src: `${embedBaseUrl}/${id}/${part}/${number}/`,
     }
@@ -68,9 +72,17 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
   }
 
   return {
-    provider: 'documentcloud',
+    provider,
     id,
     src: `${embedBaseUrl}/${id}-${slug}/`,
     thumbnail: `https://s3.documentcloud.org/documents/${id}/pages/${slug}-p1-normal.gif`,
+    ratio: '17/22',
   }
 })
+
+// A page or note embed posts its rendered height unasked, as `{ width, height, href }`. The
+// document viewer posts nothing.
+export const documentcloudRenderHint: EmbedRenderHint = {
+  provider,
+  readHeight: readObjectHeight,
+}

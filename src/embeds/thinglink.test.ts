@@ -34,6 +34,7 @@ describe('thinglinkResolveEmbed', () => {
         src: 'https://www.thinglink.com/card/853609259307368449',
         url: 'https://www.thinglink.com/card/853609259307368449',
         thumbnail: 'https://cdn.thinglink.me/api/image/853609259307368449/1024/10/scaletowidth',
+        ratio: '3/2',
       }
 
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
@@ -46,6 +47,7 @@ describe('thinglinkResolveEmbed', () => {
         id: '1681632338456346625',
         src: 'https://www.thinglink.com/card/1681632338456346625',
         url: 'https://www.thinglink.com/card/1681632338456346625',
+        ratio: '3/2',
       }
 
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
@@ -92,6 +94,7 @@ describe('thinglinkResolveEmbed', () => {
         id: '8536092593073684%2Fother',
         src: 'https://www.thinglink.com/card/8536092593073684%2Fother',
         url: 'https://www.thinglink.com/card/8536092593073684%2Fother',
+        ratio: '3/2',
       }
 
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
@@ -119,6 +122,7 @@ describe('thinglinkResolveEmbed', () => {
         src: 'https://www.thinglink.com/card/794327401873014786',
         url: 'https://www.thinglink.com/card/794327401873014786',
         thumbnail: 'https://cdn.thinglink.me/api/image/794327401873014786/1024/10/scaletowidth',
+        ratio: '3/2',
       }
 
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
@@ -131,6 +135,7 @@ describe('thinglinkResolveEmbed', () => {
         id: '1349876451188408322',
         src: 'https://www.thinglink.com/card/1349876451188408322',
         url: 'https://www.thinglink.com/card/1349876451188408322',
+        ratio: '3/2',
       }
 
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
@@ -146,6 +151,7 @@ describe('thinglinkResolveEmbed', () => {
         src: 'https://www.thinglink.com/card/794327401873014786',
         url: 'https://www.thinglink.com/card/794327401873014786',
         thumbnail: 'https://cdn.thinglink.me/api/image/794327401873014786/1024/10/scaletowidth',
+        ratio: '3/2',
       }
 
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
@@ -159,6 +165,7 @@ describe('thinglinkResolveEmbed', () => {
         src: 'https://www.thinglink.com/card/853609259307368449',
         url: 'https://www.thinglink.com/card/853609259307368449',
         thumbnail: 'https://cdn.thinglink.me/api/image/853609259307368449/1024/10/scaletowidth',
+        ratio: '3/2',
       }
 
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
@@ -171,6 +178,7 @@ describe('thinglinkResolveEmbed', () => {
         id: '1681632338456346625',
         src: 'https://www.thinglink.com/card/1681632338456346625',
         url: 'https://www.thinglink.com/card/1681632338456346625',
+        ratio: '3/2',
       }
 
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
@@ -186,6 +194,7 @@ describe('thinglinkResolveEmbed', () => {
         src: 'https://www.thinglink.com/card/496982514175311874',
         url: 'https://www.thinglink.com/card/496982514175311874',
         thumbnail: 'https://cdn.thinglink.me/api/image/496982514175311874/1024/10/scaletowidth',
+        ratio: '3/2',
       }
 
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
@@ -199,6 +208,7 @@ describe('thinglinkResolveEmbed', () => {
         src: 'https://www.thinglink.com/card/1199999999999999999',
         url: 'https://www.thinglink.com/card/1199999999999999999',
         thumbnail: 'https://cdn.thinglink.me/api/image/1199999999999999999/1024/10/scaletowidth',
+        ratio: '3/2',
       }
 
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
@@ -211,6 +221,7 @@ describe('thinglinkResolveEmbed', () => {
         id: '1200000000000000000',
         src: 'https://www.thinglink.com/card/1200000000000000000',
         url: 'https://www.thinglink.com/card/1200000000000000000',
+        ratio: '3/2',
       }
 
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
@@ -223,6 +234,7 @@ describe('thinglinkResolveEmbed', () => {
         id: '1681632338456346625',
         src: 'https://www.thinglink.com/card/1681632338456346625',
         url: 'https://www.thinglink.com/card/1681632338456346625',
+        ratio: '3/2',
       }
 
       expect(thinglinkResolveEmbed(value)).toEqual(expected)
@@ -292,6 +304,7 @@ describeForEachParser('thinglinkEmbedResolver', (parseHtml) => {
         id: '1318748169202302978',
         src: 'https://www.thinglink.com/card/1318748169202302978',
         url: 'https://www.thinglink.com/card/1318748169202302978',
+        ratio: '3/2',
       }
 
       expect(await extract(value)).toEqual(expected)

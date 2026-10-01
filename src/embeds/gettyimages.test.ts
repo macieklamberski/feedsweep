@@ -15,8 +15,6 @@ describe('readWidgetConfig', () => {
         et: 'iPo3qjCKSVJU-bRwLBwNoQ',
         sig: 'OOM9B40xxpnASE4yukj6V63Qa909rgGMxHZzru08p0c=',
         tld: 'com',
-        width: 594,
-        height: 395,
       }
 
       expect(readWidgetConfig(value)).toEqual(expected)
@@ -29,8 +27,6 @@ describe('readWidgetConfig', () => {
         et: 'abc',
         sig: 'def=',
         tld: 'com',
-        width: 480,
-        height: 320,
       }
 
       expect(readWidgetConfig(value)).toEqual(expected)
@@ -43,8 +39,6 @@ describe('readWidgetConfig', () => {
         et: 'abc',
         sig: 'def=',
         tld: 'co.uk',
-        width: undefined,
-        height: undefined,
       }
 
       expect(readWidgetConfig(value)).toEqual(expected)
@@ -122,6 +116,7 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
         id: '83621',
         src: 'https://embed.gettyimages.com/embed/83621?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=',
         url: 'https://www.gettyimages.com/detail/83621',
+        ratio: '3/2',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -208,6 +203,7 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
         id: 'latest',
         src: 'https://embed.gettyimages.com/embed/latest?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=',
         url: 'https://www.gettyimages.com/detail/latest',
+        ratio: '3/2',
       }
 
       expect(await extract(value)).toEqual(expected)

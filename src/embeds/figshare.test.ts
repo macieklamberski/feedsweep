@@ -33,6 +33,7 @@ describeForEachParser('figshareEmbedResolver', (parseHtml) => {
         provider: 'figshare',
         id: '6205541',
         src: 'https://widgets.figshare.com/articles/6205541/embed',
+        ratio: '568/351',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -44,6 +45,7 @@ describeForEachParser('figshareEmbedResolver', (parseHtml) => {
         provider: 'figshare',
         id: '21109066x',
         src: 'https://widgets.figshare.com/articles/21109066x/embed',
+        ratio: '568/351',
       }
 
       expect(await extract(value)).toEqual(expected)

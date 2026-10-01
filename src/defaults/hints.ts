@@ -17,13 +17,16 @@ import { cnnRenderHint } from '../embeds/cnn.js'
 import { codesandboxRenderHint } from '../embeds/codesandbox.js'
 import { dailymotionRenderHint } from '../embeds/dailymotion.js'
 import { deezerRenderHint } from '../embeds/deezer.js'
+import { documentcloudRenderHint } from '../embeds/documentcloud.js'
 import { donorboxRenderHint } from '../embeds/donorbox.js'
 import { flickrRenderHint } from '../embeds/flickr.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
 import { foxbusinessRenderHint, foxnewsRenderHint } from '../embeds/foxnews.js'
 import { googledriveRenderHint } from '../embeds/googledrive.js'
+import { helloassoRenderHint } from '../embeds/helloasso.js'
 import { imgurRenderHint } from '../embeds/imgur.js'
 import { inaRenderHint } from '../embeds/ina.js'
+import { infogramRenderHint } from '../embeds/infogram.js'
 import { instagramRenderHint } from '../embeds/instagram.js'
 import { kalturaRenderHint } from '../embeds/kaltura.js'
 import { mailruRenderHint } from '../embeds/mailru.js'
@@ -34,6 +37,7 @@ import { nbcnewsRenderHint } from '../embeds/nbcnews.js'
 import { neteaseRenderHint } from '../embeds/netease.js'
 import { nicovideoRenderHint } from '../embeds/nicovideo.js'
 import { notecomRenderHint } from '../embeds/notecom.js'
+import { observableRenderHint } from '../embeds/observable.js'
 import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
 import { omnyRenderHint } from '../embeds/omny.js'
 import { pbsRenderHint } from '../embeds/pbs.js'
@@ -89,14 +93,17 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   codesandboxRenderHint,
   dailymotionRenderHint,
   deezerRenderHint,
+  documentcloudRenderHint,
   donorboxRenderHint,
   flickrRenderHint,
   flourishRenderHint,
   foxbusinessRenderHint,
   foxnewsRenderHint,
   googledriveRenderHint,
+  helloassoRenderHint,
   imgurRenderHint,
   inaRenderHint,
+  infogramRenderHint,
   instagramRenderHint,
   kalturaRenderHint,
   mailruRenderHint,
@@ -107,6 +114,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   neteaseRenderHint,
   nicovideoRenderHint,
   notecomRenderHint,
+  observableRenderHint,
   odnoklassnikiRenderHint,
   omnyRenderHint,
   pbsRenderHint,

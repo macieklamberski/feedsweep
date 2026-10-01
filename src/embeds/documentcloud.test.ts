@@ -17,6 +17,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/',
         thumbnail:
           'https://s3.documentcloud.org/documents/3694123/pages/Feedback-on-the-Nakshe-Portal-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -31,6 +32,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/20705673-open-letter-acj-moud-051021/',
         thumbnail:
           'https://s3.documentcloud.org/documents/20705673/pages/open-letter-acj-moud-051021-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -45,6 +47,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/2702333-Appropriate-and-Responsible-Practices-for/',
         thumbnail:
           'https://s3.documentcloud.org/documents/2702333/pages/Appropriate-and-Responsible-Practices-for-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -115,6 +118,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/20470115-208-emergency-restraint-chair/',
         thumbnail:
           'https://s3.documentcloud.org/documents/20470115/pages/208-emergency-restraint-chair-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -157,6 +161,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/',
         thumbnail:
           'https://s3.documentcloud.org/documents/3694123/pages/Feedback-on-the-Nakshe-Portal-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -318,6 +323,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/1015756-restraint-seclusions-report-ct-2012-13/',
         thumbnail:
           'https://s3.documentcloud.org/documents/1015756/pages/restraint-seclusions-report-ct-2012-13-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -332,6 +338,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
         src: 'https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/',
         thumbnail:
           'https://s3.documentcloud.org/documents/3694123/pages/Feedback-on-the-Nakshe-Portal-p1-normal.gif',
+        ratio: '17/22',
       }
 
       expect(await extract(value)).toEqual(expected)

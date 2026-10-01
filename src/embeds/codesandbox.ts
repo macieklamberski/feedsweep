@@ -1,7 +1,7 @@
-import { getPathSegments, isHostOf, isPlainObject, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { readPixels } from '../utils/hints.js'
+import { readIframeResizeHeight } from '../utils/hints.js'
 import { composeQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -118,27 +118,12 @@ export const codesandboxIframeEmbedResolver = createUrlEmbedResolver(
   codesandboxResolveEmbed,
 )
 
-// The editor posts its rendered height unasked, as `{ src, context: 'iframe.resize', height }`
-// serialised to a JSON string.
-export const readCodesandboxHeight = (data: unknown): number | undefined => {
-  if (typeof data !== 'string') {
-    return
-  }
-
-  try {
-    const message: unknown = JSON.parse(data)
-
-    if (isPlainObject(message) && message.context === 'iframe.resize') {
-      return readPixels(message.height)
-    }
-  } catch {}
-}
-
+// The editor posts its rendered height unasked.
 export const codesandboxRenderHint: EmbedRenderHint = {
   provider,
   // Spelled out: a `www.` src 301s to the apex, so every message arrives from here.
   origin: 'https://codesandbox.io',
   // Without it the editor posts a constant 500, whatever it holds.
   params: { autoresize: '1' },
-  readHeight: readCodesandboxHeight,
+  readHeight: readIframeResizeHeight,
 }

@@ -15,6 +15,7 @@ describe('slideshareResolveEmbed', () => {
       provider: 'slideshare',
       id: '6435157',
       src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+      ratio: '595/485',
     }
 
     expect(slideshareResolveEmbed(value)).toEqual(expected)
@@ -27,6 +28,7 @@ describe('slideshareResolveEmbed', () => {
       provider: 'slideshare',
       id: '17382857',
       src: 'https://www.slideshare.net/slideshow/embed_code/17382857',
+      ratio: '595/485',
     }
 
     expect(slideshareResolveEmbed(value)).toEqual(expected)
@@ -39,6 +41,7 @@ describe('slideshareResolveEmbed', () => {
       provider: 'slideshare',
       id: '6PCWPGFw9SwsAYlongerkey',
       src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAYlongerkey',
+      ratio: '595/485',
     }
 
     expect(slideshareResolveEmbed(value)).toEqual(expected)
@@ -50,6 +53,7 @@ describe('slideshareResolveEmbed', () => {
       provider: 'slideshare',
       id: '6435157123456',
       src: 'https://www.slideshare.net/slideshow/embed_code/6435157123456',
+      ratio: '595/485',
     }
 
     expect(slideshareResolveEmbed(value)).toEqual(expected)
@@ -85,6 +89,7 @@ describe('slideshareResolveEmbed', () => {
       provider: 'slideshare',
       id: '6PCW.PGFw9SwsAY',
       src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCW.PGFw9SwsAY',
+      ratio: '595/485',
     }
 
     expect(slideshareResolveEmbed(value)).toEqual(expected)
@@ -213,6 +218,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
         url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -346,6 +352,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
         url: 'https://www.slideshare.net/..%2F..%2Fadmin/business-quotes-for-2011',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -393,6 +400,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
         url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -427,6 +435,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
         url: 'http://www.slideshare.net/haraldf/business-quotes-for-2011',
+        ratio: '595/485',
         title: 'Business Quotes for 2011',
         author: 'Harald Felgner',
       }
@@ -457,6 +466,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -488,6 +498,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         id: '755576',
         src: 'https://www.slideshare.net/slideshow/embed_code/755576',
         url: 'http://www.slideshare.net/darugar/cloud-computing-hadoop-presentation',
+        ratio: '595/485',
         title: 'presentation',
       }
 
@@ -520,6 +531,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -538,6 +550,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -652,6 +665,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
       provider: 'slideshare',
       id: '6435157',
       src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+      ratio: '595/485',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -711,6 +725,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
       provider: 'slideshare',
       id: '6PCW.PGFw9SwsAY',
       src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCW.PGFw9SwsAY',
+      ratio: '595/485',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -831,6 +846,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         id: '23660334',
         src: 'https://www.slideshare.net/slideshow/embed_code/23660334',
         url: 'http://www.slideshare.net/commonplace0807/java-23660334',
+        ratio: '595/485',
         title: 'Shibuya Java',
         author: 'commonplace0807',
       }
@@ -862,6 +878,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         id: '2nCJtB7MpHuSpf',
         src: 'https://www.slideshare.net/slideshow/embed_code/key/2nCJtB7MpHuSpf',
         url: 'https://de.slideshare.net/BLM_Bayern/christian-sieh',
+        ratio: '595/485',
         title: 'Christian Sieh',
         author: 'BLM Bayern',
       }
@@ -892,6 +909,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: 'hmqg4DDLz9bf1k',
         src: 'https://www.slideshare.net/slideshow/embed_code/key/hmqg4DDLz9bf1k',
+        ratio: '595/485',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -921,6 +939,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         id: '6PCWPGFw9SwsAY',
         src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY',
         url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
+        ratio: '595/485',
         title: 'Business Quotes for 2011',
         author: 'Harald Felgner',
       }
@@ -1010,6 +1029,7 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
         data-embed-id="hK2vDqTQ0Nz9Wm"
         data-embed-provider="slideshare"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/hK2vDqTQ0Nz9Wm"
+        data-embed-ratio="595/485"
       ></div>
     `
 
@@ -1044,6 +1064,7 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
         data-embed-id="6PCWPGFw9SwsAY"
         data-embed-provider="slideshare"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY"
+        data-embed-ratio="595/485"
       ></div>
     `
 
@@ -1073,6 +1094,7 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
         data-embed-id="6PCWPGFw9SwsAY"
         data-embed-provider="slideshare"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY"
+        data-embed-ratio="595/485"
       ></div>
       <p>
         Slides for
@@ -1119,6 +1141,7 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
         data-embed-id="10579166"
         data-embed-provider="slideshare"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/10579166"
+        data-embed-ratio="595/485"
       ></div>
     `
 

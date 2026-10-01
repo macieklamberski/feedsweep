@@ -106,13 +106,13 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
         provider: 'speakerdeck',
         id: '40746bbd65b944eb848e90ab1be552c0',
         src: 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0',
-        ratio: '1.77777777777778/1',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should carry a taller ratio the script states', async () => {
+    it('should give the deck the player ratio over a taller one the script states', async () => {
       const value = html`
         <script
           class="speakerdeck-embed"
@@ -125,7 +125,7 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
         provider: 'speakerdeck',
         id: '198d4fae73df442e89b76766b54e4773',
         src: 'https://speakerdeck.com/player/198d4fae73df442e89b76766b54e4773',
-        ratio: '1.33333333333333/1',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -133,44 +133,6 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should fall back to the default ratio for a malformed one', async () => {
-      const value = html`
-        <script
-          class="speakerdeck-embed"
-          data-id="198d4fae73df442e89b76766b54e4773"
-          data-ratio="wide"
-          src="//speakerdeck.com/assets/embed.js"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'speakerdeck',
-        id: '198d4fae73df442e89b76766b54e4773',
-        src: 'https://speakerdeck.com/player/198d4fae73df442e89b76766b54e4773',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should fall back to the default ratio for a zero one', async () => {
-      const value = html`
-        <script
-          class="speakerdeck-embed"
-          data-id="198d4fae73df442e89b76766b54e4773"
-          data-ratio="0"
-          src="//speakerdeck.com/assets/embed.js"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'speakerdeck',
-        id: '198d4fae73df442e89b76766b54e4773',
-        src: 'https://speakerdeck.com/player/198d4fae73df442e89b76766b54e4773',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should give the default ratio to a script carrying none', async () => {
       const value = html`
         <script

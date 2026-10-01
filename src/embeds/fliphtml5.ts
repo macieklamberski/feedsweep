@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { attr, parsePixelSize } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -36,6 +36,7 @@ export const fliphtml5ResolveEmbed: ResolveEmbed = (url) => {
     url: viewerUrl,
     // The cover the viewer's own `og:image` names, 404 on a book that does not exist.
     thumbnail: `${viewerUrl}files/shot.jpg`,
+    ratio: '4/3',
   }
 }
 
@@ -45,29 +46,11 @@ export const fliphtml5IframeEmbedResolver = createUrlEmbedResolver(
 )
 
 // The LightBox snippet: a cover `<img>` that its script turns into a link, opening the book named
-// in `data-href` in a frame sized by `data-width` and `data-height`. Without the script, only the
-// cover renders.
+// in `data-href`. Without the script, only the cover renders.
 export const fliphtml5LightBoxEmbedResolver = createMarkupEmbedResolver(
   'img[data-rel="fh5-light-box-demo"][data-href]',
   (element) => {
-    const href = attr(element, 'data-href')
-
-    if (!href) {
-      return
-    }
-
-    const result = fliphtml5ResolveEmbed(href)
-
-    if (!result) {
-      return
-    }
-
-    // The script opens an 800 by 600 frame for a missing or unreadable half.
-    return {
-      ...result,
-      width: parsePixelSize(attr(element, 'data-width')) ?? 800,
-      height: parsePixelSize(attr(element, 'data-height')) ?? 600,
-    }
+    return fliphtml5ResolveEmbed(attr(element, 'data-href') ?? '')
   },
   { preferResolverSize: true },
 )

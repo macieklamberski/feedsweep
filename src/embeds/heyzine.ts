@@ -64,6 +64,7 @@ export const heyzineResolveEmbed: ResolveEmbed = (url) => {
     id: flipBook.id,
     src,
     url: src,
+    ratio: '490/600',
   }
 }
 

@@ -30,6 +30,7 @@ export const tuneinResolveEmbed: ResolveEmbed = (url) => {
     src: `https://tunein.com/embed/player/${guideId}/`,
     url: hasPage ? `https://tunein.com/radio/${guideId}/` : undefined,
     thumbnail: hasPage ? `https://cdn-radiotime-logos.tunein.com/${guideId}d.png` : undefined,
+    height: 100,
   }
 }
 

@@ -6,7 +6,6 @@ import {
   blueskyIframeEmbedResolver,
   blueskyPostElementEmbedResolver,
   blueskyS9eEmbedResolver,
-  readBlueskyHeight,
 } from './bluesky.js'
 
 describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
@@ -1189,18 +1188,5 @@ describeForEachParser('blueskyPostElementEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
-  })
-})
-
-describe('readBlueskyHeight', () => {
-  it('should read the height out of the frame report', () => {
-    const value = { height: 687.125, id: '1' }
-
-    expect(readBlueskyHeight(value)).toBe(687.125)
-  })
-
-  it('should read nothing out of a message without a height', () => {
-    expect(readBlueskyHeight({ id: '1' })).toBeUndefined()
-    expect(readBlueskyHeight('ready')).toBeUndefined()
   })
 })

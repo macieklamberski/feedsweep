@@ -17,6 +17,7 @@ describe('pastebinResolveEmbed', () => {
         id: 'jFp3Y1wP',
         src: 'https://pastebin.com/embed_iframe/jFp3Y1wP',
         url: 'https://pastebin.com/jFp3Y1wP',
+        height: 150,
       }
 
       expect(pastebinResolveEmbed(value)).toEqual(expected)
@@ -29,6 +30,7 @@ describe('pastebinResolveEmbed', () => {
         id: 'jFp3Y1wP',
         src: 'https://pastebin.com/embed_iframe/jFp3Y1wP',
         url: 'https://pastebin.com/jFp3Y1wP',
+        height: 150,
       }
 
       expect(pastebinResolveEmbed(value)).toEqual(expected)
@@ -41,6 +43,7 @@ describe('pastebinResolveEmbed', () => {
         id: 'FzCyksKn',
         src: 'https://pastebin.com/embed_iframe/FzCyksKn',
         url: 'https://pastebin.com/FzCyksKn',
+        height: 150,
       }
 
       expect(pastebinResolveEmbed(value)).toEqual(expected)
@@ -53,6 +56,7 @@ describe('pastebinResolveEmbed', () => {
         id: 'agtNppwK',
         src: 'https://pastebin.com/embed_iframe/agtNppwK',
         url: 'https://pastebin.com/agtNppwK',
+        height: 150,
       }
 
       expect(pastebinResolveEmbed(value)).toEqual(expected)
@@ -65,6 +69,7 @@ describe('pastebinResolveEmbed', () => {
         id: 'heGyGJgS',
         src: 'https://pastebin.com/embed_iframe/heGyGJgS',
         url: 'https://pastebin.com/heGyGJgS',
+        height: 150,
       }
 
       expect(pastebinResolveEmbed(value)).toEqual(expected)
@@ -97,6 +102,7 @@ describe('pastebinResolveEmbed', () => {
         id: 'AbCd%2F1234',
         src: 'https://pastebin.com/embed_iframe/AbCd%2F1234',
         url: 'https://pastebin.com/AbCd%2F1234',
+        height: 150,
       }
 
       expect(pastebinResolveEmbed(value)).toEqual(expected)
@@ -153,6 +159,7 @@ describeForEachParser('pastebinScriptEmbedResolver', (parseHtml) => {
         id: 'heGyGJgS',
         src: 'https://pastebin.com/embed_iframe/heGyGJgS',
         url: 'https://pastebin.com/heGyGJgS',
+        height: 150,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -165,6 +172,7 @@ describeForEachParser('pastebinScriptEmbedResolver', (parseHtml) => {
         id: 'heGyGJgS',
         src: 'https://pastebin.com/embed_iframe/heGyGJgS',
         url: 'https://pastebin.com/heGyGJgS',
+        height: 150,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -177,6 +185,7 @@ describeForEachParser('pastebinScriptEmbedResolver', (parseHtml) => {
         id: '7v2qkUqr',
         src: 'https://pastebin.com/embed_iframe/7v2qkUqr',
         url: 'https://pastebin.com/7v2qkUqr',
+        height: 150,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -209,6 +218,7 @@ describeForEachParser('pastebin through the pipeline', (parseHtml) => {
         data-embed-provider="pastebin"
         data-embed-id="heGyGJgS"
         data-embed-url="https://pastebin.com/heGyGJgS"
+        data-embed-height="150"
       ></div>
     `
 

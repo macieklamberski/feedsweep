@@ -26,6 +26,7 @@ export const garminResolveEmbed: ResolveEmbed = (url) => {
     id: activityId,
     src: `https://connect.garmin.com/embed/activity/${activityId}`,
     url: `https://connect.garmin.com/app/activity/${activityId}`,
+    height: 548,
   }
 }
 

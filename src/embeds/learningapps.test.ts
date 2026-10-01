@@ -12,6 +12,7 @@ describe('learningappsResolveEmbed', () => {
         id: '12554379',
         src: 'https://learningapps.org/watch?app=12554379',
         thumbnail: 'https://learningapps.org/appicons/1/12554379.png',
+        height: 500,
       }
 
       expect(learningappsResolveEmbed(value)).toEqual(expected)
@@ -23,6 +24,7 @@ describe('learningappsResolveEmbed', () => {
         provider: 'learningapps',
         id: 'e1j0yk0c',
         src: 'https://learningapps.org/watch?app=e1j0yk0c',
+        height: 500,
       }
 
       expect(learningappsResolveEmbed(value)).toEqual(expected)
@@ -34,6 +36,7 @@ describe('learningappsResolveEmbed', () => {
         provider: 'learningapps',
         id: 'pg9hvgqr522',
         src: 'https://learningapps.org/watch?app=pg9hvgqr522',
+        height: 500,
       }
 
       expect(learningappsResolveEmbed(value)).toEqual(expected)
@@ -46,6 +49,7 @@ describe('learningappsResolveEmbed', () => {
         id: '12554379',
         src: 'https://learningapps.org/watch?app=12554379',
         thumbnail: 'https://learningapps.org/appicons/1/12554379.png',
+        height: 500,
       }
 
       expect(learningappsResolveEmbed(value)).toEqual(expected)
@@ -83,6 +87,7 @@ describe('learningappsResolveEmbed', () => {
         provider: 'learningapps',
         id: '../appicons',
         src: 'https://learningapps.org/watch?app=..%2Fappicons',
+        height: 500,
       }
 
       expect(learningappsResolveEmbed(value)).toEqual(expected)
@@ -94,6 +99,7 @@ describe('learningappsResolveEmbed', () => {
         provider: 'learningapps',
         id: 'abc&v=1',
         src: 'https://learningapps.org/watch?app=abc%26v%3D1',
+        height: 500,
       }
 
       expect(learningappsResolveEmbed(value)).toEqual(expected)
@@ -107,6 +113,7 @@ describe('learningappsResolveEmbed', () => {
         provider: 'learningapps',
         id: 'pwr40fwzn22',
         src: 'https://learningapps.org/watch?app=pwr40fwzn22',
+        height: 500,
       }
 
       expect(learningappsResolveEmbed(value)).toEqual(expected)
@@ -118,6 +125,7 @@ describe('learningappsResolveEmbed', () => {
         provider: 'learningapps',
         id: '123abc',
         src: 'https://learningapps.org/watch?app=123abc',
+        height: 500,
       }
 
       expect(learningappsResolveEmbed(value)).toEqual(expected)
@@ -129,6 +137,7 @@ describe('learningappsResolveEmbed', () => {
         provider: 'learningapps',
         id: 'PWR40FWZN22',
         src: 'https://learningapps.org/watch?app=PWR40FWZN22',
+        height: 500,
       }
 
       expect(learningappsResolveEmbed(value)).toEqual(expected)
@@ -141,6 +150,7 @@ describe('learningappsResolveEmbed', () => {
         id: '12554379',
         src: 'https://learningapps.org/watch?app=12554379',
         thumbnail: 'https://learningapps.org/appicons/1/12554379.png',
+        height: 500,
       }
 
       expect(learningappsResolveEmbed(value)).toEqual(expected)

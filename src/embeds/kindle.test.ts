@@ -13,6 +13,7 @@ describe('kindleResolveEmbed', () => {
         id: 'B08DGQCKF3',
         src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
+        height: 550,
       }
 
       expect(kindleResolveEmbed(value)).toEqual(expected)
@@ -25,6 +26,7 @@ describe('kindleResolveEmbed', () => {
         id: 'B08DGQCKF3',
         src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
+        height: 550,
       }
 
       expect(kindleResolveEmbed(value)).toEqual(expected)
@@ -37,6 +39,7 @@ describe('kindleResolveEmbed', () => {
         id: 'B08DGQCKF3',
         src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
+        height: 550,
       }
 
       expect(kindleResolveEmbed(value)).toEqual(expected)
@@ -49,6 +52,7 @@ describe('kindleResolveEmbed', () => {
         id: 'B08DGQCKF3',
         src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
+        height: 550,
       }
 
       expect(kindleResolveEmbed(value)).toEqual(expected)
@@ -62,6 +66,7 @@ describe('kindleResolveEmbed', () => {
         id: 'B09SLB7V48',
         src: 'https://read.amazon.com/kp/card?asin=B09SLB7V48',
         thumbnail: 'https://m.media-amazon.com/images/P/B09SLB7V48.01._SCLZZZZZZZ_.jpg',
+        height: 550,
       }
 
       expect(kindleResolveEmbed(value)).toEqual(expected)
@@ -82,6 +87,7 @@ describe('kindleResolveEmbed', () => {
         id: '../embed',
         src: 'https://read.amazon.com/kp/card?asin=..%2Fembed',
         thumbnail: 'https://m.media-amazon.com/images/P/..%2Fembed.01._SCLZZZZZZZ_.jpg',
+        height: 550,
       }
 
       expect(kindleResolveEmbed(value)).toEqual(expected)
@@ -108,6 +114,7 @@ describe('kindleResolveEmbed', () => {
         id: 'B08DGQCKF3',
         src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
         thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
+        height: 550,
       }
 
       expect(kindleResolveEmbed(value)).toEqual(expected)

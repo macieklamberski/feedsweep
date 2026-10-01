@@ -32,6 +32,8 @@ const readFallback = (blockquote: Nullish<Element>): Partial<EmbedResolverResult
 
 const fallbackSelector = '.fb-xfbml-parse-ignore blockquote, blockquote.fb-xfbml-parse-ignore'
 
+const postHeight = 646
+
 // Every carrier resolves to a plugin url built around the page it names, which is the only form
 // Facebook frames. The page is also the canonical url, so a caller that knows a better id than
 // the href states it in `extra`. `t`, where a video starts, is kept as the carrier wrote it.
@@ -51,6 +53,7 @@ const composePluginEmbed = (
     id: absoluteHref,
     src: `https://www.facebook.com/plugins/${plugin}.php${query}`,
     url: href,
+    height: plugin === 'post' ? postHeight : undefined,
     ratio: plugin === 'video' ? '16/9' : undefined,
     ...extra,
   }
