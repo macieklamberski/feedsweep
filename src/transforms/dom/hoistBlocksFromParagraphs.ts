@@ -5,9 +5,13 @@ const blockInParagraphSelector = [...blockElements].map((tag) => `p ${tag}`).joi
 const blockSelector = [...blockElements].join(', ')
 
 // A paragraph half left with neither text nor media renders as a blank line. One that
-// kept either stays.
+// kept either stays, and so does a media element left holding only its <source>.
 const hasRenderableContent = (element: Element): boolean => {
-  return hasText(element) || element.querySelector(mediaSelector) !== null
+  return (
+    hasText(element) ||
+    element.matches(mediaSelector) ||
+    element.querySelector(mediaSelector) !== null
+  )
 }
 
 const hoistBlockFromParagraph = (block: Element): void => {
@@ -31,7 +35,13 @@ const hoistBlockFromParagraph = (block: Element): void => {
     // An empty clone is a husk: an inline wrapper whose only content was the block. It is
     // not carried into the trailing half.
     if (trailing && trailing.childNodes.length > 0) {
-      clone.insertBefore(trailing, clone.firstChild)
+      // The HTML parser closes an <audio> or <video> at a block's start tag, so the rest of
+      // its fallback lands after it. A cloned player would render a second, sourceless box.
+      if (trailing.matches(mediaSelector)) {
+        clone.prepend(...trailing.childNodes)
+      } else {
+        clone.insertBefore(trailing, clone.firstChild)
+      }
     }
 
     trailing = clone
