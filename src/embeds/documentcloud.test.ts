@@ -14,7 +14,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'documentcloud',
         id: '3694123',
-        src: 'https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/?embed=1',
+        src: 'https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/',
         thumbnail:
           'https://s3.documentcloud.org/documents/3694123/pages/Feedback-on-the-Nakshe-Portal-p1-normal.gif',
         ratio: '17/22',
@@ -38,13 +38,13 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should compose the page thumbnail from the legacy viewer path without its suffix', async () => {
+    it('should move the legacy viewer onto the embed host', async () => {
       const value =
         '<iframe src="https://www.documentcloud.org/documents/2702333-Appropriate-and-Responsible-Practices-for.html"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'documentcloud',
         id: '2702333',
-        src: 'https://www.documentcloud.org/documents/2702333-Appropriate-and-Responsible-Practices-for.html',
+        src: 'https://embed.documentcloud.org/documents/2702333-Appropriate-and-Responsible-Practices-for/',
         thumbnail:
           'https://s3.documentcloud.org/documents/2702333/pages/Appropriate-and-Responsible-Practices-for-p1-normal.gif',
         ratio: '17/22',
@@ -181,7 +181,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'documentcloud',
         id: '28200073/pages/1',
-        src: 'https://embed.documentcloud.org/documents/28200073/pages/1/?embed=1',
+        src: 'https://embed.documentcloud.org/documents/28200073/pages/1/',
         width: 596,
         height: 842,
       }
@@ -204,7 +204,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'documentcloud',
         id: '4104638/annotations/380631',
-        src: 'https://embed.documentcloud.org/documents/4104638/annotations/380631/?embed=1&fullscreen=1&onlyshoworg=0&pdf=0',
+        src: 'https://embed.documentcloud.org/documents/4104638/annotations/380631/',
         width: 420.48,
         height: 148.32,
       }
@@ -212,7 +212,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should key the legacy note on the note id, keeping the embed flag its redirect needs', async () => {
+    it('should move the legacy note onto the embed host', async () => {
       const value = html`
         <iframe
           class="DC-note-image-space-filler"
@@ -225,7 +225,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'documentcloud',
         id: '2793355/annotations/287733',
-        src: 'https://www.documentcloud.org/documents/2793355-BLS-Jobs-Release/annotations/287733.html?embed=true',
+        src: 'https://embed.documentcloud.org/documents/2793355/annotations/287733/',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -249,7 +249,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'documentcloud',
         id: '2793355/annotations/a287733',
-        src: 'https://www.documentcloud.org/documents/2793355-BLS-Jobs-Release/annotations/a287733.html',
+        src: 'https://embed.documentcloud.org/documents/2793355/annotations/a287733/',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -291,8 +291,8 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
     })
   })
 
-  describe('the query the viewer reads', () => {
-    it('should keep every viewer setting the publisher chose', async () => {
+  describe('the query the embed dialog writes', () => {
+    it('should drop every viewer setting the publisher chose', async () => {
       const value = html`
         <iframe
           loading="lazy"
@@ -304,7 +304,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'documentcloud',
         id: '28266454',
-        src: 'https://embed.documentcloud.org/documents/28266454-june-2026-botm/?embed=1&fullscreen=1&mode=document&onlyshoworg=0&pdf=0&title=1',
+        src: 'https://embed.documentcloud.org/documents/28266454-june-2026-botm/',
         thumbnail:
           'https://s3.documentcloud.org/documents/28266454/pages/june-2026-botm-p1-normal.gif',
         width: 2676,
@@ -314,13 +314,13 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the sidebar setting, which the viewer no longer reads', async () => {
+    it('should drop the sidebar setting', async () => {
       const value =
         '<iframe src="https://embed.documentcloud.org/documents/1015756-restraint-seclusions-report-ct-2012-13/?embed=1&amp;sidebar=false&amp;pdf=0&amp;onlyshoworg=0&amp;fullscreen=1&amp;embed=1"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'documentcloud',
         id: '1015756',
-        src: 'https://embed.documentcloud.org/documents/1015756-restraint-seclusions-report-ct-2012-13/?embed=1&fullscreen=1&onlyshoworg=0&pdf=0',
+        src: 'https://embed.documentcloud.org/documents/1015756-restraint-seclusions-report-ct-2012-13/',
         thumbnail:
           'https://s3.documentcloud.org/documents/1015756/pages/restraint-seclusions-report-ct-2012-13-p1-normal.gif',
         ratio: '17/22',
@@ -335,7 +335,7 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'documentcloud',
         id: '3694123',
-        src: 'https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/?embed=1',
+        src: 'https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/',
         thumbnail:
           'https://s3.documentcloud.org/documents/3694123/pages/Feedback-on-the-Nakshe-Portal-p1-normal.gif',
         ratio: '17/22',
