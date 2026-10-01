@@ -31,10 +31,12 @@ describe('symbalooResolveEmbed', () => {
     })
 
     it('should mint the www host for a webmix on the edu webspace', () => {
-      const value = 'https://edu.symbaloo.com/embed/shared/AAAABQyBRAMAA41_0SJplg=='
+      const value = 'http://edu.symbaloo.com/embed/моизакладки9'
       const expected: EmbedResolverResult = {
         provider: 'symbaloo',
-        src: 'https://www.symbaloo.com/embed/shared/AAAABQyBRAMAA41_0SJplg==',
+        id: '%d0%bc%d0%be%d0%b8%d0%b7%d0%b0%d0%ba%d0%bb%d0%b0%d0%b4%d0%ba%d0%b89',
+        src: 'https://www.symbaloo.com/embed/%D0%BC%D0%BE%D0%B8%D0%B7%D0%B0%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B89',
+        url: 'https://www.symbaloo.com/mix/%D0%BC%D0%BE%D0%B8%D0%B7%D0%B0%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B89',
         height: 500,
       }
 
@@ -124,6 +126,18 @@ describe('symbalooResolveEmbed', () => {
       expect(symbalooResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should ignore the embed route on the blog subdomain', () => {
+      const value = 'https://blog.symbaloo.com/embed/x'
+
+      expect(symbalooResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore an image on the file subdomain', () => {
+      const value = 'https://cdn01.symbaloo.com/static/img/fb/fb_icon_symbaloo.png'
+
+      expect(symbalooResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', () => {
       const value = 'https://evil.test/embed/tic-tacbasicos-edu'
 
@@ -133,12 +147,12 @@ describe('symbalooResolveEmbed', () => {
 
   describe('edge cases', () => {
     it('should use a slug as written, even if the webmix is gone', () => {
-      const value = 'https://edu.symbaloo.com/embed/моизакладки9'
+      const value = 'https://www.symbaloo.com/embed/tic119'
       const expected: EmbedResolverResult = {
         provider: 'symbaloo',
-        id: '%d0%bc%d0%be%d0%b8%d0%b7%d0%b0%d0%ba%d0%bb%d0%b0%d0%b4%d0%ba%d0%b89',
-        src: 'https://www.symbaloo.com/embed/%D0%BC%D0%BE%D0%B8%D0%B7%D0%B0%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B89',
-        url: 'https://www.symbaloo.com/mix/%D0%BC%D0%BE%D0%B8%D0%B7%D0%B0%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B89',
+        id: 'tic119',
+        src: 'https://www.symbaloo.com/embed/tic119',
+        url: 'https://www.symbaloo.com/mix/tic119',
         height: 500,
       }
 
