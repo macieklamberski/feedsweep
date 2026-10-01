@@ -45,6 +45,21 @@ describe('extractBandcampRelease', () => {
     expect(extractBandcampRelease(value)).toBe(expected)
   })
 
+  it('should read the one track a signed carrier names', () => {
+    const value =
+      'https://bandcamp.com/EmbeddedPlayer/album=3807347294/size=large/tracklist=false/tracks=2464352004/esig=76671557f3fab5a5a868dbbabaa73d70/'
+    const expected = 'track/2464352004'
+
+    expect(extractBandcampRelease(value)).toBe(expected)
+  })
+
+  it('should use a signed track id that does not decode as written', () => {
+    const value = 'https://bandcamp.com/EmbeddedPlayer/album=42/tracks=7%E0%A4/esig=abc/'
+    const expected = 'track/7%E0%A4'
+
+    expect(extractBandcampRelease(value)).toBe(expected)
+  })
+
   it('should return undefined when no release is named', () => {
     const value = 'https://bandcamp.com/EmbeddedPlayer/size=small/bgcol=ffffff/'
 
@@ -98,8 +113,8 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'track/ 235369944',
-        src: 'https://bandcamp.com/EmbeddedPlayer/track=%20235369944/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/track=%20235369944/size=large/tracklist=false/artwork=small/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -110,8 +125,8 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'album/42',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/t=07x/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/size=large/tracklist=false/artwork=small/t=07x/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -135,9 +150,9 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'album/3373381116',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=3373381116/',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=3373381116/size=large/tracklist=false/artwork=small/',
         url: 'http://myexpansiveawareness.bandcamp.com/album/do-you-wanna-be-rich',
-        height: 100,
+        height: 120,
         title: 'Do You Wanna Be Rich? by My Expansive Awareness',
       }
 
@@ -156,8 +171,8 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'track/1637967854',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=1578579597/track=1637967854/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=1578579597/size=large/tracklist=false/artwork=small/track=1637967854/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -174,8 +189,8 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'album/2182110545',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=2182110545/t=38/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=2182110545/size=large/tracklist=false/artwork=small/t=38/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -191,8 +206,8 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'track/2747530839',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=2568747696/track=2747530839/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=2568747696/size=large/tracklist=false/artwork=small/track=2747530839/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -239,8 +254,8 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'album/2545703459',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=2545703459/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=2545703459/size=large/tracklist=false/artwork=small/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -253,8 +268,8 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'album/42',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/size=large/tracklist=false/artwork=small/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -267,19 +282,19 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'album/42',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/t=3/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/size=large/tracklist=false/artwork=small/t=3/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
   })
 
-  // Every preset and option is a layout of the same release. The player with no `size`
-  // segment, Bandcamp's own default, is minted in its place at its own height.
+  // Every preset and option is a layout of the same release. The small artwork strip is minted
+  // in its place at its own height.
   describe('the layout the carrier wrote', () => {
     // The commonest carrier: the large player with small artwork, drawn as a 120 tall strip.
-    it('should mint the default player in place of the small artwork strip', async () => {
+    it('should mint the small artwork strip without its colours', async () => {
       const value = html`
         <iframe
           style="border: 0; width: 100%; height: 120px;"
@@ -290,14 +305,14 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'album/1196866932',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=1196866932/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=1196866932/size=large/tracklist=false/artwork=small/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should mint the default player in place of the large preset box', async () => {
+    it('should mint the small artwork strip in place of the large preset box', async () => {
       const value = html`
         <iframe
           style="border: 0; width: 350px; height: 470px;"
@@ -308,15 +323,15 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'album/4173511610',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=4173511610/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=4173511610/size=large/tracklist=false/artwork=small/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
     it.each(presetCases)(
-      'should mint the default player in place of the %s preset',
+      'should mint the small artwork strip in place of the %s preset',
       async (preset, height) => {
         const value = html`
           <iframe
@@ -328,8 +343,8 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
         const expected: EmbedResolverResult = {
           provider: 'bandcamp',
           id: 'album/42',
-          src: 'https://bandcamp.com/EmbeddedPlayer/album=42/',
-          height: 100,
+          src: 'https://bandcamp.com/EmbeddedPlayer/album=42/size=large/tracklist=false/artwork=small/',
+          height: 120,
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -345,26 +360,56 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'album/506020072',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=506020072/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=506020072/size=large/tracklist=false/artwork=small/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The player sends `esig` to its stream api for an exclusive track. The lab's signatures
-    // answer "not available" in a browser, and the same release plays without them.
-    it('should drop an exclusive track signature', async () => {
+    // An exclusive embed names its tracks beside a signature. One named track is the track the
+    // player plays, so it is kept as a track picked off the album and the signature is dropped.
+    it('should keep the one track a signed carrier names', async () => {
       const value = html`
         <iframe
-          src="https://bandcamp.com/EmbeddedPlayer/album=3807347294/size=large/bgcol=ffffff/linkcol=0687f5/artwork=small/transparent=true/tracklist=false/tracks=139951092/esig=d16fcc7028af72f6597fb5bdf57c95e7/"
+          src="https://bandcamp.com/EmbeddedPlayer/album=3807347294/size=large/bgcol=ffffff/linkcol=0687f5/artwork=small/transparent=true/tracklist=false/tracks=2464352004/esig=76671557f3fab5a5a868dbbabaa73d70/"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
-        id: 'album/3807347294',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=3807347294/',
-        height: 100,
+        id: 'track/2464352004',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=3807347294/size=large/tracklist=false/artwork=small/track=2464352004/',
+        height: 120,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the bare album for a signed carrier naming several tracks', async () => {
+      const value = html`
+        <iframe
+          src="https://bandcamp.com/EmbeddedPlayer/album=1866610573/size=large/bgcol=ffffff/linkcol=0687f5/transparent=true/tracklist=true/tracks=1112563518,682497575,1160362223,1285506387,4133464774/esig=7adbc523e32b7a4fee12470d506dc15a/"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'album/1866610573',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=1866610573/size=large/tracklist=false/artwork=small/',
+        height: 120,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop a signed track option behind a prefix', async () => {
+      const value = html`
+        <iframe src="https://bandcamp.com/EmbeddedPlayer/album=42/xtracks=7/"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'album/42',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/size=large/tracklist=false/artwork=small/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -377,8 +422,8 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'album/42',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/size=large/tracklist=false/artwork=small/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -401,8 +446,8 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'album/123/../x',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=123%2F..%2Fx/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=123%2F..%2Fx/size=large/tracklist=false/artwork=small/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -427,8 +472,8 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
         id: 'album/42',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/',
-        height: 100,
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=42/size=large/tracklist=false/artwork=small/',
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -446,8 +491,8 @@ describeForEachParser('bandcampEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'bandcamp',
       id: 'track/42',
-      src: 'https://bandcamp.com/EmbeddedPlayer/track=42/',
-      height: 100,
+      src: 'https://bandcamp.com/EmbeddedPlayer/track=42/size=large/tracklist=false/artwork=small/',
+      height: 120,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -460,8 +505,8 @@ describeForEachParser('bandcampEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'bandcamp',
       id: 'track/42',
-      src: 'https://bandcamp.com/EmbeddedPlayer/track=42/',
-      height: 100,
+      src: 'https://bandcamp.com/EmbeddedPlayer/track=42/size=large/tracklist=false/artwork=small/',
+      height: 120,
       title: 'River Shook by Shook Ones',
     }
 
