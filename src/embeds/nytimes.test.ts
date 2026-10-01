@@ -52,14 +52,15 @@ describe('nytimesResolveEmbed', () => {
       expect(nytimesResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for a player naming no video', () => {
-      const value = 'https://www.nytimes.com/video/players/offsite/index.html'
+    it('should return undefined for a video id on a path that is not the player', () => {
+      const value =
+        'https://www.nytimes.com/video/arts/1247464583973/critics-picks-safe.html?videoId=1247464583973'
 
       expect(nytimesResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id that is not numeric', () => {
-      const value = 'https://www.nytimes.com/video/players/offsite/index.html?videoId=latest'
+    it('should return undefined for a player naming no video', () => {
+      const value = 'https://www.nytimes.com/video/players/offsite/index.html'
 
       expect(nytimesResolveEmbed(value)).toBeUndefined()
     })
@@ -69,6 +70,20 @@ describe('nytimesResolveEmbed', () => {
         'https://www.nytimes.com.evil.test/video/players/offsite/index.html?videoId=100000004460561'
 
       expect(nytimesResolveEmbed(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use a malformed video id as written, even if the player answers an error', () => {
+      const value = 'https://www.nytimes.com/video/players/offsite/index.html?videoId=latest'
+      const expected: EmbedResolverResult = {
+        provider: 'nytimes',
+        id: 'latest',
+        src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=latest',
+        ratio: '16/9',
+      }
+
+      expect(nytimesResolveEmbed(value)).toEqual(expected)
     })
   })
 })
@@ -100,7 +115,7 @@ describeForEachParser('nytimesIframeEmbedResolver', (parseHtml) => {
 
   it('should ignore a foreign host carrying the same path', async () => {
     const value =
-      '<iframe src="https://evil.test/www.nytimes.com/video/players/offsite/index.html?videoId=100000007370133"></iframe>'
+      '<iframe src="https://evil.test/video/players/offsite/index.html?videoId=100000007370133"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

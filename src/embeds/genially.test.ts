@@ -43,6 +43,24 @@ describe('extractGeniallyViewId', () => {
     expect(extractGeniallyViewId(value)).toBeUndefined()
   })
 
+  it('should return undefined for a hex segment with a leading extra character', () => {
+    const value = `https://view.genially.com/0${viewId}`
+
+    expect(extractGeniallyViewId(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a hex segment with a trailing extra character', () => {
+    const value = `https://view.genially.com/${viewId}0`
+
+    expect(extractGeniallyViewId(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a view id carrying an encoded slash', () => {
+    const value = 'https://view.genially.com/60294f8b2ec8%2f59ae0baa5'
+
+    expect(extractGeniallyViewId(value)).toBeUndefined()
+  })
+
   it('should return undefined for a url that cannot be parsed', () => {
     const value = 'https://['
 
@@ -58,6 +76,7 @@ describe('geniallyResolveEmbed', () => {
       provider: 'genially',
       id: viewId,
       src: `https://view.genially.com/${viewId}`,
+      ratio: '16/9',
     }
 
     expect(geniallyResolveEmbed(value)).toEqual(expected)
@@ -69,6 +88,7 @@ describe('geniallyResolveEmbed', () => {
       provider: 'genially',
       id: viewId,
       src: `https://view.genially.com/${viewId}`,
+      ratio: '16/9',
     }
 
     expect(geniallyResolveEmbed(value)).toEqual(expected)
@@ -96,6 +116,7 @@ describeForEachParser('geniallyEmbedResolver', (parseHtml) => {
         provider: 'genially',
         id: '60294f8b2ec856159ae0baa5',
         src: 'https://view.genially.com/60294f8b2ec856159ae0baa5',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -114,6 +135,7 @@ describeForEachParser('geniallyEmbedResolver', (parseHtml) => {
         provider: 'genially',
         id: '60294f8b2ec856159ae0baa5',
         src: 'https://view.genially.com/60294f8b2ec856159ae0baa5',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -131,6 +153,7 @@ describeForEachParser('geniallyEmbedResolver', (parseHtml) => {
         provider: 'genially',
         id: '60294f8b2ec856159ae0baa5',
         src: 'https://view.genially.com/60294f8b2ec856159ae0baa5',
+        ratio: '16/9',
         title: 'Raisonnement argumenté',
       }
 

@@ -71,21 +71,35 @@ describeForEachParser('arteEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<iframe src="https://evil.test/www.arte.tv/embeds/fr/095172-005-A"></iframe>'
+      const value = '<iframe src="https://evil.test/embeds/fr/095172-005-A"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a language outside the two-letter shape', async () => {
+    it('should use a malformed language as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://www.arte.tv/embeds/fra/095172-005-A"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'arte',
+        id: 'fra/095172-005-A',
+        src: 'https://www.arte.tv/embeds/fra/095172-005-A',
+        url: 'https://www.arte.tv/fra/videos/095172-005-A/',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore an id outside the program shape', async () => {
+    it('should use a malformed program id as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://www.arte.tv/embeds/fr/095172-005"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'arte',
+        id: 'fr/095172-005',
+        src: 'https://www.arte.tv/embeds/fr/095172-005',
+        url: 'https://www.arte.tv/fr/videos/095172-005/',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore an arte url that is not the player', async () => {
@@ -200,6 +214,38 @@ describeForEachParser('arteEmbedResolver', (parseHtml) => {
     it('should ignore the concert player config that names no program', async () => {
       const value = html`
         <iframe src="https://www.arte.tv/player/v3/index.php?json_url=http%3A%2F%2Fconcert.arte.tv%2Ffr%2Fplayer%2F48551&amp;lang=fr_FR"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player path behind a prefix', async () => {
+      const value = html`
+        <iframe src="https://www.arte.tv/x/player/v5/index.php?json_url=https%3A%2F%2Fapi.arte.tv%2Fapi%2Fplayer%2Fv2%2Fconfig%2Ffr%2F090637-075-A"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player path followed by another segment', async () => {
+      const value = html`
+        <iframe src="https://www.arte.tv/player/v5/index.php/extra?json_url=https%3A%2F%2Fapi.arte.tv%2Fapi%2Fplayer%2Fv2%2Fconfig%2Ffr%2F090637-075-A"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a config outside the api route', async () => {
+      const value = html`
+        <iframe src="https://www.arte.tv/player/v5/index.php?json_url=https%3A%2F%2Fapi.arte.tv%2Fweb%2Fplayer%2Fv2%2Fconfig%2Ffr%2F090637-075-A"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a config outside the player route', async () => {
+      const value = html`
+        <iframe src="https://www.arte.tv/player/v5/index.php?json_url=https%3A%2F%2Fapi.arte.tv%2Fapi%2Fguide%2Fv2%2Fconfig%2Ffr%2F090637-075-A"></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()

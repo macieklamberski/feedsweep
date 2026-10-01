@@ -12,6 +12,7 @@ describe('audiomackResolveEmbed', () => {
         provider: 'audiomack',
         id: 'larrynorman/song/burn-2',
         src: 'https://audiomack.com/embed/larrynorman/song/burn-2',
+        params: {},
         url: 'https://audiomack.com/larrynorman/song/burn-2',
         height: 252,
         author: 'larrynorman',
@@ -26,6 +27,7 @@ describe('audiomackResolveEmbed', () => {
         provider: 'audiomack',
         id: 'chuuwee/album/cool-world',
         src: 'https://audiomack.com/embed/chuuwee/album/cool-world',
+        params: {},
         url: 'https://audiomack.com/chuuwee/album/cool-world',
         height: 400,
         author: 'chuuwee',
@@ -37,7 +39,13 @@ describe('audiomackResolveEmbed', () => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/audiomack.com/embed/larrynorman/song/burn-2'
+      const value = 'https://evil.test/embed/larrynorman/song/burn-2'
+
+      expect(audiomackResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a route word that is not the player', () => {
+      const value = 'https://audiomack.com/widget/larrynorman/song/burn-2'
 
       expect(audiomackResolveEmbed(value)).toBeUndefined()
     })
@@ -80,10 +88,34 @@ describe('audiomackResolveEmbed', () => {
       expect(audiomackResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should refuse a slug that is not one', () => {
+    it('should use a malformed slug as written, even if the player answers an error', () => {
       const value = 'https://audiomack.com/embed/larrynorman/song/burn.2%2Fother'
+      const expected: EmbedResolverResult = {
+        provider: 'audiomack',
+        id: 'larrynorman/song/burn.2%2Fother',
+        src: 'https://audiomack.com/embed/larrynorman/song/burn.2%2Fother',
+        params: {},
+        url: 'https://audiomack.com/larrynorman/song/burn.2%2Fother',
+        height: 252,
+        author: 'larrynorman',
+      }
 
-      expect(audiomackResolveEmbed(value)).toBeUndefined()
+      expect(audiomackResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should use a malformed artist as written, even if the player answers an error', () => {
+      const value = 'https://audiomack.com/embed/larry%2Fnorman/song/burn-2'
+      const expected: EmbedResolverResult = {
+        provider: 'audiomack',
+        id: 'larry%2Fnorman/song/burn-2',
+        src: 'https://audiomack.com/embed/larry%2Fnorman/song/burn-2',
+        params: {},
+        url: 'https://audiomack.com/larry%2Fnorman/song/burn-2',
+        height: 252,
+        author: 'larry%2Fnorman',
+      }
+
+      expect(audiomackResolveEmbed(value)).toEqual(expected)
     })
   })
 
@@ -94,6 +126,7 @@ describe('audiomackResolveEmbed', () => {
         provider: 'audiomack',
         id: 'larrynorman/song/burn-2',
         src: 'https://audiomack.com/embed/larrynorman/song/burn-2',
+        params: {},
         url: 'https://audiomack.com/larrynorman/song/burn-2',
         height: 252,
         author: 'larrynorman',
@@ -102,12 +135,28 @@ describe('audiomackResolveEmbed', () => {
       expect(audiomackResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the parameters the current player takes', () => {
-      const value = 'https://audiomack.com/embed/song/mlgmusiz/new-year-new-glory?background=1'
+    it('should keep the private-link key in the player and link no page beside it', () => {
+      const value = 'https://audiomack.com/embed/song/mlgmusiz/new-year-new-glory?key=a1b2c3'
       const expected: EmbedResolverResult = {
         provider: 'audiomack',
         id: 'mlgmusiz/song/new-year-new-glory',
-        src: 'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory?background=1',
+        src: 'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory?key=a1b2c3',
+        params: {},
+        height: 252,
+        author: 'mlgmusiz',
+      }
+
+      expect(audiomackResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should carry the background setting as a param and drop the rest', () => {
+      const value =
+        'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory?background=1&autoplay=1&utm_source=fb&fbclid=abc'
+      const expected: EmbedResolverResult = {
+        provider: 'audiomack',
+        id: 'mlgmusiz/song/new-year-new-glory',
+        src: 'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory',
+        params: { background: '1' },
         url: 'https://audiomack.com/mlgmusiz/song/new-year-new-glory',
         height: 252,
         author: 'mlgmusiz',
@@ -124,6 +173,7 @@ describe('audiomackResolveEmbed', () => {
         provider: 'audiomack',
         id: 'toString/song/burn-2',
         src: 'https://audiomack.com/embed/toString/song/burn-2',
+        params: {},
         url: 'https://audiomack.com/toString/song/burn-2',
         height: 252,
         author: 'toString',
@@ -138,6 +188,7 @@ describe('audiomackResolveEmbed', () => {
         provider: 'audiomack',
         id: 'team-bigga-rankin/playlist/paper',
         src: 'https://audiomack.com/embed/team-bigga-rankin/playlist/paper',
+        params: {},
         url: 'https://audiomack.com/team-bigga-rankin/playlist/paper',
         height: 400,
         author: 'team-bigga-rankin',
@@ -154,6 +205,7 @@ describe('audiomackResolveEmbed', () => {
         provider: 'audiomack',
         id: 'hhs1987/song/pound-cake-freestyle-2',
         src: 'https://audiomack.com/embed/hhs1987/song/pound-cake-freestyle-2',
+        params: {},
         url: 'https://audiomack.com/hhs1987/song/pound-cake-freestyle-2',
         height: 252,
         author: 'hhs1987',
@@ -168,6 +220,7 @@ describe('audiomackResolveEmbed', () => {
         provider: 'audiomack',
         id: 'chuuwee/album/cool-world',
         src: 'https://audiomack.com/embed/chuuwee/album/cool-world',
+        params: {},
         url: 'https://audiomack.com/chuuwee/album/cool-world',
         height: 400,
         author: 'chuuwee',
@@ -182,6 +235,7 @@ describe('audiomackResolveEmbed', () => {
         provider: 'audiomack',
         id: 'costill8nine/song/happy-dirty',
         src: 'https://audiomack.com/embed/costill8nine/song/happy-dirty',
+        params: {},
         url: 'https://audiomack.com/costill8nine/song/happy-dirty',
         height: 252,
         author: 'costill8nine',
@@ -197,6 +251,7 @@ describe('audiomackResolveEmbed', () => {
         provider: 'audiomack',
         id: 'creative-soul-music-group-1/album/satisfaction-ep',
         src: 'https://audiomack.com/embed/creative-soul-music-group-1/album/satisfaction-ep',
+        params: {},
         url: 'https://audiomack.com/creative-soul-music-group-1/album/satisfaction-ep',
         height: 400,
         author: 'creative-soul-music-group-1',
@@ -211,6 +266,7 @@ describe('audiomackResolveEmbed', () => {
         provider: 'audiomack',
         id: 'jhoss/song/til-the-morn',
         src: 'https://audiomack.com/embed/jhoss/song/til-the-morn',
+        params: {},
         url: 'https://audiomack.com/jhoss/song/til-the-morn',
         height: 252,
         author: 'jhoss',
@@ -231,7 +287,8 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audiomack',
         id: 'larrynorman/song/burn-2',
-        src: 'https://audiomack.com/embed/larrynorman/song/burn-2?background=1',
+        src: 'https://audiomack.com/embed/larrynorman/song/burn-2',
+        params: { background: '1' },
         url: 'https://audiomack.com/larrynorman/song/burn-2',
         height: 252,
         author: 'larrynorman',
@@ -248,6 +305,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
         provider: 'audiomack',
         id: 'billnass/song/hallo',
         src: 'https://audiomack.com/embed/billnass/song/hallo',
+        params: {},
         url: 'https://audiomack.com/billnass/song/hallo',
         height: 252,
         author: 'billnass',
@@ -267,6 +325,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
         provider: 'audiomack',
         id: 'theransomreport/song/episode-i',
         src: 'https://audiomack.com/embed/theransomreport/song/episode-i',
+        params: {},
         url: 'https://audiomack.com/theransomreport/song/episode-i',
         height: 252,
         title: 'Episode I with Rodney Coursey',
@@ -279,8 +338,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value =
-        '<iframe src="https://evil.test/audiomack.com/embed/larrynorman/song/burn-2"></iframe>'
+      const value = '<iframe src="https://evil.test/embed/larrynorman/song/burn-2"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -299,6 +357,7 @@ describeForEachParser('audiomackEmbedResolver', (parseHtml) => {
         provider: 'audiomack',
         id: 'chuuwee/album/cool-world',
         src: 'https://audiomack.com/embed/chuuwee/album/cool-world',
+        params: {},
         url: 'https://audiomack.com/chuuwee/album/cool-world',
         width: 649,
         height: 1200,

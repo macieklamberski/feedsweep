@@ -1,12 +1,17 @@
-import type { Nullish, PartialNullish } from 'trousse'
+import { isString, type PartialNullish } from 'trousse'
 import type { CiteResolverResult } from '../types.js'
 
 // What a resolver scrapes: the result fields as the markup or the JSON blob carries them,
 // untrimmed and nullish wherever the field is absent.
 type RawCiteResult = PartialNullish<CiteResolverResult> & Pick<CiteResolverResult, 'provider'>
 
-const trim = (value: Nullish<string>): string | undefined => {
-  return value?.trim() || undefined
+// A JSON payload can carry a number, an array or an object where the card has text.
+export const trim = (value: unknown): string | undefined => {
+  if (!isString(value)) {
+    return
+  }
+
+  return value.trim() || undefined
 }
 
 export const buildCite = (result: RawCiteResult): CiteResolverResult | undefined => {

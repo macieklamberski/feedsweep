@@ -39,6 +39,7 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
         provider: 'issuu',
         id: '1016421/47623369',
         src: 'https://e.issuu.com/embed.html#1016421/47623369',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -66,6 +67,19 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should encode a document name carrying an encoded slash once', async () => {
+      const value = '<div class="issuuembed" data-url="https://issuu.com/pub/docs/do%2Fc"></div>'
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'pub/do/c',
+        src: 'https://e.issuu.com/embed.html?u=pub&d=do%2Fc',
+        url: 'https://issuu.com/pub/docs/do%2Fc',
+        ratio: '5/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should carry a page number from the reader url into the query', async () => {
       const value = html`
         <div
@@ -78,13 +92,13 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
         id: 'ecosistemaurbano/paisaje_transversal',
         src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal&p=12',
         url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    // A malformed config id must not block a resolution the second attribute can still supply.
-    it('should fall back to data-url when the config id is malformed', async () => {
+    it('should take a malformed config id over data-url, even if the player answers an error', async () => {
       const value = html`
         <div
           class="issuuembed"
@@ -94,9 +108,9 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'issuu',
-        id: 'ecosistemaurbano/paisaje_transversal',
-        src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal',
-        url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
+        id: 'not-a-config-id',
+        src: 'https://e.issuu.com/embed.html#not-a-config-id',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -104,15 +118,21 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a config id that is not a counter pair', async () => {
+    it('should use a malformed config id as written, even if the player answers an error', async () => {
       const value = html`
         <div
           class="issuuembed"
           data-configid="../evil/1"
         ></div>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: '../evil/1',
+        src: 'https://e.issuu.com/embed.html#../evil/1',
+        ratio: '5/3',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for an empty config id', async () => {
@@ -128,7 +148,7 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
 
     it('should return undefined for a data-url on another host', async () => {
       const value = html`
-        <div class="issuuembed" data-url="https://evil.test/issuu.com/user/docs/document"></div>
+        <div class="issuuembed" data-url="https://evil.test/ecosistemaurbano/docs/paisaje_transversal"></div>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -213,6 +233,24 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'ecosistemaurbano/paisaje_transversal',
         src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal&p=7',
         url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
+        ratio: '5/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a malformed page as written, even if the player answers an error', async () => {
+      const value = html`
+        <iframe
+          src="https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal&p=cover"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'ecosistemaurbano/paisaje_transversal',
+        src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal&p=cover',
+        url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -240,6 +278,21 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should claim a publisher name carrying a dot', async () => {
+      const value = html`
+        <iframe src="https://e.issuu.com/embed.html?u=swissgolf.ch&d=swiss_golf_02-26_de"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'swissgolf.ch/swiss_golf_02-26_de',
+        src: 'https://e.issuu.com/embed.html?u=swissgolf.ch&d=swiss_golf_02-26_de',
+        url: 'https://issuu.com/swissgolf.ch/docs/swiss_golf_02-26_de',
+        ratio: '5/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -247,6 +300,27 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
       const value = '<iframe src="https://e.issuu.com/embed.html"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a query missing the document', async () => {
+      const value = '<iframe src="https://e.issuu.com/embed.html?u=ecosistemaurbano"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should use a malformed publisher name as written, even if the player answers an error', async () => {
+      const value = html`
+        <iframe src="https://e.issuu.com/embed.html?u=..&d=paisaje_transversal"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: '../paisaje_transversal',
+        src: 'https://e.issuu.com/embed.html?u=..&d=paisaje_transversal',
+        url: 'https://issuu.com/../docs/paisaje_transversal',
+        ratio: '5/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for a query missing the publisher', async () => {
@@ -257,20 +331,19 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // The query is interpolated straight into the minted url, so a name that is not a name has
-    // to stop here.
-    it('should return undefined for a document name holding a traversal', async () => {
+    it('should use a malformed document name as written, even if the player answers an error', async () => {
       const value = html`
         <iframe src="https://e.issuu.com/embed.html?u=ecosistemaurbano&d=../../evil"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'ecosistemaurbano/../../evil',
+        src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=..%2F..%2Fevil',
+        url: 'https://issuu.com/ecosistemaurbano/docs/..%2F..%2Fevil',
+        ratio: '5/3',
+      }
 
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for names that are dot segments', async () => {
-      const value = '<iframe src="https://e.issuu.com/embed.html?u=..&d=.."></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should not claim another host spelling the embed path', async () => {
@@ -304,6 +377,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'thebeastmag/the_beast_-_july_2026',
         src: 'https://e.issuu.com/embed.html?u=thebeastmag&d=the_beast_-_july_2026',
         url: 'https://issuu.com/thebeastmag/docs/the_beast_-_july_2026',
+        ratio: '5/3',
         title: 'The Beast - July 2026',
       }
 
@@ -322,6 +396,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         provider: 'issuu',
         id: '1016421/47623369',
         src: 'https://e.issuu.com/embed.html#1016421/47623369',
+        ratio: '5/3',
         title: 'Vermont Cynic Drug Issue 2026',
       }
 
@@ -340,6 +415,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'thebeastmag/the_beast_-_july_2026',
         src: 'https://e.issuu.com/embed.html?u=thebeastmag&d=the_beast_-_july_2026',
         url: 'https://issuu.com/thebeastmag/docs/the_beast_-_july_2026',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -358,6 +434,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'basilikimetatroulou/xyz_9_1_final',
         src: 'https://e.issuu.com/embed.html?u=basilikimetatroulou&d=xyz_9_1_final',
         url: 'https://issuu.com/basilikimetatroulou/docs/xyz_9_1_final',
+        ratio: '5/3',
         title: 'The Beast',
       }
 
@@ -373,6 +450,21 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
         id: 'basilikimetatroulou/xyz_9_1_final',
         src: 'https://e.issuu.com/embed.html?u=basilikimetatroulou&d=xyz_9_1_final&p=1',
         url: 'https://issuu.com/basilikimetatroulou/docs/xyz_9_1_final',
+        ratio: '5/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read the story route as a page', async () => {
+      const value =
+        '<iframe src="https://issuu.com/basilikimetatroulou/docs/xyz_9_1_final/s/12345"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'basilikimetatroulou/xyz_9_1_final',
+        src: 'https://e.issuu.com/embed.html?u=basilikimetatroulou&d=xyz_9_1_final',
+        url: 'https://issuu.com/basilikimetatroulou/docs/xyz_9_1_final',
+        ratio: '5/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -380,11 +472,13 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
 
     // The enclosure probe offers every attachment a feed carries to each url resolver, so a
     // document name that is a filename would take the place of a playable or downloadable file.
-    it.each([
+    const filenameDocumentFrames: Array<string> = [
       '<iframe src="https://issuu.com/pub/docs/report.pdf"></iframe>',
       '<iframe src="https://issuu.com/pub/docs/episode.mp3"></iframe>',
       '<iframe src="https://issuu.com/pub/docs/cover.jpg"></iframe>',
-    ])('should return undefined for %s', async (value) => {
+    ]
+
+    it.each(filenameDocumentFrames)('should return undefined for %s', async (value) => {
       expect(await extract(value)).toBeUndefined()
     })
 
@@ -429,6 +523,7 @@ describeForEachParser('issuuIframeEmbedResolver carrier title', (parseHtml) => {
       provider: 'issuu',
       id: '1016421/47623369',
       src: 'https://e.issuu.com/embed.html#1016421/47623369',
+      ratio: '5/3',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -442,6 +537,7 @@ describeForEachParser('issuuIframeEmbedResolver carrier title', (parseHtml) => {
       provider: 'issuu',
       id: '1016421/47623369',
       src: 'https://e.issuu.com/embed.html#1016421/47623369',
+      ratio: '5/3',
       title: 'Cathedral News 07.06.26',
     }
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { parseHTML } from 'linkedom'
 import { parseHtml } from '../../parsers/linkedom.js'
-import { baseContext, describeForEachParser, queryElement } from '../../tests.js'
+import { baseContext, describeForEachParser, html, queryElement } from '../../tests.js'
 import type { HighlightFn, TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { detectLanguage, highlightCode } from './highlightCode.js'
@@ -525,6 +525,33 @@ describeForEachParser('highlightCode', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should leave a data table with numbered rows of code untouched', async () => {
+      const value = html`
+        <table>
+          <tbody>
+            <tr><th>Step</th><th>Command</th></tr>
+            <tr><td>1</td><td><pre><code>npm install</code></pre></td></tr>
+            <tr><td>2</td><td><pre><code>npm run build --prod</code></pre></td></tr>
+          </tbody>
+        </table>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should drop a one-row gutter table with integer cells', async () => {
+      const value = html`
+        <table>
+          <tbody>
+            <tr><td>1</td><td><pre><code>npm install</code></pre></td></tr>
+          </tbody>
+        </table>
+      `
+      const expected = '<pre data-pre-numbered=""><code>npm install</code></pre>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should not mark a plain code block without a gutter', async () => {
       const value = '<pre><code class="language-js">const x = 1</code></pre>'
       const expected =
@@ -719,6 +746,21 @@ describeForEachParser('highlightCode', (parseHtml) => {
     const value = '<code class="language-python">def hello():\n    print("hi")</code>'
     const expected =
       '<pre data-pre-language="python" data-pre-label="Python"><code class="language-python hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">hello</span>():\n    <span class="hljs-built_in">print</span>(<span class="hljs-string">"hi"</span>)</code></pre>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep br line breaks in a standalone code with a language-* class', async () => {
+    const value = '<code class="language-python">a = 1<br>b = 2\nc = 3</code>'
+    const expected =
+      '<pre data-pre-language="python" data-pre-label="Python"><code class="language-python hljs">a = <span class="hljs-number">1</span>\nb = <span class="hljs-number">2</span>\nc = <span class="hljs-number">3</span></code></pre>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should promote a standalone code whose lines are split only by br', async () => {
+    const value = '<code>the quick brown fox<br>jumps over the lazy dog</code>'
+    const expected = '<pre><code>the quick brown fox<br>jumps over the lazy dog</code></pre>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })

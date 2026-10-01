@@ -1,4 +1,4 @@
-import { isPlainObject } from 'trousse'
+import { getPathSegments, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest, readPixels } from '../utils/hints.js'
@@ -7,10 +7,10 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'podigee'
 
-const podigeeHosts = ['podigee.io', 'podigee.com', 'podigee-cdn.net']
+const podigeeHosts = ['podigee.io']
 
-// A show is a subdomain of podigee.io, and podigee-cdn.net serves the player's assets and the
-// episode audio.
+// A show is a subdomain of podigee.io, and `www.podigee.io` is the company site, whose paths can
+// open with a number.
 const showHostRegex = /^(?!www\.)[a-z0-9-]+\.podigee\.io$/i
 
 // An episode is always numbered, which separates it from the two other paths a show serves:
@@ -26,7 +26,7 @@ const playerHeight = 145
 // stable id without parsing the query.
 const composeEmbed = (parsed: URL, src: string): EmbedResolverResult | undefined => {
   const show = parsed.hostname.split('.')[0]
-  const episode = parsed.pathname.split('/').find(Boolean)
+  const episode = getPathSegments(parsed)[0]
 
   if (!show || !episode) {
     return
@@ -58,12 +58,11 @@ export const podigeeScriptEmbedResolver = createMarkupEmbedResolver(
 export const podigeeResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, podigeeHosts)
 
-  // An enclosure on the CDN, {n}-{hash}.mp3, reads as an episode and would lose its audio.
   if (!parsed || !showHostRegex.test(parsed.hostname)) {
     return
   }
 
-  const [episode, ...rest] = parsed.pathname.split('/').filter(Boolean)
+  const [episode, ...rest] = getPathSegments(parsed)
 
   if (!episode) {
     return
@@ -85,18 +84,29 @@ export const podigeeResolveEmbed: ResolveEmbed = (url) => {
 // An iframe framing a Podigee episode page rather than the player, so the reader gets an article.
 export const podigeeIframeEmbedResolver = createUrlEmbedResolver(podigeeHosts, podigeeResolveEmbed)
 
-// The player reports its height under a configurePlayer message, 0 before it has rendered and the
-// real value after, from the show's own subdomain.
+// The player reports its height under a configurePlayer message serialised to a JSON string, 0
+// before it has rendered and the real value after.
 export const readPodigeeHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) && data.listenTo === 'configurePlayer'
-    ? readPixels(data.height)
-    : undefined
+  if (typeof data !== 'string') {
+    return
+  }
+
+  try {
+    const message: unknown = JSON.parse(data)
+
+    if (isPlainObject(message) && message.listenTo === 'configurePlayer') {
+      return readPixels(message.height)
+    }
+  } catch {}
 }
 
 // The player takes no query to start and speaks player.js, and Podigee's help says playback waits
 // for a click.
 export const podigeeRenderHint: EmbedRenderHint = {
   provider,
+  // Spelled out: every show's `/embed` 302s to the player on this host, so its messages come
+  // from here.
+  origin: 'https://player.podigee-cdn.net',
   isReady: isPlayerJsReady,
   requestPlay: playerJsPlayRequest,
   readHeight: readPodigeeHeight,

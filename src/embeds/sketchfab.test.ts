@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { sketchfabEmbedResolver } from './sketchfab.js'
@@ -84,10 +85,34 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a uid carrying a path after it', async () => {
+      const value = html`
+        <iframe src="https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838%2F..%2Fcomments/embed"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a uid carrying a path before it', async () => {
+      const value = html`
+        <iframe src="https://sketchfab.com/models/..%2F00b8203bcdc2464bbac4b159be66e838/embed"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a uid-length segment carrying an encoded separator', async () => {
+      const value = html`
+        <iframe src="https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e%2F/embed"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', async () => {
       const value = html`
         <iframe
-          src="https://evil.test/sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed"
+          src="https://evil.test/models/00b8203bcdc2464bbac4b159be66e838/embed"
         ></iframe>
       `
 
@@ -105,6 +130,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -119,6 +145,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -133,6 +160,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -149,9 +177,30 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
         id: '00b8203bcdc2464bbac4b159be66e838',
         src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
         url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
+        ratio: '4/3',
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore a slugged page url that runs on past the uid', async () => {
+      const value = html`
+        <iframe
+          src="https://sketchfab.com/3d-models/borodyanka-ukraine-war-banksy-00b8203bcdc2464bbac4b159be66e838%2Fcomments"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a slugged page url ending in an encoded separator', async () => {
+      const value = html`
+        <iframe
+          src="https://sketchfab.com/3d-models/borodyanka-ukraine-war-banksy-00b8203bcdc2464bbac4b159be66e%2F"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a slugged page url that ends in no uid', async () => {
@@ -196,8 +245,39 @@ describeForEachParser('sketchfabEmbedResolver carrier title', (parseHtml) => {
       id: '00b8203bcdc2464bbac4b159be66e838',
       src: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838/embed',
       url: 'https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e838',
+      ratio: '4/3',
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+// sketchfab.com is listed for the viewer, and its media. subdomain serves each model's thumbnails
+// under the same models path.
+describeForEachParser('sketchfab through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a model thumbnail enclosure an image', async () => {
+    const enclosures = [
+      {
+        url: 'https://media.sketchfab.com/models/4dfa4e9b9d3842feaa1b7970f7247932/thumbnails/451d23fda90542c4ab65b6fd39e2e12b/3713a715651240d6b432ff608d182ade.jpeg',
+        type: 'image/jpeg',
+      },
+    ]
+    const expected = html`
+      <img
+        data-enclosure=""
+        src="https://media.sketchfab.com/models/4dfa4e9b9d3842feaa1b7970f7247932/thumbnails/451d23fda90542c4ab65b6fd39e2e12b/3713a715651240d6b432ff608d182ade.jpeg"
+      >
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })

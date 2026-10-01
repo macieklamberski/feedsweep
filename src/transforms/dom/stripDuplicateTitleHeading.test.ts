@@ -115,6 +115,23 @@ describeForEachParser('stripDuplicateTitleHeading', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(expected)
     })
 
+    it('should remove a matching heading inside a leading wrapper', async () => {
+      const value = html`
+        <div>
+          <h1>Breaking News Today</h1>
+        </div>
+        <p>Article body.</p>
+      `
+      const context: TransformContext = { ...baseContext, articleTitle: 'Breaking News Today' }
+      const expected = html`
+        <div>
+        </div>
+        <p>Article body.</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
     it('should only remove the first matching heading, not subsequent occurrences', async () => {
       const value = html`
         <h1>The Title</h1>
@@ -189,6 +206,29 @@ describeForEachParser('stripDuplicateTitleHeading', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(value)
     })
 
+    it('should leave a matching heading alone when body text precedes it', async () => {
+      const value = html`
+        <p>Intro.</p>
+        <p>More.</p>
+        <h2>Breaking News Today</h2>
+        <p>Tail.</p>
+      `
+      const context: TransformContext = { ...baseContext, articleTitle: 'Breaking News Today' }
+
+      expect(await transform(value, context)).toEqualHtml(value)
+    })
+
+    it('should leave a matching heading alone when an image precedes it', async () => {
+      const value = html`
+        <img src="https://example.com/cover.jpg">
+        <h1>Breaking News Today</h1>
+        <p>Body.</p>
+      `
+      const context: TransformContext = { ...baseContext, articleTitle: 'Breaking News Today' }
+
+      expect(await transform(value, context)).toEqualHtml(value)
+    })
+
     it('should leave a run of headings alone when together they overshoot the title', async () => {
       const value = html`
         <h1>Breaking News</h1>
@@ -239,6 +279,19 @@ describeForEachParser('stripDuplicateTitleHeading', (parseHtml) => {
         <p>Body.</p>
       `
       const context: TransformContext = { ...baseContext, articleTitle: 'Breaking News Today' }
+      const once = await transform(value, context)
+      const twice = await transform(once, context)
+
+      expect(twice).toEqualHtml(once)
+    })
+
+    it('should be idempotent when a later heading repeats the title', async () => {
+      const value = html`
+        <h1>The Title</h1>
+        <p>Body.</p>
+        <h1>The Title</h1>
+      `
+      const context: TransformContext = { ...baseContext, articleTitle: 'The Title' }
       const once = await transform(value, context)
       const twice = await transform(once, context)
 

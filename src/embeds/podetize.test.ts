@@ -45,10 +45,16 @@ describe('podetizeResolveEmbed', () => {
     expect(podetizeResolveEmbed(value)).toBeUndefined()
   })
 
-  it('should return undefined for an id that cannot sit in a path', () => {
+  it('should use a malformed episode id as written, even if the player answers an error', () => {
     const value = 'https://player.podetize.com/?id=P8RH/../vvMsf'
+    const expected: EmbedResolverResult = {
+      provider: 'podetize',
+      id: 'P8RH/../vvMsf',
+      src: 'https://player.podetize.com/?id=P8RH%2F..%2FvvMsf',
+      height: 200,
+    }
 
-    expect(podetizeResolveEmbed(value)).toBeUndefined()
+    expect(podetizeResolveEmbed(value)).toEqual(expected)
   })
 
   it('should return undefined for a lookalike host', () => {
@@ -104,7 +110,7 @@ describeForEachParser('podetizeScriptEmbedResolver', (parseHtml) => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value = html`
         <script
-          src="https://evil.test/player.podetize.com/loadShowcasePlayer.js"
+          src="https://evil.test/loadShowcasePlayer.js?player.podetize.com/loadShowcasePlayer.js"
           data="P8RHvvMsf"
         ></script>
       `
@@ -112,15 +118,21 @@ describeForEachParser('podetizeScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for an id that cannot sit in a query', async () => {
+    it('should use a malformed episode id as written, even if the player answers an error', async () => {
       const value = html`
         <script
           src="https://player.podetize.com/loadShowcasePlayer.js"
           data="P8RH vvMsf"
         ></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'podetize',
+        id: 'P8RH vvMsf',
+        src: 'https://player.podetize.com/?id=P8RH+vvMsf',
+        height: 200,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
@@ -147,8 +159,14 @@ describeForEachParser('podetizeIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should ignore a player url on another path', async () => {
+    const value = '<iframe src="https://player.podetize.com/other?id=P8RHvvMsf"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
   it('should ignore a foreign host carrying the same query', async () => {
-    const value = '<iframe src="https://evil.test/player.podetize.com/?id=P8RHvvMsf"></iframe>'
+    const value = '<iframe src="https://evil.test/?id=P8RHvvMsf"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

@@ -11,7 +11,7 @@ export const stripComments: DomTransform = () => {
     const comments: Array<ChildNode> = []
 
     for (let node = walker.nextNode(); node !== null; node = walker.nextNode()) {
-      comments.push(node as unknown as ChildNode)
+      comments.push(node as ChildNode)
     }
 
     for (const comment of comments) {

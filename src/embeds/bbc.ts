@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `bbc.co.uk` 301s every player route onto `bbc.com`.
@@ -8,8 +8,6 @@ const bbcHosts = ['bbc.com', 'bbc.co.uk']
 
 // A programme id: eight letters and digits with at least one digit, which keeps `articles` out.
 const pidRegex = /^[a-z](?=[0-9a-z]*\d)[0-9a-z]{7}$/
-// No width: BBC has grown the article number a digit at a time.
-const articleIdRegex = /^\d+$/
 
 // The news and World Service players render at 16:9 of their width. BBC's own embed code states
 // a 400 by 500 box, which pads them with blank below.
@@ -20,7 +18,7 @@ const isPid = (segment: string | undefined): segment is string => {
 }
 
 const isArticleId = (segment: string | undefined): segment is string => {
-  return segment !== undefined && articleIdRegex.test(segment)
+  return segment !== undefined && digitsRegex.test(segment)
 }
 
 const composeNewsEmbed = (article: string, pid: string): EmbedResolverResult => {

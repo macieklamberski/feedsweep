@@ -38,6 +38,12 @@ describe('paragraphizePlainText', () => {
     expect(paragraphize(value)).toBe(value)
   })
 
+  it('should not modify content whose tag name holds a digit', () => {
+    const value = 'Show notes\n\n<h2>Links</h2>'
+
+    expect(paragraphize(value)).toBe(value)
+  })
+
   it('should not modify content with self-closing HTML', () => {
     const value = '<img src="photo.jpg">'
 
@@ -83,6 +89,20 @@ describe('paragraphizePlainText', () => {
       expect(paragraphize(value)).toBe(value)
     })
 
+    // Beside text, so the escaped-fragment check cannot pass it through instead.
+    it('should not autop a hyphenated custom element beside text', () => {
+      const value =
+        'Photo of the week: <amp-img src="photo.jpg" width="600" height="400"></amp-img>'
+
+      expect(paragraphize(value)).toBe(value)
+    })
+
+    it('should not autop a hyphenated custom element whose name part starts with a digit', () => {
+      const value = 'Model: <amp-3d-gltf src="model.glb" width="600" height="400"></amp-3d-gltf>'
+
+      expect(paragraphize(value)).toBe(value)
+    })
+
     it('should not autop a custom element carrying more than one hyphen', () => {
       const value = '<my-video-player src="clip.mp4"></my-video-player>'
 
@@ -93,6 +113,27 @@ describe('paragraphizePlainText', () => {
     it('should autop text where the angle bracket leads nowhere', () => {
       const value = 'ratio <:1 and range <-5'
       const expected = '<p>ratio <:1 and range <-5</p>\n'
+
+      expect(paragraphize(value)).toBe(expected)
+    })
+
+    it('should autop a comparison written with a less-than-or-equal sign', () => {
+      const value = 'Retry while count <= limit'
+      const expected = '<p>Retry while count <= limit</p>\n'
+
+      expect(paragraphize(value)).toBe(expected)
+    })
+
+    it('should autop a placeholder holding an equals sign', () => {
+      const value = 'Pass each option as --set <key=value>'
+      const expected = '<p>Pass each option as --set <key=value></p>\n'
+
+      expect(paragraphize(value)).toBe(expected)
+    })
+
+    it('should autop a url written in angle brackets', () => {
+      const value = 'Reported at <https://example.com/bugs/?67590>.'
+      const expected = '<p>Reported at <https://example.com/bugs/?67590>.</p>\n'
 
       expect(paragraphize(value)).toBe(expected)
     })
@@ -186,6 +227,20 @@ describe('paragraphizePlainText', () => {
     it('should consume whitespace before a line break', () => {
       const value = 'Line one \nLine two'
       const expected = '<p>Line one<br />\nLine two</p>\n'
+
+      expect(paragraphize(value)).toBe(expected)
+    })
+
+    it('should consume a tab before a line break', () => {
+      const value = 'Line one\t\nLine two'
+      const expected = '<p>Line one<br />\nLine two</p>\n'
+
+      expect(paragraphize(value)).toBe(expected)
+    })
+
+    it('should keep punctuation before a line break', () => {
+      const value = 'Why?\nBecause'
+      const expected = '<p>Why?<br />\nBecause</p>\n'
 
       expect(paragraphize(value)).toBe(expected)
     })

@@ -1,40 +1,31 @@
-import { getPathSegments, type Nullish, parseUrl, toMap, trimObject } from 'trousse'
+import { decodeSegment, getPathSegments, type Nullish, parseUrl } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 
 const provider = 'bandcamp'
 
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// A release is either an album or a single track, and the id is Bandcamp's own numeric one.
-const releaseRegex = /^(album|track)=(\d+)$/
-// The `size=` preset is a path segment that decides the player's exact pixels.
-const sizeRegex = /^size=([a-z0-9_]+)$/
-
-// Bandcamp has one `tall` preset whose height depends on the release, hence the two slashed keys.
-// No preset tracks its width. The presets with a tracklist stretch to the frame and scroll their
-// rows inside it, and the rest lay out to a height of their own and leave the remainder blank.
-const presetHeights = toMap({
-  venti: 100,
-  grande: 100,
-  grande2: 355,
-  grande3: 415,
-  large: 470,
-  medium: 120,
-  small: 42,
-  short: 23,
-  // Bandcamp spells both `size=tall`, and an unknown preset such as `tall_album` serves `venti`.
-  'tall/album': 295,
-  'tall/track': 270,
-  tall2: 450,
-})
+// A release is either an album or a single track.
+const releaseRegex = /^(album|track)=([^/]+)$/
+// An exclusive embed names its tracks with a signature. One track is the track the player plays.
+const signedTrackRegex = /^tracks=([^/,]+)$/
+// The track number an album player opens on: `album=2182110545/t=38/` plays track 38.
+const startTrackRegex = /^t=[^/]+$/
+// The large player with small artwork and no tracklist, spelled as the embed dialog writes it. It
+// lays out as a strip 120 tall that fits its controls to any width.
+const playerLayout = 'size=large/tracklist=false/artwork=small/'
+const playerHeight = 120
 const releaseKinds = ['album', 'track']
-const numericIdRegex = /^\d+$/
 
 // The audio player spells its options as path segments (`EmbeddedPlayer/album=123/size=large/`)
-// while the video player uses a query string (`VideoEmbed?track=123&bgcol=…`). Both are minted
-// back at their shortest working form, verified live 2026-08-11, both 200.
+// while the video player uses a query string (`VideoEmbed?track=123&bgcol=…`).
 const videoPathRegex = /\/videoembed/i
 
 // A player pointing at a track inside an album names both, and the two orders both occur: the
@@ -56,15 +47,22 @@ const readReleases = (link: string): Array<[string, string]> => {
   for (const segment of getPathSegments(parsed)) {
     const match = segment.match(releaseRegex)
 
+    // A path value is decoded, like a query one, so the player url encodes it once.
     if (match) {
-      claim(match[1], match[2])
+      claim(match[1], decodeSegment(match[2]) ?? match[2])
+    }
+
+    const signed = segment.match(signedTrackRegex)
+
+    if (signed) {
+      claim('track', decodeSegment(signed[1]) ?? signed[1])
     }
   }
 
   for (const kind of releaseKinds) {
     const id = parsed.searchParams.get(kind)
 
-    if (id && numericIdRegex.test(id)) {
+    if (id) {
       claim(kind, id)
     }
   }
@@ -98,49 +96,51 @@ const parseFallback = (element: Nullish<Element>): Element | undefined => {
   )
 }
 
-export const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
+const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
-  const releases = readReleases(url)
-  const release = releases.find(([kind]) => kind === 'track') ?? releases[0]
+  const release = extractBandcampRelease(url)
 
   if (!parsed || !release) {
     return
   }
 
-  const [kind, id] = release
+  const releases = readReleases(url)
+  const [kind, id] = release.split('/')
   // The video player names a track and only a track: `VideoEmbed?album={id}` answers 404. A video
   // carrier whose only release is an album falls back to the audio player, which does serve it.
   const isVideo = videoPathRegex.test(parsed.pathname) && kind === 'track'
-  const preset = getPathSegments(parsed)
-    .map((segment) => segment.match(sizeRegex)?.[1])
-    .find(Boolean)
-  const size = preset ? `size=${preset}/` : ''
-  // Album and track both stay: given the album alone the player opens on the first track.
-  const selection = releaseKinds
-    .flatMap((wanted) => releases.filter(([named]) => named === wanted))
-    .map(([named, value]) => `${named}=${value}/`)
-    .join('')
-  const isAlbum = releases.some(([named]) => named === 'album')
-  const tallKey = isAlbum ? 'tall/album' : 'tall/track'
-  const presetKey = preset === 'tall' ? tallKey : preset
-  const height = presetHeights.get(presetKey ?? '')
+  const startTrack = getPathSegments(parsed).find((segment) => startTrackRegex.test(segment))
+  const start = startTrack ? `${startTrack}/` : ''
+  // A query id comes out decoded, and it goes into a path.
+  const segments = new Map(releases.map(([named, value]) => [named, encodePathSegment(value)]))
+  const albumId = segments.get('album')
+  const trackId = segments.get('track')
+  // The dialog writes the release first and a track picked off an album after the layout. Album
+  // and track both stay: given the album alone the player opens on the first track.
+  const head = albumId ? `album=${albumId}/` : `track=${trackId}/`
+  const tail = albumId && trackId ? `track=${trackId}/` : ''
   const anchor = parseFallback(element)
   const pageUrl = attr(anchor, 'href')
   // Bandcamp writes the label as `{title} by {artist}`, and " by " appears inside real titles too.
-  const title = text(anchor) || attr(element, 'title')
+  const title = text(anchor) ?? attr(element, 'title')
 
   return {
     provider,
-    id: `${kind}/${id}`,
+    id: release,
     src: isVideo
-      ? `https://bandcamp.com/VideoEmbed?${kind}=${id}`
-      : `https://bandcamp.com/EmbeddedPlayer/${selection}${size}`,
-    ...trimObject({ height, url: pageUrl, title }, Boolean),
+      ? `https://bandcamp.com/VideoEmbed${composeQuery({ [kind]: id })}`
+      : `https://bandcamp.com/EmbeddedPlayer/${head}${playerLayout}${tail}${start}`,
+    url: pageUrl,
+    height: isVideo ? undefined : playerHeight,
+    title,
   }
 }
 
 // Bandcamp's player iframe, whose fallback anchor is the only place the release page appears.
-export const bandcampEmbedResolver = createUrlEmbedResolver(bandcampHosts, bandcampResolveEmbed)
+// The strip outranks a box drawn for a layout it no longer loads, such as `size=small`.
+export const bandcampEmbedResolver = createUrlEmbedResolver(bandcampHosts, bandcampResolveEmbed, {
+  preferResolverSize: true,
+})
 
 export const bandcampFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'YouTube video player' },
