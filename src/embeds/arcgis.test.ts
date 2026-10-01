@@ -34,14 +34,42 @@ describe('arcgisResolveEmbed', () => {
       expect(arcgisResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should rebuild the classic embed viewer onto the Map Viewer embed', () => {
+    it('should keep the classic embed viewer with its box', () => {
       const value =
         'http://www.arcgis.com/home/webmap/embedViewer.html?webmap=5179ec6c47cf4fbb8ac31f6476b31203&zoom=true&extent=65.5444286545374,30.2897882432581,79.7983889146329,35.1848211677353'
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
         id: '5179ec6c47cf4fbb8ac31f6476b31203',
-        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=5179ec6c47cf4fbb8ac31f6476b31203',
+        src: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=5179ec6c47cf4fbb8ac31f6476b31203&extent=65.5444286545374,30.2897882432581,79.7983889146329,35.1848211677353',
         url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=5179ec6c47cf4fbb8ac31f6476b31203',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should rebuild an organization embed viewer onto the public host with its box', () => {
+      const value =
+        'http://carto.maps.arcgis.com/home/webmap/embedViewer.html?webmap=115bdac4334d46ef86b6414ab63b260a&extent=-139.4316,18.7911,-62.2896,55.2527&zoom=true'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: '115bdac4334d46ef86b6414ab63b260a',
+        src: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=115bdac4334d46ef86b6414ab63b260a&extent=-139.4316,18.7911,-62.2896,55.2527',
+        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=115bdac4334d46ef86b6414ab63b260a',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a world box on the embed viewer as written', () => {
+      const value =
+        'http://carto.maps.arcgis.com/home/webmap/embedViewer.html?webmap=dd1f8119a2b144d28db1d35ad10f0995&extent=-90.5273,-58.9046,90.5273,58.9046&zoom=true'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: 'dd1f8119a2b144d28db1d35ad10f0995',
+        src: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=dd1f8119a2b144d28db1d35ad10f0995&extent=-90.5273,-58.9046,90.5273,58.9046',
+        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=dd1f8119a2b144d28db1d35ad10f0995',
         height: 500,
       }
 
@@ -443,7 +471,7 @@ describeForEachParser('arcgis through the pipeline', (parseHtml) => {
       <div
         data-embed-id="62bf87f7b2f64f15b48491d39242f4d7"
         data-embed-provider="arcgis"
-        data-embed-src="https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&amp;webmap=62bf87f7b2f64f15b48491d39242f4d7"
+        data-embed-src="https://www.arcgis.com/home/webmap/embedViewer.html?webmap=62bf87f7b2f64f15b48491d39242f4d7"
         data-embed-url="https://www.arcgis.com/apps/mapviewer/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7"
         data-embed-height="500"
       ></div>

@@ -23,15 +23,18 @@ const experienceHosts = ['experience.arcgis.com']
 // The portal answers 404 to these paths in any other case.
 const mapViewerPath = '/apps/mapviewer/index.html'
 const classicEmbedPath = '/apps/Embed/index.html'
+const embedViewerPath = '/home/webmap/embedViewer.html'
 const webMapPaths = [
   classicEmbedPath, // The Map Viewer Classic snippet
   mapViewerPath,
-  '/home/webmap/embedViewer.html', // The Map Viewer Classic snippet
+  embedViewerPath, // The Map Viewer Classic snippet
 ]
 // The start position Map Viewer reads. The classic snippets write `scale=true` for a scale bar.
 const mapViewerPositionParams = ['center', 'scale', 'level']
 // The start position and navigation the classic player reads, `marker` centring on a pin.
 const classicEmbedPositionParams = ['extent', 'center', 'level', 'marker', 'find', 'feature']
+// The only start position the classic embed viewer reads.
+const embedViewerPositionParams = ['extent']
 // StoryMaps answers either route word in any case.
 const storyRoutes = ['stories', 'collections']
 // `item` opens that item of a collection.
@@ -59,14 +62,26 @@ const readDashboardId = (url: URL): string | undefined => {
   return url.pathname.match(dashboardPathRegex)?.[1]
 }
 
+const composeClassicSource = (
+  url: URL,
+  webMapId: string,
+  positionParams: Array<string>,
+): string => {
+  const position = filterUrlQuery(url, (name) => positionParams.includes(name))
+
+  return `https://www.arcgis.com${url.pathname}?webmap=${webMapId}${position.replace('?', '&')}`
+}
+
 // `configurableview` is what Map Viewer's iframe embed writes: the map without the viewer's
-// title, panels and sign-in bar. It goes blank on the classic snippet's `extent`, a box with no
-// wkid, so a classic carrier stays on the classic player, which Esri still serves.
+// title, panels and sign-in bar. It goes blank on the classic snippets' `extent`, a box with no
+// wkid, so a classic carrier stays on its own player, which Esri still serves.
 const composeWebMapSource = (url: URL, webMapId: string): string => {
   if (url.pathname === classicEmbedPath) {
-    const position = filterUrlQuery(url, (name) => classicEmbedPositionParams.includes(name))
+    return composeClassicSource(url, webMapId, classicEmbedPositionParams)
+  }
 
-    return `https://www.arcgis.com/apps/Embed/index.html?webmap=${webMapId}${position.replace('?', '&')}`
+  if (url.pathname === embedViewerPath) {
+    return composeClassicSource(url, webMapId, embedViewerPositionParams)
   }
 
   const src = `https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=${webMapId}`
