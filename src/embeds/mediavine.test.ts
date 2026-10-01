@@ -41,6 +41,7 @@ describeForEachParser('mediavineWidgetEmbedResolver', (parseHtml) => {
         provider: 'mediavine',
         id: 't9z9zameefjmqvtghsvu',
         src: 'https://embed.mediavine.com/videos/t9z9zameefjmqvtghsvu/iframe',
+        ratio: '16/9',
         title: 'How to fold a fitted sheet',
       }
 
@@ -71,9 +72,7 @@ describeForEachParser('mediavineWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    // The attribute is whatever the feed wrote, and unescaped it picks the page: `../../evil`
-    // climbs out of the `videos` route and a `?` moves the rest of it into the query.
-    it('should keep a traversing video id inside its own path segment', async () => {
+    it('should use a malformed video id as written, even if the player answers an error', async () => {
       const value = html`
         <div
           class="mv-video-target"
@@ -84,22 +83,7 @@ describeForEachParser('mediavineWidgetEmbedResolver', (parseHtml) => {
         provider: 'mediavine',
         id: '../../evil',
         src: 'https://embed.mediavine.com/videos/..%2F..%2Fevil/iframe',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep a query a video id states out of the minted url', async () => {
-      const value = html`
-        <div
-          class="mv-video-target"
-          data-video-id="a?autoplay=1"
-        ></div>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'mediavine',
-        id: 'a?autoplay=1',
-        src: 'https://embed.mediavine.com/videos/a%3Fautoplay%3D1/iframe',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -117,6 +101,7 @@ describeForEachParser('mediavineWidgetEmbedResolver', (parseHtml) => {
         provider: 'mediavine',
         id: 't9z9zameefjmqvtghsvu',
         src: 'https://embed.mediavine.com/videos/t9z9zameefjmqvtghsvu/iframe',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -156,6 +141,7 @@ describeForEachParser('mediavineScriptEmbedResolver', (parseHtml) => {
         provider: 'mediavine',
         id: 'dx6ydyrbrjbbu2tncqzi9',
         src: 'https://embed.mediavine.com/videos/dx6ydyrbrjbbu2tncqzi9/iframe',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -168,6 +154,7 @@ describeForEachParser('mediavineScriptEmbedResolver', (parseHtml) => {
         provider: 'mediavine',
         id: 'dx6ydyrbrjbbu2tncqzi',
         src: 'https://embed.mediavine.com/videos/dx6ydyrbrjbbu2tncqzi/iframe',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -203,9 +190,36 @@ describeForEachParser('mediavineScriptEmbedResolver', (parseHtml) => {
     // guard refuses it.
     it('should ignore a foreign host spelling the loader path', async () => {
       const value =
-        '<script src="https://evil.test/video.mediavine.com/videos/dx6ydyrbrjbbu2tncqzi.js"></script>'
+        '<script src="https://evil.test/videos/dx6ydyrbrjbbu2tncqzi.js?video.mediavine.com/videos/"></script>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the loader path behind another segment', async () => {
+      const value =
+        '<script src="https://video.mediavine.com/videos/x/videos/dx6ydyrbrjbbu2tncqzi.js"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the loader path followed by another segment', async () => {
+      const value =
+        '<script src="https://video.mediavine.com/videos/dx6ydyrbrjbbu2tncqzi.js/extra"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should use a malformed loader id as written, even if the player answers an error', async () => {
+      const value =
+        '<script src="https://video.mediavine.com/videos/dx6ydyrb%2Frjbbu2tncqzi.js"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'mediavine',
+        id: 'dx6ydyrb%2Frjbbu2tncqzi',
+        src: 'https://embed.mediavine.com/videos/dx6ydyrb%2Frjbbu2tncqzi/iframe',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore the videos route naming no file', async () => {

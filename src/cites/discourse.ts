@@ -1,9 +1,9 @@
-import { parseUrl } from 'trousse'
+import { isHostOrSubdomainOf, parseUrl } from 'trousse'
 import { parseMastodonStatus } from '../embeds/mastodon.js'
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, isElement, text } from '../utils/dom.js'
-import { isOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 
 // When the linked article has a date, the generic onebox appends it to the source anchor's
 // text ("Whonix – 13 Jan 23") behind this spaced en dash.
@@ -33,19 +33,24 @@ const githubDescription = (paragraph: Element): string | undefined => {
   return result.trim() || undefined
 }
 
-// Engines whose cards are not link previews. TikTok, Reddit, Facebook and Twitch emit bare
-// iframes, not aside.onebox, and Mastodon links go through the generic engine.
-export const omittedOneboxClasses = [
+// Engines whose cards are not link previews, or whose body is content a cite would drop. TikTok,
+// Reddit, Facebook and Twitch emit bare iframes, not aside.onebox, and Mastodon links go through
+// the generic engine.
+const omittedOneboxClasses = [
   'twitterstatus', // A social post: the heading is the author and the body the post text
   'threadsstatus', // The same social-post shape as twitterstatus
   'instagram', // Legacy social-post asides; since 2021 the engine emits a bare iframe
   'pdf', // A file card: the title is the filename and the only paragraph its size
   'googlemeet', // A join-call card: every field is a fixed label or the meeting code
+  'githubblob', // A file excerpt in a <pre><code> block
+  'githubgist', // The same file excerpt as githubblob, one block per gist file
+  'gitlabblob', // The same file excerpt as githubblob
+  'pastebin', // The paste's text in a <pre><code> block
 ]
 
 // Hosts with no onebox engine of their own: their posts arrive as generic asides whose og title
 // is the author's name.
-export const socialPostHosts = ['bsky.app', 'threads.net', 'threads.com']
+const socialPostHosts = ['bsky.app', 'threads.net', 'threads.com']
 
 // Any domain can be a Mastodon instance. A status page titles itself "Display Name
 // (@user@instance)", which the generic onebox renders as its heading.
@@ -68,7 +73,7 @@ export const discourseCiteResolver: CiteResolver = {
     // data-onebox-src arrives unrewritten, so a protocol-relative url names no host without a base.
     const cited = url ? parseUrl(url, placeholderBaseUrl) : undefined
 
-    if (cited && (isOnHosts(cited, socialPostHosts) || parseMastodonStatus(cited.href))) {
+    if (cited && (isHostOrSubdomainOf(cited, socialPostHosts) || parseMastodonStatus(cited.href))) {
       return
     }
 

@@ -9,6 +9,28 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
     return applyDomTransforms(parseHtml(value), [stripDuplicateEnclosures(context)])
   }
 
+  it('should keep a file placeholder next to content media with an empty src', async () => {
+    const value = html`
+      <p>Content</p>
+      <img src="">
+      <div
+        data-file-url="https://example.com/slides.pdf"
+        data-file-name="slides.pdf"
+        data-enclosure=""
+      ></div>
+    `
+    const expected = html`
+      <p>Content</p>
+      <img src="">
+      <div
+        data-file-url="https://example.com/slides.pdf"
+        data-file-name="slides.pdf"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   describe('image enclosures', () => {
     it('should remove a marked image that exactly matches a content image', async () => {
       const value = html`
@@ -271,6 +293,54 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
         <div data-embed-src="https://www.youtube.com/embed/abc"></div>
       `
       const expected = '<div data-embed-src="https://www.youtube.com/embed/abc"></div>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove a marked video matching the source of a content video', async () => {
+      const value = html`
+        <video
+          controls
+          src="https://example.com/clip.mp4"
+          data-enclosure=""
+        ></video>
+        <video controls>
+          <source src="https://example.com/clip.mp4" type="video/mp4">
+        </video>
+      `
+      const expected = html`
+        <video controls>
+          <source src="https://example.com/clip.mp4" type="video/mp4">
+        </video>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove a marked video matching a content video', async () => {
+      const value = html`
+        <video
+          controls
+          src="https://example.com/clip.mp4"
+          data-enclosure=""
+        ></video>
+        <video controls src="https://example.com/clip.mp4"></video>
+      `
+      const expected = '<video controls src="https://example.com/clip.mp4"></video>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // In the pipeline convertWidgets has already turned any iframe that plays into a placeholder.
+    it('should keep a marked embed placeholder beside a content iframe', async () => {
+      const value = html`
+        <div data-embed-src="https://www.youtube.com/embed/abc" data-enclosure=""></div>
+        <iframe src="https://www.youtube.com/embed/abc"></iframe>
+      `
+      const expected = html`
+        <div data-embed-src="https://www.youtube.com/embed/abc"></div>
+        <iframe src="https://www.youtube.com/embed/abc"></iframe>
+      `
 
       expect(await transform(value)).toEqualHtml(expected)
     })

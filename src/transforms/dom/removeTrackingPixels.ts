@@ -1,4 +1,4 @@
-import { escapeRegex, parseUrl } from 'trousse'
+import { escapeRegex, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import {
   getElementDimensions,
@@ -6,6 +6,7 @@ import {
   isElementHidden,
   pixelDimensionLimit,
 } from '../../utils/dom.js'
+import { placeholderBaseUrl } from '../../utils/urls.js'
 
 // `[./]` anchors require the segment to terminate with `.` (file extension) or `/`
 // (path boundary) to avoid false positives on words like `tracker` or `counter`.
@@ -20,25 +21,19 @@ const buildPathRegex = (segments: ReadonlyArray<string>): RegExp | null => {
   return new RegExp(`/(?:${alternation})[./]`, 'i')
 }
 
-const isTrackingUrl = (src: string, hosts: Set<string>, pathRegex: RegExp | null): boolean => {
-  const url = parseUrl(src, 'http://placeholder/')
+const isTrackingUrl = (
+  src: string,
+  hosts: ReadonlyArray<string>,
+  pathRegex: RegExp | null,
+): boolean => {
+  const url = parseUrl(src, placeholderBaseUrl)
 
   if (!url) {
     return false
   }
 
-  const hostname = url.hostname
-
-  if (hosts.size > 0) {
-    if (hosts.has(hostname)) {
-      return true
-    }
-
-    for (const host of hosts) {
-      if (hostname.endsWith(`.${host}`)) {
-        return true
-      }
-    }
+  if (isHostOrSubdomainOf(url, hosts)) {
+    return true
   }
 
   return pathRegex?.test(url.pathname) ?? false
@@ -50,6 +45,14 @@ const isPixelDimension = (value: number | undefined): boolean => {
 
 const isPixelSized = (dimensions: { width?: number; height?: number }): boolean => {
   return isPixelDimension(dimensions.width) || isPixelDimension(dimensions.height)
+}
+
+// A stated size above a pixel is content whatever serves it: newsletter platforms on the host
+// list serve their posts' images from subdomains of the host that serves their beacons.
+const isContentSized = (dimensions: { width?: number; height?: number }): boolean => {
+  const { width = 0, height = 0 } = dimensions
+
+  return width > pixelDimensionLimit || height > pixelDimensionLimit
 }
 
 // gif stays out of the raster list: it is the dominant spacer and pixel format.
@@ -81,9 +84,9 @@ const hasContentImageSignal = (
 
 // A tracking pixel: a hidden or pixel-sized <img> whose only job is to fire a request.
 export const removeTrackingPixels: DomTransform = (context) => {
-  const hosts = new Set(context.trackingHosts)
+  const hosts = context.trackingHosts
   const pathRegex = buildPathRegex(context.trackingPathSegments)
-  const hasUrlChecks = hosts.size > 0 || pathRegex !== null
+  const hasUrlChecks = hosts.length > 0 || pathRegex !== null
 
   return (document) => {
     const images = document.querySelectorAll('img')
@@ -101,7 +104,7 @@ export const removeTrackingPixels: DomTransform = (context) => {
         continue
       }
 
-      if (hasUrlChecks) {
+      if (hasUrlChecks && !isContentSized(dimensions)) {
         const src = image.getAttribute('src')
 
         if (src && isTrackingUrl(src, hosts, pathRegex)) {

@@ -1,4 +1,4 @@
-import { getPathSegments, trimObject } from 'trousse'
+import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -33,7 +33,8 @@ export const geniallyResolveEmbed: ResolveEmbed = (url, element) => {
     // `view.genial.ly/{id}` answers 301 to `view.genially.com/{id}`, where a real id answers 200
     // and an invented one 302s away.
     src: `https://view.genially.com/${viewId}`,
-    ...trimObject({ title }, Boolean),
+    ratio: '16/9',
+    title,
   }
 }
 

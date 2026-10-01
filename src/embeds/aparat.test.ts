@@ -8,7 +8,7 @@ describeForEachParser('aparatIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, aparatIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the player frame and keep the size the publisher stated', async () => {
+    it('should resolve the player frame and ignore the size the publisher stated', async () => {
       const value = html`
         <iframe
           src="https://www.aparat.com/video/video/embed/videohash/9o8zZ/vt/frame"
@@ -22,8 +22,7 @@ describeForEachParser('aparatIframeEmbedResolver', (parseHtml) => {
         id: '9o8zZ',
         src: 'https://www.aparat.com/video/video/embed/videohash/9o8zZ/vt/frame',
         url: 'https://www.aparat.com/v/9o8zZ',
-        width: 640,
-        height: 360,
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -107,7 +106,21 @@ describeForEachParser('aparatIframeEmbedResolver', (parseHtml) => {
 
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
-        '<iframe src="https://evil.test/www.aparat.com/video/video/embed/videohash/9o8zZ/vt/frame"></iframe>'
+        '<iframe src="https://evil.test/video/video/embed/videohash/9o8zZ/vt/frame"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the frame path behind a prefix', async () => {
+      const value =
+        '<iframe src="https://www.aparat.com/x/video/video/embed/videohash/9o8zZ/vt/frame"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the frame path followed by another segment', async () => {
+      const value =
+        '<iframe src="https://www.aparat.com/video/video/embed/videohash/9o8zZ/vt/frame/extra"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -154,9 +167,34 @@ describeForEachParser('aparatScriptEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = '<script src="https://evil.test/www.aparat.com/embed/inTtf"></script>'
+      const value = '<script src="https://evil.test/embed/inTtf?aparat.com/embed/"></script>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the loader path behind a prefix', async () => {
+      const value = '<script src="https://www.aparat.com/x/embed/inTtf?aparat.com/embed/"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the loader path followed by another segment', async () => {
+      const value = '<script src="https://www.aparat.com/embed/inTtf/extra"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should use a malformed hash as written, even if the player answers an error', async () => {
+      const value = '<script src="https://www.aparat.com/embed/inT%2Ftf"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'aparat',
+        id: 'inT%2Ftf',
+        src: 'https://www.aparat.com/video/video/embed/videohash/inT%2Ftf/vt/frame',
+        url: 'https://www.aparat.com/v/inT%2Ftf',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a loader script naming no hash', async () => {

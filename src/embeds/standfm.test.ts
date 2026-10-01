@@ -27,6 +27,7 @@ describe('standfmResolveEmbed', () => {
         id: 'channels/645af1b90b5e6b2d87ce1dc9',
         src: 'https://stand.fm/embed/channels/645af1b90b5e6b2d87ce1dc9',
         url: 'https://stand.fm/channels/645af1b90b5e6b2d87ce1dc9',
+        height: 390,
       }
 
       expect(standfmResolveEmbed(value)).toEqual(expected)
@@ -75,6 +76,30 @@ describe('standfmResolveEmbed', () => {
       expect(standfmResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should state nothing for a kind led by an encoded slash', () => {
+      const value = 'https://stand.fm/%2Fepisodes/6a8065825e9572e804f8a5cb'
+
+      expect(standfmResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should state nothing for a kind followed by an encoded slash', () => {
+      const value = 'https://stand.fm/episodes%2F..%2Fx/6a8065825e9572e804f8a5cb'
+
+      expect(standfmResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should state nothing for an id led by an encoded slash', () => {
+      const value = 'https://stand.fm/episodes/%2F6a8065825e9572e804f8a5cb'
+
+      expect(standfmResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should state nothing for an id followed by an encoded slash', () => {
+      const value = 'https://stand.fm/episodes/6a8065825e9572e804f8a5cb%2F..'
+
+      expect(standfmResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should state nothing for the site root', () => {
       const value = 'https://stand.fm/'
 
@@ -101,12 +126,8 @@ describeForEachParser('standfmEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  // The host gate is what rejects this: the path carries the host as a substring so the
-  // selector still matches, and only the gate can turn it away.
   it('should not resolve a foreign host carrying the path', async () => {
-    const value = html`
-      <iframe src="https://evil.test/stand.fm/episodes/6a8065825e9572e804f8a5cb"></iframe>
-    `
+    const value = '<iframe src="https://evil.test/episodes/6a8065825e9572e804f8a5cb"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

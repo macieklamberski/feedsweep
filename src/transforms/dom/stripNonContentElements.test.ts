@@ -45,6 +45,20 @@ const specimens: Record<string, string | [string, string]> = {
     '<amp-sticky-ad layout="nodisplay"><amp-ad width="320" height="50" type="doubleclick" data-slot="/4119129/sticky"></amp-ad></amp-sticky-ad>',
   'amp-sticky-ad-top-padding':
     '<amp-sticky-ad-top-padding class="amp-sticky-ad-top-padding"></amp-sticky-ad-top-padding>',
+  '[src*="amazon"][src*="/e/cm"]':
+    '<iframe src="https://rcm.amazon.com/e/cm?t=tag-20&o=1&p=8&l=as1&asins=B00451B7WU&f=ifr" style="width:120px;height:240px;" scrolling="no" frameborder="0"></iframe>',
+  '[src*="amazon"][src*="/widgets/q"]':
+    '<iframe src="//ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&OneJS=1&Operation=GetAdHtml&asins=B00451B7WU" width="120" height="240"></iframe>',
+  'object[data*="amazon"][data*="/widgets/q"]':
+    '<object data="//ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&asins=B00451B7WU" width="120" height="240"></object>',
+  'iframe[src*="ad.duga.jp/"]':
+    '<iframe src="https://ad.duga.jp/dynamic/1002/34/?mode=1" width="440" height="195" scrolling="no"><a href="https://example.com/1002-01">DUGA</a></iframe>',
+  'iframe[src*="shopsensewidget.shopstyle.com"]':
+    '<iframe src="//shopsensewidget.shopstyle.com/#/?options=%7B%22widgetId%22%3A%225bad8374%22%2C%22pid%22%3A%22uid0000-00000000-00%22%7D" width="460" height="402"></iframe>',
+  'script[src*="shopsensewidget.shopstyle.com"]': [
+    '<div class="shopsense-widget" data-options="%7B%22widgetId%22%3A%225dac5d8d%22%7D"><script id="shopsensewidget-script" src="//shopsensewidget.shopstyle.com/widget-script.js?cb=1571575698116"></script></div>',
+    '<div class="shopsense-widget" data-options="%7B%22widgetId%22%3A%225dac5d8d%22%7D"></div>',
+  ],
   'amp-pixel':
     '<amp-pixel src="https://www16.a8.net/0.gif?a8=abcdef" layout="nodisplay"></amp-pixel>',
   'amp-analytics':
@@ -58,6 +72,14 @@ const specimens: Record<string, string | [string, string]> = {
   '[data-component-name="ButtonCreateButton"]:has(> a[href*="action=share"])':
     '<p class="button-wrapper" data-component-name="ButtonCreateButton"><a class="button primary" href="https://example.com/p/post?action=share"><span>Share</span></a></p>',
   '[class*="social-share"]': '<div class="social-share"><a href="/x">X</a></div>',
+  'iframe[src*="eventbrite.com/tickets-external"]':
+    '<iframe src="https://www.eventbrite.com/tickets-external?eid=2112794425&ref=etckt" frameborder="0" width="100%" height="192"></iframe>',
+  'iframe[src*="eventbrite.com/countdown-widget"]':
+    '<iframe src="//www.eventbrite.com/countdown-widget?eid=20577825831" width="195" height="295" frameborder="0"></iframe>',
+  'form[action*="paypal.com/cgi-bin/webscr"]':
+    '<form action="https://www.paypal.com/cgi-bin/webscr" method="post"><input type="hidden" name="cmd" value="_donations"><input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit" alt="Donate"></form>',
+  'img[src*="paypal.com/"][src*="/i/btn/"]:not(a img)':
+    '<img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate with PayPal">',
   'p:has(> a.redcircle-link)':
     '<p style="font-size: 10px; color: gray;">Powered by <a class="redcircle-link" href="https://example.com/?utm_source=rc_embedded_player">RedCircle</a></p>',
   '[class*="share-buttons"]': '<div class="share-buttons"><a href="/fb">Facebook</a></div>',
@@ -66,6 +88,8 @@ const specimens: Record<string, string | [string, string]> = {
   '.feedflare': '<div class="feedflare"><a href="/ff">Share</a></div>',
   '.addtoany_share_save_container':
     '<div class="addtoany_share_save_container"><a class="a2a_button_facebook" href="#">Share</a></div>',
+  'iframe[src*="platform.twitter.com/widgets/"]':
+    '<iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" src="https://platform.twitter.com/widgets/tweet_button.1397165098.html#_=1400000000000&amp;count=horizontal&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=https%3A%2F%2Fexample.com%2Fpost&amp;size=m&amp;text=A%20post&amp;url=https%3A%2F%2Fexample.com%2Fpost" class="twitter-share-button twitter-share-button-rendered twitter-tweet-button" style="position: static; visibility: visible; width: 107px; height: 20px;" title="Twitter Tweet Button"></iframe>',
   'iframe:is([src*="facebook.com/plugins/like.php"], [src*="facebook.com/v"][src*="/plugins/like.php"])':
     '<iframe src="http://www.facebook.com/plugins/like.php?href=https://example.com/post/&amp;layout=standard&amp;show_faces=1&amp;width=450&amp;action=like" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:25px"></iframe>',
   'iframe:is([src*="facebook.com/plugins/page.php"], [src*="facebook.com/v"][src*="/plugins/page.php"])':
@@ -105,6 +129,24 @@ const specimens: Record<string, string | [string, string]> = {
     '<div class="ssba-classic-2 ssba ssbp-wrap alignleft ssbp--theme-1"><div style="text-align:left"><span class="ssba-share-text">Share this</span><a data-site="facebook" class="ssba_facebook_share ssba_share_link" href="https://example.com/share/facebook">Facebook</a></div></div>',
   '.swp_social_panel':
     '<div class="swp_social_panel swp_horizontal_panel swp_flat_fresh" data-min-width="1100"><div class="nc_tweetContainer swp_share_button"><a class="nc_tweet swp_share_link" href="https://example.com/share/facebook"><span class="swp_share">Share</span></a></div></div>',
+  'div.ya-share2':
+    '<div class="ya-share2" data-services="vkontakte,odnoklassniki,twitter,telegram" data-image="https://example.com/logo.png" data-title=""></div>',
+  'div.zemanta-pixie':
+    '<div style="margin-top: 10px; height: 15px;" class="zemanta-pixie"><a class="zemanta-pixie-a" href="https://example.com/zemified/da212ae4/" title="Reblog this post"><img class="zemanta-pixie-img" src="https://example.com/reblog_e.png?x-id=da212ae4" alt="Reblog this post"></a></div>',
+  'a[href*="digg.com/submit"]':
+    '<a href="https://digg.com/submit?url=https%3A%2F%2Fexample.com%2Fa&title=A+post"><img src="https://digg.com/img/badges/100x20-digg-button.png" alt="Digg"></a>',
+  'img[src*="digg.com/img/badges"]':
+    '<img src="https://digg.com/img/badges/100x20-digg-button.png" alt="Digg this">',
+  'iframe[src*="plusone.google.com"]':
+    '<iframe allowtransparency="true" frameborder="0" scrolling="no" src="https://plusone.google.com/_/+1/fastbutton?bsv&size=medium&hl=en-US&url=https%3A%2F%2Fexample.com%2Fa"></iframe>',
+  'iframe[src*="tunein.com/embed/follow/"]':
+    '<iframe src="https://tunein.com/embed/follow/p950157/?wmode=opaque"></iframe>',
+  'img[src*="w.sharethis.com/"]':
+    '<img src="https://w.sharethis.com/images/facebook_32.png" alt="Share on Facebook">',
+  'a.hatena-bookmark-button':
+    '<a href="https://example.com/entry/https://example.com/a" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" title="Add to Hatena Bookmark"><img src="https://example.com/entry-button/button-only@2x.png" alt="Add to Hatena Bookmark" width="20" height="20"></a>',
+  'iframe.hatena-bookmark-button-frame':
+    '<iframe src="https://example.com/bc/bcbutton?url=https%3A%2F%2Fexample.com%2Fa" class="hatena-bookmark-button-frame" width="150" height="28" frameborder="0" scrolling="no"></iframe>',
   '.yarpp-related':
     '<div class="yarpp yarpp-related yarpp-template-list"><h3>Related</h3><ol><li><a href="/a">A</a></li></ol></div>',
   '.jp-relatedposts':
@@ -151,11 +193,27 @@ const specimens: Record<string, string | [string, string]> = {
     '<a class="rafl" href="https://example.com/rafl/display/70b9a02412/" id="rc-70b9a02412" rel="nofollow">a Rafflecopter giveaway</a>',
   'a.e-widget':
     '<a class="e-widget no-button" href="https://example.com/3wKIE/win-100-amazon-gift-card" rel="nofollow">Win $100 Amazon Gift Card</a>',
+  '[id^="goodreadsGiveawayWidget"]':
+    '<div id="goodreadsGiveawayWidget182419"><div class="goodreadsGiveawayWidget"><h2><a href="https://example.com/">Goodreads</a> Book Giveaway</h2><div style="float: left;"><a href="https://example.com/book/show/29745568"><img alt="Benjamin McTish and The Hidden Caverns of Bristonbel by June M. Pace" src="https://example.com/books/1459384569l/29745568.jpg" width="100"></a></div><div class="giveaway_details">Giveaway ends May 13, 2016.<br>See the <a href="https://example.com/giveaway/show/182419">giveaway details</a> at Goodreads.</div><a class="goodreadsGiveawayWidgetEnterLink" href="https://example.com/giveaway/enter_choose_address/182419">Enter Giveaway</a></div></div>',
+  '.goodreadsGiveawayWidget':
+    '<div class="goodreadsGiveawayWidget" style="max-width: 350px; margin: 10px auto; padding: 10px 15px;"><h2><a href="https://example.com/">Goodreads</a> Book Giveaway</h2><div style="float: left;"><a href="https://example.com/book/show/36704145"><img src="https://example.com/books/1517005563l/36704145.jpg" alt="A Kiss, a Dance and a Diamond by Helen Lacey" width="100"></a></div><div class="giveaway_details"><p>Giveaway ends April 30, 2018.</p></div><p><a class="goodreadsGiveawayWidgetEnterLink" href="https://example.com/giveaway/enter_choose_address/268862">Enter Giveaway</a></p></div>',
+  'a.goodreadsGiveawayWidgetEnterLink[href*="goodreads.com/giveaway/"]': [
+    '<h2 style="font-size: 20px; font-weight: normal; line-height: 20px; margin: 0 0 10px; padding: 0; text-align: center;"><a class="goodreadsGiveawayWidgetEnterLink" href="https://www.goodreads.com/giveaway/show/249139">Enter Giveaway</a></h2>',
+    '<h2 style="font-size: 20px; font-weight: normal; line-height: 20px; margin: 0 0 10px; padding: 0; text-align: center;"></h2>',
+  ],
+  'iframe[src*="stay22.com/embed"]':
+    '<iframe id="stay22-widget" src="https://www.stay22.com/embed/699754889b53f8015d33a6ae" width="100%" height="428" frameborder="0"></iframe>',
+  ':is(p, div)[data-gyg-href]:not(:has(*:not(a)))':
+    '<div data-gyg-href="https://example.com/default/activities.frame" data-gyg-locale-code="en-US" data-gyg-widget="activities" data-gyg-number-of-items="3" data-gyg-partner-id="66RVO1V" data-gyg-tour-ids="76035,75950,400712">Powered by <a href="https://example.com/sarajevo-l2281/" target="_blank" rel="noopener sponsored">GetYourGuide</a></div>',
   '.image-link-expand': '<div class="image-link-expand"><button><svg></svg></button></div>',
   'drupal-render-placeholder':
     '<drupal-render-placeholder callback="comment.lazy_builders:renderLinks" arguments="0=node:1"></drupal-render-placeholder>',
   '.mcnPreviewText': '<span class="mcnPreviewText" style="display:none">Preview text</span>',
   '.tmblr-alt-text-helper': '<span class="tmblr-alt-text-helper">ALT</span>',
+  'blockquote.wp-embedded-content + iframe.wp-embedded-content': [
+    '<blockquote class="wp-embedded-content" data-secret="hDl4S8YwKz"><a href="https://www.e-startupindia.com/learn/gstr-1/">GSTR-1 Return Filing</a></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="https://www.e-startupindia.com/learn/gstr-1/embed/#?secret=hDl4S8YwKz" data-secret="hDl4S8YwKz" width="600" height="338"></iframe>',
+    '<blockquote class="wp-embedded-content" data-secret="hDl4S8YwKz"><a href="https://www.e-startupindia.com/learn/gstr-1/">GSTR-1 Return Filing</a></blockquote>',
+  ],
   'img[src*="steamcommunity.com"][src*="placeholder"]':
     '<img src="https://cdn.steamcommunity.com/news/placeholder_video.gif">',
   'script[consent-original-src-_]':
@@ -188,6 +246,45 @@ const specimens: Record<string, string | [string, string]> = {
 }
 
 const specimenEntries = Object.entries(specimens)
+
+const wordpressHandshakeFrames: Array<[string, string]> = [
+  [
+    'trailing slash',
+    '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="https://www.e-startupindia.com/learn/gstr-1/embed/#?secret=hDl4S8YwKz" data-secret="hDl4S8YwKz" width="600" height="338"></iframe>',
+  ],
+  [
+    'no trailing slash',
+    '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="https://www.elzeviro.eu/affari-di-palazzo/economia-e-finanza/la-coppia-liberista-boeri-perotti-vuole-ridurre-fondi-alle-universita.html/embed#?secret=77zVWLFl2K" data-secret="77zVWLFl2K" width="600" height="338"></iframe>',
+  ],
+  [
+    'query',
+    '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="http://technodivine.com/home/?p=687&amp;embed=true#?secret=j0JpdvuMl3" data-secret="j0JpdvuMl3" width="600" height="338"></iframe>',
+  ],
+]
+
+// WordPress stamps the class on the frame it renders for any oEmbed provider.
+const wordpressProviderFrames: Array<[string, string]> = [
+  [
+    'New York Times',
+    '<iframe class="wp-embedded-content" src="https://www.nytimes.com/svc/oembed/html/?url=https%3A%2F%2Fwww.nytimes.com%2Fstory.html"></iframe>',
+  ],
+  [
+    'Rumble',
+    '<iframe class="wp-embedded-content" src="https://rumble.com/embed/v2cr0zv/#?secret=YCf2RLw39L"></iframe>',
+  ],
+  [
+    'Audioboom',
+    '<iframe class="wp-embedded-content" src="https://embeds.audioboom.com/posts/6605531/embed/v4?eid=AQAAAJLuZVrbymQA#?secret=afwIW2qi8k"></iframe>',
+  ],
+  [
+    'Anchor show',
+    '<iframe class="wp-embedded-content" src="https://anchor.fm/turpentine-productions/embed#?secret=TBoS2x00Eq"></iframe>',
+  ],
+  [
+    'Flourish',
+    '<iframe class="wp-embedded-content" src="https://public.flourish.studio/visualisation/3197522/embed#?secret=VcZeafKFSe"></iframe>',
+  ],
+]
 
 describeForEachParser('stripNonContentElements', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
@@ -257,11 +354,105 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should strip an empty GetYourGuide paragraph mount', async () => {
+      const value =
+        '<p>Before</p><p data-gyg-href="https://example.com/default/activities.frame" data-gyg-locale-code="en-US" data-gyg-widget="activities" data-gyg-number-of-items="3" data-gyg-partner-id="66RVO1V"></p><p>After</p>'
+      const expected = '<p>Before</p><p>After</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // Publishers paste the GetYourGuide snippet's whole attribute set onto their own markup, so
+    // the attribute alone also names a heading and a hand-written list of tours, not only the
+    // partner script's mount.
+    it("should keep GetYourGuide mounts that carry the publisher's own markup", async () => {
+      const value = html`
+        <h3 data-gyg-href="https://widget.getyourguide.com/default/activities.frame" data-gyg-widget="activities" data-gyg-partner-id="SN3E6N5">The best Turkish bath and spa experiences in Istanbul:</h3>
+        <div data-gyg-href="https://widget.getyourguide.com/default/activities.frame" data-gyg-widget="activities" data-gyg-partner-id="SN3E6N5">
+          <ul>
+            <li><a href="https://gyg.me/o5CJHgXr">Private Turkish Bath, Sauna, and Massage</a> from US$58</li>
+            <li><a href="https://gyg.me/lXzd4xxJ">Traditional Turkish Bath</a> from US$25</li>
+          </ul>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should keep a read-more wrapper that holds real content (anchor-scoped)', async () => {
       const value = '<div class="read-more-section"><p>Body</p></div>'
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    // WordPress writes the handshake frame as `{post}/embed/`, `{post}/embed` and
+    // `?p={id}&embed=true`, each after its blockquote.
+    it.each(wordpressHandshakeFrames)(
+      'should strip a %s handshake frame paired with its blockquote',
+      async (_name, frame) => {
+        const blockquote = html`
+          <blockquote class="wp-embedded-content" data-secret="77zVWLFl2K">
+            <a href="https://www.elzeviro.eu/affari-di-palazzo/post.html">Post title</a>
+          </blockquote>
+        `
+        const value = `<p>Before.</p>${blockquote}\n${frame}<p>After.</p>`
+        const expected = `<p>Before.</p>${blockquote}\n<p>After.</p>`
+
+        expect(await transform(value)).toEqualHtml(expected)
+      },
+    )
+
+    // A handshake frame alone renders the post's card, and nothing else carries the post.
+    it('should keep a handshake frame with no blockquote beside it', async () => {
+      const value = html`
+        <p>Before.</p>
+        <iframe
+          class="wp-embedded-content"
+          sandbox="allow-scripts"
+          security="restricted"
+          src="https://www.e-startupindia.com/learn/gstr-1/embed/#?secret=hDl4S8YwKz"
+          data-secret="hDl4S8YwKz"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a provider frame that follows a plain blockquote', async () => {
+      const value = html`
+        <blockquote><p>A quoted line.</p></blockquote>
+        <iframe
+          class="wp-embedded-content"
+          src="https://rumble.com/embed/v2cr0zv/#?secret=YCf2RLw39L"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a provider frame that follows a post embed further down', async () => {
+      const value = html`
+        <blockquote class="wp-embedded-content">
+          <a href="https://www.e-startupindia.com/learn/gstr-1/">GSTR-1 Return Filing</a>
+        </blockquote>
+        <p>And the video:</p>
+        <iframe
+          class="wp-embedded-content"
+          src="https://rumble.com/embed/v2cr0zv/#?secret=YCf2RLw39L"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it.each(wordpressProviderFrames)(
+      'should keep the %s frame WordPress stamped as wp-embedded-content',
+      async (_name, frame) => {
+        const value = `<p>Before.</p>${frame}`
+
+        expect(await transform(value)).toEqualHtml(value)
+      },
+    )
 
     it('should remove image-link-expand carrying additional classes', async () => {
       const value = html`
@@ -442,6 +633,19 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
   })
 
   describe('scoped selectors', () => {
+    // A bookmark comment is a quoted post with the reader's own words in it, not the add button,
+    // so the button entries are matched on their own classes and never on the shared prefix.
+    it('should keep a Hatena bookmark comment beside the button', async () => {
+      const value = html`
+        <blockquote class="hatena-bookmark-comment">
+          <p>Interesting point about the new release.</p>
+          <p><cite><a href="https://example.com/entry/1/comment/reader">example.com</a></cite></p>
+        </blockquote>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     // The same wrapper with its player intact is a working embed, not chrome. Only the shells
     // whose iframe the feed generator removed are stripped.
     it('should keep an s9e wrapper whose player survived', async () => {
@@ -451,6 +655,41 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
             <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>
           </span>
         </span>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // The tweet player sits on the same host as the buttons, one path segment away, so the
+    // button entry is anchored on `/widgets/` and the frame that carries a tweet survives.
+    it('should keep the tweet player that shares the button host', async () => {
+      const value =
+        '<iframe src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a prose link to a Goodreads giveaway', async () => {
+      const value = html`
+        <p>Enter the <a href="https://www.goodreads.com/giveaway/show/249139">Goodreads giveaway</a> by Friday.</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a link carrying the enter-link class that points away from Goodreads', async () => {
+      const value = html`
+        <p><a class="goodreadsGiveawayWidgetEnterLink" href="https://example.com/giveaway">Enter Giveaway</a></p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a PayPal button image that links to its target', async () => {
+      const value = html`
+        <a href="https://www.paypal.com/donate/?hosted_button_id=2BXZQLFUKNZ3Y">
+          <img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate">
+        </a>
       `
 
       expect(await transform(value)).toEqualHtml(value)

@@ -1,6 +1,5 @@
-import { trimObject } from 'trousse'
 import type { MediaResolver, MediaResolverResult } from '../types.js'
-import { attr, getElementDimensions } from '../utils/dom.js'
+import { attr, getElementDimensions, text } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
 
 // Ghost's video and audio cards ship their media element without controls, so it never plays.
@@ -50,12 +49,12 @@ export const ghostMediaResolver: MediaResolver = {
     }
 
     // Ghost prints the track name inside the player container, so it is dropped with the chrome.
-    const title = element.querySelector('.kg-audio-title')?.textContent?.trim()
+    const title = text(element, '.kg-audio-title')
 
     return {
       tag: 'audio',
       src: source,
-      ...trimObject({ title }, Boolean),
+      title,
     }
   },
 }

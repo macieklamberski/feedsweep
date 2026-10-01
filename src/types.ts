@@ -1,5 +1,3 @@
-import type { DiscoverResolveUrlFn } from 'feedscout'
-
 import type { MaybePromise, Pattern } from 'trousse'
 
 export type EnclosureThumbnail = {
@@ -20,14 +18,20 @@ export type Enclosure = {
   thumbnails?: Array<EnclosureThumbnail>
   playerUrl?: string
   playerEmbed?: string
+  length?: number
+  isDefault?: boolean
+  groupIndex?: number
 }
 
-export type ResolveUrlFn = DiscoverResolveUrlFn
+export type ResolveUrlFn = (url: string, baseUrl: string | undefined) => string | undefined
 
 export type EmbedResolverResult = {
   provider: string
   id?: string
-  src: string
+  src?: string
+  // Settings the publisher chose for this one embed that a reader may override, such as the
+  // language of a widget's labels. They stay off `src`, so a reader can apply its own instead.
+  params?: Record<string, string>
   url?: string
   thumbnail?: string
   width?: number
@@ -47,8 +51,8 @@ export type ResolveEmbed = (url: string, element?: Element) => EmbedResolverResu
 export type EmbedRenderHint = {
   provider: string
   // The origin the player's messages arrive from, for a reader to check `event.origin` against.
-  // Absent where the player is served from the publisher's own host, a Mastodon instance or a
-  // Podigee show, and the frame's own origin is the one to match.
+  // Absent where the player is served from the publisher's own host or a Mastodon instance, and
+  // the frame's own origin is the one to match.
   origin?: string
   // Query parameters the player wants on every load, not only the one after a click. A reader
   // sets each over whatever the placeholder's url carries. They stay off the url itself, since a
@@ -57,6 +61,9 @@ export type EmbedRenderHint = {
   // Query parameters that start playback, for a load that follows a person's click. They never
   // go on the placeholder's url, since a placeholder must not start on page load.
   autoplayParams?: Record<string, string>
+  // The `name` a reader gives the frame before it loads. A player that reads `window.name` to
+  // open its message channel posts no ready message without it.
+  frameName?: string
   isReady?: (data: unknown) => boolean
   // Posted once: a second post pauses a player whose play command toggles.
   requestPlay?: unknown
@@ -80,10 +87,10 @@ export type FieldCleaner = {
   strip?: Pattern
 }
 
-// What the pipeline hands an enricher: the two attributes that name a placeholder's embed, and
-// nothing else. The id must be enough to rebuild the platform's endpoint on its own, which is why
-// TikTok's carries the handle beside the video id.
-export type EmbedRef = { provider: string; id: string }
+// What the pipeline hands an enricher. The url is what a platform's oEmbed endpoint is keyed by,
+// and where a placeholder has none the id must rebuild it on its own, which is why TikTok's
+// carries the handle beside the video id.
+export type EmbedRef = { provider: string; id: string; url?: string; src?: string }
 
 // Positional: one entry per embed sent, in the same order, undefined where nothing was found.
 export type EnrichEmbedFn = (
@@ -161,6 +168,19 @@ export type WidgetResolver = EmbedResolver | MediaResolver | CiteResolver
 
 export type WidgetResolverResult = EmbedResolverResult | MediaResolverResult | CiteResolverResult
 
+export type EmojiResolverResult =
+  | { glyph: string } // Replaced by the text
+  | { text: string } // Fallback text, wrapped in a span carrying data-emoji
+  | { custom: true } // Keeps the picture, gains data-emoji
+  | { image: string; alt?: string } // Becomes an image of that url, carrying data-emoji
+
+// Undefined is a weak match with no answer, which leaves the element to the next resolver.
+export type EmojiResolver = {
+  kind: 'emoji'
+  selector: string
+  extract: (element: Element) => EmojiResolverResult | undefined
+}
+
 export type CleanUrlFn = (url: string) => string
 
 // The role a URL plays in the output, so safety policy and neutralization can differ:
@@ -201,7 +221,7 @@ export type TransformContext = {
   deferredIframeSources: Array<DeferredIframeSource>
   trackingHosts: Array<string>
   trackingPathSegments: Array<string>
-  emojiImageHosts: Array<string>
+  emojiResolvers: Array<EmojiResolver>
   avatarImageHosts: Array<string>
   nonContentSelectors: Array<string>
   preservedPreClasses: Array<string>

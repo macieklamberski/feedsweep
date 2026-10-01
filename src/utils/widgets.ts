@@ -1,4 +1,11 @@
-import { isAnyOf, type MaybePromise, type Pattern, startsWithAnyOf, trimObject } from 'trousse'
+import {
+  isAnyOf,
+  isHostOrSubdomainOf,
+  type MaybePromise,
+  type Pattern,
+  startsWithAnyOf,
+  trimObject,
+} from 'trousse'
 import type {
   CiteResolverResult,
   EmbedResolver,
@@ -13,13 +20,15 @@ import type {
   WidgetResolverResult,
 } from '../types.js'
 import {
+  attr,
   type GeneratedWrapperType,
   getElementDimensions,
   getPairRatio,
   getStylePairRatio,
   getWrapperRatio,
+  isPercentageSized,
 } from './dom.js'
-import { cleanUrl, isOnHosts, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
+import { cleanUrl, parseUrlOnHosts, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
 
 const parseOrKeepDate = (
   date: string | undefined,
@@ -35,6 +44,16 @@ const leadingAtRegex = /^@+/
 // `@` that separates its instance. On a platform that writes bare names it invents a handle.
 export const atUsername = (name: string): string => {
   return `@${name.replace(leadingAtRegex, '')}`
+}
+
+const s9eHelperHost = 's9e.github.io'
+
+// A forum's s9e MediaEmbed helper frame, `s9e.github.io/iframe/2/{platform}.min.html#{id}`, names
+// the content in its first url fragment and the helper's own settings in a second one.
+export const readS9eFragment = (element: Element): string | undefined => {
+  const src = attr(element, 'src')
+
+  return parseUrlOnHosts(src, s9eHelperHost) ? src?.split('#')[1] : undefined
 }
 
 const embedCarriers: Record<string, string> = {
@@ -54,8 +73,10 @@ export const readCarrierUrl = (element: Element): string => {
 }
 
 type ResolverOptions = {
-  // Scribd states `height="500"` on every document and keeps the ratio in `data-aspect-ratio`.
-  preferResolverSize?: boolean
+  // Deep handling only: the carrier's declared box replaces the resolver's size. Pass it on a
+  // carrier the publisher sized for the player that loads, never on a retired tool's or dead
+  // route's.
+  readCarrierSize?: boolean
 }
 
 // A resolver whose selector names the platform's own markup.
@@ -68,9 +89,25 @@ export const createMarkupEmbedResolver = (
     kind: 'embed',
     selector,
     extract: (element) => {
-      return decideSize(element, extract(element), options.preferResolverSize)
+      return decideSize(element, extract(element), options.readCarrierSize)
     },
   }
+}
+
+// A forum's s9e MediaEmbed helper frame for one platform, composed into that platform's own url.
+export const createS9eEmbedResolver = (
+  platform: string,
+  compose: (fragment: string) => EmbedResolverResult | undefined,
+): EmbedResolver => {
+  return createMarkupEmbedResolver(`iframe[data-s9e-mediaembed="${platform}"]`, (element) => {
+    const fragment = readS9eFragment(element)
+
+    if (!fragment) {
+      return
+    }
+
+    return compose(fragment)
+  })
 }
 
 // What a carrier says about its size: the dimensions it declares, or the ratio a responsive
@@ -91,18 +128,15 @@ const hasSize = (size: SizeFields): boolean => {
 const decideSize = (
   element: Element,
   result: EmbedResolverResult | undefined,
-  preferResolverSize?: boolean,
+  readCarrierSize?: boolean,
 ): EmbedResolverResult | undefined => {
-  if (!result) {
-    return
-  }
-
-  if (preferResolverSize && hasSize(result)) {
+  if (!result || !readCarrierSize) {
     return result
   }
 
   // Ancestors are read only with no resolver size: a theme's 16:9 wrapper once beat a 9:16 player.
-  const wrapperDepth = hasSize(result) ? 0 : undefined
+  // BR's player is `100%` by `100%` inside a ratio box the publisher sized.
+  const wrapperDepth = hasSize(result) && !isPercentageSized(element) ? 0 : undefined
   const declared = getEmbedSize(element, wrapperDepth)
 
   // A lone width reserves no space, so it never outranks a resolver's ratio or height.
@@ -172,19 +206,36 @@ export const createUrlEmbedResolver = (
     extract: (element) => {
       const src = readCarrierUrl(element)
 
-      if (!isOnHosts(src, hosts)) {
+      if (!isHostOrSubdomainOf(src, hosts)) {
         return
       }
 
-      return decideSize(element, extract(src, element), options.preferResolverSize)
+      return decideSize(element, extract(src, element), options.readCarrierSize)
     },
   }
 }
 
+const playerResolverKinds: Array<WidgetResolver['kind']> = ['embed', 'media']
+
 export const isEmbedOrMediaResolver = (
   resolver: WidgetResolver,
 ): resolver is EmbedResolver | MediaResolver => {
-  return resolver.kind === 'embed' || resolver.kind === 'media'
+  return playerResolverKinds.includes(resolver.kind)
+}
+
+// True when one of the resolvers claims the iframe, the same test convertWidgets makes, so only
+// an iframe that would become a placeholder or a recovered media element passes.
+export const isResolvedIframe = async (
+  iframe: Element,
+  resolvers: ReadonlyArray<WidgetResolver>,
+): Promise<boolean> => {
+  for (const resolver of resolvers) {
+    if (iframe.matches(resolver.selector) && (await resolver.extract(iframe))) {
+      return true
+    }
+  }
+
+  return false
 }
 
 export const isMediaResult = (result: WidgetResolverResult): result is MediaResolverResult => {
@@ -247,6 +298,29 @@ export const createImage = (document: Document, fields: ImageFields): HTMLElemen
   return image
 }
 
+// An <img>, an <audio> and a <video> have nowhere of their own to show a human-readable caption.
+export const createCaptionedFigure = (
+  document: Document,
+  element: HTMLElement,
+  caption: string,
+): HTMLElement => {
+  const figure = document.createElement('figure')
+  const figcaption = document.createElement('figcaption')
+
+  figcaption.textContent = caption
+  figure.append(element, figcaption)
+
+  return figure
+}
+
+export const createLink = (document: Document, href: string, text = href): HTMLElement => {
+  const link = document.createElement('a')
+  link.setAttribute('href', href)
+  link.textContent = text
+
+  return link
+}
+
 // A platform that publishes a canonical static render of something it would otherwise show in a
 // player: Datawrapper's chart png, Giphy's gif. The render goes inline where a reader sees it at
 // once, and the interactive version stays one click away on the platform's own page.
@@ -293,8 +367,11 @@ export const createPlaceholder = <Type extends object>(
 export const normalizeEmbedFields = (
   metadata: Partial<EmbedResolverResult>,
 ): Record<string, string | undefined> => {
+  const params = new URLSearchParams(metadata.params).toString()
+
   return {
     src: metadata.src,
+    params: params || undefined,
     provider: metadata.provider,
     id: metadata.id,
     url: metadata.url,
@@ -382,14 +459,15 @@ export const cleanResultFields = <Result extends CleanableResult>(
   }
 }
 
-// The src is never cleaned: a player src carries query the platform needs.
 export const prepareEmbedMetadata = (
   metadata: Partial<EmbedResolverResult>,
   context: TransformContext,
 ): Partial<EmbedResolverResult> => {
+  const src = resolveOrDropUrl(metadata.src, context)
+
   return {
     ...cleanResultFields(metadata, context),
-    src: resolveOrDropUrl(metadata.src, context),
+    src: cleanUrl(src, context),
     url: cleanUrl(resolveOrDropUrl(metadata.url, context), context),
     thumbnail: resolveOrKeepUrl(metadata.thumbnail, context),
     avatar: resolveOrKeepUrl(metadata.avatar, context),
@@ -399,7 +477,7 @@ export const prepareEmbedMetadata = (
 
 export const createEmbedPlaceholder = (
   document: Document,
-  metadata: Partial<EmbedResolverResult> & Pick<EmbedResolverResult, 'src'>,
+  metadata: Partial<EmbedResolverResult>,
 ): HTMLElement => {
   const element = document.createElement('div')
   updateEmbedPlaceholder(element, metadata)
@@ -451,9 +529,26 @@ export const updateCitePlaceholder = (
 
 export const createCitePlaceholder = (
   document: Document,
-  result: CiteResolverResult,
+  result: Partial<CiteResolverResult>,
 ): HTMLElement => {
   return createPlaceholder(document, 'cite', normalizeCiteFields(result))
+}
+
+export type FileFields = {
+  url: string
+  name: string
+  type?: string
+  size?: number
+}
+
+// A file the reader downloads, never frames.
+export const createFilePlaceholder = (document: Document, fields: FileFields): HTMLElement => {
+  return createPlaceholder(document, 'file', {
+    url: fields.url,
+    name: fields.name,
+    type: fields.type,
+    size: fields.size ? String(fields.size) : undefined,
+  })
 }
 
 // The pass both placeholder kinds run for enrichment: read a ref off every placeholder in the

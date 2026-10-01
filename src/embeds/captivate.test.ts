@@ -8,19 +8,17 @@ import {
   extractCaptivateEmbed,
 } from './captivate.js'
 
-const uuid = '7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b'
-
 describe('extractCaptivateEmbed', () => {
   it('should read an episode player', () => {
-    const value = `https://player.captivate.fm/episode/${uuid}/`
-    const expected = { kind: 'episode', id: uuid }
+    const value = 'https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6/'
+    const expected = { kind: 'episode', id: 'db5bc483-785d-4c8c-9f7b-c0ff2fab72e6' }
 
     expect(extractCaptivateEmbed(value)).toEqual(expected)
   })
 
   it('should read a show player', () => {
-    const value = `https://player.captivate.fm/show/${uuid}`
-    const expected = { kind: 'show', id: uuid }
+    const value = 'https://player.captivate.fm/show/7fa2e8ef-c3e0-4d27-aad0-35dad879c65c'
+    const expected = { kind: 'show', id: '7fa2e8ef-c3e0-4d27-aad0-35dad879c65c' }
 
     expect(extractCaptivateEmbed(value)).toEqual(expected)
   })
@@ -28,8 +26,8 @@ describe('extractCaptivateEmbed', () => {
   // Nothing downstream reads which kind it is, so a kind Captivate adds later reaches the same
   // player instead of falling through to a carrier that has lost its height.
   it('should read a kind the platform has not published yet', () => {
-    const value = `https://player.captivate.fm/clip/${uuid}`
-    const expected = { kind: 'clip', id: uuid }
+    const value = 'https://player.captivate.fm/clip/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6'
+    const expected = { kind: 'clip', id: 'db5bc483-785d-4c8c-9f7b-c0ff2fab72e6' }
 
     expect(extractCaptivateEmbed(value)).toEqual(expected)
   })
@@ -46,8 +44,20 @@ describe('extractCaptivateEmbed', () => {
     expect(extractCaptivateEmbed(value)).toBeUndefined()
   })
 
+  it('should return undefined for a kind with a digit after the word', () => {
+    const value = 'https://player.captivate.fm/episode1/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6'
+
+    expect(extractCaptivateEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a kind with a digit before the word', () => {
+    const value = 'https://player.captivate.fm/1episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6'
+
+    expect(extractCaptivateEmbed(value)).toBeUndefined()
+  })
+
   it('should return undefined for a first segment that is not a route word', () => {
-    const value = `https://player.captivate.fm/2024/${uuid}`
+    const value = 'https://player.captivate.fm/2024/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6'
 
     expect(extractCaptivateEmbed(value)).toBeUndefined()
   })
@@ -61,11 +71,11 @@ describe('extractCaptivateEmbed', () => {
 
 describe('captivateResolveEmbed', () => {
   it('should state the fixed player height', () => {
-    const value = `https://player.captivate.fm/episode/${uuid}/`
+    const value = 'https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6/'
     const expected: EmbedResolverResult = {
       provider: 'captivate',
-      id: `episode/${uuid}`,
-      src: `https://player.captivate.fm/episode/${uuid}`,
+      id: 'episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6',
+      src: 'https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6',
       height: 200,
     }
 
@@ -86,14 +96,14 @@ describeForEachParser('captivateEmbedResolver', (parseHtml) => {
     it('should claim a player iframe and state the fixed height', async () => {
       const value = html`
         <iframe
-          src="https://player.captivate.fm/episode/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b/"
+          src="https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6/"
           frameborder="0"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'captivate',
-        id: 'episode/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b',
-        src: 'https://player.captivate.fm/episode/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b',
+        id: 'episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6',
+        src: 'https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6',
         height: 200,
       }
 
@@ -106,28 +116,27 @@ describeForEachParser('captivateEmbedResolver', (parseHtml) => {
     // the host gate has to refuse. The path is a real player path, so nothing else can refuse it.
     it('should ignore a lookalike host suffixing the player domain', async () => {
       const value =
-        '<iframe src="https://player.captivate.fm.evil.test/episode/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b"></iframe>'
+        '<iframe src="https://player.captivate.fm.evil.test/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
   })
 
   describe('the size a publisher states', () => {
-    // The 200 the resolver states is the corpus-typical box, and the publisher's own choice
-    // outranks it: they sized the player they actually embedded.
-    it('should let the carrier height win over the stated one', async () => {
+    // The 200 the resolver states is the corpus-typical box, and the carrier's height is not read.
+    it('should keep the stated height over the carrier height', async () => {
       const value = html`
         <iframe
-          src="https://player.captivate.fm/show/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b"
+          src="https://player.captivate.fm/show/7fa2e8ef-c3e0-4d27-aad0-35dad879c65c"
           width="100%"
           height="500"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'captivate',
-        id: 'show/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b',
-        src: 'https://player.captivate.fm/show/7f2c9a10-3b4d-4e5f-8a9b-0c1d2e3f4a5b',
-        height: 500,
+        id: 'show/7fa2e8ef-c3e0-4d27-aad0-35dad879c65c',
+        src: 'https://player.captivate.fm/show/7fa2e8ef-c3e0-4d27-aad0-35dad879c65c',
+        height: 200,
       }
 
       expect(await extract(value)).toEqual(expected)

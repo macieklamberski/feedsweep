@@ -50,6 +50,13 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should neutralize a javascript: image map area to the link sentinel', async () => {
+      const value = '<map name="m"><area href="javascript:alert(1)" alt="x"></map>'
+      const expected = '<map name="m"><area href="#unsafe-link" alt="x"></map>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should neutralize a javascript: image to the media sentinel', async () => {
       const value = '<img src="javascript:alert(1)">'
       const expected = '<img src="about:blank">'
@@ -64,9 +71,7 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should see through a leading C0 control byte that \\s does not match', async () => {
-      // A leading \x01 survives HTML parsing and a browser strips it before reading the
-      // scheme, so `\x01javascript:` runs, but \s never matched it.
+    it('should see through a leading C0 control byte', async () => {
       const value = '<a href="\x01javascript:alert(1)">x</a>'
       const expected = '<a href="#unsafe-link">x</a>'
 
@@ -78,6 +83,39 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       const expected = '<a href="#unsafe-link">x</a>'
 
       expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // Each href's scheme as `new URL(href, 'https://a.test/').protocol` reads it in Bun.
+    const hiddenSchemeHrefs: Array<[string, string]> = [
+      ['a newline inside javascript:', 'java\nscript:alert(1)'],
+      ['a carriage return inside javascript:', 'java\rscript:alert(1)'],
+      ['a leading space before javascript:', ' javascript:alert(1)'],
+      ['a tab inside uppercase JAVASCRIPT:', 'JAVA\tSCRIPT:alert(1)'],
+      ['a leading control before VBScript:', '\x1fVBScript:msgbox(1)'],
+      ['a newline inside vbscript:', 'vb\nscript:msgbox(1)'],
+      ['a leading space before uppercase DATA:text/html', ' DATA:text/html,hello'],
+      ['a tab inside data:text/html', 'da\tta:text/html,hello'],
+    ]
+
+    it.each(hiddenSchemeHrefs)('should neutralize a link with %s', async (_name, href) => {
+      const value = `<a href="${href}">x</a>`
+      const expected = '<a href="#unsafe-link">x</a>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // A browser resolves each of these as a relative path, not as a javascript: url.
+    const relativeLookalikeHrefs: Array<[string, string]> = [
+      ['a space inside javascript:', 'java script:x'],
+      ['a no-break space inside javascript:', 'java script:x'],
+      ['a leading no-break space before javascript:', ' javascript:x'],
+      ['a control inside javascript:', 'java\x01script:x'],
+    ]
+
+    it.each(relativeLookalikeHrefs)('should leave a link with %s', async (_name, href) => {
+      const value = `<a href="${href}">x</a>`
+
+      expect(await transform(value)).toEqualHtml(value)
     })
 
     it('should leave a safe http link untouched', async () => {
@@ -151,6 +189,21 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
 
     it('should leave a safe form action untouched', async () => {
       const value = '<form action="https://ok.test/submit"><button>go</button></form>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should neutralize a data:text/html embed to the media sentinel', async () => {
+      const value = '<embed src="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==">'
+      const expected = '<embed src="about:blank">'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // A scheme is dangerous only at the start: this lab url carries one inside a mangled id.
+    it('should keep a url that carries a scheme word past its start', async () => {
+      const value =
+        '<iframe src="https://www.youtube.com/embed/mmRtQ4javascript:void(0)tHSug"></iframe>'
 
       expect(await transform(value)).toEqualHtml(value)
     })
@@ -243,14 +296,16 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(expected)
     })
 
-    it('should neutralize unsafe embed and cite target urls with the link sentinel', async () => {
+    it('should neutralize unsafe embed, cite and file target urls with the link sentinel', async () => {
       const value = html`
         <div data-embed-url="javascript:alert(1)"></div>
         <div data-cite-url="javascript:alert(1)"></div>
+        <div data-file-url="javascript:alert(1)"></div>
       `
       const expected = html`
         <div data-embed-url="#unsafe-link"></div>
         <div data-cite-url="#unsafe-link"></div>
+        <div data-file-url="#unsafe-link"></div>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -299,7 +354,7 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
     // Stands in for a result with every field populated. The point is to fill each field the mint
     // path knows, not to be a valid result, so the declared field types are asserted away.
     const markerFields = <Type>(names: Array<string>): Type => {
-      return Object.fromEntries(names.map((name) => [name, 'not-a-url'])) as unknown as Type
+      return Object.fromEntries(names.map((name) => [name, 'not-a-url'])) as Type
     }
 
     const unchecked = async (document: Document, placeholder: Element): Promise<Array<string>> => {
