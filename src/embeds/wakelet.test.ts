@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { readWakeletHeight, wakeletEmbedResolver } from './wakelet.js'
+import { wakeletEmbedResolver } from './wakelet.js'
 
 describeForEachParser('wakeletEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, wakeletEmbedResolver)
@@ -24,6 +24,7 @@ describeForEachParser('wakeletEmbedResolver', (parseHtml) => {
         id: 'NrquVwf7yTprpa6g_e3Dw',
         src: 'https://embed.wakelet.com/wakes/NrquVwf7yTprpa6g_e3Dw/list',
         url: 'https://wakelet.com/wake/NrquVwf7yTprpa6g_e3Dw',
+        height: 760,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -45,6 +46,7 @@ describeForEachParser('wakeletEmbedResolver', (parseHtml) => {
         id: '2fw7jVdgjW0VbgzjNr3Hf',
         src: 'https://embed.wakelet.com/wakes/2fw7jVdgjW0VbgzjNr3Hf/list',
         url: 'https://wakelet.com/wake/2fw7jVdgjW0VbgzjNr3Hf',
+        height: 760,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -64,6 +66,7 @@ describeForEachParser('wakeletEmbedResolver', (parseHtml) => {
         id: '6edc7e7a-dca5-4d23-8871-f0847f5cea1e',
         src: 'https://embed.wakelet.com/wakes/6edc7e7a-dca5-4d23-8871-f0847f5cea1e/list',
         url: 'https://wakelet.com/wake/6edc7e7a-dca5-4d23-8871-f0847f5cea1e',
+        height: 760,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -100,24 +103,6 @@ describeForEachParser('wakeletEmbedResolver', (parseHtml) => {
   })
 })
 
-describe('readWakeletHeight', () => {
-  it('should read the height of the init reply', () => {
-    expect(readWakeletHeight('[iFrameSizer]wakelet:2586:560:init')).toBe(2586)
-  })
-
-  it('should ignore the zero height of a page info message', () => {
-    expect(readWakeletHeight('[iFrameSizer]wakelet:0:0:pageInfo')).toBeUndefined()
-  })
-
-  it('should ignore a message with text before the iframe-resizer prefix', () => {
-    expect(readWakeletHeight('x[iFrameSizer]wakelet:2586:560:init')).toBeUndefined()
-  })
-
-  it('should ignore a message that is not a string', () => {
-    expect(readWakeletHeight({ height: 2586 })).toBeUndefined()
-  })
-})
-
 describeForEachParser('wakelet snippets through the pipeline', (parseHtml) => {
   const convert = (value: string) => {
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
@@ -144,6 +129,7 @@ describeForEachParser('wakelet snippets through the pipeline', (parseHtml) => {
         data-embed-id="NrquVwf7yTprpa6g_e3Dw"
         data-embed-src="https://embed.wakelet.com/wakes/NrquVwf7yTprpa6g_e3Dw/list"
         data-embed-url="https://wakelet.com/wake/NrquVwf7yTprpa6g_e3Dw"
+        data-embed-height="760"
       ></div>
     `
 
