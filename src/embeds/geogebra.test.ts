@@ -6,13 +6,13 @@ import { geogebraEmbedResolver, geogebraResolveEmbed } from './geogebra.js'
 
 describe('geogebraResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should read the material iframe and drop its display options', () => {
+    it('should keep the layout size and drop the other display options', () => {
       const value =
         'https://www.geogebra.org/material/iframe/id/yqZMrWXI/width/500/height/400/border/eeeeee/rc/false/ai/false/sdz/false/smb/false/stb/false/stbh/true/ld/false/sri/false/at/auto'
       const expected: EmbedResolverResult = {
         provider: 'geogebra',
         id: 'yqZMrWXI',
-        src: 'https://www.geogebra.org/material/iframe/id/yqZMrWXI',
+        src: 'https://www.geogebra.org/material/iframe/id/yqZMrWXI/width/500/height/400',
         url: 'https://www.geogebra.org/m/yqZMrWXI',
         ratio: '4/3',
       }
@@ -27,6 +27,34 @@ describe('geogebraResolveEmbed', () => {
         id: 'yqZMrWXI',
         src: 'https://www.geogebra.org/material/iframe/id/yqZMrWXI',
         url: 'https://www.geogebra.org/m/yqZMrWXI',
+        ratio: '4/3',
+      }
+
+      expect(geogebraResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the layout size written among other options', () => {
+      const value =
+        'https://www.geogebra.org/material/iframe/id/v3rTqP3n/border/888888/height/551/sri/true/width/839'
+      const expected: EmbedResolverResult = {
+        provider: 'geogebra',
+        id: 'v3rTqP3n',
+        src: 'https://www.geogebra.org/material/iframe/id/v3rTqP3n/width/839/height/551',
+        url: 'https://www.geogebra.org/m/v3rTqP3n',
+        ratio: '4/3',
+      }
+
+      expect(geogebraResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the last layout size the path writes', () => {
+      const value =
+        'https://www.geogebra.org/material/iframe/id/v3rTqP3n/width/500/height/400/width/839/height/551'
+      const expected: EmbedResolverResult = {
+        provider: 'geogebra',
+        id: 'v3rTqP3n',
+        src: 'https://www.geogebra.org/material/iframe/id/v3rTqP3n/width/839/height/551',
+        url: 'https://www.geogebra.org/m/v3rTqP3n',
         ratio: '4/3',
       }
 
@@ -77,7 +105,7 @@ describe('geogebraResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'geogebra',
         id: 'yqZMrWXI',
-        src: 'https://www.geogebra.org/material/iframe/id/yqZMrWXI',
+        src: 'https://www.geogebra.org/material/iframe/id/yqZMrWXI/width/500/height/400',
         url: 'https://www.geogebra.org/m/yqZMrWXI',
         ratio: '4/3',
       }
@@ -180,6 +208,45 @@ describe('geogebraResolveEmbed', () => {
       expect(geogebraResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should leave the layout size out when the path names only a width', () => {
+      const value = 'https://www.geogebra.org/material/iframe/id/v3rTqP3n/width/839/border/888888'
+      const expected: EmbedResolverResult = {
+        provider: 'geogebra',
+        id: 'v3rTqP3n',
+        src: 'https://www.geogebra.org/material/iframe/id/v3rTqP3n',
+        url: 'https://www.geogebra.org/m/v3rTqP3n',
+        ratio: '4/3',
+      }
+
+      expect(geogebraResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should leave the layout size out when the path names only a height', () => {
+      const value = 'https://www.geogebra.org/material/iframe/id/v3rTqP3n/height/551/border/888888'
+      const expected: EmbedResolverResult = {
+        provider: 'geogebra',
+        id: 'v3rTqP3n',
+        src: 'https://www.geogebra.org/material/iframe/id/v3rTqP3n',
+        url: 'https://www.geogebra.org/m/v3rTqP3n',
+        ratio: '4/3',
+      }
+
+      expect(geogebraResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should use the layout size as written', () => {
+      const value = 'https://www.geogebra.org/material/iframe/id/v3rTqP3n/width/839px/height/abc'
+      const expected: EmbedResolverResult = {
+        provider: 'geogebra',
+        id: 'v3rTqP3n',
+        src: 'https://www.geogebra.org/material/iframe/id/v3rTqP3n/width/839px/height/abc',
+        url: 'https://www.geogebra.org/m/v3rTqP3n',
+        ratio: '4/3',
+      }
+
+      expect(geogebraResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should drop a tracking query', () => {
       const value = 'https://www.geogebra.org/m/NM8q9xuS?utm_source=newsletter'
       const expected: EmbedResolverResult = {
@@ -199,7 +266,7 @@ describeForEachParser('geogebraEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, geogebraEmbedResolver)
 
   describe('happy paths', () => {
-    it('should state the platform size over the box the snippet declares', async () => {
+    it('should state the platform ratio over the box the snippet declares', async () => {
       const value = html`
         <iframe
           scrolling="no"
@@ -212,7 +279,7 @@ describeForEachParser('geogebraEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'geogebra',
         id: 'yqZMrWXI',
-        src: 'https://www.geogebra.org/material/iframe/id/yqZMrWXI',
+        src: 'https://www.geogebra.org/material/iframe/id/yqZMrWXI/width/500/height/400',
         url: 'https://www.geogebra.org/m/yqZMrWXI',
         ratio: '4/3',
       }
@@ -281,7 +348,7 @@ describeForEachParser('geogebra through the pipeline', (parseHtml) => {
       <div
         data-embed-provider="geogebra"
         data-embed-id="VgXvS7qM"
-        data-embed-src="https://www.geogebra.org/material/iframe/id/VgXvS7qM"
+        data-embed-src="https://www.geogebra.org/material/iframe/id/VgXvS7qM/width/775/height/424"
         data-embed-url="https://www.geogebra.org/m/VgXvS7qM"
         data-embed-ratio="4/3"
       ></div>

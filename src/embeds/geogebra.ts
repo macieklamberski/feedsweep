@@ -9,21 +9,57 @@ const provider = 'geogebra'
 // do not map onto the current materials.
 const geogebraHosts = ['geogebra.org', 'www.geogebra.org']
 
-const readMaterialId = (segments: Array<string>): string | undefined => {
+type Material = {
+  id: string
+  layout: string
+}
+
+// The iframe reads its options as `/{key}/{value}` pairs after the id, the last one winning.
+// `width` and `height` set the size the applet is laid out at before it is scaled to the frame.
+const readLayout = (options: Array<string>): string => {
+  let width: string | undefined
+  let height: string | undefined
+
+  for (let index = 0; index < options.length; index += 2) {
+    const value = options[index + 1]
+
+    if (options[index] === 'width') {
+      width = value
+    }
+
+    if (options[index] === 'height') {
+      height = value
+    }
+  }
+
+  if (!width || !height) {
+    return ''
+  }
+
+  return `/width/${width}/height/${height}`
+}
+
+const readMaterial = (segments: Array<string>): Material | undefined => {
   const [route, ...rest] = segments
 
   if (route === 'material') {
-    const [kind, idWord, id] = rest
+    const [kind, idWord, id, ...options] = rest
 
-    if (kind === 'iframe' && idWord === 'id') {
-      return id
+    if (kind !== 'iframe' || idWord !== 'id' || !id) {
+      return
     }
 
-    return
+    return {
+      id,
+      layout: readLayout(options),
+    }
   }
 
   if ((isAnyOf(route, 'm') || route === 'classic') && rest.length === 1) {
-    return rest[0]
+    return {
+      id: rest[0],
+      layout: '',
+    }
   }
 }
 
@@ -37,19 +73,19 @@ export const geogebraResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const id = readMaterialId(getPathSegments(parsed))
+  const material = readMaterial(getPathSegments(parsed))
 
-  if (!id) {
+  if (!material) {
     return
   }
 
-  // The iframe scales the applet to fill the frame at 4:3, the 800 by 600 it defaults to
-  // when the path names no width and height.
+  // The iframe lays the applet out at 800 by 600 when the path names no width and height, and
+  // scales it into the frame at its own ratio.
   return {
     provider,
-    id,
-    src: `https://www.geogebra.org/material/iframe/id/${id}`,
-    url: `https://www.geogebra.org/m/${id}`,
+    id: material.id,
+    src: `https://www.geogebra.org/material/iframe/id/${material.id}${material.layout}`,
+    url: `https://www.geogebra.org/m/${material.id}`,
     ratio: '4/3',
   }
 }
