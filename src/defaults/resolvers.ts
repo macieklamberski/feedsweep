@@ -71,6 +71,7 @@ import {
   buzzsproutScriptEmbedResolver,
 } from '../embeds/buzzsprout.js'
 import { calameoEmbedResolver } from '../embeds/calameo.js'
+import { canaluEmbedResolver } from '../embeds/canalu.js'
 import { canvaIframeEmbedResolver, canvaWidgetEmbedResolver } from '../embeds/canva.js'
 import { captivateEmbedResolver } from '../embeds/captivate.js'
 import { ccmaEmbedResolver } from '../embeds/ccma.js'
@@ -449,6 +450,7 @@ const embedResolvers: Array<EmbedResolver> = [
   buzzsproutIframeEmbedResolver,
   buzzsproutScriptEmbedResolver,
   calameoEmbedResolver,
+  canaluEmbedResolver,
   canvaIframeEmbedResolver,
   canvaWidgetEmbedResolver,
   captivateEmbedResolver,
