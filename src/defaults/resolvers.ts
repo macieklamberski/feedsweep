@@ -129,6 +129,7 @@ import { foxnewsIframeEmbedResolver, foxnewsScriptEmbedResolver } from '../embed
 import { ganjingworldEmbedResolver } from '../embeds/ganjingworld.js'
 import { garminEmbedResolver } from '../embeds/garmin.js'
 import { geniallyEmbedResolver } from '../embeds/genially.js'
+import { geogebraEmbedResolver } from '../embeds/geogebra.js'
 import { gettyImagesEmbedResolver } from '../embeds/gettyimages.js'
 import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds/glomex.js'
 import { googlebooksEmbedResolver } from '../embeds/googlebooks.js'
@@ -505,6 +506,7 @@ const embedResolvers: Array<EmbedResolver> = [
   ganjingworldEmbedResolver,
   garminEmbedResolver,
   geniallyEmbedResolver,
+  geogebraEmbedResolver,
   gettyImagesEmbedResolver,
   glomexIframeEmbedResolver,
   glomexElementEmbedResolver,
