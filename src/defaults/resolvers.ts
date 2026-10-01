@@ -212,6 +212,7 @@ import {
 } from '../embeds/reddit.js'
 import { reverbnationEmbedResolver } from '../embeds/reverbnation.js'
 import { ridewithgpsEmbedResolver } from '../embeds/ridewithgps.js'
+import { rsscomEmbedResolver } from '../embeds/rsscom.js'
 import { rtveFlashEmbedResolver, rtveIframeEmbedResolver } from '../embeds/rtve.js'
 import { rutubeEmbedResolver } from '../embeds/rutube.js'
 import { scratchEmbedResolver } from '../embeds/scratch.js'
@@ -569,6 +570,7 @@ const embedResolvers: Array<EmbedResolver> = [
   redditS9eEmbedResolver,
   reverbnationEmbedResolver,
   ridewithgpsEmbedResolver,
+  rsscomEmbedResolver,
   rtveIframeEmbedResolver,
   rtveFlashEmbedResolver,
   rutubeEmbedResolver,
