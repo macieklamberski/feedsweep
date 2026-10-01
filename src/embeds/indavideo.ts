@@ -9,7 +9,7 @@ const indavideoHosts = ['indavideo.hu']
 
 const playerPathRegex = /^\/player\/video\/([^/]+)\/?$/
 
-// The retired Flash players, which name the video in a `vID` flashvar.
+// The retired Flash players, which name the video in a `vID` flashvar or query value.
 const flashPlayerPaths = [
   '/player/gup.swf', // files.indavideo.hu
   '/player/vc_o.swf', // files.indavideo.hu

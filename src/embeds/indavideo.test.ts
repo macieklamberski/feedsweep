@@ -116,7 +116,7 @@ describeForEachParser('indavideoEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, indavideoEmbedResolver)
 
   describe('happy paths', () => {
-    it('should state the video ratio over the box the share dialog states', async () => {
+    it('should drop the "indavideo video player" label the share dialog writes as the title', async () => {
       const value = html`
         <iframe
           title="indavideo video player"
