@@ -47,6 +47,7 @@ import { odnoklassnikiRenderHint } from '../embeds/odnoklassniki.js'
 import { omnyRenderHint } from '../embeds/omny.js'
 import { pbsRenderHint } from '../embeds/pbs.js'
 import { peertubeRenderHint } from '../embeds/peertube.js'
+import { pinecastRenderHint } from '../embeds/pinecast.js'
 import { podbeanRenderHint } from '../embeds/podbean.js'
 import { podigeeRenderHint } from '../embeds/podigee.js'
 import { redditRenderHint } from '../embeds/reddit.js'
@@ -130,6 +131,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   omnyRenderHint,
   pbsRenderHint,
   peertubeRenderHint,
+  pinecastRenderHint,
   podbeanRenderHint,
   podigeeRenderHint,
   redditRenderHint,
