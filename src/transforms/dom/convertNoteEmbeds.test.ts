@@ -181,6 +181,21 @@ describeForEachParser('convertNoteEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should leave a figure holding an image and no text untouched', async () => {
+      const value = html`
+        <figure
+          name="80c4d437-61f6-4500-9007-1a4ac10bdd2e"
+          data-src="https://example.com/item"
+          data-identifier="n1234"
+          embedded-service="shopping"
+          embedded-content-key="emb123"
+        ><img src="https://example.com/item.jpg">
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should leave a figure with an empty data-src untouched', async () => {
       const value = html`
         <figure

@@ -4,13 +4,13 @@ import { svgHrefAttribute } from '../../utils/dom.js'
 import { countSrcsetCandidates, parseSrcset } from '../../utils/images.js'
 import { absoluteUrlRegex, resolveOrKeepUrl } from '../../utils/urls.js'
 
-const hostPrefixedUrlRegex = /^(https?:)\/\/[^/?#]+(?=\/\/(?:[a-z0-9-]+\.)+[a-z]{2,}\/)/i
+const hostPrefixedUrlRegex = /^(https?:)\/\/[^/?#]+\/+(?=\/(?:[a-z0-9-]+\.)+[a-z]{2,}\/)/i
 const hostPrefixedSrcTags = ['iframe', 'embed', 'script']
 
 // A protocol-relative src resolved against the page lands behind the site's own host,
-// `{scheme}//{site}//{host}/{path}`, which the site does not serve.
+// `{scheme}//{site}//{host}/{path}`, sometimes with a third slash, which the site does not serve.
 const stripSiteHostPrefix = (url: string): string => {
-  return url.replace(hostPrefixedUrlRegex, '$1')
+  return url.replace(hostPrefixedUrlRegex, '$1/')
 }
 
 // An absolute value other than a host-prefixed player or script src is left byte-identical, and a

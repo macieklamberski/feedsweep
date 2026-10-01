@@ -193,6 +193,26 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should keep the alt of an iframe inside the link wrapper', async () => {
+    const value = html`
+      <div class="datawrapper-embed">
+        <iframe
+          src="https://datawrapper.dwcdn.net/bdqZJ/2/"
+          title="Egg prices"
+        ></iframe>
+      </div>
+    `
+    const expected = html`
+      <div class="datawrapper-embed">
+        <a href="https://datawrapper.dwcdn.net/bdqZJ/">
+          <img src="https://datawrapper.dwcdn.net/bdqZJ/full.png" alt="Egg prices">
+        </a>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should leave a standalone static image untouched', async () => {
     const value = html`
       <img

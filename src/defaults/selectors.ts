@@ -73,6 +73,10 @@ export const defaultNonContentSelectors = [
   // Survives as a live "Tweet" link in the output, usually with no other non-content selector
   // matching anywhere.
   'a.twitter-share-button',
+  // The rendered form of the same button, and of the follow button and the share counter beside
+  // it. Every class the corpus puts on one of these frames names a button, so the path is the
+  // whole platform's button namespace; the player lives under `/embed/` and is untouched.
+  'iframe[src*="platform.twitter.com/widgets/"]',
   // Drupal Easy Social. The widget is chrome, but the pipeline cannot tell, so its Facebook
   // Like iframe becomes an embed placeholder card and the chrome is promoted to content.
   'div.easy_social_box',
@@ -80,8 +84,21 @@ export const defaultNonContentSelectors = [
   // update. The button renders nothing in a reader and the count survives as a stray digit.
   '.vm-like-button',
   // The Like button pasted on its own, a 25 pixel iframe that would otherwise reach the reader
-  // as a click-to-play placeholder for a button.
-  'iframe[src*="facebook.com/plugins/like.php"]',
+  // as a click-to-play placeholder for a button. Matched in both spellings for the same reason
+  // as the plugins below.
+  'iframe:is([src*="facebook.com/plugins/like.php"], [src*="facebook.com/v"][src*="/plugins/like.php"])',
+  // The rest of the plugin namespace that is chrome rather than a post: the Page box in both its
+  // spellings, and the Share button. The resolver already refuses each of these as an embed, and
+  // refusing leaves them to the generic fallback, which draws a card for a follow widget. The two
+  // plugins that do carry content, `post.php` and `video.php`, are named nowhere here.
+  //
+  // Each entry takes the bare path and the one with a Graph API version between the host and
+  // the file (`facebook.com/v2.3/plugins/page.php`), which a generator can write and which still
+  // serves. The host is anchored to the path so a WordPress plugin file of the same name, with
+  // facebook.com somewhere in its query, stays.
+  'iframe:is([src*="facebook.com/plugins/page.php"], [src*="facebook.com/v"][src*="/plugins/page.php"])',
+  'iframe:is([src*="facebook.com/plugins/likebox.php"], [src*="facebook.com/v"][src*="/plugins/likebox.php"])',
+  'iframe:is([src*="facebook.com/plugins/share_button.php"], [src*="facebook.com/v"][src*="/plugins/share_button.php"])',
   '.a2a_kit', // AddToAny share icons (higher-prevalence marker than the wrapper).
   '[class*="addthis_"]', // AddThis share toolbox.
   '.shareaholic-canvas', // Shareaholic share/related widget.

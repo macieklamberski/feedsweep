@@ -27,6 +27,7 @@ import { googledriveRenderHint } from '../embeds/googledrive.js'
 import { helloassoRenderHint } from '../embeds/helloasso.js'
 import { imgurRenderHint } from '../embeds/imgur.js'
 import { inaRenderHint } from '../embeds/ina.js'
+import { indavideoRenderHint } from '../embeds/indavideo.js'
 import { infogramRenderHint } from '../embeds/infogram.js'
 import { instagramRenderHint } from '../embeds/instagram.js'
 import { kalturaRenderHint } from '../embeds/kaltura.js'
@@ -105,6 +106,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   helloassoRenderHint,
   imgurRenderHint,
   inaRenderHint,
+  indavideoRenderHint,
   infogramRenderHint,
   instagramRenderHint,
   kalturaRenderHint,

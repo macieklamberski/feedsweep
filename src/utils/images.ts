@@ -72,7 +72,11 @@ const sizeKeywordLeafRegex = new RegExp(
 const resolvedSource = (capture: string, proxy: URL): string | undefined => {
   const source = decodeSegment(capture) ?? capture
 
-  return source && resolveUrl(source, proxy.origin)
+  if (!source) {
+    return
+  }
+
+  return resolveUrl(source, proxy.origin)
 }
 
 // The capture is a bare host+path with the scheme stripped (Photon): re-add it.

@@ -179,13 +179,18 @@ export const number = (element: Nullish<Element>, property: string): number | un
   return value.endsWith('%') ? parsed / 100 : parsed
 }
 
-const bgImageUrlRegex = /url\(['"]?([^'")]+)/
+const bgImageUrlRegex = /url\(\s*['"]?([^'")]+)/
 
 // Some cards paint their thumbnail as an inline `background-image` or in the `background`
 // shorthand, with no `<img>`.
 export const bgImage = (element: Nullish<Element>): string | undefined => {
   const styles = declarations(element)
   const background = styles['background-image'] ?? styles.background
+  const url = background?.match(bgImageUrlRegex)?.[1]?.trim()
 
-  return background?.match(bgImageUrlRegex)?.[1]
+  if (!url) {
+    return
+  }
+
+  return url
 }

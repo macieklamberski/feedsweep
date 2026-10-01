@@ -88,8 +88,16 @@ const specimens: Record<string, string | [string, string]> = {
   '.feedflare': '<div class="feedflare"><a href="/ff">Share</a></div>',
   '.addtoany_share_save_container':
     '<div class="addtoany_share_save_container"><a class="a2a_button_facebook" href="#">Share</a></div>',
-  'iframe[src*="facebook.com/plugins/like.php"]':
+  'iframe[src*="platform.twitter.com/widgets/"]':
+    '<iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" src="https://platform.twitter.com/widgets/tweet_button.1397165098.html#_=1400000000000&amp;count=horizontal&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=https%3A%2F%2Fexample.com%2Fpost&amp;size=m&amp;text=A%20post&amp;url=https%3A%2F%2Fexample.com%2Fpost" class="twitter-share-button twitter-share-button-rendered twitter-tweet-button" style="position: static; visibility: visible; width: 107px; height: 20px;" title="Twitter Tweet Button"></iframe>',
+  'iframe:is([src*="facebook.com/plugins/like.php"], [src*="facebook.com/v"][src*="/plugins/like.php"])':
     '<iframe src="http://www.facebook.com/plugins/like.php?href=https://example.com/post/&amp;layout=standard&amp;show_faces=1&amp;width=450&amp;action=like" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:25px"></iframe>',
+  'iframe:is([src*="facebook.com/plugins/page.php"], [src*="facebook.com/v"][src*="/plugins/page.php"])':
+    '<iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Facme&amp;tabs=timeline&amp;width=340&amp;height=500&amp;small_header=false&amp;adapt_container_width=true&amp;hide_cover=false&amp;show_facepile=true" width="340" height="500" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>',
+  'iframe:is([src*="facebook.com/plugins/likebox.php"], [src*="facebook.com/v"][src*="/plugins/likebox.php"])':
+    '<iframe src="//www.facebook.com/plugins/likebox.php?href=https%3A%2F%2Fwww.facebook.com%2Facme&amp;width=292&amp;height=258&amp;show_faces=true&amp;header=false&amp;stream=false&amp;show_border=false" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:292px; height:258px" allowtransparency="true"></iframe>',
+  'iframe:is([src*="facebook.com/plugins/share_button.php"], [src*="facebook.com/v"][src*="/plugins/share_button.php"])':
+    '<iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3A%2F%2Fexample.com%2Fpost&amp;layout=button_count&amp;size=small&amp;width=90&amp;height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>',
   '.a2a_kit': '<span class="a2a_kit a2a_kit_size_32 addtoany_list"></span>',
   '[class*="addthis_"]': '<div class="addthis_toolbox addthis_default_style"></div>',
   '.shareaholic-canvas': '<div class="shareaholic-canvas" data-app="share_buttons"></div>',
@@ -492,6 +500,48 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    // A generator can write the Graph API version between the host and the file, and those urls
+    // still serve.
+    it('should strip a versioned Facebook chrome plugin frame', async () => {
+      const value = html`
+        <iframe
+          src="https://www.facebook.com/v2.3/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Facme"
+        ></iframe>
+        <iframe
+          src="https://www.facebook.com/v2.10/plugins/share_button.php?href=https%3A%2F%2Fexample.com%2Fpost"
+        ></iframe>
+        <iframe
+          src="https://www.facebook.com/v2.5/plugins/like.php?href=https%3A%2F%2Fexample.com%2Fpost&layout=standard"
+        ></iframe>
+      `
+
+      expect(await transform(`<p>Before</p>${value}<p>After</p>`)).toEqualHtml(
+        '<p>Before</p><p>After</p>',
+      )
+    })
+
+    // Two plugins on the same path carry the post itself and must survive to be resolved.
+    it('should keep the Facebook post and video plugin frames', async () => {
+      const value = html`
+        <iframe
+          src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Facme%2Fposts%2F123"
+        ></iframe>
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Facme%2Fvideos%2F456"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a same-named plugin file on another host that mentions facebook.com', async () => {
+      const value = html`
+        <iframe src="https://example.com/wp-content/plugins/like.php?ref=facebook.com"></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should leave unrelated iframes and forms untouched', async () => {
       const value = html`
         <iframe src="https://example.com/embed"></iframe>
@@ -606,6 +656,15 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
           </span>
         </span>
       `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // The tweet player sits on the same host as the buttons, one path segment away, so the
+    // button entry is anchored on `/widgets/` and the frame that carries a tweet survives.
+    it('should keep the tweet player that shares the button host', async () => {
+      const value =
+        '<iframe src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"></iframe>'
 
       expect(await transform(value)).toEqualHtml(value)
     })
