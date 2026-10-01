@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { baseContext, describeForEachParser } from '../../tests.js'
+import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { decodeDoubleEncodedTags } from './decodeDoubleEncodedTags.js'
@@ -62,6 +62,68 @@ describeForEachParser('decodeDoubleEncodedTags', (parseHtml) => {
       const value = '&lt;center&gt;&lt;font color="red"&gt;hello&lt;/font&gt;&lt;/center&gt;'
 
       expect(await transform(value)).toEqualHtml('<center><font color="red">hello</font></center>')
+    })
+  })
+
+  describe('strips an escaped paragraph pair around real elements', () => {
+    it('should drop the escaped tags and keep the elements between them', async () => {
+      const value = html`
+        <p>&lt;p&gt;The post <a href="https://example.com/news/burrito">Burrito news</a> first appeared on <a href="https://example.com">Example</a>.&lt;/p&gt;</p>
+      `
+      const expected = html`
+        <p>The post <a href="https://example.com/news/burrito">Burrito news</a> first appeared on <a href="https://example.com">Example</a>.</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should drop an escaped opening tag after leading whitespace', async () => {
+      const value =
+        '<p>\n  &lt;p&gt;The post <a href="https://example.com">Example</a>.&lt;/p&gt;</p>'
+      const expected = '<p>The post <a href="https://example.com">Example</a>.</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should drop an escaped closing tag before trailing whitespace', async () => {
+      const value =
+        '<p>&lt;p&gt;The post <a href="https://example.com">Example</a>.&lt;/p&gt;\n  </p>'
+      const expected = '<p>The post <a href="https://example.com">Example</a>.</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave an escaped pair that does not open with a paragraph', async () => {
+      const value = '<p>&lt;b&gt;The post <a href="https://example.com">Example</a>.&lt;/p&gt;</p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave an escaped paragraph tag with no closing pair', async () => {
+      const value = '<p>&lt;p&gt;The post <a href="https://example.com">Example</a> ends here.</p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave an escaped opening tag that does not start the paragraph', async () => {
+      const value =
+        '<p>Open with &lt;p&gt; as <a href="https://example.com/docs">the docs</a> show, close with &lt;/p&gt;</p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave an escaped closing tag that does not end the paragraph', async () => {
+      const value =
+        '<p>&lt;p&gt;Open as <a href="https://example.com/docs">the docs</a> show, close with &lt;/p&gt; last.</p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave an escaped pair with no element between its tags', async () => {
+      const value =
+        '<p>&lt;p&gt;Paste the snippet after &lt;blogpost&gt; in the template.&lt;/p&gt;</p>'
+
+      expect(await transform(value)).toEqualHtml(value)
     })
   })
 
@@ -159,6 +221,13 @@ describeForEachParser('decodeDoubleEncodedTags', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(
         '<p><b>bold</b></p><code>&lt;b&gt;code&lt;/b&gt;</code>',
       )
+    })
+
+    it('should not strip an escaped paragraph pair inside a real pre element', async () => {
+      const value =
+        '<pre><p>&lt;p&gt;The post <a href="https://example.com">Example</a>&lt;/p&gt;</p></pre>'
+
+      expect(await transform(value)).toEqualHtml(value)
     })
   })
 
