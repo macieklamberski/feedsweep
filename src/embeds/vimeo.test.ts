@@ -379,6 +379,111 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toBeUndefined()
   })
 
+  describe('the Flash player naming its clip in flashvars', () => {
+    it('should read the clip from the flashvars of a moogaloop_local.swf embed', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://vimeo.com/moogaloop_local.swf?ver=24882"
+          id="vimeo_clip_2610675"
+          flashvars="clip_id=2610675&amp;server=vimeo.com&amp;autoplay=0&amp;fullscreen=1&amp;md5=0&amp;show_portrait=0&amp;show_title=0&amp;show_byline=0&amp;context=user:1070318&amp;context_id=&amp;force_embed=0&amp;multimoog=&amp;color=00ADEF&amp;force_info=undefined"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: '2610675',
+        src: 'https://player.vimeo.com/video/2610675',
+        url: 'https://vimeo.com/2610675',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the clip from the flashvars of a moogaloop.swf embed', async () => {
+      const value = html`
+        <embed
+          src="http://vimeo.com/moogaloop.swf"
+          flashvars="clip_id=2610675&server=vimeo.com"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: '2610675',
+        src: 'https://player.vimeo.com/video/2610675',
+        url: 'https://vimeo.com/2610675',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the clip from the flashvars param of the object around the embed', async () => {
+      const value = html`
+        <object>
+          <param name="flashvars" value="clip_id=2610675&server=vimeo.com">
+          <embed src="http://vimeo.com/moogaloop_local.swf?ver=24882">
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: '2610675',
+        src: 'https://player.vimeo.com/video/2610675',
+        url: 'https://vimeo.com/2610675',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should prefer the clip in the src query over the one in flashvars', async () => {
+      const value = html`
+        <embed
+          src="http://vimeo.com/moogaloop.swf?clip_id=76979871"
+          flashvars="clip_id=2610675"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: '76979871',
+        src: 'https://player.vimeo.com/video/76979871',
+        url: 'https://vimeo.com/76979871',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore the flashvars of a carrier that is not a Flash player', async () => {
+      const value = html`
+        <embed
+          src="https://vimeo.com/showcase/5371408/embed"
+          flashvars="clip_id=2610675"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: 'showcase/5371408',
+        src: 'https://vimeo.com/showcase/5371408/embed',
+        url: 'https://vimeo.com/showcase/5371408',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore a moogaloop_local.swf embed with no clip in its flashvars', async () => {
+      const value = html`
+        <embed
+          src="http://vimeo.com/moogaloop_local.swf?ver=24882"
+          flashvars="server=vimeo.com&autoplay=0"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
   // Every corpus showcase carrier states a box, and none is read.
   it('should state the video ratio over the size a showcase iframe states', async () => {
     const value = html`

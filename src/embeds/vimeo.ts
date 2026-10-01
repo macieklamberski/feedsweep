@@ -1,10 +1,11 @@
 import { getPathSegments, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches } from '../utils/dom.js'
+import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
 import {
   composeQuery,
   digitsRegex,
   encodePathSegment,
+  flashFileRegex,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -160,6 +161,25 @@ const readReference = (link: string): VimeoReference | undefined => {
   }
 }
 
+// The Flash player could also take the clip from its flashvars, and `moogaloop_local.swf` names
+// it nowhere in its src.
+const readFlashReference = (
+  link: string,
+  element: Element | undefined,
+): VimeoReference | undefined => {
+  if (!flashFileRegex.test(link)) {
+    return
+  }
+
+  const clipId = flashVar(element, 'clip_id')
+
+  if (!clipId) {
+    return
+  }
+
+  return { id: clipId }
+}
+
 export const extractVimeoId = (link: string): string | undefined => {
   return readReference(link)?.id
 }
@@ -194,7 +214,7 @@ const vimeoEmbedParams = ['t']
 // label. The labels are not filtered. They are localised into at least five languages and some
 // name a plugin, not the platform, so any list of them goes stale.
 export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
-  const reference = readReference(url)
+  const reference = readReference(url) ?? readFlashReference(url, element)
 
   if (!reference) {
     return resolveShowcaseEmbed(url)
