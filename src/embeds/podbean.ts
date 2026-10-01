@@ -1,6 +1,6 @@
 import { decodeSegment, getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr, parsePixelSize } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { composeQuery, isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -54,8 +54,6 @@ export const podbeanResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const stated = parseUrl(url, placeholderBaseUrl)?.searchParams.get('size')
-  const height = parsePixelSize(stated) ?? defaultPlayerHeight
   const title = attr(element, 'title')
 
   // api.podbean.com/v1/oembed answers key-free with no title, thumbnail or author, only the
@@ -64,7 +62,7 @@ export const podbeanResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id,
     src: `https://www.podbean.com/player-v2/${composeQuery({ i: id })}`,
-    height,
+    height: defaultPlayerHeight,
     title,
   }
 }

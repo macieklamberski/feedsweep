@@ -113,10 +113,9 @@ describeForEachParser('Instagram', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
-  // The only size a quote ever comes with sits on the Tumblr figure, one level above it, so the
-  // widget pass has to run while that wrapper is still in the document. The figure is dissolved
-  // afterwards, once the size it carried has been read into the placeholder.
-  it('should take the size off the Tumblr figure the quote sits in', async () => {
+  // The Tumblr figure states the size the embed rendered at, which is the carrier's. The
+  // placeholder states none, since the frame posts its height.
+  it('should state no size over the size of the Tumblr figure the quote sits in', async () => {
     const value = html`
       <figure
         class="tmblr-embed tmblr-full"
@@ -138,8 +137,6 @@ describeForEachParser('Instagram', (parseHtml) => {
         data-embed-id="reel/DGPdABWz84n"
         data-embed-src="https://www.instagram.com/reel/DGPdABWz84n/embed/"
         data-embed-url="https://www.instagram.com/reel/DGPdABWz84n/"
-        data-embed-width="540"
-        data-embed-height="627"
       ></div>
     `
 

@@ -3,7 +3,7 @@ import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../type
 import { attr, flashVar, flashVars, keepIfMatches } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
-import { createUrlEmbedResolver, getEmbedSize } from '../utils/widgets.js'
+import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flickr'
 
@@ -101,6 +101,10 @@ const composePhotoThumbnail = (photoId: string, secret: string): string => {
 // The size Flickr's own dialog wrote for years. The slideshow renders at whatever box the query
 // names, so there is no rendered height to measure against.
 const dialogSize = { width: 400, height: 300 }
+
+// embedr draws its box at the size the query names, whatever the frame, so the video player is
+// asked for 16:9.
+const videoSize = { width: 640, height: 360 }
 
 // What a page path names, whether it arrived in the flashvars or as the framed page itself.
 // A value read out of a path is decoded, so each is held in one form and only the urls encode it.
@@ -311,14 +315,15 @@ const resolveTarget = (
     return
   }
 
-  const declared = element ? getEmbedSize(element, 0) : undefined
-  // Both halves or neither: given one half, the endpoint uses its default for the other as is.
-  const { width, height } =
-    declared?.width && declared?.height
-      ? { width: declared.width, height: declared.height }
-      : dialogSize
-
   // The size always travels in the src: with no query every image renders at NaN.
+  if (flashVideoPathRegex.test(parsed.pathname)) {
+    const { width, height } = videoSize
+
+    return { ...result, src: `${result.src}?width=${width}&height=${height}`, ratio: '16/9' }
+  }
+
+  const { width, height } = dialogSize
+
   return { ...result, src: `${result.src}?width=${width}&height=${height}`, width, height }
 }
 
@@ -332,7 +337,7 @@ export const flickrResolveEmbed: ResolveEmbed = (url, element) => {
 // the two players for a single photo. Only `/player/` and `embedr.flickr.com` are served without
 // `x-frame-options: SAMEORIGIN`, so the rest name a frame that renders empty.
 export const flickrEmbedResolver = createUrlEmbedResolver(flickrHosts, flickrResolveEmbed, {
-  // The carrier's size is already folded into the src, and it is what the endpoint renders at.
+  // The size folded into the src is what the endpoint renders at.
   preferResolverSize: true,
 })
 

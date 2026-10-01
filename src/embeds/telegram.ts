@@ -1,6 +1,6 @@
 import { getPathSegments, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, parsePixelSize } from '../utils/dom.js'
+import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import {
   atUsername,
@@ -58,18 +58,7 @@ const readDeclaredPost = (value: string | undefined): EmbedResolverResult | unde
 export const telegramScriptEmbedResolver = createMarkupEmbedResolver(
   'script[data-telegram-post]',
   (element) => {
-    const result = readDeclaredPost(attr(element, 'data-telegram-post'))
-
-    if (!result) {
-      return
-    }
-
-    // The widget resizes itself to fit the post, so the snippet states no height at all and
-    // `data-width` is the only size it carries. The usual value is `100%`, which is not a pixel
-    // size and is dropped here.
-    const width = parsePixelSize(attr(element, 'data-width'))
-
-    return width ? { ...result, width } : result
+    return readDeclaredPost(attr(element, 'data-telegram-post'))
   },
 )
 

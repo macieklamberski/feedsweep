@@ -1,6 +1,6 @@
 import { parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches, parsePixelSize } from '../utils/dom.js'
+import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   composeQuery,
   encodePathSegment,
@@ -107,20 +107,13 @@ export const fc2PlayerScriptEmbedResolver = createMarkupEmbedResolver(
       Boolean,
     )
 
-    // The loader keeps a stated width above 192 and a height above 108. Otherwise it draws the
-    // player 512 wide and 9/16 of the width tall.
-    const statedWidth = parsePixelSize(attr(element, 'w')) ?? 0
-    const statedHeight = parsePixelSize(attr(element, 'h')) ?? 0
-    const width = statedWidth > 192 ? statedWidth : 512
-    const height = statedHeight > 108 ? statedHeight : Math.floor((width * 9) / 16)
-
     // The loader states the length in whole seconds.
     const duration = Number(attr(element, 'd'))
 
     return {
       ...composeEmbed({ contentId, locale: page?.[1] }, params),
-      width,
-      height,
+      // The loader draws the player 9/16 of its width tall where the script states no box.
+      ratio: '16/9',
       title: attr(element, 'tl'),
       duration: duration > 0 ? duration : undefined,
     }
@@ -142,15 +135,13 @@ export const fc2BlogScriptEmbedResolver = createMarkupEmbedResolver(
     // The id comes out of the query decoded, and it goes into a path.
     const contentId = encodePathSegment(videoId)
 
-    // The shim writes `suggest="off"` on the loader unless `rel=1`, and a smaller box when `s`
-    // is present with any value. The account tag it writes is not derivable from the url.
+    // The shim writes `suggest="off"` on the loader unless `rel=1`. The account tag it writes is
+    // not derivable from the url.
     const params = loader.searchParams.get('rel') === '1' ? undefined : { sg: '0' }
-    const isSmall = loader.searchParams.has('s')
 
     return {
       ...composeEmbed({ contentId, locale: 'ja' }, params),
-      width: isSmall ? 320 : 446,
-      height: isSmall ? 273 : 380,
+      ratio: '16/9',
     }
   },
 )
