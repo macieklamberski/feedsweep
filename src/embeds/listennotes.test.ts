@@ -125,6 +125,12 @@ describe('listennotesResolveEmbed', () => {
     })
 
     it('should return undefined for a playlist page', () => {
+      const value = 'https://www.listennotes.com/playlists/altacities-ulimv5yN7ZW/podcasts/'
+
+      expect(listennotesResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the playlist route stopping short of the embed segment', () => {
       const value = 'https://www.listennotes.com/listen/altacities-ulimv5yN7ZW/podcasts/'
 
       expect(listennotesResolveEmbed(value)).toBeUndefined()
