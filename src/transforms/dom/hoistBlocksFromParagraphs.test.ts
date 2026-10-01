@@ -218,18 +218,12 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
       expect(await transformParagraph(value)).toEqualHtml(expected)
     })
 
-    it('should keep adjacent empty placeholders between text', async () => {
-      const value = html`
-        Intro
-        <div data-embed-src="https://www.youtube.com/embed/abc123"></div>
-        <div data-embed-src="https://www.youtube.com/embed/def456"></div>
-        outro
-      `
+    it('should keep a block other than a div that follows an empty placeholder', async () => {
+      const value = 'Intro <div data-embed-src="https://www.youtube.com/embed/abc123"></div><hr>'
       const expected = html`
         <p>Intro </p>
         <div data-embed-src="https://www.youtube.com/embed/abc123"></div>
-        <div data-embed-src="https://www.youtube.com/embed/def456"></div>
-        <p> outro</p>
+        <hr>
       `
 
       expect(await transformParagraph(value)).toEqualHtml(expected)
