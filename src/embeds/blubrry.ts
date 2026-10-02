@@ -45,14 +45,10 @@ export const blubrryResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const isEpisodeId = digitsRegex.test(id)
-
   return {
     provider,
     id,
-    src: isEpisodeId
-      ? `https://player.blubrry.com/id/${id}/`
-      : `https://player.blubrry.com/?media_url=${encodeURIComponent(id)}`,
+    src: url,
     height: playerHeight,
     title: attr(element, 'title'),
   }
