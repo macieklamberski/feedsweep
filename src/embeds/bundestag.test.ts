@@ -169,6 +169,27 @@ describeForEachParser('bundestag players through the pipeline', (parseHtml) => {
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
   }
 
+  it('should replace the frame with the player', async () => {
+    const value = html`
+      <iframe
+        src="https://webtv.bundestag.de/pservices/player/embed/nokey?e=bt-od&amp;ep=69&amp;a=144277506&amp;c=7657467&amp;t=https%3A%2F%2Fdbtg.tv%2Fcvid%2F7657467"
+        width="640"
+        height="360"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-url="https://dbtg.tv/cvid/7657467"
+        data-embed-id="7657467"
+        data-embed-provider="bundestag"
+        data-embed-src="https://webtv.bundestag.de/pservices/player/embed/nokey?e=bt-od&amp;ep=69&amp;a=144277506&amp;c=7657467"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
   it('should replace the loader script with the player', async () => {
     const value = html`
       <script
