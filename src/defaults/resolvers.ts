@@ -96,6 +96,7 @@ import {
 } from '../embeds/cnn.js'
 import { codepenIframeEmbedResolver, codepenWidgetEmbedResolver } from '../embeds/codepen.js'
 import { codesandboxIframeEmbedResolver } from '../embeds/codesandbox.js'
+import { condenastIframeEmbedResolver, condenastScriptEmbedResolver } from '../embeds/condenast.js'
 import { corriereEmbedResolver } from '../embeds/corriere.js'
 import {
   crowdsignalFlashEmbedResolver,
@@ -501,6 +502,8 @@ const embedResolvers: Array<EmbedResolver> = [
   codepenWidgetEmbedResolver,
   codepenIframeEmbedResolver,
   codesandboxIframeEmbedResolver,
+  condenastIframeEmbedResolver,
+  condenastScriptEmbedResolver,
   corriereEmbedResolver,
   crowdsignalFlashEmbedResolver,
   crowdsignalIframeEmbedResolver,
