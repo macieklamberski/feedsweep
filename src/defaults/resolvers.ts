@@ -97,6 +97,7 @@ import {
 } from '../embeds/crowdsignal.js'
 import { dailymotionEmbedResolver } from '../embeds/dailymotion.js'
 import { deezerEmbedResolver } from '../embeds/deezer.js'
+import { democracynowEmbedResolver } from '../embeds/democracynow.js'
 import { documentcloudEmbedResolver } from '../embeds/documentcloud.js'
 import { donorboxEmbedResolver } from '../embeds/donorbox.js'
 import { educaplayEmbedResolver } from '../embeds/educaplay.js'
@@ -480,6 +481,7 @@ const embedResolvers: Array<EmbedResolver> = [
   crowdsignalScriptEmbedResolver,
   dailymotionEmbedResolver,
   deezerEmbedResolver,
+  democracynowEmbedResolver,
   documentcloudEmbedResolver,
   donorboxEmbedResolver,
   educaplayEmbedResolver,
