@@ -12,6 +12,7 @@ describe('traileraddictResolveEmbed', () => {
         provider: 'traileraddict',
         id: '13259',
         src: 'https://traileraddict.com/iframe.php?id=13259',
+        url: 'https://traileraddict.com/watch/13259',
         ratio: '16/9',
       }
 
@@ -24,6 +25,7 @@ describe('traileraddictResolveEmbed', () => {
         provider: 'traileraddict',
         id: '15437',
         src: 'https://traileraddict.com/iframe.php?id=15437',
+        url: 'https://traileraddict.com/watch/15437',
         ratio: '16/9',
       }
 
@@ -36,6 +38,7 @@ describe('traileraddictResolveEmbed', () => {
         provider: 'traileraddict',
         id: '20301',
         src: 'https://traileraddict.com/iframe.php?id=20301',
+        url: 'https://traileraddict.com/watch/20301',
         ratio: '16/9',
       }
 
@@ -48,6 +51,7 @@ describe('traileraddictResolveEmbed', () => {
         provider: 'traileraddict',
         id: '11188',
         src: 'https://traileraddict.com/iframe.php?id=11188',
+        url: 'https://traileraddict.com/watch/11188',
         ratio: '16/9',
       }
 
@@ -106,6 +110,7 @@ describe('traileraddictResolveEmbed', () => {
         provider: 'traileraddict',
         id: '13259',
         src: 'https://traileraddict.com/iframe.php?id=13259',
+        url: 'https://traileraddict.com/watch/13259',
         ratio: '16/9',
       }
 
@@ -118,6 +123,7 @@ describe('traileraddictResolveEmbed', () => {
         provider: 'traileraddict',
         id: '13259a',
         src: 'https://traileraddict.com/iframe.php?id=13259a',
+        url: 'https://traileraddict.com/watch/13259a',
         ratio: '16/9',
       }
 
@@ -146,6 +152,7 @@ describeForEachParser('traileraddictEmbedResolver', (parseHtml) => {
         provider: 'traileraddict',
         id: '20301',
         src: 'https://traileraddict.com/iframe.php?id=20301',
+        url: 'https://traileraddict.com/watch/20301',
         ratio: '16/9',
       }
 
@@ -184,6 +191,7 @@ describeForEachParser('traileraddict player through the pipeline', (parseHtml) =
         data-embed-id="13259"
         data-embed-provider="traileraddict"
         data-embed-src="https://traileraddict.com/iframe.php?id=13259"
+        data-embed-url="https://traileraddict.com/watch/13259"
       ></div>
     `
 

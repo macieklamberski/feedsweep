@@ -1,6 +1,6 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'traileraddict'
@@ -13,13 +13,12 @@ const flashRoutes = ['emb', 'emd']
 // The server matches this path in its own case only.
 const playerPath = '/iframe.php'
 
-// The watch page is `/watch/{id}/{slug}/{kind}`, and neither the slug nor the kind is in the
-// embed, so no `url` is minted.
 const composeEmbed = (id: string): EmbedResolverResult => {
   return {
     provider,
     id,
     src: `https://traileraddict.com/iframe.php${composeQuery({ id })}`,
+    url: `https://traileraddict.com/watch/${encodePathSegment(id)}`,
     ratio: '16/9',
   }
 }
