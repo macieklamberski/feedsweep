@@ -10,9 +10,8 @@ const washingtonpostHosts = ['washingtonpost.com']
 const embedPathRegex = /^\/video\/c\/embed\/([^/]+)\/?$/
 const inlinePathRegex = /\/([^/]+)_inline\.html$/
 
-// The Washington Post video player. The 2012 inline player, `/{section}/{slug}/{y}/{m}/{d}/
-// {id}_inline.html`, answers 504 for every id. One whose id is a video uuid plays on the embed
-// route, and the older `gJQA…` ids name no uuid.
+// The Washington Post video player. The 2012 inline player, `{id}_inline.html`, is rebuilt onto
+// the embed route when its id is a video uuid. The older `gJQA…` ids name no uuid.
 export const washingtonpostResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, washingtonpostHosts)
 
