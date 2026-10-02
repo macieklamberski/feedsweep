@@ -8,8 +8,8 @@ const provider = 'art19'
 
 const art19Hosts = ['art19.com']
 
-// The server matches the route words and the show in their case only, and the episode uuid in
-// any case.
+// The server matches the route words and a slug show in their case only, and a uuid show and the
+// episode uuid in any case.
 const playerPathRegex = /^\/shows\/([^/]+)(?:\/episodes\/([^/]+))?\/embed\/?$/
 
 // An ART19 player, of one episode or of a whole show. The show is its slug or its uuid, and the
@@ -40,7 +40,7 @@ export const art19ResolveEmbed: ResolveEmbed = (url, element) => {
     id: show,
     src: `https://art19.com/shows/${show}/embed`,
     url: `https://art19.com/shows/${show}`,
-    height: 546,
+    height: 505,
     title: attr(element, 'title'),
   }
 }

@@ -27,7 +27,7 @@ describe('art19ResolveEmbed', () => {
         id: 'broadcast-dialogue',
         src: 'https://art19.com/shows/broadcast-dialogue/embed',
         url: 'https://art19.com/shows/broadcast-dialogue',
-        height: 546,
+        height: 505,
       }
 
       expect(art19ResolveEmbed(value)).toEqual(expected)
@@ -178,7 +178,7 @@ describeForEachParser('art19EmbedResolver', (parseHtml) => {
         id: 'kim-and-ket-stay-alive-maybe',
         src: 'https://art19.com/shows/kim-and-ket-stay-alive-maybe/embed',
         url: 'https://art19.com/shows/kim-and-ket-stay-alive-maybe',
-        height: 546,
+        height: 505,
         title: 'Kim and Ket Stay Alive... Maybe',
       }
 
