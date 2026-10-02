@@ -1,16 +1,13 @@
 import { getPathSegments } from 'trousse'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr } from '../utils/dom.js'
+import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tickettailor'
 
 const tickettailorHosts = ['tickettailor.com']
-
-// A ticket list's height follows its events, and the frame reports one only after the parent's
-// iframe-resizer handshake.
-const widgetHeight = 451
 
 const readKey = (segments: Array<string>): string | undefined => {
   const [route, first, second, third, fourth, fifth] = segments
@@ -47,7 +44,6 @@ const composeEmbed = (page: URL): EmbedResolverResult | undefined => {
     id: key,
     src: `${pageUrl}?widget=true`,
     url: key.startsWith('checkout/') ? undefined : pageUrl,
-    height: widgetHeight,
   }
 }
 
@@ -98,3 +94,12 @@ export const tickettailorScriptEmbedResolver = createMarkupEmbedResolver(
     return result
   },
 )
+
+// A ticket list's height follows its events, and the frame reports one only to a parent that
+// starts iframe-resizer.
+export const tickettailorRenderHint: EmbedRenderHint = {
+  provider,
+  origin: 'https://www.tickettailor.com',
+  requestHeight: iframeResizerHeightRequest,
+  readHeight: readIframeResizerHeight,
+}

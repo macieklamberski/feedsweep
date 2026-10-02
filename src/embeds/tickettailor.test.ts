@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
-import { tickettailorScriptEmbedResolver } from './tickettailor.js'
+import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
+import { tickettailorRenderHint, tickettailorScriptEmbedResolver } from './tickettailor.js'
 
 describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, tickettailorScriptEmbedResolver)
@@ -28,7 +29,6 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
         id: 'rivalthereimaginingvalueactionlab',
         src: 'https://www.tickettailor.com/all-tickets/rivalthereimaginingvalueactionlab/?widget=true',
         url: 'https://www.tickettailor.com/all-tickets/rivalthereimaginingvalueactionlab/',
-        height: 451,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -50,7 +50,6 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
         id: 'aneti/2443115',
         src: 'https://www.tickettailor.com/events/aneti/2443115/select-date?widget=true',
         url: 'https://www.tickettailor.com/events/aneti/2443115/select-date',
-        height: 451,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -71,7 +70,6 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
         provider: 'tickettailor',
         id: 'checkout/8625469',
         src: 'https://www.tickettailor.com/checkout/new-session/id/8625469/chk/410ded8446b6a1390609c46a1bbf7462/?widget=true',
-        height: 451,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -93,7 +91,6 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
         id: 'witneyconservativesassociation/2143010',
         src: 'https://www.tickettailor.com/events/witneyconservativesassociation/2143010/select-date?widget=true',
         url: 'https://www.tickettailor.com/events/witneyconservativesassociation/2143010/select-date',
-        height: 451,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -113,7 +110,6 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
         id: 'aneti',
         src: 'https://www.tickettailor.com/all-tickets/aneti/?widget=true',
         url: 'https://www.tickettailor.com/all-tickets/aneti/',
-        height: 451,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -329,7 +325,7 @@ describeForEachParser('the fallback the Ticket Tailor snippet carries', (parseHt
       </div>
     `
     const expected =
-      '<div data-embed-height="451" data-embed-url="https://www.tickettailor.com/all-tickets/aneti/" data-embed-id="aneti" data-embed-provider="tickettailor" data-embed-src="https://www.tickettailor.com/all-tickets/aneti/?widget=true"></div>'
+      '<div data-embed-url="https://www.tickettailor.com/all-tickets/aneti/" data-embed-id="aneti" data-embed-provider="tickettailor" data-embed-src="https://www.tickettailor.com/all-tickets/aneti/?widget=true"></div>'
 
     expect(await convert(value)).toEqualHtml(expected)
   })
@@ -371,8 +367,21 @@ describeForEachParser('the fallback the Ticket Tailor snippet carries', (parseHt
       </div>
     `
     const expected =
-      '<p><a href="https://www.tickettailor.com/all-tickets/otherbox/">Click here to buy tickets</a></p><div data-embed-height="451" data-embed-url="https://www.tickettailor.com/all-tickets/aneti/" data-embed-id="aneti" data-embed-provider="tickettailor" data-embed-src="https://www.tickettailor.com/all-tickets/aneti/?widget=true"></div>'
+      '<p><a href="https://www.tickettailor.com/all-tickets/otherbox/">Click here to buy tickets</a></p><div data-embed-url="https://www.tickettailor.com/all-tickets/aneti/" data-embed-id="aneti" data-embed-provider="tickettailor" data-embed-src="https://www.tickettailor.com/all-tickets/aneti/?widget=true"></div>'
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describe('tickettailorRenderHint', () => {
+  it('should start iframe-resizer and read the height the widget answers with', () => {
+    const expected: EmbedRenderHint = {
+      provider: 'tickettailor',
+      origin: 'https://www.tickettailor.com',
+      requestHeight: iframeResizerHeightRequest,
+      readHeight: readIframeResizerHeight,
+    }
+
+    expect(tickettailorRenderHint).toEqual(expected)
   })
 })
