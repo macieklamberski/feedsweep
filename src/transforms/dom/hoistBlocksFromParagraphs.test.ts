@@ -292,6 +292,15 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
       expect(await transformParagraph(value)).toEqualHtml(expected)
     })
 
+    it('should lift every wrapper that holds only the player', async () => {
+      const value =
+        '<a href="https://example.com/clip"><span><video controls><source src="https://example.com/clip.mp4"><p>No video</p></video></span></a>'
+      const expected =
+        '<a href="https://example.com/clip"><span><video controls><source src="https://example.com/clip.mp4"><p>No video</p></video></span></a>'
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
     it('should leave a link that holds more than the player behind', async () => {
       const value = html`
         <a href="https://example.com/clip">Watch <video controls>
