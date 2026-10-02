@@ -2,22 +2,34 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { blubrryEmbedResolver, blubrryResolveEmbed, extractBlubrryEmbed } from './blubrry.js'
+import {
+  type BlubrryPlayer,
+  blubrryEmbedResolver,
+  blubrryResolveEmbed,
+  extractBlubrryEmbed,
+} from './blubrry.js'
 
 describe('extractBlubrryEmbed', () => {
   it('should read an episode id', () => {
     const value = 'https://player.blubrry.com/id/12345678/'
-    const expected = '12345678'
+    const expected: BlubrryPlayer = { kind: 'episode', id: '12345678' }
 
-    expect(extractBlubrryEmbed(value)).toBe(expected)
+    expect(extractBlubrryEmbed(value)).toEqual(expected)
   })
 
   it('should read a media url', () => {
     const value =
       'https://player.blubrry.com/?media_url=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3'
-    const expected = 'https://media.blubrry.com/show/ep.mp3'
+    const expected: BlubrryPlayer = { kind: 'media', id: 'https://media.blubrry.com/show/ep.mp3' }
 
-    expect(extractBlubrryEmbed(value)).toBe(expected)
+    expect(extractBlubrryEmbed(value)).toEqual(expected)
+  })
+
+  it('should read an episode id that is not digits by its route', () => {
+    const value = 'https://player.blubrry.com/id/abc123x/'
+    const expected: BlubrryPlayer = { kind: 'episode', id: 'abc123x' }
+
+    expect(extractBlubrryEmbed(value)).toEqual(expected)
   })
 
   it('should return undefined for a blubrry url naming nothing', () => {
@@ -54,6 +66,18 @@ describe('blubrryResolveEmbed', () => {
       provider: 'blubrry',
       id: 'https://media.blubrry.com/show/ep.mp3',
       src: 'https://player.blubrry.com/?media_url=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3',
+      height: 164,
+    }
+
+    expect(blubrryResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should use an episode id that is not digits as written, even if the player answers an error', () => {
+    const value = 'https://player.blubrry.com/id/abc123x/'
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: 'abc123x',
+      src: 'https://player.blubrry.com/id/abc123x/',
       height: 164,
     }
 
