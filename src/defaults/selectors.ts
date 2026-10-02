@@ -323,6 +323,8 @@ export const defaultRevealableSelectors = [
   // Spoilers.
   '[class*="spoiler" i]', // `spoilermain`, `spoiler_div`, uCoz `uSpoilerText`, Easy Spoiler `easySpoilerSpoils`.
   '[id^="spoiler"]', // Easy Spoiler `spoilerDiv` panel.
+  '.alt2 > div', // vBulletin spoiler BB code, also pasted into SMF, phpBB 2, MyBB and Blogger posts.
+  '.quotecontent > div', // phpBB spoiler BB code, also on SMF and XenForo 1 boards.
 
   // Tabs.
   '[id^="rlta-panel"]', // Regular Labs Tabs and Accordions.
