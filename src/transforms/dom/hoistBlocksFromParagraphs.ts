@@ -1,25 +1,47 @@
 import type { DomTransform } from '../../types.js'
-import { blockElements, hasText, mediaSelector } from '../../utils/dom.js'
+import { blockElements, hasText, isWhitespaceText, mediaSelector } from '../../utils/dom.js'
 
 const blockInParagraphSelector = [...blockElements].map((tag) => `p ${tag}`).join(', ')
 const blockSelector = [...blockElements].join(', ')
-const playerChildTags = ['param', 'source', 'track']
 
 // A paragraph half left with neither text nor media renders as a blank line. One that
-// kept either stays, and so does a media element left holding only its <source>.
+// kept either stays.
 const hasRenderableContent = (element: Element): boolean => {
-  return (
-    hasText(element) ||
-    element.matches(mediaSelector) ||
-    element.querySelector(mediaSelector) !== null
-  )
+  return hasText(element) || element.querySelector(mediaSelector) !== null
 }
 
-const hoistBlockFromParagraph = (block: Element): void => {
-  const paragraph = block.parentElement?.closest('p')
+const hoistBlockFromParagraph = (inner: Element): void => {
+  const paragraph = inner.parentElement?.closest('p')
 
   if (!paragraph) {
     return
+  }
+
+  // A block in a media element's fallback takes the whole player out with it. Out of the
+  // paragraph, no reader's parser closes the player at the block, so the fallback stays hidden.
+  let block = inner
+  let ancestor = inner.parentElement
+
+  while (ancestor && ancestor !== paragraph) {
+    if (ancestor.matches(mediaSelector)) {
+      block = ancestor
+    }
+
+    ancestor = ancestor.parentElement
+  }
+
+  // A wrapper holding only the player, such as a link around it, comes out with it.
+  while (block !== inner && block.parentElement && block.parentElement !== paragraph) {
+    const wrapper: Element = block.parentElement
+    const isOnlyContent = [...wrapper.childNodes].every((node) => {
+      return node === block || isWhitespaceText(node)
+    })
+
+    if (!isOnlyContent) {
+      break
+    }
+
+    block = wrapper
   }
 
   let child: Node = block
@@ -36,20 +58,7 @@ const hoistBlockFromParagraph = (block: Element): void => {
     // An empty clone is a husk: an inline wrapper whose only content was the block. It is
     // not carried into the trailing half.
     if (trailing && trailing.childNodes.length > 0) {
-      // A block's start tag closes its paragraph and any <audio> or <video> open in it, and a
-      // dead <object> renders its fallback anyway. So the rest of any media element's fallback
-      // moves out bare, while the player keeps its sources, tracks and params.
-      if (trailing.matches(mediaSelector)) {
-        for (const element of [...trailing.children]) {
-          if (playerChildTags.includes(element.localName)) {
-            child.appendChild(element)
-          }
-        }
-
-        clone.prepend(...trailing.childNodes)
-      } else {
-        clone.insertBefore(trailing, clone.firstChild)
-      }
+      clone.insertBefore(trailing, clone.firstChild)
     }
 
     trailing = clone
