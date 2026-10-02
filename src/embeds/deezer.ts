@@ -18,7 +18,7 @@ const deezerHeights = toMap({
   show: 300,
 })
 
-// The dead plugin player names a resource with a plural, and a podcast with the word `podcast`
+// The classic plugin player names a resource with a plural, and a podcast with the word `podcast`
 // where the widget path says `show`. Verified live 2026-09-06: the plugin's `type=podcast&id=32049`
 // is the widget's `/widget/dark/show/32049`, which plays StarTalk Radio.
 const pluginTypes = toMap({
@@ -58,8 +58,8 @@ const readResource = (url: URL): Resource | undefined => {
     return { type: route[2] ?? '', id: route[3] ?? '', theme: route[1] ?? '' }
   }
 
-  // The classic plugin player, `deezer.com/plugins/player?type={type}&id={id}`. It answers 200 and
-  // renders Deezer's own "Page not found" for every id, real ones included.
+  // The classic plugin player, `deezer.com/plugins/player?type={type}&id={id}`. It redirects to
+  // the current widget, which is minted here directly.
   if (route[0] === 'plugins' && route[1] === 'player') {
     return { type: pluginTypes.get(query('type')) ?? '', id: query('id'), theme }
   }
