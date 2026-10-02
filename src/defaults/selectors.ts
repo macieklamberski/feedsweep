@@ -28,7 +28,7 @@ export const defaultNonContentSelectors = [
   '[class*="et_bloom"]',
   '.wpforms-container', // WPForms.
   '[class*="tve-leads"]', // Thrive Leads optin.
-  'form[action*=".list-manage"]', // Mailchimp embedded signup form, posting to `{account}.us{n}.list-manage.com`.
+  'form[action*=".list-manage"]:not(:has(img, picture, video, iframe))', // Mailchimp embedded signup form, posting to `{account}.us{n}.list-manage.com`, unless the author put media in it.
 
   // Site contact and lead forms, the same form under every post of the site.
   'form.et_pb_contact_form', // Divi contact form module.
@@ -41,7 +41,7 @@ export const defaultNonContentSelectors = [
 
   // Site search forms.
   'form[role="search"]', // Theme search form with its ARIA role.
-  'form:has(input[name="s"])', // WordPress search form without the role, named by the `s` query WordPress searches on.
+  'form:has(input[name="s"]:not([type="submit"]))', // WordPress search form without the role, named by the `s` query WordPress searches on.
 
   // Ad slots.
   '.adsbygoogle', // Google AdSense ad slot.

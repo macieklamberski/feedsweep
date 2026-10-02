@@ -33,7 +33,7 @@ const specimens: Record<string, string | [string, string]> = {
     '<div class="sqs-block newsletter-block sqs-block-newsletter"><form><input type="email"></form></div>',
   '.wpforms-container': '<div class="wpforms-container"><form></form></div>',
   '[class*="tve-leads"]': '<div class="tve-leads-conversion-object"></div>',
-  'form[action*=".list-manage"]':
+  'form[action*=".list-manage"]:not(:has(img, picture, video, iframe))':
     '<form action="https://example.us8.list-manage.com/subscribe/post?u=6812a77ff87af5e2479fffcec&amp;id=2fe16a669" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank"><div id="mc_embed_signup_scroll"><h2>Subscribe to my mailing list</h2><div class="mc-field-group"><label for="mce-EMAIL">Email Address</label><input type="email" name="EMAIL" class="required email" id="mce-EMAIL"></div><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div></form>',
   'form.et_pb_contact_form':
     '<form class="et_pb_contact_form clearfix" method="post" action="https://example.com/patio-rejuvenation/"><p class="et_pb_contact_field et_pb_contact_field_0"><label for="et_pb_contact_name_0" class="et_pb_contact_form_label">Name</label><input type="text" id="et_pb_contact_name_0" class="input" name="et_pb_contact_name_0" placeholder="Name"></p><p class="et_pb_contact_field et_pb_contact_field_1"><label for="et_pb_contact_email_0" class="et_pb_contact_form_label">Email Address</label><input type="text" id="et_pb_contact_email_0" class="input" name="et_pb_contact_email_0" placeholder="Email Address"></p><div class="et_contact_bottom_container"><button type="submit" name="et_builder_submit_button" class="et_pb_contact_submit et_pb_button">Submit</button></div></form>',
@@ -45,7 +45,7 @@ const specimens: Record<string, string | [string, string]> = {
     '<form class="vote-form" id="rate-widget-base-form" action="/taxonomy/term/8744/feed" method="post" accept-charset="UTF-8"><table class="rating-table"><tr class="rating-table-tr"><td class="rating-table-td">Was this article useful?</td></tr><tr class="rating-table-tr"><td class="rating-table-td"><div class="thumbsup-rating-wrapper rate-enabled"><label class="rating-label thumbsup-rating-label thumbsup-rating-label-up"><input class="rating-input thumbsup-rating-input form-radio" type="radio" id="edit-value-1" name="value" value="1"></label><div class="rating-option-result">0</div></div><input class="thumbsup-rating-submit button form-submit" type="submit" id="edit-submit--2" name="op" value="OK"></td></tr></table></form>',
   'form[role="search"]':
     '<form id="searchwp-form-1" role="search" method="get" class="searchwp-form" action="https://example.com/" aria-label="Search"><input type="hidden" name="swp_form[form_id]" value="1"><div class="searchwp-form-input-container swp-items-stretch"><input type="search" class="swp-input--search swp-input" name="swps" aria-label="Search"></div><input type="submit" class="search-submit swp-button" value="archive search"></form>',
-  'form:has(input[name="s"])':
+  'form:has(input[name="s"]:not([type="submit"]))':
     '<form class="e-search-form" action="https://example.com/blog" method="get"><label class="e-search-label" for="search-f088e24"><span class="elementor-screen-only">Search</span></label><div class="e-search-input-wrapper"><input id="search-f088e24" placeholder="Search" class="e-search-input" type="search" name="s" value=""></div><button class="e-search-submit" type="submit">Search</button></form>',
   '.adsbygoogle':
     '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-x" data-ad-slot="123"></ins>',
@@ -857,6 +857,51 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
         <form action="https://example.com/wp-login.php?action=postpass" class="post-password-form" method="post">
           <p>This content is password protected. To view it please enter your password below:</p>
           <p><label for="pwbox-531">Password: <input name="post_password" id="pwbox-531" type="password"></label> <input type="submit" name="Submit" value="Enter"></p>
+        </form>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a Mailchimp form the author put the post photo in', async () => {
+      const value = html`
+        <form action="https://example.us8.list-manage.com/subscribe/post?u=1&amp;id=2" method="post" class="validate">
+          <h2><img src="https://example.com/street-photo.jpg" alt="On Reading"></h2>
+          <input type="email" name="EMAIL">
+          <input type="submit" value="Subscribe">
+        </form>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a validated form that posts to another host', async () => {
+      const value = html`
+        <form action="https://example.com/register" method="post" class="validate">
+          <p>Choose a workshop date.</p>
+          <input type="date" name="date">
+        </form>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a poll named vote-form without the Rate widget id', async () => {
+      const value = html`
+        <form class="vote-form" action="https://example.com/poll" method="post">
+          <p>Which route should the new tram line take?</p>
+          <label><input type="radio" name="route" value="a"> Along the river</label>
+        </form>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a form whose submit button is named s', async () => {
+      const value = html`
+        <form action="https://example.com/pokedex" method="get">
+          <input type="text" name="q">
+          <input type="submit" name="s" value="Look up">
         </form>
       `
 
