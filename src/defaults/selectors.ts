@@ -259,3 +259,31 @@ export const defaultPreservedPreClasses = [
   'wp-block-verse', // WordPress Gutenberg Verse block: poems, lyrics, scripture stanzas.
   'wp-block-preformatted', // WordPress Gutenberg Preformatted block: author-chosen distinct blocks (ToCs, quotes, numbered headings).
 ]
+
+// Slider, gallery, spoiler, accordion and tab containers a plugin hides until a click or its
+// script shows them. `stripHiddenElements` unhides a hidden element matching one of these.
+export const defaultRevealableSelectors = [
+  // Accordions and collapsible blocks.
+  '[class*="accordion"]', // Accordion blocks such as `text-accordion-content`.
+  '[class*="collaps"]', // Wikidot `collapsible-block-unfolded`.
+  // Read more toggles.
+  '[id^="fv-more-text"]', // FV Read More.
+  '.yrm-content', // Read More by Edmon.
+  // Carousels, galleries and sliders.
+  '[class*="carousel"]', // Premium Addons `premium-adv-carousel`.
+  '.esg-grid', // Essential Grid.
+  '[class*="gallery"]', // Unite Gallery, `crp-light-gallery`.
+  '[class*="slider"]', // bxSlider, Revolution Slider, SiteOrigin `sow-slider-base`.
+  '[id^="rev_slider"]', // Revolution Slider wrapper, which carries the name in its id only.
+  '[class^="slide-"]', // MetaSlider slide.
+  '.field-slideshow-slide', // Drupal Field Slideshow slide.
+  '.swiper-slide', // Swiper slide.
+  '.testimonial_slide', // Testimonial slider slide.
+  // Spoilers.
+  '[class*="spoiler"]', // `spoilermain`, `spoilerbody`, `spoiler_div`.
+  '[class*="Spoiler"]', // uCoz `uSpoilerText`, Easy Spoiler `easySpoilerSpoils`.
+  '[id^="spoiler"]',
+  // Tabs.
+  '[id^="rlta-panel"]', // Regular Labs Tabs and Accordions.
+  '[id^="wiki-tab"]', // Wikidot tabs.
+]

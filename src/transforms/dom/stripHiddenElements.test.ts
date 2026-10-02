@@ -1,31 +1,88 @@
 import { describe, expect, it } from 'bun:test'
+import { defaultRevealableSelectors } from '../../defaults.js'
 import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { stripHiddenElements } from './stripHiddenElements.js'
 
-const revealableClassNames = [
-  'text-accordion-content',
-  'premium-adv-carousel__inner-container',
-  'collapsible-block-unfolded',
-  'esg-grid',
-  'unite-gallery',
-  'fv-more-text-1',
-  'rlta-panel-sources',
-  'bxslider-1',
-  'rev_slider_1_1',
-  'sow-slider-base',
-  'slider_1',
-  'slide-1',
-  'field-slideshow-slide',
-  'swiper-slide',
-  'hidden-slide',
-  'testimonial_slide',
-  'uSpoilerText',
-  'wiki-tab-0-2',
-  'yrm-content-1',
-]
+// One real-world specimen per default revealable selector, keyed by the selector itself, as the
+// hidden input and the unhidden output. The completeness test keeps it in step with
+// defaultRevealableSelectors.
+const specimens: Record<string, [string, string]> = {
+  '[class*="accordion"]': [
+    '<div class="text-accordion-content" style="display:none">Panel</div>',
+    '<div class="text-accordion-content">Panel</div>',
+  ],
+  '[class*="collaps"]': [
+    '<div class="collapsible-block-unfolded" style="display:none">Panel</div>',
+    '<div class="collapsible-block-unfolded">Panel</div>',
+  ],
+  '[id^="fv-more-text"]': [
+    '<div id="fv-more-text-1" style="display:none">Panel</div>',
+    '<div id="fv-more-text-1">Panel</div>',
+  ],
+  '.yrm-content': [
+    '<div class="yrm-content yrm-content-1 yrm-content-hide" style="display:none">Panel</div>',
+    '<div class="yrm-content yrm-content-1 yrm-content-hide">Panel</div>',
+  ],
+  '[class*="carousel"]': [
+    '<div class="premium-adv-carousel__inner-container" style="display:none">Panel</div>',
+    '<div class="premium-adv-carousel__inner-container">Panel</div>',
+  ],
+  '.esg-grid': [
+    '<div class="esg-grid" id="esg-grid-1-1" style="display:none">Panel</div>',
+    '<div class="esg-grid" id="esg-grid-1-1">Panel</div>',
+  ],
+  '[class*="gallery"]': [
+    '<div class="unite-gallery tiles" id="gg_1_1" style="display:none">Panel</div>',
+    '<div class="unite-gallery tiles" id="gg_1_1">Panel</div>',
+  ],
+  '[class*="slider"]': [
+    '<ul class="bxslider-1" style="display:none"><li>Panel</li></ul>',
+    '<ul class="bxslider-1"><li>Panel</li></ul>',
+  ],
+  '[id^="rev_slider"]': [
+    '<div id="rev_slider_1_1_wrapper" style="display:none">Panel</div>',
+    '<div id="rev_slider_1_1_wrapper">Panel</div>',
+  ],
+  '[class^="slide-"]': [
+    '<div class="slide-1 ms-image" style="display:none">Panel</div>',
+    '<div class="slide-1 ms-image">Panel</div>',
+  ],
+  '.field-slideshow-slide': [
+    '<div class="field-slideshow-slide field-slideshow-slide-2 odd" style="display:none">Panel</div>',
+    '<div class="field-slideshow-slide field-slideshow-slide-2 odd">Panel</div>',
+  ],
+  '.swiper-slide': [
+    '<div class="swiper-slide hidden-slide" style="display:none">Panel</div>',
+    '<div class="swiper-slide hidden-slide">Panel</div>',
+  ],
+  '.testimonial_slide': [
+    '<div class="testimonial_slide" style="display:none">Panel</div>',
+    '<div class="testimonial_slide">Panel</div>',
+  ],
+  '[class*="spoiler"]': [
+    '<div class="spoilermain" id="1" style="display:none">Panel</div>',
+    '<div class="spoilermain" id="1">Panel</div>',
+  ],
+  '[class*="Spoiler"]': [
+    '<div class="uSpoilerText" style="display:none">Panel</div>',
+    '<div class="uSpoilerText">Panel</div>',
+  ],
+  '[id^="spoiler"]': [
+    '<div id="spoiler1" style="display:none">Panel</div>',
+    '<div id="spoiler1">Panel</div>',
+  ],
+  '[id^="rlta-panel"]': [
+    '<div id="rlta-panel-sources" style="display:none">Panel</div>',
+    '<div id="rlta-panel-sources">Panel</div>',
+  ],
+  '[id^="wiki-tab"]': [
+    '<div id="wiki-tab-0-2" style="display:none">Panel</div>',
+    '<div id="wiki-tab-0-2">Panel</div>',
+  ],
+}
 
 describeForEachParser('stripHiddenElements', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
@@ -208,11 +265,18 @@ describeForEachParser('stripHiddenElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it.each(revealableClassNames)('should keep a %s panel', async (name) => {
-      const value = `<div class="${name}" style="display:none">Second panel</div>`
-      const expected = `<div class="${name}">Second panel</div>`
+    it.each(Object.entries(specimens))(
+      'should keep a %s panel',
+      async (_selector, [value, expected]) => {
+        expect(await transform(value)).toEqualHtml(expected)
+      },
+    )
 
-      expect(await transform(value)).toEqualHtml(expected)
+    it('should have a specimen for every default revealable selector', () => {
+      const specimenSelectors = Object.keys(specimens).sort()
+      const defaultSelectors = [...defaultRevealableSelectors].sort()
+
+      expect(specimenSelectors).toEqual(defaultSelectors)
     })
 
     it('should keep a spoiler holding only text', async () => {

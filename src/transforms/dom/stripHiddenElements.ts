@@ -3,11 +3,6 @@ import type { DomTransform } from '../../types.js'
 import { attr, isElementHidden } from '../../utils/dom.js'
 import * as styles from '../../utils/styles.js'
 
-// Slider, gallery, spoiler, accordion and tab plugins that hide a panel until a click or a timer
-// shows it: bxSlider, Revolution Slider, Unite Gallery, Essential Grid, Regular Labs Tabs and
-// Accordions, Read More plugins, Wikidot tabs and collapsibles.
-const revealableNameRegex =
-  /accordion|carousel|collaps|esg-grid|gallery|more-text|rlta-panel|slider|(?:^|[\s_-])slides?(?:$|[\s_-])|spoiler|wiki-tab|yrm-content/i
 const dialogNameRegex = /lightbox|modal/i
 
 const nameOf = (element: Element): string => {
@@ -38,7 +33,7 @@ const isReferenced = (element: Element): boolean => {
 }
 
 // A named slider, spoiler or tab panel, a player, find-in-page content, or a block a control names.
-const isRevealable = (element: Element): boolean => {
+const isRevealable = (element: Element, revealableSelector: string): boolean => {
   if (isChrome(element)) {
     return false
   }
@@ -46,7 +41,7 @@ const isRevealable = (element: Element): boolean => {
   return (
     isAnyOf(attr(element, 'hidden'), 'until-found') ||
     element.matches('audio, video, [role="tabpanel"]') ||
-    revealableNameRegex.test(nameOf(element)) ||
+    element.matches(revealableSelector) ||
     isReferenced(element)
   )
 }
@@ -71,7 +66,9 @@ const unhideTree = (root: Element): void => {
 
 // An element hidden inline or by attribute is an email preheader, a JS-only widget's shell, or a
 // panel a script reveals. Only the last is content.
-export const stripHiddenElements: DomTransform = () => {
+export const stripHiddenElements: DomTransform = ({ revealableSelectors }) => {
+  const revealableSelector = revealableSelectors.join(', ')
+
   return (document) => {
     for (const element of document.querySelectorAll('[hidden], [style]')) {
       // Treating opacity:0 as hidden here deletes content that only fades in.
@@ -79,7 +76,7 @@ export const stripHiddenElements: DomTransform = () => {
         continue
       }
 
-      if (isRevealable(element)) {
+      if (isRevealable(element, revealableSelector)) {
         unhideTree(element)
         continue
       }
