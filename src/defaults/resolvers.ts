@@ -45,6 +45,7 @@ import { appleEmbedResolver, appleToolsEmbedResolver } from '../embeds/apple.js'
 import { arcgisEmbedResolver } from '../embeds/arcgis.js'
 import { archiveFlashEmbedResolver, archiveIframeEmbedResolver } from '../embeds/archive.js'
 import { ardmediathekEmbedResolver } from '../embeds/ardmediathek.js'
+import { art19EmbedResolver } from '../embeds/art19.js'
 import { arteEmbedResolver } from '../embeds/arte.js'
 import { audioboomIframeEmbedResolver, audioboomWidgetEmbedResolver } from '../embeds/audioboom.js'
 import { audiomackEmbedResolver } from '../embeds/audiomack.js'
@@ -435,6 +436,7 @@ const embedResolvers: Array<EmbedResolver> = [
   archiveIframeEmbedResolver,
   archiveFlashEmbedResolver,
   ardmediathekEmbedResolver,
+  art19EmbedResolver,
   arteEmbedResolver,
   audioboomIframeEmbedResolver,
   audioboomWidgetEmbedResolver,
