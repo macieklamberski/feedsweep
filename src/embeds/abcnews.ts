@@ -11,7 +11,7 @@ const abcnewsHosts = ['abcnews.com', 'abcnews.go.com']
 // The server matches the route words in any case.
 const playerPathRegex = /^\/video\/embed\/?$/i
 
-// ABC News' video player, `/video/embed?id={id}`. The share dialog writes it on the site's own
+// ABC News' video player, `/video/embed?id={id}`. The site's own script builds it on the site's
 // host, which is `abcnews.com` today.
 export const abcnewsResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, abcnewsHosts)
