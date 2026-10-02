@@ -176,26 +176,13 @@ describe('podomaticResolveEmbed', () => {
   })
 
   describe('the current player, which names a podcast and picks an episode out of it', () => {
-    it('should take the episode the parameter names', () => {
+    it('should take the episode the parameter names and drop the theme', () => {
       const value =
         'https://www.podomatic.com/embed/v2/podcast/5476235?episode_id=11083318&theme=light'
       const expected: EmbedResolverResult = {
         provider: 'podomatic',
         id: 'episode/11083318',
-        src: 'https://podomatic.com/embed/v2/podcast/5476235?episode_id=11083318&theme=light',
-        height: 205,
-      }
-
-      expect(podomaticResolveEmbed(value)).toEqual(expected)
-    })
-
-    it('should keep a theme value from minting a parameter of its own', () => {
-      const value =
-        'https://www.podomatic.com/embed/v2/podcast/5476235?episode_id=11083318&theme=light%26autoplay%3Dtrue'
-      const expected: EmbedResolverResult = {
-        provider: 'podomatic',
-        id: 'episode/11083318',
-        src: 'https://podomatic.com/embed/v2/podcast/5476235?episode_id=11083318&theme=light%26autoplay%3Dtrue',
+        src: 'https://podomatic.com/embed/v2/podcast/5476235?episode_id=11083318',
         height: 205,
       }
 

@@ -46,8 +46,8 @@ const readPlayer = (url: URL): Player | undefined => {
     }
   }
 
-  // embed/v2/podcast/{podcast}?episode_id={episode}&theme={theme} is the snippet Podomatic hands
-  // out today, and its episode_id is the id the html5 route takes in its path.
+  // embed/v2/podcast/{podcast}?episode_id={episode} is the snippet Podomatic hands out today, and
+  // its episode_id is the id the html5 route takes in its path.
   if (segments[1] === 'v2' && segments[2] === 'podcast') {
     const podcast = segments[3]
 
@@ -56,15 +56,12 @@ const readPlayer = (url: URL): Player | undefined => {
     }
 
     const episode = url.searchParams.get('episode_id') ?? ''
-    const theme = url.searchParams.get('theme')
     const named = episode ? composeQuery({ episode_id: episode }) : ''
-    // The theme comes back decoded, so unencoded it could smuggle a second parameter.
-    const themed = theme && named ? `&theme=${encodeURIComponent(theme)}` : ''
 
     return {
       kind: named ? 'episode' : 'podcast',
       id: named ? episode : podcast,
-      src: `https://podomatic.com/embed/v2/podcast/${podcast}${named}${themed}`,
+      src: `https://podomatic.com/embed/v2/podcast/${podcast}${named}`,
       height: currentHeight,
     }
   }
