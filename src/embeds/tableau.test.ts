@@ -400,6 +400,87 @@ describeForEachParser('tableauIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('the viz page on the author profile', () => {
+    it('should build the viz frame from the workbook and sheet in the hash', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          src="https://public.tableau.com/profile/vizimpact#!/vizhome/HackerTeamClients-locationstatus/Sheet1"
+          width="100%"
+          height="600"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tableau',
+        id: 'HackerTeamClients-locationstatus',
+        src: 'https://public.tableau.com/views/HackerTeamClients-locationstatus/Sheet1?:embed=y&:showVizHome=no',
+        url: 'https://public.tableau.com/views/HackerTeamClients-locationstatus/Sheet1',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the settings written after the sheet in the hash', async () => {
+      const value = html`
+        <iframe
+          src="https://public.tableau.com/profile/fabian.prideaux#!/vizhome/ARCDPAnalysis/ARCDPAnalysis?:showVizHome=no&amp;:embed=true"
+          width="645"
+          height="955"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tableau',
+        id: 'ARCDPAnalysis',
+        src: 'https://public.tableau.com/views/ARCDPAnalysis/ARCDPAnalysis?:embed=y&:showVizHome=no',
+        url: 'https://public.tableau.com/views/ARCDPAnalysis/ARCDPAnalysis',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore a hash that names a workbook and no sheet', async () => {
+      const value =
+        '<iframe src="https://public.tableau.com/profile/vizimpact#!/vizhome/HackerTeamClients-locationstatus"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a hash with a viz on a page that is not a profile', async () => {
+      const value =
+        '<iframe src="https://public.tableau.com/gallery#!/vizhome/HackerTeamClients-locationstatus/Sheet1"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a profile path under another prefix', async () => {
+      const value =
+        '<iframe src="https://public.tableau.com/x/profile/vizimpact#!/vizhome/HackerTeamClients-locationstatus/Sheet1"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a profile path with a trailing segment', async () => {
+      const value =
+        '<iframe src="https://public.tableau.com/profile/vizimpact/x#!/vizhome/HackerTeamClients-locationstatus/Sheet1"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a vizhome hash under another prefix', async () => {
+      const value =
+        '<iframe src="https://public.tableau.com/profile/vizimpact#!/x/vizhome/HackerTeamClients-locationstatus/Sheet1"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a vizhome hash with a trailing segment', async () => {
+      const value =
+        '<iframe src="https://public.tableau.com/profile/vizimpact#!/vizhome/HackerTeamClients-locationstatus/Sheet1/x"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
 })
 
 describe('readTableauHeight', () => {
