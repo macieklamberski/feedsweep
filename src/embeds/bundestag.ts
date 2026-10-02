@@ -11,10 +11,9 @@ const idParams = toMap({
   'player/macros/bttv/hls/player.js': 'content',
 })
 
-// The Bundestag media library's player, `webtv.bundestag.de/pservices/player/embed/nokey`, which
-// names the video in `c`, and its loader script `player/macros/bttv/hls/player.js`, which names it
-// in `content` and builds the same player into the page. The loader starts the on-demand config
-// `bt-od` under policy `69`, the values every frame writes as `e` and `ep`.
+// The Bundestag media library's player, `webtv.bundestag.de/pservices/player/embed/nokey?c={id}`,
+// and its loader script `player/macros/bttv/hls/player.js?content={id}`, which builds the same
+// player with config `bt-od` and policy `69`, the values every frame writes as `e` and `ep`.
 export const bundestagResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, bundestagHosts)
 
