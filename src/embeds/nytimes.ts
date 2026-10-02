@@ -6,7 +6,8 @@ const provider = 'nytimes'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-const nytimesHosts = ['nytimes.com']
+// `static01.nyt.com` is the static host, which 301s the player onto `www.nytimes.com`.
+const nytimesHosts = ['nytimes.com', 'static01.nyt.com']
 
 // The player pages: the current one, which `graphics8.nytimes.com` 301s onto `www`, and the
 // Brightcove-era `bcvideo` one, which answers 400 for every id today. Both name the video the

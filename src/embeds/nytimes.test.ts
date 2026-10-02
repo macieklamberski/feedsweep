@@ -31,6 +31,19 @@ describe('nytimesResolveEmbed', () => {
       expect(nytimesResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should take the player from the static host', () => {
+      const value =
+        'https://static01.nyt.com/video/players/offsite/index.html?videoId=100000010648638'
+      const expected: EmbedResolverResult = {
+        provider: 'nytimes',
+        id: '100000010648638',
+        src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=100000010648638',
+        ratio: '16/9',
+      }
+
+      expect(nytimesResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should take the player from the graphics host', () => {
       const value =
         'https://graphics8.nytimes.com/video/players/offsite/index.html?videoId=100000004077071'
@@ -106,6 +119,31 @@ describeForEachParser('nytimesIframeEmbedResolver', (parseHtml) => {
       provider: 'nytimes',
       id: '100000007370133',
       src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=100000007370133',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should resolve the pasted player iframe on the static host', async () => {
+    const value = html`
+      <iframe
+        title="New York Times Video - Embed Player"
+        width="480"
+        height="373"
+        frameborder="0"
+        scrolling="no"
+        allowfullscreen="true"
+        marginheight="0"
+        marginwidth="0"
+        id="nyt_video_player"
+        src="https://static01.nyt.com/video/players/offsite/index.html?videoId=100000010648638"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'nytimes',
+      id: '100000010648638',
+      src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=100000010648638',
       ratio: '16/9',
     }
 
