@@ -7,10 +7,9 @@ const provider = 'radioradicale'
 
 const radioradicaleHosts = ['radioradicale.it']
 
-// The player's own script reads these from its query: the date and hour, the first and last
-// playlist item, the speech, and the start and end second. It also reads `a` and `m`, autoplay
-// and branding.
-const playbackParams = ['d', 'f', 'i', 'o', 'p', 's', 't']
+// The player's own script reads these from its query: the first and last playlist item, the
+// speech, and the start and end second. It also reads `a` and `m`, autoplay and branding.
+const playbackParams = ['f', 'i', 'p', 's', 't']
 
 // Radio Radicale's archive player, `/scheda/{id}/iframe`, which 301s to the same path with the
 // recording's slug inserted. The page `/scheda/{id}` does the same. The server matches the route

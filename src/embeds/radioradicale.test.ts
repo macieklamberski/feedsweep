@@ -33,12 +33,11 @@ describe('radioradicaleResolveEmbed', () => {
     })
 
     it('should keep every playback parameter the player reads', () => {
-      const value =
-        'https://www.radioradicale.it/scheda/638609/iframe?d=2021-06-10&f=1&i=251937&o=10:30&p=0&s=120&t=600'
+      const value = 'https://www.radioradicale.it/scheda/638609/iframe?f=1&i=251937&p=0&s=120&t=600'
       const expected: EmbedResolverResult = {
         provider: 'radioradicale',
         id: '638609',
-        src: 'https://www.radioradicale.it/scheda/638609/iframe?d=2021-06-10&f=1&i=251937&o=10%3A30&p=0&s=120&t=600',
+        src: 'https://www.radioradicale.it/scheda/638609/iframe?f=1&i=251937&p=0&s=120&t=600',
         url: 'https://www.radioradicale.it/scheda/638609',
         ratio: '16/9',
       }
@@ -54,6 +53,19 @@ describe('radioradicaleResolveEmbed', () => {
         id: '523655',
         src: 'https://www.radioradicale.it/scheda/523655/iframe?s=120',
         url: 'https://www.radioradicale.it/scheda/523655',
+        ratio: '16/9',
+      }
+
+      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the date and hour the player does not read', () => {
+      const value = 'https://www.radioradicale.it/scheda/638609/iframe?d=2021-06-10&o=10:30&s=120'
+      const expected: EmbedResolverResult = {
+        provider: 'radioradicale',
+        id: '638609',
+        src: 'https://www.radioradicale.it/scheda/638609/iframe?s=120',
+        url: 'https://www.radioradicale.it/scheda/638609',
         ratio: '16/9',
       }
 
