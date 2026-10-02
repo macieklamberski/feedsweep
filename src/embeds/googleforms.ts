@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'googleforms'
 
-const formHeight = 2175
+const formHeight = 600
 
 const shortLinkHost = 'forms.gle'
 

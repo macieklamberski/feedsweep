@@ -14,7 +14,7 @@ describe('googleformsResolveEmbed', () => {
         id: '1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg',
         src: 'https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform?embedded=true',
         url: 'https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform',
-        height: 2175,
+        height: 600,
       }
 
       expect(googleformsResolveEmbed(value)).toEqual(expected)
@@ -28,7 +28,7 @@ describe('googleformsResolveEmbed', () => {
         id: '10N9xJBPqhfOlC7OQN-6NXRoI0CXJpZxjkwQ_YF0H4m0',
         src: 'https://docs.google.com/forms/d/10N9xJBPqhfOlC7OQN-6NXRoI0CXJpZxjkwQ_YF0H4m0/viewform?embedded=true',
         url: 'https://docs.google.com/forms/d/10N9xJBPqhfOlC7OQN-6NXRoI0CXJpZxjkwQ_YF0H4m0/viewform',
-        height: 2175,
+        height: 600,
       }
 
       expect(googleformsResolveEmbed(value)).toEqual(expected)
@@ -42,7 +42,7 @@ describe('googleformsResolveEmbed', () => {
         id: '1FAIpQLSeRQfoqlU89dTkXX6r8aprQ9GMrwI3T6JQ7Rw1oFmpNOnV88Q',
         src: 'https://docs.google.com/forms/d/e/1FAIpQLSeRQfoqlU89dTkXX6r8aprQ9GMrwI3T6JQ7Rw1oFmpNOnV88Q/viewform?embedded=true',
         url: 'https://docs.google.com/forms/d/e/1FAIpQLSeRQfoqlU89dTkXX6r8aprQ9GMrwI3T6JQ7Rw1oFmpNOnV88Q/viewform',
-        height: 2175,
+        height: 600,
       }
 
       expect(googleformsResolveEmbed(value)).toEqual(expected)
@@ -56,7 +56,7 @@ describe('googleformsResolveEmbed', () => {
         id: '1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg',
         src: 'https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform?embedded=true&entry.553414390=SMA+Negeri+1',
         url: 'https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform',
-        height: 2175,
+        height: 600,
       }
 
       expect(googleformsResolveEmbed(value)).toEqual(expected)
@@ -69,7 +69,7 @@ describe('googleformsResolveEmbed', () => {
         id: '3mfiVWiFzt6E1hhx6',
         src: 'https://forms.gle/3mfiVWiFzt6E1hhx6',
         url: 'https://forms.gle/3mfiVWiFzt6E1hhx6',
-        height: 2175,
+        height: 600,
       }
 
       expect(googleformsResolveEmbed(value)).toEqual(expected)
@@ -133,7 +133,7 @@ describe('googleformsResolveEmbed', () => {
         id: '1FAIpQLSc9Bh47TQpW0PDuM-5NcoQjgDp_T2wV8xrX7SsXTLGMQwUdqA',
         src: 'https://docs.google.com/forms/d/e/1FAIpQLSc9Bh47TQpW0PDuM-5NcoQjgDp_T2wV8xrX7SsXTLGMQwUdqA/viewform?embedded=true',
         url: 'https://docs.google.com/forms/d/e/1FAIpQLSc9Bh47TQpW0PDuM-5NcoQjgDp_T2wV8xrX7SsXTLGMQwUdqA/viewform',
-        height: 2175,
+        height: 600,
       }
 
       expect(googleformsResolveEmbed(value)).toEqual(expected)
@@ -147,7 +147,7 @@ describe('googleformsResolveEmbed', () => {
         id: '1FAIpQLScUhhDYrYWJvD3byNVXHufauKYWXEeBp6U29PVGoSElSXBLrQ',
         src: 'https://docs.google.com/forms/d/e/1FAIpQLScUhhDYrYWJvD3byNVXHufauKYWXEeBp6U29PVGoSElSXBLrQ/viewform?embedded=true',
         url: 'https://docs.google.com/forms/d/e/1FAIpQLScUhhDYrYWJvD3byNVXHufauKYWXEeBp6U29PVGoSElSXBLrQ/viewform',
-        height: 2175,
+        height: 600,
       }
 
       expect(googleformsResolveEmbed(value)).toEqual(expected)
@@ -175,7 +175,7 @@ describeForEachParser('googleformsEmbedResolver', (parseHtml) => {
         id: '1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg',
         src: 'https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform?embedded=true',
         url: 'https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform',
-        height: 2175,
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -195,7 +195,7 @@ describeForEachParser('googleformsEmbedResolver', (parseHtml) => {
         id: '1FAIpQLSeRQfoqlU89dTkXX6r8aprQ9GMrwI3T6JQ7Rw1oFmpNOnV88Q',
         src: 'https://docs.google.com/forms/d/e/1FAIpQLSeRQfoqlU89dTkXX6r8aprQ9GMrwI3T6JQ7Rw1oFmpNOnV88Q/viewform?embedded=true',
         url: 'https://docs.google.com/forms/d/e/1FAIpQLSeRQfoqlU89dTkXX6r8aprQ9GMrwI3T6JQ7Rw1oFmpNOnV88Q/viewform',
-        height: 2175,
+        height: 600,
         title: 'Dumpling Bracket Round 2 voting',
       }
 
@@ -217,7 +217,7 @@ describeForEachParser('googleformsEmbedResolver', (parseHtml) => {
         id: '3mfiVWiFzt6E1hhx6',
         src: 'https://forms.gle/3mfiVWiFzt6E1hhx6',
         url: 'https://forms.gle/3mfiVWiFzt6E1hhx6',
-        height: 2175,
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -254,7 +254,7 @@ describeForEachParser('googleformsEmbedResolver', (parseHtml) => {
         id: '1fmi1Jzlo6RpnTuqx-6xlft9pdFvUvY8f1cdjkhESnEI',
         src: 'https://docs.google.com/forms/d/1fmi1Jzlo6RpnTuqx-6xlft9pdFvUvY8f1cdjkhESnEI/viewform?embedded=true',
         url: 'https://docs.google.com/forms/d/1fmi1Jzlo6RpnTuqx-6xlft9pdFvUvY8f1cdjkhESnEI/viewform',
-        height: 2175,
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -280,7 +280,7 @@ describeForEachParser('googleforms through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="2175"
+        data-embed-height="600"
         data-embed-url="https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform"
         data-embed-id="1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg"
         data-embed-provider="googleforms"
