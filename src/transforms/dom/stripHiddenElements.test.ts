@@ -70,6 +70,14 @@ const specimens: Record<string, [string, string]> = {
     '<div id="spoilerDiv4196800b" style="display:none">Panel</div>',
     '<div id="spoilerDiv4196800b">Panel</div>',
   ],
+  '.alt2 > div': [
+    '<div class="alt2" style="margin:0px;padding:6px"><div style="display: none;">Panel</div></div>',
+    '<div class="alt2" style="margin:0px;padding:6px"><div>Panel</div></div>',
+  ],
+  '.quotecontent > div': [
+    '<div class="quotecontent"><div style="display:none;">Panel</div></div>',
+    '<div class="quotecontent"><div>Panel</div></div>',
+  ],
   '[id^="rlta-panel"]': [
     '<div id="rlta-panel-sources" style="display:none">Panel</div>',
     '<div id="rlta-panel-sources">Panel</div>',
@@ -480,6 +488,42 @@ describeForEachParser('stripHiddenElements through the pipeline', (parseHtml) =>
       <ul class="bxslider-1">
         <li><img src="https://example.com/a.jpg" width="800" height="600"></li>
       </ul>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep the body of a vBulletin spoiler', async () => {
+    const value = html`
+      <div style="margin:20px; margin-top:5px">
+        <div class="smallfont" style="margin-bottom:2px">
+          <b>Spoiler</b>:<input type="button" value="Show">
+        </div>
+        <div class="alt2" style="margin: 0px; padding: 6px; border: 1px inset;">
+          <div style="display: none;">
+            <img src="https://example.com/screen.png" border="0" alt="">
+          </div>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <p><b>Spoiler</b>:<input type="button" value="Show"></p>
+      <img src="https://example.com/screen.png" border="0" alt="">
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep the body of a phpBB spoiler', async () => {
+    const value = html`
+      <div class="quotetitle"><b>Spoiler:</b> <input type="button" value="Show"></div>
+      <div class="quotecontent">
+        <div style="display: none;">The killer is the butler.</div>
+      </div>
+    `
+    const expected = html`
+      <p><b>Spoiler:</b> <input type="button" value="Show"></p>
+      <p>The killer is the butler.</p>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
