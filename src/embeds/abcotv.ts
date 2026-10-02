@@ -19,8 +19,8 @@ const abcotvHosts = [
 // The server matches the route words in any case.
 const playerPathRegex = /^\/video\/embed\/?$/i
 
-// The stations' video player, `/video/embed?pid={pid}`, which the share button writes on the
-// station's own host. A pid plays on every station's host, each with its own branding.
+// The stations' video player, `/video/embed?pid={pid}`, which the site's own script builds on the
+// station's host. A pid plays on every station's host, each with its own branding.
 export const abcotvResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, abcotvHosts)
 
