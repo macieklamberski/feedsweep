@@ -285,6 +285,7 @@ import {
 } from '../embeds/twitter.js'
 import { typeformIframeEmbedResolver, typeformWidgetEmbedResolver } from '../embeds/typeform.js'
 import { ultimediaEmbedResolver } from '../embeds/ultimedia.js'
+import { umapEmbedResolver } from '../embeds/umap.js'
 import { videaEmbedResolver } from '../embeds/videa.js'
 import {
   videopressFlashEmbedResolver,
@@ -695,6 +696,7 @@ const embedResolvers: Array<EmbedResolver> = [
   mastodonEmbedResolver,
   wikimediaEmbedResolver,
   peertubeEmbedResolver,
+  umapEmbedResolver,
 ]
 
 // Alphabetical by platform. Wikimedia's bare `iframe` selector sits last so a host-keyed
