@@ -20,7 +20,7 @@ const composeShortLink = (url: URL, element?: Element): EmbedResolverResult | un
   const segments = getPathSegments(url)
   const code = segments[0]
 
-  if (segments.length !== 1 || !code) {
+  if (segments.length !== 1) {
     return
   }
 
@@ -57,10 +57,10 @@ export const googleformsResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const isPublished = formSegments[1] === 'e'
-  const formId = isPublished ? formSegments[2] : formSegments[1]
-  const route = formSegments[isPublished ? 3 : 2]
+  const formId = formSegments[isPublished ? 2 : 1]
+  const routeIndex = isPublished ? 3 : 2
 
-  if (!formId || route !== 'viewform') {
+  if (formSegments[routeIndex] !== 'viewform' || formSegments.length > routeIndex + 1) {
     return
   }
 

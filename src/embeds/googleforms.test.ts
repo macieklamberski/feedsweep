@@ -84,6 +84,13 @@ describe('googleformsResolveEmbed', () => {
       expect(googleformsResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should ignore a path past the form route', () => {
+      const value =
+        'https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform/extra'
+
+      expect(googleformsResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore a deck on the same host', () => {
       const value =
         'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed'
