@@ -14,7 +14,7 @@ describe('cspanResolveEmbed', () => {
         id: 'c5108942',
         src: 'https://www.c-span.org/video/standalone/?c5108942',
         url: 'https://www.c-span.org/video/?c5108942',
-        ratio: '300/209',
+        ratio: '16/9',
       }
 
       expect(cspanResolveEmbed(value)).toEqual(expected)
@@ -27,7 +27,7 @@ describe('cspanResolveEmbed', () => {
         id: '173607-1',
         src: 'https://www.c-span.org/video/standalone/?173607-1',
         url: 'https://www.c-span.org/video/?173607-1',
-        ratio: '300/209',
+        ratio: '16/9',
       }
 
       expect(cspanResolveEmbed(value)).toEqual(expected)
@@ -41,7 +41,7 @@ describe('cspanResolveEmbed', () => {
         id: '457171-1',
         src: 'https://www.c-span.org/video/standalone/?457171-1&start=9398',
         url: 'https://www.c-span.org/video/?457171-1',
-        ratio: '300/209',
+        ratio: '16/9',
       }
 
       expect(cspanResolveEmbed(value)).toEqual(expected)
@@ -54,7 +54,7 @@ describe('cspanResolveEmbed', () => {
         id: 'c4509010',
         src: 'https://www.c-span.org/video/standalone/?c4509010&start=120',
         url: 'https://www.c-span.org/video/?c4509010',
-        ratio: '300/209',
+        ratio: '16/9',
       }
 
       expect(cspanResolveEmbed(value)).toEqual(expected)
@@ -67,7 +67,7 @@ describe('cspanResolveEmbed', () => {
         id: 'C4509010_x',
         src: 'https://www.c-span.org/video/standalone/?C4509010_x',
         url: 'https://www.c-span.org/video/?C4509010_x',
-        ratio: '300/209',
+        ratio: '16/9',
       }
 
       expect(cspanResolveEmbed(value)).toEqual(expected)
@@ -138,7 +138,7 @@ describeForEachParser('cspanEmbedResolver', (parseHtml) => {
         id: 'c5108942',
         src: 'https://www.c-span.org/video/standalone/?c5108942',
         url: 'https://www.c-span.org/video/?c5108942',
-        ratio: '300/209',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -170,7 +170,7 @@ describeForEachParser('cspan players the pipeline absolutises first', (parseHtml
     `
     const expected = html`
       <div
-        data-embed-ratio="300/209"
+        data-embed-ratio="16/9"
         data-embed-url="https://www.c-span.org/video/?c4509010"
         data-embed-id="c4509010"
         data-embed-provider="cspan"

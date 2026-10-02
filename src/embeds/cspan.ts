@@ -38,7 +38,7 @@ export const cspanResolveEmbed: ResolveEmbed = (url) => {
     id,
     src: `https://www.c-span.org/video/standalone/?${id}${query}`,
     url: `https://www.c-span.org/video/?${id}`,
-    ratio: '300/209',
+    ratio: '16/9',
   }
 }
 
