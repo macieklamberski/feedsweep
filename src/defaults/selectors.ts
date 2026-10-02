@@ -28,6 +28,20 @@ export const defaultNonContentSelectors = [
   '[class*="et_bloom"]',
   '.wpforms-container', // WPForms.
   '[class*="tve-leads"]', // Thrive Leads optin.
+  'form[action*=".list-manage"]', // Mailchimp embedded signup form, posting to `{account}.us{n}.list-manage.com`.
+
+  // Site contact and lead forms, the same form under every post of the site.
+  'form.et_pb_contact_form', // Divi contact form module.
+  'form.elementor-form', // Elementor Pro form widget.
+
+  // Rating and voting widgets, whose controls do nothing in a reader and whose count survives as
+  // a stray line of text.
+  'form[class*="fivestar"]', // Drupal Fivestar rating widget.
+  'form[id^="rate-widget"]', // Drupal Rate module vote widget.
+
+  // Site search forms.
+  'form[role="search"]', // Theme search form with its ARIA role.
+  'form:has(input[name="s"])', // WordPress search form without the role, named by the `s` query WordPress searches on.
 
   // Ad slots.
   '.adsbygoogle', // Google AdSense ad slot.
@@ -227,6 +241,7 @@ export const defaultNonContentSelectors = [
   'iframe[src*="eventbrite.com/countdown-widget"]', // Eventbrite countdown widget.
   'form[action*="paypal.com/cgi-bin/webscr"]', // PayPal buy, cart or subscribe form, or a donate form naming no button.
   'img[src*="paypal.com/"][src*="/i/btn/"]:not(a img)', // The PayPal button image pasted without its form.
+  'form.edd_download_purchase_form', // Easy Digital Downloads buy button and price.
 
   // Affiliate booking widgets, which render a map or a form to sell the reader a stay or a
   // ticket and carry none of the post.

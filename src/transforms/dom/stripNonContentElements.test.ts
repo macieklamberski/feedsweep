@@ -33,6 +33,20 @@ const specimens: Record<string, string | [string, string]> = {
     '<div class="sqs-block newsletter-block sqs-block-newsletter"><form><input type="email"></form></div>',
   '.wpforms-container': '<div class="wpforms-container"><form></form></div>',
   '[class*="tve-leads"]': '<div class="tve-leads-conversion-object"></div>',
+  'form[action*=".list-manage"]':
+    '<form action="https://example.us8.list-manage.com/subscribe/post?u=6812a77ff87af5e2479fffcec&amp;id=2fe16a669" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank"><div id="mc_embed_signup_scroll"><h2>Subscribe to my mailing list</h2><div class="mc-field-group"><label for="mce-EMAIL">Email Address</label><input type="email" name="EMAIL" class="required email" id="mce-EMAIL"></div><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div></form>',
+  'form.et_pb_contact_form':
+    '<form class="et_pb_contact_form clearfix" method="post" action="https://example.com/patio-rejuvenation/"><p class="et_pb_contact_field et_pb_contact_field_0"><label for="et_pb_contact_name_0" class="et_pb_contact_form_label">Name</label><input type="text" id="et_pb_contact_name_0" class="input" name="et_pb_contact_name_0" placeholder="Name"></p><p class="et_pb_contact_field et_pb_contact_field_1"><label for="et_pb_contact_email_0" class="et_pb_contact_form_label">Email Address</label><input type="text" id="et_pb_contact_email_0" class="input" name="et_pb_contact_email_0" placeholder="Email Address"></p><div class="et_contact_bottom_container"><button type="submit" name="et_builder_submit_button" class="et_pb_contact_submit et_pb_button">Submit</button></div></form>',
+  'form.elementor-form':
+    '<form class="elementor-form" method="post" name="Contact"><input type="hidden" name="post_id" value="1189"><div class="elementor-form-fields-wrapper elementor-labels-"><div class="elementor-field-type-text elementor-field-group elementor-column elementor-field-group-name"><label for="form-field-name" class="elementor-field-label elementor-screen-only">Name</label><input size="1" type="text" name="form_fields[name]" id="form-field-name" class="elementor-field elementor-size-sm elementor-field-textual" placeholder="Name"></div><div class="elementor-field-group elementor-column elementor-field-type-submit"><button type="submit" class="elementor-button elementor-size-sm"><span class="elementor-button-text">Send</span></button></div></div></form>',
+  'form[class*="fivestar"]':
+    '<form class="fivestar-widget" action="/taxonomy/term/116/feed" method="post" id="fivestar-custom-widget" accept-charset="UTF-8"><div class="clearfix fivestar-combo-text fivestar-combo-stars fivestar-form-item fivestar-default"><div class="form-item form-type-select form-item-vote"><select id="edit-vote--2" name="vote" class="form-select"><option value="-">Select rating</option><option value="20">Give it 1/5</option><option value="40">Give it 2/5</option><option value="60">Give it 3/5</option><option value="80">Give it 4/5</option><option value="100">Give it 5/5</option></select><div class="description"><div class="fivestar-summary fivestar-summary-average-count"><span class="average-rating">Average: <span>4.9</span></span> <span class="total-votes">(<span>8</span> votes)</span></div></div></div><input class="fivestar-submit form-submit" type="submit" id="edit-fivestar-submit" name="op" value="Rate"></div></form>',
+  'form[id^="rate-widget"]':
+    '<form class="vote-form" id="rate-widget-base-form" action="/taxonomy/term/8744/feed" method="post" accept-charset="UTF-8"><table class="rating-table"><tr class="rating-table-tr"><td class="rating-table-td">Was this article useful?</td></tr><tr class="rating-table-tr"><td class="rating-table-td"><div class="thumbsup-rating-wrapper rate-enabled"><label class="rating-label thumbsup-rating-label thumbsup-rating-label-up"><input class="rating-input thumbsup-rating-input form-radio" type="radio" id="edit-value-1" name="value" value="1"></label><div class="rating-option-result">0</div></div><input class="thumbsup-rating-submit button form-submit" type="submit" id="edit-submit--2" name="op" value="OK"></td></tr></table></form>',
+  'form[role="search"]':
+    '<form id="searchwp-form-1" role="search" method="get" class="searchwp-form" action="https://example.com/" aria-label="Search"><input type="hidden" name="swp_form[form_id]" value="1"><div class="searchwp-form-input-container swp-items-stretch"><input type="search" class="swp-input--search swp-input" name="swps" aria-label="Search"></div><input type="submit" class="search-submit swp-button" value="archive search"></form>',
+  'form:has(input[name="s"])':
+    '<form class="e-search-form" action="https://example.com/blog" method="get"><label class="e-search-label" for="search-f088e24"><span class="elementor-screen-only">Search</span></label><div class="e-search-input-wrapper"><input id="search-f088e24" placeholder="Search" class="e-search-input" type="search" name="s" value=""></div><button class="e-search-submit" type="submit">Search</button></form>',
   '.adsbygoogle':
     '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-x" data-ad-slot="123"></ins>',
   'div[id^="div-gpt-ad"]': '<div id="div-gpt-ad-1234567890"></div>',
@@ -80,6 +94,8 @@ const specimens: Record<string, string | [string, string]> = {
     '<form action="https://www.paypal.com/cgi-bin/webscr" method="post"><input type="hidden" name="cmd" value="_donations"><input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit" alt="Donate"></form>',
   'img[src*="paypal.com/"][src*="/i/btn/"]:not(a img)':
     '<img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate with PayPal">',
+  'form.edd_download_purchase_form':
+    '<form id="edd_purchase_4374" class="edd_download_purchase_form edd_purchase_4374" method="post"><div class="edd_purchase_submit_wrapper"><button class="edd-add-to-cart button red edd-submit" data-action="edd_add_to_cart" data-download-id="4374" data-variable-price="no" data-price-mode="single" data-price="15.00"><span class="edd-add-to-cart-label">$15.00&nbsp;&ndash;&nbsp;Purchase</span></button><a href="https://example.com/checkout/" class="edd_go_to_checkout button red edd-submit" style="display:none;">Checkout</a><span class="edd-cart-ajax-alert" aria-live="assertive"><span class="edd-cart-added-alert" style="display: none;">Added to cart</span></span></div><input type="hidden" name="download_id" value="4374"><input type="hidden" name="edd_action" class="edd_action_input" value="add_to_cart"></form>',
   'p:has(> a.redcircle-link)':
     '<p style="font-size: 10px; color: gray;">Powered by <a class="redcircle-link" href="https://example.com/?utm_source=rc_embedded_player">RedCircle</a></p>',
   'iframe[src*="zeno.fm/player/"] + a:is([href$="//zeno.fm/"], [href$="//www.zeno.fm/"], [href$="//www.zeno.fm"], [href$="//www.zenomedia.com/"])':
@@ -831,6 +847,31 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
     // convertUcozSpoilerButtons keeps as text.
     it('should keep a uCoz spoiler button that carries a title', async () => {
       const value = '<input type="button" class="uSpoilerButton" value="[+] Обложка">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // The password form's prompt is the only text a protected post ships with.
+    it('should keep a WordPress password form', async () => {
+      const value = html`
+        <form action="https://example.com/wp-login.php?action=postpass" class="post-password-form" method="post">
+          <p>This content is password protected. To view it please enter your password below:</p>
+          <p><label for="pwbox-531">Password: <input name="post_password" id="pwbox-531" type="password"></label> <input type="submit" name="Submit" value="Enter"></p>
+        </form>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a Drupal webform that carries the event it registers for', async () => {
+      const value = html`
+        <form class="webform-submission-form webform-submission-add-form" action="/annual-dinner" method="post">
+          <p>Dinner is served at 7pm. Choose an entree for each guest.</p>
+          <label for="edit-guest-1-entree">Guest #1 Entree</label>
+          <select id="edit-guest-1-entree" name="guest_1_entree"><option>Lemon Herb Chicken (gluten free)</option><option>Honey Miso Glazed Salmon (gluten free)</option></select>
+          <input type="submit" value="Register">
+        </form>
+      `
 
       expect(await transform(value)).toEqualHtml(value)
     })
