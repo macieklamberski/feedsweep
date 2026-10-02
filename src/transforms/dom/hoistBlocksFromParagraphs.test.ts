@@ -283,6 +283,35 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
       expect(await transformParagraph(value)).toEqualHtml(expected)
     })
 
+    it('should lift the link around a player along with it', async () => {
+      const value =
+        '<a href="https://example.com/clip"> <video controls><source src="https://example.com/clip.mp4"><p>No video</p></video> </a>'
+      const expected =
+        '<a href="https://example.com/clip"> <video controls><source src="https://example.com/clip.mp4"><p>No video</p></video> </a>'
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a link that holds more than the player behind', async () => {
+      const value = html`
+        <a href="https://example.com/clip">Watch <video controls>
+          <source src="https://example.com/clip.mp4">
+          <p>No video</p>
+        </video></a>
+      `
+      const expected = html`
+        <p>
+          <a href="https://example.com/clip">Watch </a>
+        </p>
+        <video controls>
+          <source src="https://example.com/clip.mp4">
+          <p>No video</p>
+        </video>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
     it('should lift two players from one paragraph', async () => {
       const value = html`
         <video controls>

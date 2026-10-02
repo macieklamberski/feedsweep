@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { blockElements, hasText, mediaSelector } from '../../utils/dom.js'
+import { blockElements, hasText, isWhitespaceText, mediaSelector } from '../../utils/dom.js'
 
 const blockInParagraphSelector = [...blockElements].map((tag) => `p ${tag}`).join(', ')
 const blockSelector = [...blockElements].join(', ')
@@ -28,6 +28,20 @@ const hoistBlockFromParagraph = (inner: Element): void => {
     }
 
     ancestor = ancestor.parentElement
+  }
+
+  // A wrapper holding only the player, such as a link around it, comes out with it.
+  while (block !== inner && block.parentElement && block.parentElement !== paragraph) {
+    const wrapper: Element = block.parentElement
+    const isOnlyContent = [...wrapper.childNodes].every((node) => {
+      return node === block || isWhitespaceText(node)
+    })
+
+    if (!isOnlyContent) {
+      break
+    }
+
+    block = wrapper
   }
 
   let child: Node = block
