@@ -26,9 +26,6 @@ const retiredRoutes = toMap({
 // unlocks an unreleased track.
 const audiomackEmbedParams = ['key']
 
-// A display setting the publisher chose, which a reader may apply or override.
-const audiomackDisplayParams = ['background']
-
 type Track = { artist: string; kind: string; slug: string; search: string }
 
 const readTrack = (url: URL): Track | undefined => {
@@ -64,14 +61,12 @@ export const audiomackResolveEmbed: ResolveEmbed = (url, element) => {
   const { artist, kind, slug, search } = track
   const path = `${artist}/${kind}/${slug}`
   const params = pickQueryParams(search, audiomackEmbedParams)
-  const display = pickQueryParams(search, audiomackDisplayParams)
 
   return {
     provider: 'audiomack',
     // The whole path: the same artist and slug answer under song and under playlist alike.
     id: path,
     src: `https://audiomack.com/embed/${path}${composeQuery(params)}`,
-    params: display,
     // The key is an access token, so a private track's page is not linked where it could leak.
     url: params.key ? undefined : `https://audiomack.com/${path}`,
     height: audiomackHeights.get(kind),
