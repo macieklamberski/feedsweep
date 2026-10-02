@@ -1,7 +1,9 @@
 import { getPathSegments, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { composeQuery, encodePathSegment, pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'googleslides'
 
 // The page routes a deck frame names. `/export` serves the deck as a file, which stays an
 // enclosure.
@@ -44,7 +46,7 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
     const deckPath = encodePathSegment(fileId)
 
     return {
-      provider: 'googleslides',
+      provider,
       id: fileId,
       src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(parsed)}`,
       url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
@@ -73,7 +75,7 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
 
   // `/pub` answers `x-frame-options: SAMEORIGIN`, so the frame is always `/embed`.
   return {
-    provider: 'googleslides',
+    provider,
     id: deckId,
     src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(parsed)}`,
     url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
@@ -85,3 +87,8 @@ export const googleslidesEmbedResolver = createUrlEmbedResolver(
   ['docs.google.com'],
   googleslidesResolveEmbed,
 )
+
+export const googleslidesRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { start: 'true' },
+}
