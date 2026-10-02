@@ -184,6 +184,7 @@ import { megaphoneEmbedResolver } from '../embeds/megaphone.js'
 import { megatvEmbedResolver } from '../embeds/megatv.js'
 import { mixcloudEmbedResolver } from '../embeds/mixcloud.js'
 import { mrcvideoEmbedResolver, mrcvideoFlashEmbedResolver } from '../embeds/mrcvideo.js'
+import { namashaEmbedResolver } from '../embeds/namasha.js'
 import { nbcnewsEmbedResolver } from '../embeds/nbcnews.js'
 import { neteaseEmbedResolver } from '../embeds/netease.js'
 import { nicovideoIframeEmbedResolver, nicovideoScriptEmbedResolver } from '../embeds/nicovideo.js'
@@ -561,6 +562,7 @@ const embedResolvers: Array<EmbedResolver> = [
   mixcloudEmbedResolver,
   mrcvideoEmbedResolver,
   mrcvideoFlashEmbedResolver,
+  namashaEmbedResolver,
   nbcnewsEmbedResolver,
   neteaseEmbedResolver,
   nicovideoScriptEmbedResolver,
