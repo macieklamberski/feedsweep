@@ -34,6 +34,7 @@ import { wordpressCiteResolver } from '../cites/wordpress.js'
 import { xenforoCiteResolver } from '../cites/xenforo.js'
 import { threeSixtyCitiesEmbedResolver } from '../embeds/360cities.js'
 import { abcnewsEmbedResolver } from '../embeds/abcnews.js'
+import { abcotvEmbedResolver } from '../embeds/abcotv.js'
 import { acastEmbedResolver } from '../embeds/acast.js'
 import { allocineEmbedResolver } from '../embeds/allocine.js'
 import {
@@ -433,6 +434,7 @@ import type {
 const embedResolvers: Array<EmbedResolver> = [
   threeSixtyCitiesEmbedResolver,
   abcnewsEmbedResolver,
+  abcotvEmbedResolver,
   acastEmbedResolver,
   allocineEmbedResolver,
   amebaImagePageEmbedResolver,
