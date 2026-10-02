@@ -57,7 +57,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `cleanAnchorUrls` | Clean anchor hrefs (redirects, tracking params) via the `cleanUrlFn` option |
 | `stripDeadAnchors` | Unwrap links with empty, `#`, or `javascript:` hrefs |
 | `stripNonContentElements` | Strip non-content chrome — subscribe/share/related widgets, ads, author bios |
-| `stripHiddenElements` | Strip elements hidden from view (`hidden` attribute, inline `display:none` / `visibility:hidden`) |
+| `stripHiddenElements` | Strip elements hidden from view (`hidden` attribute, inline `display:none` / `visibility:hidden`), and unhide the slides, spoilers, tabs and players a reader can reveal |
 | `removeTrackingPixels` | Strip 1×1 tracking pixels, keeping real images |
 | `convertEmojis` | Replace emoji and forum smilie markup with the real glyph, marking with `data-emoji` the images and fallback text that have none |
 | `resolveMediaDimensions` | Backfill `width`/`height` on media so aspect ratio survives style stripping |
