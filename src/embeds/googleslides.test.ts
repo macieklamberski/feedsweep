@@ -6,13 +6,13 @@ import { googleslidesEmbedResolver, googleslidesResolveEmbed } from './googlesli
 
 describe('googleslidesResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should keep the loop of a published deck frame and drop its pace and its autoplay', () => {
+    it('should drop the loop, the pace and the autoplay of a published deck frame', () => {
       const value =
         'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed?start=true&loop=true&delayms=3000'
       const expected: EmbedResolverResult = {
         provider: 'googleslides',
         id: '2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw',
-        src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed?loop=true',
+        src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed',
         url: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/pub',
         ratio: '480/299',
       }
@@ -26,7 +26,7 @@ describe('googleslidesResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'googleslides',
         id: '2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw',
-        src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed?loop=false',
+        src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed',
         url: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/pub',
         ratio: '480/299',
       }
@@ -82,7 +82,7 @@ describe('googleslidesResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'googleslides',
         id: '1OZRGyfKsSRX84MBi3LYPUkLkArsvevJV52Hm6zTd-9s',
-        src: 'https://docs.google.com/presentation/d/1OZRGyfKsSRX84MBi3LYPUkLkArsvevJV52Hm6zTd-9s/embed?loop=false',
+        src: 'https://docs.google.com/presentation/d/1OZRGyfKsSRX84MBi3LYPUkLkArsvevJV52Hm6zTd-9s/embed',
         url: 'https://docs.google.com/presentation/d/1OZRGyfKsSRX84MBi3LYPUkLkArsvevJV52Hm6zTd-9s/pub',
         ratio: '480/299',
       }
@@ -152,7 +152,7 @@ describe('googleslidesResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'googleslides',
         id: '1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk',
-        src: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/embed?loop=false',
+        src: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/embed',
         url: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/pub',
         ratio: '480/299',
       }
@@ -258,7 +258,7 @@ describe('googleslidesResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'googleslides',
         id: '2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231',
-        src: 'https://docs.google.com/presentation/d/e/2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231/embed?loop=false',
+        src: 'https://docs.google.com/presentation/d/e/2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231/embed',
         url: 'https://docs.google.com/presentation/d/e/2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231/pub',
         ratio: '480/299',
       }
@@ -306,7 +306,7 @@ describeForEachParser('googleslidesEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googleslides',
         id: '2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw',
-        src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed?loop=true',
+        src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed',
         url: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/pub',
         ratio: '480/299',
       }
