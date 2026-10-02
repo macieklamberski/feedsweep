@@ -134,8 +134,8 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
     })
   })
 
-  describe('media fallback', () => {
-    it('should keep a video whose fallback holds a block', async () => {
+  describe('media players', () => {
+    it('should lift a video whose fallback holds a block out whole', async () => {
       const value = html`
         <video controls>
           <source src="https://example.com/clip.mp4">
@@ -143,18 +143,16 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
         </video>
       `
       const expected = html`
-        <p>
-          <video controls>
-            <source src="https://example.com/clip.mp4">
-          </video>
-        </p>
-        <p>No video</p>
+        <video controls>
+          <source src="https://example.com/clip.mp4">
+          <p>No video</p>
+        </video>
       `
 
       expect(await transformParagraph(value)).toEqualHtml(expected)
     })
 
-    it('should carry the rest of the fallback out of the video', async () => {
+    it('should keep the rest of the fallback in the video', async () => {
       const value = html`
         <video controls>
           <source src="https://example.com/clip.mp4">
@@ -163,15 +161,49 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
         </video>
       `
       const expected = html`
-        <p>
-          <video controls>
-            <source src="https://example.com/clip.mp4">
-          </video>
-        </p>
-        <p>No video</p>
-        <p>
+        <video controls>
+          <source src="https://example.com/clip.mp4">
+          <p>No video</p>
           <a href="https://example.com/clip.mp4">Download</a>
-        </p>
+        </video>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
+    it('should lift an audio whose fallback holds a link and a block', async () => {
+      const value = html`
+        <audio controls>
+          <source src="https://example.com/track.mp3">
+          <a href="https://example.com/track.mp3">Download</a>
+          <p>Your browser does not support audio.</p>
+        </audio>
+      `
+      const expected = html`
+        <audio controls>
+          <source src="https://example.com/track.mp3">
+          <a href="https://example.com/track.mp3">Download</a>
+          <p>Your browser does not support audio.</p>
+        </audio>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
+    it('should split the paragraph around a player mid-sentence', async () => {
+      const value = html`
+        Watch this <video controls>
+          <source src="https://example.com/clip.mp4">
+          <p>No video</p>
+        </video> before reading on.
+      `
+      const expected = html`
+        <p>Watch this </p>
+        <video controls>
+          <source src="https://example.com/clip.mp4">
+          <p>No video</p>
+        </video>
+        <p> before reading on.</p>
       `
 
       expect(await transformParagraph(value)).toEqualHtml(expected)
@@ -185,37 +217,33 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
         </video>
       `
       const expected = html`
-        <p>
-          <video controls>
-            <source src="https://example.com/clip.mp4">
-          </video>
-        </p>
-        <p>Fallback first</p>
+        <video controls>
+          <p>Fallback first</p>
+          <source src="https://example.com/clip.mp4">
+        </video>
       `
 
       expect(await transformParagraph(value)).toEqualHtml(expected)
     })
 
-    it('should keep an unclosed audio left open in a source paragraph', async () => {
+    // Linkedom nests what follows an unclosed <audio> in a source paragraph inside the player.
+    it('should lift an unclosed audio with what it holds', async () => {
       const value = html`
-        <p>
-          <audio controls>
-            <source src="https://example.com/track.mp3">
-            <p>Subscribe here</p>
+        <audio controls>
+          <source src="https://example.com/track.mp3">
+          <p>Subscribe here</p>
       `
       const expected = html`
-        <p>
-          <audio controls>
-            <source src="https://example.com/track.mp3">
-          </audio>
-        </p>
-        <p>Subscribe here</p>
+        <audio controls>
+          <source src="https://example.com/track.mp3">
+          <p>Subscribe here</p>
+        </audio>
       `
 
-      expect(await transform(value)).toEqualHtml(expected)
+      expect(await transformParagraph(value)).toEqualHtml(expected)
     })
 
-    it('should keep the params of an object whose fallback holds a block', async () => {
+    it('should lift an object whose fallback holds a block out whole', async () => {
       const value = html`
         <object data="https://example.com/movie.swf">
           <param name="movie" value="https://example.com/movie.swf">
@@ -224,16 +252,73 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
         </object>
       `
       const expected = html`
-        <p>
-          <object data="https://example.com/movie.swf">
-            <param name="movie" value="https://example.com/movie.swf">
-            <param name="quality" value="high">
-          </object>
-        </p>
-        <p>Flash is missing</p>
+        <object data="https://example.com/movie.swf">
+          <param name="movie" value="https://example.com/movie.swf">
+          <p>Flash is missing</p>
+          <param name="quality" value="high">
+        </object>
       `
 
       expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
+    it('should lift the outer object of a nested pair', async () => {
+      const value = html`
+        <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000">
+          <param name="movie" value="https://example.com/movie.swf">
+          <object data="https://example.com/movie.swf">
+            <p>Flash is missing</p>
+          </object>
+        </object>
+      `
+      const expected = html`
+        <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000">
+          <param name="movie" value="https://example.com/movie.swf">
+          <object data="https://example.com/movie.swf">
+            <p>Flash is missing</p>
+          </object>
+        </object>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
+    it('should lift two players from one paragraph', async () => {
+      const value = html`
+        <video controls>
+          <source src="https://example.com/one.mp4">
+          <p>No video</p>
+        </video>
+        <video controls>
+          <source src="https://example.com/two.mp4">
+          <p>No video</p>
+        </video>
+      `
+      const expected = html`
+        <video controls>
+          <source src="https://example.com/one.mp4">
+          <p>No video</p>
+        </video>
+        <video controls>
+          <source src="https://example.com/two.mp4">
+          <p>No video</p>
+        </video>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a player whose fallback holds no block in its paragraph', async () => {
+      const value = html`
+        <p>Intro <video controls>
+          <source src="https://example.com/clip.mp4">No video</video> outro</p>
+      `
+      const expected = html`
+        <p>Intro <video controls>
+          <source src="https://example.com/clip.mp4">No video</video> outro</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
   })
 
@@ -346,6 +431,21 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
       const value = html`
         <div data-embed-src="https://www.youtube.com/embed/abc123"></div>
         <div data-embed-src="https://www.youtube.com/embed/def456"></div>
+      `
+      const once = await transformParagraph(value)
+      const twice = await applyDomTransforms(parseHtml(once), [
+        hoistBlocksFromParagraphs(baseContext),
+      ])
+
+      expect(twice).toEqualHtml(once)
+    })
+
+    it('should be idempotent with a player lifted out', async () => {
+      const value = html`
+        Watch this <video controls>
+          <source src="https://example.com/clip.mp4">
+          <p>No video</p>
+        </video> before reading on.
       `
       const once = await transformParagraph(value)
       const twice = await applyDomTransforms(parseHtml(once), [
