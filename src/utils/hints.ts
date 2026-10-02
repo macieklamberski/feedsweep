@@ -58,7 +58,10 @@ export const readIframeResizeHeight = (data: unknown): number | undefined => {
 export const iframeResizerHeightRequest =
   '[iFrameSizer]f0:8:false:false:32:true:true:null:bodyOffset:null:null:0:false:parent:scroll'
 
-const iframeResizerMessageRegex = /^\[iFrameSizer\][^:]*:(\d+(?:\.\d+)?):/
+const iframeResizerMessageRegex = /^\[iFrameSizer\][^:]*:(\d+(?:\.\d+)?):[^:]*:(\w+)/
+
+// Events that carry a scroll offset where a size event carries the height.
+const iframeResizerScrollEvents = ['scrollTo', 'scrollToOffset', 'inPageLink']
 
 // The height in iframe-resizer's answer, `[iFrameSizer]{id}:{height}:{width}:{event}`.
 export const readIframeResizerHeight = (data: unknown): number | undefined => {
@@ -66,5 +69,11 @@ export const readIframeResizerHeight = (data: unknown): number | undefined => {
     return
   }
 
-  return readPixels(data.match(iframeResizerMessageRegex)?.[1])
+  const match = data.match(iframeResizerMessageRegex)
+
+  if (!match || iframeResizerScrollEvents.includes(match[2] ?? '')) {
+    return
+  }
+
+  return readPixels(match[1])
 }
