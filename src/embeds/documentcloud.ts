@@ -1,6 +1,7 @@
 import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { readObjectHeight } from '../utils/hints.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'documentcloud'
@@ -17,6 +18,28 @@ const legacyNotePathRegex = /^\/documents\/(\d+)-[^/]+\/(annotations)\/([^/]+)\.
 // The embed host renders every route as an embed, so the `embed=1` the dialog writes restates it.
 // See: https://github.com/MuckRock/documentcloud-frontend/blob/main/src/lib/utils/embed.ts.
 const embedBaseUrl = 'https://embed.documentcloud.org/documents'
+
+const composeViewerUrl = (id: string, slug: string): string => {
+  return `${embedBaseUrl}/${id}-${slug}/`
+}
+
+// The `DV.load` url of the old viewer snippet, `www.documentcloud.org/documents/{id}-{slug}.js`.
+// The loader.js still served on s3.documentcloud.org frames that id and slug, read from the last
+// two path segments with the slug cut at its first dot.
+// See: https://s3.documentcloud.org/viewer/loader.js.
+export const composeLoaderViewerUrl = (url: string | undefined): string | undefined => {
+  const parsed = parseUrlOnHosts(url, legacyHosts)
+  const [route, document = ''] = parsed ? getPathSegments(parsed).slice(-2) : []
+  const hyphen = document.indexOf('-')
+
+  if (route !== 'documents' || hyphen === -1) {
+    return
+  }
+
+  const [slug] = document.slice(hyphen + 1).split('.')
+
+  return composeViewerUrl(document.slice(0, hyphen), slug)
+}
 
 // DocumentCloud's viewer iframe, `embed.documentcloud.org/documents/{id}-{slug}/`, and the older
 // `www.documentcloud.org/documents/{id}-{slug}.html`, which redirects to it. The carrier `title`
@@ -74,7 +97,7 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
   return {
     provider,
     id,
-    src: `${embedBaseUrl}/${id}-${slug}/`,
+    src: composeViewerUrl(id, slug),
     thumbnail: `https://s3.documentcloud.org/documents/${id}/pages/${slug}-p1-normal.gif`,
     ratio: '17/22',
   }

@@ -2,7 +2,73 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { documentcloudEmbedResolver } from './documentcloud.js'
+import { composeLoaderViewerUrl, documentcloudEmbedResolver } from './documentcloud.js'
+
+describe('composeLoaderViewerUrl', () => {
+  describe('happy paths', () => {
+    it('should frame the document the viewer snippet loads on the embed host', () => {
+      const value = 'http://www.documentcloud.org/documents/409020-udo-pc-review-august-14.js'
+      const expected = 'https://embed.documentcloud.org/documents/409020-udo-pc-review-august-14/'
+
+      expect(composeLoaderViewerUrl(value)).toBe(expected)
+    })
+
+    it('should read a protocol-relative url', () => {
+      const value = '//www.documentcloud.org/documents/683522-calvin-shaw-indictment.js'
+      const expected = 'https://embed.documentcloud.org/documents/683522-calvin-shaw-indictment/'
+
+      expect(composeLoaderViewerUrl(value)).toBe(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host carrying the same path', () => {
+      const value = 'https://evil.test/documents/409020-udo-pc-review-august-14.js'
+
+      expect(composeLoaderViewerUrl(value)).toBeUndefined()
+    })
+
+    it('should ignore a project, which is a second id space', () => {
+      const value = 'https://www.documentcloud.org/projects/2345-jail-records.js'
+
+      expect(composeLoaderViewerUrl(value)).toBeUndefined()
+    })
+
+    it('should ignore a segment with no hyphen, which the loader skips', () => {
+      const value = 'https://www.documentcloud.org/documents/409020.js'
+
+      expect(composeLoaderViewerUrl(value)).toBeUndefined()
+    })
+
+    it('should ignore a missing url', () => {
+      expect(composeLoaderViewerUrl(undefined)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should cut the slug at its first dot, as the loader does', () => {
+      const value = 'https://www.documentcloud.org/documents/1262997-mark-tomas.regan-indictment.js'
+      const expected = 'https://embed.documentcloud.org/documents/1262997-mark-tomas/'
+
+      expect(composeLoaderViewerUrl(value)).toBe(expected)
+    })
+
+    it('should keep the slug in the case the snippet spells it', () => {
+      const value = 'https://www.documentcloud.org/documents/2702333-Appropriate-and-Responsible.js'
+      const expected =
+        'https://embed.documentcloud.org/documents/2702333-Appropriate-and-Responsible/'
+
+      expect(composeLoaderViewerUrl(value)).toBe(expected)
+    })
+
+    it('should read the last two segments only, as the loader does', () => {
+      const value = 'https://www.documentcloud.org/x/documents/409020-udo-pc-review-august-14.js'
+      const expected = 'https://embed.documentcloud.org/documents/409020-udo-pc-review-august-14/'
+
+      expect(composeLoaderViewerUrl(value)).toBe(expected)
+    })
+  })
+})
 
 describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, documentcloudEmbedResolver)

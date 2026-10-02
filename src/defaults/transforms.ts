@@ -42,6 +42,7 @@ import { neutralizeUnsafeUrls } from '../transforms/dom/neutralizeUnsafeUrls.js'
 import { normalizeAnchoredHeadings } from '../transforms/dom/normalizeAnchoredHeadings.js'
 import { proxyAssetUrls } from '../transforms/dom/proxyAssetUrls.js'
 import { rebuildDeferredIframes } from '../transforms/dom/rebuildDeferredIframes.js'
+import { rebuildDocumentcloudEmbeds } from '../transforms/dom/rebuildDocumentcloudEmbeds.js'
 import { rebuildElementorVideoEmbeds } from '../transforms/dom/rebuildElementorVideoEmbeds.js'
 import { rebuildEmbedlyEmbeds } from '../transforms/dom/rebuildEmbedlyEmbeds.js'
 import { rebuildEmbedPlusEmbeds } from '../transforms/dom/rebuildEmbedPlusEmbeds.js'
@@ -150,6 +151,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Runs before convertCiteCards so a payload naming `link` still reaches the cite pass, and
   // before stripEmptyTags, which is what deletes an empty carrier nothing has claimed.
   rebuildEmbedlyEmbeds,
+  rebuildDocumentcloudEmbeds,
   rebuildGettyImagesEmbeds,
   rebuildJsfiddleEmbeds,
 
