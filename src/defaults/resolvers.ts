@@ -178,6 +178,7 @@ import { listennotesEmbedResolver } from '../embeds/listennotes.js'
 import { mailruEmbedResolver } from '../embeds/mailru.js'
 import { mastodonEmbedResolver } from '../embeds/mastodon.js'
 import { matterportEmbedResolver } from '../embeds/matterport.js'
+import { mediacccEmbedResolver } from '../embeds/mediaccc.js'
 import { mediavineScriptEmbedResolver, mediavineWidgetEmbedResolver } from '../embeds/mediavine.js'
 import { megaphoneEmbedResolver } from '../embeds/megaphone.js'
 import { megatvEmbedResolver } from '../embeds/megatv.js'
@@ -551,6 +552,7 @@ const embedResolvers: Array<EmbedResolver> = [
   listennotesEmbedResolver,
   mailruEmbedResolver,
   matterportEmbedResolver,
+  mediacccEmbedResolver,
   mediavineWidgetEmbedResolver,
   mediavineScriptEmbedResolver,
   megaphoneEmbedResolver,
