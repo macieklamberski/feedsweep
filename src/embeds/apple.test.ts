@@ -151,12 +151,27 @@ describe('appleResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
-    it('should drop tracking parameters', () => {
+    it('should keep the locale an episode player names', () => {
+      const value =
+        'https://embed.podcasts.apple.com/de/podcast/strengthening-digital-trust-in-the-age-of/id1797313524?i=1000705236226&l=en-GB'
+      const expected: EmbedResolverResult = {
+        provider: 'applepodcasts',
+        id: 'podcast/1000705236226',
+        src: value,
+        url: 'https://podcasts.apple.com/de/podcast/strengthening-digital-trust-in-the-age-of/id1797313524?i=1000705236226',
+        height: 175,
+      }
+
+      expect(appleResolveEmbed(value)).toEqual(expected)
+    })
+
+    // Tracking is the caller's cleanUrlFn to drop from the player url.
+    it('should keep the player url as written and drop tracking from the page url', () => {
       const value = 'https://embed.music.apple.com/us/album/thriller/1440857781?utm_source=feed'
       const expected: EmbedResolverResult = {
         provider: 'applemusic',
         id: 'album/1440857781',
-        src: 'https://embed.music.apple.com/us/album/thriller/1440857781',
+        src: value,
         url: 'https://music.apple.com/us/album/thriller/1440857781',
         height: 450,
       }
