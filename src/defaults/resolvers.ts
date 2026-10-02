@@ -100,6 +100,7 @@ import {
   crowdsignalIframeEmbedResolver,
   crowdsignalScriptEmbedResolver,
 } from '../embeds/crowdsignal.js'
+import { cspanEmbedResolver } from '../embeds/cspan.js'
 import { dailymailEmbedResolver } from '../embeds/dailymail.js'
 import { dailymotionEmbedResolver } from '../embeds/dailymotion.js'
 import { deezerEmbedResolver } from '../embeds/deezer.js'
@@ -498,6 +499,7 @@ const embedResolvers: Array<EmbedResolver> = [
   crowdsignalFlashEmbedResolver,
   crowdsignalIframeEmbedResolver,
   crowdsignalScriptEmbedResolver,
+  cspanEmbedResolver,
   dailymailEmbedResolver,
   dailymotionEmbedResolver,
   deezerEmbedResolver,
