@@ -315,6 +315,109 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('the first WordPress.com snippet on v.wordpress.com', () => {
+    it('should read the guid that is the whole path', async () => {
+      const value = html`
+        <embed
+          src="http://v.wordpress.com/hrPKeL5t"
+          type="application/x-shockwave-flash"
+          width="500"
+          height="281"
+          allowscriptaccess="always"
+          allowfullscreen="true"
+          wmode="transparent"
+        ></embed>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'videopress',
+        id: 'hrPKeL5t',
+        src: 'https://video.wordpress.com/embed/hrPKeL5t',
+        url: 'https://videopress.com/v/hrPKeL5t',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the guid path when the object carries the player', async () => {
+      const value = html`
+        <object
+          width="400"
+          height="224"
+          data="http://v.wordpress.com/hFr8Nyar"
+          type="application/x-shockwave-flash"
+        >
+          <param name="src" value="http://v.wordpress.com/hFr8Nyar" />
+          <param name="allowfullscreen" value="true" />
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'videopress',
+        id: 'hFr8Nyar',
+        src: 'https://video.wordpress.com/embed/hFr8Nyar',
+        url: 'https://videopress.com/v/hFr8Nyar',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the guid out of the flashvars on the video plugin player', async () => {
+      const value = html`
+        <embed
+          src="http://v.wordpress.com/wp-content/plugins/video/flvplayer.swf?ver=1.21"
+          type="application/x-shockwave-flash"
+          width="500"
+          height="280"
+          wmode="transparent"
+          seamlesstabbing="true"
+          allowfullscreen="true"
+          allowscriptaccess="always"
+          overstretch="true"
+          flashvars="guid=BQtfIEY1&width=500&height=280&locksize=no&dynamicseek=false&qc_publisherId=p-18-mFEk4J448M"
+        ></embed>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'videopress',
+        id: 'BQtfIEY1',
+        src: 'https://video.wordpress.com/embed/BQtfIEY1',
+        url: 'https://videopress.com/v/BQtfIEY1',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore the host root, which names no guid', async () => {
+      const value = html`
+        <embed
+          src="http://v.wordpress.com/"
+          type="application/x-shockwave-flash"
+        ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a deeper path that is not the player', async () => {
+      const value = '<embed src="http://v.wordpress.com/hrPKeL5t/extra"></embed>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a file at the root, which names no guid', async () => {
+      const value = '<embed src="http://v.wordpress.com/intro.swf"></embed>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a bare guid path on a host that never served one', async () => {
+      const value = '<embed src="http://v0.wordpress.com/hrPKeL5t"></embed>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
 })
 
 describeForEachParser('videopressIframeEmbedResolver carrier title', (parseHtml) => {
