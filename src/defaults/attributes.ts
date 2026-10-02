@@ -71,17 +71,20 @@ export const defaultLazyIframeAttributes = [
   'data-orig', // Lazy-video facades (iframe id="_ytid_*") parking the embed URL with empty src.
   'data-original-src', // Generic lazy loaders.
   'data-opt-src', // Image/embed optimizers.
+
   // Invision Community forums defer embeds two ways: an iframe with no src at all, or one whose
   // src points at the forum's own blank interface page. FixLazyIframes treats that page as a
   // placeholder so this attribute wins in both shapes. convertWidgets mints the same name onto its
   // own embed placeholders, and the two never collide: fixLazyIframes reads this list off <iframe>
   // elements only, and a placeholder is a <div>.
   'data-embed-src', // Invision Community deferred embeds.
+
   // Avada's privacy-embed facade (data-privacy-type is a taxonomy: YouTube, Vimeo, …), NOT a
   // cookie banner: it defers a real video the author embedded. Recovering it yields a privacy-safe
   // click-to-load placeholder. Stripping would delete the video. The visible Avada notice
   // (.fusion-privacy-placeholder) is stripped separately in defaultNonContentSelectors.
   'data-privacy-src', // Avada privacy-embed facade.
+
   // Cookie-consent gates (CMPs) sit on the same recover side of that line. Each plugin rewrites
   // the author's embed iframe in place, dropping src and parking the real URL in its own
   // attribute, and feed bodies carry no consent flow: the gated iframe is the whole embed, and
@@ -103,6 +106,7 @@ export const defaultLazyIframeAttributes = [
   'data-suppressedsrc', // iubenda.
   'data-uc-src', // Usercentrics.
   'data-gdpr-iframesrc', // Moove GDPR Cookie Compliance.
+
   // EmbedPlus parks the deferred player's URL here. The plugin's facade shape is rebuilt by
   // rebuildEmbedPlusEmbeds.
   'data-ep-src', // EmbedPlus YouTube deferred player.
@@ -113,8 +117,10 @@ export const defaultLazyIframeAttributes = [
 export const defaultDeferredIframeSources: Array<DeferredIframeSource> = [
   // Pym.js (NPR): the established responsive-embed convention; skip already-initialized nodes.
   { selector: '[data-pym-src]:not([data-pym-auto-initialized])', attribute: 'data-pym-src' },
+
   // @newswire/frames (Ryan Murphy; Texas Tribune bundles it as newswireFrames).
   { selector: '[data-frame-src]', attribute: 'data-frame-src' },
+
   // The Drupal/CKEditor oEmbed convention parks the source url on the wrapper, so unlike the
   // two above the value is a watch page rather than a player: `youtube.com/watch`, `vimeo.com`,
   // `listen.style/p`. That is fine here, because convertWidgets asks the resolvers what the url
@@ -128,6 +134,7 @@ export const defaultDeferredIframeSources: Array<DeferredIframeSource> = [
     selector: '[data-oembed-url]:not(:has(iframe, embed, object, video, audio))',
     attribute: 'data-oembed-url',
   },
+
   // Advanced Responsive Video Embedder's lazyload mode replaces the player with a play button
   // that holds the ready embed url and builds the iframe on click, so a reader is left with an
   // empty widget: the button carries no image either, only an inline svg. 276 corpus feeds carry
