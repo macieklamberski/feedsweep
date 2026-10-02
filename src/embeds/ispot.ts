@@ -26,7 +26,7 @@ export const ispotResolveEmbed: ResolveEmbed = (url) => {
     id,
     src: `https://www.ispot.tv/share/${id}`,
     thumbnail: `https://images-cdn.ispot.tv/ad/${id}/default-large.jpg`,
-    ratio: '320/222',
+    ratio: '16/9',
   }
 }
 

@@ -13,7 +13,7 @@ describe('ispotResolveEmbed', () => {
         id: 'IoLU',
         src: 'https://www.ispot.tv/share/IoLU',
         thumbnail: 'https://images-cdn.ispot.tv/ad/IoLU/default-large.jpg',
-        ratio: '320/222',
+        ratio: '16/9',
       }
 
       expect(ispotResolveEmbed(value)).toEqual(expected)
@@ -26,7 +26,7 @@ describe('ispotResolveEmbed', () => {
         id: '7kkJ',
         src: 'https://www.ispot.tv/share/7kkJ',
         thumbnail: 'https://images-cdn.ispot.tv/ad/7kkJ/default-large.jpg',
-        ratio: '320/222',
+        ratio: '16/9',
       }
 
       expect(ispotResolveEmbed(value)).toEqual(expected)
@@ -39,7 +39,7 @@ describe('ispotResolveEmbed', () => {
         id: 'IOLU',
         src: 'https://www.ispot.tv/share/IOLU',
         thumbnail: 'https://images-cdn.ispot.tv/ad/IOLU/default-large.jpg',
-        ratio: '320/222',
+        ratio: '16/9',
       }
 
       expect(ispotResolveEmbed(value)).toEqual(expected)
@@ -52,7 +52,7 @@ describe('ispotResolveEmbed', () => {
         id: 'tZOF',
         src: 'https://www.ispot.tv/share/tZOF',
         thumbnail: 'https://images-cdn.ispot.tv/ad/tZOF/default-large.jpg',
-        ratio: '320/222',
+        ratio: '16/9',
       }
 
       expect(ispotResolveEmbed(value)).toEqual(expected)
@@ -111,7 +111,7 @@ describeForEachParser('ispotEmbedResolver', (parseHtml) => {
         id: 'IoLU',
         src: 'https://www.ispot.tv/share/IoLU',
         thumbnail: 'https://images-cdn.ispot.tv/ad/IoLU/default-large.jpg',
-        ratio: '320/222',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -133,7 +133,7 @@ describeForEachParser('ispotEmbedResolver', (parseHtml) => {
         id: '7kkJ',
         src: 'https://www.ispot.tv/share/7kkJ',
         thumbnail: 'https://images-cdn.ispot.tv/ad/7kkJ/default-large.jpg',
-        ratio: '320/222',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -167,7 +167,7 @@ describeForEachParser('ispot player through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="320/222"
+        data-embed-ratio="16/9"
         data-embed-id="7V5I"
         data-embed-provider="ispot"
         data-embed-src="https://www.ispot.tv/share/7V5I"
