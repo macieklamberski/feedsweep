@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
@@ -154,5 +155,57 @@ describeForEachParser('lglformsIframeEmbedResolver', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('lglforms through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+  }
+
+  it('should turn the loader script into a form placeholder', async () => {
+    const value = html`
+      <script
+        type="text/javascript"
+        src="https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A.js"
+      ></script>
+    `
+    const expected = html`
+      <div
+        data-embed-height="600"
+        data-embed-url="https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A"
+        data-embed-id="F55Z_RZ2NPkjQX0XoghR5A"
+        data-embed-provider="lglforms"
+        data-embed-src="https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should turn the frame the loader writes into a form placeholder', async () => {
+    const value = html`
+      <iframe
+        id="frame-F55Z_RZ2NPkjQX0XoghR5A"
+        height="1197"
+        src="https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A?origin=https%3A%2F%2Fexample.com%2Fpost"
+        frameborder="0"
+        scrolling="no"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-height="600"
+        data-embed-url="https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A"
+        data-embed-id="F55Z_RZ2NPkjQX0XoghR5A"
+        data-embed-provider="lglforms"
+        data-embed-src="https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
