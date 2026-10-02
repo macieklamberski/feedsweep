@@ -194,3 +194,19 @@ export const bgImage = (element: Nullish<Element>): string | undefined => {
 
   return url
 }
+
+// Every other declaration stays as the source wrote it.
+export const removeDeclarations = (element: Element, properties: Array<string>): void => {
+  const kept = (element.getAttribute('style') ?? '').split(';').filter((declaration) => {
+    const property = declaration.split(':')[0]?.trim().toLowerCase() ?? ''
+
+    return !properties.includes(property)
+  })
+
+  if (kept.join('').trim() === '') {
+    element.removeAttribute('style')
+    return
+  }
+
+  element.setAttribute('style', kept.join(';'))
+}

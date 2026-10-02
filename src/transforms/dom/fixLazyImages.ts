@@ -24,18 +24,7 @@ const dropPixelStyleDimensions = (element: Element): void => {
     return
   }
 
-  const kept = (element.getAttribute('style') ?? '').split(';').filter((declaration) => {
-    const property = declaration.split(':')[0]?.trim().toLowerCase() ?? ''
-
-    return !pixelProperties.includes(property)
-  })
-
-  if (kept.join('').trim() === '') {
-    element.removeAttribute('style')
-    return
-  }
-
-  element.setAttribute('style', kept.join(';'))
+  styles.removeDeclarations(element, pixelProperties)
 }
 
 // A lazy loader sizes its placeholder gif at a pixel, in attributes or inline style, which then
