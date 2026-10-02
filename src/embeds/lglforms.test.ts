@@ -16,7 +16,7 @@ describe('lglformsResolveEmbed', () => {
         id: 'F55Z_RZ2NPkjQX0XoghR5A',
         src: 'https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A',
         url: 'https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A',
-        height: 1288,
+        height: 600,
       }
 
       expect(lglformsResolveEmbed(value)).toEqual(expected)
@@ -30,7 +30,7 @@ describe('lglformsResolveEmbed', () => {
         id: 'F55Z_RZ2NPkjQX0XoghR5A',
         src: 'https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A',
         url: 'https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A',
-        height: 1288,
+        height: 600,
       }
 
       expect(lglformsResolveEmbed(value)).toEqual(expected)
@@ -74,7 +74,7 @@ describeForEachParser('lglformsScriptEmbedResolver', (parseHtml) => {
         id: 'F55Z_RZ2NPkjQX0XoghR5A',
         src: 'https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A',
         url: 'https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A',
-        height: 1288,
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -92,7 +92,7 @@ describeForEachParser('lglformsScriptEmbedResolver', (parseHtml) => {
         id: '_-sfOGcRLLnCbi71zCVkIA',
         src: 'https://secure.lglforms.com/form_engine/s/_-sfOGcRLLnCbi71zCVkIA',
         url: 'https://secure.lglforms.com/form_engine/s/_-sfOGcRLLnCbi71zCVkIA',
-        height: 1288,
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -150,7 +150,7 @@ describeForEachParser('lglformsIframeEmbedResolver', (parseHtml) => {
       id: 'F55Z_RZ2NPkjQX0XoghR5A',
       src: 'https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A',
       url: 'https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A',
-      height: 1288,
+      height: 600,
     }
 
     expect(await extract(value)).toEqual(expected)

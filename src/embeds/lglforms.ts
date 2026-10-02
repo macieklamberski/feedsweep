@@ -11,8 +11,8 @@ const formPathRegex = /^\/form_engine\/s\/([^/]+)$/
 const loaderPathRegex = /^\/form_engine\/s\/([^/]+)\.js$/
 
 // A form's height follows its fields, and the frame posts one only to the page its `origin`
-// query names, which is the reader's own address.
-const formHeight = 1288
+// query names, which is the reader's own address, so a long form scrolls inside the frame.
+const formHeight = 600
 
 const composeEmbed = (formKey: string): EmbedResolverResult => {
   return {
