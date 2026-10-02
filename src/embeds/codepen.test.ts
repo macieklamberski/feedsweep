@@ -453,6 +453,38 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should drop a pen link that is only a button label', async () => {
+      const value = html`
+        <div
+          class="cp_embed_wrapper codepen | cellstack cellstack--center"
+          data-height="300"
+          data-default-tab="result"
+          data-slug-hash="vEyjvrb"
+          data-version="1"
+        >
+          <div class="single-media">
+            <img
+              src="https://shots.codepen.io/username/pen/vEyjvrb-512.webp?version=1790824176577"
+              alt=""
+              class="codepen-thumbnail"
+            >
+          </div>
+          <a href="https://codepen.io/chriskirknielsen/pen/vEyjvrb" class="button">View on CodePen</a>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'vEyjvrb',
+        src: 'https://codepen.io/chriskirknielsen/embed/vEyjvrb',
+        url: 'https://codepen.io/chriskirknielsen/pen/vEyjvrb',
+        thumbnail: 'https://shots.codepen.io/chriskirknielsen/pen/vEyjvrb-512.jpg',
+        height: 300,
+        author: '@chriskirknielsen',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should take the title from the pen link when data-pen-title is missing', async () => {
       const value = html`
         <p

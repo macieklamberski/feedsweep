@@ -252,4 +252,5 @@ export const codepenFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: /^codepen (?:embed|by)\b.*$/ },
   { provider, field: 'title', drop: 'CodePen' },
   { provider, field: 'title', drop: 'Untitled' },
+  { provider, field: 'title', drop: 'View on CodePen' },
 ]
