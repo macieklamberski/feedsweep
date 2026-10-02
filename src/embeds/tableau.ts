@@ -36,6 +36,8 @@ const staticImageHosts = [
 
 const viewPathRegex = /^\/views\/([^/]+)\/([^/]+)$/
 const viewNameRegex = /^([^/]+)\/([^/]+)$/
+const profilePathRegex = /^\/profile\/[^/]+$/
+const vizHomeHashRegex = /^#!\/vizhome\/([^/?]+)\/([^/?]+)(?:\?|$)/
 // `/static/images/{first two letters}/{workbook}/{sheet}/{file}`. A shared viz has no workbook
 // and writes `/static/images/{first two letters}/{key}/{file}`.
 const staticImagePathRegex = /^\/static\/images\/[^/]+\/([^/]+)\/([^/]+)\/[^/]+$/
@@ -110,9 +112,19 @@ export const tableauObjectEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
+// The viz page on the author's profile, which refuses framing. Its hash names the workbook and
+// sheet the page shows.
+const readProfileView = (parsed: URL | undefined): RegExpMatchArray | null | undefined => {
+  if (!parsed || !profilePathRegex.test(parsed.pathname)) {
+    return
+  }
+
+  return parsed.hash.match(vizHomeHashRegex)
+}
+
 const tableauResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, tableauHosts)
-  const match = parsed?.pathname.match(viewPathRegex)
+  const match = parsed?.pathname.match(viewPathRegex) ?? readProfileView(parsed)
 
   if (!match) {
     return
