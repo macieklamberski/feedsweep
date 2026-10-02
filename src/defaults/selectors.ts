@@ -30,10 +30,6 @@ export const defaultNonContentSelectors = [
   '[class*="tve-leads"]', // Thrive Leads optin.
   'form[action*=".list-manage"]:not(:has(img, picture, video, iframe))', // Mailchimp embedded signup form, posting to `{account}.us{n}.list-manage.com`, unless the author put media in it.
 
-  // Site contact and lead forms, the same form under every post of the site.
-  'form.et_pb_contact_form', // Divi contact form module.
-  'form.elementor-form', // Elementor Pro form widget.
-
   // Rating and voting widgets, whose controls do nothing in a reader and whose count survives as
   // a stray line of text.
   'form[class*="fivestar"]', // Drupal Fivestar rating widget.
