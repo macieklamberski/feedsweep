@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
@@ -237,5 +238,58 @@ describe('readFormmailerHeight', () => {
     const value = 'heightChanged'
 
     expect(readFormmailerHeight(value)).toBeUndefined()
+  })
+})
+
+describeForEachParser('formmailer through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+  }
+
+  it('should turn the inline embed and its loader into a form placeholder', async () => {
+    const value = html`
+      <div
+        class="formmailer-embed"
+        data-form-hash="44a9f70e243271"
+        data-form-host="pro.form-mailer.jp"
+      ></div>
+      <script src="https://pro.form-mailer.jp/formfiles/js/embed.js"></script>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://pro.form-mailer.jp/fms/44a9f70e243271"
+        data-embed-id="44a9f70e243271"
+        data-embed-provider="formmailer"
+        data-embed-src="https://pro.form-mailer.jp/fms/44a9f70e243271"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should turn the embed code iframe into a form placeholder', async () => {
+    const value = html`
+      <iframe
+        frameborder="0"
+        height="100%"
+        scrolling="auto"
+        src="https://ssl.form-mailer.jp/fms/6662b06a268383"
+        title="HTML Form"
+        width="100%"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://ssl.form-mailer.jp/fms/6662b06a268383"
+        data-embed-id="6662b06a268383"
+        data-embed-provider="formmailer"
+        data-embed-src="https://ssl.form-mailer.jp/fms/6662b06a268383"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
