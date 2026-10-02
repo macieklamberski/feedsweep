@@ -34,6 +34,22 @@ describeForEachParser('rebuildVokiEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should read a scene followed by a space before its comma', async () => {
+      const value = `<script>AC_Voki_Embed(200, 267, '007275daae1363c5599d3bae7e3ab08a', 2981757 , 1,'', 0);</script>`
+      const expected =
+        '<iframe src="https://www.voki.com/site/pickup?scid=2981757&amp;chsm=007275daae1363c5599d3bae7e3ab08a"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should read the scene of a call that ends after it', async () => {
+      const value = `<script>AC_Voki_Embed(200, 267, '007275daae1363c5599d3bae7e3ab08a', 2981757);</script>`
+      const expected =
+        '<iframe src="https://www.voki.com/site/pickup?scid=2981757&amp;chsm=007275daae1363c5599d3bae7e3ab08a"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should rebuild every scene a script embeds', async () => {
       const value = html`
         <script>
@@ -64,7 +80,7 @@ describeForEachParser('rebuildVokiEmbeds', (parseHtml) => {
     })
 
     it('should leave a call whose checksum quotes do not match', async () => {
-      const value = `<script>AC_Voki_Embed(200, 267, '007275daae1363c5599d3bae7e3ab08a", 2981757, 1);</script>`
+      const value = `<script>AC_Voki_Embed(200, 267, '007275daae1363c5599d3bae7e3ab08a", 2981757, 1,'', 0);</script>`
 
       expect(await transform(value)).toEqualHtml(value)
     })
