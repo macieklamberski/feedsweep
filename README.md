@@ -88,6 +88,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildGettyImagesEmbeds` | Rebuild a real `<iframe>` from a Getty Images `gie` widget facade, composing the player URL from the inline config the loader script never runs |
 | `rebuildExternalVideoEmbeds` | Rebuild a real `<iframe>` from a Seesaa or Sakura blog's `external_video.js` block onto the YouTube or Nicovideo video it names |
 | `rebuildJsfiddleEmbeds` | Rebuild a real `<iframe>` from a JSFiddle loader script onto the fiddle's own page |
+| `rebuildVokiEmbeds` | Rebuild a real `<iframe>` from Voki's script embed onto the scene's share page, reading the scene from the inline `AC_Voki_Embed` call |
 | `rebuildDeferredIframes` | Rebuild a real `<iframe>` from a URL parked in a `<div>` attribute (Pym.js `data-pym-src`, @newswire/frames `data-frame-src`) |
 | `rebuildGofundmeEmbeds` | Rebuild a real `<iframe>` from a GoFundMe campaign widget's empty `div.gfm-embed[data-url]` |
 | `rebuildPiktochartEmbeds` | Rebuild a real `<iframe>` from a Piktochart script snippet's `div.piktowrapper-embed`, keeping any prose the publisher wrote inside it |
