@@ -666,7 +666,6 @@ const embedResolvers: Array<EmbedResolver> = [
   typeformWidgetEmbedResolver,
   typeformIframeEmbedResolver,
   ultimediaEmbedResolver,
-  umapEmbedResolver,
   videaEmbedResolver,
   videopressIframeEmbedResolver,
   videopressFlashEmbedResolver,
@@ -697,6 +696,7 @@ const embedResolvers: Array<EmbedResolver> = [
   mastodonEmbedResolver,
   wikimediaEmbedResolver,
   peertubeEmbedResolver,
+  umapEmbedResolver,
 ]
 
 // Alphabetical by platform. Wikimedia's bare `iframe` selector sits last so a host-keyed

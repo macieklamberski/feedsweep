@@ -34,7 +34,8 @@ export const umapEmbedResolver = createMarkupEmbedResolver('iframe[src*="/map/"]
   }
 
   const [, lang, slug, mapId] = match
-  const page = `${url.origin}/${lang}/map/${slug}_${mapId}`
+  // Every instance 301s `http:` to `https:`, and an https page blocks an `http:` frame.
+  const page = `https://${url.host}/${lang}/map/${slug}_${mapId}`
 
   return {
     provider,

@@ -69,7 +69,7 @@ describeForEachParser('umapEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the http scheme and drop an empty layer list', async () => {
+    it('should mint https for an http src and drop an empty layer list', async () => {
       const value = html`
         <iframe
           src="http://umap.openstreetmap.fr/en/map/bandung_357466?scaleControl=false&miniMap=true&scrollWheelZoom=true&zoomControl=true&allowEdit=false&moreControl=false&searchControl=true&tilelayersControl=false&embedControl=false&datalayersControl=true&onLoadPanel=undefined&captionBar=false&datalayers=&fullscreenControl=true&locateControl=true&measureControl=true&editinosmControl=false#12/-6.2817/107.0532"
@@ -82,8 +82,8 @@ describeForEachParser('umapEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'umap',
         id: 'umap.openstreetmap.fr/357466',
-        src: 'http://umap.openstreetmap.fr/en/map/bandung_357466#12/-6.2817/107.0532',
-        url: 'http://umap.openstreetmap.fr/en/map/bandung_357466',
+        src: 'https://umap.openstreetmap.fr/en/map/bandung_357466#12/-6.2817/107.0532',
+        url: 'https://umap.openstreetmap.fr/en/map/bandung_357466',
         height: 300,
       }
 
@@ -175,6 +175,12 @@ describeForEachParser('umapEmbedResolver', (parseHtml) => {
 
     it('should ignore two short segments before the map route', async () => {
       const value = '<iframe src="https://example.org/m/a/map/maison_203723"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a one-letter first segment', async () => {
+      const value = '<iframe src="https://example.org/m/map/maison_203723"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
