@@ -6,6 +6,7 @@ import { bandcampFieldCleaners } from '../embeds/bandcamp.js'
 import { bloggerFieldCleaners } from '../embeds/blogger.js'
 import { blubrryFieldCleaners } from '../embeds/blubrry.js'
 import { codepenFieldCleaners } from '../embeds/codepen.js'
+import { dailymailFieldCleaners } from '../embeds/dailymail.js'
 import { dailymotionFieldCleaners } from '../embeds/dailymotion.js'
 import { deezerFieldCleaners } from '../embeds/deezer.js'
 import { firstoryFieldCleaners } from '../embeds/firstory.js'
@@ -39,6 +40,7 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...bloggerFieldCleaners,
   ...blubrryFieldCleaners,
   ...codepenFieldCleaners,
+  ...dailymailFieldCleaners,
   ...dailymotionFieldCleaners,
   ...deezerFieldCleaners,
   ...firstoryFieldCleaners,

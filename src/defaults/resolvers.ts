@@ -98,6 +98,7 @@ import {
   crowdsignalIframeEmbedResolver,
   crowdsignalScriptEmbedResolver,
 } from '../embeds/crowdsignal.js'
+import { dailymailEmbedResolver } from '../embeds/dailymail.js'
 import { dailymotionEmbedResolver } from '../embeds/dailymotion.js'
 import { deezerEmbedResolver } from '../embeds/deezer.js'
 import { democracynowEmbedResolver } from '../embeds/democracynow.js'
@@ -489,6 +490,7 @@ const embedResolvers: Array<EmbedResolver> = [
   crowdsignalFlashEmbedResolver,
   crowdsignalIframeEmbedResolver,
   crowdsignalScriptEmbedResolver,
+  dailymailEmbedResolver,
   dailymotionEmbedResolver,
   deezerEmbedResolver,
   democracynowEmbedResolver,
