@@ -51,17 +51,26 @@ const composeEmbed = (page: URL): EmbedResolverResult | undefined => {
   }
 }
 
-// Ticket Tailor's inline widget: `widget.js` reads the box or event page off `data-url` and
-// frames it in place, and the pipeline drops the script. The loader acts only on a script inside
-// the snippet's `.tt-widget` div or one marked inline.
+// The older `tt-widget.js` frames a script whose `data-type` is `inline`. The current `widget.js`
+// frames one whose own `type` is `inline`, or whose parent's class is exactly `tt-widget`, so a
+// script that WordPress wrapped in a paragraph inside the snippet's div stays a link.
+const isInlineLoader = (element: Element): boolean => {
+  if (attr(element, 'src')?.includes('tt-widget.js')) {
+    return attr(element, 'data-type') === 'inline'
+  }
+
+  return (
+    attr(element, 'type') === 'inline' ||
+    element.parentElement?.getAttribute('class') === 'tt-widget'
+  )
+}
+
+// Ticket Tailor's inline widget: the loader reads the box or event page off `data-url` and
+// frames it in place, and the pipeline drops the script.
 export const tickettailorScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="tickettailor"][data-url], script[src*="tt-widget.js"][data-url]',
   (element) => {
-    const isInline =
-      attr(element, 'data-type') === 'inline' ||
-      element.parentElement?.classList.contains('tt-widget')
-
-    if (!isInline) {
+    if (!isInlineLoader(element)) {
       return
     }
 

@@ -10,16 +10,18 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
   describe('happy paths', () => {
     it('should build the box widget and drop its display settings', async () => {
       const value = html`
-        <script
-          src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
-          data-url="https://www.tickettailor.com/all-tickets/rivalthereimaginingvalueactionlab/?ref=website_widget&#038;show_search_filter=true&#038;show_date_filter=true&#038;show_sort=true"
-          data-type="inline"
-          data-inline-minimal="true"
-          data-inline-show-logo="false"
-          data-inline-bg-fill="false"
-          data-inline-inherit-ref-from-url-param=""
-          data-inline-ref="website_widget"
-        ></script>
+        <div class="tt-widget">
+          <script
+            src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+            data-url="https://www.tickettailor.com/all-tickets/rivalthereimaginingvalueactionlab/?ref=website_widget&#038;show_search_filter=true&#038;show_date_filter=true&#038;show_sort=true"
+            data-type="inline"
+            data-inline-minimal="true"
+            data-inline-show-logo="false"
+            data-inline-bg-fill="false"
+            data-inline-inherit-ref-from-url-param=""
+            data-inline-ref="website_widget"
+          ></script>
+        </div>
       `
       const expected: EmbedResolverResult = {
         provider: 'tickettailor',
@@ -34,12 +36,14 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
 
     it('should build the widget of one event', async () => {
       const value = html`
-        <script
-          src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
-          data-url="https://www.tickettailor.com/events/aneti/2443115/select-date?ref=website_widget&#038;show_event_filter=false"
-          data-type="inline"
-          data-inline-minimal="true"
-        ></script>
+        <div class="tt-widget">
+          <script
+            src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+            data-url="https://www.tickettailor.com/events/aneti/2443115/select-date?ref=website_widget&#038;show_event_filter=false"
+            data-type="inline"
+            data-inline-minimal="true"
+          ></script>
+        </div>
       `
       const expected: EmbedResolverResult = {
         provider: 'tickettailor',
@@ -54,12 +58,14 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
 
     it('should build the checkout widget with no page url, since it needs its checksum', async () => {
       const value = html`
-        <script
-          src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
-          data-url="https://www.tickettailor.com/checkout/new-session/id/8625469/chk/410ded8446b6a1390609c46a1bbf7462/?ref=website_widget&#038;show_event_filter=false"
-          data-type="inline"
-          data-inline-minimal="true"
-        ></script>
+        <div class="tt-widget">
+          <script
+            src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+            data-url="https://www.tickettailor.com/checkout/new-session/id/8625469/chk/410ded8446b6a1390609c46a1bbf7462/?ref=website_widget&#038;show_event_filter=false"
+            data-type="inline"
+            data-inline-minimal="true"
+          ></script>
+        </div>
       `
       const expected: EmbedResolverResult = {
         provider: 'tickettailor',
@@ -127,13 +133,76 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a page on a foreign host', async () => {
+    it('should ignore the current loader marked inline only by data-type, which it does not read', async () => {
       const value = html`
         <script
           src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
-          data-url="https://evil.test/all-tickets/aneti/"
+          data-url="https://www.tickettailor.com/all-tickets/rivalthereimaginingvalueactionlab/?ref=website_widget"
           data-type="inline"
+          data-inline-minimal="true"
         ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the current loader wrapped in a paragraph inside the snippet div', async () => {
+      const value = html`
+        <div class="tt-widget">
+          <div class="tt-widget-fallback">
+            <p>
+              <a href="https://www.tickettailor.com/all-tickets/taddingtonbramwellinstitute/?ref=website_widget">Click here to buy tickets</a>
+            </p>
+          </div>
+          <p>
+            <script
+              src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+              data-url="https://www.tickettailor.com/all-tickets/taddingtonbramwellinstitute/?ref=website_widget"
+              data-type="inline"
+              data-inline-minimal="true"
+            ></script>
+          </p>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the current loader in a div with another class beside tt-widget', async () => {
+      const value = html`
+        <div class="tt-widget tt-widget-wide">
+          <script
+            src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+            data-url="https://www.tickettailor.com/all-tickets/aneti/"
+          ></script>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the older loader inside the snippet div with no inline type', async () => {
+      const value = html`
+        <div class="tt-widget">
+          <script
+            src="https://dc161a0a89fedd6639c9-03787a0970cd749432e2a6d3b34c55df.ssl.cf3.rackcdn.com/tt-widget.js"
+            data-url="https://www.tickettailor.com/events/witneyconservativesassociation/2143010/select-date"
+          ></script>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a page on a foreign host', async () => {
+      const value = html`
+        <div class="tt-widget">
+          <script
+            src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+            data-url="https://evil.test/all-tickets/aneti/"
+            data-type="inline"
+          ></script>
+        </div>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -141,11 +210,13 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
 
     it('should ignore a route that is not a box, an event or a checkout', async () => {
       const value = html`
-        <script
-          src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
-          data-url="https://www.tickettailor.com/notaroute/aneti/"
-          data-type="inline"
-        ></script>
+        <div class="tt-widget">
+          <script
+            src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+            data-url="https://www.tickettailor.com/notaroute/aneti/"
+            data-type="inline"
+          ></script>
+        </div>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -153,11 +224,13 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
 
     it('should ignore the box route with no box', async () => {
       const value = html`
-        <script
-          src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
-          data-url="https://www.tickettailor.com/all-tickets/"
-          data-type="inline"
-        ></script>
+        <div class="tt-widget">
+          <script
+            src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+            data-url="https://www.tickettailor.com/all-tickets/"
+            data-type="inline"
+          ></script>
+        </div>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -165,11 +238,13 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
 
     it('should ignore an event route with no event', async () => {
       const value = html`
-        <script
-          src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
-          data-url="https://www.tickettailor.com/events/aneti/"
-          data-type="inline"
-        ></script>
+        <div class="tt-widget">
+          <script
+            src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+            data-url="https://www.tickettailor.com/events/aneti/"
+            data-type="inline"
+          ></script>
+        </div>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -177,11 +252,13 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
 
     it('should ignore a checkout with no checksum', async () => {
       const value = html`
-        <script
-          src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
-          data-url="https://www.tickettailor.com/checkout/new-session/id/8625469/chk/"
-          data-type="inline"
-        ></script>
+        <div class="tt-widget">
+          <script
+            src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+            data-url="https://www.tickettailor.com/checkout/new-session/id/8625469/chk/"
+            data-type="inline"
+          ></script>
+        </div>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -189,11 +266,13 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
 
     it('should ignore a checkout route other than a new session', async () => {
       const value = html`
-        <script
-          src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
-          data-url="https://www.tickettailor.com/checkout/view-cart/id/8625469/chk/410ded84"
-          data-type="inline"
-        ></script>
+        <div class="tt-widget">
+          <script
+            src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+            data-url="https://www.tickettailor.com/checkout/view-cart/id/8625469/chk/410ded84"
+            data-type="inline"
+          ></script>
+        </div>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -201,11 +280,13 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
 
     it('should ignore a checkout that names no event id', async () => {
       const value = html`
-        <script
-          src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
-          data-url="https://www.tickettailor.com/checkout/new-session/key/8625469/chk/410ded84"
-          data-type="inline"
-        ></script>
+        <div class="tt-widget">
+          <script
+            src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+            data-url="https://www.tickettailor.com/checkout/new-session/key/8625469/chk/410ded84"
+            data-type="inline"
+          ></script>
+        </div>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -213,11 +294,13 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
 
     it('should ignore a checkout that names no checksum', async () => {
       const value = html`
-        <script
-          src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
-          data-url="https://www.tickettailor.com/checkout/new-session/id/8625469/sum/410ded84"
-          data-type="inline"
-        ></script>
+        <div class="tt-widget">
+          <script
+            src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+            data-url="https://www.tickettailor.com/checkout/new-session/id/8625469/sum/410ded84"
+            data-type="inline"
+          ></script>
+        </div>
       `
 
       expect(await extract(value)).toBeUndefined()
