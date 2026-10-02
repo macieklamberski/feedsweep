@@ -2,7 +2,7 @@ import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
-import { parseUrlOnHosts, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'infogram'
@@ -19,9 +19,6 @@ const infogramHosts = [
   'infogr.am', // The retired domain, `e.infogr.am` included
 ]
 
-// Layout settings the frame page reads.
-const keptParams = ['embed_type']
-
 // Every host and spelling serves the chart on `e.infogram.com`, whose bare route redirects to
 // `?src=embed`.
 const composeInfogramEmbed = (
@@ -29,13 +26,12 @@ const composeInfogramEmbed = (
   query: string,
   title: string | undefined,
 ): EmbedResolverResult => {
-  const params = new URLSearchParams({ src: 'embed', ...pickQueryParams(query, keptParams) })
   const live = new URLSearchParams(query).has('live') ? '&live' : ''
 
   return {
     provider,
     id: chartId,
-    src: `https://e.infogram.com/${chartId}?${params}${live}`,
+    src: `https://e.infogram.com/${chartId}?src=embed${live}`,
     url: `https://infogram.com/${chartId}`,
     title,
   }

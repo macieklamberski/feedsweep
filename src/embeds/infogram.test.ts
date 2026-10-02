@@ -288,7 +288,7 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, infogramIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the layout setting of a chart frame', async () => {
+    it('should drop the layout setting of a chart frame', async () => {
       const value = html`
         <iframe
           title="US Venture-Backed Billion-Dollar IPO Counts And Exit Value, By Quarter"
@@ -299,7 +299,7 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'infogram',
         id: '7c55cc6b-d3b6-4786-b60b-2507efdcf403',
-        src: 'https://e.infogram.com/7c55cc6b-d3b6-4786-b60b-2507efdcf403?src=embed&embed_type=responsive_iframe',
+        src: 'https://e.infogram.com/7c55cc6b-d3b6-4786-b60b-2507efdcf403?src=embed',
         url: 'https://infogram.com/7c55cc6b-d3b6-4786-b60b-2507efdcf403',
       }
 
@@ -316,7 +316,7 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'infogram',
         id: '_/xCt9tZZlJeRza5h27e5F',
-        src: 'https://e.infogram.com/_/xCt9tZZlJeRza5h27e5F?src=embed&embed_type=responsive_iframe',
+        src: 'https://e.infogram.com/_/xCt9tZZlJeRza5h27e5F?src=embed',
         url: 'https://infogram.com/_/xCt9tZZlJeRza5h27e5F',
       }
 
@@ -442,7 +442,7 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop a tracker riding beside the layout setting', async () => {
+    it('should drop a tracker and the layout setting', async () => {
       const value = html`
         <iframe
           src="https://e.infogram.com/7c55cc6b-d3b6-4786-b60b-2507efdcf403?src=embed&embed_type=responsive_iframe&utm_source=newsletter"
@@ -451,7 +451,7 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'infogram',
         id: '7c55cc6b-d3b6-4786-b60b-2507efdcf403',
-        src: 'https://e.infogram.com/7c55cc6b-d3b6-4786-b60b-2507efdcf403?src=embed&embed_type=responsive_iframe',
+        src: 'https://e.infogram.com/7c55cc6b-d3b6-4786-b60b-2507efdcf403?src=embed',
         url: 'https://infogram.com/7c55cc6b-d3b6-4786-b60b-2507efdcf403',
       }
 
