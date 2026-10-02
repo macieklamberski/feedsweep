@@ -32,11 +32,11 @@ import { tistoryCiteResolver } from '../cites/tistory.js'
 import { tumblrCiteResolver } from '../cites/tumblr.js'
 import { wordpressCiteResolver } from '../cites/wordpress.js'
 import { xenforoCiteResolver } from '../cites/xenforo.js'
+import { channelOneEmbedResolver } from '../embeds/1tv.js'
 import {
   oneTwoThreeFormBuilderIframeEmbedResolver,
   oneTwoThreeFormBuilderScriptEmbedResolver,
 } from '../embeds/123formbuilder.js'
-import { channelOneEmbedResolver } from '../embeds/1tv.js'
 import { threeSixtyCitiesEmbedResolver } from '../embeds/360cities.js'
 import { abcnewsEmbedResolver } from '../embeds/abcnews.js'
 import { abcotvEmbedResolver } from '../embeds/abcotv.js'

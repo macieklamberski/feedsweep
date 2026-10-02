@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
 import {
   oneTwoThreeFormBuilderIframeEmbedResolver,
+  oneTwoThreeFormBuilderRenderHint,
   oneTwoThreeFormBuilderResolveEmbed,
   oneTwoThreeFormBuilderScriptEmbedResolver,
 } from './123formbuilder.js'
@@ -16,7 +18,6 @@ describe('oneTwoThreeFormBuilderResolveEmbed', () => {
         id: '5013627',
         src: 'https://form.123formbuilder.com/5013627',
         url: 'https://form.123formbuilder.com/5013627',
-        height: 1036,
       }
 
       expect(oneTwoThreeFormBuilderResolveEmbed(value)).toEqual(expected)
@@ -29,7 +30,6 @@ describe('oneTwoThreeFormBuilderResolveEmbed', () => {
         id: '5013627',
         src: 'https://form.123formbuilder.com/5013627',
         url: 'https://form.123formbuilder.com/5013627',
-        height: 1036,
       }
 
       expect(oneTwoThreeFormBuilderResolveEmbed(value)).toEqual(expected)
@@ -42,7 +42,6 @@ describe('oneTwoThreeFormBuilderResolveEmbed', () => {
         id: '4733692',
         src: 'https://form.123formbuilder.com/4733692',
         url: 'https://form.123formbuilder.com/4733692',
-        height: 1036,
       }
 
       expect(oneTwoThreeFormBuilderResolveEmbed(value)).toEqual(expected)
@@ -55,7 +54,6 @@ describe('oneTwoThreeFormBuilderResolveEmbed', () => {
         id: '783097',
         src: 'https://form.123formbuilder.com/783097',
         url: 'https://form.123formbuilder.com/783097',
-        height: 1036,
       }
 
       expect(oneTwoThreeFormBuilderResolveEmbed(value)).toEqual(expected)
@@ -68,7 +66,6 @@ describe('oneTwoThreeFormBuilderResolveEmbed', () => {
         id: '5013627',
         src: 'https://form.123formbuilder.com/5013627',
         url: 'https://form.123formbuilder.com/5013627',
-        height: 1036,
       }
 
       expect(oneTwoThreeFormBuilderResolveEmbed(value)).toEqual(expected)
@@ -139,7 +136,6 @@ describeForEachParser('oneTwoThreeFormBuilderScriptEmbedResolver', (parseHtml) =
         id: '4743251',
         src: 'https://form.123formbuilder.com/4743251',
         url: 'https://form.123formbuilder.com/4743251',
-        height: 1036,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -160,7 +156,6 @@ describeForEachParser('oneTwoThreeFormBuilderScriptEmbedResolver', (parseHtml) =
         id: '5013627',
         src: 'https://form.123formbuilder.com/5013627',
         url: 'https://form.123formbuilder.com/5013627',
-        height: 1036,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -180,7 +175,6 @@ describeForEachParser('oneTwoThreeFormBuilderScriptEmbedResolver', (parseHtml) =
         id: '3072130',
         src: 'https://form.123formbuilder.com/3072130',
         url: 'https://form.123formbuilder.com/3072130',
-        height: 1036,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -202,7 +196,6 @@ describeForEachParser('oneTwoThreeFormBuilderScriptEmbedResolver', (parseHtml) =
         id: '6453710',
         src: 'https://form.123formbuilder.com/6453710',
         url: 'https://form.123formbuilder.com/6453710',
-        height: 1036,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -220,7 +213,6 @@ describeForEachParser('oneTwoThreeFormBuilderScriptEmbedResolver', (parseHtml) =
         id: 'abc_123',
         src: 'https://form.123formbuilder.com/abc_123',
         url: 'https://form.123formbuilder.com/abc_123',
-        height: 1036,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -306,7 +298,6 @@ describeForEachParser('oneTwoThreeFormBuilderIframeEmbedResolver', (parseHtml) =
         id: '783097',
         src: 'https://form.123formbuilder.com/783097',
         url: 'https://form.123formbuilder.com/783097',
-        height: 1036,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -319,5 +310,18 @@ describeForEachParser('oneTwoThreeFormBuilderIframeEmbedResolver', (parseHtml) =
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+describe('oneTwoThreeFormBuilderRenderHint', () => {
+  it('should start iframe-resizer and read the height the form answers with', () => {
+    const expected: EmbedRenderHint = {
+      provider: '123formbuilder',
+      origin: 'https://form.123formbuilder.com',
+      requestHeight: iframeResizerHeightRequest,
+      readHeight: readIframeResizerHeight,
+    }
+
+    expect(oneTwoThreeFormBuilderRenderHint).toEqual(expected)
   })
 })

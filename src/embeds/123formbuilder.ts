@@ -1,6 +1,7 @@
 import { parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
+import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -13,17 +14,12 @@ const loaderPathRegex = /^\/embed\/([^/]+)\.js$/
 const formPathRegex = /^\/(\d+)\/?$/
 const legacyFramePathRegex = /^\/my-contact-form-(?:a\d+-)?(\d+)\.html$/
 
-// A form's height follows its fields, and the frame posts none to a parent that runs no
-// iframe-resizer handshake.
-const formHeight = 1036
-
 const composeEmbed = (formId: string): EmbedResolverResult => {
   return {
     provider,
     id: formId,
     src: `https://form.123formbuilder.com/${formId}`,
     url: `https://form.123formbuilder.com/${formId}`,
-    height: formHeight,
   }
 }
 
@@ -66,3 +62,12 @@ export const oneTwoThreeFormBuilderIframeEmbedResolver = createUrlEmbedResolver(
   oneTwoThreeFormBuilderHosts,
   oneTwoThreeFormBuilderResolveEmbed,
 )
+
+// The form's height follows its fields, and it reports one only to a parent that starts
+// iframe-resizer.
+export const oneTwoThreeFormBuilderRenderHint: EmbedRenderHint = {
+  provider,
+  origin: 'https://form.123formbuilder.com',
+  requestHeight: iframeResizerHeightRequest,
+  readHeight: readIframeResizerHeight,
+}

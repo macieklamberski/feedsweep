@@ -1,3 +1,4 @@
+import { oneTwoThreeFormBuilderRenderHint } from '../embeds/123formbuilder.js'
 import { acastRenderHint } from '../embeds/acast.js'
 import { archiveRenderHint } from '../embeds/archive.js'
 import { arteRenderHint } from '../embeds/arte.js'
@@ -138,6 +139,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   observableRenderHint,
   odnoklassnikiRenderHint,
   omnyRenderHint,
+  oneTwoThreeFormBuilderRenderHint,
   pbsRenderHint,
   peertubeRenderHint,
   pinecastRenderHint,
