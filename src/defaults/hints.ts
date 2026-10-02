@@ -1,4 +1,5 @@
 import { acastRenderHint } from '../embeds/acast.js'
+import { acuityschedulingRenderHint } from '../embeds/acuityscheduling.js'
 import { archiveRenderHint } from '../embeds/archive.js'
 import { arteRenderHint } from '../embeds/arte.js'
 import { audioboomRenderHint } from '../embeds/audioboom.js'
@@ -89,6 +90,7 @@ import type { EmbedRenderHint } from '../types.js'
 // reports its rendered height. One per provider, beside its resolver.
 export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   acastRenderHint,
+  acuityschedulingRenderHint,
   archiveRenderHint,
   arteRenderHint,
   audioboomRenderHint,

@@ -37,6 +37,7 @@ import { threeSixtyCitiesEmbedResolver } from '../embeds/360cities.js'
 import { abcnewsEmbedResolver } from '../embeds/abcnews.js'
 import { abcotvEmbedResolver } from '../embeds/abcotv.js'
 import { acastEmbedResolver } from '../embeds/acast.js'
+import { acuityschedulingEmbedResolver } from '../embeds/acuityscheduling.js'
 import { allocineEmbedResolver } from '../embeds/allocine.js'
 import {
   amebaImagePageEmbedResolver,
@@ -448,6 +449,7 @@ const embedResolvers: Array<EmbedResolver> = [
   abcnewsEmbedResolver,
   abcotvEmbedResolver,
   acastEmbedResolver,
+  acuityschedulingEmbedResolver,
   allocineEmbedResolver,
   amebaImagePageEmbedResolver,
   amebaMoviePlayerEmbedResolver,
