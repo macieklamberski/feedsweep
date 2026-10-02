@@ -44,6 +44,29 @@ describeForEachParser('rebuildDocumentcloudEmbeds', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should rebuild every document a script loads', async () => {
+      const value = html`
+        <script>
+          DV.load('http://www.documentcloud.org/documents/409020-udo-pc-review-august-14.js', {});
+          DV.load('http://www.documentcloud.org/documents/1262997-mark-tomas-regan-indictment.js', {});
+        </script>
+      `
+      const expected = html`
+        <iframe src="https://embed.documentcloud.org/documents/409020-udo-pc-review-august-14/"></iframe>
+        <iframe src="https://embed.documentcloud.org/documents/1262997-mark-tomas-regan-indictment/"></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should stop the url at its closing quote', async () => {
+      const value = `<script>DV.load('http://www.documentcloud.org/documents/409020-udo-pc-review-august-14.js', { container: '#DV-viewer-409020-udo-pc-review-august-14' });</script>`
+      const expected =
+        '<iframe src="https://embed.documentcloud.org/documents/409020-udo-pc-review-august-14/"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('sad paths', () => {
