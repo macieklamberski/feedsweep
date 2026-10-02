@@ -13,6 +13,7 @@ import { convertGiphyEmbeds } from '../transforms/dom/convertGiphyEmbeds.js'
 import { convertLazyImageContainers } from '../transforms/dom/convertLazyImageContainers.js'
 import { convertNoteEmbeds } from '../transforms/dom/convertNoteEmbeds.js'
 import { convertSmartframeEmbeds } from '../transforms/dom/convertSmartframeEmbeds.js'
+import { convertUcozSpoilerButtons } from '../transforms/dom/convertUcozSpoilerButtons.js'
 import { convertWidgets } from '../transforms/dom/convertWidgets.js'
 import { decodeDoubleEncodedTags } from '../transforms/dom/decodeDoubleEncodedTags.js'
 import { demoteHeadings } from '../transforms/dom/demoteHeadings.js'
@@ -234,6 +235,9 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   flattenPictureElements,
   hoistFigcaptionFromAnchor,
   stripNonContentElements,
+
+  // Runs before wrapBareInlineInParagraphs, which puts the title in a paragraph of its own.
+  convertUcozSpoilerButtons,
   resolveRelativeUrls,
   cleanAnchorUrls,
 
