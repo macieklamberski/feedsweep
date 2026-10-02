@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
@@ -6,6 +7,24 @@ import {
   condenastResolveEmbed,
   condenastScriptEmbedResolver,
 } from './condenast.js'
+
+const readPlaceholder = (
+  result: string,
+  parseHtml: (value: string) => Document,
+): Record<string, string> => {
+  const element = parseHtml(result).querySelector('[data-embed-src]')
+  const fields: Record<string, string> = {}
+
+  for (const name of element?.getAttributeNames() ?? []) {
+    const value = element?.getAttribute(name)
+
+    if (name.startsWith('data-embed-') && value) {
+      fields[name.replace('data-embed-', '')] = value
+    }
+  }
+
+  return fields
+}
 
 describe('condenastResolveEmbed', () => {
   describe('happy paths', () => {
@@ -25,19 +44,6 @@ describe('condenastResolveEmbed', () => {
     it('should read the video after the player in the older script embed', () => {
       const value =
         '//player.cnevids.com/embedjs/5345874069702d66a4000000/video/55cb6a6c61646d6a30000011.js'
-      const expected: EmbedResolverResult = {
-        provider: 'condenast',
-        id: '55cb6a6c61646d6a30000011',
-        src: 'https://player.cnevids.com/iframe/video/55cb6a6c61646d6a30000011',
-        ratio: '16/9',
-      }
-
-      expect(condenastResolveEmbed(value)).toEqual(expected)
-    })
-
-    it('should read the older script embed on the backend host', () => {
-      const value =
-        '//player-backend.cnevids.com/embedjs/5345874069702d66a4000000/video/55cb6a6c61646d6a30000011.js'
       const expected: EmbedResolverResult = {
         provider: 'condenast',
         id: '55cb6a6c61646d6a30000011',
@@ -216,5 +222,71 @@ describeForEachParser('condenastScriptEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+describeForEachParser('condenast through the pipeline', (parseHtml) => {
+  const convert = (value: string): Promise<string> => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  const placeholder = async (value: string): Promise<Record<string, string>> => {
+    return readPlaceholder(await convert(value), parseHtml)
+  }
+
+  it('should turn the bare script embed into a placeholder', async () => {
+    const value = html`
+      <script
+        async
+        src="//player-backend.cnevids.com/script/video/5be1fd3d8c1abc6e6400000f.js?iu=/3379/newyorker.dart/share"
+      ></script>
+    `
+    const expected: Record<string, string> = {
+      provider: 'condenast',
+      id: '5be1fd3d8c1abc6e6400000f',
+      src: 'https://player.cnevids.com/iframe/video/5be1fd3d8c1abc6e6400000f',
+      ratio: '16/9',
+    }
+
+    expect(await placeholder(value)).toEqual(expected)
+  })
+
+  it('should leave no empty paragraph around a script embed', async () => {
+    const value = html`
+      <p>
+        <script
+          async=""
+          src="//player-backend.cnevids.com/script/video/5ce439aa34e7941264b4701c.js?iu=/3379/vanityfair.dart/share"
+        ></script>
+      </p>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-id="5ce439aa34e7941264b4701c"
+        data-embed-provider="condenast"
+        data-embed-src="https://player.cnevids.com/iframe/video/5ce439aa34e7941264b4701c"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should turn the oldest frame into a placeholder', async () => {
+    const value = html`
+      <iframe
+        height="390"
+        src="http://player.cnevids.com/embed/54627cfc61646d2fc1030000/52f2ad0169702d21a5080000"
+        width="560"
+      ></iframe>
+    `
+    const expected: Record<string, string> = {
+      provider: 'condenast',
+      id: '54627cfc61646d2fc1030000',
+      src: 'https://player.cnevids.com/iframe/video/54627cfc61646d2fc1030000',
+      ratio: '16/9',
+    }
+
+    expect(await placeholder(value)).toEqual(expected)
   })
 })
