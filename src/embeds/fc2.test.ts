@@ -13,7 +13,7 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
 
   describe('happy paths', () => {
     // The 448x284 box is the carrier's, which shallow handling does not read.
-    it('should read the content, the language, the tag, the title and the duration off the loader', async () => {
+    it('should read the content, the title and the duration off the loader, and drop the language and the tag', async () => {
       const value = html`
         <script
           src="http://static.fc2.com/video/js/outerplayer.min.js"
@@ -30,8 +30,8 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'fc2',
         id: '20130822huqehDnu',
-        src: 'https://video.fc2.com/embed/player/20130822huqehDnu/?tg=TWpjNE1ESTFNVFk9',
-        url: 'https://video.fc2.com/ja/content/20130822huqehDnu/',
+        src: 'https://video.fc2.com/embed/player/20130822huqehDnu/',
+        url: 'https://video.fc2.com/content/20130822huqehDnu/',
         ratio: '16/9',
         title: '下肢麻痺娘の奇跡②',
         duration: 25,
@@ -40,7 +40,7 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should carry the suggestions switched off into the player', async () => {
+    it('should drop the suggestions switch', async () => {
       const value = html`
         <script
           src="https://static.fc2.com/video/js/outerplayer.min.js"
@@ -57,8 +57,8 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'fc2',
         id: '20210528p7G2xWt4',
-        src: 'https://video.fc2.com/embed/player/20210528p7G2xWt4/?tg=TWpFek1ETTBOVEE9&sg=0',
-        url: 'https://video.fc2.com/ja/content/20210528p7G2xWt4/',
+        src: 'https://video.fc2.com/embed/player/20210528p7G2xWt4/',
+        url: 'https://video.fc2.com/content/20210528p7G2xWt4/',
         ratio: '16/9',
         title: 'こ',
         duration: 12,
@@ -86,7 +86,7 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
         provider: 'fc2',
         id: '20150807UyE5pthu',
         src: 'https://video.fc2.com/embed/player/20150807UyE5pthu/',
-        url: 'https://video.fc2.com/ja/content/20150807UyE5pthu/',
+        url: 'https://video.fc2.com/content/20150807UyE5pthu/',
         ratio: '16/9',
         title:
           '石原さとみ、『サントリー ドリームマッチ 2015』始球式で“マサカリ投法” 本家・村田兆治が伝授',
@@ -301,7 +301,7 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should play data-id over the id the url names, and keep the url language', async () => {
+    it('should play data-id over the id the url names', async () => {
       const value = html`
         <script
           src="https://static.fc2.com/video/js/outerplayer.min.js"
@@ -313,14 +313,14 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
         provider: 'fc2',
         id: '20210528p7G2xWt4',
         src: 'https://video.fc2.com/embed/player/20210528p7G2xWt4/',
-        url: 'https://video.fc2.com/ja/content/20210528p7G2xWt4/',
+        url: 'https://video.fc2.com/content/20210528p7G2xWt4/',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the url language when data-id supplies the id the url refuses', async () => {
+    it('should play data-id over a malformed id in the url', async () => {
       const value = html`
         <script
           src="https://static.fc2.com/video/js/outerplayer.min.js"
@@ -332,14 +332,14 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
         provider: 'fc2',
         id: '20210528p7G2xWt4',
         src: 'https://video.fc2.com/embed/player/20210528p7G2xWt4/',
-        url: 'https://video.fc2.com/ja/content/20210528p7G2xWt4/',
+        url: 'https://video.fc2.com/content/20210528p7G2xWt4/',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a language in uppercase', async () => {
+    it('should recognise a language in uppercase and drop it', async () => {
       const value = html`
         <script
           src="https://static.fc2.com/video/js/outerplayer.min.js"
@@ -350,14 +350,14 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
         provider: 'fc2',
         id: '20190922FrnqLhsk',
         src: 'https://video.fc2.com/embed/player/20190922FrnqLhsk/',
-        url: 'https://video.fc2.com/JA/content/20190922FrnqLhsk/',
+        url: 'https://video.fc2.com/content/20190922FrnqLhsk/',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a language in digits', async () => {
+    it('should recognise a language in digits and drop it', async () => {
       const value = html`
         <script
           src="https://static.fc2.com/video/js/outerplayer.min.js"
@@ -368,14 +368,14 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
         provider: 'fc2',
         id: '20190922FrnqLhsk',
         src: 'https://video.fc2.com/embed/player/20190922FrnqLhsk/',
-        url: 'https://video.fc2.com/12/content/20190922FrnqLhsk/',
+        url: 'https://video.fc2.com/content/20190922FrnqLhsk/',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a language in underscores', async () => {
+    it('should recognise a language in underscores and drop it', async () => {
       const value = html`
         <script
           src="https://static.fc2.com/video/js/outerplayer.min.js"
@@ -386,7 +386,7 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
         provider: 'fc2',
         id: '20190922FrnqLhsk',
         src: 'https://video.fc2.com/embed/player/20190922FrnqLhsk/',
-        url: 'https://video.fc2.com/__/content/20190922FrnqLhsk/',
+        url: 'https://video.fc2.com/content/20190922FrnqLhsk/',
         ratio: '16/9',
       }
 
@@ -420,7 +420,7 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, fc2BlogScriptEmbedResolver)
 
   describe('happy paths', () => {
-    it('should switch the suggestions off for a shim with no rel', async () => {
+    it('should drop the suggestions switch a shim with no rel writes', async () => {
       const value = html`
         <script
           type="text/javascript"
@@ -430,15 +430,15 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'fc2',
         id: '20230116F3WJd7kn',
-        src: 'https://video.fc2.com/embed/player/20230116F3WJd7kn/?sg=0',
-        url: 'https://video.fc2.com/ja/content/20230116F3WJd7kn/',
+        src: 'https://video.fc2.com/embed/player/20230116F3WJd7kn/',
+        url: 'https://video.fc2.com/content/20230116F3WJd7kn/',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the suggestions on for a shim with rel=1', async () => {
+    it('should mint the same player for a shim with rel=1', async () => {
       const value = html`
         <script
           type="text/javascript"
@@ -449,7 +449,7 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
         provider: 'fc2',
         id: '20150612T5yKXfrt',
         src: 'https://video.fc2.com/embed/player/20150612T5yKXfrt/',
-        url: 'https://video.fc2.com/ja/content/20150612T5yKXfrt/',
+        url: 'https://video.fc2.com/content/20150612T5yKXfrt/',
         ratio: '16/9',
       }
 
@@ -468,7 +468,7 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
         provider: 'fc2',
         id: '20101012GXMya76M',
         src: 'https://video.fc2.com/embed/player/20101012GXMya76M/',
-        url: 'https://video.fc2.com/ja/content/20101012GXMya76M/',
+        url: 'https://video.fc2.com/content/20101012GXMya76M/',
         ratio: '16/9',
       }
 
@@ -483,7 +483,7 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
         provider: 'fc2',
         id: '20180204VvaeWBM9',
         src: 'https://video.fc2.com/embed/player/20180204VvaeWBM9/',
-        url: 'https://video.fc2.com/ja/content/20180204VvaeWBM9/',
+        url: 'https://video.fc2.com/content/20180204VvaeWBM9/',
         ratio: '16/9',
       }
 
@@ -515,8 +515,8 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'fc2',
         id: '2023-01-16',
-        src: 'https://video.fc2.com/embed/player/2023-01-16/?sg=0',
-        url: 'https://video.fc2.com/ja/content/2023-01-16/',
+        src: 'https://video.fc2.com/embed/player/2023-01-16/',
+        url: 'https://video.fc2.com/content/2023-01-16/',
         ratio: '16/9',
       }
 
@@ -530,8 +530,8 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'fc2',
         id: '2023%2F0116',
-        src: 'https://video.fc2.com/embed/player/2023%2F0116/?sg=0',
-        url: 'https://video.fc2.com/ja/content/2023%2F0116/',
+        src: 'https://video.fc2.com/embed/player/2023%2F0116/',
+        url: 'https://video.fc2.com/content/2023%2F0116/',
         ratio: '16/9',
       }
 
@@ -540,15 +540,15 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should switch the suggestions off for a rel other than 1', async () => {
+    it('should mint the same player for a rel other than 1', async () => {
       const value = html`
         <script src="https://admin.blog.fc2.com/fc2video2.php?id=20230116F3WJd7kn&rel=0&uno=12879754"></script>
       `
       const expected: EmbedResolverResult = {
         provider: 'fc2',
         id: '20230116F3WJd7kn',
-        src: 'https://video.fc2.com/embed/player/20230116F3WJd7kn/?sg=0',
-        url: 'https://video.fc2.com/ja/content/20230116F3WJd7kn/',
+        src: 'https://video.fc2.com/embed/player/20230116F3WJd7kn/',
+        url: 'https://video.fc2.com/content/20230116F3WJd7kn/',
         ratio: '16/9',
       }
 
@@ -603,7 +603,7 @@ describeForEachParser('fc2IframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the tag and the suggestion switch and drop a tracker', async () => {
+    it('should drop the tag, the suggestion switch and a tracker', async () => {
       const value = html`
         <iframe
           src="https://video.fc2.com/embed/player/20210528p7G2xWt4/?tg=TWpFek1ETTBOVEE9&sg=0&utm_source=feed"
@@ -616,7 +616,7 @@ describeForEachParser('fc2IframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'fc2',
         id: '20210528p7G2xWt4',
-        src: 'https://video.fc2.com/embed/player/20210528p7G2xWt4/?tg=TWpFek1ETTBOVEE9&sg=0',
+        src: 'https://video.fc2.com/embed/player/20210528p7G2xWt4/',
         url: 'https://video.fc2.com/content/20210528p7G2xWt4/',
         ratio: '16/9',
       }
@@ -718,7 +718,7 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'fc2',
         id: '20120101QN5FVkv4',
-        src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/?tg=TXpBNE9ERTVOVFU9',
+        src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
         url: 'https://video.fc2.com/content/20120101QN5FVkv4/',
         ratio: '16/9',
         duration: 4942,
@@ -744,8 +744,8 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'fc2',
         id: '20140101rnmrPW9W',
-        src: 'https://video.fc2.com/embed/player/20140101rnmrPW9W/?tg=T1RVMk1UZzJNVEE9',
-        url: 'https://video.fc2.com/ja/content/20140101rnmrPW9W/',
+        src: 'https://video.fc2.com/embed/player/20140101rnmrPW9W/',
+        url: 'https://video.fc2.com/content/20140101rnmrPW9W/',
         ratio: '16/9',
         title: 'ガキの使いじゃあらへんで 　大晦日SP―②',
         duration: 5774,
@@ -827,86 +827,8 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a language the content page does not link', async () => {
+    it('should drop the language the Flash player names', async () => {
       const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=zh" />'
-      const expected: EmbedResolverResult = {
-        provider: 'fc2',
-        id: '20120101QN5FVkv4',
-        src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
-        url: 'https://video.fc2.com/zh/content/20120101QN5FVkv4/',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep a language in uppercase', async () => {
-      const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=JA" />'
-      const expected: EmbedResolverResult = {
-        provider: 'fc2',
-        id: '20120101QN5FVkv4',
-        src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
-        url: 'https://video.fc2.com/JA/content/20120101QN5FVkv4/',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep a language in digits', async () => {
-      const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=12" />'
-      const expected: EmbedResolverResult = {
-        provider: 'fc2',
-        id: '20120101QN5FVkv4',
-        src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
-        url: 'https://video.fc2.com/12/content/20120101QN5FVkv4/',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep a language in underscores', async () => {
-      const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=__" />'
-      const expected: EmbedResolverResult = {
-        provider: 'fc2',
-        id: '20120101QN5FVkv4',
-        src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
-        url: 'https://video.fc2.com/__/content/20120101QN5FVkv4/',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should leave out a language carrying a url separator', async () => {
-      const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=ja%2F.." />'
-      const expected: EmbedResolverResult = {
-        provider: 'fc2',
-        id: '20120101QN5FVkv4',
-        src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
-        url: 'https://video.fc2.com/content/20120101QN5FVkv4/',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should leave out a language longer than two characters', async () => {
-      const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=jpn" />'
-      const expected: EmbedResolverResult = {
-        provider: 'fc2',
-        id: '20120101QN5FVkv4',
-        src: 'https://video.fc2.com/embed/player/20120101QN5FVkv4/',
-        url: 'https://video.fc2.com/content/20120101QN5FVkv4/',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should leave out a two-character language carrying a url separator', async () => {
-      const value = '<embed src="http://video.fc2.com/flv2.swf?i=20120101QN5FVkv4&lang=j%2F" />'
       const expected: EmbedResolverResult = {
         provider: 'fc2',
         id: '20120101QN5FVkv4',
