@@ -146,7 +146,7 @@ describe('deezerResolveEmbed', () => {
     })
   })
 
-  describe('Variant #2: the classic plugin player, which renders a not-found page', () => {
+  describe('Variant #2: the classic plugin player, which redirects to the widget', () => {
     it('should move an album onto the widget', () => {
       const value =
         'https://www.deezer.com/plugins/player?format=classic&autoplay=false&playlist=false&width=635&height=80&color=1990DB&layout=dark&size=medium&type=album&id=75337&app_id=1'
@@ -156,6 +156,20 @@ describe('deezerResolveEmbed', () => {
         src: 'https://widget.deezer.com/widget/dark/album/75337',
         url: 'https://www.deezer.com/album/75337',
         height: 300,
+      }
+
+      expect(deezerResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint the share dialog theme over a plugin player layout', () => {
+      const value =
+        'https://www.deezer.com/plugins/player?type=tracks&id=3135556&layout=light&app_id=1'
+      const expected: EmbedResolverResult = {
+        provider: 'deezer',
+        id: 'track/3135556',
+        src: 'https://widget.deezer.com/widget/dark/track/3135556',
+        url: 'https://www.deezer.com/track/3135556',
+        height: 150,
       }
 
       expect(deezerResolveEmbed(value)).toEqual(expected)

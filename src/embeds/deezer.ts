@@ -94,7 +94,8 @@ export const deezerResolveEmbed: ResolveEmbed = (url, element) => {
   }
 }
 
-// Deezer's widget iframe, plus the plugin player and the Flash swfs, which play nothing today.
+// Deezer's widget iframe, the plugin player that redirects to it, and the Flash swfs, which
+// play nothing today.
 export const deezerEmbedResolver = createUrlEmbedResolver(deezerHosts, deezerResolveEmbed)
 
 export const deezerFieldCleaners: Array<FieldCleaner> = [
