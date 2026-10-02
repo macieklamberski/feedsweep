@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
@@ -187,5 +188,35 @@ describe('readAcuityschedulingHeight', () => {
     const value = { height: 1055 }
 
     expect(readAcuityschedulingHeight(value)).toBeUndefined()
+  })
+})
+
+describeForEachParser('acuityscheduling through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+  }
+
+  it('should turn the embed code iframe into a scheduler placeholder', async () => {
+    const value = html`
+      <iframe
+        frameBorder="0"
+        src="https://app.acuityscheduling.com/schedule.php?owner=12572531&amp;owner=12572531&amp;appointmentType=1914136"
+        width="100%"
+        height="800"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://app.acuityscheduling.com/schedule.php?owner=12572531&amp;appointmentType=1914136"
+        data-embed-id="12572531/1914136"
+        data-embed-provider="acuityscheduling"
+        data-embed-src="https://app.acuityscheduling.com/schedule.php?owner=12572531&amp;appointmentType=1914136"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
