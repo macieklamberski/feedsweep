@@ -12,8 +12,8 @@ const cognitoformsHosts = ['www.cognitoforms.com', 'services.cognitoforms.com']
 const seamlessPathRegex = /^\/f\/seamless\.js$/
 
 // A form's height follows its fields, and the frame reports one only over a channel the
-// parent opens in answer to its `cog-handshake`.
-const formHeight = 1076
+// parent opens in answer to its `cog-handshake`, so a long form scrolls inside the frame.
+const formHeight = 600
 
 const composeEmbed = (orgKey: string, formNumber: string, query = ''): EmbedResolverResult => {
   return {

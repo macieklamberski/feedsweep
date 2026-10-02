@@ -16,7 +16,7 @@ describe('cognitoformsResolveEmbed', () => {
         id: 'yExCAh1c_E2nq69zMpV9RA/48',
         src: 'https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48',
         url: 'https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48',
-        height: 1076,
+        height: 600,
       }
 
       expect(cognitoformsResolveEmbed(value)).toEqual(expected)
@@ -29,7 +29,7 @@ describe('cognitoformsResolveEmbed', () => {
         id: 'udBVZe3Z5EWT79cmnukmOA/2',
         src: 'https://www.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA/2',
         url: 'https://www.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA/2',
-        height: 1076,
+        height: 600,
       }
 
       expect(cognitoformsResolveEmbed(value)).toEqual(expected)
@@ -43,7 +43,7 @@ describe('cognitoformsResolveEmbed', () => {
         id: 'yExCAh1c_E2nq69zMpV9RA/48',
         src: 'https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48?entry=%7B%22Name%22%3A%22Jane%22%7D',
         url: 'https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48',
-        height: 1076,
+        height: 600,
       }
 
       expect(cognitoformsResolveEmbed(value)).toEqual(expected)
@@ -56,7 +56,7 @@ describe('cognitoformsResolveEmbed', () => {
         id: 'yExCAh1c_E2nq69zMpV9RA/48',
         src: 'https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48',
         url: 'https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48',
-        height: 1076,
+        height: 600,
       }
 
       expect(cognitoformsResolveEmbed(value)).toEqual(expected)
@@ -113,7 +113,7 @@ describeForEachParser('cognitoformsScriptEmbedResolver', (parseHtml) => {
         id: 'IW7SzJYLPEa96K8jyNcDaw/346',
         src: 'https://www.cognitoforms.com/f/IW7SzJYLPEa96K8jyNcDaw/346',
         url: 'https://www.cognitoforms.com/f/IW7SzJYLPEa96K8jyNcDaw/346',
-        height: 1076,
+        height: 600,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -215,7 +215,7 @@ describeForEachParser('cognitoformsIframeEmbedResolver', (parseHtml) => {
       id: 'udBVZe3Z5EWT79cmnukmOA/2',
       src: 'https://www.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA/2',
       url: 'https://www.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA/2',
-      height: 1076,
+      height: 600,
     }
 
     expect(await extract(value)).toEqual(expected)
