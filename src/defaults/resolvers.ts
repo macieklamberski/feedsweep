@@ -285,6 +285,7 @@ import {
 } from '../embeds/twitter.js'
 import { typeformIframeEmbedResolver, typeformWidgetEmbedResolver } from '../embeds/typeform.js'
 import { ultimediaEmbedResolver } from '../embeds/ultimedia.js'
+import { umapEmbedResolver } from '../embeds/umap.js'
 import { videaEmbedResolver } from '../embeds/videa.js'
 import {
   videopressFlashEmbedResolver,
@@ -665,6 +666,7 @@ const embedResolvers: Array<EmbedResolver> = [
   typeformWidgetEmbedResolver,
   typeformIframeEmbedResolver,
   ultimediaEmbedResolver,
+  umapEmbedResolver,
   videaEmbedResolver,
   videopressIframeEmbedResolver,
   videopressFlashEmbedResolver,
