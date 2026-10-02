@@ -103,6 +103,7 @@ import { deezerEmbedResolver } from '../embeds/deezer.js'
 import { democracynowEmbedResolver } from '../embeds/democracynow.js'
 import { documentcloudEmbedResolver } from '../embeds/documentcloud.js'
 import { donorboxEmbedResolver } from '../embeds/donorbox.js'
+import { dvidsEmbedResolver } from '../embeds/dvids.js'
 import { educaplayEmbedResolver } from '../embeds/educaplay.js'
 import {
   facebookAmpEmbedResolver,
@@ -493,6 +494,7 @@ const embedResolvers: Array<EmbedResolver> = [
   democracynowEmbedResolver,
   documentcloudEmbedResolver,
   donorboxEmbedResolver,
+  dvidsEmbedResolver,
   educaplayEmbedResolver,
   facebookWidgetEmbedResolver,
   facebookIframeEmbedResolver,
