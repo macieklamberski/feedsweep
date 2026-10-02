@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { tmzEmbedResolver, tmzResolveEmbed } from './tmz.js'
@@ -137,5 +138,36 @@ describeForEachParser('tmzEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+describeForEachParser('tmz player through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+  }
+
+  it('should state the player ratio over the declared box', async () => {
+    const value = html`
+      <iframe
+        loading="lazy"
+        src="https://share.tmz.com/videos/2021-12-13-121321-danny-carey-1322198/"
+        width="560"
+        height="395"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-id="2021-12-13-121321-danny-carey-1322198"
+        data-embed-provider="tmz"
+        data-embed-src="https://share.tmz.com/videos/2021-12-13-121321-danny-carey-1322198/"
+        data-embed-url="https://www.tmz.com/watch/2021-12-13-121321-danny-carey-1322198/"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
