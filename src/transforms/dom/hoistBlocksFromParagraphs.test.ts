@@ -293,10 +293,26 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
     })
 
     it('should lift every wrapper that holds only the player', async () => {
-      const value =
-        '<a href="https://example.com/clip"><span><video controls><source src="https://example.com/clip.mp4"><p>No video</p></video></span></a>'
-      const expected =
-        '<a href="https://example.com/clip"><span><video controls><source src="https://example.com/clip.mp4"><p>No video</p></video></span></a>'
+      const value = html`
+        <a href="https://example.com/clip">
+          <span>
+            <video controls>
+              <source src="https://example.com/clip.mp4">
+              <p>No video</p>
+            </video>
+          </span>
+        </a>
+      `
+      const expected = html`
+        <a href="https://example.com/clip">
+          <span>
+            <video controls>
+              <source src="https://example.com/clip.mp4">
+              <p>No video</p>
+            </video>
+          </span>
+        </a>
+      `
 
       expect(await transformParagraph(value)).toEqualHtml(expected)
     })
