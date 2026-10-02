@@ -43,6 +43,7 @@ export const blockElements = new Set([
   'nav',
   'ol',
   'p',
+  'plaintext',
   'pre',
   'search',
   'section',

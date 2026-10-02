@@ -338,6 +338,21 @@ describeForEachParser('wrapBareInlineInParagraphs', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    // jsdom reads everything after a parsed `<plaintext>` as its text, so the element is built
+    // through the DOM API here, as a transform would leave it.
+    it('should leave a top-level plaintext out of a paragraph', async () => {
+      const document = parseHtml('<i class="marker">Inner text</i>')
+      const marker = document.querySelector('i.marker')
+      const block = document.createElement('plaintext')
+      block.textContent = marker?.textContent ?? ''
+      marker?.replaceWith(block)
+      const expected = '<plaintext>Inner text</plaintext>'
+
+      expect(
+        await applyDomTransforms(document, [wrapBareInlineInParagraphs(baseContext)]),
+      ).toEqualHtml(expected)
+    })
   })
 
   describe('edge cases', () => {

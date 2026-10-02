@@ -469,7 +469,7 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
   })
 
   describe('blocks that close a paragraph', () => {
-    const paragraphClosers = ['dir', 'hgroup', 'listing', 'menu', 'search', 'xmp']
+    const paragraphClosers = ['dir', 'hgroup', 'listing', 'menu', 'plaintext', 'search', 'xmp']
 
     it.each(paragraphClosers)('should hoist a %s out of its paragraph', async (tag) => {
       const value = '<p>Before <i class="marker">Block</i> after</p>'
