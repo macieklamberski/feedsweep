@@ -97,6 +97,10 @@ import {
 } from '../embeds/cnn.js'
 import { codepenIframeEmbedResolver, codepenWidgetEmbedResolver } from '../embeds/codepen.js'
 import { codesandboxIframeEmbedResolver } from '../embeds/codesandbox.js'
+import {
+  cognitoformsIframeEmbedResolver,
+  cognitoformsScriptEmbedResolver,
+} from '../embeds/cognitoforms.js'
 import { condenastIframeEmbedResolver, condenastScriptEmbedResolver } from '../embeds/condenast.js'
 import { corriereEmbedResolver } from '../embeds/corriere.js'
 import {
@@ -510,6 +514,8 @@ const embedResolvers: Array<EmbedResolver> = [
   codepenWidgetEmbedResolver,
   codepenIframeEmbedResolver,
   codesandboxIframeEmbedResolver,
+  cognitoformsScriptEmbedResolver,
+  cognitoformsIframeEmbedResolver,
   condenastIframeEmbedResolver,
   condenastScriptEmbedResolver,
   corriereEmbedResolver,
