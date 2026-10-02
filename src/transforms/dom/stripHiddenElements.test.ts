@@ -10,11 +10,11 @@ import { stripHiddenElements } from './stripHiddenElements.js'
 // hidden input and the unhidden output. The completeness test keeps it in step with
 // defaultRevealableSelectors.
 const specimens: Record<string, [string, string]> = {
-  '[class*="accordion"]': [
+  '.text-accordion-content': [
     '<div class="text-accordion-content" style="display:none">Panel</div>',
     '<div class="text-accordion-content">Panel</div>',
   ],
-  '[class*="collaps"]': [
+  '.collapsible-block-unfolded': [
     '<div class="collapsible-block-unfolded" style="display:none">Panel</div>',
     '<div class="collapsible-block-unfolded">Panel</div>',
   ],
@@ -26,7 +26,7 @@ const specimens: Record<string, [string, string]> = {
     '<div class="yrm-content yrm-content-1 yrm-content-hide" style="display:none">Panel</div>',
     '<div class="yrm-content yrm-content-1 yrm-content-hide">Panel</div>',
   ],
-  '[class*="carousel"]': [
+  '[class*="premium-adv-carousel"]': [
     '<div class="premium-adv-carousel__inner-container" style="display:none">Panel</div>',
     '<div class="premium-adv-carousel__inner-container">Panel</div>',
   ],
@@ -62,17 +62,13 @@ const specimens: Record<string, [string, string]> = {
     '<div class="testimonial_slide" style="display:none">Panel</div>',
     '<div class="testimonial_slide">Panel</div>',
   ],
-  '[class*="spoiler"]': [
+  '[class*="spoiler" i]': [
     '<div class="spoilermain" id="1" style="display:none">Panel</div>',
     '<div class="spoilermain" id="1">Panel</div>',
   ],
-  '[class*="Spoiler"]': [
-    '<div class="uSpoilerText" style="display:none">Panel</div>',
-    '<div class="uSpoilerText">Panel</div>',
-  ],
   '[id^="spoiler"]': [
-    '<div id="spoiler1" style="display:none">Panel</div>',
-    '<div id="spoiler1">Panel</div>',
+    '<div id="spoilerDiv4196800b" style="display:none">Panel</div>',
+    '<div id="spoilerDiv4196800b">Panel</div>',
   ],
   '[id^="rlta-panel"]': [
     '<div id="rlta-panel-sources" style="display:none">Panel</div>',
@@ -175,6 +171,35 @@ describeForEachParser('stripHiddenElements', (parseHtml) => {
       const expected = '<button aria-controls="viewer">View</button>'
 
       expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove a hidden modal named in capitals', async () => {
+      const value = html`
+        <a href="#viewer">View</a>
+        <div id="viewer" class="ImageModal" style="display:none"><img src="https://example.com/photo.jpg"></div>
+      `
+      const expected = '<a href="#viewer">View</a>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove a hidden navigation menu that collapses', async () => {
+      const value = html`
+        <div class="navbar-collapse collapse" style="display:none">
+          <ul><li><a href="https://example.com/about">About</a></li></ul>
+        </div>
+        <p>Keep</p>
+      `
+      const expected = '<p>Keep</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove a hidden slider when no revealable selectors are set', async () => {
+      const value = '<ul class="bxslider-1" style="display:none"><li>Gone</li></ul>'
+      const context = { ...baseContext, revealableSelectors: [] }
+
+      expect(await transform(value, context)).toEqualHtml('')
     })
 
     it('should remove a hidden lightbox a link names', async () => {
@@ -291,6 +316,37 @@ describeForEachParser('stripHiddenElements', (parseHtml) => {
       const value =
         '<div class="uSpoilerText" style="display:none;">The killer is the butler.</div>'
       const expected = '<div class="uSpoilerText">The killer is the butler.</div>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a spoiler named in capitals', async () => {
+      const value = '<div class="SPOILER" style="display:none">The killer is the butler.</div>'
+      const expected = '<div class="SPOILER">The killer is the butler.</div>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a visible form inside a kept slider', async () => {
+      const value = html`
+        <div class="bxslider-1" style="display:none">
+          <form style="display:block"><input name="email"></form>
+        </div>
+      `
+      const expected = html`
+        <div class="bxslider-1">
+          <form style="display:block"><input name="email"></form>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a block named among several ids in aria-controls', async () => {
+      const value =
+        '<button aria-controls="question\nanswer">show</button><div id="answer" style="display:none">Forty-two.</div>'
+      const expected =
+        '<button aria-controls="question\nanswer">show</button><div id="answer">Forty-two.</div>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })

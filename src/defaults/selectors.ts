@@ -291,15 +291,15 @@ export const defaultPreservedPreClasses = [
 // script shows them. `stripHiddenElements` unhides a hidden element matching one of these.
 export const defaultRevealableSelectors = [
   // Accordions and collapsible blocks.
-  '[class*="accordion"]', // Accordion blocks such as `text-accordion-content`.
-  '[class*="collaps"]', // Wikidot `collapsible-block-unfolded`.
+  '.text-accordion-content', // Accordion block panel.
+  '.collapsible-block-unfolded', // Wikidot collapsible block.
 
   // Read more toggles.
   '[id^="fv-more-text"]', // FV Read More.
   '.yrm-content', // Read More by Edmon.
 
   // Carousels, galleries and sliders.
-  '[class*="carousel"]', // Premium Addons `premium-adv-carousel`.
+  '[class*="premium-adv-carousel"]', // Premium Addons advanced carousel.
   '.esg-grid', // Essential Grid.
   '[class*="gallery"]', // Unite Gallery, `crp-light-gallery`.
   '[class*="slider"]', // bxSlider, Revolution Slider, SiteOrigin `sow-slider-base`.
@@ -310,9 +310,8 @@ export const defaultRevealableSelectors = [
   '.testimonial_slide', // Testimonial slider slide.
 
   // Spoilers.
-  '[class*="spoiler"]', // `spoilermain`, `spoilerbody`, `spoiler_div`.
-  '[class*="Spoiler"]', // uCoz `uSpoilerText`, Easy Spoiler `easySpoilerSpoils`.
-  '[id^="spoiler"]',
+  '[class*="spoiler" i]', // `spoilermain`, `spoiler_div`, uCoz `uSpoilerText`, Easy Spoiler `easySpoilerSpoils`.
+  '[id^="spoiler"]', // Easy Spoiler `spoilerDiv` panel.
 
   // Tabs.
   '[id^="rlta-panel"]', // Regular Labs Tabs and Accordions.
