@@ -48,8 +48,6 @@ export const defaultTrackingHosts = [
   'postaffiliatepro.com', // Post Affiliate Pro tracking pixels.
 ]
 
-export const defaultTrackingPathSegments = ['pixel', 'beacon', 'count', 'impression']
-
 // Hosts that only ever serve author avatars. WordPress / WP.com attaches the
 // author's gravatar as a per-item media:content image, so an otherwise imageless
 // post would inject the author's face as its lead image. Matched by host and

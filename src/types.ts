@@ -219,7 +219,6 @@ export type TransformContext = {
   lazyIframeAttributes: Array<string>
   deferredIframeSources: Array<DeferredIframeSource>
   trackingHosts: Array<string>
-  trackingPathSegments: Array<string>
   emojiResolvers: Array<EmojiResolver>
   avatarImageHosts: Array<string>
   nonContentSelectors: Array<string>
