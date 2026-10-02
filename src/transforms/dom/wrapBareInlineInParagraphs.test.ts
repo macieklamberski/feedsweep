@@ -281,6 +281,65 @@ describeForEachParser('wrapBareInlineInParagraphs', (parseHtml) => {
     })
   })
 
+  describe('forms', () => {
+    it('should leave a form holding only blocks out of a paragraph', async () => {
+      const value = html`
+        <form action="https://example.com/login">
+          <input type="hidden" name="x" value="1">
+          <p>Enter your password:</p>
+          <p><input type="password" name="pwd"> <input type="submit" value="Enter"></p>
+        </form>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a form holding only inline controls out of a paragraph', async () => {
+      const value = html`
+        <form action="https://example.com/search">
+          <label>Search <input type="search" name="q"></label>
+          <button>Go</button>
+        </form>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a form with text before and controls after its block out of a paragraph', async () => {
+      const value = html`
+        <form action="https://example.com/contact">
+          Leave a note:
+          <p><textarea name="note"></textarea></p>
+          <input type="submit" value="Send">
+        </form>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a form with text beside its divs out of a paragraph', async () => {
+      const value = html`
+        <form action="https://example.com/subscribe">
+          Get updates by email.
+          <div><input type="email" name="email"></div>
+          <div><input type="submit" value="Subscribe"></div>
+        </form>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('blocks that close a paragraph', () => {
+    const paragraphClosers = ['dir', 'hgroup', 'listing', 'menu', 'search', 'xmp']
+
+    it.each(paragraphClosers)('should leave a top-level %s out of a paragraph', async (tag) => {
+      const value = `<${tag}>Inner text</${tag}>`
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
   describe('edge cases', () => {
     it('should leave a media-only wrapper bare', async () => {
       const value = '<div><img src="x.jpg"></div>'

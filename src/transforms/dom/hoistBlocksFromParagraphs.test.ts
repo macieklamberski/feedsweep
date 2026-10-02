@@ -376,6 +376,121 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
     })
   })
 
+  describe('forms', () => {
+    it('should hoist a form holding only blocks whole', async () => {
+      const value = html`
+        Before
+        <form action="https://example.com/login">
+          <input type="hidden" name="x" value="1">
+          <p>Enter your password:</p>
+          <p><input type="password" name="pwd"> <input type="submit" value="Enter"></p>
+        </form>
+        after
+      `
+      const expected = html`
+        <p>Before </p>
+        <form action="https://example.com/login">
+          <input type="hidden" name="x" value="1">
+          <p>Enter your password:</p>
+          <p><input type="password" name="pwd"> <input type="submit" value="Enter"></p>
+        </form>
+        <p> after</p>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
+    it('should hoist a form holding only inline controls', async () => {
+      const value = html`
+        Before
+        <form action="https://example.com/search">
+          <label>Search <input type="search" name="q"></label>
+          <button>Go</button>
+        </form>
+        after
+      `
+      const expected = html`
+        <p>Before </p>
+        <form action="https://example.com/search">
+          <label>Search <input type="search" name="q"></label>
+          <button>Go</button>
+        </form>
+        <p> after</p>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
+    it('should hoist a form with text before and controls after its block whole', async () => {
+      const value = html`
+        Before
+        <form action="https://example.com/contact">
+          Leave a note:
+          <p><textarea name="note"></textarea></p>
+          <input type="submit" value="Send">
+        </form>
+        after
+      `
+      const expected = html`
+        <p>Before </p>
+        <form action="https://example.com/contact">
+          Leave a note:
+          <p><textarea name="note"></textarea></p>
+          <input type="submit" value="Send">
+        </form>
+        <p> after</p>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+
+    it('should hoist a form with text beside its divs whole', async () => {
+      const value = html`
+        Before
+        <form action="https://example.com/subscribe">
+          Get updates by email.
+          <div><input type="email" name="email"></div>
+          <div><input type="submit" value="Subscribe"></div>
+        </form>
+        after
+      `
+      const expected = html`
+        <p>Before </p>
+        <form action="https://example.com/subscribe">
+          Get updates by email.
+          <div><input type="email" name="email"></div>
+          <div><input type="submit" value="Subscribe"></div>
+        </form>
+        <p> after</p>
+      `
+
+      expect(await transformParagraph(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('blocks that close a paragraph', () => {
+    const paragraphClosers = ['dir', 'hgroup', 'listing', 'menu', 'search', 'xmp']
+
+    it.each(paragraphClosers)('should hoist a %s out of its paragraph', async (tag) => {
+      const value = '<p>Before <i class="marker">Block</i> after</p>'
+      const expected = `<p>Before </p><${tag} data-block="">Block</${tag}><p> after</p>`
+
+      expect(await transform(value, tag)).toEqualHtml(expected)
+    })
+
+    it('should lift a figure out of a closed dialog', async () => {
+      const value = html`
+        <dialog class="modal">
+          <button autofocus>Close</button>
+          <figure><img src="https://example.com/screen.jpg" alt="Home screen"></figure>
+        </dialog>
+      `
+      const document = parseHtml(await transformParagraph(value))
+
+      expect(document.querySelector('img')?.closest('dialog')).toBeNull()
+    })
+  })
+
   describe('edge cases', () => {
     it('should leave a block outside any paragraph alone', async () => {
       const value = '<div><i class="marker">Block</i></div>'
