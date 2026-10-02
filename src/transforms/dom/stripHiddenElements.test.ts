@@ -14,8 +14,15 @@ const revealableClassNames = [
   'fv-more-text-1',
   'rlta-panel-sources',
   'bxslider-1',
+  'rev_slider_1_1',
+  'sow-slider-base',
+  'slider_1',
+  'slide-1',
+  'field-slideshow-slide',
+  'swiper-slide',
+  'hidden-slide',
+  'testimonial_slide',
   'uSpoilerText',
-  'tabItem_Ymn1',
   'wiki-tab-0-2',
   'yrm-content-1',
 ]
@@ -132,6 +139,57 @@ describeForEachParser('stripHiddenElements', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+    it('should remove a slideshow control panel', async () => {
+      const value = html`
+        <div
+          class="slideshow_controlPanel slideshow_transparent"
+          style="display: none;"
+        ><ul><li class="slideshow_togglePlay"></li></ul></div>
+        <p>Keep</p>
+      `
+      const expected = '<p>Keep</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove a block with no id when a link points at the top of the page', async () => {
+      const value = '<a href="#">Back to top</a><div style="display:none">Gone</div>'
+      const expected = '<a href="#">Back to top</a>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove a hidden form inside a kept slider', async () => {
+      const value = html`
+        <div class="bxslider-1" style="display:none">
+          <img src="https://example.com/a.jpg">
+          <form style="display:none"><input name="email"></form>
+        </div>
+      `
+      const expected = html`
+        <div class="bxslider-1">
+          <img src="https://example.com/a.jpg">
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove a hidden dialog inside a kept gallery', async () => {
+      const value = html`
+        <div class="unite-gallery" style="display:none">
+          <img src="https://example.com/a.jpg">
+          <div role="dialog" hidden><img src="https://example.com/a-large.jpg"></div>
+        </div>
+      `
+      const expected = html`
+        <div class="unite-gallery">
+          <img src="https://example.com/a.jpg">
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('keeps and unhides what a reader can reveal', () => {
@@ -214,6 +272,25 @@ describeForEachParser('stripHiddenElements', (parseHtml) => {
       const expected = html`
         <p>Answer: <a href="#answer">show</a></p>
         <div id="answer">Forty-two.</div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep the unnamed slides inside a kept slider', async () => {
+      const value = html`
+        <ul class="bxslider-1" style="display:none;">
+          <li><img src="https://example.com/a.jpg"></li>
+          <li style="display:none"><img src="https://example.com/b.jpg"></li>
+          <li style="display:none"><img src="https://example.com/c.jpg"></li>
+        </ul>
+      `
+      const expected = html`
+        <ul class="bxslider-1">
+          <li><img src="https://example.com/a.jpg"></li>
+          <li><img src="https://example.com/b.jpg"></li>
+          <li><img src="https://example.com/c.jpg"></li>
+        </ul>
       `
 
       expect(await transform(value)).toEqualHtml(expected)

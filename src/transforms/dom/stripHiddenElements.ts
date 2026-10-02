@@ -7,7 +7,7 @@ import * as styles from '../../utils/styles.js'
 // shows it: bxSlider, Revolution Slider, Unite Gallery, Essential Grid, Regular Labs Tabs and
 // Accordions, Read More plugins, Wikidot tabs and collapsibles.
 const revealableNameRegex =
-  /accordion|carousel|collaps|esg-grid|gallery|more-text|rlta-panel|slide|spoiler|tab-?item|wiki-tab|yrm-content/i
+  /accordion|carousel|collaps|esg-grid|gallery|more-text|rlta-panel|slider|(?:^|[\s_-])slides?(?:$|[\s_-])|spoiler|wiki-tab|yrm-content/i
 const dialogNameRegex = /lightbox|modal/i
 
 const nameOf = (element: Element): string => {
@@ -51,10 +51,22 @@ const isRevealable = (element: Element): boolean => {
   )
 }
 
-const unhide = (element: Element): void => {
-  element.removeAttribute('hidden')
-  element.removeAttribute('aria-hidden')
-  styles.removeDeclarations(element, ['display', 'visibility'])
+// A slider's own slides are hidden one by one, often with no name, so the whole subtree shows.
+const unhideTree = (root: Element): void => {
+  for (const element of [root, ...root.querySelectorAll('[hidden], [style]')]) {
+    if (!isElementHidden(element)) {
+      continue
+    }
+
+    if (isChrome(element)) {
+      element.remove()
+      continue
+    }
+
+    element.removeAttribute('hidden')
+    element.removeAttribute('aria-hidden')
+    styles.removeDeclarations(element, ['display', 'visibility'])
+  }
 }
 
 // An element hidden inline or by attribute is an email preheader, a JS-only widget's shell, or a
@@ -68,7 +80,7 @@ export const stripHiddenElements: DomTransform = () => {
       }
 
       if (isRevealable(element)) {
-        unhide(element)
+        unhideTree(element)
         continue
       }
 
