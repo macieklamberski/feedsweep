@@ -252,6 +252,10 @@ export const defaultNonContentSelectors = [
   '.tmblr-alt-text-helper', // Tumblr badge rendering a stray "ALT" beside an image that keeps its own alt attribute.
   'img[src*="steamcommunity.com"][src*="placeholder"]', // Steam news static poster gif shown before its JS swaps in the YouTube iframe.
 
+  // uCoz spoiler toggle with no title, reading "Open spoiler" over text that is already revealed.
+  // A titled one reads `[+] Title` and becomes its title in convertUcozSpoilerButtons.
+  '.uSpoilerButton:not([value^="[+]"])',
+
   // GDPR/consent-gated embeds are recovered, not stripped: each CMP parks the author's embed
   // URL on the iframe itself, so fixLazyIframes promotes it back into src (see the CMP block in
   // defaultLazyIframeAttributes). What stays stripped here is the part that renders as chrome.

@@ -246,6 +246,8 @@ const specimens: Record<string, string | [string, string]> = {
     '<div class="easy_social_box"><div class="easy_social-widget"><iframe src="https://www.facebook.com/plugins/like.php?href=https%3A%2F%2Fexample.com"></iframe></div></div>',
     '',
   ],
+  '.uSpoilerButton:not([value^="[+]"])':
+    '<input type="button" class="uSpoilerButton" onclick="if($(\'#uSpoiler13Cu30\')[0]){}" value="Открыть спойлер">',
   'span[data-s9e-mediaembed]:not(:has(iframe, embed, object, video, audio))':
     '<span data-s9e-mediaembed="youtube" style="display:inline-block;max-width:640px"><span style="padding-bottom:56.25%"> <strong>iframe</strong> </span></span>',
   '.fusion-privacy-placeholder':
@@ -821,6 +823,14 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
           <img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate">
         </a>
       `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // A titled spoiler button is the only copy of the spoiler's title, which
+    // convertUcozSpoilerButtons keeps as text.
+    it('should keep a uCoz spoiler button that carries a title', async () => {
+      const value = '<input type="button" class="uSpoilerButton" value="[+] Обложка">'
 
       expect(await transform(value)).toEqualHtml(value)
     })
