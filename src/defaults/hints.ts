@@ -71,6 +71,7 @@ import { tableauRenderHint } from '../embeds/tableau.js'
 import { tedRenderHint } from '../embeds/ted.js'
 import { telegramRenderHint } from '../embeds/telegram.js'
 import { tencentRenderHint } from '../embeds/tencent.js'
+import { tickettailorRenderHint } from '../embeds/tickettailor.js'
 import { transistorRenderHint } from '../embeds/transistor.js'
 import { tumblrRenderHint } from '../embeds/tumblr.js'
 import { tuneinRenderHint } from '../embeds/tunein.js'
@@ -165,6 +166,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   tedRenderHint,
   telegramRenderHint,
   tencentRenderHint,
+  tickettailorRenderHint,
   transistorRenderHint,
   tumblrRenderHint,
   tuneinRenderHint,

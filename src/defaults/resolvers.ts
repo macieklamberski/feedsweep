@@ -297,6 +297,7 @@ import {
 import { tencentEmbedResolver } from '../embeds/tencent.js'
 import { tenorIframeEmbedResolver, tenorWidgetEmbedResolver } from '../embeds/tenor.js'
 import { thinglinkEmbedResolver } from '../embeds/thinglink.js'
+import { tickettailorScriptEmbedResolver } from '../embeds/tickettailor.js'
 import {
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
@@ -709,6 +710,7 @@ const embedResolvers: Array<EmbedResolver> = [
   tenorIframeEmbedResolver,
   tenorWidgetEmbedResolver,
   thinglinkEmbedResolver,
+  tickettailorScriptEmbedResolver,
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
   tiktokS9eEmbedResolver,
