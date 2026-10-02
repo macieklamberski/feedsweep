@@ -18,7 +18,7 @@ const deezerHeights = toMap({
   show: 300,
 })
 
-// The dead plugin player names a resource with a plural, and a podcast with the word `podcast`
+// The classic plugin player names a resource with a plural, and a podcast with the word `podcast`
 // where the widget path says `show`. Verified live 2026-09-06: the plugin's `type=podcast&id=32049`
 // is the widget's `/widget/dark/show/32049`, which plays StarTalk Radio.
 const pluginTypes = toMap({
