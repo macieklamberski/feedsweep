@@ -246,6 +246,27 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should remove an unsized Newsvoir release pixel', async () => {
+      const value = '<img src="https://reports.newsvoir.com/images/pixel.gif?newsid=36688" alt="">'
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should keep an unsized Newsvoir release photo', async () => {
+      const value =
+        '<img src="https://www.newsvoir.com/images/article/image1/36688_equitas.jpg" alt="">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should remove a page-view counter badge from counter.blakedrumm.com', async () => {
+      const value = html`
+        <img src="https://counter.blakedrumm.com/count/tag.svg?url=blakedrumm.com/blog/clear-teams-cache/" alt="Page Views">
+      `
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
     it('should keep a content-sized image on a tracking-host subdomain', async () => {
       const value = html`
         <img src="https://media.beehiiv.com/cdn-cgi/image/fit=scale-down/uploads/photo.png" width="1200" height="800">

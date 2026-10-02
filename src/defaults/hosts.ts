@@ -27,7 +27,9 @@ export const defaultTrackingHosts = [
   'statcounter.com', // StatCounter analytics pixels (c.statcounter.com/counter.php).
   'gigya.com', // Gigya/SAP Wildfire IMP pixels (counters.gigya.com).
   'counter.theconversation.com', // The Conversation article counters (/content/<id>/count.gif).
+  'counter.blakedrumm.com', // Page-view counter badges (/count/tag.svg).
   'rt.prnewswire.com', // PR Newswire release tracking (rt.gif).
+  'reports.newsvoir.com', // Newsvoir release pixels. Not the bare host: www serves release photos.
   'assoc-amazon.com', // Amazon Associates link pixels (/e/ir?).
   'assoc-amazon.jp', // Amazon Associates link pixels (JP).
   'assoc-amazon.co.uk', // Amazon Associates link pixels (UK).
