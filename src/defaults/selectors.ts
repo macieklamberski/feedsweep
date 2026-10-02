@@ -139,6 +139,13 @@ export const defaultNonContentSelectors = [
   'a.hatena-bookmark-button',
   'iframe.hatena-bookmark-button-frame',
 
+  // Visitor counters.
+  // Flag Counter's counter image and the link around it, matched on the counter's routes. The
+  // same host serves the flag icons and the logo that a post listing its visitors or reviewing
+  // the service carries.
+  'img:is([src*="flagcounter.com/count"], [src*="flagcounter.com/mini/"], [src*="flagcounter.com/map/"])',
+  'a[href*="flagcounter.com/"]:has(img:is([src*="flagcounter.com/count"], [src*="flagcounter.com/mini/"], [src*="flagcounter.com/map/"]))',
+
   // Related-posts widgets.
   '.yarpp-related', // YARPP related-posts widget (WordPress).
   '.jp-relatedposts', // Jetpack related-posts carousel.
