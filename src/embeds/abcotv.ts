@@ -1,3 +1,4 @@
+import { stripWww } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { composeQuery, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -34,11 +35,14 @@ export const abcotvResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
+  // A `www.` host answers with a redirect to the apex, or with a certificate that fails.
+  const host = stripWww(parsed.hostname)
+
   return {
     provider,
     id: pid,
-    src: `https://${parsed.hostname}/video/embed${composeQuery({ pid })}`,
-    url: `https://${parsed.hostname}/videoClip/${encodePathSegment(pid)}/`,
+    src: `https://${host}/video/embed${composeQuery({ pid })}`,
+    url: `https://${host}/videoClip/${encodePathSegment(pid)}/`,
     ratio: '16/9',
   }
 }

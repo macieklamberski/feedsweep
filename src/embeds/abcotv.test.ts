@@ -44,6 +44,19 @@ describe('abcotvResolveEmbed', () => {
 
       expect(abcotvResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should mint on the apex host for a carrier written on www', () => {
+      const value = 'https://www.abc7.com/video/embed/?pid=5740386'
+      const expected: EmbedResolverResult = {
+        provider: 'abcotv',
+        id: '5740386',
+        src: 'https://abc7.com/video/embed?pid=5740386',
+        url: 'https://abc7.com/videoClip/5740386/',
+        ratio: '16/9',
+      }
+
+      expect(abcotvResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
