@@ -22,7 +22,7 @@ const composeEmbed = (id: string, query = ''): EmbedResolverResult => {
 }
 
 // The Flowplayer configuration, `/scheda/embedcfg/{id}/{clip}`, that the Flash object names in its
-// `config` query. The clip picks a stretch of the recording the iframe player cannot address.
+// `config` query. The clip picks a stretch of the recording whose seconds only that config holds.
 const readFlashId = (parsed: URL): string | undefined => {
   const config = parseUrlOnHosts(parsed.searchParams.get('config') ?? '', radioradicaleHosts)
 
