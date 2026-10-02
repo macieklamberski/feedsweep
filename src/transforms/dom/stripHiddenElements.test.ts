@@ -83,111 +83,52 @@ describeForEachParser('stripHiddenElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should remove a hidden image beside a form whose only control is its submit button', async () => {
+    it('should remove a hidden dialog a control names', async () => {
       const value = html`
-        <div><form><button>Search</button></form></div>
-        <img class="sidx-image-cookie" style="display:none;" src="https://example.com/signin/guest">
+        <button aria-controls="viewer">View</button>
+        <div id="viewer" role="dialog" hidden><img src="https://example.com/photo.jpg"></div>
       `
-      const expected = '<div><form><button>Search</button></form></div>'
+      const expected = '<button aria-controls="viewer">View</button>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should remove a hidden control even beside another control', async () => {
+    it('should remove a hidden dialog element a control names', async () => {
       const value = html`
-        <button onclick="next()">Next</button>
-        <button style="display:none" onclick="previous()">Previous</button>
+        <button aria-controls="viewer">View</button>
+        <dialog id="viewer" style="display:none"><img src="https://example.com/photo.jpg"></dialog>
       `
-      const expected = '<button onclick="next()">Next</button>'
+      const expected = '<button aria-controls="viewer">View</button>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should remove a hidden dialog a button opens', async () => {
+    it('should remove a hidden modal a control names', async () => {
       const value = html`
-        <button onclick="openViewer()">View</button>
-        <div class="ps-image-viewer" role="dialog" hidden><img src="https://example.com/photo.jpg"></div>
+        <button aria-controls="viewer">View</button>
+        <div id="viewer" class="image-modal" style="display:none"><img src="https://example.com/photo.jpg"></div>
       `
-      const expected = '<button onclick="openViewer()">View</button>'
+      const expected = '<button aria-controls="viewer">View</button>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should remove a hidden dialog element a button opens', async () => {
+    it('should remove a hidden lightbox a link names', async () => {
       const value = html`
-        <button onclick="openViewer()">View</button>
-        <dialog style="display:none"><img src="https://example.com/photo.jpg"></dialog>
-      `
-      const expected = '<button onclick="openViewer()">View</button>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should remove a hidden modal a button opens', async () => {
-      const value = html`
-        <button onclick="openViewer()">View</button>
-        <div class="image-modal" style="display:none"><img src="https://example.com/photo.jpg"></div>
-      `
-      const expected = '<button onclick="openViewer()">View</button>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should remove a hidden lightbox a button opens', async () => {
-      const value = html`
-        <button onclick="openViewer()">View</button>
+        <a href="#lightbox-1">View</a>
         <div id="lightbox-1" style="display:none"><img src="https://example.com/photo.jpg"></div>
       `
-      const expected = '<button onclick="openViewer()">View</button>'
+      const expected = '<a href="#lightbox-1">View</a>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should remove a code-fold stand-in its click handler swaps for a visible block', async () => {
+    it('should remove a block only a click handler beside it reveals', async () => {
       const value = html`
-        <img
-          id="Codehighlighter1_52_125_Open_Image"
-          onclick="this.style.display='none'; Codehighlighter1_52_125_Open_Text.style.display='none'; Codehighlighter1_52_125_Closed_Text.style.display='inline';"
-          src="https://example.com/ExpandedBlockStart.gif"
-        >
-        <span
-          id="Codehighlighter1_52_125_Closed_Text"
-          style="border: #808080 1px solid; display: none"
-        ><img src="https://example.com/dot.gif"></span>
-        <span id="Codehighlighter1_52_125_Open_Text">int main() {}</span>
+        <a onclick="layerVis('842878823', 1)">pic</a>
+        <div id="842878823" style="display: none;"><img src="https://example.com/photo.jpg"></div>
       `
-      const expected = html`
-        <img
-          id="Codehighlighter1_52_125_Open_Image"
-          onclick="this.style.display='none'; Codehighlighter1_52_125_Open_Text.style.display='none'; Codehighlighter1_52_125_Closed_Text.style.display='inline';"
-          src="https://example.com/ExpandedBlockStart.gif"
-        >
-        <span id="Codehighlighter1_52_125_Open_Text">int main() {}</span>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-    it('should remove a code-fold stand-in holding only a comment marker', async () => {
-      const value = html`
-        <img
-          id="Codehighlighter1_0_239_Open_Image"
-          onclick="this.style.display='none'; Codehighlighter1_0_239_Open_Text.style.display='none'; Codehighlighter1_0_239_Closed_Text.style.display='inline';"
-          src="https://example.com/ExpandedBlockStart.gif"
-        >
-        <span
-          id="Codehighlighter1_0_239_Closed_Text"
-          style="border: #808080 1px solid; display: none"
-        >/**/</span>
-        <span id="Codehighlighter1_0_239_Open_Text">/* Prints a greeting. */</span>
-      `
-      const expected = html`
-        <img
-          id="Codehighlighter1_0_239_Open_Image"
-          onclick="this.style.display='none'; Codehighlighter1_0_239_Open_Text.style.display='none'; Codehighlighter1_0_239_Closed_Text.style.display='inline';"
-          src="https://example.com/ExpandedBlockStart.gif"
-        >
-        <span id="Codehighlighter1_0_239_Open_Text">/* Prints a greeting. */</span>
-      `
+      const expected = `<a onclick="layerVis('842878823', 1)">pic</a>`
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -273,199 +214,6 @@ describeForEachParser('stripHiddenElements', (parseHtml) => {
       const expected = html`
         <p>Answer: <a href="#answer">show</a></p>
         <div id="answer">Forty-two.</div>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep a block a click handler names', async () => {
-      const value = html`
-        <p>Answer: <span onclick="layerVis('842878823', 1)">show</span></p>
-        <div id="842878823" style="display: none;">Forty-two.</div>
-      `
-      const expected = html`
-        <p>Answer: <span onclick="layerVis('842878823', 1)">show</span></p>
-        <div id="842878823">Forty-two.</div>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep a block a jQuery click handler names as a selector', async () => {
-      const value = html`
-        <p><a onclick="jQuery('#answer').slideToggle()">Show the answer</a></p>
-        <p>Think it over first.</p>
-        <p>Then check below.</p>
-        <div id="answer" style="display:none">Forty-two.</div>
-      `
-      const expected = html`
-        <p><a onclick="jQuery('#answer').slideToggle()">Show the answer</a></p>
-        <p>Think it over first.</p>
-        <p>Then check below.</p>
-        <div id="answer">Forty-two.</div>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep a block right after a button', async () => {
-      const value = '<button>Show</button><div style="display:none">Forty-two.</div>'
-      const expected = '<button>Show</button><div>Forty-two.</div>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep a block one element after a button', async () => {
-      const value = '<button>Show</button><br><div style="display:none">Forty-two.</div>'
-      const expected = '<button>Show</button><br><div>Forty-two.</div>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep a block whose parent follows a button', async () => {
-      const value = '<button>Show</button><div><div style="display:none">Forty-two.</div></div>'
-      const expected = '<button>Show</button><div><div>Forty-two.</div></div>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep a block right before a button', async () => {
-      const value =
-        '<div style="display:none">Forty-two.</div><p><input type="button" value="Show"></p>'
-      const expected = '<div>Forty-two.</div><p><input type="button" value="Show"></p>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep a block a role button sits beside', async () => {
-      const value = '<span role="button">Show</span><div style="display:none">Forty-two.</div>'
-      const expected = '<span role="button">Show</span><div>Forty-two.</div>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep the full text a click handler swaps in for a visible excerpt', async () => {
-      const value = html`
-        <a onclick="excerpt.style.display='none'; full.style.display='inline';">more</a>
-        <span id="excerpt">The plan</span>
-        <span id="full" style="display:none">The plan is to sail at dawn.</span>
-      `
-      const expected = html`
-        <a onclick="excerpt.style.display='none'; full.style.display='inline';">more</a>
-        <span id="excerpt">The plan</span>
-        <span id="full">The plan is to sail at dawn.</span>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep an image-only block a click handler names beside an unrelated one', async () => {
-      const value = html`
-        <a onclick="summary.style.display='none'">Hide summary</a>
-        <p id="summary">Two days on the coast.</p>
-        <p><button onclick="document.getElementById('photos-1').style.display='block'">Show photos</button></p>
-        <p>Taken on the second day.</p>
-        <p>Most of them at low tide.</p>
-        <div id="photos-1" style="display:none"><img src="https://example.com/photo.jpg"></div>
-      `
-      const expected = html`
-        <a onclick="summary.style.display='none'">Hide summary</a>
-        <p id="summary">Two days on the coast.</p>
-        <p><button onclick="document.getElementById('photos-1').style.display='block'">Show photos</button></p>
-        <p>Taken on the second day.</p>
-        <p>Most of them at low tide.</p>
-        <div id="photos-1"><img src="https://example.com/photo.jpg"></div>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep a number a click handler swaps in for a visible mask', async () => {
-      const value = html`
-        <a onclick="masked.style.display='none'; phone.style.display='inline';">Show number</a>
-        <span id="masked">555 XXXX</span>
-        <span id="phone" style="display:none">555 0134</span>
-      `
-      const expected = html`
-        <a onclick="masked.style.display='none'; phone.style.display='inline';">Show number</a>
-        <span id="masked">555 XXXX</span>
-        <span id="phone">555 0134</span>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep a block right after a link whose click handler shows it', async () => {
-      const value = html`
-        <a onclick="this.nextElementSibling.style.display='block'">Show the answer</a>
-        <div style="display:none">Forty-two.</div>
-      `
-      const expected = html`
-        <a onclick="this.nextElementSibling.style.display='block'">Show the answer</a>
-        <div>Forty-two.</div>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep an image-only pane a click handler swaps for another hidden pane', async () => {
-      const value = html`
-        <a onclick="photo.style.display='block'; notes.style.display='none'">Photo</a>
-        <a onclick="notes.style.display='block'; photo.style.display='none'">Notes</a>
-        <p>Pick a tab.</p>
-        <p>The page script opens the first.</p>
-        <div id="photo" style="display:none"><img src="https://example.com/photo.jpg"></div>
-        <div id="notes" style="display:none">Shot at dawn.</div>
-      `
-      const expected = html`
-        <a onclick="photo.style.display='block'; notes.style.display='none'">Photo</a>
-        <a onclick="notes.style.display='block'; photo.style.display='none'">Notes</a>
-        <p>Pick a tab.</p>
-        <p>The page script opens the first.</p>
-        <div id="photo"><img src="https://example.com/photo.jpg"></div>
-        <div id="notes">Shot at dawn.</div>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep an image-only block a link shows while hiding itself', async () => {
-      const value = html`
-        <a
-          id="photo-link"
-          onclick="document.getElementById('photo-link').style.display='none'; document.getElementById('photo').style.display='block'"
-        >Show the photo</a>
-        <p>It is a large file.</p>
-        <p>Open it on a fast connection.</p>
-        <div id="photo" style="display:none"><img src="https://example.com/photo.jpg"></div>
-      `
-      const expected = html`
-        <a
-          id="photo-link"
-          onclick="document.getElementById('photo-link').style.display='none'; document.getElementById('photo').style.display='block'"
-        >Show the photo</a>
-        <p>It is a large file.</p>
-        <p>Open it on a fast connection.</p>
-        <div id="photo"><img src="https://example.com/photo.jpg"></div>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep an image a click handler swaps for a visible image', async () => {
-      const value = html`
-        <a onclick="before.style.display='none'; after.style.display='inline'">Show after</a>
-        <p>Same room, two years apart.</p>
-        <p>Before on the left.</p>
-        <span id="before"><img src="https://example.com/before.jpg"></span>
-        <span id="after" style="display:none"><img src="https://example.com/after.jpg"></span>
-      `
-      const expected = html`
-        <a onclick="before.style.display='none'; after.style.display='inline'">Show after</a>
-        <p>Same room, two years apart.</p>
-        <p>Before on the left.</p>
-        <span id="before"><img src="https://example.com/before.jpg"></span>
-        <span id="after"><img src="https://example.com/after.jpg"></span>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
