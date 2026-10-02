@@ -90,12 +90,23 @@ describe('readIframeResizerHeight', () => {
 
   it('should read nothing from a message without the iframe-resizer prefix', () => {
     expect(readIframeResizerHeight('f0:884:640:init')).toBeUndefined()
+  })
+
+  it('should read nothing from a message with text before the prefix', () => {
     expect(readIframeResizerHeight('x[iFrameSizer]f0:884:640:init')).toBeUndefined()
   })
 
-  it('should read nothing from an unrendered frame or a message posted as an object', () => {
+  it('should read nothing from an unrendered frame', () => {
     expect(readIframeResizerHeight('[iFrameSizer]f0:0:640:init')).toBeUndefined()
+  })
+
+  it('should read nothing from a message posted as an object', () => {
     expect(readIframeResizerHeight({ height: 884 })).toBeUndefined()
+  })
+
+  // The form scrolls a field into view with `parentIFrame.scrollToOffset(0, y)`.
+  it('should read nothing from a scroll event, whose number is an offset', () => {
+    expect(readIframeResizerHeight('[iFrameSizer]f0:420:0:scrollToOffset')).toBeUndefined()
   })
 })
 
