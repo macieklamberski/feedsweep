@@ -71,6 +71,20 @@ describe('radioradicaleResolveEmbed', () => {
 
       expect(radioradicaleResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should rebuild the Flash player onto the whole recording', () => {
+      const value =
+        'http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?30207f&config=http://www.radioradicale.it/scheda/embedcfg/401265/2838705'
+      const expected: EmbedResolverResult = {
+        provider: 'radioradicale',
+        id: '401265',
+        src: 'https://www.radioradicale.it/scheda/401265/iframe',
+        url: 'https://www.radioradicale.it/scheda/401265',
+        ratio: '16/9',
+      }
+
+      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -112,6 +126,34 @@ describe('radioradicaleResolveEmbed', () => {
 
     it('should return undefined for the Flash player configuration', () => {
       const value = 'http://www.radioradicale.it/scheda/embedcfg/401265/2838705'
+
+      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a Flash configuration on a foreign host', () => {
+      const value =
+        'http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?config=https://evil.test/scheda/embedcfg/401265/2838705'
+
+      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a Flash configuration below another segment', () => {
+      const value =
+        'http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?config=http://www.radioradicale.it/x/embedcfg/401265/2838705'
+
+      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a Flash configuration route word the server does not serve', () => {
+      const value =
+        'http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?config=http://www.radioradicale.it/scheda/playlist/401265/2838705'
+
+      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a Flash configuration with a segment after the clip', () => {
+      const value =
+        'http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?config=http://www.radioradicale.it/scheda/embedcfg/401265/2838705/extra'
 
       expect(radioradicaleResolveEmbed(value)).toBeUndefined()
     })
@@ -171,6 +213,26 @@ describeForEachParser('radioradicaleEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should rebuild the Flash object onto the whole recording', async () => {
+      const value = html`
+        <object
+          data="http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?30207f&amp;config=http://www.radioradicale.it/scheda/embedcfg/401265/2838705"
+          height="330"
+          type="application/x-shockwave-flash"
+          width="400"
+        ></object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'radioradicale',
+        id: '401265',
+        src: 'https://www.radioradicale.it/scheda/401265/iframe',
+        url: 'https://www.radioradicale.it/scheda/401265',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -207,6 +269,37 @@ describeForEachParser('radioradicale player through the pipeline', (parseHtml) =
         data-embed-id="761070"
         data-embed-provider="radioradicale"
         data-embed-src="https://www.radioradicale.it/scheda/761070/iframe"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should rebuild the Flash object and its params onto the whole recording', async () => {
+    const value = html`
+      <object
+        data="http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?30207f&amp;config=http://www.radioradicale.it/scheda/embedcfg/401265/2838705"
+        height="330"
+        type="application/x-shockwave-flash"
+        width="400"
+      >
+        <param
+          name="movie"
+          value="http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?30207f&amp;config=http://www.radioradicale.it/scheda/embedcfg/401265/2838705"
+        />
+        <param
+          name="allowFullScreen"
+          value="true"
+        />
+      </object>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-url="https://www.radioradicale.it/scheda/401265"
+        data-embed-id="401265"
+        data-embed-provider="radioradicale"
+        data-embed-src="https://www.radioradicale.it/scheda/401265/iframe"
       ></div>
     `
 
