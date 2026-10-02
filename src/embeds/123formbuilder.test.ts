@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
@@ -323,5 +324,60 @@ describe('oneTwoThreeFormBuilderRenderHint', () => {
     }
 
     expect(oneTwoThreeFormBuilderRenderHint).toEqual(expected)
+  })
+})
+
+describeForEachParser('123formbuilder through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+  }
+
+  it('should turn the loader script into a form placeholder', async () => {
+    const value = html`
+      <script
+        type="text/javascript"
+        defer
+        src="//www.123formbuilder.com/embed/5013627.js"
+        data-role="form"
+        data-default-width="650px"
+      ></script>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://form.123formbuilder.com/5013627"
+        data-embed-id="5013627"
+        data-embed-provider="123formbuilder"
+        data-embed-src="https://form.123formbuilder.com/5013627"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should turn the older iframe snippet into a form placeholder', async () => {
+    const value = html`
+      <iframe
+        allowtransparency="true"
+        frameborder="0"
+        id="contactform123"
+        name="contactform123"
+        src="http://www.123contactform.com/my-contact-form-a6441661074-783097.html"
+        style="height: inherit; min-height: 580px; overflow: auto;"
+        width="100%"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://form.123formbuilder.com/783097"
+        data-embed-id="783097"
+        data-embed-provider="123formbuilder"
+        data-embed-src="https://form.123formbuilder.com/783097"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
