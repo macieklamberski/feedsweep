@@ -11,7 +11,6 @@ describe('steamResolveEmbed', () => {
         provider: 'steam',
         id: '355060',
         src: 'https://store.steampowered.com/widget/355060/',
-        params: {},
         url: 'https://store.steampowered.com/app/355060/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/355060/header.jpg',
         height: 190,
@@ -27,7 +26,6 @@ describe('steamResolveEmbed', () => {
         provider: 'steam',
         id: '249610',
         src: 'https://store.steampowered.com/widget/249610/30245/?t=Top-down%2C+2.5D+action+that+combines+elements+of+old-school+shooters+like+Star-Control+and+action-RPGs+like+Diablo+with+an+evolving+weapons+system%2C+32-player+dedicated+servers%2C+coop%2C+and+PVP.',
-        params: {},
         url: 'https://store.steampowered.com/app/249610/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/249610/header.jpg',
         height: 190,
@@ -45,7 +43,6 @@ describe('steamResolveEmbed', () => {
         provider: 'steam',
         id: '249610',
         src: 'https://store.steampowered.com/widget/249610/30245/?t=Top-down%2C+2.5D+action+that+combines+elements+of+old-school+shooters+like+Star-Control+and+action-RPGs+like+Diablo+with+an+evolving+weapons+system%2C+32-player+dedicated+servers%2C+coop%2C+and+PVP.',
-        params: {},
         url: 'https://store.steampowered.com/app/249610/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/249610/header.jpg',
         height: 190,
@@ -56,14 +53,13 @@ describe('steamResolveEmbed', () => {
       expect(steamResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should carry the label language as a param, not in the src', () => {
+    it('should drop the label language', () => {
       const value =
         'https://store.steampowered.com/widget/249610/30245/?t=Top-down%2C%202.5D%20action%20that%20combines%20elements%20of%20old-school%20shooters%20like%20Star-Control%20and%20action-RPGs%20like%20Diablo%20with%20an%20evolving%20weapons%20system,%2032-player%20dedicated%20servers,%20coop,%20and%20PVP.&l=german'
       const expected: EmbedResolverResult = {
         provider: 'steam',
         id: '249610',
         src: 'https://store.steampowered.com/widget/249610/30245/?t=Top-down%2C+2.5D+action+that+combines+elements+of+old-school+shooters+like+Star-Control+and+action-RPGs+like+Diablo+with+an+evolving+weapons+system%2C+32-player+dedicated+servers%2C+coop%2C+and+PVP.',
-        params: { l: 'german' },
         url: 'https://store.steampowered.com/app/249610/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/249610/header.jpg',
         height: 190,
@@ -94,7 +90,6 @@ describe('steamResolveEmbed', () => {
         provider: 'steam',
         id: 'news',
         src: 'https://store.steampowered.com/widget/news/',
-        params: {},
         url: 'https://store.steampowered.com/app/news/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/news/header.jpg',
         height: 190,
@@ -109,7 +104,6 @@ describe('steamResolveEmbed', () => {
         provider: 'steam',
         id: '355060',
         src: 'https://store.steampowered.com/widget/355060/abc/',
-        params: {},
         url: 'https://store.steampowered.com/app/355060/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/355060/header.jpg',
         height: 190,
@@ -137,7 +131,6 @@ describeForEachParser('steamEmbedResolver', (parseHtml) => {
         provider: 'steam',
         id: '355060',
         src: 'https://store.steampowered.com/widget/355060/',
-        params: {},
         url: 'https://store.steampowered.com/app/355060/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/355060/header.jpg',
         height: 190,
