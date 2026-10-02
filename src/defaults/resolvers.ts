@@ -187,6 +187,7 @@ import { kalturaIframeEmbedResolver, kalturaScriptEmbedResolver } from '../embed
 import { kindleEmbedResolver } from '../embeds/kindle.js'
 import { komootEmbedResolver } from '../embeds/komoot.js'
 import { learningappsEmbedResolver } from '../embeds/learningapps.js'
+import { lglformsIframeEmbedResolver, lglformsScriptEmbedResolver } from '../embeds/lglforms.js'
 import { libsynEmbedResolver } from '../embeds/libsyn.js'
 import { linkedinEmbedResolver } from '../embeds/linkedin.js'
 import { listennotesEmbedResolver } from '../embeds/listennotes.js'
@@ -586,6 +587,8 @@ const embedResolvers: Array<EmbedResolver> = [
   kindleEmbedResolver,
   komootEmbedResolver,
   learningappsEmbedResolver,
+  lglformsScriptEmbedResolver,
+  lglformsIframeEmbedResolver,
   libsynEmbedResolver,
   linkedinEmbedResolver,
   listennotesEmbedResolver,
