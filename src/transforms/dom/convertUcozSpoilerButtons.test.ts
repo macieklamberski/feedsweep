@@ -87,6 +87,20 @@ describeForEachParser('convertUcozSpoilerButtons through the pipeline', (parseHt
 
       expect(await convert(value)).toEqualHtml(expected)
     })
+
+    it('should keep only the revealed text when the title is empty', async () => {
+      const value = html`
+        <div class="uSpoilerClosed" id="uSpoilerAb12Cd">
+          <div class="uSpoilerButBl">
+            <input type="button" class="uSpoilerButton" value="[+] ">
+          </div>
+          <div class="uSpoilerText" style="display:none;">Body.</div>
+        </div>
+      `
+      const expected = '<p>Body.</p>'
+
+      expect(await convert(value)).toEqualHtml(expected)
+    })
   })
 
   describe('a spoiler whose button reads only "open spoiler"', () => {
