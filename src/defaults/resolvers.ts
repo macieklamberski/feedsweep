@@ -173,6 +173,7 @@ import {
   instagramS9eEmbedResolver,
   instagramSubstackEmbedResolver,
 } from '../embeds/instagram.js'
+import { ispotEmbedResolver } from '../embeds/ispot.js'
 import { issuuIframeEmbedResolver, issuuWidgetEmbedResolver } from '../embeds/issuu.js'
 import { ivooxEmbedResolver } from '../embeds/ivoox.js'
 import { jotformIframeEmbedResolver, jotformScriptEmbedResolver } from '../embeds/jotform.js'
@@ -570,6 +571,7 @@ const embedResolvers: Array<EmbedResolver> = [
   instagramSubstackEmbedResolver,
   instagramIframeEmbedResolver,
   instagramS9eEmbedResolver,
+  ispotEmbedResolver,
   issuuWidgetEmbedResolver,
   issuuIframeEmbedResolver,
   ivooxEmbedResolver,
