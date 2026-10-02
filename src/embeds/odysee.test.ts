@@ -8,7 +8,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, odyseeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the channel and claim path and drop the referral token', async () => {
+    it('should resolve the channel and claim path and keep the referral token', async () => {
       const value = html`
         <iframe
           id="odysee-iframe"
@@ -20,7 +20,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'odysee',
         id: '@corbettreport:0/webb-repersoning:7',
-        src: 'https://odysee.com/$/embed/@corbettreport:0/webb-repersoning:7',
+        src: 'https://odysee.com/$/embed/@corbettreport:0/webb-repersoning:7?r=J5ihtDQcPiJPQjEXGJApJU1nEbzqhToy',
         url: 'https://odysee.com/@corbettreport:0/webb-repersoning:7',
         ratio: '16/9',
         author: '@corbettreport',
@@ -41,7 +41,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'odysee',
         id: '@OsasunaLibertad:9/Como-Proteger-a-los-Menores:9',
-        src: 'https://odysee.com/$/embed/@OsasunaLibertad:9/Como-Proteger-a-los-Menores:9',
+        src: 'https://odysee.com/%24/embed/%40OsasunaLibertad%3A9%2FComo-Proteger-a-los-Menores%3A9?r=8rkFbaDF7G7TfiGmu6r8gNe9ShX86rJ8&autoplay=true',
         url: 'https://odysee.com/@OsasunaLibertad:9/Como-Proteger-a-los-Menores:9',
         ratio: '16/9',
         author: '@OsasunaLibertad',
@@ -63,7 +63,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'odysee',
         id: '@AldebaranVideo:b/Jorge-Katar-Race-and-Reason:f',
-        src: 'https://odysee.com/$/embed/@AldebaranVideo:b/Jorge-Katar-Race-and-Reason:f',
+        src: 'https://odysee.com/$/embed/@AldebaranVideo:b/Jorge-Katar-Race-and-Reason:f?r=3C8TK1mXmpDyhxa88xE22aLhsdpQwK49',
         url: 'https://odysee.com/@AldebaranVideo:b/Jorge-Katar-Race-and-Reason:f',
         ratio: '16/9',
         author: '@AldebaranVideo',
@@ -86,7 +86,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'odysee',
         id: '@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
-        src: 'https://odysee.com/$/embed/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
+        src: 'https://odysee.com/$/embed/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0?r=GqtYDFe44PSjFLQNJr5pB38T7AKLg2Tu',
         url: 'https://odysee.com/@Impfschaden.info:0/spirit-of-health-2015-impfen,-ja-oder:0',
         ratio: '16/9',
         author: '@Impfschaden.info',
@@ -184,14 +184,14 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
   })
 
   describe('the older spellings of a claim', () => {
-    it('should join a legacy name and claim id pair into the page path', async () => {
+    it('should keep a legacy pair player as written and join its page path', async () => {
       const value = html`
         <iframe src="https://odysee.com/$/embed/webb-repersoning/7?sunset=lbrytv"></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'odysee',
         id: 'webb-repersoning:7',
-        src: 'https://odysee.com/$/embed/webb-repersoning:7',
+        src: 'https://odysee.com/$/embed/webb-repersoning/7?sunset=lbrytv',
         url: 'https://odysee.com/webb-repersoning:7',
         ratio: '16/9',
       }
@@ -212,7 +212,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should resolve the lbry.tv host onto odysee', async () => {
+    it('should keep a player on the lbry.tv host as written', async () => {
       const value = html`
         <iframe
           id="lbry-iframe"
@@ -225,7 +225,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'odysee',
         id: 'webb-repersoning:7',
-        src: 'https://odysee.com/$/embed/webb-repersoning:7',
+        src: 'https://lbry.tv/$/embed/webb-repersoning/7',
         url: 'https://odysee.com/webb-repersoning:7',
         ratio: '16/9',
       }
@@ -233,15 +233,15 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The same redirect as lbry.tv, and the same repair: the path survives it intact.
-    it('should resolve the open.lbry.com host onto odysee', async () => {
+    // The host redirects to odysee.com with the path kept, like lbry.tv.
+    it('should keep a player on the open.lbry.com host as written', async () => {
       const value = html`
         <iframe src="https://open.lbry.com/$/embed/webb-repersoning/7"></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'odysee',
         id: 'webb-repersoning:7',
-        src: 'https://odysee.com/$/embed/webb-repersoning:7',
+        src: 'https://open.lbry.com/$/embed/webb-repersoning/7',
         url: 'https://odysee.com/webb-repersoning:7',
         ratio: '16/9',
       }
