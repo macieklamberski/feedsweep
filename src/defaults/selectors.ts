@@ -233,8 +233,8 @@ export const defaultNonContentSelectors = [
 
   // Ticketing and payment widgets, which are chrome around a transaction rather than anything
   // the item is about.
-  'iframe[src*="eventbrite.com/tickets-external"]', // Eventbrite checkout frame.
-  'iframe[src*="eventbrite.com/countdown-widget"]', // Eventbrite countdown widget.
+  'iframe[src*="eventbrite."][src*="/tickets-external"]', // Eventbrite checkout frame.
+  'iframe[src*="eventbrite."][src*="/countdown-widget"]', // Eventbrite countdown widget.
   'form[action*="paypal.com/cgi-bin/webscr"]', // PayPal buy, cart or subscribe form, or a donate form naming no button.
   'img[src*="paypal.com/"][src*="/i/btn/"]:not(a img)', // The PayPal button image pasted without its form.
   'form.edd_download_purchase_form', // Easy Digital Downloads buy button and price.

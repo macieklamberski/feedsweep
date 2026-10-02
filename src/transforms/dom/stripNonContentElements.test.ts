@@ -82,10 +82,10 @@ const specimens: Record<string, string | [string, string]> = {
   '[data-component-name="ButtonCreateButton"]:has(> a[href*="action=share"])':
     '<p class="button-wrapper" data-component-name="ButtonCreateButton"><a class="button primary" href="https://example.com/p/post?action=share"><span>Share</span></a></p>',
   '[class*="social-share"]': '<div class="social-share"><a href="/x">X</a></div>',
-  'iframe[src*="eventbrite.com/tickets-external"]':
-    '<iframe src="https://www.eventbrite.com/tickets-external?eid=2112794425&ref=etckt" frameborder="0" width="100%" height="192"></iframe>',
-  'iframe[src*="eventbrite.com/countdown-widget"]':
-    '<iframe src="//www.eventbrite.com/countdown-widget?eid=20577825831" width="195" height="295" frameborder="0"></iframe>',
+  'iframe[src*="eventbrite."][src*="/tickets-external"]':
+    '<iframe width="100%" height="214" src="//eventbrite.es/tickets-external?eid=13461809635&amp;ref=etckt"></iframe>',
+  'iframe[src*="eventbrite."][src*="/countdown-widget"]':
+    '<iframe src="//www.eventbrite.de/countdown-widget?eid=37526907992" width="195" height="295" frameborder="0"></iframe>',
   'form[action*="paypal.com/cgi-bin/webscr"]':
     '<form action="https://www.paypal.com/cgi-bin/webscr" method="post"><input type="hidden" name="cmd" value="_donations"><input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit" alt="Donate"></form>',
   'img[src*="paypal.com/"][src*="/i/btn/"]:not(a img)':
@@ -333,6 +333,12 @@ const zenoHomeLinks: Array<[string, string, string]> = [
     '<iframe frameborder="0" height="240" scrolling="no" src="//www.zeno.fm/player/sure-fm-master-input-station" width="575"></iframe><a href="https://www.zenomedia.com/" style="display: block; font-size: 0.9em; line-height: 10px;" target="_blank">...</a>',
     '<iframe frameborder="0" height="240" scrolling="no" src="//www.zeno.fm/player/sure-fm-master-input-station" width="575"></iframe>',
   ],
+]
+
+// Eventbrite's checkout and countdown routes on a host that is not Eventbrite.
+const foreignEventbriteRouteFrames = [
+  'https://tickets.example.com/tickets-external?eid=13461809635',
+  'https://tickets.example.com/countdown-widget?eid=37526907992',
 ]
 
 describeForEachParser('stripNonContentElements', (parseHtml) => {
@@ -779,6 +785,28 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    // The full event page in a frame still serves and carries the event itself.
+    it('should keep an Eventbrite event page frame', async () => {
+      const value = html`
+        <iframe
+          src="https://www.eventbrite.co.uk/e/23180298898"
+          width="100%"
+          height="600"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it.each(foreignEventbriteRouteFrames)(
+      'should keep a frame on another host at %s',
+      async (url) => {
+        const value = `<iframe src="${url}" width="100%" height="214"></iframe>`
+
+        expect(await transform(value)).toEqualHtml(value)
+      },
+    )
 
     it.each(flagCounterImageUrls)('should strip the Flag Counter image %s', async (url) => {
       expect(await transform(`<p>Thanks for reading.<img src="${url}"></p>`)).toEqualHtml(
