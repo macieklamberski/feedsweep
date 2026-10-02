@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
@@ -219,5 +220,60 @@ describeForEachParser('cognitoformsIframeEmbedResolver', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('cognitoforms through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+  }
+
+  it('should turn the seamless embed into a form placeholder', async () => {
+    const value = html`
+      <script
+        src="https://www.cognitoforms.com/f/seamless.js"
+        data-key="IW7SzJYLPEa96K8jyNcDaw"
+        data-form="346"
+      ></script>
+    `
+    const expected = html`
+      <div
+        data-embed-height="600"
+        data-embed-url="https://www.cognitoforms.com/f/IW7SzJYLPEa96K8jyNcDaw/346"
+        data-embed-id="IW7SzJYLPEa96K8jyNcDaw/346"
+        data-embed-provider="cognitoforms"
+        data-embed-src="https://www.cognitoforms.com/f/IW7SzJYLPEa96K8jyNcDaw/346"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should turn the older embed iframe into a form placeholder', async () => {
+    const value = html`
+      <iframe
+        src="https://services.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA?id=2"
+        style="position:relative;width:1px;min-width:100%;*width:100%;"
+        frameborder="0"
+        scrolling="yes"
+        seamless="seamless"
+        height="503"
+        width="100%"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-height="600"
+        data-embed-url="https://www.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA/2"
+        data-embed-id="udBVZe3Z5EWT79cmnukmOA/2"
+        data-embed-provider="cognitoforms"
+        data-embed-src="https://www.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA/2"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
