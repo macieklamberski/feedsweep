@@ -8,8 +8,13 @@ const provider = 'videopress'
 
 // Not wordpress.com itself: every blog frames its posts on that domain, and those are cards.
 // `video.wordpress.com` is the documented player host, the one its oEmbed writes, and the Flash
-// player lived on `s0.videopress.com` and `v0.wordpress.com`.
-const videopressHosts = ['videopress.com', 'video.wordpress.com', 'v0.wordpress.com']
+// player lived on `s0.videopress.com`, `v0.wordpress.com` and `v.wordpress.com`.
+const videopressHosts = [
+  'videopress.com',
+  'video.wordpress.com',
+  'v0.wordpress.com',
+  'v.wordpress.com',
+]
 
 // Where playback starts and whether it loops. The rest of the query the block editor writes goes
 // with the rebuilt src: `hd` picks the rendition, `cover` and `useAverageColor` style the player.
@@ -58,27 +63,41 @@ export const readVideopressEmbedSrc = (link: string): string | undefined => {
   return url ? videopressResolveEmbed(url.href)?.src : undefined
 }
 
-const flashPlayerPathRegex = /\/player\.swf$/i
+// `player.swf`, and `flvplayer.swf` under the video plugin path of the first WordPress.com snippet.
+const flashPlayerPathRegex = /\/(?:flv)?player\.swf$/i
+
+// The host that served the swf at a bare `/{guid}` path, the snippet's other spelling.
+const guidPathHost = 'v.wordpress.com'
 
 const videopressFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
+  if (!parsed) {
     return
   }
 
-  const guid = flashVar(element, 'guid') ?? parsed.searchParams.get('guid')
+  if (flashPlayerPathRegex.test(parsed.pathname)) {
+    const guid = flashVar(element, 'guid') ?? parsed.searchParams.get('guid')
 
-  if (!guid) {
+    if (!guid) {
+      return
+    }
+
+    return composeEmbed(guid)
+  }
+
+  const [guid, extra] = getPathSegments(parsed.href)
+
+  if (parsed.hostname !== guidPathHost || !guid || extra) {
     return
   }
 
   return composeEmbed(guid)
 }
 
-// The VideoPress Flash player: a player.swf embed naming the guid in flashvars, dead since Flash.
-// The guid sits in `flashvars="guid=…"` on the `<embed>`, or on the player's own query where the
-// snippet inlined it, and the swf src carries only the player version.
+// The VideoPress Flash player, dead since Flash. The guid sits in `flashvars="guid=…"` on the
+// `<embed>`, on the player's own query where the snippet inlined it, or as the whole path of
+// `v.wordpress.com`. A swf src otherwise carries only the player version.
 export const videopressFlashEmbedResolver = createUrlEmbedResolver(
   videopressHosts,
   videopressFlashResolveEmbed,
