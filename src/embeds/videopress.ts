@@ -88,7 +88,8 @@ const videopressFlashResolveEmbed: ResolveEmbed = (url, element) => {
 
   const [guid, extra] = getPathSegments(parsed.href)
 
-  if (parsed.hostname !== guidPathHost || !guid || extra) {
+  // A guid never holds a dot, so a segment with one is a file at the root, such as a swf.
+  if (parsed.hostname !== guidPathHost || !guid || extra || guid.includes('.')) {
     return
   }
 

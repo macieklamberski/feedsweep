@@ -406,6 +406,12 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a file at the root, which names no guid', async () => {
+      const value = '<embed src="http://v.wordpress.com/intro.swf"></embed>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a bare guid path on a host that never served one', async () => {
       const value = '<embed src="http://v0.wordpress.com/hrPKeL5t"></embed>'
 
