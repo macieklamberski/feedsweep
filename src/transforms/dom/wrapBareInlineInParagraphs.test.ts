@@ -338,6 +338,14 @@ describeForEachParser('wrapBareInlineInParagraphs', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    // jsdom reads everything after `<plaintext>` as its text, the harness's `</body>` included,
+    // so no output is HTML a parser reproduces. Only the start is the same under both parsers.
+    it('should leave a top-level plaintext out of a paragraph', async () => {
+      const value = '<plaintext>Inner text</plaintext>'
+
+      expect(await transform(value)).toStartWith('<plaintext>Inner text')
+    })
   })
 
   describe('edge cases', () => {
