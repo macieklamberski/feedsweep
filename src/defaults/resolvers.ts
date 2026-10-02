@@ -100,6 +100,7 @@ import { dailymotionEmbedResolver } from '../embeds/dailymotion.js'
 import { deezerEmbedResolver } from '../embeds/deezer.js'
 import { documentcloudEmbedResolver } from '../embeds/documentcloud.js'
 import { donorboxEmbedResolver } from '../embeds/donorbox.js'
+import { dvidsEmbedResolver } from '../embeds/dvids.js'
 import { educaplayEmbedResolver } from '../embeds/educaplay.js'
 import {
   facebookAmpEmbedResolver,
@@ -486,6 +487,7 @@ const embedResolvers: Array<EmbedResolver> = [
   deezerEmbedResolver,
   documentcloudEmbedResolver,
   donorboxEmbedResolver,
+  dvidsEmbedResolver,
   educaplayEmbedResolver,
   facebookWidgetEmbedResolver,
   facebookIframeEmbedResolver,
