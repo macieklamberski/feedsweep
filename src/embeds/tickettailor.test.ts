@@ -385,3 +385,63 @@ describe('tickettailorRenderHint', () => {
     expect(tickettailorRenderHint).toEqual(expected)
   })
 })
+
+describeForEachParser('tickettailor through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+  }
+
+  it('should turn the current loader in the snippet div into a ticket placeholder', async () => {
+    const value = html`
+      <div class="tt-widget">
+        <div class="tt-widget-fallback">
+          <p>
+            <a href="https://www.tickettailor.com/all-tickets/rivalthereimaginingvalueactionlab/?ref=website_widget&#038;show_search_filter=true&#038;show_date_filter=true&#038;show_sort=true">Click here to buy tickets</a>
+          </p>
+        </div>
+        <script
+          src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+          data-url="https://www.tickettailor.com/all-tickets/rivalthereimaginingvalueactionlab/?ref=website_widget&#038;show_search_filter=true&#038;show_date_filter=true&#038;show_sort=true"
+          data-type="inline"
+          data-inline-minimal="true"
+        ></script>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://www.tickettailor.com/all-tickets/rivalthereimaginingvalueactionlab/"
+        data-embed-id="rivalthereimaginingvalueactionlab"
+        data-embed-provider="tickettailor"
+        data-embed-src="https://www.tickettailor.com/all-tickets/rivalthereimaginingvalueactionlab/?widget=true"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should turn the older loader marked inline into a ticket placeholder', async () => {
+    const value = html`
+      <script
+        src="https://dc161a0a89fedd6639c9-03787a0970cd749432e2a6d3b34c55df.ssl.cf3.rackcdn.com/tt-widget.js"
+        data-url="https://www.tickettailor.com/events/witneyconservativesassociation/2143010/select-date"
+        data-type="inline"
+        data-inline-minimal="true"
+        data-inline-show-logo="false"
+        data-inline-bg-fill="true"
+      ></script>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://www.tickettailor.com/events/witneyconservativesassociation/2143010/select-date"
+        data-embed-id="witneyconservativesassociation/2143010"
+        data-embed-provider="tickettailor"
+        data-embed-src="https://www.tickettailor.com/events/witneyconservativesassociation/2143010/select-date?widget=true"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+})
