@@ -3,6 +3,7 @@ import {
   isPlayerJsReady,
   playerJsPlayRequest,
   readIframeResizeHeight,
+  readIframeResizerHeight,
   readObjectHeight,
   readPixels,
 } from './hints.js'
@@ -74,6 +75,38 @@ describe('readIframeResizeHeight', () => {
     expect(readIframeResizeHeight('{"context":"iframe.resize","height":0}')).toBeUndefined()
     expect(readIframeResizeHeight('{"context":"iframe.ready","height":500}')).toBeUndefined()
     expect(readIframeResizeHeight('iframe.resize')).toBeUndefined()
+  })
+})
+
+describe('readIframeResizerHeight', () => {
+  // Captured from `form.123formbuilder.com/5013627` framed on a cross-origin page in Chrome.
+  it('should read the height out of the answer to the start message', () => {
+    expect(readIframeResizerHeight('[iFrameSizer]f0:884.96875:640:init')).toBe(884.96875)
+  })
+
+  it('should read the height out of a resize the frame posts later', () => {
+    expect(readIframeResizerHeight('[iFrameSizer]f0:1203:640:resize')).toBe(1203)
+  })
+
+  it('should read nothing from a message without the iframe-resizer prefix', () => {
+    expect(readIframeResizerHeight('f0:884:640:init')).toBeUndefined()
+  })
+
+  it('should read nothing from a message with text before the prefix', () => {
+    expect(readIframeResizerHeight('x[iFrameSizer]f0:884:640:init')).toBeUndefined()
+  })
+
+  it('should read nothing from an unrendered frame', () => {
+    expect(readIframeResizerHeight('[iFrameSizer]f0:0:640:init')).toBeUndefined()
+  })
+
+  it('should read nothing from a message posted as an object', () => {
+    expect(readIframeResizerHeight({ height: 884 })).toBeUndefined()
+  })
+
+  // The form scrolls a field into view with `parentIFrame.scrollToOffset(0, y)`.
+  it('should read nothing from a scroll event, whose number is an offset', () => {
+    expect(readIframeResizerHeight('[iFrameSizer]f0:420:0:scrollToOffset')).toBeUndefined()
   })
 })
 
