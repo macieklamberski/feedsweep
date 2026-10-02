@@ -209,6 +209,14 @@ describeForEachParser('stripHiddenElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should remove a block whose id nothing on the page names', async () => {
+      const value =
+        '<a href="#comments">Comments</a><div id="custom_category" style="display:none;">events</div>'
+      const expected = '<a href="#comments">Comments</a>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should remove a block with no id when a link points at the top of the page', async () => {
       const value = '<a href="#">Back to top</a><div style="display:none">Gone</div>'
       const expected = '<a href="#">Back to top</a>'
