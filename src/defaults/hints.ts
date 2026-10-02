@@ -22,6 +22,7 @@ import { donorboxRenderHint } from '../embeds/donorbox.js'
 import { facebookRenderHint } from '../embeds/facebook.js'
 import { flickrRenderHint } from '../embeds/flickr.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
+import { formmailerRenderHint } from '../embeds/formmailer.js'
 import { foxbusinessRenderHint, foxnewsRenderHint } from '../embeds/foxnews.js'
 import { googledriveRenderHint } from '../embeds/googledrive.js'
 import { hearthisRenderHint } from '../embeds/hearthis.js'
@@ -112,6 +113,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   facebookRenderHint,
   flickrRenderHint,
   flourishRenderHint,
+  formmailerRenderHint,
   foxbusinessRenderHint,
   foxnewsRenderHint,
   googledriveRenderHint,

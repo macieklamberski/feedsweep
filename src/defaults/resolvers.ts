@@ -137,6 +137,10 @@ import {
 } from '../embeds/fliphtml5.js'
 import { flipsnackEmbedResolver } from '../embeds/flipsnack.js'
 import { flourishIframeEmbedResolver, flourishWidgetEmbedResolver } from '../embeds/flourish.js'
+import {
+  formmailerIframeEmbedResolver,
+  formmailerWidgetEmbedResolver,
+} from '../embeds/formmailer.js'
 import { foxnewsIframeEmbedResolver, foxnewsScriptEmbedResolver } from '../embeds/foxnews.js'
 import { ganjingworldEmbedResolver } from '../embeds/ganjingworld.js'
 import { garminEmbedResolver } from '../embeds/garmin.js'
@@ -537,6 +541,8 @@ const embedResolvers: Array<EmbedResolver> = [
   flipsnackEmbedResolver,
   flourishWidgetEmbedResolver,
   flourishIframeEmbedResolver,
+  formmailerWidgetEmbedResolver,
+  formmailerIframeEmbedResolver,
   foxnewsScriptEmbedResolver,
   foxnewsIframeEmbedResolver,
   ganjingworldEmbedResolver,
