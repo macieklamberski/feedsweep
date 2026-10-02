@@ -1,4 +1,4 @@
-import { escapeRegex, isHostOrSubdomainOf, parseUrl } from 'trousse'
+import { isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import {
   getElementDimensions,
@@ -8,35 +8,14 @@ import {
 } from '../../utils/dom.js'
 import { placeholderBaseUrl } from '../../utils/urls.js'
 
-// `[./]` anchors require the segment to terminate with `.` (file extension) or `/`
-// (path boundary) to avoid false positives on words like `tracker` or `counter`.
-const buildPathRegex = (segments: ReadonlyArray<string>): RegExp | null => {
-  if (segments.length === 0) {
-    return null
-  }
-
-  const alternation = segments.map((segment) => escapeRegex(segment)).join('|')
-
-  // The [./] terminator keeps a segment from matching inside words like tracker or counter.
-  return new RegExp(`/(?:${alternation})[./]`, 'i')
-}
-
-const isTrackingUrl = (
-  src: string,
-  hosts: ReadonlyArray<string>,
-  pathRegex: RegExp | null,
-): boolean => {
+const isTrackingUrl = (src: string, hosts: ReadonlyArray<string>): boolean => {
   const url = parseUrl(src, placeholderBaseUrl)
 
   if (!url) {
     return false
   }
 
-  if (isHostOrSubdomainOf(url, hosts)) {
-    return true
-  }
-
-  return pathRegex?.test(url.pathname) ?? false
+  return isHostOrSubdomainOf(url, hosts)
 }
 
 const isPixelDimension = (value: number | undefined): boolean => {
@@ -85,8 +64,6 @@ const hasContentImageSignal = (
 // A tracking pixel: a hidden or pixel-sized <img> whose only job is to fire a request.
 export const removeTrackingPixels: DomTransform = (context) => {
   const hosts = context.trackingHosts
-  const pathRegex = buildPathRegex(context.trackingPathSegments)
-  const hasUrlChecks = hosts.length > 0 || pathRegex !== null
 
   return (document) => {
     const images = document.querySelectorAll('img')
@@ -104,10 +81,10 @@ export const removeTrackingPixels: DomTransform = (context) => {
         continue
       }
 
-      if (hasUrlChecks && !isContentSized(dimensions)) {
+      if (!isContentSized(dimensions)) {
         const src = image.getAttribute('src')
 
-        if (src && isTrackingUrl(src, hosts, pathRegex)) {
+        if (src && isTrackingUrl(src, hosts)) {
           image.remove()
         }
       }

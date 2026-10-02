@@ -7,11 +7,7 @@ export {
 } from './defaults/attributes.js'
 export { defaultFieldCleaners } from './defaults/cleaners.js'
 export { defaultEmbedRenderHints } from './defaults/hints.js'
-export {
-  defaultAvatarImageHosts,
-  defaultTrackingHosts,
-  defaultTrackingPathSegments,
-} from './defaults/hosts.js'
+export { defaultAvatarImageHosts, defaultTrackingHosts } from './defaults/hosts.js'
 export { defaultEmojiResolvers, defaultWidgetResolvers } from './defaults/resolvers.js'
 export { defaultNonContentSelectors, defaultPreservedPreClasses } from './defaults/selectors.js'
 export {

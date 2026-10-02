@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { defaultTrackingHosts, defaultTrackingPathSegments } from '../../defaults.js'
+import { defaultTrackingHosts } from '../../defaults.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -273,47 +273,27 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
     })
   })
 
-  describe('path-based detection', () => {
-    it.each(defaultTrackingPathSegments)('should remove images with /%s. path', async (segment) => {
-      const value = `<img src="https://example.com/${segment}.gif?id=abc">`
+  describe('path words', () => {
+    it('should keep an unsized image whose file is named pixel', async () => {
+      const value = '<img src="https://example.com/pixel.gif?id=abc">'
 
-      expect(await transform(value)).toEqualHtml('')
+      expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should remove images with /pixel/ path', async () => {
+    it('should keep an unsized image in a folder named pixel', async () => {
       const value = '<img src="https://example.com/pixel/abc.png">'
 
-      expect(await transform(value)).toEqualHtml('')
+      expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should keep a content-sized image under a tracking path segment', async () => {
-      const value = html`
-        <img src="https://example.com/images/pixel/pixel-8-pro.jpg" width="800" height="600">
-      `
+    it('should keep an unsized page-view counter in a folder named count', async () => {
+      const value = '<img src="https://counter.example.com/count/tag.svg?url=example.com/post/">'
 
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should detect tracking path in relative URLs', async () => {
-      const value = '<img src="/pixel.gif?campaign=newsletter">'
-
-      expect(await transform(value)).toEqualHtml('')
-    })
-
-    it('should not remove track-prefixed paths now that track segment is dropped', async () => {
-      const value = '<img src="https://example.com/track/the-song.jpg">'
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
-    it('should not remove counter-like words that fail boundary check', async () => {
-      const value = '<img src="https://example.com/counterfeit.jpg">'
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
-    it('should not remove unrelated path segments containing pixel substring', async () => {
-      const value = '<img src="https://example.com/pixelated-art-piece.jpg">'
+    it('should keep an unsized photo in a folder named Beacon', async () => {
+      const value = '<img src="https://example.com/Image/newsImages/Beacon/STEAM-night.JPG">'
 
       expect(await transform(value)).toEqualHtml(value)
     })
