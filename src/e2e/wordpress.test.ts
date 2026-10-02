@@ -257,4 +257,19 @@ describeForEachParser('WordPress', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  it('should keep a password form whole around its controls', async () => {
+    const value = html`
+      <form action="https://example.com/wp-login.php?action=postpass" class="post-password-form" method="post">
+        <input type="hidden" name="x" value="1">
+        <p>This content is password protected. To view it please enter your password below:</p>
+        <p>
+          <label>Password: <input name="post_password" type="password"></label>
+          <input type="submit" name="Submit" value="Enter">
+        </p>
+      </form>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(value)
+  })
 })

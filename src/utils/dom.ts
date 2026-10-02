@@ -8,6 +8,8 @@ export const Node = { ELEMENT_NODE: 1, TEXT_NODE: 3, COMMENT_NODE: 8 } as const
 // NodeFilter is not globally available in Bun. These are the DOM-spec constants.
 export const NodeFilter = { SHOW_ELEMENT: 0x1, SHOW_TEXT: 0x4, SHOW_COMMENT: 0x80 } as const
 
+// `dialog` closes a paragraph too but stays out. A dialog without `open` hides what it holds, and
+// only as an inline element do the blocks inside it get hoisted out where they render.
 export const blockElements = new Set([
   'address',
   'article',
@@ -16,6 +18,7 @@ export const blockElements = new Set([
   'center',
   'dd',
   'details',
+  'dir',
   'div',
   'dl',
   'dt',
@@ -23,6 +26,7 @@ export const blockElements = new Set([
   'figcaption',
   'figure',
   'footer',
+  'form',
   'h1',
   'h2',
   'h3',
@@ -30,17 +34,22 @@ export const blockElements = new Set([
   'h5',
   'h6',
   'header',
+  'hgroup',
   'hr',
   'li',
+  'listing',
   'main',
+  'menu',
   'nav',
   'ol',
   'p',
   'pre',
+  'search',
   'section',
   'summary',
   'table',
   'ul',
+  'xmp',
 ])
 
 // The first descendant matching `selector`, or the first one also satisfying `predicate`.
