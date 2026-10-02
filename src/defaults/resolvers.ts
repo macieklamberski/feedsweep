@@ -293,6 +293,7 @@ import {
 } from '../embeds/vidyard.js'
 import { vimeoEmbedResolver } from '../embeds/vimeo.js'
 import { vkEmbedResolver } from '../embeds/vk.js'
+import { vokiFlashEmbedResolver, vokiIframeEmbedResolver } from '../embeds/voki.js'
 import { wakeletEmbedResolver } from '../embeds/wakelet.js'
 import { wikimediaEmbedResolver } from '../embeds/wikimedia.js'
 import { wistiaEmbedResolver } from '../embeds/wistia.js'
@@ -664,6 +665,8 @@ const embedResolvers: Array<EmbedResolver> = [
   vidyardScriptEmbedResolver,
   vimeoEmbedResolver,
   vkEmbedResolver,
+  vokiFlashEmbedResolver,
+  vokiIframeEmbedResolver,
   wakeletEmbedResolver,
   wistiaEmbedResolver,
   wordwallEmbedResolver,

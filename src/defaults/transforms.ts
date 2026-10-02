@@ -59,6 +59,7 @@ import { rebuildPiktochartEmbeds } from '../transforms/dom/rebuildPiktochartEmbe
 import { rebuildPublicalbumGalleries } from '../transforms/dom/rebuildPublicalbumGalleries.js'
 import { rebuildRocketYoutubePreviews } from '../transforms/dom/rebuildRocketYoutubePreviews.js'
 import { rebuildVideoJsEmbeds } from '../transforms/dom/rebuildVideoJsEmbeds.js'
+import { rebuildVokiEmbeds } from '../transforms/dom/rebuildVokiEmbeds.js'
 import { rebuildWistiaEmbeds } from '../transforms/dom/rebuildWistiaEmbeds.js'
 import { rebuildWmakerEmbeds } from '../transforms/dom/rebuildWmakerEmbeds.js'
 import { removeTrackingPixels } from '../transforms/dom/removeTrackingPixels.js'
@@ -154,6 +155,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   rebuildDocumentcloudEmbeds,
   rebuildGettyImagesEmbeds,
   rebuildJsfiddleEmbeds,
+  rebuildVokiEmbeds,
 
   // A GitHub Gist embed is a JS-only <script> that renders nothing in a reader. Replace it
   // with a link to the gist so the content is at least reachable.
