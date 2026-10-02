@@ -9,7 +9,11 @@ import {
 import { defaultFieldCleaners } from './cleaners.js'
 import { defaultAvatarImageHosts, defaultTrackingHosts } from './hosts.js'
 import { defaultEmojiResolvers, defaultWidgetResolvers } from './resolvers.js'
-import { defaultNonContentSelectors, defaultPreservedPreClasses } from './selectors.js'
+import {
+  defaultNonContentSelectors,
+  defaultPreservedPreClasses,
+  defaultRevealableSelectors,
+} from './selectors.js'
 import { defaultHighlightFn, defaultResolveUrlFn } from './transforms.js'
 
 // The context transformContent builds before it applies the caller's options.
@@ -25,6 +29,7 @@ export const defaultContext: TransformContext = {
   avatarImageHosts: defaultAvatarImageHosts,
   nonContentSelectors: defaultNonContentSelectors,
   preservedPreClasses: defaultPreservedPreClasses,
+  revealableSelectors: defaultRevealableSelectors,
   fieldCleaners: defaultFieldCleaners,
   resolveUrlFn: defaultResolveUrlFn,
   highlightFn: defaultHighlightFn,

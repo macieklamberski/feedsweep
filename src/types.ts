@@ -223,6 +223,7 @@ export type TransformContext = {
   avatarImageHosts: Array<string>
   nonContentSelectors: Array<string>
   preservedPreClasses: Array<string>
+  revealableSelectors: Array<string>
   fieldCleaners: Array<FieldCleaner>
   resolveUrlFn: ResolveUrlFn
   cleanUrlFn?: CleanUrlFn
