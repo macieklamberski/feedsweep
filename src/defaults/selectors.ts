@@ -3,9 +3,11 @@ export const defaultNonContentSelectors = [
   // WordPress stamps the class on every oEmbed provider's frame, so only a frame paired with a
   // blockquote is stripped.
   'blockquote.wp-embedded-content + iframe.wp-embedded-content',
+
   // Subscribe and newsletter signup forms.
   '[data-component-name="SubscribeWidget"]', // Substack inline subscribe widget.
   '.subscription-widget-wrap-editor', // Substack paywall / subscribe CTA.
+
   // The same subscribe form as the wrap below, arriving as Substack's other snippet. The path is
   // anchored so a post embed (`/embed/post/{id}`) is not caught by it.
   'iframe[src*=".substack.com/"][src$="/embed"]',
@@ -17,6 +19,7 @@ export const defaultNonContentSelectors = [
   '.jetpack_subscription_widget', // Jetpack legacy sidebar subscribe widget.
   'form[action*="buttondown.email"]', // Buttondown embed-subscribe form; mentions of the host are nearly all plain links.
   '.sqs-block-newsletter', // Squarespace newsletter block.
+
   // Bloom (Elegant Themes) optin. The bare `.et_bloom` class does not exist on any element in
   // the wild: the tokens are `et_bloom_bottom_trigger`, `et_bloom_fields` and so on, and a
   // class selector matches whole tokens, so it stripped nothing. Matched on the prefix instead.
@@ -44,6 +47,7 @@ export const defaultNonContentSelectors = [
   '[src*="amazon"][src*="/widgets/q"]',
   'object[data*="amazon"][data*="/widgets/q"]',
   'iframe[src*="ad.duga.jp/"]', // DUGA affiliate banner frame.
+
   // ShopSense product grid. Its loader survives where a wrapper held it, so both carriers go.
   'iframe[src*="shopsensewidget.shopstyle.com"]',
   'script[src*="shopsensewidget.shopstyle.com"]',
@@ -54,6 +58,7 @@ export const defaultNonContentSelectors = [
 
   // Share and call-to-action button clusters.
   '.captioned-button-wrap', // Substack caption + CTA button (Share/Subscribe/Comment).
+
   // Substack's ButtonCreateButton, its CTA button outside a captioned wrap. The component wraps
   // author-authored buttons too (donation links, "Read <post title>"), and Elementor emits the
   // same button-wrapper class, so the platform action in the href is what is matched rather than
@@ -67,26 +72,33 @@ export const defaultNonContentSelectors = [
   '.sharedaddy', // Jetpack Sharedaddy share buttons.
   '.feedflare', // FeedBurner share footer ("Share on X / Email this").
   '.addtoany_share_save_container', // AddToAny share buttons (WordPress).
+
   // The AddToAny anchor itself. Usually empty, where stripEmptyTags already removed it. This is
   // for the variant that carries an image or text and survives as a "Share" button.
   'a.addtoany_share_save',
+
   // Survives as a live "Tweet" link in the output, usually with no other non-content selector
   // matching anywhere.
   'a.twitter-share-button',
+
   // The rendered form of the same button, and of the follow button and the share counter beside
   // it. Every class the corpus puts on one of these frames names a button, so the path is the
   // whole platform's button namespace; the player lives under `/embed/` and is untouched.
   'iframe[src*="platform.twitter.com/widgets/"]',
+
   // Drupal Easy Social. The widget is chrome, but the pipeline cannot tell, so its Facebook
   // Like iframe becomes an embed placeholder card and the chrome is promoted to content.
   'div.easy_social_box',
+
   // A per-post like button with its count, which a community activity feed writes under every
   // update. The button renders nothing in a reader and the count survives as a stray digit.
   '.vm-like-button',
+
   // The Like button pasted on its own, a 25 pixel iframe that would otherwise reach the reader
   // as a click-to-play placeholder for a button. Matched in both spellings for the same reason
   // as the plugins below.
   'iframe:is([src*="facebook.com/plugins/like.php"], [src*="facebook.com/v"][src*="/plugins/like.php"])',
+
   // The rest of the plugin namespace that is chrome rather than a post: the Page box in both its
   // spellings, and the Share button. The resolver already refuses each of these as an embed, and
   // refusing leaves them to the generic fallback, which draws a card for a follow widget. The two
@@ -111,18 +123,22 @@ export const defaultNonContentSelectors = [
   '.elementor-social-icons-wrapper', // Elementor social-icons widget (follow icons).
   '.rrssb-buttons', // Ridiculously Responsive Social Sharing Buttons.
   '.simplesocialbuttons', // SimpleSocialButtons share bar.
+
   // Synved Social Share renders no wrapper, so the anchors are siblings of the post's own
   // paragraphs and the button itself is the only thing there is to match.
   'a.synved-social-button', // Synved Social Share buttons.
+
   // GemPages (Shopify page builder) social-share module. The wrapper's class is only
   // "module-wrap", so the [class*=] entries above never reach it.
   '[data-key="social-share"]',
   '.av-share-box', // Enfold theme "Share this entry" box.
+
   // Elementor names the widget only through modifier classes (elementor-share-buttons--view-icon
   // and siblings), so there is no bare class to match.
   '[class*="elementor-share-buttons"]', // Elementor share-buttons widget.
   '[class*="heateor_sss"]', // Sassy Social Share sharing container.
   '.mashsb-container', // MashShare share bar.
+
   // Simple Share Buttons Adder writes the wrapper as `ssba ssbp-wrap`; there is no `ssba-wrap`
   // class despite the plugin's name.
   '.ssbp-wrap', // Simple Share Buttons Adder share bar.
@@ -134,6 +150,7 @@ export const defaultNonContentSelectors = [
   'iframe[src*="plusone.google.com"]', // Google+ +1 button, whose endpoint closed with the service.
   'iframe[src*="tunein.com/embed/follow/"]', // TuneIn follow button for a station or a show.
   'img[src*="w.sharethis.com/"]', // ShareThis chicklet icons, the button row's pre-widget form.
+
   // Hatena Bookmark's add button. A bookmark comment carries an author's real text on a
   // blockquote of its own, so neither entry is widened to the class prefix.
   'a.hatena-bookmark-button',
@@ -182,14 +199,17 @@ export const defaultNonContentSelectors = [
   // survives is the mount's own fallback.
   'a.rcptr', // Rafflecopter giveaway mount, a link reading "a Rafflecopter giveaway".
   'a.rafl', // The same mount as Rafflecopter's earlier loader wrote it.
+
   // Gleam competition mount. The loader would replace it with the entry form; without it the
   // anchor survives as a bare link named after the competition.
   'a.e-widget',
+
   // Goodreads giveaway widget: a static card with the cover, the title, the closing date and an
   // "Enter Giveaway" button, wrapped in a div whose id the script targets. The card is the
   // widget's own fallback and is also pasted on its own without the wrapper.
   '[id^="goodreadsGiveawayWidget"]',
   '.goodreadsGiveawayWidget',
+
   // The card's "Enter Giveaway" button, which publishers also paste on its own beside the cover
   // and title they copied out of the card.
   'a.goodreadsGiveawayWidgetEnterLink[href*="goodreads.com/giveaway/"]',
@@ -204,15 +224,18 @@ export const defaultNonContentSelectors = [
   // Affiliate booking widgets, which render a map or a form to sell the reader a stay or a
   // ticket and carry none of the post.
   'iframe[src*="stay22.com/embed"]', // Stay22 hotel map.
+
   // GetYourGuide activity and availability widgets. The mount is an empty paragraph or div the
   // partner script fills, or one holding only a "Powered by GetYourGuide" credit anchor.
   // Publishers also paste the widget's whole attribute set onto their own heading or list of
   // tours, so only a paragraph or div with no child element but anchors is claimed. Text is not
   // checked, so a publisher's paragraph of prose carrying the attribute is claimed too.
   ':is(p, div)[data-gyg-href]:not(:has(*:not(a)))',
+
   // Platform UI chrome and non-rendered scaffolding.
   // RedCircle's embed snippet ships a ten-pixel "Powered by RedCircle" line under the player.
   'p:has(> a.redcircle-link)',
+
   // Zeno.FM's widget snippet writes a link to the Zeno home page right after the player. Matched
   // on that position and href only, since publishers rewrite its text.
   'iframe[src*="zeno.fm/player/"] + a:is([href$="//zeno.fm/"], [href$="//www.zeno.fm/"], [href$="//www.zeno.fm"], [href$="//www.zenomedia.com/"])',
@@ -230,16 +253,20 @@ export const defaultNonContentSelectors = [
   'script[consent-original-src-_]', // Real Cookie Banner gated scripts.
   '.cookieconsent-optout-marketing', // Cookiebot "please accept marketing cookies" notice beside the gated iframe.
   '.pec-overlay', // Publii Embed Consent click-to-accept overlay beside the gated iframe.
+
   // OneTrust video fallback: thumbnail plus "enable cookies to view this content" text and a
   // settings link, serialized as a sibling of the gated iframe inside the wrapper.
   '.onetrust-css-video-wrapper .fallback-container', // OneTrust video fallback notice.
+
   // Avada's leftover "For privacy reasons … please accept" notice. The gated iframe itself is
   // recovered via data-privacy-src (a lazy attribute); only this consent nag is dead chrome.
   '.fusion-privacy-placeholder', // Avada privacy-embed notice.
+
   // AMP's own gate follows the same split. The element holds the config and the prompt UI and
   // nothing else, since whatever it gates carries data-block-on-consent and sits elsewhere in
   // the document, so removing it takes the nag and leaves the gated element to be recovered.
   'amp-consent', // AMP consent gate.
+
   // s9e MediaEmbed (forum software) wraps its player in a sizing span. Where the feed generator
   // stripped the iframe out of it, what survives is the wrapper around the literal word
   // "iframe", which renders as that word in the middle of the post. Scoped to a wrapper holding
@@ -266,9 +293,11 @@ export const defaultRevealableSelectors = [
   // Accordions and collapsible blocks.
   '[class*="accordion"]', // Accordion blocks such as `text-accordion-content`.
   '[class*="collaps"]', // Wikidot `collapsible-block-unfolded`.
+
   // Read more toggles.
   '[id^="fv-more-text"]', // FV Read More.
   '.yrm-content', // Read More by Edmon.
+
   // Carousels, galleries and sliders.
   '[class*="carousel"]', // Premium Addons `premium-adv-carousel`.
   '.esg-grid', // Essential Grid.
@@ -279,10 +308,12 @@ export const defaultRevealableSelectors = [
   '.field-slideshow-slide', // Drupal Field Slideshow slide.
   '.swiper-slide', // Swiper slide.
   '.testimonial_slide', // Testimonial slider slide.
+
   // Spoilers.
   '[class*="spoiler"]', // `spoilermain`, `spoilerbody`, `spoiler_div`.
   '[class*="Spoiler"]', // uCoz `uSpoilerText`, Easy Spoiler `easySpoilerSpoils`.
   '[id^="spoiler"]',
+
   // Tabs.
   '[id^="rlta-panel"]', // Regular Labs Tabs and Accordions.
   '[id^="wiki-tab"]', // Wikidot tabs.

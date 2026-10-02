@@ -678,6 +678,7 @@ const embedResolvers: Array<EmbedResolver> = [
   zencastrIframeEmbedResolver,
   zenoEmbedResolver,
   zohoworkdriveEmbedResolver,
+
   // Last, outside the alphabet: keyed on a path shape rather than a host, so every resolver
   // naming a host gets the carrier first.
   mastodonEmbedResolver,
@@ -733,6 +734,7 @@ const citeResolvers: Array<CiteResolver> = [
   tumblrCiteResolver,
   wordpressCiteResolver,
   xenforoCiteResolver,
+
   // Last, outside the alphabet: `.h-cite` is generic markup any card may also carry.
   microformatsCiteResolver,
 ]
@@ -764,8 +766,10 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   lexicalEmojiResolver,
   tiptapEmojiResolver,
   froalaElementEmojiResolver,
+
   // Ahead of smilies, whose /smiles/ directory would read a Bitrix file by its filename first.
   bitrixEmojiResolver,
+
   // Ahead of smilies, whose forum names draw Liferay's smile.gif as 🙂.
   liferayEmojiResolver,
   khorosImageEmojiResolver,
@@ -791,9 +795,11 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   yahooEmojiResolver,
   yahooJapanEmojiResolver,
   froalaImageEmojiResolver,
+
   // Ahead of Twemoji, whose loose `twemoji` url match also takes Discourse's `twemoji` set, drawn
   // under Discourse's own names.
   discourseEmojiResolver,
+
   // Ahead of WordPress, whose WordPress.com host serves Twemoji files named by codepoint.
   twemojiEmojiResolver,
   wordpressEmojiResolver,
@@ -840,8 +846,10 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   btblogEmojiResolver,
   pixnetEmojiResolver,
   genericCharacterEmojiResolver,
+
   // After every engine, since TypePad, Yahoo and others put the emoticon class on their own sets.
   smiliesEmoticonEmojiResolver,
+
   // Last, since the class is shared by engines whose own signals say more.
   genericEmojiResolver,
 ]
