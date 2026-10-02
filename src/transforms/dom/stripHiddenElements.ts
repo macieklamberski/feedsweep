@@ -4,45 +4,43 @@ import { attr, isElementHidden } from '../../utils/dom.js'
 import * as styles from '../../utils/styles.js'
 
 const dialogNameRegex = /lightbox|modal/i
-
-const nameOf = (element: Element): string => {
-  return `${element.getAttribute('class') ?? ''} ${element.getAttribute('id') ?? ''}`
-}
+const whitespaceRegex = /\s+/
 
 // A form's hidden parts are its machinery, and a dialog or lightbox repeats the post as an overlay.
 const isChrome = (element: Element): boolean => {
-  return !!element.closest('form, dialog, [role="dialog"]') || dialogNameRegex.test(nameOf(element))
+  const name = `${element.getAttribute('class') ?? ''} ${element.getAttribute('id') ?? ''}`
+
+  return !!element.closest('form, dialog, [role="dialog"]') || dialogNameRegex.test(name)
 }
 
-const isReferenced = (element: Element): boolean => {
-  const id = element.id
+// Ids a control names with `aria-controls` or a link points at with `href="#id"`.
+const findReferencedIds = (document: Document): Set<string> => {
+  const ids = new Set<string>()
 
-  if (!id) {
-    return false
-  }
-
-  for (const reference of element.ownerDocument.querySelectorAll('[aria-controls], a[href^="#"]')) {
-    const controlled = (reference.getAttribute('aria-controls') ?? '').split(' ')
-
-    if (controlled.includes(id) || reference.getAttribute('href') === `#${id}`) {
-      return true
+  for (const control of document.querySelectorAll('[aria-controls]')) {
+    for (const id of (control.getAttribute('aria-controls') ?? '').split(whitespaceRegex)) {
+      ids.add(id)
     }
   }
 
-  return false
+  for (const link of document.querySelectorAll('a[href^="#"]')) {
+    ids.add((link.getAttribute('href') ?? '').slice(1))
+  }
+
+  return ids
 }
 
 // A named slider, spoiler or tab panel, a player, find-in-page content, or a block a control names.
-const isRevealable = (element: Element, revealableSelector: string): boolean => {
-  if (isChrome(element)) {
-    return false
-  }
-
+const isRevealable = (
+  element: Element,
+  revealableSelector: string,
+  referencedIds: Set<string>,
+): boolean => {
   return (
     isAnyOf(attr(element, 'hidden'), 'until-found') ||
     element.matches('audio, video, [role="tabpanel"]') ||
-    element.matches(revealableSelector) ||
-    isReferenced(element)
+    (revealableSelector !== '' && element.matches(revealableSelector)) ||
+    (element.id !== '' && referencedIds.has(element.id))
   )
 }
 
@@ -70,13 +68,15 @@ export const stripHiddenElements: DomTransform = ({ revealableSelectors }) => {
   const revealableSelector = revealableSelectors.join(', ')
 
   return (document) => {
+    const referencedIds = findReferencedIds(document)
+
     for (const element of document.querySelectorAll('[hidden], [style]')) {
       // Treating opacity:0 as hidden here deletes content that only fades in.
       if (!isElementHidden(element)) {
         continue
       }
 
-      if (isRevealable(element, revealableSelector)) {
+      if (isRevealable(element, revealableSelector, referencedIds)) {
         unhideTree(element)
         continue
       }
