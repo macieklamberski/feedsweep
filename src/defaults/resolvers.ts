@@ -35,6 +35,7 @@ import { xenforoCiteResolver } from '../cites/xenforo.js'
 import { threeSixtyCitiesEmbedResolver } from '../embeds/360cities.js'
 import { abcnewsEmbedResolver } from '../embeds/abcnews.js'
 import { acastEmbedResolver } from '../embeds/acast.js'
+import { allocineEmbedResolver } from '../embeds/allocine.js'
 import {
   amebaImagePageEmbedResolver,
   amebaMoviePlayerEmbedResolver,
@@ -431,6 +432,7 @@ const embedResolvers: Array<EmbedResolver> = [
   threeSixtyCitiesEmbedResolver,
   abcnewsEmbedResolver,
   acastEmbedResolver,
+  allocineEmbedResolver,
   amebaImagePageEmbedResolver,
   amebaMoviePlayerEmbedResolver,
   amebaReblogCardEmbedResolver,
