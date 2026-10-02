@@ -85,7 +85,7 @@ const specimens: Record<string, string | [string, string]> = {
   'iframe[src*="eventbrite."][src*="/tickets-external"]':
     '<iframe width="100%" height="214" src="//eventbrite.es/tickets-external?eid=13461809635&amp;ref=etckt"></iframe>',
   'iframe[src*="eventbrite."][src*="/countdown-widget"]':
-    '<iframe src="//www.eventbrite.de/countdown-widget?eid=37526907992" width="195" height="295" frameborder="0"></iframe>',
+    '<iframe allowtransparency="true" frameborder="0" height="383" marginheight="0" marginwidth="0" scrolling="no" src="https://www.eventbrite.ca/countdown-widget?eid=24687510007" width="195"></iframe>',
   'form[action*="paypal.com/cgi-bin/webscr"]':
     '<form action="https://www.paypal.com/cgi-bin/webscr" method="post"><input type="hidden" name="cmd" value="_donations"><input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit" alt="Donate"></form>',
   'img[src*="paypal.com/"][src*="/i/btn/"]:not(a img)':
@@ -335,9 +335,15 @@ const zenoHomeLinks: Array<[string, string, string]> = [
   ],
 ]
 
+const eventbriteComFrames = [
+  '<iframe src="https://www.eventbrite.com/tickets-external?eid=2112794425&ref=etckt" frameborder="0" width="100%" height="192"></iframe>',
+  '<iframe src="//www.eventbrite.com/countdown-widget?eid=20577825831" width="195" height="295" frameborder="0"></iframe>',
+]
+
 // Eventbrite's checkout and countdown routes on a host that is not Eventbrite.
 const foreignEventbriteRouteFrames = [
   'https://tickets.example.com/tickets-external?eid=13461809635',
+  'https://myeventbrite-clone.example/tickets-external?eid=13461809635',
   'https://tickets.example.com/countdown-widget?eid=37526907992',
 ]
 
@@ -784,6 +790,12 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       `
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it.each(eventbriteComFrames)('should strip the eventbrite.com frame %s', async (value) => {
+      expect(await transform(`<p>Before</p>${value}<p>After</p>`)).toEqualHtml(
+        '<p>Before</p><p>After</p>',
+      )
     })
 
     // The full event page in a frame still serves and carries the event itself.
