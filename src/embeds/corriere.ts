@@ -39,10 +39,9 @@ const readFeedVideo = (value: string | undefined): EmbedResolverResult | undefin
   return composeEmbed(id)
 }
 
-// Corriere della Sera's video player, `video.corriere.it/video-embed/{id}`, and two retired
-// players that render nothing: the Flash widget `static2.video.corriereobjects.it/widget/swf/`,
-// with the feed in `videoUrl` flashvars, and `video.corriere.it/widget/players/`, with the feed
-// in its `videoId` query.
+// Corriere della Sera's player, `video.corriere.it/video-embed/{id}`, and two retired players
+// that render nothing: the Flash widget `static2.video.corriereobjects.it/widget/swf/`, with the
+// feed in the `videoUrl` flashvar, and `video.corriere.it/widget/players/`, in the `videoId` query.
 export const corriereResolveEmbed: ResolveEmbed = (url, element) => {
   const flash = parseUrlOnHosts(url, corriereFlashHosts)
 
