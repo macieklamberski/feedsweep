@@ -11,7 +11,7 @@ const namashaHosts = ['namasha.com']
 // The server answers the route word and the id in any case.
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 
-// A Namasha video player. The player seeks to the `t` in its query.
+// A Namasha video player. The embed page carries `t` into the player url.
 export const namashaResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
   const id = parsed?.pathname.match(embedPathRegex)?.[1]
