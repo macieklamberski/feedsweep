@@ -152,6 +152,10 @@ const specimens: Record<string, string | [string, string]> = {
     '<a href="https://example.com/entry/https://example.com/a" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" title="Add to Hatena Bookmark"><img src="https://example.com/entry-button/button-only@2x.png" alt="Add to Hatena Bookmark" width="20" height="20"></a>',
   'iframe.hatena-bookmark-button-frame':
     '<iframe src="https://example.com/bc/bcbutton?url=https%3A%2F%2Fexample.com%2Fa" class="hatena-bookmark-button-frame" width="150" height="28" frameborder="0" scrolling="no"></iframe>',
+  'img:is([src*="flagcounter.com/count"], [src*="flagcounter.com/mini/"], [src*="flagcounter.com/map/"])':
+    '<img src="http://s01.flagcounter.com/mini/ezoj/bg_FFFFFF/txt_000000/border_CCCCCC/flags_1.jfif">',
+  'a[href*="flagcounter.com/"]:has(img:is([src*="flagcounter.com/count"], [src*="flagcounter.com/mini/"], [src*="flagcounter.com/map/"]))':
+    '<a href="https://info.flagcounter.com/9q1P"><img src="https://s11.flagcounter.com/count2/9q1P/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_0/pageviews_0/flags_0/percent_0/" alt="Flag Counter" border="0"></a>',
   '.yarpp-related':
     '<div class="yarpp yarpp-related yarpp-template-list"><h3>Related</h3><ol><li><a href="/a">A</a></li></ol></div>',
   '.jp-relatedposts':
@@ -251,6 +255,12 @@ const specimens: Record<string, string | [string, string]> = {
 }
 
 const specimenEntries = Object.entries(specimens)
+
+const flagCounterImageUrls = [
+  'http://flagcounter.com/count/t5KP/bg=B3B3B3/txt=000000/border=CCCCCC/columns=5/maxflags=248/viewers=0/labels=1/',
+  'http://s01.flagcounter.com/mini/ezoj/bg_FFFFFF/txt_000000/border_CCCCCC/flags_1.jfif',
+  'https://s09.flagcounter.com/map/1ue/size_s/txt_000000/border_CCCCCC/pageviews_1/viewers_0/flags_1/',
+]
 
 const wordpressHandshakeFrames: Array<[string, string]> = [
   [
@@ -754,6 +764,55 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       `
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it.each(flagCounterImageUrls)('should strip the Flag Counter image %s', async (url) => {
+      expect(await transform(`<p>Thanks for reading.<img src="${url}"></p>`)).toEqualHtml(
+        '<p>Thanks for reading.</p>',
+      )
+    })
+
+    it.each(flagCounterImageUrls)('should strip the Flag Counter link around %s', async (url) => {
+      const value = html`
+        <p>Thanks for reading.<a href="http://s09.flagcounter.com/more/1ue"><img src="${url}"></a></p>
+      `
+
+      expect(await transform(value)).toEqualHtml('<p>Thanks for reading.</p>')
+    })
+
+    it('should keep a prose link to Flag Counter', async () => {
+      const value = html`
+        <p><a href="http://flagcounter.com/">Flag Counter</a> counts the visitors of a blog by country.</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep the Flag Counter flag icons in a list of visitors', async () => {
+      const value = html`
+        <p>
+          <a href="http://flagcounter.com/factbook/ru"><img src="http://flagcounter.com/images/flags/ru.png"></a>
+          <a href="http://flagcounter.com/factbook/ru">Russian Federation</a> 251
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a link to another site that holds the Flag Counter image', async () => {
+      const value = html`
+        <a href="https://example.com/visitors">
+          <img src="https://s09.flagcounter.com/map/1ue/size_s/txt_000000/border_CCCCCC/pageviews_1/viewers_0/flags_1/">
+          Visitors so far
+        </a>
+      `
+      const expected = html`
+        <a href="https://example.com/visitors">
+          Visitors so far
+        </a>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should keep a PayPal button image that links to its target', async () => {
