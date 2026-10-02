@@ -39,6 +39,7 @@ import { matterportRenderHint } from '../embeds/matterport.js'
 import { megaphoneRenderHint } from '../embeds/megaphone.js'
 import { mixcloudRenderHint } from '../embeds/mixcloud.js'
 import { mrcvideoRenderHint } from '../embeds/mrcvideo.js'
+import { namashaRenderHint } from '../embeds/namasha.js'
 import { nbcnewsRenderHint } from '../embeds/nbcnews.js'
 import { neteaseRenderHint } from '../embeds/netease.js'
 import { nicovideoRenderHint } from '../embeds/nicovideo.js'
@@ -128,6 +129,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   megaphoneRenderHint,
   mixcloudRenderHint,
   mrcvideoRenderHint,
+  namashaRenderHint,
   nbcnewsRenderHint,
   neteaseRenderHint,
   nicovideoRenderHint,
