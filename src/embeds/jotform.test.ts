@@ -150,6 +150,23 @@ describeForEachParser('jotformScriptEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+    it('should mint the form from a loader on the bare jotform.com host', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="//jotform.com/jsform/221635582782058?redirect=1"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jotform',
+        id: '221635582782058',
+        src: 'https://form.jotform.com/221635582782058?redirect=1',
+        url: 'https://form.jotform.com/221635582782058',
+        height: 539,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -157,6 +174,12 @@ describeForEachParser('jotformScriptEmbedResolver', (parseHtml) => {
       const value = html`
         <script src="https://evil.test/jsform/260493476454061?form.jotform.com/jsform/"></script>
       `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a loader on an enterprise account host', async () => {
+      const value = html`<script src="https://acme.jotform.com/jsform/221635582782058"></script>`
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -227,6 +250,19 @@ describeForEachParser('jotformIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should mint the form from a frame on the bare jotform.com host', async () => {
+      const value = html`<iframe src="https://jotform.com/221635582782058"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'jotform',
+        id: '221635582782058',
+        src: 'https://form.jotform.com/221635582782058',
+        url: 'https://form.jotform.com/221635582782058',
+        height: 539,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -238,6 +274,12 @@ describeForEachParser('jotformIframeEmbedResolver', (parseHtml) => {
 
     it('should ignore a subdomain that serves uploads', async () => {
       const value = html`<iframe src="https://files.jotform.com/260493476454061"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a frame on an enterprise account host', async () => {
+      const value = html`<iframe src="https://acme.jotform.com/221635582782058"></iframe>`
 
       expect(await extract(value)).toBeUndefined()
     })

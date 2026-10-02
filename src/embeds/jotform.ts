@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
@@ -6,8 +6,8 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'jotform'
 
-// The page hosts only, since `files.jotform.com` and other subdomains serve uploads. Every
-// regional and legacy host serves the same form ids.
+// The page hosts only, matched exactly, since `files.jotform.com` and other subdomains of
+// `jotform.com` serve uploads. Every regional and legacy host serves the same form ids.
 const jotformHosts = [
   'form.jotform.co',
   'form.jotform.com',
@@ -17,6 +17,7 @@ const jotformHosts = [
   'form.jotformpro.com',
   'form.jotformz.com',
   'italian.jotform.com',
+  'jotform.com',
   'oembed.jotform.com',
   'pci.jotform.com',
   'www.jotform.com',
@@ -44,7 +45,7 @@ const composeEmbed = (formId: string, carrier: URL): EmbedResolverResult => {
 export const jotformResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
 
-  if (!parsed) {
+  if (!parsed || !isHostOf(parsed, jotformHosts)) {
     return
   }
 
@@ -68,7 +69,7 @@ export const jotformScriptEmbedResolver = createMarkupEmbedResolver(
     const loader = parseUrlOnHosts(attr(element, 'src'), jotformHosts)
     const formId = loader?.pathname.match(loaderPathRegex)?.[1]
 
-    if (!loader || !formId) {
+    if (!loader || !isHostOf(loader, jotformHosts) || !formId) {
       return
     }
 
