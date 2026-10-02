@@ -6,12 +6,12 @@ import { deezerEmbedResolver, deezerResolveEmbed } from './deezer.js'
 
 describe('deezerResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should keep the theme the widget path already states', () => {
+    it('should mint the share dialog theme over a light one', () => {
       const value = 'https://widget.deezer.com/widget/light/album/75337'
       const expected: EmbedResolverResult = {
         provider: 'deezer',
         id: 'album/75337',
-        src: 'https://widget.deezer.com/widget/light/album/75337',
+        src: 'https://widget.deezer.com/widget/dark/album/75337',
         url: 'https://www.deezer.com/album/75337',
         height: 300,
       }
@@ -119,12 +119,12 @@ describe('deezerResolveEmbed', () => {
   })
 
   describe('Variant #1: the current widget frame', () => {
-    it('should follow the auto theme through', () => {
+    it('should mint the share dialog theme over auto', () => {
       const value = 'https://widget.deezer.com/widget/auto/album/75337'
       const expected: EmbedResolverResult = {
         provider: 'deezer',
         id: 'album/75337',
-        src: 'https://widget.deezer.com/widget/auto/album/75337',
+        src: 'https://widget.deezer.com/widget/dark/album/75337',
         url: 'https://www.deezer.com/album/75337',
         height: 300,
       }

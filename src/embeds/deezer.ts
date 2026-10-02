@@ -32,10 +32,6 @@ const pluginTypes = toMap({
   tracks: 'track',
 })
 
-// The widget's first segment is its theme. `auto` follows the reader's colour scheme, and an
-// unknown one falls back to the theme Deezer's own share dialog writes.
-const themes = new Set(['auto', 'dark', 'light'])
-
 // A locale in front of the route is the site's own prefix, not part of the route.
 const localeRegex = /^[a-z]{2}$/
 
@@ -44,35 +40,34 @@ const localeRegex = /^[a-z]{2}$/
 // and `path=11969917` still a playlist.
 const trackSwfRegex = /^(?:small-widget(?:-v2)?|singlePlayer)\.swf$/
 
-type Resource = { type: string; id: string; theme: string }
+type Resource = { type: string; id: string }
 
 const readResource = (url: URL): Resource | undefined => {
   const segments = getPathSegments(url)
   const route = localeRegex.test(segments[0] ?? '') ? segments.slice(1) : segments
-  const theme = url.searchParams.get('layout') ?? ''
   // A query value comes out decoded, and the id goes into a path beside the raw path spellings.
   const query = (name: string) => encodePathSegment(url.searchParams.get(name) ?? '')
 
   // The current widget, `widget.deezer.com/widget/{theme}/{type}/{id}`.
   if (route[0] === 'widget') {
-    return { type: route[2] ?? '', id: route[3] ?? '', theme: route[1] ?? '' }
+    return { type: route[2] ?? '', id: route[3] ?? '' }
   }
 
   // The classic plugin player, `deezer.com/plugins/player?type={type}&id={id}`. It redirects to
   // the current widget, which is minted here directly.
   if (route[0] === 'plugins' && route[1] === 'player') {
-    return { type: pluginTypes.get(query('type')) ?? '', id: query('id'), theme }
+    return { type: pluginTypes.get(query('type')) ?? '', id: query('id') }
   }
 
   // `deezer.com/embedded/{player}.swf?idSong={id}` and its `swf/singlePlayer.swf` twin.
   if (trackSwfRegex.test(route[1] ?? '')) {
-    return { type: 'track', id: query('idSong'), theme }
+    return { type: 'track', id: query('idSong') }
   }
 
   // `deezer.com/embedded/widget.swf?path={id}` and `deezer.com/embed/player?pid={id}`, the two
   // spellings of the Flash-era playlist player.
   if (route[1] === 'widget.swf' || (route[0] === 'embed' && route[1] === 'player')) {
-    return { type: 'playlist', id: query('path') || query('pid'), theme }
+    return { type: 'playlist', id: query('path') || query('pid') }
   }
 }
 
@@ -85,14 +80,14 @@ export const deezerResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const { type, id } = resource
-  const theme = themes.has(resource.theme) ? resource.theme : 'dark'
 
   return {
     provider,
     // The type qualifies the id because the endpoint an enricher would call is
     // `api.deezer.com/{type}/{id}`, and the id alone does not say which one.
     id: `${type}/${id}`,
-    src: `https://widget.deezer.com/widget/${theme}/${type}/${id}`,
+    // The theme is the one Deezer's share dialog writes, whatever the carrier chose.
+    src: `https://widget.deezer.com/widget/dark/${type}/${id}`,
     url: `https://www.deezer.com/${type}/${id}`,
     height: deezerHeights.get(type),
     title: attr(element, 'title'),
