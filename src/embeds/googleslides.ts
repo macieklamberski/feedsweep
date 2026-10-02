@@ -7,9 +7,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 // enclosure.
 const deckRoutes = new Set(['edit', 'embed', 'preview', 'pub', 'pubembed'])
 
-// `loop` and `delayms` are the publisher's own slideshow settings and `slide` is the start
-// position. `start` autoplays the deck, which is the reader's call, so it goes with the trackers.
-const deckParams = ['loop', 'delayms', 'slide']
+// `slide` is the start position. `loop` and `delayms` only shape auto-advance, which `start`
+// turns on, and starting playback is the reader's call.
+const deckParams = ['slide']
 
 const deckRatio = '480/299'
 
