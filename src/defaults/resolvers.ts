@@ -227,6 +227,7 @@ import { podigeeIframeEmbedResolver, podigeeScriptEmbedResolver } from '../embed
 import { podomaticEmbedResolver } from '../embeds/podomatic.js'
 import { preziEmbedResolver } from '../embeds/prezi.js'
 import { puzzlemeEmbedResolver, puzzlemeWidgetEmbedResolver } from '../embeds/puzzleme.js'
+import { radioradicaleEmbedResolver } from '../embeds/radioradicale.js'
 import { redcircleIframeEmbedResolver, redcircleScriptEmbedResolver } from '../embeds/redcircle.js'
 import {
   redditIframeEmbedResolver,
@@ -623,6 +624,7 @@ const embedResolvers: Array<EmbedResolver> = [
   preziEmbedResolver,
   puzzlemeEmbedResolver,
   puzzlemeWidgetEmbedResolver,
+  radioradicaleEmbedResolver,
   redcircleScriptEmbedResolver,
   redcircleIframeEmbedResolver,
   redditWidgetEmbedResolver,
