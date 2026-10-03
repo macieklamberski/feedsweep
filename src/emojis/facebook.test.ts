@@ -667,4 +667,132 @@ describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
   })
+
+  describe('sprite wrappers', () => {
+    it('should replace a wrapper around a painted sprite by its label', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="frown emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_d55a98"></i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml('<p>🙁</p>')
+    })
+
+    const hiddenCases: Array<[string, string, string, string]> = [
+      ['_skr', ':-)', 'smile emoticon', '🙂'],
+      ['_4mcd', ';)', 'wink emoticon', '😉'],
+      ['_4mcd', '🙂', 'smile emoticon', '🙂'],
+      ['_skr', '<br>', 'smile emoticon', '🙂'],
+      ['_4mcd', '<img src="https://example.com/2764.png" alt="❤">', 'heart emoticon', '❤️'],
+    ]
+
+    it.each(hiddenCases)(
+      'should replace a sprite wrapper with a %s span holding %s',
+      async (hiddenClass, hiddenContent, title, glyph) => {
+        const value = html`
+          <p>
+            <i class="_1gwo" title="${title}">
+              <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+              <span class="${hiddenClass}">${hiddenContent}</span>
+            </i>
+          </p>
+        `
+
+        expect(await transform(value)).toEqualHtml(`<p>${glyph}</p>`)
+      },
+    )
+
+    it('should keep a name without a universal code as its code', async () => {
+      const value = html`
+        <p>
+          <i class="_1gwo" title="like emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_8a4c64"></i>
+            <span class="_skr">(y)</span>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml('<p><span data-emoji="">(y)</span></p>')
+    })
+
+    it('should leave a wrapper whose hidden code names another emoticon untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span class="_4mcd">;)</span>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose hidden span holds prose untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_1gwo" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span class="_skr">So, don't wait any longer</span>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper holding prose after its hidden span untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span class="_4mcd">:)</span>
+            <span>om het te vieren</span>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose hidden image names another picture untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span class="_4mcd"><img src="https://example.com/smiley-laughing.gif" alt="laughing"></span>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose sprite holds an image untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="wink emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_7f72ac"><u><img src="https://example.com/wink.png" alt="😉"></u></i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose sprite holds text untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4">“</i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
 })

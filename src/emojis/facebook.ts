@@ -8,6 +8,7 @@ import {
   noEmojiNames,
   resolveEmojiElement,
   resolveEmojiImage,
+  withEmojiPresentation,
 } from '../utils/emojis.js'
 import { bgImage } from '../utils/styles.js'
 
@@ -182,10 +183,12 @@ const labelNameRegex = new RegExp(`(?:^|[^a-z])(${classicNames.join('|')})(?:hym
 
 // The span Facebook hid from sighted readers beside an emoji image, holding its code or glyph.
 const hiddenTextSelector = 'span[class~="_7oe"]'
+// The empty `i` painted from a sprite sheet the feed does not load.
+const spriteSelector = 'i[class~="_4-k1"]'
 
-// A later chat markup of the classic emoticon: an empty span or `i` painted by Facebook's CSS,
-// named only by the screen-reader label in its title. A post's wrapper holds the emoji image
-// instead, beside the hidden span, which shows once the site's CSS is gone.
+// A later chat markup of the classic emoticon: an empty span or `i` painted by Facebook's CSS, or
+// one holding a painted sprite, named by the screen-reader label in its title. A post's wrapper
+// holds the emoji image instead, beside the hidden span, which shows once the site's CSS is gone.
 export const facebookLabelEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'span[class~="_47e3"], i[class~="_1gwo"][title], i[class~="_lew"][title]',
@@ -203,8 +206,14 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
       return result && 'glyph' in result ? result : undefined
     }
 
+    const isSpriteWrapper =
+      image?.matches(spriteSelector) &&
+      !image.firstElementChild &&
+      !image.textContent?.trim() &&
+      !rest.length
+
     // The class also rides on spans pasted around prose.
-    if (element.textContent?.trim() || element.firstElementChild) {
+    if (!isSpriteWrapper && (element.textContent?.trim() || element.firstElementChild)) {
       return
     }
 
@@ -215,7 +224,23 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
     }
 
     const code = classicCodes[name]
+    const glyph = glyphFromShortcode(code)
 
-    return resolveEmojiElement(element, { glyph: glyphFromShortcode(code), shortcode: code })
+    if (hidden) {
+      const hiddenImage = hidden.querySelector('img')
+      const hiddenText =
+        hidden.textContent?.trim() || (hiddenImage ? attr(hiddenImage, 'alt') : undefined)
+      const isCode = hiddenText === code || (!!glyph && glyphFromShortcode(hiddenText) === glyph)
+      const isGlyph =
+        !!glyph &&
+        !!hiddenText &&
+        withEmojiPresentation(hiddenText) === withEmojiPresentation(glyph)
+
+      if (hiddenText && !isCode && !isGlyph) {
+        return
+      }
+    }
+
+    return resolveEmojiElement(element, { glyph, shortcode: code })
   },
 }
