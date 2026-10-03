@@ -259,9 +259,30 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // Constructed: no feed writes both, so this pins the order the module documents.
     it('should prefer the asset in the swf query over the swf path', async () => {
       const value = html`
         <embed src="http://www.rtve.es/swf/v2/embed/913019_es_videos/RTVEPlayer.swf?assetID=824677_es_videos" />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'rtve',
+        id: 'video/824677',
+        src: 'https://www.rtve.es/drmn/embed/video/824677/',
+        url: 'https://www.rtve.es/v/824677/',
+        thumbnail: 'https://img.rtve.es/v/824677/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Constructed: no feed writes both, so this pins the order the module documents.
+    it('should prefer the asset in the flashvars over the swf path', async () => {
+      const value = html`
+        <embed
+          src="http://www.rtve.es/swf/v2/embed/913019_es_videos/RTVEPlayer.swf"
+          flashvars="assetID=824677_es_videos"
+        />
       `
       const expected: EmbedResolverResult = {
         provider: 'rtve',
