@@ -225,7 +225,7 @@ import { libsynEmbedResolver } from '../embeds/libsyn.js'
 import { linkedinEmbedResolver } from '../embeds/linkedin.js'
 import { listennotesEmbedResolver } from '../embeds/listennotes.js'
 import { lividIframeEmbedResolver, lividMetasliderEmbedResolver } from '../embeds/livid.js'
-import { mailruEmbedResolver } from '../embeds/mailru.js'
+import { mailruEmbedResolver, mailruWidgetEmbedResolver } from '../embeds/mailru.js'
 import { mastodonEmbedResolver } from '../embeds/mastodon.js'
 import { matterportEmbedResolver } from '../embeds/matterport.js'
 import { mediacccEmbedResolver } from '../embeds/mediaccc.js'
@@ -675,6 +675,7 @@ const embedResolvers: Array<EmbedResolver> = [
   lividIframeEmbedResolver,
   lividMetasliderEmbedResolver,
   mailruEmbedResolver,
+  mailruWidgetEmbedResolver,
   matterportEmbedResolver,
   mediacccEmbedResolver,
   mediavineWidgetEmbedResolver,

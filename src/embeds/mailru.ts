@@ -1,15 +1,18 @@
-import { parseUrl } from 'trousse'
+import { isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
+import * as styles from '../utils/styles.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mailru'
 const playerRatio = '16/9'
 
 // `my.mail.ru` serves the player, `api.video.mail.ru` was the host of the older embed and no
-// longer resolves, and `img.mail.ru` served the Flash player.
-const mailruHosts = ['my.mail.ru', 'api.video.mail.ru', 'img.mail.ru']
+// longer resolves, and `img.mail.ru` and the `imgsmail.ru` asset hosts served the Flash player.
+const mailruHosts = ['my.mail.ru', 'api.video.mail.ru', 'img.mail.ru', 'imgsmail.ru']
+// The asset hosts also serve images, so only their `/r` Flash route is read.
+const flashHosts = ['img.mail.ru', 'imgsmail.ru']
 
 const numericPathRegex = /^\/video\/embed\/([^/]+)\/?$/
 // api.video.mail.ru/videos/embed/{type}/{user}/{album}/{n}.html is dead, and the same path on
@@ -21,6 +24,7 @@ const subjectRegex = /^([^/]+)\/([^/]+)\/([^/]+)\/([^/]+)$/
 const flashPlayerPathRegex = /^\/r\/video2?\/\w+\.swf$/
 // The older Flash players took `par={host}/{type}/{user}/{album}/${counter}$0${duration}`.
 const flashParPathRegex = /^\/([^/]+\/[^/]+\/[^/]+)\/\$([^$/]+)\$[^/]*$/
+const leadingSlashRegex = /^\//
 
 const composeNumeric = (videoId: string): EmbedResolverResult => {
   return {
@@ -59,7 +63,7 @@ const resolveTarget = (url: string, element?: Element): EmbedResolverResult | un
     return
   }
 
-  if (parsed.hostname === 'img.mail.ru') {
+  if (isHostOrSubdomainOf(parsed, flashHosts)) {
     if (!flashPlayerPathRegex.test(parsed.pathname)) {
       return
     }
@@ -101,6 +105,25 @@ export const mailruResolveEmbed: ResolveEmbed = (url, element) => {
 
 // A Mail.ru video: the my.mail.ru iframe, the dead api.video.mail.ru embed or the Flash player.
 export const mailruEmbedResolver = createUrlEmbedResolver(mailruHosts, mailruResolveEmbed)
+
+// A my.mail.ru journal post's video: a span only Mail.ru's own page script turned into the Flash
+// player, naming the video as `/{type}/{user}/{album}/{counter}`.
+export const mailruWidgetEmbedResolver = createMarkupEmbedResolver(
+  '.b-history-event__videoevent-object[data-videoplayer-moviesrc]',
+  (element) => {
+    const movieSrc = attr(element, 'data-videoplayer-moviesrc')?.replace(leadingSlashRegex, '')
+    const subject = movieSrc ? composeSubject(movieSrc) : undefined
+
+    if (!subject) {
+      return
+    }
+
+    return {
+      ...subject,
+      thumbnail: styles.bgImage(element),
+    }
+  },
+)
 
 export const mailruRenderHint: EmbedRenderHint = {
   provider,
