@@ -72,11 +72,33 @@ describeForEachParser('sapoEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a mood icon from the older editor untouched', async () => {
+  it('should mark a mood icon from the older editor', async () => {
     const value = html`
       <p>
         <img
           src="https://blogs.example.com/stc/fckeditor/editor/images/smiley/sapo/MOOD_SAPO_TIRED.png"
+          alt=""
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://blogs.example.com/stc/fckeditor/editor/images/smiley/sapo/MOOD_SAPO_TIRED.png"
+          alt=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a city icon from the older editor untouched', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://blogs.example.com/stc/fckeditor/editor/images/smiley/sapo/LOCAL_LISBOA.png"
           alt=""
         >
       </p>
