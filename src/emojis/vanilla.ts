@@ -25,9 +25,9 @@ const names = toMap(mergeEmojiNames([...smiliesEmojiNameTables, vanillaEmojiName
 const extenderRegex = /\/plugins\/emojiextender\/emoji\//i
 
 // Vanilla's emoji, in the core directory and in the EmojiExtender sets. The directory is the only
-// signal, since Vanilla's class is the generic `emoji`. Vanilla names its files by gemoji name,
-// which is exact even where a forum engine draws a file of the same name as its own face, so the
-// forum names only cover what gemoji does not know.
+// signal, since Vanilla's class is the generic `emoji`. The stock names carry `false` entries, so
+// both keep their pictures and only a codepoint filename converts. A gemoji name only tells the
+// weak core directory that a file is an emoji.
 export const vanillaEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[src*="/resources/emoji/" i], img[src*="/plugins/emojiextender/emoji/" i]',
