@@ -341,3 +341,13 @@ export const defaultRevealableSelectors = [
   '[id^="rlta-panel"]', // Regular Labs Tabs and Accordions.
   '[id^="wiki-tab"]', // Wikidot tabs.
 ]
+
+// The <noscript> fallback of a gallery whose script draws the images at runtime, where the feed
+// carries only the fallback. `fixLazyImages` unwraps a <noscript> matching one of these.
+export const defaultGalleryNoscriptSelectors = [
+  '.juicebox-container > noscript', // Juicebox for Drupal.
+  'noscript.justified-image-grid-html', // Justified Image Grid.
+  '.lazygal > noscript', // Lazygal.
+  '.simply-gallery-amp > noscript', // SimpLy Gallery Block.
+  '.sqs-gallery noscript', // Squarespace gallery block.
+]

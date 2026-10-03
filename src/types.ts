@@ -224,6 +224,7 @@ export type TransformContext = {
   nonContentSelectors: Array<string>
   preservedPreClasses: Array<string>
   revealableSelectors: Array<string>
+  galleryNoscriptSelectors: Array<string>
   fieldCleaners: Array<FieldCleaner>
   resolveUrlFn: ResolveUrlFn
   cleanUrlFn?: CleanUrlFn

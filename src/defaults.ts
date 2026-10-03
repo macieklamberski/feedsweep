@@ -10,6 +10,7 @@ export { defaultEmbedRenderHints } from './defaults/hints.js'
 export { defaultAvatarImageHosts, defaultTrackingHosts } from './defaults/hosts.js'
 export { defaultEmojiResolvers, defaultWidgetResolvers } from './defaults/resolvers.js'
 export {
+  defaultGalleryNoscriptSelectors,
   defaultNonContentSelectors,
   defaultPreservedPreClasses,
   defaultRevealableSelectors,
