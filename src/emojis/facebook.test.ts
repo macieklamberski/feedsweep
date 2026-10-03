@@ -758,6 +758,46 @@ describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should leave a wrapper holding prose as bare text after its hidden span untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span class="_4mcd">:)</span>
+            om het te vieren
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper holding a picture after its sprite untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <img src="https://example.com/photo.jpg">
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose hidden span holds an image with no alt untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span class="_4mcd"><img src="https://example.com/photo.jpg"></span>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should leave a wrapper whose hidden image names another picture untouched', async () => {
       const value = html`
         <p>

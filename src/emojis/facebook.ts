@@ -215,7 +215,11 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
     const [zeroSize, ...after] = sprite ? children.slice(1) : children
     const isSpriteEmpty = !sprite || (!sprite.firstElementChild && !sprite.textContent?.trim())
     const isLabelWrapper =
-      (sprite || zeroSize?.matches(zeroSizeSelector)) && isSpriteEmpty && !after.length
+      (sprite || zeroSize) &&
+      (!zeroSize || zeroSize.matches(zeroSizeSelector)) &&
+      isSpriteEmpty &&
+      !after.length &&
+      element.textContent?.trim() === (zeroSize?.textContent?.trim() ?? '')
 
     // The class also rides on spans pasted around prose.
     if (!isLabelWrapper && (element.textContent?.trim() || element.firstElementChild)) {
@@ -242,6 +246,11 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
         withEmojiPresentation(hiddenText) === withEmojiPresentation(glyph)
 
       if (hiddenText && !isCode && !isGlyph) {
+        return
+      }
+
+      // An image with no alt in the span is a picture of its own, not the emoji.
+      if (hiddenImage && !hiddenText) {
         return
       }
     }
