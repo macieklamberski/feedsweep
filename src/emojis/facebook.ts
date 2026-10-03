@@ -185,15 +185,19 @@ const labelNameRegex = new RegExp(`(?:^|[^a-z])(${classicNames.join('|')})(?:hym
 const hiddenTextSelector = 'span[class~="_7oe"]'
 // The empty `i` painted from a sprite sheet the feed does not load.
 const spriteSelector = 'i[class~="_4-k1"]'
+// The span holding the code at zero size beside the sprite.
+const zeroSizeSelector = 'span[class~="_skr"], span[class~="_4mcd"]'
 
 // A later chat markup of the classic emoticon: an empty span or `i` painted by Facebook's CSS, or
-// one holding a painted sprite, named by the screen-reader label in its title. A post's wrapper
-// holds the emoji image instead, beside the hidden span, which shows once the site's CSS is gone.
+// one holding a painted sprite, its code at zero size, or both, named by the screen-reader label
+// in its title. A post's wrapper holds the emoji image instead, beside the hidden span, which
+// shows once the site's CSS is gone.
 export const facebookLabelEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'span[class~="_47e3"], i[class~="_1gwo"][title], i[class~="_lew"][title]',
   extract: (element) => {
-    const [image, hidden, ...rest] = Array.from(element.children)
+    const children = Array.from(element.children)
+    const [image, hidden, ...rest] = children
     const isImageWrapper =
       image?.matches('img') &&
       (!hidden || hidden.matches(hiddenTextSelector)) &&
@@ -206,14 +210,15 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
       return result && 'glyph' in result ? result : undefined
     }
 
-    const isSpriteWrapper =
-      image?.matches(spriteSelector) &&
-      !image.firstElementChild &&
-      !image.textContent?.trim() &&
-      !rest.length
+    // Some pastes drop the sprite and keep only the zero-size span.
+    const sprite = image?.matches(spriteSelector) ? image : undefined
+    const [zeroSize, ...after] = sprite ? children.slice(1) : children
+    const isSpriteEmpty = !sprite || (!sprite.firstElementChild && !sprite.textContent?.trim())
+    const isLabelWrapper =
+      (sprite || zeroSize?.matches(zeroSizeSelector)) && isSpriteEmpty && !after.length
 
     // The class also rides on spans pasted around prose.
-    if (!isSpriteWrapper && (element.textContent?.trim() || element.firstElementChild)) {
+    if (!isLabelWrapper && (element.textContent?.trim() || element.firstElementChild)) {
       return
     }
 
@@ -226,10 +231,10 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
     const code = classicCodes[name]
     const glyph = glyphFromShortcode(code)
 
-    if (hidden) {
-      const hiddenImage = hidden.querySelector('img')
+    if (zeroSize) {
+      const hiddenImage = zeroSize.querySelector('img')
       const hiddenText =
-        hidden.textContent?.trim() || (hiddenImage ? attr(hiddenImage, 'alt') : undefined)
+        zeroSize.textContent?.trim() || (hiddenImage ? attr(hiddenImage, 'alt') : undefined)
       const isCode = hiddenText === code || (!!glyph && glyphFromShortcode(hiddenText) === glyph)
       const isGlyph =
         !!glyph &&

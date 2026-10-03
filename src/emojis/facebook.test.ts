@@ -795,4 +795,47 @@ describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
   })
+
+  describe('zero-size wrappers', () => {
+    const zeroSizeCases: Array<[string, string, string, string]> = [
+      ['Emotikon smile', '_4mcd', ':-)', '🙂'],
+      ['wink emoticon', '_skr', ';)', '😉'],
+      ['„smile“-Emoticon', '_4mcd', ':-)', '🙂'],
+      ['frown emoticon', '_skr', '', '🙁'],
+      ['heart emoticon', '_skr', '<br>', '❤️'],
+      ['heart emoticon', '_4mcd', '<img src="https://example.com/2764.png" alt="❤">', '❤️'],
+    ]
+
+    it.each(zeroSizeCases)(
+      'should replace a wrapper labelled %s holding only a %s span',
+      async (title, zeroSizeClass, zeroSizeContent, glyph) => {
+        const value = html`
+          <p>
+            <i class="_lew" title="${title}">
+              <span
+                aria-hidden="true"
+                class="${zeroSizeClass}"
+                style="font-size: 0px;"
+              >${zeroSizeContent}</span>
+            </i>
+          </p>
+        `
+
+        expect(await transform(value)).toEqualHtml(`<p>${glyph}</p>`)
+      },
+    )
+
+    const keptCases: Array<string> = [
+      '<span class="_4mcd">Liebe Grüße</span>',
+      '<span class="_skr">;)</span>',
+      '<span class="_7oe">:)</span>',
+      '<span class="_4mcd">:)</span><span>om het te vieren</span>',
+    ]
+
+    it.each(keptCases)('should leave a wrapper holding %s untouched', async (content) => {
+      const value = `<p><i class="_1gwo" title="smile emoticon">${content}</i></p>`
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
 })

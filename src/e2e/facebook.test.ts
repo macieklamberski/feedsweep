@@ -362,6 +362,21 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  // Some pastes keep the labelled `i` and its zero-size code without the sprite, so the emoticon
+  // stays an invisible code.
+  it('should replace a labelled wrapper holding only its hidden code', async () => {
+    const value = html`
+      <p>Tot ziens
+        <i class="_1gwo" title="Emoticon smile">
+          <span class="_skr" style="font-size: 0px;">:-)</span>
+        </i>
+      </p>
+    `
+    const expected = '<p>Tot ziens 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // Facebook refuses to be framed, so a carrier holding the page itself reaches a reader as a
   // blank frame. The plugin takes the page as its href, which is the repair the widget div and
   // the fallback blockquote already perform from their own attributes.
