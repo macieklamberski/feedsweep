@@ -55,16 +55,16 @@ describeForEachParser('libsynMediaResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a file whose host no longer serves it', async () => {
+    it('should keep a file that no longer plays on a host that resolves', async () => {
       const value = html`
         <embed
           src="http://media.libsyn.com/media/themerlinshowhi/_static/play/player-licensed.swf"
-          flashvars="file=http://example.com/d/a/2011/19/348/episode-001.mp3"
+          flashvars="file=http://5by5.tv/d/a/2011/19/348/b2w-001.mp3"
         />
       `
       const expected: MediaResolverResult = {
         tag: 'audio',
-        src: 'http://example.com/d/a/2011/19/348/episode-001.mp3',
+        src: 'http://5by5.tv/d/a/2011/19/348/b2w-001.mp3',
       }
 
       expect(await extract(value)).toEqual(expected)
