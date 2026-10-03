@@ -218,3 +218,37 @@ describeForEachParser('drive downloads offered as enclosures', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+// An <audio> naming the file's page, which no browser plays, reaches the resolver only through the
+// pipeline.
+describeForEachParser('drive file pages in a media element', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should frame an audio source naming a file page', async () => {
+    const value = html`
+      <p>
+        <audio controls>
+          <source
+            src="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view?usp=sharing"
+            type="audio/mpeg"
+          >
+          Tu navegador no soporta la etiqueta de audio.
+        </audio>
+      </p>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="4/3"
+        data-embed-thumbnail="https://drive.google.com/thumbnail?id=1GRb_urzw2vn0JGKamTE70NIoELiXbAJA&sz=w640"
+        data-embed-url="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view"
+        data-embed-id="1GRb_urzw2vn0JGKamTE70NIoELiXbAJA"
+        data-embed-provider="googledrive"
+        data-embed-src="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/preview"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+})

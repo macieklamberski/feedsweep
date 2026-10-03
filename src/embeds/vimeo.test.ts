@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
@@ -580,5 +581,39 @@ describeForEachParser('vimeoEmbedResolver carrier title', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+// A WordPress video shortcode naming the video's page, which no browser plays, reaches the
+// resolver only through the pipeline.
+describeForEachParser('vimeo pages in a media element', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should frame a video shortcode naming a video page', async () => {
+    const value = html`
+      <p>
+        <video
+          class="wp-video-shortcode"
+          id="video-174-1"
+          width="640"
+          height="360"
+          preload="metadata"
+          controls="controls"
+        ><source type="video/vimeo" src="https://vimeo.com/89946577?loop=0&amp;_=1"><a href="https://vimeo.com/89946577?loop=0">https://vimeo.com/89946577?loop=0</a></video>
+      </p>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-url="https://vimeo.com/89946577"
+        data-embed-id="89946577"
+        data-embed-provider="vimeo"
+        data-embed-src="https://player.vimeo.com/video/89946577"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
