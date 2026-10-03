@@ -302,6 +302,21 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should add the skin tone to a name gemoji does not know', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://emoji.discourse-cdn.com/twitter/ballet_dancer/3.png?v=15"
+          class="emoji"
+          alt=":ballet_dancer:t3:"
+        >
+      </p>
+    `
+    const expected = '<p>🧑🏼‍🩰</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   const aliasCases: Array<[string, string]> = [
     ['slight_smile', '🙂'],
     ['xray', '🩻'],
