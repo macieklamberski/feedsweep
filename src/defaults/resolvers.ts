@@ -357,6 +357,7 @@ import { boardgamegeekEmojiResolver } from '../emojis/boardgamegeek.js'
 import { btblogEmojiResolver } from '../emojis/btblog.js'
 import { cocologEmojiResolver } from '../emojis/cocolog.js'
 import { cuteeditorEmojiResolver } from '../emojis/cuteeditor.js'
+import { deviantartEmojiResolver } from '../emojis/deviantart.js'
 import { discordEmojiResolver } from '../emojis/discord.js'
 import { discourseEmojiResolver } from '../emojis/discourse.js'
 import { discuzEmojiResolver } from '../emojis/discuz.js'
@@ -848,6 +849,9 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
 
   // Ahead of smilies, whose forum names draw Liferay's smile.gif as 🙂.
   liferayEmojiResolver,
+
+  // Ahead of Khoros and smilies, whose shared `/emoticons/` directory matches deviantART's path.
+  deviantartEmojiResolver,
   khorosImageEmojiResolver,
   webWizEmojiResolver,
   discuzEmojiResolver,
