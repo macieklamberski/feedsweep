@@ -614,8 +614,9 @@ const embedResolvers: Array<EmbedResolver> = [
   libsynEmbedResolver,
   linkedinEmbedResolver,
   listennotesEmbedResolver,
-  mailruEmbedResolver,
+  // Runs before mailruEmbedResolver, which replaces the iframes it compares a span against.
   mailruWidgetEmbedResolver,
+  mailruEmbedResolver,
   matterportEmbedResolver,
   mediacccEmbedResolver,
   mediavineWidgetEmbedResolver,

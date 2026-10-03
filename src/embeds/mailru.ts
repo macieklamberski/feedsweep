@@ -25,6 +25,9 @@ const flashPlayerPathRegex = /^\/r\/video2?\/\w+\.swf$/
 // The older Flash players took `par={host}/{type}/{user}/{album}/${counter}$0${duration}`.
 const flashParPathRegex = /^\/([^/]+\/[^/]+\/[^/]+)\/\$([^$/]+)\$[^/]*$/
 const leadingSlashRegex = /^\//
+// The span's preview, `pic?url=https://my.mail.ru/+/video/url/{shard}/{videoId}`, names the numeric
+// id the my.mail.ru iframe of the same video carries.
+const previewVideoIdRegex = /^\/\+\/video\/url\/[^/]+\/([^/]+)$/
 
 const composeNumeric = (videoId: string): EmbedResolverResult => {
   return {
@@ -97,6 +100,12 @@ const resolveTarget = (url: string, element?: Element): EmbedResolverResult | un
   return modern ? composeSubject(modern.slice(1).join('/')) : undefined
 }
 
+const readPreviewVideoId = (thumbnail: string | undefined): string | undefined => {
+  const previewUrl = parseUrl(thumbnail ?? '', placeholderBaseUrl)?.searchParams.get('url')
+
+  return parseUrl(previewUrl ?? '', placeholderBaseUrl)?.pathname.match(previewVideoIdRegex)?.[1]
+}
+
 export const mailruResolveEmbed: ResolveEmbed = (url, element) => {
   const target = resolveTarget(url, element)
 
@@ -106,8 +115,8 @@ export const mailruResolveEmbed: ResolveEmbed = (url, element) => {
 // A Mail.ru video: the my.mail.ru iframe, the dead api.video.mail.ru embed or the Flash player.
 export const mailruEmbedResolver = createUrlEmbedResolver(mailruHosts, mailruResolveEmbed)
 
-// A my.mail.ru journal post's video: a span only Mail.ru's own page script turned into the Flash
-// player, naming the video as `/{type}/{user}/{album}/{counter}`.
+// A my.mail.ru journal post's video: a span only Mail.ru's own page script turned into its player,
+// naming the video as `/{type}/{user}/{album}/{counter}`.
 export const mailruWidgetEmbedResolver = createMarkupEmbedResolver(
   '.b-history-event__videoevent-object[data-videoplayer-moviesrc]',
   (element) => {
@@ -118,9 +127,22 @@ export const mailruWidgetEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
+    const thumbnail = styles.bgImage(element)
+    const videoIds = [subject.id, readPreviewVideoId(thumbnail)]
+    const frames = Array.from(element.ownerDocument.querySelectorAll('iframe[src]'))
+
+    // A republished card sits beside the my.mail.ru iframe of the same video, which already plays.
+    for (const frame of frames) {
+      const framedId = mailruResolveEmbed(attr(frame, 'src') ?? '')?.id
+
+      if (framedId && videoIds.includes(framedId)) {
+        return
+      }
+    }
+
     return {
       ...subject,
-      thumbnail: styles.bgImage(element),
+      thumbnail,
     }
   },
 )
