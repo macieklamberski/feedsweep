@@ -353,6 +353,7 @@ import { zohoworkdriveEmbedResolver } from '../embeds/zohoworkdrive.js'
 import { amebaEmojiResolver } from '../emojis/ameba.js'
 import { artstationEmojiResolver } from '../emojis/artstation.js'
 import { bitrixEmojiResolver } from '../emojis/bitrix.js'
+import { blogmnEmojiResolver } from '../emojis/blogmn.js'
 import { boardgamegeekEmojiResolver } from '../emojis/boardgamegeek.js'
 import { btblogEmojiResolver } from '../emojis/btblog.js'
 import { cocologEmojiResolver } from '../emojis/cocolog.js'
@@ -913,6 +914,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   cuteeditorEmojiResolver,
   shinobiEmojiResolver,
   liveinternetEmojiResolver,
+  blogmnEmojiResolver,
   greensmiliesEmojiResolver,
   rcmsEmojiResolver,
   jeuxvideoEmojiResolver,
