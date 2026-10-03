@@ -144,12 +144,8 @@ const readJwpppBox = (element: Element, mediaId: string): Partial<EmbedResolverR
   const parent = element.parentElement
   const box = parent?.localName === 'p' ? parent.parentElement : parent
 
-  if (!box?.classList.contains('jwppp-video-box')) {
-    return {}
-  }
-
   const readMeta = (name: string): string | undefined => {
-    return attr(box.querySelector(`meta[itemprop="${name}"]`), 'content')
+    return attr(box?.querySelector(`meta[itemprop="${name}"]`), 'content')
   }
 
   if (!readMeta('contentUrl')?.endsWith(`/${mediaId}`)) {
