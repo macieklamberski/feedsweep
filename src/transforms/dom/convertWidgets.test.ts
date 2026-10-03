@@ -1740,6 +1740,49 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     expect(converted).toEqualHtml(expected)
   })
 
+  it('should leave the element and its companion markup to the resolver that claims it', async () => {
+    // Constructed: a resolver that reads and removes its credit sibling, as SoundCloud's does.
+    const creditResolver: EmbedResolver = {
+      kind: 'embed',
+      selector: 'audio.podcast-player',
+      extract: (element) => {
+        const credit = element.nextElementSibling
+        const title = credit?.textContent ?? undefined
+        credit?.remove()
+
+        return {
+          provider: 'example',
+          src: 'https://player.example/1',
+          height: 30,
+          title,
+        }
+      },
+    }
+    const context: TransformContext = {
+      ...baseContext,
+      widgetResolvers: [creditResolver, ...defaultWidgetResolvers],
+    }
+    const value = html`
+      <audio
+        class="podcast-player"
+        src="https://youtu.be/P9cxtTYHjSQ"
+      ></audio>
+      <div class="credit">Episode 1</div>
+    `
+    const expected = html`
+      <div
+        data-embed-title="Episode 1"
+        data-embed-height="30"
+        data-embed-provider="example"
+        data-embed-src="https://player.example/1"
+      ></div>
+    `
+
+    const converted = await applyDomTransforms(parseHtml(value), [convertWidgets(context)])
+
+    expect(converted).toEqualHtml(expected)
+  })
+
   it('should frame an element whose resolver selector matches but refuses it', async () => {
     // Constructed: a resolver selecting every <audio> that reads only its own platform's urls.
     const audioResolver: EmbedResolver = {
@@ -1762,6 +1805,7 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
         data-embed-src="https://www.youtube.com/embed/P9cxtTYHjSQ"
       ></div>
     `
+
     const converted = await applyDomTransforms(parseHtml(value), [convertWidgets(context)])
 
     expect(converted).toEqualHtml(expected)
