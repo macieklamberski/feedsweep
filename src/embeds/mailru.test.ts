@@ -615,8 +615,8 @@ describeForEachParser('mailruWidgetEmbedResolver', (parseHtml) => {
     })
   })
 
-  describe('beside a frame of another video', () => {
-    it('should repair a republished span whose frame plays another video', async () => {
+  describe('beside a frame of another upload', () => {
+    it('should repair a republished span whose frame plays another upload', async () => {
       const value = html`
         <span
           class="b-history-event__videoevent-object filed-image ui-lazy-background"
@@ -872,7 +872,7 @@ describeForEachParser('mailruEmbedResolver through the pipeline', (parseHtml) =>
     expect(await convert(value)).toEqualHtml(expected)
   })
 
-  it('should add the span player when the frame beside it plays another video', async () => {
+  it('should add the span player when the frame beside it plays another upload', async () => {
     const value = html`
       <p>
         <span
