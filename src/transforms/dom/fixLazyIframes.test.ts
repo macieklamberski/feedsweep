@@ -144,6 +144,17 @@ describeForEachParser('fixLazyIframes', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should not overwrite a src that only mentions a data image', async () => {
+    const value = html`
+      <iframe
+        src="https://example.com/embed?poster=data:image/gif;base64,R0lGOD"
+        data-src="https://example.com/embed/x"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should promote over the consentmanager blank src', async () => {
     const value = html`
       <iframe
