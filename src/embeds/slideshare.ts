@@ -11,8 +11,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const slideshareHosts = ['slideshare.net', 'slidesharecdn.com']
 
-// The Flash wrapper spells its id `__ss_{id}` on the div and `__sse{id}` on the object inside.
-// Many carriers name the deck on the div alone.
+// The Flash wrapper spells its id `__ss_{id}` on the div and `__sse{id}` on the object inside and
+// on the embed's `name`. Many carriers name the deck on the div alone.
 const wrapperIdRegex = /^__ss[e_]?(\d+)$/
 
 // Two players, the presentation one and the document one, sharing a query.
@@ -199,11 +199,21 @@ const readWrapper = (element: Nullish<Element>): { deck?: string; wrapper?: Elem
 
   // The outermost match wins: the caption sits on the __ss_ div, not the __sse object inside.
   for (let node: Nullish<Element> = element; node; node = node.parentElement) {
-    const id = attr(node, 'id')?.match(wrapperIdRegex)?.[1]
+    // An editor that rewrites the object's attributes into params moves its name there.
+    const params = Array.from(node.querySelectorAll(':scope > param[name="name"]'))
+    const names = [
+      attr(node, 'id'),
+      attr(node, 'name'),
+      ...params.map((param) => attr(param, 'value')),
+    ]
 
-    if (id) {
-      deck = id
-      wrapper = node
+    for (const name of names) {
+      const id = name?.match(wrapperIdRegex)?.[1]
+
+      if (id) {
+        deck = id
+        wrapper = node
+      }
     }
   }
 
