@@ -374,6 +374,29 @@ describeForEachParser('Facebook', (parseHtml) => {
     )
   })
 
+  // The Flash player's url answers 400, and the object, its params and the nested embed name one
+  // video, so the pair becomes one plugin placeholder.
+  it('should rebuild the Flash object and embed pair into one plugin placeholder', async () => {
+    const value = html`
+      <object width="440" height="277">
+        <param name="allowfullscreen" value="true">
+        <param name="movie" value="http://www.facebook.com/v/377994148950512">
+        <embed src="http://www.facebook.com/v/377994148950512" type="application/x-shockwave-flash" allowfullscreen="1" width="440" height="277">
+      </object>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="facebook"
+        data-embed-id="377994148950512"
+        data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D377994148950512"
+        data-embed-url="https://www.facebook.com/watch/?v=377994148950512"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // A forum's s9e helper frame names a post in its fragment, and facebookS9eEmbedResolver reads
   // it into the same plugin placeholder a pasted post gives.
   it('should convert the s9e helper frame into the plugin placeholder', async () => {

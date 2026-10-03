@@ -598,6 +598,47 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should rebuild a Flash video embed onto the current plugin', async () => {
+      const value = html`
+        <embed
+          src="http://www.facebook.com/v/377994148950512"
+          type="application/x-shockwave-flash"
+          allowfullscreen="1"
+          width="440"
+          height="277"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: '377994148950512',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D377994148950512',
+        url: 'https://www.facebook.com/watch/?v=377994148950512',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild a Flash video object onto the current plugin', async () => {
+      const value = html`
+        <object
+          data="http://www.facebook.com/v/203603585296"
+          height="188"
+          width="300"
+          type="application/x-shockwave-flash"
+        ></object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: '203603585296',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D203603585296',
+        url: 'https://www.facebook.com/watch/?v=203603585296',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   // The size a Facebook embed gets depends on which shape it arrived as, so each one is
@@ -688,6 +729,12 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
           src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Ffacebook.com.evil.test%2Fposts%2F123"
         ></iframe>
       `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a Flash video path on a foreign host', async () => {
+      const value = '<embed src="https://evil.test/v/377994148950512">'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -962,6 +1009,31 @@ describe('facebookResolveEmbed', () => {
 
   it('should return undefined for a path below the legacy video frame', () => {
     const value = 'https://www.facebook.com/video/embed/extra?video_id=123456'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should use a malformed Flash video id as written, even if the player answers an error', () => {
+    const value = 'https://www.facebook.com/v/banana'
+    const expected: EmbedResolverResult = {
+      provider: 'facebook',
+      id: 'banana',
+      src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3Dbanana',
+      url: 'https://www.facebook.com/watch/?v=banana',
+      ratio: '16/9',
+    }
+
+    expect(facebookResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should return undefined for the Flash video path under another segment', () => {
+    const value = 'https://www.facebook.com/x/v/377994148950512'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a path below the Flash video', () => {
+    const value = 'https://www.facebook.com/v/377994148950512/extra'
 
     expect(facebookResolveEmbed(value)).toBeUndefined()
   })
