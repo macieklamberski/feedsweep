@@ -326,7 +326,7 @@ describe('speakerdeckResolveEmbed', () => {
     expect(speakerdeckResolveEmbed(value)).toBeUndefined()
   })
 
-  it('should ignore a player route with no deck id', () => {
+  it('should ignore an embed route with no deck id', () => {
     const value = 'https://speakerdeck.com/embed/'
 
     expect(speakerdeckResolveEmbed(value)).toBeUndefined()

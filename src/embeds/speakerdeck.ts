@@ -67,7 +67,8 @@ export const speakerdeckLegacyScriptEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// The player iframe that script builds, saved into the feed by a CMS that ran the script first.
+// The player iframe the `data-id` script builds, saved into the feed by a CMS that ran the script
+// first, or the legacy `/embed/{id}` iframe.
 export const speakerdeckResolveEmbed: ResolveEmbed = (url, element) => {
   const [route = '', deckId] = getPathSegments(url)
 
