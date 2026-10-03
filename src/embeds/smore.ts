@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isHostOf } from 'trousse'
 import type { FieldCleaner } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -15,14 +15,8 @@ const newsletterHeight = 600
 export const smoreEmbedResolver = createUrlEmbedResolver(
   [legacyHost, 'app.smore.com', 'secure.smore.com'],
   (url, element) => {
-    const parsed = parseUrl(url)
-
-    if (!parsed) {
-      return
-    }
-
-    const segments = getPathSegments(parsed)
-    const isLegacy = parsed.hostname === legacyHost
+    const segments = getPathSegments(url)
+    const isLegacy = isHostOf(url, [legacyHost])
 
     if (!isLegacy && segments[0] !== 'n') {
       return
