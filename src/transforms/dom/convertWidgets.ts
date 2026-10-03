@@ -1,4 +1,9 @@
-import type { DomTransform, MediaResolverResult } from '../../types.js'
+import type {
+  DomTransform,
+  EmbedResolverResult,
+  MediaResolverResult,
+  WidgetResolver,
+} from '../../types.js'
 import { attr, hasText, playableElements } from '../../utils/dom.js'
 import {
   audioFileRegex,
@@ -12,6 +17,7 @@ import {
 import {
   createCaptionedFigure,
   createEmbedPlaceholder,
+  createIframe,
   createMediaElement,
   embedCarrierSelector,
   getEmbedSize,
@@ -19,6 +25,7 @@ import {
   isMediaResult,
   prepareEmbedMetadata,
   readCarrierUrl,
+  resolveEmbedProbe,
 } from '../../utils/widgets.js'
 
 const playableSelector = playableElements.join(', ')
@@ -56,6 +63,47 @@ const findParkedMedia = (
       return { tag, src: value }
     }
   }
+}
+
+type PageMedia = {
+  media: Element
+  url: string
+  embed: EmbedResolverResult
+}
+
+// A WordPress video shortcode or a hand-written <video> or <audio> can name a platform's page,
+// which no browser plays. Answers that page when a resolver claims every url the element names,
+// so an element that also names a real file keeps playing it.
+const readPageMedia = async (
+  media: Element,
+  resolvers: ReadonlyArray<WidgetResolver>,
+  document: Document,
+): Promise<PageMedia | undefined> => {
+  const found: Array<PageMedia> = []
+
+  for (const element of [media, ...media.querySelectorAll('source')]) {
+    const url = attr(element, 'src')
+
+    if (!url) {
+      continue
+    }
+
+    // Vimeo's `progressive_redirect` file and SoundCloud's feed stream sit on hosts their
+    // resolvers claim, and play in the element as written.
+    if (getMediaTag(url)) {
+      return
+    }
+
+    const embed = await resolveEmbedProbe(createIframe(document, url), resolvers)
+
+    if (!embed) {
+      return
+    }
+
+    found.push({ media, url, embed })
+  }
+
+  return found[0]
 }
 
 // A Flash <object> is a shell of classid, codebase and <param>s around its carrier, and none of
@@ -133,6 +181,45 @@ export const convertWidgets: DomTransform = (context) => {
 
       // The container often holds a caption or a track title beside the parked url.
       element.prepend(createMediaElement(document, { tag: parked.tag, src: cleaned }))
+    }
+
+    // Runs before the tiers below, which claim the frame it leaves.
+    const pageMedia: Array<PageMedia> = []
+
+    for (const media of document.querySelectorAll('audio, video')) {
+      const found = await readPageMedia(media, widgetResolvers, document)
+
+      if (found) {
+        pageMedia.push(found)
+      }
+    }
+
+    // A post that also frames the same video or file already plays it, and the dead element stays.
+    const framedKeys = new Set<string>()
+
+    if (pageMedia.length) {
+      for (const frame of document.querySelectorAll(embedCarrierSelector)) {
+        const embed = await resolveEmbedProbe(frame, widgetResolvers)
+
+        if (embed) {
+          framedKeys.add(`${embed.provider}/${embed.id}`)
+        }
+      }
+    }
+
+    for (const { media, url, embed } of pageMedia) {
+      if (framedKeys.has(`${embed.provider}/${embed.id}`)) {
+        continue
+      }
+
+      const frame = createIframe(document, url)
+      const poster = attr(media, 'poster')
+
+      if (poster) {
+        frame.setAttribute('data-thumbnail', poster)
+      }
+
+      media.replaceWith(frame)
     }
 
     for (const resolver of embedOrMediaResolvers) {

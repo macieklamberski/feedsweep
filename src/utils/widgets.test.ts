@@ -3,7 +3,9 @@ import { transformContent } from '../index.js'
 import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type {
   CiteResolverResult,
+  EmbedResolver,
   EmbedResolverResult,
+  MediaResolver,
   MediaResolverResult,
   TransformContext,
 } from '../types.js'
@@ -25,6 +27,7 @@ import {
   prepareCiteMetadata,
   prepareEmbedMetadata,
   readS9eFragment,
+  resolveEmbedProbe,
   setDimensions,
   updateCitePlaceholder,
   updateEmbedPlaceholder,
@@ -1479,6 +1482,54 @@ describeForEachParser('setDimensions', (parseHtml) => {
     const expected = '<div></div>'
 
     expect(build({})).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('resolveEmbedProbe', (parseHtml) => {
+  const embedResolver: EmbedResolver = {
+    kind: 'embed',
+    selector: 'iframe[src*="player.example"]',
+    extract: () => ({ provider: 'example', id: 'abc' }),
+  }
+
+  it('should answer the embed a matching resolver makes of the probe', async () => {
+    const value = createIframe(parseHtml(''), 'https://player.example/abc')
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc',
+    }
+
+    expect(await resolveEmbedProbe(value, [embedResolver])).toEqual(expected)
+  })
+
+  it('should skip a resolver whose selector the probe does not match', async () => {
+    const scriptResolver: EmbedResolver = {
+      kind: 'embed',
+      selector: 'script[src]',
+      extract: () => ({ provider: 'script' }),
+    }
+    const value = createIframe(parseHtml(''), 'https://player.example/abc')
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc',
+    }
+
+    expect(await resolveEmbedProbe(value, [scriptResolver, embedResolver])).toEqual(expected)
+  })
+
+  it('should skip a media result for a later embed', async () => {
+    const mediaResolver: MediaResolver = {
+      kind: 'media',
+      selector: 'iframe',
+      extract: () => ({ tag: 'video', src: 'https://player.example/abc.mp4' }),
+    }
+    const value = createIframe(parseHtml(''), 'https://player.example/abc')
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc',
+    }
+
+    expect(await resolveEmbedProbe(value, [mediaResolver, embedResolver])).toEqual(expected)
   })
 })
 

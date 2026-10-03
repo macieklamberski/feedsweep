@@ -21,9 +21,8 @@ import {
   createFilePlaceholder,
   createImage,
   createMediaElement,
-  isEmbedOrMediaResolver,
-  isMediaResult,
   prepareEmbedMetadata,
+  resolveEmbedProbe,
   setDimensions,
 } from '../../utils/widgets.js'
 
@@ -43,28 +42,18 @@ const placeholderCaptions = [
 // A single token holding a digit, an underscore or a hyphen: an upload's file name.
 const fileNameRegex = /^[\w.-]*[\d_-][\w.-]*$/
 
-const resolveEnclosure = async (
+// The audio and video enclosure branches below produce the native element for a media result.
+const resolveEnclosure = (
   url: string,
   enclosure: Enclosure,
   resolvers: ReadonlyArray<WidgetResolver>,
   document: Document,
 ): Promise<EmbedResolverResult | undefined> => {
-  const embedOrMediaResolvers = resolvers.filter(isEmbedOrMediaResolver)
   const probe = document.createElement('iframe')
   probe.setAttribute('src', url)
   setDimensions(probe, enclosure)
 
-  for (const resolver of embedOrMediaResolvers) {
-    if (probe.matches(resolver.selector)) {
-      const metadata = await resolver.extract(probe)
-
-      // A media result is not an embeddable player page, and the audio/video enclosure
-      // branches below already produce the native element for it.
-      if (metadata && !isMediaResult(metadata)) {
-        return metadata
-      }
-    }
-  }
+  return resolveEmbedProbe(probe, resolvers)
 }
 
 // TODO: render the enclosure title and description, <audio> and <video> have no caption slot.
