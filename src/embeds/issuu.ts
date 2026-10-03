@@ -3,7 +3,7 @@ import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.j
 
 const provider = 'issuu'
 
-import { attr } from '../utils/dom.js'
+import { attr, flashVars } from '../utils/dom.js'
 import { composeQuery, encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -12,6 +12,9 @@ const issuuHosts = ['issuu.com']
 // `issuu.com/{publisher}/docs/{document}/s/{story}` names a story, not a page, in the page's
 // position.
 const storyRoute = 's'
+
+// The Flash reader's route, `static.issuu.com/webembed/viewers/…/IssuuReader.swf`.
+const flashRoute = 'webembed'
 
 // Only `embed.html` is minted: `anonymous-embed.html` answers 403 for every document.
 const embedPaths = ['embed.html', 'anonymous-embed.html']
@@ -89,9 +92,30 @@ export const issuuWidgetEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// The reader iframe, at `e.issuu.com/embed.html` or the document page pasted from the address bar.
-// The Flash viewer `static.issuu.com/webembed/…/IssuuReader.swf` names its document in a
-// `documentId` flashvar, a third id space neither url form accepts.
+// The Flash reader names its document by `username` and `docName`, in the swf query or in
+// flashvars, beside a `documentId` that is a third id space neither url form accepts.
+const readFlashDocument = (parsed: URL, element?: Element): EmbedResolverResult | undefined => {
+  const settings = parsed.searchParams.has('docName')
+    ? parsed.searchParams
+    : new URLSearchParams(flashVars(element))
+  const embed = composeDocumentEmbed(
+    settings.get('username') ?? undefined,
+    settings.get('docName') ?? undefined,
+    settings.get('pageNumber') ?? undefined,
+  )
+
+  if (!embed) {
+    return
+  }
+
+  return {
+    ...embed,
+    title: settings.get('loadingInfoText') ?? undefined,
+  }
+}
+
+// The reader iframe, at `e.issuu.com/embed.html` or the document page pasted from the address bar,
+// and the retired Flash reader.
 const issuuResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
 
@@ -99,10 +123,16 @@ const issuuResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
+  const route = getPathSegments(parsed)[0] ?? ''
+
+  if (isAnyOf(route, flashRoute)) {
+    return readFlashDocument(parsed, element)
+  }
+
   // The share snippet writes the publication name on the iframe, which neither url form holds.
   const title = attr(element, 'title')
 
-  if (!isAnyOf(getPathSegments(parsed)[0] ?? '', embedPaths)) {
+  if (!isAnyOf(route, embedPaths)) {
     const embed = readDocumentUrl(url)
 
     return embed && { ...embed, title }

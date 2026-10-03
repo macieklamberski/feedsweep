@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { issuuIframeEmbedResolver, issuuWidgetEmbedResolver } from './issuu.js'
@@ -486,12 +487,182 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('the retired Flash reader', () => {
+    it('should mint the reader from the document the embed flashvars name', async () => {
+      const value = html`
+        <embed
+          align="middle"
+          allowfullscreen="true"
+          flashvars="mode=embed&amp;viewMode=presentation&amp;layout=http%3A%2F%2Fskin.issuu.com%2Fv%2Flight%2Flayout.xml&amp;showFlipBtn=true&amp;documentId=110816120820-f676251f4d3248fc88309117acd22140&amp;docName=linescatalogue&amp;username=HughMcEwen&amp;loadingInfoText=LINES%20Exhibition%20Catalogue&amp;et=1314032557338&amp;er=74"
+          menu="false"
+          name="flashticker"
+          quality="high"
+          salign="l"
+          scale="noscale"
+          src="http://static.issuu.com/webembed/viewers/style1/v1/IssuuViewer.swf"
+          style="height: 852px; width: 600px;"
+          type="application/x-shockwave-flash"
+        ></embed>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'HughMcEwen/linescatalogue',
+        src: 'https://e.issuu.com/embed.html?u=HughMcEwen&d=linescatalogue',
+        url: 'https://issuu.com/HughMcEwen/docs/linescatalogue',
+        ratio: '5/3',
+        title: 'LINES Exhibition Catalogue',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the flashvars param of an object carrier', async () => {
+      const value = html`
+        <object
+          style="width: 420px; height: 298px;"
+          width="320"
+          height="240"
+          data="http://static.issuu.com/webembed/viewers/style1/v1/IssuuViewer.swf"
+          type="application/x-shockwave-flash"
+        >
+          <param
+            name="allowfullscreen"
+            value="true"
+          />
+          <param
+            name="flashvars"
+            value="mode=embed&amp;layout=http%3A%2F%2Fskin.issuu.com%2Fv%2Flight%2Flayout.xml&amp;showFlipBtn=true&amp;documentId=110426204313-cf3e2afe82b6403f92a46aaaa77cc7d3&amp;docName=tuga_magazine_n.16_-_maio_2011&amp;username=Tuga-magazine&amp;loadingInfoText=Tuga%20Magazine%20N.16%20-%20Maio%202011&amp;et=1303920345426&amp;er=43"
+          />
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'Tuga-magazine/tuga_magazine_n.16_-_maio_2011',
+        src: 'https://e.issuu.com/embed.html?u=Tuga-magazine&d=tuga_magazine_n.16_-_maio_2011',
+        url: 'https://issuu.com/Tuga-magazine/docs/tuga_magazine_n.16_-_maio_2011',
+        ratio: '5/3',
+        title: 'Tuga Magazine N.16 - Maio 2011',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the document named in the swf query', async () => {
+      const value = html`
+        <embed
+          style="width: 420px; height: 162px;"
+          height="100"
+          width="100"
+          src="http://static.issuu.com/webembed/viewers/style1/v1/IssuuViewer.swf?mode=embed&amp;layout=http%3A%2F%2Fskin.issuu.com%2Fv%2Flight%2Flayout.xml&amp;showFlipBtn=true&amp;documentId=090125161001-a262d3aab00840f9ab472e4ed70b11a5&amp;docName=kaleed-e-jannat&amp;username=With_Hu_Presenter&amp;loadingInfoText=Kaleed-e-Jannat&amp;et=1250427221601&amp;er=15"
+          menu="false"
+          allowfullscreen="true"
+          type="application/x-shockwave-flash"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'With_Hu_Presenter/kaleed-e-jannat',
+        src: 'https://e.issuu.com/embed.html?u=With_Hu_Presenter&d=kaleed-e-jannat',
+        url: 'https://issuu.com/With_Hu_Presenter/docs/kaleed-e-jannat',
+        ratio: '5/3',
+        title: 'Kaleed-e-Jannat',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should prefer the document in the swf query over the flashvars', async () => {
+      const value = html`
+        <object
+          data="http://static.issuu.com/webembed/viewers/style1/v1/IssuuViewer.swf?documentId=120926203054-c87c187fb5ae4a5696ea7dbce53cf0d5&amp;docName=100knig2012&amp;username=biblio_romantic"
+          type="application/x-shockwave-flash"
+        >
+          <param
+            name="flashvars"
+            value="documentId=110426204313-cf3e2afe82b6403f92a46aaaa77cc7d3&amp;docName=tuga_magazine_n.16_-_maio_2011&amp;username=Tuga-magazine"
+          />
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'biblio_romantic/100knig2012',
+        src: 'https://e.issuu.com/embed.html?u=biblio_romantic&d=100knig2012',
+        url: 'https://issuu.com/biblio_romantic/docs/100knig2012',
+        ratio: '5/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should carry the page the reader opened on', async () => {
+      const value = html`
+        <object
+          width="500"
+          height="351"
+          data="http://static.issuu.com/webembed/viewers/style1/v1/IssuuViewer.swf?mode=embed&amp;layout=http%3A%2F%2Fskin.issuu.com%2Fv%2Flight%2Flayout.xml&amp;showFlipBtn=true&amp;pageNumber=4&amp;documentId=100220001505-897e84d3e21746c6ab48365e90842fd8&amp;docName=budilnikxxiivek2_2010&amp;username=kopcheto&amp;loadingInfoText=%D0%91%D1%83%D0%B4%D0%B8%D0%BB%D0%BD%D0%B8%D0%BA%20%D0%BD%D0%B0%20XXII%20%D0%B2%D0%B5%D0%BA%20%D0%B1%D1%80.2%202010%20%D0%B3%D0%BE%D0%B4%D0%B8%D0%BD%D0%B0&amp;et=1268599055661&amp;er=59"
+          type="application/x-shockwave-flash"
+        ></object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'kopcheto/budilnikxxiivek2_2010',
+        src: 'https://e.issuu.com/embed.html?u=kopcheto&d=budilnikxxiivek2_2010&p=4',
+        url: 'https://issuu.com/kopcheto/docs/budilnikxxiivek2_2010',
+        ratio: '5/3',
+        title: 'Будилник на XXII век бр.2 2010 година',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state no title when the flashvars carry no loading text', async () => {
+      const value = html`
+        <embed
+          src="http://static.issuu.com/webembed/viewers/style1/v1/IssuuViewer.swf"
+          type="application/x-shockwave-flash"
+          flashvars="mode=embed&amp;documentId=110816120820-f676251f4d3248fc88309117acd22140&amp;docName=linescatalogue&amp;username=HughMcEwen"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'HughMcEwen/linescatalogue',
+        src: 'https://e.issuu.com/embed.html?u=HughMcEwen&d=linescatalogue',
+        url: 'https://issuu.com/HughMcEwen/docs/linescatalogue',
+        ratio: '5/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should return undefined when the flashvars name no document', async () => {
+      const value = html`
+        <embed
+          src="http://static.issuu.com/webembed/viewers/style1/v1/IssuuViewer.swf"
+          type="application/x-shockwave-flash"
+          flashvars="mode=embed&amp;documentId=110816120820-f676251f4d3248fc88309117acd22140&amp;username=HughMcEwen"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should not read flashvars off an issuu path that is not the Flash reader', async () => {
+      const value = html`
+        <embed
+          src="http://static.issuu.com/viewers/webembed/style1/v1/IssuuViewer.swf"
+          type="application/x-shockwave-flash"
+          flashvars="mode=embed&amp;docName=linescatalogue&amp;username=HughMcEwen"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
   describe('deliberate non-resolutions', () => {
-    // 364 corpus feeds carry the Flash viewer and 353 of them have no companion iframe, so those
-    // documents are lost. They stay lost: the `documentId` flashvar is a third id space, and
-    // neither the hash form nor the query form accepts it. `IssuuReader.swf` is still served,
-    // which changes nothing because no browser plays it.
-    it('should leave the Flash viewer to the generic fallback', async () => {
+    // The `documentId` flashvar is a third id space, and neither the hash form nor the query form
+    // accepts it.
+    it('should leave a Flash reader naming only a document id to the generic fallback', async () => {
       const value = html`
         <embed
           src="https://static.issuu.com/webembed/viewers/style1/v2/IssuuReader.swf"
@@ -537,5 +708,45 @@ describeForEachParser('issuuIframeEmbedResolver carrier title', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('the Flash reader through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should turn the object and its nested embed into one placeholder', async () => {
+    const value = html`
+      <object style="height: 277px; width: 420px;">
+        <param
+          name="movie"
+          value="http://static.issuu.com/webembed/viewers/style1/v1/IssuuViewer.swf?mode=embed&amp;layout=http%3A%2F%2Fskin.issuu.com%2Fv%2Flight%2Flayout.xml&amp;showFlipBtn=true&amp;documentId=130208104305-eee188207cfb4860b483660ee05cdb63&amp;docName=ramarromosca&amp;username=giuseppepalumbo&amp;loadingInfoText=Ramarro%2C%20supermasohero%2C%20in%20Moscow&amp;et=1360322490658&amp;er=34"
+        />
+        <param
+          name="allowfullscreen"
+          value="true"
+        />
+        <embed
+          src="http://static.issuu.com/webembed/viewers/style1/v1/IssuuViewer.swf"
+          type="application/x-shockwave-flash"
+          allowfullscreen="true"
+          style="width:420px;height:277px"
+          flashvars="mode=embed&amp;layout=http%3A%2F%2Fskin.issuu.com%2Fv%2Flight%2Flayout.xml&amp;showFlipBtn=true&amp;documentId=130208104305-eee188207cfb4860b483660ee05cdb63&amp;docName=ramarromosca&amp;username=giuseppepalumbo&amp;loadingInfoText=Ramarro%2C%20supermasohero%2C%20in%20Moscow&amp;et=1360322490658&amp;er=34"
+        />
+      </object>
+    `
+    const expected = html`
+      <div
+        data-embed-title="Ramarro, supermasohero, in Moscow"
+        data-embed-ratio="5/3"
+        data-embed-url="https://issuu.com/giuseppepalumbo/docs/ramarromosca"
+        data-embed-id="giuseppepalumbo/ramarromosca"
+        data-embed-provider="issuu"
+        data-embed-src="https://e.issuu.com/embed.html?u=giuseppepalumbo&amp;d=ramarromosca"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
