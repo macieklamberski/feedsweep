@@ -26,6 +26,10 @@ const specimens: Record<string, [string, string]> = {
     '<div class="yrm-content yrm-content-1 yrm-content-hide" style="display:none">Panel</div>',
     '<div class="yrm-content yrm-content-1 yrm-content-hide">Panel</div>',
   ],
+  '.ead-iframe': [
+    '<iframe src="https://docs.google.com/viewer?url=https%3A%2F%2Fexample.com%2Freport.pdf&amp;embedded=true" class="ead-iframe" style="visibility: hidden;"></iframe>',
+    '<iframe src="https://docs.google.com/viewer?url=https%3A%2F%2Fexample.com%2Freport.pdf&amp;embedded=true" class="ead-iframe"></iframe>',
+  ],
   '[class*="premium-adv-carousel"]': [
     '<div class="premium-adv-carousel__inner-container" style="display:none">Panel</div>',
     '<div class="premium-adv-carousel__inner-container">Panel</div>',
@@ -488,6 +492,29 @@ describeForEachParser('stripHiddenElements through the pipeline', (parseHtml) =>
       <ul class="bxslider-1">
         <li><img src="https://example.com/a.jpg" width="800" height="600"></li>
       </ul>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should frame an Embed Any Document viewer its script would show', async () => {
+    const value = html`
+      <div class="ead-document" style="position: relative;padding-top: 90%;">
+        <div class="ead-iframe-wrapper">
+          <iframe
+            src="//docs.google.com/viewer?url=https%3A%2F%2Fexample.com%2Fwp-content%2Fuploads%2F2026%2F03%2Freport.pdf&amp;embedded=true&amp;hl=en"
+            title="Embedded Document"
+            class="ead-iframe"
+            style="width: 100%;height: 100%;border: none;position: absolute;left: 0;top: 0;visibility: hidden;"
+          ></iframe>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="100/90"
+        data-embed-src="https://docs.google.com/viewer?url=https%3A%2F%2Fexample.com%2Fwp-content%2Fuploads%2F2026%2F03%2Freport.pdf&embedded=true&hl=en"
+      ></div>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
