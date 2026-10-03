@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { mailruEmbedResolver, mailruResolveEmbed } from './mailru.js'
@@ -172,6 +173,51 @@ describe('mailruResolveEmbed', () => {
 
       expect(mailruResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the video the older Flash player names in its par path', () => {
+      const value =
+        'http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/mail/gsavinich/10/$44$0$143'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/gsavinich/10/44',
+        src: 'https://my.mail.ru/mail/gsavinich/video/embed/10/44',
+        url: 'https://my.mail.ru/mail/gsavinich/video/10/44.html',
+        ratio: '16/9',
+        author: 'gsavinich',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the par path of the full size Flash player', () => {
+      const value =
+        'http://img.mail.ru/r/video/player_full_size.swf?par=http://video.mail.ru/mail/vi-talik/kazantip-2006/$262$0$348'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/vi-talik/kazantip-2006/262',
+        src: 'https://my.mail.ru/mail/vi-talik/video/embed/kazantip-2006/262',
+        url: 'https://my.mail.ru/mail/vi-talik/video/kazantip-2006/262.html',
+        ratio: '16/9',
+        author: 'vi-talik',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read a par path whose dollar signs are percent-encoded', () => {
+      const value =
+        'http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/mail/pavelbazhenov/84/%2485%240%2451'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/pavelbazhenov/84/85',
+        src: 'https://my.mail.ru/mail/pavelbazhenov/video/embed/84/85',
+        url: 'https://my.mail.ru/mail/pavelbazhenov/video/84/85.html',
+        ratio: '16/9',
+        author: 'pavelbazhenov',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -304,6 +350,27 @@ describe('mailruResolveEmbed', () => {
 
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
+
+    it('should ignore a par path that names no counter', () => {
+      const value =
+        'http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/mail/gsavinich/10/44'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a par path behind another segment', () => {
+      const value =
+        'http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/x/mail/gsavinich/10/$44$0$143'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a par path followed by another segment', () => {
+      const value =
+        'http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/mail/gsavinich/10/$44$0$143/extra'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
   })
 })
 
@@ -420,6 +487,94 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
+
+  describe('the older Flash player that named the video in its par path', () => {
+    it('should repair the embed whose par path names the video', async () => {
+      const value = html`
+        <embed
+          src="http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/mail/gsavinich/10/$44$0$143"
+          type="application/x-shockwave-flash"
+          width="380"
+          height="325"
+          flashvars="imaginehost=video.mail.ru&perlhost=video.mail.ru&alias=mail&username=gsavinich&albumid=10&id=44&catalogurl=http://video.mail.ru/themes/music"
+          allowscriptaccess="always"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/gsavinich/10/44',
+        src: 'https://my.mail.ru/mail/gsavinich/video/embed/10/44',
+        url: 'https://my.mail.ru/mail/gsavinich/video/10/44.html',
+        ratio: '16/9',
+        author: 'gsavinich',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should repair the object whose data names the video in its par path', async () => {
+      const value = html`
+        <object
+          type="application/x-shockwave-flash"
+          data="http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/bk/nutriti/nutriti_nepoznannoe/$1993$0$3441"
+          height="367"
+          width="585"
+        >
+          <param
+            name="movie"
+            value="http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/bk/nutriti/nutriti_nepoznannoe/$1993$0$3441"
+          />
+          <param
+            name="flashvars"
+            value="imaginehost=video.mail.ru&perlhost=video.mail.ru&alias=bk&username=nutriti&albumid=nutriti_nepoznannoe&id=1993&atalogurl=http://video.mail.ru/themes/misc&page=1"
+          />
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'bk/nutriti/nutriti_nepoznannoe/1993',
+        src: 'https://my.mail.ru/bk/nutriti/video/embed/nutriti_nepoznannoe/1993',
+        url: 'https://my.mail.ru/bk/nutriti/video/nutriti_nepoznannoe/1993.html',
+        ratio: '16/9',
+        author: 'nutriti',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+describeForEachParser('mailruEmbedResolver through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+  }
+
+  it('should turn the full size Flash player into a video placeholder', async () => {
+    const value = html`
+      <embed
+        src="http://img.mail.ru/r/video/player_full_size.swf?par=http://video.mail.ru/mail/vi-talik/kazantip-2006/$262$0$348"
+        type="application/x-shockwave-flash"
+        width="452"
+        height="385"
+        flashvars="imaginehost=video.mail.ru&perlhost=my.video.mail.ru&alias=mail&username=vi-talik&albumid=kazantip-2006&id=262&catalogurl=http://video.mail.ru/catalog/tour/"
+      >
+    `
+    const expected = html`
+      <div
+        data-embed-author="vi-talik"
+        data-embed-ratio="16/9"
+        data-embed-url="https://my.mail.ru/mail/vi-talik/video/kazantip-2006/262.html"
+        data-embed-id="mail/vi-talik/kazantip-2006/262"
+        data-embed-provider="mailru"
+        data-embed-src="https://my.mail.ru/mail/vi-talik/video/embed/kazantip-2006/262"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
 

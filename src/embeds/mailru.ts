@@ -1,6 +1,7 @@
+import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mailru'
@@ -17,7 +18,9 @@ const legacyPathRegex = /^\/videos\/embed\/(.+)\.html$/
 const modernPathRegex = /^\/([^/]+)\/([^/]+)\/video\/embed\/([^/]+)\/([^/]+)\/?$/
 // {type}/{user}/{album}/{counter}.
 const subjectRegex = /^([^/]+)\/([^/]+)\/([^/]+)\/([^/]+)$/
-const flashPlayerPathRegex = /^\/r\/video2\/\w+\.swf$/
+const flashPlayerPathRegex = /^\/r\/video2?\/\w+\.swf$/
+// The older Flash players took `par={host}/{type}/{user}/{album}/${counter}$0${duration}`.
+const flashParPathRegex = /^\/([^/]+\/[^/]+\/[^/]+)\/\$([^$/]+)\$[^/]*$/
 
 const composeNumeric = (videoId: string): EmbedResolverResult => {
   return {
@@ -63,7 +66,14 @@ const resolveTarget = (url: string, element?: Element): EmbedResolverResult | un
 
     const movieSrc = parsed.searchParams.get('movieSrc') ?? flashVar(element, 'movieSrc')
 
-    return movieSrc ? composeSubject(movieSrc) : undefined
+    if (movieSrc) {
+      return composeSubject(movieSrc)
+    }
+
+    const parPath = parseUrl(parsed.searchParams.get('par') ?? '', placeholderBaseUrl)?.pathname
+    const par = parPath?.match(flashParPathRegex)
+
+    return par ? composeSubject(`${par[1]}/${par[2]}`) : undefined
   }
 
   const videoId = parsed.pathname.match(numericPathRegex)?.[1]
