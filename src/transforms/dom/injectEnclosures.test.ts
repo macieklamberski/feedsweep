@@ -721,6 +721,25 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(value)
     })
 
+    it('should inject an image enclosure sharing only an extensionless endpoint with the feed image', async () => {
+      const value = '<p>Content</p>'
+      const context: TransformContext = {
+        ...withEnclosures([
+          { url: 'http://media.releasewire.com/photos/show/?id=130537', type: 'image/jpeg' },
+        ]),
+        feedImageUrls: ['http://media.releasewire.com/photos/show/?id=68004&size=small'],
+      }
+      const expected = html`
+        <img
+          src="http://media.releasewire.com/photos/show/?id=130537"
+          data-enclosure=""
+        >
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
     it('should keep a real image enclosure and skip the feed image in the same item', async () => {
       const value = '<p>Content</p>'
       const context: TransformContext = {
