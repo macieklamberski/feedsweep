@@ -318,11 +318,30 @@ describeForEachParser('vkWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a div whose call the feed dropped', async () => {
+    it("should leave a div that holds the post's text", async () => {
       const value = html`
         <div id="vk_post_-56385211_5564">
-          <p>Мы приглашаем всех желающих к сотрудничеству.</p>
+        <div id="wpost_head_wrap" class="wpost_head_wrap clear_fix">
+        <div class="wpost_head_name">
+        <div class="wpost_head_date"><span style="font-size: medium;">Мы приглашаем всех желающих к сотрудничеству и спонсорству c нашим сервисом "MSKTS.RU" — как крупных интернет ресурсов, так и обычных интернет юзеров! </span></div>
         </div>
+        </div>
+        <div class="wpost_post_body_wrap wide_wall_module wall_module ta_l">
+        <div id="wpost_post_body">
+        <div id="wpt-56385211_5564" class="wall_post_cont _wall_post_cont">
+        <div class="wall_post_text"><br /><span style="font-size: medium;">Что мы вам можем предложить? </span><br /><span style="font-size: medium;">- Реферальную программу; </span><br /><span style="font-size: medium;">- Спонсорство в виде предоставления сервера Teamspeak3 и/или денежное спонсирование Ваших ивентов.</span><br /><br /><span style="font-size: medium;">Присылайте свои заявки в Сообщения сообщества - Рассмотрим каждую!</span></div>
+        </div>
+        </div>
+        </div>
+        </div>
+        <span style="font-size: medium;">
+        <script type="text/javascript">// <![CDATA[
+          (function(d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src = "//vk.com/js/api/openapi.js?154"; fjs.parentNode.insertBefore(js, fjs); }(document, 'script', 'vk_openapi_js'));
+          (function() {
+            if (!window.VK || !VK.Widgets || !VK.Widgets.Post || !VK.Widgets.Post("vk_post_-56385211_5564", -56385211, 5564, 'DOeSsUDkSyEp6ztv6fo0pFZe3qc')) setTimeout(arguments.callee, 50);
+          }());
+        // ]]></script>
+        </span>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -484,6 +503,37 @@ describeForEachParser('vk widgets through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it("should keep a div that holds the post's text as written", async () => {
+    const value = html`
+      <div id="vk_post_-56385211_5564">
+      <div id="wpost_head_wrap" class="wpost_head_wrap clear_fix">
+      <div class="wpost_head_name">
+      <div class="wpost_head_date"><span style="font-size: medium;">Мы приглашаем всех желающих к сотрудничеству и спонсорству c нашим сервисом "MSKTS.RU" — как крупных интернет ресурсов, так и обычных интернет юзеров! </span></div>
+      </div>
+      </div>
+      <div class="wpost_post_body_wrap wide_wall_module wall_module ta_l">
+      <div id="wpost_post_body">
+      <div id="wpt-56385211_5564" class="wall_post_cont _wall_post_cont">
+      <div class="wall_post_text"><br /><span style="font-size: medium;">Что мы вам можем предложить? </span><br /><span style="font-size: medium;">- Реферальную программу; </span><br /><span style="font-size: medium;">- Спонсорство в виде предоставления сервера Teamspeak3 и/или денежное спонсирование Ваших ивентов.</span><br /><br /><span style="font-size: medium;">Присылайте свои заявки в Сообщения сообщества - Рассмотрим каждую!</span></div>
+      </div>
+      </div>
+      </div>
+      </div>
+      <span style="font-size: medium;">
+      <script type="text/javascript">// <![CDATA[
+        (function(d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src = "//vk.com/js/api/openapi.js?154"; fjs.parentNode.insertBefore(js, fjs); }(document, 'script', 'vk_openapi_js'));
+        (function() {
+          if (!window.VK || !VK.Widgets || !VK.Widgets.Post || !VK.Widgets.Post("vk_post_-56385211_5564", -56385211, 5564, 'DOeSsUDkSyEp6ztv6fo0pFZe3qc')) setTimeout(arguments.callee, 50);
+        }());
+      // ]]></script>
+      </span>
+    `
+    const result = await convert(value)
+
+    expect(result).toContain('Присылайте свои заявки в Сообщения сообщества - Рассмотрим каждую!')
+    expect(result).not.toContain('data-embed-src')
   })
 
   it('should resolve every div of a script that fills several', async () => {
