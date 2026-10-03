@@ -384,4 +384,33 @@ describeForEachParser('assignVideoPosters under heuristics', (parseHtml) => {
 
     expect(await convert(value, enclosures)).toEqualHtml(expected)
   })
+
+  it('should keep a second rendition of the poster under another file name', async () => {
+    const value = '<p>Amnistía Internacional ha detectado casos de tortura.</p>'
+    const enclosures = [
+      {
+        url: 'https://example.org/imagenes/2014/05/12/actualidad/1399918141_217201_1399920928_miniatura_normal.jpg',
+        type: 'image/jpeg',
+      },
+      {
+        url: 'https://example.org/imagenes/2014/05/12/actualidad/1399918141_217201_1399920928_noticia_normal.jpg',
+        type: 'image/jpeg',
+      },
+      {
+        url: 'https://example.org/videos/2014/05/12/actualidad/1399918141_217201_1399965313.mp4',
+        type: 'video/m4v',
+      },
+    ]
+    const expected = html`
+      <img src="https://example.org/imagenes/2014/05/12/actualidad/1399918141_217201_1399920928_noticia_normal.jpg">
+      <video
+        poster="https://example.org/imagenes/2014/05/12/actualidad/1399918141_217201_1399920928_miniatura_normal.jpg"
+        controls
+        src="https://example.org/videos/2014/05/12/actualidad/1399918141_217201_1399965313.mp4"
+      ></video>
+      <p>Amnistía Internacional ha detectado casos de tortura.</p>
+    `
+
+    expect(await convert(value, enclosures)).toEqualHtml(expected)
+  })
 })
