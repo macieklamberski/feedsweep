@@ -130,6 +130,172 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should replace a gist-Blogger mount holding its loader with a link to the gist', async () => {
+    const value = html`
+      <div
+        class="gistLoad"
+        data-id="5362350"
+        id="gist-5362350"
+      >
+        <script
+          src="https://raw.github.com/moski/gist-Blogger/master/public/gistLoader.js"
+          type="text/javascript"
+        ></script>
+      </div>
+    `
+    const expected = '<a href="https://gist.github.com/5362350">https://gist.github.com/5362350</a>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace an empty gist-Blogger mount with a link to the gist', async () => {
+    const value = html`
+      <div
+        class="gistLoad"
+        data-id="5203217"
+        id="gist-5203217"
+      ></div>
+    `
+    const expected = '<a href="https://gist.github.com/5203217">https://gist.github.com/5203217</a>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a gist-Blogger mount holding its loading text with a link to the gist', async () => {
+    const value = html`
+      <div
+        class="gistLoad"
+        data-id="4343332"
+        id="gist-GistID"
+      >
+        Loading ....
+      </div>
+    `
+    const expected = '<a href="https://gist.github.com/4343332">https://gist.github.com/4343332</a>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a gist-Blogger mount whose loading text ends in line breaks', async () => {
+    const value = html`
+      <div
+        class="gistLoad"
+        data-id="6414925"
+        id="gist-6414925"
+      >Loading ....<br><br></div>
+    `
+    const expected = '<a href="https://gist.github.com/6414925">https://gist.github.com/6414925</a>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a gist-Blogger mount the feed left open around the rest of the post', async () => {
+    const value = html`
+      <div
+        class="gistLoad"
+        data-id="4343449"
+        id="gist-GistID"
+      >Loading ....<br>It extension point is for the application model, in fact, as the document.</div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a gist-Blogger mount that already holds the code', async () => {
+    const value = html`
+      <div
+        class="gistLoad"
+        id="gist-98d6a5d85ccd450370a947b6dd60076a"
+        data-file="usage.sh"
+        data-id="98d6a5d85ccd450370a947b6dd60076a"
+      ><pre>./rotate.sh -u "jenkins-deployment"</pre></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should replace a gist-embed code element with a link to the gist', async () => {
+    const value = html`
+      <p><code data-gist-id="57c54d734aed4f719c19109a7afddc93"> </code></p>
+    `
+    const expected = html`
+      <p><a href="https://gist.github.com/57c54d734aed4f719c19109a7afddc93">https://gist.github.com/57c54d734aed4f719c19109a7afddc93</a></p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should use a gist-embed id that names the owner as written', async () => {
+    const value = html`
+      <code
+        class="gist-embed-code"
+        data-gist-id="fwhigh/92a985dd8c494949a36433641c14e2e6"
+        data-gist-file="ssh-config"
+        data-gist-hide-footer="false"
+      ></code>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/fwhigh/92a985dd8c494949a36433641c14e2e6"
+      >https://gist.github.com/fwhigh/92a985dd8c494949a36433641c14e2e6</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a gist-embed div with a link to the gist', async () => {
+    const value = html`
+      <div
+        data-gist-id="d820e27ea986698789b93f56d3fae7fd"
+        data-gist-hide-footer="true"
+        data-gist-file="versatile-pb.dts"
+        data-gist-line="140-150"
+      ></div>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/d820e27ea986698789b93f56d3fae7fd"
+      >https://gist.github.com/d820e27ea986698789b93f56d3fae7fd</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a gist-Blogger mount that already links to the gist', async () => {
+    const value = html`
+      <div
+        class="gistLoad"
+        data-id="4045718"
+        id="gist-4045718"
+      ><a href="https://gist.github.com/deanberris/4045718#file-polymorphism-0-cpp">View in GitHub</a></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should link the gist script inside a gist-embed div, not the div', async () => {
+    const value = html`
+      <div
+        class="gist"
+        data-gist-id="your-gist-id"
+      ><script src="https://gist.github.com/fournet/8f94607c600e0d78d640148003f021f6.js"></script></div>
+    `
+    const expected = html`
+      <div
+        class="gist"
+        data-gist-id="your-gist-id"
+      ><a href="https://gist.github.com/fournet/8f94607c600e0d78d640148003f021f6">https://gist.github.com/fournet/8f94607c600e0d78d640148003f021f6</a></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a gist-embed code element with an empty gist id untouched', async () => {
+    const value = '<code data-gist-id=""></code>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should be idempotent', async () => {
     const value = '<script src="https://gist.github.com/octocat/6cad326836d38bd3a7ae.js"></script>'
     const once = await transform(value)
@@ -139,7 +305,7 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
   })
 })
 
-describeForEachParser('gist scripts the pipeline would otherwise delete', (parseHtml) => {
+describeForEachParser('gist carriers the pipeline would otherwise delete', (parseHtml) => {
   const convert = (value: string) => {
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
   }
@@ -152,6 +318,34 @@ describeForEachParser('gist scripts the pipeline would otherwise delete', (parse
           href="https://gist.github.com/octocat/6cad326836d38bd3a7ae"
         >https://gist.github.com/octocat/6cad326836d38bd3a7ae</a>
       </p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a gist-Blogger mount as a link to the gist', async () => {
+    const value = html`
+      <div
+        class="gistLoad"
+        data-id="4343332"
+        id="gist-GistID"
+      >
+        Loading ....
+      </div>
+    `
+    const expected = html`
+      <p><a href="https://gist.github.com/4343332">https://gist.github.com/4343332</a></p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a gist-embed code element as a link to the gist', async () => {
+    const value = html`
+      <p><code data-gist-id="57c54d734aed4f719c19109a7afddc93"> </code></p>
+    `
+    const expected = html`
+      <p><a href="https://gist.github.com/57c54d734aed4f719c19109a7afddc93">https://gist.github.com/57c54d734aed4f719c19109a7afddc93</a></p>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
