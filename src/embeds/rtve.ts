@@ -12,11 +12,12 @@ const rtveHosts = ['rtve.es', 'irtve.es']
 
 type Kind = 'audio' | 'video'
 
-// The asset is {id}_{locale}_{audios|videos}, in the swf query on v2 and the flashvars on 4.x.
-// The locale says nothing about the asset.
+// The asset is {id}_{locale}_{audios|videos}, in the swf query or path on v2 and the flashvars
+// on 4.x. The locale says nothing about the asset.
 const flashAssetRegex = /^([^_]+)_[^_]+_(audios|videos)$/
 
 const flashPlayerPathRegex = /^\/swf\/.*\.swf$/i
+const flashEmbedPathRegex = /^\/swf\/v2\/embed\/([^/]+)\/RTVEPlayer\.swf$/i
 
 // The player fills whatever box it gets, and the Flash video carriers state 425 by 239, 16:9.
 const playerRatio = '16/9'
@@ -73,7 +74,10 @@ const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const asset = parsed.searchParams.get('assetID') ?? flashVar(element, 'assetID')
+  const asset =
+    parsed.searchParams.get('assetID') ??
+    flashVar(element, 'assetID') ??
+    parsed.pathname.match(flashEmbedPathRegex)?.[1]
   const match = asset?.match(flashAssetRegex)
 
   if (!match) {
