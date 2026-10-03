@@ -645,6 +645,36 @@ describeForEachParser('mailruWidgetEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should not read the preview id behind another segment', async () => {
+      const value = html`
+        <span
+          class="b-history-event__videoevent-object filed-image ui-lazy-background"
+          style="background-image: url('https://filed4-21.my.mail.ru/pic?url=http%3A%2F%2Fmy.mail.ru%2Fx%2F%2B%2Fvideo%2Furl%2Fsc03%2F-16643191545523102&amp;mw=480&amp;mh=330&amp;sig=f5d969f78779100fec7222c93b385787&amp;croped=1');"
+          data-videoplayer-moviesrc="/community/sergeyrus/_groupvideo/5218"
+        ></span>
+        <iframe src="https://my.mail.ru/video/embed/-16643191545523102"></iframe>
+      `
+
+      expect(await extract(value)).toMatchObject({
+        id: 'community/sergeyrus/_groupvideo/5218',
+      })
+    })
+
+    it('should not read the preview id followed by another segment', async () => {
+      const value = html`
+        <span
+          class="b-history-event__videoevent-object filed-image ui-lazy-background"
+          style="background-image: url('https://filed4-21.my.mail.ru/pic?url=http%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fsc03%2F-16643191545523102%2Fextra&amp;mw=480&amp;mh=330&amp;sig=f5d969f78779100fec7222c93b385787&amp;croped=1');"
+          data-videoplayer-moviesrc="/community/sergeyrus/_groupvideo/5218"
+        ></span>
+        <iframe src="https://my.mail.ru/video/embed/-16643191545523102"></iframe>
+      `
+
+      expect(await extract(value)).toMatchObject({
+        id: 'community/sergeyrus/_groupvideo/5218',
+      })
+    })
   })
 
   describe('sad paths', () => {
