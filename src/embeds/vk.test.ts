@@ -347,6 +347,15 @@ describeForEachParser('vkWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a div whose call the feed stripped', async () => {
+      const value = html`
+        <p>&nbsp;</p>
+        <div id="vk_post_-35532545_6895">&nbsp;</div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a call naming another div', async () => {
       const value = html`
         <div id="vk_post_-62353676_222"></div>
