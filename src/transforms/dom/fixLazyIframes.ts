@@ -3,13 +3,16 @@ import type { DomTransform } from '../../types.js'
 import { getLazyValue } from '../../utils/dom.js'
 import { isUsableSrc } from '../../utils/urls.js'
 
-// Blank pages a platform points a deferred iframe's src at while the real URL sits in a
-// lazy attribute: a src matching one of these is a placeholder, not content.
+// Srcs a platform points a deferred iframe at while the real URL sits in a lazy attribute: a
+// src matching one of these is a placeholder, not content.
 // Invision Community pairs its page with data-embed-src, Complianz its video with data-src-cmplz.
-const placeholderPageRegexes = [
+const placeholderSrcRegexes = [
   // Invision Community's blank page or spacer image.
   /\/applications\/core\/interface\/(?:index\.html|js\/spacer\.png)(?:[?#]|$)/,
   /\/complianz-gdpr(?:-premium)?\/assets\/video\//, // Complianz's placeholder video
+  /^data:image\//, // bLazy's transparent gif
+  // consentmanager's `blank` and WP Rocket's `about:blank`, once resolved against the page.
+  /(?:^|\/)(?:about:)?blank$/,
 ]
 
 // An iframe whose src is blank or a placeholder page, the real url parked in a lazy attribute.
@@ -20,7 +23,7 @@ export const fixLazyIframes: DomTransform = (context) => {
     for (const iframe of document.querySelectorAll('iframe')) {
       const src = iframe.getAttribute('src')
 
-      if (isUsableSrc(src) && !isAnyOf(src, placeholderPageRegexes)) {
+      if (isUsableSrc(src) && !isAnyOf(src, placeholderSrcRegexes)) {
         continue
       }
 
