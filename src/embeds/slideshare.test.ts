@@ -550,6 +550,131 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('the carrier that names the deck without the wrapper', () => {
+    it('should read the id off the embed name inside an object that carries none', async () => {
+      const value = html`
+        <object
+          classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+          width="425"
+          height="355"
+        >
+          <param name="name" value="__sse4765082" />
+          <param
+            name="src"
+            value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=maowlondon-100715125842-phpapp02&amp;stripped_title=maow-london"
+          />
+          <embed
+            type="application/x-shockwave-flash"
+            width="425"
+            height="355"
+            src="https://static.slidesharecdn.com/swf/ssplayer2.swf?doc=maowlondon-100715125842-phpapp02&amp;stripped_title=maow-london"
+            name="__sse4765082"
+          ></embed>
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '4765082',
+        src: 'https://www.slideshare.net/slideshow/embed_code/4765082',
+        ratio: '595/485',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the id off the name of an embed standing alone', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          width="425"
+          height="355"
+          src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=random-100815083615-phpapp01&amp;stripped_title=ss-4973305"
+          name="__sse4973305"
+        ></embed>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '4973305',
+        src: 'https://www.slideshare.net/slideshow/embed_code/4973305',
+        ratio: '595/485',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the id off the name param of an object an editor rewrote', async () => {
+      const value = html`
+        <object
+          height="497"
+          width="595"
+          data="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=paulvspaulupdate04-04-12-120404122740-phpapp02&amp;stripped_title=paul-vs-paul-update-040412&amp;userName=kkellyfv"
+          type="application/x-shockwave-flash"
+        >
+          <param name="id" value="__sse12282935" />
+          <param name="allowFullScreen" value="true" />
+          <param
+            name="src"
+            value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=paulvspaulupdate04-04-12-120404122740-phpapp02&amp;stripped_title=paul-vs-paul-update-040412&amp;userName=kkellyfv"
+          />
+          <param name="name" value="__sse12282935" />
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '12282935',
+        src: 'https://www.slideshare.net/slideshow/embed_code/12282935',
+        url: 'https://www.slideshare.net/kkellyfv/paul-vs-paul-update-040412',
+        ratio: '595/485',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should return undefined for an embed named for the document key', async () => {
+      const value = html`
+        <embed
+          name="agiledaysnikita-091215034651-phpapp01"
+          src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=agiledaysnikita-091215034651-phpapp01"
+          type="application/x-shockwave-flash"
+        ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a deck name on a param other than the name', async () => {
+      const value = html`
+        <object
+          data="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=socialmediainfographics-100628090614-phpapp02"
+          type="application/x-shockwave-flash"
+        >
+          <param name="id" value="__sse4634732" />
+        </object>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should not read the name param of another deck in the same block', async () => {
+      const value = html`
+        <p>
+          <embed
+            src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=agiledaysnikita-091215034651-phpapp01"
+            type="application/x-shockwave-flash"
+          ></embed>
+          <object
+            data="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=paulvspaulupdate04-04-12-120404122740-phpapp02"
+            type="application/x-shockwave-flash"
+          >
+            <param name="name" value="__sse12282935" />
+          </object>
+        </p>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
   describe('sad paths', () => {
     it('should return undefined when no wrapper names the deck', async () => {
       const value = html`
