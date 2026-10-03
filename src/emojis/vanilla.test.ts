@@ -108,6 +108,88 @@ describeForEachParser('vanillaEmojiResolver', (parseHtml) => {
     })
   })
 
+  // EmojiExtender names its files by Vanilla's own names, like `grin` for `:D`, so its sets keep
+  // their pictures too. Its directory holds only emoji, so a forum's own set is marked as well.
+  describe('EmojiExtender sets', () => {
+    it('should mark a stock file', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://lowendspirit.com/plugins/emojiextender/emoji/twitter/grin.png"
+            title=":D"
+            alt=":D"
+            height="18"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://lowendspirit.com/plugins/emojiextender/emoji/twitter/grin.png"
+            title=":D"
+            alt=":D"
+            height="18"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark a file of a set the forum added', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://forumliliorum.com/plugins/EmojiExtender/emoji/dotl/Thistle.png"
+            title=":Thistle:"
+            alt=":Thistle:"
+            height="32"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://forumliliorum.com/plugins/EmojiExtender/emoji/dotl/Thistle.png"
+            title=":Thistle:"
+            alt=":Thistle:"
+            height="32"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should convert a codepoint filename', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/plugins/emojiextender/emoji/twitter/1f600.png"
+            alt=":grinning:"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml('<p>😀</p>')
+    })
+
+    it('should leave the set preview beside the sets untouched', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/plugins/emojiextender/emoji_set.png"
+            alt=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
   it('should leave an unknown file in the directory untouched', async () => {
     const value = '<p><img src="https://example.com/resources/emoji/banner-wide.png" alt=""></p>'
 
