@@ -4,6 +4,7 @@ import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   speakerdeckIframeEmbedResolver,
+  speakerdeckLegacyScriptEmbedResolver,
   speakerdeckResolveEmbed,
   speakerdeckScriptEmbedResolver,
 } from './speakerdeck.js'
@@ -207,6 +208,66 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('speakerdeckLegacyScriptEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, speakerdeckLegacyScriptEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should mint the player url from the deck id in the script path', async () => {
+      const value = html`
+        <script src="http://speakerdeck.com/embed/4ee19eec04357e0050004017.js"></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'speakerdeck',
+        id: '4ee19eec04357e0050004017',
+        src: 'https://speakerdeck.com/player/4ee19eec04357e0050004017',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the size preset the script url names', async () => {
+      const value = html`
+        <script src="https://speakerdeck.com/embed/4e80df6a55e59a0063001d32.js?size=preview"></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'speakerdeck',
+        id: '4e80df6a55e59a0063001d32',
+        src: 'https://speakerdeck.com/player/4e80df6a55e59a0063001d32',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host carrying the script path', async () => {
+      const value = html`
+        <script src="https://evil.test/embed/4ee19eec04357e0050004017.js?speakerdeck.com/embed/"></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the script path under another route', async () => {
+      const value = html`
+        <script src="https://speakerdeck.com/x/embed/4ee19eec04357e0050004017.js?speakerdeck.com/embed/"></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a segment after the script name', async () => {
+      const value = html`
+        <script src="https://speakerdeck.com/embed/4ee19eec04357e0050004017.js/extra"></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 describe('speakerdeckResolveEmbed', () => {
   it('should give a size-less player the default deck ratio', () => {
     const value = 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0'
@@ -261,6 +322,12 @@ describe('speakerdeckResolveEmbed', () => {
 
   it('should ignore a deck page rather than a player', () => {
     const value = 'https://speakerdeck.com/user/some-deck'
+
+    expect(speakerdeckResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should ignore a player route with no deck id', () => {
+    const value = 'https://speakerdeck.com/embed/'
 
     expect(speakerdeckResolveEmbed(value)).toBeUndefined()
   })
@@ -320,6 +387,24 @@ describeForEachParser('speakerdeckIframeEmbedResolver', (parseHtml) => {
       provider: 'speakerdeck',
       id: '40746bbd65b944eb848e90ab1be552c0/last',
       src: 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0?slide=last',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should mint the player url from the legacy embed iframe', async () => {
+    const value = html`
+      <iframe
+        src="https://speakerdeck.com/embed/4e79b461c9bdcb003f00331d?size=preview"
+        frameborder="0"
+        style="height: 563.65625px;"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'speakerdeck',
+      id: '4e79b461c9bdcb003f00331d',
+      src: 'https://speakerdeck.com/player/4e79b461c9bdcb003f00331d',
       ratio: '16/9',
     }
 
@@ -393,6 +478,29 @@ describeForEachParser('speakerdeckIframeEmbedResolver', (parseHtml) => {
 // The enclosure probe offers every attachment a feed carries to this resolver, and the deck
 // route is on Speaker Deck's own host, so the file-name check is what keeps a file playable.
 describeForEachParser('speakerdeck through the pipeline', (parseHtml) => {
+  it('should turn the legacy script into a deck placeholder', async () => {
+    const value = html`
+      <p>Slides:</p>
+      <script src="http://speakerdeck.com/embed/4ee19eec04357e0050004017.js"></script>
+    `
+    const expected = html`
+      <p>Slides:</p>
+      <div
+        data-embed-ratio="16/9"
+        data-embed-id="4ee19eec04357e0050004017"
+        data-embed-provider="speakerdeck"
+        data-embed-src="https://speakerdeck.com/player/4ee19eec04357e0050004017"
+      ></div>
+    `
+
+    expect(
+      await transformContent(value, {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://example.com/post',
+      }),
+    ).toEqualHtml(expected)
+  })
+
   it('should leave a video enclosure on the speakerdeck host playable', async () => {
     const enclosures = [
       {
