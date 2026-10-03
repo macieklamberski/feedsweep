@@ -6,6 +6,7 @@ import {
   extractJwplayerId,
   jwplayerAmpEmbedResolver,
   jwplayerIframeEmbedResolver,
+  jwplayerLibraryEmbedResolver,
   jwplayerResolveEmbed,
   jwplayerScriptEmbedResolver,
   jwplayerSetupEmbedResolver,
@@ -390,6 +391,182 @@ describeForEachParser('jwplayerSetupEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('jwplayerLibraryEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, jwplayerLibraryEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the media id from the setup call after the library', async () => {
+      const value = html`
+        <div id="jwppp-video-169721" class="jwplayer">Loading the player...</div>
+        <script type="text/javascript" src="https://content.jwplatform.com/libraries/Aq9gyX5k.js"></script>
+        <script type="text/javascript">
+          var playerInstance_169721 = jwplayer( "jwppp-video-169721" );
+          playerInstance_169721.setup({
+            playlist: "https://cdn.jwplayer.com/v2/media/NEnylXdA",
+          })
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'NEnylXdA',
+        src: 'https://cdn.jwplayer.com/players/NEnylXdA.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/NEnylXdA/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the media id across a mount between the library and the setup call', async () => {
+      const value = html`
+        <script type="text/javascript" src="https://content.jwplatform.com/libraries/An9NPLfb.js"></script>
+        <div id="jwplayer_m6LgPTlO_An9NPLfb_div"></div>
+        <script type="text/javascript">
+          jwplayer('jwplayer_m6LgPTlO_An9NPLfb_div').setup(
+            {"playlist":"https:\\/\\/content.jwplatform.com\\/feeds\\/m6LgPTlO.json","ph":2}
+          );
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'm6LgPTlO',
+        src: 'https://cdn.jwplayer.com/players/m6LgPTlO.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/m6LgPTlO/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the media id out of a legacy jw6 playlist', async () => {
+      const value = html`
+        <script type="text/javascript" src="http://content.jwplatform.com/libraries/SNLXQlVh.js"></script>
+        <div id="jwplayer_QJmMZD9a_SNLXQlVh_div"></div>
+        <script type="text/javascript">
+          jwplayer('jwplayer_QJmMZD9a_SNLXQlVh_div').setup(
+            {"image":"-1","playlist":"http:\\/\\/content.jwplatform.com\\/jw6\\/QJmMZD9a.xml"}
+          );
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'QJmMZD9a',
+        src: 'https://cdn.jwplayer.com/players/QJmMZD9a.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/QJmMZD9a/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a setup call made through a publisher wrapper of jwplayer()', async () => {
+      const value = html`
+        <script type="text/javascript" src="https://content.jwplatform.com/libraries/yTTJs9q5.js"></script>
+        <div id="jwplayer_vZeeVFhU_yTTJs9q5_div"></div>
+        <script type="text/javascript">
+          pmc_jwplayer('jwplayer_vZeeVFhU_yTTJs9q5_div').setup(
+            {"vloc":"auto","floating":true,"playlist":"https://content.jwplatform.com/feeds/vZeeVFhU.json","ph":2}
+          );
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'vZeeVFhU',
+        src: 'https://cdn.jwplayer.com/players/vZeeVFhU.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/vZeeVFhU/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host carrying the library path', async () => {
+      const value = html`
+        <div id="jwppp-video-169721" class="jwplayer"></div>
+        <script src="https://evil.test/libraries/Aq9gyX5k.js?content.jwplatform.com/libraries/"></script>
+        <script>jwplayer("jwppp-video-169721").setup({playlist: "https://cdn.jwplayer.com/v2/media/NEnylXdA"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a library with no setup call beside it', async () => {
+      const value = html`
+        <p>
+          <script src="http://content.jwplatform.com/libraries/TzPJRoGH.js"></script>
+          Por el placer de leer en voz alta
+        </p>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a setup call that plays a file of its own', async () => {
+      const value = html`
+        <script src="https://content.jwplatform.com/libraries/TzPJRoGH.js"></script>
+        <div id="myElement"></div>
+        <script>jwplayer("myElement").setup({file: "https://example.com/episode.mp3"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a feeds playlist on another host', async () => {
+      const value = html`
+        <script src="https://content.jwplatform.com/libraries/An9NPLfb.js"></script>
+        <div id="jwplayer_m6LgPTlO_An9NPLfb_div"></div>
+        <script>jwplayer('jwplayer_m6LgPTlO_An9NPLfb_div').setup({"playlist":"https://example.com/feeds/m6LgPTlO.json"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a setup call filling a mount away from the library', async () => {
+      const value = html`
+        <div id="jwppp-video-1"></div>
+        <script src="https://content.jwplatform.com/libraries/Aq9gyX5k.js"></script>
+        <script>jwplayer("jwppp-video-2").setup({playlist: "https://cdn.jwplayer.com/v2/media/NEnylXdA"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a setup call that names no mount', async () => {
+      const value = html`
+        <script src="https://content.jwplatform.com/libraries/Aq9gyX5k.js"></script>
+        <script>window.jwplayerInstance.setup({playlist: "https://cdn.jwplayer.com/v2/media/NEnylXdA"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a mount and setup call outside the block holding the library', async () => {
+      const value = html`
+        <div>
+          <script src="https://content.jwplatform.com/libraries/An9NPLfb.js"></script>
+        </div>
+        <div id="jwplayer_m6LgPTlO_An9NPLfb_div"></div>
+        <script>jwplayer('jwplayer_m6LgPTlO_An9NPLfb_div').setup({"playlist":"https://content.jwplatform.com/feeds/m6LgPTlO.json"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a setup call past the mount and another block', async () => {
+      const value = html`
+        <script src="https://content.jwplatform.com/libraries/An9NPLfb.js"></script>
+        <div id="jwplayer_m6LgPTlO_An9NPLfb_div"></div>
+        <p>Watch the clip.</p>
+        <script>jwplayer('jwplayer_m6LgPTlO_An9NPLfb_div').setup({"playlist":"https://content.jwplatform.com/feeds/m6LgPTlO.json"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 // The resolver alone cannot see this: `wrapBareInlineInParagraphs` runs before the widget pass
 // and puts the bare script in a `<p>`, so the div's sibling is that paragraph.
 describeForEachParser('jwplayerSetupEmbedResolver through the pipeline', (parseHtml) => {
@@ -426,5 +603,69 @@ describeForEachParser('jwplayerIframeEmbedResolver through the pipeline', (parse
         enclosures,
       }),
     ).toEqualHtml(expected)
+  })
+})
+
+// The paragraph pass puts the library and the setup call in a `<p>`, apart from the mount beside
+// them, and only the pipeline shows the setup call leaving with the library.
+describeForEachParser('jwplayerLibraryEmbedResolver through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should replace the library and its setup call and keep the mount text', async () => {
+    const value = html`
+      <div
+        id="jwppp-video-box-169721"
+        class="jwppp-video-box"
+        data-video="1"
+      >
+        <div id="jwppp-video-169721" class="jwplayer">Loading the player...</div>
+        <script type="text/javascript" src="https://content.jwplatform.com/libraries/Aq9gyX5k.js"></script><script type="text/javascript">
+          var playerInstance_169721 = jwplayer( "jwppp-video-169721" );
+          playerInstance_169721.setup({
+            playlist: "https://cdn.jwplayer.com/v2/media/NEnylXdA",
+          })
+        </script>
+      </div>
+    `
+    const expected = html`
+      <p>Loading the player...</p>
+      <div
+        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/NEnylXdA/poster.jpg"
+        data-embed-src="https://cdn.jwplayer.com/players/NEnylXdA.html"
+        data-embed-ratio="16/9"
+        data-embed-provider="jwplayer"
+        data-embed-id="NEnylXdA"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should find the mount and setup call after a library the paragraph pass wrapped', async () => {
+    const value = html`
+      <p>In einem fremden Land.
+        <script type="text/javascript" src="http://content.jwplatform.com/libraries/SNLXQlVh.js"></script>
+      </p>
+      <div id="jwplayer_QJmMZD9a_SNLXQlVh_div"></div>
+      <script type="text/javascript">
+        jwplayer('jwplayer_QJmMZD9a_SNLXQlVh_div').setup(
+          {"image":"-1","playlist":"http:\\/\\/content.jwplatform.com\\/jw6\\/QJmMZD9a.xml"}
+        );
+      </script>
+    `
+    const expected = html`
+      <p>In einem fremden Land. </p>
+      <div
+        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/QJmMZD9a/poster.jpg"
+        data-embed-src="https://cdn.jwplayer.com/players/QJmMZD9a.html"
+        data-embed-ratio="16/9"
+        data-embed-provider="jwplayer"
+        data-embed-id="QJmMZD9a"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

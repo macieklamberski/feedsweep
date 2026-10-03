@@ -193,6 +193,7 @@ import { jotformIframeEmbedResolver, jotformScriptEmbedResolver } from '../embed
 import {
   jwplayerAmpEmbedResolver,
   jwplayerIframeEmbedResolver,
+  jwplayerLibraryEmbedResolver,
   jwplayerScriptEmbedResolver,
   jwplayerSetupEmbedResolver,
 } from '../embeds/jwplayer.js'
@@ -604,6 +605,7 @@ const embedResolvers: Array<EmbedResolver> = [
   jwplayerScriptEmbedResolver,
   jwplayerAmpEmbedResolver,
   jwplayerSetupEmbedResolver,
+  jwplayerLibraryEmbedResolver,
   kalturaIframeEmbedResolver,
   kalturaScriptEmbedResolver,
   kindleEmbedResolver,

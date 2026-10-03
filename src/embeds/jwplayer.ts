@@ -88,8 +88,11 @@ export const jwplayerAmpEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// The setup object points its playlist at `cdn.jwplayer.com/v2/media/{mediaId}`.
-const setupPlaylistRegex = /\/v2\/media\/([a-zA-Z0-9]+)/
+// The setup object points its playlist at `cdn.jwplayer.com/v2/media/{mediaId}`, or at the
+// legacy `content.jwplatform.com/feeds/{mediaId}.json` or `jw6/{mediaId}.xml`, `/` often escaped.
+const setupPlaylistRegex =
+  /(?:jwplayer|jwplatform)\.com\\?\/(?:v2\\?\/media|feeds|jw6)\\?\/([^\\/."'?]+)/
+const setupMountRegex = /jwplayer\(\s*["']([^"']+)["']\s*\)/
 
 // An empty div.jwplayer beside an inline jwplayer(...).setup() call, stripped as an empty tag.
 export const jwplayerSetupEmbedResolver = createMarkupEmbedResolver('div.jwplayer', (element) => {
@@ -102,3 +105,65 @@ export const jwplayerSetupEmbedResolver = createMarkupEmbedResolver('div.jwplaye
 
   return composeJwplayerEmbed(mediaId)
 })
+
+// The paragraph pass can wrap the loader, the mount or the setup call in a <p> of its own.
+const findSnippetSibling = (
+  element: Element | undefined,
+  side: 'previousElementSibling' | 'nextElementSibling',
+): Element | undefined => {
+  if (!element) {
+    return
+  }
+
+  const sibling = element[side]
+
+  if (sibling) {
+    return sibling
+  }
+
+  if (element.parentElement?.localName !== 'p') {
+    return
+  }
+
+  return element.parentElement[side] ?? undefined
+}
+
+const findScript = (element: Element | undefined): Element | undefined => {
+  if (element?.localName === 'script') {
+    return element
+  }
+
+  return element?.querySelector('script') ?? undefined
+}
+
+// JW's cloud player library loaded beside a mount that an inline setup call fills. The mount sits
+// before the library or between it and the setup call. It keeps whatever text it holds.
+export const jwplayerLibraryEmbedResolver = createMarkupEmbedResolver(
+  'script[src*="jwplatform.com/libraries/"]',
+  (element) => {
+    if (!parseUrlOnHosts(attr(element, 'src') ?? '', jwplayerHosts)) {
+      return
+    }
+
+    const following = findSnippetSibling(element, 'nextElementSibling')
+    const afterMount = findSnippetSibling(following, 'nextElementSibling')
+    const setup = findScript(following) ?? findScript(afterMount)
+    const config = setup?.textContent ?? ''
+    const mountId = config.match(setupMountRegex)?.[1]
+    const mediaId = config.match(setupPlaylistRegex)?.[1]
+
+    if (!setup || !mountId || !mediaId) {
+      return
+    }
+
+    const mounts = [findSnippetSibling(element, 'previousElementSibling'), following]
+
+    if (!mounts.some((mount) => mount?.id === mountId)) {
+      return
+    }
+
+    setup.remove()
+
+    return composeJwplayerEmbed(mediaId)
+  },
+)
