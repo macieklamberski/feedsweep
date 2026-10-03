@@ -116,7 +116,10 @@ import { cspanEmbedResolver } from '../embeds/cspan.js'
 import { dailymailEmbedResolver } from '../embeds/dailymail.js'
 import { dailymotionEmbedResolver } from '../embeds/dailymotion.js'
 import { deezerEmbedResolver } from '../embeds/deezer.js'
-import { democracynowEmbedResolver } from '../embeds/democracynow.js'
+import {
+  democracynowIframeEmbedResolver,
+  democracynowScriptEmbedResolver,
+} from '../embeds/democracynow.js'
 import { documentcloudEmbedResolver } from '../embeds/documentcloud.js'
 import { donorboxEmbedResolver } from '../embeds/donorbox.js'
 import { dvidsEmbedResolver } from '../embeds/dvids.js'
@@ -534,7 +537,8 @@ const embedResolvers: Array<EmbedResolver> = [
   dailymailEmbedResolver,
   dailymotionEmbedResolver,
   deezerEmbedResolver,
-  democracynowEmbedResolver,
+  democracynowIframeEmbedResolver,
+  democracynowScriptEmbedResolver,
   documentcloudEmbedResolver,
   donorboxEmbedResolver,
   dvidsEmbedResolver,

@@ -1,11 +1,14 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'democracynow'
 
 const democracynowHosts = ['democracynow.org']
+
+const scriptLoaders = ['embed_show_v1', 'embed_show_v2']
 
 // The path after `/embed/` names the item, and each kind has its own page.
 const composeEmbed = (path: string, page: string): EmbedResolverResult => {
@@ -57,7 +60,37 @@ export const democracynowResolveEmbed: ResolveEmbed = (url) => {
   }
 }
 
-export const democracynowEmbedResolver = createUrlEmbedResolver(
+export const democracynowIframeEmbedResolver = createUrlEmbedResolver(
   democracynowHosts,
   democracynowResolveEmbed,
+)
+
+// Democracy Now!'s retired loader scripts, which answer 404: v2 `/{width}/{y}/{m}/{d}/story/{slug}`
+// and v1 `/{width}/{y}/{m}/{d}/segment/{n}`. A segment has no player of its own, and the v1 loader
+// played the day's whole show.
+export const democracynowScriptEmbedResolver = createMarkupEmbedResolver(
+  'script[src*="democracynow.org/embed_show_v"]',
+  (element) => {
+    const parsed = parseUrlOnHosts(attr(element, 'src'), democracynowHosts)
+
+    if (!parsed) {
+      return
+    }
+
+    const [loader = '', , year, month, day, kind, item, ...rest] = getPathSegments(parsed)
+
+    if (!scriptLoaders.includes(loader) || !item || rest.length > 0) {
+      return
+    }
+
+    const date = `${year}/${month}/${day}`
+
+    if (kind === 'story') {
+      return composeEmbed(`story/${date}/${item}`, `${date}/${item}`)
+    }
+
+    if (kind === 'segment') {
+      return composeEmbed(`show/${date}`, `shows/${date}`)
+    }
+  },
 )
