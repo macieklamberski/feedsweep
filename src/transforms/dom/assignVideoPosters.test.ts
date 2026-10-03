@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { assignVideoPosters } from './assignVideoPosters.js'
@@ -185,6 +186,62 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should move only the first image enclosure onto the poster and keep the rest', async () => {
+    const value = html`
+      <video
+        data-enclosure=""
+        controls
+        src="https://example.org/files/original/3804f8c681d45a5bc6e8fbfab6c0a2cc.mp4"
+      ></video>
+      <img
+        data-enclosure=""
+        src="https://example.org/files/original/44bc4331f3f615ae446637439c0fb89c.png"
+      >
+      <img
+        data-enclosure=""
+        src="https://example.org/files/original/5ac6d68ad69a2ad0012d9e1175520c22.JPG"
+      >
+      <img
+        data-enclosure=""
+        src="https://example.org/files/original/160ab58125cf1443da70aeaa1a53e93a.JPG"
+      >
+    `
+    const expected = html`
+      <video
+        data-enclosure=""
+        controls
+        src="https://example.org/files/original/3804f8c681d45a5bc6e8fbfab6c0a2cc.mp4"
+        poster="https://example.org/files/original/44bc4331f3f615ae446637439c0fb89c.png"
+      ></video>
+      <img src="https://example.org/files/original/5ac6d68ad69a2ad0012d9e1175520c22.JPG">
+      <img src="https://example.org/files/original/160ab58125cf1443da70aeaa1a53e93a.JPG">
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should move no remaining image enclosure onto the poster on a repeat run', async () => {
+    const value = html`
+      <video
+        data-enclosure=""
+        controls
+        src="https://example.org/files/original/3804f8c681d45a5bc6e8fbfab6c0a2cc.mp4"
+      ></video>
+      <img
+        data-enclosure=""
+        src="https://example.org/files/original/44bc4331f3f615ae446637439c0fb89c.png"
+      >
+      <img
+        data-enclosure=""
+        src="https://example.org/files/original/5ac6d68ad69a2ad0012d9e1175520c22.JPG"
+      >
+    `
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
   it('should keep an unrelated image that is not a video poster', async () => {
     const value = html`
       <img src="https://example.com/photo.jpg">
@@ -203,5 +260,128 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('assignVideoPosters under heuristics', (parseHtml) => {
+  const convert = (value: string, enclosures: Array<{ url: string; type?: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.org/post',
+      enclosures,
+      heuristics: true,
+    })
+  }
+
+  it('should keep every photo of an archive item beside its video', async () => {
+    const value = '<p>The Lesbian Avengers Eat Fire, Too</p>'
+    const enclosures = [
+      {
+        url: 'https://example.org/files/original/44bc4331f3f615ae446637439c0fb89c.png',
+        type: 'image/png',
+      },
+      {
+        url: 'https://example.org/files/original/3804f8c681d45a5bc6e8fbfab6c0a2cc.mp4',
+        type: 'video/mp4',
+      },
+      {
+        url: 'https://example.org/files/original/5ac6d68ad69a2ad0012d9e1175520c22.JPG',
+        type: 'image/jpeg',
+      },
+      {
+        url: 'https://example.org/files/original/160ab58125cf1443da70aeaa1a53e93a.JPG',
+        type: 'image/jpeg',
+      },
+      {
+        url: 'https://example.org/files/original/fe42a004954a215dccceec2ad6371459.JPG',
+        type: 'image/jpeg',
+      },
+    ]
+    const expected = html`
+      <video
+        poster="https://example.org/files/original/44bc4331f3f615ae446637439c0fb89c.png"
+        controls
+        src="https://example.org/files/original/3804f8c681d45a5bc6e8fbfab6c0a2cc.mp4"
+      ></video>
+      <img src="https://example.org/files/original/5ac6d68ad69a2ad0012d9e1175520c22.JPG">
+      <img src="https://example.org/files/original/160ab58125cf1443da70aeaa1a53e93a.JPG">
+      <img src="https://example.org/files/original/fe42a004954a215dccceec2ad6371459.JPG">
+      <p>The Lesbian Avengers Eat Fire, Too</p>
+    `
+
+    expect(await convert(value, enclosures)).toEqualHtml(expected)
+  })
+
+  it('should keep an image enclosure listed after the video in its place', async () => {
+    const value = '<p>Antonello Colonna, chef alle Olimpiadi.</p>'
+    const enclosures = [
+      { url: 'https://example.org/pictures/2025/11/27/162638436-f0210e19.jpg', type: 'image/jpeg' },
+      { url: 'https://example.org/pictures/2025/11/27/162638437-dca5ca4a.jpg', type: 'image/jpeg' },
+      {
+        url: 'https://example.org/1/273/cf1af260-ae33-4fb5-91d8-71418391765b.mp4',
+        type: 'video/mp4',
+      },
+      {
+        url: 'https://example.org/pictures/kolumbus/2025/11/27/a82710ec_thumb_1764260796233.jpg',
+        type: 'image/jpeg',
+      },
+    ]
+    const expected = html`
+      <img src="https://example.org/pictures/2025/11/27/162638437-dca5ca4a.jpg">
+      <video
+        poster="https://example.org/pictures/2025/11/27/162638436-f0210e19.jpg"
+        controls
+        src="https://example.org/1/273/cf1af260-ae33-4fb5-91d8-71418391765b.mp4"
+      ></video>
+      <img src="https://example.org/pictures/kolumbus/2025/11/27/a82710ec_thumb_1764260796233.jpg">
+      <p>Antonello Colonna, chef alle Olimpiadi.</p>
+    `
+
+    expect(await convert(value, enclosures)).toEqualHtml(expected)
+  })
+
+  it('should drop a YouTube thumbnail enclosure on its YouTube video', async () => {
+    const value = '<p>You can see the interview below.</p>'
+    const enclosures = [
+      { url: 'https://img.youtube.com/vi/UaVU95gsXW8/0.jpg', type: 'image/jpeg' },
+      { url: 'https://www.youtube.com/embed/UaVU95gsXW8' },
+    ]
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/UaVU95gsXW8/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=UaVU95gsXW8"
+        data-embed-id="UaVU95gsXW8"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/UaVU95gsXW8"
+      ></div>
+      <p>You can see the interview below.</p>
+    `
+
+    expect(await convert(value, enclosures)).toEqualHtml(expected)
+  })
+
+  it('should drop a single image enclosure when the embed already has a thumbnail', async () => {
+    const value = '<p>All is set for the premiere.</p>'
+    const enclosures = [
+      {
+        url: 'https://example.org/downloads/698/download/premiere.jpg?cb=3d7c6da47266c12d',
+        type: 'image/jpeg',
+      },
+      { url: 'http://www.youtube.com/watch?v=-GraOPPwGfA' },
+    ]
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/-GraOPPwGfA/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=-GraOPPwGfA"
+        data-embed-id="-GraOPPwGfA"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/-GraOPPwGfA"
+      ></div>
+      <p>All is set for the premiere.</p>
+    `
+
+    expect(await convert(value, enclosures)).toEqualHtml(expected)
   })
 })
