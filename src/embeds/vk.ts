@@ -102,6 +102,11 @@ const composeWidgetEmbed = (
 export const vkWidgetEmbedResolver = createMarkupEmbedResolver(
   'div[id^="vk_post_"], div[id^="vk_playlist_"]',
   (element) => {
+    // A mount that already holds the post's text keeps it.
+    if (element.textContent?.trim()) {
+      return
+    }
+
     for (const script of element.parentElement?.querySelectorAll('script') ?? []) {
       const calls = [...(script.textContent ?? '').matchAll(widgetCallRegex)]
       const call = calls.find((match) => match[3] === element.id)
