@@ -355,6 +355,75 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  // GitHub spells this file's anchor `file-qx-20261003-conf`.
+  it('should collapse a run of dashes in the anchor the way GitHub does', async () => {
+    const value = html`
+      <code
+        data-gist-id="90a5ecbb0778132650e9bcb60bb0a383"
+        data-gist-file="QX-通用白板-20261003.conf"
+      ></code>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/90a5ecbb0778132650e9bcb60bb0a383#file-qx-20261003-conf"
+      >https://gist.github.com/90a5ecbb0778132650e9bcb60bb0a383#file-qx-20261003-conf</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  // GitHub spells this file's anchor `file-rust-md`.
+  it('should trim a leading dash from the anchor the way GitHub does', async () => {
+    const value = html`
+      <code
+        data-gist-id="163bac31f4a926953c900b726562cb92"
+        data-gist-file="シニアエンジニアのためのRust集中写経チュートリアル設計ドラフト.md"
+      ></code>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/163bac31f4a926953c900b726562cb92#file-rust-md"
+      >https://gist.github.com/163bac31f4a926953c900b726562cb92#file-rust-md</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  // GitHub ends this file's anchor in `-avg`, with no dash after it.
+  it('should trim a trailing dash from the anchor the way GitHub does', async () => {
+    const value = html`
+      <code
+        data-gist-id="d2deaf1eba9694d94545cbc5fbceda5b"
+        data-gist-file="CONSULTAS SQL: FUNCIONES DE AGREGACIÓN (MIN, MAX, COUNT, SUM, AVG)"
+      ></code>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/d2deaf1eba9694d94545cbc5fbceda5b#file-consultas-sql-funciones-de-agregacion-min-max-count-sum-avg"
+      >https://gist.github.com/d2deaf1eba9694d94545cbc5fbceda5b#file-consultas-sql-funciones-de-agregacion-min-max-count-sum-avg</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should point the link at the file a gist-Blogger mount names', async () => {
+    const value = html`
+      <div
+        class="gistLoad"
+        id="gist-323652f344edcd867451582b0d2aa929"
+        data-file="rotate.sh"
+        data-id="323652f344edcd867451582b0d2aa929"
+      >Loading ....</div>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/323652f344edcd867451582b0d2aa929#file-rotate-sh"
+      >https://gist.github.com/323652f344edcd867451582b0d2aa929#file-rotate-sh</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   // GitHub spells the anchor of a file named `-` as `file-`.
   it('should trim dashes from the edges of the anchor the way GitHub does', async () => {
     const value = html`
