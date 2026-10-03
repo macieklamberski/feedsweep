@@ -6,8 +6,8 @@ import {
   parseUrl,
   trimObject,
 } from 'trousse'
-import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr } from '../utils/dom.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import { attr, find } from '../utils/dom.js'
 
 const provider = 'dailymotion'
 
@@ -19,7 +19,7 @@ import {
   placeholderBaseUrl,
   splitStrayParams,
 } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // Listed one by one: `dailymotion.de` is third-party, and a tld pattern would trust it.
 // Each apex redirects to a language landing page, dropping the video.
@@ -214,6 +214,62 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
 export const dailymotionEmbedResolver = createUrlEmbedResolver(
   dailymotionHosts,
   dailymotionResolveEmbed,
+)
+
+// The Library Script under `/libs/player/` takes no item from its tag.
+const playerScriptPathRegex = /^\/player\/[^/]+\.js$/
+// Dailymotion writes the duration in seconds alone.
+const durationRegex = /^P(\d+)S$/
+
+// The snippet Dailymotion hands out wraps the script in schema.org microdata about the item.
+const readSnippetFields = (
+  element: Element,
+  result: EmbedResolverResult,
+): Partial<EmbedResolverResult> | undefined => {
+  const readMeta = (name: string): string | undefined => {
+    return attr(find(element.parentElement, `meta[itemprop="${name}"]`), 'content')
+  }
+
+  if (dailymotionResolveEmbed(readMeta('embedUrl') ?? '')?.id !== result.id) {
+    return
+  }
+
+  const seconds = readMeta('duration')?.match(durationRegex)?.[1]
+
+  return {
+    title: readMeta('name'),
+    description: readMeta('description'),
+    date: readMeta('uploadDate'),
+    duration: seconds ? Number(seconds) : undefined,
+  }
+}
+
+// Dailymotion's Player Embed Script, `geo.dailymotion.com/player/{playerId}.js` naming the item in
+// `data-video` or `data-playlist`, which renders nothing until it runs.
+export const dailymotionScriptEmbedResolver = createMarkupEmbedResolver(
+  'script[src*="dailymotion.com/"][data-video], script[src*="dailymotion.com/"][data-playlist]',
+  (element) => {
+    const loader = parseUrlOnHosts(attr(element, 'src'), dailymotionHosts)
+
+    if (!loader || !playerScriptPathRegex.test(loader.pathname)) {
+      return
+    }
+
+    const query = composeQuery(
+      trimObject({ video: attr(element, 'data-video'), playlist: attr(element, 'data-playlist') }),
+    )
+    // The script writes its player's iframe with the same query.
+    const result = dailymotionResolveEmbed(`https://geo.dailymotion.com/player.html${query}`)
+
+    if (!result) {
+      return
+    }
+
+    return {
+      ...result,
+      ...readSnippetFields(element, result),
+    }
+  },
 )
 
 export const dailymotionFieldCleaners: Array<FieldCleaner> = [
