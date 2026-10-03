@@ -144,25 +144,27 @@ export const defaultDeferredIframeSources: Array<DeferredIframeSource> = [
   { selector: '.arve-play-btn[data-iframe]', attribute: 'data-iframe' },
 
   // Video blocks that park a page or player url on the wrapper and build the iframe in script.
-  // Enfold keeps its iframe in a `script type="text/html"`, which no reader runs, and leaves
-  // that script empty for Vimeo, so the wrapper attribute is the one url every carrier holds.
+  // A playlist tab can also hold the description the publisher wrote under the video.
+  {
+    selector: '.e-tab-content[data-video-url]:not(:has(p))', // Elementor Pro video playlist
+    attribute: 'data-video-url',
+  },
+  // Enfold keeps its iframe in a `script type="text/html"`, which no reader runs, and some
+  // carriers leave that script empty or hold a bare link, so the wrapper attribute is the one
+  // url every carrier holds.
   {
     selector: '.avia-video[data-original_url]:not(:has(iframe, embed, object, video, audio))',
     attribute: 'data-original_url',
-  }, // Enfold
-  {
-    selector: '.e-tab-content[data-video-url]:not(:has(p))',
-    attribute: 'data-video-url',
-  }, // Elementor Pro video playlist: a tab can also hold the description the publisher wrote
-  { selector: '.embed-lazy-video[data-embed]', attribute: 'data-embed' }, // LMPixels themes
-  { selector: '.gf_module-[data-url]', attribute: 'data-url' }, // GemPages YouTube
+  },
   { selector: '.module[data-url]:has(> .vimeo_video)', attribute: 'data-url' }, // GemPages Vimeo
+  { selector: '.gf_module-[data-url]', attribute: 'data-url' }, // GemPages YouTube
   { selector: '.gs-video-element[data-src]', attribute: 'data-src' }, // GreenShift
-  { selector: '.kc_video_play[data-video]', attribute: 'data-video' }, // KingComposer
   { selector: '.wp-block-kioken-videobox[data-video]', attribute: 'data-video' }, // Kioken Blocks
+  { selector: '.kc_video_play[data-video]', attribute: 'data-video' }, // KingComposer
   {
-    selector: '.lazyframe[data-src]:not(:has(iframe, embed, object, video, audio))',
+    selector: '.lazyframe[data-src]:not(:has(iframe, embed, object, video, audio))', // lazyframe
     attribute: 'data-src',
-  }, // lazyframe
+  },
+  { selector: '.embed-lazy-video[data-embed]', attribute: 'data-embed' }, // LMPixels themes
   { selector: '.ut-load-video[data-video]', attribute: 'data-video' }, // United Themes
 ]
