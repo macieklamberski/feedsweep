@@ -401,6 +401,7 @@ import { monalisaEmojiResolver } from '../emojis/monalisa.js'
 import { moodleEmojiResolver } from '../emojis/moodle.js'
 import { mozillaEmojiResolver } from '../emojis/mozilla.js'
 import { nbbcEmojiResolver } from '../emojis/nbbc.js'
+import { noisenEmojiResolver } from '../emojis/noisen.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
 import { okEmojiResolver } from '../emojis/ok.js'
 import { pivotxEmojiResolver } from '../emojis/pivotx.js'
@@ -848,6 +849,9 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
 
   // Ahead of smilies, whose forum names draw Liferay's smile.gif as 🙂.
   liferayEmojiResolver,
+
+  // Ahead of Khoros, Web Wiz, SMF, NBBC and smilies, whose shared directories match Noisen's path.
+  noisenEmojiResolver,
   khorosImageEmojiResolver,
   webWizEmojiResolver,
   discuzEmojiResolver,
