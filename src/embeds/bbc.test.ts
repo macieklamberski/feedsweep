@@ -206,6 +206,7 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
         provider: 'bbc',
         id: 'p017rsj2',
         src: 'https://www.bbc.co.uk/programmes/p017rsj2/player',
+        url: 'https://www.bbc.co.uk/programmes/p017rsj2',
         ratio: '320/374',
       }
 
@@ -228,6 +229,7 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
         provider: 'bbc',
         id: 'p00l180n',
         src: 'https://www.bbc.co.uk/programmes/p00l180n/player',
+        url: 'https://www.bbc.co.uk/programmes/p00l180n',
         ratio: '320/374',
       }
 
@@ -250,10 +252,49 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
         provider: 'bbc',
         id: 'p0040t7d',
         src: 'https://www.bbc.co.uk/programmes/p0040t7d/player',
+        url: 'https://www.bbc.co.uk/programmes/p0040t7d',
         ratio: '320/374',
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    // Constructed: the census `<object data>` carriers name news playlists, so the iPlayer one is
+    // spliced into the shape they ship.
+    it('should read the flashvars param of an object carrier', async () => {
+      const value = html`
+        <object
+          data="http://www.bbc.co.uk/emp/external/player.swf"
+          height="330"
+          type="application/x-shockwave-flash"
+          width="350"
+        >
+          <param name="movie" value="http://www.bbc.co.uk/emp/external/player.swf">
+          <param name="FlashVars" value="playlist=http://www.bbc.co.uk/iplayer/playlist/p00gygsd&amp;config_settings_showFooter=true">
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bbc',
+        id: 'p00gygsd',
+        src: 'https://www.bbc.co.uk/programmes/p00gygsd/player',
+        url: 'https://www.bbc.co.uk/programmes/p00gygsd',
+        ratio: '320/374',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Constructed: the programme page the snippet names in `embedPageUrl`, put in `playlist`.
+    it('should ignore a pid outside the playlist route', async () => {
+      const value = html`
+        <embed
+          src="http://www.bbc.co.uk/emp/iplayer/player.swf"
+          type="application/x-shockwave-flash"
+          FlashVars="playlist=http://www.bbc.co.uk/programmes/p017rsj2"
+        ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a news playlist, which names an article and no pid', async () => {
@@ -334,7 +375,7 @@ describeForEachParser('bbc through the pipeline', (parseHtml) => {
       </object>
     `
     const expected = html`
-      <div data-embed-ratio="320/374" data-embed-id="p017rsj2" data-embed-provider="bbc" data-embed-src="https://www.bbc.co.uk/programmes/p017rsj2/player"></div>
+      <div data-embed-ratio="320/374" data-embed-url="https://www.bbc.co.uk/programmes/p017rsj2" data-embed-id="p017rsj2" data-embed-provider="bbc" data-embed-src="https://www.bbc.co.uk/programmes/p017rsj2/player"></div>
     `
 
     expect(await convert(value)).toEqualHtml(expected)

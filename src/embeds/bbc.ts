@@ -34,17 +34,19 @@ const composeNewsEmbed = (article: string, pid: string): EmbedResolverResult => 
   }
 }
 
-const composeProgrammesEmbed = (pid: string): EmbedResolverResult => {
+const composeProgrammesEmbed = (pid: string, url?: string): EmbedResolverResult => {
   return {
     provider: 'bbc',
     id: pid,
     src: `https://www.bbc.co.uk/programmes/${pid}/player`,
+    url,
     ratio: programmesPlayerRatio,
   }
 }
 
-// BBC's news, World Service and programmes clip players, pasted in a portrait box that pads them.
-// No page url is derivable: a news page needs its section slug, which the embed does not carry.
+// BBC's news, World Service and programmes clip players, pasted in a portrait box that pads them,
+// and the retired Flash player. A news page needs its section slug, which the embed does not
+// carry, and a current programmes clip such as `p08s3bnj` has no page of its own.
 export const bbcResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, bbcHosts)
 
@@ -63,7 +65,7 @@ export const bbcResolveEmbed: ResolveEmbed = (url, element) => {
       return
     }
 
-    return composeProgrammesEmbed(pid)
+    return composeProgrammesEmbed(pid, `https://www.bbc.co.uk/programmes/${pid}`)
   }
 
   const segments = getPathSegments(parsed)
