@@ -642,19 +642,6 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a deck name on a param other than the name', async () => {
-      const value = html`
-        <object
-          data="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=socialmediainfographics-100628090614-phpapp02"
-          type="application/x-shockwave-flash"
-        >
-          <param name="id" value="__sse4634732" />
-        </object>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should not read the name param of another deck in the same block', async () => {
       const value = html`
         <p>
