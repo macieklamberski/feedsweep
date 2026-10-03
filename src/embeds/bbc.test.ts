@@ -188,6 +188,118 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('the retired Flash player', () => {
+    it('should repair an iPlayer playlist onto the programmes player', async () => {
+      const value = html`
+        <embed
+          src="http://www.bbc.co.uk/emp/iplayer/player.swf"
+          type="application/x-shockwave-flash"
+          allowfullscreen="true"
+          allowScriptAccess="always"
+          width="640"
+          height="504"
+          FlashVars="playlist=http://www.bbc.co.uk/iplayer/playlist/p017rsj2&amp;config=http://www.bbc.co.uk/emp/iplayer/config.xml&amp;config_settings_showFooter=true&amp;embedPageUrl=http://www.bbc.co.uk/programmes/p017rsj2&amp;config_settings_autoPlay=true"
+        ></embed>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bbc',
+        id: 'p017rsj2',
+        src: 'https://www.bbc.co.uk/programmes/p017rsj2/player',
+        ratio: '320/374',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should take the pid before the switches an iPlayer playlist appends', async () => {
+      const value = html`
+        <embed
+          width="492"
+          height="363"
+          type="application/x-shockwave-flash"
+          src="http://www.bbc.co.uk/emp/external/player.swf"
+          allowfullscreen="true"
+          allowscriptaccess="always"
+          flashvars="config_settings_skin=black&amp;config_settings_suppressRelatedLinks=true&amp;config=http%3A%2F%2Fwww%2Ebbc%2Eco%2Euk%2Femp%2Fiplayer%2Foffschedule%2Exml&amp;playlist=http%3A%2F%2Fwww%2Ebbc%2Eco%2Euk%2Fiplayer%2Fplaylist%2Fp00l180n%2Fsuppress%5Fmasterbrand%2Fsuppress%5Frelated%5Fepisodes&amp;config_settings_showFooter=true&amp;"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bbc',
+        id: 'p00l180n',
+        src: 'https://www.bbc.co.uk/programmes/p00l180n/player',
+        ratio: '320/374',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should repair a comedy playlist file onto the programmes player', async () => {
+      const value = html`
+        <embed
+          src="http://www.bbc.co.uk/emp/external/player.swf"
+          type="application/x-shockwave-flash"
+          allowfullscreen="true"
+          allowscriptaccess="always"
+          width="512"
+          height="400"
+          flashvars="config_settings_showUpdatedInFooter=true&amp;config_settings_skin=black&amp;playlist=http%3A%2F%2Fwww%2Ebbc%2Eco%2Euk%2Fcomedy%2Fforge%2Dassets%2Fextra%2Fplaylist%2Fp0040t7d%2Exml&amp;config=http%3A%2F%2Fwww%2Ebbc%2Eco%2Euk%2Femp%2Fiplayer%2Foffschedule%2Exml&amp;config_settings_showFooter=true&amp;"
+        ></embed>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bbc',
+        id: 'p0040t7d',
+        src: 'https://www.bbc.co.uk/programmes/p0040t7d/player',
+        ratio: '320/374',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore a news playlist, which names an article and no pid', async () => {
+      const value = html`
+        <embed
+          src="http://news.bbc.co.uk/player/emp/external/player.swf"
+          type="application/x-shockwave-flash"
+          allowfullscreen="true"
+          allowscriptaccess="always"
+          flashvars="playlist=http%3A//playlists.bbc.co.uk/news/uk-politics-11948231A/playlist.sxml&amp;config=http%3A//news.bbc.co.uk/player/emp/config/default.xml&amp;config_settings_showFooter=true"
+          height="400"
+          width="512"
+        ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a syndication playlist, whose segment after the route word is no pid', async () => {
+      const value = html`
+        <embed
+          src="http://news.bbc.co.uk/player/emp/external/player.swf"
+          type="application/x-shockwave-flash"
+          allowfullscreen="true"
+          allowScriptAccess="always"
+          width="310"
+          height="198"
+          FlashVars="config_settings_showUpdatedInFooter=true&amp;playlist=http%3A%2F%2Fwww.bbc.co.uk%2Fsyndicationportal%2Fplaylist%2Findex%2Fvalue%2F15064396&amp;config_settings_showFooter=true"
+        ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an iPlayer playlist path on a foreign host', async () => {
+      const value = html`
+        <embed
+          src="http://www.bbc.co.uk/emp/iplayer/player.swf"
+          type="application/x-shockwave-flash"
+          FlashVars="playlist=https://evil.test/iplayer/playlist/p017rsj2"
+        ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
 })
 
 // BBC serves podcast audio from subdomains of the two hosts the players sit on, and the enclosure
@@ -201,6 +313,32 @@ describeForEachParser('bbc through the pipeline', (parseHtml) => {
       enclosures,
     })
   }
+
+  // The Flash snippet nests an `<embed>` in an `<object>` with no `data`, and each names the clip.
+  it('should turn the iPlayer Flash snippet into one programmes player', async () => {
+    const value = html`
+      <object height="504" width="640">
+        <param name="movie" value="http://www.bbc.co.uk/emp/iplayer/player.swf"></param>
+        <param name="allowFullScreen" value="true"></param>
+        <param name="allowScriptAccess" value="always"></param>
+        <param name="FlashVars" value="playlist=http://www.bbc.co.uk/iplayer/playlist/p017rsj2&amp;config=http://www.bbc.co.uk/emp/iplayer/config.xml&amp;config_settings_showFooter=true&amp;embedPageUrl=http://www.bbc.co.uk/programmes/p017rsj2&amp;config_settings_autoPlay=true"></param>
+        <embed
+          src="http://www.bbc.co.uk/emp/iplayer/player.swf"
+          type="application/x-shockwave-flash"
+          allowfullscreen="true"
+          allowScriptAccess="always"
+          width="640"
+          height="504"
+          FlashVars="playlist=http://www.bbc.co.uk/iplayer/playlist/p017rsj2&amp;config=http://www.bbc.co.uk/emp/iplayer/config.xml&amp;config_settings_showFooter=true&amp;embedPageUrl=http://www.bbc.co.uk/programmes/p017rsj2&amp;config_settings_autoPlay=true"
+        ></embed>
+      </object>
+    `
+    const expected = html`
+      <div data-embed-ratio="320/374" data-embed-id="p017rsj2" data-embed-provider="bbc" data-embed-src="https://www.bbc.co.uk/programmes/p017rsj2/player"></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
 
   it('should leave a bbc media enclosure playable', async () => {
     const enclosures = [

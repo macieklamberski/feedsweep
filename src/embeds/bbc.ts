@@ -1,6 +1,7 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { flashVar } from '../utils/dom.js'
+import { digitsRegex, flashFileRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `bbc.co.uk` 301s every player route onto `bbc.com`.
@@ -8,6 +9,7 @@ const bbcHosts = ['bbc.com', 'bbc.co.uk']
 
 // A programme id: eight letters and digits with at least one digit, which keeps `articles` out.
 const pidRegex = /^[a-z](?=[0-9a-z]*\d)[0-9a-z]{7}$/
+const playlistPathRegex = /\/playlist\/([^/.]+)/
 
 // The news and World Service players render at 16:9 of their width. BBC's own embed code states
 // a 400 by 500 box, which pads them with blank below.
@@ -32,13 +34,36 @@ const composeNewsEmbed = (article: string, pid: string): EmbedResolverResult => 
   }
 }
 
+const composeProgrammesEmbed = (pid: string): EmbedResolverResult => {
+  return {
+    provider: 'bbc',
+    id: pid,
+    src: `https://www.bbc.co.uk/programmes/${pid}/player`,
+    ratio: programmesPlayerRatio,
+  }
+}
+
 // BBC's news, World Service and programmes clip players, pasted in a portrait box that pads them.
 // No page url is derivable: a news page needs its section slug, which the embed does not carry.
-export const bbcResolveEmbed: ResolveEmbed = (url) => {
+export const bbcResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, bbcHosts)
 
   if (!parsed) {
     return
+  }
+
+  // The retired Flash player names its clip in the `playlist` flashvar, as
+  // `/iplayer/playlist/{pid}` or `/comedy/forge-assets/extra/playlist/{pid}.xml`. News and World
+  // Service playlists carry no pid.
+  if (flashFileRegex.test(parsed.pathname)) {
+    const playlist = parseUrlOnHosts(flashVar(element, 'playlist'), bbcHosts)
+    const pid = playlist?.pathname.match(playlistPathRegex)?.[1]
+
+    if (!isPid(pid)) {
+      return
+    }
+
+    return composeProgrammesEmbed(pid)
   }
 
   const segments = getPathSegments(parsed)
@@ -71,12 +96,7 @@ export const bbcResolveEmbed: ResolveEmbed = (url) => {
   }
 
   if (first === 'programmes' && isPid(second) && third === 'player') {
-    return {
-      provider: 'bbc',
-      id: second,
-      src: `https://www.bbc.co.uk/programmes/${second}/player`,
-      ratio: programmesPlayerRatio,
-    }
+    return composeProgrammesEmbed(second)
   }
 }
 
