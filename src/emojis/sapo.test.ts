@@ -129,6 +129,22 @@ describeForEachParser('sapoEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should mark a mood emoticon from the beta host', async () => {
+    const value = '<p><img src="http://blogs-beta.sapo.pt/images/mood/EMOTICON_SKULL.png"></p>'
+    const expected =
+      '<p><img data-emoji="" src="http://blogs-beta.sapo.pt/images/mood/EMOTICON_SKULL.png"></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should mark a mood emoticon from the image host', async () => {
+    const value = '<p><img src="https://imgs.sapo.pt/images/blogs/mood/EMOTICON_LOL.png"></p>'
+    const expected =
+      '<p><img data-emoji="" src="https://imgs.sapo.pt/images/blogs/mood/EMOTICON_LOL.png"></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should leave a mood image that is not an emoticon untouched', async () => {
     const value = '<p><img alt="" src="https://blogs.sapo.pt/images/mood/banner.png"></p>'
 

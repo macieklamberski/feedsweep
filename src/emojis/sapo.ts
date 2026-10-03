@@ -11,7 +11,10 @@ export const sapoEmojiResolver: EmojiResolver = {
     'img[src*="/plugins/sapoemotions/img/EMOTICON_" i]',
     'img[src*="/fckeditor/editor/images/smiley/sapo/EMOTICON_" i]', // The older editor
     'img[src*="/fckeditor/editor/images/smiley/sapo/MOOD_SAPO_" i]',
-    'img[src*="blogs.sapo.pt/images/mood/EMOTICON_" i]', // A post's mood, shown with the same set
+    // A post's mood, shown with the same set.
+    'img[src*="blogs.sapo.pt/images/mood/EMOTICON_" i]',
+    'img[src*="blogs-beta.sapo.pt/images/mood/EMOTICON_" i]',
+    'img[src*="imgs.sapo.pt/images/blogs/mood/EMOTICON_" i]',
   ].join(', '),
   extract: (element) => {
     return resolveEmojiImage(element, { isStrong: true })
