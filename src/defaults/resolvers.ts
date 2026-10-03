@@ -329,7 +329,7 @@ import {
   vidyardScriptEmbedResolver,
 } from '../embeds/vidyard.js'
 import { vimeoEmbedResolver } from '../embeds/vimeo.js'
-import { vkEmbedResolver } from '../embeds/vk.js'
+import { vkEmbedResolver, vkWidgetEmbedResolver } from '../embeds/vk.js'
 import { vokiFlashEmbedResolver, vokiIframeEmbedResolver } from '../embeds/voki.js'
 import { wakeletEmbedResolver } from '../embeds/wakelet.js'
 import { washingtonpostEmbedResolver } from '../embeds/washingtonpost.js'
@@ -736,6 +736,7 @@ const embedResolvers: Array<EmbedResolver> = [
   vidyardScriptEmbedResolver,
   vimeoEmbedResolver,
   vkEmbedResolver,
+  vkWidgetEmbedResolver,
   vokiFlashEmbedResolver,
   vokiIframeEmbedResolver,
   wakeletEmbedResolver,
