@@ -23,6 +23,7 @@ import {
   getEmbedSize,
   isEmbedOrMediaResolver,
   isMediaResult,
+  isResolvedIframe,
   prepareEmbedMetadata,
   readCarrierUrl,
   resolveEmbedProbe,
@@ -79,14 +80,19 @@ const readPageMedia = async (
   resolvers: ReadonlyArray<WidgetResolver>,
   document: Document,
 ): Promise<PageMedia | undefined> => {
+  // A resolver that claims the element itself reads it in the tiers below. The copy keeps a
+  // resolver from removing companion markup while it is asked.
+  const copy = media.cloneNode(true) as Element
+
+  for (const element of [copy, ...copy.querySelectorAll('source')]) {
+    if (await isResolvedIframe(element, resolvers)) {
+      return
+    }
+  }
+
   const found: Array<PageMedia> = []
 
   for (const element of [media, ...media.querySelectorAll('source')]) {
-    // A resolver whose own selector names the element reads it in the tiers below.
-    if (resolvers.some((resolver) => element.matches(resolver.selector))) {
-      return
-    }
-
     const url = attr(element, 'src')
 
     if (!url) {

@@ -1706,7 +1706,7 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  it('should leave an element to a resolver whose selector names it', async () => {
+  it('should leave an element to a resolver that claims it', async () => {
     // Constructed: a resolver claiming the <audio> itself, the way a platform's audio bar does.
     const audioResolver: EmbedResolver = {
       kind: 'embed',
@@ -1735,6 +1735,33 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
       ></div>
     `
 
+    const converted = await applyDomTransforms(parseHtml(value), [convertWidgets(context)])
+
+    expect(converted).toEqualHtml(expected)
+  })
+
+  it('should frame an element whose resolver selector matches but refuses it', async () => {
+    // Constructed: a resolver selecting every <audio> that reads only its own platform's urls.
+    const audioResolver: EmbedResolver = {
+      kind: 'embed',
+      selector: 'audio',
+      extract: () => undefined,
+    }
+    const context: TransformContext = {
+      ...baseContext,
+      widgetResolvers: [audioResolver, ...defaultWidgetResolvers],
+    }
+    const value = '<audio src="https://youtu.be/P9cxtTYHjSQ"></audio>'
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/P9cxtTYHjSQ/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=P9cxtTYHjSQ"
+        data-embed-id="P9cxtTYHjSQ"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/P9cxtTYHjSQ"
+      ></div>
+    `
     const converted = await applyDomTransforms(parseHtml(value), [convertWidgets(context)])
 
     expect(converted).toEqualHtml(expected)
