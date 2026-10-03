@@ -13,7 +13,7 @@ const issuuHosts = ['issuu.com']
 // position.
 const storyRoute = 's'
 
-// The Flash reader's route, `static.issuu.com/webembed/viewers/…/IssuuReader.swf`.
+// The Flash reader's route, `static.issuu.com/webembed/viewers/…/IssuuViewer.swf`.
 const flashRoute = 'webembed'
 
 // Only `embed.html` is minted: `anonymous-embed.html` answers 403 for every document.
@@ -92,15 +92,16 @@ export const issuuWidgetEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// The Flash reader names its document by `username` and `docName`, in the swf query or in
-// flashvars, beside a `documentId` that is a third id space neither url form accepts.
+// The Flash reader names its document by `username` and `docName`, spelled `documentUsername` and
+// `documentName` by the older snippet, in the swf query or in flashvars, beside a `documentId`
+// that is a third id space neither url form accepts.
 const readFlashDocument = (parsed: URL, element?: Element): EmbedResolverResult | undefined => {
   const settings = parsed.searchParams.has('docName')
     ? parsed.searchParams
     : new URLSearchParams(flashVars(element))
   const embed = composeDocumentEmbed(
-    settings.get('username') ?? undefined,
-    settings.get('docName') ?? undefined,
+    settings.get('username') ?? settings.get('documentUsername') ?? undefined,
+    settings.get('docName') ?? settings.get('documentName') ?? undefined,
     settings.get('pageNumber') ?? undefined,
   )
 

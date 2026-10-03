@@ -571,6 +571,37 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the older documentUsername and documentName spelling', async () => {
+      const value = html`
+        <object>
+          <param
+            name="movie"
+            value="http://static.issuu.com/webembed/viewers/style1/v1/IssuuViewer.swf?mode=embed&amp;documentId=100628200840-d0bf016690554bf68c34ce4ee86a96c0&amp;documentUsername=uppercaseyyc&amp;documentName=issue6&amp;layout=http%3A%2F%2Fskin.issuu.com%2Fv%2Fcolor%2Flayout.xml&amp;backgroundColor=FFFFFF&amp;showFlipBtn=true"
+          />
+          <param
+            name="allowFullScreen"
+            value="true"
+          />
+          <embed
+            src="http://static.issuu.com/webembed/viewers/style1/v1/IssuuViewer.swf"
+            type="application/x-shockwave-flash"
+            allowFullScreen="true"
+            style="width:600;height:450"
+            flashvars="mode=embed&amp;documentId=100628200840-d0bf016690554bf68c34ce4ee86a96c0&amp;documentUsername=uppercaseyyc&amp;documentName=issue6&amp;layout=http%3A%2F%2Fskin.issuu.com%2Fv%2Fcolor%2Flayout.xml&amp;backgroundColor=FFFFFF&amp;showFlipBtn=true"
+          ></embed>
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'uppercaseyyc/issue6',
+        src: 'https://e.issuu.com/embed.html?u=uppercaseyyc&d=issue6',
+        url: 'https://issuu.com/uppercaseyyc/docs/issue6',
+        ratio: '5/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should prefer the document in the swf query over the flashvars', async () => {
       const value = html`
         <object
