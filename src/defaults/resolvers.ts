@@ -867,6 +867,8 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   e107EmojiResolver,
   jforumEmojiResolver,
   ucozEmojiResolver,
+
+  // Ahead of smilies, whose class or stock names would mark a placeholder no host serves.
   phpbbEmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,

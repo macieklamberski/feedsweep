@@ -88,4 +88,32 @@ describeForEachParser('phpbbEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should give the code of a placeholder smilie carrying the smilies class', async () => {
+    const value = html`
+      <p>
+        <img
+          class="smilies"
+          src="{SMILIES_PATH}/icon_e_smile.gif"
+          alt=":)"
+        >
+      </p>
+    `
+    const expected = '<p><span data-emoji="">:)</span></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave an unknown smilie whose placeholder was resolved', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://example.com/%7BSMILIES_PATH%7D/borracho.gif"
+          alt="(borracho)"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
 })
