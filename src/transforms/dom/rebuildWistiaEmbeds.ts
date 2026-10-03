@@ -17,9 +17,11 @@ const channelFacadeRegex = /\bwistia_channel\b/
 // Dropping the iframe arm lets a loader script beside a real iframe mint a second player.
 const wistiaSelector = [
   '[class*="wistia_async_"]',
-  // The legacy API embed: a mount div that `Wistia.embed()` fills, holding a Flash fallback.
-  // Wistia's script marks a filled div `wistia_embed_initialized`, and that div keeps its poster.
+  // The legacy API embed: a mount div that `Wistia.embed()` fills, empty or holding a Flash
+  // fallback. Wistia's script marks a filled div `wistia_embed_initialized`, and that div keeps
+  // its poster. A plugin writes the same mount with its own `wistia-video` class.
   'div.wistia_embed[id^="wistia_"]:not(.wistia_embed_initialized)',
+  'div.wistia-video[id^="wistia_"]',
   'wistia-player[media-id]',
   'script[src*="/embed/medias/"]',
   'iframe[src*="wistia"]',

@@ -226,6 +226,32 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should rebuild a mount div whose id is uppercase, keeping its case', async () => {
+      const value = '<div class="wistia_embed" id="wistia_NZ50SN6QXT">&nbsp;</div>'
+      const expected = '<iframe src="https://fast.wistia.net/embed/iframe/NZ50SN6QXT"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should rebuild an iframe from a mount div a plugin classes as a video', async () => {
+      const value = html`
+        <div class="wistia-video-wrapper" data-wistia-id="1y421nqe4n">
+          <div class="fve-video-wrapper wistia">
+            <div id="wistia_1y421nqe4n" class="wistia-video"></div>
+          </div>
+        </div>
+      `
+      const expected = html`
+        <div class="wistia-video-wrapper" data-wistia-id="1y421nqe4n">
+          <div class="fve-video-wrapper wistia">
+            <iframe src="https://fast.wistia.net/embed/iframe/1y421nqe4n"></iframe>
+          </div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should read the async class before the id when the two disagree', async () => {
       const value = html`
         <div
