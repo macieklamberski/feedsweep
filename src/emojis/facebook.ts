@@ -185,7 +185,7 @@ const labelNameRegex = new RegExp(`(?:^|[^a-z])(${classicNames.join('|')})(?:hym
 const hiddenTextSelector = 'span[class~="_7oe"]'
 // The empty `i` painted from a sprite sheet the feed does not load.
 const spriteSelector = 'i[class~="_4-k1"]'
-// The span holding the code at zero size beside the sprite.
+// The span holding the code at zero size, beside the sprite or alone.
 const zeroSizeSelector = 'span[class~="_skr"], span[class~="_4mcd"]'
 
 // A later chat markup of the classic emoticon: an empty span or `i` painted by Facebook's CSS, or
