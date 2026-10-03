@@ -105,12 +105,24 @@ describeForEachParser('rebuildDeferredIframes', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  // Some Enfold carriers hold the publisher's own iframes, here four of them in one wrapper.
+  // Some Enfold carriers hold the publisher's own iframes, several of them in one wrapper.
   it('should leave an Enfold video wrapper that already holds a player', async () => {
     const value = html`
       <div class="avia-video avia-video-16-9 av-lazyload-immediate av-lazyload-video-embed" data-original_url="https://www.youtube.com/watch?v=NbX1dbtL380">
         <iframe src="https://www.youtube.com/embed/NbX1dbtL380?feature=oembed" width="1500" height="844"></iframe>
         <iframe src="https://www.youtube.com/embed/Jiz2xU-aeuk?feature=oembed" width="1500" height="844"></iframe>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave an Enfold video wrapper that holds a self-hosted video', async () => {
+    const value = html`
+      <div class="avia-video avia-video-16-9 av-no-preview-image avia-video-load-always avia-video-html5" data-original_url="http://example.com//Dokumente/Tagesliste.mp4">
+        <video class="avia_video" preload="auto" controls>
+          <source src="http://example.com//Dokumente/Tagesliste.mp4" type="video/mp4">
+        </video>
       </div>
     `
 
