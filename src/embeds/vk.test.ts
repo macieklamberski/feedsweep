@@ -468,6 +468,14 @@ describe('readVkHeight', () => {
     expect(readVkHeight('feeds:["resize"]')).toBeUndefined()
   })
 
+  it('should refuse a height of 0', () => {
+    expect(readVkHeight('feeds:["resize",[0]]')).toBeUndefined()
+  })
+
+  it('should refuse a message for another method', () => {
+    expect(readVkHeight('feeds:["resizeWidget",[500,314]]')).toBeUndefined()
+  })
+
   it('should name the frame with the key the message carries', () => {
     expect(vkRenderHint.frameName).toBe('fXDfeeds')
   })
