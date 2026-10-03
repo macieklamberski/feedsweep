@@ -108,6 +108,8 @@ export const facebookAmpEmbedResolver = createMarkupEmbedResolver(
 const pluginPathRegex = /^(?:\/v\d+(?:\.\d+)?)?\/plugins\/(?:post|video)\.php$/
 // The pre-plugins video frame from old posts, naming its video in `video_id`.
 const legacyVideoPathRegex = /^\/video\/embed$/
+// The Flash player from older posts, naming its video in the path. Facebook answers it with 400.
+const flashVideoPathRegex = /^\/v\/([^/]+)$/
 
 // Whole segments, not `\b`: `reel-big-fish` and `video.game.news` are page names.
 // A video, reel or watch path is the video player, and everything else Facebook frames is a post.
@@ -122,6 +124,13 @@ const watchPathRegex = /^\/watch\/?$/
 
 const isWatchPage = (url: URL): boolean => {
   return watchPathRegex.test(url.pathname) && Boolean(url.searchParams.get('v'))
+}
+
+// A legacy player names only the video id, which the watch page plays.
+const composeWatchEmbed = (videoId: string): EmbedResolverResult => {
+  const watchUrl = `https://www.facebook.com/watch/${composeQuery({ v: videoId })}`
+
+  return composePluginEmbed('video', watchUrl, { id: videoId })
 }
 
 // A post has no name: its words go to `description`, and the frame titles itself
@@ -140,9 +149,13 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
       return
     }
 
-    const watchUrl = `https://www.facebook.com/watch/${composeQuery({ v: videoId })}`
+    return composeWatchEmbed(videoId)
+  }
 
-    return composePluginEmbed('video', watchUrl, { id: videoId })
+  const flashVideoId = flashVideoPathRegex.exec(parsed.pathname)?.[1]
+
+  if (flashVideoId) {
+    return composeWatchEmbed(flashVideoId)
   }
 
   if (contentPathRegex.test(parsed.pathname) || isWatchPage(parsed)) {
