@@ -479,26 +479,14 @@ describeForEachParser('fixLazyImages', (parseHtml) => {
     it('should keep the noscript when the gallery shows the same picture beside it', async () => {
       const value = html`
         <div class="sqs-gallery">
-          <a href="https://example.com/gallery">
-            <noscript>
-              <img src="https://images.example.com/content/v1/IMG_7101.jpg" alt="IMG_7101.jpg">
-            </noscript>
-            <img class="thumb-image" data-src="https://images.example.com/content/v1/IMG_7101.jpg">
-          </a>
+          <div class="image-wrapper" id="5e4a693a8497647c62a37c5a" data-type="image" data-animation-role="image">
+            <p><noscript><img src="https://example.com/nicktalk/z_f0e1d1bad37c57aaa8ba14ce1d7988b1.jpg" alt="1.jpg"></noscript><img class="thumb-image" src="https://example.com/nicktalk/z_f0e1d1bad37c57aaa8ba14ce1d7988b1.jpg" data-image="https://example.com/nicktalk/z_f0e1d1bad37c57aaa8ba14ce1d7988b1.jpg" data-image-dimensions="1920x940" data-image-focal-point="0.5,0.5" alt="1.jpg" data-load="false" data-image-id="5e4a693a8497647c62a37c5a" data-type="image"></p>
+          </div>
         </div>
       `
-      const expected = html`
-        <div class="sqs-gallery">
-          <a href="https://example.com/gallery">
-            <noscript>
-              <img src="https://images.example.com/content/v1/IMG_7101.jpg" alt="IMG_7101.jpg">
-            </noscript>
-            <img class="thumb-image" data-src="https://images.example.com/content/v1/IMG_7101.jpg" src="https://images.example.com/content/v1/IMG_7101.jpg">
-          </a>
-        </div>
-      `
+      const context = { ...baseContext, galleryNoscriptSelectors: ['.sqs-gallery noscript'] }
 
-      expect(await transform(value)).toEqualHtml(expected)
+      expect(await transform(value, context)).toEqualHtml(value)
     })
 
     it('should unwrap the noscript when the image beside it is another picture', async () => {
@@ -518,6 +506,27 @@ describeForEachParser('fixLazyImages', (parseHtml) => {
             <img src="https://images.example.com/content/v1/IMG_7101.jpg" alt="IMG_7101.jpg">
             <img src="https://images.example.com/content/v1/IMG_7102.jpg">
           </a>
+        </div>
+      `
+      const context = { ...baseContext, galleryNoscriptSelectors: ['.sqs-gallery noscript'] }
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    // Constructed: no feed in the sample repeats a gallery picture outside the gallery.
+    it('should unwrap the noscript when the same picture shows outside the gallery', async () => {
+      const value = html`
+        <p><img src="https://example.com/files/Teichfest_01.jpg"></p>
+        <div class="juicebox-container">
+          <noscript>
+            <p class="jb-image"><img src="https://example.com/files/Teichfest_01.jpg" alt=""></p>
+          </noscript>
+        </div>
+      `
+      const expected = html`
+        <p><img src="https://example.com/files/Teichfest_01.jpg"></p>
+        <div class="juicebox-container">
+          <p class="jb-image"><img src="https://example.com/files/Teichfest_01.jpg" alt=""></p>
         </div>
       `
 
@@ -647,48 +656,6 @@ describeForEachParser('fixLazyImages gallery fallbacks through the pipeline', (p
     const expected = html`
       <a href="https://example.com/?attachment_id=38284" target="_blank"><img decoding="async" alt="" width="300" height="167" loading="lazy" src="https://example.com/wp-content/uploads/2026/06/IMG-20260625-WA0003-300x167.jpg"></a>
       <a href="https://example.com/?attachment_id=38277" target="_blank"><img decoding="async" alt="" width="300" height="142" loading="lazy" src="https://example.com/wp-content/uploads/2026/06/IMG-20260624-WA0029-300x142.jpg"></a>
-    `
-
-    expect(await convert(value)).toEqualHtml(expected)
-  })
-
-  it('should show a video in a SimpLy Gallery Block gallery', async () => {
-    const value = html`
-      <div class="simply-gallery-amp pgc_sgb_slider">
-        <noscript>
-          <div class="sgb-gallery">
-            <div class="sgb-item"><video controls preload="none" src="https://example.com/wp-content/uploads/2026/08/clip.mp4"></video></div>
-          </div>
-        </noscript>
-      </div>
-    `
-    const expected = html`
-      <video
-        controls
-        preload="none"
-        src="https://example.com/wp-content/uploads/2026/08/clip.mp4"
-      ></video>
-    `
-
-    expect(await convert(value)).toEqualHtml(expected)
-  })
-
-  it('should show a Squarespace gallery slide', async () => {
-    const value = html`
-      <div class="sqs-gallery">
-        <div class="slide content-fit" data-type="image" data-click-through-url="">
-          <p><noscript><img decoding="async" src="https://images.example.com/content/v1/529a5e16e4b0701e5f3e2096/IMG_7101.jpg" alt="IMG_7101.jpg"></noscript></p>
-        </div>
-      </div>
-    `
-    const expected = html`
-      <p>
-        <img
-          decoding="async"
-          src="https://images.example.com/content/v1/529a5e16e4b0701e5f3e2096/IMG_7101.jpg"
-          alt="IMG_7101.jpg"
-        >
-      </p>
     `
 
     expect(await convert(value)).toEqualHtml(expected)

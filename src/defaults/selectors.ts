@@ -349,5 +349,4 @@ export const defaultGalleryNoscriptSelectors = [
   'noscript.justified-image-grid-html', // Justified Image Grid.
   '.lazygal > noscript', // Lazygal.
   '.simply-gallery-amp > noscript', // SimpLy Gallery Block.
-  '.sqs-gallery noscript', // Squarespace gallery block.
 ]
