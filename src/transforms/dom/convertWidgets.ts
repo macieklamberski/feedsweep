@@ -199,7 +199,7 @@ export const convertWidgets: DomTransform = (context) => {
 
     if (pageMedia.length) {
       for (const frame of document.querySelectorAll(embedCarrierSelector)) {
-        const embed = await resolveEmbedProbe(frame, widgetResolvers)
+        const embed = await resolveEmbedProbe(frame.cloneNode(true) as Element, widgetResolvers)
 
         if (embed) {
           framedKeys.add(`${embed.provider}/${embed.id}`)

@@ -1755,4 +1755,45 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should leave a resolver its companion markup while checking the post for the same item', async () => {
+    const value = html`
+      <video
+        class="wp-video-shortcode"
+        id="video-4724-3"
+        preload="none"
+        controls="controls"
+      ><source type="video/youtube" src="https://www.youtube.com/watch?v=qa-d1guhpb4&amp;_=3"></video>
+      <iframe
+        width="100%"
+        height="166"
+        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/293&amp;color=%23ff5500"
+      ></iframe>
+      <div style="font-size: 10px; color: #cccccc;">
+        <a href="https://soundcloud.com/forss" title="Forss" target="_blank">Forss</a> ·
+        <a href="https://soundcloud.com/forss/flickermood" title="Flickermood" target="_blank">Flickermood</a>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/qa-d1guhpb4/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=qa-d1guhpb4"
+        data-embed-id="qa-d1guhpb4"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/qa-d1guhpb4"
+      ></div>
+      <div
+        data-embed-author="Forss"
+        data-embed-title="Flickermood"
+        data-embed-height="166"
+        data-embed-url="https://soundcloud.com/forss/flickermood"
+        data-embed-id="tracks/293"
+        data-embed-provider="soundcloud"
+        data-embed-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/293"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
 })
