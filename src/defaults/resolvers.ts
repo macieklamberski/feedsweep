@@ -194,6 +194,7 @@ import {
   jwplayerAmpEmbedResolver,
   jwplayerIframeEmbedResolver,
   jwplayerLibraryEmbedResolver,
+  jwplayerMountEmbedResolver,
   jwplayerScriptEmbedResolver,
   jwplayerSetupEmbedResolver,
 } from '../embeds/jwplayer.js'
@@ -606,6 +607,7 @@ const embedResolvers: Array<EmbedResolver> = [
   jwplayerAmpEmbedResolver,
   jwplayerSetupEmbedResolver,
   jwplayerLibraryEmbedResolver,
+  jwplayerMountEmbedResolver,
   kalturaIframeEmbedResolver,
   kalturaScriptEmbedResolver,
   kindleEmbedResolver,

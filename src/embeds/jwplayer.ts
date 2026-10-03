@@ -7,6 +7,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const fileExtensionRegex = /\.[a-z]+$/i
 
 const jwplayerHosts = ['jwplayer.com', 'jwplatform.com']
+const libraryHosts = ['jwplatform.com', 'jwpsrv.com']
 
 // `players` is the embed and `previews` its share page, and both serve the same player for the
 // same id, 404 for a fabricated one. `cdn.jwplayer.com/videos/{id}-1280.mp4` is an enclosure.
@@ -89,9 +90,10 @@ export const jwplayerAmpEmbedResolver = createMarkupEmbedResolver(
 )
 
 // The setup object points its playlist at `cdn.jwplayer.com/v2/media/{mediaId}`, or at the
-// legacy `content.jwplatform.com/feeds/{mediaId}.json` or `jw6/{mediaId}.xml`, `/` often escaped.
+// legacy `content.jwplatform.com/feeds/{mediaId}.json`, `jw6/{mediaId}.xml` or
+// `feed/{mediaId}.rss`, also on `jwpsrv.com`, `/` often escaped.
 const setupPlaylistRegex =
-  /(?:jwplayer|jwplatform)\.com\\?\/(?:v2\\?\/media|feeds|jw6)\\?\/([^\\/."'?]+)/
+  /(?:jwplayer|jwplatform|jwpsrv)\.com\\?\/(?:v2\\?\/media|feeds?|jw6)\\?\/([^\\/."'?]+)/
 const setupMountRegex = /jwplayer\(\s*["']([^"']+)["']\s*\)/
 
 // An empty div.jwplayer beside an inline jwplayer(...).setup() call, stripped as an empty tag.
@@ -161,12 +163,13 @@ const readJwpppBox = (element: Element, mediaId: string): Partial<EmbedResolverR
   }
 }
 
-// JW's cloud player library loaded beside a mount that an inline setup call fills. The mount sits
-// before the library or between it and the setup call. It keeps whatever text it holds.
+// JW's cloud player library, `jwpsrv.com/library` before `jwplatform.com/libraries`, loaded beside
+// a mount that an inline setup call fills. The mount sits before the library or between it and the
+// setup call. It keeps whatever text it holds.
 export const jwplayerLibraryEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="jwplatform.com/libraries/"]',
+  'script[src*="jwplatform.com/libraries/"], script[src*="jwpsrv.com/library/"]',
   (element) => {
-    if (!parseUrlOnHosts(attr(element, 'src') ?? '', jwplayerHosts)) {
+    if (!parseUrlOnHosts(attr(element, 'src') ?? '', libraryHosts)) {
       return
     }
 
@@ -190,5 +193,28 @@ export const jwplayerLibraryEmbedResolver = createMarkupEmbedResolver(
     setup.remove()
 
     return { ...composeJwplayerEmbed(mediaId), ...readJwpppBox(element, mediaId) }
+  },
+)
+
+// JW's WordPress plugins name the mount `jwplayer_{mediaId}_{playerId}_div`, with a counter before
+// `_div` on Future plc's lazy mount.
+const mountIdRegex = /^jwplayer_([^_]+)_[^_]+(?:_\d+)?_div$/
+
+// A JW mount with no script left beside it: Future plc's lazy `data-key` mount, or a mount copied
+// after the player ran. A mount that holds text keeps it.
+export const jwplayerMountEmbedResolver = createMarkupEmbedResolver(
+  'div.jwplayer[id^="jwplayer_"]',
+  (element) => {
+    if (element.textContent?.trim()) {
+      return
+    }
+
+    const mediaId = element.id.match(mountIdRegex)?.[1]
+
+    if (!mediaId) {
+      return
+    }
+
+    return composeJwplayerEmbed(mediaId)
   },
 )
