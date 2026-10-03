@@ -7,6 +7,7 @@ import {
   pbsIframeEmbedResolver,
   pbsLegacyIframeEmbedResolver,
   pbsResolveEmbed,
+  pbsStationIframeEmbedResolver,
 } from './pbs.js'
 
 describe('pbsResolveEmbed', () => {
@@ -235,7 +236,7 @@ describeForEachParser('pbsLegacyIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, pbsLegacyIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should repair the retired host onto the viral player at its own size', async () => {
+    it('should repair the retired host onto the viral player', async () => {
       const value = html`
         <iframe
           width="581"
@@ -268,11 +269,173 @@ describeForEachParser('pbsLegacyIframeEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('pbsStationIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, pbsStationIframeEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should move a WTTW widget frame onto the player host', async () => {
+      const value = html`
+        <iframe
+          src="https://video.wttw.com/widget/partnerplayer/2365620920/?player=WTTW&autoplay=false&endscreen=false&topbar=false"
+          width="100%"
+          height="100%"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2365620920',
+        src: 'https://player.pbs.org/widget/partnerplayer/2365620920/',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should move a WTTW partner slug onto the player host with its clip bounds', async () => {
+      const value = html`
+        <iframe
+          style="left:0;position:absolute;top:0;"
+          allow="encrypted-media"
+          allowfullscreen
+          frameborder="0"
+          height="100%"
+          id="partnerPlayer"
+          src="https://video.wttw.com/partnerplayer/P1LNliE4bb0nHUYPQmo1Ig==/?start=0&end=0&topbar=false&autoplay=false&muted=false&endscreen=false&callsign=WTTW"
+          width="100%"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'partnerplayer/P1LNliE4bb0nHUYPQmo1Ig==',
+        src: 'https://player.pbs.org/partnerplayer/P1LNliE4bb0nHUYPQmo1Ig==/?start=0&end=0',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should move a WETA frame onto the player host', async () => {
+      const value = html`
+        <iframe
+          frameborder="0"
+          height="376"
+          src="http://watch.weta.org/viralplayer/2365460485"
+          width="512"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2365460485',
+        src: 'https://player.pbs.org/viralplayer/2365460485/',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should move a WHYY frame onto the player host', async () => {
+      const value = html`
+        <iframe
+          width="410"
+          height="309"
+          src="http://video.whyy.org/viralplayer/2365401320"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2365401320',
+        src: 'https://player.pbs.org/viralplayer/2365401320/',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should move an UNC-TV frame onto the player host', async () => {
+      const value = html`
+        <iframe
+          width="512"
+          height="376"
+          src="http://video.unctv.org/viralplayer/2365375017"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2365375017',
+        src: 'https://player.pbs.org/viralplayer/2365375017/',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should move a Rocky Mountain PBS frame onto the player host', async () => {
+      const value = html`
+        <iframe
+          src="http://video.rmpbs.org/viralplayer/2365377991"
+          width="512"
+          height="376"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2365377991',
+        src: 'https://player.pbs.org/viralplayer/2365377991/',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should repair a frame on the dead NHPTV host onto the player host', async () => {
+      const value = html`
+        <iframe
+          frameborder="0"
+          height="448"
+          src="http://video.nhptv.org/viralplayer/2365080744"
+          width="640"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2365080744',
+        src: 'https://player.pbs.org/viralplayer/2365080744/',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host carrying the station route', async () => {
+      const value = '<iframe src="https://evil.test/viralplayer/2365460485"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a station route that is not a known player', async () => {
+      const value = '<iframe src="https://video.wttw.com/videoclip/3011411426/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the current player', async () => {
+      const value = '<iframe src="https://player.pbs.org/viralplayer/3005825044/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, pbsFlashEmbedResolver)
 
   describe('happy paths', () => {
-    it('should repair the Flash player onto the viral player at its own size', async () => {
+    it('should repair the Flash player onto the viral player', async () => {
       const value = html`
         <embed
           src="http://www-tc.pbs.org/video/media/swf/PBSPlayer.swf"
@@ -311,6 +474,68 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should repair the Flash player on the CDN host onto the viral player', async () => {
+      const value = html`
+        <object
+          data="http://dgjigvacl6ipj.cloudfront.net/media/swf/PBSPlayer.swf"
+          type="application/x-shockwave-flash"
+          width="350"
+          height="250"
+        >
+          <param name="flashvars" value="video=2104663380&player=viral&end=0">
+          <param name="movie" value="http://dgjigvacl6ipj.cloudfront.net/media/swf/PBSPlayer.swf">
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2104663380',
+        src: 'https://player.pbs.org/viralplayer/2104663380/',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the numeric id from a station portal url', async () => {
+      const value = html`
+        <embed
+          src="http://dgjigvacl6ipj.cloudfront.net/media/swf/PBSPlayer.swf"
+          flashvars="width=645&height=360&video=http://video.pbs.org/videoPlayerInfo/2296255481&player=viral"
+          type="application/x-shockwave-flash"
+          width="645"
+          height="360"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2296255481',
+        src: 'https://player.pbs.org/viralplayer/2296255481/',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the partner slug from a station portal url', async () => {
+      const value = html`
+        <embed
+          src="http://dgjigvacl6ipj.cloudfront.net/media/swf/PBSPlayer.swf"
+          flashvars="width=450&amp;height=295&amp;video=http://video.pbs.org/videoinfo/4NNV3qAO5mfQ_x-7ruXhEw==/?player=PBS_Partner_Player_v2&amp;start=0&amp;end=0&amp;balance=true&amp;player=viral&amp;end=0"
+          type="application/x-shockwave-flash"
+          width="450"
+          height="295"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'partnerplayer/4NNV3qAO5mfQ_x-7ruXhEw==',
+        src: 'https://player.pbs.org/partnerplayer/4NNV3qAO5mfQ_x-7ruXhEw==/',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -333,6 +558,17 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
 
     it('should ignore the current player', async () => {
       const value = '<iframe src="https://player.pbs.org/viralplayer/3005825044/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a station portal url on another route', async () => {
+      const value = html`
+        <embed
+          src="http://dgjigvacl6ipj.cloudfront.net/media/swf/PBSPlayer.swf"
+          flashvars="video=http://video.pbs.org/videoclip/2296255481&amp;player=viral"
+        >
+      `
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -383,6 +619,7 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
   })
 })
 
+// A protocol-relative station frame reaches the resolver only once the pipeline absolutises it.
 // The Flash host also serves files, and only an enclosure reaches the path where claiming one
 // would cost a reader the video.
 describeForEachParser('pbs through the pipeline', (parseHtml) => {
@@ -393,6 +630,28 @@ describeForEachParser('pbs through the pipeline', (parseHtml) => {
       enclosures,
     })
   }
+
+  it('should move a protocol-relative WTTW frame onto the player host', async () => {
+    const value = html`
+      <iframe
+        frameborder="0"
+        width="100%"
+        height="100%"
+        src="//video.wttw.com/widget/partnerplayer/3011411426/?player=WTTW&autoplay=false&endscreen=false&topbar=false&callsign=WTTW"
+        allowfullscreen
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="13/9"
+        data-embed-id="viralplayer/3011411426"
+        data-embed-provider="pbs"
+        data-embed-src="https://player.pbs.org/widget/partnerplayer/3011411426/"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
 
   it('should leave a video enclosure on the Flash host playable', async () => {
     const enclosures = [
