@@ -1695,6 +1695,17 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should keep a video whose other source no resolver claims', async () => {
+    const value = html`
+      <video controls>
+        <source type="application/x-mpegURL" src="https://cdn.example.com/live/master.m3u8">
+        <source src="https://youtu.be/i9CIBR0jKB8">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should keep the element when the post also frames the same file', async () => {
     const value = html`
       <audio controls>
