@@ -221,6 +221,72 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  const unknownToGemojiCases: Array<[string, string]> = [
+    ['head_shaking_horizontally', '🙂‍↔️'],
+    ['head_shaking_vertically', '🙂‍↕️'],
+    ['face_with_bags_under_eyes', '🫩'],
+    ['distorted_face', '🫪'],
+    ['fight_cloud', '🫯'],
+    ['hairy_creature', '🫈'],
+    ['ballet_dancer', '🧑‍🩰'],
+    ['family_adult_adult_child', '🧑‍🧑‍🧒'],
+    ['family_adult_adult_child_child', '🧑‍🧑‍🧒‍🧒'],
+    ['family_adult_child', '🧑‍🧒'],
+    ['family_adult_child_child', '🧑‍🧒‍🧒'],
+    ['fingerprint', '🫆'],
+    ['phoenix', '🐦‍🔥'],
+    ['orca', '🫍'],
+    ['leafless_tree', '🪾'],
+    ['lime', '🍋‍🟩'],
+    ['brown_mushroom', '🍄‍🟫'],
+    ['root_vegetable', '🫜'],
+    ['landslide', '🛘'],
+    ['trombone', '🪊'],
+    ['harp', '🪉'],
+    ['treasure_chest', '🪎'],
+    ['broken_chain', '⛓️‍💥'],
+    ['shovel', '🪏'],
+    ['splatter', '🫟'],
+  ]
+
+  it.each(unknownToGemojiCases)('should replace %s, unknown to gemoji', async (name, glyph) => {
+    const value = html`
+      <p>
+        <img
+          src="https://forum.example.com/images/emoji/twitter/${name}.png?v=15"
+          title=":${name}:"
+          class="emoji"
+          alt=":${name}:"
+          loading="lazy"
+          width="20"
+          height="20"
+        >
+      </p>
+    `
+    const expected = `<p>${glyph}</p>`
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a name gemoji does not know from the twemoji set', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://forum.example.com/images/emoji/twemoji/face_with_bags_under_eyes.png?v=15"
+          title=":face_with_bags_under_eyes:"
+          class="emoji only-emoji"
+          alt=":face_with_bags_under_eyes:"
+          loading="lazy"
+          width="20"
+          height="20"
+        >
+      </p>
+    `
+    const expected = '<p>🫩</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should add the skin tone to a name Discourse draws as another glyph', async () => {
     const value = html`
       <p>
@@ -346,6 +412,24 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
       const value = '<p><img src="https://emoji.discourse-cdn.com/twitter/rocket.png?v=12"></p>'
 
       expect(await transform(value)).toEqualHtml('<p>🚀</p>')
+    })
+
+    it('should replace a name gemoji does not know from the Discourse CDN', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://emoji.discourse-cdn.com/twitter/fight_cloud.png?v=15"
+            title=":fight_cloud:"
+            class="emoji only-emoji"
+            alt=":fight_cloud:"
+            loading="lazy"
+            width="20"
+            height="20"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml('<p>🫯</p>')
     })
 
     it('should read the Discourse name, not the typed code', async () => {
