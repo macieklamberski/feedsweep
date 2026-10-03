@@ -1,4 +1,4 @@
-import { expect, it } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -193,6 +193,91 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     `
 
     expect(await transform(value)).toEqualHtml(value)
+  })
+
+  describe('the legacy API embed', () => {
+    it('should rebuild an iframe from the mount div, dropping its Flash fallback', async () => {
+      const value = html`
+        <div id="wistia_3giesn53k6" class="wistia_embed" style="width:640px;height:388px;">
+          <div itemprop="video" itemscope itemtype="http://schema.org/VideoObject">
+            <meta itemprop="duration" content="PT8M46S">
+            <object id="wistia_3giesn53k6_seo" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">
+              <param name="movie" value="http://embed-ssl.wistia.com/flash/embed_player_v2.0.swf?2013-10-04">
+              <embed src="http://embed-ssl.wistia.com/flash/embed_player_v2.0.swf?2013-10-04" name="wistia_3giesn53k6_html" type="application/x-shockwave-flash">
+            </object>
+            <noscript itemprop="description">Lesson 1 of the crash course</noscript>
+          </div>
+        </div>
+      `
+      const expected = '<iframe src="https://fast.wistia.net/embed/iframe/3giesn53k6"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should rebuild an iframe from an empty mount div', async () => {
+      const value = html`
+        <div
+          class="wistia_embed"
+          id="wistia_nz50sn6qxt"
+        >&nbsp;</div>
+      `
+      const expected = '<iframe src="https://fast.wistia.net/embed/iframe/nz50sn6qxt"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should read the async class before the id when the two disagree', async () => {
+      const value = html`
+        <div
+          id="wistia_xwzh3sowsx"
+          class="wistia_embed wistia_async_czxf8afnv5"
+        ></div>
+      `
+      const expected = '<iframe src="https://fast.wistia.net/embed/iframe/czxf8afnv5"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    // Wistia's script has filled this div with its chrome, and the poster image is what a reader
+    // without the script sees.
+    it('should leave a mount div the script already filled untouched', async () => {
+      const value = html`
+        <div id="wistia_jwarkp8erp" class="wistia_embed wistia_embed_initialized">
+          <div id="wistia_chrome_23" class="w-chrome wistia_video">
+            <img src="https://example.com/thumbnail.jpg" alt="Video Thumbnail">
+          </div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should turn the mount div into a Wistia placeholder end to end', async () => {
+      const value = html`
+        <div id="wistia_vufv0kvnq3" class="wistia_embed" style="width: 600px; height: 366px;">
+          <div>
+            <object id="wistia_vufv0kvnq3_seo" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">
+              <param name="movie" value="https://embed-ssl.wistia.com/flash/embed_player_v2.0.swf?2015-02-27">
+              <embed src="https://embed-ssl.wistia.com/flash/embed_player_v2.0.swf?2015-02-27" name="wistia_vufv0kvnq3_html" type="application/x-shockwave-flash">
+            </object>
+          </div>
+        </div>
+      `
+      const expected = html`
+        <div
+          data-embed-src="https://fast.wistia.net/embed/iframe/vufv0kvnq3"
+          data-embed-provider="wistia"
+          data-embed-id="vufv0kvnq3"
+          data-embed-ratio="16/9"
+        ></div>
+      `
+      const result = await transformContent(value, {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://example.com',
+      })
+
+      expect(result).toEqualHtml(expected)
+    })
   })
 
   it('should be idempotent', async () => {
