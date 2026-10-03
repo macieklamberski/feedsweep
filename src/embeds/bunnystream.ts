@@ -1,5 +1,6 @@
 import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
 import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -16,7 +17,7 @@ const playerPathRegex = /^\/(?:embed|play)\/([^/]+)\/([^/]+)$/
 // The start position, and the token pair a library with embed authentication needs.
 const playbackParams = ['t', 'token', 'expires']
 
-export const bunnystreamResolveEmbed: ResolveEmbed = (url) => {
+export const bunnystreamResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
   const match = parsed?.pathname.match(playerPathRegex)
 
@@ -36,6 +37,7 @@ export const bunnystreamResolveEmbed: ResolveEmbed = (url) => {
     src: `https://player.mediadelivery.net/embed/${libraryId}/${videoId}${query}`,
     url: picked.token ? undefined : `https://player.mediadelivery.net/play/${libraryId}/${videoId}`,
     ratio: '16/9',
+    title: attr(element, 'title'),
   }
 }
 
