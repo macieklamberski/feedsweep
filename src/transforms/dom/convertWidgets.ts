@@ -82,6 +82,11 @@ const readPageMedia = async (
   const found: Array<PageMedia> = []
 
   for (const element of [media, ...media.querySelectorAll('source')]) {
+    // A resolver whose own selector names the element reads it in the tiers below.
+    if (resolvers.some((resolver) => element.matches(resolver.selector))) {
+      return
+    }
+
     const url = attr(element, 'src')
 
     if (!url) {
@@ -187,7 +192,7 @@ export const convertWidgets: DomTransform = (context) => {
     const pageMedia: Array<PageMedia> = []
 
     for (const media of document.querySelectorAll('audio, video')) {
-      const found = await readPageMedia(media, widgetResolvers, document)
+      const found = await readPageMedia(media, embedOrMediaResolvers, document)
 
       if (found) {
         pageMedia.push(found)

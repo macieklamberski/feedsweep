@@ -1706,6 +1706,40 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should leave an element to a resolver whose selector names it', async () => {
+    // Constructed: a resolver claiming the <audio> itself, the way a platform's audio bar does.
+    const audioResolver: EmbedResolver = {
+      kind: 'embed',
+      selector: 'audio.podcast-player',
+      extract: () => ({
+        provider: 'example',
+        src: 'https://player.example/episode/1',
+        height: 30,
+      }),
+    }
+    const context: TransformContext = {
+      ...baseContext,
+      widgetResolvers: [audioResolver, ...defaultWidgetResolvers],
+    }
+    const value = html`
+      <audio
+        class="podcast-player"
+        src="https://youtu.be/P9cxtTYHjSQ"
+      ></audio>
+    `
+    const expected = html`
+      <div
+        data-embed-height="30"
+        data-embed-provider="example"
+        data-embed-src="https://player.example/episode/1"
+      ></div>
+    `
+
+    const converted = await applyDomTransforms(parseHtml(value), [convertWidgets(context)])
+
+    expect(converted).toEqualHtml(expected)
+  })
+
   it('should keep the element when the post also frames the same file', async () => {
     const value = html`
       <audio controls>
