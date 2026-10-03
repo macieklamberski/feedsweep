@@ -290,6 +290,22 @@ describeForEachParser('anyflip pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 
+  it('should leave a file in another bucket served path-style from S3 a file', async () => {
+    const enclosures = [
+      { url: 'https://s3.amazonaws.com/podcast-bucket/show/episode-1.mp3', type: 'audio/mpeg' },
+    ]
+    const expected = html`
+      <audio
+        data-enclosure=""
+        controls
+        src="https://s3.amazonaws.com/podcast-bucket/show/episode-1.mp3"
+      ></audio>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+
   it('should leave a page image under the book an image', async () => {
     const enclosures = [
       { url: 'https://online.anyflip.com/zruyy/qaan/files/mobile/1.jpg', type: 'image/jpeg' },
