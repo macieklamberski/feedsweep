@@ -12,11 +12,16 @@ const rtveHosts = ['rtve.es', 'irtve.es']
 
 type Kind = 'audio' | 'video'
 
-// The asset is {id}_{locale}_{audios|videos}, in the swf query on v2 and the flashvars on 4.x.
-// The locale says nothing about the asset.
+// The asset is {id}_{locale}_{audios|videos}, in the swf query or path on v2 and the flashvars
+// on 4.x. The locale says nothing about the asset.
 const flashAssetRegex = /^([^_]+)_[^_]+_(audios|videos)$/
 
 const flashPlayerPathRegex = /^\/swf\/.*\.swf$/i
+const flashEmbedPathRegex = /^\/swf\/v2\/embed\/([^/]+)\/RTVEPlayer\.swf$/i
+const flvPlayerPathRegex = /^\/swf\/FLVPlayer\.swf$/i
+const nielsenAssetRegex = /(?:^|,)assetID::([^,]+)/
+const nielsenTitleRegex = /(?:^|,)title::(.+)$/
+const audioConfigRegex = /\/rtve_config_audio_embed\.xml$/i
 
 // The player fills whatever box it gets, and the Flash video carriers state 425 by 239, 16:9.
 const playerRatio = '16/9'
@@ -73,7 +78,24 @@ const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const asset = parsed.searchParams.get('assetID') ?? flashVar(element, 'assetID')
+  // The FLVPlayer names its asset only in the nielsen beacon, assetID::{id},title::{title}, and
+  // says the asset is audio only through its config file.
+  if (flvPlayerPathRegex.test(parsed.pathname)) {
+    const config = parsed.searchParams.get('config') ?? flashVar(element, 'config')
+    const nielsen = parsed.searchParams.get('nielsen') ?? flashVar(element, 'nielsen')
+    const id = nielsen?.match(nielsenAssetRegex)?.[1]
+
+    if (!config || !audioConfigRegex.test(config) || !id) {
+      return
+    }
+
+    return { ...composeEmbed('audio', id), title: nielsen?.match(nielsenTitleRegex)?.[1] }
+  }
+
+  const asset =
+    parsed.searchParams.get('assetID') ??
+    flashVar(element, 'assetID') ??
+    parsed.pathname.match(flashEmbedPathRegex)?.[1]
   const match = asset?.match(flashAssetRegex)
 
   if (!match) {
