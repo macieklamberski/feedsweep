@@ -96,8 +96,10 @@ export const kolobokEmojiNames = toMap<EmojiGlyph>({
   eu: false,
 })
 
-// Smilies hotlinked from kolobok.us, the set's own gallery, named like `standart/pardon.gif`. Every
-// file there is a Kolobok drawing, so the host alone marks it.
+// Smilies hotlinked from kolobok.us, the set's own gallery under `smiles/` and the site's e107
+// emote folder, named like `standart/pardon.gif`. Every file there is a Kolobok drawing, so the
+// host alone marks it. The pack names never appear there, but their `false` entries keep every
+// picture, an emoji alt included.
 export const kolobokEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: [
