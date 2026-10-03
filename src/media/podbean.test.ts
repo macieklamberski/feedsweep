@@ -59,6 +59,36 @@ describeForEachParser('podbeanFlashMediaResolver', (parseHtml) => {
     })
   })
 
+  describe('the Internet Explorer object with no embed', () => {
+    it('should play the file the movie param names', async () => {
+      const value = html`
+        <object
+          align="middle"
+          althtml="&lt;embed src=&quot;http://www.podbean.com/podcast-audio-video-blog-player/mp3playerlightsmallv3.swf?"
+          classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+          codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0"
+          height="25"
+          id="mp3playerlightsmallv3"
+          width="210"
+        >
+          <param NAME="FlashVars" VALUE="">
+          <param
+            NAME="Movie"
+            VALUE="http://www.podbean.com/podcast-audio-video-blog-player/mp3playerlightsmallv3.swf?audioPath=http://darkbeige.podbean.com/mf/play/32ibxt/Interval-UnitedKingdomNILPOINTS.mp3&amp;autoStart=no"
+          >
+          <param NAME="WMode" VALUE="Transparent">
+          <param NAME="AllowScriptAccess" VALUE="sameDomain">
+        </object>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'http://darkbeige.podbean.com/mf/play/32ibxt/Interval-UnitedKingdomNILPOINTS.mp3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   describe('sad paths', () => {
     it('should ignore a player naming a playlist and no file', async () => {
       const value = html`
@@ -131,6 +161,41 @@ describeForEachParser('podbean Flash players through the pipeline', (parseHtml) 
     `
     const expected = html`
       <audio controls src="http://shambles.podbean.com/mf/play/yt829n/egg170309.mp3"></audio>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should replace the whole object when the editor put line breaks inside it', async () => {
+    const value = html`
+      <object
+        classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+        codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0"
+        width="210"
+        height="25"
+        id="mp3playerlightsmallv3"
+        align="middle"
+      >
+        <br />
+        <param name="allowScriptAccess" value="sameDomain" />
+        <br />
+        <param
+          name="movie"
+          value="http://www.podbean.com/podcast-audio-video-blog-player/mp3playerlightsmallv3.swf?audioPath=http://improvisednewyork.podbean.com/mf/play/qxrwt/INY-Episode1.mp3&autoStart=no"
+        />
+        <br />
+        <embed
+          src="http://www.podbean.com/podcast-audio-video-blog-player/mp3playerlightsmallv3.swf?audioPath=http://improvisednewyork.podbean.com/mf/play/qxrwt/INY-Episode1.mp3&autoStart=no"
+          width="210"
+          height="25"
+          name="mp3playerlightsmallv3"
+          type="application/x-shockwave-flash"
+        />
+        <br />
+      </object>
+    `
+    const expected = html`
+      <audio controls src="http://improvisednewyork.podbean.com/mf/play/qxrwt/INY-Episode1.mp3"></audio>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
