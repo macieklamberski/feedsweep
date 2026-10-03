@@ -417,6 +417,38 @@ describeForEachParser('jwplayerLibraryEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should take the title, description and date from the jwppp box naming the same media', async () => {
+      const value = html`
+        <div id="jwppp-video-box-8472f0eac1a376c597733a7f893e9c5a" class="jwppp-video-box" itemscope itemtype="http://schema.org/VideoObject" data-video="H4mbSOk5">
+          <meta itemprop="name" content="Exercise 1">
+          <meta itemprop="description" content="Michelle shares her plan for staying fit now and for decades to come!">
+          <meta itemprop="thumbnailUrl" content="https://cdn.jwplayer.com/thumbs/H4mbSOk5-720.jpg">
+          <meta itemprop="uploadDate" content="2026-06-30T12:02:04+10:00">
+          <meta itemprop="contentUrl" content="https://cdn.jwplayer.com/v2/media/H4mbSOk5">
+          <div id="jwppp-video-8472f0eac1a376c597733a7f893e9c5a" class="jwplayer">Loading the player…</div>
+          <script type="text/javascript" src="https://content.jwplatform.com/libraries/My3UNrjH.js"></script>
+          <script type="text/javascript">
+            var playerInstance_8472f0eac1a376c597733a7f893e9c5a = jwplayer( "jwppp-video-8472f0eac1a376c597733a7f893e9c5a" );
+            playerInstance_8472f0eac1a376c597733a7f893e9c5a.setup({
+              playlist: "https://cdn.jwplayer.com/v2/media/H4mbSOk5",
+            })
+          </script>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'H4mbSOk5',
+        src: 'https://cdn.jwplayer.com/players/H4mbSOk5.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/H4mbSOk5/poster.jpg',
+        ratio: '16/9',
+        title: 'Exercise 1',
+        description: 'Michelle shares her plan for staying fit now and for decades to come!',
+        date: '2026-06-30T12:02:04+10:00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read the media id across a mount between the library and the setup call', async () => {
       const value = html`
         <script type="text/javascript" src="https://content.jwplatform.com/libraries/An9NPLfb.js"></script>
@@ -511,6 +543,50 @@ describeForEachParser('jwplayerLibraryEmbedResolver', (parseHtml) => {
       `
 
       expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave out the fields of a jwppp box naming another media', async () => {
+      const value = html`
+        <div class="jwppp-video-box" data-video="1">
+          <meta itemprop="name" content="Exercise 3">
+          <meta itemprop="contentUrl" content="https://cdn.jwplayer.com/v2/media/a0pUZLdB">
+          <div id="jwppp-video-1" class="jwplayer"></div>
+          <script src="https://content.jwplatform.com/libraries/My3UNrjH.js"></script>
+          <script>jwplayer("jwppp-video-1").setup({playlist: "https://cdn.jwplayer.com/v2/media/H4mbSOk5"})</script>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'H4mbSOk5',
+        src: 'https://cdn.jwplayer.com/players/H4mbSOk5.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/H4mbSOk5/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave out the fields of a jwppp box that does not wrap the player itself', async () => {
+      const value = html`
+        <div class="jwppp-video-box" data-video="1">
+          <meta itemprop="name" content="Exercise 1">
+          <meta itemprop="contentUrl" content="https://cdn.jwplayer.com/v2/media/H4mbSOk5">
+          <div>
+            <div id="jwppp-video-1" class="jwplayer"></div>
+            <script src="https://content.jwplatform.com/libraries/My3UNrjH.js"></script>
+            <script>jwplayer("jwppp-video-1").setup({playlist: "https://cdn.jwplayer.com/v2/media/H4mbSOk5"})</script>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'H4mbSOk5',
+        src: 'https://cdn.jwplayer.com/players/H4mbSOk5.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/H4mbSOk5/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for a feeds playlist on another host', async () => {
@@ -637,6 +713,37 @@ describeForEachParser('jwplayerLibraryEmbedResolver through the pipeline', (pars
         data-embed-ratio="16/9"
         data-embed-provider="jwplayer"
         data-embed-id="NEnylXdA"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should read the jwppp box around the paragraph the library was wrapped in', async () => {
+    const value = html`
+      <div id="jwppp-video-box-8472f0eac1a376c597733a7f893e9c5a" class="jwppp-video-box" itemscope itemtype="http://schema.org/VideoObject" data-video="H4mbSOk5">
+        <meta itemprop="name" content="Exercise 1">
+        <meta itemprop="contentUrl" content="https://cdn.jwplayer.com/v2/media/H4mbSOk5">
+        <div id="jwppp-video-8472f0eac1a376c597733a7f893e9c5a" class="jwplayer">Loading the player…</div>
+        <script type="text/javascript" src="https://content.jwplatform.com/libraries/My3UNrjH.js"></script><script type="text/javascript">
+          var playerInstance_8472f0eac1a376c597733a7f893e9c5a = jwplayer( "jwppp-video-8472f0eac1a376c597733a7f893e9c5a" );
+          playerInstance_8472f0eac1a376c597733a7f893e9c5a.setup({
+            playlist: "https://cdn.jwplayer.com/v2/media/H4mbSOk5",
+          })
+        </script>
+      </div>
+    `
+    const expected = html`
+      <meta itemprop="name" content="Exercise 1">
+      <meta itemprop="contentUrl" content="https://cdn.jwplayer.com/v2/media/H4mbSOk5">
+      <p>Loading the player…</p>
+      <div
+        data-embed-title="Exercise 1"
+        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/H4mbSOk5/poster.jpg"
+        data-embed-src="https://cdn.jwplayer.com/players/H4mbSOk5.html"
+        data-embed-ratio="16/9"
+        data-embed-provider="jwplayer"
+        data-embed-id="H4mbSOk5"
       ></div>
     `
 

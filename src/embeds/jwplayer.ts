@@ -136,6 +136,31 @@ const findScript = (element: Element | undefined): Element | undefined => {
   return element?.querySelector('script') ?? undefined
 }
 
+// The jwppp plugin wraps its snippet in a schema.org VideoObject box. Its `data-video` often says
+// `1`, so only a `contentUrl` naming the same media ties the box to the player.
+const readJwpppBox = (element: Element, mediaId: string): Partial<EmbedResolverResult> => {
+  const parent = element.parentElement
+  const box = parent?.localName === 'p' ? parent.parentElement : parent
+
+  if (!box?.classList.contains('jwppp-video-box')) {
+    return {}
+  }
+
+  const readMeta = (name: string): string | undefined => {
+    return attr(box.querySelector(`meta[itemprop="${name}"]`), 'content')
+  }
+
+  if (!readMeta('contentUrl')?.endsWith(`/${mediaId}`)) {
+    return {}
+  }
+
+  return {
+    title: readMeta('name'),
+    description: readMeta('description'),
+    date: readMeta('uploadDate'),
+  }
+}
+
 // JW's cloud player library loaded beside a mount that an inline setup call fills. The mount sits
 // before the library or between it and the setup call. It keeps whatever text it holds.
 export const jwplayerLibraryEmbedResolver = createMarkupEmbedResolver(
@@ -164,6 +189,6 @@ export const jwplayerLibraryEmbedResolver = createMarkupEmbedResolver(
 
     setup.remove()
 
-    return composeJwplayerEmbed(mediaId)
+    return { ...composeJwplayerEmbed(mediaId), ...readJwpppBox(element, mediaId) }
   },
 )
