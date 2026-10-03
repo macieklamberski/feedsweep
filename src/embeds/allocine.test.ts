@@ -198,7 +198,7 @@ describeForEachParser('allocineEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the platform size over the Flash embed box', async () => {
+    it('should claim the Flash embed', async () => {
       const value = html`
         <embed
           src="http://www.allocine.fr/blogvision/18823127"
