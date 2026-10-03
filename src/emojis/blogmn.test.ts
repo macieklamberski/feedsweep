@@ -10,6 +10,9 @@ describeForEachParser('blogmnEmojiResolver', (parseHtml) => {
     ['http://www.blogmn.net/images/smiles/0134.gif', 'гоё шүү'],
     ['https://blogmn.net/images/smiles/0423.gif', '0423'],
     ['http://desert.blogmn.net/images/smiles/7.gif', ''],
+    ['https://tusgal.coo.mn/images/smiles/26.gif', 'nerd'],
+    ['http://help.dusal.net/images/smiles/1.gif', 'баярлах'],
+    ['http://www.blog.dusal.net/images/smiles/25.gif', 'angel'],
   ]
 
   it.each(smilieCases)('should mark %s', async (src, alt) => {
@@ -58,11 +61,16 @@ describeForEachParser('blogmnEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a smiles folder on another host untouched', async () => {
+  const lookalikeCases: Array<string> = [
+    'https://example.com/images/smiles/1.gif',
+    'https://example-coo.mn/images/smiles/1.gif',
+  ]
+
+  it.each(lookalikeCases)('should leave %s untouched', async (src) => {
     const value = html`
       <p>
         <img
-          src="https://example.com/images/smiles/1.gif"
+          src="${src}"
           alt="баярлах"
         >
       </p>
