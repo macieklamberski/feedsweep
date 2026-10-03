@@ -142,4 +142,27 @@ export const defaultDeferredIframeSources: Array<DeferredIframeSource> = [
   // youtube-nocookie.com or youtube.com in 275 of the 276. The class is what qualifies it, since
   // `data-iframe` is a name anyone could pick.
   { selector: '.arve-play-btn[data-iframe]', attribute: 'data-iframe' },
+
+  // Video blocks that park a page or player url on the wrapper and build the iframe in script.
+  // Enfold keeps its iframe in a `script type="text/html"`, which no reader runs, and leaves
+  // that script empty for Vimeo, so the wrapper attribute is the one url every carrier holds.
+  {
+    selector: '.avia-video[data-original_url]:not(:has(iframe, embed, object, video, audio))',
+    attribute: 'data-original_url',
+  }, // Enfold
+  {
+    selector: '.e-tab-content[data-video-url]:not(:has(p))',
+    attribute: 'data-video-url',
+  }, // Elementor Pro video playlist: a tab can also hold the description the publisher wrote
+  { selector: '.embed-lazy-video[data-embed]', attribute: 'data-embed' }, // LMPixels themes
+  { selector: '.gf_module-[data-url]', attribute: 'data-url' }, // GemPages YouTube
+  { selector: '.module[data-url]:has(> .vimeo_video)', attribute: 'data-url' }, // GemPages Vimeo
+  { selector: '.gs-video-element[data-src]', attribute: 'data-src' }, // GreenShift
+  { selector: '.kc_video_play[data-video]', attribute: 'data-video' }, // KingComposer
+  { selector: '.wp-block-kioken-videobox[data-video]', attribute: 'data-video' }, // Kioken Blocks
+  {
+    selector: '.lazyframe[data-src]:not(:has(iframe, embed, object, video, audio))',
+    attribute: 'data-src',
+  }, // lazyframe
+  { selector: '.ut-load-video[data-video]', attribute: 'data-video' }, // United Themes
 ]
