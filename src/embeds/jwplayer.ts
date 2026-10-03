@@ -139,7 +139,8 @@ const findScript = (element: Element | undefined): Element | undefined => {
 }
 
 // The jwppp plugin wraps its snippet in a schema.org VideoObject box. Its `data-video` often says
-// `1`, so only a `contentUrl` naming the same media ties the box to the player.
+// `1`, so only a `contentUrl` naming the same media ties the box to the player. Its `uploadDate` is
+// the post's date and its `description` falls back to the post's excerpt.
 const readJwpppBox = (element: Element, mediaId: string): Partial<EmbedResolverResult> => {
   const parent = element.parentElement
   const box = parent?.localName === 'p' ? parent.parentElement : parent
@@ -152,11 +153,7 @@ const readJwpppBox = (element: Element, mediaId: string): Partial<EmbedResolverR
     return {}
   }
 
-  return {
-    title: readMeta('name'),
-    description: readMeta('description'),
-    date: readMeta('uploadDate'),
-  }
+  return { title: readMeta('name') }
 }
 
 // JW's cloud player library, `jwpsrv.com/library` before `jwplatform.com/libraries`, loaded beside

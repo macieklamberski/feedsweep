@@ -418,7 +418,7 @@ describeForEachParser('jwplayerLibraryEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the title, description and date from the jwppp box naming the same media', async () => {
+    it('should take the title from the jwppp box naming the same media', async () => {
       const value = html`
         <div id="jwppp-video-box-8472f0eac1a376c597733a7f893e9c5a" class="jwppp-video-box" itemscope itemtype="http://schema.org/VideoObject" data-video="H4mbSOk5">
           <meta itemprop="name" content="Exercise 1">
@@ -443,8 +443,6 @@ describeForEachParser('jwplayerLibraryEmbedResolver', (parseHtml) => {
         thumbnail: 'https://cdn.jwplayer.com/v2/media/H4mbSOk5/poster.jpg',
         ratio: '16/9',
         title: 'Exercise 1',
-        description: 'Michelle shares her plan for staying fit now and for decades to come!',
-        date: '2026-06-30T12:02:04+10:00',
       }
 
       expect(await extract(value)).toEqual(expected)
