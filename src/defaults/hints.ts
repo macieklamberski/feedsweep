@@ -10,6 +10,7 @@ import { blueskyRenderHint } from '../embeds/bluesky.js'
 import { brRenderHint } from '../embeds/br.js'
 import { bridRenderHint } from '../embeds/brid.js'
 import { brightcoveRenderHint } from '../embeds/brightcove.js'
+import { bunnystreamRenderHint } from '../embeds/bunnystream.js'
 import { buzzsproutRenderHint } from '../embeds/buzzsprout.js'
 import { captivateRenderHint } from '../embeds/captivate.js'
 import { ccmaRenderHint } from '../embeds/ccma.js'
@@ -104,6 +105,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   bridRenderHint,
   brightcoveRenderHint,
   brRenderHint,
+  bunnystreamRenderHint,
   buzzsproutRenderHint,
   captivateRenderHint,
   ccmaRenderHint,
