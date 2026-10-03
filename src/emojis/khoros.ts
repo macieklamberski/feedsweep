@@ -38,8 +38,8 @@ export const khorosEmojiResolver: EmojiResolver = {
 
 const markerSelector = [
   'img[class~="lia-image-emoji" i]',
-  // As in `emoticon emoticon-smileywink`. Case-sensitive, so Windows Live Writer's
-  // `wlEmoticon-smile` stays out. The `emoticon` class keeps Exblog's `emoticon-img` out.
+  // As in `emoticon emoticon-smileywink`. The `emoticon` class keeps Exblog's `emoticon-img` and
+  // Windows Live Writer's `wlEmoticon` out.
   'img.emoticon[class*="emoticon-"]',
 ].join(', ')
 

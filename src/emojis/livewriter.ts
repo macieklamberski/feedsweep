@@ -2,8 +2,8 @@ import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { type EmojiGlyph, resolveEmojiImage } from '../utils/emojis.js'
 
-// Open Live Writer's emoticon ids, every one drawn as its own MSN-style face. `inlove` is
-// Windows Live Writer's, absent from Open Live Writer.
+// Open Live Writer's emoticon ids, every one drawn as its own MSN-style face. The editor writes
+// `Inlove` capitalized.
 // See: https://github.com/OpenLiveWriter/OpenLiveWriter/blob/master/src/managed/OpenLiveWriter.PostEditor/Emoticons/EmoticonsManager.cs.
 const liveWriterEmojiNames = toMap<EmojiGlyph>({
   smile: false,
