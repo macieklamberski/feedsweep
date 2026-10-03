@@ -291,6 +291,26 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should repair the Flash player on the s3 path onto the viral player', async () => {
+      const value = html`
+        <embed
+          src="http://www-tc.pbs.org/s3/pbs.videoportal-prod.cdn/media/swf/PBSPlayer.swf"
+          flashvars="width=424&height=232&video=2245886699&player=viral&end=0&lr_admap=in:warnings:0;in:pbs:0"
+          type="application/x-shockwave-flash"
+          width="424"
+          height="232"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2245886699',
+        src: 'https://player.pbs.org/viralplayer/2245886699/',
+        ratio: '13/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

@@ -14,7 +14,10 @@ const legacyPlayerHost = 'video.pbs.org'
 // The retired Flash player's host, which also serves files.
 const flashHost = 'www-tc.pbs.org'
 
-const flashPlayerPath = '/video/media/swf/PBSPlayer.swf'
+const flashPlayerPaths = [
+  '/video/media/swf/PBSPlayer.swf',
+  '/s3/pbs.videoportal-prod.cdn/media/swf/PBSPlayer.swf',
+]
 
 const pbsHosts = [playerHost, legacyPlayerHost, flashHost]
 
@@ -59,7 +62,7 @@ const composeEmbed = (
 const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | undefined => {
   const params = new URLSearchParams(flashVars(element))
 
-  if (url.pathname !== flashPlayerPath || params.get('player') !== 'viral') {
+  if (!flashPlayerPaths.includes(url.pathname) || params.get('player') !== 'viral') {
     return
   }
 
