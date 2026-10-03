@@ -1,7 +1,12 @@
 import { getPathSegments, isHostOf, type Nullish, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import {
+  absoluteUrlRegex,
+  encodePathSegment,
+  parseUrlOnHosts,
+  pickUrlParams,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pbs'
@@ -11,12 +16,31 @@ const playerHost = 'player.pbs.org'
 // The retired player host, which redirects to the player host on the same path.
 const legacyPlayerHost = 'video.pbs.org'
 
+// Member stations' player hosts, which serve the player's routes and ids or redirect onto them.
+const stationPlayerHosts = [
+  'video.nhptv.org',
+  'video.rmpbs.org',
+  'video.unctv.org',
+  'video.whyy.org',
+  'video.wttw.com',
+  'watch.weta.org',
+]
+
 // The retired Flash player's host, which also serves files.
 const flashHost = 'www-tc.pbs.org'
 
-const flashPlayerPath = '/video/media/swf/PBSPlayer.swf'
+// The CDN host that served the same Flash player.
+const flashCdnHost = 'dgjigvacl6ipj.cloudfront.net'
 
-const pbsHosts = [playerHost, legacyPlayerHost, flashHost]
+const flashPlayerPaths = [
+  '/video/media/swf/PBSPlayer.swf',
+  '/s3/pbs.videoportal-prod.cdn/media/swf/PBSPlayer.swf',
+  '/media/swf/PBSPlayer.swf',
+]
+
+const flashHosts = [flashHost, flashCdnHost]
+
+const pbsHosts = [playerHost, legacyPlayerHost, ...stationPlayerHosts, ...flashHosts]
 
 // The route a carrier names, against the id space it belongs to. `viralplayer` and
 // `widget/partnerplayer` serve each other's numeric ids; `partnerplayer` takes a base64url slug
@@ -25,6 +49,13 @@ const idSpaces = toMap({
   viralplayer: 'viralplayer',
   'widget/partnerplayer': 'viralplayer',
   partnerplayer: 'partnerplayer',
+})
+
+// The route word of a portal url in the Flash player's `video` flashvar, against the player route
+// that serves the id after it.
+const flashPortalRoutes = toMap({
+  videoPlayerInfo: 'viralplayer',
+  videoinfo: 'partnerplayer',
 })
 
 // The clip bounds and the chapter, the playback parameters the player reads besides the id.
@@ -54,19 +85,28 @@ const composeEmbed = (
   }
 }
 
-// The Flash player names the numeric id in its `video` flashvar, which the viral player serves.
+// The Flash player names the video in its `video` flashvar, as the numeric id the viral player
+// serves or as a station portal's url.
 // Every carrier writes `player=viral`, so no other player is known to map onto it.
 const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | undefined => {
   const params = new URLSearchParams(flashVars(element))
 
-  if (url.pathname !== flashPlayerPath || params.get('player') !== 'viral') {
+  if (!flashPlayerPaths.includes(url.pathname) || params.get('player') !== 'viral') {
     return
   }
 
-  const videoId = params.get('video')
+  const video = params.get('video')
+
+  // A station portal's url holds the numeric id or the partner slug after its route word.
+  if (video && absoluteUrlRegex.test(video)) {
+    const [portalRoute = '', videoId] = getPathSegments(video)
+    const route = flashPortalRoutes.get(portalRoute)
+
+    return route ? composeEmbed(route, videoId) : undefined
+  }
 
   // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
-  return composeEmbed('viralplayer', videoId ? encodePathSegment(videoId) : undefined)
+  return composeEmbed('viralplayer', video ? encodePathSegment(video) : undefined)
 }
 
 // PBS's offsite player, which renders on its own but names no page and no poster.
@@ -77,7 +117,7 @@ export const pbsResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  if (isHostOf(parsed, flashHost)) {
+  if (isHostOf(parsed, flashHosts)) {
     return readFlashCarrier(parsed, element)
   }
 
@@ -99,7 +139,12 @@ export const pbsLegacyIframeEmbedResolver = createUrlEmbedResolver(
   pbsResolveEmbed,
 )
 
-export const pbsFlashEmbedResolver = createUrlEmbedResolver([flashHost], pbsResolveEmbed)
+export const pbsStationIframeEmbedResolver = createUrlEmbedResolver(
+  stationPlayerHosts,
+  pbsResolveEmbed,
+)
+
+export const pbsFlashEmbedResolver = createUrlEmbedResolver(flashHosts, pbsResolveEmbed)
 
 export const pbsRenderHint: EmbedRenderHint = {
   provider,
