@@ -214,6 +214,17 @@ describe('getImageFingerprint', () => {
     expect(sized).toBe(bare)
   })
 
+  it('should drop the whole query of a media file name', () => {
+    const bare = getImageFingerprint(
+      'https://nypost.com/wp-content/uploads/sites/2/2026/04/joe-kent-promotes-disturbing-iranian-125122949.jpg?quality=75&strip=all',
+    )
+    const resized = getImageFingerprint(
+      'https://nypost.com/wp-content/uploads/sites/2/2026/04/joe-kent-promotes-disturbing-iranian-125122949.jpg?resize=300,198&quality=75&strip=all',
+    )
+
+    expect(resized).toBe(bare)
+  })
+
   it('should keep the query on a script endpoint so distinct images stay distinct', () => {
     const first = getImageFingerprint('https://example.com/download/file.php?id=119394')
     const second = getImageFingerprint('https://example.com/download/file.php?id=119393')
