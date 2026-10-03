@@ -66,8 +66,8 @@ export const democracynowIframeEmbedResolver = createUrlEmbedResolver(
 )
 
 // Democracy Now!'s retired loader scripts, which answer 404: v2 `/{width}/{y}/{m}/{d}/story/{slug}`
-// and v1 `/{width}/{y}/{m}/{d}/segment/{n}`. A segment has no player of its own, and the v1 loader
-// played the day's whole show.
+// and v1 `/{width}/{y}/{m}/{d}/segment/{n}`. A segment has no player of its own and its number maps
+// to no story offline, so the day's show stands in for it.
 export const democracynowScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="democracynow.org/embed_show_v"]',
   (element) => {
