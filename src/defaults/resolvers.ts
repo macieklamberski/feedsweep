@@ -674,8 +674,9 @@ const embedResolvers: Array<EmbedResolver> = [
   listennotesEmbedResolver,
   lividIframeEmbedResolver,
   lividMetasliderEmbedResolver,
-  mailruEmbedResolver,
+  // Runs before mailruEmbedResolver, which replaces the iframes it compares a span against.
   mailruWidgetEmbedResolver,
+  mailruEmbedResolver,
   matterportEmbedResolver,
   mediacccEmbedResolver,
   mediavineWidgetEmbedResolver,
