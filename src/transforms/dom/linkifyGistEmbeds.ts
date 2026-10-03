@@ -5,12 +5,16 @@ import { createLink } from '../../utils/widgets.js'
 
 const gistScriptRegex = /gist\.github\.com\/(?:([^/?"]+)\/)?([^/?"#]+)\.js/
 const jsonSuffixRegex = /\.json$/
+const gistIdRegex = /^(?:\d+|[0-9a-f]{20}|[0-9a-f]{32})$/i
+const combiningMarkRegex = /[\u0300-\u036f]/g // Combining diacritical marks
+const fileAnchorSeparatorRegex = /[^a-z0-9_-]+/g
+const edgeDashRegex = /^-+|-+$/g
 
 const gistMountSelectors = [
   'div.gistLoad[data-id]', // gist-Blogger
   'code[data-gist-id]', // gist-embed
   'div[data-gist-id]', // gist-embed
-  'div[data-gist]', // gist-oembed, Laravel Playground, Stargazer
+  'div[data-gist]', // gist-oembed, Laravel Playground, Stargazer, others
 ]
 
 const gistMountSelector = gistMountSelectors.join(', ')
@@ -29,16 +33,27 @@ const readGistPath = (element: Element): string | undefined => {
   }
 
   if (element.matches(gistMountSelector)) {
-    const value =
-      attr(element, 'data-gist-id') ?? attr(element, 'data-id') ?? attr(element, 'data-gist')
+    const value = attr(element, 'data-gist-id') ?? attr(element, 'data-id')
 
-    // One site's own loader writes the whole gist url here, and only an id composes a link.
-    if (!value || absoluteUrlRegex.test(value)) {
-      return
+    if (value) {
+      return value
     }
 
     // gist-oembed writes the path of the gist's .json endpoint.
-    return value.replace(jsonSuffixRegex, '')
+    const gist = attr(element, 'data-gist')?.replace(jsonSuffixRegex, '')
+
+    if (!gist || absoluteUrlRegex.test(gist)) {
+      return
+    }
+
+    // Loaders that are not about gists write `data-gist` too, such as TweaksWP's post slug.
+    const id = gist.split('/').at(-1) ?? ''
+
+    if (!gistIdRegex.test(id)) {
+      return
+    }
+
+    return gist
   }
 
   const match = element.getAttribute('src')?.match(gistScriptRegex)
@@ -48,6 +63,18 @@ const readGistPath = (element: Element): string | undefined => {
   }
 
   return match[1] ? `${match[1]}/${match[2]}` : match[2]
+}
+
+// GitHub's anchor for one file on the gist page, such as `#file-reduce-kt` for `reduce.kt`.
+const composeFileAnchor = (name: string): string => {
+  const slug = name
+    .normalize('NFKD')
+    .replace(combiningMarkRegex, '')
+    .toLowerCase()
+    .replace(fileAnchorSeparatorRegex, '-')
+    .replace(edgeDashRegex, '')
+
+  return `#file-${slug}`
 }
 
 // The loader overwrites its mount, which holds a placeholder such as "Loading ....". Anything more
@@ -77,8 +104,9 @@ const isPlaceholderMount = (element: Element): boolean => {
 }
 
 // A Gist embeds as a gist.github.com <script>, an <amp-gist>, or the mount a gist loader
-// fills: gist-Blogger's `div.gistLoad[data-id]` and gist-embed's `[data-gist-id]`. None renders
-// without JS. A bare id makes a working link, since gist.github.com/{id} redirects to the owner.
+// fills: gist-Blogger's `div.gistLoad[data-id]`, gist-embed's `[data-gist-id]` and the
+// `div[data-gist]` other loaders write. None renders without JS. A bare id makes a working
+// link, since gist.github.com/{id} redirects to the owner.
 export const linkifyGistEmbeds: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll(gistCarrierSelector)) {
     if (element.matches(gistMountSelector) && !isPlaceholderMount(element)) {
@@ -91,7 +119,9 @@ export const linkifyGistEmbeds: DomTransform = () => (document) => {
       continue
     }
 
-    const url = `https://gist.github.com/${path}`
+    const file = attr(element, 'data-gist-file')
+    const anchor = file ? composeFileAnchor(file) : ''
+    const url = `https://gist.github.com/${path}${anchor}`
 
     element.replaceWith(createLink(document, url))
   }

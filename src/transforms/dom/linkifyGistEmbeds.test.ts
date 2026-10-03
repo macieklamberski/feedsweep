@@ -230,7 +230,6 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
       <code
         class="gist-embed-code"
         data-gist-id="fwhigh/92a985dd8c494949a36433641c14e2e6"
-        data-gist-file="ssh-config"
         data-gist-hide-footer="false"
       ></code>
     `
@@ -248,7 +247,6 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
       <div
         data-gist-id="d820e27ea986698789b93f56d3fae7fd"
         data-gist-hide-footer="true"
-        data-gist-file="versatile-pb.dts"
         data-gist-line="140-150"
       ></div>
     `
@@ -288,6 +286,96 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     `
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should point the link at the file a gist-embed mount names', async () => {
+    const value = html`
+      <div
+        data-gist-id="4acb19b6ac4e965552ba6961e1bc9054"
+        data-gist-file="reduce.kt"
+      >reduce.kt</div>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/4acb19b6ac4e965552ba6961e1bc9054#file-reduce-kt"
+      >https://gist.github.com/4acb19b6ac4e965552ba6961e1bc9054#file-reduce-kt</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should lowercase the file name in the anchor the way GitHub does', async () => {
+    const value = html`
+      <code
+        data-gist-id="f3f82bd3d865e9c66466c38c247d6584"
+        data-gist-file="BuildElectron.cs"
+      ></code>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/f3f82bd3d865e9c66466c38c247d6584#file-buildelectron-cs"
+      >https://gist.github.com/f3f82bd3d865e9c66466c38c247d6584#file-buildelectron-cs</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep underscores and hyphens of the file name in the anchor', async () => {
+    const value = html`
+      <code
+        class="gist"
+        data-gist-file="activity_main.xml"
+        data-gist-hide-footer="true"
+        data-gist-id="8e43146623403f3eb34e"
+      ></code>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/8e43146623403f3eb34e#file-activity_main-xml"
+      >https://gist.github.com/8e43146623403f3eb34e#file-activity_main-xml</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  // GitHub spells this file's anchor `file-funciones-de-agregacion-min-max-count-sum-avg-sql`.
+  it('should fold accents and runs of punctuation in the anchor the way GitHub does', async () => {
+    const value = html`
+      <code
+        data-gist-id="dd56efffcf9510513dc8bb9477f6ffa2"
+        data-gist-file="Funciones de agregación (\`MIN\`, \`MAX\`, \`COUNT\`, \`SUM\`, \`AVG\`).sql"
+      ></code>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/dd56efffcf9510513dc8bb9477f6ffa2#file-funciones-de-agregacion-min-max-count-sum-avg-sql"
+      >https://gist.github.com/dd56efffcf9510513dc8bb9477f6ffa2#file-funciones-de-agregacion-min-max-count-sum-avg-sql</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  // GitHub spells the anchor of a file named `-` as `file-`.
+  it('should trim dashes from the edges of the anchor the way GitHub does', async () => {
+    const value = html`
+      <code
+        data-gist-id="c368a3d6d13bfbd32218bb31acfd5d99"
+        data-gist-file="-"
+      ></code>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/c368a3d6d13bfbd32218bb31acfd5d99#file-"
+      >https://gist.github.com/c368a3d6d13bfbd32218bb31acfd5d99#file-</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a div naming an id without the gistLoad class untouched', async () => {
+    const value = '<div data-id="5362350"></div>'
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 
   it('should leave a gist-embed code element with an empty gist id untouched', async () => {
@@ -356,6 +444,38 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     const expected = '<a href="https://gist.github.com/2571207">https://gist.github.com/2571207</a>'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  // gist.github.com answers an uppercase id on the user-less route with a redirect to the gist.
+  it('should link a data-gist mount whose gist id is uppercase', async () => {
+    const value = '<div class="gist" data-gist="6E54093B297C0F9DF01D0C82F65B89F6"></div>'
+    const expected =
+      '<a href="https://gist.github.com/6E54093B297C0F9DF01D0C82F65B89F6">https://gist.github.com/6E54093B297C0F9DF01D0C82F65B89F6</a>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a TweaksWP mount whose data-gist is a post slug untouched', async () => {
+    const value = html`
+      <div
+        class="wp-block-html gist-embed-placeholder is-layout-flow wp-block-group-is-layout-flow"
+        data-gist="tweakswp-12-filters-replace-plugins"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a data-gist mount whose value only starts with a gist id untouched', async () => {
+    const value = '<div data-gist="2571207-draft"></div>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a data-gist mount whose value only ends in a gist id untouched', async () => {
+    const value = '<div data-gist="draft-2571207"></div>'
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 
   it('should leave a data-gist mount that holds a whole gist url untouched', async () => {
