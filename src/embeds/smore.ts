@@ -46,5 +46,5 @@ export const smoreEmbedResolver = createUrlEmbedResolver(
 )
 
 export const smoreFieldCleaners: Array<FieldCleaner> = [
-  { provider, field: 'title', drop: 'Smore newsletter' }, // Embed dialog, when the page has no og:title
+  { provider, field: 'title', drop: 'Smore newsletter' }, // Embed dialog, when the page's og:title is missing or unusable
 ]
