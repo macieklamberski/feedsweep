@@ -190,7 +190,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // the post URL). External-article figures stay for the cite pass.
   convertNoteEmbeds,
 
-  // Materializes an iframe parked in a <div> attribute (Pym.js, @newswire/frames) so it's
+  // Materializes an iframe parked in a <div> attribute (see defaultDeferredIframeSources) so it's
   // placeholdered downstream. Runs before convertDatawrapperEmbeds so a data-frame-src
   // Datawrapper div becomes an iframe that convertDatawrapperEmbeds turns into a static image.
   rebuildDeferredIframes,
