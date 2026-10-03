@@ -14,8 +14,8 @@ const bucketHost = 's3.amazonaws.com'
 // browser on to `mobile/index.html`.
 const viewerPaths = ['', 'index.html', 'mobile/index.html']
 
-// AnyFlip's flipbook viewer, `online.anyflip.com/{user}/{book}/index.html`, opening at the `#p=`
-// page.
+// AnyFlip's flipbook viewer, `online.anyflip.com/{user}/{book}/index.html`, with the `#p=` start
+// page the embed dialog writes.
 export const anyflipResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, [viewerHost, bucketHost])
 
