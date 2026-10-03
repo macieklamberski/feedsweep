@@ -157,8 +157,8 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   rebuildJsfiddleEmbeds,
   rebuildVokiEmbeds,
 
-  // A GitHub Gist embed is a JS-only <script> that renders nothing in a reader. Replace it
-  // with a link to the gist so the content is at least reachable.
+  // A GitHub Gist embed is a JS-only <script> or loader mount that renders nothing in a reader.
+  // Replace it with a link to the gist so the content is at least reachable.
   linkifyGistEmbeds,
 
   // Runs before stripNonContentElements, which strips the `/cgi-bin/webscr` forms this leaves.
