@@ -1,13 +1,16 @@
 import type { DomTransform } from '../../types.js'
 import { attr, isElement, isSkippable, isText } from '../../utils/dom.js'
+import { absoluteUrlRegex } from '../../utils/urls.js'
 import { createLink } from '../../utils/widgets.js'
 
 const gistScriptRegex = /gist\.github\.com\/(?:([^/?"]+)\/)?([^/?"#]+)\.js/
+const jsonSuffixRegex = /\.json$/
 
 const gistMountSelectors = [
   'div.gistLoad[data-id]', // gist-Blogger
   'code[data-gist-id]', // gist-embed
   'div[data-gist-id]', // gist-embed
+  'div[data-gist]', // gist-oembed, Laravel Playground, Stargazer
 ]
 
 const gistMountSelector = gistMountSelectors.join(', ')
@@ -26,7 +29,16 @@ const readGistPath = (element: Element): string | undefined => {
   }
 
   if (element.matches(gistMountSelector)) {
-    return attr(element, 'data-gist-id') ?? attr(element, 'data-id')
+    const value =
+      attr(element, 'data-gist-id') ?? attr(element, 'data-id') ?? attr(element, 'data-gist')
+
+    // One site's own loader writes the whole gist url here, and only an id composes a link.
+    if (!value || absoluteUrlRegex.test(value)) {
+      return
+    }
+
+    // gist-oembed writes the path of the gist's .json endpoint.
+    return value.replace(jsonSuffixRegex, '')
   }
 
   const match = element.getAttribute('src')?.match(gistScriptRegex)

@@ -296,6 +296,74 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should replace a gist-oembed mount with a link to the gist its .json path names', async () => {
+    const value = html`
+      <div
+        class="gist-oembed"
+        data-gist="ayr-ton/8731331ea64583b0b3fc.json"
+      ></div>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/ayr-ton/8731331ea64583b0b3fc"
+      >https://gist.github.com/ayr-ton/8731331ea64583b0b3fc</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a Laravel Playground mount with a link to its gist', async () => {
+    const value = html`
+      <div
+        class="laravel-playground"
+        data-filename="index.php"
+        data-gist="d990a2c5f23b50564561b9266252f501"
+      ></div>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/d990a2c5f23b50564561b9266252f501"
+      >https://gist.github.com/d990a2c5f23b50564561b9266252f501</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a Stargazer mount with a link to its gist', async () => {
+    const value = html`
+      <div
+        class="stargazer with-controls labels"
+        data-gist="6e54093b297c0f9df01d0c82f65b89f6"
+        data-name="Server"
+      ></div>
+    `
+    const expected = html`
+      <a
+        href="https://gist.github.com/6e54093b297c0f9df01d0c82f65b89f6"
+      >https://gist.github.com/6e54093b297c0f9df01d0c82f65b89f6</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a div.gist mount naming a numeric gist id with a link to the gist', async () => {
+    const value = html`
+      <div
+        class="gist"
+        data-gist="2571207"
+      ></div>
+    `
+    const expected = '<a href="https://gist.github.com/2571207">https://gist.github.com/2571207</a>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a data-gist mount that holds a whole gist url untouched', async () => {
+    const value = '<div data-gist="https://gist.github.com/victorvhpg/5853429a825c94314884"></div>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should be idempotent', async () => {
     const value = '<script src="https://gist.github.com/octocat/6cad326836d38bd3a7ae.js"></script>'
     const once = await transform(value)
@@ -335,6 +403,20 @@ describeForEachParser('gist carriers the pipeline would otherwise delete', (pars
     `
     const expected = html`
       <p><a href="https://gist.github.com/4343332">https://gist.github.com/4343332</a></p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a gist-oembed mount as a link to the gist', async () => {
+    const value = html`
+      <div
+        class="gist-oembed"
+        data-gist="akkornel/b9cd992af449f0573285f1187aabfd9d.json"
+      ></div>
+    `
+    const expected = html`
+      <p><a href="https://gist.github.com/akkornel/b9cd992af449f0573285f1187aabfd9d">https://gist.github.com/akkornel/b9cd992af449f0573285f1187aabfd9d</a></p>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
