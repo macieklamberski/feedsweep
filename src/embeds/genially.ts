@@ -10,12 +10,20 @@ const geniallyHosts = ['genially.com', 'genial.ly']
 
 export const extractGeniallyViewId = (link: string): string | undefined => {
   const segments = getPathSegments(link)
+
+  // Genially redirects this retired route only as `View/Index`, `view/index` or `VIEW/INDEX`, and
+  // answers a mixed spelling such as `View/index` with 404.
+  if (segments[0] === 'View' && segments[1] === 'Index') {
+    return keepIfMatches(segments[2], safeViewIdRegex)
+  }
+
   const viewId = segments[0] === 'view' ? segments[1] : segments[0]
 
   return keepIfMatches(viewId, safeViewIdRegex)
 }
 
-// Genially's presentation iframe, on the retired `view.genial.ly` host as often as the current one.
+// Genially's presentation iframe, on the retired `view.genial.ly` host as often as the current one,
+// and on the retired `www.genial.ly/View/Index/{id}` route.
 export const geniallyResolveEmbed: ResolveEmbed = (url, element) => {
   const viewId = extractGeniallyViewId(url)
 
