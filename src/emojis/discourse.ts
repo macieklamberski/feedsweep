@@ -1,6 +1,12 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
-import { applyTones, getFileStem, queryOrHashRegex, resolveEmojiImage } from '../utils/emojis.js'
+import {
+  applyTones,
+  getFileStem,
+  glyphFromCodepoints,
+  queryOrHashRegex,
+  resolveEmojiImage,
+} from '../utils/emojis.js'
 import { glyphFromGemojiName } from '../utils/gemoji.js'
 
 // The emoji sets a Discourse site can pick, each served from `/images/emoji/<set>/`. A custom
@@ -13,8 +19,10 @@ const sets = [
   'google',
   'google_classic',
   'noto',
+  'openmoji',
   'twemoji',
   'twitter',
+  'unicode',
   'win10',
 ]
 
@@ -883,7 +891,14 @@ export const discourseEmojiResolver: EmojiResolver = {
     })
     .join(', '),
   extract: (element) => {
-    const glyph = getGlyph(element.getAttribute('src') ?? '')
+    const src = element.getAttribute('src') ?? ''
+    const glyph = getGlyph(src)
+
+    // gemoji's own images sit under `/images/emoji/unicode/` too, named by codepoint, which no
+    // Discourse set writes. The generic `emoji` class resolver converts those.
+    if (!glyph && glyphFromCodepoints(getFileStem(src.split(queryOrHashRegex)[0]))) {
+      return
+    }
 
     return resolveEmojiImage(element, { isStrong: true, glyph })
   },

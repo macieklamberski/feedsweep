@@ -83,6 +83,53 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should replace an emoji from the openmoji set by its name', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://forum.example.com/images/emoji/openmoji/white_check_mark.png?v=15"
+          title=":white_check_mark:"
+          class="emoji"
+          alt=":white_check_mark:"
+        >
+      </p>
+    `
+    const expected = '<p>✅</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace an emoji from the unicode set by its name', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://forum.example.com/images/emoji/unicode/person_shrugging.png?v=15"
+          title=":person_shrugging:"
+          class="emoji"
+          alt=":person_shrugging:"
+        >
+      </p>
+    `
+    const expected = '<p>🤷</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a gemoji image named by codepoint to the generic resolver', async () => {
+    const value = html`
+      <p>
+        <img
+          alt="warning"
+          src="https://example.com/images/emoji/unicode/26a0.png"
+          class="emoji"
+        >
+      </p>
+    `
+    const expected = '<p>⚠️</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should add the skin tone a toned file is named by', async () => {
     const value = html`
       <p>
@@ -335,6 +382,22 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
   })
 
   describe('CDN', () => {
+    it('should replace an emoji from the unicode set on the Discourse CDN', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://emoji.discourse-cdn.com/unicode/slight_smile.png?v=15"
+            title=":slight_smile:"
+            class="emoji"
+            alt=":slight_smile:"
+          >
+        </p>
+      `
+      const expected = '<p>🙂</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should replace an emoji from the Discourse CDN by its name', async () => {
       const value =
         '<p><img src="https://emoji.discourse-cdn.com/twitter/slight_smile.png?v=10" class="emoji" alt=":slight_smile:"></p>'

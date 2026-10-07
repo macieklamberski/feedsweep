@@ -181,6 +181,25 @@ describeForEachParser('Discourse', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should replace an emoji from the unicode set on the Discourse CDN', async () => {
+    const value = html`
+      <p>Thanks
+        <img
+          src="https://emoji.discourse-cdn.com/unicode/slight_smile.png?v=15"
+          title=":slight_smile:"
+          class="emoji"
+          alt=":slight_smile:"
+          loading="lazy"
+          width="20"
+          height="20"
+        >
+      </p>
+    `
+    const expected = '<p>Thanks 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   it('should rebuild an uploaded video from its placeholder div', async () => {
     const value = html`
       <div
