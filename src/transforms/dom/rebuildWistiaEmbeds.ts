@@ -5,6 +5,8 @@ import { createIframe } from '../../utils/widgets.js'
 
 // Pulls the hashed id out of the `wistia_async_{id}` class the facade carries.
 const wistiaIdRegex = /\bwistia_async_([A-Za-z0-9]+)/
+// Pulls the id out of the `wistia_{id}` id the legacy API embed's mount div carries.
+const legacyIdRegex = /^wistia_(.+)/
 
 // The facade states its kind in a second class token beside the id. A channel is its own player,
 // so the media route built from a channel id names no media.
@@ -15,6 +17,11 @@ const channelFacadeRegex = /\bwistia_channel\b/
 // Dropping the iframe arm lets a loader script beside a real iframe mint a second player.
 const wistiaSelector = [
   '[class*="wistia_async_"]',
+  // The legacy API embed: a mount div that `Wistia.embed()` fills, empty or holding a Flash
+  // fallback. Wistia's script marks a filled div `wistia_embed_initialized`, and that div keeps
+  // its poster. A plugin writes the same mount with its own `wistia-video` class.
+  'div.wistia_embed[id^="wistia_"]:not(.wistia_embed_initialized)',
+  'div.wistia-video[id^="wistia_"]',
   'wistia-player[media-id]',
   'script[src*="/embed/medias/"]',
   'iframe[src*="wistia"]',
@@ -33,10 +40,17 @@ const readMediaId = (element: Element): string | undefined => {
     return readSrcMediaId(attr(element, 'src'))
   }
 
-  return element.className.match(wistiaIdRegex)?.[1]
+  const asyncId = element.className.match(wistiaIdRegex)?.[1]
+
+  if (asyncId) {
+    return asyncId
+  }
+
+  return element.id.match(legacyIdRegex)?.[1]
 }
 
-// Wistia's async div, <wistia-player> element and loader script all render nothing without JS.
+// Wistia's async div, legacy API div, <wistia-player> element and loader script all render
+// nothing without JS, and the legacy div's Flash fallback needs a plugin no browser ships.
 // Wistia's poster needs the media JSON hop, so none of them states a thumbnail.
 export const rebuildWistiaEmbeds: DomTransform = () => (document) => {
   const elements = Array.from(document.querySelectorAll(wistiaSelector))
