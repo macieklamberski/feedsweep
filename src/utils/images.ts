@@ -3,6 +3,7 @@ import {
   addMissingProtocol,
   decodeSegment,
   getPathSegments,
+  isAnyOf,
   normalizeUrl,
   parseUrl,
   resolveUrl,
@@ -10,7 +11,7 @@ import {
 } from 'trousse'
 import type { CleanUrlFn } from '../types.js'
 import { pixelDimensionLimit } from './dom.js'
-import { placeholderBaseUrl } from './urls.js'
+import { isFileName, placeholderBaseUrl } from './urls.js'
 
 // The parser reads a bare `225w` with no url as that candidate's url, and a proxy 404s on it.
 // A Jetpack bug ships `…768w, 225w, 563w` with only the first url present.
@@ -165,6 +166,38 @@ const pathTransforms: Array<PathTransform> = [
 const scriptExtensionLiterals = ['php', 'aspx', 'ashx', 'axd', 'cgi']
 const scriptLeafRegex = new RegExp(`\\.(?:${scriptExtensionLiterals.join('|')})$`, 'i')
 
+// Size and crop parameters an image service varies between renditions of one picture.
+const renditionQueryParams = [
+  'crop', // Ning
+  'cropH', // ABC
+  'cropW', // ABC
+  'format', // Squarespace, Ning
+  'h', // RTS
+  'height', // Ning, ABC
+  'profile', // Ning
+  's', // Gravatar, GitHub avatars
+  'w', // Unsplash, RTS
+  'width', // Ning, ABC
+  'xPos', // ABC
+  'yPos', // ABC
+]
+
+// A leaf that names no media file is an endpoint, and its query names the picture:
+// `docs.google.com/File?id=`, Gmail's `attid=`, `encrypted-tbn0.gstatic.com/images?q=`.
+const getIdentityQuery = (url: URL): string => {
+  const params = new URLSearchParams(url.search)
+
+  for (const name of [...params.keys()]) {
+    if (isAnyOf(name, renditionQueryParams)) {
+      params.delete(name)
+    }
+  }
+
+  const query = params.toString()
+
+  return query ? `?${query}` : ''
+}
+
 // A leaf that is only a dimension: `640x360`, `wide__148x84`.
 const dimensionLeafRegex = /^(.*__)?\d{1,5}x\d{1,5}(\.[a-z0-9]+)?$/i
 // A scaled copy's suffix: `photo-800x450.jpg`, `photo_800x450.jpg`. WordPress writes the hyphen.
@@ -220,6 +253,9 @@ export const getImageFingerprint = (rawUrl: string, cleanUrlFn?: CleanUrlFn): st
     return normalized
   }
 
+  const fileName = getPathSegments(parsed).at(-1) ?? ''
+  const query = isFileName(fileName) ? '' : getIdentityQuery(parsed)
+
   // Strip a CDN render segment from the path (Blogger /s1600/, Wix /v1/, Cloudinary
   // upload transforms, ...) so renditions of one image collapse before the leaf checks.
   let path = `/${getPathSegments(parsed).join('/')}`
@@ -253,7 +289,7 @@ export const getImageFingerprint = (rawUrl: string, cleanUrlFn?: CleanUrlFn): st
     }
   }
 
-  return `${parsed.host}/${segments.join('/')}`
+  return `${parsed.host}/${segments.join('/')}${query}`
 }
 
 const urlPairRegex = /(?:^|[/_=-])(\d{2,5})x(\d{2,5})(?=[._\-&)?/]|$)/gi

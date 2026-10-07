@@ -128,12 +128,101 @@ const imageProxyCases: Array<[string, string, string]> = [
   ],
 ]
 
+const identityQueryCases: Array<[string, string]> = [
+  [
+    'http://media2.picsearch.com/is?7x-TvXUWzFuw0nuQvzQUkbFYJkCHdIan17jTrQmagWk&height=240',
+    'http://media2.picsearch.com/is?z0unyo8AzN3HLzOGN6RHLISbdrcMpurEHNoCg9P_SdY&height=233',
+  ],
+  [
+    'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fichef-1.bbci.co.uk%2Fnews%2F1024%2Fmedia%2Fimages%2F63032000%2Fjpg%2F_63032028_jam_ap624.jpg&f=1&nofb=1&ipt=bbee0e301f0c2367d53ebf916c2b4a0fd530463273fddbf4a177e0d76fe2f455&ipo=images',
+    'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fforum.mubi.pt%2Fuploads%2Fdefault%2Foriginal%2F2X%2F5%2F53ae2c44e97e9b971f646105e6daf88dad3ac75c.jpeg&f=1&nofb=1&ipt=e255c14e6cd5170513ce69e01061ef6293e0841ddad273d446de5c756f897413&ipo=images',
+  ],
+  [
+    'http://docs.google.com/File?id=dhg5zdns_511hnhczncm_b',
+    'http://docs.google.com/File?id=dhg5zdns_507f8q6dqch_b',
+  ],
+  [
+    'https://mail.google.com/mail/u/0/?ui=2&ik=82ae26b745&view=att&th=142725aba958efb6&attid=0.1&disp=thd&zw',
+    'https://mail.google.com/mail/u/0/?ui=2&ik=82ae26b745&view=att&th=142725aba958efb6&attid=0.5&disp=thd&zw',
+  ],
+  [
+    'https://hbb.afl.rakuten.co.jp/hgb/417daed0.873653ba.417daed1.7ad5b474/?me_id=1230409&item_id=10042845&pc=https%3A%2F%2Fimage.rakuten.co.jp%2Fgbt-dko%2Fcabinet%2Fxmas%2F25494_f2.jpg%3F_ex%3D240x240&s=240x240&t=pict',
+    'https://hbb.afl.rakuten.co.jp/hgb/417daed0.873653ba.417daed1.7ad5b474/?me_id=1230409&item_id=10042845&pc=https%3A%2F%2Fimage.rakuten.co.jp%2Fgbt-dko%2Fcabinet%2Fxmas%2F25494_f5.jpg%3F_ex%3D240x240&s=240x240&t=pict',
+  ],
+  [
+    'https://placehold.co/1200x675/png?text=ZK5%20article-052%20A',
+    'https://placehold.co/1200x675/png?text=ZK5%20article-052%20B',
+  ],
+]
+
+const renditionQueryCases: Array<[string, string]> = [
+  [
+    'https://storage.ning.com/topology/rest/1.0/file/get/7953002865?profile=RESIZE_64x64&width=64&height=64&crop=1%3A1',
+    'https://storage.ning.com/topology/rest/1.0/file/get/7953002865?profile=RESIZE_64x64&width=64&height=64',
+  ],
+  [
+    'https://live-production.wcms.abc-cdn.net.au/815171110d9baee43a7fbe22bebd846d?impolicy=wcms_crop_resize&cropH=1688&cropW=3000&xPos=0&yPos=0&width=862&height=485',
+    'https://live-production.wcms.abc-cdn.net.au/815171110d9baee43a7fbe22bebd846d?impolicy=wcms_crop_resize&cropH=2001&cropW=3000&xPos=0&yPos=0&width=862&height=485',
+  ],
+  [
+    'https://live-production.wcms.abc-cdn.net.au/1ba7c3540a06ee7afc3e51db0e1f8e01?impolicy=wcms_crop_resize&cropH=3024&cropW=3024&xPos=0&yPos=0&width=862&height=862',
+    'https://live-production.wcms.abc-cdn.net.au/1ba7c3540a06ee7afc3e51db0e1f8e01?impolicy=wcms_crop_resize&cropH=3024&cropW=4032&xPos=0&yPos=0&width=862&height=862',
+  ],
+  [
+    'https://images.squarespace-cdn.com/content/v1/54218c87e4b0004bfbd4955a/a45da8d6-e668-4f8b-b1f3-58ba4137a68f/Noble+and+Daughter+Richmond+Coat?format=1000w',
+    'https://images.squarespace-cdn.com/content/v1/54218c87e4b0004bfbd4955a/a45da8d6-e668-4f8b-b1f3-58ba4137a68f/Noble+and+Daughter+Richmond+Coat?format=100w',
+  ],
+  [
+    'https://img.rts.ch/articles/2018/image/onpcfr-26138013.image?w=1400&h=144&extension=.jpg',
+    'https://img.rts.ch/articles/2018/image/onpcfr-26138013.image?w=1400&h=1400&extension=.jpg',
+  ],
+  [
+    'https://storage.ning.com/topology/rest/1.0/file/get/2114636883?profile=RESIZE_710x&height=240&format=jpg',
+    'https://storage.ning.com/topology/rest/1.0/file/get/2114636883?profile=RESIZE_710x&height=249&format=jpg',
+  ],
+  [
+    'http://storage.ning.com/topology/rest/1.0/file/get/141439415?profile=RESIZE_710x&width=240&format=jpg',
+    'http://storage.ning.com/topology/rest/1.0/file/get/141439415?profile=RESIZE_930x&width=240&format=jpg',
+  ],
+  [
+    'https://2.gravatar.com/avatar/2c3548793b36b8b01e2704899360caaa449026b46dfeb7aa52a0ace5252061e6?s=96&d=identicon&r=G',
+    'https://2.gravatar.com/avatar/2c3548793b36b8b01e2704899360caaa449026b46dfeb7aa52a0ace5252061e6?s=48&d=identicon&r=G',
+  ],
+  [
+    'https://images.unsplash.com/photo-1610311213453-e1a8e0ca6e18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTc3M3wwfDF8c2VhcmNofDIzfHxmYWlsfGVufDB8fHx8MTc2MTMxNjk5M3ww&ixlib=rb-4.1.0&q=80&w=2000',
+    'https://images.unsplash.com/photo-1610311213453-e1a8e0ca6e18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTc3M3wwfDF8c2VhcmNofDIzfHxmYWlsfGVufDB8fHx8MTc2MTMxNjk5M3ww&ixlib=rb-4.1.0&q=80&w=600',
+  ],
+  [
+    'https://storage.ning.com/topology/rest/1.0/file/get/2114616514?profile=RESIZE_710x&width=240&format=jpg',
+    'https://storage.ning.com/topology/rest/1.0/file/get/2114616514?profile=RESIZE_710x&width=623&format=jpg',
+  ],
+  [
+    'https://live-production.wcms.abc-cdn.net.au/2ab23815a4e762f328fc8f072e3fc690?impolicy=wcms_crop_resize&cropH=576&cropW=576&xPos=0&yPos=0&width=862&height=862',
+    'https://live-production.wcms.abc-cdn.net.au/2ab23815a4e762f328fc8f072e3fc690?impolicy=wcms_crop_resize&cropH=576&cropW=576&xPos=224&yPos=0&width=862&height=862',
+  ],
+  [
+    'https://live-production.wcms.abc-cdn.net.au/b9de9574e7961aaf873cf804db733bcd?impolicy=wcms_crop_resize&cropH=2416&cropW=3624&xPos=0&yPos=298&width=862&height=575',
+    'https://live-production.wcms.abc-cdn.net.au/b9de9574e7961aaf873cf804db733bcd?impolicy=wcms_crop_resize&cropH=2416&cropW=3624&xPos=0&yPos=117&width=862&height=575',
+  ],
+]
+
 describe('getImageFingerprint', () => {
   it('should drop the query so resize variants collapse', () => {
     const bare = getImageFingerprint('https://example.com/cover.jpg')
     const sized = getImageFingerprint('https://example.com/cover.jpg?w=300')
 
     expect(sized).toBe(bare)
+  })
+
+  it('should drop the whole query of a media file name', () => {
+    const bare = getImageFingerprint(
+      'https://nypost.com/wp-content/uploads/sites/2/2026/04/joe-kent-promotes-disturbing-iranian-125122949.jpg?quality=75&strip=all',
+    )
+    const resized = getImageFingerprint(
+      'https://nypost.com/wp-content/uploads/sites/2/2026/04/joe-kent-promotes-disturbing-iranian-125122949.jpg?resize=300,198&quality=75&strip=all',
+    )
+
+    expect(resized).toBe(bare)
   })
 
   it('should keep the query on a script endpoint so distinct images stay distinct', () => {
@@ -164,6 +253,25 @@ describe('getImageFingerprint', () => {
     const sized = getImageFingerprint('https://example.com/images/cover?w=300')
 
     expect(sized).toBe(bare)
+  })
+
+  it.each(identityQueryCases)('should keep %s apart from %s', (first, second) => {
+    expect(getImageFingerprint(first)).not.toBe(getImageFingerprint(second))
+  })
+
+  it.each(renditionQueryCases)('should collapse %s and %s', (first, second) => {
+    expect(getImageFingerprint(first)).toBe(getImageFingerprint(second))
+  })
+
+  it('should drop the query of an extensionless url behind an image proxy', () => {
+    const direct = getImageFingerprint(
+      'https://ik.imagekit.io/wpkauw5rry/trik-menang-cepat-di-casino-texas-holdem-tanpa-ribet',
+    )
+    const proxied = getImageFingerprint(
+      'https://i0.wp.com/ik.imagekit.io/wpkauw5rry/trik-menang-cepat-di-casino-texas-holdem-tanpa-ribet?ssl=1',
+    )
+
+    expect(proxied).toBe(direct)
   })
 
   it('should collapse a hyphen -WxH dimension suffix to the base filename', () => {
