@@ -27,20 +27,19 @@ const getGlyph = (src: string): EmojiGlyph | undefined => {
 }
 
 // Yahoo Japan's emoticons and Mail emoji, as blogs and mail pasted them straight from its image
-// hosts. Each emoticon is Yahoo's own drawing, and converts only through a universal code alt. The
-// Mail `ew_icon` set holds drawings no carrier id maps, so it keeps its pictures.
+// hosts. The emoticons and the Mail `ew_icon` set are Yahoo's own drawings, so both keep their
+// pictures, and only files named by codepoint convert.
 export const yahooJapanEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: selectors.join(', '),
   extract: (element) => {
-    const src = element.getAttribute('src') ?? ''
-    const keepsPictures = getFileStem(src).startsWith('ew_icon_')
+    const glyph = getGlyph(element.getAttribute('src') ?? '')
 
     return resolveEmojiImage(element, {
       isStrong: true,
       names: noEmojiNames,
-      glyph: getGlyph(src),
-      keepsPictures,
+      glyph,
+      keepsPictures: true,
     })
   },
 }

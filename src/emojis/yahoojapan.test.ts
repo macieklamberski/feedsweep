@@ -45,13 +45,13 @@ describeForEachParser('yahooJapanEmojiResolver', (parseHtml) => {
     it('should mark a carrier icon beside a named drawing of the same set', async () => {
       const value = html`
         <p>
-          <img src="http://i.yimg.jp/images/mail/emoji/15/ew_icon_s366.gif">
+          <img alt="涙" src="http://i.yimg.jp/images/mail/emoji/15/ew_icon_s366.gif">
           <img alt="！" src="http://i.yimg.jp/images/mail/emoji/15/ew_icon_exclamation.gif">
         </p>
       `
       const expected = html`
         <p>
-          <img src="http://i.yimg.jp/images/mail/emoji/15/ew_icon_s366.gif" data-emoji="">
+          <img alt="涙" src="http://i.yimg.jp/images/mail/emoji/15/ew_icon_s366.gif" data-emoji="">
           <img alt="！" src="http://i.yimg.jp/images/mail/emoji/15/ew_icon_exclamation.gif" data-emoji="">
         </p>
       `
@@ -59,6 +59,7 @@ describeForEachParser('yahooJapanEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    // Constructed: no ew_icon tag in the corpus carries an emoji alt.
     it('should mark a carrier icon despite an emoji alt', async () => {
       const value = html`
         <p>
@@ -106,6 +107,15 @@ describeForEachParser('yahooJapanEmojiResolver', (parseHtml) => {
         >
       </p>
     `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  // Constructed: no Messenger emoticon in the corpus carries a universal code alt.
+  it('should mark a Messenger emoticon despite a universal code alt', async () => {
+    const value = '<p><img alt=":)" src="https://i.yimg.jp/i/jp/mesg/emoticons6/1.gif"></p>'
+    const expected =
+      '<p><img alt=":)" src="https://i.yimg.jp/i/jp/mesg/emoticons6/1.gif" data-emoji=""></p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
