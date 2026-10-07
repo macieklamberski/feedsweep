@@ -440,6 +440,7 @@ import { yahooEmojiResolver } from '../emojis/yahoo.js'
 import { yahooJapanEmojiResolver } from '../emojis/yahoojapan.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { flashMp3PlayerMediaResolver } from '../media/flashmp3player.js'
+import { flickrMediaResolver } from '../media/flickr.js'
 import { ghostMediaResolver } from '../media/ghost.js'
 import { odeoMediaResolver } from '../media/odeo.js'
 import { podloveMediaResolver } from '../media/podlove.js'
@@ -767,6 +768,7 @@ const embedResolvers: Array<EmbedResolver> = [
 const mediaResolvers: Array<MediaResolver> = [
   discourseMediaResolver,
   flashMp3PlayerMediaResolver,
+  flickrMediaResolver,
   ghostMediaResolver,
   odeoMediaResolver,
   podloveMediaResolver,
