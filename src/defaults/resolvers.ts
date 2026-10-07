@@ -49,6 +49,7 @@ import {
   amebaReblogCardEmbedResolver,
 } from '../embeds/ameba.js'
 import { anchorEmbedResolver } from '../embeds/anchor.js'
+import { anyflipEmbedResolver } from '../embeds/anyflip.js'
 import { aparatIframeEmbedResolver, aparatScriptEmbedResolver } from '../embeds/aparat.js'
 import { appleEmbedResolver, appleToolsEmbedResolver } from '../embeds/apple.js'
 import { arcgisEmbedResolver } from '../embeds/arcgis.js'
@@ -474,6 +475,7 @@ const embedResolvers: Array<EmbedResolver> = [
   amebaMoviePlayerEmbedResolver,
   amebaReblogCardEmbedResolver,
   anchorEmbedResolver,
+  anyflipEmbedResolver,
   aparatIframeEmbedResolver,
   aparatScriptEmbedResolver,
   appleEmbedResolver,
