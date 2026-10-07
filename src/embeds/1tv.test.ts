@@ -54,6 +54,42 @@ describe('channelOneResolveEmbed', () => {
       expect(channelOneResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should mint the Flash promo player onto the legacy video type', () => {
+      const value = 'http://www.1tv.ru/promoovideo/56965'
+      const expected: EmbedResolverResult = {
+        provider: '1tv',
+        id: '56965:15',
+        src: 'https://www.1tv.ru/embed/56965:15',
+        ratio: '16/9',
+      }
+
+      expect(channelOneResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint the framed video route onto the legacy video type', () => {
+      const value = 'http://www.1tv.ru/i_video/92965'
+      const expected: EmbedResolverResult = {
+        provider: '1tv',
+        id: '92965:15',
+        src: 'https://www.1tv.ru/embed/92965:15',
+        ratio: '16/9',
+      }
+
+      expect(channelOneResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint the framed news route onto its legacy news type', () => {
+      const value = 'https://www.1tv.ru/i_newsvideo/281258'
+      const expected: EmbedResolverResult = {
+        provider: '1tv',
+        id: '281258:17',
+        src: 'https://www.1tv.ru/embed/281258:17',
+        ratio: '16/9',
+      }
+
+      expect(channelOneResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should mint the www host from the bare one', () => {
       const value = 'https://1tv.ru/embed/34890:12'
       const expected: EmbedResolverResult = {
@@ -100,6 +136,12 @@ describe('channelOneResolveEmbed', () => {
 
     it('should ignore another route word', () => {
       const value = 'https://www.1tv.ru/embeds/147417:12'
+
+      expect(channelOneResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a route word that only contains the Flash news route', () => {
+      const value = 'http://www.1tv.ru/oldnewsvideo/173017'
 
       expect(channelOneResolveEmbed(value)).toBeUndefined()
     })
@@ -166,6 +208,54 @@ describeForEachParser('channelOneEmbedResolver', (parseHtml) => {
         provider: '1tv',
         id: '173017:1',
         src: 'https://www.1tv.ru/embed/173017:1',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+    it('should mint the Flash promo player inside its embed', async () => {
+      const value = html`
+        <embed
+          align="middle"
+          allowfullscreen="true"
+          allowscriptaccess="always"
+          bgcolor="white"
+          flashvars="stats=http://www.1tv.ru/addclick/"
+          height="368"
+          id="videoportal"
+          name="videoportal"
+          quality="high"
+          src="http://www.1tv.ru/promoovideo/56965"
+          swliveconnect="true"
+          type="application/x-shockwave-flash"
+          width="640"
+          wmode="window"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: '1tv',
+        id: '56965:15',
+        src: 'https://www.1tv.ru/embed/56965:15',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the framed news route inside its iframe', async () => {
+      const value = html`
+        <iframe
+          width="500"
+          height="281"
+          src="https://www.1tv.ru/i_newsvideo/281258"
+          frameborder="2"
+          allowfullscreen
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: '1tv',
+        id: '281258:17',
+        src: 'https://www.1tv.ru/embed/281258:17',
         ratio: '16/9',
       }
 
