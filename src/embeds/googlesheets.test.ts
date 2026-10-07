@@ -418,6 +418,26 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should state the height a chart carrier declares in its style', async () => {
+      const value = html`
+        <iframe
+          id="IFid"
+          src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSHamMZQILw9-FEtIhdiHMdroSgPzLv737UcgduKHdRrsEt8eXa395_MshIm5waDHMg5Aoc6Ty_14vH/pubchart?oid=992755193&amp;format=interactive"
+          frameborder="0"
+          style="overflow:hidden;height:600px;width:100%;"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '2PACX-1vSHamMZQILw9-FEtIhdiHMdroSgPzLv737UcgduKHdRrsEt8eXa395_MshIm5waDHMg5Aoc6Ty_14vH',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSHamMZQILw9-FEtIhdiHMdroSgPzLv737UcgduKHdRrsEt8eXa395_MshIm5waDHMg5Aoc6Ty_14vH/pubchart?oid=992755193&format=interactive',
+        url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSHamMZQILw9-FEtIhdiHMdroSgPzLv737UcgduKHdRrsEt8eXa395_MshIm5waDHMg5Aoc6Ty_14vH/pubhtml',
+        height: 600,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should state the chart default when the carrier declares no height', async () => {
       const value =
         '<iframe src="https://docs.google.com/spreadsheets/d/1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck/pubchart?oid=1031542142&amp;format=interactive"></iframe>'

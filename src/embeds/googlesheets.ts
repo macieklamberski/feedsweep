@@ -1,6 +1,6 @@
-import { coerceNumber, getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, getElementDimensions } from '../utils/dom.js'
 import { filterUrlQuery } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -22,9 +22,6 @@ const unseenParams = [
 
 const sheetHeight = 500
 const chartHeight = 371
-
-// A browser reads `height="505px"` as 505 pixels, and a percentage as no fixed height.
-const pixelUnitRegex = /px$/i
 
 // `/spreadsheets/d/e/{token}` names a sheet published to the web and `/spreadsheets/d/{id}` names
 // it by its Drive file id. An account index, `/u/{n}/`, only picks the sign-in and serves the
@@ -55,7 +52,7 @@ export const googlesheetsResolveEmbed: ResolveEmbed = (url, element) => {
   const sheetPath = isPublished ? `e/${sheetId}` : sheetId
   const query = filterUrlQuery(parsed, (name) => !unseenParams.includes(name))
   // A chart draws at its own pixel size and never scales, and its carrier declares that size.
-  const declaredHeight = coerceNumber(attr(element, 'height')?.replace(pixelUnitRegex, ''))
+  const declaredHeight = element ? getElementDimensions(element).height : undefined
   const height = isChart ? (declaredHeight ?? chartHeight) : sheetHeight
 
   return {
