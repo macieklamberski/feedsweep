@@ -104,6 +104,7 @@ import { codesandboxIframeEmbedResolver } from '../embeds/codesandbox.js'
 import {
   cognitoformsIframeEmbedResolver,
   cognitoformsScriptEmbedResolver,
+  cognitoformsWidgetEmbedResolver,
 } from '../embeds/cognitoforms.js'
 import { condenastIframeEmbedResolver, condenastScriptEmbedResolver } from '../embeds/condenast.js'
 import { corriereEmbedResolver } from '../embeds/corriere.js'
@@ -524,6 +525,7 @@ const embedResolvers: Array<EmbedResolver> = [
   codesandboxIframeEmbedResolver,
   cognitoformsScriptEmbedResolver,
   cognitoformsIframeEmbedResolver,
+  cognitoformsWidgetEmbedResolver,
   condenastIframeEmbedResolver,
   condenastScriptEmbedResolver,
   corriereEmbedResolver,
