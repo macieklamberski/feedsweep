@@ -261,17 +261,17 @@ const specimens: Record<string, string | [string, string]> = {
   ],
   '.uSpoilerButton:not([value^="[+]"])':
     '<input type="button" class="uSpoilerButton" onclick="if($(\'#uSpoiler13Cu30\')[0]){}" value="Открыть спойлер">',
-  '.ead-loading': [
+  '.ead-loading:not(a *)': [
     '<div class="ead-loading-main"><div class="ead-loading"><img src="https://example.com/wp-content/plugins/embed-any-document/images/loading.svg" width="55" height="55" alt="Loader"><span>Loading...</span></div></div>',
     '<div class="ead-loading-main"></div>',
   ],
-  '.ead-loading-foot-title': [
+  '.ead-loading-foot-title:not(a *)': [
     '<div class="ead-loading-foot"><div class="ead-loading-foot-title"><img src="https://example.com/wp-content/plugins/embed-any-document/images/EAD-logo.svg" alt="EAD Logo" width="36" height="23"><span>Taking too long?</span></div></div>',
     '<div class="ead-loading-foot"></div>',
   ],
-  '.ead-reload-btn':
+  '.ead-reload-btn:not(a *)':
     '<div class="ead-document-btn ead-reload-btn" role="button"><img src="https://example.com/wp-content/plugins/embed-any-document/images/reload.svg" alt="Reload" width="12" height="12"> Reload document</div>',
-  '.ead-loading-foot span': [
+  '.ead-loading-foot span:not(a *)': [
     '<div class="ead-loading-foot"><span>|</span><a href="https://example.com/wp-content/uploads/2022/08/UConn-Response-Summary-Document_Final.pdf" class="ead-document-btn" target="_blank"><img src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"> Open in new tab</a></div>',
     '<div class="ead-loading-foot"><a href="https://example.com/wp-content/uploads/2022/08/UConn-Response-Summary-Document_Final.pdf" class="ead-document-btn" target="_blank"><img src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"> Open in new tab</a></div>',
   ],
@@ -1175,6 +1175,50 @@ describeForEachParser('Embed Any Document loading block through the pipeline', (
       `
 
       expect(await convert(value)).toEqualHtml(expected)
+    })
+  })
+
+  // A spec parser clones the publisher's open link into each part of the block, but only with
+  // the whitespace the feed ships between tags, which the `html` helper would drop.
+  describe('a publisher link around the whole block', () => {
+    it('should keep the publisher link and the link to the file', async () => {
+      const value = `
+        <p><a href="https://example.com/wp-content/uploads/2021/05/Company.jpg">
+        <div class="ead-preview">
+        <div class="ead-document">
+        <div class="ead-document-loading">
+        <div class="ead-loading-wrap">
+        <div class="ead-loading-main">
+        <div class="ead-loading">
+        <img src="https://example.com/wp-content/plugins/embed-any-document/images/loading.svg" alt="Loader">
+        <span>Loading...</span>
+        </div>
+        </div>
+        <div class="ead-loading-foot">
+        <div class="ead-loading-foot-title">
+        <img src="https://example.com/wp-content/plugins/embed-any-document/images/EAD-logo.svg" alt="EAD Logo">
+        <span>Taking too long?</span>
+        </div>
+        <p>
+        <div class="ead-document-btn ead-reload-btn" role="button">
+        <img src="https://example.com/wp-content/plugins/embed-any-document/images/reload.svg" alt="Reload"> Reload document</div>
+        <span>|</span>
+        <a href="https://example.com/wp-content/uploads/2021/05/Economical-Insurance-article-early-spring-2021.pdf" class="ead-document-btn" target="_blank">
+        <img src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open"> Open in new tab</a>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </a></p>
+      `
+      const document = parseHtml(await convert(value))
+      const hrefs = [...document.querySelectorAll('a')].map((link) => link.getAttribute('href'))
+
+      expect([...new Set(hrefs)]).toEqual([
+        'https://example.com/wp-content/uploads/2021/05/Company.jpg',
+        'https://example.com/wp-content/uploads/2021/05/Economical-Insurance-article-early-spring-2021.pdf',
+      ])
     })
   })
 })

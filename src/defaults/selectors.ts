@@ -268,11 +268,12 @@ export const defaultNonContentSelectors = [
   '.uSpoilerButton:not([value^="[+]"])',
 
   // Embed Any Document's loading block beside its viewer frame, which the plugin's script hides
-  // once the frame loads. Its "Open in new tab" link stays as the route to the file.
-  '.ead-loading', // Spinner and "Loading..." text.
-  '.ead-loading-foot-title', // Logo and "Taking too long?" text.
-  '.ead-reload-btn', // Reload button, which does nothing without the plugin's script.
-  '.ead-loading-foot span', // The "|" divider between the reload button and the link.
+  // once the frame loads. Its "Open in new tab" link stays as the route to the file. A spec
+  // parser clones a publisher's link around the block into each part, so a part in a link stays.
+  '.ead-loading:not(a *)', // Spinner and "Loading..." text.
+  '.ead-loading-foot-title:not(a *)', // Logo and "Taking too long?" text.
+  '.ead-reload-btn:not(a *)', // Reload button, which does nothing without the plugin's script.
+  '.ead-loading-foot span:not(a *)', // The "|" divider between the reload button and the link.
 
   // GDPR/consent-gated embeds are recovered, not stripped: each CMP parks the author's embed
   // URL on the iframe itself, so fixLazyIframes promotes it back into src (see the CMP block in
