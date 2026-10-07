@@ -42,6 +42,18 @@ describe('channelOneResolveEmbed', () => {
       expect(channelOneResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should mint the Flash news player onto the legacy news type', () => {
+      const value = 'http://www.1tv.ru/newsvideo/173017'
+      const expected: EmbedResolverResult = {
+        provider: '1tv',
+        id: '173017:1',
+        src: 'https://www.1tv.ru/embed/173017:1',
+        ratio: '16/9',
+      }
+
+      expect(channelOneResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should mint the www host from the bare one', () => {
       const value = 'https://1tv.ru/embed/34890:12'
       const expected: EmbedResolverResult = {
@@ -103,12 +115,6 @@ describe('channelOneResolveEmbed', () => {
 
       expect(channelOneResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should leave the Flash news player alone', () => {
-      const value = 'http://www.1tv.ru/newsvideo/173017'
-
-      expect(channelOneResolveEmbed(value)).toBeUndefined()
-    })
   })
 })
 
@@ -129,6 +135,37 @@ describeForEachParser('channelOneEmbedResolver', (parseHtml) => {
         provider: '1tv',
         id: '80103:12',
         src: 'https://www.1tv.ru/embed/80103:12',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the Flash news player inside its object', async () => {
+      const value = html`
+        <object>
+          <embed
+            width="460"
+            height="353"
+            align="middle"
+            flashvars="stats=http://www.1tv.ru/addclick/"
+            allowscriptaccess="always"
+            swliveconnect="true"
+            wmode="window"
+            allowfullscreen="true"
+            quality="high"
+            bgcolor="white"
+            name="videoportal"
+            id="videoportal"
+            src="http://www.1tv.ru/newsvideo/173017"
+            type="application/x-shockwave-flash"
+          />
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: '1tv',
+        id: '173017:1',
+        src: 'https://www.1tv.ru/embed/173017:1',
         ratio: '16/9',
       }
 
