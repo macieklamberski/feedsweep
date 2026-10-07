@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { filterUrlQuery } from '../utils/urls.js'
@@ -20,9 +20,7 @@ const docHeight = 500
 // its Drive file id.
 export const googledocsResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
-
-  // Empty segments stay: `/d/{id}//pub` answers 404, and joining them would frame a working doc.
-  const pathSegments = parsed?.pathname.split('/').slice(1) ?? []
+  const pathSegments = getPathSegments(url)
 
   if (!parsed || pathSegments[0] !== 'document' || pathSegments[1] !== 'd') {
     return

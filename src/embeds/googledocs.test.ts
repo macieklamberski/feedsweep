@@ -154,13 +154,6 @@ describe('googledocsResolveEmbed', () => {
       expect(googledocsResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a publish route written with a doubled slash', () => {
-      const value =
-        'https://docs.google.com/document/d/1rv6jOzKF6j6KV-faPE_xC6Z8-1EaEbCSJ7lIAyh5BuE//pub?embedded=true'
-
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a published doc behind a Workspace prefix', () => {
       const value =
         'https://docs.google.com/a/example.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub?embedded=true'
@@ -170,6 +163,20 @@ describe('googledocsResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
+    it('should frame a doc whose path doubles the slash before the route', () => {
+      const value =
+        'https://docs.google.com/document/d/1rv6jOzKF6j6KV-faPE_xC6Z8-1EaEbCSJ7lIAyh5BuE//pub?embedded=true'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '1rv6jOzKF6j6KV-faPE_xC6Z8-1EaEbCSJ7lIAyh5BuE',
+        src: 'https://docs.google.com/document/d/1rv6jOzKF6j6KV-faPE_xC6Z8-1EaEbCSJ7lIAyh5BuE/pub?embedded=true',
+        url: 'https://docs.google.com/document/d/1rv6jOzKF6j6KV-faPE_xC6Z8-1EaEbCSJ7lIAyh5BuE/pub',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should drop an empty query', () => {
       const value =
         'https://docs.google.com/document/d/1cpdr_CQUf8w7QaeKJBFaYT8bTQXtlrA2rzSqbp2r7Mw/pub?'
