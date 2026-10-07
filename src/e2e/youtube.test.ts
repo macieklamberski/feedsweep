@@ -221,6 +221,32 @@ describeForEachParser('YouTube', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  // The playlist page refuses framing, so the generic placeholder would frame a page that shows
+  // nothing.
+  it('should repair an iframe of the playlist page into a playlist placeholder', async () => {
+    const value = html`
+      <iframe
+        width="560"
+        height="315"
+        src="https://www.youtube.com/playlist?list=PLHAu2cs0K6-czSZed7KuwocNWcrXaE6xX"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen=""
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="youtube"
+        data-embed-id="playlist/PLHAu2cs0K6-czSZed7KuwocNWcrXaE6xX"
+        data-embed-src="https://www.youtube.com/embed/videoseries?list=PLHAu2cs0K6-czSZed7KuwocNWcrXaE6xX"
+        data-embed-url="https://www.youtube.com/playlist?list=PLHAu2cs0K6-czSZed7KuwocNWcrXaE6xX"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // ARVE's lazyload button holds no image of its own, so the widget is dropped as empty markup
   // before this: the video is gone from the item entirely, not merely posterless.
   it('should recover a video from an ARVE play button', async () => {

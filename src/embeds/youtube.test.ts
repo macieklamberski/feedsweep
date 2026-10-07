@@ -657,6 +657,41 @@ describe('youtubeResolveEmbed', () => {
       expect(youtubeResolveEmbed(value)).toBeUndefined()
     })
   })
+
+  // The playlist page refuses framing, so an iframe of it renders nothing today.
+  describe('the playlist page framed as a player', () => {
+    it('should resolve the playlist page to the playlist embed, posterless', () => {
+      const value = 'http://www.youtube.com/playlist?list=PLHAu2cs0K6-czSZed7KuwocNWcrXaE6xX'
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'playlist/PLHAu2cs0K6-czSZed7KuwocNWcrXaE6xX',
+        src: 'https://www.youtube.com/embed/videoseries?list=PLHAu2cs0K6-czSZed7KuwocNWcrXaE6xX',
+        url: 'https://www.youtube.com/playlist?list=PLHAu2cs0K6-czSZed7KuwocNWcrXaE6xX',
+        ratio: '16/9',
+      }
+
+      expect(youtubeResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the interface language the playlist page carries', () => {
+      const value = 'http://www.youtube.com/playlist?list=PLCBA17066B8D68581&hl=nl_NL'
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'playlist/PLCBA17066B8D68581',
+        src: 'https://www.youtube.com/embed/videoseries?list=PLCBA17066B8D68581',
+        url: 'https://www.youtube.com/playlist?list=PLCBA17066B8D68581',
+        ratio: '16/9',
+      }
+
+      expect(youtubeResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should refuse a bare playlist page naming no list', () => {
+      const value = 'https://www.youtube.com/playlist'
+
+      expect(youtubeResolveEmbed(value)).toBeUndefined()
+    })
+  })
 })
 
 describe('isVideoId', () => {
@@ -958,6 +993,28 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
       id: 'playlist/PL7BE4DDAC0A0D31AF',
       src: 'https://www.youtube.com/embed/videoseries?list=PL7BE4DDAC0A0D31AF',
       url: 'https://www.youtube.com/playlist?list=PL7BE4DDAC0A0D31AF',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should extract the playlist from an iframe of the playlist page', async () => {
+    const value = html`
+      <iframe
+        loading="lazy"
+        width="720"
+        height="100"
+        src="https://www.youtube.com/playlist?list=OLAK5uy_kBWIsyax4PGdXtYCjyBiwwiztBrMzKqq8"
+        allow="encrypted-media"
+        frameborder="0"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'playlist/OLAK5uy_kBWIsyax4PGdXtYCjyBiwwiztBrMzKqq8',
+      src: 'https://www.youtube.com/embed/videoseries?list=OLAK5uy_kBWIsyax4PGdXtYCjyBiwwiztBrMzKqq8',
+      url: 'https://www.youtube.com/playlist?list=OLAK5uy_kBWIsyax4PGdXtYCjyBiwwiztBrMzKqq8',
       ratio: '16/9',
     }
 
