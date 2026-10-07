@@ -342,6 +342,59 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  // The later markup wraps the painted sprite and its code, hidden at zero size, in a labelled
+  // `i`. The sprite is deleted as an empty tag and the code stays invisible.
+  it('should replace a labelled sprite wrapper with its character', async () => {
+    const value = html`
+      <p>Frist for påmelding
+        <i class="_1gwo" title="Uttrykksikonet smile">
+          <i
+            aria-hidden="true"
+            class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"
+            style="background-image: url(&quot;/rsrc.php/v2/yl/r/NtxfCiWWu4q.png&quot;); background-position: 0px -340px; display: inline-block; height: 16px; width: 16px;"
+          ></i>
+          <span aria-hidden="true" class="_skr" style="font-size: 0px;">:-)</span>
+        </i>
+      </p>
+    `
+    const expected = '<p>Frist for påmelding 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // An editor clones the labelled `i` empty beside the one holding the sprite. Only the sprite
+  // showed a picture on Facebook.
+  it('should show one character for a run of empty wrappers before a sprite wrapper', async () => {
+    const value = html`
+      <p>das adversidades pode renascer algo ainda mais virtuoso&nbsp;
+        <i class="_lew" title="smile emoticon"></i>
+        <i class="_lew" title="smile emoticon"></i>
+        <i class="_lew" title="smile emoticon">
+          <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+          <span aria-hidden="true" class="_4mcd" style="font-size: 0px;">:-)</span>
+        </i>
+      </p>
+    `
+    const expected = '<p>das adversidades pode renascer algo ainda mais virtuoso&#160; 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // Some pastes keep the labelled `i` and its zero-size code without the sprite, so the emoticon
+  // stays an invisible code.
+  it('should replace a labelled wrapper holding only its hidden code', async () => {
+    const value = html`
+      <p>Tot ziens
+        <i class="_1gwo" title="Emoticon smile">
+          <span class="_skr" style="font-size: 0px;">:-)</span>
+        </i>
+      </p>
+    `
+    const expected = '<p>Tot ziens 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // Facebook refuses to be framed, so a carrier holding the page itself reaches a reader as a
   // blank frame. The plugin takes the page as its href, which is the repair the widget div and
   // the fallback blockquote already perform from their own attributes.
