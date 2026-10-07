@@ -109,17 +109,6 @@ describeForEachParser('onePixelOutFlashMediaResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should leave the copy an archive.org item hosts to its own resolver', async () => {
-      const value = html`
-        <embed
-          src="https://archive.org/download/example-item/player.swf"
-          flashvars="soundFile=https://archive.org/download/example-item/episode.mp3"
-        >
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a swf naming its file in another flashvar', async () => {
       const value = html`
         <embed
@@ -258,6 +247,29 @@ describeForEachParser('onePixelOutFlashMediaResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read flashvars the feed escaped twice', async () => {
+      const value = html`
+        <object
+          id="wp-as-797_1-flash"
+          type="application/x-shockwave-flash"
+          data="http://s0.wp.com/wp-content/plugins/audio-player/player.swf"
+          width="290"
+          height="24"
+        >
+          <param
+            name="FlashVars"
+            value="bg=0xF8F8F8&amp;amp;leftbg=0xEEEEEE&amp;amp;soundFile=http%3A%2F%2Fexample.files.wordpress.com%2F2013%2F06%2Fproject-melway-xxxi-what-women-want.mp3"
+          />
+        </object>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'http://example.files.wordpress.com/2013/06/project-melway-xxxi-what-women-want.mp3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read a swf named by a relative path', async () => {
       const value = html`
         <embed
@@ -389,6 +401,37 @@ describeForEachParser('onePixelOutWidgetMediaResolver', (parseHtml) => {
       const expected: MediaResolverResult = {
         tag: 'audio',
         src: 'http://example.com/audio/files/interview.mp3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should play the file the embed call names for the Joomla mount', async () => {
+      const value = html`
+        <p id="onepixeloutaudioplayer_6ac5b4354d58e">Audio clip: Adobe Flash Player (version 9 or above) is required to play this audio clip.</p>
+        <script language="Javascript" type="text/javascript">
+          AudioPlayer.embed("onepixeloutaudioplayer_6ac5b4354d58e", {rtl:"no",autostart:"no",loop:"no",width:500,bg:"E5E5E5",leftbg:"CCCCCC", soundFile:"https://example.com/media/com_podcastmanager/ActivePodcasts/WomensMinistry-Aug092026.mp3", titles:"Herrick"})
+        </script>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'https://example.com/media/com_podcastmanager/ActivePodcasts/WomensMinistry-Aug092026.mp3',
+        title: 'Herrick',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should play the file the embed call names for a div mount', async () => {
+      const value = html`
+        <div id="audioplayer_1">mynight.mp3<br /></div>
+        <script type="text/javascript">
+          AudioPlayer.embed("audioplayer_1", {soundFile: "http://example.com/daniel/mynight.mp3"});
+        </script>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'http://example.com/daniel/mynight.mp3',
       }
 
       expect(await extract(value)).toEqual(expected)

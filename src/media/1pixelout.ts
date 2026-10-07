@@ -1,11 +1,11 @@
 import { parseUrl } from 'trousse'
 import type { MediaResolver, MediaResolverResult } from '../types.js'
-import { flashVar } from '../utils/dom.js'
+import { flashVars } from '../utils/dom.js'
 import { flashFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
-// Weebly's own copy and the copy archive.org items host have resolvers of their own.
-const claimedHosts = ['weebly.com', 'archive.org']
+// Weebly's own copy has a resolver of its own, later in the list.
+const weeblyHost = 'weebly.com'
 
 const httpUrlRegex = /^https?:\/\//i
 const embedCallRegex = /AudioPlayer\.embed\(\s*["']([^"']+)["']\s*,\s*\{([^}]*)\}/g
@@ -59,21 +59,28 @@ export const onePixelOutFlashMediaResolver: MediaResolver = {
       return
     }
 
-    if (parseUrlOnHosts(carrierUrl, claimedHosts)) {
+    if (parseUrlOnHosts(carrierUrl, weeblyHost)) {
       return
     }
 
-    const soundFile = flashVar(element, 'soundFile') ?? player.searchParams.get('soundFile')
+    // A feed that escapes the markup twice leaves `&amp;` between the flashvars.
+    const config = new URLSearchParams(flashVars(element)?.replaceAll('&amp;', '&'))
+    const soundFile = config.get('soundFile') ?? player.searchParams.get('soundFile')
 
-    return composeAudio(soundFile ?? undefined, flashVar(element, 'titles'))
+    return composeAudio(soundFile ?? undefined, config.get('titles') ?? undefined)
   },
 }
 
 // Version 2 of the WordPress plugin writes a `<p id="audioplayer_N">` holding fallback text, and
-// an `AudioPlayer.embed` call naming that id swaps it for the player.
+// an `AudioPlayer.embed` call naming that id swaps it for the player. The Joomla `rapid1pixelout`
+// plugin writes `onepixeloutaudioplayer_{hex}`.
 export const onePixelOutWidgetMediaResolver: MediaResolver = {
   kind: 'media',
-  selector: 'p[id^="audioplayer_"]',
+  selector: [
+    'p[id^="audioplayer_"]',
+    'div[id^="audioplayer_"]',
+    'p[id^="onepixeloutaudioplayer_"]',
+  ].join(', '),
   extract: (element) => {
     // Some copies also write a native player into the mount for browsers without Flash.
     if (element.querySelector('audio, video')) {
