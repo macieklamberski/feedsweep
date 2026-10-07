@@ -39,8 +39,14 @@ export const convertEmojis: DomTransform = (context) => {
       return
     }
 
+    // A selector that reads siblings can start matching once an extract changes the tree.
+    let isChanged = false
+
     walkElements(document, (element) => {
-      if (!candidates.has(element)) {
+      const isMatch =
+        candidates.has(element) || (isChanged && selectors.some((batch) => element.matches(batch)))
+
+      if (!isMatch) {
         return
       }
 
@@ -49,6 +55,7 @@ export const convertEmojis: DomTransform = (context) => {
           continue
         }
 
+        isChanged = true
         const result = resolver.extract(element)
 
         if (!result) {
