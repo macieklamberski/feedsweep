@@ -102,5 +102,18 @@ describeForEachParser('outlookEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    it('should leave a Hotmail image outside the emoji folder untouched, constructed', async () => {
+      const value = '<p><img src="http://gfx1.hotmail.com/mail/w4/pr04/ltr/i_logo.gif" alt=""></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should mark an Outlook.com file that names no codepoint', async () => {
+      const value = '<p><img src="https://a.gfx.ms/Emoji_1F3A7_27.png" alt=""></p>'
+      const expected = '<p><img data-emoji="" src="https://a.gfx.ms/Emoji_1F3A7_27.png" alt=""></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 })
