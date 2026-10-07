@@ -310,6 +310,7 @@ import {
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
   tiktokS9eEmbedResolver,
+  tiktokWidgetEmbedResolver,
 } from '../embeds/tiktok.js'
 import { tmzEmbedResolver } from '../embeds/tmz.js'
 import { traileraddictEmbedResolver } from '../embeds/traileraddict.js'
@@ -744,6 +745,7 @@ const embedResolvers: Array<EmbedResolver> = [
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
   tiktokS9eEmbedResolver,
+  tiktokWidgetEmbedResolver,
   tmzEmbedResolver,
   traileraddictEmbedResolver,
   transistorEmbedResolver,

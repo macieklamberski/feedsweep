@@ -6,6 +6,7 @@ import {
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
   tiktokS9eEmbedResolver,
+  tiktokWidgetEmbedResolver,
 } from './tiktok.js'
 
 // One test per shape the corpus survey found, so a shape nobody handles is visible here as a
@@ -1239,6 +1240,211 @@ describeForEachParser('tiktokS9eEmbedResolver', (parseHtml) => {
       `
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+describeForEachParser('tiktokWidgetEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, tiktokWidgetEmbedResolver)
+
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  describe('happy paths', () => {
+    it('should resolve the MetaSlider Pro slide and keep its poster', async () => {
+      const value = html`
+        <li
+          class="slide-25548 ms-tiktok "
+          style="display: none; width: 100%;"
+          data-slide-type="tiktok"
+        >
+          <div
+            style="height: 700px; width: 100%;"
+            class="tiktok"
+            data-lazy-load="1"
+            data-video-id="7636550859958045972"
+            data-cite="https://www.tiktok.com/@pm.yamaha/video/7636550859958045972?is_from_webapp=1&#038;sender_device=pc&#038;web_id=7602492902425691655"
+            data-url="//www.tiktok.com/embed/v2/7636550859958045972"
+            data-width="325"
+            data-height="605"
+          >
+            <img
+              loading="lazy"
+              decoding="async"
+              src="https://example.com/wp-content/uploads/2026/05/tiktok_7636550859958045972-325x605.webp"
+              alt=""
+              class="msDefaultImage"
+              height="605"
+              width="325"
+            />
+            <span class="play_button">
+              <a tabindex="0" role="button" id="toggle">
+                <img
+                  width="75"
+                  src="https://example.com/wp-content/plugins/ml-slider-pro/modules/tiktok/assets/play-button.png"
+                >
+              </a>
+            </span>
+          </div>
+        </li>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@pm.yamaha/video/7636550859958045972',
+        src: 'https://www.tiktok.com/embed/v2/7636550859958045972',
+        url: 'https://www.tiktok.com/@pm.yamaha/video/7636550859958045972',
+        thumbnail:
+          'https://example.com/wp-content/uploads/2026/05/tiktok_7636550859958045972-325x605.webp',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a div.tiktok outside a MetaSlider TikTok slide', async () => {
+      const value = html`
+        <li class="slide-25548 ms-image">
+          <div
+            class="tiktok"
+            data-video-id="7636550859958045972"
+          ></div>
+        </li>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a slide with an empty video id', async () => {
+      const value = html`
+        <li class="ms-tiktok">
+          <div
+            class="tiktok"
+            data-video-id=""
+            data-cite="https://www.tiktok.com/@pm.yamaha/video/7636550859958045972"
+          ></div>
+        </li>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should take the clip from the video id where the cite names another clip', async () => {
+      const value = html`
+        <li class="ms-tiktok">
+          <div
+            class="tiktok"
+            data-video-id="7636550859958045972"
+            data-cite="https://www.tiktok.com/@pm.yamaha/video/7636479577350475028"
+          ></div>
+        </li>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@pm.yamaha/video/7636550859958045972',
+        src: 'https://www.tiktok.com/embed/v2/7636550859958045972',
+        url: 'https://www.tiktok.com/@pm.yamaha/video/7636550859958045972',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint no page url from a cite on a foreign host', async () => {
+      const value = html`
+        <li class="ms-tiktok">
+          <div
+            class="tiktok"
+            data-video-id="7636550859958045972"
+            data-cite="https://evil.test/@pm.yamaha/video/7636550859958045972"
+          ></div>
+        </li>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '7636550859958045972',
+        src: 'https://www.tiktok.com/embed/v2/7636550859958045972',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not take the play button as the poster', async () => {
+      const value = html`
+        <li class="ms-tiktok">
+          <div
+            class="tiktok"
+            data-video-id="7636550859958045972"
+          >
+            <span class="play_button">
+              <a tabindex="0" role="button" id="toggle">
+                <img
+                  width="75"
+                  src="https://example.com/wp-content/plugins/ml-slider-pro/modules/tiktok/assets/play-button.png"
+                >
+              </a>
+            </span>
+          </div>
+        </li>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '7636550859958045972',
+        src: 'https://www.tiktok.com/embed/v2/7636550859958045972',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  // MetaSlider writes every slide but the first hidden, so the slide has to survive
+  // stripHiddenElements before the widget pass sees it.
+  describe('through the pipeline', () => {
+    it('should replace a hidden slide with the player placeholder', async () => {
+      const value = html`
+        <ul class="slides">
+          <li
+            class="slide-25548 ms-tiktok "
+            style="display: none; width: 100%;"
+          >
+            <div
+              class="tiktok"
+              data-video-id="7636550859958045972"
+              data-cite="https://www.tiktok.com/@pm.yamaha/video/7636550859958045972"
+            >
+              <img
+                src="https://example.com/wp-content/uploads/2026/05/tiktok_7636550859958045972-325x605.webp"
+                class="msDefaultImage"
+              >
+            </div>
+          </li>
+        </ul>
+      `
+      const expected = html`
+        <ul class="slides">
+          <li
+            class="slide-25548 ms-tiktok"
+            style=" width: 100%;"
+          >
+            <div
+              data-embed-height="738"
+              data-embed-thumbnail="https://example.com/wp-content/uploads/2026/05/tiktok_7636550859958045972-325x605.webp"
+              data-embed-url="https://www.tiktok.com/@pm.yamaha/video/7636550859958045972"
+              data-embed-id="@pm.yamaha/video/7636550859958045972"
+              data-embed-provider="tiktok"
+              data-embed-src="https://www.tiktok.com/embed/v2/7636550859958045972"
+            ></div>
+          </li>
+        </ul>
+      `
+
+      expect(await convert(value)).toEqualHtml(expected)
     })
   })
 })
