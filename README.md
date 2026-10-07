@@ -90,7 +90,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildJsfiddleEmbeds` | Rebuild a real `<iframe>` from a JSFiddle loader script onto the fiddle's own page |
 | `rebuildVokiEmbeds` | Rebuild a real `<iframe>` from Voki's script embed onto the scene's share page, reading the scene from the inline `AC_Voki_Embed` call |
 | `rebuildDeferredIframes` | Rebuild a real `<iframe>` from a URL parked in a `<div>` attribute (Pym.js `data-pym-src`, @newswire/frames `data-frame-src`) |
-| `rebuildGofundmeEmbeds` | Rebuild a real `<iframe>` from a GoFundMe campaign widget's empty `div.gfm-embed[data-url]` |
+| `rebuildGofundmeEmbeds` | Rebuild a real `<iframe>` from a GoFundMe campaign widget: the empty `div.gfm-embed[data-url]`, the Flash widget and the empty media widget frame |
 | `rebuildPiktochartEmbeds` | Rebuild a real `<iframe>` from a Piktochart script snippet's `div.piktowrapper-embed`, keeping any prose the publisher wrote inside it |
 | `linkifyGistEmbeds` | Replace a GitHub Gist script embed or `<amp-gist>` with a link to the gist |
 | `linkifyPaypalDonateForms` | Replace a PayPal donate button form with its button image linked to PayPal's donate page |
