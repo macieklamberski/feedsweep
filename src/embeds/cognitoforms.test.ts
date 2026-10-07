@@ -443,6 +443,65 @@ describeForEachParser('cognitoforms through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 
+  it('should give each loader embed in one item its own form', async () => {
+    const value = html`
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      <div class="cognito">
+        <script src="https://services.cognitoforms.com/s/BVNBapeyfkKw9J10BiObEQ"></script>
+        <br>
+        <script>Cognito.load("forms", { id: "459" });</script>
+      </div>
+      <div class="cognito">
+        <script src="https://services.cognitoforms.com/s/BVNBapeyfkKw9J10BiObEQ"></script>
+        <br>
+        <script>Cognito.load("forms", { id: "462" });</script>
+      </div>
+    `
+    const expected = html`
+      <p><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></p>
+      <div
+        data-embed-height="600"
+        data-embed-url="https://www.cognitoforms.com/f/BVNBapeyfkKw9J10BiObEQ/459"
+        data-embed-id="BVNBapeyfkKw9J10BiObEQ/459"
+        data-embed-provider="cognitoforms"
+        data-embed-src="https://www.cognitoforms.com/f/BVNBapeyfkKw9J10BiObEQ/459"
+      ></div>
+      <div
+        data-embed-height="600"
+        data-embed-url="https://www.cognitoforms.com/f/BVNBapeyfkKw9J10BiObEQ/462"
+        data-embed-id="BVNBapeyfkKw9J10BiObEQ/462"
+        data-embed-provider="cognitoforms"
+        data-embed-src="https://www.cognitoforms.com/f/BVNBapeyfkKw9J10BiObEQ/462"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep the prose beside a loader embed in a wrapper', async () => {
+    const value = html`
+      <div class="K2FeedIntroText">
+        <p>Want help building your volunteer program?</p>
+        <div class="cognito">
+          <script src="https://www.cognitoforms.com/s/n54Zqftbdk2-_K7h6oGZlg" type="text/javascript"></script>
+          <script type="text/javascript">Cognito.load("forms", { id: "79" });</script>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <p>Want help building your volunteer program?</p>
+      <div
+        data-embed-height="600"
+        data-embed-url="https://www.cognitoforms.com/f/n54Zqftbdk2-_K7h6oGZlg/79"
+        data-embed-id="n54Zqftbdk2-_K7h6oGZlg/79"
+        data-embed-provider="cognitoforms"
+        data-embed-src="https://www.cognitoforms.com/f/n54Zqftbdk2-_K7h6oGZlg/79"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
   it('should turn the older embed iframe into a form placeholder', async () => {
     const value = html`
       <iframe
