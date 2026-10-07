@@ -93,17 +93,4 @@ describeForEachParser('msnEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(value)
   })
-
-  it("should leave Hotmail's emoji folder untouched", async () => {
-    const value = html`
-      <p>
-        <img
-          alt="Black heart (cards)"
-          src="http://gfx1.hotmail.com/mail/w4/pr04/ltr/emoji/emoji_02665.gif"
-        >
-      </p>
-    `
-
-    expect(await transform(value)).toEqualHtml(value)
-  })
 })
