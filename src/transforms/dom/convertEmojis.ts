@@ -31,12 +31,22 @@ export const convertEmojis: DomTransform = (context) => {
   const selectors = batchSelectors(emojiResolvers.map((resolver) => resolver.selector))
 
   return (document) => {
-    if (!selectors.length) {
+    // Linkedom compiles the selector on every matches call. The query results come batch by
+    // batch, out of document order, so the walk still sets the order.
+    const candidates = new Set(selectors.flatMap((batch) => [...document.querySelectorAll(batch)]))
+
+    if (!candidates.size) {
       return
     }
 
+    // A selector that reads siblings can start matching once an extract changes the tree.
+    let isChanged = false
+
     walkElements(document, (element) => {
-      if (!selectors.some((batch) => element.matches(batch))) {
+      const isMatch =
+        candidates.has(element) || (isChanged && selectors.some((batch) => element.matches(batch)))
+
+      if (!isMatch) {
         return
       }
 
@@ -45,6 +55,7 @@ export const convertEmojis: DomTransform = (context) => {
           continue
         }
 
+        isChanged = true
         const result = resolver.extract(element)
 
         if (!result) {
