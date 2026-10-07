@@ -88,7 +88,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     it('should leave a non-smilie image served from the smilies folder untouched', async () => {
       const value = '<p><img src="https://example.com/images/smilies/banner.png" alt="Banner"></p>'
 
-      expect(await transformKeeping(value)).toEqualHtml(value)
+      expect(await transform(value)).toEqualHtml(value)
     })
 
     // The board shipped the template variable unsubstituted, so the src is a placeholder no host
@@ -251,8 +251,13 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should leave a smilie with a bracketed alt untouched', async () => {
-      const value = '<p><img src="https://example.com/img/smilies/blahblah.gif" alt="[image]"></p>'
+    const bracketedAltCases: Array<[string, string]> = [
+      ['https://example.com/img/smilies/blahblah.gif', '[image]'],
+      ['https://example.com/images/smilies/skype_0130-devil.gif', '(devil)'],
+    ]
+
+    it.each(bracketedAltCases)('should leave %s with its %s alt untouched', async (source, alt) => {
+      const value = `<p><img src="${source}" alt="${alt}"></p>`
 
       expect(await transform(value)).toEqualHtml(value)
     })
