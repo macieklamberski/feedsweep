@@ -438,6 +438,10 @@ import { wordpressElementEmojiResolver, wordpressEmojiResolver } from '../emojis
 import { xenforoEmojiResolver } from '../emojis/xenforo.js'
 import { yahooEmojiResolver } from '../emojis/yahoo.js'
 import { yahooJapanEmojiResolver } from '../emojis/yahoojapan.js'
+import {
+  onePixelOutFlashMediaResolver,
+  onePixelOutWidgetMediaResolver,
+} from '../media/1pixelout.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { flashMp3PlayerMediaResolver } from '../media/flashmp3player.js'
 import { ghostMediaResolver } from '../media/ghost.js'
@@ -765,6 +769,8 @@ const embedResolvers: Array<EmbedResolver> = [
 // Alphabetical by platform. Wikimedia's bare `iframe` selector sits last so a host-keyed
 // resolver gets the carrier first.
 const mediaResolvers: Array<MediaResolver> = [
+  onePixelOutFlashMediaResolver,
+  onePixelOutWidgetMediaResolver,
   discourseMediaResolver,
   flashMp3PlayerMediaResolver,
   ghostMediaResolver,
