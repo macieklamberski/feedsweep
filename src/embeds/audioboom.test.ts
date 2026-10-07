@@ -434,6 +434,17 @@ describeForEachParser('audioboom through the pipeline', (parseHtml) => {
     const flashVars =
       'mp3=http%3A%2F%2Faudioboo.fm%2Fboos%2F1078557-la-minute-gourmande-du-27-novembre-la-faim-on-peut-la-convoquer.mp3%3Fkeyed%3Dtrue%26source%3Dembed&amp;mp3Title=La+minute+gourmande+du+27+novembre+%3A+la+faim%2C+on+peut+la+convoquer+%21&amp;mp3LinkURL=http%3A%2F%2Faudioboo.fm%2Fboos%2F1078557-la-minute-gourmande-du-27-novembre-la-faim-on-peut-la-convoquer&amp;mp3Author=ArianeGrumbach&amp;rootID=boo_embed_1078557'
 
+    const expected = html`
+      <div
+        data-embed-id="1078557"
+        data-embed-provider="audioboom"
+        data-embed-src="https://embeds.audioboom.com/posts/1078557/embed"
+        data-embed-height="95"
+        data-embed-title="La minute gourmande du 27 novembre : la faim, on peut la convoquer !"
+        data-embed-author="ArianeGrumbach"
+      ></div>
+    `
+
     it('should mint the compact player from the object with its iframe', async () => {
       const value = html`
         <p>
@@ -454,15 +465,6 @@ describeForEachParser('audioboom through the pipeline', (parseHtml) => {
           </object>
         </p>
       `
-      const expected = html`
-        <div
-          data-embed-id="1078557"
-          data-embed-provider="audioboom"
-          data-embed-src="https://embeds.audioboom.com/posts/1078557/embed"
-          data-embed-height="95"
-          data-embed-title="Audioboo player"
-        ></div>
-      `
 
       expect(await convert(value)).toEqualHtml(expected)
     })
@@ -481,16 +483,6 @@ describeForEachParser('audioboom through the pipeline', (parseHtml) => {
             <param name="src" value="http://abfiles.s3.amazonaws.com/swf/fullsize_player.swf" />
           </object>
         </p>
-      `
-      const expected = html`
-        <div
-          data-embed-id="1078557"
-          data-embed-provider="audioboom"
-          data-embed-src="https://embeds.audioboom.com/posts/1078557/embed"
-          data-embed-height="95"
-          data-embed-title="La minute gourmande du 27 novembre : la faim, on peut la convoquer !"
-          data-embed-author="ArianeGrumbach"
-        ></div>
       `
 
       expect(await convert(value)).toEqualHtml(expected)
