@@ -31,12 +31,16 @@ export const convertEmojis: DomTransform = (context) => {
   const selectors = batchSelectors(emojiResolvers.map((resolver) => resolver.selector))
 
   return (document) => {
-    if (!selectors.length) {
+    // Linkedom compiles the selector on every matches call. The query results come batch by
+    // batch, out of document order, so the walk still sets the order.
+    const candidates = new Set(selectors.flatMap((batch) => [...document.querySelectorAll(batch)]))
+
+    if (!candidates.size) {
       return
     }
 
     walkElements(document, (element) => {
-      if (!selectors.some((batch) => element.matches(batch))) {
+      if (!candidates.has(element)) {
         return
       }
 
