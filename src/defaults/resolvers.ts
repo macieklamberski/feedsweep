@@ -416,6 +416,7 @@ import { shinobiEmojiResolver } from '../emojis/shinobi.js'
 import { simplePressEmojiResolver } from '../emojis/simplepress.js'
 import { slackEmojiResolver } from '../emojis/slack.js'
 import { smfEmojiResolver } from '../emojis/smf.js'
+import { smileycentralEmojiResolver } from '../emojis/smileycentral.js'
 import { smiliesEmojiResolver, smiliesEmoticonEmojiResolver } from '../emojis/smilies.js'
 import { tapatalkEmojiResolver } from '../emojis/tapatalk.js'
 import { teamsEmojiResolver } from '../emojis/teams.js'
@@ -914,6 +915,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   shinobiEmojiResolver,
   liveinternetEmojiResolver,
   greensmiliesEmojiResolver,
+  smileycentralEmojiResolver,
   rcmsEmojiResolver,
   jeuxvideoEmojiResolver,
   rakutenEmojiResolver,
