@@ -13,6 +13,7 @@ describeForEachParser('fc2EmojiResolver', (parseHtml) => {
     'http://static.fc2.com/image/e/348.gif',
     'http://blog-imgs-1.fc2.com/image/i/265.gif',
     'http://blog77.fc2.com/image/v/410.gif',
+    'http://blog-imgs-1-origin.fc2.com/image/v/354.gif',
   ]
 
   it.each(folderCases)('should mark a pictogram without the class at %s', async (src) => {
@@ -32,6 +33,7 @@ describeForEachParser('fc2EmojiResolver', (parseHtml) => {
   const unclaimedCases: Array<string> = [
     'https://bj.fc2.com/image/banner3.gif',
     'https://blog-imgs-1.fc2.com/e/x/a/example/emoji.gif',
+    'https://example.web.fc2.com/image/icon/photo.jpg',
   ]
 
   it.each(unclaimedCases)('should leave %s without the class untouched', async (src) => {
