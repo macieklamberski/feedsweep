@@ -245,6 +245,34 @@ describe('googlesheetsResolveEmbed', () => {
 
       expect(googlesheetsResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should drop an empty fragment', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZs0nSuXimq1nrFUgP_84KEuRfrbB3fGRXvsIWxswuG_ZQ7c-GaMB8vBKxWUqcXh85NCkXv76_6AYP/pubhtml?widget=true&headers=false#gid='
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '2PACX-1vQZs0nSuXimq1nrFUgP_84KEuRfrbB3fGRXvsIWxswuG_ZQ7c-GaMB8vBKxWUqcXh85NCkXv76_6AYP',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZs0nSuXimq1nrFUgP_84KEuRfrbB3fGRXvsIWxswuG_ZQ7c-GaMB8vBKxWUqcXh85NCkXv76_6AYP/pubhtml?widget=true&headers=false',
+        url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZs0nSuXimq1nrFUgP_84KEuRfrbB3fGRXvsIWxswuG_ZQ7c-GaMB8vBKxWUqcXh85NCkXv76_6AYP/pubhtml',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop an empty pair from the query', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M/pubhtml?gid=1618494729&single=true&widget=true&headers=false&&range=a1:j'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M',
+        src: 'https://docs.google.com/spreadsheets/d/16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M/pubhtml?gid=1618494729&single=true&widget=true&headers=false&range=a1:j',
+        url: 'https://docs.google.com/spreadsheets/d/16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M/pubhtml',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('the sign-in prefixes', () => {
@@ -312,6 +340,101 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should state the height a chart carrier declares', async () => {
+      const value = html`
+        <iframe
+          frameborder="0"
+          height="505"
+          scrolling="no"
+          seamless=""
+          src="https://docs.google.com/spreadsheets/d/1C4qR_gd-gNUlbywprKuVBdNw9Ap6zLsFNYsHSH87K-o/pubchart?oid=537273311&amp;format=interactive"
+          width="600"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1C4qR_gd-gNUlbywprKuVBdNw9Ap6zLsFNYsHSH87K-o',
+        src: 'https://docs.google.com/spreadsheets/d/1C4qR_gd-gNUlbywprKuVBdNw9Ap6zLsFNYsHSH87K-o/pubchart?oid=537273311&format=interactive',
+        url: 'https://docs.google.com/spreadsheets/d/1C4qR_gd-gNUlbywprKuVBdNw9Ap6zLsFNYsHSH87K-o/pubhtml',
+        height: 505,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a chart height written with its unit', async () => {
+      const value = html`
+        <iframe
+          width="712px"
+          height="440px"
+          src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTKLuizF9FWWvQ1yi8_IWs_wuGbEHpYLZg4B95ng98D6e0Kvi65-KN-k85rzBGkGQt4bt8HjDfpZBA5/pubchart?oid=703555483&amp;format=interactive"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '2PACX-1vTKLuizF9FWWvQ1yi8_IWs_wuGbEHpYLZg4B95ng98D6e0Kvi65-KN-k85rzBGkGQt4bt8HjDfpZBA5',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKLuizF9FWWvQ1yi8_IWs_wuGbEHpYLZg4B95ng98D6e0Kvi65-KN-k85rzBGkGQt4bt8HjDfpZBA5/pubchart?oid=703555483&format=interactive',
+        url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKLuizF9FWWvQ1yi8_IWs_wuGbEHpYLZg4B95ng98D6e0Kvi65-KN-k85rzBGkGQt4bt8HjDfpZBA5/pubhtml',
+        height: 440,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a fractional chart height as written', async () => {
+      const value = html`
+        <iframe
+          frameborder="0"
+          height="469.5"
+          scrolling="no"
+          seamless=""
+          src="https://docs.google.com/spreadsheets/d/e/2PACX-1vS9iWeUBXWDgBwW4uHwtUrn21598gdZJkdCHPPDle-TxPIp3vWt5NQJ_iLtNMYQg-KPDUlpJ-Yw9T_4/pubchart?oid=13464762&amp;format=interactive"
+          width="550"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '2PACX-1vS9iWeUBXWDgBwW4uHwtUrn21598gdZJkdCHPPDle-TxPIp3vWt5NQJ_iLtNMYQg-KPDUlpJ-Yw9T_4',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9iWeUBXWDgBwW4uHwtUrn21598gdZJkdCHPPDle-TxPIp3vWt5NQJ_iLtNMYQg-KPDUlpJ-Yw9T_4/pubchart?oid=13464762&format=interactive',
+        url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9iWeUBXWDgBwW4uHwtUrn21598gdZJkdCHPPDle-TxPIp3vWt5NQJ_iLtNMYQg-KPDUlpJ-Yw9T_4/pubhtml',
+        height: 469.5,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state the chart default when the carrier declares no height', async () => {
+      const value =
+        '<iframe src="https://docs.google.com/spreadsheets/d/1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck/pubchart?oid=1031542142&amp;format=interactive"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck',
+        src: 'https://docs.google.com/spreadsheets/d/1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck/pubchart?oid=1031542142&format=interactive',
+        url: 'https://docs.google.com/spreadsheets/d/1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck/pubhtml',
+        height: 371,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state the chart default when the carrier declares a percentage', async () => {
+      const value = html`
+        <iframe
+          height="100%"
+          src="https://docs.google.com/spreadsheets/d/1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck/pubchart?oid=1031542142&amp;format=interactive"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck',
+        src: 'https://docs.google.com/spreadsheets/d/1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck/pubchart?oid=1031542142&format=interactive',
+        url: 'https://docs.google.com/spreadsheets/d/1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck/pubhtml',
+        height: 371,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -334,6 +457,27 @@ describeForEachParser('googlesheets through the pipeline', (parseHtml) => {
       enclosures,
     })
   }
+
+  it('should resolve a published sheet frame into its placeholder', async () => {
+    const value = html`
+      <iframe
+        height="845"
+        src="https://docs.google.com/spreadsheets/d/1cQ8dFdQARpQV-uzmLkEZZZX6m5PhyMClBagpK8yH1mI/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false"
+        width="865"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-height="500"
+        data-embed-url="https://docs.google.com/spreadsheets/d/1cQ8dFdQARpQV-uzmLkEZZZX6m5PhyMClBagpK8yH1mI/pubhtml"
+        data-embed-id="1cQ8dFdQARpQV-uzmLkEZZZX6m5PhyMClBagpK8yH1mI"
+        data-embed-provider="googlesheets"
+        data-embed-src="https://docs.google.com/spreadsheets/d/1cQ8dFdQARpQV-uzmLkEZZZX6m5PhyMClBagpK8yH1mI/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
 
   it('should leave a sheet exported as a file downloadable', async () => {
     const enclosures = [
