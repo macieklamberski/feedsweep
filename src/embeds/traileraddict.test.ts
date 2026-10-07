@@ -45,6 +45,19 @@ describe('traileraddictResolveEmbed', () => {
       expect(traileraddictResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should rebuild the short host onto the current player', () => {
+      const value = 'http://v.traileraddict.com/96331'
+      const expected: EmbedResolverResult = {
+        provider: 'traileraddict',
+        id: '96331',
+        src: 'https://traileraddict.com/iframe.php?id=96331',
+        url: 'https://traileraddict.com/watch/96331',
+        ratio: '16/9',
+      }
+
+      expect(traileraddictResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should drop everything in the query but the id', () => {
       const value = 'https://traileraddict.com/iframe.php?id=11188&autoplay=1&utm_source=feed'
       const expected: EmbedResolverResult = {
@@ -96,6 +109,24 @@ describe('traileraddictResolveEmbed', () => {
       expect(traileraddictResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should return undefined for the short host with no id', () => {
+      const value = 'https://v.traileraddict.com/'
+
+      expect(traileraddictResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a segment after the short host id', () => {
+      const value = 'https://v.traileraddict.com/119230/extra'
+
+      expect(traileraddictResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an id alone on the apex host', () => {
+      const value = 'https://traileraddict.com/119230'
+
+      expect(traileraddictResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should return undefined for the watch page', () => {
       const value = 'https://traileraddict.com/watch/13259/untitled/trailer'
 
@@ -129,6 +160,19 @@ describe('traileraddictResolveEmbed', () => {
 
       expect(traileraddictResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should pass a short host id that is not a number as written', () => {
+      const value = 'https://v.traileraddict.com/119230a'
+      const expected: EmbedResolverResult = {
+        provider: 'traileraddict',
+        id: '119230a',
+        src: 'https://traileraddict.com/iframe.php?id=119230a',
+        url: 'https://traileraddict.com/watch/119230a',
+        ratio: '16/9',
+      }
+
+      expect(traileraddictResolveEmbed(value)).toEqual(expected)
+    })
   })
 })
 
@@ -153,6 +197,28 @@ describeForEachParser('traileraddictEmbedResolver', (parseHtml) => {
         id: '20301',
         src: 'https://traileraddict.com/iframe.php?id=20301',
         url: 'https://traileraddict.com/watch/20301',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should take the platform size over the short host frame box', async () => {
+      const value = html`
+        <iframe
+          class="embed-ta"
+          src="https://v.traileraddict.com/119230"
+          width="853"
+          height="480"
+          scrolling="no"
+          allowfullscreen="allowfullscreen"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'traileraddict',
+        id: '119230',
+        src: 'https://traileraddict.com/iframe.php?id=119230',
+        url: 'https://traileraddict.com/watch/119230',
         ratio: '16/9',
       }
 
@@ -192,6 +258,30 @@ describeForEachParser('traileraddict player through the pipeline', (parseHtml) =
         data-embed-provider="traileraddict"
         data-embed-src="https://traileraddict.com/iframe.php?id=13259"
         data-embed-url="https://traileraddict.com/watch/13259"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a protocol-relative short host frame with the current player', async () => {
+    const value = html`
+      <iframe
+        loading="lazy"
+        src="//v.traileraddict.com/104947"
+        width="560"
+        height="315"
+        scrolling="no"
+        allowfullscreen="allowfullscreen"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-id="104947"
+        data-embed-provider="traileraddict"
+        data-embed-src="https://traileraddict.com/iframe.php?id=104947"
+        data-embed-url="https://traileraddict.com/watch/104947"
       ></div>
     `
 
