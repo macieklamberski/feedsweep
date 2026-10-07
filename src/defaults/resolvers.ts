@@ -267,6 +267,7 @@ import {
   slideshareFlashEmbedResolver,
   slideshareIframeEmbedResolver,
 } from '../embeds/slideshare.js'
+import { smoreEmbedResolver } from '../embeds/smore.js'
 import { soundcloudEmbedResolver } from '../embeds/soundcloud.js'
 import {
   speakerdeckIframeEmbedResolver,
@@ -683,6 +684,7 @@ const embedResolvers: Array<EmbedResolver> = [
   slideserveEmbedResolver,
   slideshareFlashEmbedResolver,
   slideshareIframeEmbedResolver,
+  smoreEmbedResolver,
   soundcloudEmbedResolver,
   speakerdeckScriptEmbedResolver,
   speakerdeckIframeEmbedResolver,
