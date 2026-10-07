@@ -2,6 +2,7 @@ import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
+import { isFileName } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flourish'
@@ -9,6 +10,7 @@ const provider = 'flourish'
 // `flo.uri.sh` is the canonical player. `public.flourish.studio/{resource}/{id}/embed` answers
 // with a shim whose only job is to rewrite the location to it.
 const flourishHosts = ['flo.uri.sh', 'public.flourish.studio']
+const sharePageHost = 'public.flourish.studio'
 
 // `template` has no embed form: its `/embed` answers 403 for a real id.
 const nonEmbeddableResource = 'template'
@@ -65,8 +67,17 @@ export const flourishResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const segments = getPathSegments(parsed)
+  const isPlayer = segments[2] === 'embed'
+  // The share page frames the same player inside the site's header, footer and cookie banner.
+  // `flo.uri.sh` serves no page at that path, and the host serves its own files beside it.
+  const isSharePage =
+    segments.length === 2 && isHostOf(parsed, sharePageHost) && !isFileName(segments[1])
 
-  const embed = segments[2] === 'embed' ? composeEmbed(segments[0], segments[1]) : undefined
+  if (!isPlayer && !isSharePage) {
+    return
+  }
+
+  const embed = composeEmbed(segments[0], segments[1])
 
   return embed && { ...embed, title: attr(element, 'title') }
 }
