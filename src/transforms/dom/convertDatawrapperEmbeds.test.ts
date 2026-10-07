@@ -178,6 +178,26 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
+  it('should convert a chart url parked in a lazy attribute end to end', async () => {
+    const value = html`
+      <iframe
+        class="perfmatters-lazy"
+        data-src="https://datawrapper.dwcdn.net/dSLe7/9/"
+      ></iframe>
+    `
+    const expected = html`
+      <a href="https://datawrapper.dwcdn.net/dSLe7/">
+        <img src="https://datawrapper.dwcdn.net/dSLe7/full.png">
+      </a>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
   it('should convert the plain-link form', async () => {
     const value = html`
       <div class="datawrapper-embed">

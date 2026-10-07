@@ -132,6 +132,11 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // below see the video and not the site's proxy route. Runs before surfaceNoscriptEmbeds,
   // which surfaces only a frame a resolver claims.
   unwrapDrupalOembedIframes,
+
+  // Runs after surfaceParkedMarkup and surfaceTemplateEmbeds, which can surface a lazy iframe, and
+  // before every pass that reads an iframe's `src`, convertDatawrapperEmbeds and convertGiphyEmbeds
+  // among them. unwrapDrupalOembedIframes reads the lazy attributes itself.
+  fixLazyIframes,
   surfaceNoscriptEmbeds,
   rebuildEmbedPlusEmbeds,
   rebuildIframelyEmbeds,
@@ -303,9 +308,6 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   stripWordBreaks,
   linkifyUrls,
   markTimestamps,
-
-  // Promotes lazy/consent-gated iframe srcs into `src` so convertWidgets sees a resolvable iframe.
-  fixLazyIframes,
   convertWidgets,
   injectEnclosures,
 
