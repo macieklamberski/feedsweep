@@ -202,6 +202,13 @@ const isBareSprite = (sprite: Element): boolean => {
     }
   }
 
+  // A picture, link or player inside a nested wrapper is content the sprite did not cover.
+  for (const descendant of Array.from(sprite.querySelectorAll('*'))) {
+    if (!descendant.matches(`${labelSelector}, ${zeroSizeSelector}, ${spriteSelector}, br`)) {
+      return false
+    }
+  }
+
   const text = sprite.textContent?.trim()
 
   return !text || !!glyphFromShortcode(text)

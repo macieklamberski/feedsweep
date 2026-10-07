@@ -924,6 +924,39 @@ describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    it('should replace a wrapper whose sprite holds a nested sprite with a line break', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile-emoticon">
+            <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4">
+              <i class="_lew" title="smile-emoticon">
+                <i class="_lew" title="smile-emoticon">
+                  <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"><br></i>
+                  <span aria-hidden="true" class="_4mcd">:)</span>
+                </i>
+              </i>
+            </i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml('<p>🙂</p>')
+    })
+
+    it('should leave a wrapper whose sprite holds a label wrapper around a picture untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="wink emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_7f72ac">
+              <span class="_47e3" title="smile emoticon"><img src="https://example.com/photo.jpg"></span>
+            </i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
   })
 
   describe('zero-size wrappers', () => {
