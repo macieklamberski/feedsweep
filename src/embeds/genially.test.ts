@@ -31,6 +31,30 @@ describe('extractGeniallyViewId', () => {
     expect(extractGeniallyViewId(value)).toBe(viewId)
   })
 
+  it('should read the id from the retired View/Index route', () => {
+    const value = 'https://www.genial.ly/View/Index/59cc0e1689ef4914f441596a'
+
+    expect(extractGeniallyViewId(value)).toBe('59cc0e1689ef4914f441596a')
+  })
+
+  it('should return undefined for a View/Index route spelled in mixed case', () => {
+    const value = 'https://www.genial.ly/View/index/59cc0e1689ef4914f441596a'
+
+    expect(extractGeniallyViewId(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a View route with another second word', () => {
+    const value = 'https://www.genial.ly/View/Embed/59cc0e1689ef4914f441596a'
+
+    expect(extractGeniallyViewId(value)).toBeUndefined()
+  })
+
+  it('should return undefined for an Index route under another first word', () => {
+    const value = 'https://www.genial.ly/Vista/Index/59cc0e1689ef4914f441596a'
+
+    expect(extractGeniallyViewId(value)).toBeUndefined()
+  })
+
   it('should return undefined for a genially url naming no view', () => {
     const value = 'https://genially.com/pricing'
 
@@ -135,6 +159,28 @@ describeForEachParser('geniallyEmbedResolver', (parseHtml) => {
         provider: 'genially',
         id: '60294f8b2ec856159ae0baa5',
         src: 'https://view.genially.com/60294f8b2ec856159ae0baa5',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should claim a view iframe on the retired View/Index route', async () => {
+      const value = html`
+        <iframe
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+          src="https://www.genial.ly/View/Index/59cc0e1689ef4914f441596a"
+          width="1600"
+          height="900"
+          frameborder="0"
+          scrolling="yes"
+          allowfullscreen="allowfullscreen"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'genially',
+        id: '59cc0e1689ef4914f441596a',
+        src: 'https://view.genially.com/59cc0e1689ef4914f441596a',
         ratio: '16/9',
       }
 
