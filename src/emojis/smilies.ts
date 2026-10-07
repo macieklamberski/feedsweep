@@ -407,6 +407,11 @@ const boardEmojiNames = toMap<EmojiGlyph>({
   welcome: false,
 })
 
+// An alt shaped like a code an author types: a known code, a `:name:`, a `(name)` or `[name]` as
+// Plurk and Skype write them, or an ASCII face.
+const shortcodeAltRegex = /^(?::[^\s:]+:|\([\w -]+\)|\[[\w -]+\])$/
+const asciiEmoticonRegex = /^[>O]?[:;=8][-'^o]?[()[\]DPpOo*|\\/$@3Xx]{1,3}$/
+
 // Forum smilie images, which render oversized without the site's CSS. An engine with names or
 // signals of its own has a resolver of its own ahead of this one.
 export const smiliesEmojiResolver: EmojiResolver = {
@@ -414,14 +419,20 @@ export const smiliesEmojiResolver: EmojiResolver = {
   selector: smilieSelector,
   extract: (element) => {
     const src = element.getAttribute('src') ?? ''
-    const isStrong = element.matches(markerSelector)
+    const isMarked = element.matches(markerSelector)
 
-    if (!isStrong && !element.matches(directorySelector)) {
+    if (!isMarked && !element.matches(directorySelector)) {
       return
     }
 
+    // A directory alone is a weak hint, so a code in the alt is the second one. Only the `:name:`
+    // form and ASCII faces count here, never the bracketed forms.
+    const alt = attr(element, 'alt') ?? ''
+    const hasCodeAlt =
+      (alt.startsWith(':') && shortcodeAltRegex.test(alt)) || asciiEmoticonRegex.test(alt)
+
     return resolveEmojiImage(element, {
-      isStrong,
+      isStrong: isMarked || hasCodeAlt,
       names: smiliesEmojiNames,
       glyph: getDirectoryGlyph(src, '/images/smilies/', boardEmojiNames),
       // An unsubstituted phpBB template variable is a src no host serves.
@@ -429,11 +440,6 @@ export const smiliesEmojiResolver: EmojiResolver = {
     })
   },
 }
-
-// An alt shaped like a code an author types: a known code, a `:name:`, a `(name)` or `[name]` as
-// Plurk and Skype write them, or an ASCII face.
-const shortcodeAltRegex = /^(?::[^\s:]+:|\([\w -]+\)|\[[\w -]+\])$/
-const asciiEmoticonRegex = /^[>O]?[:;=8][-'^o]?[()[\]DPpOo*|\\/$@3Xx]{1,3}$/
 
 // Images a site's own smilie set or album marks with the whole-word emoticon class, as Steam,
 // TypePad, Moodle and Plurk do. Reaction GIFs and photos share the class, so an image without a

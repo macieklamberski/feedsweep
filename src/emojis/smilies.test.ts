@@ -236,6 +236,28 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('code-shaped alt under a smilie directory', () => {
+    const codeAltCases: Array<[string, string]> = [
+      ['https://example.com/images/smilies/fresse.gif', ':fresse:'],
+      ['https://example.com/uploads/emoticons/default_true.gif', ':тру:'],
+      ['https://example.com/smileys/ohwell.png', ':-/'],
+      ['https://example.com/wcf/images/smilies/scared.png', '=O'],
+    ]
+
+    it.each(codeAltCases)('should mark %s by its %s alt', async (source, alt) => {
+      const value = `<p><img src="${source}" alt="${alt}"></p>`
+      const expected = `<p><img data-emoji="" src="${source}" alt="${alt}"></p>`
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a smilie with a bracketed alt untouched', async () => {
+      const value = '<p><img src="https://example.com/img/smilies/blahblah.gif" alt="[image]"></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
   describe('emoticon class', () => {
     const codeAltCases: Array<string> = [':eheh:', '(LOL)', '[emo155]', ':-))']
 
@@ -429,10 +451,12 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should leave a board image named like the codepoint of © untouched', async () => {
+    it('should mark a board image named like the codepoint of © without decoding it', async () => {
       const value = '<p><img src="https://example.com/board/emoticons/a9.jpg" alt=":a9:"></p>'
+      const expected =
+        '<p><img data-emoji="" src="https://example.com/board/emoticons/a9.jpg" alt=":a9:"></p>'
 
-      expect(await transform(value)).toEqualHtml(value)
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should mark a Kolobok smilie by its two-letter name', async () => {
