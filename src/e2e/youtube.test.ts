@@ -359,3 +359,31 @@ describeForEachParser('YouTube', (parseHtml) => {
     ).toEqualHtml(expected)
   })
 })
+
+// A WordPress video shortcode naming the watch page, which no browser plays.
+describeForEachParser('YouTube pages in a media element', (parseHtml) => {
+  it('should frame a video shortcode naming a watch page', async () => {
+    const value = html`
+      <p>
+        <video
+          class="wp-video-shortcode"
+          id="video-4724-3"
+          preload="none"
+          controls="controls"
+        ><source type="video/youtube" src="https://www.youtube.com/watch?v=qa-d1guhpb4&amp;_=3"></video>
+      </p>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/qa-d1guhpb4/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=qa-d1guhpb4"
+        data-embed-id="qa-d1guhpb4"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/qa-d1guhpb4"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+})

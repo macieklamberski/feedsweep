@@ -1561,3 +1561,355 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('convertWidgets (media elements naming a platform page)', (parseHtml) => {
+  const withDefaultResolvers: TransformContext = {
+    ...baseContext,
+    widgetResolvers: defaultWidgetResolvers,
+  }
+
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [convertWidgets(withDefaultResolvers)])
+  }
+
+  it('should frame a WordPress video shortcode naming a YouTube watch page', async () => {
+    const value = html`
+      <video
+        class="wp-video-shortcode"
+        id="video-4724-3"
+        preload="none"
+        controls="controls"
+      ><source type="video/youtube" src="https://www.youtube.com/watch?v=qa-d1guhpb4&amp;_=3"></video>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/qa-d1guhpb4/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=qa-d1guhpb4"
+        data-embed-id="qa-d1guhpb4"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/qa-d1guhpb4"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should frame a video whose own src names a youtu.be page', async () => {
+    const value = '<video src="https://youtu.be/P9cxtTYHjSQ"></video>'
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/P9cxtTYHjSQ/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=P9cxtTYHjSQ"
+        data-embed-id="P9cxtTYHjSQ"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/P9cxtTYHjSQ"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should frame an audio element naming a Google Drive file page', async () => {
+    const value = html`
+      <audio controls>
+        <source
+          src="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view?usp=sharing"
+          type="audio/mpeg"
+        >
+        Tu navegador no soporta la etiqueta de audio.
+      </audio>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="4/3"
+        data-embed-thumbnail="https://drive.google.com/thumbnail?id=1GRb_urzw2vn0JGKamTE70NIoELiXbAJA&sz=w640"
+        data-embed-url="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view"
+        data-embed-id="1GRb_urzw2vn0JGKamTE70NIoELiXbAJA"
+        data-embed-provider="googledrive"
+        data-embed-src="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/preview"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should carry the poster as the thumbnail', async () => {
+    const value = html`
+      <video
+        class="sc_video"
+        src="https://player.vimeo.com/video/71168250"
+        poster="https://example.com/poster.jpg"
+        controls="controls"
+      ></video>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://example.com/poster.jpg"
+        data-embed-url="https://vimeo.com/71168250"
+        data-embed-id="71168250"
+        data-embed-provider="vimeo"
+        data-embed-src="https://player.vimeo.com/video/71168250"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a video that also names a real file', async () => {
+    const value = html`
+      <video controls>
+        <source type="video/mp4" src="https://example.com/uploads/talk.mp4">
+        <source type="video/webm" src="https://youtu.be/i9CIBR0jKB8">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a media file on a host whose resolver claims it', async () => {
+    const value =
+      '<video controls src="https://player.vimeo.com/progressive_redirect/playback/15258345/rendition/720p/file.mp4?loc=external"></video>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a Google Drive direct download', async () => {
+    const value = html`
+      <audio controls>
+        <source
+          src="https://drive.google.com/uc?export=download&amp;id=1xj9_ppcJkXpSGK9bjYTEX1KzQyML1xyC"
+          type="audio/mp3"
+        >
+      </audio>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a page no resolver claims', async () => {
+    const value = '<video><source src="http://www.youtube.com/watch?v=kShmImcTvyIL"></video>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a video whose other source no resolver claims', async () => {
+    const value = html`
+      <video controls>
+        <source type="application/x-mpegURL" src="https://cdn.example.com/live/master.m3u8">
+        <source src="https://youtu.be/i9CIBR0jKB8">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave an element to a resolver that claims it', async () => {
+    // Constructed: a resolver claiming the <audio> itself, the way a platform's audio bar does.
+    const audioResolver: EmbedResolver = {
+      kind: 'embed',
+      selector: 'audio.podcast-player',
+      extract: () => ({
+        provider: 'example',
+        src: 'https://player.example/episode/1',
+        height: 30,
+      }),
+    }
+    const context: TransformContext = {
+      ...baseContext,
+      widgetResolvers: [audioResolver, ...defaultWidgetResolvers],
+    }
+    const value = html`
+      <audio
+        class="podcast-player"
+        src="https://youtu.be/P9cxtTYHjSQ"
+      ></audio>
+    `
+    const expected = html`
+      <div
+        data-embed-height="30"
+        data-embed-provider="example"
+        data-embed-src="https://player.example/episode/1"
+      ></div>
+    `
+
+    const converted = await applyDomTransforms(parseHtml(value), [convertWidgets(context)])
+
+    expect(converted).toEqualHtml(expected)
+  })
+
+  it('should leave the element and its companion markup to the resolver that claims it', async () => {
+    // Constructed: a resolver that reads and removes its credit sibling, as SoundCloud's does.
+    const creditResolver: EmbedResolver = {
+      kind: 'embed',
+      selector: 'audio.podcast-player',
+      extract: (element) => {
+        const credit = element.nextElementSibling
+        const title = credit?.textContent ?? undefined
+        credit?.remove()
+
+        return {
+          provider: 'example',
+          src: 'https://player.example/1',
+          height: 30,
+          title,
+        }
+      },
+    }
+    const context: TransformContext = {
+      ...baseContext,
+      widgetResolvers: [creditResolver, ...defaultWidgetResolvers],
+    }
+    const value = html`
+      <audio
+        class="podcast-player"
+        src="https://youtu.be/P9cxtTYHjSQ"
+      ></audio>
+      <div class="credit">Episode 1</div>
+    `
+    const expected = html`
+      <div
+        data-embed-title="Episode 1"
+        data-embed-height="30"
+        data-embed-provider="example"
+        data-embed-src="https://player.example/1"
+      ></div>
+    `
+
+    const converted = await applyDomTransforms(parseHtml(value), [convertWidgets(context)])
+
+    expect(converted).toEqualHtml(expected)
+  })
+
+  it('should frame an element whose resolver selector matches but refuses it', async () => {
+    // Constructed: a resolver selecting every <audio> that reads only its own platform's urls.
+    const audioResolver: EmbedResolver = {
+      kind: 'embed',
+      selector: 'audio',
+      extract: () => undefined,
+    }
+    const context: TransformContext = {
+      ...baseContext,
+      widgetResolvers: [audioResolver, ...defaultWidgetResolvers],
+    }
+    const value = '<audio src="https://youtu.be/P9cxtTYHjSQ"></audio>'
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/P9cxtTYHjSQ/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=P9cxtTYHjSQ"
+        data-embed-id="P9cxtTYHjSQ"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/P9cxtTYHjSQ"
+      ></div>
+    `
+
+    const converted = await applyDomTransforms(parseHtml(value), [convertWidgets(context)])
+
+    expect(converted).toEqualHtml(expected)
+  })
+
+  it('should keep the element when the post also frames the same file', async () => {
+    const value = html`
+      <audio controls>
+        <source
+          src="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view?usp=sharing"
+          type="audio/mpeg"
+        >
+      </audio>
+      <iframe
+        src="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view?usp=sharing"
+        width="600"
+        height="400"
+      ></iframe>
+    `
+    const expected = html`
+      <audio controls>
+        <source
+          src="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view?usp=sharing"
+          type="audio/mpeg"
+        >
+      </audio>
+      <div
+        data-embed-ratio="4/3"
+        data-embed-thumbnail="https://drive.google.com/thumbnail?id=1GRb_urzw2vn0JGKamTE70NIoELiXbAJA&sz=w640"
+        data-embed-url="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view"
+        data-embed-id="1GRb_urzw2vn0JGKamTE70NIoELiXbAJA"
+        data-embed-provider="googledrive"
+        data-embed-src="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/preview"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should frame the element when the post frames another video', async () => {
+    const value = html`
+      <video controls src="https://youtu.be/qo2veCDcG_4"></video>
+      <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/qo2veCDcG_4/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=qo2veCDcG_4"
+        data-embed-id="qo2veCDcG_4"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/qo2veCDcG_4"
+      ></div>
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        data-embed-id="dQw4w9WgXcQ"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a resolver its companion markup while checking the post for the same item', async () => {
+    const value = html`
+      <video
+        class="wp-video-shortcode"
+        id="video-4724-3"
+        preload="none"
+        controls="controls"
+      ><source type="video/youtube" src="https://www.youtube.com/watch?v=qa-d1guhpb4&amp;_=3"></video>
+      <iframe
+        width="100%"
+        height="166"
+        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/293&amp;color=%23ff5500"
+      ></iframe>
+      <div style="font-size: 10px; color: #cccccc;">
+        <a href="https://soundcloud.com/forss" title="Forss" target="_blank">Forss</a> ·
+        <a href="https://soundcloud.com/forss/flickermood" title="Flickermood" target="_blank">Flickermood</a>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/qa-d1guhpb4/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=qa-d1guhpb4"
+        data-embed-id="qa-d1guhpb4"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/qa-d1guhpb4"
+      ></div>
+      <div
+        data-embed-author="Forss"
+        data-embed-title="Flickermood"
+        data-embed-height="166"
+        data-embed-url="https://soundcloud.com/forss/flickermood"
+        data-embed-id="tracks/293"
+        data-embed-provider="soundcloud"
+        data-embed-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/293"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})
