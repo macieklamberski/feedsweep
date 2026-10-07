@@ -28,7 +28,7 @@ const tokenParam = 'flashvars[ks]'
 
 // The widget an entry's access control can be tied to, as the embedIframeJs and the
 // embedPlaykitJs player read it. Such an entry plays only with it, and errors without it.
-const widgetParams = ['widget_id', 'config[provider]']
+const widgetParams = ['wid', 'widget_id', 'config[provider]']
 
 type Entry = {
   path: string
