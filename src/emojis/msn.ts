@@ -2,7 +2,8 @@ import type { EmojiResolver } from '../types.js'
 import { resolveEmojiImage } from '../utils/emojis.js'
 
 const selectors = [
-  'img[src*="spaces.live.com/rte/emoticons/" i]', // Windows Live Spaces' editor
+  // Windows Live Spaces' editor, also on each blog's subdomain behind a build folder.
+  'img[src*="spaces.live.com/" i][src*="/rte/emoticons/" i]',
   'img[src*="spaces.msn.com/rte/emoticons/" i]', // The same editor as MSN Spaces
   'img[src*="shared.live.com/" i][src*="/emoticons/" i]', // The same set on Windows Live's CDN
   'img[src*=".hotmail.com/mail/" i][src*="/emoticons/" i]', // Hotmail's editor
@@ -11,9 +12,10 @@ const selectors = [
   'img[src*="/smiley/msn/" i]', // FCKeditor's stock set, copied to the editor's folder on any host
 ]
 
-// MSN's emoticons, as Spaces, Hotmail, Messenger and FCKeditor serve them. Each is MSN's own
-// drawing, bound to a code like `(6)` rather than a character, so the whole set keeps its pictures
-// and a universal code alt stays a marked picture too.
+// MSN's emoticons, as Spaces, Hotmail, Messenger and FCKeditor serve them, each bound to a code
+// like `(6)` rather than a character. So the whole set keeps its pictures and a universal code
+// alt stays a marked picture too. Faces a publisher added to FCKeditor's `smiley/msn/` folder go
+// with it.
 export const msnEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: selectors.join(', '),

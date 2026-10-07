@@ -7,6 +7,7 @@ describeForEachParser('msnEmojiResolver', (parseHtml) => {
   describe('sets', () => {
     const setCases: Array<string> = [
       'http://spaces.live.com/rte/emoticons/smile_sad.gif',
+      'https://i0.wp.com/jarabindan.spaces.live.com/mmm2006-10-27_23.09/rte/emoticons/phone.gif',
       'http://spaces.msn.com/rte/emoticons/smile_cry.gif',
       'http://shared.live.com/QGncRMHLLpIcOfCh--4aMA/emoticons/smile_cry.gif',
       'http://gfx2.hotmail.com/mail/w4/pr01/ltr/emoticons/rose.gif',
