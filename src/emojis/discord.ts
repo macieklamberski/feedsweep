@@ -7,6 +7,6 @@ export const discordEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[src*="cdn.discordapp.com/emojis/" i]',
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

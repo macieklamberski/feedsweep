@@ -1,5 +1,5 @@
 import { expect, it } from 'bun:test'
-import { describeForEachParser, emojiConverters } from '../tests.js'
+import { describeForEachParser, emojiConverters, html } from '../tests.js'
 
 describeForEachParser('tapatalkEmojiResolver', (parseHtml) => {
   const { transform } = emojiConverters(parseHtml)
@@ -7,6 +7,28 @@ describeForEachParser('tapatalkEmojiResolver', (parseHtml) => {
   it('should mark a numbered emoji', async () => {
     const value = '<p><img src="https://emoji.tapatalk-cdn.com/emoji6.png"></p>'
     const expected = '<p><img data-emoji="" src="https://emoji.tapatalk-cdn.com/emoji6.png"></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep an emoji whose alt is an emoji as a marked picture', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://emoji.tapatalk-cdn.com/emoji6.png"
+          alt="😀"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://emoji.tapatalk-cdn.com/emoji6.png"
+          alt="😀"
+        >
+      </p>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })

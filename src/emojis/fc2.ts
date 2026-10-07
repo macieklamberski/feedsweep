@@ -8,8 +8,9 @@ const classSelector = 'img[class~="emoji" i][src*=".fc2.com/" i]'
 // FC2's own image hosts. A homepage on `<user>.web.fc2.com` names its own `/image/` folders.
 const pictogramHostRegex = /^(?:static|blog\d*|blog-imgs-\d+(?:-origin)?)\.fc2\.com$/i
 
-// FC2's pictograms under the shared emoji class. They are numbered in decimal, so `2640.gif` is
-// not U+2640, and have no Unicode counterpart to become.
+// FC2's pictograms under the shared emoji class, numbered in decimal per carrier: `e` is au's icon
+// number and `i` docomo's, and each holds ids with no Unicode counterpart. So `2640.gif` is not
+// U+2640.
 export const fc2EmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: [

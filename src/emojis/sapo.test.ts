@@ -112,4 +112,30 @@ describeForEachParser('sapoEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(value)
   })
+
+  it('should keep an emoticon whose alt is an emoji as a marked picture', async () => {
+    const value = html`
+      <p>
+        <img
+          height="32"
+          src="https://example.com/tinymce4/plugins/sapoemoticons/img/EMOTICON_2020_BLINK.png"
+          width="32"
+          alt="😀"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          height="32"
+          src="https://example.com/tinymce4/plugins/sapoemoticons/img/EMOTICON_2020_BLINK.png"
+          width="32"
+          alt="😀"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
 })

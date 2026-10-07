@@ -6,6 +6,6 @@ export const pivotxEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[src*="/pivotx/includes/emoticons/" i]',
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

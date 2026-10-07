@@ -12,6 +12,6 @@ export const sapoEmojiResolver: EmojiResolver = {
     'img[src*="blogs.sapo.pt/images/mood/EMOTICON_" i]', // A post's mood, shown with the same set
   ].join(', '),
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

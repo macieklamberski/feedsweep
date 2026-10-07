@@ -6,6 +6,6 @@ export const pixnetEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[src*="f.pixnet.net/images/emotions/" i]',
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }
