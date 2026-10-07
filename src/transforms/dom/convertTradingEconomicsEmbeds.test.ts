@@ -58,7 +58,7 @@ describeForEachParser('convertTradingEconomicsEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should keep the www host and the http scheme the feed wrote', async () => {
+    it('should move a www carrier to the bare host over https', async () => {
       const value = html`
         <iframe
           src="http://www.tradingeconomics.com/embed/?s=dxy&amp;v=201604122040n&amp;forecast=2&amp;h=300&amp;w=600&amp;ref=/united-states/currency/forecast"
@@ -71,7 +71,7 @@ describeForEachParser('convertTradingEconomicsEmbeds', (parseHtml) => {
       const expected = html`
         <a href="https://tradingeconomics.com/united-states/currency/forecast">
           <img
-            src="http://www.tradingeconomics.com/charts/embed.png?s=dxy&amp;v=201604122040n&amp;forecast=2&amp;h=300&amp;w=600&amp;ref=/united-states/currency/forecast"
+            src="https://tradingeconomics.com/charts/embed.png?s=dxy&amp;v=201604122040n&amp;forecast=2&amp;h=300&amp;w=600&amp;ref=/united-states/currency/forecast"
             width="600"
             height="300"
           >

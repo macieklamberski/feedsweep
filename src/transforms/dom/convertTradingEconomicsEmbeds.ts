@@ -24,8 +24,13 @@ export const convertTradingEconomicsEmbeds: DomTransform = () => (document) => {
       ? `https://tradingeconomics.com${ref}`
       : 'https://tradingeconomics.com/'
 
+    // www.tradingeconomics.com fails the TLS handshake, so an https page cannot load the image
+    // from it. The bare host serves the same PNG over https.
+    const origin =
+      url.hostname === 'www.tradingeconomics.com' ? 'https://tradingeconomics.com' : url.origin
+
     const image = createLinkedImage(document, {
-      src: `${url.origin}/charts/embed.png${url.search}`,
+      src: `${origin}/charts/embed.png${url.search}`,
       href,
       width: dimensions.width ?? parsePixelSize(url.searchParams.get('w')),
       height: dimensions.height ?? parsePixelSize(url.searchParams.get('h')),
