@@ -366,6 +366,81 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
     })
   })
 
+  describe('media sources', () => {
+    const unwrapPodtrac = (url: string): string => {
+      return url.replace('https://dts.podtrac.com/redirect.mp3/', 'https://')
+    }
+
+    it('should clean an audio src with the provided cleanUrlFn', async () => {
+      const value = '<p>Episode notes</p>'
+      const context: TransformContext = {
+        ...withEnclosures([
+          {
+            url: 'https://dts.podtrac.com/redirect.mp3/example.com/podlove/file/1/episode.mp3',
+            type: 'audio/mpeg',
+          },
+        ]),
+        cleanUrlFn: unwrapPodtrac,
+      }
+      const expected = html`
+        <audio
+          src="https://example.com/podlove/file/1/episode.mp3"
+          controls
+          data-enclosure=""
+        ></audio>
+        <p>Episode notes</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should clean a video src with the provided cleanUrlFn', async () => {
+      const value = '<p>Episode notes</p>'
+      const context: TransformContext = {
+        ...withEnclosures([
+          {
+            url: 'https://dts.podtrac.com/redirect.mp3/example.com/podlove/file/1/episode.mp4',
+            type: 'video/mp4',
+          },
+        ]),
+        cleanUrlFn: unwrapPodtrac,
+      }
+      const expected = html`
+        <video
+          src="https://example.com/podlove/file/1/episode.mp4"
+          controls
+          data-enclosure=""
+        ></video>
+        <p>Episode notes</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should keep the src when the cleanUrlFn answers with nothing', async () => {
+      const value = '<p>Episode notes</p>'
+      const context: TransformContext = {
+        ...withEnclosures([
+          {
+            url: 'https://dts.podtrac.com/redirect.mp3/example.com/podlove/file/1/episode.mp3',
+            type: 'audio/mpeg',
+          },
+        ]),
+        cleanUrlFn: () => '',
+      }
+      const expected = html`
+        <audio
+          src="https://dts.podtrac.com/redirect.mp3/example.com/podlove/file/1/episode.mp3"
+          controls
+          data-enclosure=""
+        ></audio>
+        <p>Episode notes</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+  })
+
   describe('image enclosures', () => {
     it('should inject image enclosure as img element', async () => {
       const value = '<p>Content</p>'
@@ -1292,7 +1367,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       }
       const expected = html`
         <audio
-          src="https://example.com/episode.mp3?utm_source=feed"
+          src="https://example.com/episode.mp3"
           controls
           data-enclosure=""
         ></audio>
