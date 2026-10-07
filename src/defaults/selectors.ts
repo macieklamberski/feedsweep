@@ -267,6 +267,13 @@ export const defaultNonContentSelectors = [
   // A titled one reads `[+] Title` and becomes its title in convertUcozSpoilerButtons.
   '.uSpoilerButton:not([value^="[+]"])',
 
+  // Embed Any Document's loading block beside its viewer frame, which the plugin's script hides
+  // once the frame loads. Its "Open in new tab" link stays as the route to the file.
+  '.ead-loading', // Spinner and "Loading..." text.
+  '.ead-loading-foot-title', // Logo and "Taking too long?" text.
+  '.ead-reload-btn', // Reload button, which does nothing without the plugin's script.
+  '.ead-loading-foot span', // The "|" divider between the reload button and the link.
+
   // GDPR/consent-gated embeds are recovered, not stripped: each CMP parks the author's embed
   // URL on the iframe itself, so fixLazyIframes promotes it back into src (see the CMP block in
   // defaultLazyIframeAttributes). What stays stripped here is the part that renders as chrome.

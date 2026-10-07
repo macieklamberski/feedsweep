@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { defaultNonContentSelectors } from '../../defaults.js'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -260,6 +261,20 @@ const specimens: Record<string, string | [string, string]> = {
   ],
   '.uSpoilerButton:not([value^="[+]"])':
     '<input type="button" class="uSpoilerButton" onclick="if($(\'#uSpoiler13Cu30\')[0]){}" value="Открыть спойлер">',
+  '.ead-loading': [
+    '<div class="ead-loading-main"><div class="ead-loading"><img src="https://example.com/wp-content/plugins/embed-any-document/images/loading.svg" width="55" height="55" alt="Loader"><span>Loading...</span></div></div>',
+    '<div class="ead-loading-main"></div>',
+  ],
+  '.ead-loading-foot-title': [
+    '<div class="ead-loading-foot"><div class="ead-loading-foot-title"><img src="https://example.com/wp-content/plugins/embed-any-document/images/EAD-logo.svg" alt="EAD Logo" width="36" height="23"><span>Taking too long?</span></div></div>',
+    '<div class="ead-loading-foot"></div>',
+  ],
+  '.ead-reload-btn':
+    '<div class="ead-document-btn ead-reload-btn" role="button"><img src="https://example.com/wp-content/plugins/embed-any-document/images/reload.svg" alt="Reload" width="12" height="12"> Reload document</div>',
+  '.ead-loading-foot span': [
+    '<div class="ead-loading-foot"><span>|</span><a href="https://example.com/wp-content/uploads/2022/08/UConn-Response-Summary-Document_Final.pdf" class="ead-document-btn" target="_blank"><img src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"> Open in new tab</a></div>',
+    '<div class="ead-loading-foot"><a href="https://example.com/wp-content/uploads/2022/08/UConn-Response-Summary-Document_Final.pdf" class="ead-document-btn" target="_blank"><img src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"> Open in new tab</a></div>',
+  ],
   'span[data-s9e-mediaembed]:not(:has(iframe, embed, object, video, audio))':
     '<span data-s9e-mediaembed="youtube" style="display:inline-block;max-width:640px"><span style="padding-bottom:56.25%"> <strong>iframe</strong> </span></span>',
   '.fusion-privacy-placeholder':
@@ -955,6 +970,211 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       `
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+})
+
+describeForEachParser('Embed Any Document loading block through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  describe('the plugin template, whose paragraph around the buttons is never closed', () => {
+    it('should keep only the link to the file', async () => {
+      const value = html`
+        <div class="ead-document-loading" style="width:100%;height:100%;position:absolute;left:0;top:0;z-index:10;">
+          <div class="ead-loading-wrap">
+            <div class="ead-loading-main">
+              <div class="ead-loading">
+                <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/loading.svg" width="55" height="55" alt="Loader">
+                <span>Loading...</span>
+              </div>
+            </div>
+            <div class="ead-loading-foot">
+              <div class="ead-loading-foot-title">
+                <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/EAD-logo.svg" alt="EAD Logo" width="36" height="23"/>
+                <span>Taking too long?</span>
+              </div>
+              <p>
+                <div class="ead-document-btn ead-reload-btn" role="button">
+                  <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/reload.svg" alt="Reload" width="12" height="12"/> Reload document
+                </div>
+                <span>|</span>
+                <a href="https://example.com/wp-content/uploads/2022/08/UConn-Response-Summary-Document_Final.pdf" class="ead-document-btn" target="_blank">
+                  <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"/> Open in new tab
+                </a>
+            </div>
+          </div>
+        </div>
+      `
+      const expected = html`
+        <p>
+          <a href="https://example.com/wp-content/uploads/2022/08/UConn-Response-Summary-Document_Final.pdf" class="ead-document-btn" target="_blank"><img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"> Open in new tab </a>
+        </p>
+      `
+
+      expect(await convert(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('the buttons with no paragraph around them', () => {
+    it('should keep only the link to the file', async () => {
+      const value = html`
+        <div class="ead-document-loading" style="width:100%;height:100%;position:absolute;left:0;top:0;z-index:10;">
+          <div class="ead-loading-wrap">
+            <div class="ead-loading-main">
+              <div class="ead-loading">
+                <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/loading.svg" width="55" height="55" alt="Loader">
+                <span>Loading...</span>
+              </div>
+            </div>
+            <div class="ead-loading-foot">
+              <div class="ead-loading-foot-title">
+                <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/EAD-logo.svg" alt="EAD Logo" width="36" height="23"/>
+                <span>Taking too long?</span>
+              </div>
+              <div class="ead-document-btn ead-reload-btn" role="button">
+                <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/reload.svg" alt="Reload" width="12" height="12"/> Reload document
+              </div>
+              <span>|</span>
+              <a href="https://example.com/wp-content/uploads/2026/08/IEEERegion-2-Q3-2026Newsletter.pdf" class="ead-document-btn" target="_blank">
+                <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"/> Open in new tab
+              </a>
+            </div>
+          </div>
+        </div>
+      `
+      const expected = html`
+        <p>
+          <a href="https://example.com/wp-content/uploads/2026/08/IEEERegion-2-Q3-2026Newsletter.pdf" class="ead-document-btn" target="_blank"><img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"> Open in new tab </a>
+        </p>
+      `
+
+      expect(await convert(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('an empty paragraph before the buttons', () => {
+    it('should keep only the link to the file', async () => {
+      const value = html`
+        <div class="ead-document-loading" style="width:100%;height:100%;position:absolute;left:0;top:0;z-index:10;">
+          <div class="ead-loading-wrap">
+            <div class="ead-loading-main">
+              <div class="ead-loading">
+                <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/loading.svg" width="55" height="55" alt="Loader"/>
+                <span>Loading...</span>
+              </div>
+            </div>
+            <div class="ead-loading-foot">
+              <div class="ead-loading-foot-title">
+                <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/EAD-logo.svg" alt="EAD Logo" width="36" height="23"/>
+                <span>Taking too long?</span>
+              </div>
+              <p>
+              </p><div class="ead-document-btn ead-reload-btn" role="button">
+                <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/reload.svg" alt="Reload" width="12" height="12"/> Reload document
+              </div>
+              <span>|</span>
+              <a href="https://example.com/wp-content/uploads/2026/10/Fotograf-3.pdf" class="ead-document-btn" target="_blank">
+                <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"/> Open in new tab
+              </a>
+            </div>
+          </div>
+        </div>
+      `
+      const expected = html`
+        <p>
+          <a href="https://example.com/wp-content/uploads/2026/10/Fotograf-3.pdf" class="ead-document-btn" target="_blank"><img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"> Open in new tab </a>
+        </p>
+      `
+
+      expect(await convert(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('the divider and the link in a paragraph of their own', () => {
+    it('should keep only the link to the file', async () => {
+      const value = html`
+        <div class="ead-document-loading" style="width:100%;height:100%;position:absolute;left:0;top:0;z-index:10;">
+          <div class="ead-loading-wrap">
+            <div class="ead-loading-main">
+              <div class="ead-loading"> <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/loading.svg" width="55" height="55" alt="Loader"> <span>Loading&#8230;</span> </div>
+            </p></div>
+            <div class="ead-loading-foot">
+              <div class="ead-loading-foot-title"> <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/EAD-logo.svg" alt="EAD Logo" width="36" height="23"/> <span>Taking too long?</span> </div>
+              <p><div class="ead-document-btn ead-reload-btn" role="button"> <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/reload.svg" alt="Reload" width="12" height="12"/> Reload document </div>
+              <p> <span>|</span> <a href="https://example.com/wp-content/uploads/2026/10/rezultat-selectie-dosare-concurs-asistent-medical-comunitar.pdf" class="ead-document-btn" target="_blank"> <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"/> Open in new tab </a> </div>
+            </p></div>
+          </p></div>
+        </p></div>
+      `
+      const expected =
+        '<p>  <a href="https://example.com/wp-content/uploads/2026/10/rezultat-selectie-dosare-concurs-asistent-medical-comunitar.pdf" class="ead-document-btn" target="_blank"> <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"> Open in new tab </a> </p>'
+
+      expect(await convert(value)).toEqualHtml(expected)
+    })
+  })
+
+  // A selector cannot reach a text node, so this divider stays beside the link.
+  describe('the divider written as bare text beside the link', () => {
+    it('should keep the divider and the link', async () => {
+      const value = html`
+        <div class="ead-document-loading">
+          <div class="ead-loading-wrap">
+            <div class="ead-loading-main">
+              <div class="ead-loading"><img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/loading.svg" alt="Loader" width="55" height="55" />Loading&#8230;</div>
+            </div>
+            <div class="ead-loading-foot">
+              <div class="ead-loading-foot-title"><img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/EAD-logo.svg" alt="EAD Logo" width="36" height="23" />Taking too long?</div>
+              <p>&nbsp;</p>
+              <div class="ead-document-btn ead-reload-btn" role="button"><img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/reload.svg" alt="Reload" width="12" height="12" /> Reload document</div>
+              <p>| <a class="ead-document-btn" href="https://example.com/wp-content/uploads/2023/12/2023-CBC-Species-Summary.pdf" target="_blank" rel="noopener"> <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12" /> Open in new tab </a></div>
+            </div>
+          </div>
+        </div>
+      `
+      const expected =
+        '<p>| <a class="ead-document-btn" href="https://example.com/wp-content/uploads/2023/12/2023-CBC-Species-Summary.pdf" target="_blank" rel="noopener"> <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"> Open in new tab </a></p>'
+
+      expect(await convert(value)).toEqualHtml(expected)
+    })
+  })
+
+  // stripDeadAnchors unwraps a link to "#", so the icon and its label stay with no link.
+  describe('the browser viewer, whose link points at "#"', () => {
+    it('should keep the label of the link', async () => {
+      const value = html`
+        <div class="ead-document-loading" style="width:100%;height:100%;position:absolute;left:0;top:0;z-index:10;">
+          <div class="ead-loading-wrap">
+            <div class="ead-loading-main">
+              <div class="ead-loading">
+                <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/loading.svg" width="55" height="55" alt="Loader">
+                <span>Loading...</span>
+              </div>
+            </div>
+            <div class="ead-loading-foot">
+              <div class="ead-loading-foot-title">
+                <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/EAD-logo.svg" alt="EAD Logo" width="36" height="23"/>
+                <span>Taking too long?</span>
+              </div>
+              <p>
+                <div class="ead-document-btn ead-reload-btn" role="button">
+                  <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/reload.svg" alt="Reload" width="12" height="12"/> Reload document
+                </div>
+                <span>|</span>
+                <a href="#" class="ead-document-btn" target="_blank">
+                  <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"/> Open in new tab
+                </a>
+            </div>
+          </div>
+        </div>
+      `
+      const expected = html`
+        <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12">
+        <p> Open in new tab </p>
+      `
+
+      expect(await convert(value)).toEqualHtml(expected)
     })
   })
 })
