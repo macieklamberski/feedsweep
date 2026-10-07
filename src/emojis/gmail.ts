@@ -9,8 +9,9 @@ import {
 } from '../utils/emojis.js'
 
 const notoFilePrefixRegex = /^emoji_u/
-// Google's own id, bare like `1B6` or after the drawing set it picks, like `ezweb_ne_jp/B61`.
-const legacyIdRegex = /(?:^|[./])([0-9a-f]{3})$/i
+// Google's own id, bare like `1B6`, as its U+FExxx code like `fe4ea`, or after the drawing set it
+// picks, like `ezweb_ne_jp/B61`.
+const legacyIdRegex = /(?:^|[./])(?:fe)?([0-9a-f]{3})$/i
 
 const getLegacyId = (element: Element): string | undefined => {
   const code = attr(element, 'data-goomoji') ?? attr(element, 'goomoji')
@@ -27,7 +28,7 @@ const getGlyph = (element: Element): EmojiGlyph | undefined => {
 }
 
 // Gmail's emoji, as a mail sent on to a feed carries them, with the codepoint in `goomoji`. The
-// legacy set names files by Google's own emoji id instead, which emoji4unicode maps to Unicode.
+// legacy set names files by Google's own emoji id instead, and stays a set of pictures.
 export const gmailEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: [

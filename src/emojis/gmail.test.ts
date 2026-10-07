@@ -92,6 +92,77 @@ describeForEachParser('gmailEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it.each(legacySrcCases)('should mark the legacy emoji with an emoji alt at %s', async (src) => {
+    const value = `<p><img src="${src}" alt="😀"></p>`
+    const expected = `<p><img src="${src}" alt="😀" data-emoji=""></p>`
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should mark a bare legacy Google id in goomoji despite an emoji alt', async () => {
+    const value = html`
+      <p>
+        <img
+          src="cid:330@goomoji.gmail"
+          goomoji="330"
+          alt="😃"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          src="cid:330@goomoji.gmail"
+          goomoji="330"
+          alt="😃"
+          data-emoji=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a four-digit codepoint in goomoji off another host', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://example.com/assets/sunny-mood-6402.jpg"
+          alt="A sunny mood"
+          data-goomoji="2600"
+          goomoji="2600"
+        >
+      </p>
+    `
+    const expected = '<p>☀️</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should mark a legacy Google id in its U+FExxx form despite an emoji alt', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://mail.google.com/mail/e/fe4ea"
+          goomoji="fe4ea"
+          alt="😀"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          src="https://mail.google.com/mail/e/fe4ea"
+          goomoji="fe4ea"
+          alt="😀"
+          data-emoji=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should mark a legacy Google id in goomoji off another host', async () => {
     const value = html`
       <p>
