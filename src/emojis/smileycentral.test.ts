@@ -87,6 +87,19 @@ describeForEachParser('smileycentralEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should leave a signature banner from the Japanese edition untouched', async () => {
+    const value = html`
+      <p>
+        <img
+          src="http://www.smileycentral.jp/ajj-sig/sig.jsp?pc=JSzeb043&amp;pp=JSV0AJJ004"
+          border="0"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should leave a cat folder on another host untouched', async () => {
     const value = '<p><img src="https://example.com/cat/36/36_1_13.gif" alt="Bounce"></p>'
 
