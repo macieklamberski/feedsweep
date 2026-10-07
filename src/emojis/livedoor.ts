@@ -1,7 +1,8 @@
 import type { EmojiResolver } from '../types.js'
 import { resolveEmojiImage } from '../utils/emojis.js'
 
-// livedoor Blog's pictograms, with no alt. They have no Unicode counterpart to become.
+// livedoor Blog's pictograms, with no alt. The `yahoo` folder holds au's emoji by number, and like
+// every carrier set holds ids with no Unicode counterpart, so the set stays pictures.
 export const livedoorEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: [

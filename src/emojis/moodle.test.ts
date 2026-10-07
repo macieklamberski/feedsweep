@@ -50,7 +50,7 @@ describeForEachParser('moodleEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should convert an emoticon whose alt is an emoji', async () => {
+  it('should keep an emoticon whose alt is an emoji as a marked picture', async () => {
     const value = html`
       <p>
         <img
@@ -59,7 +59,37 @@ describeForEachParser('moodleEmojiResolver', (parseHtml) => {
         >
       </p>
     `
-    const expected = '<p>😉</p>'
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          alt="😉"
+          src="https://moodle.example.com/theme/image.php/boost/core/1783412454/s/wink"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep an emoticon whose alt is its code as a marked picture', async () => {
+    const value = html`
+      <p>
+        <img
+          alt=":-)"
+          src="https://moodle.example.com/theme/image.php/boost/core/1783412454/s/smiley"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          alt=":-)"
+          src="https://moodle.example.com/theme/image.php/boost/core/1783412454/s/smiley"
+        >
+      </p>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })

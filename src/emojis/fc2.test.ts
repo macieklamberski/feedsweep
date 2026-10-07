@@ -29,4 +29,28 @@ describeForEachParser('fc2EmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should keep a pictogram whose alt is an emoji as a marked picture', async () => {
+    const value = html`
+      <p>
+        <img
+          src="//blog-imgs-1.fc2.com/image/e/6.gif"
+          alt="😀"
+          class="emoji"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="//blog-imgs-1.fc2.com/image/e/6.gif"
+          alt="😀"
+          class="emoji"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
 })

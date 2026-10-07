@@ -1,7 +1,8 @@
 import type { EmojiResolver } from '../types.js'
 import { resolveEmojiImage } from '../utils/emojis.js'
 
-// Seesaa's numbered pictograms, with no alt. They have no Unicode counterpart to become.
+// Seesaa's numbered pictograms, with no alt. `images_e` follows docomo's numbering, and like every
+// carrier set holds ids with no Unicode counterpart, so the set stays pictures.
 export const seesaaEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: [

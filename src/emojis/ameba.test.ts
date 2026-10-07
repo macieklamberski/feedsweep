@@ -87,5 +87,33 @@ describeForEachParser('amebaEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should keep a char image whose alt is a symbol as a marked picture', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emoji colorbox-42458"
+            src="https://stat100.ameba.jp/blog/ucs/img/char/char3/124.png"
+            alt="&#x2642;"
+            width="24"
+            height="24"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="emoji colorbox-42458"
+            src="https://stat100.ameba.jp/blog/ucs/img/char/char3/124.png"
+            alt="&#x2642;"
+            width="24"
+            height="24"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 })
