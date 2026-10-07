@@ -199,7 +199,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should claim the query form and drop the display parameters', async () => {
+    it('should claim the query form and keep its display parameters', async () => {
       const value = html`
         <iframe
           src="https://e.issuu.com/embed.html?backgroundColor=%23ffffff&u=ecosistemaurbano&d=paisaje_transversal&hideIssuuLogo=true"
@@ -210,7 +210,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'issuu',
         id: 'ecosistemaurbano/paisaje_transversal',
-        src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal',
+        src: 'https://e.issuu.com/embed.html?backgroundColor=%23ffffff&u=ecosistemaurbano&d=paisaje_transversal&hideIssuuLogo=true',
         url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
         ratio: '5/3',
       }
@@ -370,7 +370,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'issuu',
         id: 'thebeastmag/the_beast_-_july_2026',
-        src: 'https://e.issuu.com/embed.html?u=thebeastmag&d=the_beast_-_july_2026',
+        src: 'https://e.issuu.com/embed.html?d=the_beast_-_july_2026&u=thebeastmag',
         url: 'https://issuu.com/thebeastmag/docs/the_beast_-_july_2026',
         ratio: '5/3',
         title: 'The Beast - July 2026',
@@ -408,7 +408,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'issuu',
         id: 'thebeastmag/the_beast_-_july_2026',
-        src: 'https://e.issuu.com/embed.html?u=thebeastmag&d=the_beast_-_july_2026',
+        src: 'https://e.issuu.com/embed.html?d=the_beast_-_july_2026&u=thebeastmag',
         url: 'https://issuu.com/thebeastmag/docs/the_beast_-_july_2026',
         ratio: '5/3',
       }

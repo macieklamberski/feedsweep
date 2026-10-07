@@ -116,8 +116,14 @@ const issuuResolveEmbed: ResolveEmbed = (url, element) => {
       parsed.searchParams.get('d') ?? undefined,
       parsed.searchParams.get('p') ?? undefined,
     )
+  // The reader plays as written, with its page and colours. `anonymous-embed.html` answers 403.
+  const isReader = getPathSegments(parsed)[0] === 'embed.html'
 
-  return embed && { ...embed, title }
+  if (!embed) {
+    return
+  }
+
+  return { ...embed, ...(isReader && { src: url }), title }
 }
 
 export const issuuIframeEmbedResolver = createUrlEmbedResolver(issuuHosts, issuuResolveEmbed)
