@@ -32,6 +32,20 @@ describeForEachParser('githubImageEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should replace a codepoint image with no alt by its glyph', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://github.githubassets.com/images/icons/emoji/unicode/1f914.png?v8"
+            style="width: 20px;"
+          >
+        </p>
+      `
+      const expected = '<p>🤔</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('gemoji names', () => {
@@ -92,28 +106,15 @@ describeForEachParser('githubImageEmojiResolver', (parseHtml) => {
     it('should keep an image named by a GitHub drawing as a marked picture', async () => {
       const value = html`
         <p>
-          <img
-            class="emoji"
-            title=":bowtie:"
-            alt=":bowtie:"
-            src="https://assets.github.com/images/icons/emoji/bowtie.png"
-            height="20"
-            width="20"
-            align="absmiddle"
-          >
+          <img src="https://github.githubassets.com/images/icons/emoji/bowtie.png" alt="bowtie">
         </p>
       `
       const expected = html`
         <p>
           <img
             data-emoji=""
-            class="emoji"
-            title=":bowtie:"
-            alt=":bowtie:"
-            src="https://assets.github.com/images/icons/emoji/bowtie.png"
-            height="20"
-            width="20"
-            align="absmiddle"
+            src="https://github.githubassets.com/images/icons/emoji/bowtie.png"
+            alt="bowtie"
           >
         </p>
       `
@@ -139,20 +140,6 @@ describeForEachParser('githubImageEmojiResolver', (parseHtml) => {
           >
         </p>
       `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should replace a codepoint image with no alt by its glyph', async () => {
-      const value = html`
-        <p>
-          <img
-            src="https://github.githubassets.com/images/icons/emoji/unicode/1f914.png?v8"
-            style="width: 20px;"
-          >
-        </p>
-      `
-      const expected = '<p>🤔</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
