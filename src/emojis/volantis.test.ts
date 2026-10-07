@@ -56,6 +56,8 @@ describeForEachParser('volantisEmojiResolver', (parseHtml) => {
     const value = html`
       <p>
         <img
+          no-lazy
+          class="inline"
           src="https://fastly.jsdelivr.net/gh/volantis-x/cdn-emoji/aru/13.png"
           alt="😀"
         >
@@ -65,6 +67,8 @@ describeForEachParser('volantisEmojiResolver', (parseHtml) => {
       <p>
         <img
           data-emoji=""
+          no-lazy=""
+          class="inline"
           src="https://fastly.jsdelivr.net/gh/volantis-x/cdn-emoji/aru/13.png"
           alt="😀"
         >
@@ -77,6 +81,12 @@ describeForEachParser('volantisEmojiResolver', (parseHtml) => {
   it('should leave an image from another Volantis repository untouched', async () => {
     const value =
       '<p><img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-wallpaper/abstract/00E0F0ED-9F1C-407A-9AA6-545649D919F4.jpeg"></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a cdn-emoji repository of another owner untouched', async () => {
+    const value = '<p><img src="https://cdn.jsdelivr.net/gh/example/cdn-emoji/aru/13.png"></p>'
 
     expect(await transform(value)).toEqualHtml(value)
   })
