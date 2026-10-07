@@ -880,6 +880,50 @@ describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    it('should leave a wrapper whose sprite holds its code as text untouched', async () => {
+      const value = html`
+        <p>Merci les filles pour votre bonne humeur&nbsp;
+          <i class="_lew" title="émoticône smile">
+            <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4">:)</i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should replace a wrapper by its own label when its sprite holds label wrappers', async () => {
+      const value = html`
+        <p>Egészségetekre! :)&nbsp;
+          <i class="_lew" title="wink hangulatjel">
+            <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_7f72ac">
+              <i class="_lew" title="smile hangulatjel">
+                <i class="_lew" title="smile hangulatjel">
+                  <span aria-hidden="true" class="_4mcd" style="font-size: 0px;">:)</span>
+                </i>
+              </i>
+            </i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml('<p>Egészségetekre! :)&nbsp; 😉</p>')
+    })
+
+    it('should leave a wrapper whose sprite holds a label wrapper around prose untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="wink emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_7f72ac">
+              <i class="_lew" title="smile emoticon">om het te vieren</i>
+            </i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
   })
 
   describe('zero-size wrappers', () => {

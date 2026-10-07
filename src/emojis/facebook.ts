@@ -1,5 +1,5 @@
 import type { EmojiResolver } from '../types.js'
-import { attr, isElement, isWhitespaceText } from '../utils/dom.js'
+import { attr, isElement, isNonWhitespaceText, isWhitespaceText } from '../utils/dom.js'
 import {
   getFileStem,
   glyphFromCodepoints,
@@ -187,13 +187,32 @@ const hiddenTextSelector = 'span[class~="_7oe"]'
 const spriteSelector = 'i[class~="_4-k1"]'
 // The span holding the code at zero size, beside the sprite or alone.
 const zeroSizeSelector = 'span[class~="_skr"], span[class~="_4mcd"]'
+const labelSelector = 'span[class~="_47e3"], i[class~="_1gwo"][title], i[class~="_lew"][title]'
+
+// A paste with the caret inside a sprite nests other label wrappers in it, which the sprite's own
+// picture covered.
+const isBareSprite = (sprite: Element): boolean => {
+  for (const node of Array.from(sprite.childNodes)) {
+    if (isNonWhitespaceText(node)) {
+      return false
+    }
+
+    if (isElement(node) && !node.matches(labelSelector)) {
+      return false
+    }
+  }
+
+  const text = sprite.textContent?.trim()
+
+  return !text || !!glyphFromShortcode(text)
+}
 
 // A later chat markup of the classic emoticon: a span or `i` holding a painted sprite, its code at
 // zero size, or both, named by the screen-reader label in its title. A post's wrapper holds the
 // emoji image instead, beside the hidden span, which shows once the site's CSS is gone.
 export const facebookLabelEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: 'span[class~="_47e3"], i[class~="_1gwo"][title], i[class~="_lew"][title]',
+  selector: labelSelector,
   extract: (element) => {
     const children = Array.from(element.children)
     const [image, hidden, ...rest] = children
@@ -212,13 +231,12 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
     // Some pastes drop the sprite and keep only the zero-size span.
     const sprite = image?.matches(spriteSelector) ? image : undefined
     const [zeroSize, ...after] = sprite ? children.slice(1) : children
-    const isSpriteEmpty = !sprite || (!sprite.firstElementChild && !sprite.textContent?.trim())
     const isLabelWrapper =
       (sprite || zeroSize) &&
       (!zeroSize || zeroSize.matches(zeroSizeSelector)) &&
-      isSpriteEmpty &&
+      (!sprite || isBareSprite(sprite)) &&
       !after.length &&
-      element.textContent?.trim() === (zeroSize?.textContent?.trim() ?? '')
+      !Array.from(element.childNodes).some(isNonWhitespaceText)
 
     // Facebook's CSS painted the picture on a child, never on the wrapper, so an empty wrapper
     // showed nothing. The class also rides on spans pasted around prose.
