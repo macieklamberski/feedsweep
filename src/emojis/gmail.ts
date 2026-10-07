@@ -9,25 +9,26 @@ import {
 } from '../utils/emojis.js'
 
 const notoFilePrefixRegex = /^emoji_u/
-// Google's own id, bare like `1B6` or after the drawing set it picks, like `ezweb_ne_jp/B61`.
-const legacyIdRegex = /(?:^|[./])([0-9a-f]{3})$/i
+// Google's own id, bare like `1B6`, as its U+FExxx code like `fe4ea`, or after the drawing set it
+// picks, like `ezweb_ne_jp/B61`.
+const legacyIdRegex = /(?:^|[./])(?:fe)?([0-9a-f]{3})$/i
+
+const getLegacyId = (element: Element): string | undefined => {
+  const code = attr(element, 'data-goomoji') ?? attr(element, 'goomoji')
+  const [, legacyId] = (code ?? element.getAttribute('src') ?? '').match(legacyIdRegex) ?? []
+
+  return legacyId
+}
 
 const getGlyph = (element: Element): EmojiGlyph | undefined => {
   const code = attr(element, 'data-goomoji') ?? attr(element, 'goomoji')
-  const src = element.getAttribute('src') ?? ''
-  const [, legacyId] = (code ?? src).match(legacyIdRegex) ?? []
-
-  if (legacyId) {
-    return glyphFromCarrierEmoji('google', Number.parseInt(legacyId, 16))
-  }
-
-  const stem = getFileStem(src).replace(notoFilePrefixRegex, '')
+  const stem = getFileStem(element.getAttribute('src') ?? '').replace(notoFilePrefixRegex, '')
 
   return glyphFromCodepoints((code ?? stem).toLowerCase())
 }
 
 // Gmail's emoji, as a mail sent on to a feed carries them, with the codepoint in `goomoji`. The
-// legacy set names files by Google's own emoji id instead, which emoji4unicode maps to Unicode.
+// legacy set names files by Google's own emoji id instead, and stays a set of pictures.
 export const gmailEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: [
@@ -39,6 +40,15 @@ export const gmailEmojiResolver: EmojiResolver = {
     'img[data-goomoji]',
   ].join(', '),
   extract: (element) => {
+    const legacyId = getLegacyId(element)
+
+    // Google's id table holds ids no Unicode character stands for, so the set keeps its pictures.
+    if (legacyId) {
+      const glyph = glyphFromCarrierEmoji('google', Number.parseInt(legacyId, 16))
+
+      return resolveEmojiImage(element, { isStrong: true, glyph, keepsPictures: true })
+    }
+
     return resolveEmojiImage(element, { isStrong: true, glyph: getGlyph(element) })
   },
 }
