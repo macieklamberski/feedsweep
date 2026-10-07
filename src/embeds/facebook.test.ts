@@ -810,6 +810,9 @@ describeForEachParser('facebookFlashEmbedResolver', (parseHtml) => {
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D17731186132',
         url: 'https://www.facebook.com/watch/?v=17731186132',
         ratio: '16/9',
+        title: 'BADHDHALVUMUM VEJJE DHEEVAANA',
+        author: 'Ismail Wajeeh',
+        duration: 214,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -839,6 +842,28 @@ describeForEachParser('facebookFlashEmbedResolver', (parseHtml) => {
         id: '9169571469',
         src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D9169571469',
         url: 'https://www.facebook.com/watch/?v=9169571469',
+        ratio: '16/9',
+        title: 'janey dhoovijaan',
+        author: 'Mohamed AZmeel',
+        duration: 361,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave out the fields the flashvars do not carry', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://static.ak.fbcdn.net/swf/mvp.swf?0:83575"
+          flashvars="video_id=17731186132"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: '17731186132',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D17731186132',
+        url: 'https://www.facebook.com/watch/?v=17731186132',
         ratio: '16/9',
       }
 

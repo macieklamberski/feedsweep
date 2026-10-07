@@ -1,4 +1,4 @@
-import { isHostOrSubdomainOf, type Nullish, parseUrl, trimObject } from 'trousse'
+import { coerceNumber, isHostOrSubdomainOf, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, flashVar, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -203,7 +203,12 @@ const facebookFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  return composeWatchEmbed(videoId)
+  return {
+    ...composeWatchEmbed(videoId),
+    title: flashVar(element, 'video_title'),
+    author: flashVar(element, 'video_owner_name'),
+    duration: coerceNumber(flashVar(element, 'video_seconds')),
+  }
 }
 
 export const facebookFlashEmbedResolver = createUrlEmbedResolver(

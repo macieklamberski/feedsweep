@@ -424,6 +424,9 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D17731186132"
         data-embed-url="https://www.facebook.com/watch/?v=17731186132"
         data-embed-ratio="16/9"
+        data-embed-title="BADHDHALVUMUM VEJJE DHEEVAANA"
+        data-embed-author="Ismail Wajeeh"
+        data-embed-duration="214"
       ></div>
     `
 
