@@ -50,6 +50,28 @@ describeForEachParser('deviantartEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should keep an emoticon with an emoji alt as a picture', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://e.deviantart.net/emoticons/b/biggrin.gif"
+          alt="😀"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://e.deviantart.net/emoticons/b/biggrin.gif"
+          alt="😀"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should mark an emoticon from the older deviantart.com host', async () => {
     const value = html`<p><img src="https://e.deviantart.com/emoticons/g/glomp.gif"></p>`
     const expected = html`

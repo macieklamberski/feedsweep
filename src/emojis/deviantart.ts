@@ -12,6 +12,6 @@ export const deviantartEmojiResolver: EmojiResolver = {
     'img[src*="//st.deviantart.net/emoticons/" i]',
   ].join(', '),
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }
