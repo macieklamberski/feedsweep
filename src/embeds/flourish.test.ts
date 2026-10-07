@@ -324,6 +324,18 @@ describeForEachParser('flourishIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should mint the player from a share page the refusal used to pin', async () => {
+      const value = '<iframe src="https://public.flourish.studio/visualisation/29541520/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flourish',
+        id: 'visualisation/29541520',
+        src: 'https://flo.uri.sh/visualisation/29541520/embed',
+        url: 'https://public.flourish.studio/visualisation/29541520/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

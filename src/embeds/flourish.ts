@@ -57,7 +57,8 @@ export const flourishWidgetEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// The pasted player iframe, the form that reaches a feed when the publisher skipped the script.
+// The pasted player iframe, the form that reaches a feed when the publisher skipped the script, or
+// the chart's share page, framed whole.
 // The WordPress oEmbed wrapper points at the same url with a `#?secret=` fragment appended.
 export const flourishResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
