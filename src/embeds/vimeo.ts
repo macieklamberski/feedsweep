@@ -21,6 +21,16 @@ const unlistedHashRegex = /^[0-9a-f]{10}$/
 
 const vimeoHosts = ['vimeo.com']
 
+// The hosts that serve a video page or a player. Other subdomains serve files and assets, and the
+// numbers in `av.vimeo.com/50935/740/135924474.mp4` are storage segments, not a video id.
+const vimeoPageHosts = [
+  'vimeo.com',
+  'www.vimeo.com',
+  'player.vimeo.com',
+  'player2.vimeo.com',
+  'staging.vimeo.com',
+]
+
 // A showcase and an album are playlists, a channel and a group are listings, an event is a
 // livestream and an on-demand page is a store front, and each lives in its own id space: channel
 // 927 and video 927 are both live and belong to different people.
@@ -106,11 +116,18 @@ type VimeoReference = {
 const readReference = (link: string): VimeoReference | undefined => {
   const url = parseUrl(link, placeholderBaseUrl)
 
-  if (!url) {
+  if (!url || !vimeoPageHosts.includes(url.hostname)) {
     return
   }
 
   const segments = getPathSegments(url)
+
+  // A `progressive_redirect` url is the video's own file. Its owner can limit the player to their
+  // own site while the signed file plays anywhere.
+  if (segments[0] === 'progressive_redirect') {
+    return
+  }
+
   // The Flash player carried no id in the path at all: moogaloop.swf?clip_id={id}.
   const clipId = url.searchParams.get('clip_id')
 

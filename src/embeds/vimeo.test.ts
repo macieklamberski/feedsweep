@@ -29,6 +29,17 @@ describe('extractVimeoId', () => {
     expect(extractVimeoId(value)).toBe('76979871')
   })
 
+  // The other hosts that serve a player, each with the id a real carrier names.
+  const pageHostUrls: Array<[string, string]> = [
+    ['http://www.vimeo.com/moogaloop.swf?clip_id=8944133&server=www.vimeo.com', '8944133'],
+    ['https://player2.vimeo.com/video/242463839', '242463839'],
+    ['http://staging.vimeo.com/moogaloop.swf?clip_id=6419431&server=staging.vimeo.com', '6419431'],
+  ]
+
+  it.each(pageHostUrls)('should extract the id from a page host, %s', (value, expected) => {
+    expect(extractVimeoId(value)).toBe(expected)
+  })
+
   it('should return undefined for a moogaloop.swf url with no clip id', () => {
     const value = 'http://vimeo.com/moogaloop.swf?server=vimeo.com'
 
@@ -109,6 +120,35 @@ describe('extractVimeoId', () => {
     const value = 'not a url'
 
     expect(extractVimeoId(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a url with no host', () => {
+    const value = 'http://'
+
+    expect(extractVimeoId(value)).toBeUndefined()
+  })
+
+  // A transform hands over a watch url without checking its host first.
+  it('should return undefined for a video path on a foreign host', () => {
+    const value = 'https://evil.test/76979871'
+
+    expect(extractVimeoId(value)).toBeUndefined()
+  })
+
+  describe('file urls', () => {
+    it('should not read a storage segment of the old file host as the video', () => {
+      const value =
+        'http://av.vimeo.com/50935/740/135924474.mp4?token2=1419120847_3a0308ba3fc5990ba6d094c79bf120db&aksessionid=836e901bee33a27f'
+
+      expect(extractVimeoId(value)).toBeUndefined()
+    })
+
+    it('should leave a progressive_redirect file to the native player', () => {
+      const value =
+        'https://player.vimeo.com/progressive_redirect/playback/769954486/rendition/720p/file.mp4?loc=external&signature=49342bfcee8247a4f7477c5391a8a1f641f83ce23aa30538788bcfd09186abf7'
+
+      expect(extractVimeoId(value)).toBeUndefined()
+    })
   })
 })
 
@@ -615,5 +655,32 @@ describeForEachParser('vimeo pages in a media element', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+// Only an enclosure test reaches the path where claiming a file url would cost a reader the video.
+describeForEachParser('vimeo through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a progressive_redirect enclosure playable', async () => {
+    const enclosures = [
+      {
+        url: 'https://player.vimeo.com/progressive_redirect/playback/769954486/rendition/720p/file.mp4?loc=external&signature=49342bfcee8247a4f7477c5391a8a1f641f83ce23aa30538788bcfd09186abf7',
+        type: 'video/mp4',
+      },
+    ]
+
+    const expected = html`
+      <video data-enclosure="" controls src="https://player.vimeo.com/progressive_redirect/playback/769954486/rendition/720p/file.mp4?loc=external&signature=49342bfcee8247a4f7477c5391a8a1f641f83ce23aa30538788bcfd09186abf7"></video>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
