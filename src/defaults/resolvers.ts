@@ -417,6 +417,7 @@ import { simplePressEmojiResolver } from '../emojis/simplepress.js'
 import { slackEmojiResolver } from '../emojis/slack.js'
 import { smfEmojiResolver } from '../emojis/smf.js'
 import { smiliesEmojiResolver, smiliesEmoticonEmojiResolver } from '../emojis/smilies.js'
+import { sweetimEmojiResolver } from '../emojis/sweetim.js'
 import { tapatalkEmojiResolver } from '../emojis/tapatalk.js'
 import { teamsEmojiResolver } from '../emojis/teams.js'
 import {
@@ -856,6 +857,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   invisionEmojiResolver,
   xenforoEmojiResolver,
   smfEmojiResolver,
+  sweetimEmojiResolver,
   nbbcEmojiResolver,
   simplePressEmojiResolver,
   drupalEmojiResolver,
