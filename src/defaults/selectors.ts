@@ -309,8 +309,9 @@ export const defaultPreservedPreClasses = [
   'wp-block-preformatted', // WordPress Gutenberg Preformatted block: author-chosen distinct blocks (ToCs, quotes, numbered headings).
 ]
 
-// Slider, gallery, spoiler, accordion and tab containers a plugin hides until a click or its
-// script shows them. `stripHiddenElements` unhides a hidden element matching one of these.
+// Slider, gallery, spoiler, accordion and tab containers, and document frames, a plugin hides
+// until a click or its script shows them. `stripHiddenElements` unhides a hidden element matching
+// one of these.
 export const defaultRevealableSelectors = [
   // Accordions and collapsible blocks.
   '.text-accordion-content', // Accordion block panel.
@@ -319,6 +320,9 @@ export const defaultRevealableSelectors = [
   // Read more toggles.
   '[id^="fv-more-text"]', // FV Read More.
   '.yrm-content', // Read More by Edmon.
+
+  // Document viewers.
+  '.ead-iframe', // Embed Any Document, whose script shows the frame on load.
 
   // Carousels, galleries and sliders.
   '[class*="premium-adv-carousel"]', // Premium Addons advanced carousel.
