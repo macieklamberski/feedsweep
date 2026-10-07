@@ -1,6 +1,6 @@
 import { isHostOrSubdomainOf, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, find, text } from '../utils/dom.js'
+import { attr, find, flashVar, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import {
@@ -189,6 +189,26 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
 export const facebookIframeEmbedResolver = createUrlEmbedResolver(
   facebookHosts,
   facebookResolveEmbed,
+)
+
+// The Flash player before `/v/`, `/swf/mvp.swf` on Facebook's static hosts, naming its video in
+// flashvars `video_id`. The share player names only a file and stays unresolved.
+const mvpPathRegex = /^\/swf\/mvp\.swf$/
+
+const facebookFlashResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url)
+  const videoId = flashVar(element, 'video_id')
+
+  if (!parsed || !mvpPathRegex.test(parsed.pathname) || !videoId) {
+    return
+  }
+
+  return composeWatchEmbed(videoId)
+}
+
+export const facebookFlashEmbedResolver = createUrlEmbedResolver(
+  ['static.ak.facebook.com', 'static.ak.fbcdn.net'],
+  facebookFlashResolveEmbed,
 )
 
 // The helper frame's fragment spells the content four ways: `{page}/posts/{id}` or
