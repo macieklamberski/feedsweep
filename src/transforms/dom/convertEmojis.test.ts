@@ -342,6 +342,86 @@ describeForEachParser('convertEmojis', (parseHtml) => {
     })
   })
 
+  describe('mail proxies', () => {
+    it('should convert an emoji behind the Yahoo Mail proxy', async () => {
+      const value = html`
+        <p>
+          <img
+            class="yiv0680057325img"
+            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fstatic.xx.fbcdn.net%2Fimages%2Femoji.php%2Fv9%2Ft6c%2F1%2F16%2F2764.png&amp;t=1554239749&amp;ymreqid=93d88e61-0da6-7d52-01ca-ef0e19010000&amp;sig=DzxCZnIn6aGz57UknE9zMw--~C"
+            alt=""
+            width="16"
+            height="16"
+          >
+        </p>
+      `
+      const expected = '<p>❤️</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should convert an emoji behind the Yandex Mail proxy', async () => {
+      const value = html`
+        <p>
+          <img
+            alt="🌸"
+            src="https://resize.yandex.net/mailservice?url=https%3A%2F%2Fvk.com%2Femoji%2Fe%2Ff09f8cb8.png&amp;proxy=yes&amp;key=fbb6e138eabfa3da556a345b6f3faea8"
+          >
+        </p>
+      `
+      const expected = '<p>🌸</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark a kept picture and keep its proxied src as written', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fexample.com%2Fsmiles%2Fstatic%2Fbiggrin.gif&amp;t=1603243412&amp;ymreqid=9a271ae1-65ab-6366-2fc7-760047018400&amp;sig=84h0G3GeMoqZZGmNFPVWKg--~D"
+            alt=":biggrin:"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fexample.com%2Fsmiles%2Fstatic%2Fbiggrin.gif&amp;t=1603243412&amp;ymreqid=9a271ae1-65ab-6366-2fc7-760047018400&amp;sig=84h0G3GeMoqZZGmNFPVWKg--~D"
+            alt=":biggrin:"
+            data-emoji=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a proxied photo untouched', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fexample.com%2Fpng%2Fdetail%2F15-153766_thumbs-up-emoticon.png&amp;t=1651750169&amp;ymreqid=54d677f0-7e23-f17f-2f2c-5a0010016a00&amp;sig=0p_k6v2d5nw1ki1w8_Xhyw--~D"
+            alt="Thumbs Up Emoticon"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    const lookalikeProxySrcs: Array<string> = [
+      'https://example.com/mailservice?url=https%3A%2F%2Fvk.com%2Femoji%2Fe%2Ff09f8cb8.png',
+      'https://resize.yandex.net/preview?url=https%3A%2F%2Fvk.com%2Femoji%2Fe%2Ff09f8cb8.png',
+    ]
+
+    it.each(lookalikeProxySrcs)('should not unwrap %s', async (src) => {
+      const value = `<p><img class="emoji" src="${src}"></p>`
+      const expected = `<p><img class="emoji" src="${src}" data-emoji=""></p>`
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   it('should be idempotent', async () => {
     const value = html`
       <p>Hello

@@ -1,4 +1,4 @@
-import { toMap } from 'trousse'
+import { parseUrl, toMap } from 'trousse'
 import type { EmojiResolverResult } from '../types.js'
 import { attr } from './dom.js'
 import { emojiShortcodes } from './shortcodes.js'
@@ -122,6 +122,29 @@ export const getFileStem = (src: string): string => {
 // A filename as the name tables key it.
 export const getNameStem = (src: string): string => {
   return getFileStem(src).toLowerCase().replace(namePrefixRegex, '').replace(nameVariantRegex, '')
+}
+
+// Webmail serves every image in a mail through its own proxy, the original url encoded in `url`.
+const mailProxies = [
+  'ecp.yusercontent.com/mail', // Yahoo Mail
+  'resize.yandex.net/mailservice', // Yandex Mail
+]
+
+export const mailProxySelector = mailProxies.map((proxy) => `img[src*="${proxy}?"]`).join(',')
+
+// The image as the resolvers read it: a mail-proxied one as a copy carrying the original url.
+export const unwrapMailProxy = (element: Element): Element => {
+  const proxy = parseUrl(attr(element, 'src') ?? '')
+  const source = proxy?.searchParams.get('url')
+
+  if (!proxy || !source || !mailProxies.includes(`${proxy.hostname}${proxy.pathname}`)) {
+    return element
+  }
+
+  const target = element.cloneNode() as Element
+  target.setAttribute('src', source)
+
+  return target
 }
 
 // Five hex digits tops out at 0xFFFFF, so fromCodePoint never sees a value that throws.

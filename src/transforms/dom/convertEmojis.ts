@@ -1,6 +1,11 @@
 import type { DomTransform } from '../../types.js'
 import { batchSelectors, walkElements } from '../../utils/dom.js'
-import { emojiImageAttribute, withEmojiPresentation } from '../../utils/emojis.js'
+import {
+  emojiImageAttribute,
+  mailProxySelector,
+  unwrapMailProxy,
+  withEmojiPresentation,
+} from '../../utils/emojis.js'
 
 const wrapFallbackText = (document: Document, text: string): Element => {
   const span = document.createElement('span')
@@ -28,7 +33,8 @@ const createEmojiImage = (document: Document, src: string, alt: string | undefin
 // Emoji images and wrappers, which render oversized or as nothing without the site's CSS.
 export const convertEmojis: DomTransform = (context) => {
   const { emojiResolvers, resolveUrlFn, baseUrl } = context
-  const selectors = batchSelectors(emojiResolvers.map((resolver) => resolver.selector))
+  const resolverSelectors = emojiResolvers.map((resolver) => resolver.selector)
+  const selectors = batchSelectors([...resolverSelectors, mailProxySelector])
 
   return (document) => {
     if (!selectors.length) {
@@ -40,12 +46,14 @@ export const convertEmojis: DomTransform = (context) => {
         return
       }
 
+      const target = unwrapMailProxy(element)
+
       for (const resolver of emojiResolvers) {
-        if (!element.matches(resolver.selector)) {
+        if (!target.matches(resolver.selector)) {
           continue
         }
 
-        const result = resolver.extract(element)
+        const result = resolver.extract(target)
 
         if (!result) {
           continue
