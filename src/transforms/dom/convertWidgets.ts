@@ -157,8 +157,9 @@ export const convertWidgets: DomTransform = (context) => {
             continue
           }
 
+          const cleaned = cleanUrl(src, context)
           const poster = resolveOrKeepUrl(metadata.poster, context)
-          const mediaElement = createMediaElement(document, { ...metadata, src, poster })
+          const mediaElement = createMediaElement(document, { ...metadata, src: cleaned, poster })
           const target = carrierOrShell(element)
 
           target.replaceWith(captionMedia(document, mediaElement, target, metadata.title))
