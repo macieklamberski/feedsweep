@@ -374,6 +374,65 @@ describeForEachParser('Facebook', (parseHtml) => {
     )
   })
 
+  // The Flash player's url answers 400, and the object, its params and the nested embed name one
+  // video, so the pair becomes one plugin placeholder.
+  it('should rebuild the Flash object and embed pair into one plugin placeholder', async () => {
+    const value = html`
+      <object width="440" height="277">
+        <param name="allowfullscreen" value="true">
+        <param name="movie" value="http://www.facebook.com/v/377994148950512">
+        <embed src="http://www.facebook.com/v/377994148950512" type="application/x-shockwave-flash" allowfullscreen="1" width="440" height="277">
+      </object>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="facebook"
+        data-embed-id="377994148950512"
+        data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D377994148950512"
+        data-embed-url="https://www.facebook.com/watch/?v=377994148950512"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // The older Flash player names its video in flashvars `video_id`, which the watch page plays.
+  it('should rebuild the mvp.swf Flash player into the plugin placeholder', async () => {
+    const value = html`
+      <embed
+        type="application/x-shockwave-flash"
+        src="http://static.ak.fbcdn.net/swf/mvp.swf?0:83575"
+        style=""
+        id="so_mvp_swf_48089b219dfdc0f88959988"
+        name="so_mvp_swf_48089b219dfdc0f88959988"
+        bgcolor="#000000"
+        quality="high"
+        allowscriptaccess="always"
+        scale="showall"
+        allowfullscreen="true"
+        wmode="window"
+        flashvars="video_src=http%3A%2F%2Fvideo-sf2p.facebook.com%2Fv91%2F110%2F81%2F17731186132_13102.flv&amp;stage_width=500&amp;stage_height=318&amp;motion_log=%2Fvideo%2Fmotion_log.php&amp;video_id=17731186132&amp;video_length=214200&amp;video_seconds=214&amp;video_category=2&amp;video_rotation=0&amp;video_href=%2Fvideo%2Fvideo.php%3Fv%3D17731186132&amp;video_player_type=video_player_permalink&amp;video_width=500&amp;video_height=318&amp;video_title=BADHDHALVUMUM+VEJJE+DHEEVAANA&amp;video_owner_name=Ismail+Wajeeh&amp;video_owner_href=http%3A%2F%2Fwww.facebook.com%2Fs.php%3Fk%3D100000080%26id%3D605061132&amp;video_timestamp=Uploaded+on+Thursday.&amp;next_video_url=%2Fvideo%2Fvideo.php%3Fv%3D16775446132%26oid%3D5573792853&amp;thumb_url=http%3A%2F%2Fvthumb.ak.facebook.com%2Fvthumb-ak-sf2p%2Fv221%2F106%2F27%2F605061132%2Fb605061132_17731186132_954.jpg&amp;slate_src=http%3A%2F%2Fstatic.ak.fbcdn.net%2Fswf%2Fmvp_slate.swf%3F0%3A81294&amp;tail_slate_src=http%3A%2F%2Fstatic.ak.fbcdn.net%2Fswf%2Fmvp_tail_slate.swf%3F0%3A74597&amp;string_table=/js_strings.php/t83925/en_US&amp;swf_id=so_mvp_swf_48089b219dfdc0f88959988"
+        height="318"
+        width="500"
+      >
+    `
+    const expected = html`
+      <div
+        data-embed-provider="facebook"
+        data-embed-id="17731186132"
+        data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D17731186132"
+        data-embed-url="https://www.facebook.com/watch/?v=17731186132"
+        data-embed-ratio="16/9"
+        data-embed-title="BADHDHALVUMUM VEJJE DHEEVAANA"
+        data-embed-author="Ismail Wajeeh"
+        data-embed-duration="214"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // A forum's s9e helper frame names a post in its fragment, and facebookS9eEmbedResolver reads
   // it into the same plugin placeholder a pasted post gives.
   it('should convert the s9e helper frame into the plugin placeholder', async () => {

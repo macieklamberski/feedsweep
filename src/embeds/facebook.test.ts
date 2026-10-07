@@ -5,6 +5,7 @@ import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import {
   facebookAmpEmbedResolver,
   facebookBlockquoteEmbedResolver,
+  facebookFlashEmbedResolver,
   facebookIframeEmbedResolver,
   facebookRenderHint,
   facebookResolveEmbed,
@@ -598,6 +599,47 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should rebuild a Flash video embed onto the current plugin', async () => {
+      const value = html`
+        <embed
+          src="http://www.facebook.com/v/377994148950512"
+          type="application/x-shockwave-flash"
+          allowfullscreen="1"
+          width="440"
+          height="277"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: '377994148950512',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D377994148950512',
+        url: 'https://www.facebook.com/watch/?v=377994148950512',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild a Flash video object onto the current plugin', async () => {
+      const value = html`
+        <object
+          data="http://www.facebook.com/v/203603585296"
+          height="188"
+          width="300"
+          type="application/x-shockwave-flash"
+        ></object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: '203603585296',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D203603585296',
+        url: 'https://www.facebook.com/watch/?v=203603585296',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   // The size a Facebook embed gets depends on which shape it arrived as, so each one is
@@ -692,6 +734,12 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined for a Flash video path on a foreign host', async () => {
+      const value = '<embed src="https://evil.test/v/377994148950512">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined for a plugin url with no href', async () => {
       const value = '<iframe src="https://www.facebook.com/plugins/post.php?width=500"></iframe>'
 
@@ -727,6 +775,141 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
           src="https://www.facebook.com/v2.5/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName"
         ></iframe>
       `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+describeForEachParser('facebookFlashEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, facebookFlashEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should rebuild the player on static.ak.fbcdn.net onto the current plugin', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://static.ak.fbcdn.net/swf/mvp.swf?0:83575"
+          style=""
+          id="so_mvp_swf_48089b219dfdc0f88959988"
+          name="so_mvp_swf_48089b219dfdc0f88959988"
+          bgcolor="#000000"
+          quality="high"
+          allowscriptaccess="always"
+          scale="showall"
+          allowfullscreen="true"
+          wmode="window"
+          flashvars="video_src=http%3A%2F%2Fvideo-sf2p.facebook.com%2Fv91%2F110%2F81%2F17731186132_13102.flv&amp;stage_width=500&amp;stage_height=318&amp;motion_log=%2Fvideo%2Fmotion_log.php&amp;video_id=17731186132&amp;video_length=214200&amp;video_seconds=214&amp;video_category=2&amp;video_rotation=0&amp;video_href=%2Fvideo%2Fvideo.php%3Fv%3D17731186132&amp;video_player_type=video_player_permalink&amp;video_width=500&amp;video_height=318&amp;video_title=BADHDHALVUMUM+VEJJE+DHEEVAANA&amp;video_owner_name=Ismail+Wajeeh&amp;video_owner_href=http%3A%2F%2Fwww.facebook.com%2Fs.php%3Fk%3D100000080%26id%3D605061132&amp;video_timestamp=Uploaded+on+Thursday.&amp;next_video_url=%2Fvideo%2Fvideo.php%3Fv%3D16775446132%26oid%3D5573792853&amp;thumb_url=http%3A%2F%2Fvthumb.ak.facebook.com%2Fvthumb-ak-sf2p%2Fv221%2F106%2F27%2F605061132%2Fb605061132_17731186132_954.jpg&amp;slate_src=http%3A%2F%2Fstatic.ak.fbcdn.net%2Fswf%2Fmvp_slate.swf%3F0%3A81294&amp;tail_slate_src=http%3A%2F%2Fstatic.ak.fbcdn.net%2Fswf%2Fmvp_tail_slate.swf%3F0%3A74597&amp;string_table=/js_strings.php/t83925/en_US&amp;swf_id=so_mvp_swf_48089b219dfdc0f88959988"
+          height="318"
+          width="500"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: '17731186132',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D17731186132',
+        url: 'https://www.facebook.com/watch/?v=17731186132',
+        ratio: '16/9',
+        title: 'BADHDHALVUMUM VEJJE DHEEVAANA',
+        author: 'Ismail Wajeeh',
+        duration: 214,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild the player on static.ak.facebook.com onto the current plugin', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://static.ak.facebook.com/swf/mvp.swf?51:74597"
+          style=""
+          id="so_mvp_swf_47910a8e92d19"
+          name="so_mvp_swf_47910a8e92d19"
+          bgcolor="#000000"
+          quality="high"
+          allowscriptaccess="always"
+          scale="showall"
+          allowfullscreen="true"
+          wmode="window"
+          flashvars="video_src=http%3A%2F%2Fvideo-sf2p.facebook.com%2Fv163%2F190%2F118%2F9169571469_21884.flv&amp;stage_width=646&amp;stage_height=334&amp;motion_log=%2Fvideo%2Fmotion_log.php&amp;video_id=9169571469&amp;video_length=361066&amp;video_seconds=361&amp;video_category=0&amp;video_rotation=0&amp;video_href=%2Fvideo%2Fvideo.php%3Fv%3D9169571469&amp;video_player_type=video_player_permalink&amp;video_width=400&amp;video_height=304&amp;video_title=janey+dhoovijaan&amp;video_owner_name=Mohamed+AZmeel&amp;video_owner_href=http%3A%2F%2Fwww.facebook.com%2Fprofile.php%3Fid%3D520181469&amp;video_timestamp=Uploaded+on+Wednesday&amp;next_video_url=%2Fvideo%2Fvideo.php%3Fv%3D10285056132%26oid%3D5573792853&amp;thumb_url=http%3A%2F%2Fvthumb.ak.facebook.com%2Fvthumb-ak-sf2p%2Fv93%2F195%2F90%2F520181469%2Fb520181469_9169571469_1524.jpg&amp;slate_src=http%3A%2F%2Fstatic.ak.facebook.com%2Fswf%2Fmvp_slate.swf%3F51%3A72422&amp;tail_slate_src=http%3A%2F%2Fstatic.ak.facebook.com%2Fswf%2Fmvp_tail_slate.swf%3F51%3A74597&amp;string_table=http://static.ak.facebook.com/js_strings.php/t83381/en_US&amp;swf_id=so_mvp_swf_47910a8e92d19"
+          height="334"
+          width="500"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: '9169571469',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D9169571469',
+        url: 'https://www.facebook.com/watch/?v=9169571469',
+        ratio: '16/9',
+        title: 'janey dhoovijaan',
+        author: 'Mohamed AZmeel',
+        duration: 361,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave out the fields the flashvars do not carry', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://static.ak.fbcdn.net/swf/mvp.swf?0:83575"
+          flashvars="video_id=17731186132"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: '17731186132',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D17731186132',
+        url: 'https://www.facebook.com/watch/?v=17731186132',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should return undefined for the share player, which names no video id', async () => {
+      const value = html`
+        <embed
+          allowfullscreen="true"
+          allowscriptaccess="always"
+          bgcolor="#000000"
+          flashvars="video_src=http%3A%2F%2Fvideo.ak.facebook.com%2Fvideo-ak-sf2p%2Fv1182%2F12%2F58%2F56928606326_38965.mp4&amp;stage_width=320&amp;stage_height=240&amp;video_length=36460&amp;video_seconds=36&amp;video_player_type=video_player_share&amp;video_width=320&amp;video_height=240&amp;thumb_url=http%3A%2F%2Fvthumb.ak.facebook.com%2Fvthumb-ak-sf2p%2Fv643%2F247%2F53%2F627456326%2Fb627456326_56928606326_973.jpg&amp;slate_src=http%3A%2F%2Fstatic.ak.fbcdn.net%2Fswf%2Fmvp_slate.swf%3F7%3A134155&amp;tail_slate_src=http%3A%2F%2Fstatic.ak.fbcdn.net%2Fswf%2Fmvp_tail_slate.swf%3F7%3A134155&amp;video_autoplay=0"
+          height="240"
+          id="so_video_497a4299c42878204503322"
+          name="so_video_497a4299c42878204503322"
+          quality="high"
+          scale="showall"
+          src="http://b.static.ak.fbcdn.net/swf/mvp.swf?7:136764"
+          type="application/x-shockwave-flash"
+          width="320"
+          wmode="window"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the player path on a foreign host', async () => {
+      const value = '<embed src="https://evil.test/swf/mvp.swf" flashvars="video_id=17731186132">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the player path under another segment', async () => {
+      const value =
+        '<embed src="http://static.ak.fbcdn.net/x/swf/mvp.swf" flashvars="video_id=17731186132">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a path below the player', async () => {
+      const value =
+        '<embed src="http://static.ak.fbcdn.net/swf/mvp.swf/extra" flashvars="video_id=17731186132">'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -962,6 +1145,37 @@ describe('facebookResolveEmbed', () => {
 
   it('should return undefined for a path below the legacy video frame', () => {
     const value = 'https://www.facebook.com/video/embed/extra?video_id=123456'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should use a malformed Flash video id as written, even if the player answers an error', () => {
+    const value = 'https://www.facebook.com/v/banana'
+    const expected: EmbedResolverResult = {
+      provider: 'facebook',
+      id: 'banana',
+      src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3Dbanana',
+      url: 'https://www.facebook.com/watch/?v=banana',
+      ratio: '16/9',
+    }
+
+    expect(facebookResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should return undefined for the Flash video path under another segment', () => {
+    const value = 'https://www.facebook.com/x/v/377994148950512'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for an fb.watch short link under the Flash path', () => {
+    const value = 'https://fb.watch/v/6Rhfg0Bzq'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a path below the Flash video', () => {
+    const value = 'https://www.facebook.com/v/377994148950512/extra'
 
     expect(facebookResolveEmbed(value)).toBeUndefined()
   })
