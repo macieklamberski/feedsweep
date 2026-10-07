@@ -246,6 +246,20 @@ describe('googlesheetsResolveEmbed', () => {
       expect(googlesheetsResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should frame a published sheet whose path doubles the slash before the token', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/e//2PACX-1vRu96x6GEP9i0hMcHTcR72FzgU8LHKu6nY0-GPLiy2K6jl5GCvWuF-S7BlG1yLaZRyISf_OQ2ODnryr/pubhtml?gid=1173473883&single=true&widget=false&headers=false&chrome=false'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '2PACX-1vRu96x6GEP9i0hMcHTcR72FzgU8LHKu6nY0-GPLiy2K6jl5GCvWuF-S7BlG1yLaZRyISf_OQ2ODnryr',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRu96x6GEP9i0hMcHTcR72FzgU8LHKu6nY0-GPLiy2K6jl5GCvWuF-S7BlG1yLaZRyISf_OQ2ODnryr/pubhtml?gid=1173473883&single=true&widget=false&headers=false&chrome=false',
+        url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRu96x6GEP9i0hMcHTcR72FzgU8LHKu6nY0-GPLiy2K6jl5GCvWuF-S7BlG1yLaZRyISf_OQ2ODnryr/pubhtml',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should drop an empty fragment', () => {
       const value =
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZs0nSuXimq1nrFUgP_84KEuRfrbB3fGRXvsIWxswuG_ZQ7c-GaMB8vBKxWUqcXh85NCkXv76_6AYP/pubhtml?widget=true&headers=false#gid='
