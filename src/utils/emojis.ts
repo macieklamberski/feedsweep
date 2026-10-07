@@ -332,8 +332,12 @@ export const resolveEmojiImage = (
   const shortname = attr(element, 'data-shortname')
 
   const keepsPictures = match.keepsPictures ?? hasFalseName(match.names)
+  // A set that reads no filenames numbers its files its own way, so a stem like `2694` is no
+  // codepoint there.
+  const isCodepointNamed =
+    match.names !== undefined && isCodepointFile(src, match.stem ?? getNameStem(src), alt)
 
-  if (keepsPictures && !isCodepointFile(src, match.stem ?? getNameStem(src), alt)) {
+  if (keepsPictures && !isCodepointNamed) {
     return resolveKeptPicture(element, match)
   }
 

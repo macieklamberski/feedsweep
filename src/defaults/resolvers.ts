@@ -855,6 +855,9 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   forumotionEmojiResolver,
   kunenaEmojiResolver,
   invisionEmojiResolver,
+
+  // Ahead of the forum engines and smilies, whose class and directory matches take a hotlinked
+  // Kolobok file too.
   kolobokEmojiResolver,
   xenforoEmojiResolver,
   smfEmojiResolver,
