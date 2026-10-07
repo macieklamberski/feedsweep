@@ -213,6 +213,7 @@ describeForEachParser('channelOneEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
     it('should mint the Flash promo player inside its embed', async () => {
       const value = html`
         <embed

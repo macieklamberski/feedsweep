@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const channelOneHosts = ['1tv.ru']
 
-// The Flash routes the server redirects to `embed/{id}:{type}`, each against the type it names.
+// The legacy routes the server redirects to the player, each against the type it names.
 const legacyRouteTypes = toMap({
   i_newsvideo: '17',
   i_video: '15',
@@ -13,7 +13,7 @@ const legacyRouteTypes = toMap({
   promoovideo: '15',
 })
 
-// Channel One Russia's player, `1tv.ru/embed/{id}:{type}`, and the Flash routes before it, such
+// Channel One Russia's player, `1tv.ru/embed/{id}:{type}`, and the legacy routes before it, such
 // as `1tv.ru/newsvideo/{id}`. The type picks the id space: the player looks `1` and `17` up as a
 // legacy news id, `15` as a legacy video, `11` as a news item and `12` as a video, and the same
 // number names a different item in each, so the key keeps both halves. The player reads `t` as
