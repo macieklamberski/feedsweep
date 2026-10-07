@@ -97,15 +97,18 @@ export const kolobokEmojiNames = toMap<EmojiGlyph>({
 })
 
 // Smilies hotlinked from kolobok.us, the set's own gallery under `smiles/` and the site's e107
-// emote folder, named like `standart/pardon.gif`. Every file there is a Kolobok drawing, so the
-// host alone marks it. The pack names never appear there, but their `false` entries keep every
-// picture, an emoji alt included.
+// emote folder, named like `standart/pardon.gif`, and the pack Drupal's Smiley module ships in
+// `modules/smiley/packs/kolobok/`, named like `pardon.gif` and written with no class unless the
+// site sets one. Every file there is a Kolobok drawing, so the host or path alone marks it. The
+// pack names never appear there, but their `false` entries keep every picture, an emoji alt
+// included.
 export const kolobokEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: [
     'img[src*="kolobok.us/smiles/" i]',
     'img[src*="smiles.kolobok.us/" i]',
     'img[src*="kolobok.us/content_images/emotes/" i]',
+    'img[src*="/smiley/packs/kolobok/" i]',
   ].join(','),
   extract: (element) => {
     return resolveEmojiImage(element, { isStrong: true, names: kolobokEmojiNames })
