@@ -60,7 +60,7 @@ describeForEachParser('bookcreatorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the nopreview flag', async () => {
+    it('should keep the nopreview flag in the player url', async () => {
       const value = html`
         <iframe
           allow="clipboard-write self https://read.bookcreator.com"
@@ -72,7 +72,7 @@ describeForEachParser('bookcreatorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bookcreator',
         id: 'AVx0VbpcUWWuFRIyhhhDg841RaB3/TmxA4xZCRciSwFQI32MCIw',
-        src: 'https://read.bookcreator.com/AVx0VbpcUWWuFRIyhhhDg841RaB3/TmxA4xZCRciSwFQI32MCIw',
+        src: 'https://read.bookcreator.com/AVx0VbpcUWWuFRIyhhhDg841RaB3/TmxA4xZCRciSwFQI32MCIw?nopreview',
         url: 'https://read.bookcreator.com/AVx0VbpcUWWuFRIyhhhDg841RaB3/TmxA4xZCRciSwFQI32MCIw',
         thumbnail:
           'https://assets.api.bookcreator.com/AVx0VbpcUWWuFRIyhhhDg841RaB3/books/TmxA4xZCRciSwFQI32MCIw/cover/share',
@@ -126,12 +126,25 @@ describeForEachParser('bookcreatorEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should leave a library framed as a page', async () => {
+      const value = '<iframe src="https://read.bookcreator.com/library/-NaBcDeF123"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
 
-describeForEachParser('bookcreator shapes the pipeline settles first', (parseHtml) => {
-  const convert = (value: string): Promise<string> => {
-    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+describeForEachParser('bookcreator through the pipeline', (parseHtml) => {
+  const convert = (
+    value: string,
+    enclosures?: Array<{ url: string; type: string }>,
+  ): Promise<string> => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
   }
 
   it('should build the reader from a protocol-relative frame', async () => {
@@ -157,5 +170,23 @@ describeForEachParser('bookcreator shapes the pipeline settles first', (parseHtm
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a cover the reader host serves as a file', async () => {
+    const enclosures = [
+      {
+        url: 'https://read.bookcreator.com/assets/Hzwv8sy7X6YkLJncNU8HbCaBuJP2/6XJpVcqFQDOu2Gvy9rh6rQ/cover',
+        type: 'image/jpeg',
+      },
+    ]
+    const expected = html`
+      <img
+        data-enclosure=""
+        src="https://read.bookcreator.com/assets/Hzwv8sy7X6YkLJncNU8HbCaBuJP2/6XJpVcqFQDOu2Gvy9rh6rQ/cover"
+      />
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
