@@ -2,7 +2,11 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { democracynowEmbedResolver, democracynowResolveEmbed } from './democracynow.js'
+import {
+  democracynowIframeEmbedResolver,
+  democracynowResolveEmbed,
+  democracynowScriptEmbedResolver,
+} from './democracynow.js'
 
 describe('democracynowResolveEmbed', () => {
   describe('happy paths', () => {
@@ -148,8 +152,8 @@ describe('democracynowResolveEmbed', () => {
   })
 })
 
-describeForEachParser('democracynowEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, democracynowEmbedResolver)
+describeForEachParser('democracynowIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, democracynowIframeEmbedResolver)
 
   describe('happy paths', () => {
     it('should take the platform size over the declared box', async () => {
@@ -183,6 +187,141 @@ describeForEachParser('democracynowEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('democracynowScriptEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, democracynowScriptEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should mint the story player from a v2 loader', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="http://www.democracynow.org/embed_show_v2/300/2011/5/19/story/manning_marables_controversial_new_biography_refuels"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'democracynow',
+        id: 'story/2011/5/19/manning_marables_controversial_new_biography_refuels',
+        src: 'https://www.democracynow.org/embed/story/2011/5/19/manning_marables_controversial_new_biography_refuels',
+        url: 'https://www.democracynow.org/2011/5/19/manning_marables_controversial_new_biography_refuels',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the show player of the day from a v1 segment loader', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="http://www.democracynow.org/embed_show_v1/300/2009/4/2/segment/3"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'democracynow',
+        id: 'show/2009/4/2',
+        src: 'https://www.democracynow.org/embed/show/2009/4/2',
+        url: 'https://www.democracynow.org/shows/2009/4/2',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the live player from a loader on the staging host', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="http://staging.democracynow.org/embed_show_v1/300/2009/11/2/segment/3"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'democracynow',
+        id: 'show/2009/11/2',
+        src: 'https://www.democracynow.org/embed/show/2009/11/2',
+        url: 'https://www.democracynow.org/shows/2009/11/2',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop a query the player does not read', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="http://www.democracynow.org/embed_show_v1/300/2009/4/2/segment/3?utm_source=feed"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'democracynow',
+        id: 'show/2009/4/2',
+        src: 'https://www.democracynow.org/embed/show/2009/4/2',
+        url: 'https://www.democracynow.org/shows/2009/4/2',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host carrying the same path', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="https://evil.test/embed_show_v1/300/2009/4/2/segment/3?democracynow.org/embed_show_v"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a loader that is not one of the two', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="http://www.democracynow.org/embed_show_v9/300/2009/4/2/segment/3"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a kind no loader served', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="http://www.democracynow.org/embed_show_v1/300/2009/4/2/clip/3"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a story with no slug', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="http://www.democracynow.org/embed_show_v2/300/2011/5/19/story"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a segment followed by another path segment', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="http://www.democracynow.org/embed_show_v1/300/2009/4/2/segment/3/extra"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 describeForEachParser('democracynow player through the pipeline', (parseHtml) => {
   const convert = (value: string) => {
     return transformContent(value, {
@@ -208,6 +347,26 @@ describeForEachParser('democracynow player through the pipeline', (parseHtml) =>
         data-embed-id="show/2023/6/27"
         data-embed-provider="democracynow"
         data-embed-src="https://www.democracynow.org/embed/show/2023/6/27"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a v2 loader script with the story player', async () => {
+    const value = html`
+      <script
+        type="text/javascript"
+        src="http://www.democracynow.org/embed_show_v2/300/2010/6/9/story/scientist_bp_well_could_be_leaking"
+      ></script>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-url="https://www.democracynow.org/2010/6/9/scientist_bp_well_could_be_leaking"
+        data-embed-id="story/2010/6/9/scientist_bp_well_could_be_leaking"
+        data-embed-provider="democracynow"
+        data-embed-src="https://www.democracynow.org/embed/story/2010/6/9/scientist_bp_well_could_be_leaking"
       ></div>
     `
 
