@@ -48,6 +48,28 @@ describeForEachParser('shervnetEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should mark an emoticon served through the Jetpack image proxy', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://i0.wp.com/www.sherv.net/cm/emo/christmas/christmas-wreath-smiley-emoticon.gif"
+          alt=""
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://i0.wp.com/www.sherv.net/cm/emo/christmas/christmas-wreath-smiley-emoticon.gif"
+          alt=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should keep an emoticon whose alt is an emoji as a marked picture', async () => {
     const value = html`
       <p>
