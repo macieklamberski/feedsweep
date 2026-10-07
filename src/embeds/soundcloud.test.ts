@@ -10,7 +10,28 @@ import {
 import { convertWidgets } from '../transforms/dom/convertWidgets.js'
 import type { EmbedResolverResult } from '../types.js'
 import { applyDomTransforms } from '../utils/transforms.js'
-import { soundcloudEmbedResolver } from './soundcloud.js'
+import { isSoundcloudStream, soundcloudEmbedResolver } from './soundcloud.js'
+
+describe('isSoundcloudStream', () => {
+  it('should answer true for a feed stream', () => {
+    const value =
+      'https://feeds.soundcloud.com/stream/829184995-arizona-capitol-times-the-breakdown-the-breakdown-a-sine-die-surprise.mp3'
+
+    expect(isSoundcloudStream(value)).toBe(true)
+  })
+
+  it('should answer false for the stream path on another host', () => {
+    const value = 'https://evil.test/stream/829184995-a-sine-die-surprise.mp3'
+
+    expect(isSoundcloudStream(value)).toBe(false)
+  })
+
+  it('should answer false for a stream path behind a prefix', () => {
+    const value = 'https://feeds.soundcloud.com/podcast/stream/829184995-a-sine-die-surprise.mp3'
+
+    expect(isSoundcloudStream(value)).toBe(false)
+  })
+})
 
 describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, soundcloudEmbedResolver)
@@ -998,6 +1019,71 @@ describeForEachParser('soundcloud through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+
+  it('should frame the track a WordPress audio shortcode streams', async () => {
+    const value = html`
+      <audio
+        class="wp-audio-shortcode"
+        id="audio-5325-1"
+        preload="none"
+        style="width: 100%;"
+        controls="controls"
+      >
+        <source
+          type="audio/mpeg"
+          src="http://feeds.soundcloud.com/stream/235469515-ontheregimen-core-strategies-for-building-muscle-gary-vaynerchuks-workout-plan.mp3?_=1"
+        >
+        <a href="http://feeds.soundcloud.com/stream/235469515-ontheregimen-core-strategies-for-building-muscle-gary-vaynerchuks-workout-plan.mp3">http://feeds.soundcloud.com/stream/235469515-ontheregimen-core-strategies-for-building-muscle-gary-vaynerchuks-workout-plan.mp3</a>
+      </audio>
+    `
+    const expected = html`
+      <div
+        data-embed-height="166"
+        data-embed-id="tracks/235469515"
+        data-embed-provider="soundcloud"
+        data-embed-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/235469515"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should frame the track an audio element streams on its own src', async () => {
+    const value = html`
+      <audio
+        controls
+        src="http://feeds.soundcloud.com/stream/1039766461-urodchenko-045-a-razreshenie-u-vas-imeetsya-feat-anton-kuzmin.mp3"
+      ></audio>
+    `
+    const expected = html`
+      <div
+        data-embed-height="166"
+        data-embed-id="tracks/1039766461"
+        data-embed-provider="soundcloud"
+        data-embed-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1039766461"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep an audio element whose other source is a file on another host', async () => {
+    const value = html`
+      <audio controls>
+        <source src="https://feeds.soundcloud.com/stream/829184995-arizona-capitol-times-the-breakdown-the-breakdown-a-sine-die-surprise.mp3">
+        <source src="https://example.com/wp-content/uploads/the-breakdown.mp3">
+      </audio>
+    `
+
+    expect(await convert(value)).toEqualHtml(value)
+  })
+
+  it('should keep an audio element streaming a file that names no track', async () => {
+    const value =
+      '<audio controls src="https://feeds.soundcloud.com/stream/nameless-episode.mp3"></audio>'
+
+    expect(await convert(value)).toEqualHtml(value)
   })
 })
 
