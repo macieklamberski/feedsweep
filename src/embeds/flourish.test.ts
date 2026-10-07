@@ -269,9 +269,82 @@ describeForEachParser('flourishIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should mint the player from a share page', async () => {
+      const value = html`
+        <iframe
+          height="600px"
+          width="100%"
+          class="position-center"
+          src="https://public.flourish.studio/visualisation/29276763/"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flourish',
+        id: 'visualisation/29276763',
+        src: 'https://flo.uri.sh/visualisation/29276763/embed',
+        url: 'https://public.flourish.studio/visualisation/29276763/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the campaign query a share page carries', async () => {
+      const value = html`
+        <iframe
+          frameborder="0"
+          height="800"
+          src="https://public.flourish.studio/visualisation/23615853/?utm_source=embed&amp;utm_campaign=visualisation/23615853"
+          width="100"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flourish',
+        id: 'visualisation/23615853',
+        src: 'https://flo.uri.sh/visualisation/23615853/embed',
+        url: 'https://public.flourish.studio/visualisation/23615853/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the story player from a story share page', async () => {
+      const value = html`
+        <iframe
+          src="https://public.flourish.studio/story/439516/"
+          height="700"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flourish',
+        id: 'story/439516',
+        src: 'https://flo.uri.sh/story/439516/embed',
+        url: 'https://public.flourish.studio/story/439516/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the player from a share page the refusal used to pin', async () => {
+      const value = '<iframe src="https://public.flourish.studio/visualisation/29541520/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flourish',
+        id: 'visualisation/29541520',
+        src: 'https://flo.uri.sh/visualisation/29541520/embed',
+        url: 'https://public.flourish.studio/visualisation/29541520/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
+    it('should return undefined for the share path on the player host, which serves no page', async () => {
+      const value = '<iframe src="https://flo.uri.sh/visualisation/23615853/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined for a foreign host carrying the path', async () => {
       const value = '<iframe src="https://evil.test/visualisation/29132382/embed"></iframe>'
 
@@ -325,13 +398,6 @@ describeForEachParser('flourishIframeEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
-    })
-
-    // The share page is the thing the placeholder links to, not a player to frame.
-    it('should return undefined for a share page', async () => {
-      const value = '<iframe src="https://public.flourish.studio/visualisation/29541520/"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
     })
   })
 })
@@ -411,6 +477,24 @@ describeForEachParser('flourish enclosures', (parseHtml) => {
     const expected = html`
       <img
         src="https://public.flourish.studio/visualisation/29541520/thumbnail"
+        data-enclosure=""
+      />
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+
+  it('should leave a file at the share page depth an image', async () => {
+    const enclosures = [
+      {
+        url: 'https://public.flourish.studio/resources/made_with_flourish.svg',
+        type: 'image/svg+xml',
+      },
+    ]
+    const expected = html`
+      <img
+        src="https://public.flourish.studio/resources/made_with_flourish.svg"
         data-enclosure=""
       />
       <p>Body</p>
