@@ -91,7 +91,7 @@ const readPageMedia = async (
     }
 
     // Vimeo's `progressive_redirect` file sits on a host its resolver claims, and plays in the
-    // element as written. SoundCloud's widget plays a feed stream's track even where the file is gone.
+    // element as written. A SoundCloud feed stream names its track, which the widget plays.
     if (getMediaTag(url) && !isSoundcloudStream(url)) {
       return
     }

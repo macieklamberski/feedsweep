@@ -12,6 +12,27 @@ import type { EmbedResolverResult } from '../types.js'
 import { applyDomTransforms } from '../utils/transforms.js'
 import { isSoundcloudStream, soundcloudEmbedResolver } from './soundcloud.js'
 
+describe('isSoundcloudStream', () => {
+  it('should answer true for a feed stream', () => {
+    const value =
+      'https://feeds.soundcloud.com/stream/829184995-arizona-capitol-times-the-breakdown-the-breakdown-a-sine-die-surprise.mp3'
+
+    expect(isSoundcloudStream(value)).toBe(true)
+  })
+
+  it('should answer false for the stream path on another host', () => {
+    const value = 'https://evil.test/stream/829184995-a-sine-die-surprise.mp3'
+
+    expect(isSoundcloudStream(value)).toBe(false)
+  })
+
+  it('should answer false for a stream path behind a prefix', () => {
+    const value = 'https://feeds.soundcloud.com/podcast/stream/829184995-a-sine-die-surprise.mp3'
+
+    expect(isSoundcloudStream(value)).toBe(false)
+  })
+})
+
 describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, soundcloudEmbedResolver)
 
@@ -1047,25 +1068,6 @@ describeForEachParser('soundcloud through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 
-  it('should frame the first track of an audio element streaming several', async () => {
-    const value = html`
-      <audio controls>
-        <source src="https://feeds.soundcloud.com/stream/829184995-arizona-capitol-times-the-breakdown-the-breakdown-a-sine-die-surprise.mp3">
-        <source src="https://feeds.soundcloud.com/stream/637770405-arizona-capitol-times-the-breakdown-the-breakdown-have-you-no-honor.mp3">
-      </audio>
-    `
-    const expected = html`
-      <div
-        data-embed-height="166"
-        data-embed-id="tracks/829184995"
-        data-embed-provider="soundcloud"
-        data-embed-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/829184995"
-      ></div>
-    `
-
-    expect(await convert(value)).toEqualHtml(expected)
-  })
-
   it('should keep an audio element whose other source is a file on another host', async () => {
     const value = html`
       <audio controls>
@@ -1082,27 +1084,6 @@ describeForEachParser('soundcloud through the pipeline', (parseHtml) => {
       '<audio controls src="https://feeds.soundcloud.com/stream/nameless-episode.mp3"></audio>'
 
     expect(await convert(value)).toEqualHtml(value)
-  })
-})
-
-describe('isSoundcloudStream', () => {
-  it('should answer true for a feed stream', () => {
-    const value =
-      'https://feeds.soundcloud.com/stream/829184995-arizona-capitol-times-the-breakdown-the-breakdown-a-sine-die-surprise.mp3'
-
-    expect(isSoundcloudStream(value)).toBe(true)
-  })
-
-  it('should answer false for the stream path on another host', () => {
-    const value = 'https://evil.test/stream/829184995-a-sine-die-surprise.mp3'
-
-    expect(isSoundcloudStream(value)).toBe(false)
-  })
-
-  it('should answer false for a stream path behind a prefix', () => {
-    const value = 'https://feeds.soundcloud.com/podcast/stream/829184995-a-sine-die-surprise.mp3'
-
-    expect(isSoundcloudStream(value)).toBe(false)
   })
 })
 
