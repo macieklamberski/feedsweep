@@ -70,6 +70,7 @@ import {
   blueskyPostElementEmbedResolver,
   blueskyS9eEmbedResolver,
 } from '../embeds/bluesky.js'
+import { bookcreatorEmbedResolver } from '../embeds/bookcreator.js'
 import { brEmbedResolver } from '../embeds/br.js'
 import { bridEmbedResolver } from '../embeds/brid.js'
 import {
@@ -496,6 +497,7 @@ const embedResolvers: Array<EmbedResolver> = [
   blueskyIframeEmbedResolver,
   blueskyS9eEmbedResolver,
   blueskyPostElementEmbedResolver,
+  bookcreatorEmbedResolver,
   brEmbedResolver,
   bridEmbedResolver,
   brightcoveExperienceEmbedResolver,
