@@ -6,6 +6,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'kaltura'
 
 const partnerPathRegex = /^\/p\/([^/]+)\//
+const doubledSlashRegex = /^\/\//
 
 const kalturaHost = 'kaltura.com'
 
@@ -25,7 +26,12 @@ const playbackParams = [
 // entry that needs it gets no thumbnail, since the poster would need it too.
 const tokenParam = 'flashvars[ks]'
 
+// The widget an entry's access control can be tied to, as the embedIframeJs and the
+// embedPlaykitJs player read it. Such an entry plays only with it, and errors without it.
+const widgetParams = ['widget_id', 'config[provider]']
+
 type Entry = {
+  path: string
   partner: string
   entryId: string
   parsed: URL
@@ -33,21 +39,23 @@ type Entry = {
 
 const readEntry = (url: string | undefined): Entry | undefined => {
   const parsed = parseUrlOnHosts(url, kalturaHost)
-  const partner = parsed?.pathname.match(partnerPathRegex)?.[1]
+  // Some feeds write the player path as `//p/…`, which Kaltura serves as `/p/…`.
+  const path = parsed?.pathname.replace(doubledSlashRegex, '/')
+  const partner = path?.match(partnerPathRegex)?.[1]
   const entryId = parsed?.searchParams.get('entry_id')
 
-  return parsed && partner && entryId ? { partner, entryId, parsed } : undefined
+  return parsed && path && partner && entryId ? { path, partner, entryId, parsed } : undefined
 }
 
 // The player path names the partner and the player config. Without `iframeembed=true` the same
 // route answers the auto-embed script, not a player.
-const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult => {
+const composeEmbed = ({ path, partner, entryId, parsed }: Entry): EmbedResolverResult => {
   const host = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
   const query = composeQuery({ iframeembed: 'true', entry_id: entryId })
   const hasToken = parsed.searchParams.has(tokenParam)
   const kept = filterUrlQuery(
     parsed,
-    (name) => name === tokenParam || playbackParams.includes(name),
+    (name) => name === tokenParam || widgetParams.includes(name) || playbackParams.includes(name),
   )
   const playback = kept.replace('?', '&')
   // The entry comes out of the query decoded, and it goes into a path.
@@ -57,7 +65,7 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult 
     provider,
     // Title and metadata sit behind a session key.
     id: `${partner}/${entryId}`,
-    src: `https://${host}${parsed.pathname}${query}${playback}`,
+    src: `https://${host}${path}${query}${playback}`,
     // The poster answers 200 `image/jpeg` for a real entry, 404 for an invented or a deleted one.
     thumbnail: hasToken
       ? undefined
