@@ -117,6 +117,30 @@ describeForEachParser('bitrixEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should keep a smilie whose number reads as a codepoint as a marked picture', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://example.com/upload/main/smiles/5/2694.gif"
+          alt="😀"
+          class="bx-smile"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://example.com/upload/main/smiles/5/2694.gif"
+          alt="😀"
+          class="bx-smile"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   // Codes from Bitrix's stock set that the shared table does not carry.
   const stockCodeCases: Array<string> = [':facepalm:', ':{}', ':-{}', ':~(', ':-/']
 

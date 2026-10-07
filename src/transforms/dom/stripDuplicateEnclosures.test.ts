@@ -222,6 +222,36 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should remove a marked image differing from a content image only by an extensionless rendition query', async () => {
+      const value = html`
+        <img
+          src="https://storage.ning.com/topology/rest/1.0/file/get/2114616514?profile=RESIZE_710x&width=623&format=jpg"
+          data-enclosure=""
+        >
+        <img src="https://storage.ning.com/topology/rest/1.0/file/get/2114616514?profile=RESIZE_710x&width=240&format=jpg">
+      `
+      const expected =
+        '<img src="https://storage.ning.com/topology/rest/1.0/file/get/2114616514?profile=RESIZE_710x&width=240&format=jpg">'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a marked image an extensionless endpoint tells apart by its query', async () => {
+      const value = html`
+        <img
+          src="http://docs.google.com/File?id=dhg5zdns_511hnhczncm_b"
+          data-enclosure=""
+        >
+        <img src="http://docs.google.com/File?id=dhg5zdns_507f8q6dqch_b">
+      `
+      const expected = html`
+        <img src="http://docs.google.com/File?id=dhg5zdns_511hnhczncm_b">
+        <img src="http://docs.google.com/File?id=dhg5zdns_507f8q6dqch_b">
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should keep a genuinely different image and drop its marker', async () => {
       const value = html`
         <img src="https://example.com/photos/999/888/large.jpg" data-enclosure="">
