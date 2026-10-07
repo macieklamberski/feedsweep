@@ -73,6 +73,17 @@ describeForEachParser('convertEmojis', (parseHtml) => {
 
       expect(await transformWith(value, resolvers)).toEqualHtml(expected)
     })
+
+    it('should claim an element a selector matches only after an earlier replacement', async () => {
+      const resolvers: Array<EmojiResolver> = [
+        { ...winkResolver, selector: 'span' },
+        { ...smileResolver, selector: 'img:first-child' },
+      ]
+      const value = '<p><span>;)</span><img src="/a.png"></p>'
+      const expected = '<p>😉🙂</p>'
+
+      expect(await transformWith(value, resolvers)).toEqualHtml(expected)
+    })
   })
 
   describe('data-emoji marker', () => {
