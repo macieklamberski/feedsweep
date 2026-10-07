@@ -66,6 +66,25 @@ describeForEachParser('rebuildLazyLoadForVideos', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should rebuild a vimeo facade whose data-video-uri is the api path', async () => {
+    const value = html`
+      <div class="container-lazyload container-vimeo js-lazyload--not-loaded">
+        <a
+          href="https://vimeo.com/859026332"
+          id="859026332"
+          class="lazy-load-vimeo preview-lazyload preview-vimeo"
+          data-video-uri="/videos/859026332"
+          data-video-title="Pagliacci | Hebelio"
+        >https://vimeo.com/859026332</a>
+      </div>
+    `
+    const expected = html`
+      <iframe title="Pagliacci | Hebelio" src="https://player.vimeo.com/video/859026332"></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should carry data-video-title into the iframe title', async () => {
     const value = html`
       <a

@@ -22,14 +22,22 @@ const videoUrls = [
   // The Flash player carried no id in the path at all, and shipped its options beside it.
   'http://vimeo.com/moogaloop.swf?clip_id=76979871',
   'http://vimeo.com/moogaloop.swf?clip_id=76979871&force_embed=1&server=vimeo.com&color=00adef',
-  'http://www.vimeo.com/moogaloop.swf?clip_id=76979871',
-  'https://player2.vimeo.com/video/76979871',
-  'http://staging.vimeo.com/moogaloop.swf?clip_id=76979871&server=staging.vimeo.com',
 ]
 
 describe('extractVimeoId', () => {
   it.each(videoUrls)('should extract the id from %s', (value) => {
     expect(extractVimeoId(value)).toBe('76979871')
+  })
+
+  // The other hosts that serve a player, each with the id a real carrier names.
+  const pageHostUrls: Array<[string, string]> = [
+    ['http://www.vimeo.com/moogaloop.swf?clip_id=8944133&server=www.vimeo.com', '8944133'],
+    ['https://player2.vimeo.com/video/242463839', '242463839'],
+    ['http://staging.vimeo.com/moogaloop.swf?clip_id=6419431&server=staging.vimeo.com', '6419431'],
+  ]
+
+  it.each(pageHostUrls)('should extract the id from a page host, %s', (value, expected) => {
+    expect(extractVimeoId(value)).toBe(expected)
   })
 
   it('should return undefined for a moogaloop.swf url with no clip id', () => {
