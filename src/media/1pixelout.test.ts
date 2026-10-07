@@ -465,6 +465,20 @@ describeForEachParser('onePixelOutWidgetMediaResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore a div with the prefix that no embed call names', async () => {
+      const value = html`
+        <div
+          id="audioplayer_idm14055219650296002828982-abcd-458a-8a62-504f929d79b0"
+          class="player_element"
+          data-url="http://example.com/wqxr/wqxr20141024_jurowski_bonus.mp3"
+          data-download="false"
+          data-may-embed="true"
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 
   describe('edge cases', () => {
