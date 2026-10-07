@@ -1113,7 +1113,11 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
     expect(await transform(value, context)).toEqualHtml(expected)
   })
 
-  it('should keep a media src as minted when no cleanUrlFn is provided', async () => {
+  it('should keep the media src when the cleanUrlFn answers with nothing', async () => {
+    const context: TransformContext = {
+      ...withResolver(tumblrMediaResolver),
+      cleanUrlFn: () => '',
+    }
     const value = html`
       <iframe
         class="tumblr_audio_player tumblr_audio_player_127428120413"
@@ -1127,7 +1131,7 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       ></audio>
     `
 
-    expect(await transform(value, withResolver(tumblrMediaResolver))).toEqualHtml(expected)
+    expect(await transform(value, context)).toEqualHtml(expected)
   })
 
   it('should write a poster onto a video', async () => {
