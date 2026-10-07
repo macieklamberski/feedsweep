@@ -30,6 +30,18 @@ describe('allocineResolveEmbed', () => {
       expect(allocineResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should rebuild the Flash player onto the current one', () => {
+      const value = 'http://www.allocine.fr/blogvision/18823127'
+      const expected: EmbedResolverResult = {
+        provider: 'allocine',
+        id: '18823127',
+        src: 'https://player.allocine.fr/18823127.html',
+        ratio: '16/9',
+      }
+
+      expect(allocineResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should drop everything in the query but the id', () => {
       const value =
         'https://www.allocine.fr/_video/iblogvision.aspx?cmedia=19572359&autoplay=1&utm_source=feed'
@@ -81,6 +93,36 @@ describe('allocineResolveEmbed', () => {
       expect(allocineResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should return undefined for a foreign host carrying the Flash player path', () => {
+      const value = 'https://evil.test/blogvision/18823127'
+
+      expect(allocineResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the Flash player below another segment', () => {
+      const value = 'https://www.allocine.fr/video/blogvision/18823127'
+
+      expect(allocineResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a segment after the Flash player id', () => {
+      const value = 'https://www.allocine.fr/blogvision/18823127/extra'
+
+      expect(allocineResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the Flash player with no id', () => {
+      const value = 'https://www.allocine.fr/blogvision/'
+
+      expect(allocineResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the Flash player in capitals, which the server answers 404', () => {
+      const value = 'https://www.allocine.fr/BLOGVISION/18823127'
+
+      expect(allocineResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should return undefined for the player below another segment', () => {
       const value = 'https://player.allocine.fr/video/19546104.html'
 
@@ -118,6 +160,18 @@ describe('allocineResolveEmbed', () => {
 
       expect(allocineResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should pass a Flash player id that is not a number as written', () => {
+      const value = 'https://www.allocine.fr/blogvision/18823127a'
+      const expected: EmbedResolverResult = {
+        provider: 'allocine',
+        id: '18823127a',
+        src: 'https://player.allocine.fr/18823127a.html',
+        ratio: '16/9',
+      }
+
+      expect(allocineResolveEmbed(value)).toEqual(expected)
+    })
   })
 })
 
@@ -138,6 +192,50 @@ describeForEachParser('allocineEmbedResolver', (parseHtml) => {
         provider: 'allocine',
         id: '19567053',
         src: 'https://player.allocine.fr/19567053.html',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should claim the Flash embed', async () => {
+      const value = html`
+        <embed
+          src="http://www.allocine.fr/blogvision/18823127"
+          type="application/x-shockwave-flash"
+          allowfullscreen="true"
+          allowscriptaccess="always"
+          width="100%"
+          height="100%"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'allocine',
+        id: '18823127',
+        src: 'https://player.allocine.fr/18823127.html',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should claim a Flash object that names the player in its data', async () => {
+      const value = html`
+        <object
+          data="http://www.allocine.fr/blogvision/18822093"
+          type="application/x-shockwave-flash"
+          width="439"
+          height="348"
+        >
+          <param name="quality" value="high">
+          <param name="menu" value="false">
+          <param name="src" value="http://www.allocine.fr/blogvision/18822093">
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'allocine',
+        id: '18822093',
+        src: 'https://player.allocine.fr/18822093.html',
         ratio: '16/9',
       }
 
@@ -177,6 +275,54 @@ describeForEachParser('allocine player through the pipeline', (parseHtml) => {
         data-embed-id="19546104"
         data-embed-provider="allocine"
         data-embed-src="https://player.allocine.fr/19546104.html"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should replace the Flash object with the current player', async () => {
+    const value = html`
+      <div id="blogvision" style="width:420px; height:335px">
+        <object width="100%" height="100%">
+          <param name="movie" value="http://www.allocine.fr/blogvision/19349765">
+          <param name="allowFullScreen" value="true">
+          <param name="allowScriptAccess" value="always">
+          <embed src="http://www.allocine.fr/blogvision/19349765" type="application/x-shockwave-flash" width="100%" height="100%" allowFullScreen="true" allowScriptAccess="always">
+        </object>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-id="19349765"
+        data-embed-provider="allocine"
+        data-embed-src="https://player.allocine.fr/19349765.html"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should replace the Flash object that names the player in its data', async () => {
+    const value = html`
+      <object
+        data="http://www.allocine.fr/blogvision/18822093"
+        type="application/x-shockwave-flash"
+        width="439"
+        height="348"
+      >
+        <param name="quality" value="high">
+        <param name="menu" value="false">
+        <param name="src" value="http://www.allocine.fr/blogvision/18822093">
+      </object>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-id="18822093"
+        data-embed-provider="allocine"
+        data-embed-src="https://player.allocine.fr/18822093.html"
       ></div>
     `
 
