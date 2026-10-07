@@ -181,6 +181,13 @@ const readSubstackTrack = (element: Nullish<Element>): Partial<EmbedResolverResu
   )
 }
 
+// Answers whether a url is SoundCloud's feed stream, the episode file named after its track.
+export const isSoundcloudStream = (url: string): boolean => {
+  const parsed = parseUrlOnHosts(url, soundcloudHosts)
+
+  return streamPathRegex.test(parsed?.pathname ?? '')
+}
+
 // SoundCloud's widget iframe, the dead Flash player and a framed track page answering SAMEORIGIN.
 const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
   // The factory has already matched the host, which means the url parsed, so there is no
