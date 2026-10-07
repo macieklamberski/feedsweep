@@ -28,6 +28,28 @@ describeForEachParser('millannetEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should mark a smiley served through the Jetpack image proxy', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://i0.wp.com/www.millan.net/minimations/smileys/hostlov.gif"
+          alt=""
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://i0.wp.com/www.millan.net/minimations/smileys/hostlov.gif"
+          alt=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should keep a smiley whose alt is an emoji as a marked picture', async () => {
     const value = html`
       <p>
