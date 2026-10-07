@@ -153,12 +153,12 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // `fb.watch/v/{code}` is a short link to another id, so the route is read on facebook.com only.
-  const flashVideoId = isHostOrSubdomainOf(parsed, 'facebook.com')
-    ? flashVideoPathRegex.exec(parsed.pathname)?.[1]
-    : undefined
+  if (isHostOrSubdomainOf(parsed, 'facebook.com')) {
+    const flashVideoId = flashVideoPathRegex.exec(parsed.pathname)?.[1]
 
-  if (flashVideoId) {
-    return composeWatchEmbed(flashVideoId)
+    if (flashVideoId) {
+      return composeWatchEmbed(flashVideoId)
+    }
   }
 
   if (contentPathRegex.test(parsed.pathname) || isWatchPage(parsed)) {
