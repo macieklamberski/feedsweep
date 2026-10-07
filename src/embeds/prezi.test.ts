@@ -59,9 +59,34 @@ describe('preziResolveEmbed', () => {
 
       expect(preziResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should keep the view route of a share token as written', () => {
+      const value = 'https://prezi.com/view/AmsY8GrnVuyJbYDH8QXI/embed'
+      const expected: EmbedResolverResult = {
+        provider: 'prezi',
+        id: 'AmsY8GrnVuyJbYDH8QXI',
+        src: 'https://prezi.com/view/AmsY8GrnVuyJbYDH8QXI/embed',
+        url: 'https://prezi.com/view/AmsY8GrnVuyJbYDH8QXI/',
+        ratio: '550/400',
+      }
+
+      expect(preziResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
+    it('should ignore the view page that is not the embed', () => {
+      const value = 'https://prezi.com/view/AmsY8GrnVuyJbYDH8QXI/'
+
+      expect(preziResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore an embed word after a token under a route other than view', () => {
+      const value = 'https://prezi.com/x/AmsY8GrnVuyJbYDH8QXI/embed'
+
+      expect(preziResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the embed route', () => {
       const value = 'https://evil.test/embed/testonly0001/'
 
@@ -83,12 +108,6 @@ describe('preziResolveEmbed', () => {
 
     it('should ignore an embed word under a route other than the presentation one', () => {
       const value = 'https://prezi.com/x/embed/07fqanglwhcw/'
-
-      expect(preziResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the view route of the newer product', () => {
-      const value = 'https://prezi.com/view/testonly0001/embed'
 
       expect(preziResolveEmbed(value)).toBeUndefined()
     })
@@ -224,6 +243,28 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
         id: '07fqanglwhcw',
         src: 'https://prezi.com/p/07fqanglwhcw/embed',
         url: 'https://prezi.com/p/07fqanglwhcw/',
+        ratio: '550/400',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the view frame the share dialog writes', async () => {
+      const value = html`
+        <iframe
+          width="650"
+          height="400"
+          src="https://prezi.com/view/ltVmUWho9CT4ywsuHZn3/embed"
+          webkitallowfullscreen="1"
+          mozallowfullscreen="1"
+          allowfullscreen="1"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'prezi',
+        id: 'ltVmUWho9CT4ywsuHZn3',
+        src: 'https://prezi.com/view/ltVmUWho9CT4ywsuHZn3/embed',
+        url: 'https://prezi.com/view/ltVmUWho9CT4ywsuHZn3/',
         ratio: '550/400',
       }
 
