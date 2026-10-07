@@ -2,10 +2,10 @@ import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, emojiConverters, html } from '../tests.js'
 
 describeForEachParser('weiboEmojiResolver', (parseHtml) => {
-  const { transformKeeping } = emojiConverters(parseHtml)
+  const { transform } = emojiConverters(parseHtml)
 
   describe('Weibo (sinaimg emoticon path)', () => {
-    it('should leave an emoticon with a bracketed localized alt untouched', async () => {
+    it('should mark an emoticon with a bracketed localized alt', async () => {
       const value = html`
         <p>
           <span class="url-icon">
@@ -13,8 +13,19 @@ describeForEachParser('weiboEmojiResolver', (parseHtml) => {
           </span>
         </p>
       `
+      const expected = html`
+        <p>
+          <span class="url-icon">
+            <img
+              alt="[围观]"
+              src="https://h5.sinaimg.cn/m/emoticon/icon/others/o_weiguan.png"
+              data-emoji=""
+            >
+          </span>
+        </p>
+      `
 
-      expect(await transformKeeping(value)).toEqualHtml(value)
+      expect(await transform(value)).toEqualHtml(expected)
     })
   })
 })
