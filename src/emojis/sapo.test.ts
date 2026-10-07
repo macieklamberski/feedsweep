@@ -72,11 +72,33 @@ describeForEachParser('sapoEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a mood icon from the older editor untouched', async () => {
+  it('should mark a mood icon from the older editor', async () => {
     const value = html`
       <p>
         <img
           src="https://blogs.example.com/stc/fckeditor/editor/images/smiley/sapo/MOOD_SAPO_TIRED.png"
+          alt=""
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://blogs.example.com/stc/fckeditor/editor/images/smiley/sapo/MOOD_SAPO_TIRED.png"
+          alt=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a city icon from the older editor untouched', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://blogs.example.com/stc/fckeditor/editor/images/smiley/sapo/LOCAL_LISBOA.png"
           alt=""
         >
       </p>
@@ -103,6 +125,22 @@ describeForEachParser('sapoEmojiResolver', (parseHtml) => {
     const value = '<p><img alt="" src="https://blogs.sapo.pt/images/mood/EMOTICON_LIPS.png"></p>'
     const expected =
       '<p><img data-emoji="" alt="" src="https://blogs.sapo.pt/images/mood/EMOTICON_LIPS.png"></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should mark a mood emoticon from the beta host', async () => {
+    const value = '<p><img src="http://blogs-beta.sapo.pt/images/mood/EMOTICON_SKULL.png"></p>'
+    const expected =
+      '<p><img data-emoji="" src="http://blogs-beta.sapo.pt/images/mood/EMOTICON_SKULL.png"></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should mark a mood emoticon from the image host', async () => {
+    const value = '<p><img src="https://imgs.sapo.pt/images/blogs/mood/EMOTICON_LOL.png"></p>'
+    const expected =
+      '<p><img data-emoji="" src="https://imgs.sapo.pt/images/blogs/mood/EMOTICON_LOL.png"></p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
