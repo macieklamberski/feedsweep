@@ -401,6 +401,7 @@ import { mixiEmojiResolver } from '../emojis/mixi.js'
 import { monalisaEmojiResolver } from '../emojis/monalisa.js'
 import { moodleEmojiResolver } from '../emojis/moodle.js'
 import { mozillaEmojiResolver } from '../emojis/mozilla.js'
+import { msnEmojiResolver } from '../emojis/msn.js'
 import { nbbcEmojiResolver } from '../emojis/nbbc.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
 import { okEmojiResolver } from '../emojis/ok.js'
@@ -871,6 +872,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   e107EmojiResolver,
   jforumEmojiResolver,
   ucozEmojiResolver,
+  msnEmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,
   yahooEmojiResolver,
