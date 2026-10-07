@@ -51,7 +51,7 @@ import {
 import { anchorEmbedResolver } from '../embeds/anchor.js'
 import { aparatIframeEmbedResolver, aparatScriptEmbedResolver } from '../embeds/aparat.js'
 import { appleEmbedResolver, appleToolsEmbedResolver } from '../embeds/apple.js'
-import { arcgisEmbedResolver } from '../embeds/arcgis.js'
+import { arcgisIframeEmbedResolver, arcgisWidgetEmbedResolver } from '../embeds/arcgis.js'
 import { archiveFlashEmbedResolver, archiveIframeEmbedResolver } from '../embeds/archive.js'
 import { ardmediathekEmbedResolver } from '../embeds/ardmediathek.js'
 import { art19EmbedResolver } from '../embeds/art19.js'
@@ -477,7 +477,8 @@ const embedResolvers: Array<EmbedResolver> = [
   aparatScriptEmbedResolver,
   appleEmbedResolver,
   appleToolsEmbedResolver,
-  arcgisEmbedResolver,
+  arcgisIframeEmbedResolver,
+  arcgisWidgetEmbedResolver,
   archiveIframeEmbedResolver,
   archiveFlashEmbedResolver,
   ardmediathekEmbedResolver,
