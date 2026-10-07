@@ -157,6 +157,18 @@ describeForEachParser('rebuildIframelyEmbeds', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    it('should keep a frame on a host that only ends in the Iframely host', async () => {
+      const value = html`
+        <div data-oembed-url="https://www.youtube.com/watch?v=wN_PqWOCCb4">
+          <div>
+            <iframe src="https://notif-cdn.com/tmPqyiAE"></iframe>
+          </div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
   })
 
   describe('sad paths', () => {
