@@ -2,7 +2,11 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { arcgisEmbedResolver, arcgisResolveEmbed, arcgisWidgetEmbedResolver } from './arcgis.js'
+import {
+  arcgisIframeEmbedResolver,
+  arcgisResolveEmbed,
+  arcgisWidgetEmbedResolver,
+} from './arcgis.js'
 
 describe('arcgisResolveEmbed', () => {
   describe('happy paths', () => {
@@ -104,13 +108,13 @@ describe('arcgisResolveEmbed', () => {
       expect(arcgisResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should rebuild the retired OnePane template onto Map Viewer and drop its box', () => {
+    it('should rebuild the retired OnePane template onto the classic embed viewer with its box', () => {
       const value =
         'http://www.arcgis.com/home/webmap/templates/OnePane/basicviewer/embed.html?webmap=9b6a2497b3d84aeb95633a58560025ee&gcsextent=-86.1328,-74.9594,180,81.6214&displayslider=true&displaylegend=true'
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
         id: '9b6a2497b3d84aeb95633a58560025ee',
-        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=9b6a2497b3d84aeb95633a58560025ee',
+        src: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497b3d84aeb95633a58560025ee&extent=-86.1328,-74.9594,180,81.6214',
         url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=9b6a2497b3d84aeb95633a58560025ee',
         height: 500,
       }
@@ -414,8 +418,8 @@ describe('arcgisResolveEmbed', () => {
   })
 })
 
-describeForEachParser('arcgisEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, arcgisEmbedResolver)
+describeForEachParser('arcgisIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, arcgisIframeEmbedResolver)
 
   describe('happy paths', () => {
     it('should take the map name from the stated title and drop the frame box', async () => {

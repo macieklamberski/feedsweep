@@ -90,6 +90,20 @@ const composeWebMapSource = (url: URL, webMapId: string): string => {
     return composeClassicSource(url, webMapId, embedViewerPositionParams)
   }
 
+  // Map Viewer refuses a web map saved before spec 2.0, which most OnePane maps are, so the
+  // retired template moves to the classic embed viewer. Its `extent` is the same longitude and
+  // latitude box OnePane wrote as `gcsextent`.
+  if (url.pathname === onePanePath) {
+    const src = `https://www.arcgis.com${embedViewerPath}?webmap=${webMapId}`
+    const extent = url.searchParams.get('gcsextent')
+
+    if (!extent) {
+      return src
+    }
+
+    return `${src}&extent=${extent}`
+  }
+
   const src = `https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=${webMapId}`
   const position = filterUrlQuery(url, (name) => mapViewerPositionParams.includes(name))
 
@@ -179,7 +193,7 @@ export const arcgisResolveEmbed: ResolveEmbed = (url, element) => {
   }
 }
 
-export const arcgisEmbedResolver = createUrlEmbedResolver(arcgisHosts, arcgisResolveEmbed)
+export const arcgisIframeEmbedResolver = createUrlEmbedResolver(arcgisHosts, arcgisResolveEmbed)
 
 // The Embeddable Components map, a custom element the `js.arcgis.com` loader builds into a map,
 // so it renders nothing once the loader is stripped. Its `center` is longitude first.
