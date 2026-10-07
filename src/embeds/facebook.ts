@@ -1,4 +1,4 @@
-import { type Nullish, parseUrl, trimObject } from 'trousse'
+import { isHostOrSubdomainOf, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -152,7 +152,10 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
     return composeWatchEmbed(videoId)
   }
 
-  const flashVideoId = flashVideoPathRegex.exec(parsed.pathname)?.[1]
+  // `fb.watch/v/{code}` is a short link to another id, so the route is read on facebook.com only.
+  const flashVideoId = isHostOrSubdomainOf(parsed, 'facebook.com')
+    ? flashVideoPathRegex.exec(parsed.pathname)?.[1]
+    : undefined
 
   if (flashVideoId) {
     return composeWatchEmbed(flashVideoId)

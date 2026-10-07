@@ -1032,6 +1032,12 @@ describe('facebookResolveEmbed', () => {
     expect(facebookResolveEmbed(value)).toBeUndefined()
   })
 
+  it('should return undefined for an fb.watch short link under the Flash path', () => {
+    const value = 'https://fb.watch/v/6Rhfg0Bzq'
+
+    expect(facebookResolveEmbed(value)).toBeUndefined()
+  })
+
   it('should return undefined for a path below the Flash video', () => {
     const value = 'https://www.facebook.com/v/377994148950512/extra'
 
