@@ -325,6 +325,26 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  // A newsletter archived from Yahoo Mail keeps the webmail's proxied src, the CDN url encoded
+  // in `url`.
+  it('should replace a Facebook emoji image behind the Yahoo Mail proxy', async () => {
+    const value = html`
+      <p>feel the mood
+        <span class="yiv0680057325_47e3 yiv0680057325_5mfr" title="heart emoticon"><img
+          class="yiv0680057325img"
+          src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fstatic.xx.fbcdn.net%2Fimages%2Femoji.php%2Fv9%2Ft6c%2F1%2F16%2F2764.png&amp;t=1554239749&amp;ymreqid=93d88e61-0da6-7d52-01ca-ef0e19010000&amp;sig=DzxCZnIn6aGz57UknE9zMw--~C"
+          alt=""
+          width="16"
+          height="16"
+        ></span>
+      </p>
+    `
+    const expected =
+      '<p>feel the mood <span class="yiv0680057325_47e3 yiv0680057325_5mfr" title="heart emoticon">❤️</span></p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // A post pasted from the classic site paints its emoticons from a sprite sheet the feed does
   // not load, leaving empty spans that would be deleted as empty tags.
   it('should replace a classic Facebook emoticon with its character', async () => {
