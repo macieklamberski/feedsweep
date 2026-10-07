@@ -247,7 +247,7 @@ describe('googlesheetsResolveEmbed', () => {
     })
   })
 
-  describe('the account index and Workspace prefixes', () => {
+  describe('the sign-in prefixes', () => {
     it('should frame a published sheet behind an account index on its own path', () => {
       const value =
         'https://docs.google.com/spreadsheets/u/2/d/e/2PACX-1vSycY-A50zVwI1MTL21nGd-CbjRD3hg6jOeujz18Rcy26K07py-fwJsmSkTbn89Lc1yfdREFGEHX7V9/pubhtml?gid=0&single=true'
@@ -262,23 +262,9 @@ describe('googlesheetsResolveEmbed', () => {
       expect(googlesheetsResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should frame a published sheet behind a Workspace prefix on its own path', () => {
+    it('should ignore a published sheet behind a Workspace prefix', () => {
       const value =
         'https://docs.google.com/a/example.com/spreadsheets/d/e/2PACX-1vSycY-A50zVwI1MTL21nGd-CbjRD3hg6jOeujz18Rcy26K07py-fwJsmSkTbn89Lc1yfdREFGEHX7V9/pubhtml?gid=0&single=true'
-      const expected: EmbedResolverResult = {
-        provider: 'googlesheets',
-        id: '2PACX-1vSycY-A50zVwI1MTL21nGd-CbjRD3hg6jOeujz18Rcy26K07py-fwJsmSkTbn89Lc1yfdREFGEHX7V9',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSycY-A50zVwI1MTL21nGd-CbjRD3hg6jOeujz18Rcy26K07py-fwJsmSkTbn89Lc1yfdREFGEHX7V9/pubhtml?gid=0&single=true',
-        url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSycY-A50zVwI1MTL21nGd-CbjRD3hg6jOeujz18Rcy26K07py-fwJsmSkTbn89Lc1yfdREFGEHX7V9/pubhtml',
-        height: 500,
-      }
-
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
-    })
-
-    it('should ignore a sheet behind a prefix that is not a Workspace domain', () => {
-      const value =
-        'https://docs.google.com/x/example.com/spreadsheets/d/e/2PACX-1vSycY-A50zVwI1MTL21nGd-CbjRD3hg6jOeujz18Rcy26K07py-fwJsmSkTbn89Lc1yfdREFGEHX7V9/pubhtml'
 
       expect(googlesheetsResolveEmbed(value)).toBeUndefined()
     })

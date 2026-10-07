@@ -24,18 +24,17 @@ const sheetHeight = 500
 const chartHeight = 371
 
 // `/spreadsheets/d/e/{token}` names a sheet published to the web and `/spreadsheets/d/{id}` names
-// it by its Drive file id. A Workspace prefix, `/a/{domain}/`, and an account index, `/u/{n}/`,
-// only pick the sign-in and serve the same sheet.
+// it by its Drive file id. An account index, `/u/{n}/`, only picks the sign-in and serves the
+// same sheet.
 export const googlesheetsResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
   const pathSegments = getPathSegments(url)
-  const productSegments = pathSegments[0] === 'a' ? pathSegments.slice(2) : pathSegments
 
-  if (!parsed || productSegments[0] !== 'spreadsheets') {
+  if (!parsed || pathSegments[0] !== 'spreadsheets') {
     return
   }
 
-  const segments = productSegments[1] === 'u' ? productSegments.slice(3) : productSegments.slice(1)
+  const segments = pathSegments[1] === 'u' ? pathSegments.slice(3) : pathSegments.slice(1)
 
   if (segments[0] !== 'd') {
     return
