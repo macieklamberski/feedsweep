@@ -6,6 +6,10 @@ import { getEmbedSize } from './widgets.js'
 
 const kindTypePrefixes = ['audio/', 'video/', 'image/'] as const
 
+// A JSON-escaped `&` that lost its backslash, `\u0026` or `\u0026amp;` without its semicolon,
+// anywhere after the `?`. A file name can carry the text `u0026` as written.
+const strippedJsonAmpersandRegex = /(?<=\?.*)u0026(?:amp)?/g
+
 // PeerTube ships an audio-only rendition as `type="audio/mp4"` under `medium="video"`, so the
 // type decides whenever it names a kind. A type naming none, `text/html` or a stream manifest,
 // leaves the medium to answer.
@@ -303,10 +307,15 @@ const readEnclosure = (
   context: TransformContext,
 ): Enclosure => {
   const extracted = extractEnclosureFromEmbed(enclosure, document)
+  let url = extracted.url
+
+  if (typeof url === 'string') {
+    url = url.replace(strippedJsonAmpersandRegex, '&')
+  }
 
   return {
     ...extracted,
-    url: resolveOrKeepUrl(extracted.url, context),
+    url: resolveOrKeepUrl(url, context),
     playerUrl: resolveOrKeepUrl(extracted.playerUrl, context),
   }
 }
