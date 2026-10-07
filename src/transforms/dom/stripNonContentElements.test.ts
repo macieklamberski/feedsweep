@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { defaultNonContentSelectors } from '../../defaults.js'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -956,5 +957,24 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+  })
+})
+
+describeForEachParser('stripNonContentElements through the pipeline', (parseHtml) => {
+  it('should let a strip selector remove a parked chrome frame', async () => {
+    const value = html`
+      <iframe
+        width="1200"
+        height="240"
+        data-cookieconsent="marketing"
+        data-cookieblock-src="//www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2F354052831640272&amp;width=1200&amp;height=258&amp;show_faces=true&amp;header=false"
+      ></iframe>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml('')
   })
 })
