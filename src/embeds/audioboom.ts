@@ -80,15 +80,17 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
 )
 
 // Audioboo's Flash player, which no browser runs. It names the post only in its flashvars, as the
-// page in `mp3LinkURL` or the audio file in `mp3`.
+// page in `mp3LinkURL` or the audio file in `mp3`. Audioboo's embed code paired it with the
+// compact player, which answers for the same id.
 const audioboomFlashResolveEmbed: ResolveEmbed = (_url, element) => {
   const link = flashVar(element, 'mp3LinkURL') ?? flashVar(element, 'mp3')
+  const parsed = parseUrlOnHosts(link?.replace(mp3ExtensionRegex, ''), audioboomHosts)
 
-  if (!link) {
+  if (!parsed) {
     return
   }
 
-  const post = extractAudioboomPost(link.replace(mp3ExtensionRegex, ''))
+  const post = extractAudioboomPost(parsed.href)
 
   if (!post) {
     return
@@ -97,8 +99,8 @@ const audioboomFlashResolveEmbed: ResolveEmbed = (_url, element) => {
   return {
     provider,
     id: post.id,
-    src: `https://embeds.audioboom.com/posts/${post.id}/embed/v4`,
-    height: playerHeights.v4,
+    src: `https://embeds.audioboom.com/posts/${post.id}/embed`,
+    height: playerHeights.legacy,
     title: flashVar(element, 'mp3Title'),
     author: flashVar(element, 'mp3Author'),
   }

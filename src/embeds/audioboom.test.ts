@@ -198,8 +198,8 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '88571',
-        src: 'https://embeds.audioboom.com/posts/88571/embed/v4',
-        height: 300,
+        src: 'https://embeds.audioboom.com/posts/88571/embed',
+        height: 95,
         title: 'Andrew S, tech entrepreneur, Silicon Valley',
         author: 'maaritroiha',
       }
@@ -226,8 +226,8 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '695470',
-        src: 'https://embeds.audioboom.com/posts/695470/embed/v4',
-        height: 300,
+        src: 'https://embeds.audioboom.com/posts/695470/embed',
+        height: 95,
         title: '9 Ways to Avoid Being a Victim of a Tax Scam',
         author: 'TechAccountant',
       }
@@ -249,8 +249,8 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '1078895',
-        src: 'https://embeds.audioboom.com/posts/1078895/embed/v4',
-        height: 300,
+        src: 'https://embeds.audioboom.com/posts/1078895/embed',
+        height: 95,
         title: 'Test Audioboo',
         author: 'ropofam',
       }
@@ -273,8 +273,8 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '10535',
-        src: 'https://embeds.audioboom.com/posts/10535/embed/v4',
-        height: 300,
+        src: 'https://embeds.audioboom.com/posts/10535/embed',
+        height: 95,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -292,8 +292,8 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '695470',
-        src: 'https://embeds.audioboom.com/posts/695470/embed/v4',
-        height: 300,
+        src: 'https://embeds.audioboom.com/posts/695470/embed',
+        height: 95,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -311,8 +311,8 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '695470',
-        src: 'https://embeds.audioboom.com/posts/695470/embed/v4',
-        height: 300,
+        src: 'https://embeds.audioboom.com/posts/695470/embed',
+        height: 95,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -327,6 +327,26 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
             name="FlashVars"
             value="mp3LinkURL=http%3A%2F%2Faudioboo.fm%2Fboos%2F695470-9-ways-to-avoid-being-a-victim-of-a-tax-scam"
           />
+        </object>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an audio file on a foreign host', async () => {
+      const value = html`
+        <object data="http://boos.audioboo.fm/player_mp3.swf" type="application/x-shockwave-flash">
+          <param name="FlashVars" value="mp3=https://evil.test/boos/10535-test-for-hawai-i-arts-workshop.mp3">
+        </object>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a post page on a foreign host', async () => {
+      const value = html`
+        <object data="http://boos.audioboo.fm/swf/fullsize_player.swf">
+          <param name="FlashVars" value="mp3LinkURL=https%3A%2F%2Fevil.test%2Fboos%2F123-x">
         </object>
       `
 
@@ -378,7 +398,7 @@ describeForEachParser('audioboom through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 
-  it('should replace the Flash player with the current one', async () => {
+  it('should replace the Flash player with the compact one', async () => {
     const value = html`
       <p>
         <object
@@ -400,14 +420,81 @@ describeForEachParser('audioboom through the pipeline', (parseHtml) => {
       <div
         data-embed-id="88571"
         data-embed-provider="audioboom"
-        data-embed-src="https://embeds.audioboom.com/posts/88571/embed/v4"
-        data-embed-height="300"
+        data-embed-src="https://embeds.audioboom.com/posts/88571/embed"
+        data-embed-height="95"
         data-embed-title="Andrew S, tech entrepreneur, Silicon Valley"
         data-embed-author="maaritroiha"
       ></div>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  describe('Flash object holding the compact player it was posted with', () => {
+    const flashVars =
+      'mp3=http%3A%2F%2Faudioboo.fm%2Fboos%2F1078557-la-minute-gourmande-du-27-novembre-la-faim-on-peut-la-convoquer.mp3%3Fkeyed%3Dtrue%26source%3Dembed&amp;mp3Title=La+minute+gourmande+du+27+novembre+%3A+la+faim%2C+on+peut+la+convoquer+%21&amp;mp3LinkURL=http%3A%2F%2Faudioboo.fm%2Fboos%2F1078557-la-minute-gourmande-du-27-novembre-la-faim-on-peut-la-convoquer&amp;mp3Author=ArianeGrumbach&amp;rootID=boo_embed_1078557'
+
+    it('should mint the compact player from the object with its iframe', async () => {
+      const value = html`
+        <p>
+          <object
+            id="boo_embed_1078557"
+            width="400"
+            height="129"
+            data="http://abfiles.s3.amazonaws.com/swf/fullsize_player.swf"
+            type="application/x-shockwave-flash"
+          >
+            <param name="FlashVars" value="${flashVars}" />
+            <param name="src" value="http://abfiles.s3.amazonaws.com/swf/fullsize_player.swf" />
+            <iframe
+              style="width: 400px; height: 145px;"
+              src="http://audioboo.fm/boos/1078557-la-minute-gourmande-du-27-novembre-la-faim-on-peut-la-convoquer/embed"
+              title="Audioboo player"
+            ></iframe>
+          </object>
+        </p>
+      `
+      const expected = html`
+        <div
+          data-embed-id="1078557"
+          data-embed-provider="audioboom"
+          data-embed-src="https://embeds.audioboom.com/posts/1078557/embed"
+          data-embed-height="95"
+          data-embed-title="Audioboo player"
+        ></div>
+      `
+
+      expect(await convert(value)).toEqualHtml(expected)
+    })
+
+    it('should mint the same compact player from the object alone', async () => {
+      const value = html`
+        <p>
+          <object
+            id="boo_embed_1078557"
+            width="400"
+            height="129"
+            data="http://abfiles.s3.amazonaws.com/swf/fullsize_player.swf"
+            type="application/x-shockwave-flash"
+          >
+            <param name="FlashVars" value="${flashVars}" />
+            <param name="src" value="http://abfiles.s3.amazonaws.com/swf/fullsize_player.swf" />
+          </object>
+        </p>
+      `
+      const expected = html`
+        <div
+          data-embed-id="1078557"
+          data-embed-provider="audioboom"
+          data-embed-src="https://embeds.audioboom.com/posts/1078557/embed"
+          data-embed-height="95"
+          data-embed-title="La minute gourmande du 27 novembre : la faim, on peut la convoquer !"
+          data-embed-author="ArianeGrumbach"
+        ></div>
+      `
+
+      expect(await convert(value)).toEqualHtml(expected)
+    })
   })
 
   // The episode audio sits on the same host and under the same path as the player, and differs
