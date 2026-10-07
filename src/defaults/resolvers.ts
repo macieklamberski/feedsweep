@@ -234,6 +234,7 @@ import {
   pbsFlashEmbedResolver,
   pbsIframeEmbedResolver,
   pbsLegacyIframeEmbedResolver,
+  pbsStationIframeEmbedResolver,
 } from '../embeds/pbs.js'
 import { peertubeEmbedResolver } from '../embeds/peertube.js'
 import { piktochartIframeEmbedResolver } from '../embeds/piktochart.js'
@@ -648,6 +649,7 @@ const embedResolvers: Array<EmbedResolver> = [
   pbsFlashEmbedResolver,
   pbsIframeEmbedResolver,
   pbsLegacyIframeEmbedResolver,
+  pbsStationIframeEmbedResolver,
   piktochartIframeEmbedResolver,
   pinecastEmbedResolver,
   pixivIframeEmbedResolver,
