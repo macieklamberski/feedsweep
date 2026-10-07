@@ -412,6 +412,7 @@ import { rcmsEmojiResolver } from '../emojis/rcms.js'
 import { rhymixEmojiResolver } from '../emojis/rhymix.js'
 import { sapoEmojiResolver } from '../emojis/sapo.js'
 import { seesaaEmojiResolver } from '../emojis/seesaa.js'
+import { shervnetEmojiResolver } from '../emojis/shervnet.js'
 import { shinobiEmojiResolver } from '../emojis/shinobi.js'
 import { simplePressEmojiResolver } from '../emojis/simplepress.js'
 import { slackEmojiResolver } from '../emojis/slack.js'
@@ -850,6 +851,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   liferayEmojiResolver,
   khorosImageEmojiResolver,
   webWizEmojiResolver,
+  shervnetEmojiResolver,
   discuzEmojiResolver,
   forumotionEmojiResolver,
   kunenaEmojiResolver,
