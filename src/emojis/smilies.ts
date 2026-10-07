@@ -337,9 +337,7 @@ const directories = [
   '/smiley/', // CKEditor, FCKeditor and TinyMCE; ProBoards serves the same set from here
   '/ck_smiley/', // CKEditor's set, copied into a theme
   '/emoticons/', // Serendipity's stock template set and emoticate plugin, IPS, Kunena
-  'SMILIES_PATH', // phpBB's template variable left unsubstituted, raw or percent-encoded
 ]
-const placeholderPathRegex = /^(?:\{|%7b)smilies_path(?:\}|%7d)/i
 const directorySelector = directories.map((path) => `img[src*="${path}" i]`).join(', ')
 
 // The images carrying a class several forum engines share or sitting in a directory they share.
@@ -424,8 +422,6 @@ export const smiliesEmojiResolver: EmojiResolver = {
       isStrong,
       names: smiliesEmojiNames,
       glyph: getDirectoryGlyph(src, '/images/smilies/', boardEmojiNames),
-      // An unsubstituted phpBB template variable is a src no host serves.
-      isBlank: placeholderPathRegex.test(src),
     })
   },
 }

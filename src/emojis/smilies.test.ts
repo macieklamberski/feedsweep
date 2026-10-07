@@ -90,29 +90,6 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
       expect(await transformKeeping(value)).toEqualHtml(value)
     })
-
-    // The board shipped the template variable unsubstituted, so the src is a placeholder no host
-    // serves, and the code stands in for the picture.
-    it('should give the code of a smilie whose path is the raw placeholder', async () => {
-      const value = `<p><img src="{SMILIES_PATH}/teeth_smile.gif" alt=":D" title="Very Happy"></p>`
-      const expected = '<p><span data-emoji="">:D</span></p>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should give the code of a smilie whose placeholder arrived percent-encoded', async () => {
-      const value = `<p><img src="%7BSMILIES_PATH%7D/wink_smile.gif" alt=";)"></p>`
-      const expected = '<p><span data-emoji="">;)</span></p>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should give the code of a placeholder smilie no table knows', async () => {
-      const value = `<p><img src="%7BSMILIES_PATH%7D/borracho.gif" alt="(borracho)" title="Borracho"></p>`
-      const expected = '<p><span data-emoji="">(borracho)</span></p>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
   })
 
   describe('FluxBB / PunBB (/img/smilies/ path with word names)', () => {
