@@ -185,4 +185,68 @@ describeForEachParser('TikTok', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  // MetaSlider Pro writes every slide but the first hidden, and its TikTok slide is a poster and
+  // a play button its script swaps for the player. The slide survives stripHiddenElements, and
+  // tiktokWidgetEmbedResolver keeps the poster as the placeholder's thumbnail.
+  it('should convert the MetaSlider slide into the player placeholder and keep its poster', async () => {
+    const value = html`
+      <ul class="slides">
+        <li
+          class="slide-25548 ms-tiktok "
+          style="display: none; width: 100%;"
+          data-slide-type="tiktok"
+        >
+          <div
+            style="height: 700px; width: 100%;"
+            class="tiktok"
+            data-lazy-load="1"
+            data-video-id="7636550859958045972"
+            data-cite="https://www.tiktok.com/@pm.yamaha/video/7636550859958045972?is_from_webapp=1&#038;sender_device=pc&#038;web_id=7602492902425691655"
+            data-url="//www.tiktok.com/embed/v2/7636550859958045972"
+            data-width="325"
+            data-height="605"
+          >
+            <img
+              loading="lazy"
+              decoding="async"
+              src="https://example.com/wp-content/uploads/2026/05/tiktok_7636550859958045972-325x605.webp"
+              alt=""
+              class="msDefaultImage"
+              height="605"
+              width="325"
+            />
+            <span class="play_button">
+              <a tabindex="0" role="button" id="toggle">
+                <img
+                  width="75"
+                  src="https://example.com/wp-content/plugins/ml-slider-pro/modules/tiktok/assets/play-button.png"
+                >
+              </a>
+            </span>
+          </div>
+        </li>
+      </ul>
+    `
+    const expected = html`
+      <ul class="slides">
+        <li
+          class="slide-25548 ms-tiktok"
+          style=" width: 100%;"
+          data-slide-type="tiktok"
+        >
+          <div
+            data-embed-provider="tiktok"
+            data-embed-id="@pm.yamaha/video/7636550859958045972"
+            data-embed-src="https://www.tiktok.com/embed/v2/7636550859958045972"
+            data-embed-url="https://www.tiktok.com/@pm.yamaha/video/7636550859958045972"
+            data-embed-thumbnail="https://example.com/wp-content/uploads/2026/05/tiktok_7636550859958045972-325x605.webp"
+            data-embed-height="738"
+          ></div>
+        </li>
+      </ul>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })
