@@ -84,15 +84,22 @@ const readId = (candidate: Nullish<string>): string | undefined => {
 }
 
 const wallWords = ['videowall', 'videozap']
+const playableWords = ['vids', 'playlist']
 
-// The retired widgets name what they play after a kind word: the jukebox in its first `list[]`
-// entry, `/vids/{id}+{id}` or `/playlist/{id}_{slug}/{page}`, and the video wall and videozap in
+// The retired widgets name what they play after a kind word: the jukebox in its `list[]`
+// entries, `/vids/{id}+{id}` or `/playlist/{id}_{slug}/{page}`, and the video wall and videozap in
 // the path, `/videowall/playlist/{id}_{slug}&cols=4`. Every one of them now refuses framing.
 const readWidgetEntry = (url: URL): Array<string> => {
   const segments = getPathSegments(url)
 
   if (segments[0] === 'widget' && segments[1] === 'jukebox') {
-    return (url.searchParams.get('list[]') ?? '').split('/').filter(Boolean)
+    // A jukebox can list a user or a group beside a playlist, and only a video or a playlist maps
+    // onto a player.
+    const entries = url.searchParams.getAll('list[]').map((entry) => {
+      return entry.split('/').filter(Boolean)
+    })
+
+    return entries.find(([kind]) => playableWords.includes(kind)) ?? []
   }
 
   if (wallWords.includes(segments[0])) {

@@ -500,9 +500,22 @@ describe('dailymotionResolveEmbed', () => {
       expect(dailymotionResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should leave a jukebox whose first entry is a listing', () => {
+    it('should rebuild the first playlist of a jukebox listing a user before it', () => {
       const value =
         'http://www.dailymotion.com/widget/jukebox?list[]=%2Fbhgbjazz&list%5B%5D=%2Fplaylist%2Fxaj7h_bhgbjazz_ma-chaine&skin=glossyblack'
+      const expected: EmbedResolverResult = {
+        provider: 'dailymotion',
+        id: 'playlist/xaj7h',
+        src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=xaj7h',
+        url: 'https://www.dailymotion.com/playlist/xaj7h',
+      }
+
+      expect(dailymotionResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should leave a jukebox listing only a bookmark list and a user', () => {
+      const value =
+        'http://www.dailymotion.com/widget/jukebox?list[]=%2Fbookmarks%2Fangelpuente&list%5B%5D=%2Fangelpuente&skin=default'
 
       expect(dailymotionResolveEmbed(value)).toBeUndefined()
     })
