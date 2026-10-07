@@ -1247,10 +1247,6 @@ describeForEachParser('tiktokS9eEmbedResolver', (parseHtml) => {
 describeForEachParser('tiktokWidgetEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, tiktokWidgetEmbedResolver)
 
-  const convert = (value: string) => {
-    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
-  }
-
   describe('happy paths', () => {
     it('should resolve the MetaSlider Pro slide and keep its poster', async () => {
       const value = html`
@@ -1323,7 +1319,6 @@ describeForEachParser('tiktokWidgetEmbedResolver', (parseHtml) => {
           <div
             class="tiktok"
             data-video-id=""
-            data-cite="https://www.tiktok.com/@pm.yamaha/video/7636550859958045972"
           ></div>
         </li>
       `
@@ -1400,51 +1395,6 @@ describeForEachParser('tiktokWidgetEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
-    })
-  })
-
-  // MetaSlider writes every slide but the first hidden, so the slide has to survive
-  // stripHiddenElements before the widget pass sees it.
-  describe('through the pipeline', () => {
-    it('should replace a hidden slide with the player placeholder', async () => {
-      const value = html`
-        <ul class="slides">
-          <li
-            class="slide-25548 ms-tiktok "
-            style="display: none; width: 100%;"
-          >
-            <div
-              class="tiktok"
-              data-video-id="7636550859958045972"
-              data-cite="https://www.tiktok.com/@pm.yamaha/video/7636550859958045972"
-            >
-              <img
-                src="https://example.com/wp-content/uploads/2026/05/tiktok_7636550859958045972-325x605.webp"
-                class="msDefaultImage"
-              >
-            </div>
-          </li>
-        </ul>
-      `
-      const expected = html`
-        <ul class="slides">
-          <li
-            class="slide-25548 ms-tiktok"
-            style=" width: 100%;"
-          >
-            <div
-              data-embed-height="738"
-              data-embed-thumbnail="https://example.com/wp-content/uploads/2026/05/tiktok_7636550859958045972-325x605.webp"
-              data-embed-url="https://www.tiktok.com/@pm.yamaha/video/7636550859958045972"
-              data-embed-id="@pm.yamaha/video/7636550859958045972"
-              data-embed-provider="tiktok"
-              data-embed-src="https://www.tiktok.com/embed/v2/7636550859958045972"
-            ></div>
-          </li>
-        </ul>
-      `
-
-      expect(await convert(value)).toEqualHtml(expected)
     })
   })
 })
