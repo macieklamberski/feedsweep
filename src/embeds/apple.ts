@@ -58,11 +58,14 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
   const trackId = parsed.searchParams.get('i') || undefined
   const id = trackId ?? pathId.replace(podcastIdPrefixRegex, '')
   const query = trackId ? pickUrlParams(url, ['i']) : ''
+  // A player on the embed host plays as written, with its locale and theme. A page url gets the
+  // player built.
+  const isPlayer = parsed.hostname.startsWith('embed.')
 
   return {
     provider: isPodcast ? podcastsProvider : musicProvider,
     id: `${kind}/${id}`,
-    src: `https://embed.${host}${parsed.pathname}${query}`,
+    src: isPlayer ? url : `https://embed.${host}${parsed.pathname}${query}`,
     url: `https://${host}${parsed.pathname}${query}`,
     height: appleHeights.get(trackId ? 'song' : kind),
   }
