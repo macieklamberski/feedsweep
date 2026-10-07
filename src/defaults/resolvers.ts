@@ -404,6 +404,7 @@ import { mozillaEmojiResolver } from '../emojis/mozilla.js'
 import { nbbcEmojiResolver } from '../emojis/nbbc.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
 import { okEmojiResolver } from '../emojis/ok.js'
+import { outlookEmojiResolver } from '../emojis/outlook.js'
 import { pivotxEmojiResolver } from '../emojis/pivotx.js'
 import { pixnetEmojiResolver } from '../emojis/pixnet.js'
 import { punbbEmojiResolver } from '../emojis/punbb.js'
@@ -893,6 +894,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   notoEmojiResolver,
   dropboxEmojiResolver,
   gmailEmojiResolver,
+  outlookEmojiResolver,
   okEmojiResolver,
   homepagingEmojiResolver,
   telegramImageEmojiResolver,
