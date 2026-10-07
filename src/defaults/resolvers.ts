@@ -56,7 +56,11 @@ import { archiveFlashEmbedResolver, archiveIframeEmbedResolver } from '../embeds
 import { ardmediathekEmbedResolver } from '../embeds/ardmediathek.js'
 import { art19EmbedResolver } from '../embeds/art19.js'
 import { arteEmbedResolver } from '../embeds/arte.js'
-import { audioboomIframeEmbedResolver, audioboomWidgetEmbedResolver } from '../embeds/audioboom.js'
+import {
+  audioboomFlashEmbedResolver,
+  audioboomIframeEmbedResolver,
+  audioboomWidgetEmbedResolver,
+} from '../embeds/audioboom.js'
 import { audiomackEmbedResolver } from '../embeds/audiomack.js'
 import { aushaEmbedResolver } from '../embeds/ausha.js'
 import { bandcampEmbedResolver } from '../embeds/bandcamp.js'
@@ -484,6 +488,7 @@ const embedResolvers: Array<EmbedResolver> = [
   art19EmbedResolver,
   arteEmbedResolver,
   audioboomIframeEmbedResolver,
+  audioboomFlashEmbedResolver,
   audioboomWidgetEmbedResolver,
   audiomackEmbedResolver,
   aushaEmbedResolver,

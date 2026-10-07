@@ -3,6 +3,7 @@ import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
+  audioboomFlashEmbedResolver,
   audioboomIframeEmbedResolver,
   audioboomResolveEmbed,
   audioboomWidgetEmbedResolver,
@@ -173,6 +174,183 @@ describeForEachParser('audioboomWidgetEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, audioboomFlashEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the post page the player names on its own host', async () => {
+      const value = html`
+        <object
+          type="application/x-shockwave-flash"
+          data="http://boos.audioboo.fm/swf/fullsize_player.swf"
+          height="129"
+          width="400"
+        >
+          <param value="http://boos.audioboo.fm/swf/fullsize_player.swf" name="movie" />
+          <param value="noscale" name="scale" />
+          <param
+            value="mp3=http%3A%2F%2Faudioboo.fm%2Fboos%2F88571-andrew-s-tech-entrepreneur-silicon-valley.mp3&mp3Author=maaritroiha&mp3LinkURL=http%3A%2F%2Faudioboo.fm%2Fboos%2F88571-andrew-s-tech-entrepreneur-silicon-valley&mp3Title=Andrew+S%2C+tech+entrepreneur%2C+Silicon+Valley&mp3Time=01.17pm+03+Jan+2010"
+            name="FlashVars"
+          />
+          <a href="http://audioboo.fm/boos/88571-andrew-s-tech-entrepreneur-silicon-valley.mp3">Listen!</a>
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'audioboom',
+        id: '88571',
+        src: 'https://embeds.audioboom.com/posts/88571/embed/v4',
+        height: 300,
+        title: 'Andrew S, tech entrepreneur, Silicon Valley',
+        author: 'maaritroiha',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the player served from the S3 bucket', async () => {
+      const value = html`
+        <object
+          data="http://abfiles.s3.amazonaws.com/swf/fullsize_player.swf"
+          height="129"
+          id="boo_embed_695470"
+          type="application/x-shockwave-flash"
+          width="400"
+        >
+          <param name="movie" value="http://abfiles.s3.amazonaws.com/swf/fullsize_player.swf" />
+          <param
+            name="FlashVars"
+            value="mp3=http%3A%2F%2Faudioboo.fm%2Fboos%2F695470-9-ways-to-avoid-being-a-victim-of-a-tax-scam.mp3%3Fkeyed%3Dtrue%26source%3Dembed&mp3Title=9+Ways+to+Avoid+Being+a+Victim+of+a+Tax+Scam&mp3Time=06.55pm+03+Mar+2012&mp3LinkURL=http%3A%2F%2Faudioboo.fm%2Fboos%2F695470-9-ways-to-avoid-being-a-victim-of-a-tax-scam&mp3Author=TechAccountant&rootID=boo_embed_695470"
+          />
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'audioboom',
+        id: '695470',
+        src: 'https://embeds.audioboom.com/posts/695470/embed/v4',
+        height: 300,
+        title: '9 Ways to Avoid Being a Victim of a Tax Scam',
+        author: 'TechAccountant',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the flashvars an embed carries on itself', async () => {
+      const value = html`
+        <embed
+          id="boo_embed_1078895"
+          type="application/x-shockwave-flash"
+          width="400"
+          height="225"
+          src="http://abfiles.s3.amazonaws.com/swf/fullsize_player.swf"
+          flashvars="mp3=http%3A%2F%2Faudioboo.fm%2Fboos%2F1078895-test-audioboo.mp3%3Fkeyed%3Dtrue%26source%3Dembed&amp;mp3Title=Test+Audioboo&amp;mp3Time=09.42pm+25+Nov+2012&amp;mp3LinkURL=http%3A%2F%2Faudioboo.fm%2Fboos%2F1078895-test-audioboo&amp;mp3Author=ropofam&amp;rootID=boo_embed_1078895"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'audioboom',
+        id: '1078895',
+        src: 'https://embeds.audioboom.com/posts/1078895/embed/v4',
+        height: 300,
+        title: 'Test Audioboo',
+        author: 'ropofam',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the post off the audio file when the player names no page', async () => {
+      const value = html`
+        <object
+          data="http://boos.audioboo.fm/player_mp3.swf"
+          type="application/x-shockwave-flash"
+          width="390"
+          height="104"
+        >
+          <param name="movie" value="http://boos.audioboo.fm/player_mp3.swf">
+          <param name="FlashVars" value="mp3=http://audioboo.fm/boos/10535-test-for-hawai-i-arts-workshop.mp3">
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'audioboom',
+        id: '10535',
+        src: 'https://embeds.audioboom.com/posts/10535/embed/v4',
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the post off an audio file url carrying a query', async () => {
+      const value = html`
+        <object data="http://abfiles.s3.amazonaws.com/swf/fullsize_player.swf">
+          <param
+            name="FlashVars"
+            value="mp3=http%3A%2F%2Faudioboo.fm%2Fboos%2F695470-9-ways-to-avoid-being-a-victim-of-a-tax-scam.mp3%3Fkeyed%3Dtrue%26source%3Dembed"
+          />
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'audioboom',
+        id: '695470',
+        src: 'https://embeds.audioboom.com/posts/695470/embed/v4',
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should prefer the post page over the audio file', async () => {
+      const value = html`
+        <object data="http://boos.audioboo.fm/swf/fullsize_player.swf">
+          <param
+            name="FlashVars"
+            value="mp3=http%3A%2F%2Faudioboo.fm%2Fboos%2F1095890-the-future-of-listening.mp3&mp3LinkURL=http%3A%2F%2Faudioboo.fm%2Fboos%2F695470-9-ways-to-avoid-being-a-victim-of-a-tax-scam"
+          />
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'audioboom',
+        id: '695470',
+        src: 'https://embeds.audioboom.com/posts/695470/embed/v4',
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore the same player on a foreign host', async () => {
+      const value = html`
+        <object data="https://evil.test/swf/fullsize_player.swf">
+          <param
+            name="FlashVars"
+            value="mp3LinkURL=http%3A%2F%2Faudioboo.fm%2Fboos%2F695470-9-ways-to-avoid-being-a-victim-of-a-tax-scam"
+          />
+        </object>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a player with no flashvars', async () => {
+      const value = '<object data="http://boos.audioboo.fm/swf/fullsize_player.swf"></object>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a player whose flashvars name no post', async () => {
+      const value = html`
+        <object data="http://boos.audioboo.fm/swf/fullsize_player.swf">
+          <param name="FlashVars" value="mp3LinkURL=http%3A%2F%2Faudioboo.fm%2Fusers%2Fmaaritroiha">
+        </object>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 describeForEachParser('audioboom through the pipeline', (parseHtml) => {
   const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
     return transformContent(value, {
@@ -194,6 +372,38 @@ describeForEachParser('audioboom through the pipeline', (parseHtml) => {
         data-embed-provider="audioboom"
         data-embed-src="https://embeds.audioboom.com/posts/6479208/embed/v4"
         data-embed-height="300"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should replace the Flash player with the current one', async () => {
+    const value = html`
+      <p>
+        <object
+          type="application/x-shockwave-flash"
+          data="http://boos.audioboo.fm/swf/fullsize_player.swf"
+          height="129"
+          width="400"
+        >
+          <param value="http://boos.audioboo.fm/swf/fullsize_player.swf" name="movie" />
+          <param
+            value="mp3=http%3A%2F%2Faudioboo.fm%2Fboos%2F88571-andrew-s-tech-entrepreneur-silicon-valley.mp3&mp3Author=maaritroiha&mp3LinkURL=http%3A%2F%2Faudioboo.fm%2Fboos%2F88571-andrew-s-tech-entrepreneur-silicon-valley&mp3Title=Andrew+S%2C+tech+entrepreneur%2C+Silicon+Valley&mp3Time=01.17pm+03+Jan+2010"
+            name="FlashVars"
+          />
+          <a href="http://audioboo.fm/boos/88571-andrew-s-tech-entrepreneur-silicon-valley.mp3">Listen!</a>
+        </object>
+      </p>
+    `
+    const expected = html`
+      <div
+        data-embed-id="88571"
+        data-embed-provider="audioboom"
+        data-embed-src="https://embeds.audioboom.com/posts/88571/embed/v4"
+        data-embed-height="300"
+        data-embed-title="Andrew S, tech entrepreneur, Silicon Valley"
+        data-embed-author="maaritroiha"
       ></div>
     `
 

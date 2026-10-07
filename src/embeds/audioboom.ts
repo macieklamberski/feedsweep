@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -13,6 +13,12 @@ const postIdRegex = /^(\d+)(?:-[^.]*)?$/
 
 // `audioboo.fm` is the pre-rename host.
 const audioboomHosts = ['audioboom.com', 'audioboo.fm']
+
+// Audioboo's Flash players, on its own host and on its S3 bucket.
+const flashHosts = ['boos.audioboo.fm', 'abfiles.s3.amazonaws.com']
+
+// The `mp3` flashvar names the audio file, the post page with `.mp3` on its last segment.
+const mp3ExtensionRegex = /\.mp3(?=\?|$)/
 
 // `/posts/{id}/embed[/v4]` is current. `/boos/{id}/embed` is the pre-rename spelling.
 const postIdMarkers = ['posts', 'boos']
@@ -71,6 +77,36 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
 
     return parsed && audioboomResolveEmbed(parsed.href)
   },
+)
+
+// Audioboo's Flash player, which no browser runs. It names the post only in its flashvars, as the
+// page in `mp3LinkURL` or the audio file in `mp3`.
+const audioboomFlashResolveEmbed: ResolveEmbed = (_url, element) => {
+  const link = flashVar(element, 'mp3LinkURL') ?? flashVar(element, 'mp3')
+
+  if (!link) {
+    return
+  }
+
+  const post = extractAudioboomPost(link.replace(mp3ExtensionRegex, ''))
+
+  if (!post) {
+    return
+  }
+
+  return {
+    provider,
+    id: post.id,
+    src: `https://embeds.audioboom.com/posts/${post.id}/embed/v4`,
+    height: playerHeights.v4,
+    title: flashVar(element, 'mp3Title'),
+    author: flashVar(element, 'mp3Author'),
+  }
+}
+
+export const audioboomFlashEmbedResolver = createUrlEmbedResolver(
+  flashHosts,
+  audioboomFlashResolveEmbed,
 )
 
 export const audioboomFieldCleaners: Array<FieldCleaner> = [
