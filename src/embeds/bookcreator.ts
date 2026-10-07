@@ -8,9 +8,10 @@ const provider = 'bookcreator'
 
 const readerHosts = ['read.bookcreator.com']
 
-// The reader's own routes, from its `_buildManifest.js`. Next.js matches each before
-// `/[userId]/[...params]`, so a first segment from this list is never a user.
-const readerRoutes = ['api', 'l', 'lib', 'library', 'portfolio', 'storage']
+// The reader's own routes, from its `_buildManifest.js`, and Next.js's `_next`, whose
+// `/_next/image` serves files. Next.js matches each before `/[userId]/[...params]`, so a first
+// segment from this list is never a user.
+const readerRoutes = ['_next', 'api', 'l', 'lib', 'library', 'portfolio', 'storage']
 
 // The box Book Creator's oEmbed writes for a portrait book, which the reader shows as a two-page
 // spread. A square book gets 675 by 675. The reader fits the book inside the box.
