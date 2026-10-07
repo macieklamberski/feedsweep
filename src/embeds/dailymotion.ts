@@ -83,6 +83,25 @@ const readId = (candidate: Nullish<string>): string | undefined => {
   return splitStrayParams(candidate).head.split('_')[0]
 }
 
+const wallWords = ['videowall', 'videozap']
+
+// The retired widgets name what they play after a kind word: the jukebox in its first `list[]`
+// entry, `/vids/{id}+{id}` or `/playlist/{id}_{slug}/{page}`, and the video wall and videozap in
+// the path, `/videowall/playlist/{id}_{slug}&cols=4`. Every one of them now refuses framing.
+const readWidgetEntry = (url: URL): Array<string> => {
+  const segments = getPathSegments(url)
+
+  if (segments[0] === 'widget' && segments[1] === 'jukebox') {
+    return (url.searchParams.get('list[]') ?? '').split('/').filter(Boolean)
+  }
+
+  if (wallWords.includes(segments[0])) {
+    return segments.slice(1)
+  }
+
+  return []
+}
+
 // A playlist names no single video, so it is read separately and only once the video readers have
 // found nothing: `/embed/video/{id}?playlist={id}` is a video playing inside one, not a playlist.
 const extractDailymotionPlaylistId = (link: string): string | undefined => {
@@ -98,8 +117,9 @@ const extractDailymotionPlaylistId = (link: string): string | undefined => {
   const pathId = segments[marker] === 'playlist' ? segments[marker + 1] : undefined
   // The path id is decoded here, like the query one, so the url and the player encode it once.
   const candidate = pathId ? (decodeSegment(pathId) ?? pathId) : url.searchParams.get('playlist')
+  const [kind, widgetId] = readWidgetEntry(url)
 
-  return readId(candidate)
+  return [candidate, kind === 'playlist' ? widgetId : undefined].map(readId).find(Boolean)
 }
 
 const readPathId = (url: URL, segments: Array<string>): string | undefined => {
@@ -130,8 +150,12 @@ export const extractDailymotionId = (link: string): string | undefined => {
     return
   }
 
+  const [kind, widgetIds] = readWidgetEntry(url)
+  // The jukebox joins its videos with `+`, which the query decodes to a space.
+  const widgetId = kind === 'vids' ? widgetIds?.split(' ')[0] : undefined
+
   // A path naming no video still leaves the geo player's `video` parameter to be read.
-  return [readPathId(url, getPathSegments(url)), url.searchParams.get('video')]
+  return [readPathId(url, getPathSegments(url)), url.searchParams.get('video'), widgetId]
     .map(readId)
     .find(Boolean)
 }
