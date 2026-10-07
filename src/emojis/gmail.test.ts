@@ -53,7 +53,7 @@ describeForEachParser('gmailEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should replace a legacy emoji by its Google id', async () => {
+  it('should mark a legacy emoji its Google id maps', async () => {
     const value = html`
       <p>
         <img
@@ -64,25 +64,35 @@ describeForEachParser('gmailEmojiResolver', (parseHtml) => {
         >
       </p>
     `
-    const expected = '<p>💃</p>'
+    const expected = html`
+      <p>
+        <img
+          src="https://mail.google.com/mail/e/1B6"
+          data-goomoji="1B6"
+          goomoji="1B6"
+          alt="[?]"
+          data-emoji=""
+        >
+      </p>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  const legacySrcCases: Array<[string, string]> = [
-    ['https://mail.google.com/mail/e/B60', '✨'],
-    ['https://mail.google.com/mail/e/ezweb_ne_jp/B61', '✴️'],
-    ['https://mail.google.com/mail/e/gtalk.1B2', '👿'],
+  const legacySrcCases: Array<string> = [
+    'https://mail.google.com/mail/e/B60',
+    'https://mail.google.com/mail/e/ezweb_ne_jp/B61',
+    'https://mail.google.com/mail/e/gtalk.1B2',
   ]
 
-  it.each(legacySrcCases)('should replace the legacy emoji at %s', async (src, glyph) => {
+  it.each(legacySrcCases)('should mark the legacy emoji at %s', async (src) => {
     const value = `<p><img src="${src}"></p>`
-    const expected = `<p>${glyph}</p>`
+    const expected = `<p><img src="${src}" data-emoji=""></p>`
 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should replace a legacy Google id in goomoji off another host', async () => {
+  it('should mark a legacy Google id in goomoji off another host', async () => {
     const value = html`
       <p>
         <img
@@ -91,7 +101,32 @@ describeForEachParser('gmailEmojiResolver', (parseHtml) => {
         >
       </p>
     `
-    const expected = '<p>✌️</p>'
+    const expected = html`
+      <p>
+        <img
+          src="https://example.com/proxy/e.png"
+          goomoji="softbank_ne_jp.B94"
+          data-emoji=""
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should mark a mapped legacy id beside one no Unicode character stands for', async () => {
+    const value = html`
+      <p>
+        <img style="margin:0 .2ex;vertical-align:middle;" src="https://mail.google.com/mail/e/35C" alt="">
+        <img style="margin:0 .2ex;vertical-align:middle;" src="https://mail.google.com/mail/e/814" alt="">
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img style="margin:0 .2ex;vertical-align:middle;" src="https://mail.google.com/mail/e/35C" alt="" data-emoji="">
+        <img style="margin:0 .2ex;vertical-align:middle;" src="https://mail.google.com/mail/e/814" alt="" data-emoji="">
+      </p>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })
