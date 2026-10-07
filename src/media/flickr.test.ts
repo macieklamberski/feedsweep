@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { MediaResolverResult } from '../types.js'
 import { flickrMediaResolver } from './flickr.js'
@@ -117,5 +118,48 @@ describeForEachParser('flickrMediaResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+describeForEachParser('the WordPress Flickr video shortcode', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should move the shortcode video onto 360p through the pipeline', async () => {
+    const value = html`
+      <div
+        class="flick_video"
+        style="max-width: 100%;width: 260px;height: 195px;"
+      >
+        <video
+          src="https://www.flickr.com/photos/54847721@N00/4364741366/play/iphone_wifi/c510f33749/"
+          controls
+        />
+      </div>
+    `
+    const expected =
+      '<video controls src="https://www.flickr.com/photos/54847721@N00/4364741366/play/360p/c510f33749/"></video>'
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a mobile source child as main leaves it', async () => {
+    const value = html`
+      <video
+        width="480"
+        height="360"
+        style="background-size: 32px; text-align: center;"
+        controls="controls"
+      >
+        <source
+          src="https://www.flickr.com/photos/barryhowardstudio/34221758441/play/mobile/19ff1d5195/"
+          type="video/mp4"
+        />Your browser does not support the video tag.</video>
+    `
+    const expected =
+      '<p><video data-align="center" width="480" height="360" style="background-size: 32px; text-align: center;" controls="controls"><source src="https://www.flickr.com/photos/barryhowardstudio/34221758441/play/mobile/19ff1d5195/" type="video/mp4">Your browser does not support the video tag.</video></p>'
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
