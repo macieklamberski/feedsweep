@@ -169,6 +169,7 @@ describe('dailymotionResolveEmbed', () => {
       id: 'playlist/x6zq/mk',
       src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x6zq%2Fmk',
       url: 'https://www.dailymotion.com/playlist/x6zq%2Fmk',
+      ratio: '16/9',
     }
 
     expect(dailymotionResolveEmbed(value)).toEqual(expected)
@@ -337,6 +338,7 @@ describe('dailymotionResolveEmbed', () => {
       id: 'playlist/x6zqmk',
       src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x6zqmk',
       url: 'https://www.dailymotion.com/playlist/x6zqmk',
+      ratio: '16/9',
     }
 
     expect(dailymotionResolveEmbed(value)).toEqual(expected)
@@ -394,6 +396,7 @@ describe('dailymotionResolveEmbed', () => {
       id: 'playlist/x6zqmk/../x',
       src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x6zqmk%2F..%2Fx',
       url: 'https://www.dailymotion.com/playlist/x6zqmk%2F..%2Fx',
+      ratio: '16/9',
     }
 
     expect(dailymotionResolveEmbed(value)).toEqual(expected)
@@ -432,12 +435,13 @@ describe('dailymotionResolveEmbed', () => {
 
     it('should rebuild a jukebox naming an encoded playlist with a slug and a page', () => {
       const value =
-        'http://www.dailymotion.com/widget/jukebox?list[]=%2Fplaylist%2Fx4qm8u_tvreze_fab-lab-in%2F1&&autoplay=0&mute=1'
+        'http://www.dailymotion.com/widget/jukebox?list[]=%2Fplaylist%2Fx1m76h_altatube_vic152%2F1&skin=default&autoplay=0'
       const expected: EmbedResolverResult = {
         provider: 'dailymotion',
-        id: 'playlist/x4qm8u',
-        src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x4qm8u',
-        url: 'https://www.dailymotion.com/playlist/x4qm8u',
+        id: 'playlist/x1m76h',
+        src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x1m76h',
+        url: 'https://www.dailymotion.com/playlist/x1m76h',
+        ratio: '16/9',
       }
 
       expect(dailymotionResolveEmbed(value)).toEqual(expected)
@@ -451,6 +455,7 @@ describe('dailymotionResolveEmbed', () => {
         id: 'playlist/x2sff4',
         src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x2sff4',
         url: 'https://www.dailymotion.com/playlist/x2sff4',
+        ratio: '16/9',
       }
 
       expect(dailymotionResolveEmbed(value)).toEqual(expected)
@@ -464,6 +469,7 @@ describe('dailymotionResolveEmbed', () => {
         id: 'playlist/xz8g6',
         src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=xz8g6',
         url: 'https://www.dailymotion.com/playlist/xz8g6',
+        ratio: '16/9',
       }
 
       expect(dailymotionResolveEmbed(value)).toEqual(expected)
@@ -477,6 +483,7 @@ describe('dailymotionResolveEmbed', () => {
         id: 'playlist/xjn6k',
         src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=xjn6k',
         url: 'https://www.dailymotion.com/playlist/xjn6k',
+        ratio: '16/9',
       }
 
       expect(dailymotionResolveEmbed(value)).toEqual(expected)
@@ -508,6 +515,7 @@ describe('dailymotionResolveEmbed', () => {
         id: 'playlist/xaj7h',
         src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=xaj7h',
         url: 'https://www.dailymotion.com/playlist/xaj7h',
+        ratio: '16/9',
       }
 
       expect(dailymotionResolveEmbed(value)).toEqual(expected)
@@ -609,6 +617,7 @@ describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
       id: 'playlist/xz8g6',
       src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=xz8g6',
       url: 'https://www.dailymotion.com/playlist/xz8g6',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -638,6 +647,7 @@ describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
       id: 'playlist/xzbe1',
       src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=xzbe1',
       url: 'https://www.dailymotion.com/playlist/xzbe1',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -660,6 +670,7 @@ describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
       id: 'playlist/xjn6k',
       src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=xjn6k',
       url: 'https://www.dailymotion.com/playlist/xjn6k',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)

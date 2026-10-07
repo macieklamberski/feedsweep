@@ -236,6 +236,7 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
       src: composeEmbedUrl('playlist', playlistId),
       // The `playlist` parameter comes out of the query decoded, and it goes into a path.
       url: `https://www.dailymotion.com/playlist/${encodePathSegment(playlistId)}`,
+      ratio: '16/9',
       title: attr(element, 'title'),
     }
   }
