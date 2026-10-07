@@ -271,7 +271,11 @@ describeForEachParser('cognitoformsWidgetEmbedResolver', (parseHtml) => {
           <script src="https://services.cognitoforms.com/s/yN7RjhEjnkujE280ybIhjQ"></script>
           <script>
 <!--//--><![CDATA[// ><!--
+
+<!--//--><![CDATA[// ><!--
 Cognito.load("forms", { id: "41" });
+//--><!]]]]><![CDATA[>
+
 //--><!]]></script>
         </div>
       `
