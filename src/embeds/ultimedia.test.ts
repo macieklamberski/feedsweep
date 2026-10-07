@@ -175,7 +175,7 @@ describeForEachParser('ultimediaEmbedResolver', (parseHtml) => {
     it('should leave the iframe_pub.php player unresolved', async () => {
       const value = html`
         <iframe
-          src="http://www.ultimedia.com/swf/iframe_pub.php?width=480&height=385&id=x5ll53&url_artist=http://example.com/clip.html"
+          src="http://www.ultimedia.com/swf/iframe_pub.php?width=480&height=385&id=x5ll53&url_artist=http://www.jukebo.com/artisan-guns/music-clip,heights,x5ll53.html&autoplay=0&mdtk=04516441&site=.fr"
           width="480"
           height="385"
         ></iframe>
