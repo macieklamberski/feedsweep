@@ -138,13 +138,38 @@ describeForEachParser('jwplayerIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should keep the player id a frame names', async () => {
+    const value = '<iframe src="https://cdn.jwplayer.com/players/EUHppKd8-AeXnLRNE.html"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'jwplayer',
+      id: 'EUHppKd8',
+      src: 'https://cdn.jwplayer.com/players/EUHppKd8-AeXnLRNE.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/EUHppKd8/poster.jpg',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  // An empty player id answers 404, so the frame gets the default player.
+  it('should move a frame with an empty player id to the default player', async () => {
+    const value = '<iframe src="https://cdn.jwplayer.com/players/H4GXr873-.html"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'jwplayer',
+      id: 'H4GXr873',
+      src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should resolve a jwplatform iframe', async () => {
     const value =
       '<iframe src="https://content.jwplatform.com/players/H4GXr873-abc12345.html"></iframe>'
     const expected: EmbedResolverResult = {
       provider: 'jwplayer',
       id: 'H4GXr873',
-      src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
+      src: 'https://content.jwplatform.com/players/H4GXr873-abc12345.html',
       thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
       ratio: '16/9',
     }

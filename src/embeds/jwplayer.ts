@@ -5,6 +5,8 @@ import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const fileExtensionRegex = /\.[a-z]+$/i
+// `{mediaId}-.html`, a player url with an empty player id, which 404s.
+const emptyPlayerIdRegex = /-\.html$/
 
 const jwplayerHosts = ['jwplayer.com', 'jwplatform.com']
 
@@ -41,14 +43,17 @@ const composeJwplayerEmbed = (id: string, isPlaylist = false): EmbedResolverResu
   }
 }
 
-export const jwplayerResolveEmbed: ResolveEmbed = (url) => {
+export const jwplayerResolveEmbed: ResolveEmbed = (url, element) => {
   const mediaId = extractJwplayerId(url)
 
   if (!mediaId) {
     return
   }
 
-  return composeJwplayerEmbed(mediaId)
+  // A player frame plays as written, with the publisher's player id.
+  const isPlayerFrame = element?.localName === 'iframe' && !emptyPlayerIdRegex.test(url)
+
+  return { ...composeJwplayerEmbed(mediaId), ...(isPlayerFrame && { src: url }) }
 }
 
 // A JW Player iframe, players/{mediaId}-{playerId}.html, some with an empty player id that 404s.
