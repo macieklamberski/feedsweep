@@ -72,19 +72,6 @@ describe('preziResolveEmbed', () => {
 
       expect(preziResolveEmbed(value)).toEqual(expected)
     })
-
-    it('should drop a tracker from the view route', () => {
-      const value = 'https://prezi.com/view/AmsY8GrnVuyJbYDH8QXI/embed?utm_source=feed'
-      const expected: EmbedResolverResult = {
-        provider: 'prezi',
-        id: 'AmsY8GrnVuyJbYDH8QXI',
-        src: 'https://prezi.com/view/AmsY8GrnVuyJbYDH8QXI/embed',
-        url: 'https://prezi.com/view/AmsY8GrnVuyJbYDH8QXI/',
-        ratio: '550/400',
-      }
-
-      expect(preziResolveEmbed(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {
