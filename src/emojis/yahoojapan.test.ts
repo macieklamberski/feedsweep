@@ -28,16 +28,55 @@ describeForEachParser('yahooJapanEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    const carrierCases: Array<[string, string]> = [
-      ['ew_icon_a257', '😃'],
-      ['ew_icon_s366', '😢'],
-      ['ew_icon_d151', '💡'],
-      ['ew_icon_d1022', '😌'],
+    const carrierCases: Array<string> = [
+      'ew_icon_a257',
+      'ew_icon_s366',
+      'ew_icon_d151',
+      'ew_icon_d1022',
     ]
 
-    it.each(carrierCases)('should replace %s by its carrier number', async (stem, glyph) => {
+    it.each(carrierCases)('should mark %s its carrier number maps', async (stem) => {
       const value = `<p><img src="https://i.yimg.jp/images/mail/emoji/15/${stem}.gif"></p>`
-      const expected = `<p>${glyph}</p>`
+      const expected = `<p><img src="https://i.yimg.jp/images/mail/emoji/15/${stem}.gif" data-emoji=""></p>`
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark a carrier icon beside a named drawing of the same set', async () => {
+      const value = html`
+        <p>
+          <img src="http://i.yimg.jp/images/mail/emoji/15/ew_icon_s366.gif">
+          <img alt="！" src="http://i.yimg.jp/images/mail/emoji/15/ew_icon_exclamation.gif">
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img src="http://i.yimg.jp/images/mail/emoji/15/ew_icon_s366.gif" data-emoji="">
+          <img alt="！" src="http://i.yimg.jp/images/mail/emoji/15/ew_icon_exclamation.gif" data-emoji="">
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark a carrier icon despite an emoji alt', async () => {
+      const value = html`
+        <p>
+          <img
+            alt="😢"
+            src="https://s.yimg.jp/images/mail/emoji/15/ew_icon_s366.gif"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            alt="😢"
+            src="https://s.yimg.jp/images/mail/emoji/15/ew_icon_s366.gif"
+            data-emoji=""
+          >
+        </p>
+      `
 
       expect(await transform(value)).toEqualHtml(expected)
     })
