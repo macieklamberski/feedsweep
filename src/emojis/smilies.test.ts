@@ -88,7 +88,7 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     it('should leave a non-smilie image served from the smilies folder untouched', async () => {
       const value = '<p><img src="https://example.com/images/smilies/banner.png" alt="Banner"></p>'
 
-      expect(await transformKeeping(value)).toEqualHtml(value)
+      expect(await transform(value)).toEqualHtml(value)
     })
 
     // The board shipped the template variable unsubstituted, so the src is a placeholder no host
@@ -233,6 +233,33 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
         '<p><img data-emoji="" src="http://example.com/smilies/yahoo_love.gif" alt="&lt;3"></p>'
 
       expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('code-shaped alt under a smilie directory', () => {
+    const codeAltCases: Array<[string, string]> = [
+      ['https://example.com/images/smilies/fresse.gif', ':fresse:'],
+      ['https://example.com/uploads/emoticons/default_true.gif', ':тру:'],
+      ['https://example.com/smileys/ohwell.png', ':-/'],
+      ['https://example.com/wcf/images/smilies/scared.png', '=O'],
+    ]
+
+    it.each(codeAltCases)('should mark %s by its %s alt', async (source, alt) => {
+      const value = `<p><img src="${source}" alt="${alt}"></p>`
+      const expected = `<p><img data-emoji="" src="${source}" alt="${alt}"></p>`
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    const bracketedAltCases: Array<[string, string]> = [
+      ['https://example.com/img/smilies/blahblah.gif', '[image]'],
+      ['https://example.com/images/smilies/skype_0130-devil.gif', '(devil)'],
+    ]
+
+    it.each(bracketedAltCases)('should leave %s with its %s alt untouched', async (source, alt) => {
+      const value = `<p><img src="${source}" alt="${alt}"></p>`
+
+      expect(await transform(value)).toEqualHtml(value)
     })
   })
 
@@ -429,10 +456,12 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should leave a board image named like the codepoint of © untouched', async () => {
+    it('should mark a board image named like the codepoint of © without decoding it', async () => {
       const value = '<p><img src="https://example.com/board/emoticons/a9.jpg" alt=":a9:"></p>'
+      const expected =
+        '<p><img data-emoji="" src="https://example.com/board/emoticons/a9.jpg" alt=":a9:"></p>'
 
-      expect(await transform(value)).toEqualHtml(value)
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should mark a Kolobok smilie by its two-letter name', async () => {
