@@ -409,6 +409,42 @@ describeForEachParser('convertEmojis', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should replace a blank spacer behind a mail proxy with its code', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fexample.com%2Fstyles%2Fdefault%2Fxenforo%2Fclear.png&amp;t=1"
+            alt=":)"
+          >
+        </p>
+      `
+      const expected = '<p><span data-emoji="">:)</span></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should rebuild a picture behind a mail proxy as its engine does', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://ecp.yusercontent.com/mail?url=http%3A%2F%2Fimage.space.rakuten.co.jp%2Femoji%2Fa1.gif&amp;t=1"
+            alt="sun"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            src="https://plaza.jp.rakuten-static.com/img/user/emoji/a1.gif"
+            alt="sun"
+            data-emoji=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     const lookalikeProxySrcs: Array<string> = [
       'https://example.com/mailservice?url=https%3A%2F%2Fvk.com%2Femoji%2Fe%2Ff09f8cb8.png',
       'https://resize.yandex.net/preview?url=https%3A%2F%2Fvk.com%2Femoji%2Fe%2Ff09f8cb8.png',
