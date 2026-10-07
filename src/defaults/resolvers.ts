@@ -389,6 +389,7 @@ import { jiveEmojiResolver } from '../emojis/jive.js'
 import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
 import { jugemEmojiResolver } from '../emojis/jugem.js'
 import { khorosEmojiResolver, khorosImageEmojiResolver } from '../emojis/khoros.js'
+import { kolobokEmojiResolver } from '../emojis/kolobok.js'
 import { kunenaEmojiResolver } from '../emojis/kunena.js'
 import { lexicalEmojiResolver } from '../emojis/lexical.js'
 import { liferayEmojiResolver } from '../emojis/liferay.js'
@@ -854,6 +855,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   forumotionEmojiResolver,
   kunenaEmojiResolver,
   invisionEmojiResolver,
+  kolobokEmojiResolver,
   xenforoEmojiResolver,
   smfEmojiResolver,
   nbbcEmojiResolver,
