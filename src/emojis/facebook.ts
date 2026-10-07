@@ -188,10 +188,9 @@ const spriteSelector = 'i[class~="_4-k1"]'
 // The span holding the code at zero size, beside the sprite or alone.
 const zeroSizeSelector = 'span[class~="_skr"], span[class~="_4mcd"]'
 
-// A later chat markup of the classic emoticon: an empty span or `i` painted by Facebook's CSS, or
-// one holding a painted sprite, its code at zero size, or both, named by the screen-reader label
-// in its title. A post's wrapper holds the emoji image instead, beside the hidden span, which
-// shows once the site's CSS is gone.
+// A later chat markup of the classic emoticon: a span or `i` holding a painted sprite, its code at
+// zero size, or both, named by the screen-reader label in its title. A post's wrapper holds the
+// emoji image instead, beside the hidden span, which shows once the site's CSS is gone.
 export const facebookLabelEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'span[class~="_47e3"], i[class~="_1gwo"][title], i[class~="_lew"][title]',
@@ -221,8 +220,9 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
       !after.length &&
       element.textContent?.trim() === (zeroSize?.textContent?.trim() ?? '')
 
-    // The class also rides on spans pasted around prose.
-    if (!isLabelWrapper && (element.textContent?.trim() || element.firstElementChild)) {
+    // Facebook's CSS painted the picture on a child, never on the wrapper, so an empty wrapper
+    // showed nothing. The class also rides on spans pasted around prose.
+    if (!isLabelWrapper) {
       return
     }
 

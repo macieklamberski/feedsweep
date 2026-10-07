@@ -588,22 +588,62 @@ describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
       ['émoticône grin', '😁'],
     ]
 
-    it.each(labelCases)('should replace an empty wrapper titled %s', async (title, glyph) => {
-      const value = `<p>Hi <span class="_47e3 _5mfr" title="${title}"></span></p>`
+    it.each(labelCases)('should replace a sprite wrapper titled %s', async (title, glyph) => {
+      const value = html`
+        <p>Hi
+          <i class="_lew" title="${title}">
+            <i class="_4-k1 img sp_fM-mz8spZ1b"></i>
+          </i>
+        </p>
+      `
 
       expect(await transform(value)).toEqualHtml(`<p>Hi ${glyph}</p>`)
     })
 
-    it('should replace an empty i wrapper by its label', async () => {
-      const value = '<p>Hi <i class="_1gwo" title="heart emoticon"></i></p>'
+    it('should leave a lone empty wrapper untouched', async () => {
+      const value = html`
+        <p>Nouvelle couverture, nouveau format, chez Makaka !
+          <span class="_47e3 _5mfr" title="grin emoticon"></span>
+        </p>
+      `
 
-      expect(await transform(value)).toEqualHtml('<p>Hi ❤️</p>')
+      expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should keep a name without a universal code as its code', async () => {
-      const value = '<p>Hi <span class="_47e3" title="like emoticon"></span></p>'
+    it('should leave an empty wrapper untouched and replace its full twin', async () => {
+      const value = html`
+        <p>qui fera une démo de filage au rouet.
+          <i class="_lew" title="émoticône grin"></i>
+          <i class="_lew" title="émoticône grin">
+            <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_d580ab"></i>
+          </i>
+        </p>
+      `
+      const expected = html`
+        <p>qui fera une démo de filage au rouet.
+          <i class="_lew" title="émoticône grin"></i>😁</p>
+      `
 
-      expect(await transform(value)).toEqualHtml('<p>Hi <span data-emoji="">(y)</span></p>')
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a run of empty wrappers untouched and replace the full one', async () => {
+      const value = html`
+        <p>das adversidades pode renascer algo ainda mais virtuoso&nbsp;
+          <i class="_lew" title="smile emoticon"></i>
+          <i class="_lew" title="smile emoticon"></i>
+          <i class="_lew" title="smile emoticon">
+            <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span aria-hidden="true" class="_4mcd">:-)</span>
+          </i>
+        </p>
+      `
+      const expected = html`
+        <p>das adversidades pode renascer algo ainda mais virtuoso&nbsp;
+          <i class="_lew" title="smile emoticon"></i><i class="_lew" title="smile emoticon"></i>🙂</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should leave a wrapper around prose untouched', async () => {
@@ -662,7 +702,13 @@ describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
     })
 
     it('should leave a wrapper whose label names no classic emoticon untouched', async () => {
-      const value = '<p><span class="_47e3" title="sticker"></span></p>'
+      const value = html`
+        <p>
+          <i class="_lew" title="sticker">
+            <i class="_4-k1 img sp_fM-mz8spZ1b"></i>
+          </i>
+        </p>
+      `
 
       expect(await transform(value)).toEqualHtml(value)
     })

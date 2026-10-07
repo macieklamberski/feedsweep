@@ -362,6 +362,24 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  // An editor clones the labelled `i` empty beside the one holding the sprite. Only the sprite
+  // showed a picture on Facebook.
+  it('should show one character for a run of empty wrappers before a sprite wrapper', async () => {
+    const value = html`
+      <p>das adversidades pode renascer algo ainda mais virtuoso&nbsp;
+        <i class="_lew" title="smile emoticon"></i>
+        <i class="_lew" title="smile emoticon"></i>
+        <i class="_lew" title="smile emoticon">
+          <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+          <span aria-hidden="true" class="_4mcd" style="font-size: 0px;">:-)</span>
+        </i>
+      </p>
+    `
+    const expected = '<p>das adversidades pode renascer algo ainda mais virtuoso&#160; 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // Some pastes keep the labelled `i` and its zero-size code without the sprite, so the emoticon
   // stays an invisible code.
   it('should replace a labelled wrapper holding only its hidden code', async () => {
