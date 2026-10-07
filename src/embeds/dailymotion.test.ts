@@ -6,6 +6,7 @@ import {
   dailymotionEmbedResolver,
   dailymotionRenderHint,
   dailymotionResolveEmbed,
+  dailymotionScriptEmbedResolver,
   extractDailymotionId,
   readDailymotionEmbedSrc,
 } from './dailymotion.js'
@@ -463,6 +464,247 @@ describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('dailymotionScriptEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, dailymotionScriptEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should resolve a video named on the script', async () => {
+      const value = html`
+        <div>
+          <script
+            src="https://geo.dailymotion.com/player/xhsob.js"
+            data-video="x9ai72y"
+          ></script>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'dailymotion',
+        id: 'x9ai72y',
+        src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x9ai72y',
+        url: 'https://www.dailymotion.com/video/x9ai72y',
+        thumbnail: 'https://www.dailymotion.com/thumbnail/video/x9ai72y',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve a playlist named on the script', async () => {
+      const value = html`
+        <script
+          data-playlist="x86yvo"
+          src="https://geo.dailymotion.com/player/xqu2k.js"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'dailymotion',
+        id: 'playlist/x86yvo',
+        src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x86yvo',
+        url: 'https://www.dailymotion.com/playlist/x86yvo',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should play the video inside the playlist when the script names both', async () => {
+      const value = html`
+        <script
+          src="https://geo.dailymotion.com/player/x16z72.js"
+          data-video="x84sh87"
+          data-playlist="x85ce2"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'dailymotion',
+        id: 'x84sh87',
+        src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x84sh87&playlist=x85ce2',
+        url: 'https://www.dailymotion.com/video/x84sh87',
+        thumbnail: 'https://www.dailymotion.com/thumbnail/video/x84sh87',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should pass a private id through as written', async () => {
+      const value = html`
+        <script
+          src="https://geo.dailymotion.com/player/x1jhci.js"
+          data-video="k1siYyVfJveqwwH9Wie"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'dailymotion',
+        id: 'k1siYyVfJveqwwH9Wie',
+        src: 'https://geo.dailymotion.com/player/xpiw2.html?video=k1siYyVfJveqwwH9Wie',
+        url: 'https://www.dailymotion.com/video/k1siYyVfJveqwwH9Wie',
+        thumbnail: 'https://www.dailymotion.com/thumbnail/video/k1siYyVfJveqwwH9Wie',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a script naming no item', async () => {
+      const value = html`
+        <script
+          src="https://geo.dailymotion.com/player/x1ix50.js"
+          data-video=""
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the same path', async () => {
+      const value = html`
+        <script
+          src="https://evil.test/player/xhsob.js?dailymotion.com/"
+          data-video="x9ai72y"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the Player Library Script', async () => {
+      const value = html`
+        <script
+          src="https://geo.dailymotion.com/libs/player/xhsob.js"
+          data-video="x9ai72y"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a path running past the script', async () => {
+      const value = html`
+        <script
+          src="https://geo.dailymotion.com/player/xhsob.js/extra"
+          data-video="x9ai72y"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('the microdata Dailymotion wraps around the script', () => {
+    it('should read the name, description, date and duration', async () => {
+      const value = html`
+        <div itemscope itemtype="https://schema.org/VideoObject">
+          <meta itemprop="name" content="Expo Park Okinawa">
+          <meta itemprop="description" content="Manatee Pool - Okinawa Expo Park">
+          <meta itemprop="uploadDate" content="2023-12-02T16:32:21.000Z">
+          <meta itemprop="thumbnailUrl" content="https://s1.dmcdn.net/v/VSyK71bQs0-SHLPe5/x120">
+          <meta itemprop="duration" content="P43S">
+          <meta itemprop="embedUrl" content="https://geo.dailymotion.com/player/xm0u7.html?video=x8q613b">
+          <script src="https://geo.dailymotion.com/player/xm0u7.js" data-video="x8q613b"></script>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'dailymotion',
+        id: 'x8q613b',
+        src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8q613b',
+        url: 'https://www.dailymotion.com/video/x8q613b',
+        thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8q613b',
+        ratio: '16/9',
+        title: 'Expo Park Okinawa',
+        description: 'Manatee Pool - Okinawa Expo Park',
+        date: '2023-12-02T16:32:21.000Z',
+        duration: 43,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the name of a playlist', async () => {
+      const value = html`
+        <div itemscope itemtype="https://schema.org/VideoObject">
+          <meta content="Historias de Diván (2013)" itemprop="name">
+          <meta content="2024-03-04T19:36:57.000Z" itemprop="uploadDate">
+          <meta content="https://geo.dailymotion.com/player/xqu2k.html?playlist=x86yvo" itemprop="embedUrl">
+          <script data-playlist="x86yvo" src="https://geo.dailymotion.com/player/xqu2k.js"></script>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'dailymotion',
+        id: 'playlist/x86yvo',
+        src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x86yvo',
+        url: 'https://www.dailymotion.com/playlist/x86yvo',
+        title: 'Historias de Diván (2013)',
+        date: '2024-03-04T19:36:57.000Z',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore microdata naming another video', async () => {
+      const value = html`
+        <div itemscope itemtype="https://schema.org/VideoObject">
+          <meta itemprop="name" content="Expo Park Okinawa">
+          <meta itemprop="embedUrl" content="https://geo.dailymotion.com/player/xm0u7.html?video=x8q613b">
+          <script src="https://geo.dailymotion.com/player/xm0u7.js" data-video="x8tvxb6"></script>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'dailymotion',
+        id: 'x8tvxb6',
+        src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8tvxb6',
+        url: 'https://www.dailymotion.com/video/x8tvxb6',
+        thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8tvxb6',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore microdata naming no player', async () => {
+      const value = html`
+        <div itemscope itemtype="https://schema.org/VideoObject">
+          <meta itemprop="name" content="Expo Park Okinawa">
+          <script src="https://geo.dailymotion.com/player/xm0u7.js" data-video="x8q613b"></script>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'dailymotion',
+        id: 'x8q613b',
+        src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8q613b',
+        url: 'https://www.dailymotion.com/video/x8q613b',
+        thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8q613b',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore microdata outside the snippet', async () => {
+      const value = html`
+        <div itemscope itemtype="https://schema.org/VideoObject">
+          <meta itemprop="name" content="Expo Park Okinawa">
+          <meta itemprop="embedUrl" content="https://geo.dailymotion.com/player/xm0u7.html?video=x8q613b">
+          <p>
+            <script src="https://geo.dailymotion.com/player/xm0u7.js" data-video="x8q613b"></script>
+          </p>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'dailymotion',
+        id: 'x8q613b',
+        src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8q613b',
+        url: 'https://www.dailymotion.com/video/x8q613b',
+        thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8q613b',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
 // The probe offers every enclosure a feed carries to the url resolvers, and Dailymotion serves
 // its own files under `/cdn/`. What leaves the media url alone is the route-word rule rather than
 // the id test: `/cdn/` opens no route word, so no segment is read as an id at all.
@@ -490,6 +732,26 @@ describeForEachParser('dailymotion through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+
+  it('should replace the Player Embed Script with a placeholder', async () => {
+    const value = html`
+      <h2>Saiba como acessar nossos canais do WhatsApp</h2>
+      <div><script src="https://geo.dailymotion.com/player/xhsob.js" data-video="x9ai72y"></script></div>
+    `
+    const expected = html`
+      <h2>Saiba como acessar nossos canais do WhatsApp</h2>
+      <div
+        data-embed-provider="dailymotion"
+        data-embed-id="x9ai72y"
+        data-embed-src="https://geo.dailymotion.com/player/xpiw2.html?video=x9ai72y"
+        data-embed-url="https://www.dailymotion.com/video/x9ai72y"
+        data-embed-thumbnail="https://www.dailymotion.com/thumbnail/video/x9ai72y"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
 
