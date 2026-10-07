@@ -143,7 +143,7 @@ describeForEachParser('convertTradingEconomicsEmbeds', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should pass a query the feed escaped twice through as written', async () => {
+    it('should repair a percent-encoded &#038; between query pairs', async () => {
       const value = html`
         <iframe
           src="https://tradingeconomics.com/embed/?s=usareninf&#038;v=202406121234V20230410&%23038;h=300&%23038;w=600&%23038;ref=/united-states/rent-inflation&%23038;type=spline&%23038;d1=2019-06-01&%23038;d2=2024-06-01"
@@ -154,9 +154,9 @@ describeForEachParser('convertTradingEconomicsEmbeds', (parseHtml) => {
         ></iframe>
       `
       const expected = html`
-        <a href="https://tradingeconomics.com/">
+        <a href="https://tradingeconomics.com/united-states/rent-inflation">
           <img
-            src="https://tradingeconomics.com/charts/embed.png?s=usareninf&amp;v=202406121234V20230410&amp;%23038;h=300&amp;%23038;w=600&amp;%23038;ref=/united-states/rent-inflation&amp;%23038;type=spline&amp;%23038;d1=2019-06-01&amp;%23038;d2=2024-06-01"
+            src="https://tradingeconomics.com/charts/embed.png?s=usareninf&amp;v=202406121234V20230410&amp;h=300&amp;w=600&amp;ref=/united-states/rent-inflation&amp;type=spline&amp;d1=2019-06-01&amp;d2=2024-06-01"
             width="600"
             height="300"
           >
