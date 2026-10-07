@@ -35,36 +35,124 @@ describeForEachParser('githubImageEmojiResolver', (parseHtml) => {
   })
 
   describe('gemoji names', () => {
-    it('should replace an image whose file is named by a gemoji name', async () => {
+    it('should keep an image named by a gemoji name as a marked picture', async () => {
       const value = html`
         <p>
           <img
-            src="https://assets-cdn.github.com/images/icons/emoji/arrow_up.png"
-            alt=":arrow_up:"
+            class="emoji"
+            title=":metal:"
+            alt=":metal:"
+            src="https://assets.github.com/images/icons/emoji/metal.png"
+            height="20"
+            width="20"
+            align="absmiddle"
           >
         </p>
       `
-      const expected = '<p>⬆️</p>'
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="emoji"
+            title=":metal:"
+            alt=":metal:"
+            src="https://assets.github.com/images/icons/emoji/metal.png"
+            height="20"
+            width="20"
+            align="absmiddle"
+          >
+        </p>
+      `
 
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    // The alt repeats the gemoji name, and the shortcode table draws these as other faces.
-    const sharedNameCases: Array<[string, string]> = [
-      ['smile', '😄'],
-      ['cool', '🆒'],
-    ]
-
-    it.each(sharedNameCases)('should replace %s by its gemoji glyph', async (name, glyph) => {
+    it('should keep an image named by a gemoji name with no alt as a marked picture', async () => {
       const value = html`
         <p>
           <img
-            src="https://github.githubassets.com/images/icons/emoji/${name}.png?v8"
-            alt=":${name}:"
+            class="marked-emoji"
+            src="https://github.githubassets.com/images/icons/emoji/warning.png"
           >
         </p>
       `
-      const expected = `<p>${glyph}</p>`
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="marked-emoji"
+            src="https://github.githubassets.com/images/icons/emoji/warning.png"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep an image named by a GitHub drawing as a marked picture', async () => {
+      const value = html`
+        <p>
+          <img
+            class="emoji"
+            title=":bowtie:"
+            alt=":bowtie:"
+            src="https://assets.github.com/images/icons/emoji/bowtie.png"
+            height="20"
+            width="20"
+            align="absmiddle"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            class="emoji"
+            title=":bowtie:"
+            alt=":bowtie:"
+            src="https://assets.github.com/images/icons/emoji/bowtie.png"
+            height="20"
+            width="20"
+            align="absmiddle"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep an image whose alt is a universal code as a marked picture', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://github.githubassets.com/images/icons/emoji/smile.png?v8"
+            alt=":smile:"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            data-emoji=""
+            src="https://github.githubassets.com/images/icons/emoji/smile.png?v8"
+            alt=":smile:"
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a codepoint image with no alt by its glyph', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://github.githubassets.com/images/icons/emoji/unicode/1f914.png?v8"
+            style="width: 20px;"
+          >
+        </p>
+      `
+      const expected = '<p>🤔</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
