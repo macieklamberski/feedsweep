@@ -181,3 +181,27 @@ export const tiktokIframeEmbedResolver = createUrlEmbedResolver(tiktokHosts, tik
 export const tiktokS9eEmbedResolver = createS9eEmbedResolver('tiktok', (videoId) => {
   return tiktokResolveEmbed(`https://www.tiktok.com/embed/v2/${encodePathSegment(videoId)}`)
 })
+
+// MetaSlider Pro's TikTok slide: a poster image that only the plugin's script swaps for the player.
+export const tiktokWidgetEmbedResolver = createMarkupEmbedResolver(
+  'li.ms-tiktok div.tiktok[data-video-id]',
+  (element) => {
+    const videoId = attr(element, 'data-video-id')
+
+    if (!videoId) {
+      return
+    }
+
+    const { handle } = readWatchUrl(attr(element, 'data-cite'))
+    const watchPath = handle ? `@${handle}/video/${videoId}` : undefined
+
+    return {
+      provider: 'tiktok',
+      id: watchPath ?? videoId,
+      src: `https://www.tiktok.com/embed/v2/${videoId}`,
+      url: watchPath ? `https://www.tiktok.com/${watchPath}` : undefined,
+      thumbnail: attr(element.querySelector('img.msDefaultImage'), 'src'),
+      height: playerHeight,
+    }
+  },
+)
