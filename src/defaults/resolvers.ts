@@ -157,6 +157,7 @@ import { geniallyEmbedResolver } from '../embeds/genially.js'
 import { geogebraEmbedResolver } from '../embeds/geogebra.js'
 import { gettyImagesEmbedResolver } from '../embeds/gettyimages.js'
 import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds/glomex.js'
+import { gofundmeEmbedResolver } from '../embeds/gofundme.js'
 import { googlebooksEmbedResolver } from '../embeds/googlebooks.js'
 import { googledriveEmbedResolver } from '../embeds/googledrive.js'
 import { googleformsEmbedResolver } from '../embeds/googleforms.js'
@@ -570,6 +571,7 @@ const embedResolvers: Array<EmbedResolver> = [
   gettyImagesEmbedResolver,
   glomexIframeEmbedResolver,
   glomexElementEmbedResolver,
+  gofundmeEmbedResolver,
   googlebooksEmbedResolver,
   googledriveEmbedResolver,
   googleformsEmbedResolver,
