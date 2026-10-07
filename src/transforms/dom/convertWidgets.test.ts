@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { defaultWidgetResolvers } from '../../defaults.js'
 import { youtubeIframeEmbedResolver } from '../../embeds/youtube.js'
+import { tumblrMediaResolver } from '../../media/tumblr.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { EmbedResolver, MediaResolver, TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -1089,6 +1090,48 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
     `
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should clean a media src with the provided cleanUrlFn', async () => {
+    const context: TransformContext = {
+      ...withResolver(tumblrMediaResolver),
+      cleanUrlFn: (url) => url.replace('http://www.podtrac.com/pts/redirect.mp3/', 'http://'),
+    }
+    const value = html`
+      <iframe
+        class="tumblr_audio_player tumblr_audio_player_127428120413"
+        src="https://wehavesuchfilmstoshowyou.tumblr.com/post/127428120413/audio_player_iframe/wehavesuchfilmstoshowyou/tumblr_ntk06kXey81twzean?audio_file=http%3A%2F%2Fwww.podtrac.com%2Fpts%2Fredirect.mp3%2Fstormsabrewin.org%2Fihaventseenthat%2Fihaventseenthat_065.mp3"
+      ></iframe>
+    `
+    const expected = html`
+      <audio
+        src="http://stormsabrewin.org/ihaventseenthat/ihaventseenthat_065.mp3"
+        controls
+      ></audio>
+    `
+
+    expect(await transform(value, context)).toEqualHtml(expected)
+  })
+
+  it('should keep the media src when the cleanUrlFn answers with nothing', async () => {
+    const context: TransformContext = {
+      ...withResolver(tumblrMediaResolver),
+      cleanUrlFn: () => '',
+    }
+    const value = html`
+      <iframe
+        class="tumblr_audio_player tumblr_audio_player_127428120413"
+        src="https://wehavesuchfilmstoshowyou.tumblr.com/post/127428120413/audio_player_iframe/wehavesuchfilmstoshowyou/tumblr_ntk06kXey81twzean?audio_file=http%3A%2F%2Fwww.podtrac.com%2Fpts%2Fredirect.mp3%2Fstormsabrewin.org%2Fihaventseenthat%2Fihaventseenthat_065.mp3"
+      ></iframe>
+    `
+    const expected = html`
+      <audio
+        src="http://www.podtrac.com/pts/redirect.mp3/stormsabrewin.org/ihaventseenthat/ihaventseenthat_065.mp3"
+        controls
+      ></audio>
+    `
+
+    expect(await transform(value, context)).toEqualHtml(expected)
   })
 
   it('should write a poster onto a video', async () => {
