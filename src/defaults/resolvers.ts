@@ -432,6 +432,7 @@ import { twemojiElementEmojiResolver, twemojiEmojiResolver } from '../emojis/twe
 import { ucozEmojiResolver } from '../emojis/ucoz.js'
 import { vanillaEmojiResolver } from '../emojis/vanilla.js'
 import { vkEmojiResolver } from '../emojis/vk.js'
+import { volantisEmojiResolver } from '../emojis/volantis.js'
 import { webWizEmojiResolver } from '../emojis/webwiz.js'
 import { weiboEmojiResolver } from '../emojis/weibo.js'
 import { whatsappEmojiResolver } from '../emojis/whatsapp.js'
@@ -926,6 +927,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   tistoryEmojiResolver,
   btblogEmojiResolver,
   pixnetEmojiResolver,
+  volantisEmojiResolver,
   genericCharacterEmojiResolver,
 
   // After every engine, since TypePad, Yahoo and others put the emoticon class on their own sets.
