@@ -6,6 +6,6 @@ export const jeuxvideoEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[src*="image.jeuxvideo.com/smileys_img/" i]',
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

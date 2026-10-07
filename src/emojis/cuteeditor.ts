@@ -6,6 +6,6 @@ export const cuteeditorEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[src*="/CuteSoft_Client/CuteEditor/images/em" i]',
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

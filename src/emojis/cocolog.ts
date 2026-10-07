@@ -288,6 +288,6 @@ export const cocologEmojiResolver: EmojiResolver = {
       return
     }
 
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

@@ -181,4 +181,26 @@ describeForEachParser('cocologEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(`<p><img src="${src}" alt="" data-emoji=""></p>`)
   })
+
+  it('should keep a pictogram whose alt is an emoji as a marked picture', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://emojies.cocolog-nifty.com/emoticon/shine.gif"
+          alt="😀"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://emojies.cocolog-nifty.com/emoticon/shine.gif"
+          alt="😀"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
 })

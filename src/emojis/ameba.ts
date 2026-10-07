@@ -10,6 +10,6 @@ export const amebaEmojiResolver: EmojiResolver = {
     'img[src*="emoji.ameba.jp/img/" i]', // Emoji uploaded by the blog's author
   ].join(', '),
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

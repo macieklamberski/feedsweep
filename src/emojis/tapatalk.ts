@@ -6,6 +6,6 @@ export const tapatalkEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[src*="emoji.tapatalk-cdn.com/" i]',
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

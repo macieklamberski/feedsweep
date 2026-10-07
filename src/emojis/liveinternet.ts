@@ -6,6 +6,6 @@ export const liveinternetEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[src*="li.ru/" i][src*="/images/brandnewsmilies/" i]',
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

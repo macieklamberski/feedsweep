@@ -11,6 +11,6 @@ export const seesaaEmojiResolver: EmojiResolver = {
     'img[src*="blog.seesaa.jp/images_o/" i]', // An older numbered set
   ].join(', '),
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

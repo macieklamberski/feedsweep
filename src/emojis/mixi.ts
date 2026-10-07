@@ -8,6 +8,6 @@ export const mixiEmojiResolver: EmojiResolver = {
     ', ',
   ),
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }
