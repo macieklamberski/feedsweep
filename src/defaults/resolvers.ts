@@ -160,6 +160,7 @@ import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds
 import { googlebooksEmbedResolver } from '../embeds/googlebooks.js'
 import { googledriveEmbedResolver } from '../embeds/googledrive.js'
 import { googleformsEmbedResolver } from '../embeds/googleforms.js'
+import { googlesheetsEmbedResolver } from '../embeds/googlesheets.js'
 import { googleslidesEmbedResolver } from '../embeds/googleslides.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
 import { hearthisEmbedResolver } from '../embeds/hearthis.js'
@@ -573,6 +574,7 @@ const embedResolvers: Array<EmbedResolver> = [
   googlebooksEmbedResolver,
   googledriveEmbedResolver,
   googleformsEmbedResolver,
+  googlesheetsEmbedResolver,
   googleslidesEmbedResolver,
   guardianEmbedResolver,
   hearthisEmbedResolver,
