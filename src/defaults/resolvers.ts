@@ -158,6 +158,7 @@ import { geogebraEmbedResolver } from '../embeds/geogebra.js'
 import { gettyImagesEmbedResolver } from '../embeds/gettyimages.js'
 import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds/glomex.js'
 import { googlebooksEmbedResolver } from '../embeds/googlebooks.js'
+import { googledocsEmbedResolver } from '../embeds/googledocs.js'
 import { googledriveEmbedResolver } from '../embeds/googledrive.js'
 import { googleformsEmbedResolver } from '../embeds/googleforms.js'
 import { googleslidesEmbedResolver } from '../embeds/googleslides.js'
@@ -571,6 +572,7 @@ const embedResolvers: Array<EmbedResolver> = [
   glomexIframeEmbedResolver,
   glomexElementEmbedResolver,
   googlebooksEmbedResolver,
+  googledocsEmbedResolver,
   googledriveEmbedResolver,
   googleformsEmbedResolver,
   googleslidesEmbedResolver,
