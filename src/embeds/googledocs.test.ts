@@ -170,6 +170,48 @@ describe('googledocsResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
+    it('should drop an empty query', () => {
+      const value =
+        'https://docs.google.com/document/d/1cpdr_CQUf8w7QaeKJBFaYT8bTQXtlrA2rzSqbp2r7Mw/pub?'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '1cpdr_CQUf8w7QaeKJBFaYT8bTQXtlrA2rzSqbp2r7Mw',
+        src: 'https://docs.google.com/document/d/1cpdr_CQUf8w7QaeKJBFaYT8bTQXtlrA2rzSqbp2r7Mw/pub',
+        url: 'https://docs.google.com/document/d/1cpdr_CQUf8w7QaeKJBFaYT8bTQXtlrA2rzSqbp2r7Mw/pub',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the fragment', () => {
+      const value =
+        'https://docs.google.com/document/d/1dpkp6WjVQZfWoh1CaQi3BNFCLf8aTDVW9CHnJmI8snY/pub?embedded=true#heading=h.4wc4j0r1vee5'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '1dpkp6WjVQZfWoh1CaQi3BNFCLf8aTDVW9CHnJmI8snY',
+        src: 'https://docs.google.com/document/d/1dpkp6WjVQZfWoh1CaQi3BNFCLf8aTDVW9CHnJmI8snY/pub?embedded=true',
+        url: 'https://docs.google.com/document/d/1dpkp6WjVQZfWoh1CaQi3BNFCLf8aTDVW9CHnJmI8snY/pub',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop a pair with no name', () => {
+      const value =
+        'https://docs.google.com/document/d/e/2PACX-1vSKVUN-U2sNVLmOh79E0Z0aSMpRxHIAFOlj4P42aB6fkdo0bk15Pvq8XJkRjVqhvpgYxxA6mNDH9lt0/pub?=true'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '2PACX-1vSKVUN-U2sNVLmOh79E0Z0aSMpRxHIAFOlj4P42aB6fkdo0bk15Pvq8XJkRjVqhvpgYxxA6mNDH9lt0',
+        src: 'https://docs.google.com/document/d/e/2PACX-1vSKVUN-U2sNVLmOh79E0Z0aSMpRxHIAFOlj4P42aB6fkdo0bk15Pvq8XJkRjVqhvpgYxxA6mNDH9lt0/pub',
+        url: 'https://docs.google.com/document/d/e/2PACX-1vSKVUN-U2sNVLmOh79E0Z0aSMpRxHIAFOlj4P42aB6fkdo0bk15Pvq8XJkRjVqhvpgYxxA6mNDH9lt0/pub',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should use a malformed published id as written, even if the player answers an error', () => {
       const value = 'https://docs.google.com/document/d/e/2PACX-1v%2F..%2Fx/pub'
       const expected: EmbedResolverResult = {
