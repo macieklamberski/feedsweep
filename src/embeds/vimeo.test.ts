@@ -683,4 +683,20 @@ describeForEachParser('vimeo through the pipeline', (parseHtml) => {
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
+
+  it('should repair a JSON-escaped ampersand in a progressive_redirect enclosure', async () => {
+    const enclosures = [
+      {
+        url: 'https://player.vimeo.com/progressive_redirect/playback/1209489815/rendition/1080p/file.mp4%20%281080p%29.mp4?loc=externalu0026signature=f3616a9a5cf44e2616767975cfed0346ff7f7d46ec1067b253ec760b52a6f1d9',
+        type: 'video/mp4',
+      },
+    ]
+
+    const expected = html`
+      <video data-enclosure="" controls src="https://player.vimeo.com/progressive_redirect/playback/1209489815/rendition/1080p/file.mp4%20%281080p%29.mp4?loc=external&signature=f3616a9a5cf44e2616767975cfed0346ff7f7d46ec1067b253ec760b52a6f1d9"></video>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
 })
