@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
+import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { rebuildVideoJsEmbeds } from './rebuildVideoJsEmbeds.js'
 
 describeForEachParser('rebuildVideoJsEmbeds', (parseHtml) => {
-  const transform = (value: string) => {
-    return applyDomTransforms(parseHtml(value), [rebuildVideoJsEmbeds(baseContext)])
+  const transform = (value: string, context: TransformContext = baseContext) => {
+    return applyDomTransforms(parseHtml(value), [rebuildVideoJsEmbeds(context)])
   }
 
   describe('happy paths', () => {
@@ -71,6 +72,34 @@ describeForEachParser('rebuildVideoJsEmbeds', (parseHtml) => {
       const expected = '<video controls src="https://example.com/clip.mp4"></video>'
 
       expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should clean the src with the provided cleanUrlFn', async () => {
+      const value = html`
+        <video-js>
+          <source src="https://dts.podtrac.com/redirect.mp4/example.com/clip.mp4" type="video/mp4">
+        </video-js>
+      `
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url.replace('https://dts.podtrac.com/redirect.mp4/', 'https://'),
+      }
+      const expected = '<video controls src="https://example.com/clip.mp4"></video>'
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should keep the src when the cleanUrlFn answers with nothing', async () => {
+      const value = html`
+        <video-js>
+          <source src="https://dts.podtrac.com/redirect.mp4/example.com/clip.mp4" type="video/mp4">
+        </video-js>
+      `
+      const context: TransformContext = { ...baseContext, cleanUrlFn: () => '' }
+      const expected =
+        '<video controls src="https://dts.podtrac.com/redirect.mp4/example.com/clip.mp4"></video>'
+
+      expect(await transform(value, context)).toEqualHtml(expected)
     })
   })
 

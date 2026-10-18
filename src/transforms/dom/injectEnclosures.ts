@@ -68,7 +68,7 @@ const createNativeMediaElement = (
 
   return createMediaElement(document, {
     tag,
-    src,
+    src: cleanUrl(src, context),
     poster,
     width: enclosure.width,
     height: enclosure.height,
