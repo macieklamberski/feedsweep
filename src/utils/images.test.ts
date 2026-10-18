@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'bun:test'
+import { describeForEachParser } from '../tests.js'
 import {
   countSrcsetCandidates,
+  findPosterEvidence,
   getImageFingerprint,
   getSizeKeywordRank,
   getUrlDimensions,
@@ -834,5 +836,35 @@ describe('pickLargerImageUrl', () => {
     const value2 = '/uploads/photo-150x150.jpg'
 
     expect(pickLargerImageUrl(value1, value2)).toBe(value1)
+  })
+})
+
+describeForEachParser('findPosterEvidence', (parseHtml) => {
+  it('should read the player id from a twice-encoded proxy url', () => {
+    const document = parseHtml(
+      '<div data-embed-id="dQw4w9WgXcQ" data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"></div>',
+    )
+    const video = document.querySelector('div') as Element
+    const value =
+      'https://proxy.example.com/?url=https%253A%252F%252Fi.ytimg.com%252Fvi%252FdQw4w9WgXcQ%252Fhqdefault.jpg'
+
+    expect(findPosterEvidence(value, video)).toBe('id')
+  })
+
+  it('should keep a malformed percent sequence as written', () => {
+    const document = parseHtml('<video src="https://example.com/media/interview.mp4"></video>')
+    const video = document.querySelector('video') as Element
+    const value = 'https://example.com/media/interview%E0%A4%A.jpg'
+
+    expect(findPosterEvidence(value, video)).toBeUndefined()
+  })
+
+  it('should not match by name when the image url does not parse', () => {
+    const document = parseHtml(
+      '<video src="https://example.com/media/interview.mp4" poster="https://example.com/media/interview.jpg"></video>',
+    )
+    const video = document.querySelector('video') as Element
+
+    expect(findPosterEvidence('interview-1280.jpg', video)).toBeUndefined()
   })
 })

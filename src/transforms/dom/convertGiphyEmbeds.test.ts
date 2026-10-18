@@ -146,6 +146,26 @@ describeForEachParser('convertGiphyEmbeds', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
+  it('should convert a gif url parked in a lazy attribute end to end', async () => {
+    const value = html`
+      <iframe
+        class="giphy-embed lazyload"
+        data-src="https://giphy.com/embed/3o6vXH7qktAzV4fJss"
+      ></iframe>
+    `
+    const expected = html`
+      <a href="https://giphy.com/gifs/3o6vXH7qktAzV4fJss">
+        <img src="https://media.giphy.com/media/3o6vXH7qktAzV4fJss/giphy.gif">
+      </a>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
   it('should leave a giphy url naming no gif alone', async () => {
     const value = '<iframe src="https://giphy.com/about"></iframe>'
 

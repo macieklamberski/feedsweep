@@ -2,6 +2,7 @@ import { parseSrcset as parseRawSrcset } from 'srcset'
 import {
   addMissingProtocol,
   decodeSegment,
+  escapeRegex,
   getPathSegments,
   isAnyOf,
   normalizeUrl,
@@ -9,6 +10,7 @@ import {
   resolveUrl,
   toMap,
 } from 'trousse'
+import { extractVideoId } from '../embeds/youtube.js'
 import type { CleanUrlFn } from '../types.js'
 import { pixelDimensionLimit } from './dom.js'
 import { isFileName, placeholderBaseUrl } from './urls.js'
@@ -388,4 +390,162 @@ export const pickLargerImageUrl = (first: string, second: string): string | unde
   }
 
   return firstRank > secondRank ? first : second
+}
+
+export type PosterEvidence = 'id' | 'stem' | 'same'
+
+// An id or a file name shorter than this, like a JW Player key or `video`, also turns up inside
+// unrelated file names.
+const minimumKeyLength = 6
+const extensionRegex = /\.[a-z0-9]{2,5}$/i
+// A size or a rendition word a file name ends with: `-300x250`, `-poster`, `_std`.
+const renditionSuffixRegex =
+  /(?:[-_.]?(?:\d{2,4}x\d{0,4}|poster|thumb|thumbnail|preview|still|cover|original|std|hd|sd))+$/
+// A bare width, `-1280`, tells two renditions apart only when one name lacks it: on both names it
+// is as likely a gallery's sequence number, as in `photo-107` beside `photo-108`.
+const widthSuffixRegex = /^[-_]\d{3,4}$/
+
+// A proxy carries the image url percent-encoded in its query, sometimes twice.
+const decodeUrl = (url: string): string => {
+  let value = url
+
+  for (let depth = 0; depth < 3; depth++) {
+    try {
+      const decoded = decodeURIComponent(value)
+
+      if (decoded === value) {
+        break
+      }
+
+      value = decoded
+    } catch {
+      break
+    }
+  }
+
+  return value
+}
+
+// An id names the player only as a whole token: `abc123` is not inside `xabc123y`.
+const createIdRegex = (id: string): RegExp => {
+  return new RegExp(`(^|[^\\w-])${escapeRegex(id)}([^\\w-]|$)`)
+}
+
+// A file name without its extension and rendition suffixes, so `clip-300x250.jpg` and `clip.mp4`
+// share `clip` while a gallery's `clip_2.jpg` stays apart.
+const getFileStem = (url: string): string | undefined => {
+  const fileName = decodeUrl(parseUrl(url)?.pathname.split('/').at(-1) ?? '')
+  const stem = fileName.replace(extensionRegex, '').toLowerCase().replace(renditionSuffixRegex, '')
+
+  return stem || undefined
+}
+
+const getFolder = (url: string): string | undefined => {
+  const parsed = parseUrl(url)
+
+  if (!parsed) {
+    return
+  }
+
+  return `${parsed.host}${parsed.pathname.slice(0, parsed.pathname.lastIndexOf('/'))}`
+}
+
+// Two stems name one picture when they are equal or one adds only a width, `clip-1280` and `clip`.
+const isSameStem = (left: string, right: string): boolean => {
+  if (left.length < minimumKeyLength || right.length < minimumKeyLength) {
+    return false
+  }
+
+  const [longer, shorter] = left.length >= right.length ? [left, right] : [right, left]
+
+  return (
+    longer === shorter ||
+    (longer.startsWith(shorter) && widthSuffixRegex.test(longer.slice(shorter.length)))
+  )
+}
+
+// The ids a player names: a placeholder carries data-embed-*, a raw iframe carries src.
+const getVideoIds = (video: Element): Array<string> => {
+  const ids = new Set<string>()
+  const dataId = video.getAttribute('data-embed-id')
+
+  if (dataId) {
+    ids.add(dataId)
+  }
+
+  for (const attribute of ['data-embed-src', 'data-embed-url', 'src']) {
+    const value = video.getAttribute(attribute)
+    const id = value ? extractVideoId(value) : undefined
+
+    if (id) {
+      ids.add(id)
+    }
+  }
+
+  return [...ids].filter((id) => id.length >= minimumKeyLength)
+}
+
+const getVideoFileStems = (video: Element): Array<string> => {
+  if (video.localName !== 'video') {
+    return []
+  }
+
+  const stems: Array<string> = []
+
+  for (const file of [video, ...video.querySelectorAll('source')]) {
+    const stem = getFileStem(file.getAttribute('src') ?? '')
+
+    if (stem && stem.length >= minimumKeyLength) {
+      stems.push(stem)
+    }
+  }
+
+  return stems
+}
+
+// An empty `poster=""` names no picture.
+export const getVideoThumbnail = (video: Element): string | undefined => {
+  return video.getAttribute('poster') || video.getAttribute('data-embed-thumbnail') || undefined
+}
+
+// Whether an image is a player's poster, from urls alone: the url names the player's id, it is
+// the thumbnail under another rendition or file name, as `clip-1280.jpg` beside `clip.jpg`, or,
+// with no thumbnail, its file is named after the video file, as `clip-1280.jpg` beside `clip.mp4`.
+export const findPosterEvidence = (
+  src: string,
+  video: Element,
+  cleanUrlFn?: CleanUrlFn,
+): PosterEvidence | undefined => {
+  const decoded = decodeUrl(src)
+
+  for (const id of getVideoIds(video)) {
+    if (createIdRegex(id).exec(decoded)) {
+      return 'id'
+    }
+  }
+
+  const thumbnail = getVideoThumbnail(video)
+
+  if (thumbnail) {
+    // A generic name like YouTube's `hqdefault.jpg` repeats across videos, so only a file beside
+    // the poster counts by name.
+    const stem = getFileStem(src) ?? ''
+    const isSameName =
+      getFolder(src) === getFolder(thumbnail) && isSameStem(stem, getFileStem(thumbnail) ?? '')
+
+    if (
+      isSameName ||
+      getImageFingerprint(thumbnail, cleanUrlFn) === getImageFingerprint(src, cleanUrlFn)
+    ) {
+      return 'same'
+    }
+
+    return
+  }
+
+  const stem = getFileStem(src) ?? ''
+
+  if (getVideoFileStems(video).some((videoStem) => isSameStem(stem, videoStem))) {
+    return 'stem'
+  }
 }

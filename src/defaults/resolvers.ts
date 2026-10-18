@@ -56,7 +56,11 @@ import { archiveFlashEmbedResolver, archiveIframeEmbedResolver } from '../embeds
 import { ardmediathekEmbedResolver } from '../embeds/ardmediathek.js'
 import { art19EmbedResolver } from '../embeds/art19.js'
 import { arteEmbedResolver } from '../embeds/arte.js'
-import { audioboomIframeEmbedResolver, audioboomWidgetEmbedResolver } from '../embeds/audioboom.js'
+import {
+  audioboomFlashEmbedResolver,
+  audioboomIframeEmbedResolver,
+  audioboomWidgetEmbedResolver,
+} from '../embeds/audioboom.js'
 import { audiomackEmbedResolver } from '../embeds/audiomack.js'
 import { aushaEmbedResolver } from '../embeds/ausha.js'
 import { bandcampEmbedResolver } from '../embeds/bandcamp.js'
@@ -70,6 +74,7 @@ import {
   blueskyPostElementEmbedResolver,
   blueskyS9eEmbedResolver,
 } from '../embeds/bluesky.js'
+import { bookcreatorEmbedResolver } from '../embeds/bookcreator.js'
 import { brEmbedResolver } from '../embeds/br.js'
 import { bridEmbedResolver } from '../embeds/brid.js'
 import {
@@ -161,6 +166,7 @@ import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds
 import { googlebooksEmbedResolver } from '../embeds/googlebooks.js'
 import { googledriveEmbedResolver } from '../embeds/googledrive.js'
 import { googleformsEmbedResolver } from '../embeds/googleforms.js'
+import { googlesheetsEmbedResolver } from '../embeds/googlesheets.js'
 import { googleslidesEmbedResolver } from '../embeds/googleslides.js'
 import { guardianEmbedResolver } from '../embeds/guardian.js'
 import { hearthisEmbedResolver } from '../embeds/hearthis.js'
@@ -451,6 +457,10 @@ import { wordpressElementEmojiResolver, wordpressEmojiResolver } from '../emojis
 import { xenforoEmojiResolver } from '../emojis/xenforo.js'
 import { yahooEmojiResolver } from '../emojis/yahoo.js'
 import { yahooJapanEmojiResolver } from '../emojis/yahoojapan.js'
+import {
+  onePixelOutFlashMediaResolver,
+  onePixelOutWidgetMediaResolver,
+} from '../media/1pixelout.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { flashMp3PlayerMediaResolver } from '../media/flashmp3player.js'
 import { ghostMediaResolver } from '../media/ghost.js'
@@ -496,6 +506,7 @@ const embedResolvers: Array<EmbedResolver> = [
   ardmediathekEmbedResolver,
   art19EmbedResolver,
   arteEmbedResolver,
+  audioboomFlashEmbedResolver,
   audioboomIframeEmbedResolver,
   audioboomWidgetEmbedResolver,
   audiomackEmbedResolver,
@@ -509,6 +520,7 @@ const embedResolvers: Array<EmbedResolver> = [
   blueskyIframeEmbedResolver,
   blueskyS9eEmbedResolver,
   blueskyPostElementEmbedResolver,
+  bookcreatorEmbedResolver,
   brEmbedResolver,
   bridEmbedResolver,
   brightcoveExperienceEmbedResolver,
@@ -587,6 +599,7 @@ const embedResolvers: Array<EmbedResolver> = [
   googlebooksEmbedResolver,
   googledriveEmbedResolver,
   googleformsEmbedResolver,
+  googlesheetsEmbedResolver,
   googleslidesEmbedResolver,
   guardianEmbedResolver,
   hearthisEmbedResolver,
@@ -779,6 +792,8 @@ const embedResolvers: Array<EmbedResolver> = [
 // Alphabetical by platform. Wikimedia's bare `iframe` selector sits last so a host-keyed
 // resolver gets the carrier first.
 const mediaResolvers: Array<MediaResolver> = [
+  onePixelOutFlashMediaResolver,
+  onePixelOutWidgetMediaResolver,
   discourseMediaResolver,
   flashMp3PlayerMediaResolver,
   ghostMediaResolver,
