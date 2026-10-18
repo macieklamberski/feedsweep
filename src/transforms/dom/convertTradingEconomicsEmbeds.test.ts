@@ -35,7 +35,7 @@ describeForEachParser('convertTradingEconomicsEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should load the chart of a cloudfront carrier from tradingeconomics.com and link the root', async () => {
+    it('should load the chart of a cloudfront carrier from tradingeconomics.com unlinked', async () => {
       const value = html`
         <iframe
           src="https://d3fy651gv2fhd3.cloudfront.net/embed/?s=grcdebt2gdp&v=202107132317V20200908&d1=19961223&h=450&w=900"
@@ -46,13 +46,11 @@ describeForEachParser('convertTradingEconomicsEmbeds', (parseHtml) => {
         ></iframe>
       `
       const expected = html`
-        <a href="https://tradingeconomics.com/">
-          <img
-            src="https://tradingeconomics.com/charts/embed.png?s=grcdebt2gdp&amp;v=202107132317V20200908&amp;d1=19961223&amp;h=450&amp;w=900"
-            width="900"
-            height="450"
-          >
-        </a>
+        <img
+          src="https://tradingeconomics.com/charts/embed.png?s=grcdebt2gdp&amp;v=202107132317V20200908&amp;d1=19961223&amp;h=450&amp;w=900"
+          width="900"
+          height="450"
+        >
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -87,20 +85,16 @@ describeForEachParser('convertTradingEconomicsEmbeds', (parseHtml) => {
         <iframe src="https://d3fy651gv2fhd3.cloudfront.net/embed/?s=usareninf&v=202208101303V20220312&d1=20120910&h=480&w=960"></iframe>
       `
       const expected = html`
-        <a href="https://tradingeconomics.com/">
-          <img
-            src="https://tradingeconomics.com/charts/embed.png?s=unitedstamorrat&amp;v=202208241115V20220312&amp;d1=19970901&amp;h=480&amp;w=960"
-            width="960"
-            height="480"
-          >
-        </a>
-        <a href="https://tradingeconomics.com/">
-          <img
-            src="https://tradingeconomics.com/charts/embed.png?s=usareninf&amp;v=202208101303V20220312&amp;d1=20120910&amp;h=480&amp;w=960"
-            width="960"
-            height="480"
-          >
-        </a>
+        <img
+          src="https://tradingeconomics.com/charts/embed.png?s=unitedstamorrat&amp;v=202208241115V20220312&amp;d1=19970901&amp;h=480&amp;w=960"
+          width="960"
+          height="480"
+        >
+        <img
+          src="https://tradingeconomics.com/charts/embed.png?s=usareninf&amp;v=202208101303V20220312&amp;d1=20120910&amp;h=480&amp;w=960"
+          width="960"
+          height="480"
+        >
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -177,13 +171,11 @@ describeForEachParser('convertTradingEconomicsEmbeds', (parseHtml) => {
         ></iframe>
       `
       const expected = html`
-        <a href="https://tradingeconomics.com/">
-          <img
-            src="https://tradingeconomics.com/charts/embed.png?s=australiawaggro&amp;v=201705232024v&amp;d1=20120101&amp;d2=20171231&amp;h=300&amp;w=600"
-            width="600"
-            height="300"
-          >
-        </a>
+        <img
+          src="https://tradingeconomics.com/charts/embed.png?s=australiawaggro&amp;v=201705232024v&amp;d1=20120101&amp;d2=20171231&amp;h=300&amp;w=600"
+          width="600"
+          height="300"
+        >
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -193,29 +185,25 @@ describeForEachParser('convertTradingEconomicsEmbeds', (parseHtml) => {
       const value =
         '<iframe src="https://d3fy651gv2fhd3.cloudfront.net/embed/?s=grcdebt2gdp&amp;h=450&amp;w=900"></iframe>'
       const expected = html`
-        <a href="https://tradingeconomics.com/">
-          <img
-            src="https://tradingeconomics.com/charts/embed.png?s=grcdebt2gdp&amp;h=450&amp;w=900"
-            width="900"
-            height="450"
-          >
-        </a>
+        <img
+          src="https://tradingeconomics.com/charts/embed.png?s=grcdebt2gdp&amp;h=450&amp;w=900"
+          width="900"
+          height="450"
+        >
       `
 
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should link the root when ref is not a path', async () => {
+    it('should leave the image unlinked when ref is not a path', async () => {
       const value =
         '<iframe src="https://tradingeconomics.com/embed/?s=dxy&amp;h=300&amp;w=600&amp;ref=evil.test/x"></iframe>'
       const expected = html`
-        <a href="https://tradingeconomics.com/">
-          <img
-            src="https://tradingeconomics.com/charts/embed.png?s=dxy&amp;h=300&amp;w=600&amp;ref=evil.test/x"
-            width="600"
-            height="300"
-          >
-        </a>
+        <img
+          src="https://tradingeconomics.com/charts/embed.png?s=dxy&amp;h=300&amp;w=600&amp;ref=evil.test/x"
+          width="600"
+          height="300"
+        >
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -227,20 +215,16 @@ describeForEachParser('convertTradingEconomicsEmbeds', (parseHtml) => {
         <iframe src="https://tradingeconomics.com/embed?s=dxy&amp;h=300&amp;w=600"></iframe>
       `
       const expected = html`
-        <a href="https://tradingeconomics.com/">
-          <img
-            src="https://tradingeconomics.com/charts/embed.png?s=dxy&amp;h=300&amp;w=600"
-            width="600"
-            height="300"
-          >
-        </a>
-        <a href="https://tradingeconomics.com/">
-          <img
-            src="https://tradingeconomics.com/charts/embed.png?s=dxy&amp;h=300&amp;w=600"
-            width="600"
-            height="300"
-          >
-        </a>
+        <img
+          src="https://tradingeconomics.com/charts/embed.png?s=dxy&amp;h=300&amp;w=600"
+          width="600"
+          height="300"
+        >
+        <img
+          src="https://tradingeconomics.com/charts/embed.png?s=dxy&amp;h=300&amp;w=600"
+          width="600"
+          height="300"
+        >
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -283,13 +267,11 @@ describeForEachParser('trading economics charts through the pipeline', (parseHtm
     `
     const expected = html`
       <p>
-        <a href="https://tradingeconomics.com/">
-          <img
-            height="450"
-            width="900"
-            src="https://tradingeconomics.com/charts/embed.png?s=grcdebt2gdp&amp;v=202107132317V20200908&amp;d1=19961223&amp;h=450&amp;w=900"
-          >
-        </a>
+        <img
+          height="450"
+          width="900"
+          src="https://tradingeconomics.com/charts/embed.png?s=grcdebt2gdp&amp;v=202107132317V20200908&amp;d1=19961223&amp;h=450&amp;w=900"
+        >
         source: <a href="https://tradingeconomics.com/greece/government-debt-to-gdp">tradingeconomics.com</a>
       </p>
     `
