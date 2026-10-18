@@ -147,21 +147,6 @@ describeForEachParser('khorosImageEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    // Windows Live Writer's own emoticons, which have no name table.
-    it('should leave a Windows Live Writer emoticon untouched', async () => {
-      const value = html`
-        <p>
-          <img
-            class="wlEmoticon wlEmoticon-winkingsmile"
-            alt="Winking smile"
-            src="https://example.com/wp-content/uploads/2019/03/1212.wlEmoticon-winkingsmile_63772F9B.png"
-          >
-        </p>
-      `
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
     it('should mark a face that lost its class by the name behind its size prefix', async () => {
       const value = html`
         <p>

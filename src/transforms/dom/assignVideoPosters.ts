@@ -3,6 +3,7 @@ import { extractVideoId } from '../../embeds/youtube.js'
 import type { DomTransform, TransformContext } from '../../types.js'
 import { removeWithEmptyWrappers } from '../../utils/dom.js'
 import { buildMediaKey } from '../../utils/enclosures.js'
+import { getImageFingerprint } from '../../utils/images.js'
 import { updateEmbedPlaceholder } from '../../utils/widgets.js'
 import { enclosureMarker } from './injectEnclosures.js'
 
@@ -181,17 +182,27 @@ export const assignVideoPosters: DomTransform = (context) => (document) => {
     return
   }
 
+  const thumbnail = video.getAttribute('poster') ?? video.getAttribute('data-embed-thumbnail')
+  const src = poster.getAttribute('src') ?? ''
+
+  // Beside a video with a thumbnail of its own, the enclosure is often a different picture.
+  const isOwnPicture =
+    thumbnail !== null &&
+    getImageFingerprint(thumbnail, context.cleanUrlFn) !==
+      getImageFingerprint(src, context.cleanUrlFn)
+
   // A feed that repeats a body player as an enclosure lists the post's media, so the image is as
-  // often a featured photo or a logo as the video's poster. It stays an image.
+  // often a featured photo or a logo as the video's poster. Only a matching thumbnail ties it.
   const repeatsBodyPlayer =
     players.length < document.querySelectorAll('[data-embed-src], iframe[src], video').length
+  const isKept = isOwnPicture || (repeatsBodyPlayer && thumbnail === null)
 
-  if (!repeatsBodyPlayer) {
+  if (!isKept) {
     moveImageToVideoPoster(poster, video)
   }
 
   // Without the marker a repeat run reads them as the item's own images and moves none.
-  for (const image of repeatsBodyPlayer ? [poster, ...rest] : rest) {
+  for (const image of isKept ? [poster, ...rest] : rest) {
     image.removeAttribute(enclosureMarker)
   }
 }

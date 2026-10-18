@@ -6,6 +6,6 @@ export const tistoryEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[src*="t1.daumcdn.net/keditor/emoticon/" i]',
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

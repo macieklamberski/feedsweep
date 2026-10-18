@@ -35,11 +35,32 @@ export const convertEmojis: DomTransform = (context) => {
   const selectors = batchSelectors(emojiResolvers.map((resolver) => resolver.selector))
 
   return (document) => {
-    if (!selectors.length) {
+    // Linkedom compiles the selector on every matches call. The query results come batch by
+    // batch, out of document order, so the walk still sets the order.
+    const candidates = new Set(selectors.flatMap((batch) => [...document.querySelectorAll(batch)]))
+
+    // A proxied image matches no selector as written, so the query cannot find it.
+    for (const image of document.querySelectorAll('img[src]')) {
+      if (unwrapProxiedEmoji(image) !== image) {
+        candidates.add(image)
+      }
+    }
+
+    if (!candidates.size) {
       return
     }
 
+    // A selector that reads siblings can start matching once an extract changes the tree.
+    let isChanged = false
+
     walkElements(document, (element) => {
+      const isMatch =
+        candidates.has(element) || (isChanged && selectors.some((batch) => element.matches(batch)))
+
+      if (!isMatch) {
+        return
+      }
+
       // A copy carrying the url behind an image proxy, matched only when the image itself is not,
       // since the copy has no ancestors for a selector to read.
       const target = unwrapProxiedEmoji(element)
@@ -53,10 +74,6 @@ export const convertEmojis: DomTransform = (context) => {
         }
       }
 
-      if (!selectors.some(matches)) {
-        return
-      }
-
       for (const resolver of emojiResolvers) {
         const matched = matches(resolver.selector)
 
@@ -64,6 +81,7 @@ export const convertEmojis: DomTransform = (context) => {
           continue
         }
 
+        isChanged = true
         const result = resolver.extract(matched)
 
         if (!result) {
