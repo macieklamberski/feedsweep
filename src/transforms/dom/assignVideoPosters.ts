@@ -1,10 +1,10 @@
 import { escapeRegex } from 'trousse'
 import type { DomTransform, TransformContext } from '../../types.js'
 import { removeWithEmptyWrappers } from '../../utils/dom.js'
+import { buildMediaKey } from '../../utils/enclosures.js'
 import { findPosterEvidence, getVideoThumbnail } from '../../utils/images.js'
 import { updateEmbedPlaceholder } from '../../utils/widgets.js'
 import { enclosureMarker } from './injectEnclosures.js'
-import { buildMediaKey } from './stripDuplicateEnclosures.js'
 
 // A player without a resolver, like JW Player, carries no data-embed-provider to match on.
 const videoHostFragments = [

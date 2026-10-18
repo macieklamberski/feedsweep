@@ -6,6 +6,19 @@ import { getEmbedSize } from './widgets.js'
 
 const kindTypePrefixes = ['audio/', 'video/', 'image/'] as const
 
+// The image key drops a file's query, which is what tells podcast proxy episodes apart.
+// A podcast proxy's audio url is `…/play.mp3?url={episode}`, so its identity lives in the query.
+// Audio, video and embeds have no scaled variants.
+export const buildMediaKey = (element: Element, cleanUrlFn?: CleanUrlFn): string => {
+  const src = element.getAttribute('src') ?? element.getAttribute('data-embed-src') ?? ''
+
+  if (element.localName === 'img') {
+    return getImageFingerprint(src, cleanUrlFn)
+  }
+
+  return cleanUrlFn ? cleanUrlFn(src) : src
+}
+
 // PeerTube ships an audio-only rendition as `type="audio/mp4"` under `medium="video"`, so the
 // type decides whenever it names a kind. A type naming none, `text/html` or a stream manifest,
 // leaves the medium to answer.
