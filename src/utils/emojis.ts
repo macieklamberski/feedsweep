@@ -1,6 +1,7 @@
-import { parseUrl, toMap } from 'trousse'
+import { toMap } from 'trousse'
 import type { EmojiResolverResult } from '../types.js'
 import { attr } from './dom.js'
+import { unwrapProxiedImage } from './images.js'
 import { emojiShortcodes } from './shortcodes.js'
 
 // A glyph, or false for a known name whose picture differs per engine, which is only marked.
@@ -124,20 +125,17 @@ export const getNameStem = (src: string): string => {
   return getFileStem(src).toLowerCase().replace(namePrefixRegex, '').replace(nameVariantRegex, '')
 }
 
-// Webmail serves every image in a mail through its own proxy, the original url encoded in `url`.
-const mailProxies = [
-  'ecp.yusercontent.com/mail', // Yahoo Mail
-  'resize.yandex.net/mailservice', // Yandex Mail
-]
+// The image as the resolvers read it: a proxied one as a copy carrying the original url.
+export const unwrapProxiedEmoji = (element: Element): Element => {
+  const src = attr(element, 'src')
 
-export const mailProxySelector = mailProxies.map((proxy) => `img[src*="${proxy}?"]`).join(',')
+  if (element.localName !== 'img' || !src) {
+    return element
+  }
 
-// The image as the resolvers read it: a mail-proxied one as a copy carrying the original url.
-export const unwrapMailProxy = (element: Element): Element => {
-  const proxy = parseUrl(attr(element, 'src') ?? '')
-  const source = proxy?.searchParams.get('url')
+  const source = unwrapProxiedImage(src)
 
-  if (!proxy || !source || !mailProxies.includes(`${proxy.hostname}${proxy.pathname}`)) {
+  if (source === src) {
     return element
   }
 

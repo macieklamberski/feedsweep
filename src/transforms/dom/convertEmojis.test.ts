@@ -342,7 +342,7 @@ describeForEachParser('convertEmojis', (parseHtml) => {
     })
   })
 
-  describe('mail proxies', () => {
+  describe('image proxies', () => {
     it('should convert an emoji behind the Yahoo Mail proxy', async () => {
       const value = html`
         <p>
@@ -370,6 +370,21 @@ describeForEachParser('convertEmojis', (parseHtml) => {
         </p>
       `
       const expected = '<p>🌸</p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should convert an emoji behind the Next.js image optimizer', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/_next/image?url=https%3A%2F%2Fstatic.xx.fbcdn.net%2Fimages%2Femoji.php%2Fv9%2Ft91%2F3%2F16%2F1f605.png&amp;w=1080&amp;q=75"
+            alt="&#x1f605;"
+            width="500"
+          >
+        </p>
+      `
+      const expected = '<p>😅</p>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
