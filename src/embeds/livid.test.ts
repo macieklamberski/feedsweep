@@ -91,25 +91,39 @@ describeForEachParser('lividIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, lividIframeEmbedResolver)
 
   describe('happy paths', () => {
-    it('should resolve the oEmbed iframe and keep its title', async () => {
+    it('should resolve a player iframe and keep its title', async () => {
       const value = html`
         <iframe
-          style="position:absolute;top:0;left:0;width:100%;height:100%;"
-          width="800"
-          height="450"
-          allowfullscreen
-          frameborder="0"
-          src="https://livid.com/embed/IoMGtM7uIDai"
-          title="MetaSlider-Slideshow-Different-Carousel-_Media"
+          src="https://livid.com/embed/Z1a8F0inFzve"
+          title="announcements__june_28,_2026_v1 (1080p)"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'livid',
-        id: 'IoMGtM7uIDai',
-        src: 'https://livid.com/embed/IoMGtM7uIDai',
-        url: 'https://livid.com/watch/IoMGtM7uIDai',
+        id: 'Z1a8F0inFzve',
+        src: 'https://livid.com/embed/Z1a8F0inFzve',
+        url: 'https://livid.com/watch/Z1a8F0inFzve',
         ratio: '16/9',
-        title: 'MetaSlider-Slideshow-Different-Carousel-_Media',
+        title: 'announcements__june_28,_2026_v1 (1080p)',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state the platform ratio over the carrier box', async () => {
+      const value = html`
+        <iframe
+          src="https://livid.com/embed/mqNzsMyf_ORs"
+          width="640"
+          height="360"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'livid',
+        id: 'mqNzsMyf_ORs',
+        src: 'https://livid.com/embed/mqNzsMyf_ORs',
+        url: 'https://livid.com/watch/mqNzsMyf_ORs',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
