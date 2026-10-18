@@ -13,6 +13,7 @@ import { convertGiphyEmbeds } from '../transforms/dom/convertGiphyEmbeds.js'
 import { convertLazyImageContainers } from '../transforms/dom/convertLazyImageContainers.js'
 import { convertNoteEmbeds } from '../transforms/dom/convertNoteEmbeds.js'
 import { convertSmartframeEmbeds } from '../transforms/dom/convertSmartframeEmbeds.js'
+import { convertTradingEconomicsEmbeds } from '../transforms/dom/convertTradingEconomicsEmbeds.js'
 import { convertUcozSpoilerButtons } from '../transforms/dom/convertUcozSpoilerButtons.js'
 import { convertWidgets } from '../transforms/dom/convertWidgets.js'
 import { decodeDoubleEncodedTags } from '../transforms/dom/decodeDoubleEncodedTags.js'
@@ -205,6 +206,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // linked static <img> of the chart's published PNG render. Runs in this normalize
   // cluster so the emitted <img> is dimensioned and proxied by the image transforms below.
   convertDatawrapperEmbeds,
+  convertTradingEconomicsEmbeds,
   convertAsciinemaEmbeds,
   convertGiphyEmbeds,
   convertSmartframeEmbeds,
