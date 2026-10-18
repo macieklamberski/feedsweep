@@ -6,7 +6,7 @@ import type {
   TransformContext,
   WidgetResolver,
 } from '../../types.js'
-import { isEnclosureKind, prepareEnclosures } from '../../utils/enclosures.js'
+import { enclosureMarker, isEnclosureKind, prepareEnclosures } from '../../utils/enclosures.js'
 import { getImageFingerprint } from '../../utils/images.js'
 import {
   cleanUrl,
@@ -25,11 +25,6 @@ import {
   resolveEmbedProbe,
   setDimensions,
 } from '../../utils/widgets.js'
-
-// Marks an injected element so a repeat run skips it and stripDuplicateEnclosures (an
-// opt-in heuristic) can tell it from the item's own inline content. Exported because
-// stripDuplicateEnclosures and assignVideoPosters both read it.
-export const enclosureMarker = 'data-enclosure'
 
 // Text a publishing tool wrote where a description would go, lowercased.
 const placeholderCaptions = [

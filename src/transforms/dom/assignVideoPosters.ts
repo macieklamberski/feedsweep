@@ -2,8 +2,8 @@ import { escapeRegex } from 'trousse'
 import { extractVideoId } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import { removeWithEmptyWrappers } from '../../utils/dom.js'
+import { enclosureMarker } from '../../utils/enclosures.js'
 import { updateEmbedPlaceholder } from '../../utils/widgets.js'
-import { enclosureMarker } from './injectEnclosures.js'
 
 // A YouTube thumbnail URL carries the video id in a `/vi/{id}/` segment, e.g.
 // https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg. extractVideoId only reads

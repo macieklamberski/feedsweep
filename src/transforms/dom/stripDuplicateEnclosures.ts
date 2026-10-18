@@ -1,7 +1,7 @@
 import type { CleanUrlFn, DomTransform } from '../../types.js'
 import { removeWithEmptyWrappers, walkElements } from '../../utils/dom.js'
+import { enclosureMarker } from '../../utils/enclosures.js'
 import { getImageFingerprint } from '../../utils/images.js'
-import { enclosureMarker } from './injectEnclosures.js'
 
 const existingMediaSelector = 'audio[src], video[src], source[src], img[src], [data-embed-src]'
 
