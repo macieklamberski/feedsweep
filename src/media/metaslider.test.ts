@@ -87,6 +87,32 @@ describeForEachParser('metasliderMediaResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a slide whose sources are not a list', async () => {
+      const value = html`
+        <li class="ms-local-video">
+          <div
+            class="local-video video-js"
+            data-sources="{&quot;src&quot;:&quot;https:\\/\\/example.com\\/clip.mp4&quot;}"
+          ></div>
+        </li>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a slide whose only source is a stream manifest', async () => {
+      const value = html`
+        <li class="ms-external-video">
+          <div
+            class="external-video video-js"
+            data-sources="[{&quot;type&quot;:&quot;application\\/x-mpegURL&quot;,&quot;src&quot;:&quot;https:\\/\\/cdn.example.org\\/clip.m3u8&quot;}]"
+          ></div>
+        </li>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a slide whose sources are not JSON', async () => {
       const value = html`
         <li class="ms-local-video">
@@ -102,6 +128,23 @@ describeForEachParser('metasliderMediaResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should skip a stream manifest for the next video file', async () => {
+      const value = html`
+        <li class="ms-external-video">
+          <div
+            class="external-video video-js"
+            data-sources="[{&quot;type&quot;:&quot;application\\/x-mpegURL&quot;,&quot;src&quot;:&quot;https:\\/\\/cdn.example.org\\/clip.m3u8&quot;},{&quot;type&quot;:&quot;video\\/mp4&quot;,&quot;src&quot;:&quot;https:\\/\\/cdn.example.org\\/clip.mp4&quot;}]"
+          ></div>
+        </li>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'video',
+        src: 'https://cdn.example.org/clip.mp4',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should take the first of several sources', async () => {
       const value = html`
         <li class="ms-local-video">
