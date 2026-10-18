@@ -1,6 +1,10 @@
 import type { DomTransform } from '../../types.js'
 import { batchSelectors, walkElements } from '../../utils/dom.js'
-import { emojiImageAttribute, withEmojiPresentation } from '../../utils/emojis.js'
+import {
+  emojiImageAttribute,
+  unwrapProxiedEmoji,
+  withEmojiPresentation,
+} from '../../utils/emojis.js'
 
 const wrapFallbackText = (document: Document, text: string): Element => {
   const span = document.createElement('span')
@@ -36,16 +40,31 @@ export const convertEmojis: DomTransform = (context) => {
     }
 
     walkElements(document, (element) => {
-      if (!selectors.some((batch) => element.matches(batch))) {
+      // A copy carrying the url behind an image proxy, matched only when the image itself is not,
+      // since the copy has no ancestors for a selector to read.
+      const target = unwrapProxiedEmoji(element)
+      const matches = (selector: string): Element | undefined => {
+        if (element.matches(selector)) {
+          return element
+        }
+
+        if (target !== element && target.matches(selector)) {
+          return target
+        }
+      }
+
+      if (!selectors.some(matches)) {
         return
       }
 
       for (const resolver of emojiResolvers) {
-        if (!element.matches(resolver.selector)) {
+        const matched = matches(resolver.selector)
+
+        if (!matched) {
           continue
         }
 
-        const result = resolver.extract(element)
+        const result = resolver.extract(matched)
 
         if (!result) {
           continue

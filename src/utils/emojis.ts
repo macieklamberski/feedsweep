@@ -1,6 +1,7 @@
 import { toMap } from 'trousse'
 import type { EmojiResolverResult } from '../types.js'
 import { attr } from './dom.js'
+import { unwrapProxiedImage } from './images.js'
 import { emojiShortcodes } from './shortcodes.js'
 
 // A glyph, or false for a known name whose picture differs per engine, which is only marked.
@@ -122,6 +123,26 @@ export const getFileStem = (src: string): string => {
 // A filename as the name tables key it.
 export const getNameStem = (src: string): string => {
   return getFileStem(src).toLowerCase().replace(namePrefixRegex, '').replace(nameVariantRegex, '')
+}
+
+// The image as the resolvers read it: a proxied one as a copy carrying the original url.
+export const unwrapProxiedEmoji = (element: Element): Element => {
+  const src = attr(element, 'src')
+
+  if (element.localName !== 'img' || !src) {
+    return element
+  }
+
+  const source = unwrapProxiedImage(src)
+
+  if (source === src) {
+    return element
+  }
+
+  const target = element.cloneNode() as Element
+  target.setAttribute('src', source)
+
+  return target
 }
 
 // Five hex digits tops out at 0xFFFFF, so fromCodePoint never sees a value that throws.
