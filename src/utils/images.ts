@@ -2,6 +2,7 @@ import { parseSrcset as parseRawSrcset } from 'srcset'
 import {
   addMissingProtocol,
   decodeSegment,
+  escapeRegex,
   getPathSegments,
   isAnyOf,
   normalizeUrl,
@@ -9,6 +10,7 @@ import {
   resolveUrl,
   toMap,
 } from 'trousse'
+import { extractVideoId } from '../embeds/youtube.js'
 import type { CleanUrlFn } from '../types.js'
 import { pixelDimensionLimit } from './dom.js'
 import { isFileName, placeholderBaseUrl } from './urls.js'
@@ -378,4 +380,127 @@ export const pickLargerImageUrl = (first: string, second: string): string | unde
   }
 
   return firstRank > secondRank ? first : second
+}
+
+export type PosterEvidence = 'id' | 'stem' | 'same'
+
+// An id or a file name shorter than this, like a JW Player key or `video`, also turns up inside
+// unrelated file names.
+const minimumKeyLength = 6
+const extensionRegex = /\.[a-z0-9]{2,5}$/i
+// A size or a rendition word a file name ends with: `-1280`, `-300x250`, `-poster`, `_std`.
+const renditionSuffixRegex =
+  /(?:[-_.]?(?:\d{2,4}x\d{0,4}|\d{3,4}p?|poster|thumb|thumbnail|preview|still|cover|original|std|hd|sd))+$/
+
+// A proxy carries the image url percent-encoded in its query, sometimes twice.
+const decodeUrl = (url: string): string => {
+  let value = url
+
+  for (let depth = 0; depth < 3; depth++) {
+    try {
+      const decoded = decodeURIComponent(value)
+
+      if (decoded === value) {
+        break
+      }
+
+      value = decoded
+    } catch {
+      break
+    }
+  }
+
+  return value
+}
+
+// An id names the player only as a whole token: `abc123` is not inside `xabc123y`.
+const createIdRegex = (id: string): RegExp => {
+  return new RegExp(`(^|[^\\w-])${escapeRegex(id)}([^\\w-]|$)`)
+}
+
+// A file name without its extension and rendition suffixes, so `clip-1280.jpg` and `clip.mp4`
+// share `clip` while a gallery's `clip_2.jpg` stays apart.
+const getFileStem = (url: string): string | undefined => {
+  const fileName = decodeUrl(parseUrl(url)?.pathname.split('/').at(-1) ?? '')
+  const stem = fileName.replace(extensionRegex, '').toLowerCase().replace(renditionSuffixRegex, '')
+
+  return stem || undefined
+}
+
+// The ids a player names: a placeholder carries data-embed-*, a raw iframe carries src.
+const getVideoIds = (video: Element): Array<string> => {
+  const ids = new Set<string>()
+  const dataId = video.getAttribute('data-embed-id')
+
+  if (dataId) {
+    ids.add(dataId)
+  }
+
+  for (const attribute of ['data-embed-src', 'data-embed-url', 'src']) {
+    const value = video.getAttribute(attribute)
+    const id = value ? extractVideoId(value) : undefined
+
+    if (id) {
+      ids.add(id)
+    }
+  }
+
+  return [...ids].filter((id) => id.length >= minimumKeyLength)
+}
+
+const getVideoFileStems = (video: Element): Array<string> => {
+  if (video.localName !== 'video') {
+    return []
+  }
+
+  const stems: Array<string> = []
+
+  for (const file of [video, ...video.querySelectorAll('source')]) {
+    const stem = getFileStem(file.getAttribute('src') ?? '')
+
+    if (stem && stem.length >= minimumKeyLength) {
+      stems.push(stem)
+    }
+  }
+
+  return stems
+}
+
+// An empty `poster=""` names no picture.
+export const getVideoThumbnail = (video: Element): string | undefined => {
+  return video.getAttribute('poster') || video.getAttribute('data-embed-thumbnail') || undefined
+}
+
+// Whether an image is a player's poster, from urls alone: the url names the player's id, as a
+// YouTube thumbnail or a proxied copy does, it is the player's thumbnail under another rendition,
+// or, for a player with no thumbnail, its file is named after the video file, as `clip-1280.jpg`
+// beside `clip.m3u8`. Beside a poster of its own, a file named after the video is another still.
+export const findPosterEvidence = (
+  src: string,
+  video: Element,
+  cleanUrlFn?: CleanUrlFn,
+): PosterEvidence | undefined => {
+  const decoded = decodeUrl(src)
+
+  for (const id of getVideoIds(video)) {
+    if (createIdRegex(id).exec(decoded)) {
+      return 'id'
+    }
+  }
+
+  const thumbnail = getVideoThumbnail(video)
+
+  if (thumbnail) {
+    if (getImageFingerprint(thumbnail, cleanUrlFn) === getImageFingerprint(src, cleanUrlFn)) {
+      return 'same'
+    }
+
+    return
+  }
+
+  const stem = getFileStem(src)
+
+  if (stem && getVideoFileStems(video).includes(stem)) {
+    return 'stem'
+  }
 }

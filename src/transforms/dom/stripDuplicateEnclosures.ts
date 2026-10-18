@@ -8,7 +8,7 @@ const existingMediaSelector = 'audio[src], video[src], source[src], img[src], [d
 // The image key drops a file's query, which is what tells podcast proxy episodes apart.
 // A podcast proxy's audio url is `…/play.mp3?url={episode}`, so its identity lives in the query.
 // Audio, video and embeds have no scaled variants.
-const buildMediaKey = (element: Element, cleanUrlFn?: CleanUrlFn): string => {
+export const buildMediaKey = (element: Element, cleanUrlFn?: CleanUrlFn): string => {
   const src = element.getAttribute('src') ?? element.getAttribute('data-embed-src') ?? ''
 
   if (element.localName === 'img') {

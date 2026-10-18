@@ -273,6 +273,60 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should move an inline image named after the video file onto its poster', async () => {
+    const value = html`
+      <img src="https://example.org/uploads/com-sona-150x150.png">
+      <video>
+        <source src="https://example.org/uploads/com-sona.mp4?_=6">
+      </video>
+    `
+    const expected = html`
+      <video poster="https://example.org/uploads/com-sona-150x150.png">
+        <source src="https://example.org/uploads/com-sona.mp4?_=6">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should fill an empty poster with an image named after the video file', async () => {
+    const value = html`
+      <img src="https://example.org/uploads/com-sona-150x150.png">
+      <video poster="">
+        <source src="https://example.org/uploads/com-sona.mp4">
+      </video>
+    `
+    const expected = html`
+      <video poster="https://example.org/uploads/com-sona-150x150.png">
+        <source src="https://example.org/uploads/com-sona.mp4">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a gallery photo numbered after the video file', async () => {
+    const value = html`
+      <img src="https://example.org/files/image/Wilkowiecko300825_1.jpg">
+      <video>
+        <source src="https://example.org/files/image/Wilkowiecko300825.mp4">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep an image named after the video file beside a poster of its own', async () => {
+    const value = html`
+      <img src="https://example.org/uploads/Kito-4-300x275.jpg">
+      <video poster="https://example.org/uploads/IMG_2041.jpg">
+        <source src="https://example.org/uploads/Kito-4.mp4">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should be idempotent', async () => {
     const value = html`
       <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg">
@@ -403,6 +457,34 @@ describeForEachParser('assignVideoPosters under heuristics', (parseHtml) => {
         data-embed-src="https://www.youtube.com/embed/-GraOPPwGfA"
       ></div>
       <p>All is set for the premiere.</p>
+    `
+
+    expect(await convert(value, enclosures)).toEqualHtml(expected)
+  })
+
+  it('should set the poster on the body video when the feed also lists it as an enclosure', async () => {
+    const value = html`
+      <video controls>
+        <source
+          src="https://example.org/videos/clip.mp4"
+          type="video/mp4"
+        >
+      </video>
+    `
+    const enclosures = [
+      { url: 'https://example.org/videos/clip.mp4', type: 'video/mp4' },
+      { url: 'https://example.org/images/cover.jpg', type: 'image/jpeg' },
+    ]
+    const expected = html`
+      <video
+        poster="https://example.org/images/cover.jpg"
+        controls
+      >
+        <source
+          src="https://example.org/videos/clip.mp4"
+          type="video/mp4"
+        >
+      </video>
     `
 
     expect(await convert(value, enclosures)).toEqualHtml(expected)
