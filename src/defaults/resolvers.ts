@@ -375,6 +375,7 @@ import {
 } from '../emojis/facebook.js'
 import { fc2EmojiResolver } from '../emojis/fc2.js'
 import { forumotionEmojiResolver } from '../emojis/forumotion.js'
+import { freesmileysEmojiResolver } from '../emojis/freesmileys.js'
 import { froalaElementEmojiResolver, froalaImageEmojiResolver } from '../emojis/froala.js'
 import { fudforumEmojiResolver } from '../emojis/fudforum.js'
 import { genericCharacterEmojiResolver, genericEmojiResolver } from '../emojis/generic.js'
@@ -860,6 +861,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   webWizEmojiResolver,
   shervnetEmojiResolver,
   discuzEmojiResolver,
+  freesmileysEmojiResolver,
   forumotionEmojiResolver,
   kunenaEmojiResolver,
   millannetEmojiResolver,
