@@ -148,15 +148,20 @@ export const assignVideoPosters: DomTransform = (context) => (document) => {
     return
   }
 
-  // Beside a video with a thumbnail of its own, the enclosure is often a different picture.
+  // Beside a video with a thumbnail of its own, the enclosure is often a different picture. A feed
+  // that repeats a body player as an enclosure lists the post's media, so the image is as often a
+  // featured photo or a logo as the video's poster.
   const hasThumbnail = getVideoThumbnail(video) !== undefined
+  const repeatsBodyPlayer =
+    videos.length < document.querySelectorAll('[data-embed-src], iframe[src], video').length
+  const isPoster = !hasThumbnail && !repeatsBodyPlayer
 
-  if (!hasThumbnail) {
+  if (isPoster) {
     moveImageToVideoPoster(poster, video)
   }
 
   // Without the marker a repeat run reads them as the item's own images and moves none.
-  for (const image of hasThumbnail ? [poster, ...rest] : rest) {
+  for (const image of isPoster ? rest : [poster, ...rest]) {
     image.removeAttribute(enclosureMarker)
   }
 }
