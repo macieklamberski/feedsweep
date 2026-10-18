@@ -411,6 +411,7 @@ import { nbbcEmojiResolver } from '../emojis/nbbc.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
 import { okEmojiResolver } from '../emojis/ok.js'
 import { outlookEmojiResolver } from '../emojis/outlook.js'
+import { phpbbEmojiResolver } from '../emojis/phpbb.js'
 import { pivotxEmojiResolver } from '../emojis/pivotx.js'
 import { pixnetEmojiResolver } from '../emojis/pixnet.js'
 import { punbbEmojiResolver } from '../emojis/punbb.js'
@@ -891,6 +892,9 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   jforumEmojiResolver,
   ucozEmojiResolver,
   msnEmojiResolver,
+
+  // Ahead of smilies, whose class or stock names would mark a placeholder no host serves.
+  phpbbEmojiResolver,
   smiliesEmojiResolver,
   punbbEmojiResolver,
   yahooEmojiResolver,
