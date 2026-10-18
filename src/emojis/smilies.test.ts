@@ -375,20 +375,6 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should leave a Windows Live Writer emoticon untouched', async () => {
-      const value = html`
-        <p>
-          <img
-            class="wlEmoticon wlEmoticon-smile"
-            src="https://example.com/wp-content/uploads/wlEmoticon-smile.png"
-            alt="Smile"
-          >
-        </p>
-      `
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
     it('should replace an emoticon by its emoji alt', async () => {
       const value = html`
         <p>

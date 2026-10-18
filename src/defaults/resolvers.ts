@@ -398,6 +398,7 @@ import { lexicalEmojiResolver } from '../emojis/lexical.js'
 import { liferayEmojiResolver } from '../emojis/liferay.js'
 import { livedoorEmojiResolver } from '../emojis/livedoor.js'
 import { liveinternetEmojiResolver } from '../emojis/liveinternet.js'
+import { liveWriterEmojiResolver } from '../emojis/livewriter.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
 import { maxEmojiResolver } from '../emojis/max.js'
 import { millannetEmojiResolver } from '../emojis/millannet.js'
@@ -938,6 +939,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   cuteeditorEmojiResolver,
   shinobiEmojiResolver,
   liveinternetEmojiResolver,
+  liveWriterEmojiResolver,
   greensmiliesEmojiResolver,
   smileycentralEmojiResolver,
   rcmsEmojiResolver,
