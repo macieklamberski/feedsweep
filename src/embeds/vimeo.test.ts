@@ -6,8 +6,8 @@ import {
   extractVimeoId,
   readVimeoEmbedSrc,
   vimeoEmbedResolver,
+  vimeoMetasliderEmbedResolver,
   vimeoResolveEmbed,
-  vimeoWidgetEmbedResolver,
 } from './vimeo.js'
 
 // Every url spelling that names a single video. All extract the same id, so a deleted row is a
@@ -702,8 +702,8 @@ describeForEachParser('vimeo through the pipeline', (parseHtml) => {
   })
 })
 
-describeForEachParser('vimeoWidgetEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, vimeoWidgetEmbedResolver)
+describeForEachParser('vimeoMetasliderEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, vimeoMetasliderEmbedResolver)
 
   describe('happy paths', () => {
     it('should resolve the MetaSlider Pro slide', async () => {

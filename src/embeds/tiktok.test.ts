@@ -5,8 +5,8 @@ import type { EmbedResolverResult } from '../types.js'
 import {
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
+  tiktokMetasliderEmbedResolver,
   tiktokS9eEmbedResolver,
-  tiktokWidgetEmbedResolver,
 } from './tiktok.js'
 
 // One test per shape the corpus survey found, so a shape nobody handles is visible here as a
@@ -1244,8 +1244,8 @@ describeForEachParser('tiktokS9eEmbedResolver', (parseHtml) => {
   })
 })
 
-describeForEachParser('tiktokWidgetEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, tiktokWidgetEmbedResolver)
+describeForEachParser('tiktokMetasliderEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, tiktokMetasliderEmbedResolver)
 
   describe('happy paths', () => {
     it('should resolve the MetaSlider Pro slide and keep its poster', async () => {

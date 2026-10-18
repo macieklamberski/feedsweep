@@ -188,7 +188,7 @@ describeForEachParser('TikTok', (parseHtml) => {
 
   // MetaSlider Pro writes every slide but the first hidden, and its TikTok slide is a poster and
   // a play button its script swaps for the player. The slide survives stripHiddenElements, and
-  // tiktokWidgetEmbedResolver keeps the poster as the placeholder's thumbnail.
+  // tiktokMetasliderEmbedResolver keeps the poster as the placeholder's thumbnail.
   it('should convert the MetaSlider slide into the player placeholder and keep its poster', async () => {
     const value = html`
       <ul class="slides">

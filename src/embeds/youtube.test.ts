@@ -10,8 +10,8 @@ import {
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
   youtubeIframeEmbedResolver,
+  youtubeMetasliderEmbedResolver,
   youtubeResolveEmbed,
-  youtubeWidgetEmbedResolver,
 } from './youtube.js'
 
 const watchOffsetCases: Array<[string, string]> = [
@@ -1282,8 +1282,8 @@ describeForEachParser('youtubeFc2EmbedResolver', (parseHtml) => {
   })
 })
 
-describeForEachParser('youtubeWidgetEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, youtubeWidgetEmbedResolver)
+describeForEachParser('youtubeMetasliderEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, youtubeMetasliderEmbedResolver)
 
   describe('happy paths', () => {
     it('should resolve the MetaSlider Pro slide with its start offset', async () => {

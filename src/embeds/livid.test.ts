@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { lividIframeEmbedResolver, lividResolveEmbed, lividWidgetEmbedResolver } from './livid.js'
+import {
+  lividIframeEmbedResolver,
+  lividMetasliderEmbedResolver,
+  lividResolveEmbed,
+} from './livid.js'
 
 describe('lividResolveEmbed', () => {
   describe('happy paths', () => {
@@ -173,8 +177,8 @@ describeForEachParser('lividIframeEmbedResolver', (parseHtml) => {
   })
 })
 
-describeForEachParser('lividWidgetEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, lividWidgetEmbedResolver)
+describeForEachParser('lividMetasliderEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, lividMetasliderEmbedResolver)
 
   describe('happy paths', () => {
     it('should resolve the MetaSlider lazy slide and keep its poster', async () => {

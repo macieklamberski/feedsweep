@@ -40,7 +40,7 @@ export const lividIframeEmbedResolver = createUrlEmbedResolver(lividHosts, livid
 
 // MetaSlider's lazy Livid slide parks the player iframe as markup in `data-embed`, beside a poster
 // image, and only the plugin's script swaps them.
-export const lividWidgetEmbedResolver = createMarkupEmbedResolver(
+export const lividMetasliderEmbedResolver = createMarkupEmbedResolver(
   'li.ms-livid div.ms-livid-lazy-wrap[data-embed]',
   (element) => {
     const src = attr(element, 'data-embed')?.match(iframeSrcRegex)?.[1]

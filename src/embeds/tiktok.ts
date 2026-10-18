@@ -183,7 +183,7 @@ export const tiktokS9eEmbedResolver = createS9eEmbedResolver('tiktok', (videoId)
 })
 
 // MetaSlider Pro's TikTok slide: a poster image that only the plugin's script swaps for the player.
-export const tiktokWidgetEmbedResolver = createMarkupEmbedResolver(
+export const tiktokMetasliderEmbedResolver = createMarkupEmbedResolver(
   'li.ms-tiktok div.tiktok[data-video-id]',
   (element) => {
     const videoId = attr(element, 'data-video-id')

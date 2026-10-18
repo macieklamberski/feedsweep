@@ -264,7 +264,7 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
 export const vimeoEmbedResolver = createUrlEmbedResolver(vimeoHosts, vimeoResolveEmbed)
 
 // MetaSlider Pro's Vimeo slide: an empty div that only the plugin's script builds into a player.
-export const vimeoWidgetEmbedResolver = createMarkupEmbedResolver(
+export const vimeoMetasliderEmbedResolver = createMarkupEmbedResolver(
   'li.ms-vimeo div.vimeo[data-id]',
   (element) => {
     const videoId = attr(element, 'data-id')

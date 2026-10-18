@@ -359,7 +359,7 @@ describeForEachParser('YouTube', (parseHtml) => {
     ).toEqualHtml(expected)
   })
   // MetaSlider Pro writes every slide but the first hidden, and its YouTube slide is an empty div
-  // its script builds into a player. Without youtubeWidgetEmbedResolver, stripEmptyTags deletes
+  // its script builds into a player. Without youtubeMetasliderEmbedResolver, stripEmptyTags deletes
   // the slide.
   it('should convert the hidden MetaSlider slide into the player placeholder', async () => {
     const value = html`

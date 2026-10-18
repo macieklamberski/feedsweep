@@ -212,7 +212,7 @@ import { lglformsIframeEmbedResolver, lglformsScriptEmbedResolver } from '../emb
 import { libsynEmbedResolver } from '../embeds/libsyn.js'
 import { linkedinEmbedResolver } from '../embeds/linkedin.js'
 import { listennotesEmbedResolver } from '../embeds/listennotes.js'
-import { lividIframeEmbedResolver, lividWidgetEmbedResolver } from '../embeds/livid.js'
+import { lividIframeEmbedResolver, lividMetasliderEmbedResolver } from '../embeds/livid.js'
 import { mailruEmbedResolver } from '../embeds/mailru.js'
 import { mastodonEmbedResolver } from '../embeds/mastodon.js'
 import { matterportEmbedResolver } from '../embeds/matterport.js'
@@ -310,8 +310,8 @@ import { tickettailorScriptEmbedResolver } from '../embeds/tickettailor.js'
 import {
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
+  tiktokMetasliderEmbedResolver,
   tiktokS9eEmbedResolver,
-  tiktokWidgetEmbedResolver,
 } from '../embeds/tiktok.js'
 import { tmzEmbedResolver } from '../embeds/tmz.js'
 import { traileraddictEmbedResolver } from '../embeds/traileraddict.js'
@@ -338,7 +338,7 @@ import {
   vidyardImageEmbedResolver,
   vidyardScriptEmbedResolver,
 } from '../embeds/vidyard.js'
-import { vimeoEmbedResolver, vimeoWidgetEmbedResolver } from '../embeds/vimeo.js'
+import { vimeoEmbedResolver, vimeoMetasliderEmbedResolver } from '../embeds/vimeo.js'
 import { vkEmbedResolver } from '../embeds/vk.js'
 import { vokiFlashEmbedResolver, vokiIframeEmbedResolver } from '../embeds/voki.js'
 import { wakeletEmbedResolver } from '../embeds/wakelet.js'
@@ -355,7 +355,7 @@ import {
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
   youtubeIframeEmbedResolver,
-  youtubeWidgetEmbedResolver,
+  youtubeMetasliderEmbedResolver,
 } from '../embeds/youtube.js'
 import { yumpuEmbedResolver } from '../embeds/yumpu.js'
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
@@ -649,7 +649,7 @@ const embedResolvers: Array<EmbedResolver> = [
   linkedinEmbedResolver,
   listennotesEmbedResolver,
   lividIframeEmbedResolver,
-  lividWidgetEmbedResolver,
+  lividMetasliderEmbedResolver,
   mailruEmbedResolver,
   matterportEmbedResolver,
   mediacccEmbedResolver,
@@ -750,7 +750,7 @@ const embedResolvers: Array<EmbedResolver> = [
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
   tiktokS9eEmbedResolver,
-  tiktokWidgetEmbedResolver,
+  tiktokMetasliderEmbedResolver,
   tmzEmbedResolver,
   traileraddictEmbedResolver,
   transistorEmbedResolver,
@@ -772,7 +772,7 @@ const embedResolvers: Array<EmbedResolver> = [
   vidyardImageEmbedResolver,
   vidyardScriptEmbedResolver,
   vimeoEmbedResolver,
-  vimeoWidgetEmbedResolver,
+  vimeoMetasliderEmbedResolver,
   vkEmbedResolver,
   vokiFlashEmbedResolver,
   vokiIframeEmbedResolver,
@@ -786,7 +786,7 @@ const embedResolvers: Array<EmbedResolver> = [
   youtubeIframeEmbedResolver,
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
-  youtubeWidgetEmbedResolver,
+  youtubeMetasliderEmbedResolver,
   yumpuEmbedResolver,
   zencastrBlockquoteEmbedResolver,
   zencastrIframeEmbedResolver,
