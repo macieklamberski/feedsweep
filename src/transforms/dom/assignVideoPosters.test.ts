@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { assignVideoPosters } from './assignVideoPosters.js'
@@ -185,10 +186,193 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should drop an image enclosure that is the video poster under a resize query', async () => {
+    // Constructed: the same picture as the poster, with a CDN format query.
+    const value = html`
+      <img
+        src="https://example.org/images/poster.jpg?tr=f-jpeg"
+        data-enclosure=""
+      >
+      <video
+        poster="https://example.org/images/poster.jpg"
+        src="https://example.org/videos/clip.mp4"
+      ></video>
+    `
+    const expected = html`
+      <video
+        poster="https://example.org/images/poster.jpg"
+        src="https://example.org/videos/clip.mp4"
+      ></video>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should move only the first image enclosure onto the poster and keep the rest', async () => {
+    const value = html`
+      <video
+        data-enclosure=""
+        controls
+        src="https://example.org/files/original/3804f8c681d45a5bc6e8fbfab6c0a2cc.mp4"
+      ></video>
+      <img
+        data-enclosure=""
+        src="https://example.org/files/original/44bc4331f3f615ae446637439c0fb89c.png"
+      >
+      <img
+        data-enclosure=""
+        src="https://example.org/files/original/5ac6d68ad69a2ad0012d9e1175520c22.JPG"
+      >
+      <img
+        data-enclosure=""
+        src="https://example.org/files/original/160ab58125cf1443da70aeaa1a53e93a.JPG"
+      >
+    `
+    const expected = html`
+      <video
+        data-enclosure=""
+        controls
+        src="https://example.org/files/original/3804f8c681d45a5bc6e8fbfab6c0a2cc.mp4"
+        poster="https://example.org/files/original/44bc4331f3f615ae446637439c0fb89c.png"
+      ></video>
+      <img src="https://example.org/files/original/5ac6d68ad69a2ad0012d9e1175520c22.JPG">
+      <img src="https://example.org/files/original/160ab58125cf1443da70aeaa1a53e93a.JPG">
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should move no remaining image enclosure onto the poster on a repeat run', async () => {
+    const value = html`
+      <video
+        data-enclosure=""
+        controls
+        src="https://example.org/files/original/3804f8c681d45a5bc6e8fbfab6c0a2cc.mp4"
+      ></video>
+      <img
+        data-enclosure=""
+        src="https://example.org/files/original/44bc4331f3f615ae446637439c0fb89c.png"
+      >
+      <img
+        data-enclosure=""
+        src="https://example.org/files/original/5ac6d68ad69a2ad0012d9e1175520c22.JPG"
+      >
+    `
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
+
   it('should keep an unrelated image that is not a video poster', async () => {
     const value = html`
       <img src="https://example.com/photo.jpg">
       <div data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should move an inline image named after the video file onto its poster', async () => {
+    const value = html`
+      <img src="https://example.org/uploads/com-sona-150x150.png">
+      <video>
+        <source src="https://example.org/uploads/com-sona.mp4?_=6">
+      </video>
+    `
+    const expected = html`
+      <video poster="https://example.org/uploads/com-sona-150x150.png">
+        <source src="https://example.org/uploads/com-sona.mp4?_=6">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should fill an empty poster with an image named after the video file', async () => {
+    const value = html`
+      <img src="https://example.org/uploads/com-sona-150x150.png">
+      <video poster="">
+        <source src="https://example.org/uploads/com-sona.mp4">
+      </video>
+    `
+    const expected = html`
+      <video poster="https://example.org/uploads/com-sona-150x150.png">
+        <source src="https://example.org/uploads/com-sona.mp4">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a gallery photo numbered after the video file', async () => {
+    const value = html`
+      <img src="https://example.org/files/image/Wilkowiecko300825_1.jpg">
+      <video>
+        <source src="https://example.org/files/image/Wilkowiecko300825.mp4">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should drop an image named like the video poster in another size', async () => {
+    const value = html`
+      <img src="https://example.org/video/wu_1js1kiblr/wu_1js1kiblr-1280.jpg">
+      <video poster="https://example.org/video/wu_1js1kiblr/wu_1js1kiblr.jpg">
+        <source src="https://example.org/video/wu_1js1kiblr/wu_1js1kiblr.m3u8">
+      </video>
+    `
+    const expected = html`
+      <video poster="https://example.org/video/wu_1js1kiblr/wu_1js1kiblr.jpg">
+        <source src="https://example.org/video/wu_1js1kiblr/wu_1js1kiblr.m3u8">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it("should keep another video's thumbnail with the same generic file name", async () => {
+    const value = html`
+      <img src="https://i.ytimg.com/vi/iHybI2G45OM/hqdefault.jpg">
+      <div
+        data-embed-id="FS4G3_v040A"
+        data-embed-src="https://www.youtube.com/embed/FS4G3_v040A"
+        data-embed-thumbnail="https://i.ytimg.com/vi/FS4G3_v040A/hqdefault.jpg"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a gallery photo numbered beside the video poster', async () => {
+    const value = html`
+      <img src="https://example.org/uploads/2021/10/digiro.ir-107-600x390.webp">
+      <video poster="https://example.org/uploads/2021/10/digiro.ir-108-600x364.webp">
+        <source src="https://example.org/uploads/2021/10/clip.mp4">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a screenshot sheet named after the poster with a resolution', async () => {
+    const value = html`
+      <img src="https://example.org/HLIC/IPZZ-704-1080p.jpeg">
+      <video poster="https://example.org/HLIC/IPZZ-704.jpg">
+        <source src="https://example.org/videos/trailer.mp4">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep an image named after the video file beside a poster of its own', async () => {
+    const value = html`
+      <img src="https://example.org/uploads/Kito-4-300x275.jpg">
+      <video poster="https://example.org/uploads/IMG_2041.jpg">
+        <source src="https://example.org/uploads/Kito-4.mp4">
+      </video>
     `
 
     expect(await transform(value)).toEqualHtml(value)
@@ -203,5 +387,184 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('assignVideoPosters under heuristics', (parseHtml) => {
+  const convert = (value: string, enclosures: Array<{ url: string; type?: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.org/post',
+      enclosures,
+      heuristics: true,
+    })
+  }
+
+  it('should keep every photo of an archive item beside its video', async () => {
+    const value = '<p>The Lesbian Avengers Eat Fire, Too</p>'
+    const enclosures = [
+      {
+        url: 'https://example.org/files/original/44bc4331f3f615ae446637439c0fb89c.png',
+        type: 'image/png',
+      },
+      {
+        url: 'https://example.org/files/original/3804f8c681d45a5bc6e8fbfab6c0a2cc.mp4',
+        type: 'video/mp4',
+      },
+      {
+        url: 'https://example.org/files/original/5ac6d68ad69a2ad0012d9e1175520c22.JPG',
+        type: 'image/jpeg',
+      },
+      {
+        url: 'https://example.org/files/original/160ab58125cf1443da70aeaa1a53e93a.JPG',
+        type: 'image/jpeg',
+      },
+      {
+        url: 'https://example.org/files/original/fe42a004954a215dccceec2ad6371459.JPG',
+        type: 'image/jpeg',
+      },
+    ]
+    const expected = html`
+      <video
+        poster="https://example.org/files/original/44bc4331f3f615ae446637439c0fb89c.png"
+        controls
+        src="https://example.org/files/original/3804f8c681d45a5bc6e8fbfab6c0a2cc.mp4"
+      ></video>
+      <img src="https://example.org/files/original/5ac6d68ad69a2ad0012d9e1175520c22.JPG">
+      <img src="https://example.org/files/original/160ab58125cf1443da70aeaa1a53e93a.JPG">
+      <img src="https://example.org/files/original/fe42a004954a215dccceec2ad6371459.JPG">
+      <p>The Lesbian Avengers Eat Fire, Too</p>
+    `
+
+    expect(await convert(value, enclosures)).toEqualHtml(expected)
+  })
+
+  it('should keep an image enclosure listed after the video in its place', async () => {
+    const value = '<p>Antonello Colonna, chef alle Olimpiadi.</p>'
+    const enclosures = [
+      { url: 'https://example.org/pictures/2025/11/27/162638436-f0210e19.jpg', type: 'image/jpeg' },
+      { url: 'https://example.org/pictures/2025/11/27/162638437-dca5ca4a.jpg', type: 'image/jpeg' },
+      {
+        url: 'https://example.org/1/273/cf1af260-ae33-4fb5-91d8-71418391765b.mp4',
+        type: 'video/mp4',
+      },
+      {
+        url: 'https://example.org/pictures/kolumbus/2025/11/27/a82710ec_thumb_1764260796233.jpg',
+        type: 'image/jpeg',
+      },
+    ]
+    const expected = html`
+      <img src="https://example.org/pictures/2025/11/27/162638437-dca5ca4a.jpg">
+      <video
+        poster="https://example.org/pictures/2025/11/27/162638436-f0210e19.jpg"
+        controls
+        src="https://example.org/1/273/cf1af260-ae33-4fb5-91d8-71418391765b.mp4"
+      ></video>
+      <img src="https://example.org/pictures/kolumbus/2025/11/27/a82710ec_thumb_1764260796233.jpg">
+      <p>Antonello Colonna, chef alle Olimpiadi.</p>
+    `
+
+    expect(await convert(value, enclosures)).toEqualHtml(expected)
+  })
+
+  it('should drop a YouTube thumbnail enclosure on its YouTube video', async () => {
+    const value = '<p>You can see the interview below.</p>'
+    const enclosures = [
+      { url: 'https://img.youtube.com/vi/UaVU95gsXW8/0.jpg', type: 'image/jpeg' },
+      { url: 'https://www.youtube.com/embed/UaVU95gsXW8' },
+    ]
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/UaVU95gsXW8/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=UaVU95gsXW8"
+        data-embed-id="UaVU95gsXW8"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/UaVU95gsXW8"
+      ></div>
+      <p>You can see the interview below.</p>
+    `
+
+    expect(await convert(value, enclosures)).toEqualHtml(expected)
+  })
+
+  it('should keep a single image enclosure when the embed already has a thumbnail', async () => {
+    const value = '<p>All is set for the premiere.</p>'
+    const enclosures = [
+      {
+        url: 'https://example.org/downloads/698/download/premiere.jpg?cb=3d7c6da47266c12d',
+        type: 'image/jpeg',
+      },
+      { url: 'http://www.youtube.com/watch?v=-GraOPPwGfA' },
+    ]
+    const expected = html`
+      <img src="https://example.org/downloads/698/download/premiere.jpg?cb=3d7c6da47266c12d">
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/-GraOPPwGfA/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=-GraOPPwGfA"
+        data-embed-id="-GraOPPwGfA"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/-GraOPPwGfA"
+      ></div>
+      <p>All is set for the premiere.</p>
+    `
+
+    expect(await convert(value, enclosures)).toEqualHtml(expected)
+  })
+
+  it('should keep the image enclosure beside a body video the feed also lists as an enclosure', async () => {
+    const value = html`
+      <video controls>
+        <source
+          src="https://example.org/videos/clip.mp4"
+          type="video/mp4"
+        >
+      </video>
+    `
+    const enclosures = [
+      { url: 'https://example.org/videos/clip.mp4', type: 'video/mp4' },
+      { url: 'https://example.org/images/cover.jpg', type: 'image/jpeg' },
+    ]
+    const expected = html`
+      <img src="https://example.org/images/cover.jpg">
+      <video controls>
+        <source
+          src="https://example.org/videos/clip.mp4"
+          type="video/mp4"
+        >
+      </video>
+    `
+
+    expect(await convert(value, enclosures)).toEqualHtml(expected)
+  })
+
+  it('should keep a second rendition of the poster under another file name', async () => {
+    const value = '<p>Amnistía Internacional ha detectado casos de tortura.</p>'
+    const enclosures = [
+      {
+        url: 'https://example.org/imagenes/2014/05/12/actualidad/1399918141_217201_1399920928_miniatura_normal.jpg',
+        type: 'image/jpeg',
+      },
+      {
+        url: 'https://example.org/imagenes/2014/05/12/actualidad/1399918141_217201_1399920928_noticia_normal.jpg',
+        type: 'image/jpeg',
+      },
+      {
+        url: 'https://example.org/videos/2014/05/12/actualidad/1399918141_217201_1399965313.mp4',
+        type: 'video/m4v',
+      },
+    ]
+    const expected = html`
+      <img src="https://example.org/imagenes/2014/05/12/actualidad/1399918141_217201_1399920928_noticia_normal.jpg">
+      <video
+        poster="https://example.org/imagenes/2014/05/12/actualidad/1399918141_217201_1399920928_miniatura_normal.jpg"
+        controls
+        src="https://example.org/videos/2014/05/12/actualidad/1399918141_217201_1399965313.mp4"
+      ></video>
+      <p>Amnistía Internacional ha detectado casos de tortura.</p>
+    `
+
+    expect(await convert(value, enclosures)).toEqualHtml(expected)
   })
 })

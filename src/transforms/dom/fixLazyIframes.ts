@@ -27,7 +27,6 @@ export const fixLazyIframes: DomTransform = (context) => {
       const value = getLazyValue(iframe, lazyIframeAttributes)
 
       if (value) {
-        // resolveRelativeUrls already ran, so a protocol-relative value resolves here or never.
         iframe.setAttribute('src', resolveUrlFn(value, baseUrl) ?? value)
       }
     }

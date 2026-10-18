@@ -1,5 +1,5 @@
 import { parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { composeQuery, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -25,12 +25,11 @@ const readDate = (id: string): string | undefined => {
 const cnnHosts = ['cnn.com', 'cnn.io']
 const cdnHosts = ['cdn.turner.com']
 
-// Safe only while the id shape refuses the `me{40 hex}` ids that name CNN's portrait clips.
 // The fave shell is a `padding-bottom: 56.25%` box, and ids of this form have 16:9 renditions.
 const playerRatio = '16/9'
 
-// The player answers 200 for any id. `cnn.com/videos/{id}` answers 200 for a real id and 404 for a
-// fabricated one.
+// The player answers 200 for any id. `cnn.com/videos/{id}` answers 404 for a fabricated id, and for
+// some real ones.
 const composeEmbed = (id: string): EmbedResolverResult => {
   const query = composeQuery({ video: id, customer: 'cnn', edition: 'domestic', env: 'prod' })
 
@@ -72,10 +71,18 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
 export const cnnResolveEmbed: ResolveEmbed = (url, element) => {
   const target = resolveTarget(url)
 
-  return target && { ...target, title: attr(element, 'title') }
+  if (!target) {
+    return
+  }
+
+  return {
+    ...target,
+    title: attr(element, 'title'),
+  }
 }
 
-// CNN's player iframe: the fave one still serves, the 2014 and 2008 ones load nothing today.
+// CNN's player iframe. The fave shell serves but its video does not play: the stream host answers
+// 400 "[No Host]". The 2014 and 2008 ones load nothing today.
 export const cnnIframeEmbedResolver = createUrlEmbedResolver(cnnHosts, cnnResolveEmbed)
 
 // The Flash player, `i.cdn.turner.com/cnn/.element/apps/cvp/3.0/swf/{player}.swf?…&videoId={id}`,
@@ -105,10 +112,3 @@ export const cnnScriptEmbedResolver = createMarkupEmbedResolver(
     return resolveVideoId(parsed?.searchParams.get('vid'))
   },
 )
-
-// Only the literal `autostart=true` starts playback: the player reads `1` as false.
-// The shell reads it as `autostart === 'true'` in `fave.api.cnn.io/js/lib/components/common.js`.
-export const cnnRenderHint: EmbedRenderHint = {
-  provider,
-  autoplayParams: { autostart: 'true' },
-}

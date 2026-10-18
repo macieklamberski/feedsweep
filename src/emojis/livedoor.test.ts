@@ -1,5 +1,5 @@
 import { expect, it } from 'bun:test'
-import { describeForEachParser, emojiConverters } from '../tests.js'
+import { describeForEachParser, emojiConverters, html } from '../tests.js'
 
 describeForEachParser('livedoorEmojiResolver', (parseHtml) => {
   const { transform } = emojiConverters(parseHtml)
@@ -16,6 +16,28 @@ describeForEachParser('livedoorEmojiResolver', (parseHtml) => {
     const value = '<p><img alt="" src="https://common.blogimg.jp/emoji/137414.gif"></p>'
     const expected =
       '<p><img data-emoji="" alt="" src="https://common.blogimg.jp/emoji/137414.gif"></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a pictogram whose alt is an emoji as a marked picture', async () => {
+    const value = html`
+      <p>
+        <img
+          alt="😀"
+          src="https://common.blogimg.jp/emoji/137414.gif"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          alt="😀"
+          src="https://common.blogimg.jp/emoji/137414.gif"
+        >
+      </p>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })

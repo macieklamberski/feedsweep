@@ -358,4 +358,74 @@ describeForEachParser('YouTube', (parseHtml) => {
       await transformContent('<p>Body</p>', { parseHtmlFn: parseHtml, enclosures }),
     ).toEqualHtml(expected)
   })
+  // MetaSlider Pro writes every slide but the first hidden, and its YouTube slide is an empty div
+  // its script builds into a player. Without youtubeMetasliderEmbedResolver, stripEmptyTags deletes
+  // the slide.
+  it('should convert the hidden MetaSlider slide into the player placeholder', async () => {
+    const value = html`
+      <ul class="slides">
+        <li
+          class="slide-26693 ms-youtube "
+          style="display: none; width: 100%;"
+          data-slide-type="youtube"
+        >
+          <div
+            style="position:relative;padding-bottom:178.08988764045%;height:0"
+            class="youtube"
+            data-id="aQD0yfzOJsU"
+            data-start="0"
+            data-lazy-load="0"
+          ></div>
+        </li>
+      </ul>
+    `
+    const expected = html`
+      <ul class="slides">
+        <li
+          class="slide-26693 ms-youtube"
+          style=" width: 100%;"
+          data-slide-type="youtube"
+        >
+          <div
+            data-embed-provider="youtube"
+            data-embed-id="aQD0yfzOJsU"
+            data-embed-src="https://www.youtube.com/embed/aQD0yfzOJsU?start=0"
+            data-embed-url="https://www.youtube.com/watch?v=aQD0yfzOJsU"
+            data-embed-thumbnail="https://i.ytimg.com/vi/aQD0yfzOJsU/hqdefault.jpg"
+            data-embed-ratio="16/9"
+          ></div>
+        </li>
+      </ul>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+})
+
+// A WordPress video shortcode naming the watch page, which no browser plays.
+describeForEachParser('YouTube pages in a media element', (parseHtml) => {
+  it('should frame a video shortcode naming a watch page', async () => {
+    const value = html`
+      <p>
+        <video
+          class="wp-video-shortcode"
+          id="video-4724-3"
+          preload="none"
+          controls="controls"
+        ><source type="video/youtube" src="https://www.youtube.com/watch?v=qa-d1guhpb4&amp;_=3"></video>
+      </p>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/qa-d1guhpb4/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=qa-d1guhpb4"
+        data-embed-id="qa-d1guhpb4"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/qa-d1guhpb4"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })

@@ -1,6 +1,6 @@
-import { type Nullish, parseUrl, trimObject } from 'trousse'
+import { coerceNumber, isHostOrSubdomainOf, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, find, text } from '../utils/dom.js'
+import { attr, find, flashVar, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import {
@@ -108,6 +108,8 @@ export const facebookAmpEmbedResolver = createMarkupEmbedResolver(
 const pluginPathRegex = /^(?:\/v\d+(?:\.\d+)?)?\/plugins\/(?:post|video)\.php$/
 // The pre-plugins video frame from old posts, naming its video in `video_id`.
 const legacyVideoPathRegex = /^\/video\/embed$/
+// The Flash player from older posts, naming its video in the path. Facebook answers it with 400.
+const flashVideoPathRegex = /^\/v\/([^/]+)$/
 
 // Whole segments, not `\b`: `reel-big-fish` and `video.game.news` are page names.
 // A video, reel or watch path is the video player, and everything else Facebook frames is a post.
@@ -122,6 +124,13 @@ const watchPathRegex = /^\/watch\/?$/
 
 const isWatchPage = (url: URL): boolean => {
   return watchPathRegex.test(url.pathname) && Boolean(url.searchParams.get('v'))
+}
+
+// A legacy player names only the video id, which the watch page plays.
+const composeWatchEmbed = (videoId: string): EmbedResolverResult => {
+  const watchUrl = `https://www.facebook.com/watch/${composeQuery({ v: videoId })}`
+
+  return composePluginEmbed('video', watchUrl, { id: videoId })
 }
 
 // A post has no name: its words go to `description`, and the frame titles itself
@@ -140,9 +149,16 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
       return
     }
 
-    const watchUrl = `https://www.facebook.com/watch/${composeQuery({ v: videoId })}`
+    return composeWatchEmbed(videoId)
+  }
 
-    return composePluginEmbed('video', watchUrl, { id: videoId })
+  // `fb.watch/v/{code}` is a short link to another id, so the route is read on facebook.com only.
+  if (isHostOrSubdomainOf(parsed, 'facebook.com')) {
+    const flashVideoId = flashVideoPathRegex.exec(parsed.pathname)?.[1]
+
+    if (flashVideoId) {
+      return composeWatchEmbed(flashVideoId)
+    }
   }
 
   if (contentPathRegex.test(parsed.pathname) || isWatchPage(parsed)) {
@@ -173,6 +189,31 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
 export const facebookIframeEmbedResolver = createUrlEmbedResolver(
   facebookHosts,
   facebookResolveEmbed,
+)
+
+// The Flash player before `/v/`, `/swf/mvp.swf` on Facebook's static hosts, naming its video in
+// flashvars `video_id`. The share player names only a file and stays unresolved.
+const mvpPathRegex = /^\/swf\/mvp\.swf$/
+
+const facebookFlashResolveEmbed: ResolveEmbed = (url, element) => {
+  const parsed = parseUrl(url)
+  const videoId = flashVar(element, 'video_id')
+
+  if (!parsed || !mvpPathRegex.test(parsed.pathname) || !videoId) {
+    return
+  }
+
+  return {
+    ...composeWatchEmbed(videoId),
+    title: flashVar(element, 'video_title'),
+    author: flashVar(element, 'video_owner_name'),
+    duration: coerceNumber(flashVar(element, 'video_seconds')),
+  }
+}
+
+export const facebookFlashEmbedResolver = createUrlEmbedResolver(
+  ['static.ak.facebook.com', 'static.ak.fbcdn.net'],
+  facebookFlashResolveEmbed,
 )
 
 // The helper frame's fragment spells the content four ways: `{page}/posts/{id}` or

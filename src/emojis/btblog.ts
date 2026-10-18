@@ -9,6 +9,6 @@ export const btblogEmojiResolver: EmojiResolver = {
     'img[src*=".buttobi.net/im/emoticon/" i]',
   ].join(', '),
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

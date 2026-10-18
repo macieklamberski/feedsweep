@@ -37,6 +37,7 @@ export type EmbedResolverResult = {
   width?: number
   height?: number
   ratio?: string
+  ratioHeightOffset?: number
   title?: string
   description?: string
   author?: string
