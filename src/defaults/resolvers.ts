@@ -212,6 +212,7 @@ import { lglformsIframeEmbedResolver, lglformsScriptEmbedResolver } from '../emb
 import { libsynEmbedResolver } from '../embeds/libsyn.js'
 import { linkedinEmbedResolver } from '../embeds/linkedin.js'
 import { listennotesEmbedResolver } from '../embeds/listennotes.js'
+import { lividIframeEmbedResolver, lividWidgetEmbedResolver } from '../embeds/livid.js'
 import { mailruEmbedResolver } from '../embeds/mailru.js'
 import { mastodonEmbedResolver } from '../embeds/mastodon.js'
 import { matterportEmbedResolver } from '../embeds/matterport.js'
@@ -647,6 +648,8 @@ const embedResolvers: Array<EmbedResolver> = [
   libsynEmbedResolver,
   linkedinEmbedResolver,
   listennotesEmbedResolver,
+  lividIframeEmbedResolver,
+  lividWidgetEmbedResolver,
   mailruEmbedResolver,
   matterportEmbedResolver,
   mediacccEmbedResolver,
