@@ -127,6 +127,60 @@ describeForEachParser('createEmbedPlaceholder', (parseHtml) => {
 
       expect(element.outerHTML).toEqualHtml(expected)
     })
+
+    it('should write the height offset beside the ratio', () => {
+      const document = parseHtml('')
+      const element = createEmbedPlaceholder(document, {
+        src: 'https://embed.example/abc',
+        ratio: '16/9',
+        ratioHeightOffset: 175,
+      })
+
+      const expected = html`
+        <div
+          data-embed-src="https://embed.example/abc"
+          data-embed-ratio="16/9"
+          data-embed-ratio-height-offset="175"
+        >
+        </div>
+      `
+
+      expect(element.outerHTML).toEqualHtml(expected)
+    })
+
+    it('should drop the height offset with the ratio when the metadata also states a size', () => {
+      const document = parseHtml('')
+      const element = createEmbedPlaceholder(document, {
+        src: 'https://embed.example/abc',
+        width: 560,
+        height: 315,
+        ratio: '16/9',
+        ratioHeightOffset: 175,
+      })
+
+      const expected = html`
+        <div
+          data-embed-src="https://embed.example/abc"
+          data-embed-width="560"
+          data-embed-height="315"
+        >
+        </div>
+      `
+
+      expect(element.outerHTML).toEqualHtml(expected)
+    })
+
+    it('should drop a height offset that comes with no ratio', () => {
+      const document = parseHtml('')
+      const element = createEmbedPlaceholder(document, {
+        src: 'https://embed.example/abc',
+        ratioHeightOffset: 175,
+      })
+
+      const expected = '<div data-embed-src="https://embed.example/abc"></div>'
+
+      expect(element.outerHTML).toEqualHtml(expected)
+    })
   })
 
   it.todo('should write the full metadata as data-embed-* attributes', () => {
@@ -251,6 +305,28 @@ describeForEachParser('updateEmbedPlaceholder', (parseHtml) => {
   // since a later write is a better-informed one, and dimensions beat a ratio when both arrive at
   // once because they are the more specific claim.
   describe('a size arriving beside a shape', () => {
+    it('should replace the ratio and its height offset with a size the enrichment brings', () => {
+      const document = parseHtml('')
+      const element = document.createElement('div')
+      element.setAttribute('data-embed-ratio', '16/9')
+      element.setAttribute('data-embed-ratio-height-offset', '175')
+
+      updateEmbedPlaceholder(element, {
+        width: 560,
+        height: 315,
+      })
+
+      const expected = html`
+        <div
+          data-embed-width="560"
+          data-embed-height="315"
+        >
+        </div>
+      `
+
+      expect(element.outerHTML).toEqualHtml(expected)
+    })
+
     it('should replace the ratio with a size the enrichment brings', () => {
       const document = parseHtml('')
       const element = document.createElement('div')
@@ -640,6 +716,7 @@ describe('normalizeEmbedFields', () => {
         width: 1,
         height: 2,
         ratio: '16/9',
+        ratioHeightOffset: 4,
         title: 't',
         description: 'd',
         author: 'a',
@@ -659,6 +736,7 @@ describe('normalizeEmbedFields', () => {
         'width',
         'height',
         'ratio',
+        'ratio-height-offset',
         'title',
         'description',
         'author',

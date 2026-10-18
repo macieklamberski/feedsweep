@@ -146,7 +146,13 @@ const decideSize = (
   }
 
   // Never merged: a publisher's width beside a resolver's height is a box nobody measured.
-  const { width: _width, height: _height, ratio: _ratio, ...rest } = result
+  const {
+    width: _width,
+    height: _height,
+    ratio: _ratio,
+    ratioHeightOffset: _ratioHeightOffset,
+    ...rest
+  } = result
 
   return { ...rest, ...declared }
 }
@@ -397,6 +403,9 @@ export const normalizeEmbedFields = (
     width: metadata.width ? String(metadata.width) : undefined,
     height: metadata.height ? String(metadata.height) : undefined,
     ratio: metadata.ratio,
+    'ratio-height-offset': metadata.ratioHeightOffset
+      ? String(metadata.ratioHeightOffset)
+      : undefined,
     title: metadata.title,
     description: metadata.description,
     author: metadata.author,
@@ -418,10 +427,15 @@ export const updateEmbedPlaceholder = (
     element.removeAttribute('data-embed-width')
     element.removeAttribute('data-embed-height')
     element.removeAttribute('data-embed-ratio')
+    element.removeAttribute('data-embed-ratio-height-offset')
   }
 
   if (hasDimensions(fields)) {
     fields.ratio = undefined
+  }
+
+  if (!fields.ratio) {
+    fields['ratio-height-offset'] = undefined
   }
 
   updatePlaceholder(element, 'embed', fields)
