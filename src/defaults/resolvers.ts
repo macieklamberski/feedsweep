@@ -398,6 +398,7 @@ import { livedoorEmojiResolver } from '../emojis/livedoor.js'
 import { liveinternetEmojiResolver } from '../emojis/liveinternet.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
 import { maxEmojiResolver } from '../emojis/max.js'
+import { millannetEmojiResolver } from '../emojis/millannet.js'
 import { mixiEmojiResolver } from '../emojis/mixi.js'
 import { monalisaEmojiResolver } from '../emojis/monalisa.js'
 import { moodleEmojiResolver } from '../emojis/moodle.js'
@@ -858,6 +859,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   discuzEmojiResolver,
   forumotionEmojiResolver,
   kunenaEmojiResolver,
+  millannetEmojiResolver,
   invisionEmojiResolver,
 
   // Ahead of the forum engines and smilies, whose class and directory matches take a hotlinked
