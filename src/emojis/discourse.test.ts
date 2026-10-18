@@ -119,13 +119,28 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
     const value = html`
       <p>
         <img
-          src="https://forum.example.com/images/emoji/twitter/couple_with_heart_man_man/6.png?v=12"
+          src="https://forum.example.com/images/emoji/twitter/couple_with_heart_woman_woman/6.png?v=12"
           class="emoji"
-          alt=":couple_with_heart_man_man:t6:"
+          alt=":couple_with_heart_woman_woman:t6:"
         >
       </p>
     `
-    const expected = '<p>👨🏿‍❤️‍👨🏿</p>'
+    const expected = '<p>👩🏿‍❤️‍👩🏿</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should draw the woman and man couple with heart as the couple with heart', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://forum.example.com/images/emoji/twitter/couple_with_heart_woman_man/6.png?v=12"
+          class="emoji"
+          alt=":couple_with_heart_woman_man:t6:"
+        >
+      </p>
+    `
+    const expected = '<p>💑🏿</p>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
