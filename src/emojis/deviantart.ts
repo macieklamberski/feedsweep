@@ -7,7 +7,7 @@ export const deviantartEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: [
     'img[src*="//e.deviantart.net/emoticons/" i]',
-    'img[src*="//e.deviantart.com/emoticons/" i]', // The host before deviantart.net
+    'img[src*="//e.deviantart.com/emoticons/" i]',
     'img[src*="//s.deviantart.net/emoticons/" i]',
     'img[src*="//st.deviantart.net/emoticons/" i]',
   ].join(', '),
