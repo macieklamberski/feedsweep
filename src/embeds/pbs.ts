@@ -61,8 +61,9 @@ const flashPortalRoutes = toMap({
 // The clip bounds and the chapter, the playback parameters the player reads besides the id.
 const playbackParams = ['start', 'end', 'chapter']
 
-// A 16:9 video above a control bar of fixed height, so the ratio errs tall at narrow widths.
-const playerRatio = '13/9'
+// The viral player shows a top bar above its 16:9 video, and the partner players show none.
+const playerRatio = '16/9'
+const viralTopBarHeight = 40
 
 // The route qualifies the id, since a numeric id also fits the slug alphabet and an id alone
 // addresses neither space.
@@ -82,6 +83,7 @@ const composeEmbed = (
     id: `${idSpace}/${videoId}`,
     src: `https://${playerHost}/${route}/${videoId}/${query}`,
     ratio: playerRatio,
+    ratioHeightOffset: route === 'viralplayer' ? viralTopBarHeight : undefined,
   }
 }
 
