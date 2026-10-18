@@ -385,6 +385,34 @@ describeForEachParser('assignVideoPosters under heuristics', (parseHtml) => {
     expect(await convert(value, enclosures)).toEqualHtml(expected)
   })
 
+  it('should set the poster on the body video when the feed also lists it as an enclosure', async () => {
+    const value = html`
+      <video controls>
+        <source
+          src="https://example.org/videos/clip.mp4"
+          type="video/mp4"
+        >
+      </video>
+    `
+    const enclosures = [
+      { url: 'https://example.org/videos/clip.mp4', type: 'video/mp4' },
+      { url: 'https://example.org/images/cover.jpg', type: 'image/jpeg' },
+    ]
+    const expected = html`
+      <video
+        poster="https://example.org/images/cover.jpg"
+        controls
+      >
+        <source
+          src="https://example.org/videos/clip.mp4"
+          type="video/mp4"
+        >
+      </video>
+    `
+
+    expect(await convert(value, enclosures)).toEqualHtml(expected)
+  })
+
   it('should keep a second rendition of the poster under another file name', async () => {
     const value = '<p>Amnistía Internacional ha detectado casos de tortura.</p>'
     const enclosures = [

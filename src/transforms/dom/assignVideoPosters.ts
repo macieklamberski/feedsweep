@@ -1,9 +1,10 @@
 import { escapeRegex } from 'trousse'
 import { extractVideoId } from '../../embeds/youtube.js'
-import type { DomTransform } from '../../types.js'
+import type { DomTransform, TransformContext } from '../../types.js'
 import { removeWithEmptyWrappers } from '../../utils/dom.js'
 import { updateEmbedPlaceholder } from '../../utils/widgets.js'
 import { enclosureMarker } from './injectEnclosures.js'
+import { buildMediaKey } from './stripDuplicateEnclosures.js'
 
 // A YouTube thumbnail URL carries the video id in a `/vi/{id}/` segment, e.g.
 // https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg. extractVideoId only reads
@@ -57,18 +58,63 @@ const collectEmbedsByVideoId = (document: Document): Map<string, Element> => {
   return embeds
 }
 
-// The video element of a video-led item: a native <video>, or an embed
-// (placeholder/iframe) pointing at a known video host.
-const findVideoElement = (document: Document): Element | undefined => {
-  const native = document.querySelector('video[src], video > source[src]')
-  if (native) {
-    return native.localName === 'source' ? (native.parentElement ?? undefined) : native
+const getFileKeys = (player: Element, context: TransformContext): Array<string> => {
+  const keys: Array<string> = []
+
+  for (const file of [player, ...player.querySelectorAll('source')]) {
+    const key = buildMediaKey(file, context.cleanUrlFn)
+
+    if (key) {
+      keys.push(key)
+    }
   }
 
-  for (const element of document.querySelectorAll('[data-embed-src], iframe[src]')) {
-    const src = element.getAttribute('data-embed-src') ?? element.getAttribute('src') ?? ''
-    if (videoHostRegex.test(src)) {
-      return element
+  return keys
+}
+
+// The item's players, without an injected enclosure that repeats one of the body:
+// stripDuplicateEnclosures removes that copy later, with any poster set on it.
+const collectPlayers = (document: Document, context: TransformContext): Array<Element> => {
+  const all = [...document.querySelectorAll('[data-embed-src], iframe[src], video')]
+  const bodyKeys = new Set<string>()
+
+  for (const player of all) {
+    if (!player.hasAttribute(enclosureMarker)) {
+      for (const key of getFileKeys(player, context)) {
+        bodyKeys.add(key)
+      }
+    }
+  }
+
+  const players: Array<Element> = []
+
+  for (const player of all) {
+    const isRepeat =
+      player.hasAttribute(enclosureMarker) &&
+      getFileKeys(player, context).some((key) => bodyKeys.has(key))
+
+    if (!isRepeat) {
+      players.push(player)
+    }
+  }
+
+  return players
+}
+
+// The video element of a video-led item: a native <video>, or an embed
+// (placeholder/iframe) pointing at a known video host.
+const findVideoElement = (players: Array<Element>): Element | undefined => {
+  for (const player of players) {
+    if (player.localName === 'video' && player.matches('video[src], video:has(> source[src])')) {
+      return player
+    }
+  }
+
+  for (const player of players) {
+    const src = player.getAttribute('data-embed-src') ?? player.getAttribute('src') ?? ''
+
+    if (player.localName !== 'video' && videoHostRegex.test(src)) {
+      return player
     }
   }
 }
@@ -102,7 +148,7 @@ const moveImageToVideoPoster = (image: Element, video: Element, overwrite = fals
 
 // A video's poster shipped as a second image: a thumbnail beside its embed, or an image enclosure.
 // WordPress lazy-embed plugins ship the YouTube thumbnail beside the embed.
-export const assignVideoPosters: DomTransform = () => (document) => {
+export const assignVideoPosters: DomTransform = (context) => (document) => {
   // (A) An inline image whose URL is a thumbnail of an embedded video, matched by id.
   const embedsByVideoId = collectEmbedsByVideoId(document)
   if (embedsByVideoId.size > 0) {
@@ -121,7 +167,7 @@ export const assignVideoPosters: DomTransform = () => (document) => {
 
   // (B) An injected image enclosure on a video-led item: a video is embedded and
   // the item has no inline image of its own: the first image is the video's poster.
-  const video = findVideoElement(document)
+  const video = findVideoElement(collectPlayers(document, context))
   if (!video || document.querySelector(`img[src]:not([${enclosureMarker}])`)) {
     return
   }
