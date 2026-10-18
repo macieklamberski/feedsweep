@@ -130,6 +130,7 @@ import { educaplayEmbedResolver } from '../embeds/educaplay.js'
 import {
   facebookAmpEmbedResolver,
   facebookBlockquoteEmbedResolver,
+  facebookFlashEmbedResolver,
   facebookIframeEmbedResolver,
   facebookS9eEmbedResolver,
   facebookWidgetEmbedResolver,
@@ -566,6 +567,7 @@ const embedResolvers: Array<EmbedResolver> = [
   dvidsEmbedResolver,
   educaplayEmbedResolver,
   facebookWidgetEmbedResolver,
+  facebookFlashEmbedResolver,
   facebookIframeEmbedResolver,
   facebookS9eEmbedResolver,
   facebookBlockquoteEmbedResolver,
