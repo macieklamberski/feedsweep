@@ -1,5 +1,5 @@
 import type { EmojiResolver } from '../types.js'
-import { noEmojiNames, resolveEmojiImage } from '../utils/emojis.js'
+import { resolveEmojiImage } from '../utils/emojis.js'
 
 // Moodle's theme image server, serving the core `s` folder, which holds only emoticons. Some
 // themes print the revision followed by a doubled slash.
@@ -19,6 +19,6 @@ export const moodleEmojiResolver: EmojiResolver = {
       return
     }
 
-    return resolveEmojiImage(element, { isStrong: true, names: noEmojiNames })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

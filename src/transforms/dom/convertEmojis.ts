@@ -1,6 +1,10 @@
 import type { DomTransform } from '../../types.js'
 import { batchSelectors, walkElements } from '../../utils/dom.js'
-import { emojiImageAttribute, withEmojiPresentation } from '../../utils/emojis.js'
+import {
+  emojiImageAttribute,
+  unwrapProxiedEmoji,
+  withEmojiPresentation,
+} from '../../utils/emojis.js'
 
 const wrapFallbackText = (document: Document, text: string): Element => {
   const span = document.createElement('span')
@@ -31,21 +35,54 @@ export const convertEmojis: DomTransform = (context) => {
   const selectors = batchSelectors(emojiResolvers.map((resolver) => resolver.selector))
 
   return (document) => {
-    if (!selectors.length) {
+    // Linkedom compiles the selector on every matches call. The query results come batch by
+    // batch, out of document order, so the walk still sets the order.
+    const candidates = new Set(selectors.flatMap((batch) => [...document.querySelectorAll(batch)]))
+
+    // A proxied image matches no selector as written, so the query cannot find it.
+    for (const image of document.querySelectorAll('img[src]')) {
+      if (unwrapProxiedEmoji(image) !== image) {
+        candidates.add(image)
+      }
+    }
+
+    if (!candidates.size) {
       return
     }
 
+    // A selector that reads siblings can start matching once an extract changes the tree.
+    let isChanged = false
+
     walkElements(document, (element) => {
-      if (!selectors.some((batch) => element.matches(batch))) {
+      const isMatch =
+        candidates.has(element) || (isChanged && selectors.some((batch) => element.matches(batch)))
+
+      if (!isMatch) {
         return
       }
 
+      // A copy carrying the url behind an image proxy, matched only when the image itself is not,
+      // since the copy has no ancestors for a selector to read.
+      const target = unwrapProxiedEmoji(element)
+      const matches = (selector: string): Element | undefined => {
+        if (element.matches(selector)) {
+          return element
+        }
+
+        if (target !== element && target.matches(selector)) {
+          return target
+        }
+      }
+
       for (const resolver of emojiResolvers) {
-        if (!element.matches(resolver.selector)) {
+        const matched = matches(resolver.selector)
+
+        if (!matched) {
           continue
         }
 
-        const result = resolver.extract(element)
+        isChanged = true
+        const result = resolver.extract(matched)
 
         if (!result) {
           continue

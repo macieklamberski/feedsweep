@@ -46,4 +46,28 @@ describeForEachParser('discordEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should keep a server emoji whose alt is an emoji as a marked picture', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://cdn.discordapp.com/emojis/449171648310935553.webp?size=44"
+          alt="😀"
+          class="jsResizeImage"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://cdn.discordapp.com/emojis/449171648310935553.webp?size=44"
+          alt="😀"
+          class="jsResizeImage"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
 })

@@ -104,6 +104,17 @@ describeForEachParser('stripDuplicateLeadingImages', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should remove a leading image whose repeat differs only by an extensionless rendition query', async () => {
+      const value = html`
+        <img src="https://storage.ning.com/topology/rest/1.0/file/get/2114616514?profile=RESIZE_710x&width=240&format=jpg">
+        <img src="https://storage.ning.com/topology/rest/1.0/file/get/2114616514?profile=RESIZE_710x&width=623&format=jpg">
+      `
+      const expected =
+        '<img src="https://storage.ning.com/topology/rest/1.0/file/get/2114616514?profile=RESIZE_710x&width=623&format=jpg">'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should remove a leading image whose repeat hides behind an image proxy', async () => {
       const value = html`
         <img src="https://i0.wp.com/example.com/uploads/photo.jpg">
@@ -250,6 +261,15 @@ describeForEachParser('stripDuplicateLeadingImages', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should keep distinct images an extensionless endpoint names in its query', async () => {
+      const value = html`
+        <img src="http://docs.google.com/File?id=dhg5zdns_511hnhczncm_b">
+        <img src="http://docs.google.com/File?id=dhg5zdns_507f8q6dqch_b">
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should keep a document with no images', async () => {
       const value = '<p>Content</p>'
 
@@ -287,6 +307,37 @@ describeForEachParser('stripDuplicateLeadingImages under heuristics', (parseHtml
       <p>
         <img src="https://example.com/uploads/photo.jpg">
       </p>
+      <p>Content</p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep two leading images told apart only by the query', async () => {
+    const value = html`
+      <figure>
+        <img src="https://placehold.co/1200x675/png?text=ZK5%20article-052%20A">
+      </figure>
+      <figure>
+        <img src="https://placehold.co/1200x675/png?text=ZK5%20article-052%20B">
+      </figure>
+      <p>Content</p>
+    `
+    const expected = html`
+      <figure>
+        <img
+          width="1200"
+          src="https://placehold.co/1200x675/png?text=ZK5%20article-052%20A"
+          height="675"
+        >
+      </figure>
+      <figure>
+        <img
+          width="1200"
+          src="https://placehold.co/1200x675/png?text=ZK5%20article-052%20B"
+          height="675"
+        >
+      </figure>
       <p>Content</p>
     `
 

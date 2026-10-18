@@ -1,6 +1,6 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, find, text } from '../utils/dom.js'
 import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -10,6 +10,8 @@ const provider = 'cognitoforms'
 const cognitoformsHosts = ['www.cognitoforms.com', 'services.cognitoforms.com']
 
 const seamlessPathRegex = /^\/f\/seamless\.js$/
+// The loader's `Cognito.load` refuses any kind but `"forms"`, and mounts the form named by `id`.
+const loadCallRegex = /Cognito\.load\(\s*"forms"\s*,\s*\{\s*id\s*:\s*"([^"]+)"/
 
 // A form's height follows its fields, and the frame reports one only over a channel the
 // parent opens in answer to its `cog-handshake`, so a long form scrolls inside the frame.
@@ -65,4 +67,26 @@ export const cognitoformsScriptEmbedResolver = createMarkupEmbedResolver(
 export const cognitoformsIframeEmbedResolver = createUrlEmbedResolver(
   cognitoformsHosts,
   cognitoformsResolveEmbed,
+)
+
+// Cognito Forms' oldest embed, a `div.cognito` holding the loader `/s/{org}` and an inline
+// `Cognito.load` call, which mount the form into the div only when a page runs them.
+export const cognitoformsWidgetEmbedResolver = createMarkupEmbedResolver(
+  'div.cognito',
+  (element) => {
+    const loader = parseUrlOnHosts(attr(find(element, 'script[src]'), 'src'), cognitoformsHosts)
+
+    if (!loader) {
+      return
+    }
+
+    const [route, orgKey, ...rest] = getPathSegments(loader)
+    const formNumber = text(element, 'script:not([src])')?.match(loadCallRegex)?.[1]
+
+    if (!isAnyOf(route, 's') || !orgKey || rest.length > 0 || !formNumber) {
+      return
+    }
+
+    return composeEmbed(orgKey, formNumber)
+  },
 )

@@ -36,4 +36,28 @@ describeForEachParser('exblogEmojiResolver', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it('should keep a pictogram whose alt is an emoji as a marked picture', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://pds.exblog.jp/emoji/162.png"
+          alt="😀"
+          class="emoticon-img"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://pds.exblog.jp/emoji/162.png"
+          alt="😀"
+          class="emoticon-img"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
 })

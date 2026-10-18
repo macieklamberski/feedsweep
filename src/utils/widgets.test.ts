@@ -3,7 +3,9 @@ import { transformContent } from '../index.js'
 import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type {
   CiteResolverResult,
+  EmbedResolver,
   EmbedResolverResult,
+  MediaResolver,
   MediaResolverResult,
   TransformContext,
 } from '../types.js'
@@ -25,6 +27,7 @@ import {
   prepareCiteMetadata,
   prepareEmbedMetadata,
   readS9eFragment,
+  resolveEmbedProbe,
   setDimensions,
   updateCitePlaceholder,
   updateEmbedPlaceholder,
@@ -121,6 +124,60 @@ describeForEachParser('createEmbedPlaceholder', (parseHtml) => {
         >
         </div>
       `
+
+      expect(element.outerHTML).toEqualHtml(expected)
+    })
+
+    it('should write the height offset beside the ratio', () => {
+      const document = parseHtml('')
+      const element = createEmbedPlaceholder(document, {
+        src: 'https://embed.example/abc',
+        ratio: '16/9',
+        ratioHeightOffset: 175,
+      })
+
+      const expected = html`
+        <div
+          data-embed-src="https://embed.example/abc"
+          data-embed-ratio="16/9"
+          data-embed-ratio-height-offset="175"
+        >
+        </div>
+      `
+
+      expect(element.outerHTML).toEqualHtml(expected)
+    })
+
+    it('should drop the height offset with the ratio when the metadata also states a size', () => {
+      const document = parseHtml('')
+      const element = createEmbedPlaceholder(document, {
+        src: 'https://embed.example/abc',
+        width: 560,
+        height: 315,
+        ratio: '16/9',
+        ratioHeightOffset: 175,
+      })
+
+      const expected = html`
+        <div
+          data-embed-src="https://embed.example/abc"
+          data-embed-width="560"
+          data-embed-height="315"
+        >
+        </div>
+      `
+
+      expect(element.outerHTML).toEqualHtml(expected)
+    })
+
+    it('should drop a height offset that comes with no ratio', () => {
+      const document = parseHtml('')
+      const element = createEmbedPlaceholder(document, {
+        src: 'https://embed.example/abc',
+        ratioHeightOffset: 175,
+      })
+
+      const expected = '<div data-embed-src="https://embed.example/abc"></div>'
 
       expect(element.outerHTML).toEqualHtml(expected)
     })
@@ -248,6 +305,28 @@ describeForEachParser('updateEmbedPlaceholder', (parseHtml) => {
   // since a later write is a better-informed one, and dimensions beat a ratio when both arrive at
   // once because they are the more specific claim.
   describe('a size arriving beside a shape', () => {
+    it('should replace the ratio and its height offset with a size the enrichment brings', () => {
+      const document = parseHtml('')
+      const element = document.createElement('div')
+      element.setAttribute('data-embed-ratio', '16/9')
+      element.setAttribute('data-embed-ratio-height-offset', '175')
+
+      updateEmbedPlaceholder(element, {
+        width: 560,
+        height: 315,
+      })
+
+      const expected = html`
+        <div
+          data-embed-width="560"
+          data-embed-height="315"
+        >
+        </div>
+      `
+
+      expect(element.outerHTML).toEqualHtml(expected)
+    })
+
     it('should replace the ratio with a size the enrichment brings', () => {
       const document = parseHtml('')
       const element = document.createElement('div')
@@ -637,6 +716,7 @@ describe('normalizeEmbedFields', () => {
         width: 1,
         height: 2,
         ratio: '16/9',
+        ratioHeightOffset: 4,
         title: 't',
         description: 'd',
         author: 'a',
@@ -656,6 +736,7 @@ describe('normalizeEmbedFields', () => {
         'width',
         'height',
         'ratio',
+        'ratio-height-offset',
         'title',
         'description',
         'author',
@@ -1479,6 +1560,54 @@ describeForEachParser('setDimensions', (parseHtml) => {
     const expected = '<div></div>'
 
     expect(build({})).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('resolveEmbedProbe', (parseHtml) => {
+  const embedResolver: EmbedResolver = {
+    kind: 'embed',
+    selector: 'iframe[src*="player.example"]',
+    extract: () => ({ provider: 'example', id: 'abc' }),
+  }
+
+  it('should answer the embed a matching resolver makes of the probe', async () => {
+    const value = createIframe(parseHtml(''), 'https://player.example/abc')
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc',
+    }
+
+    expect(await resolveEmbedProbe(value, [embedResolver])).toEqual(expected)
+  })
+
+  it('should skip a resolver whose selector the probe does not match', async () => {
+    const scriptResolver: EmbedResolver = {
+      kind: 'embed',
+      selector: 'script[src]',
+      extract: () => ({ provider: 'script' }),
+    }
+    const value = createIframe(parseHtml(''), 'https://player.example/abc')
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc',
+    }
+
+    expect(await resolveEmbedProbe(value, [scriptResolver, embedResolver])).toEqual(expected)
+  })
+
+  it('should skip a media result for a later embed', async () => {
+    const mediaResolver: MediaResolver = {
+      kind: 'media',
+      selector: 'iframe',
+      extract: () => ({ tag: 'video', src: 'https://player.example/abc.mp4' }),
+    }
+    const value = createIframe(parseHtml(''), 'https://player.example/abc')
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc',
+    }
+
+    expect(await resolveEmbedProbe(value, [mediaResolver, embedResolver])).toEqual(expected)
   })
 })
 

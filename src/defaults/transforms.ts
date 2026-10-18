@@ -13,6 +13,7 @@ import { convertGiphyEmbeds } from '../transforms/dom/convertGiphyEmbeds.js'
 import { convertLazyImageContainers } from '../transforms/dom/convertLazyImageContainers.js'
 import { convertNoteEmbeds } from '../transforms/dom/convertNoteEmbeds.js'
 import { convertSmartframeEmbeds } from '../transforms/dom/convertSmartframeEmbeds.js'
+import { convertTradingEconomicsEmbeds } from '../transforms/dom/convertTradingEconomicsEmbeds.js'
 import { convertUcozSpoilerButtons } from '../transforms/dom/convertUcozSpoilerButtons.js'
 import { convertWidgets } from '../transforms/dom/convertWidgets.js'
 import { decodeDoubleEncodedTags } from '../transforms/dom/decodeDoubleEncodedTags.js'
@@ -132,6 +133,11 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // below see the video and not the site's proxy route. Runs before surfaceNoscriptEmbeds,
   // which surfaces only a frame a resolver claims.
   unwrapDrupalOembedIframes,
+
+  // Runs after surfaceParkedMarkup and surfaceTemplateEmbeds, which can surface a lazy iframe, and
+  // before every pass that reads an iframe's `src`, convertDatawrapperEmbeds and convertGiphyEmbeds
+  // among them. unwrapDrupalOembedIframes reads the lazy attributes itself.
+  fixLazyIframes,
   surfaceNoscriptEmbeds,
   rebuildEmbedPlusEmbeds,
   rebuildIframelyEmbeds,
@@ -205,6 +211,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // linked static <img> of the chart's published PNG render. Runs in this normalize
   // cluster so the emitted <img> is dimensioned and proxied by the image transforms below.
   convertDatawrapperEmbeds,
+  convertTradingEconomicsEmbeds,
   convertAsciinemaEmbeds,
   convertGiphyEmbeds,
   convertSmartframeEmbeds,
@@ -303,9 +310,6 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   stripWordBreaks,
   linkifyUrls,
   markTimestamps,
-
-  // Promotes lazy/consent-gated iframe srcs into `src` so convertWidgets sees a resolvable iframe.
-  fixLazyIframes,
   convertWidgets,
   injectEnclosures,
 
