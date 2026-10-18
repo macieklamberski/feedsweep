@@ -2,6 +2,7 @@ import { escapeRegex } from 'trousse'
 import { extractVideoId } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import { removeWithEmptyWrappers } from '../../utils/dom.js'
+import { getImageFingerprint } from '../../utils/images.js'
 import { updateEmbedPlaceholder } from '../../utils/widgets.js'
 import { enclosureMarker } from './injectEnclosures.js'
 
@@ -102,7 +103,7 @@ const moveImageToVideoPoster = (image: Element, video: Element, overwrite = fals
 
 // A video's poster shipped as a second image: a thumbnail beside its embed, or an image enclosure.
 // WordPress lazy-embed plugins ship the YouTube thumbnail beside the embed.
-export const assignVideoPosters: DomTransform = () => (document) => {
+export const assignVideoPosters: DomTransform = (context) => (document) => {
   // (A) An inline image whose URL is a thumbnail of an embedded video, matched by id.
   const embedsByVideoId = collectEmbedsByVideoId(document)
   if (embedsByVideoId.size > 0) {
@@ -134,10 +135,21 @@ export const assignVideoPosters: DomTransform = () => (document) => {
     return
   }
 
-  moveImageToVideoPoster(poster, video)
+  const thumbnail = video.getAttribute('poster') ?? video.getAttribute('data-embed-thumbnail')
+  const src = poster.getAttribute('src') ?? ''
+
+  // Beside a video with a thumbnail of its own, the enclosure is often a different picture.
+  const isOwnPicture =
+    thumbnail !== null &&
+    getImageFingerprint(thumbnail, context.cleanUrlFn) !==
+      getImageFingerprint(src, context.cleanUrlFn)
+
+  if (!isOwnPicture) {
+    moveImageToVideoPoster(poster, video)
+  }
 
   // Without the marker a repeat run reads them as the item's own images and moves none.
-  for (const image of rest) {
+  for (const image of isOwnPicture ? [poster, ...rest] : rest) {
     image.removeAttribute(enclosureMarker)
   }
 }

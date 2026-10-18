@@ -186,6 +186,28 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should drop an image enclosure that is the video poster under a resize query', async () => {
+    // Constructed: the same picture as the poster, with a CDN format query.
+    const value = html`
+      <img
+        src="https://example.org/images/poster.jpg?tr=f-jpeg"
+        data-enclosure=""
+      >
+      <video
+        poster="https://example.org/images/poster.jpg"
+        src="https://example.org/videos/clip.mp4"
+      ></video>
+    `
+    const expected = html`
+      <video
+        poster="https://example.org/images/poster.jpg"
+        src="https://example.org/videos/clip.mp4"
+      ></video>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should move only the first image enclosure onto the poster and keep the rest', async () => {
     const value = html`
       <video
@@ -361,7 +383,7 @@ describeForEachParser('assignVideoPosters under heuristics', (parseHtml) => {
     expect(await convert(value, enclosures)).toEqualHtml(expected)
   })
 
-  it('should drop a single image enclosure when the embed already has a thumbnail', async () => {
+  it('should keep a single image enclosure when the embed already has a thumbnail', async () => {
     const value = '<p>All is set for the premiere.</p>'
     const enclosures = [
       {
@@ -371,6 +393,7 @@ describeForEachParser('assignVideoPosters under heuristics', (parseHtml) => {
       { url: 'http://www.youtube.com/watch?v=-GraOPPwGfA' },
     ]
     const expected = html`
+      <img src="https://example.org/downloads/698/download/premiere.jpg?cb=3d7c6da47266c12d">
       <div
         data-embed-ratio="16/9"
         data-embed-thumbnail="https://i.ytimg.com/vi/-GraOPPwGfA/hqdefault.jpg"
