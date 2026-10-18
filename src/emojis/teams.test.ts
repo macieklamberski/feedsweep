@@ -26,6 +26,30 @@ describeForEachParser('teamsEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should mark an emoticon of a name-only folder whose alt is a glyph', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://statics.teams.cdn.office.net/evergreen-assets/personal-expressions/v2/assets/emoticons/heart/default/30_f.png?v=v34"
+          alt="❤️"
+          width="20"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          src="https://statics.teams.cdn.office.net/evergreen-assets/personal-expressions/v2/assets/emoticons/heart/default/30_f.png?v=v34"
+          alt="❤️"
+          width="20"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should convert an emoticon whose folder leads with its codepoint', async () => {
     const value = html`
       <p>

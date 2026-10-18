@@ -6,6 +6,10 @@ import { getEmbedSize } from './widgets.js'
 
 const kindTypePrefixes = ['audio/', 'video/', 'image/'] as const
 
+// A JSON-escaped `&` that lost its backslash, `\u0026` or `\u0026amp;` without its semicolon,
+// anywhere after the `?`. A file name can carry the text `u0026` as written.
+const strippedJsonAmpersandRegex = /(?<=\?.*)u0026(?:amp)?/g
+
 // The image key drops a file's query, which is what tells podcast proxy episodes apart.
 // A podcast proxy's audio url is `…/play.mp3?url={episode}`, so its identity lives in the query.
 // Audio, video and embeds have no scaled variants.
@@ -316,10 +320,15 @@ const readEnclosure = (
   context: TransformContext,
 ): Enclosure => {
   const extracted = extractEnclosureFromEmbed(enclosure, document)
+  let url = extracted.url
+
+  if (typeof url === 'string') {
+    url = url.replace(strippedJsonAmpersandRegex, '&')
+  }
 
   return {
     ...extracted,
-    url: resolveOrKeepUrl(extracted.url, context),
+    url: resolveOrKeepUrl(url, context),
     playerUrl: resolveOrKeepUrl(extracted.playerUrl, context),
   }
 }

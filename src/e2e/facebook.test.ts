@@ -325,6 +325,26 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  // A newsletter archived from Yahoo Mail keeps the webmail's proxied src, the CDN url encoded
+  // in `url`.
+  it('should replace a Facebook emoji image behind the Yahoo Mail proxy', async () => {
+    const value = html`
+      <p>feel the mood
+        <span class="yiv0680057325_47e3 yiv0680057325_5mfr" title="heart emoticon"><img
+          class="yiv0680057325img"
+          src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fstatic.xx.fbcdn.net%2Fimages%2Femoji.php%2Fv9%2Ft6c%2F1%2F16%2F2764.png&amp;t=1554239749&amp;ymreqid=93d88e61-0da6-7d52-01ca-ef0e19010000&amp;sig=DzxCZnIn6aGz57UknE9zMw--~C"
+          alt=""
+          width="16"
+          height="16"
+        ></span>
+      </p>
+    `
+    const expected =
+      '<p>feel the mood <span class="yiv0680057325_47e3 yiv0680057325_5mfr" title="heart emoticon">❤️</span></p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // A post pasted from the classic site paints its emoticons from a sprite sheet the feed does
   // not load, leaving empty spans that would be deleted as empty tags.
   it('should replace a classic Facebook emoticon with its character', async () => {
@@ -338,6 +358,59 @@ describeForEachParser('Facebook', (parseHtml) => {
       </p>
     `
     const expected = '<p>We are back 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // The later markup wraps the painted sprite and its code, hidden at zero size, in a labelled
+  // `i`. The sprite is deleted as an empty tag and the code stays invisible.
+  it('should replace a labelled sprite wrapper with its character', async () => {
+    const value = html`
+      <p>Frist for påmelding
+        <i class="_1gwo" title="Uttrykksikonet smile">
+          <i
+            aria-hidden="true"
+            class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"
+            style="background-image: url(&quot;/rsrc.php/v2/yl/r/NtxfCiWWu4q.png&quot;); background-position: 0px -340px; display: inline-block; height: 16px; width: 16px;"
+          ></i>
+          <span aria-hidden="true" class="_skr" style="font-size: 0px;">:-)</span>
+        </i>
+      </p>
+    `
+    const expected = '<p>Frist for påmelding 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // An editor clones the labelled `i` empty beside the one holding the sprite. Only the sprite
+  // showed a picture on Facebook.
+  it('should show one character for a run of empty wrappers before a sprite wrapper', async () => {
+    const value = html`
+      <p>das adversidades pode renascer algo ainda mais virtuoso&nbsp;
+        <i class="_lew" title="smile emoticon"></i>
+        <i class="_lew" title="smile emoticon"></i>
+        <i class="_lew" title="smile emoticon">
+          <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+          <span aria-hidden="true" class="_4mcd" style="font-size: 0px;">:-)</span>
+        </i>
+      </p>
+    `
+    const expected = '<p>das adversidades pode renascer algo ainda mais virtuoso&#160; 🙂</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // Some pastes keep the labelled `i` and its zero-size code without the sprite, so the emoticon
+  // stays an invisible code.
+  it('should replace a labelled wrapper holding only its hidden code', async () => {
+    const value = html`
+      <p>Tot ziens
+        <i class="_1gwo" title="Emoticon smile">
+          <span class="_skr" style="font-size: 0px;">:-)</span>
+        </i>
+      </p>
+    `
+    const expected = '<p>Tot ziens 🙂</p>'
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })

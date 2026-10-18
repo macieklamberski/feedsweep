@@ -374,6 +374,15 @@ describe('getImageFingerprint', () => {
     expect(getImageFingerprint(second)).toBe('cdn.example.com/b.jpg')
   })
 
+  const mailProxyCases: Array<string> = [
+    'https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fcdn.example.com%2Fphoto.jpg&t=1554239749&sig=DzxCZnIn6aGz57UknE9zMw--~C',
+    'https://resize.yandex.net/mailservice?url=https%3A%2F%2Fcdn.example.com%2Fphoto.jpg&proxy=yes&key=fbb6e138eabfa3da556a345b6f3faea8',
+  ]
+
+  it.each(mailProxyCases)('should unwrap the mail proxy at %s to its inner source', (value) => {
+    expect(getImageFingerprint(value)).toBe('cdn.example.com/photo.jpg')
+  })
+
   it('should unwrap the Hatena image scaler to its inner source', () => {
     const value =
       'https://cdn.image.st-hatena.com/image/scale/abc/width=1300/https%3A%2F%2Fcdn.example.com%2Fphoto.jpg'

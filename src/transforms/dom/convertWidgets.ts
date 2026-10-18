@@ -205,7 +205,7 @@ export const convertWidgets: DomTransform = (context) => {
       }
     }
 
-    // A post that also frames the same video or file already plays it, and the dead element stays.
+    // A post that also frames the same video or file already plays it, so the dead element goes.
     const framedKeys = new Set<string>()
 
     if (pageMedia.length) {
@@ -220,6 +220,7 @@ export const convertWidgets: DomTransform = (context) => {
 
     for (const { media, url, embed } of pageMedia) {
       if (framedKeys.has(`${embed.provider}/${embed.id}`)) {
+        media.remove()
         continue
       }
 

@@ -31,7 +31,6 @@ const sets = [
 const discourseNames = toMap<string>({
   frowning: '☹️',
   kiss: '💏',
-  couple_with_heart: '👩‍❤️‍👨',
   dog: '🐕',
   cat: '🐈',
   tiger: '🐅',

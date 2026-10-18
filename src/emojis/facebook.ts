@@ -1,5 +1,5 @@
 import type { EmojiResolver } from '../types.js'
-import { attr, isElement, isWhitespaceText } from '../utils/dom.js'
+import { attr, isElement, isNonWhitespaceText, isWhitespaceText } from '../utils/dom.js'
 import {
   getFileStem,
   glyphFromCodepoints,
@@ -8,6 +8,7 @@ import {
   noEmojiNames,
   resolveEmojiElement,
   resolveEmojiImage,
+  withEmojiPresentation,
 } from '../utils/emojis.js'
 import { bgImage } from '../utils/styles.js'
 
@@ -182,15 +183,46 @@ const labelNameRegex = new RegExp(`(?:^|[^a-z])(${classicNames.join('|')})(?:hym
 
 // The span Facebook hid from sighted readers beside an emoji image, holding its code or glyph.
 const hiddenTextSelector = 'span[class~="_7oe"]'
+// The empty `i` painted from a sprite sheet the feed does not load.
+const spriteSelector = 'i[class~="_4-k1"]'
+// The span holding the code at zero size, beside the sprite or alone.
+const zeroSizeSelector = 'span[class~="_skr"], span[class~="_4mcd"]'
+const labelSelector = 'span[class~="_47e3"], i[class~="_1gwo"][title], i[class~="_lew"][title]'
 
-// A later chat markup of the classic emoticon: an empty span or `i` painted by Facebook's CSS,
-// named only by the screen-reader label in its title. A post's wrapper holds the emoji image
-// instead, beside the hidden span, which shows once the site's CSS is gone.
+// A paste with the caret inside a sprite nests other label wrappers in it, which the sprite's own
+// picture covered.
+const isBareSprite = (sprite: Element): boolean => {
+  for (const node of Array.from(sprite.childNodes)) {
+    if (isNonWhitespaceText(node)) {
+      return false
+    }
+
+    if (isElement(node) && !node.matches(labelSelector)) {
+      return false
+    }
+  }
+
+  // A picture, link or player inside a nested wrapper is content the sprite did not cover.
+  for (const descendant of Array.from(sprite.querySelectorAll('*'))) {
+    if (!descendant.matches(`${labelSelector}, ${zeroSizeSelector}, ${spriteSelector}, br`)) {
+      return false
+    }
+  }
+
+  const text = sprite.textContent?.trim()
+
+  return !text || !!glyphFromShortcode(text)
+}
+
+// A later chat markup of the classic emoticon: a span or `i` holding a painted sprite, its code at
+// zero size, or both, named by the screen-reader label in its title. A post's wrapper holds the
+// emoji image instead, beside the hidden span, which shows once the site's CSS is gone.
 export const facebookLabelEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: 'span[class~="_47e3"], i[class~="_1gwo"][title], i[class~="_lew"][title]',
+  selector: labelSelector,
   extract: (element) => {
-    const [image, hidden, ...rest] = Array.from(element.children)
+    const children = Array.from(element.children)
+    const [image, hidden, ...rest] = children
     const isImageWrapper =
       image?.matches('img') &&
       (!hidden || hidden.matches(hiddenTextSelector)) &&
@@ -203,8 +235,19 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
       return result && 'glyph' in result ? result : undefined
     }
 
-    // The class also rides on spans pasted around prose.
-    if (element.textContent?.trim() || element.firstElementChild) {
+    // Some pastes drop the sprite and keep only the zero-size span.
+    const sprite = image?.matches(spriteSelector) ? image : undefined
+    const [zeroSize, ...after] = sprite ? children.slice(1) : children
+    const isLabelWrapper =
+      (sprite || zeroSize) &&
+      (!zeroSize || zeroSize.matches(zeroSizeSelector)) &&
+      (!sprite || isBareSprite(sprite)) &&
+      !after.length &&
+      !Array.from(element.childNodes).some(isNonWhitespaceText)
+
+    // Facebook's CSS painted the picture on a child, never on the wrapper, so an empty wrapper
+    // showed nothing. The class also rides on spans pasted around prose.
+    if (!isLabelWrapper) {
       return
     }
 
@@ -215,7 +258,28 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
     }
 
     const code = classicCodes[name]
+    const glyph = glyphFromShortcode(code)
 
-    return resolveEmojiElement(element, { glyph: glyphFromShortcode(code), shortcode: code })
+    if (zeroSize) {
+      const hiddenImage = zeroSize.querySelector('img')
+      const hiddenText =
+        zeroSize.textContent?.trim() || (hiddenImage ? attr(hiddenImage, 'alt') : undefined)
+      const isCode = hiddenText === code || (!!glyph && glyphFromShortcode(hiddenText) === glyph)
+      const isGlyph =
+        !!glyph &&
+        !!hiddenText &&
+        withEmojiPresentation(hiddenText) === withEmojiPresentation(glyph)
+
+      if (hiddenText && !isCode && !isGlyph) {
+        return
+      }
+
+      // An image with no alt in the span is a picture of its own, not the emoji.
+      if (hiddenImage && !hiddenText) {
+        return
+      }
+    }
+
+    return resolveEmojiElement(element, { glyph, shortcode: code })
   },
 }

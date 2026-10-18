@@ -337,9 +337,7 @@ const directories = [
   '/smiley/', // CKEditor, FCKeditor and TinyMCE; ProBoards serves the same set from here
   '/ck_smiley/', // CKEditor's set, copied into a theme
   '/emoticons/', // Serendipity's stock template set and emoticate plugin, IPS, Kunena
-  'SMILIES_PATH', // phpBB's template variable left unsubstituted, raw or percent-encoded
 ]
-const placeholderPathRegex = /^(?:\{|%7b)smilies_path(?:\}|%7d)/i
 const directorySelector = directories.map((path) => `img[src*="${path}" i]`).join(', ')
 
 // The images carrying a class several forum engines share or sitting in a directory they share.
@@ -407,6 +405,12 @@ const boardEmojiNames = toMap<EmojiGlyph>({
   welcome: false,
 })
 
+// Alts shaped like a code an author types: a `:name:`, a `(name)` or `[name]` as Plurk and Skype
+// write them, or an ASCII face.
+const colonCodeRegex = /^:[^\s:]+:$/
+const bracketCodeRegex = /^(?:\([\w -]+\)|\[[\w -]+\])$/
+const asciiEmoticonRegex = /^[>O]?[:;=8][-'^o]?[()[\]DPpOo*|\\/$@3Xx]{1,3}$/
+
 // Forum smilie images, which render oversized without the site's CSS. An engine with names or
 // signals of its own has a resolver of its own ahead of this one.
 export const smiliesEmojiResolver: EmojiResolver = {
@@ -414,26 +418,22 @@ export const smiliesEmojiResolver: EmojiResolver = {
   selector: smilieSelector,
   extract: (element) => {
     const src = element.getAttribute('src') ?? ''
-    const isStrong = element.matches(markerSelector)
+    const isMarked = element.matches(markerSelector)
 
-    if (!isStrong && !element.matches(directorySelector)) {
+    if (!isMarked && !element.matches(directorySelector)) {
       return
     }
 
+    // A directory alone is a weak hint, so a code in the alt is the second one.
+    const alt = attr(element, 'alt') ?? ''
+
     return resolveEmojiImage(element, {
-      isStrong,
+      isStrong: isMarked || colonCodeRegex.test(alt) || asciiEmoticonRegex.test(alt),
       names: smiliesEmojiNames,
       glyph: getDirectoryGlyph(src, '/images/smilies/', boardEmojiNames),
-      // An unsubstituted phpBB template variable is a src no host serves.
-      isBlank: placeholderPathRegex.test(src),
     })
   },
 }
-
-// An alt shaped like a code an author types: a known code, a `:name:`, a `(name)` or `[name]` as
-// Plurk and Skype write them, or an ASCII face.
-const shortcodeAltRegex = /^(?::[^\s:]+:|\([\w -]+\)|\[[\w -]+\])$/
-const asciiEmoticonRegex = /^[>O]?[:;=8][-'^o]?[()[\]DPpOo*|\\/$@3Xx]{1,3}$/
 
 // Images a site's own smilie set or album marks with the whole-word emoticon class, as Steam,
 // TypePad, Moodle and Plurk do. Reaction GIFs and photos share the class, so an image without a
@@ -451,7 +451,10 @@ export const smiliesEmoticonEmojiResolver: EmojiResolver = {
 
     const alt = attr(element, 'alt') ?? ''
     const hasEmoticonAlt =
-      getShortcode(alt) !== undefined || shortcodeAltRegex.test(alt) || asciiEmoticonRegex.test(alt)
+      getShortcode(alt) !== undefined ||
+      colonCodeRegex.test(alt) ||
+      bracketCodeRegex.test(alt) ||
+      asciiEmoticonRegex.test(alt)
     const isStrong = size > 0 || element.matches(directorySelector) || hasEmoticonAlt
 
     return resolveEmojiImage(element, { isStrong, names: noEmojiNames })

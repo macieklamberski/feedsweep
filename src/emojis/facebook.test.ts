@@ -588,22 +588,62 @@ describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
       ['émoticône grin', '😁'],
     ]
 
-    it.each(labelCases)('should replace an empty wrapper titled %s', async (title, glyph) => {
-      const value = `<p>Hi <span class="_47e3 _5mfr" title="${title}"></span></p>`
+    it.each(labelCases)('should replace a sprite wrapper titled %s', async (title, glyph) => {
+      const value = html`
+        <p>Hi
+          <i class="_lew" title="${title}">
+            <i class="_4-k1 img sp_fM-mz8spZ1b"></i>
+          </i>
+        </p>
+      `
 
       expect(await transform(value)).toEqualHtml(`<p>Hi ${glyph}</p>`)
     })
 
-    it('should replace an empty i wrapper by its label', async () => {
-      const value = '<p>Hi <i class="_1gwo" title="heart emoticon"></i></p>'
+    it('should leave a lone empty wrapper untouched', async () => {
+      const value = html`
+        <p>Nouvelle couverture, nouveau format, chez Makaka !
+          <span class="_47e3 _5mfr" title="grin emoticon"></span>
+        </p>
+      `
 
-      expect(await transform(value)).toEqualHtml('<p>Hi ❤️</p>')
+      expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should keep a name without a universal code as its code', async () => {
-      const value = '<p>Hi <span class="_47e3" title="like emoticon"></span></p>'
+    it('should leave an empty wrapper untouched and replace its full twin', async () => {
+      const value = html`
+        <p>qui fera une démo de filage au rouet.
+          <i class="_lew" title="émoticône grin"></i>
+          <i class="_lew" title="émoticône grin">
+            <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_d580ab"></i>
+          </i>
+        </p>
+      `
+      const expected = html`
+        <p>qui fera une démo de filage au rouet.
+          <i class="_lew" title="émoticône grin"></i>😁</p>
+      `
 
-      expect(await transform(value)).toEqualHtml('<p>Hi <span data-emoji="">(y)</span></p>')
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a run of empty wrappers untouched and replace the full one', async () => {
+      const value = html`
+        <p>das adversidades pode renascer algo ainda mais virtuoso&nbsp;
+          <i class="_lew" title="smile emoticon"></i>
+          <i class="_lew" title="smile emoticon"></i>
+          <i class="_lew" title="smile emoticon">
+            <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span aria-hidden="true" class="_4mcd">:-)</span>
+          </i>
+        </p>
+      `
+      const expected = html`
+        <p>das adversidades pode renascer algo ainda mais virtuoso&nbsp;
+          <i class="_lew" title="smile emoticon"></i><i class="_lew" title="smile emoticon"></i>🙂</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should leave a wrapper around prose untouched', async () => {
@@ -662,7 +702,301 @@ describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
     })
 
     it('should leave a wrapper whose label names no classic emoticon untouched', async () => {
-      const value = '<p><span class="_47e3" title="sticker"></span></p>'
+      const value = html`
+        <p>
+          <i class="_lew" title="sticker">
+            <i class="_4-k1 img sp_fM-mz8spZ1b"></i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('sprite wrappers', () => {
+    it('should replace a wrapper around a painted sprite by its label', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="frown emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_d55a98"></i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml('<p>🙁</p>')
+    })
+
+    const hiddenCases: Array<[string, string, string, string]> = [
+      ['_skr', ':-)', 'smile emoticon', '🙂'],
+      ['_4mcd', ';)', 'wink emoticon', '😉'],
+      ['_4mcd', '🙂', 'smile emoticon', '🙂'],
+      ['_skr', '<br>', 'smile emoticon', '🙂'],
+      ['_4mcd', '<img src="https://example.com/2764.png" alt="❤">', 'heart emoticon', '❤️'],
+    ]
+
+    it.each(hiddenCases)(
+      'should replace a sprite wrapper with a %s span holding %s',
+      async (hiddenClass, hiddenContent, title, glyph) => {
+        const value = html`
+          <p>
+            <i class="_1gwo" title="${title}">
+              <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+              <span class="${hiddenClass}">${hiddenContent}</span>
+            </i>
+          </p>
+        `
+
+        expect(await transform(value)).toEqualHtml(`<p>${glyph}</p>`)
+      },
+    )
+
+    it('should keep a name without a universal code as its code', async () => {
+      const value = html`
+        <p>
+          <i class="_1gwo" title="like emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_8a4c64"></i>
+            <span class="_skr">(y)</span>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml('<p><span data-emoji="">(y)</span></p>')
+    })
+
+    it('should leave a wrapper whose hidden code names another emoticon untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span class="_4mcd">;)</span>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose hidden span holds prose untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_1gwo" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span class="_skr">So, don't wait any longer</span>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper holding prose after its hidden span untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span class="_4mcd">:)</span>
+            <span>om het te vieren</span>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper holding prose as bare text after its hidden span untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span class="_4mcd">:)</span>
+            om het te vieren
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper holding a picture after its sprite untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <img src="https://example.com/photo.jpg">
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose hidden span holds an image with no alt untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span class="_4mcd"><img src="https://example.com/photo.jpg"></span>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose hidden image names another picture untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"></i>
+            <span class="_4mcd"><img src="https://example.com/smiley-laughing.gif" alt="laughing"></span>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose sprite holds an image untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="wink emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_7f72ac"><u><img src="https://example.com/wink.png" alt="😉"></u></i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose sprite holds text untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4">“</i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose sprite holds its code as text untouched', async () => {
+      const value = html`
+        <p>Merci les filles pour votre bonne humeur&nbsp;
+          <i class="_lew" title="émoticône smile">
+            <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4">:)</i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should replace a wrapper by its own label when its sprite holds label wrappers', async () => {
+      const value = html`
+        <p>Egészségetekre! :)&nbsp;
+          <i class="_lew" title="wink hangulatjel">
+            <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_7f72ac">
+              <i class="_lew" title="smile hangulatjel">
+                <i class="_lew" title="smile hangulatjel">
+                  <span aria-hidden="true" class="_4mcd" style="font-size: 0px;">:)</span>
+                </i>
+              </i>
+            </i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml('<p>Egészségetekre! :)&nbsp; 😉</p>')
+    })
+
+    it('should leave a wrapper whose sprite holds a label wrapper around prose untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="wink emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_7f72ac">
+              <i class="_lew" title="smile emoticon">om het te vieren</i>
+            </i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should replace a wrapper whose sprite holds a nested sprite with a line break', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="smile-emoticon">
+            <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4">
+              <i class="_lew" title="smile-emoticon">
+                <i class="_lew" title="smile-emoticon">
+                  <i aria-hidden="true" class="_4-k1 img sp_fM-mz8spZ1b sx_5371b4"><br></i>
+                  <span aria-hidden="true" class="_4mcd">:)</span>
+                </i>
+              </i>
+            </i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml('<p>🙂</p>')
+    })
+
+    it('should leave a wrapper whose sprite holds a label wrapper around a picture untouched', async () => {
+      const value = html`
+        <p>
+          <i class="_lew" title="wink emoticon">
+            <i class="_4-k1 img sp_fM-mz8spZ1b sx_7f72ac">
+              <span class="_47e3" title="smile emoticon"><img src="https://example.com/photo.jpg"></span>
+            </i>
+          </i>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('zero-size wrappers', () => {
+    const zeroSizeCases: Array<[string, string, string, string]> = [
+      ['Emotikon smile', '_4mcd', ':-)', '🙂'],
+      ['wink emoticon', '_skr', ';)', '😉'],
+      ['„smile“-Emoticon', '_4mcd', ':-)', '🙂'],
+      ['frown emoticon', '_skr', '', '🙁'],
+      ['heart emoticon', '_skr', '<br>', '❤️'],
+      ['heart emoticon', '_4mcd', '<img src="https://example.com/2764.png" alt="❤">', '❤️'],
+    ]
+
+    it.each(zeroSizeCases)(
+      'should replace a wrapper labelled %s holding only a %s span',
+      async (title, zeroSizeClass, zeroSizeContent, glyph) => {
+        const value = html`
+          <p>
+            <i class="_lew" title="${title}">
+              <span
+                aria-hidden="true"
+                class="${zeroSizeClass}"
+                style="font-size: 0px;"
+              >${zeroSizeContent}</span>
+            </i>
+          </p>
+        `
+
+        expect(await transform(value)).toEqualHtml(`<p>${glyph}</p>`)
+      },
+    )
+
+    const keptCases: Array<string> = [
+      '<span class="_4mcd">Liebe Grüße</span>',
+      '<span class="_skr">;)</span>',
+      '<span class="_7oe">:)</span>',
+      '<span class="_4mcd">:)</span><span>om het te vieren</span>',
+    ]
+
+    it.each(keptCases)('should leave a wrapper holding %s untouched', async (content) => {
+      const value = `<p><i class="_1gwo" title="smile emoticon">${content}</i></p>`
 
       expect(await transform(value)).toEqualHtml(value)
     })

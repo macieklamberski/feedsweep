@@ -113,6 +113,16 @@ const imageProxies: Array<ImageProxy> = [
       /images-blogger-opensocial\.googleusercontent\.com\/gadgets\/proxy\?(?:[^#]*&)?url=([^&]+)/i,
     toSource: resolvedSource,
   },
+  // Yahoo Mail: ecp.yusercontent.com/mail?url={src}.
+  {
+    pattern: /\/\/ecp\.yusercontent\.com\/mail\?(?:[^#]*&)?url=([^&]+)/i,
+    toSource: resolvedSource,
+  },
+  // Yandex Mail: resize.yandex.net/mailservice?url={src}.
+  {
+    pattern: /\/\/resize\.yandex\.net\/mailservice\?(?:[^#]*&)?url=([^&]+)/i,
+    toSource: resolvedSource,
+  },
   // Brightspot dims (NPR, LA Times, Scripps): *.brightspotcdn.com/dims{3,4}/.../?url={src}.
   { pattern: /\.brightspotcdn\.com\/dims\d\/.*[?&]url=([^&]+)/i, toSource: resolvedSource },
   // Cloudinary fetch, which Substack's substackcdn.com serves its images through.
@@ -206,7 +216,7 @@ const dimensionLeafRegex = /^(.*__)?\d{1,5}x\d{1,5}(\.[a-z0-9]+)?$/i
 const dimensionSuffixRegex = /[-_]\d{1,5}x\d{1,5}(\.[a-z0-9]+)$/i
 
 // A proxy url can wrap another, a Cloudinary fetch of a Cloudinary upload.
-const unwrapProxiedImage = (url: string): string => {
+export const unwrapProxiedImage = (url: string): string => {
   let current = url
 
   for (let depth = 0; depth < 5; depth++) {
