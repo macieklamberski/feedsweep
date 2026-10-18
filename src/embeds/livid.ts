@@ -22,13 +22,16 @@ export const lividResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
+  // MetaSlider's Livid slide writes its own translated player label as the iframe `title`.
+  const isMetasliderSlide = Boolean(element?.closest('li.ms-livid'))
+
   return {
     provider,
     id: videoId,
     src: `https://livid.com/embed/${videoId}`,
     url: `https://livid.com/watch/${videoId}`,
     ratio: playerRatio,
-    title: element ? attr(element, 'title') : undefined,
+    title: isMetasliderSlide ? undefined : attr(element, 'title'),
   }
 }
 
@@ -47,7 +50,6 @@ export const lividWidgetEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    // The iframe's `title` is MetaSlider's player label, never the video's name.
     const result = lividResolveEmbed(url.href)
 
     if (!result) {

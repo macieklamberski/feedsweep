@@ -137,6 +137,40 @@ describeForEachParser('lividIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should drop the player label of a MetaSlider eager slide', async () => {
+      const value = html`
+        <li class="slide-61 ms-livid ">
+          <div class="ms-img-inner">
+            <div class="livid">
+              <div
+                class="ms-livid-eager"
+                style="position:absolute;top:0;left:0;width:100%;height:100%;"
+              >
+                <iframe
+                  src="https://livid.com/embed/IoMGtM7uIDai?dnt=true"
+                  style="width:100%;height:100%;border:0;"
+                  frameborder="0"
+                  allowfullscreen
+                  title="Livid video player"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </li>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'livid',
+        id: 'IoMGtM7uIDai',
+        src: 'https://livid.com/embed/IoMGtM7uIDai',
+        url: 'https://livid.com/watch/IoMGtM7uIDai',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('lividWidgetEmbedResolver', (parseHtml) => {
