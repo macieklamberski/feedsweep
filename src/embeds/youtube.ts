@@ -387,7 +387,11 @@ export const youtubeWidgetEmbedResolver = createMarkupEmbedResolver(
     // The plugin hands `data-start` to the player as its `start` parameter.
     const start = attr(element, 'data-start')
 
-    return composeVideoEmbed(videoId, start ? { start } : undefined)
+    return {
+      ...composeVideoEmbed(videoId, start ? { start } : undefined),
+      // A lazy slide's poster carries the video's title as its `alt`.
+      title: attr(element.querySelector('img.msDefaultImage'), 'alt'),
+    }
   },
 )
 
