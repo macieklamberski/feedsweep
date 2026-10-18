@@ -10,7 +10,7 @@ import {
   pickQueryParams,
   placeholderBaseUrl,
 } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'vimeo'
 const playerRatio = '16/9'
@@ -262,6 +262,20 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
 
 // A Vimeo player iframe, a frame of a video or showcase page, or the Flash moogaloop player.
 export const vimeoEmbedResolver = createUrlEmbedResolver(vimeoHosts, vimeoResolveEmbed)
+
+// MetaSlider Pro's Vimeo slide: an empty div that only the plugin's script builds into a player.
+export const vimeoWidgetEmbedResolver = createMarkupEmbedResolver(
+  'li.ms-vimeo div.vimeo[data-id]',
+  (element) => {
+    const videoId = attr(element, 'data-id')
+
+    if (!videoId) {
+      return
+    }
+
+    return vimeoResolveEmbed(`https://vimeo.com/${encodePathSegment(videoId)}`)
+  },
+)
 
 export const vimeoFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: /^vimeo[ -](?:video player|video|player)(?: \d+)?$/ },

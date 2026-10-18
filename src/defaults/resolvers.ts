@@ -337,7 +337,7 @@ import {
   vidyardImageEmbedResolver,
   vidyardScriptEmbedResolver,
 } from '../embeds/vidyard.js'
-import { vimeoEmbedResolver } from '../embeds/vimeo.js'
+import { vimeoEmbedResolver, vimeoWidgetEmbedResolver } from '../embeds/vimeo.js'
 import { vkEmbedResolver } from '../embeds/vk.js'
 import { vokiFlashEmbedResolver, vokiIframeEmbedResolver } from '../embeds/voki.js'
 import { wakeletEmbedResolver } from '../embeds/wakelet.js'
@@ -354,6 +354,7 @@ import {
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
   youtubeIframeEmbedResolver,
+  youtubeWidgetEmbedResolver,
 } from '../embeds/youtube.js'
 import { yumpuEmbedResolver } from '../embeds/yumpu.js'
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
@@ -467,6 +468,7 @@ import { discourseMediaResolver } from '../media/discourse.js'
 import { flashMp3PlayerMediaResolver } from '../media/flashmp3player.js'
 import { ghostMediaResolver } from '../media/ghost.js'
 import { libsynMediaResolver } from '../media/libsyn.js'
+import { metasliderMediaResolver } from '../media/metaslider.js'
 import { odeoMediaResolver } from '../media/odeo.js'
 import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
@@ -767,6 +769,7 @@ const embedResolvers: Array<EmbedResolver> = [
   vidyardImageEmbedResolver,
   vidyardScriptEmbedResolver,
   vimeoEmbedResolver,
+  vimeoWidgetEmbedResolver,
   vkEmbedResolver,
   vokiFlashEmbedResolver,
   vokiIframeEmbedResolver,
@@ -780,6 +783,7 @@ const embedResolvers: Array<EmbedResolver> = [
   youtubeIframeEmbedResolver,
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
+  youtubeWidgetEmbedResolver,
   yumpuEmbedResolver,
   zencastrBlockquoteEmbedResolver,
   zencastrIframeEmbedResolver,
@@ -803,6 +807,7 @@ const mediaResolvers: Array<MediaResolver> = [
   flashMp3PlayerMediaResolver,
   ghostMediaResolver,
   libsynMediaResolver,
+  metasliderMediaResolver,
   odeoMediaResolver,
   podloveMediaResolver,
   substackMediaResolver,

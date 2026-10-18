@@ -374,6 +374,23 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
+// MetaSlider Pro's YouTube slide: an empty div that only the plugin's script builds into a player.
+export const youtubeWidgetEmbedResolver = createMarkupEmbedResolver(
+  'li.ms-youtube div.youtube[data-id]',
+  (element) => {
+    const videoId = attr(element, 'data-id')
+
+    if (!videoId) {
+      return
+    }
+
+    // The plugin hands `data-start` to the player as its `start` parameter.
+    const start = attr(element, 'data-start')
+
+    return composeVideoEmbed(videoId, start ? { start } : undefined)
+  },
+)
+
 export const youtubeFieldCleaners: Array<FieldCleaner> = [
   {
     provider,

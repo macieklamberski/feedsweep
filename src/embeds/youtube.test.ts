@@ -11,6 +11,7 @@ import {
   youtubeFc2EmbedResolver,
   youtubeIframeEmbedResolver,
   youtubeResolveEmbed,
+  youtubeWidgetEmbedResolver,
 } from './youtube.js'
 
 const watchOffsetCases: Array<[string, string]> = [
@@ -1277,6 +1278,97 @@ describeForEachParser('youtubeFc2EmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+describeForEachParser('youtubeWidgetEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, youtubeWidgetEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should resolve the MetaSlider Pro slide with its start offset', async () => {
+      const value = html`
+        <li
+          class="slide-26693 ms-youtube "
+          style="display: none; width: 100%;"
+          data-slide-type="youtube"
+          data-date="2026-09-21 16:38:29"
+          data-filename="youtube_aQD0yfzOJsU.webp"
+        >
+          <div
+            style="position:relative;padding-bottom:178.08988764045%;height:0"
+            class="youtube"
+            data-id="aQD0yfzOJsU"
+            data-start="0"
+            data-auto-play="0"
+            data-mute="1"
+            data-show-controls="0"
+            data-show-related="0"
+            data-theme="dark"
+            data-color="red"
+            data-lazy-load="0"
+          ></div>
+        </li>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'aQD0yfzOJsU',
+        src: 'https://www.youtube.com/embed/aQD0yfzOJsU?start=0',
+        url: 'https://www.youtube.com/watch?v=aQD0yfzOJsU',
+        thumbnail: 'https://i.ytimg.com/vi/aQD0yfzOJsU/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve a slide with no start offset', async () => {
+      const value = html`
+        <li class="slide-1307417 ms-youtube ">
+          <div
+            class="youtube"
+            data-id="i0i36AlJciI"
+          ></div>
+        </li>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'i0i36AlJciI',
+        src: 'https://www.youtube.com/embed/i0i36AlJciI',
+        url: 'https://www.youtube.com/watch?v=i0i36AlJciI',
+        thumbnail: 'https://i.ytimg.com/vi/i0i36AlJciI/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a div.youtube outside a MetaSlider YouTube slide', async () => {
+      const value = html`
+        <li class="slide-26693 ms-image">
+          <div
+            class="youtube"
+            data-id="aQD0yfzOJsU"
+          ></div>
+        </li>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a slide with an empty video id', async () => {
+      const value = html`
+        <li class="ms-youtube">
+          <div
+            class="youtube"
+            data-id=""
+          ></div>
+        </li>
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
   })
 })
