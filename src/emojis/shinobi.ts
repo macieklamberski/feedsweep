@@ -6,6 +6,6 @@ export const shinobiEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[src*=".shinobi.jp/emoji/icon/" i]',
   extract: (element) => {
-    return resolveEmojiImage(element, { isStrong: true })
+    return resolveEmojiImage(element, { isStrong: true, keepsPictures: true })
   },
 }

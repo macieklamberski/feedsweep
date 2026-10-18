@@ -27,5 +27,31 @@ describeForEachParser('weiboEmojiResolver', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should keep an emoticon whose alt is an emoji as a marked picture', async () => {
+      const value = html`
+        <p>
+          <span class="url-icon">
+            <img
+              alt="😀"
+              src="https://h5.sinaimg.cn/m/emoticon/icon/others/o_weiguan.png"
+            >
+          </span>
+        </p>
+      `
+      const expected = html`
+        <p>
+          <span class="url-icon">
+            <img
+              data-emoji=""
+              alt="😀"
+              src="https://h5.sinaimg.cn/m/emoticon/icon/others/o_weiguan.png"
+            >
+          </span>
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 })
