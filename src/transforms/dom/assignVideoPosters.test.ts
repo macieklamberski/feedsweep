@@ -385,7 +385,7 @@ describeForEachParser('assignVideoPosters under heuristics', (parseHtml) => {
     expect(await convert(value, enclosures)).toEqualHtml(expected)
   })
 
-  it('should set the poster on the body video when the feed also lists it as an enclosure', async () => {
+  it('should keep the image enclosure beside a body video the feed also lists as an enclosure', async () => {
     const value = html`
       <video controls>
         <source
@@ -399,10 +399,8 @@ describeForEachParser('assignVideoPosters under heuristics', (parseHtml) => {
       { url: 'https://example.org/images/cover.jpg', type: 'image/jpeg' },
     ]
     const expected = html`
-      <video
-        poster="https://example.org/images/cover.jpg"
-        controls
-      >
+      <img src="https://example.org/images/cover.jpg">
+      <video controls>
         <source
           src="https://example.org/videos/clip.mp4"
           type="video/mp4"

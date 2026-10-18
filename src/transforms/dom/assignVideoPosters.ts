@@ -167,7 +167,8 @@ export const assignVideoPosters: DomTransform = (context) => (document) => {
 
   // (B) An injected image enclosure on a video-led item: a video is embedded and
   // the item has no inline image of its own: the first image is the video's poster.
-  const video = findVideoElement(collectPlayers(document, context))
+  const players = collectPlayers(document, context)
+  const video = findVideoElement(players)
   if (!video || document.querySelector(`img[src]:not([${enclosureMarker}])`)) {
     return
   }
@@ -180,10 +181,17 @@ export const assignVideoPosters: DomTransform = (context) => (document) => {
     return
   }
 
-  moveImageToVideoPoster(poster, video)
+  // A feed that repeats a body player as an enclosure lists the post's media, so the image is as
+  // often a featured photo or a logo as the video's poster. It stays an image.
+  const repeatsBodyPlayer =
+    players.length < document.querySelectorAll('[data-embed-src], iframe[src], video').length
+
+  if (!repeatsBodyPlayer) {
+    moveImageToVideoPoster(poster, video)
+  }
 
   // Without the marker a repeat run reads them as the item's own images and moves none.
-  for (const image of rest) {
+  for (const image of repeatsBodyPlayer ? [poster, ...rest] : rest) {
     image.removeAttribute(enclosureMarker)
   }
 }
