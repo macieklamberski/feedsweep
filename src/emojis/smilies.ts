@@ -407,9 +407,10 @@ const boardEmojiNames = toMap<EmojiGlyph>({
   welcome: false,
 })
 
-// An alt shaped like a code an author types: a known code, a `:name:`, a `(name)` or `[name]` as
-// Plurk and Skype write them, or an ASCII face.
-const shortcodeAltRegex = /^(?::[^\s:]+:|\([\w -]+\)|\[[\w -]+\])$/
+// Alts shaped like a code an author types: a `:name:`, a `(name)` or `[name]` as Plurk and Skype
+// write them, or an ASCII face.
+const colonCodeRegex = /^:[^\s:]+:$/
+const bracketCodeRegex = /^(?:\([\w -]+\)|\[[\w -]+\])$/
 const asciiEmoticonRegex = /^[>O]?[:;=8][-'^o]?[()[\]DPpOo*|\\/$@3Xx]{1,3}$/
 
 // Forum smilie images, which render oversized without the site's CSS. An engine with names or
@@ -425,14 +426,11 @@ export const smiliesEmojiResolver: EmojiResolver = {
       return
     }
 
-    // A directory alone is a weak hint, so a code in the alt is the second one. Only the `:name:`
-    // form and ASCII faces count here, never the bracketed forms.
+    // A directory alone is a weak hint, so a code in the alt is the second one.
     const alt = attr(element, 'alt') ?? ''
-    const hasCodeAlt =
-      (alt.startsWith(':') && shortcodeAltRegex.test(alt)) || asciiEmoticonRegex.test(alt)
 
     return resolveEmojiImage(element, {
-      isStrong: isMarked || hasCodeAlt,
+      isStrong: isMarked || colonCodeRegex.test(alt) || asciiEmoticonRegex.test(alt),
       names: smiliesEmojiNames,
       glyph: getDirectoryGlyph(src, '/images/smilies/', boardEmojiNames),
       // An unsubstituted phpBB template variable is a src no host serves.
@@ -457,7 +455,10 @@ export const smiliesEmoticonEmojiResolver: EmojiResolver = {
 
     const alt = attr(element, 'alt') ?? ''
     const hasEmoticonAlt =
-      getShortcode(alt) !== undefined || shortcodeAltRegex.test(alt) || asciiEmoticonRegex.test(alt)
+      getShortcode(alt) !== undefined ||
+      colonCodeRegex.test(alt) ||
+      bracketCodeRegex.test(alt) ||
+      asciiEmoticonRegex.test(alt)
     const isStrong = size > 0 || element.matches(directorySelector) || hasEmoticonAlt
 
     return resolveEmojiImage(element, { isStrong, names: noEmojiNames })
