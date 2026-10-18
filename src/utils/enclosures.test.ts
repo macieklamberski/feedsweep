@@ -603,6 +603,50 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
       expect(prepare(enclosures, context)).toEqual(expected)
     })
   })
+
+  describe('feed damage', () => {
+    it('should repair a JSON-escaped ampersand left as text', () => {
+      const enclosures: Array<Enclosure> = [
+        {
+          url: 'https://player.vimeo.com/progressive_redirect/playback/1209489815/rendition/1080p/file.mp4%20%281080p%29.mp4?loc=externalu0026signature=f3616a9a5cf44e2616767975cfed0346ff7f7d46ec1067b253ec760b52a6f1d9',
+          type: 'video/mp4',
+        },
+      ]
+      const expected = [
+        'https://player.vimeo.com/progressive_redirect/playback/1209489815/rendition/1080p/file.mp4%20%281080p%29.mp4?loc=external&signature=f3616a9a5cf44e2616767975cfed0346ff7f7d46ec1067b253ec760b52a6f1d9',
+      ]
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
+    it('should repair a JSON-escaped ampersand entity left as text', () => {
+      const enclosures: Array<Enclosure> = [
+        {
+          url: 'https://player.vimeo.com/progressive_redirect/playback/1132017512/rendition/2160p/file.mp4%20%282160p%29.mp4?loc=externalu0026amplog_user=0u0026ampsignature=476dd7d17e6015c5d055836463d852e11cc88d6ea67bc13d22ee5f7159781949',
+          type: 'video/mp4',
+        },
+      ]
+      const expected = [
+        'https://player.vimeo.com/progressive_redirect/playback/1132017512/rendition/2160p/file.mp4%20%282160p%29.mp4?loc=external&log_user=0&signature=476dd7d17e6015c5d055836463d852e11cc88d6ea67bc13d22ee5f7159781949',
+      ]
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
+    it('should keep the text u0026 in a file name', () => {
+      const enclosures: Array<Enclosure> = [
+        {
+          url: 'https://cdn.dbolical.com/cache/videos/mods/1/38/37596/encode_mp4/firing-sounds-and-bullet-tracers-u0026-ralsei.mp4',
+          type: 'video/mp4',
+        },
+      ]
+      const expected = [
+        'https://cdn.dbolical.com/cache/videos/mods/1/38/37596/encode_mp4/firing-sounds-and-bullet-tracers-u0026-ralsei.mp4',
+      ]
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+  })
 })
 
 describe('isEnclosureKind', () => {

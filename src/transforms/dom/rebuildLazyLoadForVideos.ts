@@ -9,17 +9,27 @@ const resolveEmbedSource = [youtubeResolveEmbed, vimeoResolveEmbed]
 // Lazy Load for Videos ships a facade anchor with the watch url and builds the iframe on click.
 export const rebuildLazyLoadForVideos: DomTransform = () => (document) => {
   for (const anchor of document.querySelectorAll('a.preview-lazyload')) {
-    const url = anchor.getAttribute('data-video-uri') ?? anchor.getAttribute('href')
-
-    if (!url) {
-      continue
-    }
+    // The plugin writes Vimeo's api path, `/videos/{id}`, in data-video-uri and the watch url in
+    // href, so each is offered in turn.
+    const urls = [anchor.getAttribute('data-video-uri'), anchor.getAttribute('href')]
 
     let source: string | undefined
-    for (const resolveEmbed of resolveEmbedSource) {
-      source = resolveEmbed(url)?.src
+
+    for (const url of urls) {
       if (source) {
         break
+      }
+
+      if (!url) {
+        continue
+      }
+
+      for (const resolveEmbed of resolveEmbedSource) {
+        source = resolveEmbed(url)?.src
+
+        if (source) {
+          break
+        }
       }
     }
 
