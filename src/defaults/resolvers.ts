@@ -465,6 +465,7 @@ import {
 import { discourseMediaResolver } from '../media/discourse.js'
 import { flashMp3PlayerMediaResolver } from '../media/flashmp3player.js'
 import { ghostMediaResolver } from '../media/ghost.js'
+import { libsynMediaResolver } from '../media/libsyn.js'
 import { odeoMediaResolver } from '../media/odeo.js'
 import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
@@ -799,6 +800,7 @@ const mediaResolvers: Array<MediaResolver> = [
   discourseMediaResolver,
   flashMp3PlayerMediaResolver,
   ghostMediaResolver,
+  libsynMediaResolver,
   odeoMediaResolver,
   podloveMediaResolver,
   substackMediaResolver,
