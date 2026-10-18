@@ -135,7 +135,7 @@ describeForEachParser('deviantartEmojiResolver', (parseHtml) => {
       <p>
         <img
           src="https://example.com/e.deviantart.net/emoticons/h/happybounce.gif"
-          alt=":happybounce:"
+          alt="happybounce"
         >
       </p>
     `
