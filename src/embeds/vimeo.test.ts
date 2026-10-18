@@ -6,6 +6,7 @@ import {
   extractVimeoId,
   readVimeoEmbedSrc,
   vimeoEmbedResolver,
+  vimeoMetasliderEmbedResolver,
   vimeoResolveEmbed,
 } from './vimeo.js'
 
@@ -698,5 +699,63 @@ describeForEachParser('vimeo through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('vimeoMetasliderEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, vimeoMetasliderEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should resolve the MetaSlider Pro slide', async () => {
+      const value = html`
+        <li
+          class="slide-31 ms-vimeo "
+          style="display: none; width: 100%;"
+          data-slide-type="vimeo"
+        >
+          <div
+            class="vimeo"
+            data-id="76979879"
+          ></div>
+        </li>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: '76979879',
+        src: 'https://player.vimeo.com/video/76979879',
+        url: 'https://vimeo.com/76979879',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a div.vimeo outside a MetaSlider Vimeo slide', async () => {
+      const value = html`
+        <li class="slide-31 ms-image">
+          <div
+            class="vimeo"
+            data-id="76979879"
+          ></div>
+        </li>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a slide with an empty video id', async () => {
+      const value = html`
+        <li class="ms-vimeo">
+          <div
+            class="vimeo"
+            data-id=""
+          ></div>
+        </li>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
