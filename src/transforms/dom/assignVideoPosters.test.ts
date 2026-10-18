@@ -316,6 +316,57 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should drop an image named like the video poster in another size', async () => {
+    const value = html`
+      <img src="https://example.org/video/wu_1js1kiblr/wu_1js1kiblr-1280.jpg">
+      <video poster="https://example.org/video/wu_1js1kiblr/wu_1js1kiblr.jpg">
+        <source src="https://example.org/video/wu_1js1kiblr/wu_1js1kiblr.m3u8">
+      </video>
+    `
+    const expected = html`
+      <video poster="https://example.org/video/wu_1js1kiblr/wu_1js1kiblr.jpg">
+        <source src="https://example.org/video/wu_1js1kiblr/wu_1js1kiblr.m3u8">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it("should keep another video's thumbnail with the same generic file name", async () => {
+    const value = html`
+      <img src="https://i.ytimg.com/vi/iHybI2G45OM/hqdefault.jpg">
+      <div
+        data-embed-id="FS4G3_v040A"
+        data-embed-src="https://www.youtube.com/embed/FS4G3_v040A"
+        data-embed-thumbnail="https://i.ytimg.com/vi/FS4G3_v040A/hqdefault.jpg"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a gallery photo numbered beside the video poster', async () => {
+    const value = html`
+      <img src="https://example.org/uploads/2021/10/digiro.ir-107-600x390.webp">
+      <video poster="https://example.org/uploads/2021/10/digiro.ir-108-600x364.webp">
+        <source src="https://example.org/uploads/2021/10/clip.mp4">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a screenshot sheet named after the poster with a resolution', async () => {
+    const value = html`
+      <img src="https://example.org/HLIC/IPZZ-704-1080p.jpeg">
+      <video poster="https://example.org/HLIC/IPZZ-704.jpg">
+        <source src="https://example.org/videos/trailer.mp4">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should keep an image named after the video file beside a poster of its own', async () => {
     const value = html`
       <img src="https://example.org/uploads/Kito-4-300x275.jpg">
