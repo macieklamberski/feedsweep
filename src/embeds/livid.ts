@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -16,13 +16,7 @@ const videoRoutes = new Set(['watch', 'embed'])
 const iframeSrcRegex = /<iframe\s[^>]*?\bsrc="([^"]+)"/i
 
 export const lividResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
-
-  if (!parsed) {
-    return
-  }
-
-  const [route, videoId] = getPathSegments(parsed)
+  const [route, videoId] = getPathSegments(url)
 
   if (!route || !videoRoutes.has(route.toLowerCase()) || !videoId) {
     return
