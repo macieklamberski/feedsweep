@@ -120,13 +120,24 @@ export const assignVideoPosters: DomTransform = () => (document) => {
   }
 
   // (B) An injected image enclosure on a video-led item: a video is embedded and
-  // the item has no inline image of its own: is the video's poster.
+  // the item has no inline image of its own: the first image is the video's poster.
   const video = findVideoElement(document)
   if (!video || document.querySelector(`img[src]:not([${enclosureMarker}])`)) {
     return
   }
 
-  for (const image of document.querySelectorAll(`img[${enclosureMarker}]`)) {
-    moveImageToVideoPoster(image, video)
+  // Only the first image is the poster. An Omeka archive item sends each photo of the item as an
+  // enclosure, and each later one is a picture of its own.
+  const [poster, ...rest] = document.querySelectorAll(`img[${enclosureMarker}]`)
+
+  if (!poster) {
+    return
+  }
+
+  moveImageToVideoPoster(poster, video)
+
+  // Without the marker a repeat run reads them as the item's own images and moves none.
+  for (const image of rest) {
+    image.removeAttribute(enclosureMarker)
   }
 }

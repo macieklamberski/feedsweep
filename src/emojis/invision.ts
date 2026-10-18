@@ -18,6 +18,11 @@ const directories = [
   '/style_emoticons/', // IPB 2 and 3
 ]
 
+// Invision Community's cloud serves each site's emoticons under `/<site>/emoticons/`, and its other
+// media beside them on the same host, so only that path marks an image as an emoticon.
+const cloudSelector = 'img[src*="invisioncic.com/" i][src*="/emoticons/" i]'
+const cloudRegex = /^https?:\/\/[^/]+\.invisioncic\.com\/[^/]+\/emoticons\//i
+
 // Invision boards' names past the stock set, under `uploads/emoticons` and IPB 2's
 // `style_emoticons`.
 const invisionEmojiNames = toMap<EmojiGlyph>({
@@ -69,10 +74,15 @@ const invisionEmojiNames = toMap<EmojiGlyph>({
   peacefingers: false,
 })
 
-// Invision's emoticons, marked by their classes and named under its upload and style directories.
+// Invision's emoticons, marked by their classes or its cloud path, and named under its upload and
+// style directories.
 export const invisionEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: [markerSelector, ...directories.map((path) => `img[src*="${path}" i]`)].join(', '),
+  selector: [
+    markerSelector,
+    ...directories.map((path) => `img[src*="${path}" i]`),
+    cloudSelector,
+  ].join(', '),
   extract: (element) => {
     const src = element.getAttribute('src') ?? ''
     const [uploads, styles] = directories
@@ -87,7 +97,7 @@ export const invisionEmojiResolver: EmojiResolver = {
     }
 
     return resolveEmojiImage(element, {
-      isStrong: element.matches(markerSelector),
+      isStrong: cloudRegex.test(src) || element.matches(markerSelector),
       names: smiliesEmojiNames,
       glyph,
     })

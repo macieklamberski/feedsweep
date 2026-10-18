@@ -125,6 +125,55 @@ describeForEachParser('invisionEmojiResolver', (parseHtml) => {
     })
   })
 
+  describe('Invision Community cloud (invisioncic.com/<site>/emoticons/ path)', () => {
+    it('should mark a board emoticon without any marker', async () => {
+      const value =
+        '<p><img src="https://media.invisioncic.com/r276385/emoticons/default_wave2.gif" alt=":waving"></p>'
+      const expected =
+        '<p><img data-emoji="" src="https://media.invisioncic.com/r276385/emoticons/default_wave2.gif" alt=":waving"></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should mark a hashed upload behind a lazy spacer', async () => {
+      const value = html`
+        <p>Thanks
+          <img
+            alt=":laugh:"
+            data-src="//content.invisioncic.com/q317750/emoticons/laugh.gif.d0c61a70c8a48df9c745be8bd59a18b1.gif"
+            src="https://example.com/applications/core/interface/js/spacer.png"
+          >
+        </p>
+      `
+      const expected = html`
+        <p>Thanks
+          <img
+            data-emoji=""
+            alt=":laugh:"
+            data-src="//content.invisioncic.com/q317750/emoticons/laugh.gif.d0c61a70c8a48df9c745be8bd59a18b1.gif"
+            src="https://content.invisioncic.com/q317750/emoticons/laugh.gif.d0c61a70c8a48df9c745be8bd59a18b1.gif"
+          >
+        </p>
+      `
+
+      expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+    })
+
+    it('should leave a stock filename among the host other media untouched', async () => {
+      const value =
+        '<p><img src="https://media.invisioncic.com/r257793/monthly_2017_01/smile.png" alt=""></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a foreign host carrying the cloud url in its query untouched', async () => {
+      const value =
+        '<p><img src="https://example.com/proxy?url=https://media.invisioncic.com/r276385/emoticons/default_wave2.gif" alt=":waving"></p>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
   it('should replace an IPS 4 emoji by its ipsEmoji class', async () => {
     const value = html`
       <p>

@@ -104,6 +104,7 @@ import { codesandboxIframeEmbedResolver } from '../embeds/codesandbox.js'
 import {
   cognitoformsIframeEmbedResolver,
   cognitoformsScriptEmbedResolver,
+  cognitoformsWidgetEmbedResolver,
 } from '../embeds/cognitoforms.js'
 import { condenastIframeEmbedResolver, condenastScriptEmbedResolver } from '../embeds/condenast.js'
 import { corriereEmbedResolver } from '../embeds/corriere.js'
@@ -357,6 +358,7 @@ import { boardgamegeekEmojiResolver } from '../emojis/boardgamegeek.js'
 import { btblogEmojiResolver } from '../emojis/btblog.js'
 import { cocologEmojiResolver } from '../emojis/cocolog.js'
 import { cuteeditorEmojiResolver } from '../emojis/cuteeditor.js'
+import { deviantartEmojiResolver } from '../emojis/deviantart.js'
 import { discordEmojiResolver } from '../emojis/discord.js'
 import { discourseEmojiResolver } from '../emojis/discourse.js'
 import { discuzEmojiResolver } from '../emojis/discuz.js'
@@ -374,6 +376,7 @@ import {
 } from '../emojis/facebook.js'
 import { fc2EmojiResolver } from '../emojis/fc2.js'
 import { forumotionEmojiResolver } from '../emojis/forumotion.js'
+import { freesmileysEmojiResolver } from '../emojis/freesmileys.js'
 import { froalaElementEmojiResolver, froalaImageEmojiResolver } from '../emojis/froala.js'
 import { fudforumEmojiResolver } from '../emojis/fudforum.js'
 import { genericCharacterEmojiResolver, genericEmojiResolver } from '../emojis/generic.js'
@@ -389,20 +392,25 @@ import { jiveEmojiResolver } from '../emojis/jive.js'
 import { joypixelsEmojiResolver } from '../emojis/joypixels.js'
 import { jugemEmojiResolver } from '../emojis/jugem.js'
 import { khorosEmojiResolver, khorosImageEmojiResolver } from '../emojis/khoros.js'
+import { kolobokEmojiResolver } from '../emojis/kolobok.js'
 import { kunenaEmojiResolver } from '../emojis/kunena.js'
 import { lexicalEmojiResolver } from '../emojis/lexical.js'
 import { liferayEmojiResolver } from '../emojis/liferay.js'
 import { livedoorEmojiResolver } from '../emojis/livedoor.js'
 import { liveinternetEmojiResolver } from '../emojis/liveinternet.js'
+import { liveWriterEmojiResolver } from '../emojis/livewriter.js'
 import { mastodonEmojiResolver } from '../emojis/mastodon.js'
 import { maxEmojiResolver } from '../emojis/max.js'
+import { millannetEmojiResolver } from '../emojis/millannet.js'
 import { mixiEmojiResolver } from '../emojis/mixi.js'
 import { monalisaEmojiResolver } from '../emojis/monalisa.js'
 import { moodleEmojiResolver } from '../emojis/moodle.js'
 import { mozillaEmojiResolver } from '../emojis/mozilla.js'
+import { msnEmojiResolver } from '../emojis/msn.js'
 import { nbbcEmojiResolver } from '../emojis/nbbc.js'
 import { notoEmojiResolver } from '../emojis/noto.js'
 import { okEmojiResolver } from '../emojis/ok.js'
+import { outlookEmojiResolver } from '../emojis/outlook.js'
 import { phpbbEmojiResolver } from '../emojis/phpbb.js'
 import { pivotxEmojiResolver } from '../emojis/pivotx.js'
 import { pixnetEmojiResolver } from '../emojis/pixnet.js'
@@ -413,11 +421,14 @@ import { rcmsEmojiResolver } from '../emojis/rcms.js'
 import { rhymixEmojiResolver } from '../emojis/rhymix.js'
 import { sapoEmojiResolver } from '../emojis/sapo.js'
 import { seesaaEmojiResolver } from '../emojis/seesaa.js'
+import { shervnetEmojiResolver } from '../emojis/shervnet.js'
 import { shinobiEmojiResolver } from '../emojis/shinobi.js'
 import { simplePressEmojiResolver } from '../emojis/simplepress.js'
 import { slackEmojiResolver } from '../emojis/slack.js'
 import { smfEmojiResolver } from '../emojis/smf.js'
+import { smileycentralEmojiResolver } from '../emojis/smileycentral.js'
 import { smiliesEmojiResolver, smiliesEmoticonEmojiResolver } from '../emojis/smilies.js'
+import { sweetimEmojiResolver } from '../emojis/sweetim.js'
 import { tapatalkEmojiResolver } from '../emojis/tapatalk.js'
 import { teamsEmojiResolver } from '../emojis/teams.js'
 import {
@@ -432,6 +443,7 @@ import { twemojiElementEmojiResolver, twemojiEmojiResolver } from '../emojis/twe
 import { ucozEmojiResolver } from '../emojis/ucoz.js'
 import { vanillaEmojiResolver } from '../emojis/vanilla.js'
 import { vkEmojiResolver } from '../emojis/vk.js'
+import { volantisEmojiResolver } from '../emojis/volantis.js'
 import { webWizEmojiResolver } from '../emojis/webwiz.js'
 import { weiboEmojiResolver } from '../emojis/weibo.js'
 import { whatsappEmojiResolver } from '../emojis/whatsapp.js'
@@ -525,6 +537,7 @@ const embedResolvers: Array<EmbedResolver> = [
   codesandboxIframeEmbedResolver,
   cognitoformsScriptEmbedResolver,
   cognitoformsIframeEmbedResolver,
+  cognitoformsWidgetEmbedResolver,
   condenastIframeEmbedResolver,
   condenastScriptEmbedResolver,
   corriereEmbedResolver,
@@ -849,14 +862,25 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
 
   // Ahead of smilies, whose forum names draw Liferay's smile.gif as 🙂.
   liferayEmojiResolver,
+
+  // Ahead of Khoros and smilies, whose shared `/emoticons/` directory matches deviantART's path.
+  deviantartEmojiResolver,
   khorosImageEmojiResolver,
   webWizEmojiResolver,
+  shervnetEmojiResolver,
   discuzEmojiResolver,
+  freesmileysEmojiResolver,
   forumotionEmojiResolver,
   kunenaEmojiResolver,
+  millannetEmojiResolver,
   invisionEmojiResolver,
+
+  // Ahead of the forum engines and smilies, whose class and directory matches take a hotlinked
+  // Kolobok file too.
+  kolobokEmojiResolver,
   xenforoEmojiResolver,
   smfEmojiResolver,
+  sweetimEmojiResolver,
   nbbcEmojiResolver,
   simplePressEmojiResolver,
   drupalEmojiResolver,
@@ -867,6 +891,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   e107EmojiResolver,
   jforumEmojiResolver,
   ucozEmojiResolver,
+  msnEmojiResolver,
 
   // Ahead of smilies, whose class or stock names would mark a placeholder no host serves.
   phpbbEmojiResolver,
@@ -892,6 +917,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   notoEmojiResolver,
   dropboxEmojiResolver,
   gmailEmojiResolver,
+  outlookEmojiResolver,
   okEmojiResolver,
   homepagingEmojiResolver,
   telegramImageEmojiResolver,
@@ -917,7 +943,9 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   cuteeditorEmojiResolver,
   shinobiEmojiResolver,
   liveinternetEmojiResolver,
+  liveWriterEmojiResolver,
   greensmiliesEmojiResolver,
+  smileycentralEmojiResolver,
   rcmsEmojiResolver,
   jeuxvideoEmojiResolver,
   rakutenEmojiResolver,
@@ -925,6 +953,7 @@ export const defaultEmojiResolvers: Array<EmojiResolver> = [
   tistoryEmojiResolver,
   btblogEmojiResolver,
   pixnetEmojiResolver,
+  volantisEmojiResolver,
   genericCharacterEmojiResolver,
 
   // After every engine, since TypePad, Yahoo and others put the emoticon class on their own sets.

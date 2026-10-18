@@ -241,6 +241,25 @@ export const isMediaResult = (result: WidgetResolverResult): result is MediaReso
   return 'tag' in result
 }
 
+// The player a url-keyed resolver makes of a probe frame. A media result is skipped: it names a
+// file, not an embeddable player page.
+export const resolveEmbedProbe = async (
+  probe: Element,
+  resolvers: ReadonlyArray<WidgetResolver>,
+): Promise<EmbedResolverResult | undefined> => {
+  for (const resolver of resolvers.filter(isEmbedOrMediaResolver)) {
+    if (!probe.matches(resolver.selector)) {
+      continue
+    }
+
+    const metadata = await resolver.extract(probe)
+
+    if (metadata && !isMediaResult(metadata)) {
+      return metadata
+    }
+  }
+}
+
 // Not used by the injectEnclosures probe: anything set here would change what every resolver sees.
 export const createIframe = (document: Document, src: string): HTMLElement => {
   const iframe = document.createElement('iframe')

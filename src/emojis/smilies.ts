@@ -10,7 +10,7 @@ import {
   noEmojiNames,
   resolveEmojiImage,
 } from '../utils/emojis.js'
-import { kolobokEmojiNames } from './punbb.js'
+import { kolobokEmojiNames } from './kolobok.js'
 
 // Each engine lists the filenames its own distribution ships, and `smile.png` is shipped by four.
 export const smiliesEmojiNameTables: Array<EmojiNameTable> = [
