@@ -4,6 +4,7 @@ import {
   applyTones,
   getFileStem,
   glyphFromCodepoints,
+  noEmojiNames,
   resolveEmojiElement,
   resolveEmojiImage,
 } from '../utils/emojis.js'
@@ -15,17 +16,14 @@ const hosts = [
   'assets-cdn.github.com/images/icons/emoji/', // GitHub's asset CDN before githubassets.com.
 ]
 
-// GitHub's gemoji images, from READMEs and issues pasted into a post.
+// GitHub's gemoji images, from READMEs and issues pasted into a post. A file outside `unicode/`
+// is named by its gemoji name, like `metal.png`, beside GitHub's own drawings like `octocat.png`,
+// so the named set keeps its pictures. A codepoint file under `unicode/` still converts.
 export const githubImageEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: hosts.map((host) => `img[src*="${host}" i]`).join(', '),
   extract: (element) => {
-    // A file outside `unicode/` is named by its gemoji name, like `arrow_up.png`, and the alt
-    // repeats that name, so neither is read as a code an author typed.
-    const stem = getFileStem(element.getAttribute('src') ?? '')
-    const glyph = glyphFromCodepoints(stem) ?? glyphFromGemojiName(stem)
-
-    return resolveEmojiImage(element, { isStrong: true, glyph })
+    return resolveEmojiImage(element, { isStrong: true, names: noEmojiNames, keepsPictures: true })
   },
 }
 
