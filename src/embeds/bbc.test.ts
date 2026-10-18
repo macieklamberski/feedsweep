@@ -48,7 +48,8 @@ describe('bbcResolveEmbed', () => {
         provider: 'bbc',
         id: 'p01tclqw',
         src: 'https://www.bbc.co.uk/programmes/p01tclqw/player',
-        ratio: '320/374',
+        ratio: '16/9',
+        ratioHeightOffset: 230,
       }
 
       expect(bbcResolveEmbed(value)).toEqual(expected)
@@ -174,7 +175,8 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
         provider: 'bbc',
         id: 'p08s3bnj',
         src: 'https://www.bbc.co.uk/programmes/p08s3bnj/player',
-        ratio: '320/374',
+        ratio: '16/9',
+        ratioHeightOffset: 230,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -207,7 +209,8 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
         id: 'p017rsj2',
         src: 'https://www.bbc.co.uk/programmes/p017rsj2/player',
         url: 'https://www.bbc.co.uk/programmes/p017rsj2',
-        ratio: '320/374',
+        ratio: '16/9',
+        ratioHeightOffset: 230,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -230,7 +233,8 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
         id: 'p00l180n',
         src: 'https://www.bbc.co.uk/programmes/p00l180n/player',
         url: 'https://www.bbc.co.uk/programmes/p00l180n',
-        ratio: '320/374',
+        ratio: '16/9',
+        ratioHeightOffset: 230,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -253,7 +257,8 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
         id: 'p0040t7d',
         src: 'https://www.bbc.co.uk/programmes/p0040t7d/player',
         url: 'https://www.bbc.co.uk/programmes/p0040t7d',
-        ratio: '320/374',
+        ratio: '16/9',
+        ratioHeightOffset: 230,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -278,7 +283,8 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
         id: 'p00gygsd',
         src: 'https://www.bbc.co.uk/programmes/p00gygsd/player',
         url: 'https://www.bbc.co.uk/programmes/p00gygsd',
-        ratio: '320/374',
+        ratio: '16/9',
+        ratioHeightOffset: 230,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -375,7 +381,7 @@ describeForEachParser('bbc through the pipeline', (parseHtml) => {
       </object>
     `
     const expected = html`
-      <div data-embed-ratio="320/374" data-embed-url="https://www.bbc.co.uk/programmes/p017rsj2" data-embed-id="p017rsj2" data-embed-provider="bbc" data-embed-src="https://www.bbc.co.uk/programmes/p017rsj2/player"></div>
+      <div data-embed-ratio="16/9" data-embed-ratio-height-offset="230" data-embed-url="https://www.bbc.co.uk/programmes/p017rsj2" data-embed-id="p017rsj2" data-embed-provider="bbc" data-embed-src="https://www.bbc.co.uk/programmes/p017rsj2/player"></div>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
