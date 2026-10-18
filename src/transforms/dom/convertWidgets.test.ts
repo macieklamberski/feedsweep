@@ -1811,7 +1811,7 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     expect(converted).toEqualHtml(expected)
   })
 
-  it('should keep the element when the post also frames the same file', async () => {
+  it('should remove the element when the post also frames the same file', async () => {
     const value = html`
       <audio controls>
         <source
@@ -1826,12 +1826,6 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
       ></iframe>
     `
     const expected = html`
-      <audio controls>
-        <source
-          src="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view?usp=sharing"
-          type="audio/mpeg"
-        >
-      </audio>
       <div
         data-embed-ratio="4/3"
         data-embed-thumbnail="https://drive.google.com/thumbnail?id=1GRb_urzw2vn0JGKamTE70NIoELiXbAJA&sz=w640"
