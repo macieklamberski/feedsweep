@@ -15,6 +15,7 @@ export const teamsEmojiResolver: EmojiResolver = {
     const folder = element.getAttribute('src')?.match(codepointFolderRegex)?.[1] ?? ''
     const glyph = glyphFromCodepoints(folder.toLowerCase())
 
-    return resolveEmojiImage(element, { isStrong: true, glyph })
+    // A name-only folder maps to no codepoint, so the set keeps its pictures, whatever the alt.
+    return resolveEmojiImage(element, { isStrong: true, glyph, keepsPictures: !glyph })
   },
 }
