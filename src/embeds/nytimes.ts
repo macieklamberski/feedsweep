@@ -15,9 +15,9 @@ const nytimesHosts = ['nytimes.com', 'static01.nyt.com']
 const playerPath = '/video/players/offsite/index.html'
 const legacyPlayerPath = '/bcvideo/1.0/iframe/embed.html'
 
-// A fixed footer sits under the video, so the ratio describes the video alone.
-// NYT's own snippet sizes the player 480 by 321.
+// A footer of share links sits under the 16:9 video. NYT's own snippet sizes the player 480 by 321.
 const playerRatio = '16/9'
+const footerHeight = 71
 
 // The video page is `/video/{section}/{id}/{slug}.html`, and neither the section nor the slug is
 // in the embed, so no `url` is minted. The player discriminates in a browser only: a fabricated
@@ -39,6 +39,7 @@ export const nytimesResolveEmbed: ResolveEmbed = (url, element) => {
     id,
     src: `https://www.nytimes.com${playerPath}${composeQuery({ videoId: id })}`,
     ratio: playerRatio,
+    ratioHeightOffset: footerHeight,
     title: attr(element, 'title'),
   }
 }
