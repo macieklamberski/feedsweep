@@ -13,7 +13,8 @@ describe('dailymailResolveEmbed', () => {
         id: '1763642',
         src: 'https://www.dailymail.co.uk/embed/video/1763642.html',
         url: 'https://www.dailymail.co.uk/video/video-1763642.html',
-        ratio: '9/10',
+        ratio: '16/9',
+        ratioHeightOffset: 250,
       }
 
       expect(dailymailResolveEmbed(value)).toEqual(expected)
@@ -26,7 +27,8 @@ describe('dailymailResolveEmbed', () => {
         id: '2685575',
         src: 'https://www.dailymail.com/embed/video/2685575.html',
         url: 'https://www.dailymail.com/video/video-2685575.html',
-        ratio: '9/10',
+        ratio: '16/9',
+        ratioHeightOffset: 250,
       }
 
       expect(dailymailResolveEmbed(value)).toEqual(expected)
@@ -40,7 +42,8 @@ describe('dailymailResolveEmbed', () => {
         id: '2076534',
         src: 'https://www.dailymail.co.uk/embed/video/2076534.html',
         url: 'https://www.dailymail.co.uk/video/video-2076534.html',
-        ratio: '9/10',
+        ratio: '16/9',
+        ratioHeightOffset: 250,
       }
 
       expect(dailymailResolveEmbed(value)).toEqual(expected)
@@ -87,7 +90,8 @@ describe('dailymailResolveEmbed', () => {
         id: '1763642a',
         src: 'https://www.dailymail.co.uk/embed/video/1763642a.html',
         url: 'https://www.dailymail.co.uk/video/video-1763642a.html',
-        ratio: '9/10',
+        ratio: '16/9',
+        ratioHeightOffset: 250,
       }
 
       expect(dailymailResolveEmbed(value)).toEqual(expected)
@@ -133,7 +137,8 @@ describeForEachParser('dailymailEmbedResolver', (parseHtml) => {
         id: '1763642',
         src: 'https://www.dailymail.co.uk/embed/video/1763642.html',
         url: 'https://www.dailymail.co.uk/video/video-1763642.html',
-        ratio: '9/10',
+        ratio: '16/9',
+        ratioHeightOffset: 250,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -151,7 +156,8 @@ describeForEachParser('dailymailEmbedResolver', (parseHtml) => {
         id: '1763642',
         src: 'https://www.dailymail.co.uk/embed/video/1763642.html',
         url: 'https://www.dailymail.co.uk/video/video-1763642.html',
-        ratio: '9/10',
+        ratio: '16/9',
+        ratioHeightOffset: 250,
         title: 'First look at Joaquin Phoenix playing a supervillain in Joker',
       }
 
@@ -192,7 +198,8 @@ describeForEachParser('dailymail player through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="9/10"
+        data-embed-ratio="16/9"
+        data-embed-ratio-height-offset="250"
         data-embed-id="2685575"
         data-embed-provider="dailymail"
         data-embed-src="https://www.dailymail.co.uk/embed/video/2685575.html"
