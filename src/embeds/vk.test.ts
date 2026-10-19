@@ -65,17 +65,61 @@ describe('vkResolveEmbed', () => {
 
       expect(vkResolveEmbed(value)).toEqual(expected)
     })
+
+    it("should mint a video's page onto its player", () => {
+      const value = 'https://vk.com/video-1_2'
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: '-1_2',
+        src: 'https://vk.ru/video_ext.php?oid=-1&id=2',
+        url: 'https://vkvideo.ru/video-1_2',
+        ratio: '16/9',
+      }
+
+      expect(vkResolveEmbed(value)).toEqual(expected)
+    })
+
+    it("should drop the query of a video's page", () => {
+      const value = 'https://vk.com/video-42258342_456239658?list=729f142272f3de38ec'
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: '-42258342_456239658',
+        src: 'https://vk.ru/video_ext.php?oid=-42258342&id=456239658',
+        url: 'https://vkvideo.ru/video-42258342_456239658',
+        ratio: '16/9',
+      }
+
+      expect(vkResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
-    it('should ignore a path that is not a player', () => {
-      const value = 'https://vk.com/al_video.php?oid=1&id=2'
+    it('should ignore a wall post', () => {
+      const value = 'https://vk.com/wall534385176_47599'
 
       expect(vkResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore the video page itself', () => {
-      const value = 'https://vk.com/video-1_2'
+    it("should ignore a community's video list", () => {
+      const value = 'https://vk.com/videos-214240511'
+
+      expect(vkResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a video page under another path', () => {
+      const value = 'https://vk.com/x/video-214240511_456239169'
+
+      expect(vkResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a path past the video page', () => {
+      const value = 'https://vk.com/video-214240511_456239169/extra'
+
+      expect(vkResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a path that is not a player', () => {
+      const value = 'https://vk.com/al_video.php?oid=1&id=2'
 
       expect(vkResolveEmbed(value)).toBeUndefined()
     })
@@ -291,6 +335,81 @@ describeForEachParser('vkWidgetEmbedResolver', (parseHtml) => {
         provider: 'vk',
         id: 'audio_playlist-113047006_85410764',
         src: 'https://vk.ru/widget_playlist.php?oid=-113047006&pid=85410764&hash=c2c936956e79205795',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the podcast widget from its episode with no page url', async () => {
+      const value = html`
+        <div id="vk_podcast_-136292562_456240468"></div>
+        <script
+          type="text/javascript"
+          src="https://vk.com/js/api/openapi.js?173"
+        ></script>
+        <script type="text/javascript">
+          (function() {
+            VK.Widgets.Podcast("vk_podcast_-136292562_456240468", "-136292562_456240468", 'b51ba7de0bf5661ab1');
+          })();
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: 'podcast-136292562_456240468',
+        src: 'https://vk.ru/widget_podcast.php?episode=-136292562_456240468',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the poll widget from the poll its call names', async () => {
+      const value = html`
+        <div id="vk_poll">&nbsp;</div>
+        <script type="text/javascript">
+          VK.Widgets.Poll("vk_poll", {}, "457398901_cb701bff78497d0d33");
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: 'widget_poll457398901_cb701bff78497d0d33',
+        src: 'https://vk.ru/al_widget_poll.php?poll_id=457398901_cb701bff78497d0d33',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the poll past the options its call sets', async () => {
+      const value = html`
+        <div id="vk_poll"></div>
+        <script type="text/javascript">
+          VK.Widgets.Poll("vk_poll", {width: 300}, "77166200_bf5be0f785d3b41854");
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: 'widget_poll77166200_bf5be0f785d3b41854',
+        src: 'https://vk.ru/al_widget_poll.php?poll_id=77166200_bf5be0f785d3b41854',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the app id a poll is scoped to', async () => {
+      const value = html`
+        <center>
+          <script type="text/javascript">
+            VK.init({apiId: 6265444, onlyWidgets: true});
+          </script>
+          <div id="vk_poll"></div>
+          <script type="text/javascript">
+            VK.Widgets.Poll("vk_poll", {width: "500"}, "279233795_821d0bb875ce1e1ece");
+          </script>
+        </center>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: 'widget_poll279233795_821d0bb875ce1e1ece',
+        src: 'https://vk.ru/al_widget_poll.php?app=6265444&poll_id=279233795_821d0bb875ce1e1ece',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -570,5 +689,114 @@ describeForEachParser('vk widgets through the pipeline', (parseHtml) => {
     const sources = [...placeholders].map((element) => element.getAttribute('data-embed-src'))
 
     expect(sources).toEqual(expected)
+  })
+})
+
+describeForEachParser('vk video pages through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should replace a video naming a video page with the player', async () => {
+    const value = html`
+      <video
+        class="elementor-video"
+        src="https://vk.com/video-42258342_456239658?list=729f142272f3de38ec"
+        controls=""
+        preload="metadata"
+      ></video>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-url="https://vkvideo.ru/video-42258342_456239658"
+        data-embed-id="-42258342_456239658"
+        data-embed-provider="vk"
+        data-embed-src="https://vk.ru/video_ext.php?oid=-42258342&id=456239658"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should replace a video whose source names a video page with the player', async () => {
+    const value = html`
+      <p>
+        <video controls="controls">
+          <source src="https://vk.com/video-214240511_456239169">
+        </video>
+      </p>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-url="https://vkvideo.ru/video-214240511_456239169"
+        data-embed-id="-214240511_456239169"
+        data-embed-provider="vk"
+        data-embed-src="https://vk.ru/video_ext.php?oid=-214240511&id=456239169"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it("should keep the video's poster as the thumbnail", async () => {
+    const value = html`
+      <video
+        poster="https://example.com/poster.jpg"
+        src="https://vk.com/video-42258342_456239658"
+      ></video>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://example.com/poster.jpg"
+        data-embed-url="https://vkvideo.ru/video-42258342_456239658"
+        data-embed-id="-42258342_456239658"
+        data-embed-provider="vk"
+        data-embed-src="https://vk.ru/video_ext.php?oid=-42258342&id=456239658"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should drop a video naming the page of a video the post already frames', async () => {
+    const value = html`
+      <iframe src="https://vk.com/video_ext.php?oid=-42258342&id=456239658&hash=8cb3638a83a93268"></iframe>
+      <video src="https://vk.com/video-42258342_456239658"></video>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-url="https://vkvideo.ru/video-42258342_456239658"
+        data-embed-id="-42258342_456239658"
+        data-embed-provider="vk"
+        data-embed-src="https://vk.ru/video_ext.php?oid=-42258342&id=456239658&hash=8cb3638a83a93268"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a video that also names a file it plays', async () => {
+    const value = html`
+      <video controls>
+        <source src="https://vk.com/video-214240511_456239169">
+        <source
+          src="https://example.com/video.mp4"
+          type="video/mp4"
+        >
+      </video>
+    `
+
+    expect(await convert(value)).toEqualHtml(value)
+  })
+
+  it('should leave a vk file a video plays', async () => {
+    const value =
+      '<video controls src="https://vk.com/doc197234991_445357396?hash=effcf1ff05569f2f20&mp4=1"></video>'
+
+    expect(await convert(value)).toEqualHtml(value)
   })
 })
