@@ -739,6 +739,7 @@ describeForEachParser('dailymotionScriptEmbedResolver', (parseHtml) => {
         id: 'playlist/x86yvo',
         src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x86yvo',
         url: 'https://www.dailymotion.com/playlist/x86yvo',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -873,6 +874,7 @@ describeForEachParser('dailymotionScriptEmbedResolver', (parseHtml) => {
         id: 'playlist/x86yvo',
         src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x86yvo',
         url: 'https://www.dailymotion.com/playlist/x86yvo',
+        ratio: '16/9',
         title: 'Historias de Diván (2013)',
         date: '2024-03-04T19:36:57.000Z',
       }
