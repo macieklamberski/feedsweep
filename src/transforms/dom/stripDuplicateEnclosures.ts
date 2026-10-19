@@ -1,7 +1,6 @@
 import type { DomTransform } from '../../types.js'
 import { removeWithEmptyWrappers, walkElements } from '../../utils/dom.js'
-import { buildMediaKey } from '../../utils/enclosures.js'
-import { enclosureMarker } from './injectEnclosures.js'
+import { buildMediaKey, enclosureMarker } from '../../utils/enclosures.js'
 
 const existingMediaSelector = 'audio[src], video[src], source[src], img[src], [data-embed-src]'
 
