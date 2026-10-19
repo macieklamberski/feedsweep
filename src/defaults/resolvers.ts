@@ -281,6 +281,7 @@ import {
 import { soundcloudEmbedResolver } from '../embeds/soundcloud.js'
 import {
   speakerdeckIframeEmbedResolver,
+  speakerdeckLegacyScriptEmbedResolver,
   speakerdeckScriptEmbedResolver,
 } from '../embeds/speakerdeck.js'
 import { spotifyEmbedResolver } from '../embeds/spotify.js'
@@ -726,6 +727,7 @@ const embedResolvers: Array<EmbedResolver> = [
   slideshareIframeEmbedResolver,
   soundcloudEmbedResolver,
   speakerdeckScriptEmbedResolver,
+  speakerdeckLegacyScriptEmbedResolver,
   speakerdeckIframeEmbedResolver,
   spotifyEmbedResolver,
   spreakerIframeEmbedResolver,
