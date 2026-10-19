@@ -228,7 +228,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the player options, the language and the widget id', async () => {
+    it('should drop the player options and the language', async () => {
       const value = html`
         <iframe
           id="kaltura_player"
@@ -243,7 +243,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'kaltura',
         id: '2346171/0_bg4o7fhu',
-        src: 'https://cdnapisec.kaltura.com/p/2346171/sp/234617100/embedIframeJs/uiconf_id/42601131/partner_id/2346171?iframeembed=true&entry_id=0_bg4o7fhu',
+        src: 'https://cdnapisec.kaltura.com/p/2346171/sp/234617100/embedIframeJs/uiconf_id/42601131/partner_id/2346171?iframeembed=true&entry_id=0_bg4o7fhu&wid=1_z2u0xe5j',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/2346171/thumbnail/entry_id/0_bg4o7fhu/width/640',
         ratio: '16/9',
@@ -263,7 +263,7 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'kaltura',
         id: '1660902/1_txx4an1j',
-        src: 'https://cdnapisec.kaltura.com/p/1660902/sp/166090200/embedIframeJs/uiconf_id/25717641/partner_id/1660902?iframeembed=true&entry_id=1_txx4an1j&flashvars%5BmediaProxy.mediaPlayFrom%5D=0',
+        src: 'https://cdnapisec.kaltura.com/p/1660902/sp/166090200/embedIframeJs/uiconf_id/25717641/partner_id/1660902?iframeembed=true&entry_id=1_txx4an1j&flashvars%5BmediaProxy.mediaPlayFrom%5D=0&wid=1_cpekzs9a',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/1660902/thumbnail/entry_id/1_txx4an1j/width/640',
         ratio: '16/9',
@@ -347,6 +347,70 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
         src: 'https://cdnapisec.kaltura.com/p/2503451/embedPlaykitJs/uiconf_id/49754663?iframeembed=true&entry_id=1_csldgzsc',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/2503451/thumbnail/entry_id/1_csldgzsc/width/640',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the widget an embedIframeJs carrier names as wid', async () => {
+      const value = html`
+        <iframe
+          id="kaltura_player"
+          title="DiSoCo Research locations in Somalia"
+          src="https://cdnapisec.kaltura.com/p/2010292/sp/201029200/embedIframeJs/uiconf_id/32599141/partner_id/2010292?iframeembed=true&amp;playerId=kaltura_player&amp;entry_id=1_w2sabqvp&amp;flashvars[streamerType]=auto&amp;flashvars[localizationCode]=en&amp;&amp;wid=1_10egwcwd"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'kaltura',
+        id: '2010292/1_w2sabqvp',
+        src: 'https://cdnapisec.kaltura.com/p/2010292/sp/201029200/embedIframeJs/uiconf_id/32599141/partner_id/2010292?iframeembed=true&entry_id=1_w2sabqvp&wid=1_10egwcwd',
+        thumbnail:
+          'https://cdnapisec.kaltura.com/p/2010292/thumbnail/entry_id/1_w2sabqvp/width/640',
+        ratio: '16/9',
+        title: 'DiSoCo Research locations in Somalia',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the widget id an access-controlled entry plays with', async () => {
+      const value = html`
+        <iframe
+          src="https://cdnapisec.kaltura.com/p/2010292/sp/201029200/embedIframeJs/uiconf_id/32599141/partner_id/2010292?iframeembed=true&amp;playerId=kaltura_player&amp;entry_id=1_toaz3mam&amp;widget_id=1_klzfz8r6"
+          width="525"
+          height="394"
+          frameborder="0"
+          allowfullscreen
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'kaltura',
+        id: '2010292/1_toaz3mam',
+        src: 'https://cdnapisec.kaltura.com/p/2010292/sp/201029200/embedIframeJs/uiconf_id/32599141/partner_id/2010292?iframeembed=true&entry_id=1_toaz3mam&widget_id=1_klzfz8r6',
+        thumbnail:
+          'https://cdnapisec.kaltura.com/p/2010292/thumbnail/entry_id/1_toaz3mam/width/640',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the widget the playkit player reads for an access-controlled entry', async () => {
+      const value = html`
+        <iframe
+          id="kaltura_player"
+          src="https://cdnapisec.kaltura.com/p/2189801/embedPlaykitJs/uiconf_id/52405342?iframeembed=true&amp;entry_id=1_esq8y0qk&amp;config%5Bprovider%5D=%7B%22widgetId%22%3A%221_k9ri0183%22%7D&amp;config%5Bplayback%5D=%7B%22startTime%22%3A0%7D"
+          style="width: 608px;height: 300px;border: 0;"
+          allowfullscreen
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'kaltura',
+        id: '2189801/1_esq8y0qk',
+        src: 'https://cdnapisec.kaltura.com/p/2189801/embedPlaykitJs/uiconf_id/52405342?iframeembed=true&entry_id=1_esq8y0qk&config%5Bprovider%5D=%7B%22widgetId%22%3A%221_k9ri0183%22%7D',
+        thumbnail:
+          'https://cdnapisec.kaltura.com/p/2189801/thumbnail/entry_id/1_esq8y0qk/width/640',
         ratio: '16/9',
       }
 
