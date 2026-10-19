@@ -282,6 +282,18 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
     }
   }
 
+  // The playlist page refuses framing, so a frame of it shows nothing, and its `list` is the id
+  // the playlist player takes.
+  if (segments[0] === 'playlist') {
+    const list = parsed?.searchParams.get('list')
+
+    if (!list) {
+      return
+    }
+
+    return composeListEmbed(list)
+  }
+
   // The Flash player took its playlist on `/p/{id}`, the playlist the modern url spells as
   // `list=PL{id}`, and the swf it points at is dead, so the id is the only thing left to rebuild
   // from. The publisher's `?hl=` and `&fs=1` are player chrome and go with the rest of the query.
