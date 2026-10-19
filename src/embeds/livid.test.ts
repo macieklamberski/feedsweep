@@ -34,6 +34,18 @@ describe('lividResolveEmbed', () => {
 
       expect(lividResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should keep the older player route, keyed by account and number', () => {
+      const value = 'https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888'
+      const expected: EmbedResolverResult = {
+        provider: 'livid',
+        id: 'qvN5Xsn5Hh-H/451811888',
+        src: 'https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888',
+        ratio: '16/9',
+      }
+
+      expect(lividResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -60,6 +72,18 @@ describe('lividResolveEmbed', () => {
 
       expect(lividResolveEmbed(value)).toBeUndefined()
     })
+
+    it('should ignore the older player route with no number', () => {
+      const value = 'https://livid.com/oe/qvN5Xsn5Hh-H/video/'
+
+      expect(lividResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the older player route naming something other than a video', () => {
+      const value = 'https://livid.com/oe/qvN5Xsn5Hh-H/videos/451811888'
+
+      expect(lividResolveEmbed(value)).toBeUndefined()
+    })
   })
 
   describe('edge cases', () => {
@@ -83,6 +107,30 @@ describe('lividResolveEmbed', () => {
         id: 'IoMGtM7uIDai',
         src: 'https://livid.com/embed/IoMGtM7uIDai',
         url: 'https://livid.com/watch/IoMGtM7uIDai',
+        ratio: '16/9',
+      }
+
+      expect(lividResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the older route words in any case and keep the account as written', () => {
+      const value = 'https://livid.com/OE/qvN5Xsn5Hh-H/VIDEO/451811888'
+      const expected: EmbedResolverResult = {
+        provider: 'livid',
+        id: 'qvN5Xsn5Hh-H/451811888',
+        src: 'https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888',
+        ratio: '16/9',
+      }
+
+      expect(lividResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the query of the older player route', () => {
+      const value = 'https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888?autoplay=1'
+      const expected: EmbedResolverResult = {
+        provider: 'livid',
+        id: 'qvN5Xsn5Hh-H/451811888',
+        src: 'https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888',
         ratio: '16/9',
       }
 

@@ -16,14 +16,37 @@ const videoRoutes = new Set(['watch', 'embed'])
 const iframeSrcRegex = /<iframe\s[^>]*?\bsrc="([^"]+)"/i
 
 export const lividResolveEmbed: ResolveEmbed = (url, element) => {
-  const [route, videoId] = getPathSegments(url)
-
-  if (!route || !videoRoutes.has(route.toLowerCase()) || !videoId) {
-    return
-  }
+  const segments = getPathSegments(url)
+  const route = segments[0]?.toLowerCase()
 
   // MetaSlider's Livid slide writes its own translated player label as the iframe `title`.
   const isMetasliderSlide = Boolean(element?.closest('li.ms-livid'))
+  const title = isMetasliderSlide ? undefined : attr(element, 'title')
+
+  // The older player route, `oe/{account}/video/{number}`, still plays. Livid assigns the video's
+  // current id itself, so the route cannot be rebuilt onto it and the player url is kept. The
+  // number names a video only together with its account.
+  if (route === 'oe') {
+    const [, account, kind, number] = segments
+
+    if (kind?.toLowerCase() !== 'video' || !number) {
+      return
+    }
+
+    return {
+      provider,
+      id: `${account}/${number}`,
+      src: `https://livid.com/oe/${account}/video/${number}`,
+      ratio: playerRatio,
+      title,
+    }
+  }
+
+  const videoId = segments[1]
+
+  if (!route || !videoRoutes.has(route) || !videoId) {
+    return
+  }
 
   return {
     provider,
@@ -31,7 +54,7 @@ export const lividResolveEmbed: ResolveEmbed = (url, element) => {
     src: `https://livid.com/embed/${videoId}`,
     url: `https://livid.com/watch/${videoId}`,
     ratio: playerRatio,
-    title: isMetasliderSlide ? undefined : attr(element, 'title'),
+    title,
   }
 }
 
