@@ -13,7 +13,7 @@ const playerPathRegex = /^\/embed\/video\/([^/]+)\.html$/
 
 // A 16:9 video between a header and title bar above and a control bar and headline below.
 const playerRatio = '16/9'
-const chromeHeight = 250
+const chromeHeight = 234
 
 // MailOnline's video player, `/embed/video/{id}.html`.
 export const dailymailResolveEmbed: ResolveEmbed = (url, element) => {
