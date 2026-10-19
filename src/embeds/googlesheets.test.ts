@@ -253,9 +253,9 @@ describe('googlesheetsResolveEmbed', () => {
       expect(googlesheetsResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a sheet framed on its preview page', () => {
+    it('should ignore a published sheet framed on its preview page', () => {
       const value =
-        'https://docs.google.com/spreadsheets/d/1dK6ywx4Zv0G-C8YE8cpnzses0R5MJAWA36SYVl74Pi0/preview'
+        'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/preview'
 
       expect(googlesheetsResolveEmbed(value)).toBeUndefined()
     })
@@ -373,6 +373,88 @@ describe('googlesheetsResolveEmbed', () => {
     })
   })
 
+  describe('the preview page of a sheet shared by link', () => {
+    it('should frame a sheet on its preview page', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1dK6ywx4Zv0G-C8YE8cpnzses0R5MJAWA36SYVl74Pi0/preview'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1dK6ywx4Zv0G-C8YE8cpnzses0R5MJAWA36SYVl74Pi0',
+        src: 'https://docs.google.com/spreadsheets/d/1dK6ywx4Zv0G-C8YE8cpnzses0R5MJAWA36SYVl74Pi0/preview',
+        url: 'https://docs.google.com/spreadsheets/d/1dK6ywx4Zv0G-C8YE8cpnzses0R5MJAWA36SYVl74Pi0/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1dK6ywx4Zv0G-C8YE8cpnzses0R5MJAWA36SYVl74Pi0&sz=w640',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the share tracker from a preview page', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1w0SUUqeK0Du9gXSKMV6Jko3d8mN6k-UhKhGMT-tVS-Y/preview?usp=drivesdk'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1w0SUUqeK0Du9gXSKMV6Jko3d8mN6k-UhKhGMT-tVS-Y',
+        src: 'https://docs.google.com/spreadsheets/d/1w0SUUqeK0Du9gXSKMV6Jko3d8mN6k-UhKhGMT-tVS-Y/preview',
+        url: 'https://docs.google.com/spreadsheets/d/1w0SUUqeK0Du9gXSKMV6Jko3d8mN6k-UhKhGMT-tVS-Y/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1w0SUUqeK0Du9gXSKMV6Jko3d8mN6k-UhKhGMT-tVS-Y&sz=w640',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the tab a preview page names in its query', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1PimT3P0y1EBVIq4IBWjz6_7wzsXq9UCLKKsYSjD2nHE/preview?gid=0'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1PimT3P0y1EBVIq4IBWjz6_7wzsXq9UCLKKsYSjD2nHE',
+        src: 'https://docs.google.com/spreadsheets/d/1PimT3P0y1EBVIq4IBWjz6_7wzsXq9UCLKKsYSjD2nHE/preview?gid=0',
+        url: 'https://docs.google.com/spreadsheets/d/1PimT3P0y1EBVIq4IBWjz6_7wzsXq9UCLKKsYSjD2nHE/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1PimT3P0y1EBVIq4IBWjz6_7wzsXq9UCLKKsYSjD2nHE&sz=w640',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the tab a preview page names in its fragment', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1lbhLGFvh3K1L4vCLPZ0n1EoZsIvP2223Xa7T3jTz874/preview#gid=1192960626'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1lbhLGFvh3K1L4vCLPZ0n1EoZsIvP2223Xa7T3jTz874',
+        src: 'https://docs.google.com/spreadsheets/d/1lbhLGFvh3K1L4vCLPZ0n1EoZsIvP2223Xa7T3jTz874/preview#gid=1192960626',
+        url: 'https://docs.google.com/spreadsheets/d/1lbhLGFvh3K1L4vCLPZ0n1EoZsIvP2223Xa7T3jTz874/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1lbhLGFvh3K1L4vCLPZ0n1EoZsIvP2223Xa7T3jTz874&sz=w640',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop an empty tab from the fragment of a preview page', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1zm2Fdsl6Y8lQQsiLnFTaGiL24qdBeOqV_WnZ_uuyeCM/preview#gid='
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1zm2Fdsl6Y8lQQsiLnFTaGiL24qdBeOqV_WnZ_uuyeCM',
+        src: 'https://docs.google.com/spreadsheets/d/1zm2Fdsl6Y8lQQsiLnFTaGiL24qdBeOqV_WnZ_uuyeCM/preview',
+        url: 'https://docs.google.com/spreadsheets/d/1zm2Fdsl6Y8lQQsiLnFTaGiL24qdBeOqV_WnZ_uuyeCM/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1zm2Fdsl6Y8lQQsiLnFTaGiL24qdBeOqV_WnZ_uuyeCM&sz=w640',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+  })
+
   describe('the sign-in prefixes', () => {
     it('should frame a published sheet behind an account index on its own path', () => {
       const value =
@@ -434,6 +516,29 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml',
         height: 500,
         title: 'December 2025 Karate Grading Results',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should frame a sheet the s9e media embed wrote on its preview page', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="googlesheets"
+          allowfullscreen=""
+          scrolling="no"
+          style="height:500px;resize:vertical;width:100%"
+          src="https://docs.google.com/spreadsheets/d/1lbhLGFvh3K1L4vCLPZ0n1EoZsIvP2223Xa7T3jTz874/preview#gid=1192960626"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1lbhLGFvh3K1L4vCLPZ0n1EoZsIvP2223Xa7T3jTz874',
+        src: 'https://docs.google.com/spreadsheets/d/1lbhLGFvh3K1L4vCLPZ0n1EoZsIvP2223Xa7T3jTz874/preview#gid=1192960626',
+        url: 'https://docs.google.com/spreadsheets/d/1lbhLGFvh3K1L4vCLPZ0n1EoZsIvP2223Xa7T3jTz874/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1lbhLGFvh3K1L4vCLPZ0n1EoZsIvP2223Xa7T3jTz874&sz=w640',
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)

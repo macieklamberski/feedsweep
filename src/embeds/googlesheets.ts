@@ -1,8 +1,9 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr, getElementDimensions } from '../utils/dom.js'
-import { pickUrlParams } from '../utils/urls.js'
+import { composeQuery, pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { composeDriveThumbnail } from './googledrive.js'
 
 const provider = 'googlesheets'
 
@@ -10,6 +11,9 @@ const provider = 'googlesheets'
 // shared answers 401 on `/edit` and `/preview`.
 const sheetRoutes = ['pubhtml', 'pubhtml/sheet']
 const chartRoute = 'pubchart'
+// Frames a sheet shared by link, by its file id. A sheet that is shared but not published
+// answers 401 on `pubhtml`.
+const sharedRoute = 'preview'
 
 // The parameters a sheet's frame keeps. Every other one is dropped.
 const sheetParams = [
@@ -25,6 +29,14 @@ const chartParams = [
 
 const sheetHeight = 500
 const chartHeight = 371
+
+// A frame can name the tab it opens on in the fragment, as `#gid={id}`.
+const readTabFragment = (url: string): string => {
+  const hash = parseUrl(url)?.hash ?? ''
+  const query = composeQuery(pickQueryParams(hash.slice(1), ['gid']))
+
+  return query.replace('?', '#')
+}
 
 // `/spreadsheets/d/e/{token}` names a sheet published to the web and `/spreadsheets/d/{id}` names
 // it by its Drive file id. An account index, `/u/{n}/`, only picks the sign-in and serves the
@@ -46,13 +58,16 @@ export const googlesheetsResolveEmbed: ResolveEmbed = (url, element) => {
   const sheetId = segments[isPublished ? 2 : 1]
   const route = segments.slice(isPublished ? 3 : 2).join('/')
   const isChart = route === chartRoute
+  // A publish token answers 404 on `/preview`.
+  const isShared = !isPublished && route === sharedRoute
 
-  if (!isChart && !sheetRoutes.includes(route)) {
+  if (!isChart && !isShared && !sheetRoutes.includes(route)) {
     return
   }
 
   const sheetPath = isPublished ? `e/${sheetId}` : sheetId
   const query = pickUrlParams(url, isChart ? chartParams : sheetParams)
+  const fragment = readTabFragment(url)
   // A chart draws at its own pixel size and never scales, and its carrier declares that size.
   const declaredHeight = element ? getElementDimensions(element).height : undefined
   const height = isChart ? (declaredHeight ?? chartHeight) : sheetHeight
@@ -60,8 +75,9 @@ export const googlesheetsResolveEmbed: ResolveEmbed = (url, element) => {
   return {
     provider,
     id: sheetId,
-    src: `https://docs.google.com/spreadsheets/d/${sheetPath}/${route}${query}`,
-    url: `https://docs.google.com/spreadsheets/d/${sheetPath}/pubhtml`,
+    src: `https://docs.google.com/spreadsheets/d/${sheetPath}/${route}${query}${fragment}`,
+    url: `https://docs.google.com/spreadsheets/d/${sheetPath}/${isShared ? 'edit' : 'pubhtml'}`,
+    thumbnail: isShared ? composeDriveThumbnail(sheetId) : undefined,
     height,
     title: attr(element, 'title'),
   }
