@@ -10,8 +10,8 @@ const provider = 'ultimedia'
 const playerPathRegex = /^\/deliver\/generic\/iframe\/mdtk\/([^/]+)\/src\/([^/]+)(?:\/|$)/
 
 // Ultimedia, trading as Digiteka: the generic player iframe, which plays as it stands and states
-// its own size. The legacy `/swf/iframe_pub.php` route carries no account key and its player is
-// gone, so there is nothing on it to mint from.
+// its own size. The legacy `/swf/iframe_pub.php` route names its account key in `mdtk`, but its
+// videos answer "Video not found" on the generic player, so there is nothing on it to mint from.
 export const ultimediaEmbedResolver = createMarkupEmbedResolver(
   'iframe[src*="ultimedia.com/deliver"]',
   (element) => {
