@@ -15,8 +15,10 @@ const googledriveHosts = [
 
 // `/file/d/{id}/preview` frames the file and `/file/d/{id}/view` is its page. A folder on
 // `/drive/folders` or `/embeddedfolderview` is a listing, not a file, and stays unclaimed.
+// A Workspace prefix, `/a/{domain}/`, only picks the sign-in and serves the same file.
 export const googledriveResolveEmbed: ResolveEmbed = (url) => {
-  const segments = getPathSegments(url)
+  const pathSegments = getPathSegments(url)
+  const segments = pathSegments[0] === 'a' ? pathSegments.slice(2) : pathSegments
   const fileId = segments[0] === 'file' && segments[1] === 'd' ? segments[2] : undefined
 
   if (!fileId) {
