@@ -13,6 +13,9 @@ const flashRoutes = ['emb', 'emd']
 // The server matches this path in its own case only.
 const playerPath = '/iframe.php'
 
+// Only this host takes the id as its only segment. The apex serves pages there, such as `/search`.
+const shortHost = 'v.traileraddict.com'
+
 const composeEmbed = (id: string): EmbedResolverResult => {
   return {
     provider,
@@ -24,12 +27,23 @@ const composeEmbed = (id: string): EmbedResolverResult => {
 }
 
 // Trailer Addict's player, `/iframe.php?id={id}`, the `embedUrl` its watch pages name. The Flash
-// player, `/emd/{id}` or `/emb/{id}`, took the same id, so it is rebuilt onto the current one.
+// player, `/emd/{id}` or `/emb/{id}`, and the short `v.traileraddict.com/{id}` took the same id,
+// so both are rebuilt onto the current one.
 export const traileraddictResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, traileraddictHosts)
 
   if (!parsed) {
     return
+  }
+
+  if (parsed.hostname === shortHost) {
+    const [id, ...rest] = getPathSegments(parsed)
+
+    if (!id || rest.length > 0) {
+      return
+    }
+
+    return composeEmbed(id)
   }
 
   if (parsed.pathname === playerPath) {
