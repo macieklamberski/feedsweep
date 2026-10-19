@@ -5,6 +5,7 @@ import { countSrcsetCandidates, parseSrcset } from '../../utils/images.js'
 import { absoluteUrlRegex, resolveOrKeepUrl } from '../../utils/urls.js'
 
 const hostPrefixedUrlRegex = /^(https?:)\/\/[^/?#]+\/+(?=\/(?:[a-z0-9-]+\.)+[a-z]{2,}\/)/i
+const leadingSlashRunRegex = /^(https?:\/\/[^/?#]+)\/{2,}/i
 const hostPrefixedSrcTags = ['iframe', 'embed', 'script']
 
 // A protocol-relative src resolved against the page lands behind the site's own host,
@@ -13,8 +14,14 @@ const stripSiteHostPrefix = (url: string): string => {
   return url.replace(hostPrefixedUrlRegex, '$1/')
 }
 
-// An absolute value other than a host-prefixed player or script src is left byte-identical, and a
-// relative one with no `baseUrl` resolves to nothing and stays as written.
+// A server answers a path opening on a run of slashes as one slash, and a resolver reading the
+// path by position refuses it. A run deeper in the path can carry an embedded url, so it stays.
+const collapseLeadingSlashes = (url: string): string => {
+  return url.replace(leadingSlashRunRegex, '$1/')
+}
+
+// An absolute value other than a player or script src is left byte-identical, and a relative one
+// with no `baseUrl` resolves to nothing and stays as written.
 const resolveAttribute = (
   element: Element,
   attribute: string,
@@ -30,7 +37,7 @@ const resolveAttribute = (
   const resolved = resolveOrKeepUrl(value, { baseUrl, resolveUrlFn })
 
   if (attribute === 'src' && hostPrefixedSrcTags.includes(element.localName)) {
-    element.setAttribute(attribute, stripSiteHostPrefix(resolved))
+    element.setAttribute(attribute, collapseLeadingSlashes(stripSiteHostPrefix(resolved)))
 
     return
   }
