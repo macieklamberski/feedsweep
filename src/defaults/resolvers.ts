@@ -135,6 +135,7 @@ import {
 import { documentcloudEmbedResolver } from '../embeds/documentcloud.js'
 import { donorboxEmbedResolver } from '../embeds/donorbox.js'
 import { dvidsEmbedResolver } from '../embeds/dvids.js'
+import { dzenEmbedResolver } from '../embeds/dzen.js'
 import { educaplayEmbedResolver } from '../embeds/educaplay.js'
 import {
   facebookAmpEmbedResolver,
@@ -590,6 +591,7 @@ const embedResolvers: Array<EmbedResolver> = [
   documentcloudEmbedResolver,
   donorboxEmbedResolver,
   dvidsEmbedResolver,
+  dzenEmbedResolver,
   educaplayEmbedResolver,
   facebookWidgetEmbedResolver,
   facebookFlashEmbedResolver,
