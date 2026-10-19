@@ -13,6 +13,7 @@ describe('nytimesResolveEmbed', () => {
         id: '100000004460561',
         src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=100000004460561',
         ratio: '16/9',
+        ratioHeightOffset: 71,
       }
 
       expect(nytimesResolveEmbed(value)).toEqual(expected)
@@ -26,6 +27,7 @@ describe('nytimesResolveEmbed', () => {
         id: '1247464583973',
         src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=1247464583973',
         ratio: '16/9',
+        ratioHeightOffset: 71,
       }
 
       expect(nytimesResolveEmbed(value)).toEqual(expected)
@@ -39,6 +41,7 @@ describe('nytimesResolveEmbed', () => {
         id: '100000010648638',
         src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=100000010648638',
         ratio: '16/9',
+        ratioHeightOffset: 71,
       }
 
       expect(nytimesResolveEmbed(value)).toEqual(expected)
@@ -52,6 +55,7 @@ describe('nytimesResolveEmbed', () => {
         id: '100000004077071',
         src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=100000004077071',
         ratio: '16/9',
+        ratioHeightOffset: 71,
       }
 
       expect(nytimesResolveEmbed(value)).toEqual(expected)
@@ -94,6 +98,7 @@ describe('nytimesResolveEmbed', () => {
         id: 'latest',
         src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=latest',
         ratio: '16/9',
+        ratioHeightOffset: 71,
       }
 
       expect(nytimesResolveEmbed(value)).toEqual(expected)
@@ -120,6 +125,7 @@ describeForEachParser('nytimesIframeEmbedResolver', (parseHtml) => {
       id: '100000007370133',
       src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=100000007370133',
       ratio: '16/9',
+      ratioHeightOffset: 71,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -145,6 +151,7 @@ describeForEachParser('nytimesIframeEmbedResolver', (parseHtml) => {
       id: '100000010648638',
       src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=100000010648638',
       ratio: '16/9',
+      ratioHeightOffset: 71,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -170,6 +177,7 @@ describeForEachParser('nytimesIframeEmbedResolver carrier title', (parseHtml) =>
       id: '1247464583973',
       src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=1247464583973',
       ratio: '16/9',
+      ratioHeightOffset: 71,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -184,6 +192,7 @@ describeForEachParser('nytimesIframeEmbedResolver carrier title', (parseHtml) =>
       id: '1247464583973',
       src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=1247464583973',
       ratio: '16/9',
+      ratioHeightOffset: 71,
       title: 'A Few Cookies a Day to Keep the Pounds Away?',
     }
 

@@ -6,8 +6,8 @@ import type {
   TransformContext,
   WidgetResolver,
 } from '../../types.js'
-import { isEnclosureKind, prepareEnclosures } from '../../utils/enclosures.js'
-import { getImageFingerprint } from '../../utils/images.js'
+import { enclosureMarker, isEnclosureKind, prepareEnclosures } from '../../utils/enclosures.js'
+import { findPosterEvidence, getImageFingerprint } from '../../utils/images.js'
 import {
   cleanUrl,
   flashFileRegex,
@@ -25,11 +25,6 @@ import {
   resolveEmbedProbe,
   setDimensions,
 } from '../../utils/widgets.js'
-
-// Marks an injected element so a repeat run skips it and stripDuplicateEnclosures (an
-// opt-in heuristic) can tell it from the item's own inline content. Exported because
-// stripDuplicateEnclosures and assignVideoPosters both read it.
-export const enclosureMarker = 'data-enclosure'
 
 // Text a publishing tool wrote where a description would go, lowercased.
 const placeholderCaptions = [
@@ -187,7 +182,8 @@ export const injectEnclosures: DomTransform = (context) => {
     const files: Array<HTMLElement> = []
     const captions = new Map<HTMLElement, string>()
 
-    const hasContentImage = !!document.querySelector('img[src], picture, [data-embed-thumbnail]')
+    const hasContentImage = !!document.querySelector('img[src], picture')
+    const thumbnailed = [...document.querySelectorAll('[data-embed-thumbnail]')]
 
     for (const enclosure of prepareEnclosures(enclosures, document, context)) {
       // The embeddable URL: a media:player console (when present) is the canonical thing to
@@ -277,7 +273,13 @@ export const injectEnclosures: DomTransform = (context) => {
       }
 
       // An image enclosure is almost always the lead image, scaled or cropped, on another url.
-      if (hasContentImage) {
+      // Beside a player's thumbnail only the image tied to that player is its poster again, and a
+      // featured photo still shows.
+      const isThumbnail = thumbnailed.some((player) => {
+        return findPosterEvidence(mediaSource, player, context.cleanUrlFn)
+      })
+
+      if (hasContentImage || isThumbnail) {
         continue
       }
 

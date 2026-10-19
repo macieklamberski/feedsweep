@@ -1,3 +1,4 @@
+import { isSoundcloudStream } from '../../embeds/soundcloud.js'
 import type {
   DomTransform,
   EmbedResolverResult,
@@ -89,9 +90,9 @@ const readPageMedia = async (
       continue
     }
 
-    // Vimeo's `progressive_redirect` file and SoundCloud's feed stream sit on hosts their
-    // resolvers claim, and play in the element as written.
-    if (getMediaTag(url)) {
+    // Vimeo's `progressive_redirect` file sits on a host its resolver claims, and plays in the
+    // element as written. A SoundCloud feed stream names its track, which the widget plays.
+    if (getMediaTag(url) && !isSoundcloudStream(url)) {
       return
     }
 

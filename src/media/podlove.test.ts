@@ -269,6 +269,78 @@ describeForEachParser('podloveMediaResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read the episode the player call inlines when the cache holds null', async () => {
+      const config = JSON.stringify([
+        null,
+        {
+          url: 'https://example.com/wp-json/podlove-web-player/shortcode/config/default/theme/default',
+          data: { activeTab: 'chapters', version: 5 },
+        },
+      ])
+      const episode = JSON.stringify({
+        title: 'gt0324 - NEWS - Microsoft Trio',
+        duration: '00:59:03',
+        poster: 'https://example.com/wp-content/uploads/2019/05/Logo-1400x1400.jpg',
+        audio: [
+          {
+            url: 'https://www.example.com/podcast/gt0324.mp3',
+            mimeType: 'audio/mpeg',
+            title: 'MP3',
+            size: 0,
+          },
+        ],
+      })
+      const value = html`
+        <div
+          id="player-6ad65b3304e60"
+          class="podlove-web-player intrinsic-ignore podlove-web-player-loading"
+        >
+          <root>
+            <tab-chapters></tab-chapters>
+            <subscribe-button></subscribe-button>
+          </root>
+        </div>
+        <script>
+          document.addEventListener("DOMContentLoaded", function() {
+            var player = document.getElementById("player-6ad65b3304e60");
+            podlovePlayerCache.add(${config});
+            podlovePlayer(player, ${episode}, "https://example.com/wp-json/podlove-web-player/shortcode/config/default/theme/default").then(function() {
+              player && player.classList.remove("podlove-web-player-loading");
+            });
+          });
+        </script>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'https://www.example.com/podcast/gt0324.mp3',
+        title: 'gt0324 - NEWS - Microsoft Trio',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should prefer the cached episode over the one the player call inlines', async () => {
+      const config = JSON.stringify([
+        { data: { audio: [{ url: 'https://example.com/cached.mp3', mimeType: 'audio/mpeg' }] } },
+      ])
+      const episode = JSON.stringify({
+        audio: [{ url: 'https://example.com/inlined.mp3', mimeType: 'audio/mpeg' }],
+      })
+      const value = html`
+        <div class="podlove-web-player"></div>
+        <script>
+          podlovePlayerCache.add(${config});
+          podlovePlayer(player, ${episode}, "https://example.com/wp-json/podlove-web-player/shortcode/config/default/theme/default");
+        </script>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'https://example.com/cached.mp3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -292,6 +364,18 @@ describeForEachParser('podloveMediaResolver', (parseHtml) => {
       const value = html`
         <div class="podlove-web-player"></div>
         <script>podlovePlayerCache.add([{"data":{"audio":[}])</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined when the inlined episode is malformed json', async () => {
+      const value = html`
+        <div class="podlove-web-player"></div>
+        <script>
+          podlovePlayerCache.add([null]);
+          podlovePlayer(player, {"audio":[}, "https://example.com/wp-json/podlove-web-player/shortcode/config/default/theme/default");
+        </script>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -349,6 +433,24 @@ describeForEachParser('podloveMediaResolver', (parseHtml) => {
       const value = '<div class="podlove-web-player"></div>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should scan a long run of player calls in under a second', async () => {
+      const value = `<div class="podlove-web-player"></div><script>${'podlovePlayer(player, {'.repeat(20000)}</script>`
+      const start = performance.now()
+
+      expect(await extract(value)).toBeUndefined()
+      expect(performance.now() - start).toBeLessThan(1000)
+    })
+
+    it('should scan a long run of cache calls in under a second', async () => {
+      const value = `<div class="podlove-web-player"></div><script>${'podlovePlayerCache.add(['.repeat(20000)}</script>`
+      const start = performance.now()
+
+      expect(await extract(value)).toBeUndefined()
+      expect(performance.now() - start).toBeLessThan(1000)
     })
   })
 })

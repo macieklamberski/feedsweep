@@ -1,14 +1,19 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, flashVars } from '../utils/dom.js'
+import { attr, flashVar, flashVars } from '../utils/dom.js'
 import {
   audioFileRegex,
   composeQuery,
+  parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
   splitStrayParams,
 } from '../utils/urls.js'
-import { createUrlEmbedResolver, getEmbedSize } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  getEmbedSize,
+} from '../utils/widgets.js'
 
 const provider = 'archive'
 
@@ -18,13 +23,26 @@ const archiveHosts = ['archive.org']
 // `stream` is the retired BookReader url, and it 302s to `details/{identifier}?view=theater`.
 const itemRoutes = ['embed', 'details', 'stream']
 
+// `embed/{identifier}/{file}` plays that file alone, and `embed/{identifier}` the item's first.
+const fileRoutes = ['embed', 'details']
+
+type SegmentParts = {
+  head: string
+  strayParams: string
+  file: string
+}
+
 // Some publisher tooling wrote `embed/{identifier}&playlist=1`, an ampersand where the query
 // should begin, so the whole tail lands inside the path segment.
-const readSegmentParts = (link: string): { head: string; strayParams: string } => {
-  const segments = getPathSegments(link)
-  const segment = itemRoutes.includes(segments[0] ?? '') ? segments[1] : undefined
+const readSegmentParts = (link: string): SegmentParts => {
+  const [route = '', segment = '', ...rest] = getPathSegments(link)
+  const { head, strayParams } = splitStrayParams(itemRoutes.includes(route) ? segment : '')
 
-  return splitStrayParams(segment ?? '')
+  return {
+    head,
+    strayParams,
+    file: fileRoutes.includes(route) ? rest.join('/') : '',
+  }
 }
 
 export const extractArchiveIdentifier = (link: string): string | undefined => {
@@ -44,12 +62,14 @@ const archiveEmbedParams = ['playlist', 'list_height', 'start', 'end']
 // Every item has a thumbnail at `archive.org/services/img/{identifier}` and a page at
 // `archive.org/details/{identifier}`. The thumbnail service answers 200 for anything, a generic
 // placeholder png for an unknown identifier.
-const composeEmbedResult = (identifier: string, query = ''): EmbedResolverResult => {
+const composeEmbedResult = (identifier: string, query = '', file = ''): EmbedResolverResult => {
+  const path = file ? `${identifier}/${file}` : identifier
+
   return {
     provider,
     id: identifier,
-    src: `https://archive.org/embed/${identifier}${query}`,
-    url: `https://archive.org/details/${identifier}`,
+    src: `https://archive.org/embed/${path}${query}`,
+    url: `https://archive.org/details/${path}`,
     thumbnail: `https://archive.org/services/img/${identifier}`,
   }
 }
@@ -68,8 +88,8 @@ const declaresAudioPlayer = (element: Element): boolean => {
   return height !== undefined && height < audioCarrierHeightLimit
 }
 
-export const archiveResolveEmbed: ResolveEmbed = (url, element) => {
-  const identifier = extractArchiveIdentifier(url)
+const readItemEmbed = (url: string): EmbedResolverResult | undefined => {
+  const { head: identifier, strayParams, file } = readSegmentParts(url)
 
   if (!identifier) {
     return
@@ -79,14 +99,23 @@ export const archiveResolveEmbed: ResolveEmbed = (url, element) => {
   // ampersand form stranded in the path is read alongside the real query, since that spelling
   // 404s and rejoining it is what makes those embeds work at all.
   const search = parseUrl(url, placeholderBaseUrl)?.search ?? ''
-  const { strayParams } = readSegmentParts(url)
   const query = composeQuery({
     ...pickQueryParams(search, archiveEmbedParams),
     // The `&` spelling 404s, so what it stranded in the path is rejoined as query.
     ...pickQueryParams(strayParams, archiveEmbedParams),
   })
 
-  const result = { ...composeEmbedResult(identifier, query), title: attr(element, 'title') }
+  return composeEmbedResult(identifier, query, file)
+}
+
+export const archiveResolveEmbed: ResolveEmbed = (url, element) => {
+  const embed = readItemEmbed(url)
+
+  if (!embed) {
+    return
+  }
+
+  const result = { ...embed, title: attr(element, 'title') }
 
   // Height alone: a width beside it reads as a ratio, and the box grows while the bar stays 30.
   if (element && declaresAudioPlayer(element)) {
@@ -99,7 +128,50 @@ export const archiveResolveEmbed: ResolveEmbed = (url, element) => {
 // The Internet Archive's player iframe, which renders on its own but names no poster or page link.
 export const archiveIframeEmbedResolver = createUrlEmbedResolver(archiveHosts, archiveResolveEmbed)
 
-const flashPlayerPathRegex = /^\/+flow\//
+// A WordPress audio block or a hand-written `<audio>` naming the item's page, which no browser
+// plays. An element that also names a file under `download` or on a storage host plays that.
+export const archiveAudioEmbedResolver = createMarkupEmbedResolver('audio', (element) => {
+  const embeds: Array<EmbedResolverResult> = []
+
+  for (const carrier of [element, ...element.querySelectorAll('source')]) {
+    const src = attr(carrier, 'src')
+
+    if (!src) {
+      continue
+    }
+
+    const embed = isHostOrSubdomainOf(src, archiveHosts) ? readItemEmbed(src) : undefined
+
+    if (!embed) {
+      return
+    }
+
+    embeds.push(embed)
+  }
+
+  const [embed] = embeds
+
+  if (!embed) {
+    return
+  }
+
+  // A post that also frames the same file already plays it, and the dead element stays. The
+  // iframe resolver runs first, so that frame is a placeholder by now.
+  const placeholders = element.ownerDocument.querySelectorAll('[data-embed-src]')
+
+  if (Array.from(placeholders).some((other) => attr(other, 'data-embed-src') === embed.src)) {
+    return
+  }
+
+  return { ...embed, height: audioPlayerHeight }
+})
+
+const flowPlayerPathRegex = /^\/+(?:flow|flv)\//
+const xspfPlayerPathRegex = /^\/+audio\/xspf_player\.swf$/
+// The WordPress audio player swf, uploaded into an item of its own or beside the files it plays.
+const itemPlayerPathRegex = /^\/+download\/.+\/player\.swf$/
+// `archive.org/download/{identifier}/{file}`, or `/{n}/items/{identifier}/{file}` on a storage host.
+const itemFilePathRegex = /^\/+(?:download|\d+\/items)\/([^/]+)\/(.+)/
 // The segment after `archive.org/download/` on any subdomain.
 // Both dialects write the file as `archive.org/download/{identifier}/{file}`, on the playlist
 // entry for a video and on the clip's `baseUrl` for audio.
@@ -115,10 +187,46 @@ const namesAudioFile = (config: string): boolean => {
   })
 }
 
+// The XSPF player loads `audio/xspf-maker.php?identifier={identifier}`, a playlist of the item.
+const readXspfPlayer = (player: URL): EmbedResolverResult | undefined => {
+  const playlist = parseUrlOnHosts(player.searchParams.get('playlist_url') ?? '', archiveHosts)
+  const identifier = playlist?.searchParams.get('identifier')
+
+  if (!identifier) {
+    return
+  }
+
+  return { ...composeEmbedResult(identifier), height: audioPlayerHeight }
+}
+
+// The `soundFile` flashvar names one file of an item that can hold hundreds, so the file is kept.
+const readItemPlayer = (element: Element | undefined): EmbedResolverResult | undefined => {
+  const soundFile = parseUrlOnHosts(flashVar(element, 'soundFile'), archiveHosts)
+  const [, identifier, file] = soundFile?.pathname.match(itemFilePathRegex) ?? []
+
+  if (!identifier) {
+    return
+  }
+
+  return { ...composeEmbedResult(identifier, '', file), height: audioPlayerHeight }
+}
+
 const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
+  if (!parsed) {
+    return
+  }
+
+  if (xspfPlayerPathRegex.test(parsed.pathname)) {
+    return readXspfPlayer(parsed)
+  }
+
+  if (itemPlayerPathRegex.test(parsed.pathname)) {
+    return readItemPlayer(element)
+  }
+
+  if (!flowPlayerPathRegex.test(parsed.pathname)) {
     return
   }
 
@@ -139,7 +247,8 @@ const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   return { ...result, ratio: videoPlayerRatio }
 }
 
-// The archive's retired Flowplayer swf, which names its item only in the Flash config.
+// The archive's retired Flash players: Flowplayer, which names its item only in the Flash config,
+// the XSPF audio player and the WordPress audio player swf an item hosts.
 export const archiveFlashEmbedResolver = createUrlEmbedResolver(
   archiveHosts,
   archiveFlashResolveEmbed,

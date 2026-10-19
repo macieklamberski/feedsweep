@@ -25,6 +25,10 @@ const playbackParams = [
 // entry that needs it gets no thumbnail, since the poster would need it too.
 const tokenParam = 'flashvars[ks]'
 
+// The widget an entry's access control can be tied to, as the embedIframeJs and the
+// embedPlaykitJs player read it. Such an entry plays only with it, and errors without it.
+const widgetParams = ['wid', 'widget_id', 'config[provider]']
+
 type Entry = {
   partner: string
   entryId: string
@@ -47,7 +51,7 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult 
   const hasToken = parsed.searchParams.has(tokenParam)
   const kept = filterUrlQuery(
     parsed,
-    (name) => name === tokenParam || playbackParams.includes(name),
+    (name) => name === tokenParam || widgetParams.includes(name) || playbackParams.includes(name),
   )
   const playback = kept.replace('?', '&')
   // The entry comes out of the query decoded, and it goes into a path.

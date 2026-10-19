@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { baseContext, describeForEachParser } from '../tests.js'
 import type { Enclosure, TransformContext } from '../types.js'
-import { isEnclosureKind, prepareEnclosures } from './enclosures.js'
+import { buildMediaKey, isEnclosureKind, prepareEnclosures } from './enclosures.js'
 
 describeForEachParser('prepareEnclosures', (parseHtml) => {
   const prepare = (
@@ -686,5 +686,51 @@ describe('isEnclosureKind', () => {
     expect(isEnclosureKind({}, 'audio')).toBe(false)
     expect(isEnclosureKind({}, 'video')).toBe(false)
     expect(isEnclosureKind({}, 'image')).toBe(false)
+  })
+})
+
+describeForEachParser('buildMediaKey', (parseHtml) => {
+  const getElement = (value: string): Element => {
+    return parseHtml(value).body.firstElementChild as Element
+  }
+
+  it('should key an image rendition like the original image', () => {
+    const value1 = getElement('<img src="https://example.com/uploads/photo-300x200.jpg">')
+    const value2 = getElement('<img src="https://example.com/uploads/photo.jpg">')
+
+    expect(buildMediaKey(value1)).toBe(buildMediaKey(value2))
+  })
+
+  it('should drop the query of an image', () => {
+    const value1 = getElement('<img src="https://example.com/uploads/photo.jpg?w=300">')
+    const value2 = getElement('<img src="https://example.com/uploads/photo.jpg">')
+
+    expect(buildMediaKey(value1)).toBe(buildMediaKey(value2))
+  })
+
+  it('should keep the query that tells podcast proxy episodes apart', () => {
+    const value1 = getElement('<audio src="https://example.com/play.mp3?url=episode-1"></audio>')
+    const value2 = getElement('<audio src="https://example.com/play.mp3?url=episode-2"></audio>')
+
+    expect(buildMediaKey(value1)).not.toBe(buildMediaKey(value2))
+  })
+
+  it('should key an embed placeholder by its source', () => {
+    const value = getElement('<div data-embed-src="https://www.youtube.com/embed/abc123"></div>')
+
+    expect(buildMediaKey(value)).toBe('https://www.youtube.com/embed/abc123')
+  })
+
+  it('should clean the url of a media file', () => {
+    const value = getElement('<video src="https://example.com/clip.mp4?utm_source=feed"></video>')
+    const cleanUrlFn = (url: string) => url.split('?')[0]
+
+    expect(buildMediaKey(value, cleanUrlFn)).toBe('https://example.com/clip.mp4')
+  })
+
+  it('should return an empty key for an element without a url', () => {
+    const value = getElement('<video></video>')
+
+    expect(buildMediaKey(value)).toBe('')
   })
 })

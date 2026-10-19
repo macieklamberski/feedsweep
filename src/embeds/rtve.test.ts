@@ -234,6 +234,179 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
     })
   })
 
+  // The v2 embed snippet names the asset as the directory of the swf, with no query.
+  describe('the v2 embed player', () => {
+    it('should repair the dead player to the modern video embed', async () => {
+      const value = html`
+        <embed
+          src="http://www.rtve.es/swf/v2/embed/913019_es_videos/RTVEPlayer.swf"
+          width="425"
+          height="300"
+          name="RTVEPlayer9268"
+          allowfullscreen="true"
+          allowscriptaccess="always"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'rtve',
+        id: 'video/913019',
+        src: 'https://www.rtve.es/drmn/embed/video/913019/',
+        url: 'https://www.rtve.es/v/913019/',
+        thumbnail: 'https://img.rtve.es/v/913019/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Constructed: no feed writes both, so this pins the order the module documents.
+    it('should prefer the asset in the swf query over the swf path', async () => {
+      const value = html`
+        <embed src="http://www.rtve.es/swf/v2/embed/913019_es_videos/RTVEPlayer.swf?assetID=824677_es_videos" />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'rtve',
+        id: 'video/824677',
+        src: 'https://www.rtve.es/drmn/embed/video/824677/',
+        url: 'https://www.rtve.es/v/824677/',
+        thumbnail: 'https://img.rtve.es/v/824677/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Constructed: no feed writes both, so this pins the order the module documents.
+    it('should prefer the asset in the flashvars over the swf path', async () => {
+      const value = html`
+        <embed
+          src="http://www.rtve.es/swf/v2/embed/913019_es_videos/RTVEPlayer.swf"
+          flashvars="assetID=824677_es_videos"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'rtve',
+        id: 'video/824677',
+        src: 'https://www.rtve.es/drmn/embed/video/824677/',
+        url: 'https://www.rtve.es/v/824677/',
+        thumbnail: 'https://img.rtve.es/v/824677/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should return undefined for the embed path below another directory', async () => {
+      const value = html`
+        <embed src="http://www.rtve.es/swf/x/swf/v2/embed/913019_es_videos/RTVEPlayer.swf" />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a swf below the player', async () => {
+      const value = html`
+        <embed src="http://www.rtve.es/swf/v2/embed/913019_es_videos/RTVEPlayer.swf/x.swf" />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  // The FLVPlayer names the asset only in its nielsen beacon, and an audio one by its config.
+  describe('the FLVPlayer', () => {
+    it('should repair the dead audio player to the modern audio embed', async () => {
+      const value = html`
+        <embed
+          src="http://www.rtve.es/swf/FLVPlayer.swf?nielsen=assetID::383526,title::Mediterráneo: 18 enero 2009&amp;file=http://www.rtve.es/resources/mp3/1/1/1232110176211.mp3&amp;config=http://www.rtve.es/swf/data/rtve_config_audio_embed.xml&amp;controlbar=title::Mediterráneo: 18 enero 2009"
+          wmode="transparent"
+          width="550"
+          height="45"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'rtve',
+        id: 'audio/383526',
+        src: 'https://www.rtve.es/drmn/embed/audio/383526/',
+        url: 'https://www.rtve.es/a/383526/',
+        ratio: '16/9',
+        title: 'Mediterráneo: 18 enero 2009',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Constructed: the census carriers write the beacon in the swf query only.
+    it('should read the beacon and the config off the flashvars', async () => {
+      const value = html`
+        <embed
+          src="http://www.rtve.es/swf/FLVPlayer.swf"
+          flashvars="nielsen=assetID::420589,title::Videodrome: Encrucijada (22 febrero 2009)&amp;config=http://www.rtve.es/swf/data/rtve_config_audio_embed.xml"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'rtve',
+        id: 'audio/420589',
+        src: 'https://www.rtve.es/drmn/embed/audio/420589/',
+        url: 'https://www.rtve.es/a/420589/',
+        ratio: '16/9',
+        title: 'Videodrome: Encrucijada (22 febrero 2009)',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should return undefined for the video config the muchachadanui carriers write', async () => {
+      const value = html`
+        <embed
+          src="http://www.rtve.es/swf/FLVPlayer.swf?nielsen=assetID::383526,title::Mediterráneo&amp;config=http://www.rtve.es/swf/data/rtve_config_embed.xml"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a config named after the audio one', async () => {
+      const value = html`
+        <embed
+          src="http://www.rtve.es/swf/FLVPlayer.swf?nielsen=assetID::383526,title::Mediterráneo&amp;config=http://www.rtve.es/swf/data/rtve_config_audio_embed.xml.bak"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined when the beacon names no asset', async () => {
+      const value = html`
+        <embed
+          src="http://www.rtve.es/swf/FLVPlayer.swf?file=http://www.rtve.es/resources/mp3/1/1/1232110176211.mp3&amp;config=http://www.rtve.es/swf/data/rtve_config_audio_embed.xml"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the FLVPlayer below another directory', async () => {
+      const value = html`
+        <embed
+          src="http://www.rtve.es/swf/x/swf/FLVPlayer.swf?nielsen=assetID::383526,title::Mediterráneo&amp;config=http://www.rtve.es/swf/data/rtve_config_audio_embed.xml"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a swf below the FLVPlayer', async () => {
+      const value = html`
+        <embed
+          src="http://www.rtve.es/swf/FLVPlayer.swf/x.swf?nielsen=assetID::383526,title::Mediterráneo&amp;config=http://www.rtve.es/swf/data/rtve_config_audio_embed.xml"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
   // The 4.x player leaves the swf url bare and passes the asset in the flashvars.
   describe('the 4.x player', () => {
     it('should read the asset off the flashvars param', async () => {
@@ -421,6 +594,85 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
 // The enclosure probe offers every attachment a feed carries to this resolver, and RTVE serves
 // its podcast and video files under its own domain, so the id shape is what keeps one playable.
 describeForEachParser('rtve through the pipeline', (parseHtml) => {
+  it('should turn a v2 embed player nested in its object into one placeholder', async () => {
+    const value = html`
+      <object
+        height="300"
+        width="425"
+        classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+        id="RTVEPlayer5110"
+      >
+        <param name="allowScriptAccess" value="never"></param>
+        <param name="src" value="http://www.rtve.es/swf/v2/embed/824677_es_videos/RTVEPlayer.swf"></param>
+        <param name="wmode" value="opaque"></param>
+        <embed
+          wmode="opaque"
+          height="300"
+          width="425"
+          name="RTVEPlayer5110"
+          src="http://www.rtve.es/swf/v2/embed/824677_es_videos/RTVEPlayer.swf"
+          type="application/x-shockwave-flash"
+        ></embed>
+      </object>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="rtve"
+        data-embed-id="video/824677"
+        data-embed-src="https://www.rtve.es/drmn/embed/video/824677/"
+        data-embed-url="https://www.rtve.es/v/824677/"
+        data-embed-thumbnail="https://img.rtve.es/v/824677/"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(
+      await transformContent(value, {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://example.com/post',
+      }),
+    ).toEqualHtml(expected)
+  })
+
+  it('should turn an audio FLVPlayer nested in its object into one placeholder', async () => {
+    const value = html`
+      <object
+        classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+        width="550"
+        height="45"
+      >
+        <param
+          name="movie"
+          value="http://www.rtve.es/swf/FLVPlayer.swf?nielsen=assetID::383526,title::Mediterráneo: 18 enero 2009&amp;file=http://www.rtve.es/resources/mp3/1/1/1232110176211.mp3&amp;config=http://www.rtve.es/swf/data/rtve_config_audio_embed.xml&amp;controlbar=title::Mediterráneo: 18 enero 2009"
+        >
+        <param name="wmode" value="transparent">
+        <embed
+          src="http://www.rtve.es/swf/FLVPlayer.swf?nielsen=assetID::383526,title::Mediterráneo: 18 enero 2009&amp;file=http://www.rtve.es/resources/mp3/1/1/1232110176211.mp3&amp;config=http://www.rtve.es/swf/data/rtve_config_audio_embed.xml&amp;controlbar=title::Mediterráneo: 18 enero 2009"
+          wmode="transparent"
+          width="550"
+          height="45"
+        ></embed>
+      </object>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="rtve"
+        data-embed-id="audio/383526"
+        data-embed-src="https://www.rtve.es/drmn/embed/audio/383526/"
+        data-embed-url="https://www.rtve.es/a/383526/"
+        data-embed-ratio="16/9"
+        data-embed-title="Mediterráneo: 18 enero 2009"
+      ></div>
+    `
+
+    expect(
+      await transformContent(value, {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://example.com/post',
+      }),
+    ).toEqualHtml(expected)
+  })
+
   it('should leave an audio enclosure on the rtve host playable', async () => {
     const enclosures = [
       {

@@ -10,6 +10,7 @@ import { blueskyRenderHint } from '../embeds/bluesky.js'
 import { brRenderHint } from '../embeds/br.js'
 import { bridRenderHint } from '../embeds/brid.js'
 import { brightcoveRenderHint } from '../embeds/brightcove.js'
+import { bunnystreamRenderHint } from '../embeds/bunnystream.js'
 import { buzzsproutRenderHint } from '../embeds/buzzsprout.js'
 import { captivateRenderHint } from '../embeds/captivate.js'
 import { ccmaRenderHint } from '../embeds/ccma.js'
@@ -20,6 +21,7 @@ import { dailymotionRenderHint } from '../embeds/dailymotion.js'
 import { deezerRenderHint } from '../embeds/deezer.js'
 import { documentcloudRenderHint } from '../embeds/documentcloud.js'
 import { donorboxRenderHint } from '../embeds/donorbox.js'
+import { dzenRenderHint } from '../embeds/dzen.js'
 import { facebookRenderHint } from '../embeds/facebook.js'
 import { flickrRenderHint } from '../embeds/flickr.js'
 import { flourishRenderHint } from '../embeds/flourish.js'
@@ -103,6 +105,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   bridRenderHint,
   brightcoveRenderHint,
   brRenderHint,
+  bunnystreamRenderHint,
   buzzsproutRenderHint,
   captivateRenderHint,
   ccmaRenderHint,
@@ -113,6 +116,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   deezerRenderHint,
   documentcloudRenderHint,
   donorboxRenderHint,
+  dzenRenderHint,
   facebookRenderHint,
   flickrRenderHint,
   flourishRenderHint,
