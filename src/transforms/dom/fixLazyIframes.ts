@@ -5,11 +5,14 @@ import { isUsableSrc } from '../../utils/urls.js'
 
 // Srcs a platform points a deferred iframe at while the real URL sits in a lazy attribute: a
 // src matching one of these is a placeholder, not content.
-// Invision Community pairs its page with data-embed-src, Complianz its video with data-src-cmplz.
+// Invision Community pairs its page with data-embed-src, Complianz its video with data-src-cmplz,
+// OSYouTube its page with data-src.
 const placeholderSrcRegexes = [
   // Invision Community's blank page or spacer image.
   /\/applications\/core\/interface\/(?:index\.html|js\/spacer\.png)(?:[?#]|$)/,
   /\/complianz-gdpr(?:-premium)?\/assets\/video\//, // Complianz's placeholder video
+  // Joomla OSYouTube's "Load after page load" page, which shows only "Loading...".
+  /(?:^|\/)plugins\/content\/osyoutube\/index\.html$/,
   /^data:image\//, // bLazy's transparent gif
   // consentmanager's `blank` and WP Rocket's `about:blank`, once resolved against the page.
   /(?:^|\/)(?:about:)?blank$/,
