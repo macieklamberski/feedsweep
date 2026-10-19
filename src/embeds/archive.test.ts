@@ -1092,6 +1092,53 @@ describeForEachParser('archive iframe embeds through the pipeline', (parseHtml) 
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
+
+  // WordPress encloses a linked details page when it answers with the file's audio type.
+  it('should give an audio enclosure on a details page the audio bar', async () => {
+    const enclosures = [
+      {
+        url: 'https://archive.org/details/nonfiction023_librivox/snf023_declarationofindependence_jefferson_bg.mp3',
+        type: 'audio/mpeg',
+      },
+    ]
+    const expected = html`
+      <div
+        data-enclosure=""
+        data-embed-height="30"
+        data-embed-thumbnail="https://archive.org/services/img/nonfiction023_librivox"
+        data-embed-url="https://archive.org/details/nonfiction023_librivox/snf023_declarationofindependence_jefferson_bg.mp3"
+        data-embed-id="nonfiction023_librivox"
+        data-embed-provider="archive"
+        data-embed-src="https://archive.org/embed/nonfiction023_librivox/snf023_declarationofindependence_jefferson_bg.mp3"
+      ></div>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+
+  it('should keep the video player for a video enclosure on a details page', async () => {
+    const enclosures = [
+      {
+        url: 'https://archive.org/details/ArteTV-093029-047-A/093029-047-A.de.mp4',
+        type: 'video/mp4',
+      },
+    ]
+    const expected = html`
+      <div
+        data-enclosure=""
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://archive.org/services/img/ArteTV-093029-047-A"
+        data-embed-url="https://archive.org/details/ArteTV-093029-047-A/093029-047-A.de.mp4"
+        data-embed-id="ArteTV-093029-047-A"
+        data-embed-provider="archive"
+        data-embed-src="https://archive.org/embed/ArteTV-093029-047-A/093029-047-A.de.mp4"
+      ></div>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
 })
 
 // Without the resolver the pipeline reads the swf as the destination, so the placeholder points

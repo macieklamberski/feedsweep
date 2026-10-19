@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { acastEmbedResolver } from '../../embeds/acast.js'
+import { archiveIframeEmbedResolver } from '../../embeds/archive.js'
 import { blubrryEmbedResolver } from '../../embeds/blubrry.js'
 import { soundcloudEmbedResolver } from '../../embeds/soundcloud.js'
 import { youtubeIframeEmbedResolver } from '../../embeds/youtube.js'
@@ -166,6 +167,35 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
     `
 
     expect(result).toEqualHtml(expected)
+  })
+
+  // The archive serves every kind of item on one url, so only the feed's type picks the player.
+  it('should hand the enclosure type to the resolver', async () => {
+    const value = '<p>Episode notes</p>'
+    const context: TransformContext = {
+      ...baseContext,
+      widgetResolvers: [archiveIframeEmbedResolver],
+      enclosures: [
+        {
+          url: 'https://archive.org/details/bt2024-06-05.BelmontonBroadway2024SaratogaNY/bt2024-06-05t20.flac',
+          type: 'audio/flac',
+        },
+      ],
+    }
+    const expected = html`
+      <div
+        data-enclosure=""
+        data-embed-height="30"
+        data-embed-thumbnail="https://archive.org/services/img/bt2024-06-05.BelmontonBroadway2024SaratogaNY"
+        data-embed-url="https://archive.org/details/bt2024-06-05.BelmontonBroadway2024SaratogaNY/bt2024-06-05t20.flac"
+        data-embed-id="bt2024-06-05.BelmontonBroadway2024SaratogaNY"
+        data-embed-provider="archive"
+        data-embed-src="https://archive.org/embed/bt2024-06-05.BelmontonBroadway2024SaratogaNY/bt2024-06-05t20.flac"
+      ></div>
+      <p>Episode notes</p>
+    `
+
+    expect(await transform(value, context)).toEqualHtml(expected)
   })
 
   it('should embed a player URL even when no resolver claims it', async () => {
