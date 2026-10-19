@@ -1159,38 +1159,44 @@ describeForEachParser('Embed Any Document loading block through the pipeline', (
     })
   })
 
-  // stripDeadAnchors unwraps a link to "#", so the icon and its label stay with no link.
-  describe('the browser viewer, whose link points at "#"', () => {
-    it('should keep the label of the link', async () => {
+  describe('the browser viewer, whose link is "#" and whose wrapper names the file', () => {
+    it('should keep only the link to the file', async () => {
       const value = html`
-        <div class="ead-document-loading" style="width:100%;height:100%;position:absolute;left:0;top:0;z-index:10;">
-          <div class="ead-loading-wrap">
-            <div class="ead-loading-main">
-              <div class="ead-loading">
-                <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/loading.svg" width="55" height="55" alt="Loader">
-                <span>Loading...</span>
-              </div>
-            </div>
-            <div class="ead-loading-foot">
-              <div class="ead-loading-foot-title">
-                <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/EAD-logo.svg" alt="EAD Logo" width="36" height="23"/>
-                <span>Taking too long?</span>
-              </div>
-              <p>
-                <div class="ead-document-btn ead-reload-btn" role="button">
-                  <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/reload.svg" alt="Reload" width="12" height="12"/> Reload document
+        <div
+          class="ead-document"
+          data-pdf-src="https://example.com/wp-content/uploads/2025/10/CC-Worksheet.pdf"
+          data-viewer="browser"
+        >
+          <div class="ead-document-loading" style="width:100%;height:100%;position:absolute;left:0;top:0;z-index:10;">
+            <div class="ead-loading-wrap">
+              <div class="ead-loading-main">
+                <div class="ead-loading">
+                  <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/loading.svg" width="55" height="55" alt="Loader">
+                  <span>Loading...</span>
                 </div>
-                <span>|</span>
-                <a href="#" class="ead-document-btn" target="_blank">
-                  <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"/> Open in new tab
-                </a>
+              </div>
+              <div class="ead-loading-foot">
+                <div class="ead-loading-foot-title">
+                  <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/EAD-logo.svg" alt="EAD Logo" width="36" height="23"/>
+                  <span>Taking too long?</span>
+                </div>
+                <p>
+                  <div class="ead-document-btn ead-reload-btn" role="button">
+                    <img decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/reload.svg" alt="Reload" width="12" height="12"/> Reload document
+                  </div>
+                  <span>|</span>
+                  <a href="#" class="ead-document-btn" target="_blank">
+                    <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"/> Open in new tab
+                  </a>
+              </div>
             </div>
           </div>
         </div>
       `
       const expected = html`
-        <img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12">
-        <p> Open in new tab </p>
+        <p>
+          <a href="https://example.com/wp-content/uploads/2025/10/CC-Worksheet.pdf" class="ead-document-btn" target="_blank"><img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/embed-any-document/images/open.svg" alt="Open" width="12" height="12"> Open in new tab </a>
+        </p>
       `
 
       expect(await convert(value)).toEqualHtml(expected)
