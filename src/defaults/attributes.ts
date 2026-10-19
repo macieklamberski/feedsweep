@@ -106,12 +106,18 @@ export const defaultLazyIframeAttributes = [
   'data-suppressedsrc', // iubenda.
   'data-uc-src', // Usercentrics.
   'data-gdpr-iframesrc', // Moove GDPR Cookie Compliance.
+  'data-cmp-src', // consentmanager: src holds `blank` or `about:blank`.
+  'data-faz-src', // FAZ Cookie Manager.
 
   // EmbedPlus parks the deferred player's URL here. The plugin's facade shape is rebuilt by
   // rebuildEmbedPlusEmbeds.
   'data-ep-src', // EmbedPlus YouTube deferred player.
   'data-lazy-load', // JetElements / Woodmart / Elementor lazy video widgets.
   'data-tally-src', // Tally forms: the iframe ships with no src at all.
+  'data-tf-src', // Themify lazy load.
+  'data-trx-lazyload-src', // ThemeREX Addons lazy load.
+  'data-src1', // Turkish WordPress news themes.
+  'data-wp-video-popup-url', // WP Video Popup: the lightbox iframe ships with an empty src.
 ]
 
 export const defaultDeferredIframeSources: Array<DeferredIframeSource> = [
