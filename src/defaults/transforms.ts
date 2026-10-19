@@ -63,6 +63,7 @@ import { rebuildVideoJsEmbeds } from '../transforms/dom/rebuildVideoJsEmbeds.js'
 import { rebuildVokiEmbeds } from '../transforms/dom/rebuildVokiEmbeds.js'
 import { rebuildWistiaEmbeds } from '../transforms/dom/rebuildWistiaEmbeds.js'
 import { rebuildWmakerEmbeds } from '../transforms/dom/rebuildWmakerEmbeds.js'
+import { rebuildWordpressEmbeds } from '../transforms/dom/rebuildWordpressEmbeds.js'
 import { removeTrackingPixels } from '../transforms/dom/removeTrackingPixels.js'
 import { replacePreLineBreaks } from '../transforms/dom/replacePreLineBreaks.js'
 import { resolveMediaDimensions } from '../transforms/dom/resolveMediaDimensions.js'
@@ -141,6 +142,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   surfaceNoscriptEmbeds,
   rebuildEmbedPlusEmbeds,
   rebuildIframelyEmbeds,
+
+  // Runs before unwrapWrappers, which dissolves the block's wrapper div, and before
+  // convertWidgets, which claims the frame this rebuilds.
+  rebuildWordpressEmbeds,
   rebuildLiteVideoEmbeds,
   rebuildLyteEmbeds,
   rebuildRocketYoutubePreviews,

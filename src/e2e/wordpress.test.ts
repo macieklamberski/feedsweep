@@ -9,12 +9,13 @@ describeForEachParser('WordPress', (parseHtml) => {
   // lazy-loader attribute stashes (defaultLazyIframeAttributes, defaultLazySrcAttributes).
   // The plugin facades are rebuilt by rebuildLyteEmbeds, rebuildRocketYoutubePreviews,
   // rebuildLazyLoadForVideos, rebuildEmbedPlusEmbeds and rebuildElementorVideoEmbeds.
-  // An oEmbed block whose provider call failed ships the bare url alone. LinkifyUrls makes it a
-  // link and unwrapWrappers drops the figure shell around it.
+  // An oEmbed block whose provider call failed ships the bare url alone. rebuildWordpressEmbeds
+  // frames a url a resolver claims. Otherwise linkifyUrls makes it a link and unwrapWrappers drops
+  // the figure shell around it.
   // A post embed's blockquote becomes a cite through wordpressCiteResolver, and
   // stripNonContentElements drops the frame paired with it.
 
-  it('should reduce a failed oEmbed block to its linkified url', async () => {
+  it('should rebuild a failed oEmbed block into the player its url names', async () => {
     const value = html`
       <p>Look:</p>
       <figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter">
@@ -25,7 +26,29 @@ describeForEachParser('WordPress', (parseHtml) => {
     `
     const expected = html`
       <p>Look:</p>
-      <p> <a href="https://twitter.com/someone/status/1234567890123456789">https://twitter.com/someone/status/1234567890123456789</a> </p>
+      <div
+        data-embed-url="https://x.com/someone/status/1234567890123456789"
+        data-embed-id="1234567890123456789"
+        data-embed-provider="twitter"
+        data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=1234567890123456789"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should reduce a failed oEmbed block no resolver claims to its linkified url', async () => {
+    const value = html`
+      <p>Look:</p>
+      <figure class="wp-block-embed is-type-rich is-provider-embed wp-block-embed-embed">
+        <div class="wp-block-embed__wrapper">
+          https://example.com/2023/05/proposal
+        </div>
+      </figure>
+    `
+    const expected = html`
+      <p>Look:</p>
+      <p> <a href="https://example.com/2023/05/proposal">https://example.com/2023/05/proposal</a> </p>
     `
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
