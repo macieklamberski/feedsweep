@@ -24,6 +24,7 @@ import { smoreFieldCleaners } from '../embeds/smore.js'
 import { soundcloudFieldCleaners } from '../embeds/soundcloud.js'
 import { speakerdeckFieldCleaners } from '../embeds/speakerdeck.js'
 import { spotifyFieldCleaners } from '../embeds/spotify.js'
+import { streamableFieldCleaners } from '../embeds/streamable.js'
 import { videopressFieldCleaners } from '../embeds/videopress.js'
 import { vimeoFieldCleaners } from '../embeds/vimeo.js'
 import { wistiaFieldCleaners } from '../embeds/wistia.js'
@@ -60,6 +61,7 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...soundcloudFieldCleaners,
   ...speakerdeckFieldCleaners,
   ...spotifyFieldCleaners,
+  ...streamableFieldCleaners,
   ...videopressFieldCleaners,
   ...vimeoFieldCleaners,
   ...wistiaFieldCleaners,
