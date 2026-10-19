@@ -42,6 +42,7 @@ import { abcnewsEmbedResolver } from '../embeds/abcnews.js'
 import { abcotvEmbedResolver } from '../embeds/abcotv.js'
 import { acastEmbedResolver } from '../embeds/acast.js'
 import { acuityschedulingEmbedResolver } from '../embeds/acuityscheduling.js'
+import { airtableEmbedResolver } from '../embeds/airtable.js'
 import { allocineEmbedResolver } from '../embeds/allocine.js'
 import {
   amebaImagePageEmbedResolver,
@@ -516,6 +517,7 @@ const embedResolvers: Array<EmbedResolver> = [
   abcotvEmbedResolver,
   acastEmbedResolver,
   acuityschedulingEmbedResolver,
+  airtableEmbedResolver,
   allocineEmbedResolver,
   amebaImagePageEmbedResolver,
   amebaMoviePlayerEmbedResolver,
