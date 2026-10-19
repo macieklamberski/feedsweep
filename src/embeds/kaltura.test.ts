@@ -552,4 +552,20 @@ describeForEachParser('kaltura through the pipeline', (parseHtml) => {
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
+
+  it('should resolve a playkit iframe whose path opens on a double slash', async () => {
+    const value =
+      '<iframe src="https://www.kaltura.com//p/662741/embedPlaykitJs/uiconf_id/52649342?iframeembed=true&amp;entry_id=1_nszp16c7"></iframe>'
+    const expected = html`
+      <div
+        data-embed-provider="kaltura"
+        data-embed-id="662741/1_nszp16c7"
+        data-embed-src="https://cdnapisec.kaltura.com/p/662741/embedPlaykitJs/uiconf_id/52649342?iframeembed=true&amp;entry_id=1_nszp16c7"
+        data-embed-thumbnail="https://cdnapisec.kaltura.com/p/662741/thumbnail/entry_id/1_nszp16c7/width/640"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
 })

@@ -453,28 +453,32 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should keep a double slash followed by path segments that only hold a dot', async () => {
+  it('should keep the site host before a double slash followed by path segments that only hold a dot', async () => {
     const value = '<script src="https://example.com//assets/vendor.bundle/main.js"></script>'
+    const expected = '<script src="https://example.com/assets/vendor.bundle/main.js"></script>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should keep a double slash followed by a file name with a hash route', async () => {
+  it('should keep the site host before a double slash followed by a file name with a hash route', async () => {
     const value = '<iframe src="https://example.com//widget.html#/player"></iframe>'
+    const expected = '<iframe src="https://example.com/widget.html#/player"></iframe>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should keep a double slash followed by a segment whose last label is not letters', async () => {
+  it('should keep the site host before a double slash followed by a segment whose last label is not letters', async () => {
     const value = '<iframe src="https://api.site.com//v1.0/x"></iframe>'
+    const expected = '<iframe src="https://api.site.com/v1.0/x"></iframe>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should keep a double slash followed by a segment whose last label holds a digit', async () => {
+  it('should keep the site host before a double slash followed by a segment whose last label holds a digit', async () => {
     const value = '<iframe src="https://api.site.com//v1.10/x"></iframe>'
+    const expected = '<iframe src="https://api.site.com/v1.10/x"></iframe>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should strip the site host from a host-prefixed embed src', async () => {
@@ -490,6 +494,53 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
     const expected = '<iframe src="https://e.issuu.com/embed.html?d=catalogue"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should collapse a leading double slash in an iframe src path', async () => {
+    const value = '<iframe src="https://video.example.com//embed/player/?id=20210101abc"></iframe>'
+    const expected =
+      '<iframe src="https://video.example.com/embed/player/?id=20210101abc"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should collapse a leading run of three slashes in an iframe src path', async () => {
+    const value = '<iframe src="https://video.example.com///embed/player/?id=20210101abc"></iframe>'
+    const expected =
+      '<iframe src="https://video.example.com/embed/player/?id=20210101abc"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should collapse a leading double slash in a script src path', async () => {
+    const value = '<script src="https://video.example.com//embed/player.js"></script>'
+    const expected = '<script src="https://video.example.com/embed/player.js"></script>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep an inner double slash in an iframe src path', async () => {
+    const value = '<iframe src="https://video.example.com/embed//player/?id=20210101abc"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a url embedded in an iframe src path', async () => {
+    const value = '<iframe src="https://video.example.com/embed/https://example.org/clip"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a leading double slash in an img src path', async () => {
+    const value = '<img src="https://cdn.example.com//images/photo.jpg">'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a leading double slash in an anchor href path', async () => {
+    const value = '<a href="https://www.example.com//p/662741/post">link</a>'
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 
   it.each(hostPrefixedKeptCarriers)('should keep a host-prefixed %s', async (_carrier, value) => {
@@ -510,16 +561,18 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  it('should keep a double slash followed by a path segment that is not a host', async () => {
+  it('should keep the site host before a double slash followed by a path segment', async () => {
     const value = '<iframe src="https://ahtary-city.ucoz.com//load/1-1-0-15"></iframe>'
+    const expected = '<iframe src="https://ahtary-city.ucoz.com/load/1-1-0-15"></iframe>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should keep a double slash followed by a file name', async () => {
+  it('should keep the site host before a double slash followed by a file name', async () => {
     const value = '<iframe src="https://ahtary-city.ucoz.com//index.php?id=1"></iframe>'
+    const expected = '<iframe src="https://ahtary-city.ucoz.com/index.php?id=1"></iframe>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should keep a host-prefixed url nested in the query', async () => {
