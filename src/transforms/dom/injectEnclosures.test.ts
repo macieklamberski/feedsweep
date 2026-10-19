@@ -697,6 +697,44 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(value)
     })
 
+    it('should not inject the image enclosure that is the thumbnail of a player', async () => {
+      const value = html`
+        <div
+          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+          data-embed-id="dQw4w9WgXcQ"
+          data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+        ></div>
+      `
+      const context = withEnclosures([
+        { url: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg', type: 'image/jpeg' },
+      ])
+
+      expect(await transform(value, context)).toEqualHtml(value)
+    })
+
+    it('should inject an image enclosure beside a player whose thumbnail is another picture', async () => {
+      const value = html`
+        <div
+          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+          data-embed-id="dQw4w9WgXcQ"
+          data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+        ></div>
+      `
+      const context = withEnclosures([
+        { url: 'https://example.com/uploads/featured.jpg', type: 'image/jpeg' },
+      ])
+      const expected = html`
+        <img src="https://example.com/uploads/featured.jpg" data-enclosure="">
+        <div
+          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+          data-embed-id="dQw4w9WgXcQ"
+          data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+        ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
     it('should still inject audio and video enclosures when content has an image', async () => {
       const value = '<p>Content</p><img src="https://example.com/inline.jpg">'
       const context = withEnclosures([
