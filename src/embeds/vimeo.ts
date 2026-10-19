@@ -108,6 +108,49 @@ const resolveShowcaseEmbed = (link: string): EmbedResolverResult | undefined => 
   return showcaseId ? composeShowcaseEmbed(showcaseId) : undefined
 }
 
+// `/embed/interaction` is the event player with Vimeo's interaction panel beside it.
+const eventLayoutSegments = ['interaction']
+
+// A livestream event, `vimeo.com/event/{id}`, played by `vimeo.com/event/{id}/embed`. The page
+// refuses framing, and an unlisted event's player and oEmbed both need its hash.
+const resolveEventEmbed = (
+  link: string,
+  element: Element | undefined,
+): EmbedResolverResult | undefined => {
+  const url = parseUrl(link, placeholderBaseUrl)
+  const segments = url ? getPathSegments(url) : []
+
+  if (segments[0] !== 'event') {
+    return
+  }
+
+  const eventId = keepIfMatches(segments[1], digitsRegex)
+
+  if (!eventId) {
+    return
+  }
+
+  const tail = segments[2] === 'embed' ? segments.slice(3) : segments.slice(2)
+  const hash = keepIfMatches(tail[0], unlistedHashRegex)
+  const layout = hash ? tail.slice(1) : tail
+
+  // A chat embed or any other route under the event is not its player.
+  if (layout.length > 1 || (layout[0] && !eventLayoutSegments.includes(layout[0]))) {
+    return
+  }
+
+  const path = hash ? `${eventId}/${hash}` : eventId
+
+  return {
+    provider,
+    id: hash ? `event/${eventId}:${hash}` : `event/${eventId}`,
+    src: `https://vimeo.com/event/${eventId}/embed${hash ? `/${hash}` : ''}`,
+    url: `https://vimeo.com/event/${path}`,
+    ratio: playerRatio,
+    title: attr(element, 'title'),
+  }
+}
+
 type VimeoReference = {
   id: string
   hash?: string
@@ -234,7 +277,7 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
   const reference = readReference(url) ?? readFlashReference(url, element)
 
   if (!reference) {
-    return resolveShowcaseEmbed(url)
+    return resolveShowcaseEmbed(url) ?? resolveEventEmbed(url, element)
   }
 
   const { id: videoId, hash } = reference
@@ -260,7 +303,7 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
   }
 }
 
-// A Vimeo player iframe, a frame of a video or showcase page, or the Flash moogaloop player.
+// A Vimeo player iframe, a frame of a video, showcase or event page, or the Flash moogaloop player.
 export const vimeoEmbedResolver = createUrlEmbedResolver(vimeoHosts, vimeoResolveEmbed)
 
 // MetaSlider Pro's Vimeo slide: an empty div that only the plugin's script builds into a player.

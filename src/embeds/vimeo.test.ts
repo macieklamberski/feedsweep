@@ -369,16 +369,128 @@ describe('vimeoResolveEmbed', () => {
       expect(vimeoResolveEmbed(value)).toBeUndefined()
     })
 
-    // An event is a livestream, not a playlist, and it stays with the generic placeholder: the
-    // refusal is deliberate and is pinned here so removing it is a decision rather than a slip.
-    it('should still leave an event embed unresolved', () => {
+    it('should still leave an on-demand store front unresolved', () => {
+      const value = 'https://vimeo.com/ondemand/20704'
+
+      expect(vimeoResolveEmbed(value)).toBeUndefined()
+    })
+  })
+
+  // An event is a livestream in its own id space, so it resolves as itself rather than as the
+  // video its number would otherwise be read as.
+  describe('the event', () => {
+    it('should resolve an event embed to the event player', () => {
       const value = 'https://vimeo.com/event/5933775/embed'
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: 'event/5933775',
+        src: 'https://vimeo.com/event/5933775/embed',
+        url: 'https://vimeo.com/event/5933775',
+        ratio: '16/9',
+      }
+
+      expect(vimeoResolveEmbed(value)).toEqual(expected)
+    })
+
+    // The event page refuses framing, so a frame of it shows nothing.
+    it('should build the player from a bare event page url', () => {
+      const value = 'https://vimeo.com/event/4250496'
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: 'event/4250496',
+        src: 'https://vimeo.com/event/4250496/embed',
+        url: 'https://vimeo.com/event/4250496',
+        ratio: '16/9',
+      }
+
+      expect(vimeoResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should carry the hash of an unlisted event embed', () => {
+      const value = 'https://vimeo.com/event/4936964/embed/8e4964f838'
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: 'event/4936964:8e4964f838',
+        src: 'https://vimeo.com/event/4936964/embed/8e4964f838',
+        url: 'https://vimeo.com/event/4936964/8e4964f838',
+        ratio: '16/9',
+      }
+
+      expect(vimeoResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should build the player from an unlisted event page url', () => {
+      const value = 'https://vimeo.com/event/4936964/8e4964f838'
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: 'event/4936964:8e4964f838',
+        src: 'https://vimeo.com/event/4936964/embed/8e4964f838',
+        url: 'https://vimeo.com/event/4936964/8e4964f838',
+        ratio: '16/9',
+      }
+
+      expect(vimeoResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the interaction panel from an event embed', () => {
+      const value = 'https://vimeo.com/event/6084402/embed/interaction'
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: 'event/6084402',
+        src: 'https://vimeo.com/event/6084402/embed',
+        url: 'https://vimeo.com/event/6084402',
+        ratio: '16/9',
+      }
+
+      expect(vimeoResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the interaction panel from an unlisted event embed', () => {
+      const value = 'https://vimeo.com/event/6069361/embed/26ae1fa0b6/interaction'
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: 'event/6069361:26ae1fa0b6',
+        src: 'https://vimeo.com/event/6069361/embed/26ae1fa0b6',
+        url: 'https://vimeo.com/event/6069361/26ae1fa0b6',
+        ratio: '16/9',
+      }
+
+      expect(vimeoResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the query an event embed carries', () => {
+      const value = 'https://vimeo.com/event/3403179/embed?dnt=true&utm_source=newsletter'
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: 'event/3403179',
+        src: 'https://vimeo.com/event/3403179/embed',
+        url: 'https://vimeo.com/event/3403179',
+        ratio: '16/9',
+      }
+
+      expect(vimeoResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should refuse the chat embed of an event', () => {
+      const value = 'https://vimeo.com/event/22567/chat'
 
       expect(vimeoResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should still leave an on-demand store front unresolved', () => {
-      const value = 'https://vimeo.com/ondemand/20704'
+    it('should refuse a route word after the event embed that is not a layout', () => {
+      const value = 'https://vimeo.com/event/6084402/embed/schedule'
+
+      expect(vimeoResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse a second segment after the interaction panel', () => {
+      const value = 'https://vimeo.com/event/6084402/embed/interaction/extra'
+
+      expect(vimeoResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should refuse an event path whose id is not numeric', () => {
+      const value = 'https://vimeo.com/event/launch/embed'
 
       expect(vimeoResolveEmbed(value)).toBeUndefined()
     })
@@ -524,6 +636,30 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+
+  // The share snippet writes the event's own name as the title, and a box that is not read.
+  it('should carry the title of an event iframe and state the video ratio', async () => {
+    const value = html`
+      <iframe
+        title="City of Newcastle ANZAC Day Dawn Service 2024"
+        src="https://vimeo.com/event/4250496/embed"
+        width="640"
+        height="360"
+        frameborder="0"
+        allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: 'event/4250496',
+      src: 'https://vimeo.com/event/4250496/embed',
+      url: 'https://vimeo.com/event/4250496',
+      ratio: '16/9',
+      title: 'City of Newcastle ANZAC Day Dawn Service 2024',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 
   // Every corpus showcase carrier states a box, and none is read.
