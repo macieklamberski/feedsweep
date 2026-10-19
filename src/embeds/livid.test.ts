@@ -162,6 +162,24 @@ describeForEachParser('lividIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should resolve an older player iframe and keep its title', async () => {
+      const value = html`
+        <iframe
+          src="https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888"
+          title="Blood Business - Trailer"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'livid',
+        id: 'qvN5Xsn5Hh-H/451811888',
+        src: 'https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888',
+        ratio: '16/9',
+        title: 'Blood Business - Trailer',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should state the platform ratio over the carrier box', async () => {
       const value = html`
         <iframe
