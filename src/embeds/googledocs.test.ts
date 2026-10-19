@@ -78,20 +78,6 @@ describe('googledocsResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a doc framed on its edit page', () => {
-      const value =
-        'https://docs.google.com/document/d/1C0UmfyMqwNmMowwhwHcvGVwiYHaS0L-uofsz894nUds/edit?usp=sharing'
-
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a doc framed on its preview page', () => {
-      const value =
-        'https://docs.google.com/document/d/1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI/preview'
-
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a doc framed by its file id with no route', () => {
       const value =
         'https://docs.google.com/document/d/17EzTWqEAgy02oqEgKphdbjiUAo7BuDWCkmKpSp9qbzk'
@@ -157,6 +143,118 @@ describe('googledocsResolveEmbed', () => {
     it('should ignore a published doc behind a Workspace prefix', () => {
       const value =
         'https://docs.google.com/a/example.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub?embedded=true'
+
+      expect(googledocsResolveEmbed(value)).toBeUndefined()
+    })
+  })
+
+  describe('the share routes of a doc shared by link', () => {
+    it('should frame a doc on its preview page', () => {
+      const value =
+        'https://docs.google.com/document/d/1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI/preview'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI',
+        src: 'https://docs.google.com/document/d/1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI/preview',
+        url: 'https://docs.google.com/document/d/1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI&sz=w640',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should frame a doc written on its edit page on its preview page', () => {
+      const value =
+        'https://docs.google.com/document/d/1Rb8puH5tsZA2RRnu1tJ6r2C9y9xFbhJQE--WEaEOGZw/edit'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '1Rb8puH5tsZA2RRnu1tJ6r2C9y9xFbhJQE--WEaEOGZw',
+        src: 'https://docs.google.com/document/d/1Rb8puH5tsZA2RRnu1tJ6r2C9y9xFbhJQE--WEaEOGZw/preview',
+        url: 'https://docs.google.com/document/d/1Rb8puH5tsZA2RRnu1tJ6r2C9y9xFbhJQE--WEaEOGZw/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1Rb8puH5tsZA2RRnu1tJ6r2C9y9xFbhJQE--WEaEOGZw&sz=w640',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the share tracker from a preview page', () => {
+      const value =
+        'https://docs.google.com/document/d/1xDIRYL9CLkQbc9_fYFZ3_82P_HaNJqeUNXeEkKg6qPA/preview?usp=drivesdk'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '1xDIRYL9CLkQbc9_fYFZ3_82P_HaNJqeUNXeEkKg6qPA',
+        src: 'https://docs.google.com/document/d/1xDIRYL9CLkQbc9_fYFZ3_82P_HaNJqeUNXeEkKg6qPA/preview',
+        url: 'https://docs.google.com/document/d/1xDIRYL9CLkQbc9_fYFZ3_82P_HaNJqeUNXeEkKg6qPA/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1xDIRYL9CLkQbc9_fYFZ3_82P_HaNJqeUNXeEkKg6qPA&sz=w640',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the share tracker from an edit page', () => {
+      const value =
+        'https://docs.google.com/document/d/1C0UmfyMqwNmMowwhwHcvGVwiYHaS0L-uofsz894nUds/edit?usp=sharing'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '1C0UmfyMqwNmMowwhwHcvGVwiYHaS0L-uofsz894nUds',
+        src: 'https://docs.google.com/document/d/1C0UmfyMqwNmMowwhwHcvGVwiYHaS0L-uofsz894nUds/preview',
+        url: 'https://docs.google.com/document/d/1C0UmfyMqwNmMowwhwHcvGVwiYHaS0L-uofsz894nUds/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1C0UmfyMqwNmMowwhwHcvGVwiYHaS0L-uofsz894nUds&sz=w640',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the minimal toolbar flag from an edit page', () => {
+      const value =
+        'https://docs.google.com/document/d/15EP2r3xZrcGa2khuo2NuCRhIESO11LXX4U7U3pf4aYM/edit?usp=sharing&rm=minimal'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '15EP2r3xZrcGa2khuo2NuCRhIESO11LXX4U7U3pf4aYM',
+        src: 'https://docs.google.com/document/d/15EP2r3xZrcGa2khuo2NuCRhIESO11LXX4U7U3pf4aYM/preview',
+        url: 'https://docs.google.com/document/d/15EP2r3xZrcGa2khuo2NuCRhIESO11LXX4U7U3pf4aYM/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=15EP2r3xZrcGa2khuo2NuCRhIESO11LXX4U7U3pf4aYM&sz=w640',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the tab an edit page names', () => {
+      const value =
+        'https://docs.google.com/document/d/1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY/edit?tab=t.0'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY',
+        src: 'https://docs.google.com/document/d/1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY/preview?tab=t.0',
+        url: 'https://docs.google.com/document/d/1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY&sz=w640',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should ignore a published doc on its preview page', () => {
+      const value =
+        'https://docs.google.com/document/d/e/2PACX-1vQW3iYIW4L0w6xry6RUhynyWSb-VeEgSQl5q3mzR0335n7RA-EUvVJSiCQbISewyqE2CNP9mVAivM4G/preview'
+
+      expect(googledocsResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a published doc on its edit page', () => {
+      const value =
+        'https://docs.google.com/document/d/e/2PACX-1vQW3iYIW4L0w6xry6RUhynyWSb-VeEgSQl5q3mzR0335n7RA-EUvVJSiCQbISewyqE2CNP9mVAivM4G/edit'
 
       expect(googledocsResolveEmbed(value)).toBeUndefined()
     })
@@ -251,6 +349,27 @@ describeForEachParser('googledocsEmbedResolver', (parseHtml) => {
         id: '2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN',
         src: 'https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub?embedded=true',
         url: 'https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub',
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should frame a doc on its preview page at the platform size', async () => {
+      const value = html`
+        <iframe
+          height="750"
+          src="https://docs.google.com/document/d/1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI/preview"
+          width="550"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI',
+        src: 'https://docs.google.com/document/d/1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI/preview',
+        url: 'https://docs.google.com/document/d/1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI&sz=w640',
         height: 500,
       }
 
