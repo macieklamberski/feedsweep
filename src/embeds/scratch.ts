@@ -12,7 +12,7 @@ const scratchHosts = [
 ]
 
 // The current spelling and the legacy one, which redirects to it.
-const projectEmbedRegex = /^\/+projects\/(?:([^/]+)\/embed|embed\/([^/]+))\/?$/
+const projectEmbedRegex = /^\/projects\/(?:([^/]+)\/embed|embed\/([^/]+))\/?$/
 
 // The box the share snippet writes.
 const snippetWidth = 485

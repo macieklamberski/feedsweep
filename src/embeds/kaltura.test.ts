@@ -568,4 +568,42 @@ describeForEachParser('kaltura through the pipeline', (parseHtml) => {
 
     expect(await convert(value)).toEqualHtml(expected)
   })
+
+  it('should resolve a playkit object whose path opens on a double slash', async () => {
+    const value =
+      '<object data="https://www.kaltura.com//p/662741/embedPlaykitJs/uiconf_id/52649342?iframeembed=true&amp;entry_id=1_nszp16c7"></object>'
+    const expected = html`
+      <div
+        data-embed-provider="kaltura"
+        data-embed-id="662741/1_nszp16c7"
+        data-embed-src="https://cdnapisec.kaltura.com/p/662741/embedPlaykitJs/uiconf_id/52649342?iframeembed=true&amp;entry_id=1_nszp16c7"
+        data-embed-thumbnail="https://cdnapisec.kaltura.com/p/662741/thumbnail/entry_id/1_nszp16c7/width/640"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should resolve a playkit enclosure whose path opens on a double slash', async () => {
+    const enclosures = [
+      {
+        url: 'https://www.kaltura.com//p/662741/embedPlaykitJs/uiconf_id/52649342?iframeembed=true&entry_id=1_nszp16c7',
+        type: 'text/html',
+      },
+    ]
+    const expected = html`
+      <div
+        data-enclosure=""
+        data-embed-provider="kaltura"
+        data-embed-id="662741/1_nszp16c7"
+        data-embed-src="https://cdnapisec.kaltura.com/p/662741/embedPlaykitJs/uiconf_id/52649342?iframeembed=true&amp;entry_id=1_nszp16c7"
+        data-embed-thumbnail="https://cdnapisec.kaltura.com/p/662741/thumbnail/entry_id/1_nszp16c7/width/640"
+        data-embed-ratio="16/9"
+      ></div>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
 })

@@ -17,8 +17,8 @@ const typeRoutes = toMap({
   '4': 'djradio',
 })
 
-const playerPathRegex = /^\/+outchain\/player\/?$/
-const flashPlayerPathRegex = /^\/+style\/swf\/widget\.swf$/
+const playerPathRegex = /^\/outchain\/player\/?$/
+const flashPlayerPathRegex = /^\/style\/swf\/widget\.swf$/
 
 // Without `height` the player loads its list layout and fills its box. 250 shows the header, about
 // three tracks and the footer, so a playlist shows that it holds more than one.

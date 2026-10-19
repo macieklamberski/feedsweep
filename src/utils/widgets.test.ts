@@ -26,6 +26,7 @@ import {
   normalizeEmbedFields,
   prepareCiteMetadata,
   prepareEmbedMetadata,
+  readCarrierUrl,
   readS9eFragment,
   resolveEmbedProbe,
   setDimensions,
@@ -1560,6 +1561,39 @@ describeForEachParser('setDimensions', (parseHtml) => {
     const expected = '<div></div>'
 
     expect(build({})).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('readCarrierUrl', (parseHtml) => {
+  const read = (value: string) => {
+    return readCarrierUrl(parseHtml(value).body.firstElementChild as Element)
+  }
+
+  it('should collapse a leading double slash in an object data path', () => {
+    const value =
+      '<object data="https://player.example.com//p/662741/embed?entry_id=1_abc"></object>'
+
+    expect(read(value)).toBe('https://player.example.com/p/662741/embed?entry_id=1_abc')
+  })
+
+  it('should keep an inner double slash in an object data path', () => {
+    const value =
+      '<object data="https://player.example.com/p//662741/embed?entry_id=1_abc"></object>'
+
+    expect(read(value)).toBe('https://player.example.com/p//662741/embed?entry_id=1_abc')
+  })
+
+  it('should keep a leading double slash in a url carried in the query', () => {
+    const value =
+      '<iframe src="https://player.example.com/embed?url=https://example.org//clip"></iframe>'
+
+    expect(read(value)).toBe('https://player.example.com/embed?url=https://example.org//clip')
+  })
+
+  it('should read the src of an element outside the carrier list', () => {
+    const value = '<script src="https://player.example.com/p/662741/embed.js"></script>'
+
+    expect(read(value)).toBe('https://player.example.com/p/662741/embed.js')
   })
 })
 

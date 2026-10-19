@@ -19,6 +19,7 @@ export const placeholderBaseUrl = 'https://example.com'
 
 const urlShapeRegex = /[:/.]/
 const queryOrHashRegex = /[?#]/
+const leadingSlashRunRegex = /^(https?:\/\/[^/?#]+)\/{2,}/i
 
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
@@ -150,6 +151,12 @@ export const groupUrlAttributesByTag = <Attribute extends UrlAttribute>(
   }
 
   return grouped
+}
+
+// A server answers a path opening on a run of slashes as one slash, and a resolver reading the
+// path by position refuses it. A run deeper in the path can carry an embedded url, so it stays.
+export const collapseLeadingSlashes = (url: string): string => {
+  return url.replace(leadingSlashRunRegex, '$1/')
 }
 
 // A real, loadable src, not empty and not the `about:blank` lazy placeholder.

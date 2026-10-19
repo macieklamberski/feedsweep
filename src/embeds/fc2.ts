@@ -10,7 +10,7 @@ const videoHosts = ['video.fc2.com']
 // The content page is `/content/{id}/`, behind a two-character language on most snippets. The
 // adult site's `/a/content/` is refused, since the embed player cannot play it.
 const contentPageRegex = /^\/(?:[A-Za-z0-9_]{2}\/)?content\/([^/]+)\/?$/
-const embedPlayerRegex = /^\/+embed\/player\/([^/]+)\/?$/i
+const embedPlayerRegex = /^\/embed\/player\/([^/]+)\/?$/i
 const flashPlayerRegex = /^\/flv2\.swf$/
 
 // `/embed/player/{id}/` is the route `outerplayer.min.js` composes. The content page is not a

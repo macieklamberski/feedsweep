@@ -142,20 +142,6 @@ describe('officeResolveEmbed', () => {
       expect(officeResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should mint the embed viewer for a doubled leading slash', () => {
-      const value =
-        'https://view.officeapps.live.com//op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx'
-      const expected: EmbedResolverResult = {
-        provider: 'office',
-        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx',
-        url: 'https://slac.uconn.edu/files/GrantWritingSICSFLAGS.pptx',
-        ratio: '8/5',
-        title: 'GrantWritingSICSFLAGS.pptx',
-      }
-
-      expect(officeResolveEmbed(value)).toEqual(expected)
-    })
-
     it('should read a protocol-relative document url', () => {
       const value =
         'https://view.officeapps.live.com/op/embed.aspx?src=%2F%2Fslac.uconn.edu%2Ffiles%2FGrantWritingSICSFLAGS.pptx'
