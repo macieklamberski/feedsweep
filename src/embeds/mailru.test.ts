@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { mailruEmbedResolver, mailruResolveEmbed } from './mailru.js'
+import { mailruEmbedResolver, mailruResolveEmbed, mailruWidgetEmbedResolver } from './mailru.js'
 
 describe('mailruResolveEmbed', () => {
   describe('happy paths', () => {
@@ -172,6 +173,51 @@ describe('mailruResolveEmbed', () => {
 
       expect(mailruResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the video the older Flash player names in its par path', () => {
+      const value =
+        'http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/mail/gsavinich/10/$44$0$143'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/gsavinich/10/44',
+        src: 'https://my.mail.ru/mail/gsavinich/video/embed/10/44',
+        url: 'https://my.mail.ru/mail/gsavinich/video/10/44.html',
+        ratio: '16/9',
+        author: 'gsavinich',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the par path of the full size Flash player', () => {
+      const value =
+        'http://img.mail.ru/r/video/player_full_size.swf?par=http://video.mail.ru/mail/vi-talik/kazantip-2006/$262$0$348'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/vi-talik/kazantip-2006/262',
+        src: 'https://my.mail.ru/mail/vi-talik/video/embed/kazantip-2006/262',
+        url: 'https://my.mail.ru/mail/vi-talik/video/kazantip-2006/262.html',
+        ratio: '16/9',
+        author: 'vi-talik',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read a par path whose dollar signs are percent-encoded', () => {
+      const value =
+        'http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/mail/pavelbazhenov/84/%2485%240%2451'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/pavelbazhenov/84/85',
+        src: 'https://my.mail.ru/mail/pavelbazhenov/video/embed/84/85',
+        url: 'https://my.mail.ru/mail/pavelbazhenov/video/84/85.html',
+        ratio: '16/9',
+        author: 'pavelbazhenov',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -304,6 +350,33 @@ describe('mailruResolveEmbed', () => {
 
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
+
+    it('should ignore an asset host path outside the Flash route', () => {
+      const value = 'https://my2.imgsmail.ru/mail/gsavinich/video/embed/10/44'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a par path that names no counter', () => {
+      const value =
+        'http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/mail/gsavinich/10/44'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a par path behind another segment', () => {
+      const value =
+        'http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/x/mail/gsavinich/10/$44$0$143'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a par path followed by another segment', () => {
+      const value =
+        'http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/mail/gsavinich/10/$44$0$143/extra'
+
+      expect(mailruResolveEmbed(value)).toBeUndefined()
+    })
   })
 })
 
@@ -420,6 +493,424 @@ describeForEachParser('mailruEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
+
+  describe('the older Flash player that named the video in its par path', () => {
+    it('should repair the embed whose par path names the video', async () => {
+      const value = html`
+        <embed
+          src="http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/mail/gsavinich/10/$44$0$143"
+          type="application/x-shockwave-flash"
+          width="380"
+          height="325"
+          flashvars="imaginehost=video.mail.ru&perlhost=video.mail.ru&alias=mail&username=gsavinich&albumid=10&id=44&catalogurl=http://video.mail.ru/themes/music"
+          allowscriptaccess="always"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/gsavinich/10/44',
+        src: 'https://my.mail.ru/mail/gsavinich/video/embed/10/44',
+        url: 'https://my.mail.ru/mail/gsavinich/video/10/44.html',
+        ratio: '16/9',
+        author: 'gsavinich',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should repair the object whose data names the video in its par path', async () => {
+      const value = html`
+        <object
+          type="application/x-shockwave-flash"
+          data="http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/bk/nutriti/nutriti_nepoznannoe/$1993$0$3441"
+          height="367"
+          width="585"
+        >
+          <param
+            name="movie"
+            value="http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/bk/nutriti/nutriti_nepoznannoe/$1993$0$3441"
+          />
+          <param
+            name="flashvars"
+            value="imaginehost=video.mail.ru&perlhost=video.mail.ru&alias=bk&username=nutriti&albumid=nutriti_nepoznannoe&id=1993&atalogurl=http://video.mail.ru/themes/misc&page=1"
+          />
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'bk/nutriti/nutriti_nepoznannoe/1993',
+        src: 'https://my.mail.ru/bk/nutriti/video/embed/nutriti_nepoznannoe/1993',
+        url: 'https://my.mail.ru/bk/nutriti/video/nutriti_nepoznannoe/1993.html',
+        ratio: '16/9',
+        author: 'nutriti',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+describeForEachParser('mailruEmbedResolver on the asset host', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mailruEmbedResolver)
+
+  it('should repair the inner object whose own flashvars name the video', async () => {
+    const value = html`
+      <object
+        type="application/x-shockwave-flash"
+        data="http://my9.imgsmail.ru/r/video2/uvpv3.swf?3"
+        height="367"
+        width="626"
+      >
+        <param name="movie" value="http://my9.imgsmail.ru/r/video2/uvpv3.swf?3" />
+        <param name="flashvars" value="movieSrc=mail/elenaolyga/822/1828&autoplay=0" />
+        <param name="allowFullScreen" value="true" />
+      </object>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'mailru',
+      id: 'mail/elenaolyga/822/1828',
+      src: 'https://my.mail.ru/mail/elenaolyga/video/embed/822/1828',
+      url: 'https://my.mail.ru/mail/elenaolyga/video/822/1828.html',
+      ratio: '16/9',
+      author: 'elenaolyga',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('mailruWidgetEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mailruWidgetEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should repair the journal video span from the video it names', async () => {
+      const value = html`
+        <span
+          class="b-history-event__videoevent-object filed-image "
+          style="background-image: url('https://filed15-30.my.mail.ru/pic?url=https%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fi%2F1752755258481704962&amp;mw=660&amp;mh=370&amp;sig=0f19984c08ef1f187b969126ca25a034&amp;croped=1')"
+          data-history-action="playVideo"
+          data-video-swfurl="https://my2.imgsmail.ru/r/video2/uvpv3.swf?60"
+          data-video-width="660"
+          data-video-height="370"
+          data-videoplayer-moviesrc="/mail/beeline_russia/_vblogs/2"
+          data-video-external-id="/mail/beeline_russia/_vblogs/2"
+          data-video-item="2"
+        >
+          <span class="b-history-event__videoevent-play"></span>
+        </span>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/beeline_russia/_vblogs/2',
+        src: 'https://my.mail.ru/mail/beeline_russia/video/embed/_vblogs/2',
+        url: 'https://my.mail.ru/mail/beeline_russia/video/_vblogs/2.html',
+        ratio: '16/9',
+        author: 'beeline_russia',
+        thumbnail:
+          'https://filed15-30.my.mail.ru/pic?url=https%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fi%2F1752755258481704962&mw=660&mh=370&sig=0f19984c08ef1f187b969126ca25a034&croped=1',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('beside a frame of another upload', () => {
+    it('should repair a republished span whose frame plays another upload', async () => {
+      const value = html`
+        <span
+          class="b-history-event__videoevent-object filed-image ui-lazy-background"
+          data-history-action="playVideo"
+          data-video-item="8250"
+          data-video-swfurl="https://my2.imgsmail.ru/r/video2/uvpv3.swf?60"
+          data-videoplayer-moviesrc="/community/russkij.medved/_groupvideo/8250"
+          style="background-image: url(&quot;https://filed4-25.my.mail.ru/pic?url=http%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fsc21%2F-16255308754051014&amp;mw=480&amp;mh=330&amp;sig=a04af2742e1d910065ba4728916f16f2&amp;croped=1&quot;);"
+        ></span>
+        <iframe
+          height="367"
+          src="https://my.mail.ru/video/embed/5031011642700202411"
+          width="626"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'community/russkij.medved/_groupvideo/8250',
+        src: 'https://my.mail.ru/community/russkij.medved/video/embed/_groupvideo/8250',
+        url: 'https://my.mail.ru/community/russkij.medved/video/_groupvideo/8250.html',
+        ratio: '16/9',
+        author: 'russkij.medved',
+        thumbnail:
+          'https://filed4-25.my.mail.ru/pic?url=http%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fsc21%2F-16255308754051014&mw=480&mh=330&sig=a04af2742e1d910065ba4728916f16f2&croped=1',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read the preview id behind another segment', async () => {
+      const value = html`
+        <span
+          class="b-history-event__videoevent-object filed-image ui-lazy-background"
+          style="background-image: url('https://filed4-21.my.mail.ru/pic?url=http%3A%2F%2Fmy.mail.ru%2Fx%2F%2B%2Fvideo%2Furl%2Fsc03%2F-16643191545523102&amp;mw=480&amp;mh=330&amp;sig=f5d969f78779100fec7222c93b385787&amp;croped=1');"
+          data-videoplayer-moviesrc="/community/sergeyrus/_groupvideo/5218"
+        ></span>
+        <iframe src="https://my.mail.ru/video/embed/-16643191545523102"></iframe>
+      `
+
+      expect(await extract(value)).toMatchObject({
+        id: 'community/sergeyrus/_groupvideo/5218',
+      })
+    })
+
+    it('should not read the preview id followed by another segment', async () => {
+      const value = html`
+        <span
+          class="b-history-event__videoevent-object filed-image ui-lazy-background"
+          style="background-image: url('https://filed4-21.my.mail.ru/pic?url=http%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fsc03%2F-16643191545523102%2Fextra&amp;mw=480&amp;mh=330&amp;sig=f5d969f78779100fec7222c93b385787&amp;croped=1');"
+          data-videoplayer-moviesrc="/community/sergeyrus/_groupvideo/5218"
+        ></span>
+        <iframe src="https://my.mail.ru/video/embed/-16643191545523102"></iframe>
+      `
+
+      expect(await extract(value)).toMatchObject({
+        id: 'community/sergeyrus/_groupvideo/5218',
+      })
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a span that names the video without its owner', async () => {
+      const value = html`
+        <span
+          class="b-history-event__videoevent-object filed-image "
+          data-video-swfurl="https://my2.imgsmail.ru/r/video2/uvpv3.swf?60"
+          data-videoplayer-moviesrc="_myvideo/1"
+          data-video-item="1"
+        ></span>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a republished span beside the frame of the same video', async () => {
+      const value = html`
+        <span
+          class="b-history-event__videoevent-object filed-image ui-lazy-background"
+          style="background-image: url('https://filed4-21.my.mail.ru/pic?url=http%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fsc03%2F-16643191545523102&amp;mw=480&amp;mh=330&amp;sig=f5d969f78779100fec7222c93b385787&amp;croped=1');"
+          data-history-action="playVideo"
+          data-video-item="5218"
+          data-video-swfurl="https://my2.imgsmail.ru/r/video2/uvpv3.swf?60"
+          data-videoplayer-moviesrc="/community/sergeyrus/_groupvideo/5218"
+        ></span>
+        <iframe
+          width="626"
+          height="367"
+          src="https://my.mail.ru/video/embed/-16643191545523102"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a span beside a frame naming the same video by its path', async () => {
+      const value = html`
+        <span
+          class="b-history-event__videoevent-object filed-image ui-lazy-background"
+          style="background-image: url('https://filed4-21.my.mail.ru/pic?url=http%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fsc03%2F-16643191545523102&amp;mw=480&amp;mh=330&amp;sig=f5d969f78779100fec7222c93b385787&amp;croped=1');"
+          data-history-action="playVideo"
+          data-video-item="5218"
+          data-video-swfurl="https://my2.imgsmail.ru/r/video2/uvpv3.swf?60"
+          data-videoplayer-moviesrc="/community/sergeyrus/_groupvideo/5218"
+        ></span>
+        <iframe src="https://my.mail.ru/community/sergeyrus/video/embed/_groupvideo/5218"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a span that names no video', async () => {
+      const value = html`
+        <span
+          class="b-history-event__videoevent-object filed-image "
+          data-video-swfurl="https://my2.imgsmail.ru/r/video2/uvpv3.swf?60"
+          data-videoplayer-moviesrc=""
+        ></span>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+describeForEachParser('mailruEmbedResolver through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+  }
+
+  it('should turn the full size Flash player into a video placeholder', async () => {
+    const value = html`
+      <embed
+        src="http://img.mail.ru/r/video/player_full_size.swf?par=http://video.mail.ru/mail/vi-talik/kazantip-2006/$262$0$348"
+        type="application/x-shockwave-flash"
+        width="452"
+        height="385"
+        flashvars="imaginehost=video.mail.ru&perlhost=my.video.mail.ru&alias=mail&username=vi-talik&albumid=kazantip-2006&id=262&catalogurl=http://video.mail.ru/catalog/tour/"
+      >
+    `
+    const expected = html`
+      <div
+        data-embed-author="vi-talik"
+        data-embed-ratio="16/9"
+        data-embed-url="https://my.mail.ru/mail/vi-talik/video/kazantip-2006/262.html"
+        data-embed-id="mail/vi-talik/kazantip-2006/262"
+        data-embed-provider="mailru"
+        data-embed-src="https://my.mail.ru/mail/vi-talik/video/embed/kazantip-2006/262"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should turn the asset host Flash object into a video placeholder', async () => {
+    const value = html`
+      <object
+        classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+        id="movie_name"
+        align="middle"
+        height="367"
+        width="626"
+      >
+        <param name="movie" value="http://my9.imgsmail.ru/r/video2/uvpv3.swf?3" />
+        <param name="flashvars" value="movieSrc=mail/elenaolyga/822/1828&amp;autoplay=0" />
+        <object
+          type="application/x-shockwave-flash"
+          data="http://my9.imgsmail.ru/r/video2/uvpv3.swf?3"
+          height="367"
+          width="626"
+        >
+          <param name="movie" value="http://my9.imgsmail.ru/r/video2/uvpv3.swf?3" />
+          <param name="flashvars" value="movieSrc=mail/elenaolyga/822/1828&amp;autoplay=0" />
+        </object>
+      </object>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://my.mail.ru/mail/elenaolyga/video/822/1828.html"
+        data-embed-src="https://my.mail.ru/mail/elenaolyga/video/embed/822/1828"
+        data-embed-ratio="16/9"
+        data-embed-provider="mailru"
+        data-embed-id="mail/elenaolyga/822/1828"
+        data-embed-author="elenaolyga"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should turn the journal video span into a video placeholder', async () => {
+    const value = html`
+      <span class="b-history-event__videoevent-item ">
+        <span
+          class="b-history-event__videoevent-object filed-image "
+          style="background-image: url('https://filed15-30.my.mail.ru/pic?url=https%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fi%2F1752755258481704962&amp;mw=660&amp;mh=370&amp;sig=0f19984c08ef1f187b969126ca25a034&amp;croped=1')"
+          data-history-action="playVideo"
+          data-video-swfurl="https://my2.imgsmail.ru/r/video2/uvpv3.swf?60"
+          data-videoplayer-moviesrc="/mail/beeline_russia/_vblogs/2"
+          data-video-item="2"
+        >
+          <span class="b-history-event__videoevent-play"></span>
+          <script type="text/plain">{ "externalId": "/mail/beeline_russia/_vblogs/2" }</script>
+        </span>
+      </span>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://my.mail.ru/mail/beeline_russia/video/_vblogs/2.html"
+        data-embed-thumbnail="https://filed15-30.my.mail.ru/pic?url=https%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fi%2F1752755258481704962&amp;mw=660&amp;mh=370&amp;sig=0f19984c08ef1f187b969126ca25a034&amp;croped=1"
+        data-embed-src="https://my.mail.ru/mail/beeline_russia/video/embed/_vblogs/2"
+        data-embed-ratio="16/9"
+        data-embed-provider="mailru"
+        data-embed-id="mail/beeline_russia/_vblogs/2"
+        data-embed-author="beeline_russia"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep one player when a republished span sits beside the frame of the same video', async () => {
+    const value = html`
+      <p>
+        <span
+          class="b-history-event__videoevent-object filed-image ui-lazy-background"
+          style="background-image: url('https://filed4-21.my.mail.ru/pic?url=http%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fsc03%2F-16643191545523102&amp;mw=480&amp;mh=330&amp;sig=f5d969f78779100fec7222c93b385787&amp;croped=1');"
+          data-history-action="playVideo"
+          data-video-item="5218"
+          data-video-swfurl="https://my2.imgsmail.ru/r/video2/uvpv3.swf?60"
+          data-videoplayer-moviesrc="/community/sergeyrus/_groupvideo/5218"
+        ></span>
+      </p>
+      <p>
+        <iframe
+          width="626"
+          height="367"
+          src="https://my.mail.ru/video/embed/-16643191545523102"
+        ></iframe>
+      </p>
+    `
+    const expected = html`
+      <div
+        data-embed-src="https://my.mail.ru/video/embed/-16643191545523102"
+        data-embed-ratio="16/9"
+        data-embed-provider="mailru"
+        data-embed-id="-16643191545523102"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should add the span player when the frame beside it plays another upload', async () => {
+    const value = html`
+      <p>
+        <span
+          class="b-history-event__videoevent-object filed-image ui-lazy-background"
+          data-history-action="playVideo"
+          data-video-item="8250"
+          data-video-swfurl="https://my2.imgsmail.ru/r/video2/uvpv3.swf?60"
+          data-videoplayer-moviesrc="/community/russkij.medved/_groupvideo/8250"
+          style="background-image: url(&quot;https://filed4-25.my.mail.ru/pic?url=http%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fsc21%2F-16255308754051014&amp;mw=480&amp;mh=330&amp;sig=a04af2742e1d910065ba4728916f16f2&amp;croped=1&quot;);"
+        ></span>
+      </p>
+      <p>
+        <iframe
+          height="367"
+          src="https://my.mail.ru/video/embed/5031011642700202411"
+          width="626"
+        ></iframe>
+      </p>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://my.mail.ru/community/russkij.medved/video/_groupvideo/8250.html"
+        data-embed-thumbnail="https://filed4-25.my.mail.ru/pic?url=http%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fsc21%2F-16255308754051014&amp;mw=480&amp;mh=330&amp;sig=a04af2742e1d910065ba4728916f16f2&amp;croped=1"
+        data-embed-src="https://my.mail.ru/community/russkij.medved/video/embed/_groupvideo/8250"
+        data-embed-ratio="16/9"
+        data-embed-provider="mailru"
+        data-embed-id="community/russkij.medved/_groupvideo/8250"
+        data-embed-author="russkij.medved"
+      ></div>
+      <div
+        data-embed-src="https://my.mail.ru/video/embed/5031011642700202411"
+        data-embed-ratio="16/9"
+        data-embed-provider="mailru"
+        data-embed-id="5031011642700202411"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
 
