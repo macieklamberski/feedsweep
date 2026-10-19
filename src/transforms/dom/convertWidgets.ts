@@ -5,7 +5,7 @@ import type {
   MediaResolverResult,
   WidgetResolver,
 } from '../../types.js'
-import { attr, hasText, playableElements } from '../../utils/dom.js'
+import { attr, isElement, isNonWhitespaceText, playableElements } from '../../utils/dom.js'
 import {
   audioFileRegex,
   cleanUrl,
@@ -118,20 +118,41 @@ const readPageMedia = async (
   return found[0]
 }
 
-// A Flash <object> is a shell of classid, codebase and <param>s around its carrier, and none of
-// those renders. An object holding text or other elements carries a fallback the publisher wrote.
-const carrierOrShell = (element: Element): Element => {
-  const parent = element.parentElement
+const shellTags = ['param', 'br']
 
-  if (parent?.localName !== 'object' || hasText(parent)) {
+// What a Flash <object> holds besides its carrier that renders nothing: <param>s, <br>s,
+// whitespace, and a wrapper such as a <p> holding only those or the carrier. A link around the
+// carrier, or an empty element such as the placeholder an earlier carrier became, is content.
+const isShellMarkup = (node: Node, carrier: Element): boolean => {
+  if (node === carrier) {
+    return true
+  }
+
+  if (!isElement(node)) {
+    return !isNonWhitespaceText(node)
+  }
+
+  if (shellTags.includes(node.localName)) {
+    return true
+  }
+
+  if (node.localName === 'a') {
+    return false
+  }
+
+  const children = Array.from(node.childNodes)
+
+  return children.length > 0 && children.every((child) => isShellMarkup(child, carrier))
+}
+
+const carrierOrShell = (element: Element): Element => {
+  const shell = element.parentElement?.closest('object')
+
+  if (!shell || !isShellMarkup(shell, element)) {
     return element
   }
 
-  const others = Array.from(parent.children).filter(
-    (child) => child !== element && child.localName !== 'param',
-  )
-
-  return others.length ? element : parent
+  return shell
 }
 
 // Ghost's video card already lands inside a figure carrying the author's own caption, which is
