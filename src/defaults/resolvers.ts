@@ -472,6 +472,7 @@ import { ghostMediaResolver } from '../media/ghost.js'
 import { libsynMediaResolver } from '../media/libsyn.js'
 import { metasliderMediaResolver } from '../media/metaslider.js'
 import { odeoMediaResolver } from '../media/odeo.js'
+import { podbeanFlashMediaResolver } from '../media/podbean.js'
 import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
 import { tumblrMediaResolver } from '../media/tumblr.js'
@@ -814,6 +815,7 @@ const mediaResolvers: Array<MediaResolver> = [
   libsynMediaResolver,
   metasliderMediaResolver,
   odeoMediaResolver,
+  podbeanFlashMediaResolver,
   podloveMediaResolver,
   substackMediaResolver,
   tumblrMediaResolver,
