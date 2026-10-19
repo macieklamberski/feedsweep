@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { readTumblrHeight, tumblrIframeEmbedResolver, tumblrPostEmbedResolver } from './tumblr.js'
+import {
+  readTumblrHeight,
+  tumblrIframeEmbedResolver,
+  tumblrPostEmbedResolver,
+  tumblrS9eEmbedResolver,
+} from './tumblr.js'
 
 describeForEachParser('tumblrIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, tumblrIframeEmbedResolver)
@@ -249,6 +254,44 @@ describeForEachParser('tumblrPostEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+describeForEachParser('tumblrS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, tumblrS9eEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should rebuild the helper frame, which names the blog key bare, on the current route', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="tumblr"
+          allowfullscreen=""
+          scrolling="no"
+          src="https://s9e.github.io/iframe/tumblr.min.html#kxNXlzA8mp9oJJsf5bphsg/159245383747"
+          style="border:0;height:180px;max-width:520px;width:100%"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tumblr',
+        id: 'kxNXlzA8mp9oJJsf5bphsg/159245383747',
+        src: 'https://embed.tumblr.com/embed/post/t:kxNXlzA8mp9oJJsf5bphsg/159245383747/v2',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a fragment naming a blog key and no post', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="tumblr"
+          src="https://s9e.github.io/iframe/tumblr.min.html#kxNXlzA8mp9oJJsf5bphsg"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
   })
 })

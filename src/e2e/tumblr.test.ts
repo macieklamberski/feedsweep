@@ -169,4 +169,26 @@ describeForEachParser('Tumblr', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  it('should convert the s9e helper frame a forum writes into a placeholder', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="tumblr"
+        allowfullscreen=""
+        onload="var a=Math.random();window.addEventListener('message',function(b){if(b.data.id==a)style.height=b.data.height+'px'});contentWindow.postMessage('s9e:'+a,'https://s9e.github.io')"
+        scrolling="no"
+        src="https://s9e.github.io/iframe/tumblr.min.html#kxNXlzA8mp9oJJsf5bphsg/159245383747"
+        style="border:0;height:180px;max-width:520px;width:100%"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="tumblr"
+        data-embed-id="kxNXlzA8mp9oJJsf5bphsg/159245383747"
+        data-embed-src="https://embed.tumblr.com/embed/post/t:kxNXlzA8mp9oJJsf5bphsg/159245383747/v2"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })
