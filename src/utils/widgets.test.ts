@@ -23,6 +23,7 @@ import {
   createS9eEmbedResolver,
   createUrlEmbedResolver,
   embedCarrierSelector,
+  findBareHandle,
   getEmbedSize,
   normalizeEmbedFields,
   prepareCiteMetadata,
@@ -568,6 +569,46 @@ describe('atUsername', () => {
     const value = ''
 
     expect(atUsername(value)).toBe('@')
+  })
+})
+
+describeForEachParser('findBareHandle', (parseHtml) => {
+  const read = (value: string) => {
+    const element = parseHtml(value).querySelector('blockquote')
+
+    return element ? findBareHandle(element) : undefined
+  }
+
+  it('should read the handle from a text node holding it', () => {
+    const value =
+      '<blockquote><div>Post by @jeremyburge</div> <div>View on Threads</div></blockquote>'
+
+    expect(read(value)).toBe('jeremyburge')
+  })
+
+  it('should stop the handle at its own text node when the next one follows with no space', () => {
+    const value = '<blockquote><div>Post by @steelydoz</div><div>View on Threads</div></blockquote>'
+
+    expect(read(value)).toBe('steelydoz')
+  })
+
+  it('should keep an underscore in the handle', () => {
+    const value = '<blockquote><div>投稿者: @hatamoto_s</div> <div>Threadsで見る</div></blockquote>'
+
+    expect(read(value)).toBe('hatamoto_s')
+  })
+
+  it('should keep a dot in the handle', () => {
+    const value =
+      '<blockquote><div>Post by @angelo.stavrow</div> <div>View on Threads</div></blockquote>'
+
+    expect(read(value)).toBe('angelo.stavrow')
+  })
+
+  it('should return undefined when no text names a handle', () => {
+    const value = '<blockquote><div>View on Threads</div></blockquote>'
+
+    expect(read(value)).toBeUndefined()
   })
 })
 
