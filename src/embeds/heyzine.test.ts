@@ -252,6 +252,138 @@ describe('heyzineResolveEmbed', () => {
       expect(heyzineResolveEmbed(value)).toEqual(expected)
     })
   })
+
+  describe('the custom domains of a paid account', () => {
+    it('should read a hexadecimal id on an aflip.in account', () => {
+      const value = 'https://arcandtype.aflip.in/1f38c904b4.html'
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: '1f38c904b4',
+        src: 'https://arcandtype.aflip.in/1f38c904b4.html',
+        url: 'https://arcandtype.aflip.in/1f38c904b4.html',
+        ratio: '490/600',
+      }
+
+      expect(heyzineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read a custom slug on an aflip.in account', () => {
+      const value = 'https://avon-rep.aflip.in/avon-campaign-14-brochure'
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: 'avon-campaign-14-brochure',
+        src: 'https://avon-rep.aflip.in/avon-campaign-14-brochure',
+        url: 'https://avon-rep.aflip.in/avon-campaign-14-brochure',
+        ratio: '490/600',
+      }
+
+      expect(heyzineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the extension a custom slug was written with and drop it from the key', () => {
+      const value = 'https://paigeweber.aflip.in/sisept25.html'
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: 'sisept25',
+        src: 'https://paigeweber.aflip.in/sisept25.html',
+        url: 'https://paigeweber.aflip.in/sisept25.html',
+        ratio: '490/600',
+      }
+
+      expect(heyzineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the custom domain host for a book the apex does not serve', () => {
+      const value = 'https://draftcraft.hflip.co/IFFInity-January-2026'
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: 'iffinity-january-2026',
+        src: 'https://draftcraft.hflip.co/IFFInity-January-2026',
+        url: 'https://draftcraft.hflip.co/IFFInity-January-2026',
+        ratio: '490/600',
+      }
+
+      expect(heyzineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read a custom slug on an hflip.co account', () => {
+      const value = 'https://thegreatbubblebarrier.hflip.co/white-paper-plastic-recycling.html'
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: 'white-paper-plastic-recycling',
+        src: 'https://thegreatbubblebarrier.hflip.co/white-paper-plastic-recycling.html',
+        url: 'https://thegreatbubblebarrier.hflip.co/white-paper-plastic-recycling.html',
+        ratio: '490/600',
+      }
+
+      expect(heyzineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should carry the page the fragment opens on', () => {
+      const value = 'https://mcneelmiami.hflip.co/e31020cf2b.html#page/10'
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: 'e31020cf2b',
+        src: 'https://mcneelmiami.hflip.co/e31020cf2b.html#page/10',
+        url: 'https://mcneelmiami.hflip.co/e31020cf2b.html#page/10',
+        ratio: '490/600',
+      }
+
+      expect(heyzineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the secret fragment a WordPress embed frame appends', () => {
+      const value = 'https://eccsleurolinkmagazine.aflip.in/eurolinkeccsl#?secret=ur5igZCLXs'
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: 'eurolinkeccsl',
+        src: 'https://eccsleurolinkmagazine.aflip.in/eurolinkeccsl',
+        url: 'https://eccsleurolinkmagazine.aflip.in/eurolinkeccsl',
+        ratio: '490/600',
+      }
+
+      expect(heyzineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop a tracking query', () => {
+      const value =
+        'https://biggertable.aflip.in/4e86b7e3ab.html?utm_source=biggertable.blue&utm_medium=newsletter&utm_campaign=why-writing-to-your-elected-official-still-matters-in-2025'
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: '4e86b7e3ab',
+        src: 'https://biggertable.aflip.in/4e86b7e3ab.html',
+        url: 'https://biggertable.aflip.in/4e86b7e3ab.html',
+        ratio: '490/600',
+      }
+
+      expect(heyzineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint https for an http carrier', () => {
+      const value = 'http://sacommuter.aflip.in/breakmag4.html'
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: 'breakmag4',
+        src: 'https://sacommuter.aflip.in/breakmag4.html',
+        url: 'https://sacommuter.aflip.in/breakmag4.html',
+        ratio: '490/600',
+      }
+
+      expect(heyzineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should ignore the account root, which holds no book', () => {
+      const value = 'https://biggertable.aflip.in/'
+
+      expect(heyzineResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a deeper path under a book', () => {
+      const value = 'https://paigeweber.aflip.in/sisept25.html/extra'
+
+      expect(heyzineResolveEmbed(value)).toBeUndefined()
+    })
+  })
 })
 
 describeForEachParser('heyzineEmbedResolver', (parseHtml) => {
@@ -298,6 +430,50 @@ describeForEachParser('heyzineEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should state the platform size over the box a custom domain carrier declares', async () => {
+      const value = html`
+        <iframe
+          allowfullscreen="allowfullscreen"
+          allow="clipboard-write"
+          scrolling="no"
+          class="fp-iframe"
+          style="border: 1px solid lightgray; width: 100%; height: 600px;"
+          src="https://sacommuter.aflip.in/breakmag4.html"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: 'breakmag4',
+        src: 'https://sacommuter.aflip.in/breakmag4.html',
+        url: 'https://sacommuter.aflip.in/breakmag4.html',
+        ratio: '490/600',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the hflip.co carrier', async () => {
+      const value = html`
+        <iframe
+          allow="clipboard-write"
+          allowfullscreen="allowfullscreen"
+          class="fp-iframe"
+          scrolling="no"
+          src="https://draftcraft.hflip.co/IFFInity-January-2026"
+          style="border: 1px solid lightgray; height: 400px; width: 100%;"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: 'iffinity-january-2026',
+        src: 'https://draftcraft.hflip.co/IFFInity-January-2026',
+        url: 'https://draftcraft.hflip.co/IFFInity-January-2026',
+        ratio: '490/600',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -310,6 +486,12 @@ describeForEachParser('heyzineEmbedResolver', (parseHtml) => {
 
     it('should ignore the flipbook route on a foreign host', async () => {
       const value = '<iframe src="https://evil.test/flip-book/4db16f598c.html"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a custom domain path on a foreign host', async () => {
+      const value = '<iframe src="https://evil.test/breakmag4.html"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
