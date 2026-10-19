@@ -7,11 +7,12 @@ const provider = 'allocine'
 
 const allocineHosts = ['allocine.fr']
 
-// The server matches both routes in their own case only.
+// The server matches every route in its own case only.
 const blogPlayerPathRegex = /^\/_video\/iblogvision\.aspx$/
+const flashPlayerPathRegex = /^\/blogvision\/([^/]+)$/
 const playerPathRegex = /^\/([^/]+)\.html$/
 
-// The two routes name the trailer by the same `cmedia` id, one in the path and one in the query.
+// Every route names the trailer by the same `cmedia` id, in the path or in the query.
 const readCmedia = (parsed: URL): string | null | undefined => {
   if (isHostOf(parsed, 'player.allocine.fr')) {
     return parsed.pathname.match(playerPathRegex)?.[1]
@@ -20,11 +21,13 @@ const readCmedia = (parsed: URL): string | null | undefined => {
   if (blogPlayerPathRegex.test(parsed.pathname)) {
     return parsed.searchParams.get('cmedia')
   }
+
+  return parsed.pathname.match(flashPlayerPathRegex)?.[1]
 }
 
-// AlloCiné's trailer player, `player.allocine.fr/{cmedia}.html`, the url the video page names as
-// its embed. The blog player, `www.allocine.fr/_video/iblogvision.aspx?cmedia={cmedia}`, serves
-// the same player by the same id. The video page's path also needs the film's id, so no `url`.
+// AlloCiné's trailer player, `player.allocine.fr/{cmedia}.html`, the embed the video page names.
+// The blog player, `/_video/iblogvision.aspx?cmedia={cmedia}`, and the retired Flash player,
+// `/blogvision/{cmedia}`, take the same id. The video page also needs the film's id, so no `url`.
 export const allocineResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, allocineHosts)
 
