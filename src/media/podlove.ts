@@ -3,7 +3,7 @@ import type { MediaResolver } from '../types.js'
 import { findConfigScript } from '../utils/dom.js'
 
 // The script inlines the config as podlovePlayerCache.add([{data: {audio: [{url, mimeType}]}}]).
-const configRegex = /podlovePlayerCache\.add\(\s*(\[[\s\S]*?\])\s*\)/
+const configRegex = /^podlovePlayerCache\.add\(\s*(\[[\s\S]*?\])\s*\)/
 
 // The Web Player plugin passes the episode itself, podlovePlayer(el, {audio, title}, "https://…"),
 // and caches null in its place. The spelling podlovePlayer('#el', 'https://…/wp-json/…') inlines
@@ -33,22 +33,30 @@ const parseJson = <T>(raw: string | undefined): T | undefined => {
   } catch {}
 }
 
+// Each regex is anchored to the first call, since trying it from every call in a script with
+// thousands of them and no closing bracket takes seconds.
+const matchFirstCall = (text: string, call: string, regex: RegExp): string | undefined => {
+  const start = text.indexOf(call)
+
+  if (start === -1) {
+    return
+  }
+
+  return text.slice(start).match(regex)?.[1]
+}
+
 const readEpisode = (script: Element): PodloveEpisode | undefined => {
   const text = script.textContent ?? ''
-  const config = parseJson<PodloveConfig>(text.match(configRegex)?.[1])
+  const config = parseJson<PodloveConfig>(
+    matchFirstCall(text, 'podlovePlayerCache.add(', configRegex),
+  )
   const cached = config?.[0]?.data
 
   if (cached) {
     return cached
   }
 
-  const call = text.indexOf('podlovePlayer(')
-
-  if (call === -1) {
-    return
-  }
-
-  return parseJson<PodloveEpisode>(text.slice(call).match(episodeRegex)?.[1])
+  return parseJson<PodloveEpisode>(matchFirstCall(text, 'podlovePlayer(', episodeRegex))
 }
 
 // Podlove Publisher ships an episode as custom elements a sibling script builds into a player.
