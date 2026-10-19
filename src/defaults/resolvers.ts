@@ -467,6 +467,7 @@ import {
 } from '../media/1pixelout.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { flashMp3PlayerMediaResolver } from '../media/flashmp3player.js'
+import { flickrMediaResolver } from '../media/flickr.js'
 import { ghostMediaResolver } from '../media/ghost.js'
 import { libsynMediaResolver } from '../media/libsyn.js'
 import { metasliderMediaResolver } from '../media/metaslider.js'
@@ -808,6 +809,7 @@ const mediaResolvers: Array<MediaResolver> = [
   onePixelOutWidgetMediaResolver,
   discourseMediaResolver,
   flashMp3PlayerMediaResolver,
+  flickrMediaResolver,
   ghostMediaResolver,
   libsynMediaResolver,
   metasliderMediaResolver,
