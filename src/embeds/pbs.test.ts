@@ -17,7 +17,8 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/',
-        ratio: '13/9',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
       }
 
       expect(pbsResolveEmbed(value)).toEqual(expected)
@@ -30,7 +31,7 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/2365866769',
         src: 'https://player.pbs.org/widget/partnerplayer/2365866769/?start=0&end=0',
-        ratio: '13/9',
+        ratio: '16/9',
       }
 
       expect(pbsResolveEmbed(value)).toEqual(expected)
@@ -42,7 +43,7 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'partnerplayer/Nt5uxMIZd-YQIx5g14yatg==',
         src: 'https://player.pbs.org/partnerplayer/Nt5uxMIZd-YQIx5g14yatg==/',
-        ratio: '13/9',
+        ratio: '16/9',
       }
 
       expect(pbsResolveEmbed(value)).toEqual(expected)
@@ -55,7 +56,8 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/',
-        ratio: '13/9',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
       }
 
       expect(pbsResolveEmbed(value)).toEqual(expected)
@@ -70,7 +72,8 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: `https://player.pbs.org/viralplayer/3005825044/?${param}`,
-        ratio: '13/9',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
       }
 
       expect(pbsResolveEmbed(value)).toEqual(expected)
@@ -93,7 +96,8 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/',
-        ratio: '13/9',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
       }
 
       expect(pbsResolveEmbed(value)).toEqual(expected)
@@ -105,7 +109,8 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/',
-        ratio: '13/9',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
       }
 
       expect(pbsResolveEmbed(value)).toEqual(expected)
@@ -117,7 +122,8 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/1506734069',
         src: 'https://player.pbs.org/viralplayer/1506734069/',
-        ratio: '13/9',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
       }
 
       expect(pbsResolveEmbed(value)).toEqual(expected)
@@ -161,7 +167,8 @@ describe('pbsResolveEmbed', () => {
         provider: 'pbs',
         id: 'viralplayer/3005%2F825044',
         src: 'https://player.pbs.org/viralplayer/3005%2F825044/',
-        ratio: '13/9',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
       }
 
       expect(pbsResolveEmbed(value)).toEqual(expected)
@@ -191,7 +198,8 @@ describeForEachParser('pbsIframeEmbedResolver', (parseHtml) => {
         provider: 'pbs',
         id: 'viralplayer/3005825044',
         src: 'https://player.pbs.org/viralplayer/3005825044/',
-        ratio: '13/9',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -252,7 +260,8 @@ describeForEachParser('pbsLegacyIframeEmbedResolver', (parseHtml) => {
         provider: 'pbs',
         id: 'viralplayer/1506734069',
         src: 'https://player.pbs.org/viralplayer/1506734069/',
-        ratio: '13/9',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -286,7 +295,8 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
         provider: 'pbs',
         id: 'viralplayer/2155877110',
         src: 'https://player.pbs.org/viralplayer/2155877110/',
-        ratio: '13/9',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -305,7 +315,8 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
         provider: 'pbs',
         id: 'viralplayer/2155877110%2F..%2Fx',
         src: 'https://player.pbs.org/viralplayer/2155877110%2F..%2Fx/',
-        ratio: '13/9',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
       }
 
       expect(await extract(value)).toEqual(expected)
