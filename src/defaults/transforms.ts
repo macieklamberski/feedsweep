@@ -21,6 +21,7 @@ import { demoteHeadings } from '../transforms/dom/demoteHeadings.js'
 import { enrichCitePlaceholders } from '../transforms/dom/enrichCitePlaceholders.js'
 import { enrichEmbedPlaceholders } from '../transforms/dom/enrichEmbedPlaceholders.js'
 import { fixDropboxMediaUrls } from '../transforms/dom/fixDropboxMediaUrls.js'
+import { fixEadDocumentLinks } from '../transforms/dom/fixEadDocumentLinks.js'
 import { fixLazyAudios } from '../transforms/dom/fixLazyAudios.js'
 import { fixLazyIframes } from '../transforms/dom/fixLazyIframes.js'
 import { fixLazyImages } from '../transforms/dom/fixLazyImages.js'
@@ -178,6 +179,9 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // from the anchor's own href before stripEmptyTags deletes the empty anchor, so the
   // image passes below dimension and proxy it like any other.
   fixSubstackImageLinks,
+
+  // Runs before stripDeadAnchors, which unwraps the `#` link this points at the file.
+  fixEadDocumentLinks,
 
   // Wraps Cargo (cargo.site) portfolio images in <figure> here in the normalize
   // cluster, so wrapBareInlineInParagraphs later sees block boundaries and keeps the
