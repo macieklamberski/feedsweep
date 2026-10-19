@@ -72,9 +72,47 @@ describe('preziResolveEmbed', () => {
 
       expect(preziResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should link a share token on the login-gated embed route to its view page', () => {
+      const value = 'https://prezi.com/p/embed/1V9KGplGyVkwW3H8OaaA/'
+      const expected: EmbedResolverResult = {
+        provider: 'prezi',
+        id: '1V9KGplGyVkwW3H8OaaA',
+        src: 'https://prezi.com/p/1V9KGplGyVkwW3H8OaaA/embed',
+        url: 'https://prezi.com/view/1V9KGplGyVkwW3H8OaaA/',
+        ratio: '550/400',
+      }
+
+      expect(preziResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the Prezi Video frame and link its view page', () => {
+      const value = 'https://prezi.com/v/embed/q88cqSPKvGcJH9t97Nmm/'
+      const expected: EmbedResolverResult = {
+        provider: 'prezi',
+        id: 'q88cqSPKvGcJH9t97Nmm',
+        src: 'https://prezi.com/v/embed/q88cqSPKvGcJH9t97Nmm/',
+        url: 'https://prezi.com/v/view/q88cqSPKvGcJH9t97Nmm/',
+        ratio: '16/9',
+      }
+
+      expect(preziResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
+    it('should ignore a route word other than embed under the video route', () => {
+      const value = 'https://prezi.com/v/watch/q88cqSPKvGcJH9t97Nmm/'
+
+      expect(preziResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the video embed route with no id', () => {
+      const value = 'https://prezi.com/v/embed/'
+
+      expect(preziResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore the view page that is not the embed', () => {
       const value = 'https://prezi.com/view/AmsY8GrnVuyJbYDH8QXI/'
 
@@ -266,6 +304,56 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
         src: 'https://prezi.com/view/ltVmUWho9CT4ywsuHZn3/embed',
         url: 'https://prezi.com/view/ltVmUWho9CT4ywsuHZn3/',
         ratio: '550/400',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should link the share token of a login-gated embed frame to its view page', async () => {
+      const value = html`
+        <iframe
+          src="https://prezi.com/p/embed/gQWRsBFXYVKqbyi386i4/"
+          id="iframe_container"
+          frameborder="0"
+          webkitallowfullscreen=""
+          mozallowfullscreen=""
+          allowfullscreen=""
+          allow="autoplay; fullscreen"
+          height="450"
+          width="800"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'prezi',
+        id: 'gQWRsBFXYVKqbyi386i4',
+        src: 'https://prezi.com/p/gQWRsBFXYVKqbyi386i4/embed',
+        url: 'https://prezi.com/view/gQWRsBFXYVKqbyi386i4/',
+        ratio: '550/400',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the Prezi Video frame the embed dialog writes', async () => {
+      const value = html`
+        <iframe
+          allow="autoplay; fullscreen"
+          allowfullscreen=""
+          frameborder="0"
+          height="315"
+          id="iframe_container"
+          mozallowfullscreen=""
+          src="https://prezi.com/v/embed/q88cqSPKvGcJH9t97Nmm/"
+          webkitallowfullscreen=""
+          width="560"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'prezi',
+        id: 'q88cqSPKvGcJH9t97Nmm',
+        src: 'https://prezi.com/v/embed/q88cqSPKvGcJH9t97Nmm/',
+        url: 'https://prezi.com/v/view/q88cqSPKvGcJH9t97Nmm/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
