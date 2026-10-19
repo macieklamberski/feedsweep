@@ -49,7 +49,6 @@ describe('bbcResolveEmbed', () => {
         id: 'p01tclqw',
         src: 'https://www.bbc.co.uk/programmes/p01tclqw/player',
         ratio: '16/9',
-        ratioHeightOffset: 230,
       }
 
       expect(bbcResolveEmbed(value)).toEqual(expected)
@@ -176,7 +175,6 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
         id: 'p08s3bnj',
         src: 'https://www.bbc.co.uk/programmes/p08s3bnj/player',
         ratio: '16/9',
-        ratioHeightOffset: 230,
       }
 
       expect(await extract(value)).toEqual(expected)
