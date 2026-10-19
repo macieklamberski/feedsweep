@@ -113,6 +113,8 @@ export const audioboomFlashEmbedResolver = createUrlEmbedResolver(
 
 export const audioboomFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Audioboom player' },
+  // The label of Audioboom's player under its pre-rename name.
+  { provider, field: 'title', drop: 'Audioboo player' },
 ]
 
 // Starts playback on the click that loads the player: the v4 player reads `autoplay` off its
