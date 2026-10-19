@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { isVkReady, vkEmbedResolver, vkResolveEmbed } from './vk.js'
+import {
+  isVkReady,
+  readVkHeight,
+  vkEmbedResolver,
+  vkRenderHint,
+  vkResolveEmbed,
+  vkWidgetEmbedResolver,
+} from './vk.js'
 
 describe('vkResolveEmbed', () => {
   describe('happy paths', () => {
@@ -205,6 +213,208 @@ describeForEachParser('vkEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('vkWidgetEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, vkWidgetEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should mint the post widget from the call beside the div', async () => {
+      const value = html`
+        <div id="vk_post_-211296925_60"></div>
+        <script
+          type="text/javascript"
+          src="https://vk.com/js/api/openapi.js?169"
+        ></script>
+        <script type="text/javascript">
+          (function() {
+            VK.Widgets.Post("vk_post_-211296925_60", -211296925, 60, 'bVYhst3km4JT6iZGIjNrIdnZCDT1', {width: 1200});
+          }());
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: 'wall-211296925_60',
+        src: 'https://vk.ru/widget_post.php?owner_id=-211296925&post_id=60&hash=bVYhst3km4JT6iZGIjNrIdnZCDT1',
+        url: 'https://vk.ru/wall-211296925_60',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the call from a paragraph after the div', async () => {
+      const value = html`
+        <div id="vk_post_-62353676_2228"></div>
+        <p>
+          <script
+            type="text/javascript"
+            src="https://vk.com/js/api/openapi.js?173"
+          ></script><br />
+          <script type="text/javascript">
+            (function() {
+              VK.Widgets.Post("vk_post_-62353676_2228", -62353676, 2228, 'pcjw5YUMJw1VBtdRfSPxm8qBgrs');
+            }());
+          </script>
+        </p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: 'wall-62353676_2228',
+        src: 'https://vk.ru/widget_post.php?owner_id=-62353676&post_id=2228&hash=pcjw5YUMJw1VBtdRfSPxm8qBgrs',
+        url: 'https://vk.ru/wall-62353676_2228',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a hash in double quotes', async () => {
+      const value = html`
+        <div id="vk_post_-227282754_915"></div>
+        <script type="text/javascript">
+          VK.Widgets.Post("vk_post_-227282754_915", -227282754, 915, "FFNod1QikYf6iVgRAOsZqnZkD6I");
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: 'wall-227282754_915',
+        src: 'https://vk.ru/widget_post.php?owner_id=-227282754&post_id=915&hash=FFNod1QikYf6iVgRAOsZqnZkD6I',
+        url: 'https://vk.ru/wall-227282754_915',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the playlist widget with no page url', async () => {
+      const value = html`
+        <div id='vk_playlist_-113047006_85410764'></div>
+        <p><script type="text/javascript">   VK.Widgets.Playlist('vk_playlist_-113047006_85410764', -113047006, 85410764, 'c2c936956e79205795');</script></p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: 'audio_playlist-113047006_85410764',
+        src: 'https://vk.ru/widget_playlist.php?oid=-113047006&pid=85410764&hash=c2c936956e79205795',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should pick the call naming this div out of a script filling several', async () => {
+      const value = html`
+        <div id="vk_post_-29531123_1341">&nbsp;</div>
+        <script type="text/javascript">
+          (function() {
+            if (!window.VK || !VK.Widgets || !VK.Widgets.Post || !VK.Widgets.Post('vk_post_-29531123_1340', -29531123, 1340, 'pS9tEkS7Ul0yJMdgUf8kQJ3Iel8')) setTimeout(arguments.callee, 50);
+            if (!window.VK || !VK.Widgets || !VK.Widgets.Post || !VK.Widgets.Post('vk_post_-29531123_1341', -29531123, 1341, 'Rk0ZsLX3e8kWlJbfKt2v1HW9h0E')) setTimeout(arguments.callee, 50);
+          }());
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: 'wall-29531123_1341',
+        src: 'https://vk.ru/widget_post.php?owner_id=-29531123&post_id=1341&hash=Rk0ZsLX3e8kWlJbfKt2v1HW9h0E',
+        url: 'https://vk.ru/wall-29531123_1341',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it("should leave a div that holds the post's text", async () => {
+      const value = html`
+        <div id="vk_post_-56385211_5564">
+        <div id="wpost_head_wrap" class="wpost_head_wrap clear_fix">
+        <div class="wpost_head_name">
+        <div class="wpost_head_date"><span style="font-size: medium;">Мы приглашаем всех желающих к сотрудничеству и спонсорству c нашим сервисом "MSKTS.RU" — как крупных интернет ресурсов, так и обычных интернет юзеров! </span></div>
+        </div>
+        </div>
+        <div class="wpost_post_body_wrap wide_wall_module wall_module ta_l">
+        <div id="wpost_post_body">
+        <div id="wpt-56385211_5564" class="wall_post_cont _wall_post_cont">
+        <div class="wall_post_text"><br /><span style="font-size: medium;">Что мы вам можем предложить? </span><br /><span style="font-size: medium;">- Реферальную программу; </span><br /><span style="font-size: medium;">- Спонсорство в виде предоставления сервера Teamspeak3 и/или денежное спонсирование Ваших ивентов.</span><br /><br /><span style="font-size: medium;">Присылайте свои заявки в Сообщения сообщества - Рассмотрим каждую!</span></div>
+        </div>
+        </div>
+        </div>
+        </div>
+        <span style="font-size: medium;">
+        <script type="text/javascript">// <![CDATA[
+          (function(d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src = "//vk.com/js/api/openapi.js?154"; fjs.parentNode.insertBefore(js, fjs); }(document, 'script', 'vk_openapi_js'));
+          (function() {
+            if (!window.VK || !VK.Widgets || !VK.Widgets.Post || !VK.Widgets.Post("vk_post_-56385211_5564", -56385211, 5564, 'DOeSsUDkSyEp6ztv6fo0pFZe3qc')) setTimeout(arguments.callee, 50);
+          }());
+        // ]]></script>
+        </span>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a div whose call the feed stripped', async () => {
+      const value = html`
+        <p>&nbsp;</p>
+        <div id="vk_post_-35532545_6895">&nbsp;</div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a call naming another div', async () => {
+      const value = html`
+        <div id="vk_post_-62353676_222"></div>
+        <script type="text/javascript">
+          VK.Widgets.Post("vk_post_-62353676_2228", -62353676, 2228, 'pcjw5YUMJw1VBtdRfSPxm8qBgrs');
+        </script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a call to another widget', async () => {
+      const value = html`
+        <div id="vk_post_-62353676_2228"></div>
+        <script type="text/javascript">
+          VK.Widgets.Comments("vk_post_-62353676_2228", -62353676, 2228, 'pcjw5YUMJw1VBtdRfSPxm8qBgrs');
+        </script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should pass an owner id through as written', async () => {
+      const value = html`
+        <div id="vk_post_-62353676_2228"></div>
+        <script type="text/javascript">
+          VK.Widgets.Post("vk_post_-62353676_2228", owner, 2228, 'pcjw5YUMJw1VBtdRfSPxm8qBgrs');
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: 'wallowner_2228',
+        src: 'https://vk.ru/widget_post.php?owner_id=owner&post_id=2228&hash=pcjw5YUMJw1VBtdRfSPxm8qBgrs',
+        url: 'https://vk.ru/wallowner_2228',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should pass an empty hash through as written', async () => {
+      const value = html`
+        <div id="vk_playlist_-224301543_164"></div>
+        <script type="text/javascript">
+          VK.Widgets.Playlist("vk_playlist_-224301543_164", -224301543, 164, "", {});
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: 'audio_playlist-224301543_164',
+        src: 'https://vk.ru/widget_playlist.php?oid=-224301543&pid=164&hash=',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
 describe('isVkReady', () => {
   it('should accept the message the player posts once it has loaded', () => {
     const value = {
@@ -237,5 +447,128 @@ describe('isVkReady', () => {
 
   it('should refuse the event name posted as a string', () => {
     expect(isVkReady('inited')).toBe(false)
+  })
+})
+
+describe('readVkHeight', () => {
+  it('should read the height the widget frame posts', () => {
+    const value = 'feeds:["resize",[314.03125]]'
+
+    expect(readVkHeight(value)).toBe(314.03125)
+  })
+
+  it('should refuse the message that opens the channel', () => {
+    expect(readVkHeight('feeds:["%init%"]')).toBeUndefined()
+  })
+
+  it('should refuse a message keyed for another frame', () => {
+    expect(readVkHeight('ab123:["resize",[314.03125]]')).toBeUndefined()
+  })
+
+  it('should refuse a message that is not JSON after the key', () => {
+    expect(readVkHeight('feeds:resize')).toBeUndefined()
+  })
+
+  it('should refuse a message posted as an object', () => {
+    expect(readVkHeight({ height: 314 })).toBeUndefined()
+  })
+
+  it('should refuse a resize with no height', () => {
+    expect(readVkHeight('feeds:["resize"]')).toBeUndefined()
+  })
+
+  it('should refuse a height of 0', () => {
+    expect(readVkHeight('feeds:["resize",[0]]')).toBeUndefined()
+  })
+
+  it('should refuse a message for another method', () => {
+    expect(readVkHeight('feeds:["resizeWidget",[500,314]]')).toBeUndefined()
+  })
+
+  it('should name the frame with the key the message carries', () => {
+    expect(vkRenderHint.frameName).toBe('fXDfeeds')
+  })
+})
+
+describeForEachParser('vk widgets through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should replace the div with the post widget and drop the loader and the call', async () => {
+    const value = html`
+      <p>Летний лагерь</p>
+      <div id="vk_post_-211296925_60"></div>
+      <script
+        type="text/javascript"
+        src="https://vk.com/js/api/openapi.js?169"
+      ></script>
+      <script type="text/javascript">
+        (function() {
+          VK.Widgets.Post("vk_post_-211296925_60", -211296925, 60, 'bVYhst3km4JT6iZGIjNrIdnZCDT1', {width: 1200});
+        }());
+      </script>
+    `
+    const expected = html`
+      <p>Летний лагерь</p>
+      <div
+        data-embed-url="https://vk.ru/wall-211296925_60"
+        data-embed-id="wall-211296925_60"
+        data-embed-provider="vk"
+        data-embed-src="https://vk.ru/widget_post.php?owner_id=-211296925&post_id=60&hash=bVYhst3km4JT6iZGIjNrIdnZCDT1"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it("should keep a div that holds the post's text as written", async () => {
+    const value = html`
+      <div id="vk_post_-56385211_5564">
+      <div id="wpost_head_wrap" class="wpost_head_wrap clear_fix">
+      <div class="wpost_head_name">
+      <div class="wpost_head_date"><span style="font-size: medium;">Мы приглашаем всех желающих к сотрудничеству и спонсорству c нашим сервисом "MSKTS.RU" — как крупных интернет ресурсов, так и обычных интернет юзеров! </span></div>
+      </div>
+      </div>
+      <div class="wpost_post_body_wrap wide_wall_module wall_module ta_l">
+      <div id="wpost_post_body">
+      <div id="wpt-56385211_5564" class="wall_post_cont _wall_post_cont">
+      <div class="wall_post_text"><br /><span style="font-size: medium;">Что мы вам можем предложить? </span><br /><span style="font-size: medium;">- Реферальную программу; </span><br /><span style="font-size: medium;">- Спонсорство в виде предоставления сервера Teamspeak3 и/или денежное спонсирование Ваших ивентов.</span><br /><br /><span style="font-size: medium;">Присылайте свои заявки в Сообщения сообщества - Рассмотрим каждую!</span></div>
+      </div>
+      </div>
+      </div>
+      </div>
+      <span style="font-size: medium;">
+      <script type="text/javascript">// <![CDATA[
+        (function(d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src = "//vk.com/js/api/openapi.js?154"; fjs.parentNode.insertBefore(js, fjs); }(document, 'script', 'vk_openapi_js'));
+        (function() {
+          if (!window.VK || !VK.Widgets || !VK.Widgets.Post || !VK.Widgets.Post("vk_post_-56385211_5564", -56385211, 5564, 'DOeSsUDkSyEp6ztv6fo0pFZe3qc')) setTimeout(arguments.callee, 50);
+        }());
+      // ]]></script>
+      </span>
+    `
+    const result = await convert(value)
+
+    expect(result).toContain('Присылайте свои заявки в Сообщения сообщества - Рассмотрим каждую!')
+    expect(result).not.toContain('data-embed-src')
+  })
+
+  it('should resolve every div of a script that fills several', async () => {
+    const value = html`
+      <div id="vk_post_-29531123_1340">&nbsp;</div>
+      <div id="vk_post_-29531123_1341">&nbsp;</div>
+      <script type="text/javascript">
+        VK.Widgets.Post('vk_post_-29531123_1340', -29531123, 1340, 'pS9tEkS7Ul0yJMdgUf8kQJ3Iel8');
+        VK.Widgets.Post('vk_post_-29531123_1341', -29531123, 1341, 'Rk0ZsLX3e8kWlJbfKt2v1HW9h0E');
+      </script>
+    `
+    const expected = [
+      'https://vk.ru/widget_post.php?owner_id=-29531123&post_id=1340&hash=pS9tEkS7Ul0yJMdgUf8kQJ3Iel8',
+      'https://vk.ru/widget_post.php?owner_id=-29531123&post_id=1341&hash=Rk0ZsLX3e8kWlJbfKt2v1HW9h0E',
+    ]
+    const placeholders = parseHtml(await convert(value)).querySelectorAll('[data-embed-src]')
+    const sources = [...placeholders].map((element) => element.getAttribute('data-embed-src'))
+
+    expect(sources).toEqual(expected)
   })
 })
