@@ -140,6 +140,57 @@ const findCaption = (element: Element, wrapper: Nullish<Element>): Nullish<Eleme
   return readCaption(findCaptionLinks(candidate)).author ? candidate : undefined
 }
 
+// An editor that rewrote the snippet moved its player out of the __ss_ div: the deck's link stays
+// before the player and the owner's line after it, each beside the player or beside the block
+// holding it. The deck's link is the one naming the slug the swf query names.
+const readSplitCaption = (player: Element, slug: string): Partial<EmbedResolverResult> => {
+  const listSiblings = (
+    direction: 'previousElementSibling' | 'nextElementSibling',
+  ): Array<Nullish<Element>> => {
+    const siblings: Array<Nullish<Element>> = []
+
+    for (let node = player[direction]; node; node = node[direction]) {
+      siblings.push(node)
+    }
+
+    return siblings.length > 0 ? siblings : [player.parentElement?.[direction]]
+  }
+
+  const findAnchor = (
+    nodes: Array<Nullish<Element>>,
+    predicate: (anchor: Element) => boolean,
+  ): Element | undefined => {
+    for (const node of nodes) {
+      if (node?.matches(captionLinkSelector) && predicate(node)) {
+        return node
+      }
+
+      const anchor = find(node, captionLinkSelector, predicate)
+
+      if (anchor) {
+        return anchor
+      }
+    }
+  }
+
+  const before = listSiblings('previousElementSibling')
+  const after = listSiblings('nextElementSibling')
+  const page = findAnchor(before, (anchor) => readPageSegments(anchor)[1] === slug)
+  const account = readPageSegments(page)[0]
+  const owner = findAnchor([...before, ...after], (anchor) => {
+    const segments = readPageSegments(anchor)
+
+    return segments.length === 1 && segments[0] === account
+  })
+
+  // A deck's link with no owner's line beside it is prose as often as a caption.
+  if (!owner) {
+    return {}
+  }
+
+  return readCaption({ page, owner })
+}
+
 // Blogger lets a post run on inside the caption block, so only the run from the deck's link to
 // the owner's goes, with any link to SlideShare's home page in the block.
 const removeAttribution = (caption: Element, page: Element, owner: Element): void => {
@@ -197,7 +248,9 @@ const readWrapper = (element: Nullish<Element>): { deck?: string; wrapper?: Elem
   let deck: string | undefined
   let wrapper: Element | undefined
 
-  // The outermost match wins: the caption sits on the __ss_ div, not the __sse object inside.
+  // The innermost match names the deck, since a snippet pasted into another one's unclosed
+  // __ss_ div sits inside a wrapper named for the other deck. The wrapper is the outermost node
+  // still naming that deck: the caption sits on the __ss_ div, not the __sse object inside.
   for (let node: Nullish<Element> = element; node; node = node.parentElement) {
     // An editor that rewrites the object's attributes into params moves its name there.
     const params = Array.from(node.querySelectorAll(':scope > param[name="name"]'))
@@ -210,10 +263,16 @@ const readWrapper = (element: Nullish<Element>): { deck?: string; wrapper?: Elem
     for (const name of names) {
       const id = name?.match(wrapperIdRegex)?.[1]
 
-      if (id) {
-        deck = id
-        wrapper = node
+      if (!id) {
+        continue
       }
+
+      if (deck && id !== deck) {
+        return { deck, wrapper }
+      }
+
+      deck = id
+      wrapper = node
     }
   }
 
@@ -258,8 +317,6 @@ const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const caption = consumeCaption(element, wrapper)
-
   // The swf query names the deck's owner and slug, which compose the same page the wrapper
   // links to. It is the fallback for a snippet that kept the player and dropped the wrapper's
   // anchor.
@@ -270,6 +327,10 @@ const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
     account && slug
       ? `https://www.slideshare.net/${encodePathSegment(account)}/${encodePathSegment(slug)}`
       : undefined
+  // The player names the deck itself only once the __ss_ div around it is gone.
+  const isPlayer = wrapper?.localName === 'object' || wrapper?.localName === 'embed'
+  const caption =
+    wrapper && slug && isPlayer ? readSplitCaption(wrapper, slug) : consumeCaption(element, wrapper)
 
   return composeEmbed(deck, { ...caption, url: caption.url ?? composed })
 }
