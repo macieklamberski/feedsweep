@@ -61,6 +61,116 @@ describeForEachParser('rebuildIframelyEmbeds', (parseHtml) => {
     })
   })
 
+  describe('the frame Iframely renders inside an oEmbed wrapper', () => {
+    it('should point a Canva frame at the design the wrapper names', async () => {
+      const value = html`
+        <div data-oembed-url="https://www.canva.com/design/DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ/view">
+          <div>
+            <div style="left: 0; width: 100%; height: 0; position: relative; padding-bottom: 80%;">
+              <iframe
+                allow="fullscreen *;"
+                allowfullscreen=""
+                src="//if-cdn.com/hFqOL9kw"
+                style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; border: 0;"
+                tabindex="-1"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      `
+      const expected = html`
+        <div data-oembed-url="https://www.canva.com/design/DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ/view">
+          <div>
+            <div style="left: 0; width: 100%; height: 0; position: relative; padding-bottom: 80%;">
+              <iframe src="https://www.canva.com/design/DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ/view"></iframe>
+            </div>
+          </div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should point a frame inside an Instant Articles figure at the post', async () => {
+      const value = html`
+        <div data-oembed-url="https://t.me/vn20minut/59305">
+          <div>
+            <div>
+              <figure class="op-interactive">
+                <iframe
+                  allowfullscreen=""
+                  src="//if-cdn.com/OfwIfCzU?app=1"
+                  tabindex="-1"
+                ></iframe>
+              </figure>
+            </div>
+          </div>
+        </div>
+      `
+      const expected = html`
+        <div data-oembed-url="https://t.me/vn20minut/59305">
+          <div>
+            <div>
+              <figure class="op-interactive">
+                <iframe src="https://t.me/vn20minut/59305"></iframe>
+              </figure>
+            </div>
+          </div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep the frame when no resolver claims the url the wrapper names', async () => {
+      const value = html`
+        <div data-oembed-url="https://tass.com/world/2132541">
+          <div>
+            <div style="left: 0; width: 100%; height: 0; position: relative; padding-bottom: 63.6667%; padding-top: 120px;">
+              <iframe
+                allowfullscreen=""
+                src="//if-cdn.com/4tZvAIdp?app=1"
+                style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; border: 0;"
+                tabindex="-1"
+              ></iframe>
+            </div>
+          </div>
+          <script
+            async=""
+            charset="utf-8"
+            src="//if-cdn.com/embed.js"
+          ></script>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a frame on another host carrying the same path', async () => {
+      const value = html`
+        <div data-oembed-url="https://www.youtube.com/watch?v=wN_PqWOCCb4">
+          <div>
+            <iframe src="https://evil.test/tmPqyiAE"></iframe>
+          </div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a frame on a host that only ends in the Iframely host', async () => {
+      const value = html`
+        <div data-oembed-url="https://www.youtube.com/watch?v=wN_PqWOCCb4">
+          <div>
+            <iframe src="https://notif-cdn.com/tmPqyiAE"></iframe>
+          </div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
   describe('sad paths', () => {
     it('should leave an anchor that already carries its own text alone', async () => {
       const value = html`
@@ -105,6 +215,20 @@ describeForEachParser('rebuildIframelyEmbeds', (parseHtml) => {
               href="https://example.com/article"
               data-iframely-url="https://cdn.iframe.ly/api/iframe?url=https%3A%2F%2Fexample.com%2Farticle"
             ></a>
+          </div>
+        </div>
+      `
+      const once = await transform(value)
+      const twice = await transform(once)
+
+      expect(twice).toEqualHtml(once)
+    })
+
+    it('should be idempotent on an oEmbed wrapper', async () => {
+      const value = html`
+        <div data-oembed-url="https://www.canva.com/design/DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ/view">
+          <div>
+            <iframe src="//if-cdn.com/hFqOL9kw"></iframe>
           </div>
         </div>
       `
@@ -166,6 +290,66 @@ describeForEachParser('rebuildIframelyEmbeds through the pipeline', (parseHtml) 
         data-embed-id="dQw4w9WgXcQ"
         data-embed-provider="youtube"
         data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should bring a Canva frame inside an oEmbed wrapper back as the Canva placeholder', async () => {
+    const value = html`
+      <div data-oembed-url="https://www.canva.com/design/DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ/view">
+        <div>
+          <div style="left: 0; width: 100%; height: 0; position: relative; padding-bottom: 80%;">
+            <iframe
+              allow="fullscreen *;"
+              allowfullscreen=""
+              src="//if-cdn.com/hFqOL9kw"
+              style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; border: 0;"
+              tabindex="-1"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-url="https://www.canva.com/design/DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ/view"
+        data-embed-id="DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ"
+        data-embed-provider="canva"
+        data-embed-src="https://www.canva.com/design/DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ/view?embed"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should bring a YouTube frame inside an oEmbed wrapper back as the YouTube placeholder', async () => {
+    const value = html`
+      <div data-oembed-url="https://www.youtube.com/watch?v=wN_PqWOCCb4">
+        <div>
+          <div style="left: 0; width: 100%; height: 0; position: relative; padding-bottom: 56.25%;">
+            <iframe
+              allow="accelerometer *; clipboard-write *; encrypted-media *; gyroscope *; picture-in-picture *; web-share *;"
+              allowfullscreen=""
+              scrolling="no"
+              src="//if-cdn.com/tmPqyiAE"
+              style="top: 0; left: 0; width: 100%; height: 100%; position: absolute; border: 0;"
+              tabindex="-1"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/wN_PqWOCCb4/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=wN_PqWOCCb4"
+        data-embed-id="wN_PqWOCCb4"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/wN_PqWOCCb4"
       ></div>
     `
 
