@@ -2,7 +2,7 @@ import { getAnyOf, getPathSegments, isHostOf, isHostOrSubdomainOf, parseUrl } fr
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Item = {
   id: string
@@ -24,13 +24,19 @@ const experienceHosts = ['experience.arcgis.com']
 const mapViewerPath = '/apps/mapviewer/index.html'
 const classicEmbedPath = '/apps/Embed/index.html'
 const embedViewerPath = '/home/webmap/embedViewer.html'
+const onePanePath = '/home/webmap/templates/OnePane/basicviewer/embed.html'
 const webMapPaths = [
   classicEmbedPath, // The Map Viewer Classic snippet
   mapViewerPath,
   embedViewerPath, // The Map Viewer Classic snippet
+  onePanePath, // The retired OnePane template, which answers 404 for every web map
 ]
 // The start position Map Viewer reads.
 const mapViewerPositionParams = ['center', 'scale', 'level']
+// The start position the embedded map element reads, which Map Viewer reads the same way.
+const elementPositionAttributes = ['center', 'scale']
+// The portal the embedded map element opens when it names none.
+const defaultPortalUrl = 'https://www.arcgis.com'
 // The start position and navigation the classic player reads, `marker` centring on a pin.
 const classicEmbedPositionParams = ['extent', 'center', 'level', 'marker', 'find', 'feature']
 // The only start position the classic embed viewer reads.
@@ -82,6 +88,20 @@ const composeWebMapSource = (url: URL, webMapId: string): string => {
 
   if (url.pathname === embedViewerPath) {
     return composeClassicSource(url, webMapId, embedViewerPositionParams)
+  }
+
+  // Map Viewer refuses a web map saved before spec 2.0, which most OnePane maps are, so the
+  // retired template moves to the classic embed viewer. Its `extent` is the same longitude and
+  // latitude box OnePane wrote as `gcsextent`.
+  if (url.pathname === onePanePath) {
+    const src = `https://www.arcgis.com${embedViewerPath}?webmap=${webMapId}`
+    const extent = url.searchParams.get('gcsextent')
+
+    if (!extent) {
+      return src
+    }
+
+    return `${src}&extent=${extent}`
   }
 
   const src = `https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=${webMapId}`
@@ -173,4 +193,30 @@ export const arcgisResolveEmbed: ResolveEmbed = (url, element) => {
   }
 }
 
-export const arcgisEmbedResolver = createUrlEmbedResolver(arcgisHosts, arcgisResolveEmbed)
+export const arcgisIframeEmbedResolver = createUrlEmbedResolver(arcgisHosts, arcgisResolveEmbed)
+
+// The Embeddable Components map, a custom element the `js.arcgis.com` loader builds into a map,
+// so it renders nothing once the loader is stripped. Its `center` is longitude first.
+export const arcgisWidgetEmbedResolver = createMarkupEmbedResolver(
+  'arcgis-embedded-map',
+  (element) => {
+    const itemId = attr(element, 'item-id')
+    const url = parseUrl(mapViewerPath, attr(element, 'portal-url') ?? defaultPortalUrl)
+
+    if (!itemId || !url) {
+      return
+    }
+
+    url.searchParams.set('webmap', itemId)
+
+    for (const name of elementPositionAttributes) {
+      const value = attr(element, name)
+
+      if (value) {
+        url.searchParams.set(name, value)
+      }
+    }
+
+    return arcgisResolveEmbed(url.href, element)
+  },
+)

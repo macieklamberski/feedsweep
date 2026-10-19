@@ -52,7 +52,7 @@ import { anchorEmbedResolver } from '../embeds/anchor.js'
 import { anyflipEmbedResolver } from '../embeds/anyflip.js'
 import { aparatIframeEmbedResolver, aparatScriptEmbedResolver } from '../embeds/aparat.js'
 import { appleEmbedResolver, appleToolsEmbedResolver } from '../embeds/apple.js'
-import { arcgisEmbedResolver } from '../embeds/arcgis.js'
+import { arcgisIframeEmbedResolver, arcgisWidgetEmbedResolver } from '../embeds/arcgis.js'
 import {
   archiveAudioEmbedResolver,
   archiveFlashEmbedResolver,
@@ -526,7 +526,8 @@ const embedResolvers: Array<EmbedResolver> = [
   aparatScriptEmbedResolver,
   appleEmbedResolver,
   appleToolsEmbedResolver,
-  arcgisEmbedResolver,
+  arcgisIframeEmbedResolver,
+  arcgisWidgetEmbedResolver,
   archiveIframeEmbedResolver,
   archiveFlashEmbedResolver,
   archiveAudioEmbedResolver,

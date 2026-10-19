@@ -2,7 +2,11 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { arcgisEmbedResolver, arcgisResolveEmbed } from './arcgis.js'
+import {
+  arcgisIframeEmbedResolver,
+  arcgisResolveEmbed,
+  arcgisWidgetEmbedResolver,
+} from './arcgis.js'
 
 describe('arcgisResolveEmbed', () => {
   describe('happy paths', () => {
@@ -98,6 +102,20 @@ describe('arcgisResolveEmbed', () => {
         id: '02b63130e0ad4462a904215858213ee7',
         src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=02b63130e0ad4462a904215858213ee7&level=12',
         url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=02b63130e0ad4462a904215858213ee7',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should rebuild the retired OnePane template onto the classic embed viewer with its box', () => {
+      const value =
+        'http://www.arcgis.com/home/webmap/templates/OnePane/basicviewer/embed.html?webmap=9b6a2497b3d84aeb95633a58560025ee&gcsextent=-86.1328,-74.9594,180,81.6214&displayslider=true&displaylegend=true'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: '9b6a2497b3d84aeb95633a58560025ee',
+        src: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497b3d84aeb95633a58560025ee&extent=-86.1328,-74.9594,180,81.6214',
+        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=9b6a2497b3d84aeb95633a58560025ee',
         height: 500,
       }
 
@@ -400,8 +418,8 @@ describe('arcgisResolveEmbed', () => {
   })
 })
 
-describeForEachParser('arcgisEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, arcgisEmbedResolver)
+describeForEachParser('arcgisIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, arcgisIframeEmbedResolver)
 
   describe('happy paths', () => {
     it('should take the map name from the stated title and drop the frame box', async () => {
@@ -454,6 +472,114 @@ describeForEachParser('arcgisEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('arcgisWidgetEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, arcgisWidgetEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should open the element on Map Viewer at its start position and drop its box', async () => {
+      const value = html`
+        <arcgis-embedded-map
+          style="height:800px;width:1000px;"
+          item-id="51f91333c1de45c6bfa8b0c83f9a434f"
+          theme="light"
+          heading-enabled
+          legend-enabled
+          information-enabled
+          basemap-gallery-enabled
+          time-zone-label-enabled
+          center="-36.817038734225186,-71.50051233783137"
+          scale="14134452.869988834"
+          portal-url="https://ncluni.maps.arcgis.com"
+        ></arcgis-embedded-map>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: '51f91333c1de45c6bfa8b0c83f9a434f',
+        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=51f91333c1de45c6bfa8b0c83f9a434f&center=-36.817038734225186%2C-71.50051233783137&scale=14134452.869988834',
+        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=51f91333c1de45c6bfa8b0c83f9a434f',
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should open an element with no start position at the saved view of the map', async () => {
+      const value = html`
+        <arcgis-embedded-map
+          style="height:500px;width:700px;"
+          item-id="2a900856e71d4398a44c5a76d456641d"
+          theme="light"
+          heading-disabled
+          legend-enabled
+          portal-url="https://svt.maps.arcgis.com"
+        ></arcgis-embedded-map>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: '2a900856e71d4398a44c5a76d456641d',
+        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=2a900856e71d4398a44c5a76d456641d',
+        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=2a900856e71d4398a44c5a76d456641d',
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should open an element that names no portal on ArcGIS Online, as the component does', async () => {
+      const value = html`
+        <arcgis-embedded-map
+          item-id="2a900856e71d4398a44c5a76d456641d"
+          theme="light"
+        ></arcgis-embedded-map>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: '2a900856e71d4398a44c5a76d456641d',
+        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=2a900856e71d4398a44c5a76d456641d',
+        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=2a900856e71d4398a44c5a76d456641d',
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore an element that names no item', async () => {
+      const value = html`
+        <arcgis-embedded-map
+          theme="light"
+          portal-url="https://svt.maps.arcgis.com"
+        ></arcgis-embedded-map>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an element whose portal is not a url', async () => {
+      const value = html`
+        <arcgis-embedded-map
+          item-id="2a900856e71d4398a44c5a76d456641d"
+          portal-url="svt.maps.arcgis.com"
+        ></arcgis-embedded-map>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an element whose portal is not on ArcGIS Online', async () => {
+      const value = html`
+        <arcgis-embedded-map
+          item-id="2a900856e71d4398a44c5a76d456641d"
+          portal-url="https://evil.test"
+        ></arcgis-embedded-map>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 // An item's file is served from the portal host, so an enclosure there reaches the resolver.
 describeForEachParser('arcgis through the pipeline', (parseHtml) => {
   const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
@@ -473,6 +599,30 @@ describeForEachParser('arcgis through the pipeline', (parseHtml) => {
         data-embed-provider="arcgis"
         data-embed-src="https://www.arcgis.com/home/webmap/embedViewer.html?webmap=62bf87f7b2f64f15b48491d39242f4d7"
         data-embed-url="https://www.arcgis.com/apps/mapviewer/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7"
+        data-embed-height="500"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should claim an embedded map whose loader the pipeline strips', async () => {
+    const value = html`
+      <script
+        type="module"
+        src="https://js.arcgis.com/embeddable-components/4.32/arcgis-embeddable-components.esm.js"
+      ></script>
+      <arcgis-embedded-map
+        item-id="06e4c3cb93114672bfb3d0ea7264fe43"
+        portal-url="https://www.arcgis.com"
+      ></arcgis-embedded-map>
+    `
+    const expected = html`
+      <div
+        data-embed-id="06e4c3cb93114672bfb3d0ea7264fe43"
+        data-embed-provider="arcgis"
+        data-embed-src="https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=06e4c3cb93114672bfb3d0ea7264fe43"
+        data-embed-url="https://www.arcgis.com/apps/mapviewer/index.html?webmap=06e4c3cb93114672bfb3d0ea7264fe43"
         data-embed-height="500"
       ></div>
     `
