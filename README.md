@@ -79,7 +79,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildRocketYoutubePreviews` | Rebuild a real `<iframe>` from a WP Rocket YouTube preview facade (`.rll-youtube-player[data-id]`), carrying over `data-query` |
 | `rebuildVideoJsEmbeds` | Rebuild a native `<video>` from a Video.js `<video-js>` element, reading the source from a `<source>` child or the `data-setup` JSON |
 | `rebuildWmakerEmbeds` | Rebuild a real `<iframe>` from a WMaker item's dead Flash player, pointing it at the modern embed page named by the article id in the item's permalink |
-| `rebuildWistiaEmbeds` | Rebuild a real `<iframe>` from a Wistia JS-API inline embed facade (`wistia_async_{id}` class) |
+| `rebuildWistiaEmbeds` | Rebuild a real `<iframe>` from a Wistia JS-API inline embed facade (`wistia_async_{id}` class) or legacy API embed mount (`wistia_{id}` id) |
 | `rebuildLazyLoadForVideos` | Rebuild a real `<iframe>` from a "Lazy Load for Videos" facade (`a.preview-lazyload`), recovering the YouTube/Vimeo id from `data-video-uri` or `href` and carrying over `data-video-title` |
 | `rebuildLazyYtEmbeds` | Rebuild a real `<iframe>` from a lazy YouTube facade parking the id in a data attribute (`data-youtube-id`, `data-youtube`, `.youtube-embed`, `.youtube-player`) |
 | `rebuildElementorVideoEmbeds` | Rebuild a real `<iframe>` from an Elementor video widget's deferred `data-settings` (YouTube / Vimeo / Dailymotion / VideoPress) |
