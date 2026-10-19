@@ -15,7 +15,7 @@ const safeIdRegex = /^[A-Za-z]+_\d+$/
 // The Flash players, all of them under `widgets/swf/{revision}/`. `pro_widget` is the common one
 // at 49 occurrences, then `tuneWidget` 17, `widgetPlayer` 7, `press` 5, `widgetPlayerMini` 3,
 // `blog_player` 2 and `widgetPlayerMicro` 1.
-const flashPathRegex = /^\/+widgets\/swf\//
+const flashPathRegex = /^\/widgets\/swf\//
 
 // The three parameters those players use to name their subject. They are the same id space as
 // the html widget's path: all six Flash-era ids sampled from the corpus answer 200 there, against

@@ -166,10 +166,10 @@ export const archiveAudioEmbedResolver = createMarkupEmbedResolver('audio', (ele
   return { ...embed, height: audioPlayerHeight }
 })
 
-const flowPlayerPathRegex = /^\/+(?:flow|flv)\//
-const xspfPlayerPathRegex = /^\/+audio\/xspf_player\.swf$/
+const flowPlayerPathRegex = /^\/(?:flow|flv)\//
+const xspfPlayerPathRegex = /^\/audio\/xspf_player\.swf$/
 // The WordPress audio player swf, uploaded into an item of its own or beside the files it plays.
-const itemPlayerPathRegex = /^\/+download\/.+\/player\.swf$/
+const itemPlayerPathRegex = /^\/download\/.+\/player\.swf$/
 // `archive.org/download/{identifier}/{file}`, or `/{n}/items/{identifier}/{file}` on a storage host.
 const itemFilePathRegex = /^\/+(?:download|\d+\/items)\/([^/]+)\/(.+)/
 // The segment after `archive.org/download/` on any subdomain.

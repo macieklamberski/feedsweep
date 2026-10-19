@@ -2,22 +2,15 @@ import { stringifySrcset } from 'srcset'
 import type { DomTransform, ResolveUrlFn } from '../../types.js'
 import { svgHrefAttribute } from '../../utils/dom.js'
 import { countSrcsetCandidates, parseSrcset } from '../../utils/images.js'
-import { absoluteUrlRegex, resolveOrKeepUrl } from '../../utils/urls.js'
+import { absoluteUrlRegex, collapseLeadingSlashes, resolveOrKeepUrl } from '../../utils/urls.js'
 
 const hostPrefixedUrlRegex = /^(https?:)\/\/[^/?#]+\/+(?=\/(?:[a-z0-9-]+\.)+[a-z]{2,}\/)/i
-const leadingSlashRunRegex = /^(https?:\/\/[^/?#]+)\/{2,}/i
 const hostPrefixedSrcTags = ['iframe', 'embed', 'script']
 
 // A protocol-relative src resolved against the page lands behind the site's own host,
 // `{scheme}//{site}//{host}/{path}`, sometimes with a third slash, which the site does not serve.
 const stripSiteHostPrefix = (url: string): string => {
   return url.replace(hostPrefixedUrlRegex, '$1/')
-}
-
-// A server answers a path opening on a run of slashes as one slash, and a resolver reading the
-// path by position refuses it. A run deeper in the path can carry an embedded url, so it stays.
-const collapseLeadingSlashes = (url: string): string => {
-  return url.replace(leadingSlashRunRegex, '$1/')
 }
 
 // An absolute value other than a player or script src is left byte-identical, and a relative one

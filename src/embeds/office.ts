@@ -9,7 +9,7 @@ const officeHosts = ['view.officeapps.live.com']
 
 // The snippet writes `embed.aspx` and the share link `view.aspx`. Both render the same document,
 // and the viewer answers any casing.
-const viewerPathRegex = /^\/+op\/(?:embed|view)\.aspx$/i
+const viewerPathRegex = /^\/op\/(?:embed|view)\.aspx$/i
 
 // A download endpoint or a directory ends on a segment that names no file.
 const readFileName = (documentUrl: string): string | undefined => {

@@ -12,11 +12,11 @@ const ccmaHosts = [
   'tv3.cat', // The Flash players
 ]
 
-const embedPathRegex = /^\/+3cat\/video\/([^/]+)\/embed\/?$/
-const legacyEmbedPathRegex = /^\/+video\/embed\/(super3\/)?(\d+)\/?$/
-const audioEmbedPathRegex = /^\/+audio\/embed\/([^/]+)\/?$/
-const evpPlayerPathRegex = /^\/+ria\/players\//
-const svpPlayerPathRegex = /^\/+svp2\/svp2\.swf$/
+const embedPathRegex = /^\/3cat\/video\/([^/]+)\/embed\/?$/
+const legacyEmbedPathRegex = /^\/video\/embed\/(super3\/)?(\d+)\/?$/
+const audioEmbedPathRegex = /^\/audio\/embed\/([^/]+)\/?$/
+const evpPlayerPathRegex = /^\/ria\/players\//
+const svpPlayerPathRegex = /^\/svp2\/svp2\.swf$/
 const svpObjectIdRegex = /^SVP(\d+)IE$/
 
 // The article page answers `x-frame-options: SAMEORIGIN`, so the embed route is the only target

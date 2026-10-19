@@ -128,6 +128,23 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
     expect(await transform(value, context)).toEqualHtml(expected)
   })
 
+  it('should keep a leading double slash in an audio enclosure url', async () => {
+    const value = '<p>Episode notes</p>'
+    const context = withEnclosures([
+      { url: 'https://example.com//episode.mp3', type: 'audio/mpeg' },
+    ])
+    const expected = html`
+      <audio
+        src="https://example.com//episode.mp3"
+        controls
+        data-enclosure=""
+      ></audio>
+      <p>Episode notes</p>
+    `
+
+    expect(await transform(value, context)).toEqualHtml(expected)
+  })
+
   it('should resolve video enclosure through embedResolver', async () => {
     const value = '<p>Episode notes</p>'
     const result = await transform(

@@ -34,6 +34,17 @@ describeForEachParser('surfaceNoscriptEmbeds', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
+  it('should surface a video iframe whose path opens on a double slash', async () => {
+    const value = html`
+      <noscript>
+        <iframe src="https://video.fc2.com//embed/player/20201116TN305VJr/"></iframe>
+      </noscript>
+    `
+    const expected = '<iframe src="https://video.fc2.com//embed/player/20201116TN305VJr/"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should leave a Google Tag Manager noscript alone', async () => {
     const value = html`
       <noscript>

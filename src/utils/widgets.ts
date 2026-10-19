@@ -3,6 +3,7 @@ import {
   isHostOrSubdomainOf,
   type MaybePromise,
   startsWithAnyOf,
+  toMap,
   trimObject,
 } from 'trousse'
 import type {
@@ -27,7 +28,13 @@ import {
   getWrapperRatio,
   isPercentageSized,
 } from './dom.js'
-import { cleanUrl, parseUrlOnHosts, resolveOrDropUrl, resolveOrKeepUrl } from './urls.js'
+import {
+  cleanUrl,
+  collapseLeadingSlashes,
+  parseUrlOnHosts,
+  resolveOrDropUrl,
+  resolveOrKeepUrl,
+} from './urls.js'
 
 const parseOrKeepDate = (
   date: string | undefined,
@@ -55,20 +62,22 @@ export const readS9eFragment = (element: Element): string | undefined => {
   return parseUrlOnHosts(src, s9eHelperHost) ? src?.split('#')[1] : undefined
 }
 
-const embedCarriers: Record<string, string> = {
+const embedCarriers = toMap({
   iframe: 'src',
   embed: 'src',
   object: 'data',
-}
+})
 
 // Legacy Flash markup nests an `<embed>` inside an `<object>`, and both match: the outer wins
 // by document order and takes the inner with it.
-export const embedCarrierSelector = Object.entries(embedCarriers)
+export const embedCarrierSelector = [...embedCarriers]
   .map(([tag, attribute]) => `${tag}[${attribute}]`)
   .join(', ')
 
 export const readCarrierUrl = (element: Element): string => {
-  return element.getAttribute(embedCarriers[element.localName] ?? 'src') ?? ''
+  const url = element.getAttribute(embedCarriers.get(element.localName) ?? 'src') ?? ''
+
+  return collapseLeadingSlashes(url)
 }
 
 type ResolverOptions = {
