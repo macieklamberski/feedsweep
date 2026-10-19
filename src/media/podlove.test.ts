@@ -444,6 +444,14 @@ describeForEachParser('podloveMediaResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
       expect(performance.now() - start).toBeLessThan(1000)
     })
+
+    it('should scan a long run of cache calls in under a second', async () => {
+      const value = `<div class="podlove-web-player"></div><script>${'podlovePlayerCache.add(['.repeat(20000)}</script>`
+      const start = performance.now()
+
+      expect(await extract(value)).toBeUndefined()
+      expect(performance.now() - start).toBeLessThan(1000)
+    })
   })
 })
 
