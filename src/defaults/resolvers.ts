@@ -179,6 +179,7 @@ import { guardianEmbedResolver } from '../embeds/guardian.js'
 import { hearthisEmbedResolver } from '../embeds/hearthis.js'
 import { helloassoEmbedResolver } from '../embeds/helloasso.js'
 import { heyzineEmbedResolver } from '../embeds/heyzine.js'
+import { hudlIframeEmbedResolver, hudlWidgetEmbedResolver } from '../embeds/hudl.js'
 import { iheartEmbedResolver } from '../embeds/iheart.js'
 import { imdbEmbedResolver } from '../embeds/imdb.js'
 import {
@@ -627,6 +628,8 @@ const embedResolvers: Array<EmbedResolver> = [
   hearthisEmbedResolver,
   helloassoEmbedResolver,
   heyzineEmbedResolver,
+  hudlIframeEmbedResolver,
+  hudlWidgetEmbedResolver,
   iheartEmbedResolver,
   imdbEmbedResolver,
   imgurBlockquoteEmbedResolver,
