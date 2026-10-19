@@ -34,6 +34,18 @@ describe('lividResolveEmbed', () => {
 
       expect(lividResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should keep the older player route, keyed by account and number', () => {
+      const value = 'https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888'
+      const expected: EmbedResolverResult = {
+        provider: 'livid',
+        id: 'qvN5Xsn5Hh-H/451811888',
+        src: 'https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888',
+        ratio: '16/9',
+      }
+
+      expect(lividResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -57,6 +69,18 @@ describe('lividResolveEmbed', () => {
 
     it('should ignore a video route with no id', () => {
       const value = 'https://livid.com/watch/'
+
+      expect(lividResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the older player route with no number', () => {
+      const value = 'https://livid.com/oe/qvN5Xsn5Hh-H/video/'
+
+      expect(lividResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the older player route naming something other than a video', () => {
+      const value = 'https://livid.com/oe/qvN5Xsn5Hh-H/videos/451811888'
 
       expect(lividResolveEmbed(value)).toBeUndefined()
     })
@@ -88,6 +112,30 @@ describe('lividResolveEmbed', () => {
 
       expect(lividResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the older route words in any case and keep the account as written', () => {
+      const value = 'https://livid.com/OE/qvN5Xsn5Hh-H/VIDEO/451811888'
+      const expected: EmbedResolverResult = {
+        provider: 'livid',
+        id: 'qvN5Xsn5Hh-H/451811888',
+        src: 'https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888',
+        ratio: '16/9',
+      }
+
+      expect(lividResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the query of the older player route', () => {
+      const value = 'https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888?autoplay=1'
+      const expected: EmbedResolverResult = {
+        provider: 'livid',
+        id: 'qvN5Xsn5Hh-H/451811888',
+        src: 'https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888',
+        ratio: '16/9',
+      }
+
+      expect(lividResolveEmbed(value)).toEqual(expected)
+    })
   })
 })
 
@@ -109,6 +157,24 @@ describeForEachParser('lividIframeEmbedResolver', (parseHtml) => {
         url: 'https://livid.com/watch/Z1a8F0inFzve',
         ratio: '16/9',
         title: 'announcements__june_28,_2026_v1 (1080p)',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve an older player iframe and keep its title', async () => {
+      const value = html`
+        <iframe
+          src="https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888"
+          title="Blood Business - Trailer"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'livid',
+        id: 'qvN5Xsn5Hh-H/451811888',
+        src: 'https://livid.com/oe/qvN5Xsn5Hh-H/video/451811888',
+        ratio: '16/9',
+        title: 'Blood Business - Trailer',
       }
 
       expect(await extract(value)).toEqual(expected)
