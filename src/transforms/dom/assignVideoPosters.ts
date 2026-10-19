@@ -1,10 +1,9 @@
 import { escapeRegex } from 'trousse'
-import type { DomTransform, TransformContext } from '../../types.js'
+import type { CleanUrlFn, DomTransform } from '../../types.js'
 import { removeWithEmptyWrappers } from '../../utils/dom.js'
-import { buildMediaKey } from '../../utils/enclosures.js'
+import { buildMediaKey, enclosureMarker } from '../../utils/enclosures.js'
 import { findPosterEvidence, getVideoThumbnail } from '../../utils/images.js'
 import { updateEmbedPlaceholder } from '../../utils/widgets.js'
-import { enclosureMarker } from './injectEnclosures.js'
 
 // A player without a resolver, like JW Player, carries no data-embed-provider to match on.
 const videoHostFragments = [
@@ -22,65 +21,44 @@ const videoHostFragments = [
 ]
 const videoHostRegex = new RegExp(videoHostFragments.map(escapeRegex).join('|'), 'i')
 
-const getFileKeys = (player: Element, context: TransformContext): Array<string> => {
-  const keys: Array<string> = []
+const playerSelector = '[data-embed-src], iframe[src], video'
 
-  for (const file of [player, ...player.querySelectorAll('source')]) {
-    const key = buildMediaKey(file, context.cleanUrlFn)
-
-    if (key) {
-      keys.push(key)
-    }
-  }
-
-  return keys
+const getFileKeys = (player: Element, cleanUrlFn?: CleanUrlFn): Array<string> => {
+  return [player, ...player.querySelectorAll('source')]
+    .map((file) => buildMediaKey(file, cleanUrlFn))
+    .filter(Boolean)
 }
 
-// The item's players, without an injected enclosure that repeats one of the body:
-// stripDuplicateEnclosures removes that copy later, with any poster set on it.
-const collectPlayers = (document: Document, context: TransformContext): Array<Element> => {
-  const all = [...document.querySelectorAll('[data-embed-src], iframe[src], video')]
-  const bodyKeys = new Set<string>()
-
-  for (const player of all) {
-    if (!player.hasAttribute(enclosureMarker)) {
-      for (const key of getFileKeys(player, context)) {
-        bodyKeys.add(key)
-      }
-    }
-  }
-
-  const players: Array<Element> = []
-
-  for (const player of all) {
-    const isRepeat =
+// An injected enclosure that repeats a body player: stripDuplicateEnclosures removes that copy
+// later, with any poster set on it.
+const findRepeats = (players: Array<Element>, cleanUrlFn?: CleanUrlFn): Set<Element> => {
+  const bodyKeys = new Set(
+    players
+      .filter((player) => !player.hasAttribute(enclosureMarker))
+      .flatMap((player) => getFileKeys(player, cleanUrlFn)),
+  )
+  const repeats = players.filter((player) => {
+    return (
       player.hasAttribute(enclosureMarker) &&
-      getFileKeys(player, context).some((key) => bodyKeys.has(key))
+      getFileKeys(player, cleanUrlFn).some((key) => bodyKeys.has(key))
+    )
+  })
 
-    if (!isRepeat) {
-      players.push(player)
-    }
-  }
-
-  return players
+  return new Set(repeats)
 }
 
 // The video element of a video-led item: a native <video>, or an embed
 // (placeholder/iframe) pointing at a known video host.
 const findVideoElement = (players: Array<Element>): Element | undefined => {
-  for (const player of players) {
-    if (player.localName === 'video' && player.matches('video[src], video:has(> source[src])')) {
-      return player
-    }
+  const isNative = (player: Element) => {
+    return player.localName === 'video' && player.matches('video[src], video:has(> source[src])')
   }
-
-  for (const player of players) {
+  const isHostedEmbed = (player: Element) => {
     const src = player.getAttribute('data-embed-src') ?? player.getAttribute('src') ?? ''
-
-    if (player.localName !== 'video' && videoHostRegex.test(src)) {
-      return player
-    }
+    return player.localName !== 'video' && videoHostRegex.test(src)
   }
+
+  return players.find(isNative) ?? players.find(isHostedEmbed)
 }
 
 // Give the video its poster, then drop the now-redundant standalone image. By default an
@@ -114,7 +92,9 @@ const moveImageToVideoPoster = (image: Element, video: Element, overwrite = fals
 // WordPress lazy-embed plugins ship the YouTube thumbnail beside the embed.
 export const assignVideoPosters: DomTransform = (context) => (document) => {
   // (A) Any image, inline or an enclosure, that something static ties to a player.
-  const videos = collectPlayers(document, context)
+  const players = [...document.querySelectorAll(playerSelector)]
+  const repeats = findRepeats(players, context.cleanUrlFn)
+  const videos = players.filter((player) => !repeats.has(player))
 
   for (const image of videos.length ? document.querySelectorAll('img[src]') : []) {
     const src = image.getAttribute('src') ?? ''
@@ -152,9 +132,7 @@ export const assignVideoPosters: DomTransform = (context) => (document) => {
   // that repeats a body player as an enclosure lists the post's media, so the image is as often a
   // featured photo or a logo as the video's poster.
   const hasThumbnail = getVideoThumbnail(video) !== undefined
-  const repeatsBodyPlayer =
-    videos.length < document.querySelectorAll('[data-embed-src], iframe[src], video').length
-  const isPoster = !hasThumbnail && !repeatsBodyPlayer
+  const isPoster = !hasThumbnail && repeats.size === 0
 
   if (isPoster) {
     moveImageToVideoPoster(poster, video)

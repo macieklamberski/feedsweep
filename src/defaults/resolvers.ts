@@ -130,6 +130,7 @@ import { educaplayEmbedResolver } from '../embeds/educaplay.js'
 import {
   facebookAmpEmbedResolver,
   facebookBlockquoteEmbedResolver,
+  facebookFlashEmbedResolver,
   facebookIframeEmbedResolver,
   facebookS9eEmbedResolver,
   facebookWidgetEmbedResolver,
@@ -200,6 +201,8 @@ import { jotformIframeEmbedResolver, jotformScriptEmbedResolver } from '../embed
 import {
   jwplayerAmpEmbedResolver,
   jwplayerIframeEmbedResolver,
+  jwplayerLibraryEmbedResolver,
+  jwplayerMountEmbedResolver,
   jwplayerScriptEmbedResolver,
   jwplayerSetupEmbedResolver,
 } from '../embeds/jwplayer.js'
@@ -211,6 +214,7 @@ import { lglformsIframeEmbedResolver, lglformsScriptEmbedResolver } from '../emb
 import { libsynEmbedResolver } from '../embeds/libsyn.js'
 import { linkedinEmbedResolver } from '../embeds/linkedin.js'
 import { listennotesEmbedResolver } from '../embeds/listennotes.js'
+import { lividIframeEmbedResolver, lividMetasliderEmbedResolver } from '../embeds/livid.js'
 import { mailruEmbedResolver } from '../embeds/mailru.js'
 import { mastodonEmbedResolver } from '../embeds/mastodon.js'
 import { matterportEmbedResolver } from '../embeds/matterport.js'
@@ -308,6 +312,7 @@ import { tickettailorScriptEmbedResolver } from '../embeds/tickettailor.js'
 import {
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
+  tiktokMetasliderEmbedResolver,
   tiktokS9eEmbedResolver,
 } from '../embeds/tiktok.js'
 import { tmzEmbedResolver } from '../embeds/tmz.js'
@@ -335,7 +340,7 @@ import {
   vidyardImageEmbedResolver,
   vidyardScriptEmbedResolver,
 } from '../embeds/vidyard.js'
-import { vimeoEmbedResolver } from '../embeds/vimeo.js'
+import { vimeoEmbedResolver, vimeoMetasliderEmbedResolver } from '../embeds/vimeo.js'
 import { vkEmbedResolver } from '../embeds/vk.js'
 import { vokiFlashEmbedResolver, vokiIframeEmbedResolver } from '../embeds/voki.js'
 import { wakeletEmbedResolver } from '../embeds/wakelet.js'
@@ -352,6 +357,7 @@ import {
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
   youtubeIframeEmbedResolver,
+  youtubeMetasliderEmbedResolver,
 } from '../embeds/youtube.js'
 import { yumpuEmbedResolver } from '../embeds/yumpu.js'
 import { zencastrBlockquoteEmbedResolver, zencastrIframeEmbedResolver } from '../embeds/zencastr.js'
@@ -463,8 +469,12 @@ import {
 } from '../media/1pixelout.js'
 import { discourseMediaResolver } from '../media/discourse.js'
 import { flashMp3PlayerMediaResolver } from '../media/flashmp3player.js'
+import { flickrMediaResolver } from '../media/flickr.js'
 import { ghostMediaResolver } from '../media/ghost.js'
+import { libsynMediaResolver } from '../media/libsyn.js'
+import { metasliderMediaResolver } from '../media/metaslider.js'
 import { odeoMediaResolver } from '../media/odeo.js'
+import { podbeanFlashMediaResolver } from '../media/podbean.js'
 import { podloveMediaResolver } from '../media/podlove.js'
 import { substackMediaResolver } from '../media/substack.js'
 import { tumblrMediaResolver } from '../media/tumblr.js'
@@ -566,6 +576,7 @@ const embedResolvers: Array<EmbedResolver> = [
   dvidsEmbedResolver,
   educaplayEmbedResolver,
   facebookWidgetEmbedResolver,
+  facebookFlashEmbedResolver,
   facebookIframeEmbedResolver,
   facebookS9eEmbedResolver,
   facebookBlockquoteEmbedResolver,
@@ -631,6 +642,8 @@ const embedResolvers: Array<EmbedResolver> = [
   jwplayerScriptEmbedResolver,
   jwplayerAmpEmbedResolver,
   jwplayerSetupEmbedResolver,
+  jwplayerLibraryEmbedResolver,
+  jwplayerMountEmbedResolver,
   kalturaIframeEmbedResolver,
   kalturaScriptEmbedResolver,
   kindleEmbedResolver,
@@ -641,6 +654,8 @@ const embedResolvers: Array<EmbedResolver> = [
   libsynEmbedResolver,
   linkedinEmbedResolver,
   listennotesEmbedResolver,
+  lividIframeEmbedResolver,
+  lividMetasliderEmbedResolver,
   mailruEmbedResolver,
   matterportEmbedResolver,
   mediacccEmbedResolver,
@@ -741,6 +756,7 @@ const embedResolvers: Array<EmbedResolver> = [
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
   tiktokS9eEmbedResolver,
+  tiktokMetasliderEmbedResolver,
   tmzEmbedResolver,
   traileraddictEmbedResolver,
   transistorEmbedResolver,
@@ -762,6 +778,7 @@ const embedResolvers: Array<EmbedResolver> = [
   vidyardImageEmbedResolver,
   vidyardScriptEmbedResolver,
   vimeoEmbedResolver,
+  vimeoMetasliderEmbedResolver,
   vkEmbedResolver,
   vokiFlashEmbedResolver,
   vokiIframeEmbedResolver,
@@ -775,6 +792,7 @@ const embedResolvers: Array<EmbedResolver> = [
   youtubeIframeEmbedResolver,
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
+  youtubeMetasliderEmbedResolver,
   yumpuEmbedResolver,
   zencastrBlockquoteEmbedResolver,
   zencastrIframeEmbedResolver,
@@ -796,8 +814,12 @@ const mediaResolvers: Array<MediaResolver> = [
   onePixelOutWidgetMediaResolver,
   discourseMediaResolver,
   flashMp3PlayerMediaResolver,
+  flickrMediaResolver,
   ghostMediaResolver,
+  libsynMediaResolver,
+  metasliderMediaResolver,
   odeoMediaResolver,
+  podbeanFlashMediaResolver,
   podloveMediaResolver,
   substackMediaResolver,
   tumblrMediaResolver,

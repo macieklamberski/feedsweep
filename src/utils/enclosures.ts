@@ -4,6 +4,10 @@ import { getImageFingerprint, getSizeKeywordRank, getUrlSizeHint } from './image
 import { absoluteUrlRegex, cleanUrl, resolveOrKeepUrl } from './urls.js'
 import { getEmbedSize } from './widgets.js'
 
+// Marks an injected element so a repeat run skips it and stripDuplicateEnclosures (an
+// opt-in heuristic) can tell it from the item's own inline content.
+export const enclosureMarker = 'data-enclosure'
+
 const kindTypePrefixes = ['audio/', 'video/', 'image/'] as const
 
 // A JSON-escaped `&` that lost its backslash, `\u0026` or `\u0026amp;` without its semicolon,

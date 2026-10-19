@@ -6,6 +6,8 @@ import {
   extractJwplayerId,
   jwplayerAmpEmbedResolver,
   jwplayerIframeEmbedResolver,
+  jwplayerLibraryEmbedResolver,
+  jwplayerMountEmbedResolver,
   jwplayerResolveEmbed,
   jwplayerScriptEmbedResolver,
   jwplayerSetupEmbedResolver,
@@ -390,6 +392,359 @@ describeForEachParser('jwplayerSetupEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('jwplayerLibraryEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, jwplayerLibraryEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the media id from the setup call after the library', async () => {
+      const value = html`
+        <div id="jwppp-video-169721" class="jwplayer">Loading the player...</div>
+        <script type="text/javascript" src="https://content.jwplatform.com/libraries/Aq9gyX5k.js"></script>
+        <script type="text/javascript">
+          var playerInstance_169721 = jwplayer( "jwppp-video-169721" );
+          playerInstance_169721.setup({
+            playlist: "https://cdn.jwplayer.com/v2/media/NEnylXdA",
+          })
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'NEnylXdA',
+        src: 'https://cdn.jwplayer.com/players/NEnylXdA.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/NEnylXdA/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should take the title from the jwppp box naming the same media', async () => {
+      const value = html`
+        <div id="jwppp-video-box-8472f0eac1a376c597733a7f893e9c5a" class="jwppp-video-box" itemscope itemtype="http://schema.org/VideoObject" data-video="H4mbSOk5">
+          <meta itemprop="name" content="Exercise 1">
+          <meta itemprop="description" content="Michelle shares her plan for staying fit now and for decades to come!">
+          <meta itemprop="thumbnailUrl" content="https://cdn.jwplayer.com/thumbs/H4mbSOk5-720.jpg">
+          <meta itemprop="uploadDate" content="2026-06-30T12:02:04+10:00">
+          <meta itemprop="contentUrl" content="https://cdn.jwplayer.com/v2/media/H4mbSOk5">
+          <div id="jwppp-video-8472f0eac1a376c597733a7f893e9c5a" class="jwplayer">Loading the player…</div>
+          <script type="text/javascript" src="https://content.jwplatform.com/libraries/My3UNrjH.js"></script>
+          <script type="text/javascript">
+            var playerInstance_8472f0eac1a376c597733a7f893e9c5a = jwplayer( "jwppp-video-8472f0eac1a376c597733a7f893e9c5a" );
+            playerInstance_8472f0eac1a376c597733a7f893e9c5a.setup({
+              playlist: "https://cdn.jwplayer.com/v2/media/H4mbSOk5",
+            })
+          </script>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'H4mbSOk5',
+        src: 'https://cdn.jwplayer.com/players/H4mbSOk5.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/H4mbSOk5/poster.jpg',
+        ratio: '16/9',
+        title: 'Exercise 1',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the media id across a mount between the library and the setup call', async () => {
+      const value = html`
+        <script type="text/javascript" src="https://content.jwplatform.com/libraries/An9NPLfb.js"></script>
+        <div id="jwplayer_m6LgPTlO_An9NPLfb_div"></div>
+        <script type="text/javascript">
+          jwplayer('jwplayer_m6LgPTlO_An9NPLfb_div').setup(
+            {"playlist":"https:\\/\\/content.jwplatform.com\\/feeds\\/m6LgPTlO.json","ph":2}
+          );
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'm6LgPTlO',
+        src: 'https://cdn.jwplayer.com/players/m6LgPTlO.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/m6LgPTlO/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the media id out of a legacy jw6 playlist', async () => {
+      const value = html`
+        <script type="text/javascript" src="http://content.jwplatform.com/libraries/SNLXQlVh.js"></script>
+        <div id="jwplayer_QJmMZD9a_SNLXQlVh_div"></div>
+        <script type="text/javascript">
+          jwplayer('jwplayer_QJmMZD9a_SNLXQlVh_div').setup(
+            {"image":"-1","playlist":"http:\\/\\/content.jwplatform.com\\/jw6\\/QJmMZD9a.xml"}
+          );
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'QJmMZD9a',
+        src: 'https://cdn.jwplayer.com/players/QJmMZD9a.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/QJmMZD9a/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a setup call made through a publisher wrapper of jwplayer()', async () => {
+      const value = html`
+        <script type="text/javascript" src="https://content.jwplatform.com/libraries/yTTJs9q5.js"></script>
+        <div id="jwplayer_vZeeVFhU_yTTJs9q5_div"></div>
+        <script type="text/javascript">
+          pmc_jwplayer('jwplayer_vZeeVFhU_yTTJs9q5_div').setup(
+            {"vloc":"auto","floating":true,"playlist":"https://content.jwplatform.com/feeds/vZeeVFhU.json","ph":2}
+          );
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'vZeeVFhU',
+        src: 'https://cdn.jwplayer.com/players/vZeeVFhU.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/vZeeVFhU/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the older jwpsrv.com library and its feed playlist', async () => {
+      const value = html`
+        <script src="http://jwpsrv.com/library/oGQG4hMaEeOvyBIxOUCPzg.js"></script>
+        <div id="player7kakZqpT"></div>
+        <script type="text/javascript">
+          jwplayer('player7kakZqpT').setup({ playlist: 'http://jwpsrv.com/feed/7kakZqpT.rss', width: '100%', aspectratio: '16:9' });
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: '7kakZqpT',
+        src: 'https://cdn.jwplayer.com/players/7kakZqpT.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/7kakZqpT/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host carrying the library path', async () => {
+      const value = html`
+        <div id="jwppp-video-169721" class="jwplayer"></div>
+        <script src="https://evil.test/libraries/Aq9gyX5k.js?content.jwplatform.com/libraries/"></script>
+        <script>jwplayer("jwppp-video-169721").setup({playlist: "https://cdn.jwplayer.com/v2/media/NEnylXdA"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the older library path', async () => {
+      const value = html`
+        <script src="https://evil.test/library/oGQG4hMaEeOvyBIxOUCPzg.js?jwpsrv.com/library/"></script>
+        <div id="player7kakZqpT"></div>
+        <script>jwplayer('player7kakZqpT').setup({ playlist: 'http://jwpsrv.com/feed/7kakZqpT.rss' });</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a library with no setup call beside it', async () => {
+      const value = html`
+        <p>
+          <script src="http://content.jwplatform.com/libraries/TzPJRoGH.js"></script>
+          Por el placer de leer en voz alta
+        </p>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a setup call that plays a file of its own', async () => {
+      const value = html`
+        <script src="https://content.jwplatform.com/libraries/TzPJRoGH.js"></script>
+        <div id="myElement"></div>
+        <script>jwplayer("myElement").setup({file: "https://example.com/episode.mp3"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave out the fields of a jwppp box naming another media', async () => {
+      const value = html`
+        <div class="jwppp-video-box" data-video="1">
+          <meta itemprop="name" content="Exercise 3">
+          <meta itemprop="contentUrl" content="https://cdn.jwplayer.com/v2/media/a0pUZLdB">
+          <div id="jwppp-video-1" class="jwplayer"></div>
+          <script src="https://content.jwplatform.com/libraries/My3UNrjH.js"></script>
+          <script>jwplayer("jwppp-video-1").setup({playlist: "https://cdn.jwplayer.com/v2/media/H4mbSOk5"})</script>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'H4mbSOk5',
+        src: 'https://cdn.jwplayer.com/players/H4mbSOk5.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/H4mbSOk5/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave out the fields of a jwppp box that does not wrap the player itself', async () => {
+      const value = html`
+        <div class="jwppp-video-box" data-video="1">
+          <meta itemprop="name" content="Exercise 1">
+          <meta itemprop="contentUrl" content="https://cdn.jwplayer.com/v2/media/H4mbSOk5">
+          <div>
+            <div id="jwppp-video-1" class="jwplayer"></div>
+            <script src="https://content.jwplatform.com/libraries/My3UNrjH.js"></script>
+            <script>jwplayer("jwppp-video-1").setup({playlist: "https://cdn.jwplayer.com/v2/media/H4mbSOk5"})</script>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'H4mbSOk5',
+        src: 'https://cdn.jwplayer.com/players/H4mbSOk5.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/H4mbSOk5/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should return undefined for a feeds playlist on another host', async () => {
+      const value = html`
+        <script src="https://content.jwplatform.com/libraries/An9NPLfb.js"></script>
+        <div id="jwplayer_m6LgPTlO_An9NPLfb_div"></div>
+        <script>jwplayer('jwplayer_m6LgPTlO_An9NPLfb_div').setup({"playlist":"https://example.com/feeds/m6LgPTlO.json"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a setup call filling a mount away from the library', async () => {
+      const value = html`
+        <div id="jwppp-video-1"></div>
+        <script src="https://content.jwplatform.com/libraries/Aq9gyX5k.js"></script>
+        <script>jwplayer("jwppp-video-2").setup({playlist: "https://cdn.jwplayer.com/v2/media/NEnylXdA"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a setup call that names no mount', async () => {
+      const value = html`
+        <script src="https://content.jwplatform.com/libraries/Aq9gyX5k.js"></script>
+        <script>window.jwplayerInstance.setup({playlist: "https://cdn.jwplayer.com/v2/media/NEnylXdA"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a mount and setup call outside the block holding the library', async () => {
+      const value = html`
+        <div>
+          <script src="https://content.jwplatform.com/libraries/An9NPLfb.js"></script>
+        </div>
+        <div id="jwplayer_m6LgPTlO_An9NPLfb_div"></div>
+        <script>jwplayer('jwplayer_m6LgPTlO_An9NPLfb_div').setup({"playlist":"https://content.jwplatform.com/feeds/m6LgPTlO.json"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a setup call past the mount and another block', async () => {
+      const value = html`
+        <script src="https://content.jwplatform.com/libraries/An9NPLfb.js"></script>
+        <div id="jwplayer_m6LgPTlO_An9NPLfb_div"></div>
+        <p>Watch the clip.</p>
+        <script>jwplayer('jwplayer_m6LgPTlO_An9NPLfb_div').setup({"playlist":"https://content.jwplatform.com/feeds/m6LgPTlO.json"})</script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+describeForEachParser('jwplayerMountEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, jwplayerMountEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the media id out of a lazy data-key mount', async () => {
+      const value = html`
+        <div
+          data-player="fuSXM6PS"
+          data-key="0DG8htfR"
+          data-loaded="false"
+          class="jwplayer"
+          id="jwplayer_0DG8htfR_fuSXM6PS_20_div"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: '0DG8htfR',
+        src: 'https://cdn.jwplayer.com/players/0DG8htfR.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/0DG8htfR/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the media id out of a mount copied after the player ran', async () => {
+      const value = html`
+        <div id="jwplayer_XtkmEUkk_mFslriqe_div" class="jwplayer jw-reset jw-state-paused jw-stretch-uniform jw-breakpoint-4" role="application" aria-label="Video Player">
+          <div class="jw-aspect jw-reset"></div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'XtkmEUkk',
+        src: 'https://cdn.jwplayer.com/players/XtkmEUkk.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/XtkmEUkk/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should keep a mount that holds text', async () => {
+      const value = html`
+        <div id="jwplayer_tQoSjH1X_eAylcU8y_div" class="jwplayer jw-reset jw-state-idle" role="application" aria-label="Video Player">
+          <div class="jw-wrapper jw-reset">
+            <div class="jw-aspect jw-reset">Was she going to be breastfeeding her child at age 13?</div>
+          </div>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a mount id that names no media', async () => {
+      const value = html`
+        <div id="jwplayer_video_1" class="jwplayer jw-reset jw-state-idle jw-skin-seven">
+          <div class="jw-media jw-reset"></div>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a mount id that runs on past `_div`', async () => {
+      const value = '<div id="jwplayer_0DG8htfR_fuSXM6PS_20_div_title" class="jwplayer"></div>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 // The resolver alone cannot see this: `wrapBareInlineInParagraphs` runs before the widget pass
 // and puts the bare script in a `<p>`, so the div's sibling is that paragraph.
 describeForEachParser('jwplayerSetupEmbedResolver through the pipeline', (parseHtml) => {
@@ -426,5 +781,153 @@ describeForEachParser('jwplayerIframeEmbedResolver through the pipeline', (parse
         enclosures,
       }),
     ).toEqualHtml(expected)
+  })
+})
+
+// The paragraph pass puts the library and the setup call in a `<p>`, apart from the mount beside
+// them, and only the pipeline shows the setup call leaving with the library.
+describeForEachParser('jwplayerLibraryEmbedResolver through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should replace the library and its setup call and keep the mount text', async () => {
+    const value = html`
+      <div
+        id="jwppp-video-box-169721"
+        class="jwppp-video-box"
+        data-video="1"
+      >
+        <div id="jwppp-video-169721" class="jwplayer">Loading the player...</div>
+        <script type="text/javascript" src="https://content.jwplatform.com/libraries/Aq9gyX5k.js"></script><script type="text/javascript">
+          var playerInstance_169721 = jwplayer( "jwppp-video-169721" );
+          playerInstance_169721.setup({
+            playlist: "https://cdn.jwplayer.com/v2/media/NEnylXdA",
+          })
+        </script>
+      </div>
+    `
+    const expected = html`
+      <p>Loading the player...</p>
+      <div
+        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/NEnylXdA/poster.jpg"
+        data-embed-src="https://cdn.jwplayer.com/players/NEnylXdA.html"
+        data-embed-ratio="16/9"
+        data-embed-provider="jwplayer"
+        data-embed-id="NEnylXdA"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should read the jwppp box around the paragraph the library was wrapped in', async () => {
+    const value = html`
+      <div id="jwppp-video-box-8472f0eac1a376c597733a7f893e9c5a" class="jwppp-video-box" itemscope itemtype="http://schema.org/VideoObject" data-video="H4mbSOk5">
+        <meta itemprop="name" content="Exercise 1">
+        <meta itemprop="contentUrl" content="https://cdn.jwplayer.com/v2/media/H4mbSOk5">
+        <div id="jwppp-video-8472f0eac1a376c597733a7f893e9c5a" class="jwplayer">Loading the player…</div>
+        <script type="text/javascript" src="https://content.jwplatform.com/libraries/My3UNrjH.js"></script><script type="text/javascript">
+          var playerInstance_8472f0eac1a376c597733a7f893e9c5a = jwplayer( "jwppp-video-8472f0eac1a376c597733a7f893e9c5a" );
+          playerInstance_8472f0eac1a376c597733a7f893e9c5a.setup({
+            playlist: "https://cdn.jwplayer.com/v2/media/H4mbSOk5",
+          })
+        </script>
+      </div>
+    `
+    const expected = html`
+      <meta itemprop="name" content="Exercise 1">
+      <meta itemprop="contentUrl" content="https://cdn.jwplayer.com/v2/media/H4mbSOk5">
+      <p>Loading the player…</p>
+      <div
+        data-embed-title="Exercise 1"
+        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/H4mbSOk5/poster.jpg"
+        data-embed-src="https://cdn.jwplayer.com/players/H4mbSOk5.html"
+        data-embed-ratio="16/9"
+        data-embed-provider="jwplayer"
+        data-embed-id="H4mbSOk5"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should replace the older jwpsrv.com library and its setup call', async () => {
+    const value = html`
+      <script src="http://jwpsrv.com/library/oGQG4hMaEeOvyBIxOUCPzg.js"></script>
+      <div id="player7kakZqpT"></div>
+      <script type="text/javascript">
+        jwplayer('player7kakZqpT').setup({ playlist: 'http://jwpsrv.com/feed/7kakZqpT.rss', width: '100%', aspectratio: '16:9' });
+      </script>
+    `
+    const expected = html`
+      <div
+        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/7kakZqpT/poster.jpg"
+        data-embed-src="https://cdn.jwplayer.com/players/7kakZqpT.html"
+        data-embed-ratio="16/9"
+        data-embed-provider="jwplayer"
+        data-embed-id="7kakZqpT"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should find the mount and setup call after a library the paragraph pass wrapped', async () => {
+    const value = html`
+      <p>In einem fremden Land.
+        <script type="text/javascript" src="http://content.jwplatform.com/libraries/SNLXQlVh.js"></script>
+      </p>
+      <div id="jwplayer_QJmMZD9a_SNLXQlVh_div"></div>
+      <script type="text/javascript">
+        jwplayer('jwplayer_QJmMZD9a_SNLXQlVh_div').setup(
+          {"image":"-1","playlist":"http:\\/\\/content.jwplatform.com\\/jw6\\/QJmMZD9a.xml"}
+        );
+      </script>
+    `
+    const expected = html`
+      <p>In einem fremden Land. </p>
+      <div
+        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/QJmMZD9a/poster.jpg"
+        data-embed-src="https://cdn.jwplayer.com/players/QJmMZD9a.html"
+        data-embed-ratio="16/9"
+        data-embed-provider="jwplayer"
+        data-embed-id="QJmMZD9a"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('jwplayerMountEmbedResolver through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should replace a lazy data-key mount with the player', async () => {
+    const value = html`
+      <div
+        data-player="fuSXM6PS"
+        data-key="0DG8htfR"
+        data-loaded="false"
+        class="jwplayer"
+        id="jwplayer_0DG8htfR_fuSXM6PS_20_div"
+      >
+      </div>
+      <h2>How to ride the maze exercise</h2>
+    `
+    const expected = html`
+      <div
+        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/0DG8htfR/poster.jpg"
+        data-embed-src="https://cdn.jwplayer.com/players/0DG8htfR.html"
+        data-embed-ratio="16/9"
+        data-embed-provider="jwplayer"
+        data-embed-id="0DG8htfR"
+      ></div>
+      <h2>How to ride the maze exercise</h2>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

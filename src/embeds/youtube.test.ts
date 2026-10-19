@@ -10,6 +10,7 @@ import {
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
   youtubeIframeEmbedResolver,
+  youtubeMetasliderEmbedResolver,
   youtubeResolveEmbed,
 } from './youtube.js'
 
@@ -1273,6 +1274,172 @@ describeForEachParser('youtubeFc2EmbedResolver', (parseHtml) => {
         src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+describeForEachParser('youtubeMetasliderEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, youtubeMetasliderEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should resolve the MetaSlider Pro slide with its start offset', async () => {
+      const value = html`
+        <li
+          class="slide-26693 ms-youtube "
+          style="display: none; width: 100%;"
+          data-slide-type="youtube"
+          data-date="2026-09-21 16:38:29"
+          data-filename="youtube_aQD0yfzOJsU.webp"
+        >
+          <div
+            style="position:relative;padding-bottom:178.08988764045%;height:0"
+            class="youtube"
+            data-id="aQD0yfzOJsU"
+            data-start="0"
+            data-auto-play="0"
+            data-mute="1"
+            data-show-controls="0"
+            data-show-related="0"
+            data-theme="dark"
+            data-color="red"
+            data-lazy-load="0"
+          ></div>
+        </li>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'aQD0yfzOJsU',
+        src: 'https://www.youtube.com/embed/aQD0yfzOJsU?start=0',
+        url: 'https://www.youtube.com/watch?v=aQD0yfzOJsU',
+        thumbnail: 'https://i.ytimg.com/vi/aQD0yfzOJsU/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the title off the lazy slide poster', async () => {
+      const value = html`
+        <li class="slide-21004 ms-youtube ">
+          <div
+            style="position:relative;padding-bottom:56.3%;height:0"
+            class="youtube"
+            data-id="i1kWnkHjDMI"
+            data-start="0"
+            data-lazy-load="1"
+          >
+            <img
+              loading="lazy"
+              decoding="async"
+              src="https://example.com/wp-content/uploads/2025/06/youtube_i1kWnkHjDMI-640x360.jpg"
+              alt="Dr. Javier Gómez | Especialista en Cirugía Oral y Maxilofacial"
+              class="msDefaultImage"
+              height="563"
+              width="1000"
+            />
+            <span class="play_button">
+              <a tabindex="0" role="button" id="toggle">
+                <img
+                  width="75"
+                  src="https://example.com/wp-content/plugins/ml-slider-pro/modules/youtube/assets/yt-play-red.png"
+                >
+              </a>
+            </span>
+          </div>
+        </li>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'i1kWnkHjDMI',
+        src: 'https://www.youtube.com/embed/i1kWnkHjDMI?start=0',
+        url: 'https://www.youtube.com/watch?v=i1kWnkHjDMI',
+        thumbnail: 'https://i.ytimg.com/vi/i1kWnkHjDMI/hqdefault.jpg',
+        ratio: '16/9',
+        title: 'Dr. Javier Gómez | Especialista en Cirugía Oral y Maxilofacial',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve a slide with no start offset', async () => {
+      const value = html`
+        <li class="slide-1307417 ms-youtube ">
+          <div
+            class="youtube"
+            data-id="i0i36AlJciI"
+          ></div>
+        </li>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'i0i36AlJciI',
+        src: 'https://www.youtube.com/embed/i0i36AlJciI',
+        url: 'https://www.youtube.com/watch?v=i0i36AlJciI',
+        thumbnail: 'https://i.ytimg.com/vi/i0i36AlJciI/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a div.youtube outside a MetaSlider YouTube slide', async () => {
+      const value = html`
+        <li class="slide-26693 ms-image">
+          <div
+            class="youtube"
+            data-id="aQD0yfzOJsU"
+          ></div>
+        </li>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a slide with an empty video id', async () => {
+      const value = html`
+        <li class="ms-youtube">
+          <div
+            class="youtube"
+            data-id=""
+          ></div>
+        </li>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should not read the play button alt as the title', async () => {
+      const value = html`
+        <li class="ms-youtube">
+          <div
+            class="youtube"
+            data-id="i1kWnkHjDMI"
+            data-lazy-load="1"
+          >
+            <span class="play_button">
+              <img
+                width="75"
+                src="https://example.com/wp-content/plugins/ml-slider-pro/modules/youtube/assets/yt-play-red.png"
+                alt="Play"
+              >
+            </span>
+          </div>
+        </li>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'i1kWnkHjDMI',
+        src: 'https://www.youtube.com/embed/i1kWnkHjDMI',
+        url: 'https://www.youtube.com/watch?v=i1kWnkHjDMI',
+        thumbnail: 'https://i.ytimg.com/vi/i1kWnkHjDMI/hqdefault.jpg',
         ratio: '16/9',
       }
 
