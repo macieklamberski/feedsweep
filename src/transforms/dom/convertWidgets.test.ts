@@ -1855,7 +1855,7 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should frame an audio element naming a Google Drive file page by its type', async () => {
+  it('should frame an audio element naming a Google Drive file page at the audio player height', async () => {
     const value = html`
       <audio controls>
         <source

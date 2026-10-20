@@ -96,10 +96,10 @@ const readPageMedia = async (
       return
     }
 
-    // A platform url serving every kind of file is sized by its kind: a <source> states it in
-    // `type`, and otherwise the <audio> or <video> tag names it.
+    // A platform url serving every kind of file is sized by its kind, which the <audio> or <video>
+    // tag names.
     const frame = createIframe(document, url)
-    frame.setAttribute('type', attr(element, 'type') ?? `${media.localName}/*`)
+    frame.setAttribute('type', `${media.localName}/*`)
 
     const embed = await resolveEmbedProbe(frame, resolvers)
 
