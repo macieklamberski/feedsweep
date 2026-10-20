@@ -118,6 +118,43 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should resolve the movie param of an object without data', async () => {
+    const value = '<object><param name="Movie" value="//www.youtube.com/v/oq4-7rK3dUM"></object>'
+    const expected =
+      '<object><param name="Movie" value="https://www.youtube.com/v/oq4-7rK3dUM"></object>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave the movie param of an object with data as written', async () => {
+    const value = '<object data="/player.swf"><param name="movie" value="/player.swf"></object>'
+    const expected =
+      '<object data="https://example.com/player.swf"><param name="movie" value="/player.swf"></object>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave the movie param of an object holding another player as written', async () => {
+    const value = html`
+      <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="780" height="420">
+        <param name="movie" value="myContent.swf">
+        <object type="application/x-shockwave-flash" data="myContent.swf" width="780" height="420">
+          <p>Alternative content</p>
+        </object>
+      </object>
+    `
+    const expected = html`
+      <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="780" height="420">
+        <param name="movie" value="myContent.swf">
+        <object type="application/x-shockwave-flash" data="https://example.com/myContent.swf" width="780" height="420">
+          <p>Alternative content</p>
+        </object>
+      </object>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should resolve relative cite on blockquotes', async () => {
     const value = '<blockquote cite="/posts/123">quote</blockquote>'
     const expected = '<blockquote cite="https://example.com/posts/123">quote</blockquote>'

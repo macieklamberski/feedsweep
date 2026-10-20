@@ -4,7 +4,6 @@ import {
   isHostOrSubdomainOf,
   type MaybePromise,
   startsWithAnyOf,
-  toMap,
   trimObject,
 } from 'trousse'
 import type {
@@ -27,7 +26,9 @@ import {
   getPairRatio,
   getStylePairRatio,
   getWrapperRatio,
+  hasText,
   isPercentageSized,
+  paramValue,
 } from './dom.js'
 import {
   cleanUrl,
@@ -63,22 +64,41 @@ export const readS9eFragment = (element: Element): string | undefined => {
   return parseUrlOnHosts(src, s9eHelperHost) ? src?.split('#')[1] : undefined
 }
 
-const embedCarriers = toMap({
-  iframe: 'src',
-  embed: 'src',
-  object: 'data',
-})
+// An object without `data` names its player in a `<param>`. One holding another player is left
+// to it, since that player renders today in place of the dead plugin.
+export const paramObjectSelector =
+  'object:not([data]):not(:has(embed, object, iframe, video, audio, img, [data-embed-src]))'
 
 // Legacy Flash markup nests an `<embed>` inside an `<object>`, and both match: the outer wins
 // by document order and takes the inner with it.
-export const embedCarrierSelector = [...embedCarriers]
-  .map(([tag, attribute]) => `${tag}[${attribute}]`)
-  .join(', ')
+export const embedCarrierSelector = [
+  'iframe[src]',
+  'embed[src]',
+  'object[data]',
+  paramObjectSelector,
+].join(', ')
+
+// Internet Explorer's Flash snippet names the player only in `<param name="movie">`. An object
+// holding text shows it as the fallback today, often the rest of the post an unclosed tag took
+// in, so it keeps its markup.
+const readObjectUrl = (element: Element): string | undefined => {
+  const data = element.getAttribute('data')
+
+  if (data !== null) {
+    return data
+  }
+
+  if (hasText(element)) {
+    return
+  }
+
+  return paramValue(element, 'movie')
+}
 
 export const readCarrierUrl = (element: Element): string => {
-  const url = element.getAttribute(embedCarriers.get(element.localName) ?? 'src') ?? ''
+  const url = element.localName === 'object' ? readObjectUrl(element) : element.getAttribute('src')
 
-  return collapseSlashRuns(url)
+  return collapseSlashRuns(url ?? '')
 }
 
 type ResolverOptions = {
