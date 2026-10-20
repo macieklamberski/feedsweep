@@ -3,8 +3,9 @@ import type { DomTransform } from '../../types.js'
 import { attr, parseRatio } from '../../utils/dom.js'
 import { createIframe } from '../../utils/widgets.js'
 
-// Pulls the hashed id out of the `wistia_async_{id}` class the facade carries.
-const wistiaIdRegex = /\bwistia_async_([A-Za-z0-9]+)/
+// Pulls the hashed id out of the `wistia_async_{id}` class the facade carries, up to the end of
+// the class token.
+const wistiaIdRegex = /\bwistia_async_(\S+)/
 // Pulls the id out of the `wistia_{id}` id the legacy API embed's mount div carries.
 const legacyIdRegex = /^wistia_(.+)/
 

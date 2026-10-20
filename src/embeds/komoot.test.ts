@@ -31,6 +31,21 @@ describe('komootResolveEmbed', () => {
       expect(komootResolveEmbed(value)).toEqual(expected)
     })
 
+    // The route 404s on the uppercase locale, and the map minted without the locale serves the
+    // tour.
+    it('should drop an uppercase locale, which the route does not serve', () => {
+      const value = 'https://www.komoot.com/DE-DE/tour/727321743/embed'
+      const expected: EmbedResolverResult = {
+        provider: 'komoot',
+        id: '727321743',
+        src: 'https://www.komoot.com/tour/727321743/embed',
+        url: 'https://www.komoot.com/tour/727321743',
+        height: 440,
+      }
+
+      expect(komootResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should keep the share token and drop the language and the gallery layout', () => {
       const value =
         'https://www.komoot.com/tour/3055667226/embed?share_token=aFCLXUxhhEfqsWzhS25hO07CKF8AD7IEY8jdgcSp24c6iS2cR0&hl=es&layout=gallery&gallery=1'
@@ -165,12 +180,6 @@ describe('komootResolveEmbed', () => {
 
     it('should ignore a locale region carrying a query separator', () => {
       const value = 'https://www.komoot.com/de-d=/tour/727321743/embed'
-
-      expect(komootResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an uppercase locale segment, which the route does not serve', () => {
-      const value = 'https://www.komoot.com/DE-DE/tour/727321743/embed'
 
       expect(komootResolveEmbed(value)).toBeUndefined()
     })

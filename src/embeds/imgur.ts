@@ -74,9 +74,10 @@ const albumPrefix = 'a/'
 // `imgur.com/{id}.gifv` redirects to the video on i.imgur.com, and no file list names `gifv`.
 const gifvFileRegex = /\.gifv$/i
 
-// The hyphen pins the id: without it a longer word reads as its own last twelve characters.
+// The hyphen pins the id: without it a word behind any other character, such as an encoded
+// slash, reads as one.
 // A share link is `gallery/{slug}-{id}`, and the slug alone redirects to the home page.
-const sluggedPostIdRegex = /(?:^|-)([a-zA-Z0-9]{5,12})$/
+const sluggedPostIdRegex = /(?:^|-)([a-zA-Z0-9]+)$/
 
 type ImgurPost = {
   id: string

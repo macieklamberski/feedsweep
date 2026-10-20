@@ -102,11 +102,11 @@ const findPost = (element: Element): Post | undefined => {
 }
 
 // `/{handle}/` on its own: the account page, as the dated byline links it.
-const profilePathRegex = /^\/([A-Za-z0-9_.]{1,30})\/?$/
+const profilePathRegex = /^\/([A-Za-z0-9_.]+)\/?$/
 // The handle as the byline spells it beside the display name, `(@handle)`. A sanitized copy
 // keeps only the bare `@handle`, which is read second: inside a quote that still carries its
 // caption, the first bare @token is as likely to be a mention as the author.
-const bylineHandleRegex = /\(@([A-Za-z0-9_.]{1,30})\)/
+const bylineHandleRegex = /\(@([A-Za-z0-9_.]+)\)/
 
 const readProfileHandle = (element: Element): string | undefined => {
   for (const anchor of element.querySelectorAll('a[href]')) {
