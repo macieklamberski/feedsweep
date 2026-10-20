@@ -1,7 +1,7 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { filterUrlQuery, pickUrlParams } from '../utils/urls.js'
+import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 import { composeDriveThumbnail } from './googledrive.js'
 
@@ -17,10 +17,9 @@ const sharedParams = [
   'tab', // The tab of the doc that shows
 ]
 
-// Each of these draws the same published doc whether present or not, unlike `embedded`, which
-// drops the published-by header.
-const unseenParams = [
-  'rm', // Minimal toolbar
+// The parameters a published doc's frame keeps. Every other one is dropped.
+const publishedParams = [
+  'embedded', // The embed view, which drops the published-by header and footer
 ]
 
 const docHeight = 500
@@ -28,10 +27,9 @@ const docHeight = 500
 // `/document/d/e/{token}` names a doc published to the web and `/document/d/{id}` names it by
 // its Drive file id.
 export const googledocsResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
   const pathSegments = getPathSegments(url)
 
-  if (!parsed || pathSegments[0] !== 'document' || pathSegments[1] !== 'd') {
+  if (pathSegments[0] !== 'document' || pathSegments[1] !== 'd') {
     return
   }
 
@@ -50,9 +48,7 @@ export const googledocsResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const docPath = isPublished ? `e/${docId}` : docId
-  const query = isShared
-    ? pickUrlParams(url, sharedParams)
-    : filterUrlQuery(parsed, (name) => !unseenParams.includes(name))
+  const query = pickUrlParams(url, isShared ? sharedParams : publishedParams)
 
   return {
     provider,
