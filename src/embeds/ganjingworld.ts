@@ -1,15 +1,11 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
+import { localePairRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `ganjing.com` 301s onto `www.ganjingworld.com/embed/{same id}`, so both hosts name one embed.
 const ganjingworldHosts = ['ganjingworld.com', 'ganjing.com']
-
-// The platform's locale segment is case-sensitive: `zh-CN` 301s onto the bare id, `zh-cn` 404s.
-// Only the platform's own spelling is claimed, so a lowercase one falls to the generic fallback.
-// The hyphen and the case tell a locale from the route words that share its slot, such as `live`.
-const localeRegex = /^[a-z]+-[A-Z]+$/
 
 type Video = {
   locale?: string
@@ -32,7 +28,8 @@ const readVideo = (url: string): Video | undefined => {
     return
   }
 
-  const locale = keepIfMatches(first, localeRegex)
+  // The hyphen tells a locale from the route words that share its slot, such as `live`.
+  const locale = keepIfMatches(first, localePairRegex)
 
   if (!locale || !third) {
     return

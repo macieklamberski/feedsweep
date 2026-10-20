@@ -2,14 +2,13 @@ import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
+import { hexRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'observable'
 
 const observableHosts = ['observablehq.com']
 
-// Observable serves the hex id in lowercase only, and answers 404 to an uppercase spelling.
-const notebookIdRegex = /^[0-9a-f]+$/
 const versionSuffixRegex = /@[^@/]*$/
 
 // Observable's notebook frame, observablehq.com/embed/@{user}/{notebook}[@{version}]?cells={names},
@@ -31,7 +30,7 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
   // A notebook id is the only segment after `embed`, and `embed/d/{id}` answers 404.
   const notebookId =
     segments.length === 2
-      ? keepIfMatches(segments[1].replace(versionSuffixRegex, ''), notebookIdRegex)
+      ? keepIfMatches(segments[1].replace(versionSuffixRegex, ''), hexRegex)
       : undefined
 
   if (notebookId) {

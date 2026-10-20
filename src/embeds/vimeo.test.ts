@@ -259,6 +259,19 @@ describe('vimeoResolveEmbed', () => {
     expect(vimeoResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should use an uppercase path hash as written, even if the player answers an error', () => {
+    const value = 'https://vimeo.com/76979871/A52724358E'
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '76979871:A52724358E',
+      src: 'https://player.vimeo.com/video/76979871?h=A52724358E',
+      url: 'https://vimeo.com/76979871/A52724358E',
+      ratio: '16/9',
+    }
+
+    expect(vimeoResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should not read a path segment carrying a percent escape as the hash', () => {
     const value = 'https://vimeo.com/76979871/a52724358e%3f'
     const expected: EmbedResolverResult = {
@@ -465,6 +478,19 @@ describe('vimeoResolveEmbed', () => {
         id: 'event/4936964:8e4964f8',
         src: 'https://vimeo.com/event/4936964/embed/8e4964f8',
         url: 'https://vimeo.com/event/4936964/8e4964f8',
+        ratio: '16/9',
+      }
+
+      expect(vimeoResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should use an uppercase event hash as written, even if the player answers an error', () => {
+      const value = 'https://vimeo.com/event/4936964/embed/8E4964F838'
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: 'event/4936964:8E4964F838',
+        src: 'https://vimeo.com/event/4936964/embed/8E4964F838',
+        url: 'https://vimeo.com/event/4936964/8E4964F838',
         ratio: '16/9',
       }
 

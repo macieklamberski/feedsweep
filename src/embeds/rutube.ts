@@ -1,13 +1,9 @@
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { encodePathSegment, hexRegex, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rutube'
-
-// An id is a uuid with the dashes stripped, and the player still plays the all-digit ids the same
-// routes carried before.
-const videoIdCharactersRegex = /^[0-9a-f]+$/
 
 const rutubeHosts = ['rutube.ru']
 
@@ -42,9 +38,11 @@ export const rutubeResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
+  // An id is a uuid with the dashes stripped, and the player still plays the all-digit ids the same
+  // routes carried before.
   const videoId = playlistPathRegex.test(parsed.pathname)
     ? parsed.searchParams.get('pl_video')
-    : keepIfMatches(parsed.pathname.match(embedPathRegex)?.[1], videoIdCharactersRegex)
+    : keepIfMatches(parsed.pathname.match(embedPathRegex)?.[1], hexRegex)
 
   if (!videoId) {
     return

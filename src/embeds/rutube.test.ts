@@ -47,6 +47,19 @@ describe('rutubeResolveEmbed', () => {
       expect(rutubeResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should use an uppercase hex id as written, even if the player answers an error', () => {
+      const value = 'https://rutube.ru/play/embed/C6CC4D620B1D4338901770A44B3E82F4'
+      const expected: EmbedResolverResult = {
+        provider: 'rutube',
+        id: 'C6CC4D620B1D4338901770A44B3E82F4',
+        src: 'https://rutube.ru/play/embed/C6CC4D620B1D4338901770A44B3E82F4',
+        url: 'https://rutube.ru/video/C6CC4D620B1D4338901770A44B3E82F4/',
+        ratio: '16/9',
+      }
+
+      expect(rutubeResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should keep the access key a private video carries in the player url only', () => {
       const value =
         'https://rutube.ru/play/embed/08fa24c07c55aa24504f0ac93f7c2d01/?p=KKiFZe0ka-lmMTIbZyvWig'
