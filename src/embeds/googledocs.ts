@@ -9,8 +9,8 @@ const provider = 'googledocs'
 
 // A doc shared by link is framed on `/preview` by its file id, and most such docs answer 401 on
 // `/pub`. An `/edit` carrier is a pasted share link that draws the editor's chrome, so it is
-// framed on `/preview` too.
-const sharedRoutes = ['edit', 'preview']
+// framed on `/preview` too, as is a bare `/document/d/{id}`, which redirects to `/edit`.
+const sharedRoutes = ['', 'edit', 'preview']
 
 // The parameters a shared doc's frame keeps. Every other one is dropped.
 const sharedParams = [
@@ -39,6 +39,10 @@ export const googledocsResolveEmbed: ResolveEmbed = (url, element) => {
   const docId = pathSegments[isPublished ? 3 : 2]
   const route = pathSegments.slice(isPublished ? 4 : 3).join('/')
   const isShared = sharedRoutes.includes(route)
+
+  if (!docId) {
+    return
+  }
 
   if (!isShared && route !== 'pub') {
     return
