@@ -584,13 +584,49 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  it('should collapse a double slash deeper in the path', async () => {
+  it('should strip the site host and directory from a host-prefixed src', async () => {
     const value =
       '<iframe src="https://ahtary-city.ucoz.com/news//www.youtube.com/embed/MLANv9VJ5Ws"></iframe>'
-    const expected =
-      '<iframe src="https://ahtary-city.ucoz.com/news/www.youtube.com/embed/MLANv9VJ5Ws"></iframe>'
+    const expected = '<iframe src="https://www.youtube.com/embed/MLANv9VJ5Ws"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should strip the site host and directory from a src prefixed with three slashes', async () => {
+    const value =
+      '<iframe src="https://crfm.int/~uwohxjxf///www.youtube.com/embed/Rh_syZg2Pts?rel=0"></iframe>'
+    const expected = '<iframe src="https://www.youtube.com/embed/Rh_syZg2Pts?rel=0"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should strip a site host behind several directories', async () => {
+    const value =
+      '<iframe src="https://ubenet.com/JavaBridge/joomla15///www.facebook.com/plugins/likebox.php"></iframe>'
+    const expected = '<iframe src="https://www.facebook.com/plugins/likebox.php"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a url carried in a web archive path', async () => {
+    const value =
+      '<iframe src="https://web.archive.org/web/20140327055211oe_/http://www.youtube.com/v/ogzjfJtg3TA"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a percent-encoded url carried in the path', async () => {
+    const value =
+      '<iframe src="https://example.com/p/https%3A//www.youtube.com/embed/MLANv9VJ5Ws"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a directory naming a host after a single slash', async () => {
+    const value =
+      '<iframe src="https://example.com/news/www.youtube.com/embed/MLANv9VJ5Ws"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 
   it('should be idempotent', async () => {

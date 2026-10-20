@@ -4,11 +4,14 @@ import { svgHrefAttribute } from '../../utils/dom.js'
 import { countSrcsetCandidates, parseSrcset } from '../../utils/images.js'
 import { absoluteUrlRegex, collapseSlashRuns, resolveOrKeepUrl } from '../../utils/urls.js'
 
-const hostPrefixedUrlRegex = /^(https?:)\/\/[^/?#]+\/+(?=\/(?:[a-z0-9-]+\.)+[a-z]{2,}\/)/i
+const hostPrefixedUrlRegex =
+  /^(https?:)\/\/[^/?#]+(?:\/[^/?#]+)*?(?<!:|%3a)\/+(?=\/(?:[a-z0-9-]+\.)+[a-z]{2,}\/)/i
 const hostPrefixedSrcTags = ['iframe', 'embed', 'script']
 
 // A protocol-relative src resolved against the page lands behind the site's own host,
-// `{scheme}//{site}//{host}/{path}`, sometimes with a third slash, which the site does not serve.
+// `{scheme}//{site}//{host}/{path}`, sometimes with a third slash and sometimes behind the page's
+// directory, `{site}/{dir}///{host}`, which the site does not serve. A run after `:` belongs to a
+// url carried in the path, such as a web archive's, so it stays.
 const stripSiteHostPrefix = (url: string): string => {
   return url.replace(hostPrefixedUrlRegex, '$1/')
 }
