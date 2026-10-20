@@ -404,11 +404,56 @@ const dimensionAttribute = (element: Element, name: string): number | undefined 
 // that is the only place the size exists.
 const imageDimensionsRegex = /^\s*([0-9]+)\s*x\s*([0-9]+)\s*$/i
 
+const pixelUnitRegex = /px\s*$/i
+
+// Beside an `auto` size the element scales, and the attribute pair is the shape it keeps.
+const isScaled = (element: Element): boolean => {
+  return styles.keyword(element, 'width') === 'auto' || styles.keyword(element, 'height') === 'auto'
+}
+
+// An inline pixel length overrides the attribute, as in the browser's cascade. A unitless length
+// is invalid CSS, and `height: 0px` hides a frame until a script sizes it, so beside either the
+// attribute stands.
+const styledDimension = (element: Element, name: 'width' | 'height'): number | undefined => {
+  const size = dimensionAttribute(element, name)
+  const declared = styles.declarations(element)[name]
+
+  if (size === undefined || !declared || !pixelUnitRegex.test(declared) || isScaled(element)) {
+    return size
+  }
+
+  const pixels = coerceNumber(styles.pixels(element, name))
+
+  if (!pixels) {
+    return size
+  }
+
+  return pixels
+}
+
+// WordPress writes `width="300" height="150"` beside `style="width:100%;height:600px"`, which
+// draws 600 tall across the column, so the percentage names no width. With no height beside it,
+// the width attribute is the only size left, and an unsized image on a beacon host is removed.
+const isFluidWidth = (element: Element): boolean => {
+  const { width, height } = styles.declarations(element)
+
+  if (!width || !percentageLengthRegex.test(width)) {
+    return false
+  }
+
+  if (height) {
+    return pixelUnitRegex.test(height)
+  }
+
+  return dimensionAttribute(element, 'height') !== undefined
+}
+
 export const getElementDimensions = (element: Element): { width?: number; height?: number } => {
-  // `width: 1px; min-width: 100%` fills the container, so the stated width names no size.
-  const isContainerWide = styles.declarations(element)['min-width'] === '100%'
-  const width = isContainerWide ? undefined : dimensionAttribute(element, 'width')
-  const height = dimensionAttribute(element, 'height')
+  // `width: 1px; min-width: 100%` fills the container as well, and names no size either.
+  const isContainerWide =
+    isFluidWidth(element) || styles.declarations(element)['min-width'] === '100%'
+  const width = isContainerWide ? undefined : styledDimension(element, 'width')
+  const height = styledDimension(element, 'height')
 
   if (width !== undefined && height !== undefined) {
     return { width, height }

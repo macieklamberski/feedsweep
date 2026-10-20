@@ -328,11 +328,112 @@ describeForEachParser('getElementDimensions', (parseHtml) => {
     expect(getElementDimensions(image)).toEqual({ width: undefined, height: undefined })
   })
 
-  it('should prefer attribute over style when both are present', () => {
+  it('should prefer a pixel style over the attribute the way the browser does', () => {
     const document = parseHtml('<img width="100" style="width: 999px">')
     const image = queryElement(document, 'img')
 
-    expect(getElementDimensions(image)).toEqual({ width: 100, height: undefined })
+    expect(getElementDimensions(image)).toEqual({ width: 999, height: undefined })
+  })
+
+  it('should drop an attribute width that a percentage style overrides', () => {
+    const document = parseHtml(
+      '<iframe width="300" height="150" style="width: 100%; height: 600px;"></iframe>',
+    )
+    const frame = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(frame)).toEqual({ width: undefined, height: 600 })
+  })
+
+  it('should drop an attribute width that a percentage style overrides beside no height', () => {
+    const document = parseHtml('<iframe width="560" height="315" style="width: 100%"></iframe>')
+    const frame = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(frame)).toEqual({ width: undefined, height: 315 })
+  })
+
+  it('should keep the attribute width beside a percentage style and no height', () => {
+    const document = parseHtml('<img height="auto" width="630" style="display:block;width:100%;">')
+    const image = queryElement(document, 'img')
+
+    expect(getElementDimensions(image)).toEqual({ width: 630, height: undefined })
+  })
+
+  it('should keep the attribute pair of a frame that fills its wrapper', () => {
+    const document = parseHtml(
+      '<iframe width="678" height="381" style="position: absolute; width: 100%; height: 100%;"></iframe>',
+    )
+    const frame = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(frame)).toEqual({ width: 678, height: 381 })
+  })
+
+  it('should keep the attribute pair beside a percentage width and an auto height', () => {
+    const document = parseHtml('<img width="800" height="600" style="width: 100%; height: auto">')
+    const image = queryElement(document, 'img')
+
+    expect(getElementDimensions(image)).toEqual({ width: 800, height: 600 })
+  })
+
+  it('should keep the attribute pair beside a pixel width and an auto height', () => {
+    const document = parseHtml('<img width="1024" height="768" style="width: 300px; height: auto">')
+    const image = queryElement(document, 'img')
+
+    expect(getElementDimensions(image)).toEqual({ width: 1024, height: 768 })
+  })
+
+  it('should keep the attribute pair beside an auto width and a pixel height', () => {
+    const document = parseHtml('<img width="1024" height="768" style="width: auto; height: 225px">')
+    const image = queryElement(document, 'img')
+
+    expect(getElementDimensions(image)).toEqual({ width: 1024, height: 768 })
+  })
+
+  it('should keep data-image-dimensions beside a percentage width with no attribute', () => {
+    const document = parseHtml(
+      '<img data-image-dimensions="2500x1695" style="width: 100%; height: 300px">',
+    )
+    const image = queryElement(document, 'img')
+
+    expect(getElementDimensions(image)).toEqual({ width: 2500, height: 1695 })
+  })
+
+  it('should keep the attribute pair beside a percentage width and a calculated height', () => {
+    const document = parseHtml(
+      '<iframe style="border: 1px solid #aaa; width: 100%; height: calc(100vh - 100px);" width="700" height="905"></iframe>',
+    )
+    const frame = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(frame)).toEqual({ width: 700, height: 905 })
+  })
+
+  it('should keep the attribute beside a style length with no unit', () => {
+    const document = parseHtml('<iframe width="560" height="315" style="height: 400"></iframe>')
+    const frame = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(frame)).toEqual({ width: 560, height: 315 })
+  })
+
+  it('should keep the attribute beside a negative pixel style', () => {
+    const document = parseHtml('<iframe width="560" height="315" style="height: -10px"></iframe>')
+    const frame = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(frame)).toEqual({ width: 560, height: 315 })
+  })
+
+  it('should keep the attribute beside a zero pixel style a script resizes', () => {
+    const document = parseHtml(
+      '<iframe height="550" width="100%" onload="iFrameResize();" style="overflow: hidden; height: 0px;"></iframe>',
+    )
+    const frame = queryElement(document, 'iframe')
+
+    expect(getElementDimensions(frame)).toEqual({ width: undefined, height: 550 })
+  })
+
+  it('should keep the attribute beside an auto style', () => {
+    const document = parseHtml('<img width="800" height="600" style="height: auto">')
+    const image = queryElement(document, 'img')
+
+    expect(getElementDimensions(image)).toEqual({ width: 800, height: 600 })
   })
 
   it('should return both undefined for an element with neither', () => {

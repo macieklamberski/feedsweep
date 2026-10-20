@@ -428,6 +428,27 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should take the height an inline style states over the attribute pair', async () => {
+    const value = html`
+      <iframe
+        style="width: 100%; height: 600px;"
+        src="https://www.jigsawplanet.com/?rc=play&amp;pid=0fc6efcb5156&amp;view=iframe"
+        width="300"
+        height="150"
+        frameborder="0"
+        allowfullscreen="allowfullscreen"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-src="https://www.jigsawplanet.com/?rc=play&amp;pid=0fc6efcb5156&amp;view=iframe"
+        data-embed-height="600"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   // The rule is the carrier tier's, not a platform's: an unknown iframe gets it too. No player is
   // nine pixels tall, so a pair this small is the shape it spells however it is spelled.
   it('should wrap an unknown iframe stating a small pair as a ratio', async () => {
