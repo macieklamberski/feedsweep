@@ -525,6 +525,27 @@ describeForEachParser('audioboomIframeEmbedResolver carrier title', (parseHtml) 
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should drop the label the player wrote under its pre-rename name', async () => {
+    const value = html`
+      <iframe
+        style="margin: 0px; padding: 0px; border: none; display: block; width: 100%; height: 89px;"
+        allowtransparency="allowtransparency"
+        frameborder="0"
+        scrolling="no"
+        src="https://audioboom.com/posts/8388499-satyadaka-and-sarvananda-sharing-a-dharma-life/embed"
+        title="Audioboo player"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'audioboom',
+      id: '8388499',
+      src: 'https://embeds.audioboom.com/posts/8388499/embed',
+      height: 95,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should read the name the carrier states', async () => {
     const value = html`
       <iframe src="https://embeds.audioboom.com/posts/8292430/embed/v4" title="The Rest Is History: Rome"></iframe>
