@@ -78,11 +78,15 @@ const composeEmbedResult = (identifier: string, query = '', file = ''): EmbedRes
 const audioPlayerHeight = 30
 const videoPlayerRatio = '16/9'
 
-// `embed/{identifier}` serves every kind of item, so the declared box only picks the kind. Every
-// item declared under 200 tall is audio, and the bar it gets is 30 tall whatever the box.
+// `embed/{identifier}` serves every kind of item, so the declared box or type only picks the kind.
+// Every item declared under 200 tall is audio, and the bar it gets is 30 tall whatever the box.
 const audioCarrierHeightLimit = 200
 
 const declaresAudioPlayer = (element: Element): boolean => {
+  if (attr(element, 'type')?.startsWith('audio/')) {
+    return true
+  }
+
   const { height } = getEmbedSize(element, 0)
 
   return height !== undefined && height < audioCarrierHeightLimit

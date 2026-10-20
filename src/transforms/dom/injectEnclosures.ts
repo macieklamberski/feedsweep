@@ -48,6 +48,12 @@ const resolveEnclosure = (
   probe.setAttribute('src', url)
   setDimensions(probe, enclosure)
 
+  // The feed's MIME type, the one hint an item url serving every kind has about which player
+  // fits. `type` is the attribute an `<embed>` or `<object>` carrier states it in.
+  if (enclosure.type) {
+    probe.setAttribute('type', enclosure.type)
+  }
+
   return resolveEmbedProbe(probe, resolvers)
 }
 
