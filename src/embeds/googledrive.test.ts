@@ -292,7 +292,7 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
       const value = html`
         <iframe
           src="https://drive.google.com/file/d/1RUUW3OB7guzN-pKAApUEr-iV408omtIK/view?usp=sharing"
-          type="video/mp4"
+          type="video/mpeg"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
