@@ -3,6 +3,7 @@ import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.j
 import { attr } from '../utils/dom.js'
 import { filterUrlQuery } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
 
 const provider = 'googleforms'
 
@@ -35,8 +36,8 @@ const composeShortLink = (url: URL, element?: Element): EmbedResolverResult | un
 }
 
 // `/forms/d/e/{id}` names a form by its published id and `/forms/d/{id}` by its Drive file id,
-// which the server redirects to the published id. The Workspace prefix `/a/{domain}/` and the
-// account prefix `/u/{n}/` only pick the sign-in and serve the same form.
+// which the server redirects to the published id. The account prefix `/u/{n}/` only picks the
+// sign-in and serves the same form.
 export const googleformsResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
 
@@ -48,8 +49,7 @@ export const googleformsResolveEmbed: ResolveEmbed = (url, element) => {
     return composeShortLink(parsed, element)
   }
 
-  const pathSegments = getPathSegments(parsed)
-  const segments = pathSegments[0] === 'a' ? pathSegments.slice(2) : pathSegments
+  const segments = getPathSegmentsWithoutWorkspace(parsed)
   const formSegments = segments[1] === 'u' ? segments.slice(3) : segments.slice(1)
 
   if (segments[0] !== 'forms' || formSegments[0] !== 'd') {
