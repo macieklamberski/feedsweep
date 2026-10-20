@@ -121,6 +121,45 @@ describe('googledriveResolveEmbed', () => {
       expect(googledriveResolveEmbed(value)).toEqual(expected)
     })
   })
+
+  describe('the Workspace domain prefix', () => {
+    it('should drop the Workspace prefix from a drive frame', () => {
+      const value =
+        'https://drive.google.com/a/example.com/file/d/0B9tSCABkwqlyRzNlZGNaZ0hIYU0/preview'
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: '0B9tSCABkwqlyRzNlZGNaZ0hIYU0',
+        src: 'https://drive.google.com/file/d/0B9tSCABkwqlyRzNlZGNaZ0hIYU0/preview',
+        url: 'https://drive.google.com/file/d/0B9tSCABkwqlyRzNlZGNaZ0hIYU0/view',
+        thumbnail: 'https://drive.google.com/thumbnail?id=0B9tSCABkwqlyRzNlZGNaZ0hIYU0&sz=w640',
+        ratio: '4/3',
+      }
+
+      expect(googledriveResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the Workspace prefix from a legacy docs frame', () => {
+      const value =
+        'https://docs.google.com/a/example.com/file/d/0B-8Pql3xY9VERE1yaTRxaXAwcXc/preview'
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: '0B-8Pql3xY9VERE1yaTRxaXAwcXc',
+        src: 'https://drive.google.com/file/d/0B-8Pql3xY9VERE1yaTRxaXAwcXc/preview',
+        url: 'https://drive.google.com/file/d/0B-8Pql3xY9VERE1yaTRxaXAwcXc/view',
+        thumbnail: 'https://drive.google.com/thumbnail?id=0B-8Pql3xY9VERE1yaTRxaXAwcXc&sz=w640',
+        ratio: '4/3',
+      }
+
+      expect(googledriveResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should ignore a file behind a prefix that is not a Workspace domain', () => {
+      const value =
+        'https://drive.google.com/x/example.com/file/d/0B9tSCABkwqlyRzNlZGNaZ0hIYU0/preview'
+
+      expect(googledriveResolveEmbed(value)).toBeUndefined()
+    })
+  })
 })
 
 describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
@@ -162,6 +201,26 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
         src: 'https://drive.google.com/file/d/0ByrtauTmPYKtR3dPN0lxY2hwdFE/preview',
         url: 'https://drive.google.com/file/d/0ByrtauTmPYKtR3dPN0lxY2hwdFE/view',
         thumbnail: 'https://drive.google.com/thumbnail?id=0ByrtauTmPYKtR3dPN0lxY2hwdFE&sz=w640',
+        ratio: '4/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should claim a drive frame behind a Workspace prefix', async () => {
+      const value = html`
+        <iframe
+          src="https://drive.google.com/a/example.com/file/d/0B9tSCABkwqlyRzNlZGNaZ0hIYU0/preview"
+          width="640"
+          height="480"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: '0B9tSCABkwqlyRzNlZGNaZ0hIYU0',
+        src: 'https://drive.google.com/file/d/0B9tSCABkwqlyRzNlZGNaZ0hIYU0/preview',
+        url: 'https://drive.google.com/file/d/0B9tSCABkwqlyRzNlZGNaZ0hIYU0/view',
+        thumbnail: 'https://drive.google.com/thumbnail?id=0B9tSCABkwqlyRzNlZGNaZ0hIYU0&sz=w640',
         ratio: '4/3',
       }
 
