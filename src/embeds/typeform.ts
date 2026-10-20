@@ -1,14 +1,15 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const typeformHosts = ['typeform.com']
 
-// Two id generations share one url template. A form id is short and mixed case (`MTt3Pw7K`), and
-// a live-embed id is a 26-char Crockford base32 ULID (`01HCZ4DNW8JM6PEGNTQWF2PW87`).
-const safeIdRegex = /^[A-Za-z0-9]+$/
+// A form id in a url path is alphanumeric (`MTt3Pw7K`). The enclosure probe offers every file on a
+// Typeform host to this resolver, so the alphabet is what tells a form from a file such as
+// `/to/MTt3Pw7K.mp3`.
+const formIdRegex = /^[A-Za-z0-9]+$/
 
 // The share panel writes the form's own title into an iframe-props string, `title=<the
 // title>,<other props>`, which is the only human-readable text the empty div carries.
@@ -19,16 +20,12 @@ const titlePropRegex = /(?:^|,)title=([^,]+)/
 // widget, so they have to be excluded before the id is read.
 const launcherAttributes = ['data-tf-popup', 'data-tf-slider', 'data-tf-popover', 'data-tf-sidetab']
 
-const composeEmbed = (id: string, title?: string): EmbedResolverResult | undefined => {
-  if (!safeIdRegex.test(id)) {
-    return
-  }
-
+const composeEmbed = (id: string, title?: string): EmbedResolverResult => {
   const result: EmbedResolverResult = {
     provider: 'typeform',
     id,
-    src: `https://form.typeform.com/to/${id}`,
-    url: `https://form.typeform.com/to/${id}`,
+    src: `https://form.typeform.com/to/${encodePathSegment(id)}`,
+    url: `https://form.typeform.com/to/${encodePathSegment(id)}`,
     height: 500,
   }
 
@@ -38,13 +35,11 @@ const composeEmbed = (id: string, title?: string): EmbedResolverResult | undefin
 // A live id is not a form id, and only Typeform's `single-embed` api maps one to the other, so the
 // placeholder names the embed for enrichment and carries no player. `data-tf-region` picks the
 // api host, so it leads the id.
-const composeLiveEmbed = (element: Element, title?: string): EmbedResolverResult | undefined => {
-  const liveId = attr(element, 'data-tf-live') ?? ''
-
-  if (!safeIdRegex.test(liveId)) {
-    return
-  }
-
+const composeLiveEmbed = (
+  liveId: string,
+  element: Element,
+  title?: string,
+): EmbedResolverResult => {
   const region = attr(element, 'data-tf-region')
   const result: EmbedResolverResult = {
     provider: 'typeform',
@@ -69,14 +64,19 @@ export const typeformWidgetEmbedResolver = createMarkupEmbedResolver(
     }
 
     const title = readTitle(element)
+    const widgetId = attr(element, 'data-tf-widget')
 
-    // Each carrier is validated on its own, so a malformed id in one does not hide a usable id
-    // in another: a block can carry all three, and only the last generation is ever complete.
-    return (
-      composeEmbed(attr(element, 'data-tf-widget') ?? '', title) ??
-      composeLiveEmbed(element, title) ??
-      typeformResolveEmbed(attr(element, 'data-url') ?? '')
-    )
+    if (widgetId) {
+      return composeEmbed(widgetId, title)
+    }
+
+    const liveId = attr(element, 'data-tf-live')
+
+    if (liveId) {
+      return composeLiveEmbed(liveId, element, title)
+    }
+
+    return typeformResolveEmbed(attr(element, 'data-url') ?? '')
   },
 )
 
@@ -92,7 +92,7 @@ export const typeformResolveEmbed: ResolveEmbed = (url, element) => {
 
   const segments = getPathSegments(parsed)
 
-  return segments[0] === 'to' && segments[1]
+  return segments[0] === 'to' && segments[1] && formIdRegex.test(segments[1])
     ? composeEmbed(segments[1], attr(element, 'title'))
     : undefined
 }
