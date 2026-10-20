@@ -2,7 +2,7 @@ import { stringifySrcset } from 'srcset'
 import type { DomTransform, ResolveUrlFn } from '../../types.js'
 import { svgHrefAttribute } from '../../utils/dom.js'
 import { countSrcsetCandidates, parseSrcset } from '../../utils/images.js'
-import { absoluteUrlRegex, collapseLeadingSlashes, resolveOrKeepUrl } from '../../utils/urls.js'
+import { absoluteUrlRegex, collapseSlashRuns, resolveOrKeepUrl } from '../../utils/urls.js'
 
 const hostPrefixedUrlRegex = /^(https?:)\/\/[^/?#]+\/+(?=\/(?:[a-z0-9-]+\.)+[a-z]{2,}\/)/i
 const hostPrefixedSrcTags = ['iframe', 'embed', 'script']
@@ -30,7 +30,7 @@ const resolveAttribute = (
   const resolved = resolveOrKeepUrl(value, { baseUrl, resolveUrlFn })
 
   if (attribute === 'src' && hostPrefixedSrcTags.includes(element.localName)) {
-    element.setAttribute(attribute, collapseLeadingSlashes(stripSiteHostPrefix(resolved)))
+    element.setAttribute(attribute, collapseSlashRuns(stripSiteHostPrefix(resolved)))
 
     return
   }
