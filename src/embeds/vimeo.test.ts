@@ -246,6 +246,45 @@ describe('vimeoResolveEmbed', () => {
     expect(vimeoResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should use a path hash of another length as written', () => {
+    const value = 'https://vimeo.com/76979871/a5272435'
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '76979871:a5272435',
+      src: 'https://player.vimeo.com/video/76979871?h=a5272435',
+      url: 'https://vimeo.com/76979871/a5272435',
+      ratio: '16/9',
+    }
+
+    expect(vimeoResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should not read a path segment carrying a percent escape as the hash', () => {
+    const value = 'https://vimeo.com/76979871/a52724358e%3f'
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '76979871',
+      src: 'https://player.vimeo.com/video/76979871',
+      url: 'https://vimeo.com/76979871',
+      ratio: '16/9',
+    }
+
+    expect(vimeoResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a ten-digit video id after the player route as the video', () => {
+    const value = 'https://player.vimeo.com/video/1209489815'
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '1209489815',
+      src: 'https://player.vimeo.com/video/1209489815',
+      url: 'https://vimeo.com/1209489815',
+      ratio: '16/9',
+    }
+
+    expect(vimeoResolveEmbed(value)).toEqual(expected)
+  })
+
   // A review link states the hash the same way, two segments further down.
   it('should read the video and hash out of a review link', () => {
     const value = 'https://vimeo.com/user170863801/review/76979871/a52724358e'
@@ -413,6 +452,19 @@ describe('vimeoResolveEmbed', () => {
         id: 'event/4936964:8e4964f838',
         src: 'https://vimeo.com/event/4936964/embed/8e4964f838',
         url: 'https://vimeo.com/event/4936964/8e4964f838',
+        ratio: '16/9',
+      }
+
+      expect(vimeoResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should carry an event hash of another length as written', () => {
+      const value = 'https://vimeo.com/event/4936964/embed/8e4964f8'
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: 'event/4936964:8e4964f8',
+        src: 'https://vimeo.com/event/4936964/embed/8e4964f8',
+        url: 'https://vimeo.com/event/4936964/8e4964f8',
         ratio: '16/9',
       }
 

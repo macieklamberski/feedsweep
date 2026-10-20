@@ -9,7 +9,7 @@ const provider = 'observable'
 const observableHosts = ['observablehq.com']
 
 // Observable serves the hex id in lowercase only, and answers 404 to an uppercase spelling.
-const notebookIdRegex = /^[0-9a-f]{16}$/
+const notebookIdRegex = /^[0-9a-f]+$/
 const versionSuffixRegex = /@[^@/]*$/
 
 // Observable's notebook frame, observablehq.com/embed/@{user}/{notebook}[@{version}]?cells={names},
@@ -28,7 +28,11 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
 
   // `@{version}` pins one revision of a notebook rather than naming another one, and the document
   // endpoint takes the notebook alone, so the suffix stays out of the id.
-  const notebookId = keepIfMatches(segments[1]?.replace(versionSuffixRegex, ''), notebookIdRegex)
+  // A notebook id is the only segment after `embed`, and `embed/d/{id}` answers 404.
+  const notebookId =
+    segments.length === 2
+      ? keepIfMatches(segments[1].replace(versionSuffixRegex, ''), notebookIdRegex)
+      : undefined
 
   if (notebookId) {
     return {
