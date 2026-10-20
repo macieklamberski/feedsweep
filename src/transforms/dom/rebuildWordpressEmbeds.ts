@@ -25,6 +25,12 @@ export const rebuildWordpressEmbeds: DomTransform = (context) => {
         continue
       }
 
+      // A blockquote around the url is another platform's carrier, such as Instagram's captioned
+      // post, and its own resolver mints more than the url alone does.
+      if (wrapper.querySelector('blockquote')) {
+        continue
+      }
+
       // Any element beside the url, an image or a native player, is content the frame would
       // replace.
       const elements = [...wrapper.querySelectorAll(':not(br)')]

@@ -202,6 +202,23 @@ describeForEachParser('rebuildWordpressEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should keep an Instagram blockquote around the url', async () => {
+      const value = html`
+        <figure class="wp-block-embed is-type-rich is-provider-instagram wp-block-embed-instagram">
+          <div class="wp-block-embed__wrapper">
+            <blockquote
+              class="instagram-media metro-instagram"
+              data-instgrm-captioned
+              data-instgrm-version="12"
+              data-instgrm-permalink="https://www.instagram.com/p/DZsKxhUOtvr/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
+            ><a href="https://www.instagram.com/p/DZsKxhUOtvr/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==">https://www.instagram.com/p/DZsKxhUOtvr/?utm_source=ig_web_copy_link&amp;igsh=MzRlODBiNWFlZA==</a></blockquote>
+          </div>
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should keep a wrapper that already holds its frame', async () => {
       const value = html`
         <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
@@ -266,6 +283,25 @@ describeForEachParser('rebuildWordpressEmbeds through the pipeline', (parseHtml)
     `
     const expected =
       '<div data-embed-ratio="16/9" data-embed-thumbnail="https://i.ytimg.com/vi/xfdNWD6Xrjw/hqdefault.jpg" data-embed-url="https://www.youtube.com/watch?v=xfdNWD6Xrjw" data-embed-id="xfdNWD6Xrjw" data-embed-provider="youtube" data-embed-src="https://www.youtube.com/embed/xfdNWD6Xrjw"></div>'
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should turn an Instagram blockquote around the url into its captioned player', async () => {
+    const value = html`
+      <figure class="wp-block-embed is-type-rich is-provider-instagram wp-block-embed-instagram">
+        <div class="wp-block-embed__wrapper">
+          <blockquote
+            class="instagram-media metro-instagram"
+            data-instgrm-captioned
+            data-instgrm-version="12"
+            data-instgrm-permalink="https://www.instagram.com/p/DZsKxhUOtvr/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
+          ><a href="https://www.instagram.com/p/DZsKxhUOtvr/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==">https://www.instagram.com/p/DZsKxhUOtvr/?utm_source=ig_web_copy_link&amp;igsh=MzRlODBiNWFlZA==</a></blockquote>
+        </div>
+      </figure>
+    `
+    const expected =
+      '<div data-embed-url="https://www.instagram.com/p/DZsKxhUOtvr/" data-embed-id="p/DZsKxhUOtvr" data-embed-provider="instagram" data-embed-src="https://www.instagram.com/p/DZsKxhUOtvr/embed/captioned/"></div>'
 
     expect(await convert(value)).toEqualHtml(expected)
   })
