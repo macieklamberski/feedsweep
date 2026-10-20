@@ -1024,6 +1024,186 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should replace a Flash shell whose carrier sits in a <div>', async () => {
+      const value = html`
+        <object width="425" height="344">
+          <param name="movie" value="http://www.youtube.com/v/uM6HzFWFHoI&amp;hl=es&amp;fs=1" />
+          <param name="allowFullScreen" value="true" />
+          <div align="center">
+            <embed src="http://www.youtube.com/v/uM6HzFWFHoI&amp;hl=es&amp;fs=1" width="425" height="344" />
+          </div>
+        </object>
+      `
+      const expected = html`
+        <div
+          data-embed-url="https://www.youtube.com/watch?v=uM6HzFWFHoI"
+          data-embed-thumbnail="https://i.ytimg.com/vi/uM6HzFWFHoI/hqdefault.jpg"
+          data-embed-ratio="16/9"
+          data-embed-src="https://www.youtube.com/embed/uM6HzFWFHoI"
+          data-embed-provider="youtube"
+          data-embed-id="uM6HzFWFHoI"
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a Flash shell with <br> between its params', async () => {
+      const value = html`
+        <object width="425" height="350">
+          <br />
+          <param name="movie" value="http://www.youtube.com/v/GFUa7bjNsZk" />
+          <br />
+          <param name="wmode" value="transparent" />
+          <br />
+          <embed src="http://www.youtube.com/v/GFUa7bjNsZk" width="425" height="350" />
+          <br />
+        </object>
+      `
+      const expected = html`
+        <div
+          data-embed-url="https://www.youtube.com/watch?v=GFUa7bjNsZk"
+          data-embed-thumbnail="https://i.ytimg.com/vi/GFUa7bjNsZk/hqdefault.jpg"
+          data-embed-ratio="16/9"
+          data-embed-src="https://www.youtube.com/embed/GFUa7bjNsZk"
+          data-embed-provider="youtube"
+          data-embed-id="GFUa7bjNsZk"
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a Flash shell whose carrier wrapper holds the publisher text', async () => {
+      const value = html`
+        <object width="425" height="344">
+          <param name="movie" value="http://www.youtube.com/v/uM6HzFWFHoI" />
+          <div>
+            Watch the video:
+            <embed src="http://www.youtube.com/v/uM6HzFWFHoI" />
+          </div>
+        </object>
+      `
+      const expected = html`
+        <object
+          width="425"
+          height="344"
+        >
+          <param
+            value="http://www.youtube.com/v/uM6HzFWFHoI"
+            name="movie"
+          ></param>
+          <div>
+            Watch the video:
+            <div
+              data-embed-url="https://www.youtube.com/watch?v=uM6HzFWFHoI"
+              data-embed-thumbnail="https://i.ytimg.com/vi/uM6HzFWFHoI/hqdefault.jpg"
+              data-embed-ratio="16/9"
+              data-embed-src="https://www.youtube.com/embed/uM6HzFWFHoI"
+              data-embed-provider="youtube"
+              data-embed-id="uM6HzFWFHoI"
+            ></div>
+          </div>
+        </object>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should replace a Flash shell whose nested object carrier holds fallback text', async () => {
+      const value = html`
+        <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="640" height="385">
+          <param name="movie" value="https://www.youtube.com/v/v7Ist21lPLU&amp;fmt=18" />
+          <param name="allowfullscreen" value="true" />
+          <!--[if gte IE 7]>-->
+          <object type="application/x-shockwave-flash" data="https://www.youtube.com/v/v7Ist21lPLU&amp;fmt=18" width="640" height="385">
+            <param name="allowfullscreen" value="true" />
+            <!--<![endif]-->
+            <p>You are missing some Flash content that should appear here! Perhaps your browser cannot display it, or maybe it did not initialize correctly.</p>
+            <!--[if gte IE 7]>-->
+          </object>
+          <!--<![endif]-->
+        </object>
+      `
+      const expected = html`
+        <div
+          data-embed-url="https://www.youtube.com/watch?v=v7Ist21lPLU"
+          data-embed-thumbnail="https://i.ytimg.com/vi/v7Ist21lPLU/hqdefault.jpg"
+          data-embed-ratio="16/9"
+          data-embed-src="https://www.youtube.com/embed/v7Ist21lPLU"
+          data-embed-provider="youtube"
+          data-embed-id="v7Ist21lPLU"
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a Flash shell whose carrier sits in a link', async () => {
+      const value = html`
+        <object width="320" height="200">
+          <param name="movie" value="http://www.youtube.com/v/LLcTGKByzno&amp;hl=en_US&amp;fs=1" />
+          <a href="http://www.youtube.com/watch?v=LLcTGKByzno">
+            <embed src="http://www.youtube.com/v/LLcTGKByzno&amp;hl=en_US&amp;fs=1" width="320" height="200" />
+          </a>
+        </object>
+      `
+      const expected = html`
+        <object
+          width="320"
+          height="200"
+        >
+          <param
+            value="http://www.youtube.com/v/LLcTGKByzno&amp;hl=en_US&amp;fs=1"
+            name="movie"
+          ></param>
+          <a href="http://www.youtube.com/watch?v=LLcTGKByzno">
+            <div
+              data-embed-url="https://www.youtube.com/watch?v=LLcTGKByzno"
+              data-embed-thumbnail="https://i.ytimg.com/vi/LLcTGKByzno/hqdefault.jpg"
+              data-embed-ratio="16/9"
+              data-embed-src="https://www.youtube.com/embed/LLcTGKByzno"
+              data-embed-provider="youtube"
+              data-embed-id="LLcTGKByzno"
+            ></div>
+          </a>
+        </object>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep the placeholder of an earlier carrier in the same object', async () => {
+      const value = html`
+        <object class="zb-embed">
+          <iframe src="https://www.youtube.com/embed/l2_AaJUj-bs" width="560" height="315"></iframe>
+          <iframe src="https://www.youtube.com/embed/ZGacBF1zTGI" width="560" height="315"></iframe>
+        </object>
+      `
+      const expected = html`
+        <object class="zb-embed">
+          <div
+            data-embed-url="https://www.youtube.com/watch?v=l2_AaJUj-bs"
+            data-embed-thumbnail="https://i.ytimg.com/vi/l2_AaJUj-bs/hqdefault.jpg"
+            data-embed-ratio="16/9"
+            data-embed-src="https://www.youtube.com/embed/l2_AaJUj-bs"
+            data-embed-provider="youtube"
+            data-embed-id="l2_AaJUj-bs"
+          ></div>
+          <div
+            data-embed-url="https://www.youtube.com/watch?v=ZGacBF1zTGI"
+            data-embed-thumbnail="https://i.ytimg.com/vi/ZGacBF1zTGI/hqdefault.jpg"
+            data-embed-ratio="16/9"
+            data-embed-src="https://www.youtube.com/embed/ZGacBF1zTGI"
+            data-embed-provider="youtube"
+            data-embed-id="ZGacBF1zTGI"
+          ></div>
+        </object>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should leave a non-provider carrier to the generic placeholder', async () => {
       const value = '<embed src="https://example.com/player/embed.html">'
       const expected = html`
