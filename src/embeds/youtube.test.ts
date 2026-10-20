@@ -101,6 +101,32 @@ describe('extractVideoId', () => {
     expect(extractVideoId(value)).toBeUndefined()
   })
 
+  // YouTube's embed player shows an error for this segment, and /shorts/ answers 404.
+  it('should read the embed path id whole', () => {
+    const value = 'http://www.youtube.com/embed/OgiAa5Xi6ok&t=6s'
+
+    expect(extractVideoId(value)).toBeUndefined()
+  })
+
+  it('should read the shorts path id whole', () => {
+    const value = 'https://www.youtube.com/shorts/OgiAa5Xi6ok&t=6s'
+
+    expect(extractVideoId(value)).toBeUndefined()
+  })
+
+  // YouTube redirects youtu.be/{id}&t=6s to the watch page and plays /live/{id}&t=6s itself.
+  it('should read the id head of a youtu.be path with a glued query', () => {
+    const value = 'https://youtu.be/OgiAa5Xi6ok&t=6s'
+
+    expect(extractVideoId(value)).toBe('OgiAa5Xi6ok')
+  })
+
+  it('should read the id head of a live path with a glued query', () => {
+    const value = 'https://www.youtube.com/live/OgiAa5Xi6ok&t=6s'
+
+    expect(extractVideoId(value)).toBe('OgiAa5Xi6ok')
+  })
+
   it('should return undefined for embed url with no id', () => {
     const value = 'https://www.youtube.com/embed/'
 
@@ -313,18 +339,11 @@ describe('youtubeResolveEmbed', () => {
     expect(youtubeResolveEmbed(value)?.src).toBe(expected)
   })
 
-  it('should carry the offset the Flash-era path spelling leaves after the id', () => {
+  // YouTube's player answers this src with its error screen, so it is not cut back to the id.
+  it('should not resolve an embed path with an offset glued onto the id', () => {
     const value = 'http://www.youtube.com/embed/OgiAa5Xi6ok&t=6s'
-    const expected: EmbedResolverResult = {
-      provider: 'youtube',
-      id: 'OgiAa5Xi6ok',
-      src: 'https://www.youtube.com/embed/OgiAa5Xi6ok?start=6',
-      url: 'https://www.youtube.com/watch?v=OgiAa5Xi6ok',
-      thumbnail: 'https://i.ytimg.com/vi/OgiAa5Xi6ok/hqdefault.jpg',
-      ratio: '16/9',
-    }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(value)).toBeUndefined()
   })
 
   it('should carry a fragment offset over as the start', () => {

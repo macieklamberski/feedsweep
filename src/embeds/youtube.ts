@@ -71,11 +71,20 @@ export const composeEmbedUrl = (videoId: string, params?: Record<string, string>
   return `https://www.youtube.com/embed/${videoId}${query}`
 }
 
+// YouTube answers `{id}&t=6s` as the video on youtu.be, its page routes and the Flash `/v/` player,
+// so there the id is the segment's head. Its embed player shows an error for that segment and
+// `/shorts/` answers 404, so on those two routes the segment is read whole.
+const wholeSegmentRoutes = ['embed', 'shorts']
+
+const readCandidate = (candidate: string): string => {
+  return splitStrayParams(candidate.replace(strayLeadingQuoteRegex, '')).head
+}
+
 const readPathId = (url: URL): string | undefined => {
   const segments = getPathSegments(url)
 
   if (url.hostname === 'youtu.be' || url.hostname.endsWith('.youtu.be')) {
-    return segments[0]
+    return segments[0] ? readCandidate(segments[0]) : undefined
   }
 
   let index = 0
@@ -86,7 +95,15 @@ const readPathId = (url: URL): string | undefined => {
 
   // A path opening with no route word names no video: a bare vanity channel url would otherwise
   // read as one whenever the name happens to be eleven legal characters.
-  return index > 0 ? segments[index] : undefined
+  if (index === 0 || !segments[index]) {
+    return
+  }
+
+  if (wholeSegmentRoutes.includes(segments[index - 1] ?? '')) {
+    return segments[index].replace(strayLeadingQuoteRegex, '')
+  }
+
+  return readCandidate(segments[index])
 }
 
 export const extractVideoId = (link: string): string | undefined => {
@@ -96,19 +113,14 @@ export const extractVideoId = (link: string): string | undefined => {
     return
   }
 
-  const candidates = [
-    readPathId(url),
+  const otherCandidates = [
     ...queryIdParams.map((param) => url.searchParams.get(param)),
     url.hash.match(hashbangIdRegex)?.[1],
     url.hash.match(gridFragmentIdRegex)?.[1],
-  ]
+  ].map((candidate) => (candidate ? readCandidate(candidate) : undefined))
+  const candidates = [readPathId(url), ...otherCandidates]
 
-  // The Flash player wrote `/v/{id}&hl=en_US&fs=1`, so the id is the segment's head.
-  return candidates
-    .map((candidate) =>
-      candidate ? splitStrayParams(candidate.replace(strayLeadingQuoteRegex, '')).head : undefined,
-    )
-    .find((candidate) => !!candidate && isVideoId(candidate))
+  return candidates.find((candidate) => !!candidate && isVideoId(candidate))
 }
 
 // A clip embed needs both `clip` and `clipt`, and `loop` does nothing without `playlist`, which in
@@ -143,8 +155,7 @@ const parseWatchOffset = (value: string): string | undefined => {
 }
 
 // The player ignores `t`, so an offset moves over as `start` unless one is stated. Besides the
-// query, the Flash-era spelling left it in the path as `/embed/{id}&t=6s`, and publishers write it
-// in the fragment as `#t=220`.
+// query, publishers write it in the fragment as `#t=220`.
 const readEmbedParams = (url: string): Record<string, string> => {
   const parsed = parseUrl(url, placeholderBaseUrl)
   const params = pickQueryParams(parsed?.search ?? '', youtubeEmbedParams)
@@ -153,11 +164,7 @@ const readEmbedParams = (url: string): Record<string, string> => {
     return params
   }
 
-  const offsetQueries = [
-    parsed.search,
-    splitStrayParams(parsed.pathname).strayParams,
-    parsed.hash.slice(1),
-  ]
+  const offsetQueries = [parsed.search, parsed.hash.slice(1)]
   const start = offsetQueries
     .map((query) => parseWatchOffset(new URLSearchParams(query).get('t') ?? ''))
     .find(Boolean)
