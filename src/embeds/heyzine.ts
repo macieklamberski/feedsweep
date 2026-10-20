@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isHostOf, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -12,6 +12,9 @@ const provider = 'heyzine'
 
 // Listed exactly, not by subdomain: cdnm.heyzine.com serves the uploaded PDFs.
 const heyzineHosts = ['heyzine.com', 'www.heyzine.com', 'cdn.heyzine.com']
+// Paid custom domains serve an account's flipbooks at the root, `{account}.aflip.in/{name}`. A
+// book can live on its custom domain alone, so the mint keeps the host.
+const customDomainHosts = ['aflip.in', 'hflip.co']
 
 // The embed id is ten hexadecimal characters, with or without the `.html` the snippet writes.
 // The viewer answers the id in either case.
@@ -41,9 +44,45 @@ const readFlipBook = (name: string): FlipBook | undefined => {
   }
 }
 
+// A custom domain serves a name with `.html` only when the publisher wrote it into the name, and
+// then serves it without too, so the key drops it.
+const readCustomFlipBook = (name: string): FlipBook | undefined => {
+  if (!name) {
+    return
+  }
+
+  return {
+    id: name.replace(htmlExtensionRegex, '').toLowerCase(),
+    path: name,
+  }
+}
+
+const readPage = (parsed: URL): string => {
+  return parsed.hash.match(pageFragmentRegex)?.[0] ?? ''
+}
+
 // Heyzine's flipbook viewer, which renders on its own and is its own page.
 export const heyzineResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
+
+  if (parsed && isHostOrSubdomainOf(parsed, customDomainHosts)) {
+    const [name = '', ...rest] = getPathSegments(parsed)
+    const flipBook = readCustomFlipBook(name)
+
+    if (!flipBook || rest.length) {
+      return
+    }
+
+    const src = `https://${parsed.hostname}/${flipBook.path}${readPage(parsed)}`
+
+    return {
+      provider,
+      id: flipBook.id,
+      src,
+      url: src,
+      ratio: '490/600',
+    }
+  }
 
   if (!parsed || !isHostOf(parsed, heyzineHosts)) {
     return
@@ -56,8 +95,7 @@ export const heyzineResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const page = parsed.hash.match(pageFragmentRegex)?.[0] ?? ''
-  const src = `https://heyzine.com/flip-book/${flipBook.path}${page}`
+  const src = `https://heyzine.com/flip-book/${flipBook.path}${readPage(parsed)}`
 
   return {
     provider,
@@ -68,4 +106,7 @@ export const heyzineResolveEmbed: ResolveEmbed = (url) => {
   }
 }
 
-export const heyzineEmbedResolver = createUrlEmbedResolver(heyzineHosts, heyzineResolveEmbed)
+export const heyzineEmbedResolver = createUrlEmbedResolver(
+  [...heyzineHosts, ...customDomainHosts],
+  heyzineResolveEmbed,
+)
