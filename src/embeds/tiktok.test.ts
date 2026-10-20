@@ -152,6 +152,25 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should recover a clip id that is not numeric from the cite as written', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          cite="https://www.tiktok.com/@user/video/ZMabc123"
+          data-video-id=""
+        ></blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@user/video/ZMabc123',
+        src: 'https://www.tiktok.com/embed/v2/ZMabc123',
+        url: 'https://www.tiktok.com/@user/video/ZMabc123',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read the caption and author from the paragraph-wrapped shape', async () => {
       // The shape the default pipeline hands to convertWidgets: earlier transforms have
       // wrapped the section's bare author and sound anchors into paragraphs of their own.

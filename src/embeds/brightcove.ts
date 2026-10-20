@@ -2,7 +2,7 @@ import type { Nullish } from 'trousse'
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches, paramValue } from '../utils/dom.js'
-import { composeQuery, digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brightcove'
@@ -160,9 +160,7 @@ export const brightcoveExperienceEmbedResolver = createMarkupEmbedResolver(
   'object.BrightcoveExperience',
   (element) => {
     const videoId = paramValue(element, '@videoplayer')
-    const account = videoId
-      ? keepIfMatches(readPlayerKeyAccount(paramValue(element, 'playerkey')), digitsRegex)
-      : undefined
+    const account = videoId ? readPlayerKeyAccount(paramValue(element, 'playerkey')) : undefined
 
     if (!videoId || !account) {
       return

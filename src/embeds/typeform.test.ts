@@ -212,6 +212,19 @@ describe('typeformResolveEmbed', () => {
     expect(typeformResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should resolve a form id outside the alphanumeric alphabet as written', () => {
+    const value = 'https://form.typeform.com/to/MTt3-Pw7K'
+    const expected: EmbedResolverResult = {
+      provider: 'typeform',
+      id: 'MTt3-Pw7K',
+      src: value,
+      url: value,
+      height: 500,
+    }
+
+    expect(typeformResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should resolve a per-account subdomain to the canonical form url', () => {
     const value = 'https://sessionlab.typeform.com/to/WCfVwJTK'
     const expected: EmbedResolverResult = {

@@ -119,12 +119,6 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a locale prefix that is not a language code', async () => {
-      const value = html`<iframe src="https://wordwall.net/e5s/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore an id segment with a non-hex letter inside it', async () => {
       const value = html`<iframe src="https://wordwall.net/embed/deadzone"></iframe>`
 
@@ -139,6 +133,18 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should read past a locale prefix of any shape', async () => {
+      const value = html`<iframe src="https://wordwall.net/e5s/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'wordwall',
+        id: 'd4e3c25ffe7545a19a8b0cd802f68f4d',
+        src: 'https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d',
+        ratio: '500/380',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should state no size and no thumbnail of its own', async () => {
       const value = html`<iframe src="https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
       const expected: EmbedResolverResult = {

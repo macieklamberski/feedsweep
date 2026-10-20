@@ -1,16 +1,12 @@
 import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { attr } from '../utils/dom.js'
+import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'vidyard'
 
 const vidyardHosts = ['play.vidyard.com']
-
-// Every carrier names the video with the same uuid, so one key serves them. The alphabet is what
-// refuses `{uuid}.jpg` and `{uuid}.js`, which share the player's root segment.
-const uuidRegex = /^[A-Za-z0-9]+$/
 
 // The player sits at the root as `{uuid}.html`, or with no extension where `embed/v4.js` writes
 // the iframe, so the single segment is what tells it from `embed/v4.js`.
@@ -32,9 +28,10 @@ const composeEmbed = (uuid: string, thumbnail?: string): EmbedResolverResult => 
 
 const vidyardResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
-  const uuid = keepIfMatches(parsed?.pathname.match(playerPathRegex)?.[1], uuidRegex)
+  const uuid = parsed?.pathname.match(playerPathRegex)?.[1]
 
-  if (!uuid) {
+  // `{uuid}.jpg` and `{uuid}.js` share the player's root segment.
+  if (!uuid || isFileName(uuid)) {
     return
   }
 

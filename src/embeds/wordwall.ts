@@ -9,8 +9,6 @@ const wordwallHosts = ['wordwall.net', 'www.wordwall.net']
 
 const activityIdRegex = /^[0-9a-f]+$/i
 
-const localeRegex = /^[a-z]+(?:-[a-z]+)?$/i
-
 // `templateId` picks the game the activity is played as, over the one the activity stores.
 const playParams = ['templateId']
 
@@ -39,10 +37,6 @@ const extractActivityId = (link: string): string | undefined => {
   const idIndex = locale ? 2 : 1
 
   if (segments[idIndex - 1] !== 'embed') {
-    return
-  }
-
-  if (locale && !localeRegex.test(locale)) {
     return
   }
 
