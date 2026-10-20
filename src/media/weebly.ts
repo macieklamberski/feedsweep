@@ -9,8 +9,8 @@ const audioPlayerPath = '/weebly/apps/audioPlayer2.swf'
 // The upload path is /uploads/b/{user}-{pathId}/{name}, which only the poster url carries.
 const posterUrlRegex = /url\(\s*['"]?([^'")]*\/uploads\/[^'")]+)['"]?\s*\)/
 
-// Some posters arrive as //www.weebly.comhttp://{site}/uploads/…, the site origin concatenated
-// onto an absolute url. The url after the prefix is the one that serves.
+// Weebly's feed exporter prepends the site origin to the page's //www.weebly.com/uploads/… poster,
+// giving //www.weebly.comhttp://{site}/uploads/…. The url after the prefix is the one that serves.
 const mangledPosterPrefixRegex = /^\/\/www\.weebly\.com(?=https?:\/\/)/
 
 // A wrapper already holding a real player is a third-party embed sitting in Weebly's video
