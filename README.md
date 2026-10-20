@@ -67,7 +67,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `hoistBlocksFromParagraphs` | Hoist block elements out of enclosing paragraphs, keeping only halves that still render |
 | `wrapCargoGalleryImages` | Wrap Cargo portfolio captions and images in `<figure>` blocks so they stay apart |
 | `injectEnclosures` | Inject feed enclosures as native media or embed placeholders, collapsing a media group to one rendition and merging a player page entry with its media file; an image enclosure injects only when the content has no image of its own, captioned with its description; anything else becomes a `data-file-*` placeholder, after the content |
-| `surfaceParkedMarkup` | Dissolve a lazy-loader container (`div.load-later[data-content]`) into the percent-encoded embed markup it holds, whatever platform that turns out to be |
+| `surfaceParkedMarkup` | Dissolve a container holding an embed encoded in an attribute, a lazy loader's `div.load-later` or a Borlabs Cookie content blocker, into the markup it holds |
 | `rebuildPublicalbumGalleries` | Rebuild a Publicalbum Google Photos album widget into its photos as linked images under a captioned `<figure>` |
 | `surfaceTemplateEmbeds` | Hoist a video embed out of a lazy-load `<template>` (e.g. Better Core Video Embeds) so it renders in a reader |
 | `unwrapDrupalOembedIframes` | Point a Drupal media oEmbed proxy frame (`/media/oembed?url=`) at the page url it wraps |
@@ -83,6 +83,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildLazyLoadForVideos` | Rebuild a real `<iframe>` from a "Lazy Load for Videos" facade (`a.preview-lazyload`), recovering the YouTube/Vimeo id from `data-video-uri` or `href` and carrying over `data-video-title` |
 | `rebuildLazyYtEmbeds` | Rebuild a real `<iframe>` from a lazy YouTube facade parking the id in a data attribute (`data-youtube-id`, `data-youtube`, `.youtube-embed`, `.youtube-player`) |
 | `rebuildElementorVideoEmbeds` | Rebuild a real `<iframe>` from an Elementor video widget's deferred `data-settings` (YouTube / Vimeo / Dailymotion / VideoPress) |
+| `rebuildEmbedPrivacyLinks` | Rebuild the link an Embed Privacy feed carries in place of an embed into that url's frame, when a resolver claims the url |
 | `rebuildEmbedlyEmbeds` | Unwrap an Embedly media widget to the inner provider iframe, carrying the poster as `data-thumbnail` |
 | `rebuildDocumentcloudEmbeds` | Rebuild a real `<iframe>` from DocumentCloud's old viewer snippet onto the document's embed page, reading the document from the inline `DV.load` call |
 | `rebuildGettyImagesEmbeds` | Rebuild a real `<iframe>` from a Getty Images `gie` widget facade, composing the player URL from the inline config the loader script never runs |
