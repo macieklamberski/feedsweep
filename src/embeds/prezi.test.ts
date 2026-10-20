@@ -98,6 +98,18 @@ describe('preziResolveEmbed', () => {
 
       expect(preziResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should link a 40-character hex id to its page with no player', () => {
+      const value =
+        'http://prezi.com/embed/b07154b2490642b0394646bef079b4739db3ed9c/?bgcolor=ffffff&lock_to_path=0&autoplay=no&autohide_ctrls=0&features=undefined&disabled_features=undefined'
+      const expected: EmbedResolverResult = {
+        provider: 'prezi',
+        id: 'b07154b2490642b0394646bef079b4739db3ed9c',
+        url: 'https://prezi.com/p/b07154b2490642b0394646bef079b4739db3ed9c/',
+      }
+
+      expect(preziResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -358,6 +370,64 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should link the 40-character hex id of a Flash loader to its page with no player', async () => {
+      const value = html`
+        <object
+          id="prezi_38ee474153c5296958444a7a3554e8d27453f099"
+          name="prezi_38ee474153c5296958444a7a3554e8d27453f099"
+          classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+          width="550"
+          height="400"
+        >
+          <param
+            name="movie"
+            value="http://prezi.com/bin/preziloader.swf"
+          />
+          <param
+            name="flashvars"
+            value="prezi_id=38ee474153c5296958444a7a3554e8d27453f099&amp;lock_to_path=0&amp;color=ffffff&amp;autoplay=no&amp;autohide_ctrls=0"
+          />
+          <embed
+            id="preziEmbed_38ee474153c5296958444a7a3554e8d27453f099"
+            name="preziEmbed_38ee474153c5296958444a7a3554e8d27453f099"
+            src="http://prezi.com/bin/preziloader.swf"
+            type="application/x-shockwave-flash"
+            allowfullscreen="true"
+            allowscriptaccess="always"
+            width="550"
+            height="400"
+            bgcolor="#ffffff"
+            flashvars="prezi_id=38ee474153c5296958444a7a3554e8d27453f099&amp;lock_to_path=0&amp;color=ffffff&amp;autoplay=no&amp;autohide_ctrls=0"
+          />
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'prezi',
+        id: '38ee474153c5296958444a7a3554e8d27453f099',
+        url: 'https://prezi.com/p/38ee474153c5296958444a7a3554e8d27453f099/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should link the 40-character hex id of a legacy embed frame to its page with no player', async () => {
+      const value = html`
+        <iframe
+          frameborder="0"
+          height="400"
+          src="http://prezi.com/embed/b07154b2490642b0394646bef079b4739db3ed9c/?bgcolor=ffffff&amp;lock_to_path=0&amp;autoplay=no&amp;autohide_ctrls=0&amp;features=undefined&amp;disabled_features=undefined"
+          width="550"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'prezi',
+        id: 'b07154b2490642b0394646bef079b4739db3ed9c',
+        url: 'https://prezi.com/p/b07154b2490642b0394646bef079b4739db3ed9c/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -470,6 +540,74 @@ describeForEachParser('the Flash object other Flash readers could claim first', 
         data-embed-ratio="550/400"
         data-embed-src="https://prezi.com/p/bsno4idxinyc/embed"
         data-embed-url="https://prezi.com/p/bsno4idxinyc/"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('the 40-character hex ids Prezi no longer serves', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should turn the Flash player into a placeholder with no player', async () => {
+    const value = html`
+      <object
+        id="prezi_38ee474153c5296958444a7a3554e8d27453f099"
+        name="prezi_38ee474153c5296958444a7a3554e8d27453f099"
+        classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+        width="550"
+        height="400"
+      >
+        <param
+          name="movie"
+          value="http://prezi.com/bin/preziloader.swf"
+        />
+        <param
+          name="flashvars"
+          value="prezi_id=38ee474153c5296958444a7a3554e8d27453f099&amp;lock_to_path=0&amp;color=ffffff&amp;autoplay=no&amp;autohide_ctrls=0"
+        />
+        <embed
+          id="preziEmbed_38ee474153c5296958444a7a3554e8d27453f099"
+          name="preziEmbed_38ee474153c5296958444a7a3554e8d27453f099"
+          src="http://prezi.com/bin/preziloader.swf"
+          type="application/x-shockwave-flash"
+          allowfullscreen="true"
+          allowscriptaccess="always"
+          width="550"
+          height="400"
+          bgcolor="#ffffff"
+          flashvars="prezi_id=38ee474153c5296958444a7a3554e8d27453f099&amp;lock_to_path=0&amp;color=ffffff&amp;autoplay=no&amp;autohide_ctrls=0"
+        />
+      </object>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="prezi"
+        data-embed-id="38ee474153c5296958444a7a3554e8d27453f099"
+        data-embed-url="https://prezi.com/p/38ee474153c5296958444a7a3554e8d27453f099/"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should turn the legacy embed frame into a placeholder with no player', async () => {
+    const value = html`
+      <iframe
+        frameborder="0"
+        height="400"
+        src="http://prezi.com/embed/b07154b2490642b0394646bef079b4739db3ed9c/?bgcolor=ffffff&amp;lock_to_path=0&amp;autoplay=no&amp;autohide_ctrls=0&amp;features=undefined&amp;disabled_features=undefined"
+        width="550"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="prezi"
+        data-embed-id="b07154b2490642b0394646bef079b4739db3ed9c"
+        data-embed-url="https://prezi.com/p/b07154b2490642b0394646bef079b4739db3ed9c/"
       ></div>
     `
 

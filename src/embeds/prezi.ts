@@ -14,6 +14,8 @@ const elementIdRegex = /^prezi(?:Embed)?_(.+)/
 // Classic ids are 12 characters and share tokens 20. A share token's page lives on `/view/{id}/`,
 // and `/p/{id}/` answers 404 for it, while a classic id's page answers only on `/p/{id}/`.
 const shareTokenLength = 20
+// Prezi answers 404 for a 40-character hex id on every player and page route.
+const hexIdLength = 40
 
 const composePageUrl = (id: string): string => {
   if (id.length === shareTokenLength) {
@@ -24,6 +26,14 @@ const composePageUrl = (id: string): string => {
 }
 
 const composeEmbed = (id: string, route = 'p'): EmbedResolverResult => {
+  if (id.length === hexIdLength) {
+    return {
+      provider: 'prezi',
+      id,
+      url: composePageUrl(id),
+    }
+  }
+
   return {
     provider: 'prezi',
     id,
