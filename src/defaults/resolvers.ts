@@ -309,6 +309,7 @@ import { stravaIframeEmbedResolver, stravaPlaceholderEmbedResolver } from '../em
 import { strawpollIframeEmbedResolver, strawpollMountEmbedResolver } from '../embeds/strawpoll.js'
 import {
   streamableIframeEmbedResolver,
+  streamableMlbEmbedResolver,
   streamableWidgetEmbedResolver,
 } from '../embeds/streamable.js'
 import { subsplashEmbedResolver } from '../embeds/subsplash.js'
@@ -780,6 +781,7 @@ const embedResolvers: Array<EmbedResolver> = [
   strawpollIframeEmbedResolver,
   strawpollMountEmbedResolver,
   streamableIframeEmbedResolver,
+  streamableMlbEmbedResolver,
   streamableWidgetEmbedResolver,
   subsplashEmbedResolver,
   swayEmbedResolver,
