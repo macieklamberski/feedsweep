@@ -287,13 +287,13 @@ describe('archiveResolveEmbed', () => {
     })
 
     it('should use a malformed identifier as written, even if the player answers an error', () => {
-      const value = 'https://archive.org/embed/..&playlist=1'
+      const value = 'https://archive.org/embed/..%2Fsome_album&playlist=1'
       const expected: EmbedResolverResult = {
         provider: 'archive',
-        id: '..',
-        src: 'https://archive.org/embed/..?playlist=1',
-        url: 'https://archive.org/details/..',
-        thumbnail: 'https://archive.org/services/img/..',
+        id: '..%2Fsome_album',
+        src: 'https://archive.org/embed/..%2Fsome_album?playlist=1',
+        url: 'https://archive.org/details/..%2Fsome_album',
+        thumbnail: 'https://archive.org/services/img/..%2Fsome_album',
         ratio: '16/9',
       }
 

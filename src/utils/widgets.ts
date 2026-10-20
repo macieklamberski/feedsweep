@@ -1,4 +1,5 @@
 import {
+  fixMalformedQuery,
   isAnyOf,
   isHostOrSubdomainOf,
   type MaybePromise,
@@ -224,7 +225,8 @@ export const createUrlEmbedResolver = (
         return
       }
 
-      return decideSize(element, extract(src, element), options.readCarrierSize)
+      // Only a resolver reads the repaired url: a frame no resolver claims keeps the src as written.
+      return decideSize(element, extract(fixMalformedQuery(src), element), options.readCarrierSize)
     },
   }
 }

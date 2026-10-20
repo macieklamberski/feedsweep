@@ -1599,6 +1599,44 @@ describeForEachParser('readCarrierUrl', (parseHtml) => {
 
     expect(read(value)).toBe('https://player.example.com/p/662741/embed.js')
   })
+
+  it('should keep a query glued onto the path as written', () => {
+    const value = '<iframe src="https://player.example.com/embed/abc&autoplay=1"></iframe>'
+
+    expect(read(value)).toBe('https://player.example.com/embed/abc&autoplay=1')
+  })
+})
+
+describeForEachParser('createUrlEmbedResolver', (parseHtml) => {
+  const resolver = createUrlEmbedResolver(['x.test'], (url) => {
+    return { provider: 'example', id: 'abc', src: url }
+  })
+
+  const extract = (value: string) => {
+    return resolver.extract(parseHtml(value).body.firstElementChild as Element)
+  }
+
+  it('should hand the resolver a query glued onto the path as a query', () => {
+    const value = '<iframe src="https://x.test/embed/abc&autoplay=1"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc',
+      src: 'https://x.test/embed/abc?autoplay=1',
+    }
+
+    expect(extract(value)).toEqual(expected)
+  })
+
+  it('should hand the resolver a question mark inside a value as a separator', () => {
+    const value = '<iframe src="https://x.test/embed/abc?list=PL1?autoplay=1"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc',
+      src: 'https://x.test/embed/abc?list=PL1&autoplay=1',
+    }
+
+    expect(extract(value)).toEqual(expected)
+  })
 })
 
 describeForEachParser('resolveEmbedProbe', (parseHtml) => {

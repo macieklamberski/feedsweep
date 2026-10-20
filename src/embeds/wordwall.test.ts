@@ -83,10 +83,16 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore an id carrying a query separator', async () => {
+    it('should read the id before a query glued on with an ampersand', async () => {
       const value = html`<iframe src="https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d&a=1"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'wordwall',
+        id: 'd4e3c25ffe7545a19a8b0cd802f68f4d',
+        src: 'https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d',
+        ratio: '500/380',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a locale carrying a query separator', async () => {

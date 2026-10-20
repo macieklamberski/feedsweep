@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOrSubdomainOf, parseUrl } from 'trousse'
+import { fixMalformedQuery, getPathSegments, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar, flashVars } from '../utils/dom.js'
 import {
@@ -7,7 +7,6 @@ import {
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
-  splitStrayParams,
 } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
@@ -28,36 +27,27 @@ const fileRoutes = ['embed', 'details']
 
 type SegmentParts = {
   head: string
-  strayParams: string
   file: string
 }
 
 // archive.org's own details pages write `embed/{identifier}&playlist=1` into their player meta,
 // an ampersand where the query should begin. Its player still served that spelling in 2023 and
 // answers 404 for it now, while `?playlist=1` answers 200.
-const readSegmentParts = (link: string): SegmentParts => {
-  const [route = '', segment = '', ...rest] = getPathSegments(link)
-  const { head, strayParams } = splitStrayParams(itemRoutes.includes(route) ? segment : '')
+const parseArchiveUrl = (link: string): URL | undefined => {
+  return parseUrl(fixMalformedQuery(link), placeholderBaseUrl)
+}
 
-  // The tail can hold a url, `&poster=https://archive.org/download/…`, whose slashes split it
-  // into further segments. It is read whole from the raw path, so none of it becomes a file.
-  if (strayParams) {
-    return {
-      head,
-      strayParams: splitStrayParams(parseUrl(link, placeholderBaseUrl)?.pathname ?? '').strayParams,
-      file: '',
-    }
-  }
+const readSegmentParts = (url: URL | undefined): SegmentParts => {
+  const [route = '', segment = '', ...rest] = url ? getPathSegments(url) : []
 
   return {
-    head,
-    strayParams,
+    head: itemRoutes.includes(route) ? segment : '',
     file: fileRoutes.includes(route) ? rest.join('/') : '',
   }
 }
 
 export const extractArchiveIdentifier = (link: string): string | undefined => {
-  const { head } = readSegmentParts(link)
+  const { head } = readSegmentParts(parseArchiveUrl(link))
 
   if (!head) {
     return
@@ -104,19 +94,15 @@ const declaresAudioPlayer = (element: Element): boolean => {
 }
 
 const readItemEmbed = (url: string): EmbedResolverResult | undefined => {
-  const { head: identifier, strayParams, file } = readSegmentParts(url)
+  const parsed = parseArchiveUrl(url)
+  const { head: identifier, file } = readSegmentParts(parsed)
 
   if (!identifier) {
     return
   }
 
-  // The parameters that say what plays are carried over; the rest is dropped. Anything the
-  // ampersand form stranded in the path is read alongside the real query.
-  const search = parseUrl(url, placeholderBaseUrl)?.search ?? ''
-  const query = composeQuery({
-    ...pickQueryParams(search, archiveEmbedParams),
-    ...pickQueryParams(strayParams, archiveEmbedParams),
-  })
+  // The parameters that say what plays are carried over; the rest is dropped.
+  const query = composeQuery(pickQueryParams(parsed?.search ?? '', archiveEmbedParams))
 
   return composeEmbedResult(identifier, query, file)
 }

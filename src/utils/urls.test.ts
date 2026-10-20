@@ -11,7 +11,6 @@ import {
   pickUrlParams,
   resolveOrDropUrl,
   resolveOrKeepUrl,
-  splitStrayParams,
 } from './urls.js'
 
 describe('parseUrlOnHosts', () => {
@@ -179,28 +178,6 @@ describe('cleanUrl', () => {
 
     expect(cleanUrl(undefined, { ...baseContext, cleanUrlFn })).toBeUndefined()
     expect(called).toBe(false)
-  })
-})
-
-describe('splitStrayParams', () => {
-  it('should split the id from the tail at the first ampersand', () => {
-    const value = 'mhrk1978&playlist=1&autoplay=1'
-    const expected = { head: 'mhrk1978', strayParams: 'playlist=1&autoplay=1' }
-
-    expect(splitStrayParams(value)).toEqual(expected)
-  })
-
-  it('should leave a clean segment whole', () => {
-    const value = 'mhrk1978'
-    const expected = { head: 'mhrk1978', strayParams: '' }
-
-    expect(splitStrayParams(value)).toEqual(expected)
-  })
-
-  it('should return an empty head for an empty segment', () => {
-    const expected = { head: '', strayParams: '' }
-
-    expect(splitStrayParams('')).toEqual(expected)
   })
 })
 

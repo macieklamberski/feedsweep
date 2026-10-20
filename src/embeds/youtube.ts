@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
+import { decodeSegment, fixMalformedQuery, getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
@@ -7,7 +7,6 @@ import {
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
-  splitStrayParams,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -89,8 +88,14 @@ const readPathId = (url: URL): string | undefined => {
   return index > 0 ? segments[index] : undefined
 }
 
+// The Flash player wrote `/v/{id}&hl=en_US&fs=1`, the query glued onto the id, and transforms
+// outside the resolver factory read urls here too.
+const parseYoutubeUrl = (link: string): URL | undefined => {
+  return parseUrl(fixMalformedQuery(link), placeholderBaseUrl)
+}
+
 export const extractVideoId = (link: string): string | undefined => {
-  const url = parseUrl(link, placeholderBaseUrl)
+  const url = parseYoutubeUrl(link)
 
   if (!url) {
     return
@@ -103,11 +108,8 @@ export const extractVideoId = (link: string): string | undefined => {
     url.hash.match(gridFragmentIdRegex)?.[1],
   ]
 
-  // The Flash player wrote `/v/{id}&hl=en_US&fs=1`, so the id is the segment's head.
   return candidates
-    .map((candidate) =>
-      candidate ? splitStrayParams(candidate.replace(strayLeadingQuoteRegex, '')).head : undefined,
-    )
+    .map((candidate) => candidate?.replace(strayLeadingQuoteRegex, ''))
     .find((candidate) => !!candidate && isVideoId(candidate))
 }
 
@@ -143,21 +145,16 @@ const parseWatchOffset = (value: string): string | undefined => {
 }
 
 // The player ignores `t`, so an offset moves over as `start` unless one is stated. Besides the
-// query, the Flash-era spelling left it in the path as `/embed/{id}&t=6s`, and publishers write it
-// in the fragment as `#t=220`.
+// query, publishers write it in the fragment as `#t=220`.
 const readEmbedParams = (url: string): Record<string, string> => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
+  const parsed = parseYoutubeUrl(url)
   const params = pickQueryParams(parsed?.search ?? '', youtubeEmbedParams)
 
   if (!parsed || params.start) {
     return params
   }
 
-  const offsetQueries = [
-    parsed.search,
-    splitStrayParams(parsed.pathname).strayParams,
-    parsed.hash.slice(1),
-  ]
+  const offsetQueries = [parsed.search, parsed.hash.slice(1)]
   const start = offsetQueries
     .map((query) => parseWatchOffset(new URLSearchParams(query).get('t') ?? ''))
     .find(Boolean)
@@ -269,7 +266,7 @@ const resolveCollectionEmbed = (
 }
 
 const resolveTarget = (url: string): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
+  const parsed = parseYoutubeUrl(url)
   const segments = parsed ? getPathSegments(parsed) : []
 
   if (segments[0] === 'embed' && parsed) {
@@ -298,7 +295,7 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   // `list=PL{id}`, and the swf it points at is dead, so the id is the only thing left to rebuild
   // from. The publisher's `?hl=` and `&fs=1` are player chrome and go with the rest of the query.
   if (segments[0] === 'p') {
-    const head = splitStrayParams(segments[1] ?? '').head
+    const head = segments[1] ?? ''
     // The id moves from a path segment into the query, so it is decoded first.
     const list = decodeSegment(head) ?? head
 
