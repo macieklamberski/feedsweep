@@ -475,6 +475,40 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should key a reference id that ends in digits under its account', async () => {
+      const value = html`
+        <video-js
+          data-account="1234567890"
+          data-video-id="ref:6098765432"
+        ></video-js>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '1234567890/ref:6098765432',
+        src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=ref%3A6098765432',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a free-text reference id as written', async () => {
+      const value = html`
+        <video-js
+          data-account="1234567890"
+          data-video-id="ref:Spring launch/2024 #1"
+        ></video-js>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '1234567890/ref:Spring launch/2024 #1',
+        src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=ref%3ASpring+launch%2F2024+%231',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   // The older Brightcove syntax, and the only shape the 26 corpus feeds shipping the loader
@@ -584,11 +618,23 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a reference id that ends in digits', async () => {
+    it('should return undefined for a reference prefix with no id after it', async () => {
       const value = html`
         <video-js
           data-account="1234567890"
-          data-video-id="ref:6098765432"
+          data-video-id="ref:"
+        ></video-js>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    // Brightcove's player answers "resource not found" for `REF:` on an id that plays as `ref:`.
+    it('should return undefined for an uppercase reference prefix', async () => {
+      const value = html`
+        <video-js
+          data-account="1234567890"
+          data-video-id="REF:6098765432"
         ></video-js>
       `
 
