@@ -330,6 +330,17 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore an open link on the legacy docs host', async () => {
+      const value = html`
+        <iframe
+          src="https://docs.google.com/open?id=1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_"
+          type="audio/mpeg"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore an open link with no file id', async () => {
       const value = html`
         <iframe

@@ -1,7 +1,7 @@
-import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'googledrive'
@@ -9,15 +9,9 @@ const provider = 'googledrive'
 // A link-shared file from before 2021 answers only with its resource key.
 const accessParams = ['resourcekey']
 
-const googledriveHosts = [
-  'docs.google.com', // Legacy spelling of the same file frame
-  'drive.google.com',
-]
-
 // The audio preview draws a card 206 tall at every width, and the virus-scan dialog it shows
 // for a file over 100 MB is 252 tall.
 const audioPlayerHeight = 252
-const filePlayerRatio = '4/3'
 
 // `/open?id={id}` redirects a file to its page and a folder to its listing, so only an audio
 // type says the id is a file.
@@ -31,9 +25,14 @@ const readFileId = (
   }
 
   if (isAudio && segments.length === 1 && segments[0] === 'open') {
-    return parseUrl(url, placeholderBaseUrl)?.searchParams.get('id') ?? undefined
+    return parseUrlOnHosts(url, 'drive.google.com')?.searchParams.get('id') ?? undefined
   }
 }
+
+const googledriveHosts = [
+  'docs.google.com', // Legacy spelling of the same file frame
+  'drive.google.com',
+]
 
 // `/file/d/{id}/preview` frames the file and `/file/d/{id}/view` is its page. A folder on
 // `/drive/folders` or `/embeddedfolderview` is a listing, not a file, and stays unclaimed.
@@ -50,8 +49,6 @@ export const googledriveResolveEmbed: ResolveEmbed = (url, element) => {
 
   const src = `https://drive.google.com/file/d/${fileId}/preview`
   const accessQuery = pickUrlParams(url, accessParams)
-  const height = isAudio ? audioPlayerHeight : undefined
-  const ratio = isAudio ? undefined : filePlayerRatio
 
   // The page and the thumbnail refuse a keyed file without its key, which stays in `src` alone.
   if (accessQuery) {
@@ -59,24 +56,29 @@ export const googledriveResolveEmbed: ResolveEmbed = (url, element) => {
       provider,
       id: fileId,
       src: `${src}${accessQuery}`,
-      height,
-      ratio,
+      height: isAudio ? audioPlayerHeight : undefined,
+      ratio: isAudio ? undefined : '4/3',
     }
   }
 
   // Drive renders no thumbnail for an audio file.
-  const thumbnail = isAudio
-    ? undefined
-    : `https://drive.google.com/thumbnail${composeQuery({ id: decodeSegment(fileId) ?? fileId, sz: 'w640' })}`
+  if (isAudio) {
+    return {
+      provider,
+      id: fileId,
+      src,
+      url: `https://drive.google.com/file/d/${fileId}/view`,
+      height: audioPlayerHeight,
+    }
+  }
 
   return {
     provider,
     id: fileId,
     src,
     url: `https://drive.google.com/file/d/${fileId}/view`,
-    thumbnail,
-    height,
-    ratio,
+    thumbnail: `https://drive.google.com/thumbnail${composeQuery({ id: decodeSegment(fileId) ?? fileId, sz: 'w640' })}`,
+    ratio: '4/3',
   }
 }
 
