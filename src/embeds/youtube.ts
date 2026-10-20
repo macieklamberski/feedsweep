@@ -253,9 +253,9 @@ const resolveCollectionEmbed = (
     return channel ? composeChannelEmbed(channel, encodePathSegment(channel)) : undefined
   }
 
-  // `/embed/videoseries?list=` and the bare `/embed/?list=` some WordPress plugins emit are the
-  // same playlist spelled two ways.
-  if (segments[1] !== 'videoseries' && segments.length !== 1) {
+  // `/embed/videoseries?list=`, `/embed/playlist?list=` and the bare `/embed/?list=` some
+  // WordPress plugins emit are the same playlist spelled three ways.
+  if (segments[1] !== 'videoseries' && segments[1] !== 'playlist' && segments.length !== 1) {
     return
   }
 

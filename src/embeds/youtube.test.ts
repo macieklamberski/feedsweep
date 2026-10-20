@@ -476,6 +476,23 @@ describe('youtubeResolveEmbed', () => {
     expect(youtubeResolveEmbed(value)).toEqual(expected)
   })
 
+  const playlistRouteUrls = [
+    'https://www.youtube.com/embed/playlist?list=PLS6tnpTr39sEdnMYtNP3U3C2AsQZycEyP',
+    'https://www.youtube-nocookie.com/embed/playlist?list=PLS6tnpTr39sEdnMYtNP3U3C2AsQZycEyP',
+  ]
+
+  it.each(playlistRouteUrls)('should rebuild %s onto the videoseries embed', (value) => {
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'playlist/PLS6tnpTr39sEdnMYtNP3U3C2AsQZycEyP',
+      src: 'https://www.youtube.com/embed/videoseries?list=PLS6tnpTr39sEdnMYtNP3U3C2AsQZycEyP',
+      url: 'https://www.youtube.com/playlist?list=PLS6tnpTr39sEdnMYtNP3U3C2AsQZycEyP',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should resolve a user_uploads embed to the channel uploads, posterless', () => {
     const value = 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser'
     const expected: EmbedResolverResult = {

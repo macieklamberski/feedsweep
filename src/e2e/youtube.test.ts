@@ -174,6 +174,29 @@ describeForEachParser('YouTube', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should rebuild a YouTube playlist route embed onto the videoseries player', async () => {
+    const value = html`
+      <iframe
+        width="560"
+        height="315"
+        src="https://www.youtube.com/embed/playlist?list=PLS6tnpTr39sEdnMYtNP3U3C2AsQZycEyP"
+        frameborder="0"
+        allowfullscreen
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="youtube"
+        data-embed-id="playlist/PLS6tnpTr39sEdnMYtNP3U3C2AsQZycEyP"
+        data-embed-src="https://www.youtube.com/embed/videoseries?list=PLS6tnpTr39sEdnMYtNP3U3C2AsQZycEyP"
+        data-embed-url="https://www.youtube.com/playlist?list=PLS6tnpTr39sEdnMYtNP3U3C2AsQZycEyP"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   it('should resolve a YouTube channel live embed to a posterless youtube placeholder', async () => {
     const value = html`
       <iframe src="https://www.youtube.com/embed/live_stream?channel=UCabc123"></iframe>
