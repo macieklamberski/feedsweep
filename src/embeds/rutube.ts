@@ -5,10 +5,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rutube'
 
-// Hex with at least one digit, so the route words feed and added, hex letters alone, are refused.
 // An id is a uuid with the dashes stripped, and the player still plays the all-digit ids the same
 // routes carried before.
-const safeVideoIdRegex = /^(?=[0-9a-f]*\d)[0-9a-f]+$/
+const videoIdCharactersRegex = /^[0-9a-f]+$/
 
 const rutubeHosts = ['rutube.ru']
 
@@ -44,7 +43,7 @@ export const rutubeResolveEmbed: ResolveEmbed = (url, element) => {
 
   const videoId = playlistPathRegex.test(parsed.pathname)
     ? parsed.searchParams.get('pl_video')
-    : keepIfMatches(parsed.pathname.match(embedPathRegex)?.[1], safeVideoIdRegex)
+    : keepIfMatches(parsed.pathname.match(embedPathRegex)?.[1], videoIdCharactersRegex)
 
   if (!videoId) {
     return

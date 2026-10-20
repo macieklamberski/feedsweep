@@ -7,21 +7,26 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'sketchfab'
 
 // A model uid is 32 hex characters, and it also ends the slugged page url
-// (`/3d-models/{slug}-{uid}`), which is how a pasted page link is read.
+// (`/3d-models/{slug}-{uid}`), which is how a pasted page link is read. The shape tells a uid from
+// the listing words that share the bare page route, such as `/models/popular`.
 const safeUidRegex = /^[0-9a-f]{32}$/i
 const sluggedUidRegex = /([0-9a-f]{32})$/i
+// Older models carry a 26-character uid in letters of both cases, which the viewer still plays.
+const uidCharactersRegex = /^[0-9A-Za-z]+$/
 
 const sketchfabHosts = ['sketchfab.com']
 
 const readModelUid = (parsed: URL): string | undefined => {
   const [route, second, third] = getPathSegments(parsed)
 
-  const isModelRoute = route === 'models' && (third === undefined || third === 'embed')
+  if (route === 'models' && third === undefined) {
+    return keepIfMatches(second, safeUidRegex)
+  }
 
   // The viewer is `/models/{uid}/embed`, which the retired `/embed/{uid}` and `/show/{uid}`
   // redirect to.
-  if (isModelRoute || route === 'embed' || route === 'show') {
-    return keepIfMatches(second, safeUidRegex)
+  if ((route === 'models' && third === 'embed') || route === 'embed' || route === 'show') {
+    return keepIfMatches(second, uidCharactersRegex)
   }
 
   if (route === '3d-models') {

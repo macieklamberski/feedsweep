@@ -111,6 +111,13 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a locale behind a separator', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/=zh-CN/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a locale whose language code carries a separator', async () => {
       const value =
         '<iframe src="https://www.ganjingworld.com/z=-CN/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c"></iframe>'
@@ -121,20 +128,6 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
     it('should ignore a locale whose region code carries a separator', async () => {
       const value =
         '<iframe src="https://www.ganjingworld.com/zh-C=/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a locale with a longer language code', async () => {
-      const value =
-        '<iframe src="https://www.ganjingworld.com/fil-PH/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a locale with a longer region code', async () => {
-      const value =
-        '<iframe src="https://www.ganjingworld.com/en-USA/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -190,6 +183,34 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
         id: '1fv8993v57oI%2F3UiHioRJzFV1L1cq1c',
         src: 'https://www.ganjingworld.com/embed/1fv8993v57oI%2F3UiHioRJzFV1L1cq1c',
         url: 'https://www.ganjingworld.com/video/1fv8993v57oI%2F3UiHioRJzFV1L1cq1c',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a locale with a longer language code as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/fil-PH/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ganjingworld',
+        id: '1fv8993v57oI3UiHioRJzFV1L1cq1c',
+        src: 'https://www.ganjingworld.com/fil-PH/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c',
+        url: 'https://www.ganjingworld.com/fil-PH/video/1fv8993v57oI3UiHioRJzFV1L1cq1c',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a locale with a longer region code as written, even if the player answers an error', async () => {
+      const value =
+        '<iframe src="https://www.ganjingworld.com/en-USA/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ganjingworld',
+        id: '1fv8993v57oI3UiHioRJzFV1L1cq1c',
+        src: 'https://www.ganjingworld.com/en-USA/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c',
+        url: 'https://www.ganjingworld.com/en-USA/video/1fv8993v57oI3UiHioRJzFV1L1cq1c',
         ratio: '16/9',
       }
 

@@ -61,6 +61,19 @@ describe('standfmResolveEmbed', () => {
 
       expect(standfmResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should pass an id of another length inside the hex alphabet as written', () => {
+      const value = 'https://stand.fm/embed/episodes/6a8065825e9572e804f8a5'
+      const expected: EmbedResolverResult = {
+        provider: 'standfm',
+        id: 'episodes/6a8065825e9572e804f8a5',
+        src: 'https://stand.fm/embed/episodes/6a8065825e9572e804f8a5',
+        url: 'https://stand.fm/episodes/6a8065825e9572e804f8a5',
+        height: 190,
+      }
+
+      expect(standfmResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -70,8 +83,14 @@ describe('standfmResolveEmbed', () => {
       expect(standfmResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should state nothing for an id that is not a 24-character hex', () => {
+    it('should state nothing for an id outside the hex alphabet', () => {
       const value = 'https://stand.fm/episodes/not-an-object-id'
+
+      expect(standfmResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should state nothing for the route word in the id slot of the episode page', () => {
+      const value = 'https://stand.fm/episodes/new'
 
       expect(standfmResolveEmbed(value)).toBeUndefined()
     })
@@ -95,7 +114,7 @@ describe('standfmResolveEmbed', () => {
     })
 
     it('should state nothing for an id followed by an encoded slash', () => {
-      const value = 'https://stand.fm/episodes/6a8065825e9572e804f8a5cb%2F..'
+      const value = 'https://stand.fm/episodes/6a8065825e9572e804f8a5cb%2f'
 
       expect(standfmResolveEmbed(value)).toBeUndefined()
     })

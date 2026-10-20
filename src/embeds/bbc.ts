@@ -7,8 +7,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 // `bbc.co.uk` 301s every player route onto `bbc.com`.
 const bbcHosts = ['bbc.com', 'bbc.co.uk']
 
-// A programme id: eight letters and digits with at least one digit, which keeps `articles` out.
+// A programme id: eight letters and digits with at least one digit. Where no route fixes its slot,
+// the shape keeps `articles` and the playlist route word `index` out.
 const pidRegex = /^[a-z](?=[0-9a-z]*\d)[0-9a-z]{7}$/
+const pidCharactersRegex = /^[0-9a-z]+$/
 const playlistPathRegex = /\/playlist\/([^/.]+)/
 
 // The news and World Service players render at 16:9 of their width. BBC's own embed code states
@@ -19,6 +21,10 @@ const programmesPlayerRatio = '16/9'
 
 const isPid = (segment: string | undefined): segment is string => {
   return segment !== undefined && pidRegex.test(segment)
+}
+
+const isPidSlot = (segment: string | undefined): segment is string => {
+  return segment !== undefined && pidCharactersRegex.test(segment)
 }
 
 const isArticleId = (segment: string | undefined): segment is string => {
@@ -73,12 +79,12 @@ export const bbcResolveEmbed: ResolveEmbed = (url, element) => {
 
   // `/news/av/embed/{pid}/{article}` 301s to `/news/av-embeds/{article}/vpid/{pid}`, and the
   // player answers 404 when either the pid or the article is fabricated.
-  if (first === 'news' && second === 'av' && third === 'embed' && isPid(fourth)) {
+  if (first === 'news' && second === 'av' && third === 'embed' && isPidSlot(fourth)) {
     return isArticleId(fifth) ? composeNewsEmbed(fifth, fourth) : undefined
   }
 
   if (first === 'news' && second === 'av-embeds' && isArticleId(third) && fourth === 'vpid') {
-    return isPid(fifth) ? composeNewsEmbed(third, fifth) : undefined
+    return isPidSlot(fifth) ? composeNewsEmbed(third, fifth) : undefined
   }
 
   // `/ws/av-embeds/articles/{article}/{pid}/{lang}/` is the same player app as the news one.
@@ -97,7 +103,7 @@ export const bbcResolveEmbed: ResolveEmbed = (url, element) => {
     }
   }
 
-  if (first === 'programmes' && isPid(second) && third === 'player') {
+  if (first === 'programmes' && isPidSlot(second) && third === 'player') {
     return composeProgrammesEmbed(second)
   }
 }
