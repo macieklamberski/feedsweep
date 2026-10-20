@@ -66,6 +66,42 @@ describe('bbcResolveEmbed', () => {
 
       expect(bbcResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should pass a word in the pid slot of the news player as written', () => {
+      const value = 'https://www.bbc.com/news/av-embeds/46292361/vpid/latest'
+      const expected: EmbedResolverResult = {
+        provider: 'bbc',
+        id: 'latest',
+        src: 'https://www.bbc.com/news/av-embeds/46292361/vpid/latest',
+        ratio: '16/9',
+      }
+
+      expect(bbcResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should pass a nine-character pid on the pasted news player as written', () => {
+      const value = 'https://www.bbc.com/news/av/embed/xp06sf6tr/46292361'
+      const expected: EmbedResolverResult = {
+        provider: 'bbc',
+        id: 'xp06sf6tr',
+        src: 'https://www.bbc.com/news/av-embeds/46292361/vpid/xp06sf6tr',
+        ratio: '16/9',
+      }
+
+      expect(bbcResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should pass a nine-character pid on the programmes player as written', () => {
+      const value = 'https://www.bbc.co.uk/programmes/xp01tclqw/player'
+      const expected: EmbedResolverResult = {
+        provider: 'bbc',
+        id: 'xp01tclqw',
+        src: 'https://www.bbc.co.uk/programmes/xp01tclqw/player',
+        ratio: '16/9',
+      }
+
+      expect(bbcResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -90,18 +126,6 @@ describe('bbcResolveEmbed', () => {
 
     it('should return undefined for a news player naming no article', () => {
       const value = 'https://www.bbc.com/news/av/embed/p06sf6tr'
-
-      expect(bbcResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a news player whose pid is not one', () => {
-      const value = 'https://www.bbc.com/news/av-embeds/46292361/vpid/latest'
-
-      expect(bbcResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a pid behind a prefix', () => {
-      const value = 'https://www.bbc.com/news/av/embed/xp06sf6tr/46292361'
 
       expect(bbcResolveEmbed(value)).toBeUndefined()
     })

@@ -62,13 +62,40 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should resolve a model with the older 26-character uid', async () => {
+      const value = html`
+        <iframe
+          width="640"
+          height="480"
+          src="https://sketchfab.com/models/xvFkC5jSm9mMG8cCTLfyg1VKJB/embed"
+          frameborder="0"
+          allowfullscreen=""
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'sketchfab',
+        id: 'xvFkC5jSm9mMG8cCTLfyg1VKJB',
+        src: 'https://sketchfab.com/models/xvFkC5jSm9mMG8cCTLfyg1VKJB/embed',
+        url: 'https://sketchfab.com/models/xvFkC5jSm9mMG8cCTLfyg1VKJB',
+        ratio: '4/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
-    it('should ignore a uid that is not thirty-two hex characters', async () => {
+    it('should ignore a uid outside the viewer alphabet', async () => {
       const value = html`
-        <iframe src="https://sketchfab.com/models/00b8203bcdc2464bbac4b159be66e83/embed"></iframe>
+        <iframe src="https://sketchfab.com/models/00b8203b-cdc2-464b-bac4-b159be66e838/embed"></iframe>
       `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a listing word on the unslugged page url', async () => {
+      const value = html`<iframe src="https://sketchfab.com/models/popular"></iframe>`
 
       expect(await extract(value)).toBeUndefined()
     })

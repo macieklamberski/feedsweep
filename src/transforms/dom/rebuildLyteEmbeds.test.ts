@@ -276,10 +276,11 @@ describeForEachParser('rebuildLyteEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  it('should leave a thumbnail path that names no video id', async () => {
+  // With no API key the plugin writes a playlist's id into the thumbnail path a video id takes.
+  it('should leave the thumbnail of a playlist', async () => {
     const value = html`
       <a href="https://example.com/post/"><img
-          src="https://i.ytimg.com/vi/videoseries/hqdefault.jpg"
+          src="https://i.ytimg.com/vi/PLx0sYbCqOb8TBPRdmBHs5Iftvv9TPboYG/hqdefault.jpg"
           alt="YouTube Video"
         ></a>
     `

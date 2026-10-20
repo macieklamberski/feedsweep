@@ -8,7 +8,8 @@ const ganjingworldHosts = ['ganjingworld.com', 'ganjing.com']
 
 // The platform's locale segment is case-sensitive: `zh-CN` 301s onto the bare id, `zh-cn` 404s.
 // Only the platform's own spelling is claimed, so a lowercase one falls to the generic fallback.
-const localeRegex = /^[a-z]{2}-[A-Z]{2}$/
+// The hyphen and the case tell a locale from the route words that share its slot, such as `live`.
+const localeRegex = /^[a-z]+-[A-Z]+$/
 
 type Video = {
   locale?: string

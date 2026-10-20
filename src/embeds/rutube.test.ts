@@ -34,6 +34,19 @@ describe('rutubeResolveEmbed', () => {
       expect(rutubeResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should use a hex-letter word in the id slot as written, even if the player answers an error', () => {
+      const value = 'https://rutube.ru/play/embed/added'
+      const expected: EmbedResolverResult = {
+        provider: 'rutube',
+        id: 'added',
+        src: 'https://rutube.ru/play/embed/added',
+        url: 'https://rutube.ru/video/added/',
+        ratio: '16/9',
+      }
+
+      expect(rutubeResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should keep the access key a private video carries', () => {
       const value =
         'https://rutube.ru/play/embed/08fa24c07c55aa24504f0ac93f7c2d01/?p=KKiFZe0ka-lmMTIbZyvWig'
@@ -96,10 +109,20 @@ describe('rutubeResolveEmbed', () => {
       expect(rutubeResolveEmbed(value)).toBeUndefined()
     })
 
-    // The id alphabet is hex, so a word spelled in those letters sits in the id position without
-    // naming anything. A real id always carries a digit, which is what tells the two apart.
-    it('should return undefined for a hex-letter word in the id position', () => {
-      const value = 'https://rutube.ru/play/embed/added'
+    it('should ignore an id behind a letter outside the hex alphabet', () => {
+      const value = 'https://rutube.ru/play/embed/x73502f04b326cc20937a65e122a88cf8'
+
+      expect(rutubeResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore an id followed by a letter outside the hex alphabet', () => {
+      const value = 'https://rutube.ru/play/embed/73502f04b326cc20937a65e122a88cf8x'
+
+      expect(rutubeResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore an id carrying a percent escape', () => {
+      const value = 'https://rutube.ru/play/embed/73502f04b326cc20937a65e122a88cf8%3f'
 
       expect(rutubeResolveEmbed(value)).toBeUndefined()
     })
