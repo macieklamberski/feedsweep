@@ -8,8 +8,8 @@ const hostPrefixedUrlRegex =
   /^(https?:)\/\/[^/?#]+(?:\/[^/?#]+)*?(?<!:|%3a)\/+(?=\/(?:[a-z0-9-]+\.)+[a-z]{2,}\/)/i
 const hostPrefixedSrcTags = ['iframe', 'embed', 'script']
 
-// A protocol-relative src resolved against the page lands behind the site's own host,
-// `{scheme}//{site}//{host}/{path}`, sometimes with a third slash and sometimes behind the page's
+// Some sites join their own url onto a protocol-relative src as text, so the feed already holds
+// `{scheme}//{site}//{host}/{path}`, sometimes with a third slash and sometimes behind the site's
 // directory, `{site}/{dir}///{host}`, which the site does not serve. A run after `:` belongs to a
 // url carried in the path, such as a web archive's, so it stays.
 const stripSiteHostPrefix = (url: string): string => {
