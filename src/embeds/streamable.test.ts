@@ -4,6 +4,7 @@ import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import {
   streamableIframeEmbedResolver,
+  streamableMlbEmbedResolver,
   streamableRenderHint,
   streamableResolveEmbed,
   streamableWidgetEmbedResolver,
@@ -301,6 +302,130 @@ describeForEachParser('streamableIframeEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('streamableMlbEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, streamableMlbEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the clip out of the SB Nation MLB snippet', async () => {
+      const value = html`
+        <div class="mlb.com-embed">
+          <a
+            href="https://www.mlb.com/video/josh-rojas-homers-8-on-a-fly-ball-to-left-field"
+            target="_blank"
+            rel="noopener noreferrer"
+          >View Link</a>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'streamable',
+        id: 'm/josh-rojas-homers-8-on-a-fly-ball-to-left-field',
+        src: 'https://streamable.com/m/josh-rojas-homers-8-on-a-fly-ball-to-left-field',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the snippet spelled with a hyphen and drop the page query', async () => {
+      const value = html`
+        <div class="mlb-com-embed">
+          <a
+            href="https://www.mlb.com/video/junior-caminero-crushes-463-foot-home-run?q=Junior%20Caminero&amp;cp=CMS_FIRST&amp;qt=FREETEXT&amp;p=0"
+            target="_blank"
+            rel="noopener noreferrer"
+          >View Link</a>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'streamable',
+        id: 'm/junior-caminero-crushes-463-foot-home-run',
+        src: 'https://streamable.com/m/junior-caminero-crushes-463-foot-home-run',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it("should read a clip on a club's page", async () => {
+      const value = html`
+        <div class="mlb.com-embed">
+          <a
+            href="https://www.mlb.com/rockies/video/daniel-bard-in-play-out-s-to-will-smith?partnerId=web_video-playback-page_video-share"
+            target="_blank"
+            rel="noopener noreferrer"
+          >View Link</a>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'streamable',
+        id: 'm/daniel-bard-in-play-out-s-to-will-smith',
+        src: 'https://streamable.com/m/daniel-bard-in-play-out-s-to-will-smith',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host carrying the same path', async () => {
+      const value = html`
+        <div class="mlb.com-embed">
+          <a href="https://evil.test/video/josh-rojas-homers-8-on-a-fly-ball-to-left-field">View Link</a>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a legacy page whose slug the frame does not use', async () => {
+      const value = html`
+        <div class="mlb.com-embed">
+          <a href="https://www.mlb.com/video/happs-leaping-catch-into-ivy/c-2388489783?tid=51231442">View Link</a>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a fan reel, which has no frame', async () => {
+      const value = html`
+        <div class="mlb.com-embed">
+          <a href="https://www.mlb.com/video/00u7mjff3NboqTTTt356/reels/christian-walker-defense">View Link</a>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a clip path nested under two segments', async () => {
+      const value = html`
+        <div class="mlb.com-embed">
+          <a href="https://www.mlb.com/rockies/fans/video/daniel-bard-in-play-out-s-to-will-smith">View Link</a>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a page that is not a clip', async () => {
+      const value = html`
+        <div class="mlb.com-embed">
+          <a href="https://www.mlb.com/news/dodgers-roster-moves">View Link</a>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a snippet with no link', async () => {
+      const value = '<div class="mlb.com-embed"></div>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 describeForEachParser('streamableWidgetEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, streamableWidgetEmbedResolver)
 
@@ -379,6 +504,32 @@ describeForEachParser('streamable through the pipeline', (parseHtml) => {
         data-embed-id="0891o"
         data-embed-provider="streamable"
         data-embed-src="https://streamable.com/e/0891o"
+      ></div>
+      <p>After</p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should replace the SB Nation MLB snippet and keep the prose around it', async () => {
+    const value = html`
+      <p>Before</p>
+      <div class="mlb.com-embed">
+        <a
+          href="https://www.mlb.com/video/josh-rojas-homers-8-on-a-fly-ball-to-left-field"
+          target="_blank"
+          rel="noopener noreferrer"
+        >View Link</a>
+      </div>
+      <p>After</p>
+    `
+    const expected = html`
+      <p>Before</p>
+      <div
+        data-embed-ratio="16/9"
+        data-embed-id="m/josh-rojas-homers-8-on-a-fly-ball-to-left-field"
+        data-embed-provider="streamable"
+        data-embed-src="https://streamable.com/m/josh-rojas-homers-8-on-a-fly-ball-to-left-field"
       ></div>
       <p>After</p>
     `
