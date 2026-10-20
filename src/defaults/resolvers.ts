@@ -268,6 +268,7 @@ import { podcloudIframeEmbedResolver, podcloudWidgetEmbedResolver } from '../emb
 import { podetizeIframeEmbedResolver, podetizeScriptEmbedResolver } from '../embeds/podetize.js'
 import { podigeeIframeEmbedResolver, podigeeScriptEmbedResolver } from '../embeds/podigee.js'
 import { podomaticEmbedResolver } from '../embeds/podomatic.js'
+import { pollmakerFormEmbedResolver, pollmakerIframeEmbedResolver } from '../embeds/pollmaker.js'
 import { preziEmbedResolver } from '../embeds/prezi.js'
 import { puzzlemeEmbedResolver, puzzlemeWidgetEmbedResolver } from '../embeds/puzzleme.js'
 import { radioradicaleEmbedResolver } from '../embeds/radioradicale.js'
@@ -729,6 +730,8 @@ const embedResolvers: Array<EmbedResolver> = [
   podigeeScriptEmbedResolver,
   podigeeIframeEmbedResolver,
   podomaticEmbedResolver,
+  pollmakerIframeEmbedResolver,
+  pollmakerFormEmbedResolver,
   preziEmbedResolver,
   puzzlemeEmbedResolver,
   puzzlemeWidgetEmbedResolver,
