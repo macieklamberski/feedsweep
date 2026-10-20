@@ -12,8 +12,9 @@ const provider = 'googlesheets'
 const sheetRoutes = ['pubhtml', 'pubhtml/sheet']
 const chartRoute = 'pubchart'
 // Frames a sheet shared by link, by its file id. A sheet that is shared but not published
-// answers 401 on `pubhtml`.
-const sharedRoute = 'preview'
+// answers 401 on `pubhtml`. An `/edit` carrier is a pasted share link that draws the editor's
+// chrome, so it is framed on `/preview` too.
+const sharedRoutes = ['edit', 'preview']
 
 // The parameters a sheet's frame keeps. Every other one is dropped.
 const sheetParams = [
@@ -58,14 +59,15 @@ export const googlesheetsResolveEmbed: ResolveEmbed = (url, element) => {
   const sheetId = segments[isPublished ? 2 : 1]
   const route = segments.slice(isPublished ? 3 : 2).join('/')
   const isChart = route === chartRoute
-  // A publish token answers 404 on `/preview`.
-  const isShared = !isPublished && route === sharedRoute
+  // A publish token answers 404 on `/edit` and `/preview`.
+  const isShared = !isPublished && sharedRoutes.includes(route)
 
   if (!isChart && !isShared && !sheetRoutes.includes(route)) {
     return
   }
 
   const sheetPath = isPublished ? `e/${sheetId}` : sheetId
+  const frameRoute = isShared ? 'preview' : route
   const query = pickUrlParams(url, isChart ? chartParams : sheetParams)
   const fragment = readTabFragment(url)
   // A chart draws at its own pixel size and never scales, and its carrier declares that size.
@@ -75,7 +77,7 @@ export const googlesheetsResolveEmbed: ResolveEmbed = (url, element) => {
   return {
     provider,
     id: sheetId,
-    src: `https://docs.google.com/spreadsheets/d/${sheetPath}/${route}${query}${fragment}`,
+    src: `https://docs.google.com/spreadsheets/d/${sheetPath}/${frameRoute}${query}${fragment}`,
     url: `https://docs.google.com/spreadsheets/d/${sheetPath}/${isShared ? 'edit' : 'pubhtml'}`,
     thumbnail: isShared ? composeDriveThumbnail(sheetId) : undefined,
     height,
