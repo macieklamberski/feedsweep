@@ -1,10 +1,15 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const typeformHosts = ['typeform.com']
+
+// A form id in a url path is alphanumeric (`MTt3Pw7K`). The enclosure probe offers every file on a
+// Typeform host to this resolver, so the alphabet is what tells a form from a file such as
+// `/to/MTt3Pw7K.mp3`.
+const formIdRegex = /^[A-Za-z0-9]+$/
 
 // The share panel writes the form's own title into an iframe-props string, `title=<the
 // title>,<other props>`, which is the only human-readable text the empty div carries.
@@ -87,7 +92,7 @@ export const typeformResolveEmbed: ResolveEmbed = (url, element) => {
 
   const segments = getPathSegments(parsed)
 
-  return segments[0] === 'to' && segments[1] && !isFileName(segments[1])
+  return segments[0] === 'to' && segments[1] && formIdRegex.test(segments[1])
     ? composeEmbed(segments[1], attr(element, 'title'))
     : undefined
 }

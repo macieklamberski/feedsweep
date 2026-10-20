@@ -268,17 +268,23 @@ describe('spotifyResolveEmbed', () => {
       expect(spotifyResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should insert a legacy uri id that runs on past the id as written', () => {
-      const value = 'https://embed.spotify.com/?uri=spotify:track:4cOdK2wGLETKBW3PvgPWqT/extra'
+    it('should resolve a legacy uri id of unusual length as written', () => {
+      const value = 'https://embed.spotify.com/?uri=spotify:track:4cOd'
       const expected: EmbedResolverResult = {
         provider: 'spotify',
-        id: 'track/4cOdK2wGLETKBW3PvgPWqT%2Fextra',
-        src: 'https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT%2Fextra',
-        url: 'https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT%2Fextra',
+        id: 'track/4cOd',
+        src: 'https://open.spotify.com/embed/track/4cOd',
+        url: 'https://open.spotify.com/track/4cOd',
         height: 152,
       }
 
       expect(spotifyResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should return undefined for a legacy uri that runs on past the id', () => {
+      const value = 'https://embed.spotify.com/?uri=spotify:track:4cOdK2wGLETKBW3PvgPWqT/extra'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
     })
 
     it('should return undefined for a lookalike host', () => {

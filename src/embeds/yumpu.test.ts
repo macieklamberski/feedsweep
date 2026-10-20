@@ -118,16 +118,29 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore a locale prefix carrying a separator after the locale', async () => {
+      const value =
+        '<iframe src="https://www.yumpu.com/de%2F..%2Fx/embed/view/z4xYaRXnsDqwc2GE"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a locale prefix carrying a separator before the locale', async () => {
+      const value =
+        '<iframe src="https://www.yumpu.com/x%2Fde/embed/view/z4xYaRXnsDqwc2GE"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 
   describe('edge cases', () => {
-    it('should keep a locale prefix of another shape as written', async () => {
-      const value =
-        '<iframe src="https://www.yumpu.com/pt-br/embed/view/z4xYaRXnsDqwc2GE"></iframe>'
+    it('should keep a locale prefix of another length as written', async () => {
+      const value = '<iframe src="https://www.yumpu.com/deu/embed/view/z4xYaRXnsDqwc2GE"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/pt-br/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/deu/embed/view/z4xYaRXnsDqwc2GE',
         ratio: '4/3',
       }
 

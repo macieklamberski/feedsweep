@@ -1,7 +1,12 @@
 import { getPathSegments, isHostOrSubdomainOf, type Nullish, parseUrl, toMap } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
-import { attr, jsonAttr, keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { attr, jsonAttr } from '../utils/dom.js'
+import {
+  encodePathSegment,
+  parseUrlOnHosts,
+  pickUrlParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const musicProvider = 'applemusic'
@@ -15,7 +20,6 @@ const applePodcastsHosts = ['podcasts.apple.com']
 // The path is `/{storefront}/{kind}/{slug}/{id}`, with the storefront and the slug both
 // optional. A music id is numeric, a playlist or station id carries a two-letter prefix
 // (`pl.`, `ra.`) and a podcast id an `id` one.
-const storefrontRegex = /^[a-z]{2}$/
 const podcastIdPrefixRegex = /^id/
 
 // The player is fluid-width. The podcast show player fills any frame and floors at 180 at 320
@@ -41,7 +45,9 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const segments = getPathSegments(parsed)
-  const [kind, ...rest] = storefrontRegex.test(segments[0] ?? '') ? segments.slice(1) : segments
+  // Any first segment that is not a kind is the storefront.
+  const hasStorefront = !appleHeights.has(segments[0] ?? '')
+  const [kind, ...rest] = hasStorefront ? segments.slice(1) : segments
   const pathId = rest[rest.length - 1]
 
   // A segment past the id, such as an artist's `see-all`, names a page on the site, not a player.
@@ -137,8 +143,8 @@ const appleToolsHosts = ['tools.applemusic.com']
 const toolsPathRegex = /^\/embed\/v1\/([a-z]+)\/([^/]+)$/
 
 // The same album, playlist or song as the modern player, reached through the retired tool's url.
-// The tool wrote the storefront as `country`. A missing or malformed `country` drops the segment,
-// and Apple serves a storefront-less url from the US store.
+// The tool wrote the storefront as `country`. A missing `country` drops the segment, and Apple
+// serves a storefront-less url from the US store.
 export const appleToolsEmbedResolver = createUrlEmbedResolver(appleToolsHosts, (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
   const match = parsed?.pathname.match(toolsPathRegex)
@@ -150,7 +156,7 @@ export const appleToolsEmbedResolver = createUrlEmbedResolver(appleToolsHosts, (
   const [, kind, pathId] = match
 
   const country = parsed?.searchParams.get('country')?.toLowerCase()
-  const storefront = keepIfMatches(country, storefrontRegex)
+  const storefront = country ? encodePathSegment(country) : undefined
   const modernUrl = `https://music.apple.com/${storefront ? `${storefront}/` : ''}${kind}/${pathId}`
 
   return appleResolveEmbed(modernUrl)

@@ -151,6 +151,19 @@ describe('appleResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
+    it('should keep a storefront of another length as written', () => {
+      const value = 'https://music.apple.com/usa/album/thriller/1440857781'
+      const expected: EmbedResolverResult = {
+        provider: 'applemusic',
+        id: 'album/1440857781',
+        src: 'https://embed.music.apple.com/usa/album/thriller/1440857781',
+        url: 'https://music.apple.com/usa/album/thriller/1440857781',
+        height: 450,
+      }
+
+      expect(appleResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should drop tracking parameters', () => {
       const value = 'https://embed.music.apple.com/us/album/thriller/1440857781?utm_source=feed'
       const expected: EmbedResolverResult = {
@@ -686,28 +699,14 @@ describeForEachParser('appleToolsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop a storefront that is not a two-letter code', async () => {
+    it('should keep a storefront of another length as written', async () => {
       const value =
         '<iframe src="https://tools.applemusic.com/embed/v1/album/111492?country=usa"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'applemusic',
         id: 'album/111492',
-        src: 'https://embed.music.apple.com/album/111492',
-        url: 'https://music.apple.com/album/111492',
-        height: 450,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should drop a storefront carrying an equals sign', async () => {
-      const value =
-        '<iframe src="https://tools.applemusic.com/embed/v1/album/111492?country=u%3D"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'applemusic',
-        id: 'album/111492',
-        src: 'https://embed.music.apple.com/album/111492',
-        url: 'https://music.apple.com/album/111492',
+        src: 'https://embed.music.apple.com/usa/album/111492',
+        url: 'https://music.apple.com/usa/album/111492',
         height: 450,
       }
 

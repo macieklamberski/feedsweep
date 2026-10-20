@@ -212,17 +212,23 @@ describe('typeformResolveEmbed', () => {
     expect(typeformResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should resolve a form id outside the alphanumeric alphabet as written', () => {
-    const value = 'https://form.typeform.com/to/MTt3-Pw7K'
+  it('should resolve a form id of unusual length as written', () => {
+    const value = 'https://form.typeform.com/to/Ab'
     const expected: EmbedResolverResult = {
       provider: 'typeform',
-      id: 'MTt3-Pw7K',
+      id: 'Ab',
       src: value,
       url: value,
       height: 500,
     }
 
     expect(typeformResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should return undefined for a form id outside the alphanumeric alphabet', () => {
+    const value = 'https://form.typeform.com/to/MTt3-Pw7K'
+
+    expect(typeformResolveEmbed(value)).toBeUndefined()
   })
 
   it('should resolve a per-account subdomain to the canonical form url', () => {

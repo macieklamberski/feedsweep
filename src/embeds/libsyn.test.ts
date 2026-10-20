@@ -69,14 +69,20 @@ describe('extractLibsynEmbed', () => {
     expect(extractLibsynEmbed(value)).toBeUndefined()
   })
 
-  it('should read an id that is not numeric as written', () => {
-    const value = 'https://play.libsyn.com/embed/episode/id/abc/'
+  it('should read an id of unusual length as written', () => {
+    const value = 'https://play.libsyn.com/embed/episode/id/123/'
     const expected = {
       kind: 'episode',
-      id: 'abc',
+      id: '123',
     }
 
     expect(extractLibsynEmbed(value)).toEqual(expected)
+  })
+
+  it('should return undefined for a non-numeric id', () => {
+    const value = 'https://play.libsyn.com/embed/episode/id/abc/'
+
+    expect(extractLibsynEmbed(value)).toBeUndefined()
   })
 
   it('should return undefined for a url that cannot be parsed', () => {

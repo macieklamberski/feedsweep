@@ -67,6 +67,12 @@ describeForEachParser('vidyardIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should ignore a uuid outside the alphanumeric alphabet', async () => {
+      const value = '<iframe src="https://play.vidyard.com/gdoa-8386mue3jppdkpZc9A.html"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a player path served by a foreign host', async () => {
       const value = '<iframe src="https://evil.test/gdoa8386mue3jppdkpZc9A.html"></iframe>'
 
@@ -94,14 +100,14 @@ describeForEachParser('vidyardIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should build the placeholder from a uuid outside the alphanumeric alphabet as written', async () => {
-      const value = '<iframe src="https://play.vidyard.com/gdoa8386-mue3_jppdkpZc9A.html"></iframe>'
+    it('should build the placeholder from a uuid of unusual length as written', async () => {
+      const value = '<iframe src="https://play.vidyard.com/gdoa8386.html"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'vidyard',
-        id: 'gdoa8386-mue3_jppdkpZc9A',
-        src: 'https://play.vidyard.com/gdoa8386-mue3_jppdkpZc9A.html',
-        url: 'https://share.vidyard.com/watch/gdoa8386-mue3_jppdkpZc9A',
-        thumbnail: 'https://play.vidyard.com/gdoa8386-mue3_jppdkpZc9A.jpg',
+        id: 'gdoa8386',
+        src: 'https://play.vidyard.com/gdoa8386.html',
+        url: 'https://share.vidyard.com/watch/gdoa8386',
+        thumbnail: 'https://play.vidyard.com/gdoa8386.jpg',
         ratio: '16/9',
       }
 

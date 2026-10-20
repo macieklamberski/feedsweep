@@ -1,7 +1,7 @@
 import { getPathSegments, isPlainObject, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The player is fluid-width and fixed-height: a compact bar for a single item, a taller box for
@@ -22,7 +22,7 @@ const pathPrefixRegex = /^(?:embed|embed-podcast|intl-[a-z]{2})$/
 // spotify:{type}:{id}, or the owned playlist form spotify:user:{handle}:playlist:{id}.
 // The pre-2017 snippet framed `embed.spotify.com/?uri=spotify:{type}:{id}`, and that host still
 // serves a player.
-const legacyUriRegex = /^spotify:(?:.*:)?([a-z]+):([^:]+)$/
+const legacyUriRegex = /^spotify:(?:.*:)?([a-z]+):([a-zA-Z0-9]+)$/
 // Substack writes `By {owner}` where a playlist card's act goes, and Spotify names that same
 // account bare on its own player.
 const ownerPrefixRegex = /^By /
@@ -98,9 +98,7 @@ export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
   // resource's id under another's type.
   const pair =
     readPathPair(parsed) ??
-    (legacy
-      ? [legacy[1], encodePathSegment(legacy[2])]
-      : readPathPair(parseUrlOnHosts(uri, spotifyHosts)))
+    (legacy ? [legacy[1], legacy[2]] : readPathPair(parseUrlOnHosts(uri, spotifyHosts)))
   const [type, id] = pair ?? []
 
   if (!type || !id || !spotifyHeights.has(type)) {

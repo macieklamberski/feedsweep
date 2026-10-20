@@ -152,19 +152,19 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should recover a clip id that is not numeric from the cite as written', async () => {
+    it('should recover a clip id of unusual length from the cite as written', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
-          cite="https://www.tiktok.com/@user/video/ZMabc123"
+          cite="https://www.tiktok.com/@user/video/123"
           data-video-id=""
         ></blockquote>
       `
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
-        id: '@user/video/ZMabc123',
-        src: 'https://www.tiktok.com/embed/v2/ZMabc123',
-        url: 'https://www.tiktok.com/@user/video/ZMabc123',
+        id: '@user/video/123',
+        src: 'https://www.tiktok.com/embed/v2/123',
+        url: 'https://www.tiktok.com/@user/video/123',
         height: 738,
       }
 
@@ -571,6 +571,18 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should ignore a cite whose clip id is not numeric', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          cite="https://www.tiktok.com/@user/video/abc"
+          data-video-id=""
+        ></blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined when the video id is empty and no clip or account is named', async () => {
       const value = html`
         <blockquote
