@@ -50,6 +50,21 @@ const gridFragmentIdRegex = /^#p\/.+\/([0-9A-Za-z_-]{11})$/
 // feeds of that era.
 const youtubeHosts = ['youtube.com', 'youtube-nocookie.com', 'youtu.be', 'youtube.googleapis.com']
 
+// Some feeds glue a second `?` onto a query value, as in `list={id}?autoplay=0`, and the player
+// then reads `?autoplay=0` as part of the id and plays nothing. Each `?` after the first opens a
+// parameter here.
+const parseYoutubeUrl = (link: string): URL | undefined => {
+  const queryStart = link.indexOf('?')
+
+  if (queryStart === -1) {
+    return parseUrl(link, placeholderBaseUrl)
+  }
+
+  const query = link.slice(queryStart + 1).replaceAll('?', '&')
+
+  return parseUrl(`${link.slice(0, queryStart)}?${query}`, placeholderBaseUrl)
+}
+
 // A bare id, already separated from any url: the right shape, and not one of the embed path
 // words that share it.
 export const isVideoId = (value: string): boolean => {
@@ -90,7 +105,7 @@ const readPathId = (url: URL): string | undefined => {
 }
 
 export const extractVideoId = (link: string): string | undefined => {
-  const url = parseUrl(link, placeholderBaseUrl)
+  const url = parseYoutubeUrl(link)
 
   if (!url) {
     return
@@ -146,7 +161,7 @@ const parseWatchOffset = (value: string): string | undefined => {
 // query, the Flash-era spelling left it in the path as `/embed/{id}&t=6s`, and publishers write it
 // in the fragment as `#t=220`.
 const readEmbedParams = (url: string): Record<string, string> => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
+  const parsed = parseYoutubeUrl(url)
   const params = pickQueryParams(parsed?.search ?? '', youtubeEmbedParams)
 
   if (!parsed || params.start) {
@@ -269,7 +284,7 @@ const resolveCollectionEmbed = (
 }
 
 const resolveTarget = (url: string): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
+  const parsed = parseYoutubeUrl(url)
   const segments = parsed ? getPathSegments(parsed) : []
 
   if (segments[0] === 'embed' && parsed) {

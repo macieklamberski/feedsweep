@@ -247,6 +247,30 @@ describeForEachParser('YouTube', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should cut a second question mark off the playlist a video embed plays from', async () => {
+    const value = html`
+      <iframe
+        width="560"
+        height="315"
+        src="https://www.youtube.com/embed/2bCtYcr9t1g?list=PLJwc_2Sj0xGJcA-hXqaZSZJXDpNaKRIB2?ecver=1"
+        frameborder="0"
+        allowfullscreen
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="youtube"
+        data-embed-id="2bCtYcr9t1g"
+        data-embed-src="https://www.youtube.com/embed/2bCtYcr9t1g?list=PLJwc_2Sj0xGJcA-hXqaZSZJXDpNaKRIB2"
+        data-embed-url="https://www.youtube.com/watch?v=2bCtYcr9t1g"
+        data-embed-thumbnail="https://i.ytimg.com/vi/2bCtYcr9t1g/hqdefault.jpg"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // ARVE's lazyload button holds no image of its own, so the widget is dropped as empty markup
   // before this: the video is gone from the item entirely, not merely posterless.
   it('should recover a video from an ARVE play button', async () => {

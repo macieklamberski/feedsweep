@@ -64,6 +64,9 @@ const videoUrls = [
   '//www.youtube.com/watch?v=dQw4w9WgXcQ',
   // The stray quote Steam news leaks into embed srcs.
   'https://www.youtube-nocookie.com/embed/"dQw4w9WgXcQ?fs=1&rel=0',
+  // A second `?` glued onto the id, framed as a watch page and as the embed watch mistake.
+  'https://www.youtube.com/watch?v=dQw4w9WgXcQ?fs=1',
+  'http://www.youtube.com/embed/watch?v=dQw4w9WgXcQ?rel=0',
 ]
 
 describe('extractVideoId', () => {
@@ -483,6 +486,35 @@ describe('youtubeResolveEmbed', () => {
       id: 'user/SomeUser',
       src: 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser',
       url: 'https://www.youtube.com/user/SomeUser',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should cut a second question mark off a playlist id', () => {
+    const value =
+      'https://www.youtube.com/embed/?list=PLbWvcwWtuDm1OpcbohZTOwwzmc8SMmlBD?autoplay=0&controls=1'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: 'playlist/PLbWvcwWtuDm1OpcbohZTOwwzmc8SMmlBD',
+      src: 'https://www.youtube.com/embed/videoseries?list=PLbWvcwWtuDm1OpcbohZTOwwzmc8SMmlBD',
+      url: 'https://www.youtube.com/playlist?list=PLbWvcwWtuDm1OpcbohZTOwwzmc8SMmlBD',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should cut a second question mark off the playlist a video embed plays from', () => {
+    const value =
+      'https://www.youtube.com/embed/2bCtYcr9t1g?list=PLJwc_2Sj0xGJcA-hXqaZSZJXDpNaKRIB2?ecver=1'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: '2bCtYcr9t1g',
+      src: 'https://www.youtube.com/embed/2bCtYcr9t1g?list=PLJwc_2Sj0xGJcA-hXqaZSZJXDpNaKRIB2',
+      url: 'https://www.youtube.com/watch?v=2bCtYcr9t1g',
+      thumbnail: 'https://i.ytimg.com/vi/2bCtYcr9t1g/hqdefault.jpg',
       ratio: '16/9',
     }
 
