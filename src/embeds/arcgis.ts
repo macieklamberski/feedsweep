@@ -118,10 +118,13 @@ const readPortalItem = (url: URL): Item | undefined => {
       return
     }
 
+    // Map Viewer refuses a web map saved before spec 2.0, which a classic carrier can hold.
+    const page = url.pathname === mapViewerPath ? mapViewerPath : embedViewerPath
+
     return {
       id: webMapId,
       src: composeWebMapSource(url, webMapId),
-      url: `https://www.arcgis.com/apps/mapviewer/index.html?webmap=${webMapId}`,
+      url: `https://www.arcgis.com${page}?webmap=${webMapId}`,
     }
   }
 

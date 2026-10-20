@@ -17,7 +17,7 @@ describe('arcgisResolveEmbed', () => {
         provider: 'arcgis',
         id: '62bf87f7b2f64f15b48491d39242f4d7',
         src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7&extent=-123.0692,38.5233,-122.9947,38.5929',
-        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7',
+        url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=62bf87f7b2f64f15b48491d39242f4d7',
         height: 500,
       }
 
@@ -31,7 +31,7 @@ describe('arcgisResolveEmbed', () => {
         provider: 'arcgis',
         id: '84a606bfb3d848c69ca61321f3ac2e9f',
         src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=84a606bfb3d848c69ca61321f3ac2e9f&center=-0.1985,51.5554&level=11',
-        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=84a606bfb3d848c69ca61321f3ac2e9f',
+        url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=84a606bfb3d848c69ca61321f3ac2e9f',
         height: 500,
       }
 
@@ -45,7 +45,7 @@ describe('arcgisResolveEmbed', () => {
         provider: 'arcgis',
         id: '5179ec6c47cf4fbb8ac31f6476b31203',
         src: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=5179ec6c47cf4fbb8ac31f6476b31203&extent=65.5444286545374,30.2897882432581,79.7983889146329,35.1848211677353',
-        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=5179ec6c47cf4fbb8ac31f6476b31203',
+        url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=5179ec6c47cf4fbb8ac31f6476b31203',
         height: 500,
       }
 
@@ -59,7 +59,7 @@ describe('arcgisResolveEmbed', () => {
         provider: 'arcgis',
         id: '115bdac4334d46ef86b6414ab63b260a',
         src: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=115bdac4334d46ef86b6414ab63b260a&extent=-139.4316,18.7911,-62.2896,55.2527',
-        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=115bdac4334d46ef86b6414ab63b260a',
+        url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=115bdac4334d46ef86b6414ab63b260a',
         height: 500,
       }
 
@@ -73,7 +73,7 @@ describe('arcgisResolveEmbed', () => {
         provider: 'arcgis',
         id: 'dd1f8119a2b144d28db1d35ad10f0995',
         src: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=dd1f8119a2b144d28db1d35ad10f0995&extent=-90.5273,-58.9046,90.5273,58.9046',
-        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=dd1f8119a2b144d28db1d35ad10f0995',
+        url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=dd1f8119a2b144d28db1d35ad10f0995',
         height: 500,
       }
 
@@ -115,7 +115,7 @@ describe('arcgisResolveEmbed', () => {
         provider: 'arcgis',
         id: '9b6a2497b3d84aeb95633a58560025ee',
         src: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497b3d84aeb95633a58560025ee&extent=-86.1328,-74.9594,180,81.6214',
-        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=9b6a2497b3d84aeb95633a58560025ee',
+        url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497b3d84aeb95633a58560025ee',
         height: 500,
       }
 
@@ -435,7 +435,7 @@ describeForEachParser('arcgisIframeEmbedResolver', (parseHtml) => {
         provider: 'arcgis',
         id: '7bd57dbfa6e145df86268fd3e93b7766',
         src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=7bd57dbfa6e145df86268fd3e93b7766',
-        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=7bd57dbfa6e145df86268fd3e93b7766',
+        url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=7bd57dbfa6e145df86268fd3e93b7766',
         height: 500,
         title: 'Lifeform Map - Sonoma Veg Map',
       }
@@ -598,7 +598,7 @@ describeForEachParser('arcgis through the pipeline', (parseHtml) => {
         data-embed-id="62bf87f7b2f64f15b48491d39242f4d7"
         data-embed-provider="arcgis"
         data-embed-src="https://www.arcgis.com/home/webmap/embedViewer.html?webmap=62bf87f7b2f64f15b48491d39242f4d7"
-        data-embed-url="https://www.arcgis.com/apps/mapviewer/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7"
+        data-embed-url="https://www.arcgis.com/home/webmap/embedViewer.html?webmap=62bf87f7b2f64f15b48491d39242f4d7"
         data-embed-height="500"
       ></div>
     `
