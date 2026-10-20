@@ -537,6 +537,31 @@ describe('googlesheetsResolveEmbed', () => {
     })
   })
 
+  describe('the bare route of a sheet shared by link', () => {
+    it('should rebuild a sheet framed by its file id with no route onto its preview page', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1v_cAZz7QkFTJ0KF_w6If31DBseYylcv3_cjAPa9qi5o'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1v_cAZz7QkFTJ0KF_w6If31DBseYylcv3_cjAPa9qi5o',
+        src: 'https://docs.google.com/spreadsheets/d/1v_cAZz7QkFTJ0KF_w6If31DBseYylcv3_cjAPa9qi5o/preview',
+        url: 'https://docs.google.com/spreadsheets/d/1v_cAZz7QkFTJ0KF_w6If31DBseYylcv3_cjAPa9qi5o/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1v_cAZz7QkFTJ0KF_w6If31DBseYylcv3_cjAPa9qi5o&sz=w640',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should ignore a published sheet framed by its token with no route', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x'
+
+      expect(googlesheetsResolveEmbed(value)).toBeUndefined()
+    })
+  })
+
   describe('the sign-in prefixes', () => {
     it('should frame a published sheet behind an account index on its own path', () => {
       const value =
@@ -642,6 +667,49 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
         url: 'https://docs.google.com/spreadsheets/d/1KDKx8_xOZdFzqyShk7iKKOesyzm1yaXNbKq135QKzcI/edit',
         thumbnail:
           'https://drive.google.com/thumbnail?id=1KDKx8_xOZdFzqyShk7iKKOesyzm1yaXNbKq135QKzcI&sz=w640',
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild a sheet framed by its file id with no route onto its preview page', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          src="https://docs.google.com/spreadsheets/d/1v_cAZz7QkFTJ0KF_w6If31DBseYylcv3_cjAPa9qi5o"
+          width="760"
+          height="8577"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1v_cAZz7QkFTJ0KF_w6If31DBseYylcv3_cjAPa9qi5o',
+        src: 'https://docs.google.com/spreadsheets/d/1v_cAZz7QkFTJ0KF_w6If31DBseYylcv3_cjAPa9qi5o/preview',
+        url: 'https://docs.google.com/spreadsheets/d/1v_cAZz7QkFTJ0KF_w6If31DBseYylcv3_cjAPa9qi5o/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1v_cAZz7QkFTJ0KF_w6If31DBseYylcv3_cjAPa9qi5o&sz=w640',
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the publish flags glued to the id of a sheet with no route', async () => {
+      const value = html`
+        <iframe
+          src="https://docs.google.com/spreadsheets/d/1E_-E_908mv7c4Yt34y7TNIfYhIy3vJzgo5Am0S9p12E&amp;output=html&amp;widget=true"
+          width="800"
+          height="1000"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1E_-E_908mv7c4Yt34y7TNIfYhIy3vJzgo5Am0S9p12E',
+        src: 'https://docs.google.com/spreadsheets/d/1E_-E_908mv7c4Yt34y7TNIfYhIy3vJzgo5Am0S9p12E/preview',
+        url: 'https://docs.google.com/spreadsheets/d/1E_-E_908mv7c4Yt34y7TNIfYhIy3vJzgo5Am0S9p12E/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1E_-E_908mv7c4Yt34y7TNIfYhIy3vJzgo5Am0S9p12E&sz=w640',
         height: 500,
       }
 
