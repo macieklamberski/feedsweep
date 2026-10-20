@@ -18,10 +18,7 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
         ></div>
       `
       const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/large"
-          height="560"
-        ></iframe>
+        <iframe src="https://www.gofundme.com/f/save-the-hall/widget/large"></iframe>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -35,10 +32,7 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
         ></div>
       `
       const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/large"
-          height="560"
-        ></iframe>
+        <iframe src="https://www.gofundme.com/f/save-the-hall/widget/large"></iframe>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -52,10 +46,7 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
         ></div>
       `
       const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/large"
-          height="560"
-        ></iframe>
+        <iframe src="https://www.gofundme.com/f/save-the-hall/widget/large"></iframe>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -69,10 +60,7 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
         ></div>
       `
       const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/large"
-          height="560"
-        ></iframe>
+        <iframe src="https://www.gofundme.com/f/save-the-hall/widget/large"></iframe>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -86,10 +74,7 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
         ></div>
       `
       const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/large"
-          height="560"
-        ></iframe>
+        <iframe src="https://www.gofundme.com/f/save-the-hall/widget/large"></iframe>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -103,10 +88,7 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
         ></div>
       `
       const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/save-the-hall/widget/large"
-          height="560"
-        ></iframe>
+        <iframe src="https://www.gofundme.com/f/save-the-hall/widget/large"></iframe>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -120,10 +102,7 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
         ></div>
       `
       const expected = html`
-        <iframe
-          src="https://www.gofundme.com/f/Save-The-Hall/widget/large"
-          height="560"
-        ></iframe>
+        <iframe src="https://www.gofundme.com/f/Save-The-Hall/widget/large"></iframe>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
@@ -224,19 +203,217 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+  })
 
-    it('should be idempotent', async () => {
+  describe('the specimen widget div', () => {
+    it('should rebuild a campaign url with a trailing slash', async () => {
       const value = html`
         <div
           class="gfm-embed"
-          data-url="https://www.gofundme.com/f/save-the-hall/widget/large?sharesheet=campaign_page"
+          data-url="https://www.gofundme.com/f/fire-destroyed-the-crimethinc-mailorder-space/widget/large/"
+          style="margin-bottom: 3rem"
         ></div>
       `
-      const once = await transform(value)
-      const twice = await transform(once)
+      const expected = html`
+        <iframe src="https://www.gofundme.com/f/fire-destroyed-the-crimethinc-mailorder-space/widget/large"></iframe>
+      `
 
-      expect(twice).toEqualHtml(once)
+      expect(await transform(value)).toEqualHtml(expected)
     })
+  })
+
+  describe('the Flash widget naming the campaign in flashvars', () => {
+    it('should rebuild the object with its nested embed into one widget', async () => {
+      const value = html`
+        <object
+          classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+          height="338"
+          title="Click Here to donate!"
+          type="application/x-shockwave-flash"
+          width="258"
+        >
+          <param
+            name="movie"
+            value="//funds.gofundme.com/Widgetflex.swf"
+          />
+          <param
+            name="quality"
+            value="high"
+          />
+          <param
+            name="flashvars"
+            value="page=posyfilledpockets&template=1"
+          />
+          <param
+            name="wmode"
+            value="transparent"
+          />
+          <embed
+            allowScriptAccess="always"
+            src="//funds.gofundme.com/Widgetflex.swf"
+            quality="high"
+            flashVars="page=posyfilledpockets&template=1"
+            type="application/x-shockwave-flash"
+            wmode="transparent"
+            width="258"
+            height="338"
+          ></embed>
+        </object>
+      `
+      const expected = html`
+        <iframe src="https://www.gofundme.com/f/posyfilledpockets/widget/large"></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should rebuild a bare embed', async () => {
+      const value = html`
+        <embed
+          src="//funds.gofundme.com/Widgetflex.swf"
+          flashvars="page=posyfilledpockets&template=1"
+          type="application/x-shockwave-flash"
+        />
+      `
+      const expected = html`
+        <iframe src="https://www.gofundme.com/f/posyfilledpockets/widget/large"></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should rebuild an object naming the file in data', async () => {
+      const value = html`
+        <object
+          data="//funds.gofundme.com/Widgetflex.swf"
+          type="application/x-shockwave-flash"
+        >
+          <param
+            name="flashvars"
+            value="page=posyfilledpockets&template=1"
+          />
+        </object>
+      `
+      const expected = html`
+        <iframe src="https://www.gofundme.com/f/posyfilledpockets/widget/large"></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should insert the page as written', async () => {
+      const value = html`
+        <embed
+          src="//funds.gofundme.com/Widgetflex.swf"
+          flashvars="page=3dCamera&template=1"
+        />
+      `
+      const expected = html`
+        <iframe src="https://www.gofundme.com/f/3dCamera/widget/large"></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave the widget file on a foreign host', async () => {
+      const value = html`
+        <embed
+          src="https://evil.test/Widgetflex.swf?funds.gofundme.com"
+          flashvars="page=posyfilledpockets&template=1"
+        />
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave another Flash file on the widget host', async () => {
+      const value = html`
+        <embed
+          src="//funds.gofundme.com/Player.swf"
+          flashvars="page=posyfilledpockets&template=1"
+        />
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave the widget file naming no page', async () => {
+      const value = html`
+        <embed
+          src="//funds.gofundme.com/Widgetflex.swf"
+          flashvars="template=1"
+        />
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('the media widget naming the campaign in its id', () => {
+    it('should rebuild the empty frame', async () => {
+      const value = html`
+        <iframe
+          class="gfm-media-widget"
+          coinfo="1"
+          frameborder="0"
+          height="100%"
+          id="lukejansen-mentoring-music"
+          image="1"
+          width="100%"
+        ></iframe>
+      `
+      const expected = html`
+        <iframe src="https://www.gofundme.com/f/lukejansen-mentoring-music/widget/large"></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a frame the loader already pointed somewhere', async () => {
+      const value = html`
+        <iframe
+          class="gfm-media-widget"
+          id="lukejansen-mentoring-music"
+          src="https://www.gofundme.com/mvc.php?route=widgets/mediawidget&fund=lukejansen-mentoring-music"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a frame of another class', async () => {
+      const value = html`
+        <iframe
+          class="media-widget"
+          id="lukejansen-mentoring-music"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  it('should be idempotent', async () => {
+    const value = html`
+      <div
+        class="gfm-embed"
+        data-url="https://www.gofundme.com/f/save-the-hall/widget/large?sharesheet=campaign_page"
+      ></div>
+      <object data="//funds.gofundme.com/Widgetflex.swf">
+        <param
+          name="flashvars"
+          value="page=posyfilledpockets"
+        />
+      </object>
+      <iframe
+        class="gfm-media-widget"
+        id="lukejansen-mentoring-music"
+      ></iframe>
+    `
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
   })
 })
 
@@ -245,7 +422,7 @@ describeForEachParser('rebuildGofundmeEmbeds through the pipeline', (parseHtml) 
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
   }
 
-  it('should surface the widget into a placeholder and drop the loader script', async () => {
+  it('should surface the widget div into a placeholder and drop the loader script', async () => {
     const value = html`
       <div
         class="gfm-embed"
@@ -258,8 +435,72 @@ describeForEachParser('rebuildGofundmeEmbeds through the pipeline', (parseHtml) 
     `
     const expected = html`
       <div
+        data-embed-url="https://www.gofundme.com/f/save-the-hall"
+        data-embed-id="save-the-hall"
+        data-embed-provider="gofundme"
         data-embed-src="https://www.gofundme.com/f/save-the-hall/widget/large"
-        data-embed-height="560"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should surface the Flash widget into a placeholder', async () => {
+    const value = html`
+      <object
+        classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+        height="338"
+        type="application/x-shockwave-flash"
+        width="258"
+      >
+        <param
+          name="movie"
+          value="//funds.gofundme.com/Widgetflex.swf"
+        />
+        <param
+          name="flashvars"
+          value="page=posyfilledpockets&template=1"
+        />
+        <embed
+          src="//funds.gofundme.com/Widgetflex.swf"
+          flashVars="page=posyfilledpockets&template=1"
+          type="application/x-shockwave-flash"
+          width="258"
+          height="338"
+        ></embed>
+      </object>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://www.gofundme.com/f/posyfilledpockets"
+        data-embed-id="posyfilledpockets"
+        data-embed-provider="gofundme"
+        data-embed-src="https://www.gofundme.com/f/posyfilledpockets/widget/large"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should surface the media widget into a placeholder and drop the loader script', async () => {
+    const value = html`
+      <iframe
+        class="gfm-media-widget"
+        coinfo="1"
+        frameborder="0"
+        height="100%"
+        id="lukejansen-mentoring-music"
+        image="1"
+        width="100%"
+      ></iframe>
+      <script src="//funds.gofundme.com/js/5.0/media-widget.js"></script>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://www.gofundme.com/f/lukejansen-mentoring-music"
+        data-embed-id="lukejansen-mentoring-music"
+        data-embed-provider="gofundme"
+        data-embed-src="https://www.gofundme.com/f/lukejansen-mentoring-music/widget/large"
       ></div>
     `
 
