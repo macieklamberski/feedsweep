@@ -11,6 +11,8 @@ const playerRatio = '16/9'
 // The minimum length is the only check on the id: `AQ~~` decodes to the number 1.
 // A real Brightcove id runs to ten digits and more.
 const brightcoveIdRegex = /^\d{5,}$/
+// A reference id is free text the publisher chose, named by Brightcove's own `ref:` prefix.
+const brightcoveVideoIdRegex = /^(?:\d{5,}|ref:.+)$/
 const accountScriptSelector = 'script[src*="players.brightcove.net"]'
 const accountScriptRegex = /players\.brightcove\.net\/(\d+)\//
 
@@ -89,7 +91,7 @@ export const brightcoveVideoJsEmbedResolver = createMarkupEmbedResolver(
     // Video.js is a library anyone can use, and `data-video-id` is not a name only Brightcove
     // could have chosen, so the id shape is all this carrier has to go on. The inference is safe
     // in practice too: nearly every feed carrying the element also ships the loader script.
-    const videoId = keepIfMatches(attr(element, 'data-video-id'), brightcoveIdRegex)
+    const videoId = keepIfMatches(attr(element, 'data-video-id'), brightcoveVideoIdRegex)
     const account = videoId ? readPlayerAccount(element) : undefined
 
     if (!videoId || !account) {
