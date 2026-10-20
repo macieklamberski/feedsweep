@@ -11,13 +11,14 @@ const videoIdCharactersRegex = /^[0-9a-f]+$/
 
 const rutubeHosts = ['rutube.ru']
 
-const embedPathRegex = /^\/(?:play\/embed|video\/embed|embed)\/([^/]+)\/?$/
+// The player reads its id off the last path segment, so `/play/embed/private/{id}` plays `{id}`.
+const embedPathRegex = /^\/(?:play\/embed(?:\/private)?|video\/embed|embed)\/([^/]+)\/?$/
 const playlistPathRegex = /^\/pl\/?$/
 
 // `p` is the access key a private video will not play without.
 const rutubeEmbedParams = ['p', 't', 'stopTime']
 
-const composeEmbed = (videoId: string, link: string): EmbedResolverResult => {
+const composeEmbed = (videoId: string, parsed: URL): EmbedResolverResult => {
   // A playlist's `pl_video` comes out of the query decoded, and it goes into a path.
   const segment = encodePathSegment(videoId)
 
@@ -27,8 +28,8 @@ const composeEmbed = (videoId: string, link: string): EmbedResolverResult => {
   return {
     provider,
     id: videoId,
-    src: `https://rutube.ru/play/embed/${segment}${pickUrlParams(link, rutubeEmbedParams)}`,
-    url: `https://rutube.ru/video/${segment}/`,
+    src: `https://rutube.ru/play/embed/${segment}${pickUrlParams(parsed.href, rutubeEmbedParams)}`,
+    url: parsed.searchParams.get('p') ? undefined : `https://rutube.ru/video/${segment}/`,
     // The player fills its box, and Rutube's snippet and oEmbed size it 720 by 405.
     ratio: '16/9',
   }
@@ -49,7 +50,7 @@ export const rutubeResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const result = composeEmbed(videoId, parsed.href)
+  const result = composeEmbed(videoId, parsed)
   const title = attr(element, 'title')
 
   return title ? { ...result, title } : result

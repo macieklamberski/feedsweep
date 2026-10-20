@@ -208,6 +208,23 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the older 26-character uid off the end of the slugged page url', async () => {
+      const value = html`
+        <iframe
+          src="https://sketchfab.com/3d-models/usaf10meterorionengine4zip-xvFkC5jSm9mMG8cCTLfyg1VKJB"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'sketchfab',
+        id: 'xvFkC5jSm9mMG8cCTLfyg1VKJB',
+        src: 'https://sketchfab.com/models/xvFkC5jSm9mMG8cCTLfyg1VKJB/embed',
+        url: 'https://sketchfab.com/models/xvFkC5jSm9mMG8cCTLfyg1VKJB',
+        ratio: '4/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore a slugged page url that runs on past the uid', async () => {
       const value = html`
         <iframe

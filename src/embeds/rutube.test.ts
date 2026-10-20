@@ -47,14 +47,13 @@ describe('rutubeResolveEmbed', () => {
       expect(rutubeResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the access key a private video carries', () => {
+    it('should keep the access key a private video carries in the player url only', () => {
       const value =
         'https://rutube.ru/play/embed/08fa24c07c55aa24504f0ac93f7c2d01/?p=KKiFZe0ka-lmMTIbZyvWig'
       const expected: EmbedResolverResult = {
         provider: 'rutube',
         id: '08fa24c07c55aa24504f0ac93f7c2d01',
         src: 'https://rutube.ru/play/embed/08fa24c07c55aa24504f0ac93f7c2d01?p=KKiFZe0ka-lmMTIbZyvWig',
-        url: 'https://rutube.ru/video/08fa24c07c55aa24504f0ac93f7c2d01/',
         ratio: '16/9',
       }
 
@@ -185,6 +184,33 @@ describe('rutubeResolveEmbed', () => {
         id: '1f166e1227ab75d3a14890d5c5bf5e7a',
         src: 'https://rutube.ru/play/embed/1f166e1227ab75d3a14890d5c5bf5e7a',
         url: 'https://rutube.ru/video/1f166e1227ab75d3a14890d5c5bf5e7a/',
+        ratio: '16/9',
+      }
+
+      expect(rutubeResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint the player for the private embed route', () => {
+      const value =
+        'https://rutube.ru/play/embed/private/06292328a74e4db33e2214711f40d5b4?skinColor=00ff7a'
+      const expected: EmbedResolverResult = {
+        provider: 'rutube',
+        id: '06292328a74e4db33e2214711f40d5b4',
+        src: 'https://rutube.ru/play/embed/06292328a74e4db33e2214711f40d5b4',
+        url: 'https://rutube.ru/video/06292328a74e4db33e2214711f40d5b4/',
+        ratio: '16/9',
+      }
+
+      expect(rutubeResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the access key on the private embed route in the player url only', () => {
+      const value =
+        'https://rutube.ru/play/embed/private/08fa24c07c55aa24504f0ac93f7c2d01/?p=KKiFZe0ka-lmMTIbZyvWig'
+      const expected: EmbedResolverResult = {
+        provider: 'rutube',
+        id: '08fa24c07c55aa24504f0ac93f7c2d01',
+        src: 'https://rutube.ru/play/embed/08fa24c07c55aa24504f0ac93f7c2d01?p=KKiFZe0ka-lmMTIbZyvWig',
         ratio: '16/9',
       }
 
