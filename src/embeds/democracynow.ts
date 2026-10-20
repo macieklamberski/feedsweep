@@ -8,8 +8,6 @@ const provider = 'democracynow'
 
 const democracynowHosts = ['democracynow.org']
 
-const scriptLoaders = ['embed_show_v1', 'embed_show_v2']
-
 // The path after `/embed/` names the item, and each kind has its own page.
 const composeEmbed = (path: string, page: string): EmbedResolverResult => {
   return {
@@ -65,11 +63,10 @@ export const democracynowIframeEmbedResolver = createUrlEmbedResolver(
   democracynowResolveEmbed,
 )
 
-// Democracy Now!'s retired loader scripts, which answer 404: v2 `/{width}/{y}/{m}/{d}/story/{slug}`
-// and v1 `/{width}/{y}/{m}/{d}/segment/{n}`. A segment has no player of its own and its number maps
-// to no story offline, so the day's show stands in for it.
+// Democracy Now!'s retired v2 loader script, `/embed_show_v2/{width}/{y}/{m}/{d}/story/{slug}`,
+// which answers 404.
 export const democracynowScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="democracynow.org/embed_show_v"]',
+  'script[src*="democracynow.org/embed_show_v2"]',
   (element) => {
     const parsed = parseUrlOnHosts(attr(element, 'src'), democracynowHosts)
 
@@ -77,9 +74,9 @@ export const democracynowScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const [loader = '', , year, month, day, kind, item, ...rest] = getPathSegments(parsed)
+    const [loader, , year, month, day, kind, item, ...rest] = getPathSegments(parsed)
 
-    if (!scriptLoaders.includes(loader) || !item || rest.length > 0) {
+    if (loader !== 'embed_show_v2' || !item || rest.length > 0) {
       return
     }
 
@@ -87,10 +84,6 @@ export const democracynowScriptEmbedResolver = createMarkupEmbedResolver(
 
     if (kind === 'story') {
       return composeEmbed(`story/${date}/${item}`, `${date}/${item}`)
-    }
-
-    if (kind === 'segment') {
-      return composeEmbed(`show/${date}`, `shows/${date}`)
     }
   },
 )

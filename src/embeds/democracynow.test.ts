@@ -209,54 +209,18 @@ describeForEachParser('democracynowScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should mint the show player of the day from a v1 segment loader', async () => {
-      const value = html`
-        <script
-          type="text/javascript"
-          src="http://www.democracynow.org/embed_show_v1/300/2009/4/2/segment/3"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'democracynow',
-        id: 'show/2009/4/2',
-        src: 'https://www.democracynow.org/embed/show/2009/4/2',
-        url: 'https://www.democracynow.org/shows/2009/4/2',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should mint the live player from a loader on the staging host', async () => {
-      const value = html`
-        <script
-          type="text/javascript"
-          src="http://staging.democracynow.org/embed_show_v1/300/2009/11/2/segment/3"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'democracynow',
-        id: 'show/2009/11/2',
-        src: 'https://www.democracynow.org/embed/show/2009/11/2',
-        url: 'https://www.democracynow.org/shows/2009/11/2',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should drop a query the player does not read', async () => {
       const value = html`
         <script
           type="text/javascript"
-          src="http://www.democracynow.org/embed_show_v1/300/2009/4/2/segment/3?utm_source=feed"
+          src="http://www.democracynow.org/embed_show_v2/300/2011/5/19/story/manning_marables_controversial_new_biography_refuels?utm_source=feed"
         ></script>
       `
       const expected: EmbedResolverResult = {
         provider: 'democracynow',
-        id: 'show/2009/4/2',
-        src: 'https://www.democracynow.org/embed/show/2009/4/2',
-        url: 'https://www.democracynow.org/shows/2009/4/2',
+        id: 'story/2011/5/19/manning_marables_controversial_new_biography_refuels',
+        src: 'https://www.democracynow.org/embed/story/2011/5/19/manning_marables_controversial_new_biography_refuels',
+        url: 'https://www.democracynow.org/2011/5/19/manning_marables_controversial_new_biography_refuels',
         ratio: '16/9',
       }
 
@@ -265,22 +229,44 @@ describeForEachParser('democracynowScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', async () => {
+    it('should leave a v1 segment loader, whose story cannot be derived', async () => {
       const value = html`
         <script
           type="text/javascript"
-          src="https://evil.test/embed_show_v1/300/2009/4/2/segment/3?democracynow.org/embed_show_v"
+          src="http://www.democracynow.org/embed_show_v1/300/2009/4/2/segment/3"
         ></script>
       `
 
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a loader that is not one of the two', async () => {
+    it('should leave a v1 segment loader on the staging host', async () => {
       const value = html`
         <script
           type="text/javascript"
-          src="http://www.democracynow.org/embed_show_v9/300/2009/4/2/segment/3"
+          src="http://staging.democracynow.org/embed_show_v1/300/2009/11/2/segment/3"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the same path', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="https://evil.test/embed_show_v2/300/2011/5/19/story/manning_marables_controversial_new_biography_refuels?democracynow.org/embed_show_v2"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a loader word that only starts with the v2 loader', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="http://www.democracynow.org/embed_show_v20/300/2011/5/19/story/manning_marables_controversial_new_biography_refuels"
         ></script>
       `
 
@@ -291,7 +277,7 @@ describeForEachParser('democracynowScriptEmbedResolver', (parseHtml) => {
       const value = html`
         <script
           type="text/javascript"
-          src="http://www.democracynow.org/embed_show_v1/300/2009/4/2/clip/3"
+          src="http://www.democracynow.org/embed_show_v2/300/2011/5/19/clip/3"
         ></script>
       `
 
@@ -309,11 +295,11 @@ describeForEachParser('democracynowScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a segment followed by another path segment', async () => {
+    it('should ignore a story followed by another path segment', async () => {
       const value = html`
         <script
           type="text/javascript"
-          src="http://www.democracynow.org/embed_show_v1/300/2009/4/2/segment/3/extra"
+          src="http://www.democracynow.org/embed_show_v2/300/2011/5/19/story/manning_marables_controversial_new_biography_refuels/extra"
         ></script>
       `
 
