@@ -69,10 +69,14 @@ describe('extractLibsynEmbed', () => {
     expect(extractLibsynEmbed(value)).toBeUndefined()
   })
 
-  it('should return undefined for a non-numeric id', () => {
+  it('should read an id that is not numeric as written', () => {
     const value = 'https://play.libsyn.com/embed/episode/id/abc/'
+    const expected = {
+      kind: 'episode',
+      id: 'abc',
+    }
 
-    expect(extractLibsynEmbed(value)).toBeUndefined()
+    expect(extractLibsynEmbed(value)).toEqual(expected)
   })
 
   it('should return undefined for a url that cannot be parsed', () => {

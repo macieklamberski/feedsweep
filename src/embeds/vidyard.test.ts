@@ -94,6 +94,20 @@ describeForEachParser('vidyardIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should build the placeholder from a uuid outside the alphanumeric alphabet as written', async () => {
+      const value = '<iframe src="https://play.vidyard.com/gdoa8386-mue3_jppdkpZc9A.html"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'vidyard',
+        id: 'gdoa8386-mue3_jppdkpZc9A',
+        src: 'https://play.vidyard.com/gdoa8386-mue3_jppdkpZc9A.html',
+        url: 'https://share.vidyard.com/watch/gdoa8386-mue3_jppdkpZc9A',
+        thumbnail: 'https://play.vidyard.com/gdoa8386-mue3_jppdkpZc9A.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore a player page nested under another path', async () => {
       const value =
         '<iframe src="https://play.vidyard.com/embed/gdoa8386mue3jppdkpZc9A.html"></iframe>'
