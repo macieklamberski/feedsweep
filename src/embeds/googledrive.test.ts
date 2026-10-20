@@ -90,6 +90,12 @@ describe('googledriveResolveEmbed', () => {
 
       expect(googledriveResolveEmbed(value)).toBeUndefined()
     })
+
+    it('should ignore an open link that states no type', () => {
+      const value = 'https://drive.google.com/open?id=1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_'
+
+      expect(googledriveResolveEmbed(value)).toBeUndefined()
+    })
   })
 
   describe('edge cases', () => {
@@ -228,6 +234,114 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('files typed audio', () => {
+    it('should state the audio player height for a file typed audio', async () => {
+      const value = html`
+        <iframe
+          src="https://drive.google.com/file/d/11xQxXUWu4JWxuhQkGH2FUGWPCh0Ow1aw/view"
+          type="audio/x-m4a"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: '11xQxXUWu4JWxuhQkGH2FUGWPCh0Ow1aw',
+        src: 'https://drive.google.com/file/d/11xQxXUWu4JWxuhQkGH2FUGWPCh0Ow1aw/preview',
+        url: 'https://drive.google.com/file/d/11xQxXUWu4JWxuhQkGH2FUGWPCh0Ow1aw/view',
+        height: 252,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state the audio player height for a keyed file typed audio', async () => {
+      const value = html`
+        <iframe
+          src="https://drive.google.com/file/d/0Bzq4uXIf8dNTVS1wQl9sME5FcFE/view?resourcekey=0-aeSGEHR1GEcB98yGmsP_XA"
+          type="audio/mpeg"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: '0Bzq4uXIf8dNTVS1wQl9sME5FcFE',
+        src: 'https://drive.google.com/file/d/0Bzq4uXIf8dNTVS1wQl9sME5FcFE/preview?resourcekey=0-aeSGEHR1GEcB98yGmsP_XA',
+        height: 252,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should frame an open link typed audio', async () => {
+      const value = html`
+        <iframe
+          src="https://drive.google.com/open?id=1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_"
+          type="audio/mpeg"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: '1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_',
+        src: 'https://drive.google.com/file/d/1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_/preview',
+        url: 'https://drive.google.com/file/d/1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_/view',
+        height: 252,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the file ratio for a file typed video', async () => {
+      const value = html`
+        <iframe
+          src="https://drive.google.com/file/d/1RUUW3OB7guzN-pKAApUEr-iV408omtIK/view?usp=sharing"
+          type="video/mp4"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: '1RUUW3OB7guzN-pKAApUEr-iV408omtIK',
+        src: 'https://drive.google.com/file/d/1RUUW3OB7guzN-pKAApUEr-iV408omtIK/preview',
+        url: 'https://drive.google.com/file/d/1RUUW3OB7guzN-pKAApUEr-iV408omtIK/view',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1RUUW3OB7guzN-pKAApUEr-iV408omtIK&sz=w640',
+        ratio: '4/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore an open link typed as something other than audio', async () => {
+      const value = html`
+        <iframe
+          src="https://drive.google.com/open?id=0B0LxOmlUZ59zdEF1MjhleU1ZdnM"
+          type="mp3"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a route below the open link', async () => {
+      const value = html`
+        <iframe
+          src="https://drive.google.com/open/view?id=1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_"
+          type="audio/mpeg"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an open link with no file id', async () => {
+      const value = html`
+        <iframe
+          src="https://drive.google.com/open?usp=sharing"
+          type="audio/mpeg"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the file route', async () => {
       const value = html`
@@ -249,7 +363,7 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
 
 // Drive also serves a file's bytes on `/uc`, which a feed can carry as an enclosure, and the
 // resolver reaches that path only through the registered default list.
-describeForEachParser('drive downloads offered as enclosures', (parseHtml) => {
+describeForEachParser('drive files offered as enclosures', (parseHtml) => {
   const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
     return transformContent(value, {
       parseHtmlFn: parseHtml,
@@ -271,6 +385,50 @@ describeForEachParser('drive downloads offered as enclosures', (parseHtml) => {
         controls
         src="https://drive.google.com/uc?export=download&id=1bCH3PkxgHe32KzhMFq9SDhsDHgkuZk6Q"
       ></audio>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+
+  it('should frame an audio file enclosure at the audio player height', async () => {
+    const enclosures = [
+      {
+        url: 'https://drive.google.com/file/d/11xQxXUWu4JWxuhQkGH2FUGWPCh0Ow1aw/view',
+        type: 'audio/x-m4a',
+      },
+    ]
+    const expected = html`
+      <div
+        data-enclosure
+        data-embed-height="252"
+        data-embed-url="https://drive.google.com/file/d/11xQxXUWu4JWxuhQkGH2FUGWPCh0Ow1aw/view"
+        data-embed-id="11xQxXUWu4JWxuhQkGH2FUGWPCh0Ow1aw"
+        data-embed-provider="googledrive"
+        data-embed-src="https://drive.google.com/file/d/11xQxXUWu4JWxuhQkGH2FUGWPCh0Ow1aw/preview"
+      ></div>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+
+  it('should frame an audio open link enclosure', async () => {
+    const enclosures = [
+      {
+        url: 'https://drive.google.com/open?id=1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_',
+        type: 'audio/mpeg',
+      },
+    ]
+    const expected = html`
+      <div
+        data-enclosure
+        data-embed-height="252"
+        data-embed-url="https://drive.google.com/file/d/1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_/view"
+        data-embed-id="1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_"
+        data-embed-provider="googledrive"
+        data-embed-src="https://drive.google.com/file/d/1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_/preview"
+      ></div>
       <p>Body</p>
     `
 
