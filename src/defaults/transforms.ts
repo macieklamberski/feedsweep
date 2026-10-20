@@ -47,6 +47,7 @@ import { rebuildDocumentcloudEmbeds } from '../transforms/dom/rebuildDocumentclo
 import { rebuildElementorVideoEmbeds } from '../transforms/dom/rebuildElementorVideoEmbeds.js'
 import { rebuildEmbedlyEmbeds } from '../transforms/dom/rebuildEmbedlyEmbeds.js'
 import { rebuildEmbedPlusEmbeds } from '../transforms/dom/rebuildEmbedPlusEmbeds.js'
+import { rebuildEmbedPrivacyLinks } from '../transforms/dom/rebuildEmbedPrivacyLinks.js'
 import { rebuildExternalVideoEmbeds } from '../transforms/dom/rebuildExternalVideoEmbeds.js'
 import { rebuildGettyImagesEmbeds } from '../transforms/dom/rebuildGettyImagesEmbeds.js'
 import { rebuildGofundmeEmbeds } from '../transforms/dom/rebuildGofundmeEmbeds.js'
@@ -113,10 +114,10 @@ export const defaultStringTransforms: Array<StringTransform> = [
 export const defaultStandardDomTransforms: Array<DomTransform> = [
   decodeDoubleEncodedTags,
 
-  // Dissolves a lazy-loader container into the original embed markup it holds encoded. Runs at
-  // the head of the cluster because what comes out is ordinary markup of any kind, so every pass
-  // below (comment and hidden-element stripping, the rebuilds, convertWidgets, the cite pass)
-  // has to see it.
+  // Dissolves a lazy-loader or Borlabs Cookie container into the original embed markup it holds
+  // encoded. Runs at the head of the cluster because what comes out is ordinary markup of any
+  // kind, so every pass below (comment and hidden-element stripping, the rebuilds, convertWidgets,
+  // the cite pass) has to see it.
   surfaceParkedMarkup,
   stripComments,
 
@@ -251,6 +252,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   convertUcozSpoilerButtons,
   resolveRelativeUrls,
   cleanAnchorUrls,
+
+  // Runs after resolveRelativeUrls, so the probe a resolver answers for carries an absolute url
+  // where the link was protocol-relative, and before convertWidgets, which claims the frame.
+  rebuildEmbedPrivacyLinks,
 
   // Runs after cleanAnchorUrls, whose cleanUrlFn can unwrap a redirect around a link to this
   // same page, and before normalizeAnchoredHeadings so heading permalinks are already bare

@@ -325,6 +325,95 @@ describeForEachParser('surfaceParkedMarkup', (parseHtml) => {
     })
   })
 
+  // Borlabs Cookie unblocks by base64-decoding the payload as UTF-8 into the container's place.
+  describe('Borlabs Cookie content blocker', () => {
+    it('should recover the player iframe in place of the consent notice', async () => {
+      const payload =
+        'PGlmcmFtZSB3aWR0aD0iOTAwIiBoZWlnaHQ9IjUwNyIgc3JjPSJodHRwczovL3d3dy55b3V0dWJlLW5vY29va2llLmNvbS9lbWJlZC91eFBIN0NCMTloMD9yZWw9MCZhbXA7c2hvd2luZm89MCIgZnJhbWVib3JkZXI9IjAiIGFsbG93ZnVsbHNjcmVlbj48L2lmcmFtZT4='
+      const value = html`
+        <div
+          class="brlbs-cmpnt-container brlbs-cmpnt-content-blocker brlbs-cmpnt-with-individual-styles"
+          data-borlabs-cookie-content-blocker-id="youtube-content-blocker"
+          data-borlabs-cookie-content="${payload}"
+        >
+          <div class="brlbs-cmpnt-cb-preset-c brlbs-cmpnt-cb-youtube">
+            <div class="brlbs-cmpnt-cb-main">
+              <p class="brlbs-cmpnt-cb-description">
+                Du siehst gerade einen Platzhalterinhalt von <strong>YouTube</strong>.
+              </p>
+              <div class="brlbs-cmpnt-cb-buttons">
+                <a
+                  class="brlbs-cmpnt-cb-btn"
+                  href="#"
+                  data-borlabs-cookie-unblock
+                  role="button"
+                >Inhalt entsperren</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `
+      const expected = html`
+        <iframe
+          width="900"
+          height="507"
+          src="https://www.youtube-nocookie.com/embed/uxPH7CB19h0?rel=0&amp;showinfo=0"
+          frameborder="0"
+          allowfullscreen
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should read the payload as UTF-8', async () => {
+      const payload =
+        'PGlmcmFtZSB0aXRsZT0iQW5uYSBTdMO2aHIgb24gd2VpZ2h0LCBudXRyaXRpb24gYW5kIGNsaW1iaW5nIiB3aWR0aD0iMTA4MCIgaGVpZ2h0PSI2MDgiIHNyYz0iaHR0cHM6Ly93d3cueW91dHViZS1ub2Nvb2tpZS5jb20vZW1iZWQvUElLb1ZraDFGVms/ZmVhdHVyZT1vZW1iZWQiIGZyYW1lYm9yZGVyPSIwIiBhbGxvdz0iYWNjZWxlcm9tZXRlcjsgYXV0b3BsYXk7IGNsaXBib2FyZC13cml0ZTsgZW5jcnlwdGVkLW1lZGlhOyBneXJvc2NvcGU7IHBpY3R1cmUtaW4tcGljdHVyZSIgYWxsb3dmdWxsc2NyZWVuPjwvaWZyYW1lPjxzY3JpcHQ+aWYgKHR5cGVvZiBqUXVlcnkgPT09ICJmdW5jdGlvbiIgJiYgdHlwZW9mIGpRdWVyeS5mbi5maXRWaWRzID09PSAiZnVuY3Rpb24iKSB7alF1ZXJ5KGRvY3VtZW50LmN1cnJlbnRTY3JpcHQucGFyZW50Tm9kZSkuZml0VmlkcygpfTwvc2NyaXB0Pg=='
+      const value = html`
+        <div
+          class="brlbs-cmpnt-container brlbs-cmpnt-content-blocker"
+          data-borlabs-cookie-content-blocker-id="youtube"
+          data-borlabs-cookie-content="${payload}"
+        ></div>
+      `
+      const expected = html`
+        <iframe
+          title="Anna Stöhr on weight, nutrition and climbing"
+          width="1080"
+          height="608"
+          src="https://www.youtube-nocookie.com/embed/PIKoVkh1FVk?feature=oembed"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe><script>if (typeof jQuery === "function" && typeof jQuery.fn.fitVids === "function") {jQuery(document.currentScript.parentNode).fitVids()}</script>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a blocker whose payload is not base64', async () => {
+      const value = html`
+        <div
+          class="brlbs-cmpnt-container brlbs-cmpnt-content-blocker"
+          data-borlabs-cookie-content="%%%"
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a blocker whose payload is not UTF-8', async () => {
+      const value = html`
+        <div
+          class="brlbs-cmpnt-container brlbs-cmpnt-content-blocker"
+          data-borlabs-cookie-content="//4="
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
   it('should resolve a feed-relative container url against the base url end to end', async () => {
     const value = html`
       <div
@@ -342,6 +431,38 @@ describeForEachParser('surfaceParkedMarkup', (parseHtml) => {
     const result = await transformContent(value, {
       parseHtmlFn: parseHtml,
       baseUrl: 'https://www.instagram.com/feed',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
+  it('should bring a Borlabs blocker back as the YouTube placeholder end to end', async () => {
+    const payload =
+      'PGlmcmFtZSB3aWR0aD0iOTAwIiBoZWlnaHQ9IjUwNyIgc3JjPSJodHRwczovL3d3dy55b3V0dWJlLW5vY29va2llLmNvbS9lbWJlZC91eFBIN0NCMTloMD9yZWw9MCZhbXA7c2hvd2luZm89MCIgZnJhbWVib3JkZXI9IjAiIGFsbG93ZnVsbHNjcmVlbj48L2lmcmFtZT4='
+    const value = html`
+      <div
+        class="brlbs-cmpnt-container brlbs-cmpnt-content-blocker brlbs-cmpnt-with-individual-styles"
+        data-borlabs-cookie-content-blocker-id="youtube-content-blocker"
+        data-borlabs-cookie-content="${payload}"
+      >
+        <p class="brlbs-cmpnt-cb-description">
+          Du siehst gerade einen Platzhalterinhalt von <strong>YouTube</strong>.
+        </p>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/uxPH7CB19h0/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=uxPH7CB19h0"
+        data-embed-id="uxPH7CB19h0"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/uxPH7CB19h0"
+      ></div>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/feed/',
     })
 
     expect(result).toEqualHtml(expected)
