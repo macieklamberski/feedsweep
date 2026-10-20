@@ -16,7 +16,7 @@ import { pixelDimensionLimit } from './dom.js'
 import { isFileName, placeholderBaseUrl } from './urls.js'
 
 // The parser reads a bare `225w` with no url as that candidate's url, and a proxy 404s on it.
-// A Jetpack bug ships `…768w, 225w, 563w` with only the first url present.
+// Jetpack's feed export keeps only the first url, `…768w, 225w, 563w`, while the page has them all.
 const descriptorOnlyUrlRegex = /^\d+(?:\.\d+)?[wx]$/i
 // The lenient parser can leave a trailing comma on a malformed candidate's url.
 const trailingCommaRegex = /,$/

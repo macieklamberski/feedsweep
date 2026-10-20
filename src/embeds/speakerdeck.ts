@@ -11,7 +11,8 @@ const speakerdeckHosts = ['speakerdeck.com']
 // The legacy `/embed/{id}` iframe redirects to `/player/{id}`.
 const deckRouteWords = ['player', 'embed']
 
-// A few feeds fold the slide number into the id attribute itself.
+// Speaker Deck's embed.js appends `data-id` to the player path, so `{id}?slide=N` opens slide N
+// on the publisher's page.
 const slideSuffixRegex = /\?slide=([^&]+)$/
 const legacyScriptPathRegex = /^\/embed\/([^/]+)\.js$/
 
