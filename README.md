@@ -202,6 +202,8 @@ The `stringTransforms` and `domTransforms` options each fully replace the corres
 
 The platforms feedsweep recognizes, the hosts it treats as trackers, the selectors it strips as non-content, the lazy-loading attributes it reads and the player labels it strips from a title or description are all built in and not configurable. A platform or attribute that is missing belongs in the library: open an issue or a pull request.
 
+Feedsweep is not a sanitizer. Apart from the dangerous-scheme floor on URLs, markup such as `<script>` and `on*` handlers passes through as the feed wrote it. Run an HTML sanitizer on the output, not before feedsweep: some transforms decode markup a feed parks in an attribute, so a sanitizer that ran first never saw it.
+
 ## DOM library
 
 Feedsweep is parser-agnostic. You provide `parseHtmlFn` — a function that turns an HTML string into a `Document`. Use any DOM library that produces a standards-compliant `Document`. The test suite runs the full pipeline against both linkedom and jsdom.
