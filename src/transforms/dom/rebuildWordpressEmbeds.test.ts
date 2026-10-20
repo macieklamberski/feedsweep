@@ -125,6 +125,67 @@ describeForEachParser('rebuildWordpressEmbeds', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should rebuild a url inside a styling span', async () => {
+      const value = html`
+        <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+          <div class="wp-block-embed__wrapper">
+            <span style="text-decoration: underline;">https://youtu.be/xK628wrPMIk</span>
+          </div>
+        </figure>
+      `
+      const expected = html`
+        <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+          <div class="wp-block-embed__wrapper">
+            <iframe src="https://youtu.be/xK628wrPMIk"></iframe>
+          </div>
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should rebuild a url beside an oEmbed element with no source', async () => {
+      const value = html`
+        <figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter">
+          <div class="wp-block-embed__wrapper">
+            <div><embed type="oembed">https://twitter.com/MiamiDolphins/status/2009289106388336970?s=20</div>
+          </div>
+        </figure>
+      `
+      const expected = html`
+        <figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter">
+          <div class="wp-block-embed__wrapper">
+            <iframe src="https://twitter.com/MiamiDolphins/status/2009289106388336970?s=20"></iframe>
+          </div>
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should rebuild a url inside an EmbedPress mount', async () => {
+      const value = html`
+        <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+          <div class="wp-block-embed__wrapper">
+            <div
+              class="ose-youtube ose-uid-8d5f12d62b0a08e6cc72cd340b51fd0f ose-embedpress-responsive"
+              style="width:600px; height:550px; max-height:550px; max-width:100%; display:inline-block;"
+              data-embed-type="Youtube"
+            >https://www.youtube.com/watch?v=ohNqsS0sh6w&#038;list=RDohNqsS0sh6w&#038;start_radio=1</div>
+          </div>
+        </figure>
+      `
+      const expected = html`
+        <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+          <div class="wp-block-embed__wrapper">
+            <iframe src="https://www.youtube.com/watch?v=ohNqsS0sh6w&amp;list=RDohNqsS0sh6w&amp;start_radio=1"></iframe>
+          </div>
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -219,6 +280,71 @@ describeForEachParser('rebuildWordpressEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should keep a native video player whose fallback link a resolver claims', async () => {
+      const value = html`
+        <figure class="wp-block-embed is-type-rich is-provider-embed wp-block-embed-embed">
+          <div class="wp-block-embed__wrapper">
+            <video controls>
+              <source
+                type="video/mp4"
+                src="https://archive.org/details/night_of_the_living_dead/night_of_the_living_dead_512kb.mp4?_=1"
+              />
+              <a href="https://archive.org/details/night_of_the_living_dead/night_of_the_living_dead_512kb.mp4">https://archive.org/details/night_of_the_living_dead/night_of_the_living_dead_512kb.mp4</a>
+            </video>
+          </div>
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a frame the publisher wrote beside the url', async () => {
+      const value = html`
+        <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+          <div class="wp-block-embed__wrapper">
+            <iframe src="https://www.youtube.com/embed/xfdNWD6Xrjw"></iframe>
+            https://youtu.be/xfdNWD6Xrjw
+          </div>
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a Flash object the publisher wrote beside the url', async () => {
+      const value = html`
+        <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+          <div class="wp-block-embed__wrapper">
+            <object
+              type="application/x-shockwave-flash"
+              data="https://www.youtube.com/v/xfdNWD6Xrjw"
+            >
+              <param name="movie" value="https://www.youtube.com/v/xfdNWD6Xrjw" />
+            </object>
+            https://youtu.be/xfdNWD6Xrjw
+          </div>
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a Flash embed the publisher wrote beside the url', async () => {
+      const value = html`
+        <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+          <div class="wp-block-embed__wrapper">
+            <embed
+              type="application/x-shockwave-flash"
+              src="https://www.youtube.com/v/xfdNWD6Xrjw"
+            />
+            https://youtu.be/xfdNWD6Xrjw
+          </div>
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should keep a wrapper that already holds its frame', async () => {
       const value = html`
         <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
@@ -302,6 +428,20 @@ describeForEachParser('rebuildWordpressEmbeds through the pipeline', (parseHtml)
     `
     const expected =
       '<div data-embed-url="https://www.instagram.com/p/DZsKxhUOtvr/" data-embed-id="p/DZsKxhUOtvr" data-embed-provider="instagram" data-embed-src="https://www.instagram.com/p/DZsKxhUOtvr/embed/captioned/"></div>'
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should turn a url inside a styling span into the player', async () => {
+    const value = html`
+      <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+        <div class="wp-block-embed__wrapper">
+          <span style="text-decoration: underline;">https://youtu.be/xK628wrPMIk</span>
+        </div>
+      </figure>
+    `
+    const expected =
+      '<div data-embed-ratio="16/9" data-embed-thumbnail="https://i.ytimg.com/vi/xK628wrPMIk/hqdefault.jpg" data-embed-url="https://www.youtube.com/watch?v=xK628wrPMIk" data-embed-id="xK628wrPMIk" data-embed-provider="youtube" data-embed-src="https://www.youtube.com/embed/xK628wrPMIk"></div>'
 
     expect(await convert(value)).toEqualHtml(expected)
   })

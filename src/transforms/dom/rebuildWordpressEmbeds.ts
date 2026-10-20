@@ -3,6 +3,7 @@ import { attr } from '../../utils/dom.js'
 import { createIframe, isEmbedOrMediaResolver, isResolvedIframe } from '../../utils/widgets.js'
 
 const wrapperSelector = '.wp-block-embed__wrapper'
+const contentSelector = 'img, video, audio, iframe, object, embed[src]'
 const whitespaceRegex = /\s/
 
 // A WordPress embed block whose oEmbed call never rendered: the wrapper holds only the source url,
@@ -31,11 +32,9 @@ export const rebuildWordpressEmbeds: DomTransform = (context) => {
         continue
       }
 
-      // Any element beside the url, an image or a native player, is content the frame would
-      // replace.
-      const elements = [...wrapper.querySelectorAll(':not(br)')]
-
-      if (elements.some((element) => !anchor?.contains(element) && !element.contains(anchor))) {
+      // An image or a native player is content the frame would replace. A styling element around
+      // the url holds nothing but the url.
+      if (wrapper.querySelector(contentSelector)) {
         continue
       }
 
