@@ -42,6 +42,55 @@ describe('rsscomResolveEmbed', () => {
       expect(rsscomResolveEmbed(value)).toEqual(expected)
     })
 
+    // The player plays the whole show for any word in place of the episode id.
+    it('should mint the show player for a second segment that is not an episode id', () => {
+      const value = 'https://player.rss.com/allouttabubblegum/episodes?v=2'
+      const expected: EmbedResolverResult = {
+        provider: 'rsscom',
+        id: 'allouttabubblegum',
+        src: 'https://player.rss.com/allouttabubblegum?v=2',
+        url: 'https://rss.com/podcasts/allouttabubblegum/',
+      }
+
+      expect(rsscomResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint the show player for an episode id with a prefix', () => {
+      const value = 'https://player.rss.com/allouttabubblegum/x2949933?v=2'
+      const expected: EmbedResolverResult = {
+        provider: 'rsscom',
+        id: 'allouttabubblegum',
+        src: 'https://player.rss.com/allouttabubblegum?v=2',
+        url: 'https://rss.com/podcasts/allouttabubblegum/',
+      }
+
+      expect(rsscomResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint the show player for an episode id with a suffix', () => {
+      const value = 'https://player.rss.com/allouttabubblegum/2949933x?v=2'
+      const expected: EmbedResolverResult = {
+        provider: 'rsscom',
+        id: 'allouttabubblegum',
+        src: 'https://player.rss.com/allouttabubblegum?v=2',
+        url: 'https://rss.com/podcasts/allouttabubblegum/',
+      }
+
+      expect(rsscomResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint the show player for the newest-episode segment in capitals', () => {
+      const value = 'https://player.rss.com/allouttabubblegum/LATEST?v=2'
+      const expected: EmbedResolverResult = {
+        provider: 'rsscom',
+        id: 'allouttabubblegum',
+        src: 'https://player.rss.com/allouttabubblegum?v=2',
+        url: 'https://rss.com/podcasts/allouttabubblegum/',
+      }
+
+      expect(rsscomResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should keep the start position', () => {
       const value = 'https://player.rss.com/thecosafashow/2909608?theme=color&v=2&time=90'
       const expected: EmbedResolverResult = {
@@ -80,20 +129,9 @@ describe('rsscomResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a second segment that is not an episode id', () => {
-      const value = 'https://player.rss.com/allouttabubblegum/episodes?v=2'
-
-      expect(rsscomResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an episode id with a prefix', () => {
-      const value = 'https://player.rss.com/allouttabubblegum/x2949933?v=2'
-
-      expect(rsscomResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an episode id with a suffix', () => {
-      const value = 'https://player.rss.com/allouttabubblegum/2949933x?v=2'
+    // The player plays the newest episode alone there, and the page url 404s.
+    it('should ignore the newest-episode segment', () => {
+      const value = 'https://player.rss.com/allouttabubblegum/latest?v=2'
 
       expect(rsscomResolveEmbed(value)).toBeUndefined()
     })
