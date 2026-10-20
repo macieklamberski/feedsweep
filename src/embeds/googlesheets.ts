@@ -13,8 +13,9 @@ const sheetRoutes = ['pubhtml', 'pubhtml/sheet']
 const chartRoute = 'pubchart'
 // Frames a sheet shared by link, by its file id. A sheet that is shared but not published
 // answers 401 on `pubhtml`. An `/edit` carrier is a pasted share link that draws the editor's
-// chrome, so it is framed on `/preview` too.
-const sharedRoutes = ['edit', 'preview']
+// chrome, so it is framed on `/preview` too, as is a bare `/spreadsheets/d/{id}`, which redirects
+// to `/edit`.
+const sharedRoutes = ['', 'edit', 'preview']
 
 // The parameters a sheet's frame keeps. Every other one is dropped.
 const sheetParams = [
@@ -61,6 +62,10 @@ export const googlesheetsResolveEmbed: ResolveEmbed = (url, element) => {
   const isChart = route === chartRoute
   // A publish token answers 404 on `/edit` and `/preview`.
   const isShared = !isPublished && sharedRoutes.includes(route)
+
+  if (!sheetId) {
+    return
+  }
 
   if (!isChart && !isShared && !sheetRoutes.includes(route)) {
     return
