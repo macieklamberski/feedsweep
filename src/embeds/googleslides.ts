@@ -1,7 +1,8 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { composeQuery, encodePathSegment, pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
 
 const provider = 'googleslides'
 
@@ -25,11 +26,9 @@ const readDeckFragment = (parsed: URL): string => {
 
 // `/presentation/d/e/{id}` names a deck published to the web and `/presentation/d/{id}` names it
 // by its Drive file id. The legacy `/presentation/embed?id={id}` 301s onto the second.
-// A Workspace prefix, `/a/{domain}/`, only picks the sign-in and serves the same deck.
 export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
-  const pathSegments = getPathSegments(url)
-  const segments = pathSegments[0] === 'a' ? pathSegments.slice(2) : pathSegments
+  const segments = getPathSegmentsWithoutWorkspace(url)
 
   if (!parsed || segments[0] !== 'presentation') {
     return

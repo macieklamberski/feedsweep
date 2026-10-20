@@ -34,6 +34,14 @@ const googledriveHosts = [
   'drive.google.com',
 ]
 
+// The path segments of a Google Docs-family url past a Workspace prefix, `/a/{domain}/`, which
+// only picks the sign-in and serves the same item.
+export const getPathSegmentsWithoutWorkspace = (url: string | URL): Array<string> => {
+  const pathSegments = getPathSegments(url)
+
+  return pathSegments[0] === 'a' ? pathSegments.slice(2) : pathSegments
+}
+
 // The thumbnail of a link-shared Drive file, by its file id.
 export const composeDriveThumbnail = (fileId: string): string => {
   return `https://drive.google.com/thumbnail${composeQuery({ id: decodeSegment(fileId) ?? fileId, sz: 'w640' })}`
@@ -41,10 +49,8 @@ export const composeDriveThumbnail = (fileId: string): string => {
 
 // `/file/d/{id}/preview` frames the file and `/file/d/{id}/view` is its page. A folder on
 // `/drive/folders` or `/embeddedfolderview` is a listing, not a file, and stays unclaimed.
-// A Workspace prefix, `/a/{domain}/`, only picks the sign-in and serves the same file.
 export const googledriveResolveEmbed: ResolveEmbed = (url, element) => {
-  const pathSegments = getPathSegments(url)
-  const segments = pathSegments[0] === 'a' ? pathSegments.slice(2) : pathSegments
+  const segments = getPathSegmentsWithoutWorkspace(url)
   const isAudio = attr(element, 'type')?.startsWith('audio/')
   const fileId = readFileId(segments, url, isAudio)
 
