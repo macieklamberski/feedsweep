@@ -371,6 +371,7 @@ import {
   yandexMapsIframeEmbedResolver,
   yandexMapsScriptEmbedResolver,
 } from '../embeds/yandexmaps.js'
+import { yandexMusicEmbedResolver } from '../embeds/yandexmusic.js'
 import { youkuEmbedResolver } from '../embeds/youku.js'
 import {
   youtubeAmpEmbedResolver,
@@ -824,6 +825,7 @@ const embedResolvers: Array<EmbedResolver> = [
   wordwallEmbedResolver,
   yandexMapsIframeEmbedResolver,
   yandexMapsScriptEmbedResolver,
+  yandexMusicEmbedResolver,
   youkuEmbedResolver,
   youtubeIframeEmbedResolver,
   youtubeAmpEmbedResolver,
