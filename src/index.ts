@@ -141,6 +141,7 @@ export { stripLeadingIndentation } from './transforms/dom/stripLeadingIndentatio
 export { stripMarkdownEscapeBackslashes } from './transforms/dom/stripMarkdownEscapeBackslashes.js'
 export { stripNonContentElements } from './transforms/dom/stripNonContentElements.js'
 export { stripWordBreaks } from './transforms/dom/stripWordBreaks.js'
+export { stripWordpressEmbedFrames } from './transforms/dom/stripWordpressEmbedFrames.js'
 export { surfaceNoscriptEmbeds } from './transforms/dom/surfaceNoscriptEmbeds.js'
 export { surfaceParkedMarkup } from './transforms/dom/surfaceParkedMarkup.js'
 export { surfaceTemplateEmbeds } from './transforms/dom/surfaceTemplateEmbeds.js'

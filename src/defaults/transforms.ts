@@ -82,6 +82,7 @@ import { stripLeadingIndentation } from '../transforms/dom/stripLeadingIndentati
 import { stripMarkdownEscapeBackslashes } from '../transforms/dom/stripMarkdownEscapeBackslashes.js'
 import { stripNonContentElements } from '../transforms/dom/stripNonContentElements.js'
 import { stripWordBreaks } from '../transforms/dom/stripWordBreaks.js'
+import { stripWordpressEmbedFrames } from '../transforms/dom/stripWordpressEmbedFrames.js'
 import { surfaceNoscriptEmbeds } from '../transforms/dom/surfaceNoscriptEmbeds.js'
 import { surfaceParkedMarkup } from '../transforms/dom/surfaceParkedMarkup.js'
 import { surfaceTemplateEmbeds } from '../transforms/dom/surfaceTemplateEmbeds.js'
@@ -261,6 +262,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // and before stripDeadAnchors so a `#`-only permalink isn't unwrapped first.
   normalizeAnchoredHeadings,
   stripDeadAnchors,
+
+  // Runs after stripNonContentElements and stripDeadAnchors, which can take the link out of a
+  // post embed's blockquote, and before convertCiteCards replaces the blockquote it pairs by.
+  stripWordpressEmbedFrames,
   convertCiteCards,
 
   // Compares the first heading's text with the article title, so it runs after

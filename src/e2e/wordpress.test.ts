@@ -12,7 +12,7 @@ describeForEachParser('WordPress', (parseHtml) => {
   // An oEmbed block whose provider call failed ships the bare url alone. LinkifyUrls makes it a
   // link and unwrapWrappers drops the figure shell around it.
   // A post embed's blockquote becomes a cite through wordpressCiteResolver, and
-  // stripNonContentElements drops the frame paired with it.
+  // stripWordpressEmbedFrames drops the frame paired with it by their shared secret.
 
   it('should reduce a failed oEmbed block to its linkified url', async () => {
     const value = html`
@@ -59,6 +59,28 @@ describeForEachParser('WordPress', (parseHtml) => {
         data-cite-url="https://www.e-startupindia.com/learn/gstr-1/"
         data-cite-title="GSTR-1 Return Filing"
       ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should turn a post embed into one cite when wpautop wrapped its frame', async () => {
+    const value = html`
+      <blockquote class="wp-embedded-content" data-secret="SKmjMBV4Gw">
+        <p><a href="https://wprawo.pl/liczby-nie-klamia-mamy-lekki-sezon-grypowy-w-ubieglych-latach-liczba-infekcji-byla-o-wiele-wyzsza/">Liczby nie kłamią! Mamy lekki sezon grypowy.</a></p>
+      </blockquote>
+      <p>
+        <iframe title="&#8222;Liczby nie kłamią! Mamy lekki sezon grypowy.&#8221; &#8212; wPrawo.pl" class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="https://wprawo.pl/liczby-nie-klamia-mamy-lekki-sezon-grypowy-w-ubieglych-latach-liczba-infekcji-byla-o-wiele-wyzsza/embed/#?secret=SKmjMBV4Gw" data-secret="SKmjMBV4Gw" width="600" height="338" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
+      </p>
+      <p>Na koniec.</p>
+    `
+    const expected = html`
+      <div
+        data-cite-provider="wordpress"
+        data-cite-url="https://wprawo.pl/liczby-nie-klamia-mamy-lekki-sezon-grypowy-w-ubieglych-latach-liczba-infekcji-byla-o-wiele-wyzsza/"
+        data-cite-title="Liczby nie kłamią! Mamy lekki sezon grypowy."
+      ></div>
+      <p>Na koniec.</p>
     `
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
