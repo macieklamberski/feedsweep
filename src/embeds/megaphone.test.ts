@@ -152,6 +152,30 @@ describe('megaphoneResolveEmbed', () => {
     expect(megaphoneResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should keep the start position and drop a tracker', () => {
+    const value = 'https://playlist.megaphone.fm?e=FOXM4466927623&start=4580&utm_source=newsletter'
+    const expected: EmbedResolverResult = {
+      provider: 'megaphone',
+      id: 'episode/FOXM4466927623',
+      src: 'https://playlist.megaphone.fm/?e=FOXM4466927623&start=4580',
+      height: 200,
+    }
+
+    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep a start position of zero as written', () => {
+    const value = 'https://playlist.megaphone.fm/?e=FOXM4466927623&start=0'
+    const expected: EmbedResolverResult = {
+      provider: 'megaphone',
+      id: 'episode/FOXM4466927623',
+      src: 'https://playlist.megaphone.fm/?e=FOXM4466927623&start=0',
+      height: 200,
+    }
+
+    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should use a malformed episode id as written, even if the player answers an error', () => {
     const value = 'https://playlist.megaphone.fm/?e=AUDD4761726018%26autoplay%3D1'
     const expected: EmbedResolverResult = {
