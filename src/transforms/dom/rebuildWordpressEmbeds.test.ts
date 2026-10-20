@@ -298,6 +298,53 @@ describeForEachParser('rebuildWordpressEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should keep a frame the publisher wrote beside the url', async () => {
+      const value = html`
+        <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+          <div class="wp-block-embed__wrapper">
+            <iframe src="https://www.youtube.com/embed/xfdNWD6Xrjw"></iframe>
+            https://youtu.be/xfdNWD6Xrjw
+          </div>
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a Flash object the publisher wrote beside the url', async () => {
+      const value = html`
+        <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+          <div class="wp-block-embed__wrapper">
+            <object
+              type="application/x-shockwave-flash"
+              data="https://www.youtube.com/v/xfdNWD6Xrjw"
+            >
+              <param name="movie" value="https://www.youtube.com/v/xfdNWD6Xrjw" />
+            </object>
+            https://youtu.be/xfdNWD6Xrjw
+          </div>
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a Flash embed the publisher wrote beside the url', async () => {
+      const value = html`
+        <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+          <div class="wp-block-embed__wrapper">
+            <embed
+              type="application/x-shockwave-flash"
+              src="https://www.youtube.com/v/xfdNWD6Xrjw"
+            />
+            https://youtu.be/xfdNWD6Xrjw
+          </div>
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should keep a wrapper that already holds its frame', async () => {
       const value = html`
         <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
