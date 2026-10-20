@@ -251,6 +251,88 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should map a group pool named by its alias onto the group player its NSID names', async () => {
+      const value = html`
+        <object
+          height="300"
+          width="400"
+        >
+          <param
+            name="flashvars"
+            value="offsite=true&amp;lang=es-us&amp;page_show_url=%2Fgroups%2Furbansketches%2Fpool%2Fshow%2F&amp;page_show_back_url=%2Fgroups%2Furbansketches%2Fpool%2F&amp;group_id=568523@N21&amp;jump_to=&amp;start_index="
+          >
+          <embed
+            type="application/x-shockwave-flash"
+            src="http://www.flickr.com/apps/slideshow/show.swf?v=109615"
+            allowFullScreen="true"
+            flashvars="offsite=true&amp;lang=es-us&amp;page_show_url=%2Fgroups%2Furbansketches%2Fpool%2Fshow%2F&amp;page_show_back_url=%2Fgroups%2Furbansketches%2Fpool%2F&amp;group_id=568523@N21&amp;jump_to=&amp;start_index="
+            width="400"
+            height="300"
+          >
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'groups/568523@N21',
+        src: 'https://embedr.flickr.com/groups/568523@N21?width=400&height=300',
+        url: 'https://www.flickr.com/groups/568523@N21/',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should map a group pool named by its alias on the embed alone onto the group player', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://www.flickr.com/apps/slideshow/show.swf?v=71649"
+          allowFullScreen="true"
+          flashvars="offsite=true&amp;lang=en-us&amp;page_show_url=%2Fgroups%2Foperationpaperstorm%2Fpool%2Fshow%2F&amp;page_show_back_url=%2Fgroups%2Foperationpaperstorm%2Fpool%2F&amp;group_id=1614570@N22&amp;jump_to=&amp;start_index="
+          width="400"
+          height="300"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'groups/1614570@N22',
+        src: 'https://embedr.flickr.com/groups/1614570@N22?width=400&height=300',
+        url: 'https://www.flickr.com/groups/1614570@N22/',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should return undefined for a group pool path named by its alias under another path', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://www.flickr.com/apps/slideshow/show.swf?v=71649"
+          flashvars="page_show_url=%2Fx%2Fgroups%2Foperationpaperstorm%2Fpool%2Fshow%2F&amp;group_id=1614570@N22"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a group pool named by its alias alone when it starts on a photo', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://www.flickr.com/apps/slideshow/show.swf?v=71649"
+          allowFullScreen="true"
+          flashvars="offsite=true&amp;lang=en-us&amp;page_show_url=%2Fgroups%2Fafs85mmf14g%2Fpool%2Fshow%2Fwith%2F4959570037%2F&amp;page_show_back_url=%2Fgroups%2Fafs85mmf14g%2Fpool%2Fwith%2F4959570037%2F&amp;group_id=1461497@N24&amp;jump_to=4959570037&amp;start_index="
+          width="400"
+          height="300"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     // embedr's group player ignores a `tags` query and shows the whole pool.
     it('should leave a group pool filtered by a tag alone rather than mint the user beside it', async () => {
       const value = html`
