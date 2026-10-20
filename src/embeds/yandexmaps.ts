@@ -15,8 +15,6 @@ const widgetPath = '/map-widget/v1/'
 // names the constructor space, since `um` also carries `mymaps:` maps.
 const constructorIdRegex = /^constructor:(.+)/
 
-const spacedQueryRegex = /\/js\/%20(.+)/
-
 const mapHeight = 400
 
 // Composed from the id alone, with no key and no expiry. The static render answers 400 unless
@@ -51,18 +49,6 @@ const resolveConstructorMap = (query: URLSearchParams): EmbedResolverResult | un
   }
 }
 
-// Some feeds carry the script with a space where the `?` was, which leaves the query in the path
-// and makes Yandex answer with a queryless redirect.
-const readScriptQuery = (url: URL): URLSearchParams => {
-  const spacedQuery = url.pathname.match(spacedQueryRegex)?.[1]
-
-  if (url.search || !spacedQuery) {
-    return url.searchParams
-  }
-
-  return new URLSearchParams(spacedQuery)
-}
-
 // The Constructor's script injects the map where it stands, so a reader strips it and the map
 // renders as nothing. Its own query states the id.
 export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
@@ -75,7 +61,7 @@ export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return resolveConstructorMap(readScriptQuery(url))
+    return resolveConstructorMap(url.searchParams)
   },
 )
 

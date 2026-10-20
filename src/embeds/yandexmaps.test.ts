@@ -120,27 +120,6 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should read the query of a script whose question mark became a space', async () => {
-      const value = html`
-        <script
-          charset="utf-8"
-          async="async"
-          src="https://api-maps.yandex.ru/services/constructor/1.0/js/ um=constructor%3A855da93025cc3bfe3d4b608b50d21825a24fe350250f46898de7e9fb3fcc894f&amp;width=100%25&amp;height=570&amp;lang=ru_RU&amp;scroll=true"
-          type="text/javascript"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'yandexmaps',
-        id: 'constructor:855da93025cc3bfe3d4b608b50d21825a24fe350250f46898de7e9fb3fcc894f',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A855da93025cc3bfe3d4b608b50d21825a24fe350250f46898de7e9fb3fcc894f&source=constructor',
-        thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A855da93025cc3bfe3d4b608b50d21825a24fe350250f46898de7e9fb3fcc894f&width=650&height=400',
-        height: 400,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {
@@ -178,10 +157,13 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a space written anywhere but after the script route', async () => {
+    it('should leave a script whose question mark became a space unclaimed', async () => {
       const value = html`
         <script
-          src="https://api-maps.yandex.ru/services/constructor/1.0/%20um=constructor%3A855da93025cc3bfe3d4b608b50d21825a24fe350250f46898de7e9fb3fcc894f&amp;width=100%25&amp;height=570"
+          charset="utf-8"
+          async="async"
+          src="https://api-maps.yandex.ru/services/constructor/1.0/js/ um=constructor%3A855da93025cc3bfe3d4b608b50d21825a24fe350250f46898de7e9fb3fcc894f&amp;width=100%25&amp;height=570&amp;lang=ru_RU&amp;scroll=true"
+          type="text/javascript"
         ></script>
       `
 
@@ -190,24 +172,6 @@ describeForEachParser('yandexMapsScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should keep the stated query over one written after a space in the path', async () => {
-      const value = html`
-        <script
-          src="https://api-maps.yandex.ru/services/constructor/1.0/js/%20um=constructor%3A855da93025cc3bfe3d4b608b50d21825a24fe350250f46898de7e9fb3fcc894f?sid=XrE3bAUZf88xO0B6nFH3wQbCoNJFhYBD"
-        ></script>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'yandexmaps',
-        id: 'constructor:XrE3bAUZf88xO0B6nFH3wQbCoNJFhYBD',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3AXrE3bAUZf88xO0B6nFH3wQbCoNJFhYBD&source=constructor',
-        thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3AXrE3bAUZf88xO0B6nFH3wQbCoNJFhYBD&width=650&height=400',
-        height: 400,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should read a um value whose colon arrived unescaped', async () => {
       const value = html`
         <script
