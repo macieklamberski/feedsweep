@@ -1396,6 +1396,39 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 
+  it('should read no deck from a caption linking to the player url', async () => {
+    const value = html`
+      <div>
+        <iframe
+          class="scribd_iframe_embed"
+          src="https://www.slideshare.net/slideshow/embed_code/102428855&amp;doc=erasmus-180614083305"
+        ></iframe>
+        <div align="center">
+          Δείτε το στο
+          <a href="https://www.slideshare.net/slideshow/embed_code/102428855&amp;doc=erasmus-180614083305"
+            >slideshare.net</a
+          >
+        </div>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-id="102428855"
+        data-embed-provider="slideshare"
+        data-embed-src="https://www.slideshare.net/slideshow/embed_code/102428855"
+        data-embed-ratio="595/485"
+      ></div>
+      <p>
+        Δείτε το στο
+        <a href="https://www.slideshare.net/slideshow/embed_code/102428855&amp;doc=erasmus-180614083305"
+          >slideshare.net</a
+        >
+      </p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
   // The pre-2015 wrapper holds the player, so it cannot be the block that goes: removing it would
   // take the deck with it. Its caption is the one that still reads twice.
   it('should keep the wrapper the pre-2015 snippet builds around the player', async () => {
