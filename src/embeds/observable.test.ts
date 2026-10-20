@@ -174,6 +174,12 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should refuse a hex id carrying a percent escape', async () => {
+      const value = '<iframe src="https://observablehq.com/embed/3ac7%3fdcbdcb1dd2a"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should refuse a hex id with a character before it', async () => {
       const value =
         '<iframe src="https://observablehq.com/embed/x3ac7dfcbdcb1dd2a@248?cells=map,css"></iframe>'
@@ -181,11 +187,17 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should refuse a hex id with a character after it', async () => {
+    it('should use a hex id of another length as written, even if the frame answers an error', async () => {
       const value =
         '<iframe src="https://observablehq.com/embed/3ac7dfcbdcb1dd2a0@248?cells=map,css"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'observable',
+        id: '3ac7dfcbdcb1dd2a0',
+        src: 'https://observablehq.com/embed/3ac7dfcbdcb1dd2a0@248?cells=map,css',
+        url: 'https://observablehq.com/d/3ac7dfcbdcb1dd2a0',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
   })
 

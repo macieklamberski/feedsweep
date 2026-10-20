@@ -1,10 +1,12 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// The view id is a dashless 24-character hex id.
+// The view id is a dashless 24-character hex id. On the main site the length tells it from a page
+// such as `genially.com/de`, whose name is hex too.
 const safeViewIdRegex = /^[0-9a-f]{24}$/i
+const viewIdCharactersRegex = /^[0-9a-f]+$/i
 
 const geniallyHosts = ['genially.com', 'genial.ly']
 
@@ -14,7 +16,12 @@ export const extractGeniallyViewId = (link: string): string | undefined => {
   // Genially redirects this retired route only as `View/Index`, `view/index` or `VIEW/INDEX`, and
   // answers a mixed spelling such as `View/index` with 404.
   if (segments[0] === 'View' && segments[1] === 'Index') {
-    return keepIfMatches(segments[2], safeViewIdRegex)
+    return keepIfMatches(segments[2], viewIdCharactersRegex)
+  }
+
+  // The view host serves views alone, and answers 404 for a site page such as `/de`.
+  if (parseUrl(link)?.hostname.startsWith('view.')) {
+    return keepIfMatches(segments[0], viewIdCharactersRegex)
   }
 
   const viewId = segments[0] === 'view' ? segments[1] : segments[0]

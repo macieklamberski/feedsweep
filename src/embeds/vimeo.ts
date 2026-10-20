@@ -15,9 +15,9 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'vimeo'
 const playerRatio = '16/9'
 
-// An unlisted video's privacy hash is ten lowercase hex characters, and case-sensitive.
+// An unlisted video's privacy hash is lowercase hex, and case-sensitive.
 const whitespaceRegex = /\s/
-const unlistedHashRegex = /^[0-9a-f]{10}$/
+const unlistedHashRegex = /^[0-9a-f]+$/
 
 const vimeoHosts = ['vimeo.com']
 
@@ -188,7 +188,7 @@ const readReference = (link: string): VimeoReference | undefined => {
     return id ? { id } : undefined
   }
 
-  // A ten-digit video id matches the hash shape, so only a segment after an id counts as one.
+  // A numeric video id matches the hash alphabet, so only a segment after an id counts as one.
   const hashIndex = segments.findIndex((segment, index) => {
     return index > 0 && unlistedHashRegex.test(segment) && digitsRegex.test(segments[index - 1])
   })

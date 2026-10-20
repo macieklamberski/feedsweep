@@ -67,14 +67,20 @@ describe('extractGeniallyViewId', () => {
     expect(extractGeniallyViewId(value)).toBeUndefined()
   })
 
-  it('should return undefined for a hex segment with a leading extra character', () => {
-    const value = `https://view.genially.com/0${viewId}`
+  it('should use a hex id of another length on the view host as written', () => {
+    const value = `https://view.genially.com/${viewId}0`
 
-    expect(extractGeniallyViewId(value)).toBeUndefined()
+    expect(extractGeniallyViewId(value)).toBe(`${viewId}0`)
   })
 
-  it('should return undefined for a hex segment with a trailing extra character', () => {
-    const value = `https://view.genially.com/${viewId}0`
+  it('should use a hex id of another length on the retired route as written', () => {
+    const value = 'https://www.genial.ly/View/Index/60294f8b2ec856159ae0ba'
+
+    expect(extractGeniallyViewId(value)).toBe('60294f8b2ec856159ae0ba')
+  })
+
+  it('should return undefined for a site page on the main host whose name is hex', () => {
+    const value = 'https://genially.com/de'
 
     expect(extractGeniallyViewId(value)).toBeUndefined()
   })
