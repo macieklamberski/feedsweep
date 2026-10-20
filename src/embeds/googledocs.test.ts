@@ -245,6 +245,22 @@ describe('googledocsResolveEmbed', () => {
       expect(googledocsResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should drop the parameters of an Office file shared by link', () => {
+      const value =
+        'https://docs.google.com/document/d/1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY/edit?ouid=104377468225391683720&rtpof=true&sd=true'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY',
+        src: 'https://docs.google.com/document/d/1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY/preview',
+        url: 'https://docs.google.com/document/d/1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY&sz=w640',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should ignore a published doc on its preview page', () => {
       const value =
         'https://docs.google.com/document/d/e/2PACX-1vQW3iYIW4L0w6xry6RUhynyWSb-VeEgSQl5q3mzR0335n7RA-EUvVJSiCQbISewyqE2CNP9mVAivM4G/preview'
