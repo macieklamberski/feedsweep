@@ -22,6 +22,7 @@ import {
   createPlaceholder,
   createS9eEmbedResolver,
   createUrlEmbedResolver,
+  embedCarrierSelector,
   getEmbedSize,
   normalizeEmbedFields,
   prepareCiteMetadata,
@@ -1604,6 +1605,199 @@ describeForEachParser('readCarrierUrl', (parseHtml) => {
     const value = '<iframe src="https://player.example.com/embed/abc&autoplay=1"></iframe>'
 
     expect(read(value)).toBe('https://player.example.com/embed/abc&autoplay=1')
+  })
+
+  it('should read the player an object without data names in its movie param', () => {
+    const value = html`
+      <object
+        id="prezi_wfead3cfqtpa"
+        classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+        width="550"
+        height="400"
+        name="prezi_wfead3cfqtpa"
+      >
+        <param name="movie" value="http://prezi.com/bin/preziloader.swf">
+        <param name="allowfullscreen" value="true">
+      </object>
+    `
+
+    expect(read(value)).toBe('http://prezi.com/bin/preziloader.swf')
+  })
+
+  it('should read the movie param whatever case its name is spelled in', () => {
+    const value = html`
+      <object width="425" height="350">
+        <param name="Movie" value="http://www.youtube.com/v/hG2m626N_YI">
+      </object>
+    `
+
+    expect(read(value)).toBe('http://www.youtube.com/v/hG2m626N_YI')
+  })
+
+  it('should prefer the data of an object over its movie param', () => {
+    const value = html`
+      <object data="https://player.example.com/data.swf">
+        <param name="movie" value="https://player.example.com/movie.swf">
+      </object>
+    `
+
+    expect(read(value)).toBe('https://player.example.com/data.swf')
+  })
+
+  it('should read nothing from an object without data that holds text', () => {
+    const value = html`
+      <object width="500" height="375">
+        <param name="allowfullscreen" value="true">
+        <param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=77323891&force_embed=1&server=vimeo.com">
+        <p><a href="http://vimeo.com/77323891">Des lapins morts sur le vieux port</a> from <a href="http://vimeo.com/user14724364">Naiel</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
+        <p>Des lapins morts sur le Vieux Port</p>
+      </object>
+    `
+
+    expect(read(value)).toBe('')
+  })
+})
+
+describeForEachParser('embedCarrierSelector', (parseHtml) => {
+  const match = (value: string) => {
+    return Array.from(parseHtml(value).querySelectorAll(embedCarrierSelector), (element) => {
+      return element.localName
+    })
+  }
+
+  it('should match an object without data that holds only its params', () => {
+    const value = html`
+      <object
+        id="prezi_vkvslwzxtkzr"
+        name="prezi_vkvslwzxtkzr"
+        classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+        width="550"
+        height="400"
+      >
+        <param name="movie" value="http://prezi.com/bin/preziloader.swf">
+        <param name="flashvars" value="prezi_id=vkvslwzxtkzr&amp;lock_to_path=0">
+      </object>
+    `
+
+    expect(match(value)).toEqual(['object'])
+  })
+
+  it('should leave an object without data that holds an embed to the embed', () => {
+    const value = html`
+      <object width="440" height="325">
+        <param name="movie" value="http://prezi.com/bin/preziloader.swf">
+        <embed id="preziEmbed_wfqsr9xleno5" src="http://prezi.com/bin/preziloader.swf" type="application/x-shockwave-flash">
+      </object>
+    `
+
+    expect(match(value)).toEqual(['embed'])
+  })
+
+  it('should leave an object without data that holds another object to the inner one', () => {
+    const value = html`
+      <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="780" height="420">
+        <param name="movie" value="myContent.swf">
+        <object type="application/x-shockwave-flash" data="myContent.swf" width="780" height="420">
+          <p>Alternative content</p>
+        </object>
+      </object>
+    `
+
+    expect(match(value)).toEqual(['object'])
+    expect(parseHtml(value).querySelector(embedCarrierSelector)?.getAttribute('data')).toBe(
+      'myContent.swf',
+    )
+  })
+
+  it('should leave an object without data that holds an iframe to the iframe', () => {
+    const value = html`
+      <object height="350" width="425">
+        <param name="movie" value="http://www.youtube.com/v/hG2m626N_YI">
+        <param name="wmode" value="transparent">
+        <iframe allowfullscreen frameborder="0" height="300" src="https://www.youtube.com/embed/1LsalZTEc7s" width="400"></iframe>
+      </object>
+    `
+
+    expect(match(value)).toEqual(['iframe'])
+  })
+
+  it('should leave an object without data that holds an image as it is', () => {
+    const value = html`
+      <object height="355" width="425">
+        <param name="movie" value="http://www.youtube.com/v/srhI7Iz9wPM&rel=1">
+        <param name="wmode" value="transparent">
+        <center><a href="http://www.dogswithblogs.com.au/stormysorders.htm"><img src="http://www.dogswithblogs.com.au/obbhbutton.png"></a></center>
+      </object>
+    `
+
+    expect(match(value)).toEqual([])
+  })
+})
+
+describeForEachParser('objects naming their player in a movie param', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should resolve a protocol-relative movie param', async () => {
+    const value = html`
+      <object width="420" height="315">
+        <param name="movie" value="//www.youtube.com/v/oq4-7rK3dUM?version=3&hl=en_US">
+        <param name="allowFullScreen" value="true">
+        <param name="allowscriptaccess" value="always">
+      </object>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/oq4-7rK3dUM/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=oq4-7rK3dUM"
+        data-embed-id="oq4-7rK3dUM"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/oq4-7rK3dUM"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep an object holding text as written', async () => {
+    const value = html`
+      <object width="500" height="375">
+        <param name="allowfullscreen" value="true">
+        <param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=77323891&force_embed=1&server=vimeo.com">
+        <p><a href="http://vimeo.com/77323891">Des lapins morts sur le vieux port</a> from <a href="http://vimeo.com/user14724364">Naiel</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
+        <p>Des lapins morts sur le Vieux Port</p>
+      </object>
+    `
+
+    expect(await convert(value)).toEqualHtml(value)
+  })
+
+  // A forum editor wrote its own player into a broken movie param. The player resolves first,
+  // and the object does not replace it.
+  it('should keep the placeholder of a player the object holds', async () => {
+    const value = html`
+      <object width="425" height="350"><param name="movie" value="
+      </p>
+      <div class=" ipsEmbeddedVideo"><div><iframe width="459" height="344" frameborder="0" allowfullscreen data-embed-src="https://www.youtube.com/embed/6f8EQNVxxbw?feature=oembed"></iframe></div></object>
+    `
+    const placeholders = parseHtml(await convert(value)).querySelectorAll('[data-embed-provider]')
+    const ids = Array.from(placeholders, (element) => element.getAttribute('data-embed-id'))
+
+    expect(ids).toEqual(['6f8EQNVxxbw'])
+  })
+
+  it('should leave the object around a placeholder as it is on a second pass', async () => {
+    const value = html`
+      <object width="425" height="350"><param name="movie" value="
+      </p>
+      <div class=" ipsEmbeddedVideo"><div><iframe width="459" height="344" frameborder="0" allowfullscreen data-embed-src="https://www.youtube.com/embed/6f8EQNVxxbw?feature=oembed"></iframe></div></object>
+    `
+    const once = await convert(value)
+    const twice = await convert(once)
+
+    expect(twice).toEqualHtml(once)
   })
 })
 

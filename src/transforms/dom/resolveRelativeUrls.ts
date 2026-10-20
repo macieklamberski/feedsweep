@@ -3,6 +3,7 @@ import type { DomTransform, ResolveUrlFn } from '../../types.js'
 import { svgHrefAttribute } from '../../utils/dom.js'
 import { countSrcsetCandidates, parseSrcset } from '../../utils/images.js'
 import { absoluteUrlRegex, collapseSlashRuns, resolveOrKeepUrl } from '../../utils/urls.js'
+import { paramObjectSelector } from '../../utils/widgets.js'
 
 const hostPrefixedUrlRegex = /^(https?:)\/\/[^/?#]+\/+(?=\/(?:[a-z0-9-]+\.)+[a-z]{2,}\/)/i
 const hostPrefixedSrcTags = ['iframe', 'embed', 'script']
@@ -80,6 +81,8 @@ const urlAttributes: Array<UrlAttribute> = [
   { selector: 'a[href]:not([href^="#"]), area[href]:not([href^="#"])', attribute: 'href' },
   { selector: 'video[poster]', attribute: 'poster' },
   { selector: 'object[data]', attribute: 'data' },
+  // The widget resolvers read the player such an object names here.
+  { selector: `${paramObjectSelector} param[name="movie" i]`, attribute: 'value' },
   { selector: 'blockquote[cite], q[cite], ins[cite], del[cite]', attribute: 'cite' },
   { selector: 'image', attribute: svgHrefAttribute },
   { selector: 'img[srcset], source[srcset]', attribute: 'srcset', srcset: true },

@@ -210,6 +210,33 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the presentation out of an object naming the loader only in a param', async () => {
+      const value = html`
+        <object
+          id="prezi_wfead3cfqtpa"
+          classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+          width="550"
+          height="400"
+          name="prezi_wfead3cfqtpa"
+        >
+          <param name="movie" value="http://prezi.com/bin/preziloader.swf">
+          <param name="allowfullscreen" value="true">
+          <param name="allowscriptaccess" value="always">
+          <param name="bgcolor" value="#ffffff">
+          <param name="flashvars" value="prezi_id=wfead3cfqtpa&amp;lock_to_path=0&amp;color=ffffff&amp;autoplay=no&amp;autohide_ctrls=0">
+        </object>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'prezi',
+        id: 'wfead3cfqtpa',
+        src: 'https://prezi.com/p/wfead3cfqtpa/embed',
+        url: 'https://prezi.com/p/wfead3cfqtpa/',
+        ratio: '550/400',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should fall back to the element id when the flashvars are gone', async () => {
       const value = html`
         <object
@@ -470,6 +497,28 @@ describeForEachParser('the Flash object other Flash readers could claim first', 
         data-embed-ratio="550/400"
         data-embed-src="https://prezi.com/p/bsno4idxinyc/embed"
         data-embed-url="https://prezi.com/p/bsno4idxinyc/"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should turn the object naming the loader only in a param into the same placeholder', async () => {
+    const value = html`
+      <object width="400" height="300" id="prezi_hmql6k-ryv21" name="prezi_hmql6k-ryv21" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"><p></p>
+      <param name="movie" value="http://prezi.com/bin/preziloader.swf">
+      <param name="allowfullscreen" value="true">
+      <param name="allowscriptaccess" value="always">
+      <param name="bgcolor" value="#ffffff">
+      <param name="flashvars" value="prezi_id=hmql6k-ryv21&amp;lock_to_path=0&amp;color=ffffff&amp;autoplay=no&amp;autohide_ctrls=0"></object>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="prezi"
+        data-embed-id="hmql6k-ryv21"
+        data-embed-ratio="550/400"
+        data-embed-src="https://prezi.com/p/hmql6k-ryv21/embed"
+        data-embed-url="https://prezi.com/p/hmql6k-ryv21/"
       ></div>
     `
 
