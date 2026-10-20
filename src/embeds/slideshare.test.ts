@@ -530,6 +530,54 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should take the deck and caption from a wrapper nested in another deck', async () => {
+      const value = html`
+        <div id="__ss_12318365" style="width: 425px;">
+          <br />
+          <div style="padding: 5px 0 12px;">
+            <div id="__ss_13423377" style="width: 425px;">
+              <b style="display: block; margin: 12px 0 4px;"
+                ><a
+                  href="http://www.slideshare.net/bcqc/mostly-harmless-22nd-april-2012"
+                  title="Mostly harmless   22nd april 2012"
+                  >Mostly harmless 22nd april 2012</a
+                ></b
+              >
+              <object height="355" id="__sse13423377" width="425">
+                <param
+                  name="movie"
+                  value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=mostlyharmless-22ndapril2012-120622155619-phpapp01&stripped_title=mostly-harmless-22nd-april-2012&userName=bcqc"
+                />
+                <embed
+                  name="__sse13423377"
+                  src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=mostlyharmless-22ndapril2012-120622155619-phpapp01&stripped_title=mostly-harmless-22nd-april-2012&userName=bcqc"
+                  type="application/x-shockwave-flash"
+                  width="425"
+                  height="355"
+                ></embed>
+              </object>
+              <br />
+              <div style="padding: 5px 0 12px;">
+                View more <a href="http://www.slideshare.net/">presentations</a> from
+                <a href="http://www.slideshare.net/bcqc">Boat Club Quiz Club Pune</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '13423377',
+        src: 'https://www.slideshare.net/slideshow/embed_code/13423377',
+        url: 'http://www.slideshare.net/bcqc/mostly-harmless-22nd-april-2012',
+        ratio: '595/485',
+        title: 'Mostly harmless   22nd april 2012',
+        author: 'Boat Club Quiz Club Pune',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read the id off the object when the outer div is gone', async () => {
       const value = html`
         <object id="__sse6435157">
@@ -659,6 +707,271 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
       `
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('the caption an editor split around the player', () => {
+    it('should read the deck before the player and the owner after it', async () => {
+      const value = html`
+        <div style="width:425px">
+          <strong
+            ><a
+              href="http://www.slideshare.net/escolalestel/historia-marcel"
+              title="Historia marcel"
+              >Historia marcel</a
+            ></strong
+          ><object id="__sse13123724" width="425" height="355">
+            <param
+              name="movie"
+              value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=historiamarcel-120529143341-phpapp02&amp;stripped_title=historia-marcel&amp;userName=escolalestel"
+            />
+            <embed
+              name="__sse13123724"
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=historiamarcel-120529143341-phpapp02&amp;stripped_title=historia-marcel&amp;userName=escolalestel"
+              type="application/x-shockwave-flash"
+              width="425"
+              height="355"
+            ></embed>
+          </object>
+          <div style="padding:5px 0 12px">
+            View more <a href="http://www.slideshare.net/">presentations</a> from
+            <a href="http://www.slideshare.net/escolalestel">escolalestel</a>.
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '13123724',
+        src: 'https://www.slideshare.net/slideshow/embed_code/13123724',
+        url: 'http://www.slideshare.net/escolalestel/historia-marcel',
+        ratio: '595/485',
+        title: 'Historia marcel',
+        author: 'escolalestel',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read an owner link standing beside the player', async () => {
+      const value = html`
+        <div>
+          <strong style="display: block; margin: 12px 0 4px;"
+            ><a
+              href="http://www.slideshare.net/nonty/eclipse-summit-europe-10-test-ui-aspects-of-plugins"
+              title="Eclipse Summit Europe '10 - Test UI Aspects of Plug-ins"
+              >Eclipse Summit Europe '10 - Test UI Aspects of Plug-ins</a
+            ></strong
+          >
+          <object height="355" id="__sse5631696" width="425">
+            <embed
+              name="__sse5631696"
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=pr0031-eclipsesummiteurope10-testuiaspectsofplug-ins-101101050601-phpapp01&stripped_title=eclipse-summit-europe-10-test-ui-aspects-of-plugins&userName=nonty"
+              type="application/x-shockwave-flash"
+              width="425"
+              height="355"
+            ></embed>
+          </object>
+          <br />
+          <br />
+          View more presentations from <a href="http://www.slideshare.net/nonty">The RCP Company</a>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '5631696',
+        src: 'https://www.slideshare.net/slideshow/embed_code/5631696',
+        url: 'http://www.slideshare.net/nonty/eclipse-summit-europe-10-test-ui-aspects-of-plugins',
+        ratio: '595/485',
+        title: "Eclipse Summit Europe '10 - Test UI Aspects of Plug-ins",
+        author: 'The RCP Company',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the caption around an embed standing without its object', async () => {
+      const value = html`
+        <div style="width: 425px;">
+          <strong style="display: block; margin: 12px 0pt 4px;"
+            ><a
+              title="《Photoshop使用经验谈》谢晓路"
+              href="http://www.slideshare.net/topidea/photoshop-4973393"
+              target="_blank"
+              >4：《Photoshop使用经验谈》谢晓路</a
+            ></strong
+          ><embed
+            type="application/x-shockwave-flash"
+            width="425"
+            height="355"
+            src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=photoshop-100815085413-phpapp02&amp;stripped_title=photoshop-4973393"
+            name="__sse4973393"
+            allowscriptaccess="never"
+            allowfullscreen="true"
+            wmode="transparent"
+          /><span class="link popout">Popout</span>View more
+          <a href="http://www.slideshare.net/" target="_blank">presentations</a> from
+          <a href="http://www.slideshare.net/topidea" target="_blank">top idea</a>.
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '4973393',
+        src: 'https://www.slideshare.net/slideshow/embed_code/4973393',
+        url: 'http://www.slideshare.net/topidea/photoshop-4973393',
+        ratio: '595/485',
+        title: '《Photoshop使用经验谈》谢晓路',
+        author: 'top idea',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the deck and the owner from the blocks around the player', async () => {
+      const value = html`
+        <div style="width: 595px;">
+          <strong style="display:block;margin:12px 0 4px"
+            ><a
+              title="Romney vs. romney (update, 04.04.12)"
+              href="http://www.slideshare.net/kkellyfv/romney-vs-romney-update-040412"
+              >Romney vs. Romney (update, 04.04.12)</a
+            ></strong
+          >
+        </div>
+        <div style="width: 595px;">
+          <object
+            width="595"
+            height="497"
+            data="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=romneyvs-romneyupdate04-04-12-120404115349-phpapp01&amp;stripped_title=romney-vs-romney-update-040412&amp;userName=kkellyfv"
+            type="application/x-shockwave-flash"
+          >
+            <param name="id" value="__sse12282593" />
+            <param name="name" value="__sse12282593" />
+          </object>
+        </div>
+        <div id="__ss_12282593" style="width: 595px;">
+          <div style="padding:5px 0 12px">
+            View more <a href="http://www.slideshare.net/">presentations</a> from
+            <a href="http://www.slideshare.net/kkellyfv">kkellyfv</a>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '12282593',
+        src: 'https://www.slideshare.net/slideshow/embed_code/12282593',
+        url: 'http://www.slideshare.net/kkellyfv/romney-vs-romney-update-040412',
+        ratio: '595/485',
+        title: 'Romney vs. romney (update, 04.04.12)',
+        author: 'kkellyfv',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a whole caption left in the block before the player', async () => {
+      const value = html`
+        <div style="width: 425px;" id="__ss_4382729">
+          <b style="display:block;margin:12px 0 4px"
+            ><a
+              href="http://www.slideshare.net/PSFK/psfk-presents-future-of-retail-report"
+              title="PSFK presents Future of Retail report"
+              >PSFK presents Future of Retail report</a
+            ></b
+          >
+          <div style="padding:5px 0 12px">
+            View more <a href="http://www.slideshare.net/">presentations</a> from
+            <a href="http://www.slideshare.net/PSFK">PSFK</a>.
+          </div>
+        </div>
+        <p style="text-align: center;">
+          <object
+            height="355"
+            width="425"
+            data="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=psfkpresentsfutureofretailreportv1-100601202203-phpapp01&amp;stripped_title=psfk-presents-future-of-retail-report"
+            type="application/x-shockwave-flash"
+          >
+            <param name="id" value="__sse4382729" />
+            <param name="name" value="__sse4382729" />
+          </object>
+        </p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '4382729',
+        src: 'https://www.slideshare.net/slideshow/embed_code/4382729',
+        url: 'http://www.slideshare.net/PSFK/psfk-presents-future-of-retail-report',
+        ratio: '595/485',
+        title: 'PSFK presents Future of Retail report',
+        author: 'PSFK',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read a deck link naming another slug than the player', async () => {
+      const value = html`
+        <div style="width:425px">
+          <strong
+            ><a
+              href="http://www.slideshare.net/escolalestel/historia-roger"
+              title="Historia roger"
+              >Historia roger</a
+            ></strong
+          ><object id="__sse13123724" width="425" height="355">
+            <embed
+              name="__sse13123724"
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=historiamarcel-120529143341-phpapp02&amp;stripped_title=historia-marcel&amp;userName=escolalestel"
+              type="application/x-shockwave-flash"
+            ></embed>
+          </object>
+          <div style="padding:5px 0 12px">
+            View more <a href="http://www.slideshare.net/">presentations</a> from
+            <a href="http://www.slideshare.net/escolalestel">escolalestel</a>.
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '13123724',
+        src: 'https://www.slideshare.net/slideshow/embed_code/13123724',
+        url: 'https://www.slideshare.net/escolalestel/historia-marcel',
+        ratio: '595/485',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read an owner line naming another account than the deck', async () => {
+      const value = html`
+        <div style="width:425px">
+          <strong
+            ><a
+              href="http://www.slideshare.net/escolalestel/historia-marcel"
+              title="Historia marcel"
+              >Historia marcel</a
+            ></strong
+          ><object id="__sse13123724" width="425" height="355">
+            <embed
+              name="__sse13123724"
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=historiamarcel-120529143341-phpapp02&amp;stripped_title=historia-marcel&amp;userName=escolalestel"
+              type="application/x-shockwave-flash"
+            ></embed>
+          </object>
+          <div style="padding:5px 0 12px">
+            View more <a href="http://www.slideshare.net/">presentations</a> from
+            <a href="http://www.slideshare.net/someoneelse">Someone Else</a>.
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '13123724',
+        src: 'https://www.slideshare.net/slideshow/embed_code/13123724',
+        url: 'https://www.slideshare.net/escolalestel/historia-marcel',
+        ratio: '595/485',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
@@ -1468,6 +1781,190 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should mint the deck of a player left inside another deck wrapper', async () => {
+    const value = html`
+      <div id="__ss_6285355" style="width: 635px;">
+        <object height="700" id="__sse6285355" width="635">
+          <param
+            name="movie"
+            value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=toan-cau-hoa-va-nhung-mat-trai-1-101222000526-phpapp02&stripped_title=ton-cu-ha-v-nhng-mt-tri-tp-1&userName=sukienhay"
+          />
+          <embed
+            name="__sse6285355"
+            src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=toan-cau-hoa-va-nhung-mat-trai-1-101222000526-phpapp02&stripped_title=ton-cu-ha-v-nhng-mt-tri-tp-1&userName=sukienhay"
+            type="application/x-shockwave-flash"
+            width="635"
+            height="700"
+          ></embed>
+        </object>
+        <br />
+        <div style="padding: 5px 0pt 12px;">
+          Click menu để xem Fullscree<br />
+          <b style="color: cyan; display: block; margin: 12px 0pt 4px;"
+            >Toàn cầu hóa và những mặt trái Tập 2</b
+          >
+          <object height="700" id="__sse6285290" width="635">
+            <param
+              name="movie"
+              value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=toan-cau-hoa-va-nhung-mat-trai-101222000113-phpapp01&stripped_title=ton-cu-ha-v-nhng-mt-tri&userName=sukienhay"
+            />
+            <embed
+              name="__sse6285290"
+              src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=toan-cau-hoa-va-nhung-mat-trai-101222000113-phpapp01&stripped_title=ton-cu-ha-v-nhng-mt-tri&userName=sukienhay"
+              type="application/x-shockwave-flash"
+              width="635"
+              height="700"
+            ></embed>
+          </object>
+        </div>
+      </div>
+    `
+    const expected = [
+      {
+        id: '6285355',
+        url: 'https://www.slideshare.net/sukienhay/ton-cu-ha-v-nhng-mt-tri-tp-1',
+        title: null,
+      },
+      {
+        id: '6285290',
+        url: 'https://www.slideshare.net/sukienhay/ton-cu-ha-v-nhng-mt-tri',
+        title: null,
+      },
+    ]
+
+    expect(placeholders(await convert(value), parseHtml)).toEqual(expected)
+  })
+
+  it('should caption a snippet pasted inside another one from its own wrapper', async () => {
+    const value = html`
+      <div style="width: 477px;" id="__ss_9490981">
+        <strong style="display: block; margin: 12px 0pt 4px;"
+          ><a
+            href="http://www.slideshare.net/belindahc/pegar-gometz-crculos"
+            title="Pegar gometz círculos"
+            >Pegar gometz círculos</a
+          ></strong
+        >
+        <object id="__sse9490981" width="477" height="510">
+          <param
+            name="movie"
+            value="http://static.slidesharecdn.com/swf/doc_player.swf?doc=pegargometzcrculos-110930132426-phpapp02&amp;stripped_title=pegar-gometz-crculos&amp;userName=belindahc"
+          />
+          <embed
+            name="__sse9490981"
+            src="http://static.slidesharecdn.com/swf/doc_player.swf?doc=pegargometzcrculos-110930132426-phpapp02&amp;stripped_title=pegar-gometz-crculos&amp;userName=belindahc"
+            type="application/x-shockwave-flash"
+            width="477"
+            height="510"
+          ></embed>
+        </object>
+        <div style="padding: 5px 0pt 12px;">
+          View more <a href="http://www.slideshare.net/">documents</a> from
+          <a href="http://www.slideshare.net/belindahc">belindahc</a>.<br /><br />
+          <div style="width:477px" id="__ss_9491020">
+            <strong style="display:block;margin:12px 0 4px"
+              ><a
+                href="http://www.slideshare.net/belindahc/series-pegar-gometz"
+                title="Series pegar gometz"
+                >Series pegar gometz</a
+              ></strong
+            >
+            <object id="__sse9491020" width="477" height="510">
+              <param
+                name="movie"
+                value="http://static.slidesharecdn.com/swf/doc_player.swf?doc=seriespegargometz-110930132911-phpapp01&stripped_title=series-pegar-gometz&userName=belindahc"
+              />
+              <embed
+                name="__sse9491020"
+                src="http://static.slidesharecdn.com/swf/doc_player.swf?doc=seriespegargometz-110930132911-phpapp01&stripped_title=series-pegar-gometz&userName=belindahc"
+                type="application/x-shockwave-flash"
+                width="477"
+                height="510"
+              ></embed>
+            </object>
+            <div style="padding:5px 0 12px">
+              View more <a href="http://www.slideshare.net/">documents</a> from
+              <a href="http://www.slideshare.net/belindahc">belindahc</a>.
+            </div>
+          </div>
+        </div>
+      </div>
+    `
+    const expected = [
+      {
+        id: '9490981',
+        url: 'http://www.slideshare.net/belindahc/pegar-gometz-crculos',
+        title: 'Pegar gometz círculos',
+      },
+      {
+        id: '9491020',
+        url: 'http://www.slideshare.net/belindahc/series-pegar-gometz',
+        title: 'Series pegar gometz',
+      },
+    ]
+
+    expect(placeholders(await convert(value), parseHtml)).toEqual(expected)
+  })
+
+  it('should caption an iframe nested in another deck wrapper from its own wrapper', async () => {
+    const value = html`
+      <div id="__ss_667402" style="width: 425px;">
+        <strong style="display: block; margin: 12px 0 4px;"
+          ><a
+            href="http://www.slideshare.net/escamon4/halloween-vocabulary-presentation"
+            target="_blank"
+            title="Halloween Vocabulary"
+            >Halloween Vocabulary</a
+          ></strong
+        >
+        <iframe
+          frameborder="0"
+          height="300"
+          scrolling="no"
+          src="http://www.slideshare.net/slideshow/embed_code/667402"
+          width="300"
+        ></iframe
+        ><br />
+        <div style="padding: 5px 0 12px;">
+          <div id="__ss_2735732" style="width: 425px;">
+            <strong style="display: block; margin-bottom: 4px; margin-top: 12px; text-align: left;"
+              ><a
+                href="http://www.slideshare.net/DorienSW/halloween-2735732"
+                target="_blank"
+                title="Halloween"
+                >Halloween</a
+              ></strong
+            >
+            <br />
+            <div style="text-align: left;">
+              <iframe
+                frameborder="0"
+                height="300"
+                scrolling="no"
+                src="http://www.slideshare.net/slideshow/embed_code/2735732"
+                width="300"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    `
+    const expected = [
+      {
+        id: '667402',
+        url: 'http://www.slideshare.net/escamon4/halloween-vocabulary-presentation',
+        title: 'Halloween Vocabulary',
+      },
+      {
+        id: '2735732',
+        url: 'http://www.slideshare.net/DorienSW/halloween-2735732',
+        title: 'Halloween',
+      },
+    ]
+
+    expect(placeholders(await convert(value), parseHtml)).toEqual(expected)
   })
 
   // The enclosure probe offers every attachment a feed carries to this resolver, and SlideShare's
