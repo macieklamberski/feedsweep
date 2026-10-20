@@ -4,7 +4,7 @@ import { attr } from '../utils/dom.js'
 
 const provider = 'libsyn'
 
-import { isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const libsynHosts = ['libsyn.com']
@@ -40,7 +40,7 @@ export const extractLibsynEmbed = (link: string): { kind: string; id: string } |
 
   const id = readPathOption(segments, 'id')
 
-  if (!id) {
+  if (!id || !digitsRegex.test(id)) {
     return
   }
 

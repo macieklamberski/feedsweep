@@ -18,7 +18,7 @@ const playerPathRegex = /^\/(?:embed(?:\/v2)?|player\/v1)\/(\d+)\/?$/
 
 // A watch url names the clip's owner and the clip: `/@handle/video/{id}`. Sanitized copies
 // sometimes keep only the `/video/{id}` half, so the handle is optional.
-const watchPathRegex = /^(?:\/@([^/]+))?\/video\/([^/]+)\/?$/
+const watchPathRegex = /^(?:\/@([^/]+))?\/video\/(\d+)\/?$/
 
 // Not a 9/16 ratio: the frame stays 738 tall at any width, and the ratio asks 1778 at 1000.
 // The clip is letterboxed inside a frame whose header, caption, sound row and action rail set
