@@ -78,13 +78,6 @@ describe('googledocsResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a doc framed by its file id with no route', () => {
-      const value =
-        'https://docs.google.com/document/d/17EzTWqEAgy02oqEgKphdbjiUAo7BuDWCkmKpSp9qbzk'
-
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a doc exported as a file', () => {
       const value =
         'https://docs.google.com/document/d/1VEG0aH5kQ19Aq3I0honkir-8m9wTfZoWCyLPMOQIypQ/export?format=pdf'
@@ -175,6 +168,38 @@ describe('googledocsResolveEmbed', () => {
         url: 'https://docs.google.com/document/d/1Rb8puH5tsZA2RRnu1tJ6r2C9y9xFbhJQE--WEaEOGZw/edit',
         thumbnail:
           'https://drive.google.com/thumbnail?id=1Rb8puH5tsZA2RRnu1tJ6r2C9y9xFbhJQE--WEaEOGZw&sz=w640',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should frame a doc written with no route on its preview page', () => {
+      const value =
+        'https://docs.google.com/document/d/17EzTWqEAgy02oqEgKphdbjiUAo7BuDWCkmKpSp9qbzk'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '17EzTWqEAgy02oqEgKphdbjiUAo7BuDWCkmKpSp9qbzk',
+        src: 'https://docs.google.com/document/d/17EzTWqEAgy02oqEgKphdbjiUAo7BuDWCkmKpSp9qbzk/preview',
+        url: 'https://docs.google.com/document/d/17EzTWqEAgy02oqEgKphdbjiUAo7BuDWCkmKpSp9qbzk/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=17EzTWqEAgy02oqEgKphdbjiUAo7BuDWCkmKpSp9qbzk&sz=w640',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the embedded flag from a doc written with no route', () => {
+      const value =
+        'https://docs.google.com/document/d/15gcrtBykB7BNhRTiq-Yg3xMHu4AOJ94bHEIhn152cgA/?embedded=true'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '15gcrtBykB7BNhRTiq-Yg3xMHu4AOJ94bHEIhn152cgA',
+        src: 'https://docs.google.com/document/d/15gcrtBykB7BNhRTiq-Yg3xMHu4AOJ94bHEIhn152cgA/preview',
+        url: 'https://docs.google.com/document/d/15gcrtBykB7BNhRTiq-Yg3xMHu4AOJ94bHEIhn152cgA/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=15gcrtBykB7BNhRTiq-Yg3xMHu4AOJ94bHEIhn152cgA&sz=w640',
         height: 500,
       }
 
