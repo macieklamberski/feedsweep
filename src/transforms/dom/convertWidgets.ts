@@ -69,7 +69,7 @@ const findParkedMedia = (
 
 type PageMedia = {
   media: Element
-  url: string
+  frame: Element
   embed: EmbedResolverResult
 }
 
@@ -96,13 +96,18 @@ const readPageMedia = async (
       return
     }
 
-    const embed = await resolveEmbedProbe(createIframe(document, url), resolvers)
+    // A platform url serving every kind of file is sized by its kind: a <source> states it in
+    // `type`, and otherwise the <audio> or <video> tag names it.
+    const frame = createIframe(document, url)
+    frame.setAttribute('type', attr(element, 'type') ?? `${media.localName}/*`)
+
+    const embed = await resolveEmbedProbe(frame, resolvers)
 
     if (!embed) {
       return
     }
 
-    found.push({ media, url, embed })
+    found.push({ media, frame, embed })
   }
 
   // A resolver that claims the element itself reads it in the tiers below. The copy keeps a
@@ -240,13 +245,12 @@ export const convertWidgets: DomTransform = (context) => {
       }
     }
 
-    for (const { media, url, embed } of pageMedia) {
+    for (const { media, frame, embed } of pageMedia) {
       if (framedKeys.has(`${embed.provider}/${embed.id}`)) {
         media.remove()
         continue
       }
 
-      const frame = createIframe(document, url)
       const poster = attr(media, 'poster')
 
       if (poster) {

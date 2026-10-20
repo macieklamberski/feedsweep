@@ -454,7 +454,7 @@ describeForEachParser('drive file pages in a media element', (parseHtml) => {
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
   }
 
-  it('should frame an audio source naming a file page', async () => {
+  it('should frame an audio source naming a file page at the audio player height', async () => {
     const value = html`
       <p>
         <audio controls>
@@ -468,12 +468,71 @@ describeForEachParser('drive file pages in a media element', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="4/3"
-        data-embed-thumbnail="https://drive.google.com/thumbnail?id=1GRb_urzw2vn0JGKamTE70NIoELiXbAJA&sz=w640"
+        data-embed-height="252"
         data-embed-url="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view"
         data-embed-id="1GRb_urzw2vn0JGKamTE70NIoELiXbAJA"
         data-embed-provider="googledrive"
         data-embed-src="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/preview"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should frame an audio element naming a file page at the audio player height', async () => {
+    const value = html`
+      <audio
+        controls="controls"
+        src="https://drive.google.com/file/d/1mfIjYMk3XStUeBh5Wo3GTofVdqVbEK1f/view?usp=drive_link"
+      ></audio>
+    `
+    const expected = html`
+      <div
+        data-embed-height="252"
+        data-embed-url="https://drive.google.com/file/d/1mfIjYMk3XStUeBh5Wo3GTofVdqVbEK1f/view"
+        data-embed-id="1mfIjYMk3XStUeBh5Wo3GTofVdqVbEK1f"
+        data-embed-provider="googledrive"
+        data-embed-src="https://drive.google.com/file/d/1mfIjYMk3XStUeBh5Wo3GTofVdqVbEK1f/preview"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should frame an untyped source in an audio element at the audio player height', async () => {
+    const value = html`
+      <audio controls>
+        <source src="https://drive.google.com/file/d/1tveioycFCl8gqz4Z0B3ZW_RORdZkMHWA/view?usp=sharing">
+      </audio>
+    `
+    const expected = html`
+      <div
+        data-embed-height="252"
+        data-embed-url="https://drive.google.com/file/d/1tveioycFCl8gqz4Z0B3ZW_RORdZkMHWA/view"
+        data-embed-id="1tveioycFCl8gqz4Z0B3ZW_RORdZkMHWA"
+        data-embed-provider="googledrive"
+        data-embed-src="https://drive.google.com/file/d/1tveioycFCl8gqz4Z0B3ZW_RORdZkMHWA/preview"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep the file ratio for a video element naming a file page', async () => {
+    const value = html`
+      <video
+        controls
+        src="https://drive.google.com/file/d/1VZerjwInNuY8lCcXuPA-mnKWIyIIVrYK/view?usp=drivesdk"
+      ></video>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="4/3"
+        data-embed-thumbnail="https://drive.google.com/thumbnail?id=1VZerjwInNuY8lCcXuPA-mnKWIyIIVrYK&sz=w640"
+        data-embed-url="https://drive.google.com/file/d/1VZerjwInNuY8lCcXuPA-mnKWIyIIVrYK/view"
+        data-embed-id="1VZerjwInNuY8lCcXuPA-mnKWIyIIVrYK"
+        data-embed-provider="googledrive"
+        data-embed-src="https://drive.google.com/file/d/1VZerjwInNuY8lCcXuPA-mnKWIyIIVrYK/preview"
       ></div>
     `
 
