@@ -7,6 +7,7 @@ import {
   brightcoveFlashEmbedResolver,
   brightcoveIframeEmbedResolver,
   brightcoveResolveEmbed,
+  brightcoveSkyEmbedResolver,
   brightcoveVideoJsEmbedResolver,
 } from './brightcove.js'
 
@@ -706,6 +707,273 @@ describeForEachParser('brightcove video-js through the pipeline', (parseHtml) =>
         data-embed-provider="brightcove"
         data-embed-id="1234567890/6098765432"
         data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(result).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('brightcoveSkyEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, brightcoveSkyEmbedResolver)
+
+  describe('the sdc-site-video widget', () => {
+    it('should mint the player page from the widget attributes', async () => {
+      const value = html`
+        <div
+          class="sdc-site-video sdc-article-widget callfn"
+          data-fn="sdc-site-video"
+          data-video-id="ref:QzMThsajE6ZPSBF0Puv1kQthTGUq21ZI"
+          data-account-id="6058004172001"
+          data-provider="brightcove"
+          data-player-id="RC9PQUaJ6"
+        >
+          <p class="sdc-site-video__accessibility-message">Please use Chrome browser for a more accessible video player</p>
+          <div class="sdc-site-video__inner">
+            <div
+              class="sdc-site-video__content"
+              style="padding-bottom: calc(100% / ());"
+            >
+              <span class="sdc-site-video__poster">
+                <img
+                  src="https://images.example.com/20/07/768x432/quarantine_5052935.jpg"
+                  class="sdc-site-video__poster-img"
+                >
+              </span>
+              <video
+                id="id_QzMThsajE6ZPSBF0Puv1kQthTGUq21ZI"
+                data-embed="default"
+                class="video-js sdc-site-video__tag"
+                controls
+                playsinline
+              ></video>
+            </div>
+            <figcaption class="sdc-site-video__caption">
+              <span
+                class="sdc-site-video__caption-text"
+                data-role="caption-text"
+              >July 2020: 'Chief medical officer was concerned about Spain'</span>
+            </figcaption>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '6058004172001/ref:QzMThsajE6ZPSBF0Puv1kQthTGUq21ZI',
+        src: 'https://players.brightcove.net/6058004172001/RC9PQUaJ6_default/index.html?videoId=ref%3AQzMThsajE6ZPSBF0Puv1kQthTGUq21ZI',
+        thumbnail: 'https://images.example.com/20/07/768x432/quarantine_5052935.jpg',
+        ratio: '16/9',
+        title: "July 2020: 'Chief medical officer was concerned about Spain'",
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should take the stated caption over the caption text', async () => {
+      const value = html`
+        <div
+          class="sdc-article-widget sdc-site-video sdc-article-widget callfn"
+          data-account-id="6057984924001"
+          data-caption="Sky Sports News&apos; Geraint Hughes explains what England will experience at altitude."
+          data-provider="brightcove"
+          data-player-id="DESF5xFjJ"
+          data-video-id="ref:cea463a6-2379-461a-87e4-3487b6240e8c"
+        >
+          <figcaption class="sdc-site-video__caption ui-media-caption">
+            <span
+              class="ui-media-caption__caption-text"
+              data-role="caption-text"
+            >Sky Sports News&#8217; Geraint Hughes explains what England will experience at altitude.</span>
+          </figcaption>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '6057984924001/ref:cea463a6-2379-461a-87e4-3487b6240e8c',
+        src: 'https://players.brightcove.net/6057984924001/DESF5xFjJ_default/index.html?videoId=ref%3Acea463a6-2379-461a-87e4-3487b6240e8c',
+        ratio: '16/9',
+        title: "Sky Sports News' Geraint Hughes explains what England will experience at altitude.",
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('the ui-video-player Sky News writes now', () => {
+    it('should load the bare id on the root as a reference id', async () => {
+      const value = html`
+        <div
+          class="sdc-article-widget sdc-site-video"
+          data-testid="site-video"
+        >
+          <div
+            id="vjs_video_3"
+            class="ui-video-player"
+            data-component-name="ui-video-player"
+            data-account-id="6058004172001"
+            data-player-id="FeuO55X2f"
+            data-video-id="5da0547e-7367-4623-9993-e7e9e2340378"
+          ></div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '6058004172001/ref:5da0547e-7367-4623-9993-e7e9e2340378',
+        src: 'https://players.brightcove.net/6058004172001/FeuO55X2f_default/index.html?videoId=ref%3A5da0547e-7367-4623-9993-e7e9e2340378',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the stated title and the poster image', async () => {
+      const value = html`
+        <div
+          class="ui-video-player"
+          data-component-name="ui-video-player"
+          data-account-id="6058004172001"
+          data-player-id="FeuO55X2f"
+          data-video-id="5da0547e-7367-4623-9993-e7e9e2340378"
+          data-title="Post Office Scandal: DWP review"
+        >
+          <button
+            class="ui-video-player-poster"
+            title="Post Office Scandal: DWP review"
+          >
+            <img
+              src="https://images.example.com/25/08/768x432/review_6986192.jpg"
+              class="ui-video-player-poster-image"
+              alt=""
+            >
+            <span>2:27</span>
+          </button>
+          <div class="ui-video-player-body">
+            <video-js
+              class="ui-video-player-tag"
+              playsinline
+            ></video-js>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '6058004172001/ref:5da0547e-7367-4623-9993-e7e9e2340378',
+        src: 'https://players.brightcove.net/6058004172001/FeuO55X2f_default/index.html?videoId=ref%3A5da0547e-7367-4623-9993-e7e9e2340378',
+        thumbnail: 'https://images.example.com/25/08/768x432/review_6986192.jpg',
+        ratio: '16/9',
+        title: 'Post Office Scandal: DWP review',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore an sdc-site-video widget on another provider', async () => {
+      const value = html`
+        <div
+          class="sdc-site-video"
+          data-video-id="ref:QzMThsajE6ZPSBF0Puv1kQthTGUq21ZI"
+          data-account-id="6058004172001"
+          data-provider="ooyala"
+          data-player-id="RC9PQUaJ6"
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the widget shell a feed copied without its attributes', async () => {
+      const value = html`
+        <div class="sdc-article-widget sdc-site-video callfn">
+          <div class="sdc-site-video__inner">
+            <p class="sdc-site-video__accessibility-message">Please use Chrome browser for a more accessible video player</p>
+          </div>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a widget that names no account', async () => {
+      const value = html`
+        <div
+          class="sdc-site-video"
+          data-video-id="ref:QzMThsajE6ZPSBF0Puv1kQthTGUq21ZI"
+          data-provider="brightcove"
+          data-player-id="RC9PQUaJ6"
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a player that names no video', async () => {
+      const value = html`
+        <div
+          class="ui-video-player"
+          data-account-id="6058004172001"
+          data-player-id="FeuO55X2f"
+          data-video-id=""
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+// The widget holds a `video.video-js` the Video.js passes see first, so only a run proves the
+// whole widget, its poster, caption and notice included, comes out as one placeholder.
+describeForEachParser('brightcove sky widget through the pipeline', (parseHtml) => {
+  it('should replace the whole widget with one placeholder', async () => {
+    const value = html`
+      <div
+        class="sdc-site-video sdc-article-widget callfn"
+        data-video-id="ref:953c249f-651b-474a-a8b5-30546a0a8ae9"
+        data-account-id="6058004172001"
+        data-provider="brightcove"
+        data-player-id="RC9PQUaJ6"
+      >
+        <p class="sdc-site-video__accessibility-message">Please use Chrome browser for a more accessible video player</p>
+        <div class="sdc-site-video__inner">
+          <div class="sdc-site-video__content">
+            <span class="sdc-site-video__poster">
+              <img
+                src="https://images.example.com/21/01/768x432/transport_5238009.jpg"
+                class="sdc-site-video__poster-img"
+              >
+            </span>
+            <video
+              id="id_953c249f-651b-474a-a8b5-30546a0a8ae9"
+              data-embed="default"
+              class="video-js sdc-site-video__tag"
+              controls
+              playsinline
+            ></video>
+          </div>
+          <figcaption class="sdc-site-video__caption">
+            <span
+              class="sdc-site-video__caption-text"
+              data-role="caption-text"
+            >Minister on Brazil variant and travel ban</span>
+          </figcaption>
+        </div>
+      </div>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    const expected = html`
+      <div
+        data-embed-title="Minister on Brazil variant and travel ban"
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://images.example.com/21/01/768x432/transport_5238009.jpg"
+        data-embed-id="6058004172001/ref:953c249f-651b-474a-a8b5-30546a0a8ae9"
+        data-embed-provider="brightcove"
+        data-embed-src="https://players.brightcove.net/6058004172001/RC9PQUaJ6_default/index.html?videoId=ref%3A953c249f-651b-474a-a8b5-30546a0a8ae9"
       ></div>
     `
 

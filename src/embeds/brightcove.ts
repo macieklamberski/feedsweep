@@ -1,7 +1,7 @@
 import type { Nullish } from 'trousse'
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr, flashVars, keepIfMatches, paramValue } from '../utils/dom.js'
+import { attr, find, flashVars, keepIfMatches, paramValue, text } from '../utils/dom.js'
 import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -108,6 +108,45 @@ export const brightcoveVideoJsEmbedResolver = createMarkupEmbedResolver(
         attr(element, 'data-embed'),
       ),
       ratio: playerRatio,
+    }
+  },
+)
+
+const readSkyVideoId = (element: Element): string | undefined => {
+  const videoId = attr(element, 'data-video-id')
+
+  // Sky's `ui-video-player` script loads the bare id on its root as a reference id.
+  if (!videoId || !element.matches('.ui-video-player')) {
+    return videoId
+  }
+
+  return `ref:${videoId}`
+}
+
+// Sky News's and Sky Sports's article video: an empty `div.sdc-site-video`, or the newer
+// `div.ui-video-player`, that only Sky's own script builds into the account's player.
+export const brightcoveSkyEmbedResolver = createMarkupEmbedResolver(
+  'div.sdc-site-video[data-provider="brightcove"], div.ui-video-player',
+  (element) => {
+    const account = attr(element, 'data-account-id')
+    const videoId = readSkyVideoId(element)
+
+    if (!account || !videoId) {
+      return
+    }
+
+    const poster = find(element, 'img.sdc-site-video__poster-img, img.ui-video-player-poster-image')
+
+    return {
+      provider,
+      id: `${account}/${videoId}`,
+      src: composePlayerUrl(account, videoId, attr(element, 'data-player-id')),
+      thumbnail: attr(poster, 'src'),
+      ratio: playerRatio,
+      title:
+        attr(element, 'data-caption') ??
+        attr(element, 'data-title') ??
+        text(element, '[data-role="caption-text"]'),
     }
   },
 )

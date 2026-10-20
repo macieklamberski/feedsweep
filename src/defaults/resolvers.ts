@@ -87,6 +87,7 @@ import {
   brightcoveExperienceEmbedResolver,
   brightcoveFlashEmbedResolver,
   brightcoveIframeEmbedResolver,
+  brightcoveSkyEmbedResolver,
   brightcoveVideoJsEmbedResolver,
 } from '../embeds/brightcove.js'
 import { bundestagIframeEmbedResolver, bundestagScriptEmbedResolver } from '../embeds/bundestag.js'
@@ -568,6 +569,7 @@ const embedResolvers: Array<EmbedResolver> = [
   brightcoveExperienceEmbedResolver,
   brightcoveFlashEmbedResolver,
   brightcoveIframeEmbedResolver,
+  brightcoveSkyEmbedResolver,
   brightcoveVideoJsEmbedResolver,
   bundestagIframeEmbedResolver,
   bundestagScriptEmbedResolver,
