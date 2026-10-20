@@ -1,7 +1,7 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { alphanumericRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'sketchfab'
@@ -13,8 +13,6 @@ const safeUidRegex = /^[0-9a-f]{32}$/i
 // The lengths tell the uid from the slug words before it. Older models end the slug in a
 // 26-character uid in letters of both cases.
 const sluggedUidRegex = /(?<uid>[0-9a-f]{32}|[0-9a-z]{26})$/i
-// Older models carry a 26-character uid in letters of both cases, which the viewer still plays.
-const uidCharactersRegex = /^[0-9A-Za-z]+$/
 
 const sketchfabHosts = ['sketchfab.com']
 
@@ -28,7 +26,8 @@ const readModelUid = (parsed: URL): string | undefined => {
   // The viewer is `/models/{uid}/embed`, which the retired `/embed/{uid}` and `/show/{uid}`
   // redirect to.
   if ((route === 'models' && third === 'embed') || route === 'embed' || route === 'show') {
-    return keepIfMatches(second, uidCharactersRegex)
+    // Older models carry a 26-character uid in letters of both cases, which the viewer still plays.
+    return keepIfMatches(second, alphanumericRegex)
   }
 
   if (route === '3d-models') {

@@ -26,6 +26,10 @@ const pathSlashRunRegex = /^https?:\/\/[^/?#]+[^?#]*\/\//i
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
 
 export const digitsRegex = /^\d+$/
+export const alphanumericRegex = /^[A-Za-z0-9]+$/
+export const hexRegex = /^[0-9a-f]+$/i
+export const localeWordRegex = /^[a-z]+$/i
+export const localePairRegex = /^[a-z]+-[a-z]+$/i
 
 // A browser trims C0 controls and spaces from both ends, so \x01javascript: runs. Inside the
 // url it drops only tabs and newlines: java\tscript: runs, java script: is a relative path.

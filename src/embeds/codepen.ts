@@ -2,6 +2,7 @@ import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import {
+  alphanumericRegex,
   composeQuery,
   encodePathSegment,
   isFileName,
@@ -16,9 +17,6 @@ const provider = 'codepen'
 // redirects every path to the site root.
 const codepenHosts = ['codepen.io']
 
-// Slugs come in three lengths: 5 on pens from around 2012, 7 since, and 32 hex on CodePen's own.
-// Pens saved in the 2.0 editor take a uuid instead.
-const slugRegex = /^[A-Za-z0-9]+$/
 const leadingAtRegex = /^@/
 
 // Segments CodePen owns in the position a username sits in. `cpe` is the 2.0 editor's own path
@@ -178,7 +176,11 @@ const readPenReference = (element: Element): CodepenTarget | undefined => {
     return
   }
 
-  return parseTarget(href) ?? (slugRegex.test(href) ? { kind: 'embed', slug: href } : undefined)
+  // Slugs come in three lengths: 5 on pens from around 2012, 7 since, and 32 hex on CodePen's own.
+  // Pens saved in the 2.0 editor take a uuid instead.
+  const isSlug = alphanumericRegex.test(href)
+
+  return parseTarget(href) ?? (isSlug ? { kind: 'embed', slug: href } : undefined)
 }
 
 const readWidget = (element: Element): EmbedResolverResult | undefined => {
