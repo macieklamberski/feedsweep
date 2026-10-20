@@ -1855,7 +1855,7 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should frame an audio element naming a Google Drive file page', async () => {
+  it('should frame an audio element naming a Google Drive file page at the audio player height', async () => {
     const value = html`
       <audio controls>
         <source
@@ -1867,8 +1867,7 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     `
     const expected = html`
       <div
-        data-embed-ratio="4/3"
-        data-embed-thumbnail="https://drive.google.com/thumbnail?id=1GRb_urzw2vn0JGKamTE70NIoELiXbAJA&sz=w640"
+        data-embed-height="252"
         data-embed-url="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view"
         data-embed-id="1GRb_urzw2vn0JGKamTE70NIoELiXbAJA"
         data-embed-provider="googledrive"
