@@ -519,10 +519,12 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should keep an inner double slash in an iframe src path', async () => {
+  it('should collapse an inner double slash in an iframe src path', async () => {
     const value = '<iframe src="https://video.example.com/embed//player/?id=20210101abc"></iframe>'
+    const expected =
+      '<iframe src="https://video.example.com/embed/player/?id=20210101abc"></iframe>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should keep a url embedded in an iframe src path', async () => {
@@ -582,11 +584,13 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  it('should keep a double slash deeper in the path', async () => {
+  it('should collapse a double slash deeper in the path', async () => {
     const value =
       '<iframe src="https://ahtary-city.ucoz.com/news//www.youtube.com/embed/MLANv9VJ5Ws"></iframe>'
+    const expected =
+      '<iframe src="https://ahtary-city.ucoz.com/news/www.youtube.com/embed/MLANv9VJ5Ws"></iframe>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should be idempotent', async () => {

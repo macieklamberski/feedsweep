@@ -1562,11 +1562,29 @@ describeForEachParser('readCarrierUrl', (parseHtml) => {
     expect(read(value)).toBe('https://player.example.com/p/662741/embed?entry_id=1_abc')
   })
 
-  it('should keep an inner double slash in an object data path', () => {
+  it('should collapse an inner double slash in an object data path', () => {
     const value =
       '<object data="https://player.example.com/p//662741/embed?entry_id=1_abc"></object>'
 
-    expect(read(value)).toBe('https://player.example.com/p//662741/embed?entry_id=1_abc')
+    expect(read(value)).toBe('https://player.example.com/p/662741/embed?entry_id=1_abc')
+  })
+
+  it('should collapse a double slash after a route word', () => {
+    const value = '<iframe src="https://www.youtube.com/embed//9J1geyFW0uY"></iframe>'
+
+    expect(read(value)).toBe('https://www.youtube.com/embed/9J1geyFW0uY')
+  })
+
+  it('should keep a url carried in the path', () => {
+    const value = '<iframe src="https://video.example.com/embed/https://example.org/clip"></iframe>'
+
+    expect(read(value)).toBe('https://video.example.com/embed/https://example.org/clip')
+  })
+
+  it('should keep a value that is not an http url', () => {
+    const value = '<iframe src="data:text/html,<a href=//example.org//clip>"></iframe>'
+
+    expect(read(value)).toBe('data:text/html,<a href=//example.org//clip>')
   })
 
   it('should keep a leading double slash in a url carried in the query', () => {

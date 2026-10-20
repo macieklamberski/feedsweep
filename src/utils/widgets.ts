@@ -30,7 +30,7 @@ import {
 } from './dom.js'
 import {
   cleanUrl,
-  collapseLeadingSlashes,
+  collapseSlashRuns,
   parseUrlOnHosts,
   resolveOrDropUrl,
   resolveOrKeepUrl,
@@ -77,7 +77,7 @@ export const embedCarrierSelector = [...embedCarriers]
 export const readCarrierUrl = (element: Element): string => {
   const url = element.getAttribute(embedCarriers.get(element.localName) ?? 'src') ?? ''
 
-  return collapseLeadingSlashes(url)
+  return collapseSlashRuns(url)
 }
 
 type ResolverOptions = {
