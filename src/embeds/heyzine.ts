@@ -1,5 +1,6 @@
 import { getPathSegments, isHostOf, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -19,7 +20,7 @@ const customDomainHosts = ['aflip.in', 'hflip.co']
 // The embed id is ten hexadecimal characters, with or without the `.html` the snippet writes.
 // The viewer answers the id in either case.
 const flipBookIdRegex = /^([0-9a-f]{10})(?:\.html)?$/i
-// A custom slug is served only without `.html`, in either case.
+// A custom slug is served without `.html`, and only some are served with it too.
 const htmlExtensionRegex = /\.html$/i
 // The viewer opens on the page a `#page/{n}` fragment names, framed or not.
 const pageFragmentRegex = /^#page\/[^/]+$/
@@ -62,7 +63,7 @@ const readPage = (parsed: URL): string => {
 }
 
 // Heyzine's flipbook viewer, which renders on its own and is its own page.
-export const heyzineResolveEmbed: ResolveEmbed = (url) => {
+export const heyzineResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (parsed && isHostOrSubdomainOf(parsed, customDomainHosts)) {
@@ -81,6 +82,7 @@ export const heyzineResolveEmbed: ResolveEmbed = (url) => {
       src,
       url: src,
       ratio: '490/600',
+      title: attr(element, 'title'),
     }
   }
 
@@ -103,6 +105,7 @@ export const heyzineResolveEmbed: ResolveEmbed = (url) => {
     src,
     url: src,
     ratio: '490/600',
+    title: attr(element, 'title'),
   }
 }
 
