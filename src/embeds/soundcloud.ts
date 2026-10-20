@@ -150,6 +150,12 @@ const classicPlayerHeights: Record<string, number | undefined> = {
 // check the factory applies is what narrows it, so no player path is spelled in a selector.
 const soundcloudHosts = ['soundcloud.com']
 
+const pageDepth = (anchor: Element | undefined): number => {
+  const page = parseUrlOnHosts(attr(anchor, 'href'), soundcloudHosts)
+
+  return page ? getPathSegments(page).length : 0
+}
+
 type SubstackTrackAttributes = {
   title?: string
   description?: string
@@ -273,13 +279,15 @@ const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
     return page && pageHostRegex.test(page.hostname)
   })
 
-  // The Copy embed snippet ships a sibling div with two anchors, artist page and track page.
-  // The snippet's shape is fixed: artist first, track second. Anything else is not the
-  // share snippet, so the sibling stays untouched.
-  if (anchors.length === 2) {
-    result.author = text(anchors[0])
-    result.title = text(anchors[1]) ?? result.title
-    result.url = attr(anchors[1], 'href')
+  // The Copy embed snippet ships a sibling div, `{artist} · {track}`, and the Flash snippet a
+  // span, `{track} by {artist}`. The track page sits deeper than the artist page, which tells
+  // the two apart in either order. Anything else is not a share snippet and stays untouched.
+  const [artist, track] = anchors.toSorted((a, b) => pageDepth(a) - pageDepth(b))
+
+  if (anchors.length === 2 && pageDepth(artist) < pageDepth(track)) {
+    result.author = text(artist)
+    result.title = text(track) ?? result.title
+    result.url = attr(track, 'href')
     sibling?.remove()
   }
 
