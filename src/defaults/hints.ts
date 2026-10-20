@@ -1,6 +1,7 @@
 import { oneTwoThreeFormBuilderRenderHint } from '../embeds/123formbuilder.js'
 import { acastRenderHint } from '../embeds/acast.js'
 import { acuityschedulingRenderHint } from '../embeds/acuityscheduling.js'
+import { airtableRenderHint } from '../embeds/airtable.js'
 import { archiveRenderHint } from '../embeds/archive.js'
 import { arteRenderHint } from '../embeds/arte.js'
 import { audioboomRenderHint } from '../embeds/audioboom.js'
@@ -96,6 +97,7 @@ import type { EmbedRenderHint } from '../types.js'
 export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   acastRenderHint,
   acuityschedulingRenderHint,
+  airtableRenderHint,
   archiveRenderHint,
   arteRenderHint,
   audioboomRenderHint,
