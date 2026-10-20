@@ -79,7 +79,12 @@ const readPageSegments = (anchor: Nullish<Element>): Array<string> => {
 type CaptionLinks = { page?: Element; owner?: Element }
 
 const findCaptionLinks = (caption: Nullish<Element>): CaptionLinks => {
-  const page = find(caption, captionLinkSelector, (anchor) => readPageSegments(anchor).length > 1)
+  // A blog plugin captions the iframe with a link to the player url, its text `slideshare.net`.
+  const page = find(caption, captionLinkSelector, (anchor) => {
+    const segments = readPageSegments(anchor)
+
+    return segments.length > 1 && !segments.includes('embed_code')
+  })
   const account = readPageSegments(page)[0]
   // A route word has the shape of a handle: the 2008 caption offers `slideshare.net/upload` one
   // anchor after the deck it names.
