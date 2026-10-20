@@ -212,6 +212,60 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should fall back to the user the config names when its tag is the word groups', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://www.flickr.com/apps/slideshow/show.swf?v=104087"
+          allowFullScreen="true"
+          flashvars="offsite=true&amp;lang=en-us&amp;page_show_url=%2Fphotos%2F39017545%40N02%2Ftags%2Fgroups%2Fshow%2F&amp;page_show_back_url=%2Fphotos%2F39017545%40N02%2Ftags%2Fgroups%2F&amp;user_id=39017545@N02&amp;tags=groups&amp;jump_to=&amp;start_index="
+          width="400"
+          height="300"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photostreams/39017545@N02',
+        src: 'https://embedr.flickr.com/photostreams/39017545@N02?width=400&height=300',
+        url: 'https://www.flickr.com/photos/39017545@N02/',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave a group pool named by its alias alone rather than mint the user beside it', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://www.flickr.com/apps/slideshow/show.swf?v=71649"
+          allowFullScreen="true"
+          flashvars="offsite=true&amp;lang=en-us&amp;page_show_url=%2Fgroups%2Ftorontophotowalks%2Fpool%2Fshow%2F&amp;page_show_back_url=%2Fgroups%2Ftorontophotowalks%2Fpool%2F&amp;user_id=31652145@N08&amp;jump_to=&amp;start_index="
+          width="400"
+          height="300"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    // embedr's group player ignores a `tags` query and shows the whole pool.
+    it('should leave a group pool filtered by a tag alone rather than mint the user beside it', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://www.flickr.com/apps/slideshow/show.swf?v=71649"
+          allowFullScreen="true"
+          flashvars="offsite=true&amp;lang=en-us&amp;page_show_url=%2Fgroups%2Ftorontophotowalks%2Fpool%2Ftags%2Ftopwbch%2Fshow%2F&amp;page_show_back_url=%2Fgroups%2Ftorontophotowalks%2Fpool%2Ftags%2Ftopwbch%2F&amp;group_id=1259833@N24&amp;user_id=31652145@N08&amp;tags=topwbch&amp;jump_to=&amp;start_index="
+          width="400"
+          height="300"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 
   describe('set ids in a path', () => {
@@ -370,6 +424,16 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
     it('should return undefined for a group id that is not an nsid', async () => {
       const value = html`
         <iframe src="https://www.flickr.com/slideshow/index.gne?group_id=197"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a group alias alone rather than mint the user beside it', async () => {
+      const value = html`
+        <iframe
+          src="http://www.flickr.com/slideShow/index.gne?group_id=torontophotowalks&amp;user_id=31652145@N08&amp;set_id=&amp;text="
+        ></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()

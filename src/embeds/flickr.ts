@@ -18,6 +18,7 @@ const legacyPlayerPathRegex = /^\/slideshow\/index\.gne$/i
 const setPathRegex = /^\/photos\/([^/]+)\/(?:sets|albums)\/(\d+)/
 const streamPathRegex = /^\/photos\/([^/]+)\/show\/?$/
 const groupPathRegex = /^\/groups\/(\d+@N\d\d)\/pool\/show\/?$/
+const groupPagePathRegex = /^\/groups\//
 // An owner of `_` names nobody: the player ignores it, and `/photos/_/{photoId}/` answers 404.
 const photoPathRegex = /^\/photos\/(?:_|([^/]+))\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
 const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/
@@ -137,8 +138,19 @@ const readPageSubject = (page: string): FlickrSubject | undefined => {
 const readFlashSubject = (element: Nullish<Element>): FlickrSubject => {
   const config = new URLSearchParams(flashVars(element) ?? '')
   const page = config.get('page_show_url') ?? ''
+  const subject = readPageSubject(page)
 
-  return readPageSubject(page) ?? { owner: config.get('user_id') ?? undefined }
+  if (subject) {
+    return subject
+  }
+
+  // A page path under a group names a pool, and a `user_id` beside it names a member's
+  // photostream, which is another item.
+  if (groupPagePathRegex.test(page)) {
+    return {}
+  }
+
+  return { owner: config.get('user_id') ?? undefined }
 }
 
 // The video swf names its photo in the flashvars and nothing else: no page path and no owner,
@@ -249,7 +261,12 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
     }
   }
 
-  if (subject.groupId && nsidRegex.test(subject.groupId)) {
+  // A group named by its alias has no player, and the owner beside it names another item.
+  if (subject.groupId) {
+    if (!nsidRegex.test(subject.groupId)) {
+      return
+    }
+
     return {
       provider,
       id: `groups/${subject.groupId}`,
