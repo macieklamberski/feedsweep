@@ -114,6 +114,73 @@ describeForEachParser('fixLazyIframes', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should promote over the OSYouTube placeholder page src', async () => {
+    const value = html`
+      <iframe
+        id="youtube_weSP2792HUQ"
+        width="425"
+        height="344"
+        frameborder="0"
+        src="https://site.example/plugins/content/osyoutube/index.html"
+        data-src="https://www.youtube-nocookie.com/embed/weSP2792HUQ?wmode=transparent&amp;controls=1&amp;rel=0&amp;fs=1&amp;loop=1&amp;sound=on&amp;playlist=weSP2792HUQ"
+        allowfullscreen
+      ></iframe>
+    `
+    const expected = html`
+      <iframe
+        id="youtube_weSP2792HUQ"
+        width="425"
+        height="344"
+        frameborder="0"
+        src="https://www.youtube-nocookie.com/embed/weSP2792HUQ?wmode=transparent&amp;controls=1&amp;rel=0&amp;fs=1&amp;loop=1&amp;sound=on&amp;playlist=weSP2792HUQ"
+        data-src="https://www.youtube-nocookie.com/embed/weSP2792HUQ?wmode=transparent&amp;controls=1&amp;rel=0&amp;fs=1&amp;loop=1&amp;sound=on&amp;playlist=weSP2792HUQ"
+        allowfullscreen
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  // The plugin writes the page relative to the site root, and with no base it stays that way.
+  it('should promote over the OSYouTube placeholder page src left relative', async () => {
+    const value = html`
+      <iframe
+        src="plugins/content/osyoutube/index.html"
+        data-src="https://www.youtube-nocookie.com/embed/GVn0OvKZVjI"
+      ></iframe>
+    `
+    const expected = html`
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/GVn0OvKZVjI"
+        data-src="https://www.youtube-nocookie.com/embed/GVn0OvKZVjI"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should not overwrite a src whose segment only ends in plugins', async () => {
+    const value = html`
+      <iframe
+        src="https://site.example/myplugins/content/osyoutube/index.html"
+        data-src="https://www.youtube-nocookie.com/embed/GVn0OvKZVjI"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should not overwrite a src with a segment after the OSYouTube page', async () => {
+    const value = html`
+      <iframe
+        src="https://site.example/plugins/content/osyoutube/index.html/embed"
+        data-src="https://www.youtube-nocookie.com/embed/GVn0OvKZVjI"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should promote over a bLazy transparent gif src', async () => {
     const value = html`
       <iframe
@@ -373,6 +440,34 @@ describeForEachParser('fixLazyIframes through the pipeline', (parseHtml) => {
         data-embed-thumbnail="https://i.ytimg.com/vi/HdcLyhNo3C4/hqdefault.jpg"
         data-embed-ratio="16/9"
         data-embed-url="https://www.youtube.com/watch?v=HdcLyhNo3C4"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should resolve an OSYouTube iframe whose src is the placeholder page', async () => {
+    const value = html`
+      <div class="video-responsive">
+        <iframe
+          id="youtube_GVn0OvKZVjI"
+          width="425"
+          height="344"
+          frameborder="0"
+          src="https://site.example/plugins/content/osyoutube/index.html"
+          data-src="https://www.youtube-nocookie.com/embed/GVn0OvKZVjI?wmode=transparent&amp;controls=1&amp;rel=0&amp;fs=1&amp;loop=0&amp;sound=on"
+          allowfullscreen
+        ></iframe>
+      </div>
+    `
+    const expected = html`
+      <div
+        data-embed-src="https://www.youtube.com/embed/GVn0OvKZVjI?loop=0"
+        data-embed-provider="youtube"
+        data-embed-id="GVn0OvKZVjI"
+        data-embed-thumbnail="https://i.ytimg.com/vi/GVn0OvKZVjI/hqdefault.jpg"
+        data-embed-ratio="16/9"
+        data-embed-url="https://www.youtube.com/watch?v=GVn0OvKZVjI"
       ></div>
     `
 
