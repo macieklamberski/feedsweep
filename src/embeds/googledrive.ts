@@ -34,6 +34,11 @@ const googledriveHosts = [
   'drive.google.com',
 ]
 
+// The thumbnail of a link-shared Drive file, by its file id.
+export const composeDriveThumbnail = (fileId: string): string => {
+  return `https://drive.google.com/thumbnail${composeQuery({ id: decodeSegment(fileId) ?? fileId, sz: 'w640' })}`
+}
+
 // `/file/d/{id}/preview` frames the file and `/file/d/{id}/view` is its page. A folder on
 // `/drive/folders` or `/embeddedfolderview` is a listing, not a file, and stays unclaimed.
 // A Workspace prefix, `/a/{domain}/`, only picks the sign-in and serves the same file.
@@ -77,7 +82,7 @@ export const googledriveResolveEmbed: ResolveEmbed = (url, element) => {
     id: fileId,
     src,
     url: `https://drive.google.com/file/d/${fileId}/view`,
-    thumbnail: `https://drive.google.com/thumbnail${composeQuery({ id: decodeSegment(fileId) ?? fileId, sz: 'w640' })}`,
+    thumbnail: composeDriveThumbnail(fileId),
     ratio: '4/3',
   }
 }
