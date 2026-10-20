@@ -148,7 +148,7 @@ describe('heyzineResolveEmbed', () => {
       expect(heyzineResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a custom slug with the extension, which the viewer does not serve', () => {
+    it('should ignore a custom slug with the extension, which not every slug is served with', () => {
       const value = 'https://heyzine.com/flip-book/ThroughThePrism.html'
 
       expect(heyzineResolveEmbed(value)).toBeUndefined()
@@ -470,6 +470,77 @@ describeForEachParser('heyzineEmbedResolver', (parseHtml) => {
         src: 'https://draftcraft.hflip.co/IFFInity-January-2026',
         url: 'https://draftcraft.hflip.co/IFFInity-January-2026',
         ratio: '490/600',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the book title a WordPress embed frame writes', async () => {
+      const value = html`
+        <iframe
+          class="wp-embedded-content"
+          sandbox="allow-scripts"
+          security="restricted"
+          title="KEJOHANAN OLAHRAGA"
+          scrolling="no"
+          src="https://heyzine.com/flip-book/332f319f1d.html#?secret=RPscMMbaYl"
+          data-secret="RPscMMbaYl"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: '332f319f1d',
+        src: 'https://heyzine.com/flip-book/332f319f1d.html',
+        url: 'https://heyzine.com/flip-book/332f319f1d.html',
+        ratio: '490/600',
+        title: 'KEJOHANAN OLAHRAGA',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the book title a WordPress embed frame writes on a custom domain', async () => {
+      const value = html`
+        <iframe
+          class="wp-embedded-content"
+          sandbox="allow-scripts"
+          security="restricted"
+          title="EUROLINK JUNE EDITION 2026"
+          scrolling="no"
+          src="https://eccsleurolinkmagazine.aflip.in/eurolinkeccsl#?secret=ur5igZCLXs"
+          data-secret="ur5igZCLXs"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: 'eurolinkeccsl',
+        src: 'https://eccsleurolinkmagazine.aflip.in/eurolinkeccsl',
+        url: 'https://eccsleurolinkmagazine.aflip.in/eurolinkeccsl',
+        ratio: '490/600',
+        title: 'EUROLINK JUNE EDITION 2026',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the book title a hand-written frame states', async () => {
+      const value = html`
+        <iframe
+          style="border: none; display: block;"
+          title="AWDF Malawi Impact Story"
+          src="https://heyzine.com/flip-book/AWDF_Malawi_Impact_Story"
+          width="100%"
+          height="600"
+          allowfullscreen="allowfullscreen"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'heyzine',
+        id: 'awdf_malawi_impact_story',
+        src: 'https://heyzine.com/flip-book/AWDF_Malawi_Impact_Story',
+        url: 'https://heyzine.com/flip-book/AWDF_Malawi_Impact_Story',
+        ratio: '490/600',
+        title: 'AWDF Malawi Impact Story',
       }
 
       expect(await extract(value)).toEqual(expected)
