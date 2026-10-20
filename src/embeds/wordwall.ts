@@ -1,15 +1,11 @@
 import { getPathSegments, isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { pickUrlParams } from '../utils/urls.js'
+import { hexRegex, localePairRegex, localeWordRegex, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `screens.cdn.wordwall.net` serves the activity images, so only the page hosts are claimed.
 const wordwallHosts = ['wordwall.net', 'www.wordwall.net']
-
-const activityIdRegex = /^[0-9a-f]+$/i
-
-const localeRegex = /^[a-z]+(?:-[a-z]+)?$/i
 
 // `templateId` picks the game the activity is played as, over the one the activity stores.
 const playParams = ['templateId']
@@ -42,11 +38,11 @@ const extractActivityId = (link: string): string | undefined => {
     return
   }
 
-  if (locale && !localeRegex.test(locale)) {
+  if (locale && !localeWordRegex.test(locale) && !localePairRegex.test(locale)) {
     return
   }
 
-  return keepIfMatches(segments[idIndex], activityIdRegex)
+  return keepIfMatches(segments[idIndex], hexRegex)
 }
 
 // Wordwall's activity player, a classroom quiz or game a teacher's post pastes under a lesson.

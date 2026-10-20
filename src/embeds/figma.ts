@@ -1,6 +1,11 @@
 import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  alphanumericRegex,
+  composeQuery,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const figmaHost = 'figma.com'
@@ -13,9 +18,6 @@ const figmaFileHosts = ['figma.com', 'www.figma.com']
 // Figma keeps opening kinds: `design`, `make` and `slides` sit beside the `file`, `proto`,
 // `board` and `deck` the feeds carry, and every one of them takes the same route shape.
 const kindRegex = /^[a-z]+$/
-
-// A file key is base62, so a hyphenated marketing slug sitting in the same position is not one.
-const fileKeyRegex = /^[A-Za-z0-9]+$/
 
 // `node-id` names the frame the embed opens on, `page-id` the page that holds it,
 // `starting-point-node-id` the node that starts a prototype's flow, and `version-id` the version.
@@ -36,7 +38,8 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
     return
   }
 
-  if (!kindRegex.test(kind) || kind === catalogueKind || !fileKeyRegex.test(key)) {
+  // A file key is base62, so a hyphenated marketing slug sitting in the same position is not one.
+  if (!kindRegex.test(kind) || kind === catalogueKind || !alphanumericRegex.test(key)) {
     return
   }
 

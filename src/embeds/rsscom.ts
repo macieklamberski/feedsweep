@@ -2,7 +2,7 @@ import { getPathSegments } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readObjectHeight } from '../utils/hints.js'
-import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { composeQuery, digitsRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rsscom'
@@ -11,7 +11,6 @@ const rsscomHosts = ['player.rss.com']
 
 // The player reads a numeric second segment as an episode, and `latest` as the newest episode,
 // which no page url names. Any other word, `LATEST` included, plays the whole show.
-const episodeIdRegex = /^\d+$/
 const latestSegment = 'latest'
 
 // The player draws its older layout unless `v=2` asks for the one the embed dialog writes.
@@ -39,7 +38,7 @@ export const rsscomResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  if (!episodeId || !episodeIdRegex.test(episodeId)) {
+  if (!episodeId || !digitsRegex.test(episodeId)) {
     return {
       provider,
       id: slug,

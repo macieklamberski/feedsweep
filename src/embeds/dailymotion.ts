@@ -36,7 +36,8 @@ const dailymotionHosts = [
 const pathWords = new Set(['embed', 'video', 'swf'])
 
 // `/embed/{locale}/video/{id}` serves the player and redirects to
-// `geo.dailymotion.com/player.html?video={id}`.
+// `geo.dailymotion.com/player.html?video={id}`. Two letters tell a locale from an account handle,
+// since account pages also open the path.
 const localeRegex = /^[a-z]{2}$/
 
 // Kinds Dailymotion's embed route serves besides a video: each reaches the player with an empty
