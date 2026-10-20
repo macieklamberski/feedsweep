@@ -333,7 +333,11 @@ import {
 import { tmzEmbedResolver } from '../embeds/tmz.js'
 import { traileraddictEmbedResolver } from '../embeds/traileraddict.js'
 import { transistorEmbedResolver } from '../embeds/transistor.js'
-import { tumblrIframeEmbedResolver, tumblrPostEmbedResolver } from '../embeds/tumblr.js'
+import {
+  tumblrIframeEmbedResolver,
+  tumblrPostEmbedResolver,
+  tumblrS9eEmbedResolver,
+} from '../embeds/tumblr.js'
 import { tuneinEmbedResolver } from '../embeds/tunein.js'
 import {
   twitterAmpEmbedResolver,
@@ -792,6 +796,7 @@ const embedResolvers: Array<EmbedResolver> = [
   transistorEmbedResolver,
   tumblrIframeEmbedResolver,
   tumblrPostEmbedResolver,
+  tumblrS9eEmbedResolver,
   tuneinEmbedResolver,
   twitterBlockquoteEmbedResolver,
   twitterAmpEmbedResolver,

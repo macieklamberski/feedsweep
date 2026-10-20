@@ -518,8 +518,7 @@ describeForEachParser('createS9eEmbedResolver', (parseHtml) => {
   })
 })
 
-// The helper pages for Gist and Tumblr have no resolver behind them, so their frames stay the
-// generic placeholder.
+// The helper page for Gist has no resolver behind it, so its frame stays the generic placeholder.
 describeForEachParser('s9e helper frames no resolver claims', (parseHtml) => {
   const convert = (value: string) => {
     return transformContent(value, { parseHtmlFn: parseHtml })
@@ -534,19 +533,6 @@ describeForEachParser('s9e helper frames no resolver claims', (parseHtml) => {
     `
     const expected =
       '<div data-embed-src="https://s9e.github.io/iframe/2/gist.min.html#octocat/6cad326836d38bd3a7ae"></div>'
-
-    expect(await convert(value)).toEqualHtml(expected)
-  })
-
-  it('should leave the Tumblr helper frame a generic placeholder', async () => {
-    const value = html`
-      <iframe
-        data-s9e-mediaembed="tumblr"
-        src="https://s9e.github.io/iframe/2/tumblr.min.html#staff/729012345678901234"
-      ></iframe>
-    `
-    const expected =
-      '<div data-embed-src="https://s9e.github.io/iframe/2/tumblr.min.html#staff/729012345678901234"></div>'
 
     expect(await convert(value)).toEqualHtml(expected)
   })

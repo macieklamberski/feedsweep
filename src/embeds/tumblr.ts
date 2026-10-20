@@ -3,7 +3,11 @@ import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createS9eEmbedResolver,
+  createUrlEmbedResolver,
+} from '../utils/widgets.js'
 
 const provider = 'tumblr'
 
@@ -59,6 +63,12 @@ export const tumblrPostEmbedResolver = createMarkupEmbedResolver(
     return { ...result, url: postUrl?.href }
   },
 )
+
+// A forum's s9e MediaEmbed helper frame, naming the post as `{blogKey}/{postId}` in its url
+// fragment.
+export const tumblrS9eEmbedResolver = createS9eEmbedResolver('tumblr', (fragment) => {
+  return readPostEmbed(`https://embed.tumblr.com/embed/post/${fragment}`)
+})
 
 // The frame posts its height unasked, as a JSON string whose `args` holds the body's scroll
 // height, on load and again whenever its body resizes.
