@@ -29,6 +29,7 @@ import {
   hasText,
   isPercentageSized,
   paramValue,
+  textNode,
 } from './dom.js'
 import {
   cleanUrl,
@@ -52,6 +53,20 @@ const leadingAtRegex = /^@+/
 // `@` that separates its instance. On a platform that writes bare names it invents a handle.
 export const atUsername = (name: string): string => {
   return `@${name.replace(leadingAtRegex, '')}`
+}
+
+export const bareHandleRegex = /@([A-Za-z0-9_.]{1,30})/
+
+// The first `@handle` in an element's text, read one element's own text at a time: a minified
+// embed dialog joins "Post by @handle" and "View on Threads" with no space between them.
+export const findBareHandle = (element: Element): string | undefined => {
+  for (const node of [element, ...element.querySelectorAll('*')]) {
+    const handle = textNode(node)?.match(bareHandleRegex)?.[1]
+
+    if (handle) {
+      return handle
+    }
+  }
 }
 
 const s9eHelperHost = 's9e.github.io'

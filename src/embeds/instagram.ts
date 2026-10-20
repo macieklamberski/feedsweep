@@ -5,6 +5,7 @@ import { readPixels } from '../utils/hints.js'
 import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import {
   atUsername,
+  bareHandleRegex,
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
   createUrlEmbedResolver,
@@ -106,7 +107,6 @@ const profilePathRegex = /^\/([A-Za-z0-9_.]{1,30})\/?$/
 // keeps only the bare `@handle`, which is read second: inside a quote that still carries its
 // caption, the first bare @token is as likely to be a mention as the author.
 const bylineHandleRegex = /\(@([A-Za-z0-9_.]{1,30})\)/
-const bareHandleRegex = /@([A-Za-z0-9_.]{1,30})/
 
 const readProfileHandle = (element: Element): string | undefined => {
   for (const anchor of element.querySelectorAll('a[href]')) {
