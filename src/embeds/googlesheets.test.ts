@@ -6,13 +6,55 @@ import { googlesheetsEmbedResolver, googlesheetsResolveEmbed } from './googleshe
 
 describe('googlesheetsResolveEmbed', () => {
   describe('happy paths', () => {
-    it('should keep the tab bar and header flags of a published sheet', () => {
+    it('should keep the tab a sheet opens on', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1D6w8dbh2Fkftr1k6puOjq-Q2xiTKYt1Tutn65X82KMQ/pubhtml?gid=0'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1D6w8dbh2Fkftr1k6puOjq-Q2xiTKYt1Tutn65X82KMQ',
+        src: 'https://docs.google.com/spreadsheets/d/1D6w8dbh2Fkftr1k6puOjq-Q2xiTKYt1Tutn65X82KMQ/pubhtml?gid=0',
+        url: 'https://docs.google.com/spreadsheets/d/1D6w8dbh2Fkftr1k6puOjq-Q2xiTKYt1Tutn65X82KMQ/pubhtml',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the single tab flag of a sheet', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1je2Bj1k_HJSOKAtFtOrHoUEFCIm1AG5JlS7Z3T1mp3E/pubhtml?gid=0&single=true'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1je2Bj1k_HJSOKAtFtOrHoUEFCIm1AG5JlS7Z3T1mp3E',
+        src: 'https://docs.google.com/spreadsheets/d/1je2Bj1k_HJSOKAtFtOrHoUEFCIm1AG5JlS7Z3T1mp3E/pubhtml?gid=0&single=true',
+        url: 'https://docs.google.com/spreadsheets/d/1je2Bj1k_HJSOKAtFtOrHoUEFCIm1AG5JlS7Z3T1mp3E/pubhtml',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the cell range of a sheet', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/e/2PACX-1vTkvnj4-XYq1a5yilaz2lZ1huzi7tsxQXnjZUwhC1mqo5XFBwkJPwtjqJakL0uy2n8xptrmMEtJZQXr/pubhtml?gid=393389165&range=A30:I34'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '2PACX-1vTkvnj4-XYq1a5yilaz2lZ1huzi7tsxQXnjZUwhC1mqo5XFBwkJPwtjqJakL0uy2n8xptrmMEtJZQXr',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTkvnj4-XYq1a5yilaz2lZ1huzi7tsxQXnjZUwhC1mqo5XFBwkJPwtjqJakL0uy2n8xptrmMEtJZQXr/pubhtml?gid=393389165&range=A30%3AI34',
+        url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTkvnj4-XYq1a5yilaz2lZ1huzi7tsxQXnjZUwhC1mqo5XFBwkJPwtjqJakL0uy2n8xptrmMEtJZQXr/pubhtml',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the tab bar and header flags the publish dialog writes', () => {
       const value =
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml?widget=true&headers=false'
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml?widget=true&headers=false',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml',
         height: 500,
       }
@@ -20,41 +62,55 @@ describe('googlesheetsResolveEmbed', () => {
       expect(googlesheetsResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the tab a sheet framed by its file id opens on', () => {
+    it('should drop the flag that moves the tab bar to the top', () => {
       const value =
-        'https://docs.google.com/spreadsheets/d/10P1pvE-X8KqXW58mnhb42Ve2aQoBv8mBFYeQkzvZndM/pubhtml?gid=1511085359&single=true&widget=true&headers=false'
+        'https://docs.google.com/spreadsheets/d/1A-hgNPSUpXdh7UclqbMkgDmjv18lArU4uE5d5PuMGTM/pubhtml?widget=false'
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
-        id: '10P1pvE-X8KqXW58mnhb42Ve2aQoBv8mBFYeQkzvZndM',
-        src: 'https://docs.google.com/spreadsheets/d/10P1pvE-X8KqXW58mnhb42Ve2aQoBv8mBFYeQkzvZndM/pubhtml?gid=1511085359&single=true&widget=true&headers=false',
-        url: 'https://docs.google.com/spreadsheets/d/10P1pvE-X8KqXW58mnhb42Ve2aQoBv8mBFYeQkzvZndM/pubhtml',
+        id: '1A-hgNPSUpXdh7UclqbMkgDmjv18lArU4uE5d5PuMGTM',
+        src: 'https://docs.google.com/spreadsheets/d/1A-hgNPSUpXdh7UclqbMkgDmjv18lArU4uE5d5PuMGTM/pubhtml',
+        url: 'https://docs.google.com/spreadsheets/d/1A-hgNPSUpXdh7UclqbMkgDmjv18lArU4uE5d5PuMGTM/pubhtml',
         height: 500,
       }
 
       expect(googlesheetsResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the cell range and the title bar flag of a sheet', () => {
+    it('should drop the header flag of a sheet', () => {
       const value =
-        'https://docs.google.com/spreadsheets/d/1XCf_FhT4FFMeO2FRJUQiuvT9CYu7i3dOt3FNNer9WMc/pubhtml?gid=1096163043&single=true&widget=false&headers=false&chrome=false&range=A1:G18'
+        'https://docs.google.com/spreadsheets/d/1AwZWMsnOZQGgVXVQa6OkSWIpytcxcso9Bk9xrpem8ok/pubhtml?headers=false'
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
-        id: '1XCf_FhT4FFMeO2FRJUQiuvT9CYu7i3dOt3FNNer9WMc',
-        src: 'https://docs.google.com/spreadsheets/d/1XCf_FhT4FFMeO2FRJUQiuvT9CYu7i3dOt3FNNer9WMc/pubhtml?gid=1096163043&single=true&widget=false&headers=false&chrome=false&range=A1:G18',
-        url: 'https://docs.google.com/spreadsheets/d/1XCf_FhT4FFMeO2FRJUQiuvT9CYu7i3dOt3FNNer9WMc/pubhtml',
+        id: '1AwZWMsnOZQGgVXVQa6OkSWIpytcxcso9Bk9xrpem8ok',
+        src: 'https://docs.google.com/spreadsheets/d/1AwZWMsnOZQGgVXVQa6OkSWIpytcxcso9Bk9xrpem8ok/pubhtml',
+        url: 'https://docs.google.com/spreadsheets/d/1AwZWMsnOZQGgVXVQa6OkSWIpytcxcso9Bk9xrpem8ok/pubhtml',
         height: 500,
       }
 
       expect(googlesheetsResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should drop the minimal toolbar flag, which draws the same sheet', () => {
+    it('should drop the title bar flag of a sheet', () => {
       const value =
-        'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwT6OXaYOLfiKZtE1Ki7VMLKkxHFKVZBtbG7VbQ_Fh7irnAHTMxGtQ45jEcNdZA6he8v7Wcx52Ac5m/pubhtml?widget=true&headers=false&rm=minimal'
+        'https://docs.google.com/spreadsheets/d/1A-hgNPSUpXdh7UclqbMkgDmjv18lArU4uE5d5PuMGTM/pubhtml?chrome=false'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1A-hgNPSUpXdh7UclqbMkgDmjv18lArU4uE5d5PuMGTM',
+        src: 'https://docs.google.com/spreadsheets/d/1A-hgNPSUpXdh7UclqbMkgDmjv18lArU4uE5d5PuMGTM/pubhtml',
+        url: 'https://docs.google.com/spreadsheets/d/1A-hgNPSUpXdh7UclqbMkgDmjv18lArU4uE5d5PuMGTM/pubhtml',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the minimal toolbar flag of a sheet', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwT6OXaYOLfiKZtE1Ki7VMLKkxHFKVZBtbG7VbQ_Fh7irnAHTMxGtQ45jEcNdZA6he8v7Wcx52Ac5m/pubhtml?rm=minimal'
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vTwT6OXaYOLfiKZtE1Ki7VMLKkxHFKVZBtbG7VbQ_Fh7irnAHTMxGtQ45jEcNdZA6he8v7Wcx52Ac5m',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwT6OXaYOLfiKZtE1Ki7VMLKkxHFKVZBtbG7VbQ_Fh7irnAHTMxGtQ45jEcNdZA6he8v7Wcx52Ac5m/pubhtml?widget=true&headers=false',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwT6OXaYOLfiKZtE1Ki7VMLKkxHFKVZBtbG7VbQ_Fh7irnAHTMxGtQ45jEcNdZA6he8v7Wcx52Ac5m/pubhtml',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwT6OXaYOLfiKZtE1Ki7VMLKkxHFKVZBtbG7VbQ_Fh7irnAHTMxGtQ45jEcNdZA6he8v7Wcx52Ac5m/pubhtml',
         height: 500,
       }
@@ -64,11 +120,11 @@ describe('googlesheetsResolveEmbed', () => {
 
     it('should drop the share tracker of a sheet', () => {
       const value =
-        'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml?widget=true&usp=sharing'
+        'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml?usp=sharing'
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml?widget=true',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml',
         height: 500,
       }
@@ -76,13 +132,13 @@ describe('googlesheetsResolveEmbed', () => {
       expect(googlesheetsResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should drop the output flag, which draws the same sheet', () => {
+    it('should drop the output flag of a sheet', () => {
       const value =
-        'https://docs.google.com/spreadsheets/d/1gK8t8PedCgoRnLjulWMkJHIU7lecnmmhNcyVgVoZHYQ/pubhtml?gid=0&single=true&output=html&chrome=false&headers=false&widget=false'
+        'https://docs.google.com/spreadsheets/d/1gK8t8PedCgoRnLjulWMkJHIU7lecnmmhNcyVgVoZHYQ/pubhtml?gid=0&single=true&output=html'
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '1gK8t8PedCgoRnLjulWMkJHIU7lecnmmhNcyVgVoZHYQ',
-        src: 'https://docs.google.com/spreadsheets/d/1gK8t8PedCgoRnLjulWMkJHIU7lecnmmhNcyVgVoZHYQ/pubhtml?gid=0&single=true&chrome=false&headers=false&widget=false',
+        src: 'https://docs.google.com/spreadsheets/d/1gK8t8PedCgoRnLjulWMkJHIU7lecnmmhNcyVgVoZHYQ/pubhtml?gid=0&single=true',
         url: 'https://docs.google.com/spreadsheets/d/1gK8t8PedCgoRnLjulWMkJHIU7lecnmmhNcyVgVoZHYQ/pubhtml',
         height: 500,
       }
@@ -90,13 +146,13 @@ describe('googlesheetsResolveEmbed', () => {
       expect(googlesheetsResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should drop the embedded flag, which draws the same sheet', () => {
+    it('should drop the embedded flag of a sheet', () => {
       const value =
-        'https://docs.google.com/spreadsheets/d/e/2PACX-1vR1wLa6JQpFtYSYWqQ-KnXzdY7ZSBGrVJRdkplyQD5_ts18GF3qqnlRobuuBIb0MpFSDGWHCI8onOoS/pubhtml?embedded=true,single=true&widget=true&'
+        'https://docs.google.com/spreadsheets/d/e/2PACX-1vR1wLa6JQpFtYSYWqQ-KnXzdY7ZSBGrVJRdkplyQD5_ts18GF3qqnlRobuuBIb0MpFSDGWHCI8onOoS/pubhtml?embedded=true,single=true'
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vR1wLa6JQpFtYSYWqQ-KnXzdY7ZSBGrVJRdkplyQD5_ts18GF3qqnlRobuuBIb0MpFSDGWHCI8onOoS',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR1wLa6JQpFtYSYWqQ-KnXzdY7ZSBGrVJRdkplyQD5_ts18GF3qqnlRobuuBIb0MpFSDGWHCI8onOoS/pubhtml?widget=true',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR1wLa6JQpFtYSYWqQ-KnXzdY7ZSBGrVJRdkplyQD5_ts18GF3qqnlRobuuBIb0MpFSDGWHCI8onOoS/pubhtml',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR1wLa6JQpFtYSYWqQ-KnXzdY7ZSBGrVJRdkplyQD5_ts18GF3qqnlRobuuBIb0MpFSDGWHCI8onOoS/pubhtml',
         height: 500,
       }
@@ -104,13 +160,27 @@ describe('googlesheetsResolveEmbed', () => {
       expect(googlesheetsResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep a parameter it does not know as written', () => {
+    it('should drop the format flag of a sheet', () => {
       const value =
-        'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2E0Uyt2V1s_BqvXIsSojR_5GQDFG-SfpaxbgdxGR3pOrEEKu4qrhcjT0ZTtkGsFV1E_6MU36bLk3A/pubhtml?widget=true&width='
+        'https://docs.google.com/spreadsheets/d/1uXYTiTY30ozoOFZlHqGDCFV2-ONJhrAj-Kr3j5Vwmi8/pubhtml?format=interactive'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1uXYTiTY30ozoOFZlHqGDCFV2-ONJhrAj-Kr3j5Vwmi8',
+        src: 'https://docs.google.com/spreadsheets/d/1uXYTiTY30ozoOFZlHqGDCFV2-ONJhrAj-Kr3j5Vwmi8/pubhtml',
+        url: 'https://docs.google.com/spreadsheets/d/1uXYTiTY30ozoOFZlHqGDCFV2-ONJhrAj-Kr3j5Vwmi8/pubhtml',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop a parameter it does not know', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2E0Uyt2V1s_BqvXIsSojR_5GQDFG-SfpaxbgdxGR3pOrEEKu4qrhcjT0ZTtkGsFV1E_6MU36bLk3A/pubhtml?width='
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vT2E0Uyt2V1s_BqvXIsSojR_5GQDFG-SfpaxbgdxGR3pOrEEKu4qrhcjT0ZTtkGsFV1E_6MU36bLk3A',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2E0Uyt2V1s_BqvXIsSojR_5GQDFG-SfpaxbgdxGR3pOrEEKu4qrhcjT0ZTtkGsFV1E_6MU36bLk3A/pubhtml?widget=true&width=',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2E0Uyt2V1s_BqvXIsSojR_5GQDFG-SfpaxbgdxGR3pOrEEKu4qrhcjT0ZTtkGsFV1E_6MU36bLk3A/pubhtml',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2E0Uyt2V1s_BqvXIsSojR_5GQDFG-SfpaxbgdxGR3pOrEEKu4qrhcjT0ZTtkGsFV1E_6MU36bLk3A/pubhtml',
         height: 500,
       }
@@ -120,11 +190,11 @@ describe('googlesheetsResolveEmbed', () => {
 
     it('should keep the single sheet route of a sheet', () => {
       const value =
-        'https://docs.google.com/spreadsheets/d/1U3GGl7tMh_RcurZevHcKkAmnLKy90MfNvid05MeWju0/pubhtml/sheet?headers=false&gid=573553659&range=A1:E22'
+        'https://docs.google.com/spreadsheets/d/1U3GGl7tMh_RcurZevHcKkAmnLKy90MfNvid05MeWju0/pubhtml/sheet?gid=573553659'
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '1U3GGl7tMh_RcurZevHcKkAmnLKy90MfNvid05MeWju0',
-        src: 'https://docs.google.com/spreadsheets/d/1U3GGl7tMh_RcurZevHcKkAmnLKy90MfNvid05MeWju0/pubhtml/sheet?headers=false&gid=573553659&range=A1:E22',
+        src: 'https://docs.google.com/spreadsheets/d/1U3GGl7tMh_RcurZevHcKkAmnLKy90MfNvid05MeWju0/pubhtml/sheet?gid=573553659',
         url: 'https://docs.google.com/spreadsheets/d/1U3GGl7tMh_RcurZevHcKkAmnLKy90MfNvid05MeWju0/pubhtml',
         height: 500,
       }
@@ -132,13 +202,27 @@ describe('googlesheetsResolveEmbed', () => {
       expect(googlesheetsResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the chart and its interactive format of a published chart', () => {
+    it('should keep the chart a published chart names', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1s8zs0Ho1XvBGXspVh2mEOfiE06g-4J2BFip8rOdLVho/pubchart?oid=390769411'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1s8zs0Ho1XvBGXspVh2mEOfiE06g-4J2BFip8rOdLVho',
+        src: 'https://docs.google.com/spreadsheets/d/1s8zs0Ho1XvBGXspVh2mEOfiE06g-4J2BFip8rOdLVho/pubchart?oid=390769411',
+        url: 'https://docs.google.com/spreadsheets/d/1s8zs0Ho1XvBGXspVh2mEOfiE06g-4J2BFip8rOdLVho/pubhtml',
+        height: 371,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the interactive format of a chart', () => {
       const value =
         'https://docs.google.com/spreadsheets/d/12eGQA3Go0aBYEcbpwd8QddARuQiDCbsaO9XWV26UW6o/pubchart?oid=1123833282&format=interactive'
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '12eGQA3Go0aBYEcbpwd8QddARuQiDCbsaO9XWV26UW6o',
-        src: 'https://docs.google.com/spreadsheets/d/12eGQA3Go0aBYEcbpwd8QddARuQiDCbsaO9XWV26UW6o/pubchart?oid=1123833282&format=interactive',
+        src: 'https://docs.google.com/spreadsheets/d/12eGQA3Go0aBYEcbpwd8QddARuQiDCbsaO9XWV26UW6o/pubchart?oid=1123833282',
         url: 'https://docs.google.com/spreadsheets/d/12eGQA3Go0aBYEcbpwd8QddARuQiDCbsaO9XWV26UW6o/pubhtml',
         height: 371,
       }
@@ -146,13 +230,13 @@ describe('googlesheetsResolveEmbed', () => {
       expect(googlesheetsResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the image format of a chart published by its token', () => {
+    it('should drop the image format of a chart published by its token', () => {
       const value =
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vTer4F1dwvz5S6cFf_pr768UANwA6btXwwKCOCHteBJn5GOXkiXGj0wjHiVlU6xos8MWd56Y_pLsmAL/pubchart?oid=1703615479&format=image'
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vTer4F1dwvz5S6cFf_pr768UANwA6btXwwKCOCHteBJn5GOXkiXGj0wjHiVlU6xos8MWd56Y_pLsmAL',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTer4F1dwvz5S6cFf_pr768UANwA6btXwwKCOCHteBJn5GOXkiXGj0wjHiVlU6xos8MWd56Y_pLsmAL/pubchart?oid=1703615479&format=image',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTer4F1dwvz5S6cFf_pr768UANwA6btXwwKCOCHteBJn5GOXkiXGj0wjHiVlU6xos8MWd56Y_pLsmAL/pubchart?oid=1703615479',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTer4F1dwvz5S6cFf_pr768UANwA6btXwwKCOCHteBJn5GOXkiXGj0wjHiVlU6xos8MWd56Y_pLsmAL/pubhtml',
         height: 371,
       }
@@ -252,7 +336,7 @@ describe('googlesheetsResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vRu96x6GEP9i0hMcHTcR72FzgU8LHKu6nY0-GPLiy2K6jl5GCvWuF-S7BlG1yLaZRyISf_OQ2ODnryr',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRu96x6GEP9i0hMcHTcR72FzgU8LHKu6nY0-GPLiy2K6jl5GCvWuF-S7BlG1yLaZRyISf_OQ2ODnryr/pubhtml?gid=1173473883&single=true&widget=false&headers=false&chrome=false',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRu96x6GEP9i0hMcHTcR72FzgU8LHKu6nY0-GPLiy2K6jl5GCvWuF-S7BlG1yLaZRyISf_OQ2ODnryr/pubhtml?gid=1173473883&single=true',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRu96x6GEP9i0hMcHTcR72FzgU8LHKu6nY0-GPLiy2K6jl5GCvWuF-S7BlG1yLaZRyISf_OQ2ODnryr/pubhtml',
         height: 500,
       }
@@ -266,7 +350,7 @@ describe('googlesheetsResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vQZs0nSuXimq1nrFUgP_84KEuRfrbB3fGRXvsIWxswuG_ZQ7c-GaMB8vBKxWUqcXh85NCkXv76_6AYP',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZs0nSuXimq1nrFUgP_84KEuRfrbB3fGRXvsIWxswuG_ZQ7c-GaMB8vBKxWUqcXh85NCkXv76_6AYP/pubhtml?widget=true&headers=false',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZs0nSuXimq1nrFUgP_84KEuRfrbB3fGRXvsIWxswuG_ZQ7c-GaMB8vBKxWUqcXh85NCkXv76_6AYP/pubhtml',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZs0nSuXimq1nrFUgP_84KEuRfrbB3fGRXvsIWxswuG_ZQ7c-GaMB8vBKxWUqcXh85NCkXv76_6AYP/pubhtml',
         height: 500,
       }
@@ -280,7 +364,7 @@ describe('googlesheetsResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M',
-        src: 'https://docs.google.com/spreadsheets/d/16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M/pubhtml?gid=1618494729&single=true&widget=true&headers=false&range=a1:j',
+        src: 'https://docs.google.com/spreadsheets/d/16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M/pubhtml?gid=1618494729&single=true&range=a1%3Aj',
         url: 'https://docs.google.com/spreadsheets/d/16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M/pubhtml',
         height: 500,
       }
@@ -328,7 +412,7 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml?widget=true&headers=false',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml',
         height: 500,
       }
@@ -346,7 +430,7 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml?widget=true&headers=false',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml',
         height: 500,
         title: 'December 2025 Karate Grading Results',
@@ -369,7 +453,7 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '1C4qR_gd-gNUlbywprKuVBdNw9Ap6zLsFNYsHSH87K-o',
-        src: 'https://docs.google.com/spreadsheets/d/1C4qR_gd-gNUlbywprKuVBdNw9Ap6zLsFNYsHSH87K-o/pubchart?oid=537273311&format=interactive',
+        src: 'https://docs.google.com/spreadsheets/d/1C4qR_gd-gNUlbywprKuVBdNw9Ap6zLsFNYsHSH87K-o/pubchart?oid=537273311',
         url: 'https://docs.google.com/spreadsheets/d/1C4qR_gd-gNUlbywprKuVBdNw9Ap6zLsFNYsHSH87K-o/pubhtml',
         height: 505,
       }
@@ -388,7 +472,7 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vTKLuizF9FWWvQ1yi8_IWs_wuGbEHpYLZg4B95ng98D6e0Kvi65-KN-k85rzBGkGQt4bt8HjDfpZBA5',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKLuizF9FWWvQ1yi8_IWs_wuGbEHpYLZg4B95ng98D6e0Kvi65-KN-k85rzBGkGQt4bt8HjDfpZBA5/pubchart?oid=703555483&format=interactive',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKLuizF9FWWvQ1yi8_IWs_wuGbEHpYLZg4B95ng98D6e0Kvi65-KN-k85rzBGkGQt4bt8HjDfpZBA5/pubchart?oid=703555483',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKLuizF9FWWvQ1yi8_IWs_wuGbEHpYLZg4B95ng98D6e0Kvi65-KN-k85rzBGkGQt4bt8HjDfpZBA5/pubhtml',
         height: 440,
       }
@@ -410,7 +494,7 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vS9iWeUBXWDgBwW4uHwtUrn21598gdZJkdCHPPDle-TxPIp3vWt5NQJ_iLtNMYQg-KPDUlpJ-Yw9T_4',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9iWeUBXWDgBwW4uHwtUrn21598gdZJkdCHPPDle-TxPIp3vWt5NQJ_iLtNMYQg-KPDUlpJ-Yw9T_4/pubchart?oid=13464762&format=interactive',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9iWeUBXWDgBwW4uHwtUrn21598gdZJkdCHPPDle-TxPIp3vWt5NQJ_iLtNMYQg-KPDUlpJ-Yw9T_4/pubchart?oid=13464762',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9iWeUBXWDgBwW4uHwtUrn21598gdZJkdCHPPDle-TxPIp3vWt5NQJ_iLtNMYQg-KPDUlpJ-Yw9T_4/pubhtml',
         height: 469.5,
       }
@@ -430,7 +514,7 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vSHamMZQILw9-FEtIhdiHMdroSgPzLv737UcgduKHdRrsEt8eXa395_MshIm5waDHMg5Aoc6Ty_14vH',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSHamMZQILw9-FEtIhdiHMdroSgPzLv737UcgduKHdRrsEt8eXa395_MshIm5waDHMg5Aoc6Ty_14vH/pubchart?oid=992755193&format=interactive',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSHamMZQILw9-FEtIhdiHMdroSgPzLv737UcgduKHdRrsEt8eXa395_MshIm5waDHMg5Aoc6Ty_14vH/pubchart?oid=992755193',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSHamMZQILw9-FEtIhdiHMdroSgPzLv737UcgduKHdRrsEt8eXa395_MshIm5waDHMg5Aoc6Ty_14vH/pubhtml',
         height: 600,
       }
@@ -444,7 +528,7 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck',
-        src: 'https://docs.google.com/spreadsheets/d/1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck/pubchart?oid=1031542142&format=interactive',
+        src: 'https://docs.google.com/spreadsheets/d/1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck/pubchart?oid=1031542142',
         url: 'https://docs.google.com/spreadsheets/d/1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck/pubhtml',
         height: 371,
       }
@@ -462,7 +546,7 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck',
-        src: 'https://docs.google.com/spreadsheets/d/1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck/pubchart?oid=1031542142&format=interactive',
+        src: 'https://docs.google.com/spreadsheets/d/1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck/pubchart?oid=1031542142',
         url: 'https://docs.google.com/spreadsheets/d/1nAONxXtIuFidW5_OjltMI_zKXT_y5v1c9LX2klC7zck/pubhtml',
         height: 371,
       }
@@ -506,7 +590,7 @@ describeForEachParser('googlesheets through the pipeline', (parseHtml) => {
         data-embed-url="https://docs.google.com/spreadsheets/d/1cQ8dFdQARpQV-uzmLkEZZZX6m5PhyMClBagpK8yH1mI/pubhtml"
         data-embed-id="1cQ8dFdQARpQV-uzmLkEZZZX6m5PhyMClBagpK8yH1mI"
         data-embed-provider="googlesheets"
-        data-embed-src="https://docs.google.com/spreadsheets/d/1cQ8dFdQARpQV-uzmLkEZZZX6m5PhyMClBagpK8yH1mI/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false"
+        data-embed-src="https://docs.google.com/spreadsheets/d/1cQ8dFdQARpQV-uzmLkEZZZX6m5PhyMClBagpK8yH1mI/pubhtml?gid=0&amp;single=true"
       ></div>
     `
 

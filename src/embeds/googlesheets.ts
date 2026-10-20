@@ -1,7 +1,7 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr, getElementDimensions } from '../utils/dom.js'
-import { filterUrlQuery } from '../utils/urls.js'
+import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'googlesheets'
@@ -11,13 +11,16 @@ const provider = 'googlesheets'
 const sheetRoutes = ['pubhtml', 'pubhtml/sheet']
 const chartRoute = 'pubchart'
 
-// Each of these draws the same page whether present or not, unlike `gid`, `range`, `widget`,
-// `headers` and `chrome`.
-const unseenParams = [
-  'embedded',
-  'output',
-  'rm',
-  'usp', // Share link tracker
+// The parameters a sheet's frame keeps. Every other one is dropped.
+const sheetParams = [
+  'gid', // The tab that shows
+  'single', // Only that tab
+  'range', // The cells that show
+]
+
+// The parameters a chart's frame keeps. Every other one is dropped.
+const chartParams = [
+  'oid', // The chart
 ]
 
 const sheetHeight = 500
@@ -27,10 +30,9 @@ const chartHeight = 371
 // it by its Drive file id. An account index, `/u/{n}/`, only picks the sign-in and serves the
 // same sheet.
 export const googlesheetsResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
   const pathSegments = getPathSegments(url)
 
-  if (!parsed || pathSegments[0] !== 'spreadsheets') {
+  if (pathSegments[0] !== 'spreadsheets') {
     return
   }
 
@@ -50,7 +52,7 @@ export const googlesheetsResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const sheetPath = isPublished ? `e/${sheetId}` : sheetId
-  const query = filterUrlQuery(parsed, (name) => !unseenParams.includes(name))
+  const query = pickUrlParams(url, isChart ? chartParams : sheetParams)
   // A chart draws at its own pixel size and never scales, and its carrier declares that size.
   const declaredHeight = element ? getElementDimensions(element).height : undefined
   const height = isChart ? (declaredHeight ?? chartHeight) : sheetHeight

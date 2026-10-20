@@ -62,13 +62,13 @@ describe('googledocsResolveEmbed', () => {
       expect(googledocsResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep a parameter it does not know as written', () => {
+    it('should drop the deck parameters a doc carries', () => {
       const value =
         'https://docs.google.com/document/d/14GKnVuWvZTOvUg_NCe6_7ahqiEogrmYCzrqQVyQjDNU/pub?embedded?start=false&loop=false&delayms=3000'
       const expected: EmbedResolverResult = {
         provider: 'googledocs',
         id: '14GKnVuWvZTOvUg_NCe6_7ahqiEogrmYCzrqQVyQjDNU',
-        src: 'https://docs.google.com/document/d/14GKnVuWvZTOvUg_NCe6_7ahqiEogrmYCzrqQVyQjDNU/pub?embedded?start=false&loop=false&delayms=3000',
+        src: 'https://docs.google.com/document/d/14GKnVuWvZTOvUg_NCe6_7ahqiEogrmYCzrqQVyQjDNU/pub',
         url: 'https://docs.google.com/document/d/14GKnVuWvZTOvUg_NCe6_7ahqiEogrmYCzrqQVyQjDNU/pub',
         height: 500,
       }
