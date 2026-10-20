@@ -9,14 +9,16 @@ const provider = 'rsscom'
 
 const rsscomHosts = ['player.rss.com']
 
-// The player reads a numeric second segment as an episode, and `latest` as the newest episode.
+// The player reads a numeric second segment as an episode, and `latest` as the newest episode,
+// which no page url names. Any other word, `LATEST` included, plays the whole show.
 const episodeIdRegex = /^\d+$/
+const latestSegment = 'latest'
 
 // The player draws its older layout unless `v=2` asks for the one the embed dialog writes.
 const playerParams = { v: '2' }
 
 // An RSS.com podcast player, framed as `/{slug}/{episodeId}` for an episode and `/{slug}` for the
-// show with its episode list.
+// show with its episode list, which `/{slug}/{word}` plays too.
 export const rsscomResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, rsscomHosts)
 
@@ -33,7 +35,11 @@ export const rsscomResolveEmbed: ResolveEmbed = (url, element) => {
   const query = composeQuery({ ...playerParams, ...pickQueryParams(parsed.search, ['time']) })
   const title = attr(element, 'title')
 
-  if (!episodeId) {
+  if (episodeId === latestSegment) {
+    return
+  }
+
+  if (!episodeId || !episodeIdRegex.test(episodeId)) {
     return {
       provider,
       id: slug,
@@ -41,10 +47,6 @@ export const rsscomResolveEmbed: ResolveEmbed = (url, element) => {
       url: `https://rss.com/podcasts/${slug}/`,
       title,
     }
-  }
-
-  if (!episodeIdRegex.test(episodeId)) {
-    return
   }
 
   return {
