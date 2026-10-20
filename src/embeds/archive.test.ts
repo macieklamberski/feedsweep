@@ -121,8 +121,8 @@ describe('archiveResolveEmbed', () => {
       expect(archiveResolveEmbed(value)).toEqual(expected)
     })
 
-    // Publishers spelled the query with a leading ampersand, and that url answers 404 today
-    // while the `?` spelling answers 200.
+    // archive.org's own details pages spell the query with a leading ampersand, and that url
+    // answers 404 today while the `?` spelling answers 200.
     it('should repair a query the ampersand form stranded in the path', () => {
       const value = 'https://archive.org/embed/some_album&playlist=1'
       const expected: EmbedResolverResult = {
@@ -162,6 +162,22 @@ describe('archiveResolveEmbed', () => {
         src: 'https://archive.org/embed/some_album?playlist=1',
         url: 'https://archive.org/details/some_album',
         thumbnail: 'https://archive.org/services/img/some_album',
+        ratio: '16/9',
+      }
+
+      expect(archiveResolveEmbed(value)).toEqual(expected)
+    })
+
+    // greatscottgadgets.com strands a poster url, and its slashes are no file inside the item.
+    it('should keep a stranded poster url out of the file path', () => {
+      const value =
+        'https://archive.org/embed/making-usb-accessible-teardown-2019&poster=https://archive.org/download/making-usb-accessible-teardown-2019/making-usb-accessible-teardown-2019.thumbs/making-usb-accessible-teardown-2019_000001.jpg'
+      const expected: EmbedResolverResult = {
+        provider: 'archive',
+        id: 'making-usb-accessible-teardown-2019',
+        src: 'https://archive.org/embed/making-usb-accessible-teardown-2019',
+        url: 'https://archive.org/details/making-usb-accessible-teardown-2019',
+        thumbnail: 'https://archive.org/services/img/making-usb-accessible-teardown-2019',
         ratio: '16/9',
       }
 

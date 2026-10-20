@@ -32,11 +32,22 @@ type SegmentParts = {
   file: string
 }
 
-// Some publisher tooling wrote `embed/{identifier}&playlist=1`, an ampersand where the query
-// should begin, so the whole tail lands inside the path segment.
+// archive.org's own details pages write `embed/{identifier}&playlist=1` into their player meta,
+// an ampersand where the query should begin. Its player still served that spelling in 2023 and
+// answers 404 for it now, while `?playlist=1` answers 200.
 const readSegmentParts = (link: string): SegmentParts => {
   const [route = '', segment = '', ...rest] = getPathSegments(link)
   const { head, strayParams } = splitStrayParams(itemRoutes.includes(route) ? segment : '')
+
+  // The tail can hold a url, `&poster=https://archive.org/download/…`, whose slashes split it
+  // into further segments. It is read whole from the raw path, so none of it becomes a file.
+  if (strayParams) {
+    return {
+      head,
+      strayParams: splitStrayParams(parseUrl(link, placeholderBaseUrl)?.pathname ?? '').strayParams,
+      file: '',
+    }
+  }
 
   return {
     head,
@@ -100,12 +111,10 @@ const readItemEmbed = (url: string): EmbedResolverResult | undefined => {
   }
 
   // The parameters that say what plays are carried over; the rest is dropped. Anything the
-  // ampersand form stranded in the path is read alongside the real query, since that spelling
-  // 404s and rejoining it is what makes those embeds work at all.
+  // ampersand form stranded in the path is read alongside the real query.
   const search = parseUrl(url, placeholderBaseUrl)?.search ?? ''
   const query = composeQuery({
     ...pickQueryParams(search, archiveEmbedParams),
-    // The `&` spelling 404s, so what it stranded in the path is rejoined as query.
     ...pickQueryParams(strayParams, archiveEmbedParams),
   })
 
