@@ -1,4 +1,4 @@
-import { isPlainObject, parseUrl, toMap } from 'trousse'
+import { isPlainObject, isPresent, parseUrl, toMap, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
 import {
@@ -26,16 +26,28 @@ const players = toMap({
 // since a public video's page ignores it. Quality and autoplay are the reader's call.
 const playerParams = ['oid', 'id', 'hash']
 
-// The call `openapi.js` runs to fill a widget div: the div's id, the owner, the post or playlist,
-// and the hash.
+// The calls `openapi.js` runs to fill a widget div, each naming the div's id first. A post or
+// playlist names the owner, the item and the hash, a podcast the episode, and a poll an options
+// object and the poll.
 const widgetCallRegex =
-  /VK\.Widgets\.(Post|Playlist)\(\s*(["'])(.+?)\2\s*,\s*([^,\s]+)\s*,\s*([^,\s]+)\s*,\s*(["'])(.*?)\6/g
+  /VK\.Widgets\.(?<kind>Post|Playlist)\(\s*(?<elementQuote>["'])(?<element>.+?)\k<elementQuote>\s*,\s*(?<owner>[^,\s]+)\s*,\s*(?<item>[^,\s]+)\s*,\s*(?<hashQuote>["'])(?<hash>.*?)\k<hashQuote>/g
+const podcastCallRegex =
+  /VK\.Widgets\.(?<kind>Podcast)\(\s*(?<elementQuote>["'])(?<element>.+?)\k<elementQuote>\s*,\s*(?<itemQuote>["'])(?<item>.+?)\k<itemQuote>/g
+const pollCallRegex =
+  /VK\.Widgets\.(?<kind>Poll)\(\s*(?<elementQuote>["'])(?<element>.+?)\k<elementQuote>\s*,\s*\{[^}]*\}\s*,\s*(?<itemQuote>["'])(?<item>.+?)\k<itemQuote>/g
+// The page's `VK.init` call, whose `apiId` `openapi.js` adds to every widget frame as `app`.
+const initCallRegex = /VK\.init\(\s*\{[^}]*?\bapiId\s*:\s*(?<app>\d+)/
+
+// A video's own page, `/video{owner}_{video}`, which plays on the player with the same ids. The
+// signed owner tells it from `/videos{owner}`, `/video_ext.php` and `/video_embed`.
+const videoPageRegex = /^\/video(?<owner>-?\d+)_(?<video>[^/]+)$/
 
 // The widget frame opens its message channel only when its `window.name` is `fXD` and a
 // five-character key, and it starts every message with that key.
 const widgetFrameKey = 'feeds'
 
-// VK's player, `video_ext.php?oid={ownerId}&id={videoId}`, and the clip player beside it.
+// VK's player, `video_ext.php?oid={ownerId}&id={videoId}`, the clip player beside it, and a
+// video's page.
 export const vkResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
@@ -43,15 +55,16 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const player = players.get(parsed.pathname)
-  const ownerId = parsed.searchParams.get('oid') ?? ''
-  const videoId = parsed.searchParams.get('id') ?? ''
+  const page = parsed.pathname.match(videoPageRegex)?.groups
+  const player = players.get(page ? '/video_ext.php' : parsed.pathname)
+  const ownerId = page?.owner ?? parsed.searchParams.get('oid') ?? ''
+  const videoId = page?.video ?? parsed.searchParams.get('id') ?? ''
 
   if (!player || !ownerId || !videoId) {
     return
   }
 
-  const params = pickQueryParams(parsed.search, playerParams)
+  const params = page ? { oid: ownerId, id: videoId } : pickQueryParams(parsed.search, playerParams)
   const id = `${ownerId}_${videoId}`
   // See: https://dev.vk.com/ru/widgets/video, which writes the player on vk.ru.
   const src = `https://vk.ru${player.path}${composeQuery(params)}`
@@ -70,15 +83,16 @@ export const vkEmbedResolver = createUrlEmbedResolver(vkHosts, vkResolveEmbed)
 
 // `hash` unlocks the post, and the widget answers "Error" without it. The playlist widget
 // ignores it, and its page answers the same shell for any playlist, so it gets no page url.
+// The podcast page does the same for any episode. A poll has no page outside the widget.
 const composeWidgetEmbed = (
-  kind: string,
-  ownerId: string,
-  itemId: string,
-  hash: string,
+  call: Record<string, string>,
+  app: string | undefined,
 ): EmbedResolverResult => {
+  const { kind, owner, item, hash } = call
+
   if (kind === 'Post') {
-    const id = `wall${ownerId}_${itemId}`
-    const query = composeQuery({ owner_id: ownerId, post_id: itemId, hash })
+    const id = `wall${owner}_${item}`
+    const query = composeQuery({ owner_id: owner, post_id: item, hash })
 
     return {
       provider,
@@ -88,30 +102,61 @@ const composeWidgetEmbed = (
     }
   }
 
-  const query = composeQuery({ oid: ownerId, pid: itemId, hash })
+  // `openapi.js` reads a third argument as options, so the hash VK's snippet passes never reaches
+  // the frame.
+  if (kind === 'Podcast') {
+    return {
+      provider,
+      id: `podcast${item}`,
+      src: `https://vk.ru/widget_podcast.php${composeQuery({ episode: item })}`,
+    }
+  }
+
+  // A poll made under an app answers "Access denied" without that app's id.
+  if (kind === 'Poll') {
+    const query = composeQuery(trimObject({ app, poll_id: item }))
+
+    return {
+      provider,
+      id: `widget_poll${item}`,
+      src: `https://vk.ru/al_widget_poll.php${query}`,
+    }
+  }
+
+  const query = composeQuery({ oid: owner, pid: item, hash })
 
   return {
     provider,
-    id: `audio_playlist${ownerId}_${itemId}`,
+    id: `audio_playlist${owner}_${item}`,
     src: `https://vk.ru/widget_playlist.php${query}`,
   }
 }
 
-// VK's Post and Playlist widgets: an empty div that `openapi.js` fills from an inline
-// `VK.Widgets.Post` or `VK.Widgets.Playlist` call naming the div's id.
+// VK's Post, Playlist, Podcast and Poll widgets: an empty div that `openapi.js` fills from an
+// inline `VK.Widgets` call naming the div's id.
 export const vkWidgetEmbedResolver = createMarkupEmbedResolver(
-  'div[id^="vk_post_"], div[id^="vk_playlist_"]',
+  'div[id^="vk_post_"], div[id^="vk_playlist_"], div[id^="vk_podcast_"], div[id^="vk_poll"]',
   (element) => {
     // A mount that already holds the post's text keeps it.
     if (element.textContent?.trim()) {
       return
     }
 
-    for (const script of element.parentElement?.querySelectorAll('script') ?? []) {
-      const calls = [...(script.textContent ?? '').matchAll(widgetCallRegex)]
-      const call = calls.find((match) => match[3] === element.id)
+    const scripts = [...(element.parentElement?.querySelectorAll('script') ?? [])]
+    const app = scripts
+      .map((script) => {
+        return script.textContent?.match(initCallRegex)?.groups?.app
+      })
+      .find(isPresent)
 
-      if (!call) {
+    for (const script of scripts) {
+      const code = script.textContent ?? ''
+      const calls = [widgetCallRegex, podcastCallRegex, pollCallRegex].flatMap((regex) => {
+        return [...code.matchAll(regex)]
+      })
+      const call = calls.find((match) => match.groups?.element === element.id)
+
+      if (!call?.groups) {
         continue
       }
 
@@ -120,9 +165,7 @@ export const vkWidgetEmbedResolver = createMarkupEmbedResolver(
         script.remove()
       }
 
-      const [, kind, , , ownerId, itemId, , hash] = call
-
-      return composeWidgetEmbed(kind, ownerId, itemId, hash)
+      return composeWidgetEmbed(call.groups, app)
     }
   },
 )
