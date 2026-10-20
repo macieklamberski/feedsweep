@@ -83,18 +83,34 @@ describeForEachParser('typeformWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // A block can carry both generations, and only the later one is guaranteed intact, so each
-    // attribute is validated rather than the first one present being committed to.
-    it('should read the live id when the widget id is malformed', async () => {
+    // The first id present is used as written, so a malformed widget id gives the form url the
+    // publisher's own page loads, not the live id beside it.
+    it('should use the widget id as written when a live id sits beside it', async () => {
       const value = html`
         <div
-          data-tf-widget="../evil"
+          data-tf-widget="MTt3Pw7K?x"
           data-tf-live="01HXYZ"
         ></div>
       `
       const expected: EmbedResolverResult = {
         provider: 'typeform',
-        id: '01HXYZ',
+        id: 'MTt3Pw7K?x',
+        src: 'https://form.typeform.com/to/MTt3Pw7K%3Fx',
+        url: 'https://form.typeform.com/to/MTt3Pw7K%3Fx',
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep an id holding a slash in one path segment', async () => {
+      const value = '<div data-tf-widget="../evil"></div>'
+      const expected: EmbedResolverResult = {
+        provider: 'typeform',
+        id: '../evil',
+        src: 'https://form.typeform.com/to/..%2Fevil',
+        url: 'https://form.typeform.com/to/..%2Fevil',
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -163,12 +179,6 @@ describeForEachParser('typeformWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for an id outside the url-safe alphabet', async () => {
-      const value = '<div data-tf-widget="../evil"></div>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should return undefined for an empty id', async () => {
       const value = '<div data-tf-widget=""></div>'
 
