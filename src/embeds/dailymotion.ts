@@ -1,5 +1,6 @@
 import {
   decodeSegment,
+  fixMalformedQuery,
   getPathSegments,
   isPlainObject,
   type Nullish,
@@ -17,7 +18,6 @@ import {
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
-  splitStrayParams,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -73,14 +73,19 @@ const skipRouteWords = (segments: Array<string>): number => {
   return index
 }
 
-// Share urls append a `_title-slug` to the id and the platform strips it itself. The Flash player
-// wrote `/swf/{id}&colors=…`, so a stray query rides on the segment too.
+// Share urls append a `_title-slug` to the id and the platform strips it itself.
 const readId = (candidate: Nullish<string>): string | undefined => {
   if (!candidate) {
     return
   }
 
-  return splitStrayParams(candidate).head.split('_')[0]
+  return candidate.split('_')[0]
+}
+
+// The Flash player wrote `/swf/{id}&colors=…`, the query glued onto the id, and transforms outside
+// the resolver factory read urls here too.
+const parseDailymotionUrl = (link: string): URL | undefined => {
+  return parseUrl(fixMalformedQuery(link), placeholderBaseUrl)
 }
 
 const wallWords = ['videowall', 'videozap']
@@ -112,7 +117,7 @@ const readWidgetEntry = (url: URL): Array<string> => {
 // A playlist names no single video, so it is read separately and only once the video readers have
 // found nothing: `/embed/video/{id}?playlist={id}` is a video playing inside one, not a playlist.
 const extractDailymotionPlaylistId = (link: string): string | undefined => {
-  const url = parseUrl(link, placeholderBaseUrl)
+  const url = parseDailymotionUrl(link)
 
   if (!url) {
     return
@@ -151,7 +156,7 @@ const readPathId = (url: URL, segments: Array<string>): string | undefined => {
 }
 
 export const extractDailymotionId = (link: string): string | undefined => {
-  const url = parseUrl(link, placeholderBaseUrl)
+  const url = parseDailymotionUrl(link)
 
   if (!url) {
     return

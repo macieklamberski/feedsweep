@@ -327,6 +327,13 @@ describe('youtubeResolveEmbed', () => {
     expect(youtubeResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should read the query after a name the Flash-era path spelling leaves after the id', () => {
+    const value = 'https://www.youtube.com/embed/OgiAa5Xi6ok&t?start=30'
+    const expected = 'https://www.youtube.com/embed/OgiAa5Xi6ok?start=30'
+
+    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+  })
+
   it('should carry a fragment offset over as the start', () => {
     const value = 'https://www.youtube.com/embed/1sJnSoSb_SE#t=220'
     const expected: EmbedResolverResult = {

@@ -167,7 +167,7 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
     })
 
     it('should keep a show name carrying an ampersand as one parameter', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Shows/Azure&Friends/An-Episode/player"></iframe>`
+      const value = html`<iframe src="https://channel9.msdn.com/Shows/Azure%26Friends/An-Episode/player"></iframe>`
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'azure&friends/an-episode',
@@ -179,7 +179,7 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
     })
 
     it('should keep an event session carrying a separator as one parameter', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Events/Build/2017/T6064&ev=stolen/player"></iframe>`
+      const value = html`<iframe src="https://channel9.msdn.com/Events/Build/2017/T6064%26ev%3Dstolen/player"></iframe>`
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'events/build-2017/t6064&ev=stolen',

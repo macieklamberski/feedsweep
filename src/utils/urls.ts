@@ -189,13 +189,6 @@ export const parseUrlOnHosts = (
   }
 }
 
-// A Flash-era player took its options as `{id}&autoplay=1` with no `?`, so they share a segment.
-export const splitStrayParams = (segment: string): { head: string; strayParams: string } => {
-  const [head = '', ...rest] = segment.split('&')
-
-  return { head, strayParams: rest.join('&') }
-}
-
 // The same pick as `pickUrlParams`, for a query that arrives on its own, not on a url, which is
 // how a facade states its player options (`lite-youtube`'s `params`). Returns the pairs instead
 // of a string, so a caller can override one from a dedicated attribute before building.

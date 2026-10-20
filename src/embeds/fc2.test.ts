@@ -658,13 +658,13 @@ describeForEachParser('fc2IframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed content id carrying a url separator as written, even if the player answers an error', async () => {
+    it('should read the content id before a query glued on with an ampersand', async () => {
       const value = '<iframe src="https://video.fc2.com/embed/player/2020&x=0926/"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'fc2',
-        id: '2020&x=0926',
-        src: 'https://video.fc2.com/embed/player/2020&x=0926/',
-        url: 'https://video.fc2.com/content/2020&x=0926/',
+        id: '2020',
+        src: 'https://video.fc2.com/embed/player/2020/',
+        url: 'https://video.fc2.com/content/2020/',
         ratio: '16/9',
       }
 
