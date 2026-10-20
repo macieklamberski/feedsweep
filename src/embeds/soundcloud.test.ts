@@ -148,6 +148,31 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the Flash snippet sibling, which names the track first', async () => {
+      const value = html`
+        <object
+          width="100%"
+          height="81"
+          data="https://player.soundcloud.com/player.swf?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F68669052&amp;show_comments=true&amp;auto_play=false&amp;color=ff7700"
+          type="application/x-shockwave-flash"
+        ></object>
+        <span><a href="http://soundcloud.com/rozie-3/13-bks-suicide">13-BKS-Suicide</a> by <a href="http://soundcloud.com/rozie-3">rozie</a></span>
+      `
+      const expected = html`
+        <div
+          data-embed-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/68669052"
+          data-embed-provider="soundcloud"
+          data-embed-id="tracks/68669052"
+          data-embed-url="http://soundcloud.com/rozie-3/13-bks-suicide"
+          data-embed-title="13-BKS-Suicide"
+          data-embed-author="rozie"
+          data-embed-height="166"
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should move a page url the swf names onto the widget and keep the page as the url', async () => {
       const value = html`
         <embed
@@ -915,6 +940,24 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
           data-embed-height="166"
         ></div>
         <p>A caption the author wrote with one <a href="https://soundcloud.com/artist">link</a>.</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a sibling whose two links both name the track alone', async () => {
+      const value = html`
+        <iframe src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/41638331"></iframe>
+        <p>Follow Me Hip Hop Instrumental <a href="http://soundcloud.com/305dopebeats/follow-me#">beat making</a> software <a href="http://soundcloud.com/305dopebeats/follow-me">305DopeBeats-Follow Me Hip Hop Instrumental</a></p>
+      `
+      const expected = html`
+        <div
+          data-embed-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/41638331"
+          data-embed-provider="soundcloud"
+          data-embed-id="tracks/41638331"
+          data-embed-height="166"
+        ></div>
+        <p>Follow Me Hip Hop Instrumental <a href="http://soundcloud.com/305dopebeats/follow-me#">beat making</a> software <a href="http://soundcloud.com/305dopebeats/follow-me">305DopeBeats-Follow Me Hip Hop Instrumental</a></p>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
