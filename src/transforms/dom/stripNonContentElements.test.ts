@@ -180,7 +180,8 @@ const specimens: Record<string, string | [string, string]> = {
     '<div class="wp-block-post-author"><div class="wp-block-post-author__content"><p>Jane</p></div></div>',
   '.saboxplugin-wrap':
     '<div class="saboxplugin-wrap"><div class="saboxplugin-tab"><p>About the author</p></div></div>',
-  'a[class*="read-more"]': '<a class="read-more-link" href="/post">Read more</a>',
+  'a[class*="read-more"]:not(blockquote.wp-embedded-content a)':
+    '<a class="read-more-link" href="/post">Read more</a>',
   'a[class*="continue-reading"]': '<a class="continue-reading" href="/post">Continue reading</a>',
   '.fb-comments': '<div class="fb-comments" data-href="https://example.com/p"></div>',
   '.printfriendly': '<a class="printfriendly" href="#">Print</a>',
@@ -232,10 +233,6 @@ const specimens: Record<string, string | [string, string]> = {
     '<drupal-render-placeholder callback="comment.lazy_builders:renderLinks" arguments="0=node:1"></drupal-render-placeholder>',
   '.mcnPreviewText': '<span class="mcnPreviewText" style="display:none">Preview text</span>',
   '.tmblr-alt-text-helper': '<span class="tmblr-alt-text-helper">ALT</span>',
-  'blockquote.wp-embedded-content + iframe.wp-embedded-content': [
-    '<blockquote class="wp-embedded-content" data-secret="hDl4S8YwKz"><a href="https://www.e-startupindia.com/learn/gstr-1/">GSTR-1 Return Filing</a></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="https://www.e-startupindia.com/learn/gstr-1/embed/#?secret=hDl4S8YwKz" data-secret="hDl4S8YwKz" width="600" height="338"></iframe>',
-    '<blockquote class="wp-embedded-content" data-secret="hDl4S8YwKz"><a href="https://www.e-startupindia.com/learn/gstr-1/">GSTR-1 Return Filing</a></blockquote>',
-  ],
   'img[src*="steamcommunity.com"][src*="placeholder"]':
     '<img src="https://cdn.steamcommunity.com/news/placeholder_video.gif">',
   'script[consent-original-src-_]':
@@ -275,45 +272,6 @@ const flagCounterImageUrls = [
   'http://flagcounter.com/count/t5KP/bg=B3B3B3/txt=000000/border=CCCCCC/columns=5/maxflags=248/viewers=0/labels=1/',
   'http://s01.flagcounter.com/mini/ezoj/bg_FFFFFF/txt_000000/border_CCCCCC/flags_1.jfif',
   'https://s09.flagcounter.com/map/1ue/size_s/txt_000000/border_CCCCCC/pageviews_1/viewers_0/flags_1/',
-]
-
-const wordpressHandshakeFrames: Array<[string, string]> = [
-  [
-    'trailing slash',
-    '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="https://www.e-startupindia.com/learn/gstr-1/embed/#?secret=hDl4S8YwKz" data-secret="hDl4S8YwKz" width="600" height="338"></iframe>',
-  ],
-  [
-    'no trailing slash',
-    '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="https://www.elzeviro.eu/affari-di-palazzo/economia-e-finanza/la-coppia-liberista-boeri-perotti-vuole-ridurre-fondi-alle-universita.html/embed#?secret=77zVWLFl2K" data-secret="77zVWLFl2K" width="600" height="338"></iframe>',
-  ],
-  [
-    'query',
-    '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="http://technodivine.com/home/?p=687&amp;embed=true#?secret=j0JpdvuMl3" data-secret="j0JpdvuMl3" width="600" height="338"></iframe>',
-  ],
-]
-
-// WordPress stamps the class on the frame it renders for any oEmbed provider.
-const wordpressProviderFrames: Array<[string, string]> = [
-  [
-    'New York Times',
-    '<iframe class="wp-embedded-content" src="https://www.nytimes.com/svc/oembed/html/?url=https%3A%2F%2Fwww.nytimes.com%2Fstory.html"></iframe>',
-  ],
-  [
-    'Rumble',
-    '<iframe class="wp-embedded-content" src="https://rumble.com/embed/v2cr0zv/#?secret=YCf2RLw39L"></iframe>',
-  ],
-  [
-    'Audioboom',
-    '<iframe class="wp-embedded-content" src="https://embeds.audioboom.com/posts/6605531/embed/v4?eid=AQAAAJLuZVrbymQA#?secret=afwIW2qi8k"></iframe>',
-  ],
-  [
-    'Anchor show',
-    '<iframe class="wp-embedded-content" src="https://anchor.fm/turpentine-productions/embed#?secret=TBoS2x00Eq"></iframe>',
-  ],
-  [
-    'Flourish',
-    '<iframe class="wp-embedded-content" src="https://public.flourish.studio/visualisation/3197522/embed#?secret=VcZeafKFSe"></iframe>',
-  ],
 ]
 
 // Zeno.FM's snippet links to the Zeno home page under each of its names, whatever text the
@@ -454,74 +412,15 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    // WordPress writes the handshake frame as `{post}/embed/`, `{post}/embed` and
-    // `?p={id}&embed=true`, each after its blockquote.
-    it.each(wordpressHandshakeFrames)(
-      'should strip a %s handshake frame paired with its blockquote',
-      async (_name, frame) => {
-        const blockquote = html`
-          <blockquote class="wp-embedded-content" data-secret="77zVWLFl2K">
-            <a href="https://www.elzeviro.eu/affari-di-palazzo/post.html">Post title</a>
-          </blockquote>
-        `
-        const value = `<p>Before.</p>${blockquote}\n${frame}<p>After.</p>`
-        const expected = `<p>Before.</p>${blockquote}\n<p>After.</p>`
-
-        expect(await transform(value)).toEqualHtml(expected)
-      },
-    )
-
-    // A handshake frame alone renders the post's card, and nothing else carries the post.
-    it('should keep a handshake frame with no blockquote beside it', async () => {
+    it('should keep a post embed link classed as read-more', async () => {
       const value = html`
-        <p>Before.</p>
-        <iframe
-          class="wp-embedded-content"
-          sandbox="allow-scripts"
-          security="restricted"
-          src="https://www.e-startupindia.com/learn/gstr-1/embed/#?secret=hDl4S8YwKz"
-          data-secret="hDl4S8YwKz"
-        ></iframe>
-      `
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
-    it('should keep a provider frame that follows a plain blockquote', async () => {
-      const value = html`
-        <blockquote><p>A quoted line.</p></blockquote>
-        <iframe
-          class="wp-embedded-content"
-          src="https://rumble.com/embed/v2cr0zv/#?secret=YCf2RLw39L"
-        ></iframe>
-      `
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
-    it('should keep a provider frame that follows a post embed further down', async () => {
-      const value = html`
-        <blockquote class="wp-embedded-content">
-          <a href="https://www.e-startupindia.com/learn/gstr-1/">GSTR-1 Return Filing</a>
+        <blockquote class="wp-embedded-content" data-secret="P7TxSPofAu">
+          <p><a class="inline-read-more" href="https://www.nsmbl.nl/krijgen-bb-eigenaren-vergoeding-deelname/">B&amp;B Vol Liefde 2026 begint bijna: deze vergoeding krijgen B&amp;B-eigenaren voor hun deelname</a></p>
         </blockquote>
-        <p>And the video:</p>
-        <iframe
-          class="wp-embedded-content"
-          src="https://rumble.com/embed/v2cr0zv/#?secret=YCf2RLw39L"
-        ></iframe>
       `
 
       expect(await transform(value)).toEqualHtml(value)
     })
-
-    it.each(wordpressProviderFrames)(
-      'should keep the %s frame WordPress stamped as wp-embedded-content',
-      async (_name, frame) => {
-        const value = `<p>Before.</p>${frame}`
-
-        expect(await transform(value)).toEqualHtml(value)
-      },
-    )
 
     it('should remove image-link-expand carrying additional classes', async () => {
       const value = html`

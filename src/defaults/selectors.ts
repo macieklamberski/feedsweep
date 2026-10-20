@@ -1,9 +1,4 @@
 export const defaultNonContentSelectors = [
-  // The frame half of a WordPress post embed, whose blockquote `wordpressCiteResolver` converts.
-  // WordPress stamps the class on every oEmbed provider's frame, so only a frame paired with a
-  // blockquote is stripped.
-  'blockquote.wp-embedded-content + iframe.wp-embedded-content',
-
   // Subscribe and newsletter signup forms.
   '[data-component-name="SubscribeWidget"]', // Substack inline subscribe widget.
   '.subscription-widget-wrap-editor', // Substack paywall / subscribe CTA.
@@ -184,7 +179,8 @@ export const defaultNonContentSelectors = [
   '.saboxplugin-wrap', // Simple Author Box WordPress plugin.
 
   // Excerpt-truncation links. Anchor-scoped so wrappers holding real content survive.
-  'a[class*="read-more"]', // "Read more" excerpt-truncation links.
+  // Some sites class the link of a WordPress post embed as `inline-read-more`.
+  'a[class*="read-more"]:not(blockquote.wp-embedded-content a)', // "Read more" excerpt-truncation links.
   'a[class*="continue-reading"]', // "Continue reading" excerpt-truncation links.
 
   // Comment-system embeds (JS mounts that render nothing without their loader script).

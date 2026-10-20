@@ -107,6 +107,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `assignVideoPosters` | _Heuristic (opt-in):_ move a redundant video-poster image (inline or an enclosure) onto the embed as its poster, then drop the standalone image |
 | `stripDuplicateEnclosures` | _Heuristic (opt-in):_ remove an injected enclosure that duplicates inline content (image size-variants, exact audio/video/embed) |
 | `stripDuplicateLeadingImages` | _Heuristic (opt-in):_ remove a leading image the body repeats as the very next image (featured-image prepends), keeping the larger copy |
+| `stripWordpressEmbedFrames` | Remove the frame of a WordPress post embed whose blockquote becomes a cite, so the post shows once |
 | `convertCiteCards` | Convert link-preview cards into `data-cite-*` placeholders |
 | `enrichEmbedPlaceholders` | Fill placeholder metadata via the caller's `enrichEmbedFn` (no-op unless set) |
 | `enrichCitePlaceholders` | Fill cite placeholder metadata via the caller's `enrichCiteFn` (no-op unless set) |
