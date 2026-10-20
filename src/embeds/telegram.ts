@@ -11,10 +11,12 @@ import {
 
 const provider = 'telegram'
 
-// A channel name and a message id, the pair the widget spells channel/111424. Three characters
-// is the floor: t.me/nft/3 serves a real post (checked 2026-09-07), and every reserved route
-// that takes a numeric second segment is shorter.
-const postRegex = /^([a-zA-Z][a-zA-Z0-9_]{2,})\/(\d+)$/
+// A channel name and a message id, the pair the widget spells channel/111424.
+const postRegex = /^([A-Za-z0-9_]+)\/(\d+)$/
+
+// The t.me routes that take a numeric second segment and name no post: `c/{id}` is a private
+// channel and `s/{channel}` the channel preview.
+const reservedRoutes = new Set(['c', 's'])
 
 // The third apex Telegram has always answered on, serving the identical widget: probed live, a
 // real post answers 200 there.
@@ -35,7 +37,7 @@ const composePost = (channel: string, messageId: string): EmbedResolverResult =>
 const readPost = (value: string | undefined): EmbedResolverResult | undefined => {
   const match = postRegex.exec(value ?? '')
 
-  if (!match?.[1] || !match[2]) {
+  if (!match?.[1] || !match[2] || reservedRoutes.has(match[1])) {
     return
   }
 

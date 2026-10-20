@@ -293,6 +293,32 @@ describe('imgurResolveEmbed', () => {
     expect(imgurResolveEmbed(value)).toEqual(expected)
   })
 
+  // The hyphen says where the id starts, and nothing tests its length, so a slug with no id
+  // after it is read off its last word.
+  it('should read the last word of a slug with no id after it as the id', () => {
+    const value = 'https://imgur.com/gallery/this-is-why'
+    const expected: EmbedResolverResult = {
+      provider: 'imgur',
+      id: 'a/why',
+      src: 'https://imgur.com/a/why/embed',
+      url: 'https://imgur.com/a/why',
+    }
+
+    expect(imgurResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a single word longer than an id whole', () => {
+    const value = 'https://imgur.com/gallery/misadventures'
+    const expected: EmbedResolverResult = {
+      provider: 'imgur',
+      id: 'a/misadventures',
+      src: 'https://imgur.com/a/misadventures/embed',
+      url: 'https://imgur.com/a/misadventures',
+    }
+
+    expect(imgurResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should resolve an album page url, which the prefix already names as one', () => {
     const value = 'https://imgur.com/a/16lVn5E'
     const expected: EmbedResolverResult = {
@@ -371,17 +397,6 @@ describe('imgurResolveEmbed', () => {
         expect(imgurResolveEmbed(value)).toBeUndefined()
       },
     )
-
-    // The hyphen is what says where the id starts, so a single word is read whole and a word
-    // longer than an id is not one.
-    const idlessGalleryUrls: Array<string> = [
-      'https://imgur.com/gallery/this-is-why',
-      'https://imgur.com/gallery/misadventures',
-    ]
-
-    it.each(idlessGalleryUrls)('should ignore %s, which ends in no id', (value) => {
-      expect(imgurResolveEmbed(value)).toBeUndefined()
-    })
   })
 
   it('should ignore a slugged gallery id carrying an encoded slash', () => {

@@ -10,8 +10,9 @@ type Resource = {
 
 const komootHosts = ['komoot.com', 'komoot.de']
 
-// Lowercase only: `/DE-DE/tour/{tourId}/embed` answers 404.
-const localeRegex = /^[a-z]{2}-[a-z]{2}$/
+// In any case: the mint drops the locale, so `/DE-DE/tour/{tourId}/embed`, which answers 404,
+// still names the tour.
+const localeRegex = /^[a-z]{2}-[a-z]{2}$/i
 
 // `share_token` is what opens a tour its owner has not made public.
 const accessParams = ['share_token']

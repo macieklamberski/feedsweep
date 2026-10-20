@@ -216,6 +216,31 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read a byline handle past thirty characters', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/reel/DMMWPU6PCU8/"
+          data-instgrm-version="14"
+        >
+          <p>
+            <a href="https://www.instagram.com/reel/DMMWPU6PCU8/" target="_blank">
+              A post shared by Busana (@busana.smk3kudus_official_archive)
+            </a>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'reel/DMMWPU6PCU8',
+        src: 'https://www.instagram.com/reel/DMMWPU6PCU8/embed/',
+        url: 'https://www.instagram.com/reel/DMMWPU6PCU8/',
+        author: '@busana.smk3kudus_official_archive',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('the reel permalink', () => {
@@ -436,6 +461,31 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
         description:
           '?Alatw combo Latw? #iamafreestyler @iamafreestyler #ballerzdistrict @ballersdistrict #fsrepostfr #freestylefootball #fslife',
         author: '@lucie.__fs',
+        date: '2018-03-13T19:56:44+00:00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a byline link handle past thirty characters', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/BgRph3VDrW0/"
+          data-instgrm-version="8"
+        >
+          <p>
+            A post shared by @<a href="https://www.instagram.com/lucie.__fs_freestyle_archive_2018/" target="_blank"> lucie.__fs_freestyle_archive_2018</a>
+            on <time datetime="2018-03-13T19:56:44+00:00">Mar 13, 2018 at 12:56pm PDT</time>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/BgRph3VDrW0',
+        src: 'https://www.instagram.com/p/BgRph3VDrW0/embed/',
+        url: 'https://www.instagram.com/p/BgRph3VDrW0/',
+        author: '@lucie.__fs_freestyle_archive_2018',
         date: '2018-03-13T19:56:44+00:00',
       }
 

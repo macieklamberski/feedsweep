@@ -56,6 +56,13 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should take the facade id as written up to the end of its class token', async () => {
+    const value = '<div class="wistia_embed wistia_async_u3gz5bka6b-old popover=true"></div>'
+    const expected = '<iframe src="https://fast.wistia.net/embed/iframe/u3gz5bka6b-old"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should rebuild a custom element whose id is uppercase, keeping its case', async () => {
     const value = '<wistia-player media-id="U3GZ5BKA6B"></wistia-player>'
     const expected = '<iframe src="https://fast.wistia.net/embed/iframe/U3GZ5BKA6B"></iframe>'

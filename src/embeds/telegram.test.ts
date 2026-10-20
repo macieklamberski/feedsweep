@@ -319,6 +319,45 @@ describeForEachParser('telegramIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should claim an iframe whose channel holds digits and underscores', async () => {
+      const value = '<iframe src="https://t.me/letletlet_warplanes2/9?embed=1"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'telegram',
+        id: 'letletlet_warplanes2/9',
+        src: 'https://t.me/letletlet_warplanes2/9?embed=1',
+        url: 'https://t.me/letletlet_warplanes2/9',
+        author: '@letletlet_warplanes2',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a two-character channel as written', async () => {
+      const value = '<iframe src="https://t.me/ab/111424?embed=1"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'telegram',
+        id: 'ab/111424',
+        src: 'https://t.me/ab/111424?embed=1',
+        url: 'https://t.me/ab/111424',
+        author: '@ab',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a channel led by a digit as written', async () => {
+      const value = '<iframe src="https://t.me/1rvvoenkor/12345?embed=1"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'telegram',
+        id: '1rvvoenkor/12345',
+        src: 'https://t.me/1rvvoenkor/12345?embed=1',
+        url: 'https://t.me/1rvvoenkor/12345',
+        author: '@1rvvoenkor',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -330,6 +369,18 @@ describeForEachParser('telegramIframeEmbedResolver', (parseHtml) => {
 
     it('should return undefined for the channel preview path', async () => {
       const value = '<iframe src="https://t.me/s/rvvoenkor"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a forum topic post unresolved', async () => {
+      const value = '<iframe src="https://t.me/tochkapress/45/111424?embed=1"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for the channel preview of a numeric channel name', async () => {
+      const value = '<iframe src="https://t.me/s/12345"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -355,7 +406,7 @@ describeForEachParser('telegramIframeEmbedResolver', (parseHtml) => {
     })
 
     // The same route without the message is the shape the two-segment pattern could claim, and
-    // the only thing refusing it is that `c` sits under the channel floor.
+    // the only thing refusing it is that `c` is a reserved route.
     it('should return undefined for a private channel id', async () => {
       const value = '<iframe src="https://t.me/c/1234567"></iframe>'
 
