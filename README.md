@@ -75,7 +75,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildEmbedPlusEmbeds` | Rebuild a real `<iframe>` from an "Embed Plus for YouTube" facade (`.epyt-facade[data-facadesrc]`) |
 | `rebuildIframelyEmbeds` | Rebuild an Iframely anchor facade (an empty `a[data-iframely-url]`) into the destination's frame or a plain link |
 | `rebuildLiteVideoEmbeds` | Rebuild a real `<iframe>` from a `lite-youtube` / `lite-vimeo` web component's `videoid`, carrying over `start` and `videotitle` |
-| `rebuildLyteEmbeds` | Rebuild a real `<iframe>` from a WP YouTube Lyte facade (`WYL_`/`lyte_` id) |
+| `rebuildLyteEmbeds` | Rebuild a real `<iframe>` from a WP YouTube Lyte facade (`WYL_`/`lyte_` id) or the thumbnail it writes into feeds |
 | `rebuildRocketYoutubePreviews` | Rebuild a real `<iframe>` from a WP Rocket YouTube preview facade (`.rll-youtube-player[data-id]`), carrying over `data-query` |
 | `rebuildVideoJsEmbeds` | Rebuild a native `<video>` from a Video.js `<video-js>` element, reading the source from a `<source>` child or the `data-setup` JSON |
 | `rebuildWmakerEmbeds` | Rebuild a real `<iframe>` from a WMaker item's dead Flash player, pointing it at the modern embed page named by the article id in the item's permalink |
