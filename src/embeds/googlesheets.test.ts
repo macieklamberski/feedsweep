@@ -246,9 +246,9 @@ describe('googlesheetsResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a sheet framed on its edit page', () => {
+    it('should ignore a published sheet framed on its edit page', () => {
       const value =
-        'https://docs.google.com/spreadsheets/d/1Dd9ne3X9TDQ5ZH2xB8u2Ndwi54lSBeF2AIlav9jifew/edit#gid=648248961'
+        'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/edit'
 
       expect(googlesheetsResolveEmbed(value)).toBeUndefined()
     })
@@ -455,6 +455,88 @@ describe('googlesheetsResolveEmbed', () => {
     })
   })
 
+  describe('the edit page of a sheet shared by link', () => {
+    it('should rebuild a sheet framed on its edit page onto its preview page', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1KDKx8_xOZdFzqyShk7iKKOesyzm1yaXNbKq135QKzcI/edit?usp=sharing'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1KDKx8_xOZdFzqyShk7iKKOesyzm1yaXNbKq135QKzcI',
+        src: 'https://docs.google.com/spreadsheets/d/1KDKx8_xOZdFzqyShk7iKKOesyzm1yaXNbKq135QKzcI/preview',
+        url: 'https://docs.google.com/spreadsheets/d/1KDKx8_xOZdFzqyShk7iKKOesyzm1yaXNbKq135QKzcI/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1KDKx8_xOZdFzqyShk7iKKOesyzm1yaXNbKq135QKzcI&sz=w640',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the tab an edit page names in its fragment', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1Dd9ne3X9TDQ5ZH2xB8u2Ndwi54lSBeF2AIlav9jifew/edit#gid=648248961'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1Dd9ne3X9TDQ5ZH2xB8u2Ndwi54lSBeF2AIlav9jifew',
+        src: 'https://docs.google.com/spreadsheets/d/1Dd9ne3X9TDQ5ZH2xB8u2Ndwi54lSBeF2AIlav9jifew/preview#gid=648248961',
+        url: 'https://docs.google.com/spreadsheets/d/1Dd9ne3X9TDQ5ZH2xB8u2Ndwi54lSBeF2AIlav9jifew/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1Dd9ne3X9TDQ5ZH2xB8u2Ndwi54lSBeF2AIlav9jifew&sz=w640',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep the tab an edit page names in its query and its fragment', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1WBvHidMuiVLPuMKQ0HgSYqg_zxtj3sl3cwT7P89HATQ/edit?gid=0#gid=0'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1WBvHidMuiVLPuMKQ0HgSYqg_zxtj3sl3cwT7P89HATQ',
+        src: 'https://docs.google.com/spreadsheets/d/1WBvHidMuiVLPuMKQ0HgSYqg_zxtj3sl3cwT7P89HATQ/preview?gid=0#gid=0',
+        url: 'https://docs.google.com/spreadsheets/d/1WBvHidMuiVLPuMKQ0HgSYqg_zxtj3sl3cwT7P89HATQ/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1WBvHidMuiVLPuMKQ0HgSYqg_zxtj3sl3cwT7P89HATQ&sz=w640',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the minimal toolbar flag from an edit page', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1OLBYgRrauNsWyEkVGvPscXOcnHzWekxJznkCBHs4HPo/edit?rm=minimal&gid=2109176598#gid=2109176598'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1OLBYgRrauNsWyEkVGvPscXOcnHzWekxJznkCBHs4HPo',
+        src: 'https://docs.google.com/spreadsheets/d/1OLBYgRrauNsWyEkVGvPscXOcnHzWekxJznkCBHs4HPo/preview?gid=2109176598#gid=2109176598',
+        url: 'https://docs.google.com/spreadsheets/d/1OLBYgRrauNsWyEkVGvPscXOcnHzWekxJznkCBHs4HPo/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1OLBYgRrauNsWyEkVGvPscXOcnHzWekxJznkCBHs4HPo&sz=w640',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the Office upload flags from an edit page', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1U9T-1TCHXkwaUZz5toPqG7RjBsHV67ML/edit?usp=sharing&ouid=111652815326674989993&rtpof=true&sd=true'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1U9T-1TCHXkwaUZz5toPqG7RjBsHV67ML',
+        src: 'https://docs.google.com/spreadsheets/d/1U9T-1TCHXkwaUZz5toPqG7RjBsHV67ML/preview',
+        url: 'https://docs.google.com/spreadsheets/d/1U9T-1TCHXkwaUZz5toPqG7RjBsHV67ML/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1U9T-1TCHXkwaUZz5toPqG7RjBsHV67ML&sz=w640',
+        height: 500,
+      }
+
+      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+    })
+  })
+
   describe('the sign-in prefixes', () => {
     it('should frame a published sheet behind an account index on its own path', () => {
       const value =
@@ -538,6 +620,28 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
         url: 'https://docs.google.com/spreadsheets/d/1lbhLGFvh3K1L4vCLPZ0n1EoZsIvP2223Xa7T3jTz874/edit',
         thumbnail:
           'https://drive.google.com/thumbnail?id=1lbhLGFvh3K1L4vCLPZ0n1EoZsIvP2223Xa7T3jTz874&sz=w640',
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild a sheet framed on its edit page onto its preview page', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          width="100%"
+          height="600"
+          src="https://docs.google.com/spreadsheets/d/1KDKx8_xOZdFzqyShk7iKKOesyzm1yaXNbKq135QKzcI/edit?usp=sharing"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1KDKx8_xOZdFzqyShk7iKKOesyzm1yaXNbKq135QKzcI',
+        src: 'https://docs.google.com/spreadsheets/d/1KDKx8_xOZdFzqyShk7iKKOesyzm1yaXNbKq135QKzcI/preview',
+        url: 'https://docs.google.com/spreadsheets/d/1KDKx8_xOZdFzqyShk7iKKOesyzm1yaXNbKq135QKzcI/edit',
+        thumbnail:
+          'https://drive.google.com/thumbnail?id=1KDKx8_xOZdFzqyShk7iKKOesyzm1yaXNbKq135QKzcI&sz=w640',
         height: 500,
       }
 
