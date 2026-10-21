@@ -181,6 +181,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
+        id: 'erwtenpeller/war-of-the-worlds',
         src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/erwtenpeller/war-of-the-worlds',
         url: 'https://soundcloud.com/erwtenpeller/war-of-the-worlds',
         height: 166,
@@ -494,6 +495,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const value = '<iframe src="https://soundcloud.com/anjunadeep/edition-586"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
+        id: 'anjunadeep/edition-586',
         src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/anjunadeep/edition-586',
         url: 'https://soundcloud.com/anjunadeep/edition-586',
         height: 166,
@@ -506,6 +508,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const value = '<iframe src="https://soundcloud.com/anjunadeep/sets/edition"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
+        id: 'anjunadeep/sets/edition',
         src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/anjunadeep/sets/edition',
         url: 'https://soundcloud.com/anjunadeep/sets/edition',
         height: 450,
@@ -519,6 +522,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const value = '<iframe src="https://www.soundcloud.com/anjunadeep/edition-586"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
+        id: 'anjunadeep/edition-586',
         src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/anjunadeep/edition-586',
         url: 'https://soundcloud.com/anjunadeep/edition-586',
         height: 166,
@@ -531,6 +535,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const value = '<iframe src="https://soundcloud.com/anjunadeep"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
+        id: 'anjunadeep',
         src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/anjunadeep',
         url: 'https://soundcloud.com/anjunadeep',
         height: 450,
@@ -548,6 +553,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
+        id: 'porzadnyagile/063-ocena-stanu-zwinnosci-firmy',
         src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy&secret_token=s-vd94Qjk1b3m',
         url: 'https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy',
         height: 166,
@@ -591,6 +597,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const value = '<iframe src="https://soundcloud.com/anjunadeep/glass-house"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
+        id: 'anjunadeep/glass-house',
         src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/anjunadeep/glass-house',
         url: 'https://soundcloud.com/anjunadeep/glass-house',
         height: 166,
@@ -614,6 +621,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
+        id: 'anjunadeep/edition-586',
         src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/anjunadeep/edition-586',
         url: 'https://soundcloud.com/anjunadeep/edition-586',
         height: 166,
@@ -645,6 +653,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
         const value = `<iframe src="${url}"></iframe>`
         const expected: EmbedResolverResult = {
           provider: 'soundcloud',
+          id: `anjunadeep/${segment}`,
           src: `https://w.soundcloud.com/player/?url=https://soundcloud.com/anjunadeep/${segment}`,
           url,
           height: 450,
@@ -813,6 +822,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
+        id: 'porzadnyagile/063-ocena-stanu-zwinnosci-firmy',
         src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy&secret_token=s-vd94Qjk1b3m',
         url: 'https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy',
         height: 166,
@@ -829,6 +839,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
+        id: 'porzadnyagile/063-ocena-stanu-zwinnosci-firmy',
         src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy&secret_token=s-vd94Qjk1b3m',
         url: 'https://soundcloud.com/porzadnyagile/063-ocena-stanu-zwinnosci-firmy',
         height: 166,
@@ -845,6 +856,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
+        id: 'stingray-edmonton/bill-henderson-chilliwack',
         src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/stingray-edmonton/bill-henderson-chilliwack%23t=1:30',
         url: 'https://soundcloud.com/stingray-edmonton/bill-henderson-chilliwack',
         height: 166,
@@ -861,6 +873,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
+        id: 'stingray-edmonton/bill-henderson-chilliwack',
         src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/stingray-edmonton/bill-henderson-chilliwack',
         url: 'https://soundcloud.com/stingray-edmonton/bill-henderson-chilliwack',
         height: 166,
@@ -1152,6 +1165,7 @@ describeForEachParser('soundcloudEmbedResolver carrier title', (parseHtml) => {
     `
     const expected: EmbedResolverResult = {
       provider: 'soundcloud',
+      id: 'anjunadeep/edition-586',
       src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/anjunadeep/edition-586',
       url: 'https://soundcloud.com/anjunadeep/edition-586',
       height: 166,
@@ -1166,6 +1180,7 @@ describeForEachParser('soundcloudEmbedResolver carrier title', (parseHtml) => {
     `
     const expected: EmbedResolverResult = {
       provider: 'soundcloud',
+      id: 'anjunadeep/edition-586',
       src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/anjunadeep/edition-586',
       url: 'https://soundcloud.com/anjunadeep/edition-586',
       height: 166,
@@ -1180,6 +1195,7 @@ describeForEachParser('soundcloudEmbedResolver carrier title', (parseHtml) => {
     `
     const expected: EmbedResolverResult = {
       provider: 'soundcloud',
+      id: 'anjunadeep/edition-586',
       src: 'https://w.soundcloud.com/player/?url=https://soundcloud.com/anjunadeep/edition-586',
       url: 'https://soundcloud.com/anjunadeep/edition-586',
       height: 166,
