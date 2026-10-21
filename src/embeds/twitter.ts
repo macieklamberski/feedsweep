@@ -1,8 +1,8 @@
 import { isHostOrSubdomainOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, find, jsonAttr, text } from '../utils/dom.js'
+import { attr, find, jsonAttr, keepIfMatches, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
@@ -96,8 +96,10 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
     attr(element, 'data-tweet-id') ??
     attr(element, 'data-tweetid') ??
     framed
+  // A status id is digits, the same alphabet the status path takes.
+  const id = keepIfMatches(declared, digitsRegex)
 
-  return declared ? { status: { handle: '', id: declared } } : undefined
+  return id ? { status: { handle: '', id } } : undefined
 }
 
 // A byline the embed dialog wrote gives up its display name. Anything else is taken whole, since
@@ -137,7 +139,7 @@ const composeEmbed = (status: Status, extra: Partial<EmbedResolverResult>): Embe
     provider,
     id: status.id,
     src: `https://platform.twitter.com/embed/Tweet.html${composeQuery({ id: status.id })}`,
-    url: `https://x.com/${status.handle || handleStandIn}/status/${encodePathSegment(status.id)}`,
+    url: `https://x.com/${status.handle || handleStandIn}/status/${status.id}`,
     ...extra,
   }
 }
@@ -246,7 +248,9 @@ const playerPaths = new Set(['/embed/Tweet.html', '/embed/index.html'])
 // or `X Post`.
 export const twitterResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
-  const id = parsed && playerPaths.has(parsed.pathname) ? parsed.searchParams.get('id') : undefined
+  const framed =
+    parsed && playerPaths.has(parsed.pathname) ? parsed.searchParams.get('id') : undefined
+  const id = keepIfMatches(framed, digitsRegex)
 
   if (id) {
     return composeEmbed({ handle: '', id }, {})

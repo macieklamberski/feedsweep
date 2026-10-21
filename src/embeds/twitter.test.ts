@@ -328,11 +328,11 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use the first id attribute present as written and keep it one segment of the status url', async () => {
+    it('should take data-twitter-tweet-id over data-tweet-id when both are present', async () => {
       const value = html`
         <blockquote
           class="twitter-tweet"
-          data-twitter-tweet-id="../evil"
+          data-twitter-tweet-id="987654321098765"
           data-tweet-id="${statusId}"
         >
           <p>Text.</p>
@@ -340,13 +340,37 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'twitter',
-        id: '../evil',
-        src: 'https://platform.twitter.com/embed/Tweet.html?id=..%2Fevil',
-        url: 'https://x.com/i/status/..%2Fevil',
+        id: '987654321098765',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=987654321098765',
+        url: 'https://x.com/i/status/987654321098765',
         description: 'Text.',
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should return undefined for a declared id outside the digits', async () => {
+      const value = html`
+        <blockquote
+          class="twitter-tweet"
+          data-twitter-tweet-id="../evil"
+        >
+          <p>Text.</p>
+        </blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a framed id outside the digits', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p>Text.</p>
+          <iframe src="https://platform.twitter.com/embed/Tweet.html?id=..%2Fevil"></iframe>
+        </blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
   })
 
@@ -1262,16 +1286,10 @@ describe('twitterResolveEmbed', () => {
     expect(twitterResolveEmbed('https://platform.twitter.com/embed/Tweet.html')).toBeUndefined()
   })
 
-  it('should use a malformed player id as written, even if the player answers an error', () => {
+  it('should return undefined for a player id outside the digits', () => {
     const value = 'https://platform.twitter.com/embed/Tweet.html?id=20x'
-    const expected: EmbedResolverResult = {
-      provider: 'twitter',
-      id: '20x',
-      src: 'https://platform.twitter.com/embed/Tweet.html?id=20x',
-      url: 'https://x.com/i/status/20x',
-    }
 
-    expect(twitterResolveEmbed(value)).toEqual(expected)
+    expect(twitterResolveEmbed(value)).toBeUndefined()
   })
 
   it('should return undefined for an invalid url', () => {
@@ -1481,21 +1499,15 @@ describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should keep a fragment holding an ampersand whole in the id parameter', async () => {
+    it('should return undefined for a fragment holding more than the digits of an id', async () => {
       const value = html`
         <iframe
           data-s9e-mediaembed="twitter"
           src="https://s9e.github.io/iframe/2/twitter.min.html#123&lang=en"
         ></iframe>
       `
-      const expected: EmbedResolverResult = {
-        provider: 'twitter',
-        id: '123&lang=en',
-        src: 'https://platform.twitter.com/embed/Tweet.html?id=123%26lang%3Den',
-        url: 'https://x.com/i/status/123&lang=en',
-      }
 
-      expect(await extract(value)).toEqual(expected)
+      expect(await extract(value)).toBeUndefined()
     })
   })
 })
