@@ -33,7 +33,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         <div class="fb-xfbml-parse-ignore">
           <blockquote cite="https://www.facebook.com/PageName/posts/123">
             <p>Caption text about the thing.</p>
-            Posted by <a href="https://www.facebook.com/PageName/">PageName</a> on
+            Posted by <a href="https://www.facebook.com/PageName/">Page Name</a> on
             <a href="https://www.facebook.com/PageName/posts/123">Tuesday, 3 June 2026</a>
           </blockquote>
         </div>
@@ -47,7 +47,6 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-url="https://www.facebook.com/PageName/posts/123"
         data-embed-description="Caption text about the thing."
         data-embed-author="PageName"
-        data-embed-date="Tuesday, 3 June 2026"
       ></div>
     `
 
@@ -205,7 +204,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         cite="https://www.facebook.com/PageName/videos/123/"
       >
         <p>A video caption.</p>
-        Posted by <a href="https://www.facebook.com/PageName/">PageName</a> on
+        Posted by <a href="https://www.facebook.com/PageName/">Page Name</a> on
         <a href="https://www.facebook.com/PageName/videos/123/">Wednesday, 4 June 2026</a>
       </blockquote>
     `
@@ -218,7 +217,6 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-ratio="16/9"
         data-embed-description="A video caption."
         data-embed-author="PageName"
-        data-embed-date="Wednesday, 4 June 2026"
       ></div>
     `
 

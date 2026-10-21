@@ -119,13 +119,13 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
   describe('the dialog fallback blockquote inside the div', () => {
     // The fallback is the only readable copy of the post, so replacing the widget without it
     // would lose the text outright.
-    it('should lift the text, the page and the date out of it', async () => {
+    it('should lift the text and the page username out of it, and not the localised date', async () => {
       const value = html`
         <div class="fb-post" data-href="https://www.facebook.com/PageName/posts/123">
           <div class="fb-xfbml-parse-ignore">
             <blockquote cite="https://www.facebook.com/PageName/posts/123">
               <p>Caption text about the thing.</p>
-              Posted by <a href="https://www.facebook.com/PageName/">PageName</a> on
+              Posted by <a href="https://www.facebook.com/PageName/">Page Name</a> on
               <a href="https://www.facebook.com/PageName/posts/123">Tuesday, 3 June 2026</a>
             </blockquote>
           </div>
@@ -138,7 +138,29 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
         url: 'https://www.facebook.com/PageName/posts/123',
         description: 'Caption text about the thing.',
         author: 'PageName',
-        date: 'Tuesday, 3 June 2026',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should claim no author from a page named by its numeric profile id', async () => {
+      const value = html`
+        <div class="fb-post" data-href="https://www.facebook.com/PageName/posts/123">
+          <div class="fb-xfbml-parse-ignore">
+            <blockquote cite="https://www.facebook.com/PageName/posts/123">
+              <p>Caption text about the thing.</p>
+              Posted by <a href="https://www.facebook.com/profile.php?id=100064">Page Name</a> on
+              <a href="https://www.facebook.com/PageName/posts/123">Tuesday, 3 June 2026</a>
+            </blockquote>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/PageName/posts/123',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
+        url: 'https://www.facebook.com/PageName/posts/123',
+        description: 'Caption text about the thing.',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -344,7 +366,7 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
           class="fb-xfbml-parse-ignore"
         >
           <p>A video caption.</p>
-          Posted by <a href="https://www.facebook.com/PageName/">PageName</a> on
+          Posted by <a href="https://www.facebook.com/PageName/">Page Name</a> on
           <a href="https://www.facebook.com/PageName/videos/123/">Wednesday, 4 June 2026</a>
         </blockquote>
       `
@@ -356,7 +378,6 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
         ratio: '16/9',
         description: 'A video caption.',
         author: 'PageName',
-        date: 'Wednesday, 4 June 2026',
       }
 
       expect(await extract(value)).toEqual(expected)
