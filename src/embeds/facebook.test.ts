@@ -166,6 +166,29 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should claim no author from a page named under the pages route', async () => {
+      const value = html`
+        <div class="fb-post" data-href="https://www.facebook.com/PageName/posts/123">
+          <div class="fb-xfbml-parse-ignore">
+            <blockquote cite="https://www.facebook.com/PageName/posts/123">
+              <p>Caption text about the thing.</p>
+              Posted by <a href="https://www.facebook.com/pages/Rai4/175278142499856">Rai4</a> on
+              <a href="https://www.facebook.com/PageName/posts/123">Tuesday, 3 June 2026</a>
+            </blockquote>
+          </div>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/PageName/posts/123',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
+        url: 'https://www.facebook.com/PageName/posts/123',
+        description: 'Caption text about the thing.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // "Posted by {page} on {date}" is a fixed pair of anchors. Anything else is a hand-edited
     // fallback, so the text is kept and no author or date is invented from it.
     it('should keep the text and claim no author or date from another byline', async () => {
