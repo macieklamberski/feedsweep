@@ -487,7 +487,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
     })
 
     // TikTok's own snippet wrote the account's opaque secUid where the handle goes.
-    it('should read a clip whose cite names the account by its secUid, and claim no author', async () => {
+    it('should read a clip whose cite names the account by its secUid, with the author from the link title', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -509,6 +509,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@MS4wLjABAAAAK8xx3229m3fUzgHwcSSSaRV0c9Jb2tJ1hEx29oIMwyU/video/6808836928138448129',
         src: 'https://www.tiktok.com/embed/v2/6808836928138448129',
         url: 'https://www.tiktok.com/@MS4wLjABAAAAK8xx3229m3fUzgHwcSSSaRV0c9Jb2tJ1hEx29oIMwyU/video/6808836928138448129',
+        author: '@158669521',
         height: 738,
       }
 
