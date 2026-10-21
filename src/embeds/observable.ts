@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
@@ -17,12 +17,13 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
   const segments = getPathSegments(url)
 
-  if (!parsed || segments[0] !== 'embed') {
+  if (!parsed || !isAnyOf(segments[0], 'embed')) {
     return
   }
 
   // The query names which cells the frame renders, in `cells` or a repeated `cell`, and the frame
   // hands the rest to the notebook's own code, so all of it is kept.
+  parsed.pathname = parsed.pathname.replace(segments[0], 'embed')
   const src = parsed.href
 
   // `@{version}` pins one revision of a notebook rather than naming another one, and the document

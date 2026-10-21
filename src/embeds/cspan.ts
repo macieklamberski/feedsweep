@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -19,7 +19,7 @@ export const cspanResolveEmbed: ResolveEmbed = (url) => {
 
   const [video, standalone, ...rest] = getPathSegments(parsed)
 
-  if (video !== 'video' || standalone !== 'standalone' || rest.length > 0) {
+  if (!isAnyOf(video, 'video') || !isAnyOf(standalone, 'standalone') || rest.length > 0) {
     return
   }
 

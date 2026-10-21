@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { composeQuery, localePairRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -20,13 +20,13 @@ const readResource = (segments: Array<string>): Resource | undefined => {
     return
   }
 
-  if (route === 'tour' && rest[0] === 'embed') {
+  if (isAnyOf(route, 'tour') && isAnyOf(rest[0], 'embed')) {
     return { id, path: `tour/${id}` }
   }
 
   const [slug = '', action] = rest
 
-  if (route === 'collection' && slug && action === 'embed') {
+  if (isAnyOf(route, 'collection') && slug && isAnyOf(action, 'embed')) {
     return { id: `collection/${id}`, path: `collection/${id}/${slug}` }
   }
 }
