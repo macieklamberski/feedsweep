@@ -41,11 +41,11 @@ const readCompanion = (element: Element | undefined): Partial<EmbedResolverResul
 const readHash = (segments: Array<string>): string | undefined => {
   const [route, kind, hash] = segments
 
-  if (route === 'embed' && kind === 'view') {
+  if (isAnyOf(route, 'embed') && isAnyOf(kind, 'view')) {
     return hash
   }
 
-  if (route === 'document' && kind === 'embed') {
+  if (isAnyOf(route, 'document') && isAnyOf(kind, 'embed')) {
     return hash
   }
 }

@@ -37,7 +37,7 @@ export const extractAnchorEpisode = (link: string): string | undefined => {
 }
 
 const anchorShowPathRegex = /^\/([^/]+)\/embed\/?$/i
-const anchorEpisodePagePathRegex = /^\/(?<show>[^/]+)\/episodes\/(?<slug>[^/]+)\/?$/
+const anchorEpisodePagePathRegex = /^\/(?<show>[^/]+)\/episodes\/(?<slug>[^/]+)\/?$/i
 const spotifyShowPathRegex = /^\/pod\/(?:show|profile)\/([^/]+)\/embed\/?$/i
 
 // `anchor.fm/{show}/embed`, `podcasters.spotify.com/pod/show/{show}/embed`,

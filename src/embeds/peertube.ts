@@ -31,11 +31,11 @@ const isVideoId = (segment: string | undefined): segment is string => {
 
 // A playlist's player, `/video-playlists/embed/{id}`, and its watch page, `/w/p/{id}`.
 const readPlaylistId = (segments: Array<string>): string | undefined => {
-  if (segments[0] === 'w' && segments[1] === 'p') {
+  if (isAnyOf(segments[0], 'w') && isAnyOf(segments[1], 'p')) {
     return segments[2]
   }
 
-  if (segments[0] === 'video-playlists' && segments[1] === 'embed') {
+  if (isAnyOf(segments[0], 'video-playlists') && isAnyOf(segments[1], 'embed')) {
     return segments[2]
   }
 }
@@ -80,8 +80,9 @@ const peertubeEmbedParams = ['start', 'stop', 'loop']
 // The video the playlist player opens on.
 const peertubePlaylistParams = ['playlistPosition']
 
-// A PeerTube video or playlist, framed as the bare player or as the watch page. A framed watch page loads the
-// instance's whole page, header and comments around the player, so the src is rebuilt either way.
+// A PeerTube video or playlist, framed as the bare player or as the watch page. A framed watch
+// page loads the instance's whole page, header and comments around the player, so the src is
+// rebuilt either way.
 export const peertubeEmbedResolver = createMarkupEmbedResolver(
   'iframe[src*="/videos/embed/" i], iframe[src*="/videos/watch/" i], iframe[src*="/w/" i], iframe[src*="/video-playlists/embed/" i]',
   (element) => {
