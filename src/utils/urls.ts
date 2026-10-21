@@ -193,6 +193,16 @@ export const parseUrlOnHosts = (
   }
 }
 
+// The origin a url can be rebuilt on. A url with no host, such as `javascript:/@user/123`, has an
+// opaque origin, which serializes as the string `null` and builds a relative path.
+export const readOrigin = (url: URL | undefined): string | undefined => {
+  if (!url || url.origin === 'null') {
+    return
+  }
+
+  return url.origin
+}
+
 // The same pick as `pickUrlParams`, for a query that arrives on its own, not on a url, which is
 // how a facade states its player options (`lite-youtube`'s `params`). Returns the pairs instead
 // of a string, so a caller can override one from a dedicated attribute before building.

@@ -1,6 +1,6 @@
+import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const glomexHosts = ['player.glomex.com']
@@ -36,7 +36,7 @@ const readEmbed = (
 }
 
 const glomexResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, glomexHosts)
+  const parsed = parseUrl(url)
 
   if (!parsed || !playerPathRegex.test(parsed.pathname)) {
     return

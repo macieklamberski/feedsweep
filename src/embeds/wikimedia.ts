@@ -5,6 +5,7 @@ import {
   isMediaWikiFilePage,
   parseMediaWikiFileName,
   placeholderBaseUrl,
+  readOrigin,
   videoFileRegex,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
@@ -31,7 +32,7 @@ export const composeFilePathUrl = (
   fileName: string,
   width?: number,
 ): string | undefined => {
-  const origin = parseUrl(url, placeholderBaseUrl)?.origin
+  const origin = readOrigin(parseUrl(url, placeholderBaseUrl))
   const query = width ? `?width=${width}` : ''
 
   return origin && `${origin}/wiki/Special:FilePath/${fileName}${query}`
@@ -39,10 +40,14 @@ export const composeFilePathUrl = (
 
 // The url Commons' "Embed this file" dialog writes. Without `embedplayer` the same address answers
 // with the file's description page. `File:` is the namespace name every wiki answers to.
-const composePlayerUrl = (url: string, fileName: string): string => {
-  const host = parseUrl(url, placeholderBaseUrl)?.host ?? ''
+const composePlayerUrl = (url: string, fileName: string): string | undefined => {
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
-  return `https://${host}/wiki/File:${fileName}?embedplayer=yes`
+  if (!parsed || !readOrigin(parsed)) {
+    return
+  }
+
+  return `https://${parsed.host}/wiki/File:${fileName}?embedplayer=yes`
 }
 
 // MediaWiki's TimedMediaHandler frames its own player for a freely licensed file, and that player
@@ -57,15 +62,16 @@ export const wikimediaEmbedResolver: EmbedResolver = createMarkupEmbedResolver(
     }
 
     const fileName = parseMediaWikiFileName(source)
+    const src = fileName && composePlayerUrl(source, fileName)
 
-    if (!fileName) {
+    if (!fileName || !src) {
       return
     }
 
     const result: EmbedResolverResult = {
       provider: 'wikimedia',
       id: fileName,
-      src: composePlayerUrl(source, fileName),
+      src,
       ratio: '16/9',
     }
 

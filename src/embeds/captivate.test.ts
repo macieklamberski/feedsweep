@@ -112,11 +112,17 @@ describeForEachParser('captivateEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    // `captivate.fm` admits every subdomain, so a lookalike suffixing the whole domain is what
-    // the host gate has to refuse. The path is a real player path, so nothing else can refuse it.
+    // The path is a real player path, so nothing but the host gate can refuse it.
     it('should ignore a lookalike host suffixing the player domain', async () => {
       const value =
         '<iframe src="https://player.captivate.fm.evil.test/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player path on the subdomain that serves the files', async () => {
+      const value =
+        '<iframe src="https://podcasts.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -145,7 +151,7 @@ describeForEachParser('captivateEmbedResolver', (parseHtml) => {
 })
 
 // The url resolver reaches every enclosure a feed carries, and Captivate's episode files sit on
-// the same domain as its player one segment deeper, so only the segment count keeps them playable.
+// a subdomain of the player's domain.
 describeForEachParser('captivate through the pipeline', (parseHtml) => {
   it('should leave a captivate audio enclosure playable', async () => {
     const enclosures = [

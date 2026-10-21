@@ -1,7 +1,7 @@
-import { getPathSegments, isHttpUrl, parseUrl } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickUrlParams, uuidRegex } from '../utils/urls.js'
+import { pickUrlParams, readOrigin, uuidRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'peertube'
@@ -40,9 +40,9 @@ const readPathId = (segments: Array<string>): string | undefined => {
 
 const parseVideo = (link: string): PeertubeVideo | undefined => {
   const url = parseUrl(link)
+  const origin = readOrigin(url)
 
-  // A javascript: url parses with a matching pathname, and its origin is the string null.
-  if (!url || !isHttpUrl(url)) {
+  if (!url || !origin) {
     return
   }
 
@@ -52,7 +52,7 @@ const parseVideo = (link: string): PeertubeVideo | undefined => {
     return
   }
 
-  return { origin: url.origin, id }
+  return { origin, id }
 }
 
 // Where playback starts and stops, and the subtitle track. The rest of the query sets the
