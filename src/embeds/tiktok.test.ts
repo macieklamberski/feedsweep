@@ -487,7 +487,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
     })
 
     // TikTok's own snippet wrote the account's opaque secUid where the handle goes.
-    it('should read a clip whose cite names the account by its secUid', async () => {
+    it('should read a clip whose cite names the account by its secUid, and claim no author', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -509,7 +509,6 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@MS4wLjABAAAAK8xx3229m3fUzgHwcSSSaRV0c9Jb2tJ1hEx29oIMwyU/video/6808836928138448129',
         src: 'https://www.tiktok.com/embed/v2/6808836928138448129',
         url: 'https://www.tiktok.com/@MS4wLjABAAAAK8xx3229m3fUzgHwcSSSaRV0c9Jb2tJ1hEx29oIMwyU/video/6808836928138448129',
-        author: '@158669521',
         height: 738,
       }
 
@@ -885,6 +884,37 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       `
 
       expect(await convert(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('the author the byline names', () => {
+    it('should read the handle from the profile link, not its text', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          cite="https://www.tiktok.com/@realname/video/7001234567890123456"
+          data-video-id="7001234567890123456"
+        >
+          <section>
+            <a
+              target="_blank"
+              title="@shown"
+              href="https://www.tiktok.com/@realname?refer=embed"
+              >@shown</a
+            >
+          </section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@realname/video/7001234567890123456',
+        src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
+        url: 'https://www.tiktok.com/@realname/video/7001234567890123456',
+        author: '@realname',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
