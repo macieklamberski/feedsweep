@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr, flashVars } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
+import { digitsRegex, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ted'
@@ -32,7 +32,7 @@ export const extractTedTalk = (link: string): string | undefined => {
 
 // The Flash player's url is the same file for every talk, so the carrier names nothing on its
 // own and the talk is only in the flashVars, inside the ad targeting keys:
-// `adKeys=talk={slug};year=2010;theme=…`. The player is dead, so these embeds render nothing.
+// `adKeys=talk={slug};year=2010;theme=…`, or as the talk number `ti`. The player is dead, so these embeds render nothing.
 const flashPlayerPathRegex = /\/assets\/player\/swf\/embedplayer\.swf$/i
 // The talk key in the flashVars adKeys value, spelled talk={slug};year={year}.
 const adKeysTalkRegex = /(?:^|;)talk=([^;]+)/i
@@ -48,7 +48,11 @@ const readFlashTalk = (
   }
 
   const config = new URLSearchParams(flashVars(element) ?? '')
-  const slug = config.get('adKeys')?.match(adKeysTalkRegex)?.[1]
+  // Older snippets carry no adKeys and name the talk only by its number in `ti`, which the
+  // embed player redirects to the talk's slug.
+  const slug =
+    config.get('adKeys')?.match(adKeysTalkRegex)?.[1] ??
+    keepIfMatches(config.get('ti'), digitsRegex)
 
   if (!slug) {
     return
