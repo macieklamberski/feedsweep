@@ -80,6 +80,19 @@ describeForEachParser('padletEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+    it('should rebuild the board page, which refuses framing, onto its embed', async () => {
+      const value =
+        '<iframe src="https://padlet.com/gwusa/for-our-parks-for-our-future-9gm8z3x03iuwt1zp"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'padlet',
+        id: '9gm8z3x03iuwt1zp',
+        src: 'https://padlet.com/embed/9gm8z3x03iuwt1zp',
+        thumbnail: 'https://padlet.net/social-previews/board/9gm8z3x03iuwt1zp/opengraph.jpg',
+        height: 608,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -90,9 +103,15 @@ describeForEachParser('padletEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore the board page rather than its embed', async () => {
+    it('should ignore a board page path under another segment', async () => {
       const value =
-        '<iframe src="https://padlet.com/gwusa/for-our-parks-for-our-future-9gm8z3x03iuwt1zp"></iframe>'
+        '<iframe src="https://padlet.com/x/gwusa/for-our-parks-for-our-future-9gm8z3x03iuwt1zp"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a board page slug with no id after a hyphen', async () => {
+      const value = '<iframe src="https://padlet.com/gwusa/parks"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
