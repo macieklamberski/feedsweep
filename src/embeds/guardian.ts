@@ -35,9 +35,14 @@ const readDate = (path: string): string | undefined => {
     return
   }
 
-  const month = monthNumbers[parts[2]]
+  // Own keys only, so a path word such as `constructor` reads as no month.
+  const month = Object.hasOwn(monthNumbers, parts[2]) ? monthNumbers[parts[2]] : undefined
 
-  return month ? `${parts[1]}-${month}-${parts[3]}` : undefined
+  if (!month) {
+    return
+  }
+
+  return `${parts[1]}-${month}-${parts[3]}`
 }
 
 // Measured 2026-09-07 in a browser at 300, 600 and 900 pixels wide: the `<video>` is 169, 338
