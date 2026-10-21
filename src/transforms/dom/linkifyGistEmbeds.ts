@@ -5,6 +5,7 @@ import { createLink } from '../../utils/widgets.js'
 
 const gistScriptRegex = /gist\.github\.com\/(?:([^/?"]+)\/)?([^/?"#]+)\.js/
 const jsonSuffixRegex = /\.json$/
+// length: keeps another loader's data-gist value out, such as a post slug in hex letters
 const gistIdRegex = /^(?:\d+|[0-9a-f]{20}|[0-9a-f]{32})$/i
 const combiningMarkRegex = /[\u0300-\u036f]/g // Combining diacritical marks
 const fileAnchorSeparatorRegex = /[^a-z0-9_]+/g

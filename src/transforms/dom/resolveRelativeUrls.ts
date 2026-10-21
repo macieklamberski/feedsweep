@@ -6,6 +6,7 @@ import { absoluteUrlRegex, collapseSlashRuns, resolveOrKeepUrl } from '../../uti
 import { paramObjectSelector } from '../../utils/widgets.js'
 
 const hostPrefixedUrlRegex =
+  // length: keeps a dotted path segment with a one-letter last label out of the host slot
   /^(https?:)\/\/[^/?#]+(?:\/[^/?#]+)*?(?<!:|%3a)\/+(?=\/(?:[a-z0-9-]+\.)+[a-z]{2,}\/)/i
 const hostPrefixedSrcTags = ['iframe', 'embed', 'script']
 

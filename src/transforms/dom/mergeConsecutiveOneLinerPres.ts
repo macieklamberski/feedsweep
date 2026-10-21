@@ -67,6 +67,7 @@ export const mergeConsecutiveOneLinerPres: DomTransform = ({ preservedPreClasses
         sibling = sibling.nextSibling
       }
 
+      // length: keeps a lone pre out of the merge
       if (run.length < 2) {
         continue
       }
