@@ -622,6 +622,23 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should map a framed album page with its route word in uppercase', async () => {
+      const value = html`
+        <iframe src="http://www.flickr.com/photos/dublx/SETS/72157623516208778/show/"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'dublx/72157623516208778',
+        src: 'https://embedr.flickr.com/photosets/72157623516208778?width=400&height=300',
+        url: 'https://www.flickr.com/photos/dublx/sets/72157623516208778',
+        width: 400,
+        height: 300,
+        author: 'dublx',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should map a framed album page without the show segment', async () => {
       const value = html`
         <iframe src="http://www.flickr.com/photos/53116286@N07/sets/72157627116531602/"></iframe>
