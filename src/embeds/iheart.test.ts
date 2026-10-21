@@ -13,7 +13,7 @@ describe('iheartResolveEmbed', () => {
         id: '84297824/87767164',
         src: 'https://www.iheart.com/podcast/84297824/episode/87767164/?embed=true',
         url: 'https://www.iheart.com/podcast/84297824/episode/87767164/',
-        height: 121,
+        height: 120,
       }
 
       expect(iheartResolveEmbed(value)).toEqual(expected)
@@ -27,7 +27,7 @@ describe('iheartResolveEmbed', () => {
         id: '76003809/92987656',
         src: 'https://www.iheart.com/podcast/76003809/episode/92987656/?embed=true',
         url: 'https://www.iheart.com/podcast/76003809/episode/92987656/',
-        height: 121,
+        height: 120,
       }
 
       expect(iheartResolveEmbed(value)).toEqual(expected)
@@ -41,7 +41,7 @@ describe('iheartResolveEmbed', () => {
         id: '24837940/337745026',
         src: 'https://www.iheart.com/podcast/24837940/episode/337745026/?embed=true',
         url: 'https://www.iheart.com/podcast/24837940/episode/337745026/',
-        height: 121,
+        height: 120,
       }
 
       expect(iheartResolveEmbed(value)).toEqual(expected)
@@ -55,7 +55,7 @@ describe('iheartResolveEmbed', () => {
         id: '24837940/305951801',
         src: 'https://www.iheart.com/podcast/24837940/episode/305951801/?embed=true',
         url: 'https://www.iheart.com/podcast/24837940/episode/305951801/',
-        height: 121,
+        height: 120,
       }
 
       expect(iheartResolveEmbed(value)).toEqual(expected)
@@ -68,7 +68,7 @@ describe('iheartResolveEmbed', () => {
         id: '84297824/87767164',
         src: 'https://www.iheart.com/podcast/84297824/episode/87767164/?embed=true',
         url: 'https://www.iheart.com/podcast/84297824/episode/87767164/',
-        height: 121,
+        height: 120,
       }
 
       expect(iheartResolveEmbed(value)).toEqual(expected)
@@ -160,7 +160,7 @@ describeForEachParser('iheartEmbedResolver', (parseHtml) => {
         id: '24837940/337745026',
         src: 'https://www.iheart.com/podcast/24837940/episode/337745026/?embed=true',
         url: 'https://www.iheart.com/podcast/24837940/episode/337745026/',
-        height: 121,
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -182,7 +182,7 @@ describeForEachParser('iheartEmbedResolver', (parseHtml) => {
         id: '84297824/87767164',
         src: 'https://www.iheart.com/podcast/84297824/episode/87767164/?embed=true',
         url: 'https://www.iheart.com/podcast/84297824/episode/87767164/',
-        height: 121,
+        height: 120,
         title:
           'Friday Faceoff: CID Director Josie Pagani and former MP Peter Dunne - Wellington Mornings with Nick Mills',
       }
@@ -205,7 +205,7 @@ describeForEachParser('iheartEmbedResolver', (parseHtml) => {
         id: '27977436/56902288',
         src: 'https://www.iheart.com/podcast/27977436/episode/56902288/?embed=true',
         url: 'https://www.iheart.com/podcast/27977436/episode/56902288/',
-        height: 121,
+        height: 120,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -244,7 +244,7 @@ describeForEachParser('iheart through the pipeline', (parseHtml) => {
         data-embed-provider="iheart"
         data-embed-src="https://www.iheart.com/podcast/24837940/episode/304420715/?embed=true"
         data-embed-url="https://www.iheart.com/podcast/24837940/episode/304420715/"
-        data-embed-height="121"
+        data-embed-height="120"
       ></div>
     `
 

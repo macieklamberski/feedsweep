@@ -13,9 +13,9 @@ const iheartHosts = ['iheart.com']
 const episodePathRegex = /^\/podcast\/(?:[^/]*-)?(\d+)\/episode\/(?:[^/]*-)?(\d+)\/?$/i
 const showPathRegex = /^\/podcast\/(?:[^/]*-)?(\d+)\/?$/i
 
-// The episode player fills its frame and switches to a compact bar, drawn whole at 121 tall. The
+// The episode player fills its frame and switches to a compact bar, drawn whole at 120 tall. The
 // show player keeps the 300 its embed code writes.
-const playerHeights = { episode: 121, show: 300 }
+const playerHeights = { episode: 120, show: 300 }
 
 // An iHeart podcast player, of one episode or of a show, on www.iheart.com or beta.iheart.com.
 export const iheartResolveEmbed: ResolveEmbed = (url, element) => {
