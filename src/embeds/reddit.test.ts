@@ -297,6 +297,28 @@ describeForEachParser('redditWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read an author whose profile link is spelled with u', async () => {
+      const value = html`
+        <blockquote class="reddit-embed-bq">
+          <a href="https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/heron_at_dawn/">Heron at dawn</a>
+          <br>
+          by
+          <a href="https://www.reddit.com/u/early_riser/">u/early_riser</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'reddit',
+        id: 'r/Birdwatching/comments/1x9y8z7',
+        src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/',
+        url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/',
+        title: 'Heron at dawn',
+        author: 'u/early_riser',
+        publisher: 'r/Birdwatching',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should state no author when the byline links the profile root with no name', async () => {
       const value = html`
         <blockquote class="reddit-embed-bq">
@@ -502,6 +524,45 @@ describe('redditResolveEmbed', () => {
       src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/',
       url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/',
       publisher: 'r/Birdwatching',
+    }
+
+    expect(redditResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should rebuild a profile post spelled with u onto the user route', () => {
+    const value = 'https://www.reddit.com/u/photo_poster/comments/hj7k2p/a_long_exposure_test/'
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'user/photo_poster/comments/hj7k2p',
+      src: 'https://embed.reddit.com/user/photo_poster/comments/hj7k2p/',
+      url: 'https://www.reddit.com/user/photo_poster/comments/hj7k2p/',
+      publisher: 'u/photo_poster',
+    }
+
+    expect(redditResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should write route words spelled in uppercase in the case the player answers', () => {
+    const value = 'https://www.reddit.com/R/Birdwatching/COMMENTS/1x9y8z7/heron_at_dawn/'
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'r/Birdwatching/comments/1x9y8z7',
+      src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/',
+      url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/',
+      publisher: 'r/Birdwatching',
+    }
+
+    expect(redditResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should write a user route spelled in uppercase in the case the player answers', () => {
+    const value = 'https://www.reddit.com/USER/photo_poster/comments/hj7k2p/'
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'user/photo_poster/comments/hj7k2p',
+      src: 'https://embed.reddit.com/user/photo_poster/comments/hj7k2p/',
+      url: 'https://www.reddit.com/user/photo_poster/comments/hj7k2p/',
+      publisher: 'u/photo_poster',
     }
 
     expect(redditResolveEmbed(value)).toEqual(expected)
