@@ -1,14 +1,9 @@
 import { encodePathSegment, getQueryParam } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { keepIfMatches } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'youku'
-
-// Every Youku video id opens with a literal X, and without it a route word in the id position,
-// embed/about, reads as a video.
-const videoIdRegex = /^X[^/]+$/
 
 const youkuHosts = ['player.youku.com', 'static.youku.com']
 
@@ -44,7 +39,7 @@ const readVideoId = (url: string): string | undefined => {
     return
   }
 
-  return keepIfMatches(videoId, videoIdRegex)
+  return videoId
 }
 
 const youkuResolveEmbed: ResolveEmbed = (url) => {
