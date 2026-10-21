@@ -30,9 +30,9 @@ export const extractTedTalk = (link: string): string | undefined => {
   return (segments[1] === 'lang' ? segments[3] : segments[1])?.replace(htmlSuffixRegex, '')
 }
 
-// The Flash player's url is the same file for every talk, so the carrier names nothing on its
-// own and the talk is only in the flashVars, inside the ad targeting keys:
-// `adKeys=talk={slug};year=2010;theme=…`. The player is dead, so these embeds render nothing.
+// The Flash player's url is the same file for every talk, and the player is dead, so these embeds
+// render nothing. The talk is only in the flashVars: as a slug in the ad targeting keys,
+// `adKeys=talk={slug};year=2010;theme=…`, and as a numeric id in `ti`.
 const flashPlayerPathRegex = /\/assets\/player\/swf\/embedplayer\.swf$/i
 // The talk key in the flashVars adKeys value, spelled talk={slug};year={year}.
 const adKeysTalkRegex = /(?:^|;)talk=([^;]+)/i
