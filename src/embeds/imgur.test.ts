@@ -145,6 +145,7 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
         id: 'a/16lVn5E',
         src: 'https://imgur.com/a/16lVn5E/embed',
         url: 'https://imgur.com/a/16lVn5E',
+        height: 500,
         title: 'Album title',
       }
 
@@ -231,6 +232,7 @@ describe('imgurResolveEmbed', () => {
       id: 'a/16lVn5E',
       src: 'https://imgur.com/a/16lVn5E/embed',
       url: 'https://imgur.com/a/16lVn5E',
+      height: 500,
     }
 
     expect(imgurResolveEmbed(value)).toEqual(expected)
@@ -243,6 +245,7 @@ describe('imgurResolveEmbed', () => {
       id: 'a/CajzWlF',
       src: 'https://imgur.com/a/CajzWlF/embed',
       url: 'https://imgur.com/a/CajzWlF',
+      height: 500,
     }
 
     expect(imgurResolveEmbed(value)).toEqual(expected)
@@ -257,6 +260,7 @@ describe('imgurResolveEmbed', () => {
       id: 'a/KVfuRXc',
       src: 'https://imgur.com/a/KVfuRXc/embed',
       url: 'https://imgur.com/a/KVfuRXc',
+      height: 500,
     }
 
     expect(imgurResolveEmbed(value)).toEqual(expected)
@@ -271,6 +275,7 @@ describe('imgurResolveEmbed', () => {
       id: 'a/9xCXfv8',
       src: 'https://imgur.com/a/9xCXfv8/embed',
       url: 'https://imgur.com/a/9xCXfv8',
+      height: 500,
     }
 
     expect(imgurResolveEmbed(value)).toEqual(expected)
@@ -288,6 +293,7 @@ describe('imgurResolveEmbed', () => {
       id: 'a/flights',
       src: 'https://imgur.com/a/flights/embed',
       url: 'https://imgur.com/a/flights',
+      height: 500,
     }
 
     expect(imgurResolveEmbed(value)).toEqual(expected)
@@ -302,6 +308,7 @@ describe('imgurResolveEmbed', () => {
       id: 'a/why',
       src: 'https://imgur.com/a/why/embed',
       url: 'https://imgur.com/a/why',
+      height: 500,
     }
 
     expect(imgurResolveEmbed(value)).toEqual(expected)
@@ -314,6 +321,7 @@ describe('imgurResolveEmbed', () => {
       id: 'a/misadventures',
       src: 'https://imgur.com/a/misadventures/embed',
       url: 'https://imgur.com/a/misadventures',
+      height: 500,
     }
 
     expect(imgurResolveEmbed(value)).toEqual(expected)
@@ -326,6 +334,7 @@ describe('imgurResolveEmbed', () => {
       id: 'a/16lVn5E',
       src: 'https://imgur.com/a/16lVn5E/embed',
       url: 'https://imgur.com/a/16lVn5E',
+      height: 500,
     }
 
     expect(imgurResolveEmbed(value)).toEqual(expected)
@@ -520,6 +529,7 @@ describeForEachParser('imgurS9eEmbedResolver', (parseHtml) => {
         id: 'a/4dD8XWO',
         src: 'https://imgur.com/a/4dD8XWO/embed',
         url: 'https://imgur.com/a/4dD8XWO',
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -537,6 +547,7 @@ describeForEachParser('imgurS9eEmbedResolver', (parseHtml) => {
         id: 'a/4dD8XWO',
         src: 'https://imgur.com/a/4dD8XWO/embed',
         url: 'https://imgur.com/a/4dD8XWO',
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -554,6 +565,7 @@ describeForEachParser('imgurS9eEmbedResolver', (parseHtml) => {
         id: 'a/4dD8XWO',
         src: 'https://imgur.com/a/4dD8XWO/embed',
         url: 'https://imgur.com/a/4dD8XWO',
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -586,6 +598,7 @@ describeForEachParser('imgurS9eEmbedResolver', (parseHtml) => {
         id: 'a/9L0qCYg',
         src: 'https://imgur.com/a/9L0qCYg/embed',
         url: 'https://imgur.com/a/9L0qCYg',
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)

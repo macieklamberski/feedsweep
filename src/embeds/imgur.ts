@@ -71,6 +71,10 @@ const galleryListingSegments = new Set(['hot', 'new', 'top', 'trending'])
 // tells the two apart.
 const albumPrefix = 'a/'
 
+// Imgur's embed script frames a post 500 tall until the post posts its height, which an album
+// never does.
+const albumHeight = 500
+
 // `imgur.com/{id}.gifv` redirects to the video on i.imgur.com, and no file list names `gifv`.
 const gifvFileRegex = /\.gifv$/i
 
@@ -103,6 +107,10 @@ const composeEmbed = (post: ImgurPost, title?: string): EmbedResolverResult => {
     id: path,
     src: `https://imgur.com/${path}/embed`,
     url: `https://imgur.com/${path}`,
+  }
+
+  if (post.isAlbum) {
+    result.height = albumHeight
   }
 
   // A single image has a thumbnail at a derivable url, the id plus a size suffix. An album does
