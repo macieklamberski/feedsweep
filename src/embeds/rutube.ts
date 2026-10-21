@@ -51,7 +51,10 @@ export const rutubeResolveEmbed: ResolveEmbed = (url, element) => {
   const result = composeEmbed(videoId, parsed)
   const title = attr(element, 'title')
 
-  return title ? { ...result, title } : result
+  return {
+    ...result,
+    title,
+  }
 }
 
 // Rutube's player iframe, rutube.ru/play/embed/{id}, and the three older spellings that 301 to it.

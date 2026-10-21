@@ -24,7 +24,10 @@ const composeEmbed = (id: string, title?: string): EmbedResolverResult => {
     height: 500,
   }
 
-  return title ? { ...result, title } : result
+  return {
+    ...result,
+    title,
+  }
 }
 
 // A live id is not a form id, and only Typeform's `single-embed` api maps one to the other, so the
@@ -41,7 +44,10 @@ const composeLiveEmbed = (
     id: region ? `${region}/${liveId}` : liveId,
   }
 
-  return title ? { ...result, title } : result
+  return {
+    ...result,
+    title,
+  }
 }
 
 const readTitle = (element: Element): string | undefined => {

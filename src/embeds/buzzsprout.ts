@@ -50,7 +50,10 @@ export const buzzsproutResolveEmbed: ResolveEmbed = (url, element) => {
   const title = attr(element, 'title')
   const result = composeEmbed(match[1], match[2])
 
-  return title ? { ...result, title } : result
+  return {
+    ...result,
+    title,
+  }
 }
 
 export const buzzsproutIframeEmbedResolver: EmbedResolver = createUrlEmbedResolver(

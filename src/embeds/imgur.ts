@@ -111,7 +111,10 @@ const composeEmbed = (post: ImgurPost, title?: string): EmbedResolverResult => {
     result.thumbnail = `https://i.imgur.com/${post.id}m.jpg`
   }
 
-  return title ? { ...result, title } : result
+  return {
+    ...result,
+    title,
+  }
 }
 
 // Only a route word puts the id at a known depth, so only behind one can a slug in front of the
