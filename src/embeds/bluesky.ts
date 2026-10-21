@@ -1,6 +1,6 @@
 import { getPathSegments, type Nullish } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
-import { attr, find, isBlockElement, isBr, isElement, jsonAttr, text } from '../utils/dom.js'
+import { attr, find, isBlockElement, isBr, isElement, jsonAttr } from '../utils/dom.js'
 import { readObjectHeight } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -25,10 +25,6 @@ const atUriRegex = /^at:\/\/([^/]+)\/([^/]+)\/([^/?#]+)/
 
 // Whitespace, an en dash, an em dash or a hyphen.
 const authorSeparatorRegex = /^[\s–—-]+/
-
-// Bluesky's own fallback for media the blockquote cannot render, e.g. `[image or embed]`. It
-// is an anchor to the post like the date link is, so a date reading has to tell them apart.
-const mediaMarkerRegex = /^\[.*\]$/
 
 type BlueskyPost = {
   authority: string
@@ -168,14 +164,12 @@ const readQuotedPost = (
   element: Element,
 ): { post?: BlueskyPost; fields: Partial<EmbedResolverResult> } => {
   const postAnchor = findPostAnchor(element)
-  const date = text(postAnchor)
 
   return {
     post: extractBlueskyPostFromUrl(attr(postAnchor, 'href') ?? ''),
     fields: {
       description: readPostText(element, postAnchor),
       author: postAnchor && readAuthor(postAnchor),
-      date: date && !mediaMarkerRegex.test(date) ? date : undefined,
     },
   }
 }

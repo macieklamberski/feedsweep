@@ -5,7 +5,7 @@ import { describeForEachParser, html, jsonAttrValue } from '../tests.js'
 describeForEachParser('Bluesky', (parseHtml) => {
   // Four resolvers split the carriers. blueskyBlockquoteEmbedResolver claims the oEmbed
   // blockquote by its class or its declared AT URI, whichever wrapper it arrives in, and reads
-  // the post text, author and date out of it. blueskyIframeEmbedResolver claims the player
+  // the post text and author out of it. blueskyIframeEmbedResolver claims the player
   // iframe and the newsletter wrapper whose data-attrs holds the whole post.
   // blueskyS9eEmbedResolver claims the forum helper page, and blueskyPostElementEmbedResolver
   // the <bluesky-post> custom element. A Discourse onebox citing bsky.app is a cite rather
@@ -41,7 +41,6 @@ describeForEachParser('Bluesky', (parseHtml) => {
         data-embed-url="https://bsky.app/profile/did:plc:ewvi7nxzyoun6zhxrhs64oiz/post/3lbwtqmxbec2p"
         data-embed-description="The block editor pastes the oEmbed html verbatim."
         data-embed-author="Display Name (@user.bsky.social)"
-        data-embed-date="2025-01-02T03:04:05.006Z"
       ></div>
     `
 
@@ -184,7 +183,6 @@ describeForEachParser('Bluesky', (parseHtml) => {
         data-embed-url="https://bsky.app/profile/newsroom.example/post/3miq7aeuwbg42"
         data-embed-description="The web component never mounts in a reader."
         data-embed-author="Newsroom (@newsroom.example)"
-        data-embed-date="2026-02-15T16:17:18.019Z"
       ></div>
     `
 
