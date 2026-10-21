@@ -8,10 +8,6 @@ const provider = 'donorbox'
 
 const donorboxHosts = ['donorbox.org']
 
-// 900 is what the later steps need, where the first step measures 733.
-// Donorbox's own snippet reserves 900, and the form does not grow with its container.
-const formHeight = 900
-
 // Only `/embed/{slug}` is a form. The campaign page sits at `/{slug}` and is what the
 // placeholder links to; the blog and event routes name nothing embeddable.
 export const donorboxResolveEmbed: ResolveEmbed = (url) => {
@@ -36,7 +32,6 @@ export const donorboxResolveEmbed: ResolveEmbed = (url) => {
     id: slug,
     src: `https://donorbox.org/embed/${slug}${query}`,
     url: `https://donorbox.org/${slug}`,
-    height: formHeight,
   }
 }
 
