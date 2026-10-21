@@ -384,6 +384,26 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
 
     // Nothing in the pipeline absolutises a `cite`, so a CMS that rewrites urls to `//` hands
     // the resolver one with no scheme.
+    it('should read a photo route that names its post in the query', async () => {
+      const value = html`
+        <blockquote
+          cite="https://www.facebook.com/photo.php?fbid=2957968630947197&amp;type=3"
+          class="fb-xfbml-parse-ignore"
+        >
+          <p>A photo caption.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/photo.php?fbid=2957968630947197&type=3',
+        src: 'https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/photo.php?fbid=2957968630947197%26type=3',
+        url: 'https://www.facebook.com/photo.php?fbid=2957968630947197&type=3',
+        description: 'A photo caption.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read a protocol-relative cite', async () => {
       const value = html`
         <blockquote
@@ -414,6 +434,24 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
         >
           <p>Not a facebook post.</p>
         </blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave the Page plugin fallback, which cites a page', async () => {
+      const value = html`
+        <div
+          class="fb-page"
+          data-href="https://www.facebook.com/spiritalivegr/"
+        >
+          <blockquote
+            cite="https://www.facebook.com/spiritalivegr/"
+            class="fb-xfbml-parse-ignore"
+          >
+            <a href="https://www.facebook.com/spiritalivegr/">Spirit Alive</a>
+          </blockquote>
+        </div>
       `
 
       expect(await extract(value)).toBeUndefined()
