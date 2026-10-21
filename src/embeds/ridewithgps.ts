@@ -136,7 +136,11 @@ const readPathEmbed = (parsed: URL): EmbedResolverResult | undefined => {
 const ridewithgpsResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  return parsed && (readQueryEmbed(parsed) ?? readPathEmbed(parsed))
+  if (!parsed) {
+    return
+  }
+
+  return readQueryEmbed(parsed) ?? readPathEmbed(parsed)
 }
 
 // The Ride with GPS route map iframe, in both its query and its path spelling.

@@ -133,7 +133,15 @@ export const appleEmbedResolver = createUrlEmbedResolver(appleHosts, (url, eleme
   const result = appleResolveEmbed(url)
   const card = readSubstackPodcast(element)
 
-  return result && { ...result, ...card, title: card.title ?? attr(element, 'title') }
+  if (!result) {
+    return
+  }
+
+  return {
+    ...result,
+    ...card,
+    title: card.title ?? attr(element, 'title'),
+  }
 })
 
 // The retired Apple Music Marketing Tools host. Every id on it, real or not, redirects to the

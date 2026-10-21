@@ -34,7 +34,11 @@ export const composeFilePathUrl = (
   const origin = parseUrl(url, placeholderBaseUrl)?.origin
   const query = width ? `?width=${width}` : ''
 
-  return origin && `${origin}/wiki/Special:FilePath/${fileName}${query}`
+  if (!origin) {
+    return
+  }
+
+  return `${origin}/wiki/Special:FilePath/${fileName}${query}`
 }
 
 // The url Commons' "Embed this file" dialog writes. Without `embedplayer` the same address answers

@@ -109,7 +109,14 @@ const readPreviewVideoId = (thumbnail: string | undefined): string | undefined =
 export const mailruResolveEmbed: ResolveEmbed = (url, element) => {
   const target = resolveTarget(url, element)
 
-  return target && { ...target, title: attr(element, 'title') }
+  if (!target) {
+    return
+  }
+
+  return {
+    ...target,
+    title: attr(element, 'title'),
+  }
 }
 
 // A Mail.ru video: the my.mail.ru iframe, the dead api.video.mail.ru embed or the Flash player.

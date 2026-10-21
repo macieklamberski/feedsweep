@@ -314,7 +314,14 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
 export const youtubeResolveEmbed: ResolveEmbed = (url, element) => {
   const target = resolveTarget(url)
 
-  return target && { ...target, title: attr(element, 'title') }
+  if (!target) {
+    return
+  }
+
+  return {
+    ...target,
+    title: attr(element, 'title'),
+  }
 }
 
 // FC2's blog player shell on static.fc2.com, a page that builds only the YouTube player its query

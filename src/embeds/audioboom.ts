@@ -75,7 +75,11 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     const parsed = parseUrlOnHosts(attr(element, 'data-boourl'), audioboomHosts)
 
-    return parsed && audioboomResolveEmbed(parsed.href)
+    if (!parsed) {
+      return
+    }
+
+    return audioboomResolveEmbed(parsed.href)
   },
 )
 

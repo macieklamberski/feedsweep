@@ -304,7 +304,11 @@ const composePlayerEmbed = (
   if (flashVideoPathRegex.test(parsed.pathname)) {
     const photo = readFlashPhoto(element)
 
-    return photo && composePhotoEmbed(composePhotoPlayer(photo.photoId), photo)
+    if (!photo) {
+      return
+    }
+
+    return composePhotoEmbed(composePhotoPlayer(photo.photoId), photo)
   }
 
   if (flashPlayerPathRegex.test(parsed.pathname)) {
@@ -317,7 +321,11 @@ const composePlayerEmbed = (
 
   const subject = readPageSubject(parsed.pathname)
 
-  return subject && composeEmbed(subject)
+  if (!subject) {
+    return
+  }
+
+  return composeEmbed(subject)
 }
 
 const resolveTarget = (
@@ -357,7 +365,14 @@ const resolveTarget = (
 export const flickrResolveEmbed: ResolveEmbed = (url, element) => {
   const target = resolveTarget(url, element)
 
-  return target && { ...target, title: target.title ?? attr(element, 'title') }
+  if (!target) {
+    return
+  }
+
+  return {
+    ...target,
+    title: target.title ?? attr(element, 'title'),
+  }
 }
 
 // Flickr's slideshow swf, its video swf, the legacy iframe, a framed album or stream page, and

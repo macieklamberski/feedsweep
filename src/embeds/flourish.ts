@@ -80,7 +80,14 @@ export const flourishResolveEmbed: ResolveEmbed = (url, element) => {
 
   const embed = composeEmbed(segments[0], segments[1])
 
-  return embed && { ...embed, title: attr(element, 'title') }
+  if (!embed) {
+    return
+  }
+
+  return {
+    ...embed,
+    title: attr(element, 'title'),
+  }
 }
 
 export const flourishIframeEmbedResolver = createUrlEmbedResolver(

@@ -136,7 +136,14 @@ const issuuResolveEmbed: ResolveEmbed = (url, element) => {
   if (!isAnyOf(route, embedPaths)) {
     const embed = readDocumentUrl(url)
 
-    return embed && { ...embed, title }
+    if (!embed) {
+      return
+    }
+
+    return {
+      ...embed,
+      title,
+    }
   }
   // The two id spaces the carrier can name, in the order the reader states them: a config id
   // pair in the fragment, else the publisher and document names in the query.
@@ -148,7 +155,14 @@ const issuuResolveEmbed: ResolveEmbed = (url, element) => {
       parsed.searchParams.get('p') ?? undefined,
     )
 
-  return embed && { ...embed, title }
+  if (!embed) {
+    return
+  }
+
+  return {
+    ...embed,
+    title,
+  }
 }
 
 export const issuuIframeEmbedResolver = createUrlEmbedResolver(issuuHosts, issuuResolveEmbed)

@@ -86,7 +86,11 @@ const resolvedSource = (capture: string, proxy: URL): string | undefined => {
 const bareHostSource = (capture: string): string | undefined => {
   const source = decodeSegment(capture) ?? capture
 
-  return source && addMissingProtocol(source)
+  if (!source) {
+    return
+  }
+
+  return addMissingProtocol(source)
 }
 
 type ImageProxy = {
