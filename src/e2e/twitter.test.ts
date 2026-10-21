@@ -123,6 +123,7 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-provider="twitter"
         data-embed-id="123456789012345"
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
+        data-embed-url="https://x.com/i/status/123456789012345"
       ></div>
     `
 
@@ -235,6 +236,7 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-provider="twitter"
         data-embed-id="123456789012345"
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
+        data-embed-url="https://x.com/i/status/123456789012345"
       ></div>
     `
 
@@ -296,6 +298,7 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-provider="twitter"
         data-embed-id="123456789012345"
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
+        data-embed-url="https://x.com/i/status/123456789012345"
       ></div>
     `
 
