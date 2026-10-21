@@ -4,6 +4,7 @@ import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   imgurBlockquoteEmbedResolver,
+  imgurGifvEmbedResolver,
   imgurIframeEmbedResolver,
   imgurResolveEmbed,
   imgurS9eEmbedResolver,
@@ -486,6 +487,68 @@ describeForEachParser('imgurIframeEmbedResolver', (parseHtml) => {
 
 // The enclosure probe offers every attachment to every url resolver, so only a pipeline test
 // reaches the path where claiming a media url would cost a reader the file.
+describeForEachParser('imgurGifvEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, imgurGifvEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should rebuild the gifv embed onto the post embed', async () => {
+      const value = html`
+        <iframe
+          class="imgur-embed"
+          width="100%"
+          height="404"
+          frameborder="0"
+          src="http://i.imgur.com/iUq9luK.gifv#embed"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'imgur',
+        id: 'iUq9luK',
+        src: 'https://imgur.com/iUq9luK/embed',
+        url: 'https://imgur.com/iUq9luK',
+        thumbnail: 'https://i.imgur.com/iUq9luKm.jpg',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host carrying the same path', async () => {
+      const value = html`
+        <iframe
+          class="imgur-embed"
+          src="https://evil.test/iUq9luK.gifv#embed?i.imgur.com/"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a file that is not a gifv', async () => {
+      const value = html`
+        <iframe
+          class="imgur-embed"
+          src="https://i.imgur.com/iUq9luK.mp4"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the gifv nested under another segment', async () => {
+      const value = html`
+        <iframe
+          class="imgur-embed"
+          src="https://i.imgur.com/x/iUq9luK.gifv#embed"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 describeForEachParser('imgurS9eEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, imgurS9eEmbedResolver)
 
