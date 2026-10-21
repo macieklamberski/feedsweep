@@ -11,7 +11,7 @@ const provider = 'fliphtml5'
 const fliphtml5Hosts = ['online.fliphtml5.com']
 
 // FlipHTML5's flipbook viewer, `online.fliphtml5.com/{account}/{book}/`, opening at the `#p=` page.
-export const fliphtml5ResolveEmbed: ResolveEmbed = (url) => {
+export const fliphtml5ResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, fliphtml5Hosts)
 
   if (!parsed) {
@@ -37,6 +37,7 @@ export const fliphtml5ResolveEmbed: ResolveEmbed = (url) => {
     // The cover the viewer's own `og:image` names, 404 on a book that does not exist.
     thumbnail: `${viewerUrl}files/shot.jpg`,
     ratio: '4/3',
+    title: attr(element, 'title'),
   }
 }
 

@@ -209,6 +209,32 @@ describeForEachParser('simplecastEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
   })
+
+  describe('the title the carrier states', () => {
+    it('should read the episode name the frame states', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          title="Beyond the Deals: Student-Athlete Identity, Development, and NIL With 42U&apos;s Stephen Bienko"
+          src="https://player.simplecast.com/e720e8de-94c2-4c89-a588-4fa1535f3cde"
+          height="200"
+          width="100%"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'simplecast',
+        id: 'e720e8de-94c2-4c89-a588-4fa1535f3cde',
+        src: 'https://player.simplecast.com/e720e8de-94c2-4c89-a588-4fa1535f3cde',
+        height: 200,
+        title:
+          "Beyond the Deals: Student-Athlete Identity, Development, and NIL With 42U's Stephen Bienko",
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 // injectEnclosures offers every attachment to every url-keyed resolver, and simplecast serves the

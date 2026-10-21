@@ -81,6 +81,7 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
         id: '9ef3034e9ee8b8c1',
         src: 'https://observablehq.com/embed/9ef3034e9ee8b8c1?cells=chart',
         url: 'https://observablehq.com/d/9ef3034e9ee8b8c1',
+        title: 'Percentage of female execs',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -101,6 +102,7 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
         id: '3ac7dfcbdcb1dd2a',
         src: 'https://observablehq.com/embed/3ac7dfcbdcb1dd2a@248?cells=map,css',
         url: 'https://observablehq.com/d/3ac7dfcbdcb1dd2a',
+        title: "RuPaul's Drag Queens",
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -340,6 +340,7 @@ describeForEachParser('anchorEmbedResolver', (parseHtml) => {
         id: 'turpentine-productions',
         src: 'https://creators.spotify.com/pod/profile/turpentine-productions/embed',
         height: 100,
+        title: 'The Pilgrimage Saga',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -363,6 +364,55 @@ describeForEachParser('anchorEmbedResolver', (parseHtml) => {
       const value = '<iframe src="https://anchor.fm/pricing"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('the title the carrier states', () => {
+    it('should read the episode name WordPress writes on the frame', async () => {
+      const value = html`
+        <iframe
+          class="wp-embedded-content"
+          sandbox="allow-scripts"
+          security="restricted"
+          title="Essential Oils &amp; Immunity Part 2 by Axiom Wellness"
+          src="https://anchor.fm/axiomwellness/embed/episodes/Essential-Oils--Immunity-Part-2-es1a63#?secret=HTlq5wbPsQ"
+          data-secret="HTlq5wbPsQ"
+          height="102px"
+          width="400px"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'anchor',
+        id: 'axiomwellness/Essential-Oils--Immunity-Part-2-es1a63',
+        src: 'https://creators.spotify.com/pod/profile/axiomwellness/embed/episodes/Essential-Oils--Immunity-Part-2-es1a63',
+        height: 100,
+        title: 'Essential Oils & Immunity Part 2 by Axiom Wellness',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the myFrame label some snippets write', async () => {
+      const value = html`
+        <iframe
+          frameborder="0"
+          height="102px"
+          scrolling="no"
+          src="https://podcasters.spotify.com/pod/show/angelo-irano/embed/episodes/Il-bias-dellancoraggio-e26o3s7/a-aa3s36i"
+          title="myFrame"
+          width="570px"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'anchor',
+        id: 'angelo-irano/Il-bias-dellancoraggio-e26o3s7',
+        src: 'https://creators.spotify.com/pod/profile/angelo-irano/embed/episodes/Il-bias-dellancoraggio-e26o3s7',
+        height: 100,
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
