@@ -156,6 +156,17 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a talk that is a dot segment', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          flashvars="adKeys=talk=..;year=2010"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host serving the same player path', async () => {
       const value = html`
         <embed

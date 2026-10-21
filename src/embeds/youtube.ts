@@ -209,13 +209,19 @@ const composeListEmbed = (list: string): EmbedResolverResult => {
 }
 
 // `listType=user_uploads` takes a legacy username in place of a playlist id.
-const composeUploadsEmbed = (user: string): EmbedResolverResult => {
+const composeUploadsEmbed = (user: string): EmbedResolverResult | undefined => {
+  // The username comes out of the query decoded, and it goes into a path.
+  const segment = encodePathSegment(user)
+
+  if (!segment) {
+    return
+  }
+
   return {
     provider,
     id: `user/${user}`,
     src: `https://www.youtube.com/embed${composeQuery({ listType: 'user_uploads', list: user })}`,
-    // The username comes out of the query decoded, and it goes into a path.
-    url: `https://www.youtube.com/user/${encodePathSegment(user)}`,
+    url: `https://www.youtube.com/user/${segment}`,
     ratio: playerRatio,
   }
 }
@@ -255,7 +261,17 @@ const resolveCollectionEmbed = (
   const channel = getQueryParam(parsed.searchParams, 'channel')
 
   if (isAnyOf(segments[1], 'live_stream')) {
-    return channel ? composeChannelEmbed(channel, encodePathSegment(channel)) : undefined
+    if (!channel) {
+      return
+    }
+
+    const segment = encodePathSegment(channel)
+
+    if (!segment) {
+      return
+    }
+
+    return composeChannelEmbed(channel, segment)
   }
 
   // `/embed/videoseries?list=`, `/embed/playlist?list=` and the bare `/embed/?list=` some

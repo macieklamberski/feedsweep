@@ -281,6 +281,17 @@ describeForEachParser('mrcvideoFlashEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a callback node id that is a dot segment', async () => {
+      const value = html`
+        <embed
+          src="http://www.mrctv.org/jwplayer/player.swf"
+          flashvars="yourlytics.callback=http://www.mrctv.org/postback/remoteview?nodeid=.."
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a player naming no node id', async () => {
       const value = html`
         <embed

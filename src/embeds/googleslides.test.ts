@@ -316,6 +316,12 @@ describeForEachParser('googleslidesEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a file id that is a dot segment', async () => {
+      const value = '<iframe src="https://docs.google.com/presentation/embed?id=.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', async () => {
       const value = html`
         <iframe src="https://evil.test/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed"></iframe>

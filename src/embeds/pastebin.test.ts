@@ -140,6 +140,12 @@ describeForEachParser('pastebinIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a query id that is a dot segment', async () => {
+      const value = '<iframe src="https://pastebin.com/embed_iframe.php?i=.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a lookalike host', async () => {
       const value = '<iframe src="https://pastebin.com.evil.test/embed_iframe/AbCd1234"></iframe>'
 

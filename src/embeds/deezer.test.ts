@@ -400,6 +400,20 @@ describeForEachParser('deezerEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a plugin player id that is a dot segment', async () => {
+      const value = html`
+        <iframe src="https://www.deezer.com/plugins/player?type=tracks&id=.."></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a playlist path that is a dot segment, not fall back to pid', async () => {
+      const value = '<embed src="https://www.deezer.com/embedded/widget.swf?path=..&pid=1234">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', async () => {
       const value = '<iframe src="https://evil.test/widget/dark/track/3135556"></iframe>'
 

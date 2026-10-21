@@ -700,6 +700,22 @@ describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
 
     expect(await extract(value)).toEqual(expected)
   })
+
+  describe('a value that is a dot segment', () => {
+    it('should return undefined for a geo video that is a dot segment', async () => {
+      const value = '<iframe src="https://geo.dailymotion.com/player/xm0u7.html?video=.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a geo playlist that is a dot segment', async () => {
+      const value = html`
+        <iframe src="https://geo.dailymotion.com/player/xm0u7.html?playlist=.."></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
 })
 
 describeForEachParser('dailymotionScriptEmbedResolver', (parseHtml) => {

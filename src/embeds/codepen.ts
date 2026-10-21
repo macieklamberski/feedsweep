@@ -112,9 +112,13 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   }
 
   const user = readUser(rawUser)
-  const queryToken = getQueryParam(parsed.searchParams, 'token')
+  const queryToken = pathToken ? undefined : getQueryParam(parsed.searchParams, 'token')
   // A query token comes out decoded, and it goes into a path beside the raw path spelling.
-  const token = pathToken ?? (queryToken ? encodePathSegment(queryToken) : undefined)
+  const token = queryToken ? encodePathSegment(queryToken) : pathToken
+
+  if (queryToken && !token) {
+    return
+  }
 
   return {
     kind,

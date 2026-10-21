@@ -557,6 +557,17 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a video that is a dot segment', async () => {
+      const value = html`
+        <embed
+          src="http://www-tc.pbs.org/video/media/swf/PBSPlayer.swf"
+          flashvars="video=..&amp;player=viral"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should keep a decoded video id carrying a separator in one path segment', async () => {
       const value = html`
         <embed

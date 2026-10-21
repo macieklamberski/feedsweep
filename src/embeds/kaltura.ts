@@ -46,7 +46,17 @@ const readEntry = (url: string | undefined): Entry | undefined => {
 
 // The player path names the partner and the player config. Without `iframeembed=true` the same
 // route answers the auto-embed script, not a player.
-const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult => {
+const composeEmbed = (
+  { partner, entryId, parsed }: Entry,
+  title?: string,
+): EmbedResolverResult | undefined => {
+  // The entry comes out of the query decoded, and it goes into a path.
+  const entrySegment = encodePathSegment(entryId)
+
+  if (!entrySegment) {
+    return
+  }
+
   const host = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
   const query = composeQuery({ iframeembed: 'true', entry_id: entryId })
   const hasToken = getQueryParam(parsed.searchParams, tokenParam) !== undefined
@@ -56,8 +66,6 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult 
       isAnyOf(name, tokenParam) || isAnyOf(name, widgetParams) || isAnyOf(name, playbackParams),
   )
   const playback = kept.replace('?', '&')
-  // The entry comes out of the query decoded, and it goes into a path.
-  const entrySegment = encodePathSegment(entryId)
 
   return {
     provider,
@@ -69,6 +77,7 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult 
       ? undefined
       : `https://${host}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
     ratio: '16/9',
+    title,
   }
 }
 
@@ -79,7 +88,7 @@ export const kalturaResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  return { ...composeEmbed(entry), title: attr(element, 'title') }
+  return composeEmbed(entry, attr(element, 'title'))
 }
 
 // Kaltura's embedIframeJs and embedPlaykitJs iframes, which render and only lack a poster.

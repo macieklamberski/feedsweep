@@ -87,6 +87,16 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a publisherID that is a dot segment', async () => {
+      const value = html`
+        <embed
+          src="http://c.brightcove.com/services/viewer/federated_f9/19517958001?isVid=1&publisherID=..&videoId=6098765432"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a federated url with no video id anywhere', async () => {
       const value = html`
         <embed
@@ -600,6 +610,30 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a player that is a dot segment', async () => {
+      const value = html`
+        <video-js
+          data-account="1234567890"
+          data-player=".."
+          data-video-id="6098765432"
+        ></video-js>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an embed that is a dot segment', async () => {
+      const value = html`
+        <video-js
+          data-account="1234567890"
+          data-embed=".."
+          data-video-id="6098765432"
+        ></video-js>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined when no account can be found', async () => {
       const value = '<video-js data-video-id="6098765432"></video-js>'
 
@@ -869,6 +903,19 @@ describeForEachParser('brightcoveSkyEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for an account that is a dot segment', async () => {
+      const value = html`
+        <div
+          class="sdc-site-video"
+          data-provider="brightcove"
+          data-account-id=".."
+          data-video-id="6098765432"
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore an sdc-site-video widget on another provider', async () => {
       const value = html`
         <div

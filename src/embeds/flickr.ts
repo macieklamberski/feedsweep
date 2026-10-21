@@ -38,18 +38,18 @@ type FlickrPhoto = { photoId: string; owner?: string; secret?: string }
 
 // Flickr's own embed script writes these embedr endpoints into a frameless iframe. A real id
 // answers 200 with the whole slideshow and an invented one 404.
-const composeAlbumPlayer = (setId: string): string => {
-  return `https://embedr.flickr.com/photosets/${encodePathSegment(setId)}`
+const composeAlbumPlayer = (setSegment: string): string => {
+  return `https://embedr.flickr.com/photosets/${setSegment}`
 }
 
-const composeStreamPlayer = (owner: string): string => {
-  return `https://embedr.flickr.com/photostreams/${encodePathSegment(owner)}`
+const composeStreamPlayer = (ownerSegment: string): string => {
+  return `https://embedr.flickr.com/photostreams/${ownerSegment}`
 }
 
 // The page player takes either owner spelling, serves no frame-blocking header and takes the
 // same width and height query as embedr.
-const composeAliasStreamPlayer = (owner: string): string => {
-  return `https://www.flickr.com/photos/${encodePathSegment(owner)}/player`
+const composeAliasStreamPlayer = (ownerSegment: string): string => {
+  return `https://www.flickr.com/photos/${ownerSegment}/player`
 }
 
 const composeGroupPlayer = (groupId: string): string => {
@@ -63,7 +63,9 @@ const composePhotoPlayer = (photoId: string): string => {
 // The page player ignores the owner segment and the secret after `player/`, and serves the same
 // page for a wrong secret. An `in/{context}` segment only picks the set its arrows walk through.
 const composePagePhotoPlayer = (photo: FlickrPhoto): string => {
+  // The owner is read out of a path, where the parser has already resolved any dot segment away.
   const owner = photo.owner ? encodePathSegment(photo.owner) : '_'
+
   return `https://www.flickr.com/photos/${owner}/${photo.photoId}/player/`
 }
 
@@ -172,8 +174,18 @@ const readFlashPhoto = (element: Nullish<Element>): FlickrPhoto | undefined => {
 
   const secret = flashVar(element, 'photo_secret')
 
+  if (!secret) {
+    return { photoId }
+  }
+
   // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
-  return { photoId, secret: secret ? encodePathSegment(secret) : undefined }
+  const secretSegment = encodePathSegment(secret)
+
+  if (!secretSegment) {
+    return
+  }
+
+  return { photoId, secret: secretSegment }
 }
 
 const trailingSlashesRegex = /\/+$/
@@ -210,7 +222,6 @@ const readPhotoPlayer = (parsed: URL): { src: string; photo: FlickrPhoto } | und
       photoId: player[2],
       secret: player[3],
     }
-
     return { src: composePagePhotoPlayer(photo), photo }
   }
 
@@ -225,14 +236,16 @@ const readPhotoPlayer = (parsed: URL): { src: string; photo: FlickrPhoto } | und
 // the frame.
 const composePhotoEmbed = (src: string, photo: FlickrPhoto): EmbedResolverResult => {
   const { photoId, owner, secret } = photo
+  // Only the page player names an owner, read out of a path that holds no dot segment.
+  const ownerSegment = owner ? encodePathSegment(owner) : undefined
 
   return {
     provider,
     // The photo's key-free oEmbed answers on the page url and on the short url alike.
     id: owner ? `photos/${owner}/${photoId}` : `p/${encodeBase58(photoId)}`,
     src,
-    url: owner
-      ? `https://www.flickr.com/photos/${encodePathSegment(owner)}/${photoId}/`
+    url: ownerSegment
+      ? `https://www.flickr.com/photos/${ownerSegment}/${photoId}/`
       : composeShortPhotoUrl(photoId),
     thumbnail: secret ? composePhotoThumbnail(photoId, secret) : undefined,
     author: readOwnerAlias(owner),
@@ -244,6 +257,13 @@ const composePhotoEmbed = (src: string, photo: FlickrPhoto): EmbedResolverResult
 const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined => {
   const owner = subject.owner
   const author = readOwnerAlias(owner)
+  // Empty where the subject names no such part.
+  const ownerSegment = owner ? encodePathSegment(owner) : ''
+  const setSegment = subject.setId ? encodePathSegment(subject.setId) : ''
+
+  if (ownerSegment === undefined || setSegment === undefined) {
+    return
+  }
 
   // The album page path starts with the owner. `/sets/{id}` is still served and does not
   // redirect to `/albums/`, while the `/albums/` player redirects to `/sets/` (2026-09-29).
@@ -252,8 +272,8 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
       provider,
       // The album's key-free oEmbed needs `{owner}/{setId}`: a title, an author, a thumbnail.
       id: `${owner}/${subject.setId}`,
-      src: composeAlbumPlayer(subject.setId),
-      url: `https://www.flickr.com/photos/${encodePathSegment(owner)}/sets/${encodePathSegment(subject.setId)}`,
+      src: composeAlbumPlayer(setSegment),
+      url: `https://www.flickr.com/photos/${ownerSegment}/sets/${setSegment}`,
       author,
     }
   }
@@ -264,7 +284,7 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
       provider,
       // Addresses the player but not oEmbed.
       id: `photosets/${subject.setId}`,
-      src: composeAlbumPlayer(subject.setId),
+      src: composeAlbumPlayer(setSegment),
       url: composeShortAlbumUrl(subject.setId),
     }
   }
@@ -290,8 +310,10 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
       provider,
       id: `photostreams/${owner}`,
       // embedr 404s on an alias, so only an NSID goes there.
-      src: nsidRegex.test(owner) ? composeStreamPlayer(owner) : composeAliasStreamPlayer(owner),
-      url: `https://www.flickr.com/photos/${encodePathSegment(owner)}/`,
+      src: nsidRegex.test(owner)
+        ? composeStreamPlayer(ownerSegment)
+        : composeAliasStreamPlayer(ownerSegment),
+      url: `https://www.flickr.com/photos/${ownerSegment}/`,
       author,
     }
   }

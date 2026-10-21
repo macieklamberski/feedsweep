@@ -179,6 +179,12 @@ describeForEachParser('typeformWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a form id that is a dot segment', async () => {
+      const value = '<div data-tf-widget=".."></div>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined for an empty id', async () => {
       const value = '<div data-tf-widget=""></div>'
 

@@ -492,6 +492,12 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for an id that is a dot segment', async () => {
+      const value = '<script src="https://admin.blog.fc2.com/fc2video2.php?id=.."></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a shim served from another host', async () => {
       const value = html`
         <script src="https://evil.test/fc2video2.php?admin.blog.fc2.com/fc2video2.php&id=20230116F3WJd7kn"></script>
@@ -756,6 +762,12 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for an id that is a dot segment', async () => {
+      const value = '<embed src="http://video.fc2.com/flv2.swf?i=..">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', async () => {
       const value = '<embed src="https://evil.test/flv2.swf?i=20120101QN5FVkv4" />'
 

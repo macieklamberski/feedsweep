@@ -438,6 +438,16 @@ describeForEachParser('kalturaIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for an entry that is a dot segment', async () => {
+      const value = html`
+        <iframe
+          src="https://cdnapisec.kaltura.com/p/520801/sp/52080100/embedIframeJs/uiconf_id/31230141/partner_id/520801?iframeembed=true&entry_id=.."
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
         '<iframe src="https://evil.test/p/520801/embedPlaykitJs/uiconf_id/1?iframeembed=true&entry_id=1_w0bwzism"></iframe>'

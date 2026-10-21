@@ -282,6 +282,12 @@ describeForEachParser('abcotvEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a pid that is a dot segment', async () => {
+      const value = '<iframe src="https://abc7news.com/video/embed?pid=.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', async () => {
       const value = '<iframe src="https://evil.test/video/embed/?pid=5740386"></iframe>'
 
