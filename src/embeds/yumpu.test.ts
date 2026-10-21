@@ -65,6 +65,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
     it('should rebuild the older document embed route onto the player', async () => {
       const value = html`
         <iframe
@@ -194,6 +195,43 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
 
     it('should mint the English locale onto a locale-less embed path', async () => {
       const value = '<iframe src="https://www.yumpu.com/embed/view/z4xYaRXnsDqwc2GE"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yumpu',
+        id: 'z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the player route words in any case', async () => {
+      const value = '<iframe src="https://www.yumpu.com/de/Embed/View/z4xYaRXnsDqwc2GE"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yumpu',
+        id: 'z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the older document embed route words in any case', async () => {
+      const value =
+        '<iframe src="https://www.yumpu.com/es/Document/Embed/HItJxtpSy3tdyhFd"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yumpu',
+        id: 'HItJxtpSy3tdyhFd',
+        src: 'https://www.yumpu.com/es/embed/view/HItJxtpSy3tdyhFd',
+        ratio: '4/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a locale-less embed route word in any case', async () => {
+      const value = '<iframe src="https://www.yumpu.com/Embed/view/z4xYaRXnsDqwc2GE"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',

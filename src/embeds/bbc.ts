@@ -13,7 +13,7 @@ const bbcImageHosts = ['bbcimg.co.uk']
 const pidRegex = /^[a-z](?=[0-9a-z]*\d)[0-9a-z]{7}$/
 const pidCharactersRegex = /^[0-9a-z]+$/
 const playlistPathRegex = /\/playlist\/([^/.]+)/
-const newsPagePathRegex = /^\/news\/[^/]*-(?<article>\d+)\/?$/
+const newsPagePathRegex = /^\/news\/[^/]*-(?<article>\d+)\/?$/i
 
 // The news and World Service players render at 16:9 of their width. BBC's own embed code states
 // a 400 by 500 box, which pads them with blank below.
