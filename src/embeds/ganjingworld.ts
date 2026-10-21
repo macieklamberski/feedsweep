@@ -1,27 +1,17 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { keepIfMatches } from '../utils/dom.js'
 import { hyphenatedLettersRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `ganjing.com` 301s onto `www.ganjingworld.com/embed/{same id}`, so both hosts name one embed.
 const ganjingworldHosts = ['ganjingworld.com', 'ganjing.com']
 
-type Video = {
-  locale?: string
-  id: string
-}
-
-const readVideo = (url: string): Video | undefined => {
+const readVideoId = (url: string): string | undefined => {
   const [first, second, third] = getPathSegments(url)
 
   // The route word tells an embed from a channel, `/channel`, or a shared post, `/s`.
   if (isAnyOf(first, 'embed')) {
-    if (!second) {
-      return
-    }
-
-    return { id: second }
+    return second
   }
 
   if (!isAnyOf(second, 'embed')) {
@@ -29,33 +19,29 @@ const readVideo = (url: string): Video | undefined => {
   }
 
   // The hyphen tells a locale from the route words that share its slot, such as `live`.
-  const locale = keepIfMatches(first, hyphenatedLettersRegex)
-
-  if (!locale || !third) {
+  if (!hyphenatedLettersRegex.test(first ?? '')) {
     return
   }
 
-  return { locale, id: third }
+  return third
 }
 
 // No title: the carrier states one, but Gan Jing World is unmeasured, so reading it risks putting
 // a player label in the item's title. No thumbnail: the poster is a uuid on a separate cdn and
 // nothing composes it from the video id.
 const ganjingworldResolveEmbed: ResolveEmbed = (url) => {
-  const video = readVideo(url)
+  const videoId = readVideoId(url)
 
-  if (!video) {
+  if (!videoId) {
     return
   }
 
-  // The locale stays in `src` and `url` and out of the `id`, so one video has one key.
-  const prefix = video.locale ? `/${video.locale}` : ''
-
+  // The locale is dropped: both locale routes answer 301 to the bare route for the same id.
   return {
     provider: 'ganjingworld',
-    id: video.id,
-    src: `https://www.ganjingworld.com${prefix}/embed/${video.id}`,
-    url: `https://www.ganjingworld.com${prefix}/video/${video.id}`,
+    id: videoId,
+    src: `https://www.ganjingworld.com/embed/${videoId}`,
+    url: `https://www.ganjingworld.com/video/${videoId}`,
     ratio: '16/9',
   }
 }

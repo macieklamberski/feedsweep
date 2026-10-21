@@ -30,7 +30,7 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should resolve the ganjing.com mirror onto the canonical host and keep its locale', async () => {
+    it('should resolve the ganjing.com mirror onto the canonical host and drop its locale', async () => {
       const value = html`
         <iframe
           loading="lazy"
@@ -46,8 +46,8 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ganjingworld',
         id: '1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
-        src: 'https://www.ganjingworld.com/vi-VN/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
-        url: 'https://www.ganjingworld.com/vi-VN/video/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
+        src: 'https://www.ganjingworld.com/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
+        url: 'https://www.ganjingworld.com/video/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
         ratio: '16/9',
       }
 
@@ -104,14 +104,14 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use a lowercase locale as written, even if the player answers an error', async () => {
+    it('should drop a lowercase locale', async () => {
       const value =
         '<iframe src="https://www.ganjingworld.com/zh-cn/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'ganjingworld',
         id: '1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
-        src: 'https://www.ganjingworld.com/zh-cn/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
-        url: 'https://www.ganjingworld.com/zh-cn/video/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
+        src: 'https://www.ganjingworld.com/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
+        url: 'https://www.ganjingworld.com/video/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
         ratio: '16/9',
       }
 
@@ -168,14 +168,14 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed id behind a locale as written, even if the player answers an error', async () => {
+    it('should use a malformed id behind a locale as written and drop the locale', async () => {
       const value =
         '<iframe src="https://www.ganjingworld.com/vi-VN/embed/1fv8993v57oI3UiHioRJzFV1.mp4"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'ganjingworld',
         id: '1fv8993v57oI3UiHioRJzFV1.mp4',
-        src: 'https://www.ganjingworld.com/vi-VN/embed/1fv8993v57oI3UiHioRJzFV1.mp4',
-        url: 'https://www.ganjingworld.com/vi-VN/video/1fv8993v57oI3UiHioRJzFV1.mp4',
+        src: 'https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1.mp4',
+        url: 'https://www.ganjingworld.com/video/1fv8993v57oI3UiHioRJzFV1.mp4',
         ratio: '16/9',
       }
 
@@ -196,28 +196,28 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a locale with a longer language code as written, even if the player answers an error', async () => {
+    it('should drop a locale with a longer language code', async () => {
       const value =
         '<iframe src="https://www.ganjingworld.com/fil-PH/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'ganjingworld',
         id: '1fv8993v57oI3UiHioRJzFV1L1cq1c',
-        src: 'https://www.ganjingworld.com/fil-PH/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c',
-        url: 'https://www.ganjingworld.com/fil-PH/video/1fv8993v57oI3UiHioRJzFV1L1cq1c',
+        src: 'https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c',
+        url: 'https://www.ganjingworld.com/video/1fv8993v57oI3UiHioRJzFV1L1cq1c',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a locale with a longer region code as written, even if the player answers an error', async () => {
+    it('should drop a locale with a longer region code', async () => {
       const value =
         '<iframe src="https://www.ganjingworld.com/en-USA/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'ganjingworld',
         id: '1fv8993v57oI3UiHioRJzFV1L1cq1c',
-        src: 'https://www.ganjingworld.com/en-USA/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c',
-        url: 'https://www.ganjingworld.com/en-USA/video/1fv8993v57oI3UiHioRJzFV1L1cq1c',
+        src: 'https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c',
+        url: 'https://www.ganjingworld.com/video/1fv8993v57oI3UiHioRJzFV1L1cq1c',
         ratio: '16/9',
       }
 
@@ -262,8 +262,8 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ganjingworld',
         id: '1ilf5kdso911p2vxVOvfx6VqW1ld1c',
-        src: 'https://www.ganjingworld.com/zh-CN/embed/1ilf5kdso911p2vxVOvfx6VqW1ld1c',
-        url: 'https://www.ganjingworld.com/zh-CN/video/1ilf5kdso911p2vxVOvfx6VqW1ld1c',
+        src: 'https://www.ganjingworld.com/embed/1ilf5kdso911p2vxVOvfx6VqW1ld1c',
+        url: 'https://www.ganjingworld.com/video/1ilf5kdso911p2vxVOvfx6VqW1ld1c',
         ratio: '16/9',
       }
 
