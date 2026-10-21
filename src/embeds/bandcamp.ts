@@ -26,7 +26,7 @@ const releaseKinds = ['album', 'track']
 
 // The audio player spells its options as path segments (`EmbeddedPlayer/album=123/size=large/`)
 // while the video player uses a query string (`VideoEmbed?track=123&bgcol=…`).
-const videoPathRegex = /\/videoembed/i
+const videoPathRegex = /^\/videoembed(?:\/|$)/i
 
 // A player pointing at a track inside an album names both, and the two orders both occur: the
 // modern path writes `album=` first and the legacy `v=2/` path writes `track=` first.
