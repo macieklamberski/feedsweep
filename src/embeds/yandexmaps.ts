@@ -7,9 +7,12 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'yandexmaps'
 
 const yandexMapsHosts = ['api-maps.yandex.ru']
-const yandexMapsWidgetHosts = ['yandex.ru']
+const yandexMapsWidgetHosts = ['yandex.by', 'yandex.ru']
 
 const widgetPath = '/map-widget/v1/'
+// A short link the map's share dialog writes, `/map-widget/v1/-/{code}`. The code names the same
+// map on every regional host.
+const shortLinkPathRegex = /^\/map-widget\/v1\/-\/(?<code>[^/]+)\/?$/
 
 // The Constructor's own script loads the older `sid={id}` as `um=constructor:{id}`. The prefix
 // names the constructor space, since `um` also carries `mymaps:` maps.
@@ -65,11 +68,22 @@ export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// The frame the Constructor's iframe snippet writes, which names the map by `um` alone.
+// The frame the Constructor's iframe snippet writes, which names the map by `um` alone, and the
+// frame of a short link.
 export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
   yandexMapsWidgetHosts,
   (url) => {
     const parsed = parseUrl(url)
+    const code = parsed?.pathname.match(shortLinkPathRegex)?.groups?.code
+
+    if (code) {
+      return {
+        provider,
+        id: `-/${code}`,
+        src: `https://yandex.ru${widgetPath}-/${code}`,
+        height: mapHeight,
+      }
+    }
 
     if (parsed?.pathname !== widgetPath) {
       return
