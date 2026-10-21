@@ -23,7 +23,13 @@ const readPathOption = (segments: Array<string>, name: string): string | undefin
   return index >= 0 ? segments[index + 1] : undefined
 }
 
-export const extractLibsynEmbed = (link: string): { kind: string; id: string } | undefined => {
+type LibsynEmbed = {
+  kind: string
+  id: string
+  start?: string
+}
+
+export const extractLibsynEmbed = (link: string): LibsynEmbed | undefined => {
   const parsed = parseUrl(link, placeholderBaseUrl)
 
   // An audio file on the player path would otherwise trade its audio element for a placeholder.
@@ -47,6 +53,8 @@ export const extractLibsynEmbed = (link: string): { kind: string; id: string } |
   return {
     kind: segments[1] as string,
     id,
+    // The player seeks to `time-start/{hh:mm:ss}` once loaded.
+    start: readPathOption(segments, 'time-start'),
   }
 }
 
@@ -60,10 +68,12 @@ export const libsynResolveEmbed: ResolveEmbed = (url, element) => {
   // No thumbnail and no canonical url: `oembed.libsyn.com` answers `No valid media found` to
   // `?item_id={id}` and an HTML page to `?url={player url}`, and artwork needs an authenticated
   // api call.
+  const start = embed.start ? `time-start/${embed.start}/` : ''
+
   return {
     provider,
     id: `${embed.kind}/${embed.id}`,
-    src: `https://play.libsyn.com/embed/${embed.kind}/id/${embed.id}/`,
+    src: `https://play.libsyn.com/embed/${embed.kind}/id/${embed.id}/${start}`,
     height: playerHeight,
     title: attr(element, 'title'),
   }

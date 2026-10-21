@@ -121,6 +121,19 @@ describe('libsynResolveEmbed', () => {
     expect(libsynResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should keep the start position the path names as written', () => {
+    const value =
+      'https://play.libsyn.com/embed/episode/id/41557470/theme/modern/time-start/00:12:30/'
+    const expected: EmbedResolverResult = {
+      provider: 'libsyn',
+      id: 'episode/41557470',
+      src: 'https://play.libsyn.com/embed/episode/id/41557470/time-start/00:12:30/',
+      height: 128,
+    }
+
+    expect(libsynResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for a libsyn url naming no episode', () => {
     const value = 'https://play.libsyn.com/about'
 
@@ -239,7 +252,7 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'libsyn',
       id: 'episode/41557470',
-      src: 'https://play.libsyn.com/embed/episode/id/41557470/',
+      src: 'https://play.libsyn.com/embed/episode/id/41557470/time-start/00:00:00/',
       height: 128,
     }
 
