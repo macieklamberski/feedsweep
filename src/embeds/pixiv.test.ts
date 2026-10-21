@@ -8,7 +8,7 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, pixivScriptEmbedResolver)
 
   describe('happy paths', () => {
-    it('should mint the oEmbed frame from the loader, with the credits', async () => {
+    it('should mint the oEmbed frame from the loader, with the title and not the artist from the credits', async () => {
       const value = html`
         <script
           src="https://s.pximg.net/source/embed.js"
@@ -33,7 +33,6 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
         width: 600,
         height: 315,
         title: 'コミティア124　新刊サンプル',
-        author: 'みなづき忍',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -64,7 +63,6 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
         width: 600,
         height: 315,
         title: 'C83新刊 まんまるドロップ',
-        author: '空木次葉@31日東H-10b',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -282,29 +280,6 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should not read the work as the author when the block names no artist', async () => {
-      const value = html`
-        <script
-          src="https://source.pixiv.net/source/embed.js"
-          data-id="45958594_2a40c2e14793e84b2a7d7d6ecc7cde12"
-          data-size="small"
-          data-border="on"
-        ></script>
-        <noscript><p><a href="https://www.pixiv.net/artworks/45958594">A work</a></p></noscript>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'pixiv',
-        id: '45958594',
-        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594',
-        url: 'https://www.pixiv.net/artworks/45958594',
-        width: 600,
-        height: 315,
-        title: 'A work',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should not read a work link under a prefixed path', async () => {
       const value = html`
         <script
@@ -336,50 +311,6 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
           data-border="on"
         ></script>
         <noscript><p><a href="https://www.pixiv.net/artworks/45958594/extra">A work</a></p></noscript>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'pixiv',
-        id: '45958594',
-        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594',
-        url: 'https://www.pixiv.net/artworks/45958594',
-        width: 600,
-        height: 315,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should not read an artist link under a prefixed path', async () => {
-      const value = html`
-        <script
-          src="https://source.pixiv.net/source/embed.js"
-          data-id="45958594_2a40c2e14793e84b2a7d7d6ecc7cde12"
-          data-size="small"
-          data-border="on"
-        ></script>
-        <noscript><p><a href="https://www.pixiv.net/x/users/463194">An artist</a></p></noscript>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'pixiv',
-        id: '45958594',
-        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594',
-        url: 'https://www.pixiv.net/artworks/45958594',
-        width: 600,
-        height: 315,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should not read an artist link with a trailing segment', async () => {
-      const value = html`
-        <script
-          src="https://source.pixiv.net/source/embed.js"
-          data-id="45958594_2a40c2e14793e84b2a7d7d6ecc7cde12"
-          data-size="small"
-          data-border="on"
-        ></script>
-        <noscript><p><a href="https://www.pixiv.net/users/463194/extra">An artist</a></p></noscript>
       `
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
@@ -756,7 +687,6 @@ describeForEachParser('pixiv through the pipeline', (parseHtml) => {
         data-embed-width="600"
         data-embed-height="315"
         data-embed-title="A work"
-        data-embed-author="An artist"
       ></div>
     `
 
