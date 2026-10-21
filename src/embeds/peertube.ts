@@ -9,6 +9,7 @@ const provider = 'peertube'
 type PeertubeVideo = {
   origin: string
   id: string
+  isPlaylist: boolean
 }
 
 // The two spellings PeerTube writes a video id in: the uuid, and the 22-character short form its
@@ -26,6 +27,17 @@ const playerRatio = '16/9'
 
 const isVideoId = (segment: string | undefined): segment is string => {
   return !!segment && (uuidRegex.test(segment) || shortIdRegex.test(segment))
+}
+
+// A playlist's player, `/video-playlists/embed/{id}`, and its watch page, `/w/p/{id}`.
+const readPlaylistId = (segments: Array<string>): string | undefined => {
+  if (segments[0] === 'w' && segments[1] === 'p') {
+    return segments[2]
+  }
+
+  if (segments[0] === 'video-playlists' && segments[1] === 'embed') {
+    return segments[2]
+  }
 }
 
 const readPathId = (segments: Array<string>): string | undefined => {
@@ -46,29 +58,50 @@ const parseVideo = (link: string): PeertubeVideo | undefined => {
     return
   }
 
-  const id = readPathId(getPathSegments(url))
+  const segments = getPathSegments(url)
+  const playlistId = readPlaylistId(segments)
+
+  if (isVideoId(playlistId)) {
+    return { origin: url.origin, id: playlistId, isPlaylist: true }
+  }
+
+  const id = readPathId(segments)
 
   if (!isVideoId(id)) {
     return
   }
 
-  return { origin: url.origin, id }
+  return { origin: url.origin, id, isPlaylist: false }
 }
 
 // Where playback starts and stops, and the subtitle track. The rest of the query sets the
 // player's chrome, which is the reader's to choose.
 const peertubeEmbedParams = ['start', 'stop', 'subtitle']
 
-// A PeerTube video, framed as the bare player or as the watch page. A framed watch page loads the
+// The video the playlist player opens on.
+const peertubePlaylistParams = ['playlistPosition']
+
+// A PeerTube video or playlist, framed as the bare player or as the watch page. A framed watch page loads the
 // instance's whole page, header and comments around the player, so the src is rebuilt either way.
 export const peertubeEmbedResolver = createMarkupEmbedResolver(
-  'iframe[src*="/videos/embed/"], iframe[src*="/videos/watch/"], iframe[src*="/w/"]',
+  'iframe[src*="/videos/embed/"], iframe[src*="/videos/watch/"], iframe[src*="/w/"], iframe[src*="/video-playlists/embed/"]',
   (element) => {
     const link = readCarrierUrl(element)
     const video = parseVideo(link)
 
     if (!video) {
       return
+    }
+
+    if (video.isPlaylist) {
+      return {
+        provider,
+        id: `playlist/${video.id}`,
+        src: `${video.origin}/video-playlists/embed/${video.id}${pickUrlParams(link, peertubePlaylistParams)}`,
+        url: `${video.origin}/w/p/${video.id}`,
+        ratio: playerRatio,
+        title: attr(element, 'title'),
+      }
     }
 
     // Both watch routes reach the player on the id they carry, which is what the instance's own
