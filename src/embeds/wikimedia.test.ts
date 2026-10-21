@@ -168,6 +168,12 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should skip a file page path on a url with no host', async () => {
+      const value = '<iframe src="javascript:/wiki/File:Ada.webm"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 
   describe('edge cases', () => {
