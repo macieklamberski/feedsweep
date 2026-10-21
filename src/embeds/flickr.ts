@@ -228,8 +228,8 @@ const composePhotoEmbed = (src: string, photo: FlickrPhoto): EmbedResolverResult
 
   return {
     provider,
-    // The photo's key-free oEmbed answers on the page url and on the short url alike.
-    id: owner ? `photos/${owner}/${photoId}` : `p/${encodeBase58(photoId)}`,
+    // The photo's key-free oEmbed answers on the short url, which names the photo without its owner.
+    id: `p/${encodeBase58(photoId)}`,
     src,
     url: owner
       ? `https://www.flickr.com/photos/${encodePathSegment(owner)}/${photoId}/`
