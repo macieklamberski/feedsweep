@@ -183,6 +183,7 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-id="123456789012345"
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
         data-embed-url="https://x.com/user/status/123456789012345"
+        data-embed-author="@user"
       ></div>
     `
 

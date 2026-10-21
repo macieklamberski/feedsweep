@@ -200,6 +200,22 @@ const readPhotoUrl = (photos: SubstackTweetAttrs['photos']): string | undefined 
   return parsed?.search === '' ? url : undefined
 }
 
+const readSubstackAuthor = (attrs: SubstackTweetAttrs): string | undefined => {
+  const name = attrs.name?.trim()
+
+  if (name) {
+    return name
+  }
+
+  const username = attrs.username?.trim()
+
+  if (!username) {
+    return
+  }
+
+  return atUsername(username)
+}
+
 const extractSubstackTweet = (element: Element): EmbedResolverResult | undefined => {
   const attrs = jsonAttr<SubstackTweetAttrs>(element, 'data-attrs')
 
@@ -215,7 +231,7 @@ const extractSubstackTweet = (element: Element): EmbedResolverResult | undefined
 
   return composeEmbed(status, {
     description: readTweetText(element, attrs.full_text),
-    author: attrs.name?.trim() || attrs.username?.trim() || undefined,
+    author: readSubstackAuthor(attrs),
     avatar: attrs.profile_image_url?.trim() || undefined,
     date: attrs.date?.trim() || undefined,
     thumbnail: readPhotoUrl(attrs.photos),
@@ -249,7 +265,7 @@ export const twitterResolveEmbed: ResolveEmbed = (url) => {
 
   const status = readStatusUrl(url)
 
-  return status ? composeEmbed(status, {}) : undefined
+  return status ? composeEmbed(status, { author: readAuthor(status) }) : undefined
 }
 
 // A Twitter player iframe, or a frame of the status page, which refuses framing.

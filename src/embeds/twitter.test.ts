@@ -1070,7 +1070,7 @@ describeForEachParser('twitterSubstackEmbedResolver', (parseHtml) => {
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: 'user',
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1307,6 +1307,7 @@ describe('twitterResolveEmbed', () => {
       id: statusId,
       src: playerUrl,
       url: `https://x.com/sixteencharacter/status/${statusId}`,
+      author: '@sixteencharacter',
     }
 
     expect(twitterResolveEmbed(value)).toEqual(expected)
@@ -1374,6 +1375,7 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
         id: statusId,
         src: playerUrl,
         url: statusUrl,
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1386,14 +1388,15 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
         id: statusId,
         src: playerUrl,
         url: statusUrl,
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
     // The id is the enrichment key, so a page carrier and a player carrier naming one tweet have
-    // to agree on it. Both results are stated whole: the only difference is the url, which names
-    // the page's handle and the `i` stand-in for the player.
+    // to agree on it. Both results are stated whole: the page names its handle in the url and the
+    // author, and the player has only the `i` stand-in.
     it('should give a page carrier the id its player carrier states', async () => {
       const playerValue = html`<iframe src="${playerUrl}"></iframe>`
       const pageValue = html`<iframe src="${statusUrl}"></iframe>`
@@ -1408,6 +1411,7 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
         id: statusId,
         src: playerUrl,
         url: statusUrl,
+        author: '@user',
       }
 
       expect(await extract(playerValue)).toEqual(expectedPlayer)
