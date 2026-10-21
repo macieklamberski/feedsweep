@@ -37,6 +37,7 @@ export const extractAnchorEpisode = (link: string): string | undefined => {
 }
 
 const anchorShowPathRegex = /^\/([^/]+)\/embed\/?$/i
+const anchorEpisodePagePathRegex = /^\/(?<show>[^/]+)\/episodes\/(?<slug>[^/]+)\/?$/
 const spotifyShowPathRegex = /^\/pod\/(?:show|profile)\/([^/]+)\/embed\/?$/i
 
 // `anchor.fm/{show}/embed`, `podcasters.spotify.com/pod/show/{show}/embed`,
@@ -55,9 +56,26 @@ const extractAnchorShow = (link: string): string | undefined => {
   return parsed.pathname.match(pathRegex)?.[1]
 }
 
+// The episode page, `anchor.fm/{show}/episodes/{slug}`, names the same episode as its player.
+const extractAnchorEpisodePage = (link: string): string | undefined => {
+  const parsed = parseUrl(link)
+
+  if (!parsed || !isHostOrSubdomainOf(parsed, ['anchor.fm'])) {
+    return
+  }
+
+  const page = parsed.pathname.match(anchorEpisodePagePathRegex)?.groups
+
+  if (!page?.show || !page.slug) {
+    return
+  }
+
+  return `${page.show}/${page.slug}`
+}
+
 // The player carries no metadata, and Anchor's old oEmbed endpoint is gone.
 export const anchorResolveEmbed: ResolveEmbed = (url, element) => {
-  const episode = extractAnchorEpisode(url)
+  const episode = extractAnchorEpisode(url) ?? extractAnchorEpisodePage(url)
 
   if (episode) {
     const [show, slug] = episode.split('/')
@@ -87,7 +105,7 @@ export const anchorResolveEmbed: ResolveEmbed = (url, element) => {
 }
 
 // Anchor's episode and show player iframes, on the anchor.fm host and the two Spotify hosts it
-// became.
+// became, and an anchor.fm episode page, rebuilt onto its player.
 export const anchorEmbedResolver = createUrlEmbedResolver(anchorHosts, anchorResolveEmbed)
 
 export const anchorFieldCleaners: Array<FieldCleaner> = [
