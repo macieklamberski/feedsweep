@@ -1,5 +1,6 @@
 import {
   composeQuery,
+  encodePathSegment,
   getQueryParam,
   isAnyOf,
   isHostOrSubdomainOf,
@@ -148,7 +149,7 @@ const composeEmbed = (status: Status, extra: Partial<EmbedResolverResult>): Embe
     provider,
     id: status.id,
     src: `https://platform.twitter.com/embed/Tweet.html${composeQuery({ id: status.id })}`,
-    url: composeTwitterStatusUrl(status.handle || handleStandIn, status.id),
+    url: composeTwitterStatusUrl(status.handle || handleStandIn, encodePathSegment(status.id)),
     ...extra,
   }
 }
