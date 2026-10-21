@@ -283,7 +283,7 @@ export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    // fb.watch links only to videos, and the post plugin answers one with 400.
+    // fb.watch links only to videos, so the cite takes the video plugin the fb-video widget mints.
     if (isHostOrSubdomainOf(parsed, 'fb.watch')) {
       return composePluginEmbed('video', cite, readFallback(element))
     }
