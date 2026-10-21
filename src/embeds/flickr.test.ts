@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { flickrEmbedResolver, flickrResolveEmbed } from './flickr.js'
@@ -1420,5 +1421,33 @@ describeForEachParser('flickrEmbedResolver carrier title', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+// www.flickr.com serves a photo's video file on its play route, so an enclosure there reaches the
+// resolver.
+describeForEachParser('flickr through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a flickr video enclosure playable', async () => {
+    const enclosures = [
+      {
+        url: 'https://www.flickr.com/photos/macarignan/7531203512/play/360p/3f1b9c7a2e/',
+        type: 'video/mp4',
+      },
+    ]
+
+    const expected = html`
+      <video data-enclosure="" controls src="https://www.flickr.com/photos/macarignan/7531203512/play/360p/3f1b9c7a2e/"></video>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
