@@ -6,9 +6,6 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'notecom'
 
-// A note id opens with `n`, e.g. `nf938ce640465`.
-const noteIdRegex = /^n/
-
 // `note.mu` is the platform's former domain and still 301s to `note.com` on the same path
 // (checked 2026-08-15), so both are matched and only the current one is minted.
 const notecomHosts = ['note.com', 'note.mu']
@@ -26,11 +23,7 @@ const composePostUrl = (noteId: string, pageUrl: string | undefined): string => 
   return pageUrl ?? `https://note.com/notes/${noteId}`
 }
 
-const composeEmbed = (noteId: string, pageUrl?: string): EmbedResolverResult | undefined => {
-  if (!noteIdRegex.test(noteId)) {
-    return
-  }
-
+const composeEmbed = (noteId: string, pageUrl?: string): EmbedResolverResult => {
   return {
     provider,
     id: noteId,

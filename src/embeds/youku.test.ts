@@ -42,7 +42,6 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // Youku has minted ids of several lengths, so only the `X` is checked.
     it('should read an id longer than the ones minted so far', async () => {
       const value =
         '<iframe src="https://player.youku.com/embed/XNDUyNTczMDEyOFdvcmtpbmdMb25nZXI="></iframe>'
@@ -72,10 +71,17 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a video id that is not one', async () => {
+    it('should use an id without the leading X as written', async () => {
       const value = '<iframe src="https://player.youku.com/embed/watch"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'youku',
+        id: 'watch',
+        src: 'https://player.youku.com/embed/watch',
+        url: 'https://v.youku.com/v_show/id_watch.html',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore the player api script path', async () => {

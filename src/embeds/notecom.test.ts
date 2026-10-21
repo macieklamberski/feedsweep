@@ -88,10 +88,16 @@ describeForEachParser('notecomIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should state nothing for an id with a character before the n', async () => {
+    it('should use an id with a character before the n as written', async () => {
       const value = html`<iframe src="https://note.com/embed/notes/xnf938ce640465"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'notecom',
+        id: 'xnf938ce640465',
+        src: 'https://note.com/embed/notes/xnf938ce640465',
+        url: 'https://note.com/notes/xnf938ce640465',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should state nothing for a foreign host carrying the path', async () => {
