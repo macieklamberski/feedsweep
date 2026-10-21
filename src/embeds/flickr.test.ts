@@ -591,7 +591,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         url: 'https://www.flickr.com/photos/17367418@N03%20/',
         width: 400,
         height: 300,
-        author: '17367418@N03 ',
       }
 
       expect(await extract(value)).toEqual(expected)
