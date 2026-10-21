@@ -109,9 +109,8 @@ const readAuthor = (status: Status): string | undefined => {
   return atUsername(status.handle)
 }
 
-// The tweet text and the byline, which by this point are sibling paragraphs: whatever shape
-// the source used, the bare byline has been wrapped into a paragraph of its own upstream.
-// A long tweet spans several paragraphs, so every one that is not the byline is tweet text.
+// The tweet text: every paragraph but the one holding the dated anchor, which is the byline once
+// the pipeline has wrapped it. A long tweet spans several paragraphs.
 const readContent = (element: Element, status: Status, anchor: Element | undefined) => {
   const byline = anchor?.parentElement
   const body = Array.from(element.querySelectorAll('p'))

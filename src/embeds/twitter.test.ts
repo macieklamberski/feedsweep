@@ -1514,7 +1514,7 @@ describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
 
 // The Atom payload is markup only after the entities are decoded, and the loader beside a
 // blockquote goes only in a later pass, so these survey shapes are asserted on the pipeline.
-describeForEachParser('twitter shapes the pipeline repairs first', (parseHtml) => {
+describeForEachParser('twitter shapes asserted on the pipeline', (parseHtml) => {
   const convert = (value: string): Promise<string> => {
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
   }
