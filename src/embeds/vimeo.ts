@@ -6,6 +6,7 @@ import {
   digitsRegex,
   encodePathSegment,
   flashFileRegex,
+  hexRegex,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -15,9 +16,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'vimeo'
 const playerRatio = '16/9'
 
-// An unlisted video's privacy hash is lowercase hex, and case-sensitive.
 const whitespaceRegex = /\s/
-const unlistedHashRegex = /^[0-9a-f]+$/
 
 const vimeoHosts = ['vimeo.com']
 
@@ -131,7 +130,7 @@ const resolveEventEmbed = (
   }
 
   const tail = segments[2] === 'embed' ? segments.slice(3) : segments.slice(2)
-  const hash = keepIfMatches(tail[0], unlistedHashRegex)
+  const hash = keepIfMatches(tail[0], hexRegex)
   const layout = hash ? tail.slice(1) : tail
 
   // A chat embed or any other route under the event is not its player.
@@ -190,7 +189,7 @@ const readReference = (link: string): VimeoReference | undefined => {
 
   // A numeric video id matches the hash alphabet, so only a segment after an id counts as one.
   const hashIndex = segments.findIndex((segment, index) => {
-    return index > 0 && unlistedHashRegex.test(segment) && digitsRegex.test(segments[index - 1])
+    return index > 0 && hexRegex.test(segment) && digitsRegex.test(segments[index - 1])
   })
   // The last numeric segment, which is the video in every remaining spelling: `/{id}`,
   // `/video/{id}` and the review pages.

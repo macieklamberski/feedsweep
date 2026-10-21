@@ -104,11 +104,18 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a lowercase locale', async () => {
+    it('should use a lowercase locale as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://www.ganjingworld.com/zh-cn/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ganjingworld',
+        id: '1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
+        src: 'https://www.ganjingworld.com/zh-cn/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
+        url: 'https://www.ganjingworld.com/zh-cn/video/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a locale behind a separator', async () => {

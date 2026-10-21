@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { composeQuery, localePairRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Resource = {
@@ -9,10 +9,6 @@ type Resource = {
 }
 
 const komootHosts = ['komoot.com', 'komoot.de']
-
-// In any case: the mint drops the locale, so `/DE-DE/tour/{tourId}/embed`, which answers 404,
-// still names the tour.
-const localeRegex = /^[a-z]{2}-[a-z]{2}$/i
 
 // `share_token` is what opens a tour its owner has not made public.
 const accessParams = ['share_token']
@@ -45,7 +41,9 @@ export const komootResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const [first = '', ...rest] = getPathSegments(parsed)
-  const hasLocale = localeRegex.test(first)
+  // In any case: the mint drops the locale, so `/DE-DE/tour/{tourId}/embed`, which answers 404,
+  // still names the tour.
+  const hasLocale = localePairRegex.test(first)
   const resource = readResource(hasLocale ? rest : [first, ...rest])
 
   if (!resource) {

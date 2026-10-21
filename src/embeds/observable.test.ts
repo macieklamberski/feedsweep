@@ -166,14 +166,20 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // Observable answers 404 to each of these spellings of a real id.
-    it('should refuse an uppercase hex id', async () => {
+    it('should use an uppercase hex id as written, even if the player answers an error', async () => {
       const value =
         '<iframe src="https://observablehq.com/embed/3AC7DFCBDCB1DD2A@248?cells=map,css"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'observable',
+        id: '3AC7DFCBDCB1DD2A',
+        src: 'https://observablehq.com/embed/3AC7DFCBDCB1DD2A@248?cells=map,css',
+        url: 'https://observablehq.com/d/3AC7DFCBDCB1DD2A',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
+    // Observable answers 404 to each of these spellings of a real id.
     it('should refuse a hex id carrying a percent escape', async () => {
       const value = '<iframe src="https://observablehq.com/embed/3ac7%3fdcbdcb1dd2a"></iframe>'
 

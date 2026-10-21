@@ -160,14 +160,14 @@ describe('komootResolveEmbed', () => {
       expect(komootResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a locale segment with a prefix', () => {
-      const value = 'https://www.komoot.com/xde-de/tour/727321743/embed'
+    it('should ignore a locale segment with a digit before it', () => {
+      const value = 'https://www.komoot.com/1de-de/tour/727321743/embed'
 
       expect(komootResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a locale segment with a suffix', () => {
-      const value = 'https://www.komoot.com/de-dex/tour/727321743/embed'
+    it('should ignore a locale segment with a digit after it', () => {
+      const value = 'https://www.komoot.com/de-de1/tour/727321743/embed'
 
       expect(komootResolveEmbed(value)).toBeUndefined()
     })
@@ -186,6 +186,32 @@ describe('komootResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
+    it('should drop a locale with a three-letter language', () => {
+      const value = 'https://www.komoot.com/xde-de/tour/727321743/embed'
+      const expected: EmbedResolverResult = {
+        provider: 'komoot',
+        id: '727321743',
+        src: 'https://www.komoot.com/tour/727321743/embed',
+        url: 'https://www.komoot.com/tour/727321743',
+        height: 440,
+      }
+
+      expect(komootResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop a locale with a three-letter region', () => {
+      const value = 'https://www.komoot.com/de-dex/tour/727321743/embed'
+      const expected: EmbedResolverResult = {
+        provider: 'komoot',
+        id: '727321743',
+        src: 'https://www.komoot.com/tour/727321743/embed',
+        url: 'https://www.komoot.com/tour/727321743',
+        height: 440,
+      }
+
+      expect(komootResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should keep the share token and name no page for a private tour', () => {
       const value =
         'https://www.komoot.com/de-de/tour/2011745032/embed?share_token=aBTJUZkJPE0Q0fxRFmoCr1AfWEChEEtXO4Bm57ZbsAKrVDvgb8&profile=1'
