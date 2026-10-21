@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
+import type { CleanUrlFn, EmbedResolverResult } from '../types.js'
 import {
   type BlubrryPlayer,
   blubrryEmbedResolver,
+  blubrryPowerpressEmbedResolver,
   blubrryResolveEmbed,
   extractBlubrryEmbed,
 } from './blubrry.js'
@@ -243,5 +244,182 @@ describeForEachParser('blubrryEmbedResolver carrier title', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('blubrryPowerpressEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, blubrryPowerpressEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should pass an audio frame through at the measured bar height', async () => {
+      const value = html`
+        <iframe
+          width="320"
+          height="30"
+          src="https://joy.org.au/bentnotes/?powerpress_embed=3443-podcast&amp;powerpress_player=mediaelement-audio"
+          title="Blubrry Podcast Player"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'joy.org.au/bentnotes/3443-podcast',
+        src: 'https://joy.org.au/bentnotes/?powerpress_embed=3443-podcast&powerpress_player=mediaelement-audio',
+        height: 40,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should pass a default player frame through at the measured bar height', async () => {
+      const value = html`
+        <iframe
+          width="320"
+          height="24"
+          src="https://nynjbengali.com/?powerpress_embed=1784-podcast&amp;powerpress_player=default"
+          title="Blubrry Podcast Player"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'nynjbengali.com/1784-podcast',
+        src: 'https://nynjbengali.com/?powerpress_embed=1784-podcast&powerpress_player=default',
+        height: 40,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should state a 16:9 ratio for a video frame', async () => {
+      const value = html`
+        <iframe
+          width="825"
+          height="825"
+          src="https://grrotary.org/?powerpress_embed=61144-podcast&amp;powerpress_player=html5video"
+          title="Blubrry Podcast Player"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'grrotary.org/61144-podcast',
+        src: 'https://grrotary.org/?powerpress_embed=61144-podcast&powerpress_player=html5video',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should use a feed slug other than podcast as written', async () => {
+      const value =
+        '<iframe src="https://example.com/?powerpress_embed=618-timbernook-tips&amp;powerpress_player=mediaelement-audio"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'example.com/618-timbernook-tips',
+        src: 'https://example.com/?powerpress_embed=618-timbernook-tips&powerpress_player=mediaelement-audio',
+        height: 40,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the name the carrier states', async () => {
+      const value =
+        '<iframe src="https://example.com/?powerpress_embed=618-podcast" title="Episode 618"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'example.com/618-podcast',
+        src: 'https://example.com/?powerpress_embed=618-podcast',
+        height: 40,
+        title: 'Episode 618',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    // PowerPress answers a value with no `-` with the site's page, not a player.
+    it('should ignore a value naming no feed', async () => {
+      const value = '<iframe src="https://example.com/?powerpress_embed=3443"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the name inside another parameter', async () => {
+      const value = '<iframe src="https://example.com/?q=powerpress_embed=3443-podcast"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a url that cannot be parsed', async () => {
+      const value = '<iframe src="https://[/?powerpress_embed=3443-podcast"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should state the audio height for a frame naming no player', async () => {
+      const value = '<iframe src="https://example.com/?powerpress_embed=3443-podcast"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'example.com/3443-podcast',
+        src: 'https://example.com/?powerpress_embed=3443-podcast',
+        height: 40,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+describeForEachParser('blubrryPowerpressEmbedResolver through the pipeline', (parseHtml) => {
+  const convert = (value: string, cleanUrlFn?: CleanUrlFn) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      cleanUrlFn,
+    })
+  }
+
+  it('should claim a PowerPress frame the generic fallback took before', async () => {
+    const value = html`
+      <iframe
+        width="320"
+        height="30"
+        src="https://joy.org.au/bentnotes/?powerpress_embed=3443-podcast&amp;powerpress_player=mediaelement-audio"
+        title="Blubrry Podcast Player"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-id="joy.org.au/bentnotes/3443-podcast"
+        data-embed-provider="blubrry"
+        data-embed-src="https://joy.org.au/bentnotes/?powerpress_embed=3443-podcast&amp;powerpress_player=mediaelement-audio"
+        data-embed-height="40"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it("should hand the carrier src to the caller's cleaner", async () => {
+    const value = html`
+      <iframe
+        src="https://joy.org.au/bentnotes/?powerpress_embed=3443-podcast&amp;powerpress_player=mediaelement-audio&amp;utm_source=feed"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-id="joy.org.au/bentnotes/3443-podcast"
+        data-embed-provider="blubrry"
+        data-embed-src="https://joy.org.au/bentnotes/?powerpress_embed=3443-podcast&amp;powerpress_player=mediaelement-audio"
+        data-embed-height="40"
+      ></div>
+    `
+    const cleanUrlFn = (url: string) => url.replace(/&utm_\w+=\w+/g, '')
+
+    expect(await convert(value, cleanUrlFn)).toEqualHtml(expected)
   })
 })

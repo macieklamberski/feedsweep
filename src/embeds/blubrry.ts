@@ -5,15 +5,28 @@ import { attr } from '../utils/dom.js'
 const provider = 'blubrry'
 
 import { placeholderBaseUrl } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readCarrierUrl,
+} from '../utils/widgets.js'
 
-// PowerPress, Blubrry's WordPress plugin, renders the same player on the publisher's own domain
-// as `{site}/?powerpress_embed={postId}-{feed}`, with no Blubrry host in the url at all.
 const blubrryHosts = ['blubrry.com']
 
 // The player is 164 tall, one less than the 165 publishers write.
 // A fixed height on a fluid width, and still 164 inside a 100-tall frame.
 const playerHeight = 164
+
+// The players PowerPress writes into an embed url for a video file, per
+// `powerpressplayer_embedable` in its powerpress-player.php. Every other value is an audio player.
+const powerpressVideoPlayers = new Set(['html5video', 'mediaelement-video'])
+
+// The frame draws MediaElement's 40-pixel audio bar at any width, over the 30 or 24 PowerPress
+// writes on the carrier.
+const powerpressAudioHeight = 40
+
+// The video fills the frame's width at 57% of it, and shrinks to 16:9 when the frame is shorter.
+const powerpressVideoRatio = '16/9'
 
 export type BlubrryPlayer = { kind: 'episode' | 'media'; id: string }
 
@@ -65,6 +78,35 @@ export const blubrryResolveEmbed: ResolveEmbed = (url, element) => {
 }
 
 export const blubrryEmbedResolver = createUrlEmbedResolver(blubrryHosts, blubrryResolveEmbed)
+
+// PowerPress, Blubrry's WordPress plugin, frames an episode from the publisher's own site as
+// `{site}/?powerpress_embed={postId}-{feed}`. The post id belongs to that site and maps onto no
+// Blubrry player, so the written url passes through. PowerPress serves the frame only for a value
+// holding a `-`, and the site's page otherwise.
+export const blubrryPowerpressEmbedResolver = createMarkupEmbedResolver(
+  'iframe[src*="powerpress_embed="]',
+  (element) => {
+    const link = readCarrierUrl(element)
+    const url = parseUrl(link)
+    const episode = url?.searchParams.get('powerpress_embed')
+
+    if (!url || !episode?.includes('-')) {
+      return
+    }
+
+    const isVideo = powerpressVideoPlayers.has(url.searchParams.get('powerpress_player') ?? '')
+
+    return {
+      provider,
+      // A post id is unique only within its site, so the site travels in the id.
+      id: [url.host, ...getPathSegments(url), episode].join('/'),
+      src: link,
+      height: isVideo ? undefined : powerpressAudioHeight,
+      ratio: isVideo ? powerpressVideoRatio : undefined,
+      title: attr(element, 'title'),
+    }
+  },
+)
 
 export const blubrryFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Blubrry Podcast Player' },

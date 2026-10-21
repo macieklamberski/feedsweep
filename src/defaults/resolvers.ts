@@ -73,7 +73,7 @@ import { bandcampEmbedResolver } from '../embeds/bandcamp.js'
 import { bbcIframeEmbedResolver } from '../embeds/bbc.js'
 import { bitchuteEmbedResolver } from '../embeds/bitchute.js'
 import { bloggerEmbedResolver } from '../embeds/blogger.js'
-import { blubrryEmbedResolver } from '../embeds/blubrry.js'
+import { blubrryEmbedResolver, blubrryPowerpressEmbedResolver } from '../embeds/blubrry.js'
 import {
   blueskyBlockquoteEmbedResolver,
   blueskyIframeEmbedResolver,
@@ -559,6 +559,7 @@ const embedResolvers: Array<EmbedResolver> = [
   bitchuteEmbedResolver,
   bloggerEmbedResolver,
   blubrryEmbedResolver,
+  blubrryPowerpressEmbedResolver,
   blueskyBlockquoteEmbedResolver,
   blueskyIframeEmbedResolver,
   blueskyS9eEmbedResolver,
