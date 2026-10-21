@@ -124,6 +124,13 @@ describe('redcircleResolveEmbed', () => {
       expect(redcircleResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should return undefined for an object prototype key in the route slot', () => {
+      const value =
+        'https://redcircle.com/constructor/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5'
+
+      expect(redcircleResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should return undefined for an episode player missing the sh marker', () => {
       const value =
         'https://redcircle.com/embedded-player/show/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5'
