@@ -59,8 +59,8 @@ export const blockElements = new Set([
   'xmp',
 ])
 
-// Raw text per HTML5: a parser can keep their content as one text node holding markup, so a
-// transform writing an element into it writes markup a browser shows as text.
+// Elements whose content the HTML parser reads as text, not markup: a parser can keep it as one
+// text node, so a transform writing an element into it writes markup a browser shows as text.
 export const rawTextElements = [
   'iframe',
   'noembed',
