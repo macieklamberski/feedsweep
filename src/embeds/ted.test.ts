@@ -192,6 +192,58 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the talk number when the snippet carries no ad keys', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          type="application/x-shockwave-flash"
+          flashvars="vu=http://video.ted.com/talks/embed/SirKenRobinson_2006-embed_high.flv&su=http://images.ted.com/images/ted/tedindex/embed-posters/SirKenRobinson-2006.embed_thumbnail.jpg&vw=320&vh=240&ap=0&ti=66"
+          height="326"
+          width="334"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: '66',
+        src: 'https://embed.ted.com/embed/66',
+        url: 'https://www.ted.com/talks/66',
+        thumbnail:
+          'http://images.ted.com/images/ted/tedindex/embed-posters/SirKenRobinson-2006.embed_thumbnail.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should prefer the talk key over the talk number', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          flashvars="ti=66&adKeys=talk=ken_robinson_says_schools_kill_creativity;year=2006"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: 'ken_robinson_says_schools_kill_creativity',
+        src: 'https://embed.ted.com/embed/ken_robinson_says_schools_kill_creativity',
+        url: 'https://www.ted.com/talks/ken_robinson_says_schools_kill_creativity',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore a talk number holding a path separator', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          flashvars="ti=66%2F..%2Fx"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should use a malformed talk key as written, even if the url answers an error', async () => {
       const value = html`
         <embed
