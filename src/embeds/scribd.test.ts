@@ -216,8 +216,7 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'scribd',
         id: '108992419',
-        src: 'https://www.scribd.com/embeds/108992419/content',
-        url: 'https://www.scribd.com/document/108992419',
+        src: 'https://www.scribd.com/embeds/108992419/content?access_key=key-13davbc',
         height: 600,
       }
 
@@ -236,8 +235,7 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'scribd',
         id: '55715',
-        src: 'https://www.scribd.com/embeds/55715/content',
-        url: 'https://www.scribd.com/document/55715',
+        src: 'https://www.scribd.com/embeds/55715/content?access_key=key-abc',
         height: 600,
       }
 
@@ -258,8 +256,7 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'scribd',
         id: '41131710',
-        src: 'https://www.scribd.com/embeds/41131710/content',
-        url: 'https://www.scribd.com/document/41131710',
+        src: 'https://www.scribd.com/embeds/41131710/content?access_key=key-abc',
         height: 600,
       }
 
@@ -279,8 +276,7 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'scribd',
         id: '41131710',
-        src: 'https://www.scribd.com/embeds/41131710/content',
-        url: 'https://www.scribd.com/document/41131710',
+        src: 'https://www.scribd.com/embeds/41131710/content?access_key=key-abc',
         height: 600,
       }
 

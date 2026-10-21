@@ -8,7 +8,7 @@ import {
   parseUrl,
 } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, flashVar } from '../utils/dom.js'
+import { attr, flashVar, flashVars } from '../utils/dom.js'
 import { parseUrlOnHosts, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -85,14 +85,15 @@ export const scribdFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const document =
-    getQueryParam(parsed.searchParams, 'document_id') ?? flashVar(element, 'document_id')
+  const queryDocument = getQueryParam(parsed.searchParams, 'document_id')
+  const document = queryDocument ?? flashVar(element, 'document_id')
 
   if (!document) {
     return
   }
 
-  return composeEmbed(document)
+  // The access key sits beside the document id, in the swf query or in the flashvars.
+  return composeEmbed(document, queryDocument ? parsed.search : flashVars(element))
 }
 
 // Scribd's Flash viewer, scribdviewer.swf, dead since 2020 and naming its document in document_id.
