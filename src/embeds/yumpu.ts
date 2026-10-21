@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, isElement, isWhitespaceText, keepIfMatches, text } from '../utils/dom.js'
 import { localeWordRegex, parseUrlOnHosts } from '../utils/urls.js'
@@ -37,9 +37,9 @@ const readCompanion = (element: Element | undefined): Partial<EmbedResolverResul
 }
 
 const yumpuResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
+  const parsed = parseUrlOnHosts(url, yumpuHosts, isHostOf)
 
-  if (!parsed || !isHostOf(parsed, yumpuHosts)) {
+  if (!parsed) {
     return
   }
 

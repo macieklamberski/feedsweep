@@ -1,8 +1,8 @@
-import { getPathSegments, isAnyOf, isHostOf, isPlainObject, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { isFileName } from '../utils/urls.js'
+import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flourish'
@@ -61,9 +61,9 @@ export const flourishWidgetEmbedResolver = createMarkupEmbedResolver(
 // the chart's share page, framed whole.
 // The WordPress oEmbed wrapper points at the same url with a `#?secret=` fragment appended.
 export const flourishResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
+  const parsed = parseUrlOnHosts(url, flourishHosts, isHostOf)
 
-  if (!parsed || !isHostOf(parsed, flourishHosts)) {
+  if (!parsed) {
     return
   }
 
