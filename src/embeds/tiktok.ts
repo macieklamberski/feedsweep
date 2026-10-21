@@ -40,6 +40,15 @@ const readWatchUrl = (url: string | undefined): Clip => {
   return { handle, videoId }
 }
 
+// A profile url and nothing else: `/@handle`, with no video segment after it.
+const profilePathRegex = /^\/@([^/]+)\/?$/
+// The account's opaque id, which TikTok writes where a handle goes.
+const secUidRegex = /^MS4wLjABAAAA/
+
+const readProfileHandle = (anchor: Element | undefined): string | undefined => {
+  return parseUrlOnHosts(attr(anchor, 'href'), tiktokHosts)?.pathname.match(profilePathRegex)?.[1]
+}
+
 const resolveClip = (element: Element): EmbedResolverResult | undefined => {
   const declared = attr(element, 'data-video-id')
   const cite = attr(element, 'cite')
@@ -66,18 +75,18 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
   // The declared id comes out of its attribute decoded, and it goes into a path.
   const segment = encodePathSegment(videoId)
 
-  const author = text(
-    find(element, 'section a', (anchor) => text(anchor)?.startsWith('@') === true),
-  )
+  const profile = find(element, 'section a[href]', (anchor) => !!readProfileHandle(anchor))
+  const byline = text(profile)
+  const profileHandle = readProfileHandle(profile)
+  const author = secUidRegex.test(profileHandle ?? '') ? undefined : profileHandle
   const caption = find(element, 'section p', (paragraph) => {
     const value = text(paragraph)
 
-    return Boolean(value && value !== author && !value.startsWith('♬'))
+    return Boolean(value && value !== byline && !value.startsWith('♬'))
   })
 
-  // A handle read from a path is already a segment. The byline's comes out of its text decoded.
-  const bylineHandle = author ? encodePathSegment(author.slice(1)) : undefined
-  const handle = cited.handle ?? linked.handle ?? bylineHandle
+  // A handle read from a path is already a segment.
+  const handle = cited.handle ?? linked.handle ?? profileHandle
 
   // The watch page is the path the id already spells, so it is mintable from the same two halves
   // wherever a handle survives: a blockquote whose only source is a body anchor names both. The
@@ -92,13 +101,10 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
     // A sanitized cite is truncated to the bare host, which links nothing worth keeping.
     url: cited.videoId ? cite : watchPath && `https://www.tiktok.com/${watchPath}`,
     description: text(caption),
-    author,
+    author: author ? atUsername(author) : undefined,
     height: playerHeight,
   }
 }
-
-// A profile url and nothing else: `/@handle`, with no video segment after it.
-const profilePathRegex = /^\/@([^/]+)\/?$/
 
 // The account a blockquote names, from `data-unique-id` where the creator widget declares it,
 // otherwise from the profile anchor, the only source the half-encoded shape keeps. The attribute
@@ -111,14 +117,10 @@ const readHandle = (element: Element): { handle: string; segment: string } | und
   }
 
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const parsed = parseUrlOnHosts(attr(anchor, 'href'), tiktokHosts)
+    const handle = readProfileHandle(anchor)
 
-    if (parsed) {
-      const handle = parsed.pathname.match(profilePathRegex)?.[1]
-
-      if (handle) {
-        return { handle, segment: handle }
-      }
+    if (handle) {
+      return { handle, segment: handle }
     }
   }
 }
