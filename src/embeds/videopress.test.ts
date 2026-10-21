@@ -174,6 +174,29 @@ describeForEachParser('videopressIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
   })
+
+  describe('the poster the publisher chose', () => {
+    it('should copy the poster the block editor writes into the player url', async () => {
+      const value = html`
+        <iframe
+          title="VideoPress Video Player"
+          width="560"
+          height="315"
+          src="https://video.wordpress.com/embed/atTeBVcs?cover=1&amp;posterUrl=https%3A%2F%2Fvideos.files.wordpress.com%2FatTeBVcs%2Fimg_3869_mov_std.original.jpg&amp;preloadContent=metadata&amp;useAverageColor=1&amp;hd=0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'videopress',
+        id: 'atTeBVcs',
+        src: 'https://video.wordpress.com/embed/atTeBVcs',
+        url: 'https://videopress.com/v/atTeBVcs',
+        thumbnail: 'https://videos.files.wordpress.com/atTeBVcs/img_3869_mov_std.original.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
@@ -449,6 +472,26 @@ describeForEachParser('videopressIframeEmbedResolver carrier title', (parseHtml)
       url: 'https://videopress.com/v/TxdSIdpO',
       ratio: '16/9',
       title: 'WordPress Category Hierarchy',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  const localisedLabels: Array<string> = ['VideoPress videospiller', 'Trình phát video VideoPress']
+
+  it.each(localisedLabels)('should drop the %s label', async (label) => {
+    const value = html`
+      <iframe
+        title="${label}"
+        src="https://video.wordpress.com/embed/ye8c1tJY?hd=0&amp;autoPlay=0&amp;cover=1"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'videopress',
+      id: 'ye8c1tJY',
+      src: 'https://video.wordpress.com/embed/ye8c1tJY',
+      url: 'https://videopress.com/v/ye8c1tJY',
+      ratio: '16/9',
     }
 
     expect(await extract(value)).toEqual(expected)
