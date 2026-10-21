@@ -334,6 +334,22 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should resolve a classless iframe whose embed suffix is in uppercase', async () => {
+      const value = html`
+        <iframe src="https://mastodon.social/@Gargron/117476327964213749/EMBED" width="400"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mastodon',
+        id: 'mastodon.social/117476327964213749',
+        src: 'https://mastodon.social/@Gargron/117476327964213749/embed',
+        url: 'https://mastodon.social/@Gargron/117476327964213749',
+        author: '@Gargron@mastodon.social',
+        publisher: 'mastodon.social',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   // Mastodon's username route constraint excludes `@`, so this path never reaches the embed
