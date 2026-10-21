@@ -38,7 +38,6 @@ export const mergeFragmentedLists: DomTransform = () => {
         candidate = nextMergeableSibling(candidate, localName)
       }
 
-      // length: keeps a lone list out of the merge
       if (run.length < 2) {
         continue
       }
