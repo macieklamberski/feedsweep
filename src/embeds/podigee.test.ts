@@ -18,6 +18,7 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
         provider: 'podigee',
         id: 'theshow/42-an-episode',
         src: 'https://theshow.podigee.io/42-an-episode/embed?context=external',
+        url: 'https://theshow.podigee.io/42-an-episode',
         height: 145,
       }
 
@@ -32,6 +33,7 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
         provider: 'podigee',
         id: 'redfield/183-r-183-mit-michaela-schneider-ceo-von-allgaeu-concerts',
         src: 'https://redfield.podigee.io/183-r-183-mit-michaela-schneider-ceo-von-allgaeu-concerts/embed?context=external',
+        url: 'https://redfield.podigee.io/183-r-183-mit-michaela-schneider-ceo-von-allgaeu-concerts',
         height: 145,
       }
 
@@ -44,6 +46,7 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
         provider: 'podigee',
         id: 'theshow/embed',
         src: 'https://theshow.podigee.io/embed?context=external',
+        url: 'https://theshow.podigee.io/',
         height: 145,
       }
 
@@ -58,6 +61,7 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
         provider: 'podigee',
         id: 'theshow/42-an-episode',
         src: 'https://theshow.podigee.io/42-an-episode/embed?context=external',
+        url: 'https://theshow.podigee.io/42-an-episode',
         height: 145,
       }
 
@@ -129,6 +133,7 @@ describe('podigeeResolveEmbed', () => {
       provider: 'podigee',
       id: 'cloudonaut/72-serverless-and-devops-a-match',
       src: 'https://cloudonaut.podigee.io/72-serverless-and-devops-a-match/embed?context=external',
+      url: 'https://cloudonaut.podigee.io/72-serverless-and-devops-a-match',
       height: 145,
     }
 
@@ -141,6 +146,7 @@ describe('podigeeResolveEmbed', () => {
       provider: 'podigee',
       id: 'diepresse1848/100-neue-episode',
       src: 'https://diepresse1848.podigee.io/100-neue-episode/embed?context=external',
+      url: 'https://diepresse1848.podigee.io/100-neue-episode',
       height: 145,
     }
 
@@ -154,6 +160,7 @@ describe('podigeeResolveEmbed', () => {
       provider: 'podigee',
       id: 'digitalisierung-erfolgreich-gestalten/28-digitalisierung-in-der-finanzwirtschaft-mit-sascha-rabe',
       src: value,
+      url: 'https://digitalisierung-erfolgreich-gestalten.podigee.io/28-digitalisierung-in-der-finanzwirtschaft-mit-sascha-rabe',
       height: 145,
     }
 
@@ -180,6 +187,7 @@ describe('podigeeResolveEmbed', () => {
       provider: 'podigee',
       id: 'cloudonaut/72-an-episode',
       src: 'https://cloudonaut.podigee.io/72-an-episode/embed?context=external',
+      url: 'https://cloudonaut.podigee.io/72-an-episode',
       height: 145,
     }
 
@@ -193,6 +201,7 @@ describe('podigeeResolveEmbed', () => {
       provider: 'podigee',
       id: 'cloudonaut/an-unnumbered-episode',
       src: 'https://cloudonaut.podigee.io/an-unnumbered-episode/embed?context=external',
+      url: 'https://cloudonaut.podigee.io/an-unnumbered-episode',
       height: 145,
     }
 
@@ -214,6 +223,7 @@ describe('podigeeResolveEmbed', () => {
       provider: 'podigee',
       id: 'cloudonaut/72-an-episode',
       src: 'https://cloudonaut.podigee.io/72-an-episode/embed?context=external',
+      url: 'https://cloudonaut.podigee.io/72-an-episode',
       height: 145,
     }
 
@@ -270,6 +280,7 @@ describeForEachParser('podigee through the pipeline', (parseHtml) => {
         data-embed-id="cloudonaut/72-an-episode"
         data-embed-provider="podigee"
         data-embed-src="https://cloudonaut.podigee.io/72-an-episode/embed?context=external"
+        data-embed-url="https://cloudonaut.podigee.io/72-an-episode"
         data-embed-height="145"
       ></div>
     `
