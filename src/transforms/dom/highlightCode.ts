@@ -1,6 +1,7 @@
 import { toMap } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { hasAncestorWithTagName, isElement, isText, text, walkElements } from '../../utils/dom.js'
+import { digitsRegex } from '../../utils/urls.js'
 import labels from './highlightCode.json' with { type: 'json' }
 
 // The languages feedsweep recognizes, keyed by token (and alias). Used both to
@@ -210,8 +211,6 @@ const getCodeBlockText = (target: Element): string => {
   return text
 }
 
-const integerLineRegex = /^\d+$/
-
 // A node is a line-number gutter when every non-empty line of its text is just an
 // integer. Detected structurally (not by class) so any highlighter's table is covered.
 const isLineNumberText = (text: string): boolean => {
@@ -225,7 +224,7 @@ const isLineNumberText = (text: string): boolean => {
     return accumulator
   }, [])
 
-  return lines.length > 0 && lines.every((line) => integerLineRegex.test(line))
+  return lines.length > 0 && lines.every((line) => digitsRegex.test(line))
 }
 
 // Chroma writes .ln and .lnt, Prism .line-numbers-rows, Pygments .lineno under linenos=inline.

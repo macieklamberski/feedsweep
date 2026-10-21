@@ -1,5 +1,6 @@
 import type { DomTransform } from '../../types.js'
 import { collectTextNodes, isBlockElement, isBr, isElement, isText } from '../../utils/dom.js'
+import { digitsRegex } from '../../utils/urls.js'
 
 const timestampIgnoreTags = new Set(['a', 'pre', 'code', 'kbd', 'samp', 'var', 'script', 'style'])
 const tableCellTags = ['td', 'th']
@@ -14,7 +15,6 @@ const lineBoundaryTimestampRegex = new RegExp(
   'g',
 )
 
-const numericPartRegex = /^\d+$/
 const leadingSpacesRegex = /^[ \t]+/
 const trailingSpacesRegex = /[ \t]+$/
 
@@ -23,7 +23,7 @@ const trailingSpacesRegex = /[ \t]+$/
 export const parseTimestampSeconds = (timestamp: string): number | undefined => {
   const parts = timestamp.split(':')
 
-  if (!parts.every((part) => numericPartRegex.test(part))) {
+  if (!parts.every((part) => digitsRegex.test(part))) {
     return
   }
 

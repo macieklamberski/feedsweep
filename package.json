@@ -44,6 +44,7 @@
   "scripts": {
     "prepare": "lefthook install",
     "build": "tsdown src/index.ts src/defaults.ts src/parsers/linkedom.ts --format esm --dts --clean --unbundle",
+    "lint:checks": "bun scripts/checks.ts",
     "test": "bun test",
     "test:linkedom": "DOM_LIBRARY=linkedom bun test",
     "test:jsdom": "DOM_LIBRARY=jsdom bun test"
