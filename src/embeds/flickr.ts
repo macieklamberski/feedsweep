@@ -17,7 +17,7 @@ const legacyPlayerPathRegex = /^\/slideshow\/index\.gne$/i
 
 const setPathRegex = /^\/photos\/([^/]+)\/(?:sets|albums)\/(\d+)(?:\/|$)/
 const streamPathRegex = /^\/photos\/([^/]+)\/show\/?$/
-const groupPathRegex = /^\/groups\/(\d+@N\d+)\/pool\/show\/?$/
+const groupPathRegex = /^\/groups\/(\d+@N\d\d)\/pool\/show\/?$/
 const groupPagePathRegex = /^\/groups\//
 const groupAliasPoolPathRegex = /^\/groups\/[^/]+\/pool\/show(?:\/with\/[^/]+)?\/?$/
 // An owner of `_` names nobody: the player ignores it, and `/photos/_/{photoId}/` answers 404.

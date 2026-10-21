@@ -727,22 +727,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should map a framed group pool slideshow page whose NSID ends in three digits', async () => {
-      const value = html`
-        <iframe src="https://www.flickr.com/groups/1753363@N230/pool/show/"></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'flickr',
-        id: 'groups/1753363@N230',
-        src: 'https://embedr.flickr.com/groups/1753363@N230?width=400&height=300',
-        url: 'https://www.flickr.com/groups/1753363@N230/',
-        width: 400,
-        height: 300,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     // The photo page answers `x-frame-options: SAMEORIGIN` and names no `/player/` segment.
     it('should return undefined for a photo page framed without the player segment', async () => {
       const value = html`
