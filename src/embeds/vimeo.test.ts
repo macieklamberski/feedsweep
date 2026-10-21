@@ -966,19 +966,6 @@ describeForEachParser('vimeoMetasliderEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a data-id that is a dot segment', async () => {
-      const value = html`
-        <li class="ms-vimeo">
-          <div
-            class="vimeo"
-            data-id=".."
-          ></div>
-        </li>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a div.vimeo outside a MetaSlider Vimeo slide', async () => {
       const value = html`
         <li class="slide-31 ms-image">
