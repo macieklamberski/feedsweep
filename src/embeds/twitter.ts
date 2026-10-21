@@ -148,7 +148,7 @@ const composeEmbed = (status: Status, extra: Partial<EmbedResolverResult>): Embe
     provider,
     id: status.id,
     src: `https://platform.twitter.com/embed/Tweet.html${composeQuery({ id: status.id })}`,
-    url: status.handle ? composeTwitterStatusUrl(status.handle, status.id) : undefined,
+    url: composeTwitterStatusUrl(status.handle || handleStandIn, status.id),
     ...extra,
   }
 }
