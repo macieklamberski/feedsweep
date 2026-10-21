@@ -11,10 +11,9 @@ type PeertubeVideo = {
   id: string
 }
 
-// The two spellings PeerTube writes a video id in: the uuid, and the 22-character short form its
-// short-uuid translator produces over the flickrBase58 alphabet, which holds no 0, O, I or l.
-// The shape is the whole guard, since the software runs on thousands of instances and there is no
-// host to key on: loosened, it claims any site's /w/{slug} and /videos/watch/{slug}.
+// The two spellings PeerTube writes a video id in: the uuid, and the short form its short-uuid
+// translator produces over the flickrBase58 alphabet, which holds no 0, O, I or l.
+// length: keeps another site's /w/{slug} and /videos/watch/{slug} out, such as dalfak.com
 const shortIdRegex = /^[1-9A-HJ-NP-Za-km-z]{22}$/
 
 // `/videos/watch/{id}` is the watch page PeerTube served before 4.0 and still answers on.

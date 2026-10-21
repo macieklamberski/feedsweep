@@ -12,6 +12,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'youtube'
 
+// length: keeps another site's id out where extractVideoId reads any host's url
 const safeVideoIdRegex = /^[a-zA-Z0-9_-]{11}$/
 
 // Steam feeds leak a bbcode quote into the src as /embed/"{id}, and the video drops without it.
@@ -43,6 +44,7 @@ const queryIdParams = ['v', 'vi', 'video_id']
 // (`/watch#!v={id}`, `/user/{name}#p/u/1/{id}`), so the server-side path names no video. The
 // links survive in old posts, and the hash still says which video was meant.
 const hashbangIdRegex = /^#!vi?=([^&;]+)/
+// length: keeps the playlist id of a `#p/c/{playlist}` fragment out of the video slot
 const gridFragmentIdRegex = /^#p\/.+\/([0-9A-Za-z_-]{11})$/
 
 // `youtube.googleapis.com/v/{id}` is the Flash player's other host, still shipped by Blogger
