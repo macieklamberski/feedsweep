@@ -339,13 +339,6 @@ describeForEachParser('blubrryPowerpressEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    // PowerPress answers a value with no `-` with the site's page, not a player.
-    it('should ignore a value naming no feed', async () => {
-      const value = '<iframe src="https://example.com/?powerpress_embed=3443"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore the name inside another parameter', async () => {
       const value = '<iframe src="https://example.com/?q=powerpress_embed=3443-podcast"></iframe>'
 
@@ -366,6 +359,18 @@ describeForEachParser('blubrryPowerpressEmbedResolver', (parseHtml) => {
         provider: 'blubrry',
         id: 'example.com/3443-podcast',
         src: 'https://example.com/?powerpress_embed=3443-podcast',
+        height: 40,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should pass through a value naming no feed as written', async () => {
+      const value = '<iframe src="https://example.com/?powerpress_embed=3443"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'example.com/3443',
+        src: 'https://example.com/?powerpress_embed=3443',
         height: 40,
       }
 

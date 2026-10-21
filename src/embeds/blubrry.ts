@@ -81,8 +81,7 @@ export const blubrryEmbedResolver = createUrlEmbedResolver(blubrryHosts, blubrry
 
 // PowerPress, Blubrry's WordPress plugin, frames an episode from the publisher's own site as
 // `{site}/?powerpress_embed={postId}-{feed}`. The post id belongs to that site and maps onto no
-// Blubrry player, so the written url passes through. PowerPress serves the frame only for a value
-// holding a `-`, and the site's page otherwise.
+// Blubrry player, so the written url passes through.
 export const blubrryPowerpressEmbedResolver = createMarkupEmbedResolver(
   'iframe[src*="powerpress_embed="]',
   (element) => {
@@ -95,7 +94,7 @@ export const blubrryPowerpressEmbedResolver = createMarkupEmbedResolver(
 
     const episode = url.searchParams.get('powerpress_embed')
 
-    if (!episode?.includes('-')) {
+    if (!episode) {
       return
     }
 
