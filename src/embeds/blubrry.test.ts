@@ -25,6 +25,22 @@ describe('extractBlubrryEmbed', () => {
     expect(extractBlubrryEmbed(value)).toEqual(expected)
   })
 
+  it('should read the episode id a media url player names beside its file', () => {
+    const value =
+      'https://player.blubrry.com/?podcast_id=154118283&media_url=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3&modern=1'
+    const expected: BlubrryPlayer = { kind: 'episode', id: '154118283' }
+
+    expect(extractBlubrryEmbed(value)).toEqual(expected)
+  })
+
+  it('should read the media url when the episode id beside it is not digits', () => {
+    const value =
+      'https://player.blubrry.com/?podcast_id=..%2Fpricing&media_url=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3'
+    const expected: BlubrryPlayer = { kind: 'media', id: 'https://media.blubrry.com/show/ep.mp3' }
+
+    expect(extractBlubrryEmbed(value)).toEqual(expected)
+  })
+
   it('should read an episode id that is not digits by its route', () => {
     const value = 'https://player.blubrry.com/id/abc123x/'
     const expected: BlubrryPlayer = { kind: 'episode', id: 'abc123x' }
@@ -106,6 +122,24 @@ describeForEachParser('blubrryEmbedResolver', (parseHtml) => {
         provider: 'blubrry',
         id: '153989314',
         src: 'https://player.blubrry.com/id/153989314/',
+        height: 164,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should key a media url player naming its episode by the episode', async () => {
+      const value = html`
+        <iframe
+          src="https://player.blubrry.com/?podcast_id=154118283&amp;media_url=https%3A%2F%2Fmedia.blubrry.com%2Fjustflyperformancepodcast%2Fcontent.blubrry.com%2Fjustflyperformancepodcast%2F521_Joe_Pedulla.mp3&amp;modern=1"
+          width="100%"
+          height="165"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: '154118283',
+        src: 'https://player.blubrry.com/id/154118283/',
         height: 164,
       }
 

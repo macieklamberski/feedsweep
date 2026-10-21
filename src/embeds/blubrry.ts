@@ -4,7 +4,7 @@ import { attr } from '../utils/dom.js'
 
 const provider = 'blubrry'
 
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // PowerPress, Blubrry's WordPress plugin, renders the same player on the publisher's own domain
@@ -31,6 +31,13 @@ export const extractBlubrryEmbed = (link: string): BlubrryPlayer | undefined => 
 
   if (segments[0] === 'id' && segments[1]) {
     return { kind: 'episode', id: segments[1] }
+  }
+
+  // A player beside its media url often names the episode too, which `/id/{podcastId}/` plays.
+  const podcastId = parsed.searchParams.get('podcast_id')
+
+  if (podcastId && digitsRegex.test(podcastId)) {
+    return { kind: 'episode', id: podcastId }
   }
 
   const mediaUrl = parsed.searchParams.get('media_url')
