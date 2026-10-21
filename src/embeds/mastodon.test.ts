@@ -338,6 +338,31 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('the x-mastodon-embed custom element', () => {
+    it('should read the status out of its url attribute', async () => {
+      const value = html`
+        <x-mastodon-embed url="https://grapheneos.social/@GrapheneOS/113969399692663684"></x-mastodon-embed>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mastodon',
+        id: 'grapheneos.social/113969399692663684',
+        src: 'https://grapheneos.social/@GrapheneOS/113969399692663684/embed',
+        url: 'https://grapheneos.social/@GrapheneOS/113969399692663684',
+        author: '@GrapheneOS@grapheneos.social',
+        publisher: 'grapheneos.social',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore an element whose url names no status', async () => {
+      const value =
+        '<x-mastodon-embed url="https://grapheneos.social/@GrapheneOS"></x-mastodon-embed>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
   // Mastodon's username route constraint excludes `@`, so this path never reaches the embed
   // action: it answers with the application shell under `frame-ancestors 'none'` instead of the
   // status. The embeddable copy lives on the remote instance

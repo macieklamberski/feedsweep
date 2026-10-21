@@ -58,11 +58,12 @@ export const mastodonEmbedResolver = createMarkupEmbedResolver(
   // The status iframe is matched by its src, with or without the mastodon-embed class.
   // aside.mastodon-embed is a hand-typed quote carrying the post's body text, and
   // div.mastodon-embed only wraps the iframe.
-  'iframe[src$="/embed"], iframe[src$="/embed/"], blockquote.mastodon-embed',
+  'iframe[src$="/embed"], iframe[src$="/embed/"], blockquote.mastodon-embed, x-mastodon-embed[url]',
   (element) => {
     const status = [
       attr(element, 'src'),
       attr(element, 'data-embed-url'),
+      attr(element, 'url'),
       attr(find(element, 'a[href]'), 'href'),
     ]
       .map((link) => (link ? parseMastodonStatus(link) : undefined))
