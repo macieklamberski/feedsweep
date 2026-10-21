@@ -13,7 +13,6 @@ const pixivHosts = ['pixiv.net']
 // A work id is the illustration's number and an upload hash. The endpoint keys on the number.
 const illustIdRegex = /^(\d+)(?:_[0-9a-f]+)?$/
 const workPathRegex = /^\/(?:member_illust\.php|artworks\/\d+)$/
-const artistPathRegex = /^\/(?:member\.php|users\/\d+)$/
 const framePathRegex = /^\/(code|embed_mk2|fixed|oembed_iframe)\.php$/
 
 // The loader draws nothing for a `data-size` outside its own table.
@@ -114,7 +113,6 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
       return parseUrlOnHosts(attr(anchor, 'href'), pixivHosts)
     })
     const work = isPixivBlock ? findAnchor(anchors, workPathRegex) : undefined
-    const artist = isPixivBlock ? findAnchor(anchors, artistPathRegex) : undefined
     const result: EmbedResolverResult = {
       provider,
       id: illustId,
@@ -123,7 +121,6 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
       width: frameWidth,
       height: frameHeight,
       title: text(work),
-      author: text(artist),
     }
 
     // The credits name the same work and would show as a second caption under the frame.
