@@ -103,7 +103,7 @@ const readCaption = ({ page, owner }: CaptionLinks): Partial<EmbedResolverResult
   return {
     url: attr(page, 'href'),
     title: attr(page, 'title') ?? text(page),
-    author: text(owner),
+    author: readPageSegments(owner)[0],
   }
 }
 
