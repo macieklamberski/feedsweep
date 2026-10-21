@@ -271,15 +271,13 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The AP-canonical spelling routes to the same page but is deliberately not matched, so a
-    // carrier stating it has to leave the anchor beside it free to name the post.
-    it('should fall back to the anchor when the embed url is a spelling it does not match', async () => {
+    it('should read the embed url in its ActivityPub spelling', async () => {
       const value = html`
         <blockquote
           class="mastodon-embed"
           data-embed-url="https://ruby.social/users/coder/statuses/110000000000000009/embed"
         >
-          <a href="https://ruby.social/@coder/110000000000000009" target="_blank">
+          <a href="https://ruby.social/@coder/110000000000000001" target="_blank">
             <div>Post by @coder@ruby.social</div>
           </a>
         </blockquote>
@@ -466,9 +464,65 @@ describe('parseMastodonStatus', () => {
     expect(parseMastodonStatus('https://shop.example/@brand/42')).toBeUndefined()
   })
 
-  it('should reject the ActivityPub spelling of a status url', () => {
+  it('should read the ActivityPub spelling of a status url', () => {
+    const value = 'https://mastodon.social/users/Gargron/statuses/116535232552529093'
+    const expected: MastodonStatus = {
+      origin: 'https://mastodon.social',
+      host: 'mastodon.social',
+      user: 'Gargron',
+      id: '116535232552529093',
+    }
+
+    expect(parseMastodonStatus(value)).toEqual(expected)
+  })
+
+  it('should read the ActivityPub spelling behind the embed suffix', () => {
+    const value = 'https://mastodon.social/users/Gargron/statuses/116535232552529093/embed'
+    const expected: MastodonStatus = {
+      origin: 'https://mastodon.social',
+      host: 'mastodon.social',
+      user: 'Gargron',
+      id: '116535232552529093',
+    }
+
+    expect(parseMastodonStatus(value)).toEqual(expected)
+  })
+
+  it('should read the route words of the ActivityPub spelling in any case', () => {
+    const value = 'https://mastodon.social/USERS/Gargron/STATUSES/116535232552529093/EMBED'
+    const expected: MastodonStatus = {
+      origin: 'https://mastodon.social',
+      host: 'mastodon.social',
+      user: 'Gargron',
+      id: '116535232552529093',
+    }
+
+    expect(parseMastodonStatus(value)).toEqual(expected)
+  })
+
+  it('should read the embed suffix in any case', () => {
+    const value = 'https://en.osm.town/@mapper/111222333444555666/EMBED'
+    const expected: MastodonStatus = {
+      origin: 'https://en.osm.town',
+      host: 'en.osm.town',
+      user: 'mapper',
+      id: '111222333444555666',
+    }
+
+    expect(parseMastodonStatus(value)).toEqual(expected)
+  })
+
+  it('should reject the ActivityPub spelling under another path', () => {
     expect(
-      parseMastodonStatus('https://mastodon.social/users/Gargron/statuses/116535232552529093'),
+      parseMastodonStatus('https://mastodon.social/x/users/Gargron/statuses/116535232552529093'),
+    ).toBeUndefined()
+  })
+
+  it('should reject the ActivityPub spelling followed by another segment', () => {
+    expect(
+      parseMastodonStatus(
+        'https://mastodon.social/users/Gargron/statuses/116535232552529093/activity',
+      ),
     ).toBeUndefined()
   })
 
