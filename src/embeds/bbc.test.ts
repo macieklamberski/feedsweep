@@ -166,6 +166,47 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, bbcIframeEmbedResolver)
 
   describe('happy paths', () => {
+    it('should read the clip and article the retired news player names', async () => {
+      const value = html`
+        <embed
+          src="http://news.bbc.co.uk/player/emp/external/player.swf"
+          type="application/x-shockwave-flash"
+          allowfullscreen="true"
+          allowscriptaccess="always"
+          width="400"
+          height="320"
+          flashvars="&config_settings_autoPlay=true&widgetRevision=323797&config=http://news.bbc.co.uk/player/emp/1_1_3_0_0_440234_441894_1/config/default.xml&externalIdentifier=p00h8wqt&embedPageUrl=http://www.bbc.co.uk/news/technology-13614478&config_settings_showShareButton=true&embedReferer=&holdingImage=http://news.bbcimg.co.uk/media/images/53087000/jpg/_53087856_jex_1062219_de27-1.jpg&size=Large&playlist=http://playlists.bbc.co.uk/news/technology-13607303A/playlist.sxml"
+        ></embed>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bbc',
+        id: 'p00h8wqt',
+        src: 'https://www.bbc.com/news/av-embeds/13614478/vpid/p00h8wqt',
+        thumbnail:
+          'http://news.bbcimg.co.uk/media/images/53087000/jpg/_53087856_jex_1062219_de27-1.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave out a holding image on a foreign host', async () => {
+      const value = html`
+        <embed
+          src="http://news.bbc.co.uk/player/emp/external/player.swf"
+          flashvars="externalIdentifier=p00h8wqt&embedPageUrl=http://www.bbc.co.uk/news/technology-13614478&holdingImage=https://evil.test/poster.jpg"
+        ></embed>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bbc',
+        id: 'p00h8wqt',
+        src: 'https://www.bbc.com/news/av-embeds/13614478/vpid/p00h8wqt',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The snippet states 400 by 500 for a 16:9 player, and the measured ratio is preferred.
     it('should resolve the pasted news player iframe', async () => {
       const value = html`
@@ -331,6 +372,39 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
           flashvars="playlist=http%3A//playlists.bbc.co.uk/news/uk-politics-11948231A/playlist.sxml&amp;config=http%3A//news.bbc.co.uk/player/emp/config/default.xml&amp;config_settings_showFooter=true"
           height="400"
           width="512"
+        ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a news player naming its clip in a page off the news section', async () => {
+      const value = html`
+        <embed
+          src="http://news.bbc.co.uk/player/emp/external/player.swf"
+          flashvars="externalIdentifier=p00h8wqt&embedPageUrl=http://www.bbc.co.uk/sport/technology-13614478"
+        ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a news player naming its clip with no article page', async () => {
+      const value = html`
+        <embed
+          src="http://news.bbc.co.uk/player/emp/external/player.swf"
+          flashvars="externalIdentifier=p00h8wqt"
+        ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a news player whose clip holds a path separator', async () => {
+      const value = html`
+        <embed
+          src="http://news.bbc.co.uk/player/emp/external/player.swf"
+          flashvars="externalIdentifier=p00h8wqt%2F..&embedPageUrl=http://www.bbc.co.uk/news/technology-13614478"
         ></embed>
       `
 
