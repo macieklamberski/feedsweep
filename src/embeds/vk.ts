@@ -23,8 +23,9 @@ const players = toMap({
 })
 
 // `hash` unlocks a video its owner shared privately, so it stays in `src`. The page url drops it,
-// since a public video's page ignores it. Quality and autoplay are the reader's call.
-const playerParams = ['oid', 'id', 'hash']
+// since a public video's page ignores it. `t` is the start position, in seconds or as `1m30s`.
+// Quality and autoplay are the reader's call.
+const playerParams = ['oid', 'id', 'hash', 't']
 
 // The calls `openapi.js` runs to fill a widget div, each naming the div's id first. A post or
 // playlist names the owner, the item and the hash, a podcast the episode, and a poll an options

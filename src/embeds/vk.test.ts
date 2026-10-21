@@ -40,6 +40,33 @@ describe('vkResolveEmbed', () => {
       expect(vkResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep a start position in the player as written', () => {
+      const value =
+        'https://vkvideo.ru/video_ext.php?oid=-227210256&id=456239068&hash=84252005194333bb&hd=2&t=14s'
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: '-227210256_456239068',
+        src: 'https://vk.ru/video_ext.php?oid=-227210256&id=456239068&hash=84252005194333bb&t=14s',
+        url: 'https://vkvideo.ru/video-227210256_456239068',
+        ratio: '16/9',
+      }
+
+      expect(vkResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a start position in seconds as written', () => {
+      const value = 'https://vk.com/video_ext.php?oid=237504171&id=456239204&hd=2&t=485'
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: '237504171_456239204',
+        src: 'https://vk.ru/video_ext.php?oid=237504171&id=456239204&t=485',
+        url: 'https://vkvideo.ru/video237504171_456239204',
+        ratio: '16/9',
+      }
+
+      expect(vkResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should mint the video_embed route onto the player', () => {
       const value = 'https://vk.com/video_embed?oid=-206078025&id=456239342'
       const expected: EmbedResolverResult = {
