@@ -130,7 +130,7 @@ const isWatchPage = (url: URL): boolean => {
 const composeWatchEmbed = (videoId: string): EmbedResolverResult => {
   const watchUrl = `https://www.facebook.com/watch/${composeQuery({ v: videoId })}`
 
-  return composePluginEmbed('video', watchUrl, { id: videoId })
+  return composePluginEmbed('video', watchUrl, {})
 }
 
 // A post has no name: its words go to `description`, and the frame titles itself
