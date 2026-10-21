@@ -250,8 +250,9 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   if (subject.setId && owner) {
     return {
       provider,
-      // The album's key-free oEmbed needs `{owner}/{setId}`: a title, an author, a thumbnail.
-      id: `${owner}/${subject.setId}`,
+      // Flickr serves the album without its owner, on the short url too, so the owner stays out
+      // of the key and an ownerless carrier of the same album gets the same one.
+      id: `photosets/${subject.setId}`,
       src: composeAlbumPlayer(subject.setId),
       url: `https://www.flickr.com/photos/${encodePathSegment(owner)}/sets/${encodePathSegment(subject.setId)}`,
       author,
@@ -262,7 +263,6 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   if (subject.setId && digitsRegex.test(subject.setId)) {
     return {
       provider,
-      // Addresses the player but not oEmbed.
       id: `photosets/${subject.setId}`,
       src: composeAlbumPlayer(subject.setId),
       url: composeShortAlbumUrl(subject.setId),
