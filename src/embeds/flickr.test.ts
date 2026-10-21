@@ -693,7 +693,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         '<iframe src="https://www.flickr.com/photos/strictly.kev/15753890338/player/"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photos/strictly.kev/15753890338',
+        id: 'p/q17NJW',
         src: 'https://www.flickr.com/photos/strictly.kev/15753890338/player/',
         url: 'https://www.flickr.com/photos/strictly.kev/15753890338/',
         author: 'strictly.kev',
@@ -758,7 +758,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photos/celesteh/15753890338',
+        id: 'p/q17NJW',
         src: 'https://www.flickr.com/photos/celesteh/15753890338/player/',
         url: 'https://www.flickr.com/photos/celesteh/15753890338/',
         author: 'celesteh',
@@ -785,7 +785,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photos/hankthetank/15637343340',
+        id: 'p/pPPtnW',
         src: 'https://www.flickr.com/photos/hankthetank/15637343340/player/',
         url: 'https://www.flickr.com/photos/hankthetank/15637343340/',
         thumbnail: 'https://live.staticflickr.com/0/15637343340_2d3295bc6d_b.jpg',
@@ -807,7 +807,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photos/jackieboyslim/8740425686',
+        id: 'p/ejmY3A',
         src: 'https://www.flickr.com/photos/jackieboyslim/8740425686/player/',
         url: 'https://www.flickr.com/photos/jackieboyslim/8740425686/',
         author: 'jackieboyslim',
@@ -829,7 +829,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photos/kimim-photo/11616055053',
+        id: 'p/iGtjtg',
         src: 'https://www.flickr.com/photos/kimim-photo/11616055053/player/',
         url: 'https://www.flickr.com/photos/kimim-photo/11616055053/',
         thumbnail: 'https://live.staticflickr.com/0/11616055053_c64480d113_b.jpg',
@@ -850,7 +850,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photos/hankthetank/15637343340',
+        id: 'p/pPPtnW',
         src: 'https://www.flickr.com/photos/hankthetank/15637343340/player/',
         url: 'https://www.flickr.com/photos/hankthetank/15637343340/',
         thumbnail: 'https://live.staticflickr.com/0/15637343340_2d3295bc6d%20_b.jpg',
@@ -871,7 +871,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photos/hankthetank/15591173770',
+        id: 'p/pKJQLS',
         src: 'https://www.flickr.com/photos/hankthetank/15591173770/player/',
         url: 'https://www.flickr.com/photos/hankthetank/15591173770/',
         thumbnail: 'https://live.staticflickr.com/0/15591173770_542b374f55_b.jpg',
@@ -917,7 +917,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photos/20899351@N00/3786844985',
+        id: 'p/6LCz5M',
         src: 'https://www.flickr.com/photos/20899351@N00/3786844985/player/',
         url: 'https://www.flickr.com/photos/20899351@N00/3786844985/',
         ratio: '4/3',
@@ -1295,7 +1295,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         '<iframe src="https://www.flickr.com/photos/kimim%2Fphoto/11616055053/player/"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photos/kimim/photo/11616055053',
+        id: 'p/iGtjtg',
         src: 'https://www.flickr.com/photos/kimim%2Fphoto/11616055053/player/',
         url: 'https://www.flickr.com/photos/kimim%2Fphoto/11616055053/',
         author: 'kimim/photo',
