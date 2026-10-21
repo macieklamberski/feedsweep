@@ -5,7 +5,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'captivate'
 
-const captivateHosts = ['captivate.fm']
+// Exact: `podcasts.captivate.fm` serves the episode files.
+const captivateHosts = ['player.captivate.fm']
 
 // Every specimen states 200, and Captivate publishes no oEmbed, so the height is the whole
 // of what this states beyond the provider tag.
@@ -19,7 +20,6 @@ export const extractCaptivateEmbed = (link: string): { kind: string; id: string 
   const segments = getPathSegments(link)
   const [kind, id] = segments
 
-  // The segment count keeps a `media/{uuid}/{file}.mp3` enclosure out of a dead placeholder.
   if (segments.length !== 2 || !kind || !id || !embedKindRegex.test(kind) || !uuidRegex.test(id)) {
     return
   }

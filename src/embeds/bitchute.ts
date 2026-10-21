@@ -1,11 +1,16 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-const bitchuteHosts = ['bitchute.com']
+// Exact: `seed{n}.bitchute.com` serves the video files.
+const bitchuteHosts = ['bitchute.com', 'www.bitchute.com', 'old.bitchute.com']
 
 const bitchuteResolveEmbed: ResolveEmbed = (url, element) => {
+  if (!isHostOf(url, bitchuteHosts)) {
+    return
+  }
+
   const [route, id] = getPathSegments(url)
 
   // The route word tells a video from a channel or a profile.

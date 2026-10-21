@@ -124,6 +124,12 @@ describeForEachParser('bitchuteEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore the player path on the subdomain that serves the files', async () => {
+      const value = '<iframe src="https://seed171.bitchute.com/embed/0fRr8eQ5hvv8/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
 
