@@ -12,8 +12,6 @@ describeForEachParser('Twitter', (parseHtml) => {
   // on the resolver. A twitter-video blockquote reaches the same placeholder as the canonical
   // one through the same passes, so one case covers both.
 
-  // The byline is a bare text node between the tweet paragraph and the dated anchor, so the
-  // resolver cannot read the author until wrapBareInlineInParagraphs has made it a paragraph.
   // The loader that turns the quote into a player is childless, so stripEmptyTags takes it.
   it('should convert the canonical blockquote and leave no loader behind', async () => {
     const value = html`
@@ -40,8 +38,7 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
         data-embed-url="https://x.com/user/status/123456789012345"
         data-embed-description="Tweet text here."
-        data-embed-author="Display Name"
-        data-embed-date="May 12, 2020"
+        data-embed-author="@user"
       ></div>
     `
 
@@ -80,8 +77,7 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
         data-embed-url="https://x.com/user/status/123456789012345"
         data-embed-description="Tweet text here."
-        data-embed-author="Display Name"
-        data-embed-date="May 12, 2020"
+        data-embed-author="@user"
       ></div>
     `
 
@@ -99,8 +95,7 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
         data-embed-url="https://x.com/user/status/123456789012345"
         data-embed-description="Tweet text here."
-        data-embed-author="Display Name"
-        data-embed-date="May 12, 2020"
+        data-embed-author="@user"
       ></div>
     `
 
@@ -211,8 +206,7 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
         data-embed-url="https://x.com/user/status/123456789012345"
         data-embed-description="Tweet text here."
-        data-embed-author="Display Name"
-        data-embed-date="May 12, 2020"
+        data-embed-author="@user"
       ></div>
     `
 
