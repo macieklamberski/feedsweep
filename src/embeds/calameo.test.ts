@@ -184,6 +184,19 @@ describe('calameoResolveEmbed', () => {
       expect(calameoResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should read the library query names in any case', () => {
+      const value = 'https://v.calameo.com/library/?TYPE=account&ID=5807295&ROWS=5'
+      const expected: EmbedResolverResult = {
+        provider: 'calameo',
+        id: 'library/account/5807295',
+        src: 'https://v.calameo.com/library/?type=account&id=5807295&rows=5',
+        url: 'https://www.calameo.com/accounts/5807295',
+        height: 925,
+      }
+
+      expect(calameoResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should keep a row count the widget cannot parse and state one row', () => {
       const value = 'https://v.calameo.com/library/?type=account&id=5807295&rows=auto'
       const expected: EmbedResolverResult = {
