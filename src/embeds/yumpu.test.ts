@@ -65,6 +65,26 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+    it('should rebuild the older document embed route onto the player', async () => {
+      const value = html`
+        <iframe
+          allowfullscreen=""
+          allowtransparency="true"
+          frameborder="0"
+          height="384px"
+          src="https://www.yumpu.com/es/document/embed/HItJxtpSy3tdyhFd"
+          width="512px"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'yumpu',
+        id: 'HItJxtpSy3tdyhFd',
+        src: 'https://www.yumpu.com/es/embed/view/HItJxtpSy3tdyhFd',
+        ratio: '4/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -91,6 +111,13 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
     it('should ignore a document page pasted into the carrier', async () => {
       const value =
         '<iframe src="https://www.yumpu.com/de/document/view/71235096/sukultur-2026"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore another route under the document path', async () => {
+      const value =
+        '<iframe src="https://www.yumpu.com/es/document/other/HItJxtpSy3tdyhFd"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

@@ -36,6 +36,20 @@ const readCompanion = (element: Element | undefined): Partial<EmbedResolverResul
   return { url: href, title: attr(anchor, 'title') ?? text(anchor) }
 }
 
+// The player, `embed/view/{hash}`, and the older `document/embed/{hash}`, which YUMPU redirects
+// onto it.
+const readHash = (segments: Array<string>): string | undefined => {
+  const [route, kind, hash] = segments
+
+  if (route === 'embed' && kind === 'view') {
+    return hash
+  }
+
+  if (route === 'document' && kind === 'embed') {
+    return hash
+  }
+}
+
 const yumpuResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
 
@@ -47,9 +61,9 @@ const yumpuResolveEmbed: ResolveEmbed = (url, element) => {
   const isLocaleless = segments[0] === 'embed'
   // YUMPU redirects an embed path with no locale prefix to `/en/`.
   const locale = isLocaleless ? 'en' : keepIfMatches(segments[0], localeWordRegex)
-  const [embed, view, hash] = isLocaleless ? segments : segments.slice(1)
+  const hash = readHash(isLocaleless ? segments : segments.slice(1))
 
-  if (!locale || embed !== 'embed' || view !== 'view' || !hash) {
+  if (!locale || !hash) {
     return
   }
 
