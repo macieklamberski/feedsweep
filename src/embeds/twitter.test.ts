@@ -328,7 +328,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use the first id attribute present as written, even if the player answers an error', async () => {
+    it('should use the first id attribute present as written and keep it one segment of the status url', async () => {
       const value = html`
         <blockquote
           class="twitter-tweet"
@@ -342,7 +342,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         provider: 'twitter',
         id: '../evil',
         src: 'https://platform.twitter.com/embed/Tweet.html?id=..%2Fevil',
-        url: 'https://x.com/i/status/../evil',
+        url: 'https://x.com/i/status/..%2Fevil',
         description: 'Text.',
       }
 
