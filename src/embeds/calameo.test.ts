@@ -82,6 +82,33 @@ describe('calameoResolveEmbed', () => {
 
       expect(calameoResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should keep the row count of an account library and state its height', () => {
+      const value =
+        'https://v.calameo.com/library/?type=account&id=6112630&rows=5&sortBy=latestPublished&theme=wood&bgColor=&thumbSize=large&showTitle=true&showShadow=true&showGloss=true&showInfo=account&linkTo=view&linkTarget=_blank'
+      const expected: EmbedResolverResult = {
+        provider: 'calameo',
+        id: 'library/account/6112630',
+        src: 'https://v.calameo.com/library/?type=account&id=6112630&rows=5',
+        url: 'https://www.calameo.com/accounts/6112630',
+        height: 925,
+      }
+
+      expect(calameoResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should state one row for an account library naming no row count', () => {
+      const value = 'https://v.calameo.com/library/?type=account&id=5807295'
+      const expected: EmbedResolverResult = {
+        provider: 'calameo',
+        id: 'library/account/5807295',
+        src: 'https://v.calameo.com/library/?type=account&id=5807295',
+        url: 'https://www.calameo.com/accounts/5807295',
+        height: 185,
+      }
+
+      expect(calameoResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -113,6 +140,71 @@ describe('calameoResolveEmbed', () => {
         src: 'https://v.calameo.com/?bkcode=0047347972d89219ca0ff',
         url: 'https://www.calameo.com/books/0047347972d89219ca0ff',
         ratio: '300/194',
+      }
+
+      expect(calameoResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should ignore a library of a type other than an account', () => {
+      const value = 'https://v.calameo.com/library/?type=zzfabricated&id=5807295&rows=1'
+
+      expect(calameoResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore an account library naming no account', () => {
+      const value = 'https://v.calameo.com/library/?type=account&rows=1'
+
+      expect(calameoResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore the library route under another path', () => {
+      const value = 'https://v.calameo.com/x/library/?type=account&id=5807295&rows=1'
+
+      expect(calameoResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a path below the library route', () => {
+      const value = 'https://v.calameo.com/library/extra?type=account&id=5807295&rows=1'
+
+      expect(calameoResolveEmbed(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should read the library route and its type in any case and write them in the widget case', () => {
+      const value = 'https://v.calameo.com/LIBRARY/?type=ACCOUNT&id=5807295&rows=1'
+      const expected: EmbedResolverResult = {
+        provider: 'calameo',
+        id: 'library/account/5807295',
+        src: 'https://v.calameo.com/library/?type=account&id=5807295&rows=1',
+        url: 'https://www.calameo.com/accounts/5807295',
+        height: 185,
+      }
+
+      expect(calameoResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a row count the widget cannot parse and state one row', () => {
+      const value = 'https://v.calameo.com/library/?type=account&id=5807295&rows=auto'
+      const expected: EmbedResolverResult = {
+        provider: 'calameo',
+        id: 'library/account/5807295',
+        src: 'https://v.calameo.com/library/?type=account&id=5807295&rows=auto',
+        url: 'https://www.calameo.com/accounts/5807295',
+        height: 185,
+      }
+
+      expect(calameoResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should state one row for a row count below one', () => {
+      const value = 'https://v.calameo.com/library/?type=account&id=5807295&rows=0'
+      const expected: EmbedResolverResult = {
+        provider: 'calameo',
+        id: 'library/account/5807295',
+        src: 'https://v.calameo.com/library/?type=account&id=5807295&rows=0',
+        url: 'https://www.calameo.com/accounts/5807295',
+        height: 185,
       }
 
       expect(calameoResolveEmbed(value)).toEqual(expected)
@@ -249,6 +341,29 @@ describeForEachParser('calameoEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read the account library iframe at its height for one row', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          src="https://v.calameo.com/library/?type=account&#038;id=5807295&#038;rows=1&#038;sortBy=latestPublished&#038;theme=wood&#038;bgColor=&#038;thumbSize=large&#038;showTitle=true&#038;showShadow=true&#038;showGloss=true&#038;showInfo=account&#038;linkTo=view&#038;linkTarget=_blank"
+          width="100%"
+          height="240"
+          frameborder="0"
+          allowfullscreen
+          allowtransparency
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'calameo',
+        id: 'library/account/5807295',
+        src: 'https://v.calameo.com/library/?type=account&id=5807295&rows=1',
+        url: 'https://www.calameo.com/accounts/5807295',
+        height: 185,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -350,6 +465,31 @@ describeForEachParser('calameoEmbedResolver through the pipeline', (parseHtml) =
         data-embed-id="002574221fb7a74a40f7a"
         data-embed-ratio="300/194"
         data-embed-src="https://v.calameo.com/?bkcode=002574221fb7a74a40f7a&amp;authid=WdhyTr98dSUk"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should turn a protocol-relative account library iframe into a placeholder of its rows', async () => {
+    const value = html`
+      <iframe
+        loading="lazy"
+        src="//v.calameo.com/library/?type=account&#038;id=6112630&#038;rows=5&#038;sortBy=latestPublished&#038;theme=wood&#038;bgColor=&#038;thumbSize=large&#038;showTitle=true&#038;showShadow=true&#038;showGloss=true&#038;showInfo=account&#038;linkTo=view&#038;linkTarget=_blank"
+        width="100%"
+        height="1200"
+        frameborder="0"
+        allowfullscreen
+        allowtransparency
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="calameo"
+        data-embed-id="library/account/6112630"
+        data-embed-height="925"
+        data-embed-src="https://v.calameo.com/library/?type=account&amp;id=6112630&amp;rows=5"
+        data-embed-url="https://www.calameo.com/accounts/6112630"
       ></div>
     `
 
