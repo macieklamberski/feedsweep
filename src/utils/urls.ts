@@ -193,13 +193,16 @@ export const isUrlShaped = (value: string): boolean => {
   return urlShapeRegex.test(value)
 }
 
+// A host whose subdomains serve files or other sites takes `isHostOf`, which matches the listed
+// hosts alone.
 export const parseUrlOnHosts = (
-  url: string | undefined,
+  url: string | null | undefined,
   hosts: string | ReadonlyArray<string>,
+  isOnHost: (url: URL, hosts: string | ReadonlyArray<string>) => boolean = isHostOrSubdomainOf,
 ): URL | undefined => {
   const parsed = url ? parseUrl(url, placeholderBaseUrl) : undefined
 
-  if (parsed && isHostOrSubdomainOf(parsed, hosts)) {
+  if (parsed && isOnHost(parsed, hosts)) {
     return parsed
   }
 }

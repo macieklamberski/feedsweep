@@ -1,6 +1,6 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'symbaloo'
@@ -13,9 +13,9 @@ const webmixHeight = 500
 // Symbaloo's embedded webmix, `/embed/{slug}` for a published webmix and `/embed/shared/{token}`
 // for one shared by link. The route words are case-sensitive, the slug is not.
 export const symbalooResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
+  const parsed = parseUrlOnHosts(url, symbalooHosts, isHostOf)
 
-  if (!parsed || !isHostOf(parsed, symbalooHosts)) {
+  if (!parsed) {
     return
   }
 

@@ -1,7 +1,7 @@
-import { isHostOf, parseUrl } from 'trousse'
+import { isHostOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pollmaker'
@@ -35,9 +35,9 @@ const composeEmbed = (
 }
 
 const readPollId = (url: string): string | undefined => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
+  const parsed = parseUrlOnHosts(url, pollmakerHosts, isHostOf)
 
-  if (!parsed || !isHostOf(parsed, pollmakerHosts)) {
+  if (!parsed) {
     return
   }
 

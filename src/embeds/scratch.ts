@@ -1,6 +1,6 @@
-import { isHostOf, parseUrl } from 'trousse'
+import { isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'scratch'
@@ -20,9 +20,9 @@ const snippetHeight = 402
 
 // Scratch's project player.
 export const scratchResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
+  const parsed = parseUrlOnHosts(url, scratchHosts, isHostOf)
 
-  if (!parsed || !isHostOf(parsed, scratchHosts)) {
+  if (!parsed) {
     return
   }
 

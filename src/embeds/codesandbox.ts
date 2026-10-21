@@ -4,13 +4,12 @@ import {
   getQueryParam,
   isAnyOf,
   isHostOf,
-  parseUrl,
   trimObject,
 } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
-import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codesandbox'
@@ -51,9 +50,9 @@ const readId = (slug: string): string => {
 }
 
 const parseTarget = (value: string | undefined): CodesandboxTarget | undefined => {
-  const parsed = parseUrl(value ?? '', placeholderBaseUrl)
+  const parsed = parseUrlOnHosts(value, codesandboxHosts, isHostOf)
 
-  if (!parsed || !isHostOf(parsed, codesandboxHosts)) {
+  if (!parsed) {
     return
   }
 

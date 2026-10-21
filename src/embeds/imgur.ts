@@ -1,8 +1,8 @@
-import { getPathSegments, isAnyOf, isHostOf, isPlainObject, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
@@ -154,9 +154,9 @@ export const imgurBlockquoteEmbedResolver = createMarkupEmbedResolver(
 // The frame the embed script builds, kept by exports that stored the page after it rendered.
 // Its query (`pub`, `ref`, `context`, `analytics`, `w`) describes the embedding page.
 export const imgurResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
+  const parsed = parseUrlOnHosts(url, imgurPageHosts, isHostOf)
 
-  if (!parsed || !isHostOf(parsed, imgurPageHosts)) {
+  if (!parsed) {
     return
   }
 
@@ -195,9 +195,9 @@ const gifvPathRegex = /^\/(?<id>[a-zA-Z0-9]+)\.gifv$/
 export const imgurGifvEmbedResolver = createMarkupEmbedResolver(
   'iframe.imgur-embed[src*="i.imgur.com/"]',
   (element) => {
-    const parsed = parseUrl(attr(element, 'src') ?? '', placeholderBaseUrl)
+    const parsed = parseUrlOnHosts(attr(element, 'src'), 'i.imgur.com', isHostOf)
 
-    if (!parsed || !isHostOf(parsed, 'i.imgur.com')) {
+    if (!parsed) {
       return
     }
 

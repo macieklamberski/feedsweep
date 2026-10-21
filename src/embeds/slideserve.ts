@@ -1,7 +1,7 @@
-import { getPathSegments, getQueryParam, isAnyOf, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'slideserve'
@@ -14,14 +14,6 @@ const movieFileRegex = /^\/video\/([^/]+)\.swf$/i
 const viewkeyRegex = /^[^/]+\/[^/]+\/(.+)/
 
 const deckRatio = '300/271'
-
-const parseOnHosts = (url: string | null | undefined): URL | undefined => {
-  const parsed = url ? parseUrl(url, placeholderBaseUrl) : undefined
-
-  if (parsed && isHostOf(parsed, slideserveHosts)) {
-    return parsed
-  }
-}
 
 // The server ignores a segment after the id.
 const readEmbedId = (parsed: URL): string | undefined => {
@@ -43,7 +35,11 @@ const readFlashId = (parsed: URL): string | undefined => {
     return
   }
 
-  const movie = parseOnHosts(getQueryParam(parsed.searchParams, 'moviePath'))
+  const movie = parseUrlOnHosts(
+    getQueryParam(parsed.searchParams, 'moviePath'),
+    slideserveHosts,
+    isHostOf,
+  )
 
   return movie?.pathname.match(movieFileRegex)?.[1]
 }
@@ -51,7 +47,7 @@ const readFlashId = (parsed: URL): string | undefined => {
 // No `url` and no `thumbnail`: the deck page is `/{user}/{slug}`, and the slide images sit on a
 // numbered cdn host, neither of which the id composes.
 const slideserveResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseOnHosts(url)
+  const parsed = parseUrlOnHosts(url, slideserveHosts, isHostOf)
 
   if (!parsed) {
     return

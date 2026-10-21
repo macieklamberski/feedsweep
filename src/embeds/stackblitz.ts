@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { filterUrlQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { filterUrlQuery, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `blog.stackblitz.com` and `developer.stackblitz.com` are prose, and a project's running preview
@@ -23,9 +23,9 @@ type StackblitzTarget = {
 }
 
 const parseTarget = (value: string | undefined): StackblitzTarget | undefined => {
-  const parsed = parseUrl(value ?? '', placeholderBaseUrl)
+  const parsed = parseUrlOnHosts(value, stackblitzHosts, isHostOf)
 
-  if (!parsed || !isHostOf(parsed, stackblitzHosts)) {
+  if (!parsed) {
     return
   }
 
