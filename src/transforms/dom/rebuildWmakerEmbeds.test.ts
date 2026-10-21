@@ -107,7 +107,7 @@ describeForEachParser('rebuildWmakerEmbeds', (parseHtml) => {
         </object>
       `
       const expected =
-        '<iframe src="https://www.hospitalia.fr/embed/4183/" width="608" height="372"></iframe>'
+        '<iframe src="https://www.hospitalia.fr/embed/4183/" width="640" height="360"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -115,7 +115,8 @@ describeForEachParser('rebuildWmakerEmbeds', (parseHtml) => {
     it('should take the origin from the permalink rather than from the path it sits on', async () => {
       const value =
         '<object data="https://www.ccmag.fr/v/751de3d3566cb8441f72eebcbc8b939bbdfaad79"></object>'
-      const expected = '<iframe src="https://www.ccmag.fr/embed/391/"></iframe>'
+      const expected =
+        '<iframe src="https://www.ccmag.fr/embed/391/" width="640" height="360"></iframe>'
 
       expect(
         await transformWith(value, 'https://www.ccmag.fr/section/Me-and-My-Captain_a391.html'),
@@ -175,13 +176,13 @@ describeForEachParser('rebuildWmakerEmbeds', (parseHtml) => {
     it('should repair a player whose url carries a query', async () => {
       const value =
         '<object data="https://www.hospitalia.fr/v/633ed090acc56dbee0aea06de3d69c00e8757bba?autoplay=1"></object>'
-      const expected = '<iframe src="https://www.hospitalia.fr/embed/4183/"></iframe>'
+      const expected =
+        '<iframe src="https://www.hospitalia.fr/embed/4183/" width="640" height="360"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    // A zero reserves no space, so it is not a box the publisher declared.
-    it('should not carry a zero dimension onto the player', async () => {
+    it('should state the player size whatever box the carrier declares', async () => {
       const value = html`
         <object
           data="https://www.hospitalia.fr/v/633ed090acc56dbee0aea06de3d69c00e8757bba"
@@ -189,7 +190,8 @@ describeForEachParser('rebuildWmakerEmbeds', (parseHtml) => {
           height="372"
         ></object>
       `
-      const expected = '<iframe src="https://www.hospitalia.fr/embed/4183/" height="372"></iframe>'
+      const expected =
+        '<iframe src="https://www.hospitalia.fr/embed/4183/" width="640" height="360"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -223,8 +225,8 @@ describeForEachParser('dead WMaker players the pipeline repairs into an embed', 
     `
     const expected = html`
       <div
-        data-embed-height="372"
-        data-embed-width="608"
+        data-embed-height="360"
+        data-embed-width="640"
         data-embed-src="https://www.hospitalia.fr/embed/4183/"
       ></div>
     `
