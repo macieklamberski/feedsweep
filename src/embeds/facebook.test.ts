@@ -444,7 +444,7 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read an fb.watch short link', async () => {
+    it('should read an fb.watch short link as the video plugin', async () => {
       // Constructed: no lab feed cites an fb.watch link in this blockquote.
       const value = html`
         <blockquote
@@ -457,8 +457,9 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://fb.watch/abcDEF123/',
-        src: 'https://www.facebook.com/plugins/post.php?href=https://fb.watch/abcDEF123/',
+        src: 'https://www.facebook.com/plugins/video.php?href=https://fb.watch/abcDEF123/',
         url: 'https://fb.watch/abcDEF123/',
+        ratio: '16/9',
         description: 'A video caption.',
       }
 

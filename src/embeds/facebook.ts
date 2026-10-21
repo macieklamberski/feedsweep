@@ -283,6 +283,11 @@ export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
+    // fb.watch links only to videos, and the post plugin answers one with 400.
+    if (isHostOrSubdomainOf(parsed, 'fb.watch')) {
+      return composePluginEmbed('video', cite, readFallback(element))
+    }
+
     const plugin = videoPathRegex.test(parsed.pathname) ? 'video' : 'post'
 
     return composePluginEmbed(plugin, cite, readFallback(element))
