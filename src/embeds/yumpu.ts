@@ -36,6 +36,20 @@ const readCompanion = (element: Element | undefined): Partial<EmbedResolverResul
   return { url: href, title: attr(anchor, 'title') ?? text(anchor) }
 }
 
+// The player, `embed/view/{hash}`, and the older `document/embed/{hash}`, which YUMPU redirects
+// onto it.
+const readHash = (segments: Array<string>): string | undefined => {
+  const [route, kind, hash] = segments
+
+  if (route === 'embed' && kind === 'view') {
+    return hash
+  }
+
+  if (route === 'document' && kind === 'embed') {
+    return hash
+  }
+}
+
 const yumpuResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, yumpuHosts, isHostOf)
 
@@ -45,13 +59,13 @@ const yumpuResolveEmbed: ResolveEmbed = (url, element) => {
 
   const segments = getPathSegments(parsed)
   const isLocaleless = isAnyOf(segments[0], 'embed')
-  const [embed, view, hash] = isLocaleless ? segments : segments.slice(1)
+  const hash = readHash(isLocaleless ? segments : segments.slice(1))
 
   if (!isLocaleless && !lettersRegex.test(segments[0] ?? '')) {
     return
   }
 
-  if (!isAnyOf(embed, 'embed') || !isAnyOf(view, 'view') || !hash) {
+  if (!hash) {
     return
   }
 
