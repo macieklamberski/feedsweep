@@ -9,6 +9,7 @@ import {
   parseUrlOnHosts,
   pickQueryParams,
   pickUrlParams,
+  readOrigin,
   resolveOrDropUrl,
   resolveOrKeepUrl,
 } from './urls.js'
@@ -53,6 +54,30 @@ describe('parseUrlOnHosts', () => {
   it('should return undefined for an empty or undefined url', () => {
     expect(parseUrlOnHosts('', hosts)).toBeUndefined()
     expect(parseUrlOnHosts(undefined, hosts)).toBeUndefined()
+  })
+})
+
+describe('readOrigin', () => {
+  it('should return the origin of an http url', () => {
+    const value = new URL('https://social.example:8443/@alice/109876543210987654')
+
+    expect(readOrigin(value)).toBe('https://social.example:8443')
+  })
+
+  it('should return undefined for a javascript: url', () => {
+    const value = new URL('javascript:/@alice/109876543210987654')
+
+    expect(readOrigin(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a data: url', () => {
+    const value = new URL('data:text/html,/w/9c9de5e8-0a1b-4f6a-8a6a-2b1f1c0e7d3a')
+
+    expect(readOrigin(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a missing url', () => {
+    expect(readOrigin(undefined)).toBeUndefined()
   })
 })
 
