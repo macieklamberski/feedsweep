@@ -51,15 +51,34 @@ describe('foxnewsResolveEmbed', () => {
 
       expect(foxnewsResolveEmbed(value)).toEqual(expected)
     })
+    it('should rebuild the video page onto the player', () => {
+      const value = 'https://video.foxnews.com/v/5406119088001/'
+      const expected: EmbedResolverResult = {
+        provider: 'foxnews',
+        id: '5406119088001',
+        src: 'https://video.foxnews.com/v/video-embed.html?video_id=5406119088001',
+        url: 'https://www.foxnews.com/video/5406119088001',
+        ratio: '16/9',
+      }
+
+      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should rebuild a Fox Business video page and drop its fragment', () => {
+      const value = 'https://video.foxbusiness.com/v/6297488565001#sp=show-clips'
+      const expected: EmbedResolverResult = {
+        provider: 'foxbusiness',
+        id: '6297488565001',
+        src: 'https://video.foxbusiness.com/v/video-embed.html?video_id=6297488565001',
+        url: 'https://www.foxbusiness.com/video/6297488565001',
+        ratio: '16/9',
+      }
+
+      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
-    it('should return undefined for the video page itself', () => {
-      const value = 'https://video.foxnews.com/v/5406119088001/'
-
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a script carrying no id', () => {
       const value = 'https://video.foxnews.com/v/embed.js?w=466&h=263'
 
@@ -104,12 +123,6 @@ describe('foxnewsResolveEmbed', () => {
 
     it('should return undefined for another page under the player route', () => {
       const value = 'https://video.foxbusiness.com/v/other.html?id=6355436296112'
-
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a Fox Business video page linked in prose', () => {
-      const value = 'https://video.foxbusiness.com/v/6297488565001#sp=show-clips'
 
       expect(foxnewsResolveEmbed(value)).toBeUndefined()
     })
@@ -247,8 +260,44 @@ describeForEachParser('foxnewsIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should ignore an iframe framing the video page', async () => {
+  it('should rebuild an iframe framing the video page onto the player', async () => {
     const value = '<iframe src="https://video.foxnews.com/v/5406119088001/"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'foxnews',
+      id: '5406119088001',
+      src: 'https://video.foxnews.com/v/video-embed.html?video_id=5406119088001',
+      url: 'https://www.foxnews.com/video/5406119088001',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should rebuild the legacy Fox Business video page onto its player', async () => {
+    const value = html`
+      <iframe
+        frameborder="0"
+        height="249"
+        marginheight="0"
+        marginwidth="0"
+        scrolling="no"
+        src="http://video.foxbusiness.com/v/2717779528001/will-obamacare-hurt-productivity-in-america/"
+        width="400"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'foxbusiness',
+      id: '2717779528001',
+      src: 'https://video.foxbusiness.com/v/video-embed.html?video_id=2717779528001',
+      url: 'https://www.foxbusiness.com/video/2717779528001',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should ignore a page segment that is not an id', async () => {
+    const value = '<iframe src="https://video.foxnews.com/v/zzpage/"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

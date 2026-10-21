@@ -8,7 +8,7 @@ import {
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type FoxBrand = {
@@ -53,8 +53,8 @@ const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult => {
   }
 }
 
-// Both carriers name the video in a query parameter: `id` on the script, `video_id` on the
-// iframe, and the rest of the query is the snippet's size or the embedding page's referrer. The
+// Both carriers name the video in a query parameter, `id` on the script, `video_id` on the
+// iframe, or the legacy video page in its path, and the rest of the query is the snippet's size or the embedding page's referrer. The
 // ids of the retired root `embed.js` route are gone from both the player and the page.
 export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
@@ -68,7 +68,16 @@ export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
     getQueryParam(parsed.searchParams, 'video_id') ?? getQueryParam(parsed.searchParams, 'id')
   const [route, page] = getPathSegments(parsed)
 
-  if (!brand || !isAnyOf(route, 'v') || !isAnyOf(page, ['embed.js', 'video-embed.html'])) {
+  if (!brand || !isAnyOf(route, 'v')) {
+    return
+  }
+
+  // The legacy video page, `/v/{id}/{slug}/`, redirects to a page that refuses framing.
+  if (page && digitsRegex.test(page)) {
+    return composeEmbed(brand, page)
+  }
+
+  if (!isAnyOf(page, ['embed.js', 'video-embed.html'])) {
     return
   }
 
