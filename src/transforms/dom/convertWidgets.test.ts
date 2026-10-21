@@ -1529,6 +1529,7 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
           data-embed-provider="wikimedia"
           data-embed-ratio="16/9"
           data-embed-src="https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes"
+          data-embed-url="https://commons.wikimedia.org/wiki/File:Example.webm"
         ></div>
       `
 
