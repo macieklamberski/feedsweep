@@ -404,7 +404,7 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
   })
 
   describe('the CCMA audio frame', () => {
-    it('should key the audio frame apart from video ids', async () => {
+    it('should key the audio frame apart from video ids and state its 16:9', async () => {
       const value = html`
         <iframe
           allowfullscreen=""
@@ -419,6 +419,7 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
         provider: 'ccma',
         id: 'audio/859074',
         src: 'https://www.3cat.cat/3cat/audio/859074/embed/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -430,6 +431,7 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
         provider: 'ccma',
         id: 'audio/abc',
         src: 'https://www.3cat.cat/3cat/audio/abc/embed/',
+        ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
