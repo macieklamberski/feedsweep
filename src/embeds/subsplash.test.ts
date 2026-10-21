@@ -52,7 +52,7 @@ describe('subsplashResolveEmbed', () => {
         provider: 'subsplash',
         id: '9xvbxmg',
         src: 'https://subsplash.com/u/-677XD4/media/embed/d/9XVBXMG',
-        url: 'https://subspla.sh/9xvbxmg',
+        url: 'https://subspla.sh/9XVBXMG',
         ratio: '16/9',
       }
 

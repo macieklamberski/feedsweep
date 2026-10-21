@@ -18,7 +18,7 @@ const composeEmbed = (id: string, src: string): EmbedResolverResult => {
     provider,
     id: key,
     src,
-    url: `https://subspla.sh/${key}`,
+    url: `https://subspla.sh/${id}`,
     ratio: '16/9',
   }
 }
