@@ -87,6 +87,44 @@ describe('iheartResolveEmbed', () => {
 
       expect(iheartResolveEmbed(value)).toEqual(expected)
     })
+    it('should mint the live station player', () => {
+      const value = 'https://www.iheart.com/live/kfi-am-640-177/?embed=true'
+      const expected: EmbedResolverResult = {
+        provider: 'iheart',
+        id: 'live/177',
+        src: 'https://www.iheart.com/live/177/?embed=true',
+        url: 'https://www.iheart.com/live/177/',
+        height: 200,
+      }
+
+      expect(iheartResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should mint the artist radio player', () => {
+      const value = 'https://www.iheart.com/artist/bruno-mars-337578?app=listen&embed=true'
+      const expected: EmbedResolverResult = {
+        provider: 'iheart',
+        id: 'artist/337578',
+        src: 'https://www.iheart.com/artist/337578/?embed=true',
+        url: 'https://www.iheart.com/artist/337578/',
+        height: 200,
+      }
+
+      expect(iheartResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should write a station route word read in another case in the server case', () => {
+      const value = 'https://www.iheart.com/Live/pride-radio-3949/?embed=true'
+      const expected: EmbedResolverResult = {
+        provider: 'iheart',
+        id: 'live/3949',
+        src: 'https://www.iheart.com/live/3949/?embed=true',
+        url: 'https://www.iheart.com/live/3949/',
+        height: 200,
+      }
+
+      expect(iheartResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -126,8 +164,20 @@ describe('iheartResolveEmbed', () => {
       expect(iheartResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a live station player', () => {
-      const value = 'https://www.iheart.com/live/kfi-am-640-177/?embed=true'
+    it('should ignore a station route followed by another segment', () => {
+      const value = 'https://www.iheart.com/live/kfi-am-640-177/extra/?embed=true'
+
+      expect(iheartResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore a station route behind another segment', () => {
+      const value = 'https://www.iheart.com/x/live/kfi-am-640-177/?embed=true'
+
+      expect(iheartResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should ignore an unknown route word naming an id', () => {
+      const value = 'https://www.iheart.com/zzroute/kfi-am-640-177/?embed=true'
 
       expect(iheartResolveEmbed(value)).toBeUndefined()
     })
@@ -205,6 +255,26 @@ describeForEachParser('iheartEmbedResolver', (parseHtml) => {
         id: '27977436/56902288',
         src: 'https://www.iheart.com/podcast/27977436/episode/56902288/?embed=true',
         url: 'https://www.iheart.com/podcast/27977436/episode/56902288/',
+        height: 200,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+    it('should resolve the live station iframe the publisher pasted', async () => {
+      const value = html`
+        <iframe
+          allow="autoplay"
+          width="100%"
+          height="200"
+          src="https://www.iheart.com/live/pride-radio-3949?embed=true"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'iheart',
+        id: 'live/3949',
+        src: 'https://www.iheart.com/live/3949/?embed=true',
+        url: 'https://www.iheart.com/live/3949/',
         height: 200,
       }
 

@@ -12,11 +12,13 @@ const iheartHosts = ['iheart.com']
 // A route segment is the bare id or a slug hanging before it, `{slug}-{id}`.
 const episodePathRegex = /^\/podcast\/(?:[^/]*-)?(\d+)\/episode\/(?:[^/]*-)?(\d+)\/?$/i
 const showPathRegex = /^\/podcast\/(?:[^/]*-)?(\d+)\/?$/i
+const stationPathRegex = /^\/(?<kind>live|artist)\/(?:[^/]*-)?(?<id>\d+)\/?$/i
 
 // The player's own embed code sizes the episode bar and the show player differently.
-const playerHeights = { episode: 200, show: 300 }
+const playerHeights = { episode: 200, show: 300, station: 200 }
 
-// An iHeart podcast player, of one episode or of a show, on www.iheart.com or beta.iheart.com.
+// An iHeart podcast player, of one episode or of a show, and the live station and artist radio
+// players, on www.iheart.com or beta.iheart.com.
 export const iheartResolveEmbed: ResolveEmbed = (url, element) => {
   const pathname = parseUrl(url, placeholderBaseUrl)?.pathname ?? ''
   const episode = pathname.match(episodePathRegex)
@@ -30,6 +32,22 @@ export const iheartResolveEmbed: ResolveEmbed = (url, element) => {
       src: `${page}?embed=true`,
       url: page,
       height: playerHeights.episode,
+      title: attr(element, 'title'),
+    }
+  }
+
+  const station = pathname.match(stationPathRegex)?.groups
+
+  if (station?.kind && station.id) {
+    const kind = station.kind.toLowerCase()
+    const page = `https://www.iheart.com/${kind}/${station.id}/`
+
+    return {
+      provider,
+      id: `${kind}/${station.id}`,
+      src: `${page}?embed=true`,
+      url: page,
+      height: playerHeights.station,
       title: attr(element, 'title'),
     }
   }
