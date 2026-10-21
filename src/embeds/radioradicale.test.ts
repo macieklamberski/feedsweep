@@ -118,12 +118,6 @@ describe('radioradicaleResolveEmbed', () => {
       expect(radioradicaleResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for the player word in capitals, which lands on the page', () => {
-      const value = 'https://www.radioradicale.it/scheda/542812/IFRAME'
-
-      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the Flash player configuration', () => {
       const value = 'http://www.radioradicale.it/scheda/embedcfg/401265/2838705'
 
@@ -180,6 +174,60 @@ describe('radioradicaleResolveEmbed', () => {
         id: '542812a',
         src: 'https://www.radioradicale.it/scheda/542812a/iframe',
         url: 'https://www.radioradicale.it/scheda/542812a',
+        ratio: '16/9',
+      }
+
+      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the player word in capitals and write it lowercase', () => {
+      const value = 'https://www.radioradicale.it/scheda/542812/IFRAME'
+      const expected: EmbedResolverResult = {
+        provider: 'radioradicale',
+        id: '542812',
+        src: 'https://www.radioradicale.it/scheda/542812/iframe',
+        url: 'https://www.radioradicale.it/scheda/542812',
+        ratio: '16/9',
+      }
+
+      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the archive word in capitals and write it lowercase', () => {
+      const value = 'https://www.radioradicale.it/SCHEDA/542812/iframe'
+      const expected: EmbedResolverResult = {
+        provider: 'radioradicale',
+        id: '542812',
+        src: 'https://www.radioradicale.it/scheda/542812/iframe',
+        url: 'https://www.radioradicale.it/scheda/542812',
+        ratio: '16/9',
+      }
+
+      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the archive word of the Flash configuration in capitals', () => {
+      const value =
+        'http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?config=http://www.radioradicale.it/SCHEDA/embedcfg/401265/2838705'
+      const expected: EmbedResolverResult = {
+        provider: 'radioradicale',
+        id: '401265',
+        src: 'https://www.radioradicale.it/scheda/401265/iframe',
+        url: 'https://www.radioradicale.it/scheda/401265',
+        ratio: '16/9',
+      }
+
+      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the configuration word of the Flash configuration in capitals', () => {
+      const value =
+        'http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?config=http://www.radioradicale.it/scheda/EMBEDCFG/401265/2838705'
+      const expected: EmbedResolverResult = {
+        provider: 'radioradicale',
+        id: '401265',
+        src: 'https://www.radioradicale.it/scheda/401265/iframe',
+        url: 'https://www.radioradicale.it/scheda/401265',
         ratio: '16/9',
       }
 
