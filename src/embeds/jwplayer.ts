@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, findConfigScript } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const fileExtensionRegex = /\.[a-z]+$/i
@@ -57,6 +57,22 @@ export const jwplayerIframeEmbedResolver = createUrlEmbedResolver(
   jwplayerHosts,
   jwplayerResolveEmbed,
 )
+
+// out.com's wrapper frame, `out.com/res/scraper/embed/?jwplayer_video_url={script}`, which names
+// the JW player script in its query.
+export const jwplayerOutEmbedResolver = createUrlEmbedResolver(['out.com'], (url) => {
+  const { jwplayer_video_url: script } = pickQueryParams(parseUrl(url)?.search ?? '', [
+    'jwplayer_video_url',
+  ])
+
+  const parsed = parseUrlOnHosts(script, jwplayerHosts)
+
+  if (!parsed) {
+    return
+  }
+
+  return jwplayerResolveEmbed(parsed.href)
+})
 
 // JW Player's script embed: the same players/{mediaId}-{playerId} url beside an empty botr_ div.
 export const jwplayerScriptEmbedResolver = createMarkupEmbedResolver(

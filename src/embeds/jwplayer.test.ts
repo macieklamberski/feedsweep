@@ -8,6 +8,7 @@ import {
   jwplayerIframeEmbedResolver,
   jwplayerLibraryEmbedResolver,
   jwplayerMountEmbedResolver,
+  jwplayerOutEmbedResolver,
   jwplayerResolveEmbed,
   jwplayerScriptEmbedResolver,
   jwplayerSetupEmbedResolver,
@@ -158,6 +159,61 @@ describeForEachParser('jwplayerIframeEmbedResolver', (parseHtml) => {
     const value = '<iframe src="https://example.com/video"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
+  })
+})
+
+describeForEachParser('jwplayerOutEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, jwplayerOutEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the JW script out of the wrapper query', async () => {
+      const value = html`
+        <iframe
+          frameborder="0"
+          height="100%"
+          scrolling="no"
+          src="https://www.out.com/res/scraper/embed/?jwplayer_video_url=https%3A%2F%2Fcontent.jwplatform.com%2Fplayers%2Ft8BMK40i-4mfZ1NcF.js"
+          width="100%"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 't8BMK40i',
+        src: 'https://cdn.jwplayer.com/players/t8BMK40i.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/t8BMK40i/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a wrapper query naming a script on a foreign host', async () => {
+      const value = html`
+        <iframe
+          src="https://www.out.com/res/scraper/embed/?jwplayer_video_url=https%3A%2F%2Fevil.test%2Fplayers%2Ft8BMK40i-4mfZ1NcF.js"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the same wrapper on a foreign host', async () => {
+      const value = html`
+        <iframe
+          src="https://evil.test/res/scraper/embed/?jwplayer_video_url=https%3A%2F%2Fcontent.jwplatform.com%2Fplayers%2Ft8BMK40i-4mfZ1NcF.js"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a wrapper naming no script', async () => {
+      const value = '<iframe src="https://www.out.com/res/scraper/embed/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
 
