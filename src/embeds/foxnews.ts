@@ -48,8 +48,9 @@ const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult => {
 }
 
 // Both carriers name the video in a query parameter, `id` on the script, `video_id` on the
-// iframe, or the legacy video page in its path, and the rest of the query is the snippet's size or the embedding page's referrer. The
-// ids of the retired root `embed.js` route are gone from both the player and the page.
+// iframe, or the legacy video page in its path, and the rest of the query is the snippet's size
+// or the embedding page's referrer. The ids of the retired root `embed.js` route are gone from
+// both the player and the page.
 export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 

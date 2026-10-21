@@ -80,6 +80,7 @@ describeForEachParser('padletEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
     it('should rebuild the board page, which refuses framing, onto its embed', async () => {
       const value =
         '<iframe src="https://padlet.com/gwusa/for-our-parks-for-our-future-9gm8z3x03iuwt1zp"></iframe>'
