@@ -75,6 +75,19 @@ describe('standfmResolveEmbed', () => {
       expect(standfmResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should build the player from an uppercase kind on its lowercase route word', () => {
+      const value = 'https://stand.fm/embed/EPISODES/6a8065825e9572e804f8a5cb'
+      const expected: EmbedResolverResult = {
+        provider: 'standfm',
+        id: 'episodes/6a8065825e9572e804f8a5cb',
+        src: 'https://stand.fm/embed/episodes/6a8065825e9572e804f8a5cb',
+        url: 'https://stand.fm/episodes/6a8065825e9572e804f8a5cb',
+        height: 190,
+      }
+
+      expect(standfmResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should use an uppercase hex id as written, even if the player answers an error', () => {
       const value = 'https://stand.fm/embed/episodes/6A8065825E9572E804F8A5'
       const expected: EmbedResolverResult = {

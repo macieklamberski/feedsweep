@@ -1,13 +1,9 @@
 import { getPathSegments, isAnyOf, parseUrl, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { hexRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { hexRegex, localeWordRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const standfmHosts = ['stand.fm']
-
-// stand.fm publishes two kinds today, and a first segment that names no player answers 404, which
-// the page url answered anyway.
-const playerKindRegex = /^[a-z]+$/
 
 // stand.fm's own snippet sizes the iframe with a `<style>` beside it, which is stripped before the
 // iframe reaches a reader. A channel embed scrolls its list of episodes inside a fixed card.
@@ -21,7 +17,7 @@ export const standfmResolveEmbed: ResolveEmbed = (url) => {
   const kind = rawKind?.toLowerCase()
 
   // The hex alphabet keeps a route word such as `/episodes/new`, a live page, out of the id slot.
-  if (!kind || !playerKindRegex.test(kind) || !id || !hexRegex.test(id)) {
+  if (!kind || !localeWordRegex.test(kind) || !id || !hexRegex.test(id)) {
     return
   }
 

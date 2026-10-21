@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { uuidRegex } from '../utils/urls.js'
+import { localeWordRegex, uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'captivate'
@@ -12,16 +12,14 @@ const captivateHosts = ['captivate.fm']
 const playerHeight = 200
 const showHeight = 600
 
-// A shape, not a list of the two kinds published today, so a kind added later still resolves.
-// The player host answers the same empty shell for every path it does not serve.
-const embedKindRegex = /^[a-z]+$/
-
 export const extractCaptivateEmbed = (link: string): { kind: string; id: string } | undefined => {
   const segments = getPathSegments(link)
-  const [kind, id] = segments
+  const [route, id] = segments
+  const kind = route?.toLowerCase()
 
-  // The segment count keeps a `media/{uuid}/{file}.mp3` enclosure out of a dead placeholder.
-  if (segments.length !== 2 || !kind || !id || !embedKindRegex.test(kind) || !uuidRegex.test(id)) {
+  // The segment count keeps a `media/{uuid}/{file}.mp3` enclosure out of a dead placeholder. The kind
+  // is a shape, so a kind added later still resolves.
+  if (segments.length !== 2 || !kind || !id || !localeWordRegex.test(kind) || !uuidRegex.test(id)) {
     return
   }
 
