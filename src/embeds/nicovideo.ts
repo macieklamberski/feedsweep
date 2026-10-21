@@ -1,7 +1,7 @@
 import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'nicovideo'
@@ -17,6 +17,9 @@ const nicovideoHosts = ['nicovideo.jp']
 const nonVideoHosts = ['seiga.nicovideo.jp', 'manga.nicovideo.jp', 'news.nicovideo.jp']
 
 const videoIdMarkers = ['thumb_watch', 'thumb', 'watch', 'embed']
+
+// The video player starts at `from`, in seconds.
+const nicovideoEmbedParams = ['from']
 
 export const extractNicovideoId = (link: string): string | undefined => {
   // The script selector matches on a substring, so any host can spell `nicovideo.jp/thumb_watch`
@@ -61,7 +64,7 @@ export const nicovideoResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider,
     id: videoId,
-    src: `https://embed.nicovideo.jp/watch/${videoId}`,
+    src: `https://embed.nicovideo.jp/watch/${videoId}${pickUrlParams(url, nicovideoEmbedParams)}`,
     url: `https://www.nicovideo.jp/watch/${videoId}`,
     ratio: '16/9',
   }

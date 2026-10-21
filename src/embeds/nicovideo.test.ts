@@ -126,7 +126,7 @@ describeForEachParser('nicovideoIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the query the player iframe carries', async () => {
+    it('should keep the start position and drop the rest of the query', async () => {
       const value = html`
         <iframe
           width="640"
@@ -141,7 +141,7 @@ describeForEachParser('nicovideoIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'nicovideo',
         id: 'sm28553330',
-        src: 'https://embed.nicovideo.jp/watch/sm28553330',
+        src: 'https://embed.nicovideo.jp/watch/sm28553330?from=0',
         url: 'https://www.nicovideo.jp/watch/sm28553330',
         ratio: '16/9',
       }
@@ -240,6 +240,19 @@ describe('nicovideoResolveEmbed', () => {
       provider: 'nicovideo',
       id: 'sm9',
       src: 'https://embed.nicovideo.jp/watch/sm9',
+      url: 'https://www.nicovideo.jp/watch/sm9',
+      ratio: '16/9',
+    }
+
+    expect(nicovideoResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep the start position the player url names', () => {
+    const value = 'https://embed.nicovideo.jp/watch/sm9?from=30&oldScript=1'
+    const expected: EmbedResolverResult = {
+      provider: 'nicovideo',
+      id: 'sm9',
+      src: 'https://embed.nicovideo.jp/watch/sm9?from=30',
       url: 'https://www.nicovideo.jp/watch/sm9',
       ratio: '16/9',
     }
