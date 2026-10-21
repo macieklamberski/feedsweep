@@ -393,14 +393,14 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
   })
 
   describe('the legacy slideshow iframe', () => {
-    it('should trim the path slash a feed left on the set id', async () => {
+    it('should use a set id carrying a path slash as written', async () => {
       const value =
         '<iframe src="http://www.flickr.com/slideShow/index.gne?user_id=24006738@N07&amp;set_id=72157627734131040/"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: '24006738@N07/72157627734131040',
-        src: 'https://embedr.flickr.com/photosets/72157627734131040?width=400&height=300',
-        url: 'https://www.flickr.com/photos/24006738@N07/sets/72157627734131040',
+        id: '24006738@N07/72157627734131040/',
+        src: 'https://embedr.flickr.com/photosets/72157627734131040%2F?width=400&height=300',
+        url: 'https://www.flickr.com/photos/24006738@N07/sets/72157627734131040%2F',
         width: 400,
         height: 300,
       }
@@ -606,6 +606,14 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should return undefined for an album page whose set id runs on past its digits', async () => {
+      const value = html`
+        <iframe src="http://www.flickr.com/photos/53116286@N07/sets/72157627116531602x/"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should map a framed album player onto the album player', async () => {
       const value = html`
         <iframe
@@ -712,6 +720,22 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'groups/1753363@N23',
         src: 'https://embedr.flickr.com/groups/1753363@N23?width=400&height=300',
         url: 'https://www.flickr.com/groups/1753363@N23/',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should map a framed group pool slideshow page whose NSID ends in three digits', async () => {
+      const value = html`
+        <iframe src="https://www.flickr.com/groups/1753363@N230/pool/show/"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'groups/1753363@N230',
+        src: 'https://embedr.flickr.com/groups/1753363@N230?width=400&height=300',
+        url: 'https://www.flickr.com/groups/1753363@N230/',
         width: 400,
         height: 300,
       }
