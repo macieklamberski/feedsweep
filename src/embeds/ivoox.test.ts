@@ -163,11 +163,50 @@ describe('extractIvooxSubject', () => {
     expect(extractIvooxSubject(value)).toEqual(expected)
   })
 
-  it('should use a malformed podcast id as written, even if the player answers an error', () => {
+  it('should return undefined for a podcast id that is not digits', () => {
     const value = 'https://www.ivoox.com/player_es_podcast_x1267769_1.html'
+
+    expect(extractIvooxSubject(value)).toBeUndefined()
+  })
+
+  it('should read a podcast id of unusual length as written', () => {
+    const value = 'https://www.ivoox.com/player_es_podcast_123456789012_1.html'
     const expected: IvooxSubject = {
       kind: 'show',
-      id: 'x1267769',
+      id: '123456789012',
+      page: '1',
+    }
+
+    expect(extractIvooxSubject(value)).toEqual(expected)
+  })
+
+  it('should read a show player spelled in uppercase', () => {
+    const value = 'https://www.ivoox.com/PLAYER_ES_PODCAST_1267769_ZP_1.HTML'
+    const expected: IvooxSubject = {
+      kind: 'show',
+      id: '1267769',
+      page: '1',
+    }
+
+    expect(extractIvooxSubject(value)).toEqual(expected)
+  })
+
+  it('should read an episode player spelled in uppercase', () => {
+    const value = 'https://www.ivoox.com/PLAYER_EJ_80807760_6_1.HTML'
+    const expected: IvooxSubject = {
+      kind: 'episode',
+      id: '80807760',
+      page: '1',
+    }
+
+    expect(extractIvooxSubject(value)).toEqual(expected)
+  })
+
+  it('should read a legacy player spelled in uppercase', () => {
+    const value = 'https://www.ivoox.com/PLAYERIVOOX_EE_80807760_1.HTML'
+    const expected: IvooxSubject = {
+      kind: 'episode',
+      id: '80807760',
       page: '1',
     }
 

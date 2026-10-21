@@ -17,7 +17,7 @@ const episodePlayerRegex = /\/player_e[jk]_([^_/]+)(?:_\d+)?_(\d+)\.html$/i
 // The show player, which carries every episode. Its id is the podcast's, a different id space
 // from an episode's, so it cannot share the episode kind.
 // The skin is a number, or `zp` on the current player.
-const showPlayerRegex = /\/player_es_podcast_([^_/]+)(?:_[^_/]+)?_(\d+)\.html$/i
+const showPlayerRegex = /\/player_es_podcast_(\d+)(?:_[^_/]+)?_(\d+)\.html$/i
 
 const ivooxHosts = ['ivoox.com']
 
