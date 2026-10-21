@@ -1,4 +1,4 @@
-import { getPathSegments, isPlainObject, toMap } from 'trousse'
+import { getAnyOf, getPathSegments, isAnyOf, isPlainObject, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -15,6 +15,7 @@ const spotifyHeights = toMap({
   playlist: 352,
   artist: 352,
 })
+const spotifyTypes = Array.from(spotifyHeights.keys())
 
 // `embed` opens a player path, `embed-podcast` its older podcast-only twin, `intl-{lang}` a
 // localized page path. Whatever follows the id (`/video` on a video podcast) is decorative.
@@ -22,7 +23,7 @@ const pathPrefixRegex = /^(?:embed|embed-podcast|intl-.+)$/i
 // spotify:{type}:{id}, or the owned playlist form spotify:user:{handle}:playlist:{id}.
 // The pre-2017 snippet framed `embed.spotify.com/?uri=spotify:{type}:{id}`, and that host still
 // serves a player.
-const legacyUriRegex = /^spotify:(?:.*:)?([a-z]+):([a-zA-Z0-9]+)$/
+const legacyUriRegex = /^spotify:(?:.*:)?([a-z]+):([a-zA-Z0-9]+)$/i
 // Substack writes `By {owner}` where a playlist card's act goes, and Spotify names that same
 // account bare on its own player.
 const ownerPrefixRegex = /^By /
@@ -75,7 +76,7 @@ const readPathPair = (url: URL | undefined): [string, string] | undefined => {
   const segments = getPathSegments(url)
   const named = pathPrefixRegex.test(segments[0] ?? '') ? segments.slice(1) : segments
   // The same ownership spelled as a path, `/embed/user/{handle}/playlist/{id}`.
-  const owned = named[0] === 'user' ? named.slice(2) : named
+  const owned = isAnyOf(named[0], 'user') ? named.slice(2) : named
 
   return owned[0] && owned[1] ? [owned[0], owned[1]] : undefined
 }
@@ -99,9 +100,10 @@ export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
   const pair =
     readPathPair(parsed) ??
     (legacy ? [legacy[1], legacy[2]] : readPathPair(parseUrlOnHosts(uri, spotifyHosts)))
-  const [type, id] = pair ?? []
+  const type = getAnyOf(pair?.[0], spotifyTypes)
+  const id = pair?.[1]
 
-  if (!type || !id || !spotifyHeights.has(type)) {
+  if (!type || !id) {
     return
   }
 
