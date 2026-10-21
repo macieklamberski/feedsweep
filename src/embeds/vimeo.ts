@@ -268,11 +268,7 @@ const vimeoEmbedParams = ['loop']
 
 // The player seeks to `t` in the fragment, `#t=30s`, and ignores a `t` in the query, which a page
 // url shared with a start carries.
-const readStart = (url: URL | undefined): string | undefined => {
-  if (!url) {
-    return
-  }
-
+const readStart = (url: URL): string | undefined => {
   return pickQueryParams(url.hash.slice(1), ['t']).t ?? pickQueryParams(url.search, ['t']).t
 }
 
@@ -301,7 +297,7 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     // The hash travels in the id: an oEmbed lookup for the bare id answers 404.
     id: hash ? `${videoId}:${hash}` : videoId,
-    src: composeEmbedUrl(segment, params, readStart(parsed)),
+    src: composeEmbedUrl(segment, params, parsed ? readStart(parsed) : undefined),
     // Without the hash the page loses its title and its video, so it stays on the url too.
     url: `https://vimeo.com/${segment}${hash ? `/${encodePathSegment(hash)}` : ''}`,
     ratio: playerRatio,
