@@ -33,8 +33,9 @@ const quantifierRegex = /\{\d+(?:,\d*)?\}/
 // A year, month or day in a date route is route structure, not a value length.
 const dateQuantifierRegex = /\\d\{[24]\}/g
 const lengthCompareRegex = /\b(\w+)\??\.length\s*(?:[<>]=?|[!=]==)\s*(?:[2-9]|\d{2,}|\w+Length)\b/
-// A plural, `rest` or `path` names an array of segments, whose length is a route shape.
-const arrayNameRegex = /(?:s|rest|path)$/
+// A plural, `rest` or `path` names an array of segments, whose length is a route shape. A `run`
+// holds sibling elements, whose length counts them.
+const arrayNameRegex = /(?:s|rest|path|run)$/
 const lengthMarkerRegex = /^\s*\/\/ length: (?:keeps .+ out|extracts .+)/
 // Any flag but `g`: a global literal is a replace, such as a trim, and tests no value.
 const anchoredLiteralRegex = /^\/\^.*\$\/[a-fh-z]*$/

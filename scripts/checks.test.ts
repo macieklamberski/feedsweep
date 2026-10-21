@@ -79,6 +79,12 @@ describe('checkLengths', () => {
     )
   })
 
+  it('should pass a count of sibling elements in a run', () => {
+    const value = '      if (run.length < 2) {'
+
+    expect(checkLengths('src/transforms/dom/acme.ts', value)).toEqual([])
+  })
+
   it('should pass a date route', () => {
     const value = 'const pathDateRegex = /\\/(\\d{4})\\/(0[1-9]|1[0-2])\\/(\\d{2})\\//'
 
