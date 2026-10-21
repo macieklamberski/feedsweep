@@ -1240,6 +1240,17 @@ describeForEachParser('tiktokS9eEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a clip id that is a dot segment', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="tiktok"
+          src="https://s9e.github.io/iframe/2/tiktok.min.html#.."
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a fragment that is not a clip id', async () => {
       const value = html`
         <iframe
