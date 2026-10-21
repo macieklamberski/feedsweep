@@ -9,10 +9,10 @@ const guardianHosts = ['embed.theguardian.com']
 // slug 404s.
 const playerPathRegex = /^\/embed\/video\/([^/]+\/video\/[^/]+\/[^/]+\/[^/]+\/[^/]+)$/
 
-// A path states a day and not a moment, so `date` carries the calendar day alone, and a name
-// outside the twelve months leaves it unstated.
-// length: extracts the month, the three-letter English abbreviation on every edition
-const pathDateRegex = /^[a-z0-9-]+\/video\/(\d{4})\/([a-z]{3})\/(0[1-9]|[12]\d|3[01])\//
+// The path dates the video, and the month is the three-letter English abbreviation on every
+// edition. A path states a day and not a moment, so `date` carries the calendar day alone, and
+// a name outside the twelve months leaves it unstated.
+const pathDateRegex = /^[a-z0-9-]+\/video\/(\d{4})\/([a-z]+)\/(0[1-9]|[12]\d|3[01])\//
 const monthNumbers: Record<string, string | undefined> = {
   jan: '01',
   feb: '02',
