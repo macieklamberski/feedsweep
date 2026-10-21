@@ -364,6 +364,46 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+    it('should claim a short link frame', async () => {
+      const value = html`
+        <iframe
+          allowfullscreen="true"
+          frameborder="1"
+          height="400"
+          loading="lazy"
+          src="https://yandex.ru/map-widget/v1/-/CCUnYRDQkD"
+          width="600"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        id: '-/CCUnYRDQkD',
+        src: 'https://yandex.ru/map-widget/v1/-/CCUnYRDQkD',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should claim a short link frame on the Belarusian host', async () => {
+      const value = html`
+        <iframe
+          src="https://yandex.by/map-widget/v1/-/CCUmMWx~KA"
+          width="560"
+          height="400"
+          frameborder="1"
+          allowfullscreen="allowfullscreen"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        id: '-/CCUmMWx~KA',
+        src: 'https://yandex.ru/map-widget/v1/-/CCUmMWx~KA',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -374,8 +414,20 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a short link frame', async () => {
-      const value = '<iframe src="https://yandex.ru/map-widget/v1/-/CHA0YA-W"></iframe>'
+    it('should ignore a short link frame naming no code', async () => {
+      const value = '<iframe src="https://yandex.ru/map-widget/v1/-/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a segment after the short link code', async () => {
+      const value = '<iframe src="https://yandex.ru/map-widget/v1/-/CHA0YA-W/extra"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the short link path under another route', async () => {
+      const value = '<iframe src="https://yandex.ru/x/map-widget/v1/-/CHA0YA-W"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
