@@ -655,10 +655,18 @@ describeForEachParser('mailruWidgetEmbedResolver', (parseHtml) => {
         ></span>
         <iframe src="https://my.mail.ru/video/embed/-16643191545523102"></iframe>
       `
-
-      expect(await extract(value)).toMatchObject({
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
         id: 'community/sergeyrus/_groupvideo/5218',
-      })
+        src: 'https://my.mail.ru/community/sergeyrus/video/embed/_groupvideo/5218',
+        url: 'https://my.mail.ru/community/sergeyrus/video/_groupvideo/5218.html',
+        ratio: '16/9',
+        author: 'sergeyrus',
+        thumbnail:
+          'https://filed4-21.my.mail.ru/pic?url=http%3A%2F%2Fmy.mail.ru%2Fx%2F%2B%2Fvideo%2Furl%2Fsc03%2F-16643191545523102&mw=480&mh=330&sig=f5d969f78779100fec7222c93b385787&croped=1',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should not read the preview id followed by another segment', async () => {
@@ -670,10 +678,18 @@ describeForEachParser('mailruWidgetEmbedResolver', (parseHtml) => {
         ></span>
         <iframe src="https://my.mail.ru/video/embed/-16643191545523102"></iframe>
       `
-
-      expect(await extract(value)).toMatchObject({
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
         id: 'community/sergeyrus/_groupvideo/5218',
-      })
+        src: 'https://my.mail.ru/community/sergeyrus/video/embed/_groupvideo/5218',
+        url: 'https://my.mail.ru/community/sergeyrus/video/_groupvideo/5218.html',
+        ratio: '16/9',
+        author: 'sergeyrus',
+        thumbnail:
+          'https://filed4-21.my.mail.ru/pic?url=http%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fsc03%2F-16643191545523102%2Fextra&mw=480&mh=330&sig=f5d969f78779100fec7222c93b385787&croped=1',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 
