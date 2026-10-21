@@ -1004,6 +1004,19 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toBeUndefined()
   })
 
+  it('should ignore the subscribe button that names its channel by id', async () => {
+    const value =
+      '<iframe src="https://www.youtube.com/subscribe_embed?usegapi=1&channelid=UCDP6UUSHAn--bITwyf6uycQ&layout=full"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore the subscribe button that names its channel by user', async () => {
+    const value = '<iframe src="http://www.youtube.com/subscribe_widget?p=tyndago"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
   // The Flash playlist arrives on an `<embed>`, never an iframe: the form predates the iframe
   // player, so the carrier is the half of this that has to keep working.
   it('should extract the playlist from a Flash embed carrier', async () => {
