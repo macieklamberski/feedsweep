@@ -1,7 +1,13 @@
 import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { composeQuery, digitsRegex, isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  digitsRegex,
+  isFileName,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'megaphone'
@@ -51,10 +57,13 @@ export const megaphoneResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
+  const playback = pickQueryParams(parseUrl(url, placeholderBaseUrl)?.search ?? '', ['start'])
+  const query = composeQuery({ [embed.param]: embed.id, ...playback })
+
   return {
     provider,
     id: `${embed.kind}/${embed.id}`,
-    src: `https://playlist.megaphone.fm/${composeQuery({ [embed.param]: embed.id })}`,
+    src: `https://playlist.megaphone.fm/${query}`,
     height: embed.height,
   }
 }
