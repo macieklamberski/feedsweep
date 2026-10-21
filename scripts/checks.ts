@@ -17,7 +17,7 @@ type LineCheck = {
   isMatch: (line: string) => boolean
 }
 
-const moduleDirs = ['src/cites', 'src/embeds', 'src/media', 'src/transforms']
+const moduleDirs = ['src/cites', 'src/embeds', 'src/emojis', 'src/media', 'src/transforms']
 
 const commentLineRegex = /^\s*\/\//
 const mediaFileRegex = /\\\.\((?:[a-z0-9]+\|)+[a-z0-9]+\)\$/
