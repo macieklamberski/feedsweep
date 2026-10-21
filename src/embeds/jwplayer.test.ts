@@ -159,6 +159,31 @@ describeForEachParser('jwplayerIframeEmbedResolver', (parseHtml) => {
 
     expect(await extract(value)).toBeUndefined()
   })
+
+  it('should read the media name the frame states', async () => {
+    const value = html`
+      <iframe
+        src="https://content.jwplatform.com/players/cqFQ5oTg.html"
+        id="cqFQ5oTg"
+        title="Windows 11 in 2026: First look at NEW features and changes coming this year"
+        width="1920"
+        height="1080"
+        frameborder="0"
+        scrolling="auto"
+        allowfullscreen
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'jwplayer',
+      id: 'cqFQ5oTg',
+      src: 'https://cdn.jwplayer.com/players/cqFQ5oTg.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/cqFQ5oTg/poster.jpg',
+      ratio: '16/9',
+      title: 'Windows 11 in 2026: First look at NEW features and changes coming this year',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
 })
 
 describeForEachParser('jwplayerScriptEmbedResolver', (parseHtml) => {

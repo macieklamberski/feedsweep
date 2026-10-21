@@ -25,6 +25,7 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
         src: 'https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c',
         url: 'https://www.ganjingworld.com/video/1fv8993v57oI3UiHioRJzFV1L1cq1c',
         ratio: '16/9',
+        title: 'Thiển đàm về võ thuật truyền thống và võ thuật hiện đại | TTV',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -49,6 +50,7 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
         src: 'https://www.ganjingworld.com/vi-VN/embed/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
         url: 'https://www.ganjingworld.com/vi-VN/video/1fsgbpm9oun2BkUb1UnIp8fuS1ll1c',
         ratio: '16/9',
+        title: 'Khoảnh khắc cả dãy nhà bị sụp xuống sông ở An Giang',
       }
 
       expect(await extract(value)).toEqual(expected)

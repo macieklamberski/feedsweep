@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { keepIfMatches } from '../utils/dom.js'
+import { attr, keepIfMatches } from '../utils/dom.js'
 import { localePairRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -38,10 +38,8 @@ const readVideo = (url: string): Video | undefined => {
   return { locale, id: third }
 }
 
-// No title: the carrier states one, but Gan Jing World is unmeasured, so reading it risks putting
-// a player label in the item's title. No thumbnail: the poster is a uuid on a separate cdn and
-// nothing composes it from the video id.
-const ganjingworldResolveEmbed: ResolveEmbed = (url) => {
+// No thumbnail: the poster is a uuid on a separate cdn and nothing composes it from the video id.
+const ganjingworldResolveEmbed: ResolveEmbed = (url, element) => {
   const video = readVideo(url)
 
   if (!video) {
@@ -57,6 +55,7 @@ const ganjingworldResolveEmbed: ResolveEmbed = (url) => {
     src: `https://www.ganjingworld.com${prefix}/embed/${video.id}`,
     url: `https://www.ganjingworld.com${prefix}/video/${video.id}`,
     ratio: '16/9',
+    title: attr(element, 'title'),
   }
 }
 

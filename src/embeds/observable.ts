@@ -1,6 +1,6 @@
 import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { keepIfMatches } from '../utils/dom.js'
+import { attr, keepIfMatches } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
 import { hexRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -13,7 +13,7 @@ const versionSuffixRegex = /@[^@/]*$/
 
 // Observable's notebook frame, observablehq.com/embed/@{user}/{notebook}[@{version}]?cells={names},
 // or embed/{16 hex}[@{version}] for a notebook addressed by its id.
-const observableResolveEmbed: ResolveEmbed = (url) => {
+const observableResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
   const segments = getPathSegments(url)
 
@@ -39,6 +39,7 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
       id: notebookId,
       src,
       url: `https://observablehq.com/d/${notebookId}`,
+      title: attr(element, 'title'),
     }
   }
 
@@ -61,6 +62,7 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
     id: `${handle}/${notebook}`,
     src,
     url: `https://observablehq.com/${rawHandle}/${rawSlug.replace(versionSuffixRegex, '')}`,
+    title: attr(element, 'title'),
   }
 }
 

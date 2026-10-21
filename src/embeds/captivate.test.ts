@@ -142,6 +142,33 @@ describeForEachParser('captivateEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
   })
+
+  describe('the title the carrier states', () => {
+    it('should read the episode name WordPress writes on the frame', async () => {
+      const value = html`
+        <iframe
+          class="wp-embedded-content"
+          sandbox="allow-scripts"
+          security="restricted"
+          title="Speaker Showcase: Strategies for Navigating Disputes in Contested Matters with Steve Malech and Matt Smith"
+          frameborder="0"
+          scrolling="no"
+          src="https://player.captivate.fm/episode/da911323-a816-4e01-96cc-047abe51c62f/#?secret=nkygyFAPpV"
+          data-secret="nkygyFAPpV"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'captivate',
+        id: 'episode/da911323-a816-4e01-96cc-047abe51c62f',
+        src: 'https://player.captivate.fm/episode/da911323-a816-4e01-96cc-047abe51c62f',
+        height: 200,
+        title:
+          'Speaker Showcase: Strategies for Navigating Disputes in Contested Matters with Steve Malech and Matt Smith',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 // The url resolver reaches every enclosure a feed carries, and Captivate's episode files sit on

@@ -42,14 +42,14 @@ const composeJwplayerEmbed = (id: string, isPlaylist = false): EmbedResolverResu
   }
 }
 
-export const jwplayerResolveEmbed: ResolveEmbed = (url) => {
+export const jwplayerResolveEmbed: ResolveEmbed = (url, element) => {
   const mediaId = extractJwplayerId(url)
 
   if (!mediaId) {
     return
   }
 
-  return composeJwplayerEmbed(mediaId)
+  return { ...composeJwplayerEmbed(mediaId), title: attr(element, 'title') }
 }
 
 // A JW Player iframe, players/{mediaId}-{playerId}.html, some with an empty player id that 404s.

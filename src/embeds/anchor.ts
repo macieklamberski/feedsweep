@@ -1,6 +1,9 @@
 import { getPathSegments, isHostOrSubdomainOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'anchor'
 
 // One service, three host generations, all still live in feeds: `anchor.fm` became
 // `podcasters.spotify.com` became `creators.spotify.com`. The Spotify resolver matches the
@@ -53,17 +56,18 @@ const extractAnchorShow = (link: string): string | undefined => {
 }
 
 // The player carries no metadata, and Anchor's old oEmbed endpoint is gone.
-export const anchorResolveEmbed: ResolveEmbed = (url) => {
+export const anchorResolveEmbed: ResolveEmbed = (url, element) => {
   const episode = extractAnchorEpisode(url)
 
   if (episode) {
     const [show, slug] = episode.split('/')
 
     return {
-      provider: 'anchor',
+      provider,
       id: episode,
       src: `https://creators.spotify.com/pod/profile/${show}/embed/episodes/${slug}`,
       height: playerHeight,
+      title: attr(element, 'title'),
     }
   }
 
@@ -74,13 +78,18 @@ export const anchorResolveEmbed: ResolveEmbed = (url) => {
   }
 
   return {
-    provider: 'anchor',
+    provider,
     id: show,
     src: `https://creators.spotify.com/pod/profile/${show}/embed`,
     height: playerHeight,
+    title: attr(element, 'title'),
   }
 }
 
 // Anchor's episode and show player iframes, on the anchor.fm host and the two Spotify hosts it
 // became.
 export const anchorEmbedResolver = createUrlEmbedResolver(anchorHosts, anchorResolveEmbed)
+
+export const anchorFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'myFrame' },
+]

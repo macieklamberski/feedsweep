@@ -29,14 +29,14 @@ const composeEmbed = (pollId: string): EmbedResolverResult => {
 }
 
 // The poll frame, `poll.fm/{id}/embed`, and the poll page, which the snippet's <noscript> names.
-export const crowdsignalResolveEmbed: ResolveEmbed = (url) => {
+export const crowdsignalResolveEmbed: ResolveEmbed = (url, element) => {
   const pollId = parseUrl(url, placeholderBaseUrl)?.pathname.match(pollPathRegex)?.[1]
 
   if (!pollId) {
     return
   }
 
-  return composeEmbed(pollId)
+  return { ...composeEmbed(pollId), title: attr(element, 'title') }
 }
 
 export const crowdsignalIframeEmbedResolver = createUrlEmbedResolver(

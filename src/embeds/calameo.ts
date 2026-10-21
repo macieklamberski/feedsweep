@@ -1,6 +1,6 @@
 import { parseUrl, trimObject } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { flashVars } from '../utils/dom.js'
+import { attr, flashVars } from '../utils/dom.js'
 import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -39,6 +39,7 @@ export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
       id: code,
       src,
       ratio: viewerRatio,
+      title: attr(element, 'title'),
     }
   }
 
@@ -49,6 +50,7 @@ export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
     // The code comes out of a query decoded, and it goes into a path.
     url: `https://www.calameo.com/books/${encodePathSegment(code)}`,
     ratio: viewerRatio,
+    title: attr(element, 'title'),
   }
 }
 

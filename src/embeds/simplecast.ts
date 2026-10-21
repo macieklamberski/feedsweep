@@ -1,5 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
 import { digitsRegex, uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -31,7 +32,7 @@ export const extractSimplecastEpisode = (
   }
 }
 
-export const simplecastResolveEmbed: ResolveEmbed = (url) => {
+export const simplecastResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
   const episode = extractSimplecastEpisode(url)
 
@@ -50,6 +51,7 @@ export const simplecastResolveEmbed: ResolveEmbed = (url) => {
     // resolved by javascript. Only the legacy host validates, answering 404 for an unknown id.
     src: episode.isCurrent ? `https://player.simplecast.com/${episode.id}` : legacySource,
     height: playerHeight,
+    title: attr(element, 'title'),
   }
 }
 
