@@ -126,6 +126,56 @@ describe('extractMegaphoneEmbed', () => {
   })
 })
 
+describe('extractMegaphoneEmbed on the legacy episode player', () => {
+  it('should read the episode the path names', () => {
+    const value = 'https://player.megaphone.fm/VMP9785445903'
+    const expected = {
+      param: 'e',
+      kind: 'episode',
+      id: 'VMP9785445903',
+      height: 200,
+    }
+
+    expect(extractMegaphoneEmbed(value)).toEqual(expected)
+  })
+
+  it('should read the episode with a trailing slash', () => {
+    const value = 'https://player.megaphone.fm/ATL3525134210/'
+    const expected = {
+      param: 'e',
+      kind: 'episode',
+      id: 'ATL3525134210',
+      height: 200,
+    }
+
+    expect(extractMegaphoneEmbed(value)).toEqual(expected)
+  })
+
+  it('should ignore the same path on the current player host', () => {
+    const value = 'https://playlist.megaphone.fm/VMP9785445903'
+
+    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+  })
+
+  it('should ignore a path segment outside the episode format', () => {
+    const value = 'https://player.megaphone.fm/settings'
+
+    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+  })
+
+  it('should ignore the episode nested under another segment', () => {
+    const value = 'https://player.megaphone.fm/x/VMP9785445903'
+
+    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+  })
+
+  it('should ignore a segment after the episode', () => {
+    const value = 'https://player.megaphone.fm/VMP9785445903/extra'
+
+    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+  })
+})
+
 describe('megaphoneResolveEmbed', () => {
   it('should size an episode at the episode height', () => {
     const value = 'https://playlist.megaphone.fm?e=AUDD4761726018'
@@ -217,6 +267,18 @@ describeForEachParser('megaphoneEmbedResolver', (parseHtml) => {
         provider: 'megaphone',
         id: 'episode/AUDD4761726018',
         src: 'https://playlist.megaphone.fm/?e=AUDD4761726018',
+        height: 200,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild the legacy episode player onto the current one', async () => {
+      const value = '<iframe src="https://player.megaphone.fm/VMP9785445903"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'megaphone',
+        id: 'episode/VMP9785445903',
+        src: 'https://playlist.megaphone.fm/?e=VMP9785445903',
         height: 200,
       }
 
