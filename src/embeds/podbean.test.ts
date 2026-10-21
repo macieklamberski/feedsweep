@@ -31,7 +31,7 @@ describe('extractPodbeanId', () => {
     expect(extractPodbeanId(value)).toBeUndefined()
   })
 
-  it('should return undefined for the legacy audio post player', () => {
+  it('should return undefined for the audio post player, whose episode id the server assigns', () => {
     const value =
       'http://www.podbean.com/media/player/audio/postId/5412166?url=http%3A%2F%2Fthetilehurstend.podbean.com%2Fe%2Fepisode-45%2F'
 

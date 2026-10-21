@@ -7,8 +7,8 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'flourish'
 
-// `flo.uri.sh` is the canonical player. `public.flourish.studio/{resource}/{id}/embed` answers
-// with a shim whose only job is to rewrite the location to it.
+// `flo.uri.sh` is the canonical player, and `public.flourish.studio/{resource}/{id}/embed`
+// 301s onto it.
 const flourishHosts = ['flo.uri.sh', 'public.flourish.studio']
 const sharePageHost = 'public.flourish.studio'
 

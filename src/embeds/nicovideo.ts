@@ -67,7 +67,8 @@ export const nicovideoResolveEmbed: ResolveEmbed = (url) => {
   }
 }
 
-// The legacy ext.nicovideo.jp/thumb/{id} iframe card, which now answers 403 to every user agent.
+// The legacy ext.nicovideo.jp/thumb/{id} iframe card, an info card rather than a player, which
+// serves only readers in Japan.
 export const nicovideoIframeEmbedResolver = createUrlEmbedResolver(
   nicovideoHosts,
   nicovideoResolveEmbed,

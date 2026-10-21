@@ -44,7 +44,7 @@ export const nytimesResolveEmbed: ResolveEmbed = (url, element) => {
   }
 }
 
-// The Brightcove-era nytimes.com/bcvideo iframe player, which answers 400 for every id today.
+// NYT's offsite video player iframe, current or Brightcove-era bcvideo, keyed by videoId.
 export const nytimesIframeEmbedResolver = createUrlEmbedResolver(nytimesHosts, nytimesResolveEmbed)
 
 export const nytimesFieldCleaners: Array<FieldCleaner> = [
