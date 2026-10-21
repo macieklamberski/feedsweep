@@ -1,5 +1,5 @@
 import { encodePathSegment, getPathSegments, isAnyOf, isHostOf, isPlainObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
@@ -147,8 +147,7 @@ export const imgurBlockquoteEmbedResolver = createMarkupEmbedResolver(
     }
 
     // The fallback anchor carries the post's title when the author set one, and the dialog's
-    // own label when they did not. Both are carried as stated: the label is localised, so any
-    // list of its wordings ages, and what the source says is what the placeholder reports.
+    // own label when they did not.
     return composeEmbed(post, text(find(element, 'a')))
   },
 )
@@ -212,6 +211,11 @@ export const imgurGifvEmbedResolver = createMarkupEmbedResolver(
     return composeEmbed({ id, isAlbum: false })
   },
 )
+
+// The embed dialog writes this label in English whatever `lang` it states.
+export const imgurFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: 'View post on imgur.com' },
+]
 
 // A forum's s9e MediaEmbed helper frame, naming the post or album in its url fragment. The helper
 // page reads an encoded `%2F` as the slash it stands for.

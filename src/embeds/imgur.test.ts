@@ -52,7 +52,7 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, imgurBlockquoteEmbedResolver)
 
   describe('a single post', () => {
-    it('should derive the player and the poster from the id', async () => {
+    it('should derive the player and the poster from the id and drop the dialog label', async () => {
       const value = html`
         <blockquote
           class="imgur-embed-pub"
@@ -73,13 +73,12 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://imgur.com/pVa2rXL/embed',
         url: 'https://imgur.com/pVa2rXL',
         thumbnail: 'https://i.imgur.com/pVa2rXLm.jpg',
-        title: 'View post on imgur.com',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should carry whatever the anchor states, including the dialog label', async () => {
+    it('should carry the title the author set', async () => {
       const value = html`
         <blockquote
           class="imgur-embed-pub"
