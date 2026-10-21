@@ -382,8 +382,6 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // Nothing in the pipeline absolutises a `cite`, so a CMS that rewrites urls to `//` hands
-    // the resolver one with no scheme.
     it('should read a photo route that names its post in the query', async () => {
       const value = html`
         <blockquote
@@ -404,6 +402,91 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the photo route without .php', async () => {
+      // Constructed: the lab holds one `photo.php` cite and no `photo/?fbid=` one.
+      const value = html`
+        <blockquote
+          cite="https://www.facebook.com/photo/?fbid=1234567890&amp;set=a.1"
+          class="fb-xfbml-parse-ignore"
+        >
+          <p>A photo caption.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/photo/?fbid=1234567890&set=a.1',
+        src: 'https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/photo/?fbid=1234567890%26set=a.1',
+        url: 'https://www.facebook.com/photo/?fbid=1234567890&set=a.1',
+        description: 'A photo caption.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the photo route in any case', async () => {
+      const value = html`
+        <blockquote
+          cite="https://www.facebook.com/Photo/?fbid=1234567890"
+          class="fb-xfbml-parse-ignore"
+        >
+          <p>A photo caption.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/Photo/?fbid=1234567890',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPhoto%2F%3Ffbid%3D1234567890',
+        url: 'https://www.facebook.com/Photo/?fbid=1234567890',
+        description: 'A photo caption.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the watch route as the video plugin', async () => {
+      const value = html`
+        <blockquote
+          cite="https://www.facebook.com/watch/?v=10153231379946729"
+          class="fb-xfbml-parse-ignore"
+        >
+          <p>A video caption.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/watch/?v=10153231379946729',
+        src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=10153231379946729',
+        url: 'https://www.facebook.com/watch/?v=10153231379946729',
+        ratio: '16/9',
+        description: 'A video caption.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read an fb.watch short link', async () => {
+      // Constructed: no lab feed cites an fb.watch link in this blockquote.
+      const value = html`
+        <blockquote
+          cite="https://fb.watch/abcDEF123/"
+          class="fb-xfbml-parse-ignore"
+        >
+          <p>A video caption.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://fb.watch/abcDEF123/',
+        src: 'https://www.facebook.com/plugins/post.php?href=https://fb.watch/abcDEF123/',
+        url: 'https://fb.watch/abcDEF123/',
+        description: 'A video caption.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Nothing in the pipeline absolutises a `cite`, so a CMS that rewrites urls to `//` hands
+    // the resolver one with no scheme.
     it('should read a protocol-relative cite', async () => {
       const value = html`
         <blockquote

@@ -131,9 +131,9 @@ const contentPathRegex = /^\/(?:reel\/[^/]+|[^/]+\/(?:posts|videos)\/[^/]+)/i
 // The bare `/watch` hub is Facebook's video front page, where every visitor sees something else.
 const watchPathRegex = /^\/watch\/?$/i
 
-// A page's own root, `/{page}/`, which the Page plugin's fallback cites. A one-segment `.php`
-// route such as `photo.php` or `permalink.php` names a post in its query.
-const pageRootPathRegex = /^\/(?![^/]*\.php$)[^/]*\/?$/
+// A page's own root, `/{page}/`, which the Page plugin's fallback cites. `/watch/`, `/photo/`
+// and a `.php` route such as `permalink.php` name a post or a video in their query.
+const pageRootPathRegex = /^\/(?!(?:watch|photo)\/?$|[^/]*\.php$)[^/]*\/?$/i
 
 const isWatchPage = (url: URL): boolean => {
   return watchPathRegex.test(url.pathname) && Boolean(getQueryParam(url.searchParams, 'v'))
@@ -278,8 +278,8 @@ export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(
     }
 
     // The post plugin answers a page with "This Facebook post is no longer available", and the
-    // fallback's link to the page is all the Page plugin leaves.
-    if (pageRootPathRegex.test(parsed.pathname)) {
+    // fallback's link to the page is all the Page plugin leaves. An fb.watch path is a short link.
+    if (isHostOrSubdomainOf(parsed, 'facebook.com') && pageRootPathRegex.test(parsed.pathname)) {
       return
     }
 
