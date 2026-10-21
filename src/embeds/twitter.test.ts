@@ -14,6 +14,7 @@ import {
 
 const statusId = '123456789012345'
 const playerUrl = `https://platform.twitter.com/embed/Tweet.html?id=${statusId}`
+const standInUrl = `https://x.com/i/status/${statusId}`
 const statusUrl = `https://x.com/user/status/${statusId}`
 
 // Every `data-embed-*` field the placeholder carries, for the shapes that only resolve once the
@@ -341,6 +342,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         provider: 'twitter',
         id: '../evil',
         src: 'https://platform.twitter.com/embed/Tweet.html?id=..%2Fevil',
+        url: 'https://x.com/i/status/../evil',
         description: 'Text.',
       }
 
@@ -395,6 +397,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           provider: 'twitter',
           id: statusId,
           src: playerUrl,
+          url: standInUrl,
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -434,6 +437,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           provider: 'twitter',
           id: '2072040167112638956',
           src: 'https://platform.twitter.com/embed/Tweet.html?id=2072040167112638956',
+          url: 'https://x.com/i/status/2072040167112638956',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -912,6 +916,7 @@ describeForEachParser('twitterAmpEmbedResolver', (parseHtml) => {
       provider: 'twitter',
       id: statusId,
       src: playerUrl,
+      url: standInUrl,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -1231,6 +1236,7 @@ describe('twitterResolveEmbed', () => {
       provider: 'twitter',
       id: statusId,
       src: playerUrl,
+      url: standInUrl,
     }
 
     expect(twitterResolveEmbed(playerUrl)).toEqual(expected)
@@ -1242,6 +1248,7 @@ describe('twitterResolveEmbed', () => {
       provider: 'twitter',
       id: statusId,
       src: playerUrl,
+      url: standInUrl,
     }
 
     expect(twitterResolveEmbed(value)).toEqual(expected)
@@ -1261,6 +1268,7 @@ describe('twitterResolveEmbed', () => {
       provider: 'twitter',
       id: '20x',
       src: 'https://platform.twitter.com/embed/Tweet.html?id=20x',
+      url: 'https://x.com/i/status/20x',
     }
 
     expect(twitterResolveEmbed(value)).toEqual(expected)
@@ -1294,6 +1302,7 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
       provider: 'twitter',
       id: statusId,
       src: playerUrl,
+      url: standInUrl,
     }
 
     expect(await extract(value)).toEqual(expected)
@@ -1361,8 +1370,8 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
     })
 
     // The id is the enrichment key, so a page carrier and a player carrier naming one tweet have
-    // to agree on it. Both results are stated whole: the only difference is the url, which the
-    // page states a handle for and the player does not.
+    // to agree on it. Both results are stated whole: the only difference is the url, which names
+    // the page's handle and the `i` stand-in for the player.
     it('should give a page carrier the id its player carrier states', async () => {
       const playerValue = html`<iframe src="${playerUrl}"></iframe>`
       const pageValue = html`<iframe src="${statusUrl}"></iframe>`
@@ -1370,6 +1379,7 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
         provider: 'twitter',
         id: statusId,
         src: playerUrl,
+        url: standInUrl,
       }
       const expectedPage: EmbedResolverResult = {
         provider: 'twitter',
@@ -1433,6 +1443,7 @@ describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
         provider: 'twitter',
         id: '2073030328415858798',
         src: 'https://platform.twitter.com/embed/Tweet.html?id=2073030328415858798',
+        url: 'https://x.com/i/status/2073030328415858798',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1449,6 +1460,7 @@ describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
         provider: 'twitter',
         id: '1022299781106819073',
         src: 'https://platform.twitter.com/embed/Tweet.html?id=1022299781106819073',
+        url: 'https://x.com/i/status/1022299781106819073',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1480,6 +1492,7 @@ describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
         provider: 'twitter',
         id: '123&lang=en',
         src: 'https://platform.twitter.com/embed/Tweet.html?id=123%26lang%3Den',
+        url: 'https://x.com/i/status/123&lang=en',
       }
 
       expect(await extract(value)).toEqual(expected)
