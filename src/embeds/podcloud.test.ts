@@ -151,6 +151,8 @@ describe('podcloudResolveEmbed', () => {
       expect(podcloudResolveEmbed(value)).toEqual(expected)
     })
 
+    // The playlist id in this case and the next is constructed. No lab feed carries one, and the
+    // player redirects a made-up playlist id the same as any other, so a probe cannot confirm one.
     it('should keep a playlist and key on it', () => {
       const value =
         'https://podcloud.fr/podcast/oxymut/player/playlist:5e1f0c2a8b3d4e0011223344-5e1f0c2a8b3d4e0055667788'
