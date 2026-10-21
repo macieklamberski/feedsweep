@@ -176,11 +176,19 @@ const readPenReference = (element: Element): CodepenTarget | undefined => {
     return
   }
 
+  const target = parseTarget(href)
+
+  if (target) {
+    return target
+  }
+
   // Slugs come in three lengths: 5 on pens from around 2012, 7 since, and 32 hex on CodePen's own.
   // Pens saved in the 2.0 editor take a uuid instead.
-  const isSlug = alphanumericRegex.test(href)
+  if (!alphanumericRegex.test(href)) {
+    return
+  }
 
-  return parseTarget(href) ?? (isSlug ? { kind: 'embed', slug: href } : undefined)
+  return { kind: 'embed', slug: href }
 }
 
 const readWidget = (element: Element): EmbedResolverResult | undefined => {

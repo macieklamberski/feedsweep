@@ -76,7 +76,11 @@ export const podigeeResolveEmbed: ResolveEmbed = (url) => {
 
   // {episode}/embed answers 302 to player.podigee-cdn.net/podcast-player/podigee-podcast-player
   // .html for a real episode and 404 for an invented one.
-  return safeEpisodeRegex.test(episode) ? composeEmbed(parsed, episode) : undefined
+  if (!safeEpisodeRegex.test(episode)) {
+    return
+  }
+
+  return composeEmbed(parsed, episode)
 }
 
 // An iframe framing a Podigee episode page rather than the player, so the reader gets an article.

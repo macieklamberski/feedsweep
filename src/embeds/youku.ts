@@ -28,10 +28,16 @@ const readVideoId = (url: string): string | undefined => {
   if (parsed?.hostname === 'static.youku.com') {
     const videoIds = parsed.searchParams.get('VideoIDS')
 
+    if (!staticFlashPathRegex.test(parsed.pathname)) {
+      return
+    }
+
+    if (!videoIds) {
+      return
+    }
+
     // The query value comes out decoded, and it goes into the player path.
-    return staticFlashPathRegex.test(parsed.pathname) && videoIds
-      ? encodePathSegment(videoIds)
-      : undefined
+    return encodePathSegment(videoIds)
   }
 
   const videoId =

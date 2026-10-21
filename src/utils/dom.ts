@@ -133,7 +133,15 @@ export const attr = (element: Nullish<Element>, name: string): string | undefine
 // Keeps a value read out of an attribute or a url when its shape tells it apart, such as an id
 // from a route word, and drops it otherwise.
 export const keepIfMatches = (value: Nullish<string>, regex: RegExp): string | undefined => {
-  return value && regex.test(value) ? value : undefined
+  if (!value) {
+    return
+  }
+
+  if (!regex.test(value)) {
+    return
+  }
+
+  return value
 }
 
 // The `<object>` whose params configure a carrier: the carrier itself, or the object an `<embed>`
@@ -381,7 +389,11 @@ export const parsePixelSize = (value: Nullish<string>): number | undefined => {
 
   const size = Number(digits)
 
-  return size >= minimumPixelSize && size <= maximumPixelSize ? size : undefined
+  if (size < minimumPixelSize || size > maximumPixelSize) {
+    return
+  }
+
+  return size
 }
 
 // A browser reads `height="900px"` and `height="900pt"` alike as 900 pixels. Editor output often
@@ -486,7 +498,11 @@ const shorthandSide = (declarations: styles.Declarations, index: 0 | 2): string 
 
   const sides = padding.split(whitespaceRegex)
 
-  return sides.length >= 3 ? sides[index] : undefined
+  if (sides.length < 3) {
+    return
+  }
+
+  return sides[index]
 }
 
 // Ordered by trust, the max-width pair last: it infers a ratio the others state outright.
@@ -509,7 +525,11 @@ const elementRatioSources: Array<(element: Element) => string | undefined> = [
   (element) => {
     const match = wpEmbedAspectRegex.exec(element.getAttribute('class') ?? '')
 
-    return match ? parseRatio(`${match[1]}:${match[2]}`) : undefined
+    if (!match) {
+      return
+    }
+
+    return parseRatio(`${match[1]}:${match[2]}`)
   },
 
   // The legacy inline padding hack (`padding-bottom:56.25%`): the percent is the
@@ -537,7 +557,15 @@ const elementRatioSources: Array<(element: Element) => string | undefined> = [
     const width = styles.pixels(element, 'max-width')
     const height = styles.pixels(element, 'max-height')
 
-    return width && height ? parseRatio(`${width}:${height}`) : undefined
+    if (!width) {
+      return
+    }
+
+    if (!height) {
+      return
+    }
+
+    return parseRatio(`${width}:${height}`)
   },
 ]
 
@@ -601,7 +629,11 @@ const styleLengthRegex = /^(\d+)(?:px)?$/
 const readStyleLength = (value: string | undefined): number | undefined => {
   const digits = value?.match(styleLengthRegex)?.[1]
 
-  return digits === undefined ? undefined : Number(digits)
+  if (digits === undefined) {
+    return
+  }
+
+  return Number(digits)
 }
 
 const percentageLengthRegex = /^\s*[\d.]+%\s*$/

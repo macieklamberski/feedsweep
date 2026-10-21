@@ -27,7 +27,11 @@ const readVideoHash = (url: string | undefined, pathRegex: RegExp): string | und
 const aparatResolveEmbed: ResolveEmbed = (url, element) => {
   const videoHash = readVideoHash(url, framePathRegex)
 
-  return videoHash ? { ...composeEmbed(videoHash), title: attr(element, 'title') } : undefined
+  if (!videoHash) {
+    return
+  }
+
+  return { ...composeEmbed(videoHash), title: attr(element, 'title') }
 }
 
 // Aparat's player iframe.
@@ -46,6 +50,10 @@ export const aparatScriptEmbedResolver = createMarkupEmbedResolver(
     // name the div the script would have written into, and say nothing about the video.
     const videoHash = readVideoHash(attr(element, 'src'), scriptPathRegex)
 
-    return videoHash ? composeEmbed(videoHash) : undefined
+    if (!videoHash) {
+      return
+    }
+
+    return composeEmbed(videoHash)
   },
 )

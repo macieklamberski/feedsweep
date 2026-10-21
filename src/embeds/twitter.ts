@@ -70,7 +70,11 @@ const readStatusUrl = (value: string | undefined): Status | undefined => {
 
   const handleless = parsed.pathname.match(handlelessPathRegex)
 
-  return handleless ? { handle: handleStandIn, id: handleless[1] } : undefined
+  if (!handleless) {
+    return
+  }
+
+  return { handle: handleStandIn, id: handleless[1] }
 }
 
 // Where the tweet is named, in the order the shapes provide it. The dated anchor is the usual
@@ -97,7 +101,11 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
     attr(element, 'data-tweetid') ??
     framed
 
-  return declared ? { status: { handle: '', id: declared } } : undefined
+  if (!declared) {
+    return
+  }
+
+  return { status: { handle: '', id: declared } }
 }
 
 // A byline the embed dialog wrote gives up its display name. Anything else is taken whole, since
@@ -204,7 +212,11 @@ const readPhotoUrl = (photos: SubstackTweetAttrs['photos']): string | undefined 
   const parsed = parseUrl(url, placeholderBaseUrl)
 
   // A query carries a signature or an expiry, and a stored url with one stops resolving.
-  return parsed?.search === '' ? url : undefined
+  if (parsed?.search !== '') {
+    return
+  }
+
+  return url
 }
 
 const extractSubstackTweet = (element: Element): EmbedResolverResult | undefined => {
@@ -254,7 +266,11 @@ export const twitterResolveEmbed: ResolveEmbed = (url) => {
 
   const status = readStatusUrl(url)
 
-  return status ? composeEmbed(status, {}) : undefined
+  if (!status) {
+    return
+  }
+
+  return composeEmbed(status, {})
 }
 
 // A Twitter player iframe, or a frame of the status page, which refuses framing.
@@ -280,7 +296,11 @@ export const readTwitterHeight = (data: unknown): number | undefined => {
       ? call.params[0]
       : undefined
 
-  return isPlainObject(params) ? readPixels(params.height) : undefined
+  if (!isPlainObject(params)) {
+    return
+  }
+
+  return readPixels(params.height)
 }
 
 export const twitterRenderHint: EmbedRenderHint = {

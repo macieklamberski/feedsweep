@@ -232,7 +232,15 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
     if (isImageWrapper) {
       const result = facebookEmojiResolver.extract(image)
 
-      return result && 'glyph' in result ? result : undefined
+      if (!result) {
+        return
+      }
+
+      if (!('glyph' in result)) {
+        return
+      }
+
+      return result
     }
 
     // Some pastes drop the sprite and keep only the zero-size span.

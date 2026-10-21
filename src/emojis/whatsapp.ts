@@ -21,7 +21,11 @@ export const whatsappEmojiResolver: EmojiResolver = {
     const text = element.textContent?.trim()
 
     if (text) {
-      return isEmojiShaped(text) ? { glyph: text } : undefined
+      if (!isEmojiShaped(text)) {
+        return
+      }
+
+      return { glyph: text }
     }
 
     const url = bgImage(element)

@@ -33,7 +33,11 @@ export const genericCharacterEmojiResolver: EmojiResolver = {
 
     // An empty span with nothing to read is left for other passes.
     if (isSpan) {
-      return glyph ? { glyph } : undefined
+      if (!glyph) {
+        return
+      }
+
+      return { glyph }
     }
 
     return resolveEmojiImage(element, { isStrong: true, glyph })

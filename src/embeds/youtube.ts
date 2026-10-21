@@ -85,7 +85,11 @@ const readPathId = (url: URL): string | undefined => {
 
   // A path opening with no route word names no video: a bare vanity channel url would otherwise
   // read as one whenever the name happens to be eleven legal characters.
-  return index > 0 ? segments[index] : undefined
+  if (index <= 0) {
+    return
+  }
+
+  return segments[index]
 }
 
 // The Flash player wrote `/v/{id}&hl=en_US&fs=1`, the query glued onto the id, and transforms
@@ -247,7 +251,11 @@ const resolveCollectionEmbed = (
   const channel = parsed.searchParams.get('channel')
 
   if (segments[1] === 'live_stream') {
-    return channel ? composeChannelEmbed(channel, encodePathSegment(channel)) : undefined
+    if (!channel) {
+      return
+    }
+
+    return composeChannelEmbed(channel, encodePathSegment(channel))
   }
 
   // `/embed/videoseries?list=`, `/embed/playlist?list=` and the bare `/embed/?list=` some
@@ -299,7 +307,11 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
     // The id moves from a path segment into the query, so it is decoded first.
     const list = decodeSegment(head) ?? head
 
-    return list ? composeListEmbed(`PL${list}`) : undefined
+    if (!list) {
+      return
+    }
+
+    return composeListEmbed(`PL${list}`)
   }
 
   const videoId = extractVideoId(url)
@@ -366,7 +378,11 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
     if (!videoId) {
       const channel = attr(element, 'data-live-channelid')
 
-      return channel ? composeChannelEmbed(channel) : undefined
+      if (!channel) {
+        return
+      }
+
+      return composeChannelEmbed(channel)
     }
 
     // `videoseries` and `live_stream` are route words that sit where a video id does.

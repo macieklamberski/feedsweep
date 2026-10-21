@@ -37,7 +37,15 @@ const composeSource = (id: string, query: string): string => {
 const readWidgetId = (url: URL): string | undefined => {
   const segments = getPathSegments(url)
 
-  return segments[0] === 'widget_code' && segments[1] === 'html_widget' ? segments[2] : undefined
+  if (segments[0] !== 'widget_code') {
+    return
+  }
+
+  if (segments[1] !== 'html_widget') {
+    return
+  }
+
+  return segments[2]
 }
 
 // The Flash players sit on cache.reverbnation.com, which serves swf files and nothing else.

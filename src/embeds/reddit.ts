@@ -54,7 +54,11 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
   // A bare profile is not a target: embed.reddit.com/user/{name}/ answers 404.
   // A profile post, /user/{name}/comments/{id}/, renders like any other.
   if (comments === undefined) {
-    return scope === 'r' ? { kind: 'subreddit', path: `r/${name}`, publisher } : undefined
+    if (scope !== 'r') {
+      return
+    }
+
+    return { kind: 'subreddit', path: `r/${name}`, publisher }
   }
 
   if (comments !== 'comments' || !postId) {
@@ -146,7 +150,11 @@ export const redditWidgetEmbedResolver = createMarkupEmbedResolver(
 export const redditResolveEmbed: ResolveEmbed = (url, element) => {
   const target = parseTarget(url)
 
-  return target ? composeEmbed(target, { title: attr(element, 'title') }) : undefined
+  if (!target) {
+    return
+  }
+
+  return composeEmbed(target, { title: attr(element, 'title') })
 }
 
 // The embed.reddit.com frame the loader builds, kept by exports that stored the rendered page.
@@ -162,7 +170,15 @@ export const redditS9eEmbedResolver = createS9eEmbedResolver('reddit', (fragment
 // The player reports its height under a `resize.embed` type, first as 0 and then as the rendered
 // value once the post is in, so the first message reads as nothing.
 export const readRedditHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) && data.type === 'resize.embed' ? readPixels(data.data) : undefined
+  if (!isPlainObject(data)) {
+    return
+  }
+
+  if (data.type !== 'resize.embed') {
+    return
+  }
+
+  return readPixels(data.data)
 }
 
 export const redditRenderHint: EmbedRenderHint = {

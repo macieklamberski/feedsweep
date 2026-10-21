@@ -20,7 +20,11 @@ const playerHeight = 128
 const readPathOption = (segments: Array<string>, name: string): string | undefined => {
   const index = segments.indexOf(name)
 
-  return index >= 0 ? segments[index + 1] : undefined
+  if (index < 0) {
+    return
+  }
+
+  return segments[index + 1]
 }
 
 export const extractLibsynEmbed = (link: string): { kind: string; id: string } | undefined => {

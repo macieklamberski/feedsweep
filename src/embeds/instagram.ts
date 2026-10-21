@@ -222,7 +222,11 @@ const readPayloadCaption = (title: string | undefined): string | undefined => {
 
 // Only a rehosted copy: the earliest payloads carry Instagram's signed CDN url, long expired.
 const readRehostedUrl = (url: string | null | undefined): string | undefined => {
-  return url?.includes('__ss-rehost__') ? url : undefined
+  if (!url?.includes('__ss-rehost__')) {
+    return
+  }
+
+  return url
 }
 
 // Substack ships an Instagram post as a childless div with the whole card as JSON in `data-attrs`.
@@ -280,9 +284,19 @@ export const instagramS9eEmbedResolver = createS9eEmbedResolver('instagram', (sh
 // The player measures itself once mounted and reports it under a `MEASURE` type. `LOADING`
 // and `MOUNTED` come through the same channel without a size.
 export const readInstagramHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) && data.type === 'MEASURE' && isPlainObject(data.details)
-    ? readPixels(data.details.height)
-    : undefined
+  if (!isPlainObject(data)) {
+    return
+  }
+
+  if (data.type !== 'MEASURE') {
+    return
+  }
+
+  if (!isPlainObject(data.details)) {
+    return
+  }
+
+  return readPixels(data.details.height)
 }
 
 export const instagramFieldCleaners: Array<FieldCleaner> = [

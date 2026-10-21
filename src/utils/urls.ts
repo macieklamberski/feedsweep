@@ -288,7 +288,11 @@ export const resolveOrDropUrl = (
 ): string | undefined => {
   const trimmed = url?.trim()
 
-  return trimmed ? context.resolveUrlFn(trimmed, context.baseUrl) : undefined
+  if (!trimmed) {
+    return
+  }
+
+  return context.resolveUrlFn(trimmed, context.baseUrl)
 }
 
 // Overloaded the same way and for the same reason as resolveOrKeepUrl: cleaning a definite url

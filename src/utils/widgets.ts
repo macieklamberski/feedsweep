@@ -43,7 +43,11 @@ const parseOrKeepDate = (
   date: string | undefined,
   parseDateFn: ParseDateFn | undefined,
 ): string | undefined => {
-  return date ? (parseDateFn?.(date) ?? date) : undefined
+  if (!date) {
+    return
+  }
+
+  return parseDateFn?.(date) ?? date
 }
 
 const leadingAtRegex = /^@+/
@@ -76,7 +80,11 @@ const s9eHelperHost = 's9e.github.io'
 export const readS9eFragment = (element: Element): string | undefined => {
   const src = attr(element, 'src')
 
-  return parseUrlOnHosts(src, s9eHelperHost) ? src?.split('#')[1] : undefined
+  if (!parseUrlOnHosts(src, s9eHelperHost)) {
+    return
+  }
+
+  return src?.split('#')[1]
 }
 
 // An object without `data` names its player in a `<param>`. One holding another player is left

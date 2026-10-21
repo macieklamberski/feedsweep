@@ -142,7 +142,11 @@ const findCaption = (element: Element, wrapper: Nullish<Element>): Nullish<Eleme
     (parent?.lastElementChild === element ? skipEmptyBlocks(parent.nextElementSibling) : undefined)
 
   // A block naming a deck without its owner is prose about the next deck as often as a caption.
-  return readCaption(findCaptionLinks(candidate)).author ? candidate : undefined
+  if (!readCaption(findCaptionLinks(candidate)).author) {
+    return
+  }
+
+  return candidate
 }
 
 // An editor that rewrote the snippet moved its player out of the __ss_ div: the deck's link stays

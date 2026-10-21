@@ -132,7 +132,11 @@ const readAuthor = (anchor: Element): string | undefined => {
   const author = label.replace(authorSeparatorRegex, '').trim()
 
   // Every footer names the handle, so a run with no `@` in it is body text.
-  return author.includes('@') ? author : undefined
+  if (!author.includes('@')) {
+    return
+  }
+
+  return author
 }
 
 const readPostText = (element: Element, postAnchor: Element | undefined): string | undefined => {
@@ -188,7 +192,11 @@ const extractQuotedPost = (
   // Some feeds strip the blockquote's data attributes, and others drop its class and keep them.
   const post = extractBlueskyPost(attr(element, attribute) ?? '') ?? quoted.post
 
-  return post ? { ...composeEmbedResult(post), ...quoted.fields } : undefined
+  if (!post) {
+    return
+  }
+
+  return { ...composeEmbedResult(post), ...quoted.fields }
 }
 
 // Bluesky's post blockquote, the fallback its embed script replaces and no reader runs.

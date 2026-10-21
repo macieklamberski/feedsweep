@@ -66,15 +66,27 @@ const namedCollectionPaths = ['ondemand', 'channels']
 // and both would read as a video here.
 const readCollectionVideoId = (segments: Array<string>): string | undefined => {
   if (showcasePaths.has(segments[0])) {
-    return segments[2] === 'video' ? segments[3] : undefined
+    if (segments[2] !== 'video') {
+      return
+    }
+
+    return segments[3]
   }
 
   if (segments[0] === 'groups') {
-    return segments[2] === 'videos' ? segments[3] : undefined
+    if (segments[2] !== 'videos') {
+      return
+    }
+
+    return segments[3]
   }
 
   if (namedCollectionPaths.includes(segments[0])) {
-    return segments.length === 3 ? segments[2] : undefined
+    if (segments.length !== 3) {
+      return
+    }
+
+    return segments[2]
   }
 }
 
@@ -104,7 +116,11 @@ const resolveShowcaseEmbed = (link: string): EmbedResolverResult | undefined => 
 
   const showcaseId = keepIfMatches(segments[1], digitsRegex)
 
-  return showcaseId ? composeShowcaseEmbed(showcaseId) : undefined
+  if (!showcaseId) {
+    return
+  }
+
+  return composeShowcaseEmbed(showcaseId)
 }
 
 // `/embed/interaction` is the event player with Vimeo's interaction panel beside it.
@@ -184,7 +200,11 @@ const readReference = (link: string): VimeoReference | undefined => {
   if (collectionPaths.has(segments[0])) {
     const id = keepIfMatches(readCollectionVideoId(segments), digitsRegex)
 
-    return id ? { id } : undefined
+    if (!id) {
+      return
+    }
+
+    return { id }
   }
 
   // A numeric video id matches the hash alphabet, so only a segment after an id counts as one.
@@ -263,7 +283,11 @@ export const readVimeoEmbedSrc = (link: string): string | undefined => {
   const url = parseUrlOnHosts(link, vimeoHosts)
   const videoId = url && extractVimeoId(url.href)
 
-  return videoId ? composeEmbedUrl(encodePathSegment(videoId)) : undefined
+  if (!videoId) {
+    return
+  }
+
+  return composeEmbedUrl(encodePathSegment(videoId))
 }
 
 // `t` is the start offset, in Vimeo's `{n}s` form.

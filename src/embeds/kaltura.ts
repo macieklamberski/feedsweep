@@ -40,7 +40,19 @@ const readEntry = (url: string | undefined): Entry | undefined => {
   const partner = parsed?.pathname.match(partnerPathRegex)?.[1]
   const entryId = parsed?.searchParams.get('entry_id')
 
-  return parsed && partner && entryId ? { partner, entryId, parsed } : undefined
+  if (!parsed) {
+    return
+  }
+
+  if (!partner) {
+    return
+  }
+
+  if (!entryId) {
+    return
+  }
+
+  return { partner, entryId, parsed }
 }
 
 // The player path names the partner and the player config. Without `iframeembed=true` the same

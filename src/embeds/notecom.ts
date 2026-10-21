@@ -78,9 +78,11 @@ export const notecomIframeEmbedResolver = createUrlEmbedResolver(notecomHosts, (
 const heightMessageRegex = /^height::.*::(\d+(?:\.\d+)?)$/
 
 export const readNotecomHeight = (data: unknown): number | undefined => {
-  return typeof data === 'string'
-    ? readPixels(Number(data.match(heightMessageRegex)?.[1]))
-    : undefined
+  if (typeof data !== 'string') {
+    return
+  }
+
+  return readPixels(Number(data.match(heightMessageRegex)?.[1]))
 }
 
 export const notecomRenderHint: EmbedRenderHint = {

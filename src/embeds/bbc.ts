@@ -80,11 +80,19 @@ export const bbcResolveEmbed: ResolveEmbed = (url, element) => {
   // `/news/av/embed/{pid}/{article}` 301s to `/news/av-embeds/{article}/vpid/{pid}`, and the
   // player answers 404 when either the pid or the article is fabricated.
   if (first === 'news' && second === 'av' && third === 'embed' && isPidSlot(fourth)) {
-    return isArticleId(fifth) ? composeNewsEmbed(fifth, fourth) : undefined
+    if (!isArticleId(fifth)) {
+      return
+    }
+
+    return composeNewsEmbed(fifth, fourth)
   }
 
   if (first === 'news' && second === 'av-embeds' && isArticleId(third) && fourth === 'vpid') {
-    return isPidSlot(fifth) ? composeNewsEmbed(third, fifth) : undefined
+    if (!isPidSlot(fifth)) {
+      return
+    }
+
+    return composeNewsEmbed(third, fifth)
   }
 
   // `/ws/av-embeds/articles/{article}/{pid}/{lang}/` is the same player app as the news one.

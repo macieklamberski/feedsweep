@@ -60,7 +60,11 @@ export const getShortcode = (token: string | undefined): EmojiGlyph | undefined 
 export const glyphFromShortcode = (token: string | undefined): string | undefined => {
   const glyph = getShortcode(token)
 
-  return glyph === false ? undefined : glyph
+  if (glyph === false) {
+    return
+  }
+
+  return glyph
 }
 
 // The table for a set that names every file by its codepoint, which leaves no names to look up.

@@ -37,7 +37,11 @@ const readDate = (path: string): string | undefined => {
 
   const month = monthNumbers[parts[2]]
 
-  return month ? `${parts[1]}-${month}-${parts[3]}` : undefined
+  if (!month) {
+    return
+  }
+
+  return `${parts[1]}-${month}-${parts[3]}`
 }
 
 // Measured 2026-09-07 in a browser at 300, 600 and 900 pixels wide: the `<video>` is 169, 338

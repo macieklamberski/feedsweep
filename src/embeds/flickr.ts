@@ -195,7 +195,15 @@ const readLegacySubject = (parsed: URL): FlickrSubject => {
 // Only the path alias is a name. The NSID spelling of the same owner names nobody a reader
 // could read.
 const readOwnerAlias = (owner: string | undefined): string | undefined => {
-  return owner && !nsidRegex.test(owner) ? owner : undefined
+  if (!owner) {
+    return
+  }
+
+  if (nsidRegex.test(owner)) {
+    return
+  }
+
+  return owner
 }
 
 // Flickr's own page player, `/photos/{owner}/{photoId}/player/`, optionally with the browsing

@@ -126,7 +126,11 @@ const composeAlbumEmbed = (segment: string | undefined): EmbedResolverResult | u
 
   const id = segment.match(sluggedPostIdRegex)?.[1]
 
-  return id ? composeEmbed({ id, isAlbum: true }) : undefined
+  if (!id) {
+    return
+  }
+
+  return composeEmbed({ id, isAlbum: true })
 }
 
 // Imgur ships a post as a blockquote only its embed script turns into the player.
@@ -178,7 +182,11 @@ export const imgurResolveEmbed: ResolveEmbed = (url) => {
 
   const post = parsePost(route)
 
-  return post ? composeEmbed(post) : undefined
+  if (!post) {
+    return
+  }
+
+  return composeEmbed(post)
 }
 
 export const imgurIframeEmbedResolver = createUrlEmbedResolver(imgurHosts, imgurResolveEmbed)

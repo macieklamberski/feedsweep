@@ -54,7 +54,11 @@ export const extractWistiaEmbed = (
 export const readSrcMediaId = (src: string | undefined): string | undefined => {
   const url = parseUrlOnHosts(src, wistiaHosts)
 
-  return url ? extractWistiaEmbed(url.href)?.id : undefined
+  if (!url) {
+    return
+  }
+
+  return extractWistiaEmbed(url.href)?.id
 }
 
 // No thumbnail: the poster needs Wistia's media JSON hop.

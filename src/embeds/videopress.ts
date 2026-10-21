@@ -60,7 +60,11 @@ export const videopressIframeEmbedResolver = createUrlEmbedResolver(
 export const readVideopressEmbedSrc = (link: string): string | undefined => {
   const url = parseUrlOnHosts(link, videopressHosts)
 
-  return url ? videopressResolveEmbed(url.href)?.src : undefined
+  if (!url) {
+    return
+  }
+
+  return videopressResolveEmbed(url.href)?.src
 }
 
 // `player.swf`, and `flvplayer.swf` under the video plugin path of the first WordPress.com snippet.

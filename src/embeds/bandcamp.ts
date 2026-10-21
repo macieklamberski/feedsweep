@@ -76,7 +76,11 @@ export const extractBandcampRelease = (link: string): string | undefined => {
   // Naming both is what the builder writes when a publisher picks a track off an album page.
   const release = releases.find(([kind]) => kind === 'track') ?? releases[0]
 
-  return release ? `${release[0]}/${release[1]}` : undefined
+  if (!release) {
+    return
+  }
+
+  return `${release[0]}/${release[1]}`
 }
 
 const bandcampHosts = ['bandcamp.com']

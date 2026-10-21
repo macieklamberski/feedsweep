@@ -85,7 +85,15 @@ export const telegramS9eEmbedResolver = createS9eEmbedResolver('telegram', (frag
 // The player reports a `resize` event with its height, `null` for a post it could not load,
 // which reads as nothing.
 export const readTelegramHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) && data.event === 'resize' ? readPixels(data.height) : undefined
+  if (!isPlainObject(data)) {
+    return
+  }
+
+  if (data.event !== 'resize') {
+    return
+  }
+
+  return readPixels(data.height)
 }
 
 export const telegramRenderHint: EmbedRenderHint = {

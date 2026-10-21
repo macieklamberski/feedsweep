@@ -5,7 +5,15 @@ import { coerceNumber, isPlainObject } from 'trousse'
 export const readPixels = (value: unknown): number | undefined => {
   const pixels = coerceNumber(value)
 
-  return pixels !== undefined && pixels > 0 ? pixels : undefined
+  if (pixels === undefined) {
+    return
+  }
+
+  if (pixels <= 0) {
+    return
+  }
+
+  return pixels
 }
 
 // player.js takes the message as a JSON string, not an object, and answers the same way.
@@ -33,7 +41,11 @@ export const isPlayerJsReady = (data: unknown): boolean => {
 
 // The height several embeds post unasked as an object, `{ height }`, beside fields of their own.
 export const readObjectHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) ? readPixels(data.height) : undefined
+  if (!isPlainObject(data)) {
+    return
+  }
+
+  return readPixels(data.height)
 }
 
 // The resize message several embeds post unasked, `{ src, context: 'iframe.resize', height }`
