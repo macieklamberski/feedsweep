@@ -33,6 +33,7 @@ const composeEmbed = (parsed: URL, episode?: string): EmbedResolverResult => {
     provider,
     id: `${show}/${episode ?? 'embed'}`,
     src: `https://${parsed.hostname}/${path}?context=external`,
+    url: `https://${parsed.hostname}/${episode ?? ''}`,
     height: playerHeight,
   }
 }
