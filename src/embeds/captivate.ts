@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { localeWordRegex, uuidRegex } from '../utils/urls.js'
+import { lettersRegex, uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'captivate'
@@ -19,7 +19,7 @@ export const extractCaptivateEmbed = (link: string): { kind: string; id: string 
 
   // The segment count keeps a `media/{uuid}/{file}.mp3` enclosure out of a dead placeholder. The kind
   // is a shape, so a kind added later still resolves.
-  if (segments.length !== 2 || !kind || !id || !localeWordRegex.test(kind) || !uuidRegex.test(id)) {
+  if (segments.length !== 2 || !kind || !id || !lettersRegex.test(kind) || !uuidRegex.test(id)) {
     return
   }
 

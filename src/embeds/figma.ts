@@ -2,7 +2,7 @@ import { composeQuery, getPathSegments, getQueryParam, isAnyOf, isHostOf, parseU
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import {
   alphanumericRegex,
-  localeWordRegex,
+  lettersRegex,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -38,7 +38,7 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
 
   // Figma keeps opening kinds beside the `file`, `proto`, `board` and `deck` the feeds carry, and
   // every one takes the same route shape. A file key is base62, so a hyphenated slug is not one.
-  if (!localeWordRegex.test(kind) || kind === catalogueKind || !alphanumericRegex.test(key)) {
+  if (!lettersRegex.test(kind) || kind === catalogueKind || !alphanumericRegex.test(key)) {
     return
   }
 

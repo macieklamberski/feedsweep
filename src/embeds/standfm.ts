@@ -1,6 +1,6 @@
 import { getPathSegments, isAnyOf, parseUrl, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { hexRegex, localeWordRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { hexRegex, lettersRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const standfmHosts = ['stand.fm']
@@ -17,7 +17,7 @@ export const standfmResolveEmbed: ResolveEmbed = (url) => {
   const kind = rawKind?.toLowerCase()
 
   // The hex alphabet keeps a route word such as `/episodes/new`, a live page, out of the id slot.
-  if (!kind || !localeWordRegex.test(kind) || !id || !hexRegex.test(id)) {
+  if (!kind || !lettersRegex.test(kind) || !id || !hexRegex.test(id)) {
     return
   }
 

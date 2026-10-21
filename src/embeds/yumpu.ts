@@ -1,7 +1,7 @@
 import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, isElement, isWhitespaceText, keepIfMatches, text } from '../utils/dom.js'
-import { localeWordRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { lettersRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'yumpu'
@@ -46,7 +46,7 @@ const yumpuResolveEmbed: ResolveEmbed = (url, element) => {
   const segments = getPathSegments(parsed)
   const isLocaleless = isAnyOf(segments[0], 'embed')
   // YUMPU redirects an embed path with no locale prefix to `/en/`.
-  const locale = isLocaleless ? 'en' : keepIfMatches(segments[0], localeWordRegex)
+  const locale = isLocaleless ? 'en' : keepIfMatches(segments[0], lettersRegex)
   const [embed, view, hash] = isLocaleless ? segments : segments.slice(1)
 
   if (!locale || !isAnyOf(embed, 'embed') || !isAnyOf(view, 'view') || !hash) {
