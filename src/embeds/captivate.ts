@@ -33,10 +33,13 @@ export const captivateResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
+  // Captivate's snippet writes an episode player with a trailing slash and a show player without.
+  const trailingSlash = embed.kind === 'episode' ? '/' : ''
+
   return {
     provider,
     id: `${embed.kind}/${embed.id}`,
-    src: `https://player.captivate.fm/${embed.kind}/${embed.id}`,
+    src: `https://player.captivate.fm/${embed.kind}/${embed.id}${trailingSlash}`,
     height: embed.kind === 'show' ? showHeight : playerHeight,
   }
 }

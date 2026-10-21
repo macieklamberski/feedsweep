@@ -75,7 +75,19 @@ describe('captivateResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'captivate',
       id: 'episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6',
-      src: 'https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6',
+      src: 'https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6/',
+      height: 200,
+    }
+
+    expect(captivateResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should mint the trailing slash onto an episode player written without it', () => {
+    const value = 'https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6'
+    const expected: EmbedResolverResult = {
+      provider: 'captivate',
+      id: 'episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6',
+      src: 'https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6/',
       height: 200,
     }
 
@@ -103,7 +115,7 @@ describeForEachParser('captivateEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'captivate',
         id: 'episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6',
-        src: 'https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6',
+        src: 'https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6/',
         height: 200,
       }
 
