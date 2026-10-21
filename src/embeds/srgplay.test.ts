@@ -41,13 +41,13 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the player on the business unit own host', async () => {
+    it('should read the player on the business unit own host and drop the segment list toggle', async () => {
       const value =
         '<iframe src="https://www.rts.ch/play/embed?urn=urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c&subdivisions=false"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
         id: 'urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c',
-        src: 'https://www.rts.ch/play/embed?urn=urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c&subdivisions=false',
+        src: 'https://www.rts.ch/play/embed?urn=urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c',
         url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c',
         ratio: '16/9',
       }

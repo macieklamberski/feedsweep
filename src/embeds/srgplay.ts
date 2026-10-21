@@ -16,7 +16,7 @@ const playerHosts = toMap({
 })
 
 const srgplayHosts = ['srgssr.ch', ...playerHosts.values()]
-const srgplayEmbedParams = ['startTime', 'subdivisions']
+const srgplayEmbedParams = ['startTime']
 
 // The business unit after `urn:` picks the host. The rest varies in segment count, the corpus
 // carries `urn:srf:ais:video:` beside `urn:srf:video:`, so it is kept as the source wrote it.
