@@ -2,7 +2,12 @@ import { decodeSegment, isHostOf, type Nullish, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar, flashVars, keepIfMatches } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  digitsRegex,
+  encodePathSegment,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flickr'
@@ -136,8 +141,7 @@ const readPageSubject = (page: string): FlickrSubject | undefined => {
 
 // The swf carrier names its subject in the flashvars beside it: the page path first, and the
 // bare `user_id` for the few snippets that carry nothing else.
-const readFlashSubject = (element: Nullish<Element>): FlickrSubject => {
-  const config = new URLSearchParams(flashVars(element) ?? '')
+const readFlashSubject = (config: URLSearchParams): FlickrSubject => {
   const page = config.get('page_show_url') ?? ''
   const subject = readPageSubject(page)
 
@@ -308,7 +312,7 @@ const composePlayerEmbed = (
   }
 
   if (flashPlayerPathRegex.test(parsed.pathname)) {
-    return composeEmbed(readFlashSubject(element))
+    return composeEmbed(readFlashSubject(new URLSearchParams(flashVars(element) ?? '')))
   }
 
   if (legacyPlayerPathRegex.test(parsed.pathname)) {
@@ -318,6 +322,12 @@ const composePlayerEmbed = (
   const subject = readPageSubject(parsed.pathname)
 
   return subject && composeEmbed(subject)
+}
+
+const sizeDialogEmbed = (result: EmbedResolverResult): EmbedResolverResult => {
+  const { width, height } = dialogSize
+
+  return { ...result, src: `${result.src}?width=${width}&height=${height}`, width, height }
 }
 
 const resolveTarget = (
@@ -349,9 +359,7 @@ const resolveTarget = (
     return { ...result, src: `${result.src}?width=${width}&height=${height}`, ratio: '16/9' }
   }
 
-  const { width, height } = dialogSize
-
-  return { ...result, src: `${result.src}?width=${width}&height=${height}`, width, height }
+  return sizeDialogEmbed(result)
 }
 
 export const flickrResolveEmbed: ResolveEmbed = (url, element) => {
@@ -364,6 +372,25 @@ export const flickrResolveEmbed: ResolveEmbed = (url, element) => {
 // the two players for a single photo. Only `/player/` and `embedr.flickr.com` are served without
 // `x-frame-options: SAMEORIGIN`, so the rest name a frame that renders empty.
 export const flickrEmbedResolver = createUrlEmbedResolver(flickrHosts, flickrResolveEmbed)
+
+// WordPress.com's wrapper frame around a Flash snippet, `wpcomwidgets.com/?src={swf}&flashvars=…`,
+// which names the slideshow swf in `src` and its subject in `flashvars`.
+export const flickrWpcomEmbedResolver = createUrlEmbedResolver(['wpcomwidgets.com'], (url) => {
+  const query = parseUrl(url, placeholderBaseUrl)?.searchParams
+  const player = parseUrlOnHosts(query?.get('src') ?? undefined, flickrHosts)
+
+  if (!query || !player || !flashPlayerPathRegex.test(player.pathname)) {
+    return
+  }
+
+  const result = composeEmbed(readFlashSubject(new URLSearchParams(query.get('flashvars') ?? '')))
+
+  if (!result) {
+    return
+  }
+
+  return sizeDialogEmbed(result)
+})
 
 // Only embedr's video player answers player.js. A photo and the page player post no ready message.
 export const flickrRenderHint: EmbedRenderHint = {

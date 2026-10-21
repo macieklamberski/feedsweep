@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { flickrEmbedResolver, flickrResolveEmbed } from './flickr.js'
+import { flickrEmbedResolver, flickrResolveEmbed, flickrWpcomEmbedResolver } from './flickr.js'
 
 describeForEachParser('flickrEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, flickrEmbedResolver)
@@ -1420,5 +1420,66 @@ describeForEachParser('flickrEmbedResolver carrier title', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('flickrWpcomEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, flickrWpcomEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should map the wrapped slideshow onto the album its flashvars name', async () => {
+      const value = html`
+        <iframe
+          frameborder="0"
+          width="500"
+          height="360"
+          src="https://wpcomwidgets.com/?src=http%3A%2F%2Fwww.flickr.com%2Fapps%2Fslideshow%2Fshow.swf%3Fv%3D71649&#038;width=500&#038;flashvars=offsite%3Dtrue%26lang%3Den-us%26page_show_url%3D%2Fphotos%2Fmacarignan%2Fsets%2F72157630500191816%2Fshow%2F%26page_show_back_url%3D%2Fphotos%2Fmacarignan%2Fsets%2F72157630500191816%2F%26set_id%3D72157630500191816%26jump_to%3D&#038;allowfullscreen=true&#038;height=360&#038;_tag=gigya&#038;_hash=c5929a9fba9ef66ba55b7ea01159528c"
+          id="wpcom-iframe-c5929a9fba9ef66ba55b7ea01159528c"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'macarignan/72157630500191816',
+        src: 'https://embedr.flickr.com/photosets/72157630500191816?width=400&height=300',
+        url: 'https://www.flickr.com/photos/macarignan/sets/72157630500191816',
+        width: 400,
+        height: 300,
+        author: 'macarignan',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a wrapper around another platform', async () => {
+      const value = html`
+        <iframe
+          src="https://wpcomwidgets.com/?src=http%3A%2F%2Fwww.podcaster.cl%2Fi%2Fplayer.swf&#038;flashvars=meta%3Dhttp%3A%2F%2Fwww.podcaster.cl%2Fget_podcast%3Fid%3D69018"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a wrapped Flickr swf that is not the slideshow', async () => {
+      const value = html`
+        <iframe
+          src="https://wpcomwidgets.com/?src=http%3A%2F%2Fwww.flickr.com%2Fapps%2Fother%2Fshow.swf&#038;flashvars=page_show_url%3D%2Fphotos%2Fmacarignan%2Fsets%2F72157630500191816%2Fshow%2F"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the same query on a foreign wrapper host', async () => {
+      const value = html`
+        <iframe
+          src="https://evil.test/?src=http%3A%2F%2Fwww.flickr.com%2Fapps%2Fslideshow%2Fshow.swf&#038;flashvars=page_show_url%3D%2Fphotos%2Fmacarignan%2Fsets%2F72157630500191816%2Fshow%2F"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
