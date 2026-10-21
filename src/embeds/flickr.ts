@@ -19,7 +19,7 @@ const setPathRegex = /^\/photos\/([^/]+)\/(?:sets|albums)\/(\d+)/
 const streamPathRegex = /^\/photos\/([^/]+)\/show\/?$/
 const groupPathRegex = /^\/groups\/(\d+@N\d\d)\/pool\/show\/?$/
 const groupPagePathRegex = /^\/groups\//
-const groupAliasPoolPathRegex = /^\/groups\/[^/]+\/pool\/show\/?$/
+const groupAliasPoolPathRegex = /^\/groups\/[^/]+\/pool\/show(?:\/with\/[^/]+)?\/?$/
 // An owner of `_` names nobody: the player ignores it, and `/photos/_/{photoId}/` answers 404.
 const photoPathRegex = /^\/photos\/(?:_|([^/]+))\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
 const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/
@@ -146,7 +146,8 @@ const readFlashSubject = (element: Nullish<Element>): FlickrSubject => {
   }
 
   // Flickr's dialog names a group with a path alias in the pool path and by its NSID in
-  // `group_id`, the spelling the group player takes.
+  // `group_id`, the spelling the group player takes. The player reads no start photo, so a
+  // `with/{photoId}` start is dropped.
   if (groupAliasPoolPathRegex.test(page)) {
     return { groupId: config.get('group_id') ?? undefined }
   }

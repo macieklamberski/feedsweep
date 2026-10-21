@@ -318,7 +318,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should leave a group pool named by its alias alone when it starts on a photo', async () => {
+    it('should map a group pool named by its alias that starts on a photo onto the group player', async () => {
       const value = html`
         <embed
           type="application/x-shockwave-flash"
@@ -327,6 +327,26 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
           flashvars="offsite=true&amp;lang=en-us&amp;page_show_url=%2Fgroups%2Fafs85mmf14g%2Fpool%2Fshow%2Fwith%2F4959570037%2F&amp;page_show_back_url=%2Fgroups%2Fafs85mmf14g%2Fpool%2Fwith%2F4959570037%2F&amp;group_id=1461497@N24&amp;jump_to=4959570037&amp;start_index="
           width="400"
           height="300"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'groups/1461497@N24',
+        src: 'https://embedr.flickr.com/groups/1461497@N24?width=400&height=300',
+        url: 'https://www.flickr.com/groups/1461497@N24/',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should return undefined for a group pool path that starts on a photo and goes on', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://www.flickr.com/apps/slideshow/show.swf?v=71649"
+          flashvars="page_show_url=%2Fgroups%2Fafs85mmf14g%2Fpool%2Fshow%2Fwith%2F4959570037%2Fextra%2F&amp;group_id=1461497@N24"
         >
       `
 
