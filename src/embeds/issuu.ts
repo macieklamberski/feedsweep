@@ -45,14 +45,21 @@ const composeDocumentEmbed = (
     return
   }
 
+  // The iframe's `u` and `d` come out of the query decoded, and each goes into a path segment.
+  const publisherSegment = encodePathSegment(publisher)
+  const documentSegment = encodePathSegment(documentName)
+
+  if (!publisherSegment || !documentSegment) {
+    return
+  }
+
   const query = composeQuery(trimObject({ u: publisher, d: documentName, p: page }))
 
   return {
     provider,
     id: `${publisher}/${documentName}`,
     src: `https://e.issuu.com/embed.html${query}`,
-    // The iframe's `u` and `d` come out of the query decoded, and each goes into a path segment.
-    url: `https://issuu.com/${encodePathSegment(publisher)}/docs/${encodePathSegment(documentName)}`,
+    url: `https://issuu.com/${publisherSegment}/docs/${documentSegment}`,
     ratio: documentRatio,
   }
 }

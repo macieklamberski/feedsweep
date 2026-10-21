@@ -372,6 +372,12 @@ describeForEachParser('nprFlashEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a story id that is a dot segment', async () => {
+      const value = '<embed src="http://www.npr.org/v2/?i=..&m=340005057&t=audio">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the Flash player path', async () => {
       const value = '<embed src="https://evil.test/v2/?i=340005056&m=340005057&t=audio" />'
 

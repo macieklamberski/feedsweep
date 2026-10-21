@@ -112,7 +112,18 @@ const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
   const startTrack = getPathSegments(parsed).find((segment) => startTrackRegex.test(segment))
   const start = startTrack ? `${startTrack}/` : ''
   // A query id comes out decoded, and it goes into a path.
-  const segments = new Map(releases.map(([named, value]) => [named, encodePathSegment(value)]))
+  const segments = new Map<string, string>()
+
+  for (const [named, value] of releases) {
+    const segment = encodePathSegment(value)
+
+    if (!segment) {
+      return
+    }
+
+    segments.set(named, segment)
+  }
+
   const albumId = segments.get('album')
   const trackId = segments.get('track')
   // The dialog writes the release first and a track picked off an album after the layout. Album

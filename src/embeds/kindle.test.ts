@@ -318,6 +318,12 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for an asin that is a dot segment', async () => {
+      const value = '<iframe src="https://read.amazon.com/kp/card?asin=.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore the card route on a foreign host', async () => {
       const value = '<iframe src="https://evil.test/kp/card?asin=B08DGQCKF3"></iframe>'
 

@@ -240,6 +240,20 @@ describe('encodePathSegment', () => {
 
     expect(encodePathSegment(value)).toBe(value)
   })
+
+  it('should return undefined for a whole value of two dots', () => {
+    expect(encodePathSegment('..')).toBeUndefined()
+  })
+
+  it('should return undefined for a whole value of one dot', () => {
+    expect(encodePathSegment('.')).toBeUndefined()
+  })
+
+  it('should keep dots that are not the whole value', () => {
+    const value = '...'
+
+    expect(encodePathSegment(value)).toBe(value)
+  })
 })
 
 describe('composeQuery', () => {

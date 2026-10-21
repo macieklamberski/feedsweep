@@ -431,6 +431,12 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a release id that is a dot segment', async () => {
+      const value = '<iframe src="https://bandcamp.com/EmbeddedPlayer/?album=.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a player naming no release', async () => {
       const value = html`
         <iframe src="https://bandcamp.com/EmbeddedPlayer/size=small/bgcol=ffffff/"></iframe>

@@ -179,7 +179,13 @@ export const tiktokIframeEmbedResolver = createUrlEmbedResolver(tiktokHosts, tik
 
 // A forum's s9e MediaEmbed helper frame, naming the clip id in its url fragment.
 export const tiktokS9eEmbedResolver = createS9eEmbedResolver('tiktok', (videoId) => {
-  return tiktokResolveEmbed(`https://www.tiktok.com/embed/v2/${encodePathSegment(videoId)}`)
+  const segment = encodePathSegment(videoId)
+
+  if (!segment) {
+    return
+  }
+
+  return tiktokResolveEmbed(`https://www.tiktok.com/embed/v2/${segment}`)
 })
 
 // MetaSlider Pro's TikTok slide: a poster image that only the plugin's script swaps for the player.

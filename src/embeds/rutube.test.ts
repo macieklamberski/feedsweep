@@ -320,6 +320,23 @@ describeForEachParser('rutubeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a titled playlist video that is a dot segment', async () => {
+      const value = html`
+        <iframe
+          src="https://rutube.ru/pl/?pl_video=.."
+          title="Видео"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a playlist video that is a dot segment', async () => {
+      const value = '<iframe src="https://rutube.ru/pl/?pl_video=.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
         '<iframe src="https://evil.test/play/embed/c91d5d8847c7c5391a090fff38c86f34/"></iframe>'

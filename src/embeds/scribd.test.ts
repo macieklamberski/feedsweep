@@ -289,6 +289,12 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a document_id that is a dot segment', async () => {
+      const value = '<embed src="http://d1.scribdassets.com/ScribdViewer.swf?document_id=..">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined when neither the swf query nor the flashvars name a document', async () => {
       const value = html`
         <object data="http://d1.scribdassets.com/ScribdViewer.swf?access_key=key-abc">

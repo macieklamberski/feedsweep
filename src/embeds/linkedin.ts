@@ -25,6 +25,7 @@ const linkedinResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
+  // The urn is read out of a path, where the parser has already resolved any dot segment away.
   const urnSegment = encodePathSegment(postUrn)
 
   // No title: carriers state the boilerplate "Embedded post" in eight languages.

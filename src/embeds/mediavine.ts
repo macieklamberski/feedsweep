@@ -7,8 +7,14 @@ const playerRatio = '16/9'
 
 // Without /iframe the route answers 200 but is served x-frame-options: SAMEORIGIN.
 // A fabricated id answers 404 on the /iframe route.
-const composeEmbedUrl = (videoId: string): string => {
-  return `https://embed.mediavine.com/videos/${encodePathSegment(videoId)}/iframe`
+const composeEmbedUrl = (videoId: string): string | undefined => {
+  const segment = encodePathSegment(videoId)
+
+  if (!segment) {
+    return
+  }
+
+  return `https://embed.mediavine.com/videos/${segment}/iframe`
 }
 
 // Mediavine ships a video as an empty div.mv-video-target its script builds into a player.
@@ -21,11 +27,17 @@ export const mediavineWidgetEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
+    const src = composeEmbedUrl(videoId)
+
+    if (!src) {
+      return
+    }
+
     // Mediavine has no public watch page.
     return {
       provider: 'mediavine',
       id: videoId,
-      src: composeEmbedUrl(videoId),
+      src,
       ratio: playerRatio,
       title: attr(element, 'title'),
     }
@@ -51,11 +63,17 @@ export const mediavineScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
+    // The script path id is decoded, like the div's attribute, so the player url encodes it once.
+    const src = composeEmbedUrl(decodeSegment(videoId) ?? videoId)
+
+    if (!src) {
+      return
+    }
+
     return {
       provider: 'mediavine',
       id: videoId,
-      // The script path id is decoded, like the div's attribute, so the player url encodes it once.
-      src: composeEmbedUrl(decodeSegment(videoId) ?? videoId),
+      src,
       ratio: playerRatio,
     }
   },

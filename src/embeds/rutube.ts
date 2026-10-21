@@ -14,9 +14,13 @@ const playlistPathRegex = /^\/pl\/?$/
 // `p` is the access key a private video will not play without.
 const rutubeEmbedParams = ['p', 't', 'stopTime']
 
-const composeEmbed = (videoId: string, parsed: URL): EmbedResolverResult => {
+const composeEmbed = (videoId: string, parsed: URL): EmbedResolverResult | undefined => {
   // A playlist's `pl_video` comes out of the query decoded, and it goes into a path.
   const segment = encodePathSegment(videoId)
+
+  if (!segment) {
+    return
+  }
 
   // rutube.ru/api/video/{id}/ answers key-free with the title, author, duration and a poster, 200
   // for a real id and 404 for an invented one, and the poster file is named by a hash the id does
@@ -49,6 +53,11 @@ export const rutubeResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const result = composeEmbed(videoId, parsed)
+
+  if (!result) {
+    return
+  }
+
   const title = attr(element, 'title')
 
   return title ? { ...result, title } : result

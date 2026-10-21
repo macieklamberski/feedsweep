@@ -274,7 +274,13 @@ export const instagramIframeEmbedResolver = createUrlEmbedResolver(
 
 // A forum's s9e MediaEmbed helper frame, naming the post's shortcode in its url fragment.
 export const instagramS9eEmbedResolver = createS9eEmbedResolver('instagram', (shortcode) => {
-  return instagramResolveEmbed(`https://www.instagram.com/p/${encodePathSegment(shortcode)}/`)
+  const segment = encodePathSegment(shortcode)
+
+  if (!segment) {
+    return
+  }
+
+  return instagramResolveEmbed(`https://www.instagram.com/p/${segment}/`)
 })
 
 // The player measures itself once mounted and reports it under a `MEASURE` type. `LOADING`

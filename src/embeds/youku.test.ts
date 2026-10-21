@@ -59,6 +59,12 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a VideoIDS that is a dot segment', async () => {
+      const value = '<embed src="http://static.youku.com/v1.0.0080/v/swf/qplayer.swf?VideoIDS=..">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should use a malformed video id as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://player.youku.com/embed/XNDUy_NTcz-MDEyOA"></iframe>'
       const expected: EmbedResolverResult = {

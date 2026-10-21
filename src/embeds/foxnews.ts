@@ -36,13 +36,19 @@ const playerRatio = '16/9'
 // `video-embed.html` is what Fox names as the player in the video page's `twitter:player` and
 // `embedUrl`. The Fox News player answers 404 for an unknown id, while the Fox Business player
 // answers 200 with an empty shell and its page url redirects to the `/video` index.
-const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult => {
+const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult | undefined => {
+  // The id comes out of the query decoded, and it goes into a path.
+  const segment = encodePathSegment(id)
+
+  if (!segment) {
+    return
+  }
+
   return {
     provider: brand.provider,
     id,
     src: `https://${brand.playerHost}/v/video-embed.html${composeQuery({ video_id: id })}`,
-    // The id comes out of the query decoded, and it goes into a path.
-    url: `https://${brand.pageHost}/video/${encodePathSegment(id)}`,
+    url: `https://${brand.pageHost}/video/${segment}`,
     ratio: playerRatio,
   }
 }

@@ -1045,6 +1045,22 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
 
     expect(await extract(value)).toEqual(expected)
   })
+
+  describe('a value that is a dot segment', () => {
+    it('should return undefined for an uploads username that is a dot segment', async () => {
+      const value = html`
+        <iframe src="https://www.youtube.com/embed?listType=user_uploads&list=.."></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a live stream channel that is a dot segment', async () => {
+      const value = '<iframe src="https://www.youtube.com/embed/live_stream?channel=.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
 })
 
 describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {

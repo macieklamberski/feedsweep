@@ -26,11 +26,17 @@ export const abcnewsResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
+  const segment = encodePathSegment(id)
+
+  if (!segment) {
+    return
+  }
+
   return {
     provider,
     id,
     src: `https://abcnews.com/video/embed${composeQuery({ id })}`,
-    url: `https://abcnews.com/video/${encodePathSegment(id)}`,
+    url: `https://abcnews.com/video/${segment}`,
     ratio: '16/9',
   }
 }

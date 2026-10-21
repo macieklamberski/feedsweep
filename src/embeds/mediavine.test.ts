@@ -29,6 +29,17 @@ describeForEachParser('mediavineWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a video id that is a dot segment', async () => {
+      const value = html`
+        <div
+          class="mv-video-target"
+          data-video-id=".."
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should read the name the carrier states', async () => {
       const value = html`
         <div
@@ -186,6 +197,12 @@ describeForEachParser('mediavineScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for an escaped video id that is a dot segment', async () => {
+      const value = '<script src="https://video.mediavine.com/videos/%2E%2E.js"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     // The selector matches a substring, so a lookalike host reaches `extract` and only the host
     // guard refuses it.
     it('should ignore a foreign host spelling the loader path', async () => {

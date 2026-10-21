@@ -15,9 +15,13 @@ const flashPlayerPathRegex = /^\/poll\.swf$/
 // A poll's height follows its answer count, and the frame posts none.
 const pollHeight = 533
 
-const composeEmbed = (pollId: string): EmbedResolverResult => {
+const composeEmbed = (pollId: string): EmbedResolverResult | undefined => {
   // The Flash flashvar `p` comes out decoded, and it goes into a path.
   const segment = encodePathSegment(pollId)
+
+  if (!segment) {
+    return
+  }
 
   return {
     provider,

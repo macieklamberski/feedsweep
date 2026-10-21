@@ -449,6 +449,30 @@ describeForEachParser('ccmaEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for an EVP videoid that is a dot segment', async () => {
+      const value = html`
+        <embed
+          src="http://www.tv3.cat/ria/players/3ac/evp/Main.swf"
+          flashvars="videoid=.."
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for an SVP2 VIDEO_ID that is a dot segment, not fall back to the object id', async () => {
+      const value = html`
+        <object id="SVP4545IE">
+          <embed
+            src="http://www.tv3.cat/svp2/svp2.swf"
+            flashvars="VIDEO_ID=.."
+          >
+        </object>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore the legacy videos route, which names no player', async () => {
       const value = html`
         <object

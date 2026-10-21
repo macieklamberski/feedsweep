@@ -635,6 +635,14 @@ describeForEachParser('appleToolsEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a country that is a dot segment', async () => {
+      const value = html`
+        <iframe src="https://tools.applemusic.com/embed/v1/album/1195107058?country=.."></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a kind the player does not embed', async () => {
       const value =
         '<iframe src="https://tools.applemusic.com/embed/v1/curator/111492?country=us"></iframe>'

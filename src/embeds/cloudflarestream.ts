@@ -96,6 +96,10 @@ export const cloudflarestreamScriptEmbedResolver = createMarkupEmbedResolver(
     // The loader's `video` comes out of its query decoded, and it goes into a path.
     const segment = encodePathSegment(videoId)
 
+    if (!segment) {
+      return
+    }
+
     // The loader names no account, so the video is rebuilt on the shared host, which holds it
     // whichever account uploaded it.
     return {

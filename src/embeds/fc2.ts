@@ -53,6 +53,10 @@ const fc2FlashResolveEmbed: ResolveEmbed = (url) => {
   // The id comes out of the query decoded, and it goes into a path.
   const contentId = encodePathSegment(videoId)
 
+  if (!contentId) {
+    return
+  }
+
   const duration = Number(parsed.searchParams.get('d'))
 
   return {
@@ -102,6 +106,10 @@ export const fc2BlogScriptEmbedResolver = createMarkupEmbedResolver(
 
     // The id comes out of the query decoded, and it goes into a path.
     const contentId = encodePathSegment(videoId)
+
+    if (!contentId) {
+      return
+    }
 
     return composeEmbed(contentId)
   },

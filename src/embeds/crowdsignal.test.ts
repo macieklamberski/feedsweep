@@ -327,6 +327,17 @@ describeForEachParser('crowdsignalFlashEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a poll id that is a dot segment', async () => {
+      const value = html`
+        <embed
+          src="http://www.polldaddy.com/poll.swf"
+          flashvars="p=.."
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host serving the player path', async () => {
       const value = html`
         <embed

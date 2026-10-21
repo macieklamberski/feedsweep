@@ -41,13 +41,18 @@ const localeRegex = /^[a-z]{2}$/
 // and `path=11969917` still a playlist.
 const trackSwfRegex = /^(?:small-widget(?:-v2)?|singlePlayer)\.swf$/
 
-type Resource = { type: string; id: string }
+type Resource = { type: string; id?: string }
 
 const readResource = (url: URL): Resource | undefined => {
   const segments = getPathSegments(url)
   const route = localeRegex.test(segments[0] ?? '') ? segments.slice(1) : segments
   // A query value comes out decoded, and the id goes into a path beside the raw path spellings.
-  const query = (name: string) => encodePathSegment(url.searchParams.get(name) ?? '')
+  // An absent value reads as empty, and one the path cannot take as undefined.
+  const query = (name: string): string | undefined => {
+    const value = url.searchParams.get(name)
+
+    return value ? encodePathSegment(value) : ''
+  }
 
   // The current widget, `widget.deezer.com/widget/{theme}/{type}/{id}`.
   if (route[0] === 'widget') {
@@ -57,7 +62,7 @@ const readResource = (url: URL): Resource | undefined => {
   // The classic plugin player, `deezer.com/plugins/player?type={type}&id={id}`. It redirects to
   // the current widget, which is minted here directly.
   if (route[0] === 'plugins' && route[1] === 'player') {
-    return { type: pluginTypes.get(query('type')) ?? '', id: query('id') }
+    return { type: pluginTypes.get(query('type') ?? '') ?? '', id: query('id') }
   }
 
   // `deezer.com/embedded/{player}.swf?idSong={id}` and its `swf/singlePlayer.swf` twin.
@@ -68,7 +73,9 @@ const readResource = (url: URL): Resource | undefined => {
   // `deezer.com/embedded/widget.swf?path={id}` and `deezer.com/embed/player?pid={id}`, the two
   // spellings of the Flash-era playlist player.
   if (route[1] === 'widget.swf' || (route[0] === 'embed' && route[1] === 'player')) {
-    return { type: 'playlist', id: query('path') || query('pid') }
+    const path = query('path')
+
+    return { type: 'playlist', id: path === '' ? query('pid') : path }
   }
 }
 

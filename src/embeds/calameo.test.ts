@@ -252,6 +252,12 @@ describeForEachParser('calameoEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a bkcode that is a dot segment', async () => {
+      const value = '<iframe src="https://v.calameo.com/?bkcode=.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the viewer query', async () => {
       const value = '<iframe src="https://evil.test/?bkcode=0077756511c9c6e552299"></iframe>'
 

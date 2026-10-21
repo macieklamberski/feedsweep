@@ -361,6 +361,14 @@ describeForEachParser('cloudflarestreamScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a video that is a dot segment', async () => {
+      const value = html`
+        <script src="https://embed.cloudflarestream.com/embed/r4xu.fla9.latest.js?video=.."></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the loader path', async () => {
       const value =
         '<script src="https://evil.test/embed/r4xu.fla9.latest.js?video=5653cfd537db1edbed98c5c0119f390c&embed.videodelivery.net/embed/"></script>'

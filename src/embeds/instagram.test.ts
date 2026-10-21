@@ -1033,6 +1033,17 @@ describeForEachParser('instagramS9eEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a shortcode that is a dot segment', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="instagram"
+          src="https://s9e.github.io/iframe/2/instagram.min.html#.."
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore the helper path on a foreign host', async () => {
       const value = html`
         <iframe

@@ -160,6 +160,12 @@ describe('readVimeoEmbedSrc', () => {
 
     expect(readVimeoEmbedSrc(value)).toEqual(expected)
   })
+
+  it('should return undefined for a clip_id that is a dot segment', () => {
+    const value = 'http://vimeo.com/moogaloop.swf?clip_id=..'
+
+    expect(readVimeoEmbedSrc(value)).toBeUndefined()
+  })
 })
 
 describe('vimeoResolveEmbed', () => {
@@ -800,6 +806,20 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('a value that is a dot segment', () => {
+    it('should return undefined for a clip_id that is a dot segment', async () => {
+      const value = '<embed src="http://vimeo.com/moogaloop.swf?clip_id=..">'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a hash that is a dot segment', async () => {
+      const value = '<iframe src="https://player.vimeo.com/video/76979871?h=.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
     })
   })
 })

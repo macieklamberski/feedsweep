@@ -103,7 +103,13 @@ const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
   }
 
   // The id comes out of the query decoded, and the page goes into a path beside the raw spelling.
-  return composeEmbed(kind, shape, encodePathSegment(id), src, title)
+  const segment = encodePathSegment(id)
+
+  if (!segment) {
+    return
+  }
+
+  return composeEmbed(kind, shape, segment, src, title)
 }
 
 // The older per-resource spelling, `ridewithgps.com/{routes|trips}/{id}/embed`, which feeds

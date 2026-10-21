@@ -13,12 +13,18 @@ const mrcvideoHosts = ['mrcvideo.org', 'mrctv.org', 'www.mrctv.org']
 // The sharing snippet in the Flash player's flashvars lost the closing quote of its `src`.
 const sharingSrcRegex = /src="([^"\s]+)/
 
-const composeEmbed = (id: string): EmbedResolverResult => {
+const composeEmbed = (id: string): EmbedResolverResult | undefined => {
+  const segment = encodePathSegment(id)
+
+  if (!segment) {
+    return
+  }
+
   // No `url`: the oEmbed endpoint answers only the slug page, which the id cannot compose.
   return {
     provider,
     id,
-    src: `https://mrcvideo.org/embed/${encodePathSegment(id)}`,
+    src: `https://mrcvideo.org/embed/${segment}`,
     ratio: '16/9',
   }
 }

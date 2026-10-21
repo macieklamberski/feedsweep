@@ -1346,6 +1346,12 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a query token that is a dot segment', async () => {
+      const value = '<iframe src="https://codepen.io/leaverou/embed/OJYzQjN?token=.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     // The selector matches every iframe, so the host check inside `extract` is what rejects
     // this one. A lookalike host would never reach it.
     it('should ignore a foreign host carrying the same path', async () => {

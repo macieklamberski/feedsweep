@@ -57,10 +57,15 @@ const readFlashTalk = (
   // The snippet states its own poster in `su`, on `images.ted.com`, and those files still serve
   // with no signature and no expiry.
   const poster = config.get('su') ?? undefined
-
   // The slug comes out of the flashvars decoded, and it goes into a path beside the raw spelling.
+  const segment = encodePathSegment(slug)
+
+  if (!segment) {
+    return
+  }
+
   return {
-    slug: encodePathSegment(slug),
+    slug: segment,
     thumbnail: parseUrlOnHosts(poster, tedHosts) ? poster : undefined,
   }
 }

@@ -16,12 +16,18 @@ const playerPath = '/iframe.php'
 // Only this host takes the id as its only segment. The apex serves pages there, such as `/search`.
 const shortHost = 'v.traileraddict.com'
 
-const composeEmbed = (id: string): EmbedResolverResult => {
+const composeEmbed = (id: string): EmbedResolverResult | undefined => {
+  const segment = encodePathSegment(id)
+
+  if (!segment) {
+    return
+  }
+
   return {
     provider,
     id,
     src: `https://traileraddict.com/iframe.php${composeQuery({ id })}`,
-    url: `https://traileraddict.com/watch/${encodePathSegment(id)}`,
+    url: `https://traileraddict.com/watch/${segment}`,
     ratio: '16/9',
   }
 }

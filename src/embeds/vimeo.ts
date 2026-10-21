@@ -263,7 +263,17 @@ export const readVimeoEmbedSrc = (link: string): string | undefined => {
   const url = parseUrlOnHosts(link, vimeoHosts)
   const videoId = url && extractVimeoId(url.href)
 
-  return videoId ? composeEmbedUrl(encodePathSegment(videoId)) : undefined
+  if (!videoId) {
+    return
+  }
+
+  const segment = encodePathSegment(videoId)
+
+  if (!segment) {
+    return
+  }
+
+  return composeEmbedUrl(segment)
 }
 
 // `t` is the start offset, in Vimeo's `{n}s` form.
@@ -282,6 +292,13 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
   const { id: videoId, hash } = reference
   // A `clip_id` comes out of the query decoded, and it goes into a path.
   const segment = encodePathSegment(videoId)
+  // Empty where the reference holds no hash.
+  const hashSegment = hash ? encodePathSegment(hash) : ''
+
+  if (!segment || hashSegment === undefined) {
+    return
+  }
+
   const title = element ? attr(element, 'title') : undefined
   const params = {
     // The player takes the hash only as h=: the /video/{id}/{hash} path spelling is a 404.
@@ -295,7 +312,7 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
     id: hash ? `${videoId}:${hash}` : videoId,
     src: composeEmbedUrl(segment, params),
     // Without the hash the page loses its title and its video, so it stays on the url too.
-    url: `https://vimeo.com/${segment}${hash ? `/${encodePathSegment(hash)}` : ''}`,
+    url: `https://vimeo.com/${segment}${hashSegment ? `/${hashSegment}` : ''}`,
     ratio: playerRatio,
     title,
     // TODO: no thumbnail. Vimeo posters are not derivable from the id and need an oEmbed lookup.
@@ -315,7 +332,13 @@ export const vimeoMetasliderEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return vimeoResolveEmbed(`https://vimeo.com/${encodePathSegment(videoId)}`)
+    const segment = encodePathSegment(videoId)
+
+    if (!segment) {
+      return
+    }
+
+    return vimeoResolveEmbed(`https://vimeo.com/${segment}`)
   },
 )
 

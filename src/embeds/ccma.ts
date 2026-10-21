@@ -93,11 +93,14 @@ export const ccmaResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   if (svpPlayerPathRegex.test(parsed.pathname)) {
+    // A flashvar the path cannot take refuses the carrier, not only the flashvar.
+    if (flashVar(element, 'VIDEO_ID')) {
+      return composeResult(readFlashVideoId(element, 'VIDEO_ID'))
+    }
+
     const objectId = attr(element?.closest('object'), 'id')
 
-    return composeResult(
-      readFlashVideoId(element, 'VIDEO_ID') ?? objectId?.match(svpObjectIdRegex)?.[1],
-    )
+    return composeResult(objectId?.match(svpObjectIdRegex)?.[1])
   }
 }
 
