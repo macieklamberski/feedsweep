@@ -889,6 +889,8 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
   })
 
   describe('the author the byline names', () => {
+    // Constructed: TikTok's snippet writes one handle in the href, the title and the text, so
+    // only a fixture that splits them shows which one is read.
     it('should read the handle from the profile link, not its text', async () => {
       const value = html`
         <blockquote

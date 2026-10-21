@@ -75,7 +75,8 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
   const profile = find(element, 'section a[href]', (anchor) => !!readProfileHandle(anchor))
   const byline = text(profile)
   const profileHandle = readProfileHandle(profile)
-  // Where the link holds a secUid, TikTok's snippet writes the handle into the link's `title`.
+  // Where the link holds a secUid, the account name survives only in the link's `title`, as
+  // `@{name}`, which is not always the handle.
   const author = secUidRegex.test(profileHandle ?? '') ? attr(profile, 'title') : profileHandle
   const caption = find(element, 'section p', (paragraph) => {
     const value = text(paragraph)
