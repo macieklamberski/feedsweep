@@ -1,6 +1,7 @@
 import {
   coerceNumber,
   composeQuery,
+  getPathSegments,
   getQueryParam,
   isAnyOf,
   isHostOrSubdomainOf,
@@ -24,9 +25,29 @@ const provider = 'facebook'
 // Posts live on the apex and on `web.`, `m.` and `business.` alike.
 const facebookHosts = ['facebook.com', 'fb.watch']
 
+// A page named by its numeric id, `profile.php?id={id}`, has no username.
+const profileRoute = 'profile.php'
+
+// The page's own username, `facebook.com/{username}/`.
+const readPageUsername = (anchor: Nullish<Element>): string | undefined => {
+  const page = parseUrlOnHosts(attr(anchor, 'href'), facebookHosts)
+
+  if (!page) {
+    return
+  }
+
+  const segments = getPathSegments(page)
+
+  if (segments.length !== 1 || isAnyOf(segments[0], profileRoute)) {
+    return
+  }
+
+  return segments[0]
+}
+
 // The embed dialog ships the post text, the page and the date in a fallback `<blockquote cite>`
 // that renders when the SDK never loads. The shape is fixed: a caption paragraph, then
-// "Posted by {page} on {date}" as two anchors.
+// "Posted by {page} on {date}" as two anchors, whose text is localised.
 const readFallback = (blockquote: Nullish<Element>): Partial<EmbedResolverResult> => {
   if (!blockquote) {
     return {}
@@ -39,7 +60,7 @@ const readFallback = (blockquote: Nullish<Element>): Partial<EmbedResolverResult
     return { description }
   }
 
-  return { description, author: text(anchors[0]), date: text(anchors[1]) }
+  return { description, author: readPageUsername(anchors[0]) }
 }
 
 const fallbackSelector = '.fb-xfbml-parse-ignore blockquote, blockquote.fb-xfbml-parse-ignore'
