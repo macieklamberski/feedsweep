@@ -430,7 +430,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         url: 'http://www.slideshare.net/haraldf/business-quotes-for-2011',
         ratio: '595/485',
         title: 'Business Quotes for 2011',
-        author: 'Harald Felgner',
+        author: 'haraldf',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -572,7 +572,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         url: 'http://www.slideshare.net/bcqc/mostly-harmless-22nd-april-2012',
         ratio: '595/485',
         title: 'Mostly harmless   22nd april 2012',
-        author: 'Boat Club Quiz Club Pune',
+        author: 'bcqc',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -783,7 +783,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         url: 'http://www.slideshare.net/nonty/eclipse-summit-europe-10-test-ui-aspects-of-plugins',
         ratio: '595/485',
         title: "Eclipse Summit Europe '10 - Test UI Aspects of Plug-ins",
-        author: 'The RCP Company',
+        author: 'nonty',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -820,7 +820,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         url: 'http://www.slideshare.net/topidea/photoshop-4973393',
         ratio: '595/485',
         title: '《Photoshop使用经验谈》谢晓路',
-        author: 'top idea',
+        author: 'topidea',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1194,7 +1194,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
         ratio: '595/485',
         title: 'Business Quotes for 2011',
-        author: 'Harald Felgner',
+        author: 'haraldf',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1230,7 +1230,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         url: 'http://www.slideshare.net/null0x00/make-profit-with-uiredressing-attacks',
         ratio: '595/485',
         title: 'Make profit with UI-Redressing attacks.',
-        author: 'n|u - The Open Security Community',
+        author: 'null0x00',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1294,7 +1294,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         url: 'https://de.slideshare.net/BLM_Bayern/christian-sieh',
         ratio: '595/485',
         title: 'Christian Sieh',
-        author: 'BLM Bayern',
+        author: 'BLM_Bayern',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1355,7 +1355,7 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
         url: 'https://www.slideshare.net/haraldf/business-quotes-for-2011',
         ratio: '595/485',
         title: 'Business Quotes for 2011',
-        author: 'Harald Felgner',
+        author: 'haraldf',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1472,7 +1472,7 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-author="Harald Felgner"
+        data-embed-author="haraldf"
         data-embed-title="Business Quotes for 2011"
         data-embed-url="https://www.slideshare.net/haraldf/business-quotes-for-2011"
         data-embed-id="6PCWPGFw9SwsAY"
@@ -1509,7 +1509,7 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-author="Χρήστος Χαρμπής"
+        data-embed-author="xristoasxar"
         data-embed-title="Θέματα και απαντήσεις"
         data-embed-url="https://www.slideshare.net/xristoasxar/ss-73029387"
         data-embed-id="uQJbKEhYOWJAi5"
@@ -1632,7 +1632,7 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 
-  it('should leave a caption block whose owner link holds no name', async () => {
+  it('should take a caption block whose owner link holds only an image', async () => {
     const value = html`
       <div>
         <iframe src="http://www.slideshare.net/slideshow/embed_code/29123651"></iframe>
@@ -1656,18 +1656,8 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
         data-embed-provider="slideshare"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/29123651"
         data-embed-ratio="595/485"
+        data-embed-author="zampire"
       ></div>
-      <p>
-        <b>
-          <a
-            href="https://fr.slideshare.net/zampire/down-de-la-guilde-rage"
-            title="Down de la guilde rage"
-            >Down de la guilde rage</a
-          >
-        </b>
-        from
-      </p>
-      <a href="http://www.slideshare.net/zampire"><img src="https://example.com/avatar.jpg" /></a>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
@@ -1770,7 +1760,7 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
         from <strong><a href="https://www.slideshare.net/null0x00">Krzysztof Kotowicz</a></strong>
       </p>
       <div
-        data-embed-author="Krzysztof Kotowicz"
+        data-embed-author="null0x00"
         data-embed-title="Make profit with UI-redressing attacks"
         data-embed-url="https://www.slideshare.net/null0x00/make-profit-with-uiredressing-attacks"
         data-embed-id="10579166"
