@@ -139,7 +139,13 @@ const readPathId = (url: URL, segments: Array<string>): string | undefined => {
   // The short domain is a pure shortener with no routes of its own: every path it does not know
   // as a video goes to `/urlshortener?path=…`, so nothing there needs telling from an id.
   if (url.hostname === 'dai.ly' || url.hostname.endsWith('.dai.ly')) {
-    return segments[0] && (decodeSegment(segments[0]) ?? segments[0])
+    const [first] = segments
+
+    if (!first) {
+      return
+    }
+
+    return decodeSegment(first) ?? first
   }
 
   const index = skipRouteWords(segments)
