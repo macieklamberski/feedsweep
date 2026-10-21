@@ -142,13 +142,13 @@ describe('omnyResolveEmbed', () => {
     expect(omnyResolveEmbed(value)).toEqual(expected)
   })
 
-  // The list under the player grows with the playlist, so no height fits it.
-  it('should state no size for a playlist', () => {
+  it('should give a playlist the height of its own box', () => {
     const value = 'https://omny.fm/shows/the-show/playlists/highlights/embed?style=cover'
     const expected: EmbedResolverResult = {
       provider: 'omny',
       id: 'the-show/playlists/highlights',
       src: 'https://omny.fm/shows/the-show/playlists/highlights/embed',
+      height: 500,
     }
 
     expect(omnyResolveEmbed(value)).toEqual(expected)
@@ -250,6 +250,7 @@ describeForEachParser('omnyEmbedResolver', (parseHtml) => {
         provider: 'omny',
         id: 'the-show/playlists/highlights',
         src: 'https://omny.fm/shows/the-show/playlists/highlights/embed',
+        height: 500,
       }
 
       expect(await extract(value)).toEqual(expected)

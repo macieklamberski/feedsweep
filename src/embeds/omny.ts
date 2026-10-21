@@ -9,9 +9,10 @@ const provider = 'omny'
 const omnyHosts = ['omny.fm']
 
 // The boxes Omny's embed dialog writes: 180 tall for the wide audio player, 560 by 315 for the
-// video one. The square layout and the artwork style are dropped with the query that picked them.
-// A playlist grows with its list, so it states none.
+// video one, and 500 tall for a playlist, which scrolls its list inside the frame. The square
+// layout and the artwork style are dropped with the query that picked them.
 const audioHeight = 180
+const playlistHeight = 500
 const videoRatio = '16/9'
 
 // `/shows/{show}/{clip}/embed` is a clip and `/shows/{show}/playlists/{slug}/embed` a playlist.
@@ -52,6 +53,8 @@ export const omnyResolveEmbed: ResolveEmbed = (url, element) => {
   // The player reads the value in any case.
   const isVideo = media?.toLowerCase() === 'video'
   const isPlaylist = clip.includes('/playlists/')
+  const isVideoClip = isVideo && !isPlaylist
+  const height = isPlaylist ? playlistHeight : audioHeight
   const query = composeQuery(trimObject({ media: isVideo ? media : undefined, t }))
   const title = attr(element, 'title')
 
@@ -59,8 +62,8 @@ export const omnyResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id: clip,
     src: `https://omny.fm/shows/${clip}/embed${query}`,
-    height: isVideo || isPlaylist ? undefined : audioHeight,
-    ratio: isVideo && !isPlaylist ? videoRatio : undefined,
+    height: isVideoClip ? undefined : height,
+    ratio: isVideoClip ? videoRatio : undefined,
     title,
   }
 }
