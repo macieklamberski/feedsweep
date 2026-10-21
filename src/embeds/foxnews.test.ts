@@ -51,6 +51,7 @@ describe('foxnewsResolveEmbed', () => {
 
       expect(foxnewsResolveEmbed(value)).toEqual(expected)
     })
+
     it('should rebuild the video page onto the player', () => {
       const value = 'https://video.foxnews.com/v/5406119088001/'
       const expected: EmbedResolverResult = {
