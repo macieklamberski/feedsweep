@@ -301,6 +301,7 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
         id: '7c55cc6b-d3b6-4786-b60b-2507efdcf403',
         src: 'https://e.infogram.com/7c55cc6b-d3b6-4786-b60b-2507efdcf403?src=embed',
         url: 'https://infogram.com/7c55cc6b-d3b6-4786-b60b-2507efdcf403',
+        title: 'US Venture-Backed Billion-Dollar IPO Counts And Exit Value, By Quarter',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -318,6 +319,7 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
         id: '_/xCt9tZZlJeRza5h27e5F',
         src: 'https://e.infogram.com/_/xCt9tZZlJeRza5h27e5F?src=embed',
         url: 'https://infogram.com/_/xCt9tZZlJeRza5h27e5F',
+        title: 'Mashable Samsung UK',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -339,6 +341,7 @@ describeForEachParser('infogramIframeEmbedResolver', (parseHtml) => {
         id: '43292ecb-8a6f-48dd-8cfe-ebf1501154b7',
         src: 'https://e.infogram.com/43292ecb-8a6f-48dd-8cfe-ebf1501154b7?src=embed',
         url: 'https://infogram.com/43292ecb-8a6f-48dd-8cfe-ebf1501154b7',
+        title: 'Evolució passatgers aeroport',
       }
 
       expect(await extract(value)).toEqual(expected)

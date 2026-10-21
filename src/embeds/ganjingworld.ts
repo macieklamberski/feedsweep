@@ -1,5 +1,6 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
 import { hyphenatedLettersRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -26,10 +27,8 @@ const readVideoId = (url: string): string | undefined => {
   return third
 }
 
-// No title: the carrier states one, but Gan Jing World is unmeasured, so reading it risks putting
-// a player label in the item's title. No thumbnail: the poster is a uuid on a separate cdn and
-// nothing composes it from the video id.
-const ganjingworldResolveEmbed: ResolveEmbed = (url) => {
+// No thumbnail: the poster is a uuid on a separate cdn and nothing composes it from the video id.
+const ganjingworldResolveEmbed: ResolveEmbed = (url, element) => {
   const videoId = readVideoId(url)
 
   if (!videoId) {
@@ -43,6 +42,7 @@ const ganjingworldResolveEmbed: ResolveEmbed = (url) => {
     src: `https://www.ganjingworld.com/embed/${videoId}`,
     url: `https://www.ganjingworld.com/video/${videoId}`,
     ratio: '16/9',
+    title: attr(element, 'title'),
   }
 }
 

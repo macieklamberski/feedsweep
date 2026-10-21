@@ -210,6 +210,37 @@ describeForEachParser('fliphtml5IframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('the title the carrier states', () => {
+    it('should read the book name WordPress writes on the frame', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          class="wp-embedded-content"
+          sandbox="allow-scripts"
+          security="restricted"
+          title="British Columbia Consensus on Brain Injury, Mental Health and Addictions"
+          width="640"
+          height="360"
+          src="https://online.fliphtml5.com/mzsro/jvuq/#?secret=t5CbQCavWG"
+          data-secret="t5CbQCavWG"
+          scrolling="no"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'fliphtml5',
+        id: 'mzsro/jvuq',
+        src: 'https://online.fliphtml5.com/mzsro/jvuq/',
+        url: 'https://online.fliphtml5.com/mzsro/jvuq/',
+        thumbnail: 'https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg',
+        ratio: '4/3',
+        title: 'British Columbia Consensus on Brain Injury, Mental Health and Addictions',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('fliphtml5LightBoxEmbedResolver', (parseHtml) => {
