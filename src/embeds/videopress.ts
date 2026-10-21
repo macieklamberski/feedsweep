@@ -30,8 +30,8 @@ const composeEmbed = (guid: string, query = ''): EmbedResolverResult => {
   }
 }
 
-// The poster, and the title where the carrier states none, live behind
-// `public-api.wordpress.com/rest/v1.1/videos/{guid}`, which answers with no key.
+// The poster where the player url names none, and the title where the carrier states none, live
+// behind `public-api.wordpress.com/rest/v1.1/videos/{guid}`, which answers with no key.
 const videopressResolveEmbed: ResolveEmbed = (url, element) => {
   const [route, guid] = getPathSegments(url)
 
@@ -45,6 +45,8 @@ const videopressResolveEmbed: ResolveEmbed = (url, element) => {
 
   return {
     ...composeEmbed(guid, pickUrlParams(url, videopressEmbedParams)),
+    // The block editor writes the poster the publisher chose into the player url.
+    thumbnail: parseUrl(url, placeholderBaseUrl)?.searchParams.get('posterUrl') ?? undefined,
     title: attr(element, 'title'),
   }
 }
@@ -112,6 +114,8 @@ export const videopressFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Lettore video VideoPress' },
   { provider, field: 'title', drop: 'VideoPress videospeler' },
   { provider, field: 'title', drop: 'VideoPress-videospelare' },
+  { provider, field: 'title', drop: 'VideoPress videospiller' },
+  { provider, field: 'title', drop: 'Trình phát video VideoPress' },
 ]
 
 // Starts playback on the click that loads the player. The player's routes read the boolean
