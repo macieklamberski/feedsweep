@@ -1,5 +1,7 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { attr, text } from '../utils/dom.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'yandexmusic'
@@ -132,14 +134,58 @@ const composeYandexMusicEmbed = (item: YandexMusicItem): EmbedResolverResult => 
   }
 }
 
-const yandexMusicResolveEmbed: ResolveEmbed = (url) => {
+// The old share dialog wrote "Слушайте {title} — {artist} на Яндекс.Музыке" inside the iframe, the
+// title linking the album or track and the artist linking `/artist/{id}`. linkedom parses those
+// anchors as children, and jsdom keeps the iframe's content as raw text.
+const readFallbackAnchors = (element: Element | undefined): Array<Element> => {
+  if (!element) {
+    return []
+  }
+
+  const anchors = Array.from(element.querySelectorAll('a[href]'))
+
+  if (anchors.length || !element.textContent) {
+    return anchors
+  }
+
+  const container = element.ownerDocument.createElement('div')
+  container.innerHTML = element.textContent
+
+  return Array.from(container.querySelectorAll('a[href]'))
+}
+
+const titleRoutes = ['album', 'track']
+const artistRoute = 'artist'
+
+const readAnchorRoute = (anchor: Element): string => {
+  const parsed = parseUrlOnHosts(attr(anchor, 'href'), yandexMusicHosts)
+
+  if (!parsed) {
+    return ''
+  }
+
+  return getPathSegments(parsed)[0] ?? ''
+}
+
+const readFallback = (element: Element | undefined): Partial<EmbedResolverResult> => {
+  const anchors = readFallbackAnchors(element)
+  const title = anchors.find((anchor) => isAnyOf(readAnchorRoute(anchor), titleRoutes))
+  const artist = anchors.find((anchor) => isAnyOf(readAnchorRoute(anchor), artistRoute))
+
+  return {
+    title: text(title),
+    author: text(artist),
+  }
+}
+
+const yandexMusicResolveEmbed: ResolveEmbed = (url, element) => {
   const item = readYandexMusicItem(url)
 
   if (!item) {
     return
   }
 
-  return composeYandexMusicEmbed(item)
+  return { ...composeYandexMusicEmbed(item), ...readFallback(element) }
 }
 
 // Yandex Music's player iframe, on its path or hash route, and its retired Flash track player in
