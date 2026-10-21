@@ -541,7 +541,7 @@ export const prepareEmbedMetadata = (
     ...cleanResultFields(metadata, context),
     src: cleanUrl(src, context),
     url: cleanUrl(resolveOrDropUrl(metadata.url, context), context),
-    thumbnail: resolveOrKeepUrl(metadata.thumbnail, context),
+    thumbnail: cleanUrl(resolveOrKeepUrl(metadata.thumbnail, context), context),
     avatar: resolveOrKeepUrl(metadata.avatar, context),
     date: parseOrKeepDate(metadata.date, context.parseDateFn),
   }

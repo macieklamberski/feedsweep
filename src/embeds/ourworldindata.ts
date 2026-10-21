@@ -37,7 +37,6 @@ const displayParams = [
   'yScale',
   'zoomToSelection',
 ]
-const trackingParamRegex = /^(?:utm_|fbclid$)/
 
 // The embed dialog's snippet frames the page 600 pixels tall, and 696 for an explorer, whose
 // controls take the extra height. The chart fills whatever box it gets.
@@ -61,7 +60,7 @@ const ourworldindataResolveEmbed: ResolveEmbed = (url) => {
 
   const isChart = kind === 'grapher'
   const query = filterUrlQuery(parsed, (name) => {
-    return !displayParams.includes(name) && !trackingParamRegex.test(name)
+    return !displayParams.includes(name)
   })
   const src = `https://ourworldindata.org/${kind}/${slug}${query}`
 

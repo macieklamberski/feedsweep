@@ -2294,6 +2294,23 @@ describe('prepareEmbedMetadata', () => {
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
   })
 
+  it('should clean the thumbnail with the provided cleanUrlFn', () => {
+    const value: Partial<EmbedResolverResult> = {
+      provider: 'example',
+      thumbnail: 'https://cdn.example.com/thumbs/abc.png?time=2017&utm_source=feed',
+    }
+    const expected: Partial<EmbedResolverResult> = {
+      provider: 'example',
+      thumbnail: 'https://cdn.example.com/thumbs/abc.png?time=2017',
+    }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
+    }
+
+    expect(prepareEmbedMetadata(value, context)).toEqual(expected)
+  })
+
   it('should keep the src as written when no cleaner is given', () => {
     const value: Partial<EmbedResolverResult> = {
       provider: 'example',
