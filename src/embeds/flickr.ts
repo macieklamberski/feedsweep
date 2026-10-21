@@ -22,7 +22,7 @@ const flashPlayerPathRegex = /^\/apps\/slideshow\//i
 const flashVideoPathRegex = /^\/apps\/video\/stewart\.swf$/i
 const legacyPlayerPathRegex = /^\/slideshow\/index\.gne$/i
 
-const setPathRegex = /^\/photos\/([^/]+)\/(?:sets|albums)\/(\d+)/i
+const setPathRegex = /^\/photos\/([^/]+)\/(?:sets|albums)\/(\d+)(?:\/|$)/i
 const streamPathRegex = /^\/photos\/([^/]+)\/show\/?$/i
 const groupPathRegex = /^\/groups\/([^/]+)\/pool\/show\/?$/i
 const groupPagePathRegex = /^\/groups\//i
@@ -183,14 +183,10 @@ const readFlashPhoto = (element: Nullish<Element>): FlickrPhoto | undefined => {
   return { photoId, secret: secret ? encodePathSegment(secret) : undefined }
 }
 
-const trailingSlashesRegex = /\/+$/
-
 // The iframe carrier names its subject in its own query. A set is preferred where several
 // appear, being the narrowest of the three.
 const readLegacySubject = (parsed: URL): FlickrSubject => {
-  // Some feeds end the set id with the `/` of a path. A set id never holds one, so the trim
-  // repairs what the feed did.
-  const setId = getQueryParam(parsed.searchParams, 'set_id')?.replace(trailingSlashesRegex, '')
+  const setId = getQueryParam(parsed.searchParams, 'set_id')
 
   return {
     setId: setId || undefined,
