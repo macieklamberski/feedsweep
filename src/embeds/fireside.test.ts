@@ -140,20 +140,19 @@ describe('firesideResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'fireside',
       id: 'DiNRb69N+Dagp3z15',
-      src: 'https://player.fireside.fm/v2/DiNRb69N+Dagp3z15',
+      src: 'https://player.fireside.fm/v3/DiNRb69N+Dagp3z15',
       height: 200,
     }
 
     expect(firesideResolveEmbed(value)).toEqual(expected)
   })
 
-  // v3 is what the platform writes today, so a publisher on it is not sent back to v2.
-  it('should keep the player version the source states', () => {
-    const value = 'https://player.fireside.fm/v3/I-2by1pi+kf-gXAOz'
+  it('should rebuild a v2 player onto v3', () => {
+    const value = 'https://player.fireside.fm/v2/ygwv5uru+zQL7_-bH'
     const expected: EmbedResolverResult = {
       provider: 'fireside',
-      id: 'I-2by1pi+kf-gXAOz',
-      src: 'https://player.fireside.fm/v3/I-2by1pi+kf-gXAOz',
+      id: 'ygwv5uru+zQL7_-bH',
+      src: 'https://player.fireside.fm/v3/ygwv5uru+zQL7_-bH',
       height: 200,
     }
 
@@ -213,7 +212,7 @@ describeForEachParser('firesideEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'fireside',
         id: 'DiNRb69N+Dagp3z15',
-        src: 'https://player.fireside.fm/v2/DiNRb69N+Dagp3z15',
+        src: 'https://player.fireside.fm/v3/DiNRb69N+Dagp3z15',
         height: 200,
       }
 

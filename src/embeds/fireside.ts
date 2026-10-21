@@ -52,8 +52,9 @@ export const firesideResolveEmbed: ResolveEmbed = (url) => {
     provider: 'fireside',
     id: player.token,
     // Feeds write `fireside.fm/player/{version}/{token}`, which 301s to the same path on
-    // `player.fireside.fm`, where a real token answers 200 and a fabricated one 404.
-    src: `https://player.fireside.fm/${player.version}/${player.token}`,
+    // `player.fireside.fm`. A token from any version plays on the current player, where a real
+    // token answers 200 and a fabricated one 404.
+    src: `https://player.fireside.fm/${currentPlayerVersion}/${player.token}`,
     height: playerHeight,
   }
 }
