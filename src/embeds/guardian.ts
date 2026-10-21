@@ -1,3 +1,4 @@
+import { toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -13,7 +14,7 @@ const playerPathRegex = /^\/embed\/video\/([^/]+\/video\/[^/]+\/[^/]+\/[^/]+\/[^
 // edition. A path states a day and not a moment, so `date` carries the calendar day alone, and
 // a name outside the twelve months leaves it unstated.
 const pathDateRegex = /^[a-z0-9-]+\/video\/(\d{4})\/([a-z]+)\/(0[1-9]|[12]\d|3[01])\//
-const monthNumbers: Record<string, string | undefined> = {
+const monthNumbers = toMap({
   jan: '01',
   feb: '02',
   mar: '03',
@@ -26,7 +27,7 @@ const monthNumbers: Record<string, string | undefined> = {
   oct: '10',
   nov: '11',
   dec: '12',
-}
+})
 
 const readDate = (path: string): string | undefined => {
   const parts = path.match(pathDateRegex)
@@ -35,8 +36,7 @@ const readDate = (path: string): string | undefined => {
     return
   }
 
-  // Own keys only, so a path word such as `constructor` reads as no month.
-  const month = Object.hasOwn(monthNumbers, parts[2]) ? monthNumbers[parts[2]] : undefined
+  const month = monthNumbers.get(parts[2])
 
   if (!month) {
     return
