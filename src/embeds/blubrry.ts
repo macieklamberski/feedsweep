@@ -88,9 +88,14 @@ export const blubrryPowerpressEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     const link = readCarrierUrl(element)
     const url = parseUrl(link)
-    const episode = url?.searchParams.get('powerpress_embed')
 
-    if (!url || !episode?.includes('-')) {
+    if (!url) {
+      return
+    }
+
+    const episode = url.searchParams.get('powerpress_embed')
+
+    if (!episode?.includes('-')) {
       return
     }
 
