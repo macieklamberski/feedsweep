@@ -18,7 +18,7 @@ const spotifyHeights = toMap({
 
 // `embed` opens a player path, `embed-podcast` its older podcast-only twin, `intl-{lang}` a
 // localized page path. Whatever follows the id (`/video` on a video podcast) is decorative.
-const pathPrefixRegex = /^(?:embed|embed-podcast|intl-[a-z]{2})$/
+const pathPrefixRegex = /^(?:embed|embed-podcast|intl-.+)$/i
 // spotify:{type}:{id}, or the owned playlist form spotify:user:{handle}:playlist:{id}.
 // The pre-2017 snippet framed `embed.spotify.com/?uri=spotify:{type}:{id}`, and that host still
 // serves a player.

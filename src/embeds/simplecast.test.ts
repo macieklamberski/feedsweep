@@ -47,13 +47,17 @@ describe('extractSimplecastEpisode', () => {
     expect(extractSimplecastEpisode(value)).toBeUndefined()
   })
 
-  it('should return undefined for a legacy segment longer than the eight-character id', () => {
+  it('should keep a legacy segment of another length as written', () => {
     const value = 'https://embed.simplecast.com/a1b2c3d4e5f6'
+    const expected = {
+      id: 'a1b2c3d4e5f6',
+      isCurrent: false,
+    }
 
-    expect(extractSimplecastEpisode(value)).toBeUndefined()
+    expect(extractSimplecastEpisode(value)).toEqual(expected)
   })
 
-  it('should return undefined for a legacy segment ending in the eight-character id', () => {
+  it('should return undefined for a legacy segment holding a character outside the hex class', () => {
     const value = 'https://embed.simplecast.com/x-a1b2c3d4'
 
     expect(extractSimplecastEpisode(value)).toBeUndefined()
