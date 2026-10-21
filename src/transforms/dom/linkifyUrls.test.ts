@@ -157,6 +157,7 @@ describeForEachParser('linkifyUrls', (parseHtml) => {
     'noscript',
     'script',
     'textarea',
+    'title',
     'xmp',
   ]
 

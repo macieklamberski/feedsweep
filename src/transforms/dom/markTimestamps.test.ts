@@ -225,7 +225,21 @@ describeForEachParser('markTimestamps', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  const unwrappableTags: Array<string> = ['a', 'pre', 'code', 'kbd', 'samp', 'var', 'script']
+  const unwrappableTags: Array<string> = [
+    'a',
+    'pre',
+    'code',
+    'kbd',
+    'samp',
+    'var',
+    'iframe',
+    'noembed',
+    'noframes',
+    'script',
+    'textarea',
+    'title',
+    'xmp',
+  ]
 
   it.each(unwrappableTags)('should not wrap a timestamp inside %s tag', async (tag) => {
     const value = `<${tag}>00:00 - Intro</${tag}>`

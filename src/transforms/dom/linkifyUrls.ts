@@ -1,28 +1,14 @@
 import { find as linkifyFind } from 'linkifyjs'
 import type { DomTransform } from '../../types.js'
-import { collectTextNodes } from '../../utils/dom.js'
+import { collectTextNodes, rawTextElements } from '../../utils/dom.js'
 
 const urlProtocolRegex = /^https?:\/\//i
-const linkifyIgnoreTags = new Set([
-  'a',
-  'pre',
-  'code',
-  'kbd',
-  'samp',
-  'var',
-  // Raw text per HTML5: a parser can keep their content as one text node holding markup.
-  'iframe',
-  'noembed',
-  'noframes',
-  'noscript',
-  'script',
-  'style',
-  'textarea',
-  'xmp',
-])
+const linkifyIgnoreTags = new Set(['a', 'pre', 'code', 'kbd', 'samp', 'var', 'noscript'])
 
 const shouldSkipElement = (element: Element): boolean => {
-  return linkifyIgnoreTags.has(element.tagName.toLowerCase())
+  const tag = element.tagName.toLowerCase()
+
+  return linkifyIgnoreTags.has(tag) || rawTextElements.includes(tag)
 }
 
 // A bare url in running text, which the feed never wrapped in an anchor.
