@@ -60,14 +60,13 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the byline as written when it is not the dialog shape', async () => {
+    it('should read the author from the status url when the byline is not the dialog shape', async () => {
       const value = html`
         <blockquote class="twitter-tweet">
           <p lang="en" dir="ltr">Tweet text here.</p>
@@ -83,14 +82,13 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: 'Posted by somebody',
-        date: 'May 12, 2020',
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the display name out of a byline whose handle runs long', async () => {
+    it('should read a handle that runs past fifteen characters from the status url', async () => {
       const value = html`
         <blockquote class="twitter-tweet">
           <p lang="en" dir="ltr">Tweet text here.</p>
@@ -106,8 +104,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: playerUrl,
         url: `https://x.com/sixteencharacter/status/${statusId}`,
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@sixteencharacter',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -130,14 +127,13 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: playerUrl,
         url: statusUrl,
         description: 'First paragraph of a long tweet.\nSecond paragraph of the same tweet.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the display name out of a byline led by an en dash', async () => {
+    it('should read the author from the status url beside a byline led by an en dash', async () => {
       const value = html`
         <blockquote class="twitter-tweet">
           <p lang="en" dir="ltr">Tweet text here.</p>
@@ -153,14 +149,13 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the display name out of a byline led by a hyphen', async () => {
+    it('should read the author from the status url beside a byline led by a hyphen', async () => {
       const value = html`
         <blockquote class="twitter-tweet">
           <p lang="en" dir="ltr">Tweet text here.</p>
@@ -176,14 +171,13 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the byline as written when text leads the dash', async () => {
+    it('should read the author from the status url beside a byline led by text', async () => {
       const value = html`
         <blockquote class="twitter-tweet">
           <p lang="en" dir="ltr">Tweet text here.</p>
@@ -199,14 +193,13 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: 'Posted — Display Name (@user)',
-        date: 'May 12, 2020',
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the byline as written when text follows the handle', async () => {
+    it('should read the author from the status url beside a byline trailed by text', async () => {
       const value = html`
         <blockquote class="twitter-tweet">
           <p lang="en" dir="ltr">Tweet text here.</p>
@@ -222,14 +215,13 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: '— Display Name (@user) via web',
-        date: 'May 12, 2020',
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read a status and a byline whose handle holds capitals', async () => {
+    it('should keep the case of a handle that holds capitals', async () => {
       const value = html`
         <blockquote class="twitter-tweet">
           <p lang="en" dir="ltr">Tweet text here.</p>
@@ -245,14 +237,13 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://platform.twitter.com/embed/Tweet.html?id=1468647038925500418',
         url: 'https://x.com/AarikaRhodes/status/1468647038925500418',
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@AarikaRhodes',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read a status and a byline whose handle holds digits', async () => {
+    it('should read a handle that holds digits', async () => {
       const value = html`
         <blockquote class="twitter-tweet">
           <p lang="en" dir="ltr">Tweet text here.</p>
@@ -268,14 +259,13 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://platform.twitter.com/embed/Tweet.html?id=1458434502930358280',
         url: 'https://x.com/a01744/status/1458434502930358280',
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@a01744',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read a status and a byline whose handle holds an underscore', async () => {
+    it('should read a handle that holds an underscore', async () => {
       const value = html`
         <blockquote class="twitter-tweet">
           <p lang="en" dir="ltr">Tweet text here.</p>
@@ -291,8 +281,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://platform.twitter.com/embed/Tweet.html?id=677212533854466048',
         url: 'https://x.com/a_cowley/status/677212533854466048',
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@a_cowley',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -300,6 +289,27 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should state no author for a status url that names no handle', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p lang="en" dir="ltr">Tweet text here.</p>
+          <p>
+            &mdash; Display Name (@user)
+            <a href="https://x.com/i/status/123456789012345">May 12, 2020</a>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+        url: standInUrl,
+        description: 'Tweet text here.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should return undefined when nothing names a status', async () => {
       const value = '<blockquote class="twitter-tweet"><p>Just some text.</p></blockquote>'
 
@@ -397,8 +407,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           src: playerUrl,
           url: statusUrl,
           description: 'Tweet text here.',
-          author: 'Display Name',
-          date: 'May 12, 2020',
+          author: '@user',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -430,7 +439,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
 
     describe('Variant #10: skeleton blockquote naming the tweet in an attribute', () => {
       // The class arrives compounded here, which is why it is matched as a token.
-      it('should carry the id and the status url, with no text to take', async () => {
+      it('should carry the id, the status url and its handle, with no text to take', async () => {
         const value = html`
           <blockquote
             class="rm-embed twitter-tweet"
@@ -444,6 +453,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           id: statusId,
           src: playerUrl,
           url: statusUrl,
+          author: '@user',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -470,8 +480,8 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
 
     describe('Variant #10a: skeleton blockquote keeping the byline punctuation only', () => {
       // The skeleton fills in neither half of the byline, so what survives is the dash and an
-      // empty handle. Carrying that through would state it as the author.
-      it('should state no author for a byline naming nobody', async () => {
+      // empty handle. The status url still names the handle.
+      it('should read the author from the status url when the byline names nobody', async () => {
         const value = html`
           <blockquote class="twitter-tweet">
             <p></p>
@@ -484,7 +494,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           id: statusId,
           src: playerUrl,
           url: statusUrl,
-          date: 'May 1, 2024',
+          author: '@user',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -524,8 +534,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           src: playerUrl,
           url: statusUrl,
           description: 'Tweet text here.',
-          author: 'Display Name',
-          date: 'May 12, 2020',
+          author: '@user',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -551,8 +560,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           src: playerUrl,
           url: statusUrl,
           description: 'Tweet text here.',
-          author: 'Display Name',
-          date: 'May 12, 2020',
+          author: '@user',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -583,8 +591,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://platform.twitter.com/embed/Tweet.html?id=698590349225287682',
         url: 'https://x.com/itsniner/status/698590349225287682',
         description: 'Tweet text with a video. pic.twitter.com/mjQaqccCMe',
-        author: 'niner',
-        date: '13. Februar 2016',
+        author: '@itsniner',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -618,8 +625,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -641,8 +647,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -671,8 +676,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           src: playerUrl,
           url: statusUrl,
           description: 'Tweet text here.',
-          author: 'Display Name',
-          date: 'May 12, 2020',
+          author: '@user',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -695,7 +699,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           src: playerUrl,
           url: statusUrl,
           description: 'Tweet text here.',
-          date: 'May 12, 2020',
+          author: '@user',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -718,7 +722,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           src: playerUrl,
           url: statusUrl,
           description: 'Tweet text here.',
-          date: 'May 12, 2020',
+          author: '@user',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -741,7 +745,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           src: playerUrl,
           url: statusUrl,
           description: 'Tweet text here.',
-          date: 'May 12, 2020',
+          author: '@user',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -764,7 +768,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           src: playerUrl,
           url: statusUrl,
           description: 'Tweet text here.',
-          date: 'May 12, 2020',
+          author: '@user',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -787,7 +791,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           src: playerUrl,
           url: statusUrl,
           description: 'Tweet text here.',
-          date: 'May 12, 2020',
+          author: '@user',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -808,7 +812,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           src: playerUrl,
           url: statusUrl,
           description: 'Tweet text here.',
-          date: 'May 12, 2020',
+          author: '@user',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -829,7 +833,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
           src: playerUrl,
           url: statusUrl,
           description: 'Tweet text here.',
-          date: 'May 12, 2020',
+          author: '@user',
         }
 
         expect(await extract(value)).toEqual(expected)
@@ -1440,10 +1444,6 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
   })
 })
 
-// The three survey shapes whose markup the resolver cannot read as published: the byline is a
-// bare text node until the pipeline wraps it into a paragraph, and the Atom payload is markup
-// only after the entities are decoded. Both are what earlier transforms hand over, so the
-// assertion belongs at the end of the pipeline rather than on the resolver.
 describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, twitterS9eEmbedResolver)
 
@@ -1512,6 +1512,8 @@ describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
   })
 })
 
+// The Atom payload is markup only after the entities are decoded, and the loader beside a
+// blockquote goes only in a later pass, so these survey shapes are asserted on the pipeline.
 describeForEachParser('twitter shapes the pipeline repairs first', (parseHtml) => {
   const convert = (value: string): Promise<string> => {
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
@@ -1540,15 +1542,14 @@ describeForEachParser('twitter shapes the pipeline repairs first', (parseHtml) =
       ></script>
     `
 
-    it('should carry every field across once the byline is a paragraph', async () => {
+    it('should carry every field across', async () => {
       const expected: Record<string, string> = {
         provider: 'twitter',
         id: statusId,
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@user',
       }
 
       expect(await placeholder(value)).toEqual(expected)
@@ -1569,8 +1570,7 @@ describeForEachParser('twitter shapes the pipeline repairs first', (parseHtml) =
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@user',
       }
 
       expect(await placeholder(value)).toEqual(expected)
@@ -1608,8 +1608,7 @@ describeForEachParser('twitter shapes the pipeline repairs first', (parseHtml) =
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@user',
       }
 
       expect(await placeholder(value)).toEqual(expected)
