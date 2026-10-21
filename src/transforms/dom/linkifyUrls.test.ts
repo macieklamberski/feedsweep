@@ -146,7 +146,19 @@ describeForEachParser('linkifyUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  const unlinkableTags: Array<string> = ['pre', 'code', 'kbd', 'samp', 'var', 'script', 'noscript']
+  const unlinkableTags: Array<string> = [
+    'pre',
+    'code',
+    'kbd',
+    'samp',
+    'var',
+    'noembed',
+    'noframes',
+    'noscript',
+    'script',
+    'textarea',
+    'xmp',
+  ]
 
   it.each(unlinkableTags)('should not link URL inside %s tag', async (tag) => {
     const value = `<${tag}>https://example.com</${tag}>`
@@ -157,6 +169,16 @@ describeForEachParser('linkifyUrls', (parseHtml) => {
   it('should not link URL inside style tag', async () => {
     // Valid CSS (a comment) so jsdom's stylesheet parser stays quiet.
     const value = '<style>/*\nhttps://example.com\n*/</style>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  // jsdom keeps an iframe's content as one text node holding the markup, so a link here would
+  // nest an anchor inside the href of the one already written.
+  it('should not link URL inside an iframe fallback', async () => {
+    const value = html`
+      <iframe src="https://example.com/player">Listen to <a href="https://example.com/track/1">a track</a></iframe>
+    `
 
     expect(await transform(value)).toEqualHtml(value)
   })

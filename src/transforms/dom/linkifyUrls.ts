@@ -10,9 +10,15 @@ const linkifyIgnoreTags = new Set([
   'kbd',
   'samp',
   'var',
+  // Raw text per HTML5: a parser can keep their content as one text node holding markup.
+  'iframe',
+  'noembed',
+  'noframes',
+  'noscript',
   'script',
   'style',
-  'noscript',
+  'textarea',
+  'xmp',
 ])
 
 const shouldSkipElement = (element: Element): boolean => {
