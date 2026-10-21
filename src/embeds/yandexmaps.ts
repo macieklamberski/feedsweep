@@ -1,22 +1,27 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'yandexmaps'
 
 const yandexMapsHosts = ['api-maps.yandex.ru']
-const yandexMapsWidgetHosts = ['yandex.by', 'yandex.ru']
+const yandexMapsWidgetHosts = ['yandex.by', 'yandex.com', 'yandex.ru']
 
 const widgetPath = '/map-widget/v1/'
 // A short link the map's share dialog writes, `/map-widget/v1/-/{code}`. The code names the same
 // map on every regional host.
-const shortLinkPathRegex = /^\/map-widget\/v1\/-\/(?<code>[^/]+)\/?$/
+const shortLinkPathRegex = /^\/map-widget\/v1\/-\/(?<code>[^/]+)\/?$/i
 
 // The Constructor's own script loads the older `sid={id}` as `um=constructor:{id}`. The prefix
 // names the constructor space, since `um` also carries `mymaps:` maps.
 const constructorIdRegex = /^constructor:(.+)/
+
+// A coordinate map names no item, only where the map opens: its centre `ll`, its zoom `z` and its
+// layer `l`. A frame naming anything more, such as an organisation's `oid` or a search `text`,
+// stays as written.
+const positionParams = ['ll', 'z', 'l']
 
 const mapHeight = 400
 
@@ -52,6 +57,26 @@ const resolveConstructorMap = (query: URLSearchParams): EmbedResolverResult | un
   }
 }
 
+const resolveCoordinateMap = (
+  query: URLSearchParams,
+  element: Element | undefined,
+): EmbedResolverResult | undefined => {
+  const names = [...query.keys()]
+
+  if (!query.has('ll') || !names.every((name) => positionParams.includes(name))) {
+    return
+  }
+
+  const position = composeQuery(pickQueryParams(query.toString(), positionParams))
+
+  return {
+    provider,
+    src: `https://yandex.ru${widgetPath}${position}`,
+    height: mapHeight,
+    title: attr(element, 'title'),
+  }
+}
+
 // The Constructor's script injects the map where it stands, so a reader strips it and the map
 // renders as nothing. Its own query states the id.
 export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
@@ -68,11 +93,11 @@ export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// The frame the Constructor's iframe snippet writes, which names the map by `um` alone, and the
-// frame of a short link.
+// The frame the Constructor's iframe snippet writes, which names the map by `um` alone, the frame
+// of a short link, and a coordinate map's frame.
 export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
   yandexMapsWidgetHosts,
-  (url) => {
+  (url, element) => {
     const parsed = parseUrl(url)
     const code = parsed?.pathname.match(shortLinkPathRegex)?.groups?.code
 
@@ -85,10 +110,13 @@ export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
       }
     }
 
-    if (parsed?.pathname !== widgetPath) {
+    if (parsed?.pathname.toLowerCase() !== widgetPath) {
       return
     }
 
-    return resolveConstructorMap(parsed.searchParams)
+    return (
+      resolveConstructorMap(parsed.searchParams) ??
+      resolveCoordinateMap(parsed.searchParams, element)
+    )
   },
 )

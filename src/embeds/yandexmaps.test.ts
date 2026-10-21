@@ -364,6 +364,7 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
     it('should claim a short link frame', async () => {
       const value = html`
         <iframe
@@ -404,6 +405,62 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read the short link route words in any case', async () => {
+      const value = '<iframe src="https://yandex.by/Map-Widget/V1/-/CCUmMWx~KA"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        id: '-/CCUmMWx~KA',
+        src: 'https://yandex.ru/map-widget/v1/-/CCUmMWx~KA',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should claim a coordinate map frame and keep where it opens', async () => {
+      const value = html`
+        <iframe
+          src="https://yandex.com/map-widget/v1/?ll=37.612000%2C55.752000&#038;z=13&#038;l=map"
+          style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
+          loading="lazy"
+          allowfullscreen
+          title="Yandex map of central Moscow"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        src: 'https://yandex.ru/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map',
+        height: 400,
+        title: 'Yandex map of central Moscow',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should claim a frame placed by coordinates on the Russian host', async () => {
+      const value =
+        '<iframe src="https://yandex.ru/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        src: 'https://yandex.ru/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the widget route words of a coordinate map in any case', async () => {
+      const value =
+        '<iframe src="https://yandex.com/Map-Widget/V1/?ll=37.612000%2C55.752000&z=13&l=map"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        src: 'https://yandex.ru/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -432,9 +489,15 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a frame placed by coordinates', async () => {
+    it('should ignore a coordinate frame naming no centre', async () => {
+      const value = '<iframe src="https://yandex.com/map-widget/v1/?z=13&l=map"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a coordinate frame naming an organisation', async () => {
       const value =
-        '<iframe src="https://yandex.ru/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map"></iframe>'
+        '<iframe src="https://yandex.com/map-widget/v1/?ll=30.326905%2C59.940084&mode=search&oid=1184371713&ol=biz&z=16"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
