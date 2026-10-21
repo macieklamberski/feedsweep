@@ -204,14 +204,14 @@ describe('vimeoResolveEmbed', () => {
     expect(vimeoResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should cut a query hash at the whitespace a feed left in it', () => {
+  it('should use a query hash holding the whitespace a feed left in it as written', () => {
     const value =
       'https://player.vimeo.com/video/664725670?h=04acf91ce2 portrait=0&amp;color=98895e'
     const expected: EmbedResolverResult = {
       provider: 'vimeo',
-      id: '664725670:04acf91ce2',
-      src: 'https://player.vimeo.com/video/664725670?h=04acf91ce2',
-      url: 'https://vimeo.com/664725670/04acf91ce2',
+      id: '664725670:04acf91ce2 portrait=0',
+      src: 'https://player.vimeo.com/video/664725670?h=04acf91ce2+portrait%3D0',
+      url: 'https://vimeo.com/664725670/04acf91ce2%20portrait=0',
       ratio: '16/9',
     }
 

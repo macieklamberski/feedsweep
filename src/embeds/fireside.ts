@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments } from 'trousse'
+import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -23,16 +23,11 @@ type FiresidePlayer = { version: string; token: string }
 export const extractFiresideToken = (link: string): FiresidePlayer | undefined => {
   const segments = getPathSegments(link)
   const versioned = segments[0] === 'player' ? segments.slice(1) : segments
-  const [version, encodedToken] =
-    segments[0] === 's' ? [currentPlayerVersion, segments[1]] : versioned
+  const [version, token] = segments[0] === 's' ? [currentPlayerVersion, segments[1]] : versioned
 
   if (!version || !playerVersionRegex.test(version)) {
     return
   }
-
-  // The `+` joining the two halves arrives as `%2B` from some feeds, so the segment is decoded
-  // before it is tested. A malformed escape throws, and an unreadable token is no token.
-  const token = decodeSegment(encodedToken)
 
   if (token && tokenRegex.test(token)) {
     return { version, token }
