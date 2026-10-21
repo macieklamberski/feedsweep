@@ -1,9 +1,9 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
-import { composeDriveThumbnail } from './googledrive.js'
+import { composeDriveThumbnail, getPathSegmentsWithoutWorkspace } from './googledrive.js'
 
 const provider = 'googledocs'
 
@@ -27,7 +27,7 @@ const docHeight = 500
 // `/document/d/e/{token}` names a doc published to the web and `/document/d/{id}` names it by
 // its Drive file id.
 export const googledocsResolveEmbed: ResolveEmbed = (url, element) => {
-  const pathSegments = getPathSegments(url)
+  const pathSegments = getPathSegmentsWithoutWorkspace(url)
 
   if (!isAnyOf(pathSegments[0], 'document') || !isAnyOf(pathSegments[1], 'd')) {
     return
