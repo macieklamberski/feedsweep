@@ -162,7 +162,7 @@ describeForEachParser('learningappsEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, learningappsEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the height the carrier states in its style', async () => {
+    it('should build the placeholder from the player iframe', async () => {
       const value = html`
         <iframe
           allowfullscreen="true"
@@ -212,6 +212,28 @@ describeForEachParser('learningappsEmbedResolver', (parseHtml) => {
       const value = '<iframe src="https://evil.test/watch?app=12554379"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it("should state the player's 500 pixel height whatever the carrier declares", async () => {
+      const value = html`
+        <iframe
+          allowfullscreen="true"
+          mozallowfullscreen="true"
+          src="https://learningapps.org/watch?v=pnrtbszia17"
+          style="border: 0px; height: 300px; width: 100%;"
+          webkitallowfullscreen="true"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'learningapps',
+        id: 'pnrtbszia17',
+        src: 'https://learningapps.org/watch?app=pnrtbszia17',
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
