@@ -149,7 +149,7 @@ const readContent = (element: Element): Partial<EmbedResolverResult> => {
     // The display name sits behind a localized "A post shared by" prefix in the shape that
     // still carries it, so the handle is the half every era spells the same way.
     author: handle ? atUsername(handle) : undefined,
-    date: attr(time, 'datetime') ?? text(time),
+    date: attr(time, 'datetime'),
   }
 }
 

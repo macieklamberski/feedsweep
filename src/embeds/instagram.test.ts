@@ -377,7 +377,7 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should fall back to the displayed date when the time states none', async () => {
+    it('should leave the date unset when the time states none', async () => {
       const value = html`
         <blockquote
           class="instagram-media"
@@ -395,7 +395,6 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://www.instagram.com/p/BgPrjlfHcoB/embed/',
         url: 'https://www.instagram.com/p/BgPrjlfHcoB/',
         author: '@jervoisakl',
-        date: 'Mar 21, 2018',
       }
 
       expect(await extract(value)).toEqual(expected)
