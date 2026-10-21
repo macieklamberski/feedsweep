@@ -741,6 +741,19 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should keep a reference whose id runs on past its digits as written', async () => {
+      const value = html`
+        <iframe src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1857599997color=%23ff5500auto_play=false"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        src: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1857599997color%3D%23ff5500auto_play%3Dfalse',
+        height: 166,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('the widget rebuilt around what it plays', () => {

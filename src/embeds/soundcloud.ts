@@ -10,7 +10,7 @@ const provider = 'soundcloud'
 // The colons arrive percent-encoded because the whole reference is itself a query value. The
 // widget resolves an `api-v2` reference to the same track as an `api` one.
 const referenceRegex =
-  /api(?:-v2)?\.soundcloud\.com\/(tracks|playlists|users)\/(?:soundcloud(?::|%3A)\w+(?::|%3A))?(\d+)/i
+  /api(?:-v2)?\.soundcloud\.com\/(tracks|playlists|users)\/(?:soundcloud(?::|%3A)\w+(?::|%3A))?(\d+)(?=[/?#&]|$)/i
 
 // The widget is the only part of SoundCloud that can be framed: the site itself answers
 // `x-frame-options: SAMEORIGIN`, so a carrier pointing straight at a track page shows nothing.

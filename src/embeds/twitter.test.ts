@@ -327,6 +327,17 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined for a status id that runs on past its digits', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p>Text.</p>
+          <a href="https://twitter.com/user/status/${statusId}abc">Date</a>
+        </blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should use the first id attribute present as written, even if the player answers an error', async () => {
       const value = html`
         <blockquote
@@ -1329,6 +1340,12 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should return undefined for an internal path whose id runs on past its digits', async () => {
+      const value = html`<iframe src="https://x.com/i/web/status/${statusId}abc"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
     })
   })
 
