@@ -23,7 +23,7 @@ const flipBookIdRegex = /^([0-9a-f]{10})(?:\.html)?$/i
 // A custom slug is served without `.html`, and only some are served with it too.
 const htmlExtensionRegex = /\.html$/i
 // The viewer opens on the page a `#page/{n}` fragment names, framed or not.
-const pageFragmentRegex = /^#page\/[^/]+$/i
+const pageFragmentRegex = /^#page\/(?<page>[^/]+)$/i
 
 const readFlipBook = (name: string): FlipBook | undefined => {
   const flipBookId = name.match(flipBookIdRegex)?.[1]
@@ -59,7 +59,13 @@ const readCustomFlipBook = (name: string): FlipBook | undefined => {
 }
 
 const readPage = (parsed: URL): string => {
-  return parsed.hash.match(pageFragmentRegex)?.[0] ?? ''
+  const page = parsed.hash.match(pageFragmentRegex)?.groups?.page
+
+  if (!page) {
+    return ''
+  }
+
+  return `#page/${page}`
 }
 
 // Heyzine's flipbook viewer, which renders on its own and is its own page.

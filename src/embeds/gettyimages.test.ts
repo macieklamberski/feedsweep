@@ -283,13 +283,13 @@ describeForEachParser('gettyImagesEmbedResolver in any case', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should read the `sig` parameter name in capitals', async () => {
+  it('should write the `sig` parameter name read in capitals from the code', async () => {
     const value =
       '<iframe src="https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&amp;tld=com&amp;SIG=OOM9B40x%3D"></iframe>'
     const expected = {
       provider: 'gettyimages',
       id: '491183014',
-      src: 'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&SIG=OOM9B40x%3D',
+      src: 'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&sig=OOM9B40x%3D',
       url: 'https://www.gettyimages.com/detail/491183014',
       ratio: '3/2',
     }

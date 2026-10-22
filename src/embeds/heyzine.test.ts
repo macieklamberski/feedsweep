@@ -614,4 +614,17 @@ describeForEachParser('heyzineEmbedResolver in any case', (parseHtml) => {
 
     expect(await extract(value)).toEqual(expected)
   })
+
+  it('should write the route word `page` of the fragment from the code', async () => {
+    const value = '<iframe src="https://heyzine.com/flip-book/4db16f598c.html#PAGE/3"></iframe>'
+    const expected = {
+      provider: 'heyzine',
+      id: '4db16f598c',
+      src: 'https://heyzine.com/flip-book/4db16f598c.html#page/3',
+      url: 'https://heyzine.com/flip-book/4db16f598c.html#page/3',
+      ratio: '490/600',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
 })

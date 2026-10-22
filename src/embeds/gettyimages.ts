@@ -4,7 +4,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
-const ampPrefixRegex = /^(amp;)+/i
+// A doubled `&amp;amp;` in the feed reaches the query as `amp;sig=`.
+const signaturePairRegex = /^(?:amp;)*sig=/i
 
 const gettyImagesHosts = ['gettyimages.com']
 
@@ -19,13 +20,20 @@ type WidgetConfig = {
 // answers 400. The pairs after it, such as `caption` and `ver`, are unsigned.
 const readSignedQuery = (url: URL): string => {
   const pairs = url.search.slice(1).split('&')
-  // A doubled `&amp;amp;` in the feed reaches the query as `amp;sig=`.
-  const isSignaturePair = (pair: string) => {
-    return pair.replace(ampPrefixRegex, '').toLowerCase().startsWith('sig=')
-  }
-  const signedPairs = pairs.slice(0, pairs.findIndex(isSignaturePair) + 1)
+  const signatureIndex = pairs.findIndex((pair) => signaturePairRegex.test(pair))
+  const signaturePair = pairs[signatureIndex]
 
-  return signedPairs.length > 0 ? `?${signedPairs.join('&')}` : ''
+  if (!signaturePair) {
+    return ''
+  }
+
+  // Getty reads only the lowercase `sig` name and answers 400 to `SIG`.
+  const signedPairs = [
+    ...pairs.slice(0, signatureIndex),
+    signaturePair.replace(signaturePairRegex, 'sig='),
+  ]
+
+  return `?${signedPairs.join('&')}`
 }
 
 const gettyImagesResolveEmbed: ResolveEmbed = (url) => {

@@ -208,7 +208,7 @@ describeForEachParser('guardianEmbedResolver', (parseHtml) => {
 describeForEachParser('guardianEmbedResolver in any case', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, guardianEmbedResolver)
 
-  it('should write the route words `video` and `jun` from the code when the carrier spells them in capitals', async () => {
+  it('should write the route word `video` and the month `jun` from the code when the carrier spells them in capitals', async () => {
     const value =
       '<iframe src="https://embed.theguardian.com/EMBED/VIDEO/society/VIDEO/2015/JUN/18/superbugs-la-mrsa-pigs-antibiotics-video"></iframe>'
     const expected = {
@@ -252,7 +252,7 @@ describeForEachParser('guardianEmbedResolver in any case', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should write the route words `video` and `oct` from the code when the carrier spells them in capitals', async () => {
+  it('should write the route word `video` and the month `oct` from the code when the carrier spells them in capitals', async () => {
     const value =
       '<iframe src="https://embed.theguardian.com/EMBED/VIDEO/world/VIDEO/2015/OCT/08/ashton-carter-nato-syria-video"></iframe>'
     const expected = {
