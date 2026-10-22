@@ -37,8 +37,8 @@ const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
     provider: 'scribd',
     id: document,
     src: `https://www.scribd.com/embeds/${segment}/content${composeQuery(params)}`,
-    // The document page takes no key, so a private document gets no page url.
-    url: params.access_key ? undefined : `https://www.scribd.com/document/${segment}`,
+    // Every embed snippet carries a key, and the document page ignores it either way.
+    url: `https://www.scribd.com/document/${segment}`,
     height: 600,
   }
 }

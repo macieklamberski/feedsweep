@@ -76,13 +76,14 @@ describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('a player the publisher configured', () => {
-    it('should keep the access key and start page and drop the view mode and language host', async () => {
+    it('should keep the access key, the start page and the page url and drop the view mode and language host', async () => {
       const value =
         '<iframe src="https://fr.scribd.com/embeds/488306777/content?start_page=1&view_mode=scroll&access_key=key-ZJXG4sWak4icye8tCa8g"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'scribd',
         id: '488306777',
         src: 'https://www.scribd.com/embeds/488306777/content?access_key=key-ZJXG4sWak4icye8tCa8g&start_page=1',
+        url: 'https://www.scribd.com/document/488306777',
         height: 600,
       }
 
@@ -217,6 +218,7 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
         provider: 'scribd',
         id: '108992419',
         src: 'https://www.scribd.com/embeds/108992419/content?access_key=key-13davbc',
+        url: 'https://www.scribd.com/document/108992419',
         height: 600,
       }
 
@@ -236,6 +238,7 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
         provider: 'scribd',
         id: '55715',
         src: 'https://www.scribd.com/embeds/55715/content?access_key=key-abc',
+        url: 'https://www.scribd.com/document/55715',
         height: 600,
       }
 
@@ -257,6 +260,7 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
         provider: 'scribd',
         id: '41131710',
         src: 'https://www.scribd.com/embeds/41131710/content?access_key=key-abc',
+        url: 'https://www.scribd.com/document/41131710',
         height: 600,
       }
 
@@ -277,6 +281,7 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
         provider: 'scribd',
         id: '41131710',
         src: 'https://www.scribd.com/embeds/41131710/content?access_key=key-abc',
+        url: 'https://www.scribd.com/document/41131710',
         height: 600,
       }
 
