@@ -107,6 +107,18 @@ describe('spreakerResolveEmbed', () => {
     expect(spreakerResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should keep the player and drop the page for an episode id that is a dot segment', () => {
+    const value = 'https://widget.spreaker.com/player?episode_id=..'
+    const expected: EmbedResolverResult = {
+      provider: 'spreaker',
+      id: 'episode/..',
+      src: 'https://widget.spreaker.com/player?episode_id=..',
+      height: 200,
+    }
+
+    expect(spreakerResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for a spreaker url naming no episode', () => {
     const value = 'https://widget.spreaker.com/player?x=1'
 

@@ -2,7 +2,7 @@ import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'spreaker'
@@ -45,6 +45,8 @@ export const spreakerResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const title = attr(element, 'title')
+  // The query id comes out decoded, and it goes into the page path.
+  const segment = encodePathSegment(embed.id)
 
   // Both kinds name a page that takes the bare id and redirects to its canonical slugged form,
   // `/episode/{id}` and `/show/{id}`, so the click target is the resource the player plays.
@@ -52,7 +54,7 @@ export const spreakerResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id: `${embed.kind}/${embed.id}`,
     src: `https://widget.spreaker.com/player?${embed.param}=${embed.id}`,
-    url: `https://www.spreaker.com/${embed.kind}/${embed.id}`,
+    url: segment ? `https://www.spreaker.com/${embed.kind}/${segment}` : undefined,
     height: playerHeight,
     title,
   }

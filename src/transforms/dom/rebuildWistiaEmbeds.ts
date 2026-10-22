@@ -1,6 +1,7 @@
 import { composeEmbedUrl, readSrcMediaId } from '../../embeds/wistia.js'
 import type { DomTransform } from '../../types.js'
 import { attr, parseRatio } from '../../utils/dom.js'
+import { encodePathSegment } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 // Pulls the hashed id out of the `wistia_async_{id}` class the facade carries, up to the end of
@@ -32,9 +33,10 @@ const wistiaSelector = [
 // them on a substring, so nothing before `readSrcMediaId` has looked at the host.
 const srcCarrierTags = new Set(['script', 'iframe'])
 
+// A src path is already a segment. An attribute comes out decoded, and its id goes into a path.
 const readMediaId = (element: Element): string | undefined => {
   if (element.localName === 'wistia-player') {
-    return attr(element, 'media-id')
+    return encodePathSegment(attr(element, 'media-id') ?? '')
   }
 
   if (srcCarrierTags.has(element.localName)) {
@@ -44,10 +46,10 @@ const readMediaId = (element: Element): string | undefined => {
   const asyncId = element.className.match(wistiaIdRegex)?.[1]
 
   if (asyncId) {
-    return asyncId
+    return encodePathSegment(asyncId)
   }
 
-  return element.id.match(legacyIdRegex)?.[1]
+  return encodePathSegment(element.id.match(legacyIdRegex)?.[1] ?? '')
 }
 
 // Wistia's async div, legacy API div, <wistia-player> element and loader script all render

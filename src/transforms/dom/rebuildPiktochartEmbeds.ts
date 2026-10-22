@@ -1,7 +1,7 @@
 import { composePiktochartEmbedUrl } from '../../embeds/piktochart.js'
 import type { DomTransform } from '../../types.js'
 import { attr, isElement, isText } from '../../utils/dom.js'
-import { parseUrlOnHosts } from '../../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 const loadingTextRegex = /^Loading(?:\.\.\.|…)$/
@@ -51,7 +51,8 @@ const removeLoaderChrome = (element: Element): void => {
 // infographic. Bloggers' editors put prose inside its loading overlay, so that prose stays.
 export const rebuildPiktochartEmbeds: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll('div.piktowrapper-embed')) {
-    const uid = attr(element, 'data-uid') ?? attr(element, 'pikto-uid')
+    // The uid comes out of its attribute decoded, and it goes into a path.
+    const uid = encodePathSegment(attr(element, 'data-uid') ?? attr(element, 'pikto-uid') ?? '')
 
     if (!uid) {
       continue

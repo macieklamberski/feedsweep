@@ -1,5 +1,6 @@
 import { decodeSegment, getPathSegments } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { encodePathSegment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'br'
@@ -12,8 +13,10 @@ const mediaTokenRegex = /av:[^/]+$/
 const brResolveEmbed: ResolveEmbed = (url) => {
   const [section, route, slot] = getPathSegments(url)
   const token = decodeSegment(slot)?.match(mediaTokenRegex)?.[0]
+  // The token is read decoded, and it goes back into the path.
+  const segment = token ? encodePathSegment(token) : undefined
 
-  if (section !== 'mediathek' || route !== 'embed' || !token) {
+  if (section !== 'mediathek' || route !== 'embed' || !token || !segment) {
     return
   }
 
@@ -22,7 +25,7 @@ const brResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider,
     id: token,
-    src: `https://www.br.de/mediathek/embed/${token}`,
+    src: `https://www.br.de/mediathek/embed/${segment}`,
     ratio: '16/9',
   }
 }

@@ -1,5 +1,5 @@
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tencent'
@@ -46,15 +46,18 @@ const tencentResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
+  // The query id comes out decoded, and it goes into the page and poster paths.
+  const segment = encodePathSegment(videoId)
+
   return {
     provider,
     id: videoId,
     src: `https://v.qq.com/txp/iframe/player.html?vid=${videoId}`,
-    url: `https://v.qq.com/x/page/${videoId}.html`,
+    url: segment ? `https://v.qq.com/x/page/${segment}.html` : undefined,
     // The poster the watch page shows, addressed by the id alone, and an invented id gets a 5 KB
     // png placeholder. `vv.video.qq.com/getinfo?vids={vid}&otype=json` answers key-free with the
     // title, the duration and the frame size.
-    thumbnail: `https://puui.qpic.cn/qqvideo_ori/0/${videoId}_496_280/0`,
+    thumbnail: segment ? `https://puui.qpic.cn/qqvideo_ori/0/${segment}_496_280/0` : undefined,
     ratio: playerRatio,
   }
 }

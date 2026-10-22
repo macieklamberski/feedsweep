@@ -1,7 +1,12 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  encodePathSegment,
+  parseUrlOnHosts,
+  pickUrlParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'videopress'
@@ -77,7 +82,10 @@ const videopressFlashResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   if (flashPlayerPathRegex.test(parsed.pathname)) {
-    const guid = flashVar(element, 'guid') ?? parsed.searchParams.get('guid')
+    // The guid comes out of its flashvar or query decoded, and it goes into a path.
+    const guid = encodePathSegment(
+      flashVar(element, 'guid') ?? parsed.searchParams.get('guid') ?? '',
+    )
 
     if (!guid) {
       return

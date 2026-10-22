@@ -1,7 +1,7 @@
 import { isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, isEmptyElement } from '../utils/dom.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'puzzleme'
@@ -62,11 +62,13 @@ export const puzzlemeWidgetEmbedResolver = createMarkupEmbedResolver(
     const kind = attr(element, 'data-puzzletype')
     const id = attr(element, 'data-id')
     const set = attr(element, 'data-set')
+    // The puzzle type comes out of its attribute decoded, and it goes into a path.
+    const segment = kind ? encodePathSegment(kind) : undefined
 
-    if (!kind || !id || !set) {
+    if (!segment || !id || !set) {
       return
     }
 
-    return composePuzzlemeEmbed(kind, id, set)
+    return composePuzzlemeEmbed(segment, id, set)
   },
 )

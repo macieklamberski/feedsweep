@@ -1,6 +1,6 @@
-import { decodeSegment, parseUrl } from 'trousse'
+import { decodeSegment, isPresent, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // lbry.tv and open.lbry.com redirect every url to odysee.com with the path kept.
@@ -46,7 +46,14 @@ const readClaimPath = (parsed: URL): string | undefined => {
     return
   }
 
-  return claims.join('/')
+  // Each claim was read decoded, and each goes back into the path as one segment.
+  const claimSegments = claims.map(encodePathSegment)
+
+  if (!claimSegments.every(isPresent)) {
+    return
+  }
+
+  return claimSegments.join('/')
 }
 
 const odyseeResolveEmbed: ResolveEmbed = (url) => {

@@ -348,6 +348,12 @@ describe('arcgisResolveEmbed', () => {
       expect(arcgisResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should ignore a shell fragment whose dashboard id is a dot segment', () => {
+      const value = 'https://www.arcgis.com/apps/dashboards/index.html#/..'
+
+      expect(arcgisResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore the Dashboards app shell with no dashboard in the fragment', () => {
       const value = 'https://www.arcgis.com/apps/dashboards/index.html'
 

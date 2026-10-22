@@ -1,5 +1,5 @@
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.
@@ -63,7 +63,8 @@ const readConfigValue = (source: string, key: string): string | undefined => {
 // that transform alone: the platform's url shape is spelled here, never in the transform.
 // The `gie` widget is an `<a class="gie-single">` beside an inline `<script>` holding the config.
 export const readWidgetConfig = (source: string): WidgetConfig | undefined => {
-  const items = readConfigValue(source, 'items')
+  // The item goes from the script into a path.
+  const items = encodePathSegment(readConfigValue(source, 'items') ?? '')
   // The config spells the embed token `id`, and the player url spells it `et`.
   const et = readConfigValue(source, 'id')
   const sig = readConfigValue(source, 'sig')

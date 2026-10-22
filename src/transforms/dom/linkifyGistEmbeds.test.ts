@@ -84,10 +84,16 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should use a malformed gist id as written, even if the link answers an error', async () => {
+  it('should leave an amp-gist whose path holds a dot segment', async () => {
     const value = '<amp-gist data-gistid="../../evil"></amp-gist>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should keep a gist id holding a query separator inside its path segment', async () => {
+    const value = '<amp-gist data-gistid="b9bb35bc68df68259af94430f012425f?x"></amp-gist>'
     const expected =
-      '<a href="https://gist.github.com/../../evil">https://gist.github.com/../../evil</a>'
+      '<a href="https://gist.github.com/b9bb35bc68df68259af94430f012425f%3Fx">https://gist.github.com/b9bb35bc68df68259af94430f012425f%3Fx</a>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
@@ -531,6 +537,18 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
         data-gist="tweakswp-12-filters-replace-plugins"
       ></div>
     `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a data-gist mount whose owner is a dot segment untouched', async () => {
+    const value = '<div class="gist" data-gist="../6E54093B297C0F9DF01D0C82F65B89F6"></div>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a gist-embed mount whose id is a dot segment untouched', async () => {
+    const value = '<code data-gist-id=".."></code>'
 
     expect(await transform(value)).toEqualHtml(value)
   })

@@ -1,6 +1,7 @@
 import { isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
+import { encodePathSegment } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // Exact: `document-export.canva.com` serves the files a design exports.
@@ -45,16 +46,18 @@ export const canvaWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.canva-embed[data-design-id]',
   (element) => {
     const id = attr(element, 'data-design-id')
+    // The id comes out of its attribute decoded, and it goes into a path.
+    const segment = id ? encodePathSegment(id) : undefined
 
-    if (!id) {
+    if (!id || !segment) {
       return
     }
 
     return {
       provider: 'canva',
       id,
-      src: `https://www.canva.com/design/${id}/view?embed`,
-      url: `https://www.canva.com/design/${id}/view`,
+      src: `https://www.canva.com/design/${segment}/view?embed`,
+      url: `https://www.canva.com/design/${segment}/view`,
       ratio: designRatio,
     }
   },

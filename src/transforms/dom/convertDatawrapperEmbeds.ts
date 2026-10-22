@@ -1,5 +1,6 @@
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
+import { encodePathSegment } from '../../utils/urls.js'
 import { createLinkedImage } from '../../utils/widgets.js'
 
 const chartIdRegex = /datawrapper\.dwcdn\.net\/([^/?#]+)/
@@ -9,8 +10,9 @@ const visWrapperIdRegex = /^datawrapper-vis-(.+)$/
 // pre-2017 form keys a `window.datawrapper[<id>]` object instead.
 const resizeScriptRegex = /datawrapper-height|window\.datawrapper/
 
+// The url is never parsed, so a dot segment in it survives into the chart id.
 const getChartId = (url: string | null | undefined): string | undefined => {
-  return url?.match(chartIdRegex)?.[1]
+  return encodePathSegment(url?.match(chartIdRegex)?.[1] ?? '')
 }
 
 // Datawrapper publishes a static PNG of every chart at dwcdn.net/<id>/full.png and names that
@@ -44,7 +46,8 @@ export const convertDatawrapperEmbeds: DomTransform = () => (document) => {
   // Script form: <div id="datawrapper-vis-<id>"> wrapping the embed.js loader and a
   // <noscript><img full.png> fallback.
   for (const wrapper of document.querySelectorAll('[id^="datawrapper-vis-"]')) {
-    const chartId = wrapper.id.match(visWrapperIdRegex)?.[1]
+    // The id comes out of its attribute decoded, and the chart id in it goes into a path.
+    const chartId = encodePathSegment(wrapper.id.match(visWrapperIdRegex)?.[1] ?? '')
 
     if (!chartId) {
       continue

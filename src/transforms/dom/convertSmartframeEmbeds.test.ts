@@ -47,19 +47,19 @@ describeForEachParser('convertSmartframeEmbeds', (parseHtml) => {
 
   // Both halves go straight into a path, so a value that is not the shape the platform issues
   // is left where it is.
-  it('should use a malformed customer id as written, even if the image answers an error', async () => {
+  it('should keep a customer id holding slashes inside one path segment', async () => {
     const value = html`
       <smartframe-embed
         customer-id="../../evil"
         image-id="WmOBDE33lTbF"
       ></smartframe-embed>
     `
-    const expected = '<img src="https://thumbs.smartframe.io/../../evil/WmOBDE33lTbF.webp">'
+    const expected = '<img src="https://thumbs.smartframe.io/..%2F..%2Fevil/WmOBDE33lTbF.webp">'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should use a malformed image id as written, even if the image answers an error', async () => {
+  it('should keep an image id holding a slash inside one path segment', async () => {
     const value = html`
       <smartframe-embed
         customer-id="b0c95bc04383cef69c6b47df872135cf"
@@ -67,9 +67,31 @@ describeForEachParser('convertSmartframeEmbeds', (parseHtml) => {
       ></smartframe-embed>
     `
     const expected =
-      '<img src="https://thumbs.smartframe.io/b0c95bc04383cef69c6b47df872135cf/a/b.webp">'
+      '<img src="https://thumbs.smartframe.io/b0c95bc04383cef69c6b47df872135cf/a%2Fb.webp">'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave an element whose customer id is a dot segment alone', async () => {
+    const value = html`
+      <smartframe-embed
+        customer-id=".."
+        image-id="WmOBDE33lTbF"
+      ></smartframe-embed>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave an element whose image id is a dot segment alone', async () => {
+    const value = html`
+      <smartframe-embed
+        customer-id="b0c95bc04383cef69c6b47df872135cf"
+        image-id=".."
+      ></smartframe-embed>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 
   // The element arrives inside the paragraph the plugin wraps it in, and the picture has to

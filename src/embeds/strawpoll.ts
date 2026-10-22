@@ -2,7 +2,7 @@ import { isHostOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'strawpoll'
@@ -74,7 +74,8 @@ const isEmptyMount = (element: Element): boolean => {
 export const strawpollMountEmbedResolver = createMarkupEmbedResolver(
   `div.strawpoll-embed[id^="${mountIdPrefix}"]`,
   (element) => {
-    const pollId = attr(element, 'id')?.slice(mountIdPrefix.length)
+    // The id comes out of its attribute decoded, and the poll in it goes into a path.
+    const pollId = encodePathSegment(attr(element, 'id')?.slice(mountIdPrefix.length) ?? '')
 
     if (!pollId) {
       return

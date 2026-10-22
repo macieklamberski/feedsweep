@@ -4,6 +4,7 @@ import { attr, flashVar, flashVars } from '../utils/dom.js'
 import {
   audioFileRegex,
   composeQuery,
+  encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -190,12 +191,14 @@ const namesAudioFile = (config: string): boolean => {
 const readXspfPlayer = (player: URL): EmbedResolverResult | undefined => {
   const playlist = parseUrlOnHosts(player.searchParams.get('playlist_url') ?? '', archiveHosts)
   const identifier = playlist?.searchParams.get('identifier')
+  // A query identifier comes out decoded, and it goes into a path.
+  const segment = identifier ? encodePathSegment(identifier) : undefined
 
-  if (!identifier) {
+  if (!segment) {
     return
   }
 
-  return { ...composeEmbedResult(identifier), height: audioPlayerHeight }
+  return { ...composeEmbedResult(segment), height: audioPlayerHeight }
 }
 
 // The `soundFile` flashvar names one file of an item that can hold hundreds, so the file is kept.
@@ -232,12 +235,13 @@ const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   // The config arrives as the `flashVars` attribute or, on the older player, as a `config` query.
   const config = flashVars(element) ?? parsed.searchParams.get('config')
   const identifier = config?.match(downloadIdentifierRegex)?.[1]
+  const segment = identifier ? encodePathSegment(identifier) : undefined
 
-  if (!identifier || !config) {
+  if (!segment || !config) {
     return
   }
 
-  const result = composeEmbedResult(identifier)
+  const result = composeEmbedResult(segment)
 
   if (namesAudioFile(config)) {
     return { ...result, height: audioPlayerHeight }

@@ -2,7 +2,7 @@ import { decodeSegment } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, paramValue, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type View = {
@@ -62,6 +62,22 @@ const composeTableauEmbed = (
   }
 }
 
+// A param or a fragment names the view decoded or unparsed, and both halves go into a path.
+const composeNamedEmbed = (
+  workbook: string,
+  sheet: string,
+  title: string | undefined,
+): EmbedResolverResult | undefined => {
+  const workbookSegment = encodePathSegment(workbook)
+  const sheetSegment = encodePathSegment(sheet)
+
+  if (!workbookSegment || !sheetSegment) {
+    return
+  }
+
+  return composeTableauEmbed(workbookSegment, sheetSegment, title)
+}
+
 // The snippet's image of the viz, written from the same workbook and sheet as the viz. Its
 // public.tableau.com copy is a blank 1x1 png for most workbooks that still exist.
 const readStaticImage = (url: string | undefined): View | undefined => {
@@ -108,7 +124,7 @@ export const tableauObjectEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return composeTableauEmbed(match[1], match[2], undefined)
+    return composeNamedEmbed(match[1], match[2], undefined)
   },
 )
 
@@ -124,13 +140,19 @@ const readProfileView = (parsed: URL | undefined): RegExpMatchArray | null | und
 
 const tableauResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, tableauHosts)
-  const match = parsed?.pathname.match(viewPathRegex) ?? readProfileView(parsed)
+  const view = parsed?.pathname.match(viewPathRegex)
 
-  if (!match) {
+  if (view) {
+    return composeTableauEmbed(view[1], view[2], attr(element, 'title'))
+  }
+
+  const profileView = readProfileView(parsed)
+
+  if (!profileView) {
     return
   }
 
-  return composeTableauEmbed(match[1], match[2], attr(element, 'title'))
+  return composeNamedEmbed(profileView[1], profileView[2], attr(element, 'title'))
 }
 
 export const tableauIframeEmbedResolver = createUrlEmbedResolver(tableauHosts, tableauResolveEmbed)

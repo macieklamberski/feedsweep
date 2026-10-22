@@ -914,6 +914,16 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore an XSPF playlist whose identifier is a dot segment', async () => {
+      const value = html`
+        <embed
+          src="http://www.archive.org/audio/xspf_player.swf?playlist_url=http%3A%2F%2Fwww.archive.org%2Faudio%2Fxspf-maker.php%3Fidentifier%3D.."
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore an archive url that is not the flash player', async () => {
       const value = '<embed src="https://archive.org/embed/nasa_hubble">'
 
@@ -937,23 +947,15 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use a malformed config identifier as written, even if the player answers an error', async () => {
+    it('should ignore a config whose download identifier is a dot segment', async () => {
       const value = html`
         <embed
           src="http://www.archive.org/flow/flowplayer.commercial-3.2.1.swf"
           flashvars='config={"playlist":[{"url":"http://www.archive.org/download/../clip.mp4"}]}'
         />
       `
-      const expected: EmbedResolverResult = {
-        provider: 'archive',
-        id: '..',
-        src: 'https://archive.org/embed/..',
-        url: 'https://archive.org/details/..',
-        thumbnail: 'https://archive.org/services/img/..',
-        ratio: '16/9',
-      }
 
-      expect(await extract(value)).toEqual(expected)
+      expect(await extract(value)).toBeUndefined()
     })
 
     // A base url on its own names the download endpoint rather than any item under it.

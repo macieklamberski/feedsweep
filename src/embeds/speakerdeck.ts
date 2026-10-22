@@ -1,7 +1,13 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  isFileName,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'speakerdeck'
@@ -41,14 +47,16 @@ export const speakerdeckScriptEmbedResolver = createMarkupEmbedResolver(
     const raw = attr(element, 'data-id') ?? ''
     const inlineSlide = raw.match(slideSuffixRegex)?.[1]
     const deckId = raw.replace(slideSuffixRegex, '')
+    // The id comes out of its attribute decoded, and it goes into a path.
+    const segment = encodePathSegment(deckId)
 
-    if (!deckId) {
+    if (!segment) {
       return
     }
 
     const slide = inlineSlide ?? attr(element, 'data-slide') ?? undefined
 
-    return composeEmbed(deckId, { slide })
+    return composeEmbed(segment, { slide })
   },
 )
 

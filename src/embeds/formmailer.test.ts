@@ -171,6 +171,24 @@ describeForEachParser('formmailerWidgetEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should keep a hash holding slashes inside one path segment', async () => {
+      const value = html`
+        <div
+          class="formmailer-embed"
+          data-form-hash="../fms/44a9f70e243271"
+          data-form-host="pro.form-mailer.jp"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'formmailer',
+        id: '..%2Ffms%2F44a9f70e243271',
+        src: 'https://pro.form-mailer.jp/fms/..%2Ffms%2F44a9f70e243271',
+        url: 'https://pro.form-mailer.jp/fms/..%2Ffms%2F44a9f70e243271',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 })
 

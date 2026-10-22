@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tenor'
@@ -48,15 +48,17 @@ export const tenorWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.tenor-gif-embed[data-postid]',
   (element) => {
     const postId = attr(element, 'data-postid')
+    // The id comes out of its attribute decoded, and it goes into a path.
+    const segment = postId ? encodePathSegment(postId) : undefined
 
-    if (!postId) {
+    if (!segment) {
       return
     }
 
     // Tenor writes the GIF's name as the text of its own `/view/` link. The other anchor is a
     // search link, which names a query and not this GIF.
     return {
-      ...composeEmbed(postId),
+      ...composeEmbed(segment),
       title: text(element, 'a[href*="tenor.com/view/"]'),
     }
   },

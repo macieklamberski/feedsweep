@@ -1,7 +1,7 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rtve'
@@ -83,7 +83,8 @@ const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   if (flvPlayerPathRegex.test(parsed.pathname)) {
     const config = parsed.searchParams.get('config') ?? flashVar(element, 'config')
     const nielsen = parsed.searchParams.get('nielsen') ?? flashVar(element, 'nielsen')
-    const id = nielsen?.match(nielsenAssetRegex)?.[1]
+    // The asset goes from a decoded query or flashvar into a path.
+    const id = encodePathSegment(nielsen?.match(nielsenAssetRegex)?.[1] ?? '')
 
     if (!config || !audioConfigRegex.test(config) || !id) {
       return
@@ -97,15 +98,16 @@ const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
     flashVar(element, 'assetID') ??
     parsed.pathname.match(flashEmbedPathRegex)?.[1]
   const match = asset?.match(flashAssetRegex)
+  const id = match ? encodePathSegment(match[1]) : undefined
 
-  if (!match) {
+  if (!match || !id) {
     return
   }
 
   // The 4.x snippet writes the asset's page link as the object's fallback, named after it.
   const title = element?.closest('object')?.querySelector(':scope > a')?.textContent?.trim()
 
-  return { ...composeEmbed(match[2] === 'audios' ? 'audio' : 'video', match[1]), title }
+  return { ...composeEmbed(match[2] === 'audios' ? 'audio' : 'video', id), title }
 }
 
 // RTVE's retired Flash player under /swf/, which names its asset as {id}_es_{audios|videos}.

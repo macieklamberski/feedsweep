@@ -1,6 +1,6 @@
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'indavideo'
@@ -27,7 +27,10 @@ const readVideoId = (url: URL, element?: Element): string | undefined => {
     return
   }
 
-  return url.searchParams.get('vID') ?? flashVar(element, 'vID')
+  const flashId = url.searchParams.get('vID') ?? flashVar(element, 'vID')
+
+  // The Flash id comes out of its query or flashvars decoded, and it goes into a path.
+  return flashId ? encodePathSegment(flashId) : undefined
 }
 
 // An Indavideo player: the iframe on indavideo.hu or embed.indavideo.hu, or the retired Flash

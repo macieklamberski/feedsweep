@@ -255,6 +255,17 @@ describeForEachParser('strawpollMountEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a wrapper whose poll id is a dot segment', async () => {
+      const value = html`
+        <div
+          id="strawpoll_.."
+          class="strawpoll-embed"
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a wrapper without the snippet id', async () => {
       const value = html`
         <div

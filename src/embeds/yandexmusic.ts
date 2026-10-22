@@ -1,5 +1,6 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'yandexmusic'
@@ -99,29 +100,50 @@ const readYandexMusicItem = (url: string): YandexMusicItem | undefined => {
   return readRoute(rest)
 }
 
-const composeYandexMusicEmbed = (item: YandexMusicItem): EmbedResolverResult => {
+// The values come out of a fragment or a `{track}:{album}` pair, where a dot segment survives.
+const composeYandexMusicEmbed = (item: YandexMusicItem): EmbedResolverResult | undefined => {
   if (item.kind === 'album') {
+    const album = encodePathSegment(item.album)
+
+    if (!album) {
+      return
+    }
+
     return {
       provider,
       id: `album/${item.album}`,
-      src: `https://music.yandex.ru/iframe/album/${item.album}`,
-      url: `https://music.yandex.ru/album/${item.album}`,
+      src: `https://music.yandex.ru/iframe/album/${album}`,
+      url: `https://music.yandex.ru/album/${album}`,
       height: listHeight,
     }
   }
 
   if (item.kind === 'playlist') {
+    const owner = encodePathSegment(item.owner)
+    const playlist = encodePathSegment(item.playlist)
+
+    if (!owner || !playlist) {
+      return
+    }
+
     return {
       provider,
       id: `playlist/${item.owner}/${item.playlist}`,
-      src: `https://music.yandex.ru/iframe/playlist/${item.owner}/${item.playlist}`,
-      url: `https://music.yandex.ru/users/${item.owner}/playlists/${item.playlist}`,
+      src: `https://music.yandex.ru/iframe/playlist/${owner}/${playlist}`,
+      url: `https://music.yandex.ru/users/${owner}/playlists/${playlist}`,
       height: listHeight,
     }
   }
 
+  const track = encodePathSegment(item.track)
+  const album = item.album ? encodePathSegment(item.album) : ''
+
+  if (!track || album === undefined) {
+    return
+  }
+
   // The track id alone addresses the track, so the album stays out of the key.
-  const path = item.album ? `album/${item.album}/track/${item.track}` : `track/${item.track}`
+  const path = album ? `album/${album}/track/${track}` : `track/${track}`
 
   return {
     provider,

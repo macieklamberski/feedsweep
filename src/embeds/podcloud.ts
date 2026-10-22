@@ -2,7 +2,7 @@ import { getPathSegments } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podcloud'
@@ -97,8 +97,9 @@ export const podcloudIframeEmbedResolver = createUrlEmbedResolver(
 export const podcloudWidgetEmbedResolver = createMarkupEmbedResolver(
   'div[data-podcloud="player"][data-feed][data-item]',
   (element) => {
-    const show = attr(element, 'data-feed')
-    const episode = attr(element, 'data-item')
+    // Both come out of their attributes decoded, and both go into a path.
+    const show = encodePathSegment(attr(element, 'data-feed') ?? '')
+    const episode = encodePathSegment(attr(element, 'data-item') ?? '')
 
     if (!show || !episode) {
       return

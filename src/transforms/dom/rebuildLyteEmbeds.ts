@@ -9,7 +9,7 @@ import {
   isText,
   isWhitespaceText,
 } from '../../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 // In a feed the plugin writes no facade. It writes the thumbnail linked to the post, with
@@ -124,13 +124,14 @@ export const rebuildLyteEmbeds: DomTransform = () => (document) => {
       continue
     }
 
-    const videoId = element.id.slice(element.id.indexOf('_') + 1)
+    // The id comes out of its attribute decoded, and the video id in it goes into a path.
+    const segment = encodePathSegment(element.id.slice(element.id.indexOf('_') + 1))
 
-    if (!videoId) {
+    if (!segment) {
       continue
     }
 
-    const iframe = createIframe(document, composeEmbedUrl(videoId))
+    const iframe = createIframe(document, composeEmbedUrl(segment))
     element.replaceWith(iframe)
   }
 

@@ -1,7 +1,7 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, findConfigScript } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const fileExtensionRegex = /\.[a-z]+$/i
@@ -79,7 +79,8 @@ export const jwplayerAmpEmbedResolver = createMarkupEmbedResolver(
   'amp-jwplayer[data-media-id], amp-jwplayer[data-playlist-id]',
   (element) => {
     const playlistId = attr(element, 'data-playlist-id')
-    const id = playlistId ?? attr(element, 'data-media-id')
+    // The id comes out of its attribute decoded, and it goes into a path.
+    const id = encodePathSegment(playlistId ?? attr(element, 'data-media-id') ?? '')
 
     if (!id) {
       return
@@ -99,7 +100,8 @@ const setupMountRegex = /jwplayer\(\s*["']([^"']+)["']\s*\)/
 // An empty div.jwplayer beside an inline jwplayer(...).setup() call, stripped as an empty tag.
 export const jwplayerSetupEmbedResolver = createMarkupEmbedResolver('div.jwplayer', (element) => {
   const config = findConfigScript(element)?.textContent
-  const mediaId = config?.match(setupPlaylistRegex)?.[1]
+  // The script's id goes into a path.
+  const mediaId = encodePathSegment(config?.match(setupPlaylistRegex)?.[1] ?? '')
 
   if (!mediaId) {
     return
@@ -171,7 +173,7 @@ export const jwplayerLibraryEmbedResolver = createMarkupEmbedResolver(
     const setup = findScript(following) ?? findScript(afterMount)
     const config = setup?.textContent ?? ''
     const mountId = config.match(setupMountRegex)?.[1]
-    const mediaId = config.match(setupPlaylistRegex)?.[1]
+    const mediaId = encodePathSegment(config.match(setupPlaylistRegex)?.[1] ?? '')
 
     if (!setup || !mountId || !mediaId) {
       return
@@ -202,7 +204,8 @@ export const jwplayerMountEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const mediaId = element.id.match(mountIdRegex)?.[1]
+    // The mount id comes out of its attribute decoded, and the media id in it goes into a path.
+    const mediaId = encodePathSegment(element.id.match(mountIdRegex)?.[1] ?? '')
 
     if (!mediaId) {
       return

@@ -2,7 +2,7 @@ import { getPathSegments, type Nullish } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find, isBlockElement, isBr, isElement, jsonAttr, text } from '../utils/dom.js'
 import { readObjectHeight } from '../utils/hints.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'bluesky'
@@ -52,7 +52,15 @@ const extractBlueskyPost = (uri: string): BlueskyPost | undefined => {
     return
   }
 
-  return { authority: match[1], rkey: match[3] }
+  // The URI is never parsed as a url, so a dot segment, a space or a `?` in it survives.
+  const authority = encodePathSegment(match[1])
+  const rkey = encodePathSegment(match[3])
+
+  if (!authority || !rkey) {
+    return
+  }
+
+  return { authority, rkey }
 }
 
 const extractBlueskyPostFromUrl = (link: string): BlueskyPost | undefined => {

@@ -1,7 +1,7 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cognitoforms'
@@ -37,7 +37,8 @@ export const cognitoformsResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const [route, orgKey, pathNumber, ...rest] = getPathSegments(parsed)
-  const formNumber = pathNumber ?? parsed.searchParams.get('id')
+  // A query form number comes out decoded, and it goes into a path.
+  const formNumber = pathNumber ?? encodePathSegment(parsed.searchParams.get('id') ?? '')
 
   if (!isAnyOf(route, 'f') || !orgKey || !formNumber || rest.length > 0) {
     return
@@ -53,8 +54,9 @@ export const cognitoformsScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="cognitoforms.com/f/seamless.js"][data-key][data-form]',
   (element) => {
     const loader = parseUrlOnHosts(attr(element, 'src'), cognitoformsHosts)
-    const orgKey = attr(element, 'data-key')
-    const formNumber = attr(element, 'data-form')
+    // Both come out of their attributes decoded, and both go into a path.
+    const orgKey = encodePathSegment(attr(element, 'data-key') ?? '')
+    const formNumber = encodePathSegment(attr(element, 'data-form') ?? '')
 
     if (!loader || !seamlessPathRegex.test(loader.pathname) || !orgKey || !formNumber) {
       return
@@ -81,7 +83,9 @@ export const cognitoformsWidgetEmbedResolver = createMarkupEmbedResolver(
     }
 
     const [route, orgKey, ...rest] = getPathSegments(loader)
-    const formNumber = text(element, 'script:not([src])')?.match(loadCallRegex)?.[1]
+    const loadedNumber = text(element, 'script:not([src])')?.match(loadCallRegex)?.[1]
+    // The script's string goes into a path.
+    const formNumber = loadedNumber ? encodePathSegment(loadedNumber) : undefined
 
     if (!isAnyOf(route, 's') || !orgKey || rest.length > 0 || !formNumber) {
       return

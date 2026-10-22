@@ -324,6 +324,30 @@ describeForEachParser('podcloudWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a div whose show is a dot segment', async () => {
+      const value = html`
+        <div
+          data-podcloud="player"
+          data-feed=".."
+          data-item="episode-1"
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a div whose episode is a dot segment', async () => {
+      const value = html`
+        <div
+          data-podcloud="player"
+          data-feed="xv-bras-xv-jambes"
+          data-item=".."
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should leave the subscribe button alone', async () => {
       const value = html`
         <div

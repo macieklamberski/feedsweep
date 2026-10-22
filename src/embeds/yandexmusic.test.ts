@@ -156,6 +156,37 @@ describeForEachParser('yandexMusicEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore a hash album that is a dot segment', async () => {
+      const value = '<iframe src="https://music.yandex.ru/iframe/#album/.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a hash playlist owner that is a dot segment', async () => {
+      const value = '<iframe src="https://music.yandex.ru/iframe/#playlist/../1016"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a hash playlist kind that is a dot segment', async () => {
+      const value =
+        '<iframe src="https://music.yandex.ru/iframe/#playlist/yandexmusic/.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a hash track that is a dot segment', async () => {
+      const value = '<iframe src="https://music.yandex.ru/iframe/#track/.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a track whose album after a colon is a dot segment', async () => {
+      const value = '<iframe src="https://music.yandex.ru/iframe/track/1710816:.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 
   describe('edge cases', () => {

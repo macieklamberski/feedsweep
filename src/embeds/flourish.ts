@@ -2,7 +2,7 @@ import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { isFileName } from '../utils/urls.js'
+import { encodePathSegment, isFileName } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flourish'
@@ -45,7 +45,15 @@ export const flourishWidgetEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const result = composeEmbed(match[1], match[2])
+    // The path is never parsed, so a dot segment in it survives into the player url.
+    const resource = encodePathSegment(match[1])
+    const id = encodePathSegment(match[2])
+
+    if (!resource || !id) {
+      return
+    }
+
+    const result = composeEmbed(resource, id)
     // The div usually wraps a static thumbnail img, bare or inside a <noscript>.
     const thumbnail = attr(element.querySelector('img'), 'src')
 

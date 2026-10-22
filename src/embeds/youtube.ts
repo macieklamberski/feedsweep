@@ -4,7 +4,6 @@ import { attr } from '../utils/dom.js'
 import {
   composeQuery,
   encodePathSegment,
-  isDotSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -218,20 +217,28 @@ const composeUploadsEmbed = (user: string): EmbedResolverResult => {
 const composeVideoEmbed = (
   videoId: string,
   params?: Record<string, string>,
-): EmbedResolverResult => {
+): EmbedResolverResult | undefined => {
+  // An attribute or query id comes out decoded, and it goes into the player and poster paths.
+  const segment = encodePathSegment(videoId)
+
+  if (!segment) {
+    return
+  }
+
   return {
     provider,
     id: videoId,
-    src: composeEmbedUrl(videoId, params),
+    src: composeEmbedUrl(segment, params),
     url: `https://www.youtube.com/watch${composeQuery({ v: videoId })}`,
-    thumbnail: composeThumbnailUrl(videoId),
+    thumbnail: composeThumbnailUrl(segment),
     ratio: playerRatio,
   }
 }
 
-// `segment` is the channel as the page path takes it: AMP's attribute goes in as written, and a
-// query value comes out decoded, so its caller encodes it.
-const composeChannelEmbed = (channel: string, segment: string | undefined): EmbedResolverResult => {
+// AMP's attribute and the query value both come out decoded, and the channel goes into a path.
+const composeChannelEmbed = (channel: string): EmbedResolverResult => {
+  const segment = encodePathSegment(channel)
+
   return {
     provider,
     id: `channel/${channel}`,
@@ -250,7 +257,7 @@ const resolveCollectionEmbed = (
   const channel = parsed.searchParams.get('channel')
 
   if (segments[1] === 'live_stream') {
-    return channel ? composeChannelEmbed(channel, encodePathSegment(channel)) : undefined
+    return channel ? composeChannelEmbed(channel) : undefined
   }
 
   // `/embed/videoseries?list=`, `/embed/playlist?list=` and the bare `/embed/?list=` some
@@ -339,9 +346,14 @@ export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
     }
 
     const title = parsed.searchParams.get('title')
+    const embed = composeVideoEmbed(videoId)
+
+    if (!embed) {
+      return
+    }
 
     return {
-      ...composeVideoEmbed(videoId),
+      ...embed,
       // The shell draws no title when the query `title` is the string "undefined".
       title: title && title !== 'undefined' ? title : undefined,
     }
@@ -366,8 +378,7 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
         return
       }
 
-      // A dot segment drops the url. Any other value goes into it as written.
-      return composeChannelEmbed(channel, isDotSegment(channel) ? undefined : channel)
+      return composeChannelEmbed(channel)
     }
 
     // `videoseries` and `live_stream` are route words that sit where a video id does.
@@ -403,9 +414,14 @@ export const youtubeMetasliderEmbedResolver = createMarkupEmbedResolver(
 
     // The plugin hands `data-start` to the player as its `start` parameter.
     const start = attr(element, 'data-start')
+    const embed = composeVideoEmbed(videoId, start ? { start } : undefined)
+
+    if (!embed) {
+      return
+    }
 
     return {
-      ...composeVideoEmbed(videoId, start ? { start } : undefined),
+      ...embed,
       // A lazy slide's poster carries the video's title as its `alt`.
       title: attr(element.querySelector('img.msDefaultImage'), 'alt'),
     }

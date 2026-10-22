@@ -92,14 +92,27 @@ describe('cnnResolveEmbed', () => {
       expect(cnnResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should use a malformed section as written, even if the player answers an error', () => {
+    it('should keep the player and drop the page for a section that is a dot segment', () => {
       const value =
         'https://fave.api.cnn.io/v1/fav/?video=../arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn'
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: '../arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn',
         src: 'https://fave.api.cnn.io/v1/fav/?video=..%2Farts%2F2018%2F07%2F09%2Fspencer-tunick-nude-art-melbourne.cnn&customer=cnn&edition=domestic&env=prod',
-        url: 'https://www.cnn.com/videos/../arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn',
+        ratio: '16/9',
+        date: '2018-07-09',
+      }
+
+      expect(cnnResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a slug holding a query separator inside its page path segment', () => {
+      const value = 'https://fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick%3Fx.cnn'
+      const expected: EmbedResolverResult = {
+        provider: 'cnn',
+        id: 'arts/2018/07/09/spencer-tunick?x.cnn',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=arts%2F2018%2F07%2F09%2Fspencer-tunick%3Fx.cnn&customer=cnn&edition=domestic&env=prod',
+        url: 'https://www.cnn.com/videos/arts/2018/07/09/spencer-tunick%3Fx.cnn',
         ratio: '16/9',
         date: '2018-07-09',
       }

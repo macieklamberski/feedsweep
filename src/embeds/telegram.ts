@@ -2,6 +2,7 @@ import { getPathSegments, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
+import { encodePathSegment } from '../utils/urls.js'
 import {
   atUsername,
   createMarkupEmbedResolver,
@@ -46,13 +47,16 @@ const readPost = (value: string | undefined): EmbedResolverResult | undefined =>
 
 // The attribute holds only the `{channel}/{id}` pair, so no route word can stand in either half.
 const readDeclaredPost = (value: string | undefined): EmbedResolverResult | undefined => {
-  const [channel, messageId, ...rest] = value?.split('/') ?? []
+  const [channel = '', messageId = '', ...rest] = value?.split('/') ?? []
+  // Each half comes out of the attribute decoded, and each goes into a path.
+  const channelSegment = encodePathSegment(channel)
+  const messageSegment = encodePathSegment(messageId)
 
-  if (!channel || !messageId || rest.length) {
+  if (!channelSegment || !messageSegment || rest.length) {
     return
   }
 
-  return composePost(channel, messageId)
+  return composePost(channelSegment, messageSegment)
 }
 
 // Telegram ships a post as a bare <script data-telegram-post> whose widget.js builds the iframe.

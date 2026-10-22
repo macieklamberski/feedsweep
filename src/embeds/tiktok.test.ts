@@ -690,7 +690,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed data-video-id as written over the cite, even if the player answers an error', async () => {
+    it('should keep a data-video-id holding a slash inside one path segment over the cite', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -700,8 +700,8 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
-        id: '@user/video/../evil',
-        src: 'https://www.tiktok.com/embed/v2/../evil',
+        id: '@user/video/..%2Fevil',
+        src: 'https://www.tiktok.com/embed/v2/..%2Fevil',
         url: 'https://www.tiktok.com/@user/video/7001234567890123456',
         height: 738,
       }
@@ -709,7 +709,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed data-unique-id as written, even if the player answers an error', async () => {
+    it('should keep a data-unique-id holding a slash inside one path segment', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -725,13 +725,19 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
         id: '@../evil',
-        src: 'https://www.tiktok.com/embed/@../evil',
+        src: 'https://www.tiktok.com/embed/@..%2Fevil',
         url: 'https://www.tiktok.com/@user',
         height: 478,
         author: '@../evil',
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore a data-video-id that is a dot segment', async () => {
+      const value = '<blockquote class="tiktok-embed" data-video-id=".."></blockquote>'
+
+      expect(await extract(value)).toBeUndefined()
     })
 
     // A foreign cite names neither the url nor a handle, and nothing else in the markup does
@@ -1350,6 +1356,19 @@ describeForEachParser('tiktokMetasliderEmbedResolver', (parseHtml) => {
           <div
             class="tiktok"
             data-video-id=""
+          ></div>
+        </li>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a slide whose video id is a dot segment', async () => {
+      const value = html`
+        <li class="ms-tiktok">
+          <div
+            class="tiktok"
+            data-video-id=".."
           ></div>
         </li>
       `

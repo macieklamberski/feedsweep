@@ -1,6 +1,7 @@
 import { composeEmbedUrl } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import { attr, parsePixelSize } from '../../utils/dom.js'
+import { encodePathSegment } from '../../utils/urls.js'
 import { createIframe, setDimensions } from '../../utils/widgets.js'
 
 // data-youtube-id and data-youtube name the platform on their own. data-video_id, data-id and
@@ -17,13 +18,14 @@ const facadeSources: Array<{ selector: string; attribute: string }> = [
 export const rebuildLazyYtEmbeds: DomTransform = () => (document) => {
   for (const { selector, attribute } of facadeSources) {
     for (const element of document.querySelectorAll(selector)) {
-      const videoId = attr(element, attribute)
+      // The id comes out of its attribute decoded, and it goes into a path.
+      const segment = encodePathSegment(attr(element, attribute) ?? '')
 
-      if (!videoId || !element.parentNode) {
+      if (!segment || !element.parentNode) {
         continue
       }
 
-      const iframe = createIframe(document, composeEmbedUrl(videoId))
+      const iframe = createIframe(document, composeEmbedUrl(segment))
 
       // The facades state 100% in data-width and data-height as often as a pixel count.
       setDimensions(iframe, {

@@ -142,6 +142,34 @@ describeForEachParser('bridEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should ignore a config whose video id is a dot segment', async () => {
+      const value = html`
+        <div
+          id="Brid_3"
+          class="brid"
+        ></div>
+        <script type="text/javascript">
+          $bp("Brid_3", {"id":"26602","video":".."});
+        </script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a config whose player id is a dot segment', async () => {
+      const value = html`
+        <div
+          id="Brid_3"
+          class="brid"
+        ></div>
+        <script type="text/javascript">
+          $bp("Brid_3", {"id":"..","video":"755958"});
+        </script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a div with no config script beside it', async () => {
       const value = html`
         <div

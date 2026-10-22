@@ -1,8 +1,8 @@
-import { isHostOrSubdomainOf, parseUrl } from 'trousse'
+import { isHostOrSubdomainOf, isPresent, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mailru'
@@ -46,14 +46,23 @@ const composeSubject = (subject: string): EmbedResolverResult | undefined => {
   }
 
   const [, type, user, album, counter] = match
+  // A Flash or span subject comes out decoded, and each of its parts goes into a path.
+  const segments = [type, user, album, counter].map(encodePathSegment)
+
+  if (!segments.every(isPresent)) {
+    return
+  }
+
+  const [typeSegment, userSegment, albumSegment, counterSegment] = segments
+  const owner = `${typeSegment}/${userSegment}`
 
   return {
     provider,
     // my.mail.ru/+/video/meta/{type}/{user}/{n} answers with the title, the poster and the duration
     // for a real video and 404 for an invented one.
     id: `${type}/${user}/${album}/${counter}`,
-    src: `https://my.mail.ru/${type}/${user}/video/embed/${album}/${counter}`,
-    url: `https://my.mail.ru/${type}/${user}/video/${album}/${counter}.html`,
+    src: `https://my.mail.ru/${owner}/video/embed/${albumSegment}/${counterSegment}`,
+    url: `https://my.mail.ru/${owner}/video/${albumSegment}/${counterSegment}.html`,
     ratio: playerRatio,
     author: user,
   }

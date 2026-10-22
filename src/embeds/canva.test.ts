@@ -244,19 +244,25 @@ describeForEachParser('canvaWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should use a malformed design id as written, even if the player answers an error', async () => {
+    it('should keep a design id holding percent signs inside one path segment', async () => {
       const value = html`
         <div class="canva-embed" data-height-ratio="1" data-design-id="DAC3_5NqG20%2F..%2Fedit"></div>
       `
       const expected: EmbedResolverResult = {
         provider: 'canva',
         id: 'DAC3_5NqG20%2F..%2Fedit',
-        src: 'https://www.canva.com/design/DAC3_5NqG20%2F..%2Fedit/view?embed',
-        url: 'https://www.canva.com/design/DAC3_5NqG20%2F..%2Fedit/view',
+        src: 'https://www.canva.com/design/DAC3_5NqG20%252F..%252Fedit/view?embed',
+        url: 'https://www.canva.com/design/DAC3_5NqG20%252F..%252Fedit/view',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore a design id that is a dot segment', async () => {
+      const value = '<div class="canva-embed" data-design-id=".."></div>'
+
+      expect(await extract(value)).toBeUndefined()
     })
   })
 })

@@ -376,6 +376,16 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined when the beacon names an asset that is a dot segment', async () => {
+      const value = html`
+        <embed
+          src="http://www.rtve.es/swf/FLVPlayer.swf?nielsen=assetID::..,title::Mediterráneo&amp;config=http://www.rtve.es/swf/data/rtve_config_audio_embed.xml"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined when the beacon names no asset', async () => {
       const value = html`
         <embed
@@ -517,20 +527,28 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use a malformed asset id as written, even if the player answers an error', async () => {
+    it('should keep an asset id holding a slash inside one path segment', async () => {
       const value = html`
         <embed src="http://www.rtve.es/swf/v2/RTVEPlayer.swf?assetID=../evil_es_videos" />
       `
       const expected: EmbedResolverResult = {
         provider: 'rtve',
-        id: 'video/../evil',
-        src: 'https://www.rtve.es/drmn/embed/video/../evil/',
-        url: 'https://www.rtve.es/v/../evil/',
-        thumbnail: 'https://img.rtve.es/v/../evil/',
+        id: 'video/..%2Fevil',
+        src: 'https://www.rtve.es/drmn/embed/video/..%2Fevil/',
+        url: 'https://www.rtve.es/v/..%2Fevil/',
+        thumbnail: 'https://img.rtve.es/v/..%2Fevil/',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should return undefined for an asset id that is a dot segment', async () => {
+      const value = html`
+        <embed src="http://www.rtve.es/swf/v2/RTVEPlayer.swf?assetID=.._es_videos" />
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
 
     it('should use a malformed asset id longer than any minted as written, even if the player answers an error', async () => {

@@ -1,7 +1,7 @@
 import { decodeSegment, getPathSegments } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'googledrive'
@@ -24,8 +24,9 @@ const readFileId = (
     return segments[2]
   }
 
+  // A query id comes out decoded, and it goes into a path beside a path id's raw spelling.
   if (isAudio && segments.length === 1 && segments[0] === 'open') {
-    return parseUrlOnHosts(url, 'drive.google.com')?.searchParams.get('id') ?? undefined
+    return encodePathSegment(parseUrlOnHosts(url, 'drive.google.com')?.searchParams.get('id') ?? '')
   }
 }
 
