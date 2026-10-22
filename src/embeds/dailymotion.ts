@@ -2,6 +2,8 @@ import {
   decodeSegment,
   fixMalformedQuery,
   getPathSegments,
+  getQueryParam,
+  getQueryParams,
   isAnyOf,
   isPlainObject,
   type Nullish,
@@ -16,8 +18,6 @@ const provider = 'dailymotion'
 import {
   composeQuery,
   encodePathSegment,
-  getQueryParam,
-  getQueryParams,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,

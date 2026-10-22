@@ -1,6 +1,7 @@
+import { getQueryParam } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, getElementDimensions, parsePixelSize } from '../../utils/dom.js'
-import { getQueryParam, parseUrlOnHosts } from '../../utils/urls.js'
+import { parseUrlOnHosts } from '../../utils/urls.js'
 import { createImage, createLinkedImage } from '../../utils/widgets.js'
 
 const hosts = ['tradingeconomics.com', 'd3fy651gv2fhd3.cloudfront.net']

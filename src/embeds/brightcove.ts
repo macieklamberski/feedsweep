@@ -1,13 +1,8 @@
 import type { Nullish } from 'trousse'
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, find, flashVars, keepIfMatches, paramValue, text } from '../utils/dom.js'
-import {
-  composeQuery,
-  encodePathSegment,
-  getQueryParam,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brightcove'

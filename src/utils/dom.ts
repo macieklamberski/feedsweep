@@ -1,6 +1,12 @@
-import { coerceNumber, isNonEmptyString, type Nullish, startsWithAnyOf } from 'trousse'
+import {
+  coerceNumber,
+  getQueryParam,
+  isNonEmptyString,
+  type Nullish,
+  startsWithAnyOf,
+} from 'trousse'
 import * as styles from './styles.js'
-import { getQueryParam, isUrlShaped } from './urls.js'
+import { isUrlShaped } from './urls.js'
 
 // Linkedom mis-types Node as `() => void` in facades.d.ts (WebReflection/linkedom#167).
 export const Node = { ELEMENT_NODE: 1, TEXT_NODE: 3, COMMENT_NODE: 8 } as const

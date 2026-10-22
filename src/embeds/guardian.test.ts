@@ -208,14 +208,14 @@ describeForEachParser('guardianEmbedResolver', (parseHtml) => {
 describeForEachParser('guardianEmbedResolver in any case', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, guardianEmbedResolver)
 
-  it('should read the route words `embed`, `video` and `jun` in capitals', async () => {
+  it('should write the route word `video` and the month `jun` from the code when the carrier spells them in capitals', async () => {
     const value =
       '<iframe src="https://embed.theguardian.com/EMBED/VIDEO/society/VIDEO/2015/JUN/18/superbugs-la-mrsa-pigs-antibiotics-video"></iframe>'
     const expected = {
       provider: 'guardian',
-      id: 'society/VIDEO/2015/JUN/18/superbugs-la-mrsa-pigs-antibiotics-video',
-      src: 'https://embed.theguardian.com/embed/video/society/VIDEO/2015/JUN/18/superbugs-la-mrsa-pigs-antibiotics-video',
-      url: 'https://www.theguardian.com/society/VIDEO/2015/JUN/18/superbugs-la-mrsa-pigs-antibiotics-video',
+      id: 'society/video/2015/jun/18/superbugs-la-mrsa-pigs-antibiotics-video',
+      src: 'https://embed.theguardian.com/embed/video/society/video/2015/jun/18/superbugs-la-mrsa-pigs-antibiotics-video',
+      url: 'https://www.theguardian.com/society/video/2015/jun/18/superbugs-la-mrsa-pigs-antibiotics-video',
       ratio: '16/9',
       date: '2015-06-18',
     }
@@ -223,14 +223,43 @@ describeForEachParser('guardianEmbedResolver in any case', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should read the route words `embed`, `video` and `oct` in capitals', async () => {
+  it('should keep the section and the slug as written', async () => {
+    const value =
+      '<iframe src="https://embed.theguardian.com/embed/video/SOCIETY/video/2015/jun/18/Superbugs-LA-MRSA-pigs-antibiotics-video"></iframe>'
+    const expected = {
+      provider: 'guardian',
+      id: 'SOCIETY/video/2015/jun/18/Superbugs-LA-MRSA-pigs-antibiotics-video',
+      src: 'https://embed.theguardian.com/embed/video/SOCIETY/video/2015/jun/18/Superbugs-LA-MRSA-pigs-antibiotics-video',
+      url: 'https://www.theguardian.com/SOCIETY/video/2015/jun/18/Superbugs-LA-MRSA-pigs-antibiotics-video',
+      ratio: '16/9',
+      date: '2015-06-18',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should keep a month slot outside the twelve months as written', async () => {
+    const value =
+      '<iframe src="https://embed.theguardian.com/embed/video/society/video/2015/Constructor/18/superbugs-la-mrsa-pigs-antibiotics-video"></iframe>'
+    const expected = {
+      provider: 'guardian',
+      id: 'society/video/2015/Constructor/18/superbugs-la-mrsa-pigs-antibiotics-video',
+      src: 'https://embed.theguardian.com/embed/video/society/video/2015/Constructor/18/superbugs-la-mrsa-pigs-antibiotics-video',
+      url: 'https://www.theguardian.com/society/video/2015/Constructor/18/superbugs-la-mrsa-pigs-antibiotics-video',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should write the route word `video` and the month `oct` from the code when the carrier spells them in capitals', async () => {
     const value =
       '<iframe src="https://embed.theguardian.com/EMBED/VIDEO/world/VIDEO/2015/OCT/08/ashton-carter-nato-syria-video"></iframe>'
     const expected = {
       provider: 'guardian',
-      id: 'world/VIDEO/2015/OCT/08/ashton-carter-nato-syria-video',
-      src: 'https://embed.theguardian.com/embed/video/world/VIDEO/2015/OCT/08/ashton-carter-nato-syria-video',
-      url: 'https://www.theguardian.com/world/VIDEO/2015/OCT/08/ashton-carter-nato-syria-video',
+      id: 'world/video/2015/oct/08/ashton-carter-nato-syria-video',
+      src: 'https://embed.theguardian.com/embed/video/world/video/2015/oct/08/ashton-carter-nato-syria-video',
+      url: 'https://www.theguardian.com/world/video/2015/oct/08/ashton-carter-nato-syria-video',
       ratio: '16/9',
       date: '2015-10-08',
     }

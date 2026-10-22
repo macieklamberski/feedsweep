@@ -40,6 +40,10 @@ const readWatchUrl = (url: string | undefined): Clip => {
   return { handle, videoId }
 }
 
+const composeWatchUrl = (handle: string | undefined, videoId: string): string => {
+  return `https://www.tiktok.com/${handle ? `@${handle}/` : ''}video/${videoId}`
+}
+
 const resolveClip = (element: Element): EmbedResolverResult | undefined => {
   const declared = attr(element, 'data-video-id')
   const cite = attr(element, 'cite')
@@ -85,7 +89,9 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
     id: watchPath ?? videoId,
     src: `https://www.tiktok.com/embed/v2/${videoId}`,
     // A sanitized cite is truncated to the bare host, which links nothing worth keeping.
-    url: cited.videoId ? cite : watchPath && `https://www.tiktok.com/${watchPath}`,
+    url: cited.videoId
+      ? composeWatchUrl(cited.handle, cited.videoId)
+      : watchPath && `https://www.tiktok.com/${watchPath}`,
     description: text(caption),
     author,
     height: playerHeight,
@@ -169,7 +175,7 @@ export const tiktokResolveEmbed: ResolveEmbed = (src) => {
     provider: 'tiktok',
     id: handle ? `@${handle}/video/${videoId}` : videoId,
     src: `https://www.tiktok.com/embed/v2/${videoId}`,
-    url: src,
+    url: composeWatchUrl(handle, videoId),
     height: playerHeight,
   }
 }

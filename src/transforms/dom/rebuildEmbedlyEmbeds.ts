@@ -1,7 +1,7 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, jsonAttr } from '../../utils/dom.js'
-import { getQueryParam, isUrlShaped, placeholderBaseUrl } from '../../utils/urls.js'
+import { isUrlShaped, placeholderBaseUrl } from '../../utils/urls.js'
 import { createIframe, createLink } from '../../utils/widgets.js'
 
 const embedlyCarrierSelector = [

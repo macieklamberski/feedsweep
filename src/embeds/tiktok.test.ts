@@ -1456,4 +1456,46 @@ describeForEachParser('tiktokIframeEmbedResolver in any case', (parseHtml) => {
 
     expect(await extract(value)).toEqual(expected)
   })
+
+  it('should write the route word `video` of a watch page from the code', async () => {
+    const value =
+      '<iframe src="https://www.tiktok.com/@10gsocial/VIDEO/7178262497063914795"></iframe>'
+    const expected = {
+      provider: 'tiktok',
+      id: '@10gsocial/video/7178262497063914795',
+      src: 'https://www.tiktok.com/embed/v2/7178262497063914795',
+      url: 'https://www.tiktok.com/@10gsocial/video/7178262497063914795',
+      height: 738,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('tiktokBlockquoteEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, tiktokBlockquoteEmbedResolver)
+
+  it('should write the route word `video` of the cite from the code', async () => {
+    const value = html`
+      <blockquote
+        class="tiktok-embed"
+        cite="https://www.tiktok.com/@10gsocial/VIDEO/7178262497063914795"
+        data-video-id="7178262497063914795"
+      >
+        <section>
+          <a href="https://www.tiktok.com/@10gsocial">@10gsocial</a>
+        </section>
+      </blockquote>
+    `
+    const expected = {
+      provider: 'tiktok',
+      id: '@10gsocial/video/7178262497063914795',
+      src: 'https://www.tiktok.com/embed/v2/7178262497063914795',
+      url: 'https://www.tiktok.com/@10gsocial/video/7178262497063914795',
+      height: 738,
+      author: '@10gsocial',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
 })

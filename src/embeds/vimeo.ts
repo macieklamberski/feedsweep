@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
 import {
@@ -6,7 +6,6 @@ import {
   digitsRegex,
   encodePathSegment,
   flashFileRegex,
-  getQueryParam,
   hexRegex,
   parseUrlOnHosts,
   pickQueryParams,

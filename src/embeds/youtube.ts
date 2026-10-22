@@ -1,10 +1,16 @@
-import { decodeSegment, fixMalformedQuery, getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import {
+  decodeSegment,
+  fixMalformedQuery,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  parseUrl,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
   composeQuery,
   encodePathSegment,
-  getQueryParam,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,

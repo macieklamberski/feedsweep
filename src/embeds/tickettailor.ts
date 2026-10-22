@@ -9,15 +9,27 @@ const provider = 'tickettailor'
 
 const tickettailorHosts = ['tickettailor.com']
 
-const readKey = (segments: Array<string>): string | undefined => {
+type Page = { key: string; path: string }
+
+// The server answers 404 to a route word in capitals, so the path writes each one from the code
+// and keeps the values as written.
+const readPage = (page: URL): Page | undefined => {
+  const segments = getPathSegments(page)
   const [route, first, second, third, fourth, fifth] = segments
+  const trailingSlash = page.pathname.endsWith('/') ? '/' : ''
 
   if (isAnyOf(route, 'all-tickets') && first) {
-    return first
+    return {
+      key: first,
+      path: `/all-tickets/${segments.slice(1).join('/')}${trailingSlash}`,
+    }
   }
 
   if (isAnyOf(route, 'events') && first && second) {
-    return `${first}/${second}`
+    return {
+      key: `${first}/${second}`,
+      path: `/events/${segments.slice(1).join('/')}${trailingSlash}`,
+    }
   }
 
   // A checkout names the event by id beside a checksum it answers 404 without.
@@ -31,24 +43,27 @@ const readKey = (segments: Array<string>): string | undefined => {
       return
     }
 
-    return `checkout/${third}`
+    return {
+      key: `checkout/${third}`,
+      path: `/checkout/new-session/id/${third}/chk/${segments.slice(5).join('/')}${trailingSlash}`,
+    }
   }
 }
 
 const composeEmbed = (page: URL): EmbedResolverResult | undefined => {
-  const key = readKey(getPathSegments(page))
+  const read = readPage(page)
 
-  if (!key) {
+  if (!read) {
     return
   }
 
-  const pageUrl = `https://www.tickettailor.com${page.pathname}`
+  const pageUrl = `https://www.tickettailor.com${read.path}`
 
   return {
     provider,
-    id: key,
+    id: read.key,
     src: `${pageUrl}?widget=true`,
-    url: key.startsWith('checkout/') ? undefined : pageUrl,
+    url: read.key.startsWith('checkout/') ? undefined : pageUrl,
   }
 }
 

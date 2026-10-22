@@ -283,14 +283,42 @@ describeForEachParser('gettyImagesEmbedResolver in any case', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should read the `sig` parameter name in capitals', async () => {
+  it('should write the `sig` parameter name read in capitals from the code', async () => {
     const value =
       '<iframe src="https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&amp;tld=com&amp;SIG=OOM9B40x%3D"></iframe>'
     const expected = {
       provider: 'gettyimages',
       id: '491183014',
-      src: 'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&SIG=OOM9B40x%3D',
+      src: 'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&sig=OOM9B40x%3D',
       url: 'https://www.gettyimages.com/detail/491183014',
+      ratio: '3/2',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should write the `et` and `tld` parameter names read in capitals from the code', async () => {
+    const value =
+      '<iframe src="https://embed.gettyimages.com/embed/1179214625?ET=c6v3oJKLRHl-sP1_Ytjj1g&amp;TLD=co.uk&amp;sig=C3Ss6cEqvxD2EKAfIWt5vBh0z1hAqmd0p0OJ-7fcJJQ="></iframe>'
+    const expected = {
+      provider: 'gettyimages',
+      id: '1179214625',
+      src: 'https://embed.gettyimages.com/embed/1179214625?et=c6v3oJKLRHl-sP1_Ytjj1g&tld=co.uk&sig=C3Ss6cEqvxD2EKAfIWt5vBh0z1hAqmd0p0OJ-7fcJJQ=',
+      url: 'https://www.gettyimages.com/detail/1179214625',
+      ratio: '3/2',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should keep a signed parameter name Getty does not read as written', async () => {
+    const value =
+      '<iframe src="https://embed.gettyimages.com/embed/492381322?et=cDxg5NFcRMx1XLFxZDgc0w&amp;tld=com&amp;VIEWMORELINK=on&amp;sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY="></iframe>'
+    const expected = {
+      provider: 'gettyimages',
+      id: '492381322',
+      src: 'https://embed.gettyimages.com/embed/492381322?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&VIEWMORELINK=on&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=',
+      url: 'https://www.gettyimages.com/detail/492381322',
       ratio: '3/2',
     }
 

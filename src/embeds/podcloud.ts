@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getAnyOf, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
@@ -16,11 +16,22 @@ const podcloudHost = 'podcloud.fr'
 const contentOptions = ['guid', 'playlist']
 
 // The options the player reads from the segments after `player`, each split on `;` and named
-// by the part before `:`.
+// by the part before `:`. The name is written from the code and the value as written.
 const readContentOptions = (segments: Array<string>): Array<string> => {
-  return segments
-    .flatMap((segment) => segment.split(';'))
-    .filter((option) => isAnyOf(option.split(':')[0], contentOptions))
+  const options: Array<string> = []
+
+  for (const option of segments.flatMap((segment) => segment.split(';'))) {
+    const [name, ...value] = option.split(':')
+    const contentOption = getAnyOf(name, contentOptions)
+
+    if (!contentOption) {
+      continue
+    }
+
+    options.push([contentOption, ...value].join(':'))
+  }
+
+  return options
 }
 
 // The player's url and page, as the episode page's og:video and og:url write them. A show with
@@ -39,7 +50,7 @@ const composeEmbed = (
   // With a content option the page names another item, so the key is the option the player
   // queries by: `podcastItem(_id)` for a guid, `playlist(user_id, _id)` for a playlist, which
   // wins over a guid.
-  const option = options.find((value) => value.toLowerCase().startsWith('playlist:')) ?? options[0]
+  const option = options.find((value) => value.startsWith('playlist:')) ?? options[0]
 
   if (option) {
     return {

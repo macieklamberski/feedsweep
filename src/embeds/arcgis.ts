@@ -1,6 +1,7 @@
 import {
   getAnyOf,
   getPathSegments,
+  getQueryParam,
   isAnyOf,
   isHostOf,
   isHostOrSubdomainOf,
@@ -8,7 +9,7 @@ import {
 } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { filterUrlQuery, getQueryParam, placeholderBaseUrl } from '../utils/urls.js'
+import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Item = {

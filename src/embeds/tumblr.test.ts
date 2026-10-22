@@ -347,4 +347,16 @@ describeForEachParser('tumblrIframeEmbedResolver in any case', (parseHtml) => {
 
     expect(await extract(value)).toEqual(expected)
   })
+
+  it('should write the blog key prefix read in capitals from the code', async () => {
+    const value =
+      '<iframe src="https://embed.tumblr.com/embed/post/T:9NYQOutKOEXi4aopdzCr9A/144854447139/v2"></iframe>'
+    const expected = {
+      provider: 'tumblr',
+      id: '9NYQOutKOEXi4aopdzCr9A/144854447139',
+      src: 'https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
 })

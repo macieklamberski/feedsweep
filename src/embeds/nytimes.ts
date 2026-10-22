@@ -3,8 +3,8 @@ import { attr } from '../utils/dom.js'
 
 const provider = 'nytimes'
 
-import { isAnyOf } from 'trousse'
-import { composeQuery, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
+import { getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `static01.nyt.com` is the static host, which 301s the player onto `www.nytimes.com`.

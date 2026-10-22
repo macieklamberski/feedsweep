@@ -1,10 +1,9 @@
-import { isPlainObject, isPresent, parseUrl, toMap, trimObject } from 'trousse'
+import { getQueryParam, isPlainObject, isPresent, parseUrl, toMap, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
 import {
   composeQuery,
   encodePathSegment,
-  getQueryParam,
   pickQueryParams,
   placeholderBaseUrl,
 } from '../utils/urls.js'

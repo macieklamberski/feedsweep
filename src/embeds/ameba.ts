@@ -1,14 +1,14 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, getQueryParam, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const amebaHosts = ['static.blog-video.jp']
 const amebloHosts = ['ameblo.jp']
 
 const reblogCardPathRegex = /^\/s\/embed\/reblog-card\/([^/]+)\/entry-([^/]+)\.html$/i
-const imagePagePathRegex = /^\/p\/embed\/([^/]+\/image-[^/]+)\.html$/i
+const imagePagePathRegex = /^\/p\/embed\/([^/]+)\/image-([^/]+)\.html$/i
 
 // Ameba's movie player, `static.blog-video.jp/?v={id}`, for a video uploaded into a blog post.
 // The id is the whole key the platform's own endpoint takes. Its thumbnails are pathed by the
@@ -78,11 +78,14 @@ export const amebaImagePageEmbedResolver = createUrlEmbedResolver(amebloHosts, (
     return
   }
 
+  // The `image-` prefix is written from the code, the blog and the ids as written.
+  const id = `${match[1]}/image-${match[2]}`
+
   return {
     provider: 'ameba',
-    id: match[1],
-    src: `https://${amebloHosts[0]}/p/embed/${match[1]}.html`,
-    url: `https://${amebloHosts[0]}/${match[1]}.html`,
+    id,
+    src: `https://${amebloHosts[0]}/p/embed/${id}.html`,
+    url: `https://${amebloHosts[0]}/${id}.html`,
     ratio: '360/416',
   }
 })

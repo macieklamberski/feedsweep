@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments, type Nullish, parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, getQueryParam, type Nullish, parseUrl } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 
@@ -7,7 +7,6 @@ const provider = 'bandcamp'
 import {
   composeQuery,
   encodePathSegment,
-  getQueryParam,
   parseUrlOnHosts,
   placeholderBaseUrl,
 } from '../utils/urls.js'

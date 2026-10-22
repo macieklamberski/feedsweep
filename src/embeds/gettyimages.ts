@@ -1,12 +1,16 @@
+import { getAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
-const ampPrefixRegex = /^(amp;)+/i
+// A doubled `&amp;amp;` in the feed reaches the query as `amp;sig=`.
+const signaturePairRegex = /^(?:amp;)*sig=/i
+const pairNameRegex = /^(?:amp;)*(?<name>[^=]*)=/
 
 const gettyImagesHosts = ['gettyimages.com']
+const signedParams = ['et', 'tld', 'sig']
 
 type WidgetConfig = {
   items: string
@@ -15,17 +19,32 @@ type WidgetConfig = {
   tld: string
 }
 
+// Getty reads only the lowercase `et`, `tld` and `sig` names and answers 400 to `ET`, `TLD` or
+// `SIG`. Any other signed pair is part of the signature as written.
+const writeSignedPairName = (pair: string): string => {
+  const pairName = pair.match(pairNameRegex)?.groups?.name
+  const name = getAnyOf(pairName, signedParams)
+
+  if (!name) {
+    return pair
+  }
+
+  return pair.replace(pairNameRegex, `${name}=`)
+}
+
 // Getty signs the query up to `sig` in the order written: a pair dropped or moved before it
 // answers 400. The pairs after it, such as `caption` and `ver`, are unsigned.
 const readSignedQuery = (url: URL): string => {
   const pairs = url.search.slice(1).split('&')
-  // A doubled `&amp;amp;` in the feed reaches the query as `amp;sig=`.
-  const isSignaturePair = (pair: string) => {
-    return pair.replace(ampPrefixRegex, '').toLowerCase().startsWith('sig=')
-  }
-  const signedPairs = pairs.slice(0, pairs.findIndex(isSignaturePair) + 1)
+  const signatureIndex = pairs.findIndex((pair) => signaturePairRegex.test(pair))
 
-  return signedPairs.length > 0 ? `?${signedPairs.join('&')}` : ''
+  if (signatureIndex === -1) {
+    return ''
+  }
+
+  const signedPairs = pairs.slice(0, signatureIndex + 1).map(writeSignedPairName)
+
+  return `?${signedPairs.join('&')}`
 }
 
 const gettyImagesResolveEmbed: ResolveEmbed = (url) => {

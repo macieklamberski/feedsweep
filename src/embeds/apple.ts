@@ -1,9 +1,15 @@
-import { getPathSegments, isHostOrSubdomainOf, type Nullish, parseUrl, toMap } from 'trousse'
+import {
+  getPathSegments,
+  getQueryParam,
+  isHostOrSubdomainOf,
+  type Nullish,
+  parseUrl,
+  toMap,
+} from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
 import {
   encodePathSegment,
-  getQueryParam,
   parseUrlOnHosts,
   pickUrlParams,
   placeholderBaseUrl,
@@ -22,6 +28,8 @@ const applePodcastsHosts = ['podcasts.apple.com']
 // optional. A music id is numeric, a playlist or station id carries a two-letter prefix
 // (`pl.`, `ra.`) and a podcast id an `id` one.
 const podcastIdPrefixRegex = /^id/i
+// The same prefix where the path ends, so the minted path writes it from the code.
+const podcastIdPathRegex = /\/id(?=[^/]+\/?$)/i
 
 // The player is fluid-width. The podcast show player fills any frame and floors at 180 at 320
 // wide, 360 at 640 and 422 at 1280, and the episode player floors at 160 at every width.
@@ -61,7 +69,7 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const path = parsed.pathname.replace(route, kind)
+  const path = parsed.pathname.replace(route, kind).replace(podcastIdPathRegex, '/id')
   const isPodcast = isHostOrSubdomainOf(parsed, applePodcastsHosts)
   const host = isPodcast ? 'podcasts.apple.com' : 'music.apple.com'
   const trackId = getQueryParam(parsed.searchParams, 'i')

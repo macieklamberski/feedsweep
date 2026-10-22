@@ -1,7 +1,7 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { getLazyValue } from '../../utils/dom.js'
-import { getQueryParam, isUrlShaped, placeholderBaseUrl } from '../../utils/urls.js'
+import { isUrlShaped, placeholderBaseUrl } from '../../utils/urls.js'
 
 // Drupal's /media/oembed frame around a remote video, naming the site rather than the provider,
 // so the placeholder gets no poster, no shape and no provider.

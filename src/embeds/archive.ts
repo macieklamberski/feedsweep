@@ -1,10 +1,16 @@
-import { fixMalformedQuery, getPathSegments, isAnyOf, isHostOrSubdomainOf, parseUrl } from 'trousse'
+import {
+  fixMalformedQuery,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  isHostOrSubdomainOf,
+  parseUrl,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar, flashVars } from '../utils/dom.js'
 import {
   audioFileRegex,
   composeQuery,
-  getQueryParam,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,

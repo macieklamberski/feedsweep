@@ -790,14 +790,14 @@ describeForEachParser('appleEmbedResolver in any case', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should read the podcast id prefix `id` in capitals', async () => {
+  it('should write the podcast id prefix `id` from the code when the carrier spells it in capitals', async () => {
     const value =
       '<iframe src="https://embed.podcasts.apple.com/us/podcast/the-daily/ID1200361736"></iframe>'
     const expected = {
       provider: 'applepodcasts',
       id: 'podcast/1200361736',
-      src: 'https://embed.podcasts.apple.com/us/podcast/the-daily/ID1200361736',
-      url: 'https://podcasts.apple.com/us/podcast/the-daily/ID1200361736',
+      src: 'https://embed.podcasts.apple.com/us/podcast/the-daily/id1200361736',
+      url: 'https://podcasts.apple.com/us/podcast/the-daily/id1200361736',
       height: 450,
     }
 

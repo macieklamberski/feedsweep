@@ -534,6 +534,20 @@ describeForEachParser('amebaImagePageEmbedResolver in any case', (parseHtml) => 
 
     expect(await extract(value)).toEqual(expected)
   })
+
+  it('should write the `image-` prefix from the code when the carrier spells it in capitals', async () => {
+    const value =
+      '<iframe src="https://ameblo.jp/p/embed/SD-milk/IMAGE-12806733695-15295885078.HTML"></iframe>'
+    const expected = {
+      provider: 'ameba',
+      id: 'SD-milk/image-12806733695-15295885078',
+      src: 'https://ameblo.jp/p/embed/SD-milk/image-12806733695-15295885078.html',
+      url: 'https://ameblo.jp/SD-milk/image-12806733695-15295885078.html',
+      ratio: '360/416',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
 })
 
 describeForEachParser('amebaMoviePlayerEmbedResolver in any case', (parseHtml) => {

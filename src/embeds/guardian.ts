@@ -1,3 +1,4 @@
+import { toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -7,13 +8,13 @@ const guardianHosts = ['embed.theguardian.com']
 // `/embed/video/{section}/video/{yyyy}/{mon}/{dd}/{slug}`.
 // The video's page is the same path on `www`, and a real path answers 200 where a fabricated
 // slug 404s.
-const playerPathRegex = /^\/embed\/video\/([^/]+\/video\/[^/]+\/[^/]+\/[^/]+\/[^/]+)$/i
+const playerPathRegex = /^\/embed\/video\/([^/]+)\/video\/([^/]+)\/([^/]+)\/([^/]+\/[^/]+)$/i
 
 // The path dates the video, and the month is the three-letter English abbreviation on every
 // edition. A path states a day and not a moment, so `date` carries the calendar day alone, and
 // a name outside the twelve months leaves it unstated.
 const pathDateRegex = /^[a-z0-9-]+\/video\/(\d{4})\/([a-z]{3})\/(0[1-9]|[12]\d|3[01])\//i
-const monthNumbers: Record<string, string | undefined> = {
+const monthNumbers = toMap({
   jan: '01',
   feb: '02',
   mar: '03',
@@ -26,7 +27,7 @@ const monthNumbers: Record<string, string | undefined> = {
   oct: '10',
   nov: '11',
   dec: '12',
-}
+})
 
 const readDate = (path: string): string | undefined => {
   const parts = path.match(pathDateRegex)
@@ -35,7 +36,7 @@ const readDate = (path: string): string | undefined => {
     return
   }
 
-  const month = monthNumbers[parts[2].toLowerCase()]
+  const month = monthNumbers.get(parts[2].toLowerCase())
 
   return month ? `${parts[1]}-${month}-${parts[3]}` : undefined
 }
@@ -46,11 +47,18 @@ const playerRatio = '16/9'
 
 export const guardianResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, guardianHosts)
-  const path = parsed?.pathname.match(playerPathRegex)?.[1]
+  const match = parsed?.pathname.match(playerPathRegex)
 
-  if (!path) {
+  if (!match) {
     return
   }
+
+  // The server answers 404 to `VIDEO` and to a month in capitals, so both are written from the
+  // code. A name outside the twelve months is written as found.
+  const [, section, year, month, rest] = match
+  const lowerMonth = month.toLowerCase()
+  const pathMonth = monthNumbers.has(lowerMonth) ? lowerMonth : month
+  const path = `${section}/video/${year}/${pathMonth}/${rest}`
 
   return {
     provider: 'guardian',
