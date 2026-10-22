@@ -47,13 +47,13 @@ describe('rutubeResolveEmbed', () => {
       expect(rutubeResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should use an uppercase hex id as written, even if the player answers an error', () => {
+    it('should lowercase an uppercase hex id, which the player answers only in lowercase', () => {
       const value = 'https://rutube.ru/play/embed/C6CC4D620B1D4338901770A44B3E82F4'
       const expected: EmbedResolverResult = {
         provider: 'rutube',
-        id: 'C6CC4D620B1D4338901770A44B3E82F4',
-        src: 'https://rutube.ru/play/embed/C6CC4D620B1D4338901770A44B3E82F4',
-        url: 'https://rutube.ru/video/C6CC4D620B1D4338901770A44B3E82F4/',
+        id: 'c6cc4d620b1d4338901770a44b3e82f4',
+        src: 'https://rutube.ru/play/embed/c6cc4d620b1d4338901770a44b3e82f4',
+        url: 'https://rutube.ru/video/c6cc4d620b1d4338901770a44b3e82f4/',
         ratio: '16/9',
       }
 

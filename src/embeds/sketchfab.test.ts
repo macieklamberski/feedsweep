@@ -63,6 +63,21 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should lowercase an uppercase hex uid, which the api answers only in lowercase', async () => {
+      const value = html`
+        <iframe src="https://sketchfab.com/models/B2752B227D9449DA870B80AE90F04932/embed"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'sketchfab',
+        id: 'b2752b227d9449da870b80ae90f04932',
+        src: 'https://sketchfab.com/models/b2752b227d9449da870b80ae90f04932/embed',
+        url: 'https://sketchfab.com/models/b2752b227d9449da870b80ae90f04932',
+        ratio: '4/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should resolve a model with the older 26-character uid', async () => {
       const value = html`
         <iframe

@@ -39,10 +39,10 @@ export const rutubeResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   // An id is a uuid with the dashes stripped, and the player still plays the all-digit ids the same
-  // routes carried before.
+  // routes carried before. The player's api answers 404 for an id in capitals.
   const videoId = playlistPathRegex.test(parsed.pathname)
     ? parsed.searchParams.get('pl_video')
-    : keepIfMatches(parsed.pathname.match(embedPathRegex)?.[1], hexRegex)
+    : keepIfMatches(parsed.pathname.match(embedPathRegex)?.[1], hexRegex)?.toLowerCase()
 
   if (!videoId) {
     return

@@ -28,16 +28,19 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
   // `@{version}` pins one revision of a notebook rather than naming another one, and the document
   // endpoint takes the notebook alone, so the suffix stays out of the id.
   // A notebook id is the only segment after `embed`, and `embed/d/{id}` answers 404.
-  const notebookId =
+  const writtenId =
     segments.length === 2
       ? keepIfMatches(segments[1].replace(versionSuffixRegex, ''), hexRegex)
       : undefined
 
-  if (notebookId) {
+  if (writtenId) {
+    // The frame and the document endpoint answer 404 for a notebook id in capitals.
+    const notebookId = writtenId.toLowerCase()
+
     return {
       provider,
       id: notebookId,
-      src,
+      src: src.replace(`/embed/${writtenId}`, `/embed/${notebookId}`),
       url: `https://observablehq.com/d/${notebookId}`,
     }
   }

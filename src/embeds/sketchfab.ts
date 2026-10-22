@@ -39,11 +39,15 @@ const readModelUid = (parsed: URL): string | undefined => {
 // `sketchfab.com/oembed?url=…` answers with it and the title, with no key.
 const sketchfabResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
-  const uid = parsed ? readModelUid(parsed) : undefined
+  const writtenUid = parsed ? readModelUid(parsed) : undefined
 
-  if (!uid) {
+  if (!writtenUid) {
     return
   }
+
+  // The api and oEmbed answer 404 for a hex uid in capitals. The 26-character uids are
+  // case-sensitive, so they stay as written.
+  const uid = safeUidRegex.test(writtenUid) ? writtenUid.toLowerCase() : writtenUid
 
   return {
     provider,

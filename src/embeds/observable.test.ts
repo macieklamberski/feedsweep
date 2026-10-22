@@ -166,14 +166,14 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use an uppercase hex id as written, even if the player answers an error', async () => {
+    it('should lowercase an uppercase hex id, which the frame answers only in lowercase', async () => {
       const value =
         '<iframe src="https://observablehq.com/embed/3AC7DFCBDCB1DD2A@248?cells=map,css"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'observable',
-        id: '3AC7DFCBDCB1DD2A',
-        src: 'https://observablehq.com/embed/3AC7DFCBDCB1DD2A@248?cells=map,css',
-        url: 'https://observablehq.com/d/3AC7DFCBDCB1DD2A',
+        id: '3ac7dfcbdcb1dd2a',
+        src: 'https://observablehq.com/embed/3ac7dfcbdcb1dd2a@248?cells=map,css',
+        url: 'https://observablehq.com/d/3ac7dfcbdcb1dd2a',
       }
 
       expect(await extract(value)).toEqual(expected)

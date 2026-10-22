@@ -9,6 +9,7 @@ const odyseeHosts = ['odysee.com', 'lbry.tv', 'open.lbry.com']
 // A claim, `{name}:{hex claim id}`, with an optional leading `@` for a channel and an optional id.
 // A bare name addresses the winning claim for it.
 const claimRegex = /^[^:]+(?::[0-9a-f]+)?$/i
+const claimIdRegex = /:[0-9a-f]+$/i
 
 const readClaimPath = (parsed: URL): string | undefined => {
   // The current share code percent-encodes the whole path, $ and / included.
@@ -46,7 +47,8 @@ const readClaimPath = (parsed: URL): string | undefined => {
     return
   }
 
-  return claims.join('/')
+  // The player and the page answer not found for a claim id in capitals. The name keeps its case.
+  return claims.map((claim) => claim.replace(claimIdRegex, (id) => id.toLowerCase())).join('/')
 }
 
 const odyseeResolveEmbed: ResolveEmbed = (url) => {

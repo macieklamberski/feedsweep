@@ -72,6 +72,23 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should lowercase an uppercase claim id and keep the name as written', async () => {
+      const value = html`
+        <iframe
+          src="https://odysee.com/$/embed/ZenoLeoni-US-China/B87789CCE763E2F0F52AB21BE29ACB7183CB3906?r=BARPruoxUcBxdL4vPfpJHfXkZXrU3YrH"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'odysee',
+        id: 'ZenoLeoni-US-China:b87789cce763e2f0f52ab21be29acb7183cb3906',
+        src: 'https://odysee.com/$/embed/ZenoLeoni-US-China:b87789cce763e2f0f52ab21be29acb7183cb3906',
+        url: 'https://odysee.com/ZenoLeoni-US-China:b87789cce763e2f0f52ab21be29acb7183cb3906',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should not read the title the carrier states', async () => {
       const value = html`
         <iframe
