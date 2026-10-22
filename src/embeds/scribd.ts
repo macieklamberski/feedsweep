@@ -37,7 +37,8 @@ const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
     provider: 'scribd',
     id: document,
     src: `https://www.scribd.com/embeds/${segment}/content${composeQuery(params)}`,
-    // Every embed snippet carries a key, and the document page ignores it either way.
+    // A public document's page opens without the key. A private one answers 410 with or without
+    // it, and nothing offline tells the two apart.
     url: `https://www.scribd.com/document/${segment}`,
     height: 600,
   }
