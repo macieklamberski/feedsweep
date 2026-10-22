@@ -408,6 +408,28 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep the language a constructor frame names', async () => {
+      const value = html`
+        <iframe
+          src="https://yandex.ru/map-widget/v1/?lang=ru_RU&amp;scroll=true&amp;um=constructor%3Acdaf1d35825766e91a2eecbac1476a02c410ff570830efd17ecaffeb5effbfb9"
+          frameborder="0"
+          allowfullscreen="true"
+          width="100%"
+          height="400px"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        id: 'constructor:cdaf1d35825766e91a2eecbac1476a02c410ff570830efd17ecaffeb5effbfb9',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3Acdaf1d35825766e91a2eecbac1476a02c410ff570830efd17ecaffeb5effbfb9&source=constructor&lang=ru_RU',
+        thumbnail:
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3Acdaf1d35825766e91a2eecbac1476a02c410ff570830efd17ecaffeb5effbfb9&width=650&height=400',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should claim a short link frame', async () => {
       const value = html`
         <iframe
