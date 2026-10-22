@@ -26,6 +26,13 @@ const atUriRegex = /^at:\/\/([^/]+)\/([^/]+)\/([^/?#]+)/
 // Whitespace, an en dash, an em dash or a hyphen.
 const authorSeparatorRegex = /^[\s–—-]+/
 
+// A post's record key is a TID: 64 bits in base32-sortable, the top bit zero, then microseconds
+// since the Unix epoch the client set when it wrote the post, then a 10-bit clock id.
+// See: https://atproto.com/specs/tid.
+const tidAlphabet = '234567abcdefghijklmnopqrstuvwxyz'
+// length: keeps a record key that is not a TID out
+const tidRegex = /^[234567abcdefghij][234567abcdefghijklmnopqrstuvwxyz]{12}$/
+
 type BlueskyPost = {
   authority: string
   rkey: string
@@ -73,6 +80,23 @@ const extractBlueskyPostFromUrl = (link: string): BlueskyPost | undefined => {
   ) {
     return { authority, rkey }
   }
+}
+
+// The date a post was written at, read from its record key.
+const readTidDate = (rkey: string): string | undefined => {
+  if (!tidRegex.test(rkey)) {
+    return
+  }
+
+  let value = 0n
+
+  for (const character of rkey) {
+    value = (value << 5n) | BigInt(tidAlphabet.indexOf(character))
+  }
+
+  const milliseconds = Number((value >> 10n) / 1000n)
+
+  return new Date(milliseconds).toISOString()
 }
 
 const composeEmbedResult = (post: BlueskyPost): EmbedResolverResult => {
@@ -183,7 +207,11 @@ const extractQuotedPost = (
   // Some feeds strip the blockquote's data attributes, and others drop its class and keep them.
   const post = extractBlueskyPost(attr(element, attribute) ?? '') ?? quoted.post
 
-  return post ? { ...composeEmbedResult(post), ...quoted.fields } : undefined
+  if (!post) {
+    return
+  }
+
+  return { ...composeEmbedResult(post), ...quoted.fields, date: readTidDate(post.rkey) }
 }
 
 // Bluesky's post blockquote, the fallback its embed script replaces and no reader runs.

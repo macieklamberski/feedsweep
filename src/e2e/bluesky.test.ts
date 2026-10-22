@@ -5,8 +5,9 @@ import { describeForEachParser, html, jsonAttrValue } from '../tests.js'
 describeForEachParser('Bluesky', (parseHtml) => {
   // Four resolvers split the carriers. blueskyBlockquoteEmbedResolver claims the oEmbed
   // blockquote by its class or its declared AT URI, whichever wrapper it arrives in, and reads
-  // the post text and author out of it. blueskyIframeEmbedResolver claims the player
-  // iframe and the newsletter wrapper whose data-attrs holds the whole post.
+  // the post text and author out of it and the date out of its record key.
+  // blueskyIframeEmbedResolver claims the player iframe and the newsletter wrapper whose
+  // data-attrs holds the whole post.
   // blueskyS9eEmbedResolver claims the forum helper page, and blueskyPostElementEmbedResolver
   // the <bluesky-post> custom element. A Discourse onebox citing bsky.app is a cite rather
   // than an embed, so it belongs to discourseCiteResolver and to the Discourse suite.
@@ -41,6 +42,7 @@ describeForEachParser('Bluesky', (parseHtml) => {
         data-embed-url="https://bsky.app/profile/did:plc:ewvi7nxzyoun6zhxrhs64oiz/post/3lbwtqmxbec2p"
         data-embed-description="The block editor pastes the oEmbed html verbatim."
         data-embed-author="Display Name (@user.bsky.social)"
+        data-embed-date="2024-11-27T15:14:47.996Z"
       ></div>
     `
 
@@ -67,6 +69,7 @@ describeForEachParser('Bluesky', (parseHtml) => {
         data-embed-src="https://embed.bsky.app/embed/did:plc:6hz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3lvq7aeuwbg42"
         data-embed-url="https://bsky.app/profile/did:plc:6hz4agnyzcrsvpnprxrbjrpa/post/3lvq7aeuwbg42"
         data-embed-description="Invalid nesting, still a post."
+        data-embed-date="2025-08-06T12:15:41.949Z"
       ></div>
     `
 
@@ -183,6 +186,7 @@ describeForEachParser('Bluesky', (parseHtml) => {
         data-embed-url="https://bsky.app/profile/newsroom.example/post/3miq7aeuwbg42"
         data-embed-description="The web component never mounts in a reader."
         data-embed-author="Newsroom (@newsroom.example)"
+        data-embed-date="2026-04-05T07:14:22.876Z"
       ></div>
     `
 
