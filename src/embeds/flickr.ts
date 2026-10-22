@@ -174,18 +174,8 @@ const readFlashPhoto = (element: Nullish<Element>): FlickrPhoto | undefined => {
 
   const secret = flashVar(element, 'photo_secret')
 
-  if (!secret) {
-    return { photoId }
-  }
-
   // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
-  const secretSegment = encodePathSegment(secret)
-
-  if (!secretSegment) {
-    return
-  }
-
-  return { photoId, secret: secretSegment }
+  return { photoId, secret: secret ? encodePathSegment(secret) : undefined }
 }
 
 const trailingSlashesRegex = /\/+$/
@@ -257,11 +247,11 @@ const composePhotoEmbed = (src: string, photo: FlickrPhoto): EmbedResolverResult
 const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined => {
   const owner = subject.owner
   const author = readOwnerAlias(owner)
-  // Empty where the subject names no such part.
-  const ownerSegment = owner ? encodePathSegment(owner) : ''
+  const ownerSegment = owner ? encodePathSegment(owner) : undefined
+  // Empty where the subject names no set.
   const setSegment = subject.setId ? encodePathSegment(subject.setId) : ''
 
-  if (ownerSegment === undefined || setSegment === undefined) {
+  if (setSegment === undefined) {
     return
   }
 
@@ -273,7 +263,9 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
       // The album's key-free oEmbed needs `{owner}/{setId}`: a title, an author, a thumbnail.
       id: `${owner}/${subject.setId}`,
       src: composeAlbumPlayer(setSegment),
-      url: `https://www.flickr.com/photos/${ownerSegment}/sets/${setSegment}`,
+      url: ownerSegment
+        ? `https://www.flickr.com/photos/${ownerSegment}/sets/${setSegment}`
+        : undefined,
       author,
     }
   }
@@ -306,6 +298,10 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   // embedr takes the NSID and 404s on an alias, and nothing offline converts one into the
   // other. An alias resolves through the page player instead, which serves both spellings.
   if (owner) {
+    if (!ownerSegment) {
+      return
+    }
+
     return {
       provider,
       id: `photostreams/${owner}`,

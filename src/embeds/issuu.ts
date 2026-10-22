@@ -49,17 +49,16 @@ const composeDocumentEmbed = (
   const publisherSegment = encodePathSegment(publisher)
   const documentSegment = encodePathSegment(documentName)
 
-  if (!publisherSegment || !documentSegment) {
-    return
-  }
-
   const query = composeQuery(trimObject({ u: publisher, d: documentName, p: page }))
 
   return {
     provider,
     id: `${publisher}/${documentName}`,
     src: `https://e.issuu.com/embed.html${query}`,
-    url: `https://issuu.com/${publisherSegment}/docs/${documentSegment}`,
+    url:
+      publisherSegment && documentSegment
+        ? `https://issuu.com/${publisherSegment}/docs/${documentSegment}`
+        : undefined,
     ratio: documentRatio,
   }
 }

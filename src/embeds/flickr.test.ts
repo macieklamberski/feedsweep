@@ -1071,7 +1071,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a photo secret that is a dot segment', async () => {
+    it('should keep the player and drop the thumbnail for a photo secret that is a dot segment', async () => {
       const value = html`
         <object
           type="application/x-shockwave-flash"
@@ -1084,7 +1084,15 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         </object>
       `
 
-      expect(await extract(value)).toBeUndefined()
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/8NKp7f',
+        src: 'https://embedr.flickr.com/photos/5123523742?width=640&height=360',
+        url: 'https://flic.kr/p/8NKp7f',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for a set id that is a dot segment', async () => {
@@ -1207,7 +1215,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for a page path owner that is a dot segment', async () => {
+    it('should keep the player and drop the url for a page path owner that is a dot segment', async () => {
       const value = html`
         <embed
           src="https://www.flickr.com/apps/slideshow/show.swf"
@@ -1215,7 +1223,16 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         />
       `
 
-      expect(await extract(value)).toBeUndefined()
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: '../72157624341',
+        src: 'https://embedr.flickr.com/photosets/72157624341?width=400&height=300',
+        width: 400,
+        height: 300,
+        author: '..',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     // Only the slideshow swf and the video swf are read. Any other app under `/apps/` names no

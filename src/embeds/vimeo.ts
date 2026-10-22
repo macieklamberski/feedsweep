@@ -295,7 +295,7 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
   // Empty where the reference holds no hash.
   const hashSegment = hash ? encodePathSegment(hash) : ''
 
-  if (!segment || hashSegment === undefined) {
+  if (!segment) {
     return
   }
 
@@ -312,7 +312,10 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
     id: hash ? `${videoId}:${hash}` : videoId,
     src: composeEmbedUrl(segment, params),
     // Without the hash the page loses its title and its video, so it stays on the url too.
-    url: `https://vimeo.com/${segment}${hashSegment ? `/${hashSegment}` : ''}`,
+    url:
+      hashSegment === undefined
+        ? undefined
+        : `https://vimeo.com/${segment}${hashSegment ? `/${hashSegment}` : ''}`,
     ratio: playerRatio,
     title,
     // TODO: no thumbnail. Vimeo posters are not derivable from the id and need an oEmbed lookup.

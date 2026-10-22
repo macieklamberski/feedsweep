@@ -292,10 +292,17 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a document that is a dot segment', async () => {
+    it('should keep the player and drop the url for a document that is a dot segment', async () => {
       const value = '<iframe src="https://e.issuu.com/embed.html?u=ecosistemaurbano&d=.."></iframe>'
 
-      expect(await extract(value)).toBeUndefined()
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'ecosistemaurbano/..',
+        src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=..',
+        ratio: '5/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for an issuu url naming no document', async () => {
@@ -310,12 +317,19 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a publisher that is a dot segment', async () => {
+    it('should keep the player and drop the url for a publisher that is a dot segment', async () => {
       const value = html`
         <iframe src="https://e.issuu.com/embed.html?u=..&d=paisaje_transversal"></iframe>
       `
 
-      expect(await extract(value)).toBeUndefined()
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: '../paisaje_transversal',
+        src: 'https://e.issuu.com/embed.html?u=..&d=paisaje_transversal',
+        ratio: '5/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined for a query missing the publisher', async () => {

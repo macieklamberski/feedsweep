@@ -37,10 +37,6 @@ export const abcotvResolveEmbed: ResolveEmbed = (url) => {
 
   const segment = encodePathSegment(pid)
 
-  if (!segment) {
-    return
-  }
-
   // A `www.` host answers with a redirect to the apex, or with a certificate that fails.
   const host = stripWww(parsed.hostname)
 
@@ -48,7 +44,7 @@ export const abcotvResolveEmbed: ResolveEmbed = (url) => {
     provider,
     id: pid,
     src: `https://${host}/video/embed${composeQuery({ pid })}`,
-    url: `https://${host}/videoClip/${segment}/`,
+    url: segment ? `https://${host}/videoClip/${segment}/` : undefined,
     ratio: '16/9',
   }
 }

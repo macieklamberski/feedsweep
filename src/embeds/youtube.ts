@@ -201,19 +201,15 @@ const composeListEmbed = (list: string): EmbedResolverResult => {
 }
 
 // `listType=user_uploads` takes a legacy username in place of a playlist id.
-const composeUploadsEmbed = (user: string): EmbedResolverResult | undefined => {
+const composeUploadsEmbed = (user: string): EmbedResolverResult => {
   // The username comes out of the query decoded, and it goes into a path.
   const segment = encodePathSegment(user)
-
-  if (!segment) {
-    return
-  }
 
   return {
     provider,
     id: `user/${user}`,
     src: `https://www.youtube.com/embed${composeQuery({ listType: 'user_uploads', list: user })}`,
-    url: `https://www.youtube.com/user/${segment}`,
+    url: segment ? `https://www.youtube.com/user/${segment}` : undefined,
     ratio: playerRatio,
   }
 }
@@ -234,12 +230,12 @@ const composeVideoEmbed = (
 
 // `segment` is the channel as the page path takes it: AMP's attribute goes in as written, and a
 // query value comes out decoded, so its caller encodes it.
-const composeChannelEmbed = (channel: string, segment = channel): EmbedResolverResult => {
+const composeChannelEmbed = (channel: string, segment: string | undefined): EmbedResolverResult => {
   return {
     provider,
     id: `channel/${channel}`,
     src: composeEmbedUrl('live_stream', { channel }),
-    url: `https://www.youtube.com/channel/${segment}`,
+    url: segment ? `https://www.youtube.com/channel/${segment}` : undefined,
     ratio: playerRatio,
   }
 }
@@ -253,17 +249,7 @@ const resolveCollectionEmbed = (
   const channel = parsed.searchParams.get('channel')
 
   if (segments[1] === 'live_stream') {
-    if (!channel) {
-      return
-    }
-
-    const segment = encodePathSegment(channel)
-
-    if (!segment) {
-      return
-    }
-
-    return composeChannelEmbed(channel, segment)
+    return channel ? composeChannelEmbed(channel, encodePathSegment(channel)) : undefined
   }
 
   // `/embed/videoseries?list=`, `/embed/playlist?list=` and the bare `/embed/?list=` some
@@ -375,7 +361,7 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
     if (!videoId) {
       const channel = attr(element, 'data-live-channelid')
 
-      return channel ? composeChannelEmbed(channel) : undefined
+      return channel ? composeChannelEmbed(channel, channel) : undefined
     }
 
     // `videoseries` and `live_stream` are route words that sit where a video id does.

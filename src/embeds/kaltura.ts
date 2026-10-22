@@ -45,17 +45,9 @@ const readEntry = (url: string | undefined): Entry | undefined => {
 
 // The player path names the partner and the player config. Without `iframeembed=true` the same
 // route answers the auto-embed script, not a player.
-const composeEmbed = (
-  { partner, entryId, parsed }: Entry,
-  title?: string,
-): EmbedResolverResult | undefined => {
+const composeEmbed = ({ partner, entryId, parsed }: Entry, title?: string): EmbedResolverResult => {
   // The entry comes out of the query decoded, and it goes into a path.
   const entrySegment = encodePathSegment(entryId)
-
-  if (!entrySegment) {
-    return
-  }
-
   const host = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
   const query = composeQuery({ iframeembed: 'true', entry_id: entryId })
   const hasToken = parsed.searchParams.has(tokenParam)
@@ -71,9 +63,10 @@ const composeEmbed = (
     id: `${partner}/${entryId}`,
     src: `https://${host}${parsed.pathname}${query}${playback}`,
     // The poster answers 200 `image/jpeg` for a real entry, 404 for an invented or a deleted one.
-    thumbnail: hasToken
-      ? undefined
-      : `https://${host}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
+    thumbnail:
+      hasToken || !entrySegment
+        ? undefined
+        : `https://${host}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
     ratio: '16/9',
     title,
   }

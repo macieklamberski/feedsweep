@@ -1047,18 +1047,32 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('a value that is a dot segment', () => {
-    it('should return undefined for an uploads username that is a dot segment', async () => {
+    it('should keep the player and drop the url for an uploads username that is a dot segment', async () => {
       const value = html`
         <iframe src="https://www.youtube.com/embed?listType=user_uploads&list=.."></iframe>
       `
 
-      expect(await extract(value)).toBeUndefined()
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'user/..',
+        src: 'https://www.youtube.com/embed?listType=user_uploads&list=..',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for a live stream channel that is a dot segment', async () => {
+    it('should keep the player and drop the url for a live stream channel that is a dot segment', async () => {
       const value = '<iframe src="https://www.youtube.com/embed/live_stream?channel=.."></iframe>'
 
-      expect(await extract(value)).toBeUndefined()
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'channel/..',
+        src: 'https://www.youtube.com/embed/live_stream?channel=..',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

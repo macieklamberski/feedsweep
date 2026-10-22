@@ -327,15 +327,9 @@ const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
   // anchor.
   const account = parsed.searchParams.get('userName')
   const slug = parsed.searchParams.get('stripped_title')
-  // Both come out of the query decoded, and each goes into a path segment of its own. Each is
-  // empty where the query names none.
-  const accountSegment = account ? encodePathSegment(account) : ''
-  const slugSegment = slug ? encodePathSegment(slug) : ''
-
-  if (accountSegment === undefined || slugSegment === undefined) {
-    return
-  }
-
+  // Both come out of the query decoded, and each goes into a path segment of its own.
+  const accountSegment = account ? encodePathSegment(account) : undefined
+  const slugSegment = slug ? encodePathSegment(slug) : undefined
   const composed =
     accountSegment && slugSegment
       ? `https://www.slideshare.net/${accountSegment}/${slugSegment}`

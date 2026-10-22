@@ -45,15 +45,11 @@ export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
   // The code comes out of a query decoded, and it goes into a path.
   const segment = encodePathSegment(code)
 
-  if (!segment) {
-    return
-  }
-
   return {
     provider: 'calameo',
     id: code,
     src,
-    url: `https://www.calameo.com/books/${segment}`,
+    url: segment ? `https://www.calameo.com/books/${segment}` : undefined,
     ratio: viewerRatio,
   }
 }
