@@ -1,7 +1,7 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { paramValue } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
 const podbeanHosts = ['podbean.com']
@@ -12,8 +12,8 @@ const playerRoute = 'podcast-audio-video-blog-player'
 export const podbeanFlashMediaResolver: MediaResolver = {
   kind: 'media',
   selector: [
-    `embed[src*="podbean.com/${playerRoute}/"]`,
-    `object[data*="podbean.com/${playerRoute}/"]`,
+    `embed[src*="podbean.com/${playerRoute}/" i]`,
+    `object[data*="podbean.com/${playerRoute}/" i]`,
     // An Internet Explorer object names the swf in its `movie` param.
     'object[classid]',
   ].join(', '),
@@ -26,11 +26,11 @@ export const podbeanFlashMediaResolver: MediaResolver = {
 
     const player = parseUrlOnHosts(playerUrl, podbeanHosts)
 
-    if (!player || getPathSegments(player)[0] !== playerRoute) {
+    if (!player || !isAnyOf(getPathSegments(player)[0], playerRoute)) {
       return
     }
 
-    const src = player.searchParams.get('audioPath')
+    const src = getQueryParam(player.searchParams, 'audioPath')
 
     if (!src) {
       return

@@ -549,3 +549,65 @@ describeForEachParser('1 pixel out shapes the pipeline places', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('onePixelOutFlashMediaResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, onePixelOutFlashMediaResolver)
+
+  it('should read the `soundFile` and `titles` flashvar names in capitals', async () => {
+    const value = html`
+      <embed
+        flashvars="SOUNDFILE=http://example.com/Trancemix_389.mp3&TITLES=Trancemix 389"
+        src="http://example.com/player.swf"
+      >
+    `
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://example.com/Trancemix_389.mp3',
+      title: 'Trancemix 389',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `soundFile` parameter name in capitals on the swf url', async () => {
+    const value =
+      '<embed src="http://example.com/player.swf?SOUNDFILE=http://example.com/Trancemix_389.mp3">'
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://example.com/Trancemix_389.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('onePixelOutWidgetMediaResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, onePixelOutWidgetMediaResolver)
+
+  it('should read the mount id prefix in capitals', async () => {
+    const value = html`
+      <p id="AudioPlayer_1">[audio player]</p>
+      <script>AudioPlayer.embed("AudioPlayer_1", {soundFile: "http://example.com/audio/episode.mp3"});</script>
+    `
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://example.com/audio/episode.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `soundFile` and `titles` option names in capitals', async () => {
+    const value = html`
+      <p id="audioplayer_1">[audio player]</p>
+      <script>AudioPlayer.embed("audioplayer_1", {SOUNDFILE: "http://example.com/audio/episode.mp3", TITLES: "Episode"});</script>
+    `
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://example.com/audio/episode.mp3',
+      title: 'Episode',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

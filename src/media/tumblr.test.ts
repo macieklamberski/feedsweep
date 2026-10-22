@@ -80,3 +80,18 @@ describeForEachParser('tumblrMediaResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('tumblrMediaResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, tumblrMediaResolver)
+
+  it('should read the `audio_file` parameter name in capitals', async () => {
+    const value =
+      '<iframe class="tumblr_audio_player" src="https://example.com/post/83372210021/audio_player_iframe/example/tumblr_n4d1nwh3ub1qz6kxf?AUDIO_FILE=https%3A%2F%2Fa.tumblr.com%2Ftumblr_n4d1nwh3ub1qz6kxfo1_r1.mp3"></iframe>'
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'https://a.tumblr.com/tumblr_n4d1nwh3ub1qz6kxfo1_r1.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

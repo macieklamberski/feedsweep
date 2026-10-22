@@ -108,6 +108,17 @@ describeForEachParser('nytimesCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore another nytimes.com page carrying the card path in its query', async () => {
+      const value = html`
+        <iframe
+          title="A post"
+          src="https://www.nytimes.com/video/?url=https%3A%2F%2Fwww.nytimes.com%2F2020%2F04%2F13%2Fscience%2Fputin.html&x=nytimes.com/svc/oembed/html/"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
 
@@ -142,5 +153,33 @@ describeForEachParser('nytimes card through the pipeline', (parseHtml) => {
     `
 
     expect(result).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('nytimesCiteResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, nytimesCiteResolver)
+
+  it('should read the card route in capitals', async () => {
+    const value =
+      '<iframe title="Putin and science" src="https://www.nytimes.com/SVC/OEMBED/HTML/?url=https%3A%2F%2Fwww.nytimes.com%2F2020%2F04%2F13%2Fscience%2Fputin.html"></iframe>'
+    const expected: CiteResolverResult = {
+      provider: 'nytimes',
+      url: 'https://www.nytimes.com/2020/04/13/science/putin.html',
+      title: 'Putin and science',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `url` parameter name in capitals', async () => {
+    const value =
+      '<iframe title="Putin and science" src="https://www.nytimes.com/svc/oembed/html/?URL=https%3A%2F%2Fwww.nytimes.com%2F2020%2F04%2F13%2Fscience%2Fputin.html"></iframe>'
+    const expected: CiteResolverResult = {
+      provider: 'nytimes',
+      url: 'https://www.nytimes.com/2020/04/13/science/putin.html',
+      title: 'Putin and science',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

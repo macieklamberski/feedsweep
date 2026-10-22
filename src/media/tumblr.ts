@@ -1,6 +1,6 @@
 import { parseUrl } from 'trousse'
 import type { MediaResolver } from '../types.js'
-import { audioFileRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { audioFileRegex, getQueryParam, placeholderBaseUrl } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
 // A Tumblr audio post frames its player page, which a native <audio> cannot play. The page url
@@ -10,7 +10,7 @@ export const tumblrMediaResolver: MediaResolver = {
   selector: 'iframe.tumblr_audio_player',
   extract: (element) => {
     const parsed = parseUrl(readCarrierUrl(element), placeholderBaseUrl)
-    const file = parsed?.searchParams.get('audio_file')
+    const file = getQueryParam(parsed?.searchParams, 'audio_file')
 
     if (!file || !audioFileRegex.test(file)) {
       return

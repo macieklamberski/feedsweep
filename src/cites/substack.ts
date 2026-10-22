@@ -65,7 +65,7 @@ export const substackOwnPostCiteResolver: CiteResolver = {
         // author's Substack profile, on custom domains too.
         url: attr(find(element, 'a[href]'), 'href'),
         title: text(element, 'h4'),
-        author: text(element, 'a[href*="substack.com/profile/"]'),
+        author: text(element, 'a[href*="substack.com/profile/" i]'),
         thumbnail: attr(find(element, 'img'), 'src'),
       })
     }

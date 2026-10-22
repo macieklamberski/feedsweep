@@ -163,3 +163,18 @@ describeForEachParser('the WordPress Flickr video shortcode', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('flickrMediaResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, flickrMediaResolver)
+
+  it('should read the route words in capitals and write them in lowercase', async () => {
+    const value =
+      '<video src="https://www.flickr.com/PHOTOS/jbury/2596355511/PLAY/IPHONE_WIFI/9d99048374/"></video>'
+    const expected: MediaResolverResult = {
+      tag: 'video',
+      src: 'https://www.flickr.com/photos/jbury/2596355511/play/360p/9d99048374/',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

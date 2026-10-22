@@ -372,3 +372,64 @@ describeForEachParser('weebly blocks through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('weeblyMediaResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, weeblyMediaResolver)
+
+  it('should read the uploads route in capitals', async () => {
+    const value = html`
+      <div class="wsite-video-wrapper">
+        <style>#wsite-video-container-1{ background: url(//www.weebly.com/UPLOADS/b/1/clip_176.jpg); }</style>
+      </div>
+    `
+    const expected: MediaResolverResult = {
+      tag: 'video',
+      src: '//www.weebly.com/UPLOADS/b/1/clip_176.mp4',
+      poster: '//www.weebly.com/UPLOADS/b/1/clip_176.jpg',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the exporter prefix written in capitals', async () => {
+    const value = html`
+      <div class="wsite-video-wrapper">
+        <style>#wsite-video-container-1{ background: url(//WWW.WEEBLY.COMhttp://sample.weebly.com/uploads/1/2/3/4/1234/dotday_772.jpg); }</style>
+      </div>
+    `
+    const expected: MediaResolverResult = {
+      tag: 'video',
+      src: 'http://sample.weebly.com/uploads/1/2/3/4/1234/dotday_772.mp4',
+      poster: 'http://sample.weebly.com/uploads/1/2/3/4/1234/dotday_772.jpg',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('weeblyFlashMediaResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, weeblyFlashMediaResolver)
+
+  it('should read the player path in capitals', async () => {
+    const value =
+      '<embed src="http://www.weebly.com/WEEBLY/APPS/AUDIOPLAYER2.SWF?user_id=4427146" flashvars="soundFile=http://www.example.com/uploads/knowing_yourself.mp3">'
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://www.example.com/uploads/knowing_yourself.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `soundFile` and `titles` flashvar names in capitals', async () => {
+    const value =
+      '<embed src="http://www.weebly.com/weebly/apps/audioPlayer2.swf?user_id=4427146" flashvars="SOUNDFILE=http://www.example.com/uploads/knowing_yourself.mp3&TITLES=Knowing%20Yourself">'
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://www.example.com/uploads/knowing_yourself.mp3',
+      title: 'Knowing Yourself',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

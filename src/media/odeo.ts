@@ -12,7 +12,7 @@ const deadFileHosts = ['media.odeo.com']
 // player is gone and the file it names is usually on the publisher's own host.
 export const odeoMediaResolver: MediaResolver = {
   kind: 'media',
-  selector: 'embed[src*="odeo.com/flash/"], object[data*="odeo.com/flash/"]',
+  selector: 'embed[src*="odeo.com/flash/" i], object[data*="odeo.com/flash/" i]',
   extract: (element) => {
     if (!parseUrlOnHosts(readCarrierUrl(element), odeoHosts)) {
       return

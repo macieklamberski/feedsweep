@@ -511,3 +511,26 @@ describeForEachParser('substackPublicationCiteResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('substackOwnPostCiteResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, substackOwnPostCiteResolver)
+
+  it('should read the profile route in capitals', async () => {
+    const value = html`
+      <div data-component-name="DigestPostEmbed">
+        <a href="https://thereader.example.com/p/model-drop">
+          <h4>Model Drop</h4>
+        </a>
+        <a href="https://substack.com/PROFILE/8243895-author-name">Author name</a>
+      </div>
+    `
+    const expected: CiteResolverResult = {
+      provider: 'substack',
+      url: 'https://thereader.example.com/p/model-drop',
+      title: 'Model Drop',
+      author: 'Author name',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

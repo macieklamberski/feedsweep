@@ -1,6 +1,6 @@
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
 const flashMp3PlayerHosts = ['flash-mp3-player.net']
@@ -10,7 +10,7 @@ const flashMp3PlayerHosts = ['flash-mp3-player.net']
 export const flashMp3PlayerMediaResolver: MediaResolver = {
   kind: 'media',
   selector:
-    'embed[src*="flash-mp3-player.net/medias/"], object[data*="flash-mp3-player.net/medias/"]',
+    'embed[src*="flash-mp3-player.net/medias/" i], object[data*="flash-mp3-player.net/medias/" i]',
   extract: (element) => {
     const parsed = parseUrlOnHosts(readCarrierUrl(element), flashMp3PlayerHosts)
 
@@ -18,7 +18,7 @@ export const flashMp3PlayerMediaResolver: MediaResolver = {
       return
     }
 
-    const source = flashVar(element, 'mp3') ?? parsed.searchParams.get('mp3')
+    const source = flashVar(element, 'mp3') ?? getQueryParam(parsed.searchParams, 'mp3')
 
     if (!source) {
       return

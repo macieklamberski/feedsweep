@@ -7,13 +7,13 @@ const flickrHost = 'flickr.com'
 // Flickr's `iphone_wifi` route answers 404, while `360p` redirects the same item to a signed
 // mp4. The other qualities still play as written.
 const retiredRouteRegex =
-  /^(?<route>\/photos\/[^/]+\/[^/]+\/play\/)iphone_wifi(?<secret>\/[^/]+\/)$/
+  /^\/photos\/(?<owner>[^/]+)\/(?<photo>[^/]+)\/play\/iphone_wifi\/(?<secret>[^/]+)\/$/i
 
 // A WordPress `<video src>` on a Flickr photo's play route, which no longer serves the item on
 // its retired `iphone_wifi` quality.
 export const flickrMediaResolver: MediaResolver = {
   kind: 'media',
-  selector: 'video[src*="/play/iphone_wifi/"]',
+  selector: 'video[src*="/play/iphone_wifi/" i]',
   extract: (element) => {
     const url = parseUrlOnHosts(attr(element, 'src'), flickrHost)
 
@@ -21,7 +21,10 @@ export const flickrMediaResolver: MediaResolver = {
       return
     }
 
-    url.pathname = url.pathname.replace(retiredRouteRegex, '$<route>360p$<secret>')
+    url.pathname = url.pathname.replace(
+      retiredRouteRegex,
+      '/photos/$<owner>/$<photo>/play/360p/$<secret>/',
+    )
 
     return {
       tag: 'video',

@@ -111,3 +111,18 @@ describeForEachParser('the nested pair the odeo snippet usually ships', (parseHt
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('odeoMediaResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, odeoMediaResolver)
+
+  it('should read the player route in capitals', async () => {
+    const value =
+      '<embed src="http://odeo.com/FLASH/audio_player_gray.swf" flashvars="external_url=http://example.com/show/episode.mp3">'
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://example.com/show/episode.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

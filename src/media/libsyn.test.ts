@@ -172,3 +172,18 @@ describeForEachParser('the object the libsyn snippet wraps around its embed', (p
     expect(await convert(value)).toEqualHtml(value)
   })
 })
+
+describeForEachParser('libsynMediaResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, libsynMediaResolver)
+
+  it('should read the player path in capitals', async () => {
+    const value =
+      '<embed src="http://media.libsyn.com/media/themerlinshowhi/_STATIC/PLAY/PLAYER-LICENSED.SWF" flashvars="file=http://media.libsyn.com/media/themerlinshowhi/Fresh_Starts.mp3">'
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://media.libsyn.com/media/themerlinshowhi/Fresh_Starts.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

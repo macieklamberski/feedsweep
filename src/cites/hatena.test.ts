@@ -366,3 +366,31 @@ describeForEachParser('hatena cards beside the prose they sit in', (parseHtml) =
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('hatenaCiteResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, hatenaCiteResolver)
+
+  it('should read the card route in capitals', async () => {
+    const value =
+      '<iframe title="Page title" src="https://hatenablog-parts.com/EMBED?url=https%3A%2F%2Fexample.com%2Fentry"></iframe>'
+    const expected: CiteResolverResult = {
+      provider: 'hatena',
+      url: 'https://example.com/entry',
+      title: 'Page title',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `url` parameter name in capitals', async () => {
+    const value =
+      '<iframe title="Page title" class="embed-card" src="https://hatenablog-parts.com/embed?URL=https%3A%2F%2Fexample.com%2Fentry"></iframe>'
+    const expected: CiteResolverResult = {
+      provider: 'hatena',
+      url: 'https://example.com/entry',
+      title: 'Page title',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

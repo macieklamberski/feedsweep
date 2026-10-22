@@ -10,7 +10,7 @@ const libsynMediaHosts = ['media.libsyn.com']
 // was blocked. Its `file` flashvar names the episode's own audio file.
 export const libsynMediaResolver: MediaResolver = {
   kind: 'media',
-  selector: 'embed[src*="/_static/play/player-licensed.swf"]',
+  selector: 'embed[src*="/_static/play/player-licensed.swf" i]',
   extract: (element) => {
     if (!parseUrlOnHosts(readCarrierUrl(element), libsynMediaHosts)) {
       return

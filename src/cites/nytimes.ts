@@ -1,8 +1,8 @@
-import { parseUrl } from 'trousse'
+import { isAnyOf, parseUrl } from 'trousse'
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr } from '../utils/dom.js'
-import { absoluteUrlRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { absoluteUrlRegex, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 
 const cardHost = 'nytimes.com'
 const cardPath = '/svc/oembed/html/'
@@ -13,15 +13,15 @@ const articleBaseUrl = 'https://www.nytimes.com'
 // for a pasted article link, and the snippet states the headline in the iframe's title.
 export const nytimesCiteResolver: CiteResolver = {
   kind: 'cite',
-  selector: `iframe[src*="nytimes.com${cardPath}"]`,
+  selector: `iframe[src*="nytimes.com${cardPath}" i]`,
   extract: (element) => {
     const card = parseUrlOnHosts(attr(element, 'src'), cardHost)
 
-    if (card?.pathname !== cardPath) {
+    if (!card || !isAnyOf(card.pathname, cardPath)) {
       return
     }
 
-    const article = card.searchParams.get('url') || undefined
+    const article = getQueryParam(card.searchParams, 'url')
     let url = article
 
     // A bare path names a page on nytimes.com, the host of the card itself, not on the feed's host.

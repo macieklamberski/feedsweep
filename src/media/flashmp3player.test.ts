@@ -128,3 +128,29 @@ describeForEachParser('flashMp3PlayerMediaResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('flashMp3PlayerMediaResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, flashMp3PlayerMediaResolver)
+
+  it('should read the player route in capitals', async () => {
+    const value =
+      '<embed src="http://flash-mp3-player.net/MEDIAS/player_mp3_mini.swf" flashvars="mp3=http%3A//example.com/audio/track.mp3">'
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://example.com/audio/track.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `mp3` parameter name in capitals on the swf url', async () => {
+    const value =
+      '<embed src="http://flash-mp3-player.net/medias/player_mp3_multi.swf?MP3=http://example.com/audio/track.mp3">'
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://example.com/audio/track.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
