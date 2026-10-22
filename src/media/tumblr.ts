@@ -1,6 +1,6 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, parseUrl } from 'trousse'
 import type { MediaResolver } from '../types.js'
-import { audioFileRegex, getQueryParam, placeholderBaseUrl } from '../utils/urls.js'
+import { audioFileRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
 // A Tumblr audio post frames its player page, which a native <audio> cannot play. The page url

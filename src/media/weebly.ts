@@ -1,7 +1,7 @@
-import { isAnyOf } from 'trousse'
+import { getQueryParam, isAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVars } from '../utils/dom.js'
-import { audioFileRegex, getQueryParam, imageFileRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { audioFileRegex, imageFileRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
 const weeblyHost = 'weebly.com'

@@ -1,12 +1,7 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, parseUrl } from 'trousse'
 import type { MediaResolver, MediaResolverResult } from '../types.js'
 import { flashVars } from '../utils/dom.js'
-import {
-  flashFileRegex,
-  getQueryParam,
-  parseUrlOnHosts,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { flashFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
 // Weebly's own copy has a resolver of its own, later in the list.

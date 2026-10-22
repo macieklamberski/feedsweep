@@ -1,8 +1,8 @@
-import { isAnyOf, parseUrl } from 'trousse'
+import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr } from '../utils/dom.js'
-import { absoluteUrlRegex, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
+import { absoluteUrlRegex, parseUrlOnHosts } from '../utils/urls.js'
 
 const cardHost = 'nytimes.com'
 const cardPath = '/svc/oembed/html/'

@@ -1,6 +1,7 @@
+import { getQueryParam } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
 const flashMp3PlayerHosts = ['flash-mp3-player.net']
