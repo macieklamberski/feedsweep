@@ -34,8 +34,8 @@ describe('extractBlubrryEmbed', () => {
   })
 
   it('should read the episode id of a player naming no media url', () => {
-    const value = 'https://player.blubrry.com/?podcast_id=154118283&modern=1'
-    const expected: BlubrryPlayer = { kind: 'episode', id: '154118283' }
+    const value = 'https://player.blubrry.com/?podcast_id=96123983&modern=1'
+    const expected: BlubrryPlayer = { kind: 'episode', id: '96123983' }
 
     expect(extractBlubrryEmbed(value)).toEqual(expected)
   })
@@ -156,15 +156,15 @@ describeForEachParser('blubrryEmbedResolver', (parseHtml) => {
     it('should key a player naming only a podcast id by the episode', async () => {
       const value = html`
         <iframe
-          src="https://player.blubrry.com/?podcast_id=154118283&amp;modern=1"
+          src="https://player.blubrry.com?podcast_id=19453169"
           width="100%"
-          height="165"
+          height="138px"
         ></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'blubrry',
-        id: '154118283',
-        src: 'https://player.blubrry.com/id/154118283/',
+        id: '19453169',
+        src: 'https://player.blubrry.com/id/19453169/',
         height: 164,
       }
 
