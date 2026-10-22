@@ -353,6 +353,25 @@ describeForEachParser('blubrryPowerpressEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should read the player of a video frame the feed escaped twice', async () => {
+      const value = html`
+        <iframe
+          width="825"
+          height="825"
+          src="https://grrotary.org/?powerpress_embed=61144-podcast&amp;amp;powerpress_player=html5video"
+          title="Blubrry Podcast Player"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'grrotary.org/61144-podcast',
+        src: 'https://grrotary.org/?powerpress_embed=61144-podcast&powerpress_player=html5video',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should state the audio height for a frame naming no player', async () => {
       const value = '<iframe src="https://example.com/?powerpress_embed=3443-podcast"></iframe>'
       const expected: EmbedResolverResult = {
