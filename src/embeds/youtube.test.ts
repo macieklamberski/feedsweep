@@ -1219,6 +1219,18 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should keep the player and drop the url for an AMP live channel that is a dot segment', async () => {
+      const value = '<amp-youtube data-live-channelid=".."></amp-youtube>'
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'channel/..',
+        src: 'https://www.youtube.com/embed/live_stream?channel=..',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('the channel-live variant', () => {

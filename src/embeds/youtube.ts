@@ -4,6 +4,7 @@ import { attr } from '../utils/dom.js'
 import {
   composeQuery,
   encodePathSegment,
+  isDotSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -361,7 +362,12 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
     if (!videoId) {
       const channel = attr(element, 'data-live-channelid')
 
-      return channel ? composeChannelEmbed(channel, channel) : undefined
+      if (!channel) {
+        return
+      }
+
+      // A dot segment drops the url. Any other value goes into it as written.
+      return composeChannelEmbed(channel, isDotSegment(channel) ? undefined : channel)
     }
 
     // `videoseries` and `live_stream` are route words that sit where a video id does.

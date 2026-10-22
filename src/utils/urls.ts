@@ -216,12 +216,16 @@ export const pickQueryParams = (
 
 const dotSegments = ['.', '..']
 
+// A whole `.` or `..` is a dot segment the url parser resolves away.
+export const isDotSegment = (value: string): boolean => {
+  return dotSegments.includes(value)
+}
+
 // A decoded value written into a url path stays one segment. Only the characters that would open
 // a new segment, a query or a fragment, a literal `%` and whitespace are escaped, so an `@`, `=` or
-// `:` the value holds reads as written. A whole `.` or `..` is a dot segment the url parser
-// resolves away, so it is refused.
+// `:` the value holds reads as written. A dot segment is refused.
 export const encodePathSegment = (value: string): string | undefined => {
-  if (dotSegments.includes(value)) {
+  if (isDotSegment(value)) {
     return
   }
 
