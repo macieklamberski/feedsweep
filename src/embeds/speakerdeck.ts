@@ -1,13 +1,7 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import {
-  composeQuery,
-  getQueryParam,
-  isFileName,
-  parseUrlOnHosts,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { composeQuery, isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'speakerdeck'

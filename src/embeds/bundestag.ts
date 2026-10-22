@@ -1,7 +1,7 @@
-import { getPathSegments, toMap } from 'trousse'
+import { getPathSegments, getQueryParam, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const bundestagHosts = ['webtv.bundestag.de']

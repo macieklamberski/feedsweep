@@ -1,12 +1,7 @@
-import { parseUrl, trimObject } from 'trousse'
+import { getQueryParam, parseUrl, trimObject } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
-import {
-  composeQuery,
-  encodePathSegment,
-  getQueryParam,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const viewerRatio = '300/194'

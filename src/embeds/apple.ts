@@ -1,9 +1,15 @@
-import { getPathSegments, isHostOrSubdomainOf, type Nullish, parseUrl, toMap } from 'trousse'
+import {
+  getPathSegments,
+  getQueryParam,
+  isHostOrSubdomainOf,
+  type Nullish,
+  parseUrl,
+  toMap,
+} from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
 import {
   encodePathSegment,
-  getQueryParam,
   parseUrlOnHosts,
   pickUrlParams,
   placeholderBaseUrl,

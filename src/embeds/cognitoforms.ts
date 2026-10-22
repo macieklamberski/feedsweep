@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
-import { getQueryParam, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cognitoforms'

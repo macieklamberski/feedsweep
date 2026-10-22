@@ -1,10 +1,9 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import {
   composeQuery,
   digitsRegex,
-  getQueryParam,
   isFileName,
   pickQueryParams,
   placeholderBaseUrl,

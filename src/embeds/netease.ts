@@ -1,6 +1,6 @@
-import { toMap } from 'trousse'
+import { getQueryParam, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'netease'

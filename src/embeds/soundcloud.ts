@@ -1,7 +1,14 @@
-import { getPathSegments, isAnyOf, type Nullish, parseUrl, trimObject } from 'trousse'
+import {
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  type Nullish,
+  parseUrl,
+  trimObject,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, text } from '../utils/dom.js'
-import { getQueryParam, isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'soundcloud'

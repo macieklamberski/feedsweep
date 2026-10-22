@@ -1,6 +1,6 @@
-import { getAnyOf, getPathSegments, isAnyOf } from 'trousse'
+import { getAnyOf, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { filterUrlQuery, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
+import { filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'reverbnation'

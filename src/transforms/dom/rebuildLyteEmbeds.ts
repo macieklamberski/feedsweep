@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import { composeEmbedUrl, extractVideoId, isVideoId } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import {
@@ -9,7 +9,7 @@ import {
   isText,
   isWhitespaceText,
 } from '../../utils/dom.js'
-import { getQueryParam, parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 // In a feed the plugin writes no facade. It writes the thumbnail linked to the post, with

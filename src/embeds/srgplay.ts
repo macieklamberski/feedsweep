@@ -1,6 +1,6 @@
-import { isHostOrSubdomainOf, toMap } from 'trousse'
+import { getQueryParam, isHostOrSubdomainOf, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, getQueryParam, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'srgplay'

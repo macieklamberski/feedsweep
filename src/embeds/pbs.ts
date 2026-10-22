@@ -1,10 +1,9 @@
-import { getPathSegments, isAnyOf, isHostOf, type Nullish, toMap } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, isHostOf, type Nullish, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
 import {
   absoluteUrlRegex,
   encodePathSegment,
-  getQueryParam,
   parseUrlOnHosts,
   pickUrlParams,
 } from '../utils/urls.js'

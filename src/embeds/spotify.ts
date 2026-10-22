@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, isPlainObject, toMap } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, isPlainObject, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
-import { getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The player is fluid-width and fixed-height: a compact bar for a single item, a taller box for

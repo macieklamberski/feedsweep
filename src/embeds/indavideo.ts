@@ -1,7 +1,7 @@
-import { isAnyOf } from 'trousse'
+import { getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'indavideo'

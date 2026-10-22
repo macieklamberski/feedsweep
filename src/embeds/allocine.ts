@@ -1,6 +1,6 @@
-import { isHostOf } from 'trousse'
+import { getQueryParam, isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { encodePathSegment, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'allocine'

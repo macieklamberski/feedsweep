@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { getQueryParam, parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'videopress'

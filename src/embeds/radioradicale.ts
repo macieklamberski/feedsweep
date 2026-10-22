@@ -1,6 +1,6 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { getQueryParam, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'radioradicale'

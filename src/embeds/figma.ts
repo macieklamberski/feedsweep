@@ -1,9 +1,8 @@
-import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import {
   alphanumericRegex,
   composeQuery,
-  getQueryParam,
   pickQueryParams,
   placeholderBaseUrl,
 } from '../utils/urls.js'

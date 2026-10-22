@@ -2,6 +2,7 @@ import {
   audioExtensions,
   documentExtensions,
   flashExtensions,
+  getQueryParam,
   imageExtensions,
   isAnyOf,
   isHostOrSubdomainOf,
@@ -192,32 +193,6 @@ export const parseUrlOnHosts = (
   if (parsed && isHostOrSubdomainOf(parsed, hosts)) {
     return parsed
   }
-}
-
-// Every value of a query parameter, its name read in any case: `?V=` names `v`.
-export const getQueryParams = (
-  params: URLSearchParams | undefined,
-  name: string,
-): Array<string> => {
-  const folded = name.toLowerCase()
-  const values: Array<string> = []
-
-  for (const [key, value] of params ?? []) {
-    if (key.toLowerCase() === folded) {
-      values.push(value)
-    }
-  }
-
-  return values
-}
-
-// The first value of a query parameter, its name read in any case, as `URLSearchParams.get` reads
-// it in exact case.
-export const getQueryParam = (
-  params: URLSearchParams | undefined,
-  name: string,
-): string | undefined => {
-  return getQueryParams(params, name)[0]
 }
 
 // The same pick as `pickUrlParams`, for a query that arrives on its own, not on a url, which is

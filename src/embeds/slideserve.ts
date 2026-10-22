@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { getQueryParam, placeholderBaseUrl } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'slideserve'

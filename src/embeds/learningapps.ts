@@ -1,6 +1,6 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, digitsRegex, getQueryParam } from '../utils/urls.js'
+import { composeQuery, digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const learningappsHosts = ['learningapps.org']

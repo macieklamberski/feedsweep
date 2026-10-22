@@ -1,5 +1,6 @@
 import {
   coerceNumber,
+  getQueryParam,
   isAnyOf,
   isHostOrSubdomainOf,
   type Nullish,
@@ -9,7 +10,7 @@ import {
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, flashVar, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { composeQuery, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,

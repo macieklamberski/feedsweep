@@ -1,16 +1,17 @@
-import { decodeSegment, getPathSegments, isAnyOf, parseUrl, trimObject } from 'trousse'
+import {
+  decodeSegment,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  parseUrl,
+  trimObject,
+} from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 
 const provider = 'issuu'
 
 import { attr, flashVars } from '../utils/dom.js'
-import {
-  composeQuery,
-  encodePathSegment,
-  getQueryParam,
-  isFileName,
-  parseUrlOnHosts,
-} from '../utils/urls.js'
+import { composeQuery, encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const issuuHosts = ['issuu.com']

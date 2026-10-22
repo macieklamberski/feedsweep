@@ -1,12 +1,6 @@
-import { isAnyOf, parseUrl } from 'trousse'
+import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import {
-  composeQuery,
-  encodePathSegment,
-  getQueryParam,
-  pickQueryParams,
-  pickUrlParams,
-} from '../utils/urls.js'
+import { composeQuery, encodePathSegment, pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
 

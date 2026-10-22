@@ -1,8 +1,8 @@
-import { isAnyOf, parseUrl } from 'trousse'
+import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
-import { getQueryParam, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = '123formbuilder'

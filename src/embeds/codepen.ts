@@ -1,11 +1,10 @@
-import { getPathSegments, isAnyOf, isHostOf, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import {
   alphanumericRegex,
   composeQuery,
   encodePathSegment,
-  getQueryParam,
   isFileName,
   placeholderBaseUrl,
   uuidRegex,

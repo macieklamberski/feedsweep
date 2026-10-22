@@ -1,10 +1,10 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 const provider = 'blubrry'
 
-import { getQueryParam, placeholderBaseUrl } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // PowerPress, Blubrry's WordPress plugin, renders the same player on the publisher's own domain

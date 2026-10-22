@@ -6,8 +6,6 @@ import {
   dropUrlParams,
   encodePathSegment,
   filterUrlQuery,
-  getQueryParam,
-  getQueryParams,
   isMediaWikiFilePage,
   parseUrlOnHosts,
   pickQueryParams,
@@ -181,56 +179,6 @@ describe('cleanUrl', () => {
 
     expect(cleanUrl(undefined, { ...baseContext, cleanUrlFn })).toBeUndefined()
     expect(called).toBe(false)
-  })
-})
-
-describe('getQueryParam', () => {
-  it('should read a parameter by its name', () => {
-    const value = new URLSearchParams('v=dQw4w9WgXcQ')
-
-    expect(getQueryParam(value, 'v')).toBe('dQw4w9WgXcQ')
-  })
-
-  it('should read a parameter named in another case', () => {
-    const value = new URLSearchParams('V=dQw4w9WgXcQ')
-
-    expect(getQueryParam(value, 'v')).toBe('dQw4w9WgXcQ')
-  })
-
-  it('should read a camel-case name written in lowercase', () => {
-    const value = new URLSearchParams('videoid=6331')
-
-    expect(getQueryParam(value, 'videoId')).toBe('6331')
-  })
-
-  it('should take the first of a repeated parameter across cases', () => {
-    const value = new URLSearchParams('ID=10&id=90')
-
-    expect(getQueryParam(value, 'id')).toBe('10')
-  })
-
-  it('should read an empty value', () => {
-    const value = new URLSearchParams('live')
-
-    expect(getQueryParam(value, 'live')).toBe('')
-  })
-
-  it('should return undefined for a missing parameter', () => {
-    const value = new URLSearchParams('v=dQw4w9WgXcQ')
-
-    expect(getQueryParam(value, 'list')).toBeUndefined()
-  })
-
-  it('should return undefined for missing params', () => {
-    expect(getQueryParam(undefined, 'v')).toBeUndefined()
-  })
-})
-
-describe('getQueryParams', () => {
-  it('should read every value of a parameter in any case, in the order written', () => {
-    const value = new URLSearchParams('list[]=a&LIST[]=b&other=c')
-
-    expect(getQueryParams(value, 'list[]')).toEqual(['a', 'b'])
   })
 })
 

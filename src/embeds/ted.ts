@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVars } from '../utils/dom.js'
-import { encodePathSegment, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ted'

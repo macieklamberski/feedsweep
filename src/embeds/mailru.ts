@@ -1,8 +1,8 @@
-import { isHostOrSubdomainOf, parseUrl } from 'trousse'
+import { getQueryParam, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
-import { getQueryParam, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mailru'
