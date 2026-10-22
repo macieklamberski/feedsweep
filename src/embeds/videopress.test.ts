@@ -257,7 +257,7 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use a malformed flashvars guid as written over the src guid, even if the player answers an error', async () => {
+    it('should keep a flashvars guid holding a slash inside one path segment over the src guid', async () => {
       const value = html`
         <embed
           src="http://s0.videopress.com/player.swf?guid=kUJmAcSf&v=1"
@@ -266,13 +266,24 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'videopress',
-        id: '../etc',
-        src: 'https://video.wordpress.com/embed/../etc',
-        url: 'https://videopress.com/v/../etc',
+        id: '..%2Fetc',
+        src: 'https://video.wordpress.com/embed/..%2Fetc',
+        url: 'https://videopress.com/v/..%2Fetc',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should return undefined for a flashvars guid that is a dot segment', async () => {
+      const value = html`
+        <embed
+          src="http://s0.videopress.com/player.swf?v=1"
+          flashvars="guid=..&isDynamicSeeking=false"
+        ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
 
     it('should read the flashvars guid when the src names a different one', async () => {

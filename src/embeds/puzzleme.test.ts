@@ -242,6 +242,19 @@ describeForEachParser('puzzlemeWidgetEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore a mount whose puzzle type is a dot segment', async () => {
+      const value = html`
+        <div
+          class="pm-embed-div"
+          data-id="54602d16"
+          data-puzzletype=".."
+          data-set="example"
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
 

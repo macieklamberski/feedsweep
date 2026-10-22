@@ -169,13 +169,19 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should use a malformed claim as written, even if the player answers an error', async () => {
+    it('should ignore a decoded claim that is a dot segment', async () => {
       const value = '<iframe src="https://odysee.com/%24%2Fembed%2F.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should keep a decoded claim holding a percent sign inside one path segment', async () => {
+      const value = '<iframe src="https://odysee.com/%24%2Fembed%2Fwebb%2520talk%3A7"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'odysee',
-        id: '..',
-        src: 'https://odysee.com/$/embed/..',
-        url: 'https://odysee.com/..',
+        id: 'webb%2520talk:7',
+        src: 'https://odysee.com/$/embed/webb%2520talk:7',
+        url: 'https://odysee.com/webb%2520talk:7',
         ratio: '16/9',
       }
 

@@ -167,6 +167,28 @@ describeForEachParser('flourishWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should ignore a div whose widget id is a dot segment', async () => {
+      const value = html`
+        <div
+          class="flourish-embed"
+          data-src="visualisation/.."
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a div whose widget kind is a dot segment', async () => {
+      const value = html`
+        <div
+          class="flourish-embed"
+          data-src="../3677950"
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should omit the thumbnail when the div wraps no img', async () => {
       const value = html`
         <div

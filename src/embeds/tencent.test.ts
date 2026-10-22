@@ -129,15 +129,27 @@ describeForEachParser('tencentEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use a malformed id as written, even if the player answers an error', async () => {
+    it('should keep an id holding a slash inside one page and poster path segment', async () => {
       const value =
         '<iframe src="https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%2Fx"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'tencent',
         id: 'v03604lrvan/x',
         src: 'https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan/x',
-        url: 'https://v.qq.com/x/page/v03604lrvan/x.html',
-        thumbnail: 'https://puui.qpic.cn/qqvideo_ori/0/v03604lrvan/x_496_280/0',
+        url: 'https://v.qq.com/x/page/v03604lrvan%2Fx.html',
+        thumbnail: 'https://puui.qpic.cn/qqvideo_ori/0/v03604lrvan%2Fx_496_280/0',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the player and drop the page and poster for an id that is a dot segment', async () => {
+      const value = '<iframe src="https://v.qq.com/txp/iframe/player.html?vid=.."></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'tencent',
+        id: '..',
+        src: 'https://v.qq.com/txp/iframe/player.html?vid=..',
         ratio: '16/9',
       }
 

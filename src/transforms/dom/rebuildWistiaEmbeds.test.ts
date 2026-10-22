@@ -129,12 +129,24 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should use a malformed media id as written, even if the player answers an error', async () => {
+  it('should keep a media id holding percent signs inside one path segment', async () => {
     const value = '<wistia-player media-id="u3gz5bka6b%2F..%2Fchannel"></wistia-player>'
     const expected =
-      '<iframe src="https://fast.wistia.net/embed/iframe/u3gz5bka6b%2F..%2Fchannel"></iframe>'
+      '<iframe src="https://fast.wistia.net/embed/iframe/u3gz5bka6b%252F..%252Fchannel"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a custom element whose media id is a dot segment untouched', async () => {
+    const value = '<wistia-player media-id=".."></wistia-player>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a facade whose async id is a dot segment untouched', async () => {
+    const value = '<div class="wistia_embed wistia_async_.."></div>'
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 
   it('should rebuild an iframe from a lone loader script', async () => {

@@ -341,6 +341,17 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore an open link whose file id is a dot segment', async () => {
+      const value = html`
+        <iframe
+          src="https://drive.google.com/open?id=.."
+          type="audio/mpeg"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore an open link with no file id', async () => {
       const value = html`
         <iframe

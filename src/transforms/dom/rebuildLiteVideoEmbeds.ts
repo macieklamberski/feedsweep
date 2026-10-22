@@ -2,7 +2,7 @@ import { toMap } from 'trousse'
 import { composeEmbedUrl as composeVimeoUrl } from '../../embeds/vimeo.js'
 import { composeEmbedUrl as composeYoutubeUrl, youtubeEmbedParams } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
-import { pickQueryParams } from '../../utils/urls.js'
+import { encodePathSegment, pickQueryParams } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 type EmbedSource = {
@@ -30,9 +30,11 @@ const escapedQuotesRegex = /^\\"(.*)\\"$/
 export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll('lite-youtube[videoid], lite-vimeo[videoid]')) {
     const source = embedSources.get(element.localName)
-    const videoId = element.getAttribute('videoid')?.replace(escapedQuotesRegex, '$1')
+    const videoId = element.getAttribute('videoid')?.replace(escapedQuotesRegex, '$1') ?? ''
+    // The id comes out of its attribute decoded, and it goes into a path.
+    const segment = encodePathSegment(videoId)
 
-    if (!source || !videoId) {
+    if (!source || !segment) {
       continue
     }
 
@@ -45,7 +47,7 @@ export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
       params.start = start
     }
 
-    const iframe = createIframe(document, source.compose(videoId, params))
+    const iframe = createIframe(document, source.compose(segment, params))
 
     const videoTitle = element.getAttribute('videotitle')
     if (videoTitle) {

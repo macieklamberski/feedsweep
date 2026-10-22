@@ -58,8 +58,10 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
 
   // Sanitizers empty or strip `data-video-id` while leaving the cite or a caption link intact.
   const videoId = declared ?? cited.videoId ?? linked.videoId
+  // The declared id comes out of its attribute decoded, and it goes into a path.
+  const segment = videoId ? encodePathSegment(videoId) : undefined
 
-  if (!videoId) {
+  if (!segment) {
     return
   }
 
@@ -72,18 +74,20 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
     return Boolean(value && value !== author && !value.startsWith('♬'))
   })
 
-  const handle = cited.handle ?? linked.handle ?? author?.slice(1)
+  // A handle read from a path is already a segment. The byline's comes out of its text decoded.
+  const bylineHandle = author ? encodePathSegment(author.slice(1)) : undefined
+  const handle = cited.handle ?? linked.handle ?? bylineHandle
 
   // The watch page is the path the id already spells, so it is mintable from the same two halves
   // wherever a handle survives: a blockquote whose only source is a body anchor names both. The
   // cite comes first where it still names the clip, since that is the url the publisher wrote.
-  const watchPath = handle ? `@${handle}/video/${videoId}` : undefined
+  const watchPath = handle ? `@${handle}/video/${segment}` : undefined
 
   return {
     provider: 'tiktok',
     // TikTok's oEmbed endpoint takes the watch url, which needs the handle beside the video id.
     id: watchPath ?? videoId,
-    src: `https://www.tiktok.com/embed/v2/${videoId}`,
+    src: `https://www.tiktok.com/embed/v2/${segment}`,
     // A sanitized cite is truncated to the bare host, which links nothing worth keeping.
     url: cited.videoId ? cite : watchPath && `https://www.tiktok.com/${watchPath}`,
     description: text(caption),
@@ -96,13 +100,13 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
 const profilePathRegex = /^\/@([^/]+)\/?$/
 
 // The account a blockquote names, from `data-unique-id` where the creator widget declares it,
-// otherwise from the profile anchor. The half-encoded shape keeps no data attributes at all,
-// so that anchor is the only place the account survives.
-const readHandle = (element: Element): string | undefined => {
+// otherwise from the profile anchor, the only source the half-encoded shape keeps. The attribute
+// comes out decoded, and the anchor's path is already a segment.
+const readHandle = (element: Element): { handle: string; segment?: string } | undefined => {
   const declared = attr(element, 'data-unique-id')
 
   if (declared) {
-    return declared
+    return { handle: declared, segment: encodePathSegment(declared) }
   }
 
   for (const anchor of element.querySelectorAll('a[href]')) {
@@ -112,16 +116,16 @@ const readHandle = (element: Element): string | undefined => {
       const handle = parsed.pathname.match(profilePathRegex)?.[1]
 
       if (handle) {
-        return handle
+        return { handle, segment: handle }
       }
     }
   }
 }
 
 const resolveAccount = (element: Element): EmbedResolverResult | undefined => {
-  const handle = readHandle(element)
+  const { handle, segment } = readHandle(element) ?? {}
 
-  if (!handle) {
+  if (!handle || !segment) {
     return
   }
 
@@ -131,8 +135,8 @@ const resolveAccount = (element: Element): EmbedResolverResult | undefined => {
   return {
     provider: 'tiktok',
     id: atUsername(handle),
-    src: `https://www.tiktok.com/embed/@${handle}`,
-    url: isCitedProfile ? cite : `https://www.tiktok.com/@${handle}`,
+    src: `https://www.tiktok.com/embed/@${segment}`,
+    url: isCitedProfile ? cite : `https://www.tiktok.com/@${segment}`,
     height: profileHeight,
     description: textNode(element),
     author: atUsername(handle),
@@ -193,18 +197,20 @@ export const tiktokMetasliderEmbedResolver = createMarkupEmbedResolver(
   'li.ms-tiktok div.tiktok[data-video-id]',
   (element) => {
     const videoId = attr(element, 'data-video-id')
+    // The id comes out of its attribute decoded, and it goes into a path.
+    const segment = videoId ? encodePathSegment(videoId) : undefined
 
-    if (!videoId) {
+    if (!videoId || !segment) {
       return
     }
 
     const { handle } = readWatchUrl(attr(element, 'data-cite'))
-    const watchPath = handle ? `@${handle}/video/${videoId}` : undefined
+    const watchPath = handle ? `@${handle}/video/${segment}` : undefined
 
     return {
       provider: 'tiktok',
       id: watchPath ?? videoId,
-      src: `https://www.tiktok.com/embed/v2/${videoId}`,
+      src: `https://www.tiktok.com/embed/v2/${segment}`,
       url: watchPath ? `https://www.tiktok.com/${watchPath}` : undefined,
       thumbnail: attr(element.querySelector('img.msDefaultImage'), 'src'),
       height: playerHeight,

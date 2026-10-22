@@ -159,6 +159,12 @@ describeForEachParser('rebuildPiktochartEmbeds', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should leave a snippet whose uid is a dot segment alone', async () => {
+      const value = '<div class="piktowrapper-embed" data-uid=".."></div>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should leave a snippet with a blank uid alone', async () => {
       const value = '<div class="piktowrapper-embed" data-uid=""></div>'
 

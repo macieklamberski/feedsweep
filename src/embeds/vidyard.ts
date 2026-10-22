@@ -1,7 +1,12 @@
 import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { alphanumericRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  alphanumericRegex,
+  encodePathSegment,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'vidyard'
@@ -48,7 +53,8 @@ export const vidyardIframeEmbedResolver = createUrlEmbedResolver(vidyardHosts, v
 export const vidyardImageEmbedResolver = createMarkupEmbedResolver(
   'img.vidyard-player-embed[data-uuid]',
   (element) => {
-    const uuid = attr(element, 'data-uuid')
+    // The uuid comes out of its attribute decoded, and it goes into a path.
+    const uuid = encodePathSegment(attr(element, 'data-uuid') ?? '')
 
     if (!uuid) {
       return

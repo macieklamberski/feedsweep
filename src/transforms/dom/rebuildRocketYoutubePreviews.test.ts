@@ -79,6 +79,17 @@ describeForEachParser('rebuildRocketYoutubePreviews', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should leave the element untouched when its data-id is a dot segment', async () => {
+    const value = html`
+      <div
+        class="rll-youtube-player"
+        data-id=".."
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should leave the element untouched when it states no video at all', async () => {
     const value = html`
       <div class="rll-youtube-player" data-query="feature=oembed"></div>

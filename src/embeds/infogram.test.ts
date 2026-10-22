@@ -100,7 +100,7 @@ describeForEachParser('infogramWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should use a malformed chart id as written, even if the player answers an error', async () => {
+    it('should keep a chart id holding a slash inside one path segment', async () => {
       const value = html`
         <div
           class="infogram-embed"
@@ -110,8 +110,8 @@ describeForEachParser('infogramWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'infogram',
         id: '../other',
-        src: 'https://e.infogram.com/../other?src=embed',
-        url: 'https://infogram.com/../other',
+        src: 'https://e.infogram.com/..%2Fother?src=embed',
+        url: 'https://infogram.com/..%2Fother',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -265,7 +265,7 @@ describeForEachParser('infogramScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should use a malformed chart id as written, even if the player answers an error', async () => {
+    it('should keep a chart id holding a slash inside one path segment', async () => {
       const value = html`
         <script
           id="infogram_0_abc/def"
@@ -275,8 +275,8 @@ describeForEachParser('infogramScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'infogram',
         id: 'abc/def',
-        src: 'https://e.infogram.com/abc/def?src=embed',
-        url: 'https://infogram.com/abc/def',
+        src: 'https://e.infogram.com/abc%2Fdef?src=embed',
+        url: 'https://infogram.com/abc%2Fdef',
       }
 
       expect(await extract(value)).toEqual(expected)

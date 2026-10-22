@@ -95,6 +95,12 @@ describe('cognitoformsResolveEmbed', () => {
 
       expect(cognitoformsResolveEmbed(value)).toBeUndefined()
     })
+
+    it('should ignore an older embed whose query form number is a dot segment', () => {
+      const value = 'https://services.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA?id=..'
+
+      expect(cognitoformsResolveEmbed(value)).toBeUndefined()
+    })
   })
 })
 
@@ -189,6 +195,30 @@ describeForEachParser('cognitoformsScriptEmbedResolver', (parseHtml) => {
           src="https://www.cognitoforms.com/f/seamless.js"
           data-key="IW7SzJYLPEa96K8jyNcDaw"
           data-form=""
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an organisation key that is a dot segment', async () => {
+      const value = html`
+        <script
+          src="https://www.cognitoforms.com/f/seamless.js"
+          data-key=".."
+          data-form="346"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a form number that is a dot segment', async () => {
+      const value = html`
+        <script
+          src="https://www.cognitoforms.com/f/seamless.js"
+          data-key="IW7SzJYLPEa96K8jyNcDaw"
+          data-form=".."
         ></script>
       `
 
@@ -369,6 +399,17 @@ Cognito.load("forms", { id: "41" });
       const value = html`
         <div class="cognito">
           <script src="https://services.cognitoforms.com/s/Lt1_lEG75k-lbJUheZ0tSg"></script>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a load call whose form number is a dot segment', async () => {
+      const value = html`
+        <div class="cognito">
+          <script src="https://services.cognitoforms.com/s/Lt1_lEG75k-lbJUheZ0tSg"></script>
+          <script>Cognito.load("forms", { id: ".." });</script>
         </div>
       `
 

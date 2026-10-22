@@ -97,6 +97,12 @@ describe('indavideoResolveEmbed', () => {
       expect(indavideoResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should ignore a Flash player whose vID is a dot segment', () => {
+      const value = 'http://files.indavideo.hu/player/vc_o.swf?vID=..'
+
+      expect(indavideoResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore a swf that is not one of the video players', () => {
       const value = 'http://files.indavideo.hu/player/other.swf?vID=06aceb75c8'
 

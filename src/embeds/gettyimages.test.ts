@@ -67,6 +67,23 @@ describe('readWidgetConfig', () => {
 
       expect(readWidgetConfig(value)).toEqual(expected)
     })
+
+    it('should keep an item id holding a slash inside one path segment', () => {
+      const value = `gie.widgets.load({id:'abc',sig:'def=',items:'../491183014'})`
+      const expected = {
+        items: '..%2F491183014',
+        et: 'abc',
+        sig: 'def=',
+      }
+
+      expect(readWidgetConfig(value)).toEqual(expected)
+    })
+
+    it('should refuse a config whose item id is a dot segment', () => {
+      const value = `gie.widgets.load({id:'abc',sig:'def=',items:'..'})`
+
+      expect(readWidgetConfig(value)).toBeUndefined()
+    })
   })
 })
 

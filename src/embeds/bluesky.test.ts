@@ -576,7 +576,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use a malformed authority as written, even if the player answers an error', async () => {
+    it('should keep an authority holding spaces inside one path segment', async () => {
       const value = html`
         <blockquote
           class="bluesky-embed"
@@ -587,16 +587,16 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'bluesky',
-        id: 'not an authority/3lzq7aeuwbg42',
-        src: 'https://embed.bsky.app/embed/not an authority/app.bsky.feed.post/3lzq7aeuwbg42',
-        url: 'https://bsky.app/profile/not an authority/post/3lzq7aeuwbg42',
+        id: 'not%20an%20authority/3lzq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/not%20an%20authority/app.bsky.feed.post/3lzq7aeuwbg42',
+        url: 'https://bsky.app/profile/not%20an%20authority/post/3lzq7aeuwbg42',
         description: 'Nothing addressable here.',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed record key as written, even if the player answers an error', async () => {
+    it('should return nothing for a record key that is a dot segment', async () => {
       const value = html`
         <blockquote
           class="bluesky-embed"
@@ -605,15 +605,21 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
           <p lang="en">The record key would climb out of the collection.</p>
         </blockquote>
       `
-      const expected: EmbedResolverResult = {
-        provider: 'bluesky',
-        id: 'did:plc:9hz4agnyzcrsvpnprxrbjrpa/..',
-        src: 'https://embed.bsky.app/embed/did:plc:9hz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/..',
-        url: 'https://bsky.app/profile/did:plc:9hz4agnyzcrsvpnprxrbjrpa/post/..',
-        description: 'The record key would climb out of the collection.',
-      }
 
-      expect(await extract(value)).toEqual(expected)
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return nothing for an authority that is a dot segment', async () => {
+      const value = html`
+        <blockquote
+          class="bluesky-embed"
+          data-bluesky-uri="at://../app.bsky.feed.post/3lzq7aeuwbg42"
+        >
+          <p lang="en">The authority would climb out of the player route.</p>
+        </blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
 
     it('should return nothing for a blockquote naming no post at all', async () => {

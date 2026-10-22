@@ -181,6 +181,18 @@ describeForEachParser('telegramScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined for a channel that is a dot segment', async () => {
+      const value = '<script data-telegram-post="../111424"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a message id that is a dot segment', async () => {
+      const value = '<script data-telegram-post="tochkapress/.."></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined for an empty attribute', async () => {
       const value = '<script data-telegram-post=""></script>'
 

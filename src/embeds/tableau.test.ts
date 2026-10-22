@@ -295,6 +295,28 @@ describeForEachParser('tableauObjectEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore a name whose workbook is a dot segment', async () => {
+      const value = html`
+        <object class="tableauViz">
+          <param name="host_url" value="https%3A%2F%2Fpublic.tableau.com%2F" />
+          <param name="name" value="../FTEDash" />
+        </object>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a name whose sheet is a dot segment', async () => {
+      const value = html`
+        <object class="tableauViz">
+          <param name="host_url" value="https%3A%2F%2Fpublic.tableau.com%2F" />
+          <param name="name" value="BillsData2025/.." />
+        </object>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
 
@@ -463,6 +485,13 @@ describeForEachParser('tableauIframeEmbedResolver', (parseHtml) => {
     it('should ignore a profile path with a trailing segment', async () => {
       const value =
         '<iframe src="https://public.tableau.com/profile/vizimpact/x#!/vizhome/HackerTeamClients-locationstatus/Sheet1"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a vizhome hash whose sheet is a dot segment', async () => {
+      const value =
+        '<iframe src="https://public.tableau.com/profile/vizimpact#!/vizhome/HackerTeamClients-locationstatus/.."></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

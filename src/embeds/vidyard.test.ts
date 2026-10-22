@@ -205,7 +205,7 @@ describeForEachParser('vidyardImageEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use a malformed uuid as written, even if the player answers an error', async () => {
+    it('should keep a uuid holding slashes inside one path segment', async () => {
       const value = html`
         <img
           class="vidyard-player-embed"
@@ -214,14 +214,20 @@ describeForEachParser('vidyardImageEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'vidyard',
-        id: '../../stolen',
-        src: 'https://play.vidyard.com/../../stolen.html',
-        url: 'https://share.vidyard.com/watch/../../stolen',
-        thumbnail: 'https://play.vidyard.com/../../stolen.jpg',
+        id: '..%2F..%2Fstolen',
+        src: 'https://play.vidyard.com/..%2F..%2Fstolen.html',
+        url: 'https://share.vidyard.com/watch/..%2F..%2Fstolen',
+        thumbnail: 'https://play.vidyard.com/..%2F..%2Fstolen.jpg',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore a uuid that is a dot segment', async () => {
+      const value = '<img class="vidyard-player-embed" data-uuid="..">'
+
+      expect(await extract(value)).toBeUndefined()
     })
   })
 

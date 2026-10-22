@@ -11,7 +11,7 @@ import {
 } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Item = {
@@ -71,8 +71,11 @@ const composeItem = (id: string, src: string): Item => {
 }
 
 const readDashboardId = (url: URL): string | undefined => {
+  // The parser resolves no dot segment in a fragment, and the id goes into a path.
   if (isAnyOf(url.pathname, dashboardShellPaths)) {
-    return url.hash.match(dashboardFragmentRegex)?.[1]
+    const fragmentId = url.hash.match(dashboardFragmentRegex)?.[1]
+
+    return fragmentId ? encodePathSegment(fragmentId) : undefined
   }
 
   return url.pathname.match(dashboardPathRegex)?.[1]

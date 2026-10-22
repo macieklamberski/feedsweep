@@ -1,6 +1,7 @@
 import { decodeSegment } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { findConfigScript } from '../utils/dom.js'
+import { encodePathSegment } from '../utils/urls.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brid'
@@ -20,8 +21,9 @@ export const bridEmbedResolver = createMarkupEmbedResolver('div.brid[id^="Brid_"
   const text = script?.textContent ?? ''
   // Read after the div's own id, so a script holding several configs yields the right one.
   const config = text.slice(text.indexOf(element.id))
-  const playerId = config.match(playerIdRegex)?.[1]
-  const videoId = config.match(videoIdRegex)?.[1]
+  // Both go from the script into a path.
+  const playerId = encodePathSegment(config.match(playerIdRegex)?.[1] ?? '')
+  const videoId = encodePathSegment(config.match(videoIdRegex)?.[1] ?? '')
 
   if (!playerId || !videoId) {
     return

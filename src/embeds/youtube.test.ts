@@ -1206,27 +1206,33 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use a malformed videoid as written, even if the player answers an error', async () => {
+    it('should keep a videoid holding slashes inside one path segment', async () => {
       const value = '<amp-youtube data-videoid="../../evil"></amp-youtube>'
       const expected: EmbedResolverResult = {
         provider: 'youtube',
         id: '../../evil',
-        src: 'https://www.youtube.com/embed/../../evil',
+        src: 'https://www.youtube.com/embed/..%2F..%2Fevil',
         url: 'https://www.youtube.com/watch?v=../../evil',
-        thumbnail: 'https://i.ytimg.com/vi/../../evil/hqdefault.jpg',
+        thumbnail: 'https://i.ytimg.com/vi/..%2F..%2Fevil/hqdefault.jpg',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed live channel id as written, even if the player answers an error', async () => {
+    it('should return undefined for a videoid that is a dot segment', async () => {
+      const value = '<amp-youtube data-videoid=".."></amp-youtube>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should keep a live channel id holding slashes inside one path segment', async () => {
       const value = '<amp-youtube data-live-channelid="../../evil"></amp-youtube>'
       const expected: EmbedResolverResult = {
         provider: 'youtube',
         id: 'channel/../../evil',
         src: 'https://www.youtube.com/embed/live_stream?channel=../../evil',
-        url: 'https://www.youtube.com/channel/../../evil',
+        url: 'https://www.youtube.com/channel/..%2F..%2Fevil',
         ratio: '16/9',
       }
 
@@ -1377,6 +1383,14 @@ describeForEachParser('youtubeFc2EmbedResolver', (parseHtml) => {
     it('should ignore a path going on past the shell', async () => {
       const value = html`
         <iframe src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html/x?id=dQw4w9WgXcQ"></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a query id that is a dot segment', async () => {
+      const value = html`
+        <iframe src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?id=.."></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -1543,6 +1557,19 @@ describeForEachParser('youtubeMetasliderEmbedResolver', (parseHtml) => {
           <div
             class="youtube"
             data-id=""
+          ></div>
+        </li>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a slide whose video id is a dot segment', async () => {
+      const value = html`
+        <li class="ms-youtube">
+          <div
+            class="youtube"
+            data-id=".."
           ></div>
         </li>
       `

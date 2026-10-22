@@ -1,7 +1,7 @@
-import { composeQuery, getQueryParam, isAnyOf, parseUrl } from 'trousse'
+import { composeQuery, getQueryParam, isAnyOf, isPresent, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cnn'
@@ -28,16 +28,28 @@ const cdnHosts = ['cdn.turner.com']
 // The fave shell is a `padding-bottom: 56.25%` box, and ids of this form have 16:9 renditions.
 const playerRatio = '16/9'
 
+// The id is a path read decoded out of a query, so each of its segments goes in as one.
+const composePagePath = (id: string): string | undefined => {
+  const segments = id.split('/').map(encodePathSegment)
+
+  if (!segments.every(isPresent)) {
+    return
+  }
+
+  return segments.join('/')
+}
+
 // The player answers 200 for any id. `cnn.com/videos/{id}` answers 404 for a fabricated id, and for
 // some real ones.
 const composeEmbed = (id: string): EmbedResolverResult => {
   const query = composeQuery({ video: id, customer: 'cnn', edition: 'domestic', env: 'prod' })
+  const pagePath = composePagePath(id)
 
   return {
     provider,
     id,
     src: `https://fave.api.cnn.io/v1/fav/${query}`,
-    url: `https://www.cnn.com/videos/${id}`,
+    url: pagePath ? `https://www.cnn.com/videos/${pagePath}` : undefined,
     ratio: playerRatio,
     date: readDate(id),
   }

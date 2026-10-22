@@ -154,7 +154,7 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should use a malformed deck id as written, even if the player answers an error', async () => {
+    it('should keep a deck id holding slashes inside one path segment', async () => {
       const value = html`
         <script
           class="speakerdeck-embed"
@@ -164,12 +164,20 @@ describeForEachParser('speakerdeckScriptEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'speakerdeck',
-        id: '../decks/evil',
-        src: 'https://speakerdeck.com/player/../decks/evil',
+        id: '..%2Fdecks%2Fevil',
+        src: 'https://speakerdeck.com/player/..%2Fdecks%2Fevil',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should return undefined for a deck id that is a dot segment', async () => {
+      const value = html`
+        <script class="speakerdeck-embed" data-id=".." src="//speakerdeck.com/assets/embed.js"></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
     })
 
     it('should use a malformed slide suffix as written, even if the player answers an error', async () => {
