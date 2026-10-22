@@ -1,7 +1,6 @@
 import {
   audioExtensions,
   documentExtensions,
-  fixMalformedQuery,
   flashExtensions,
   imageExtensions,
   isHostOrSubdomainOf,
@@ -168,37 +167,6 @@ export const collapseSlashRuns = (url: string): string => {
   }
 
   return normalizeUrl(url, { collapseSlashes: true })
-}
-
-// The lookbehind starts a match only at the head of a whitespace run, so a long run is read once.
-const lostSeparatorRegex = /(?<!\s)\s+(?=[A-Za-z_][\w.-]*=)/g
-const slashEndedValueRegex = /(=[^&/=]+)\/+(?=&|$)/g
-const nestedUrlRegex = /(?::|%3A)(?:\/\/|%2F%2F)/i
-
-// The class repairs a resolver reads a carrier url through, after its host check, so a frame no
-// resolver claims keeps its src as written. `fixMalformedQuery` turns a glued query back into
-// one. A feed also glues junk onto a value at one character: whitespace in place of the `&`
-// before a parameter, `h=04acf91ce2 portrait=0`, and a `/` closing a value,
-// `set_id=72157627734131040/&text=`. A query carrying a url is left as it is past the first repair.
-export const repairCarrierQuery = (url: string): string => {
-  const repaired = fixMalformedQuery(url)
-  const queryIndex = repaired.indexOf('?')
-
-  if (queryIndex === -1) {
-    return repaired
-  }
-
-  const hashIndex = repaired.indexOf('#', queryIndex)
-  const queryEnd = hashIndex === -1 ? repaired.length : hashIndex
-  const query = repaired.slice(queryIndex, queryEnd)
-
-  if (nestedUrlRegex.test(query)) {
-    return repaired
-  }
-
-  const fixedQuery = query.replace(lostSeparatorRegex, '&').replace(slashEndedValueRegex, '$1')
-
-  return repaired.slice(0, queryIndex) + fixedQuery + repaired.slice(queryEnd)
 }
 
 // A real, loadable src, not empty and not the `about:blank` lazy placeholder.

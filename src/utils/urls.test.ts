@@ -9,7 +9,6 @@ import {
   parseUrlOnHosts,
   pickQueryParams,
   pickUrlParams,
-  repairCarrierQuery,
   resolveOrDropUrl,
   resolveOrKeepUrl,
 } from './urls.js'
@@ -218,70 +217,6 @@ describe('pickQueryParams', () => {
     const expected = { start: '10' }
 
     expect(pickQueryParams(value, ['start'])).toEqual(expected)
-  })
-})
-
-describe('repairCarrierQuery', () => {
-  it('should turn the whitespace a feed left in place of an ampersand into one', () => {
-    const value = 'https://player.vimeo.com/video/664725670?h=04acf91ce2 portrait=0&color=98895e'
-    const expected = 'https://player.vimeo.com/video/664725670?h=04acf91ce2&portrait=0&color=98895e'
-
-    expect(repairCarrierQuery(value)).toBe(expected)
-  })
-
-  it('should keep whitespace inside a value that no parameter follows', () => {
-    const value = 'https://player.example.com/?fonts=Arial Black&skin=f6f6f6'
-
-    expect(repairCarrierQuery(value)).toBe(value)
-  })
-
-  it('should drop a slash a feed glued onto the end of a value', () => {
-    const value = 'http://www.flickr.com/slideShow/index.gne?set_id=72157627734131040/&text='
-    const expected = 'http://www.flickr.com/slideShow/index.gne?set_id=72157627734131040&text='
-
-    expect(repairCarrierQuery(value)).toBe(expected)
-  })
-
-  it('should drop a slash a feed glued onto the last value', () => {
-    const value = 'http://vimeo.com/moogaloop.swf?clip_id=4775093/'
-    const expected = 'http://vimeo.com/moogaloop.swf?clip_id=4775093'
-
-    expect(repairCarrierQuery(value)).toBe(expected)
-  })
-
-  it('should keep the closing slash of a value that holds a path', () => {
-    const value = 'https://player.example.com/?path=albums/2024/'
-
-    expect(repairCarrierQuery(value)).toBe(value)
-  })
-
-  it('should leave a query carrying a url as written', () => {
-    const value =
-      'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1857599997color=%23ff5500 visual=true'
-
-    expect(repairCarrierQuery(value)).toBe(value)
-  })
-
-  it('should leave the fragment as written', () => {
-    const value = 'https://player.example.com/?id=123#t=1 start=2'
-
-    expect(repairCarrierQuery(value)).toBe(value)
-  })
-
-  it('should turn a query glued onto the path back into one', () => {
-    const value = 'https://www.youtube.com/v/dQw4w9WgXcQ&hl=en_US'
-    const expected = 'https://www.youtube.com/v/dQw4w9WgXcQ?hl=en_US'
-
-    expect(repairCarrierQuery(value)).toBe(expected)
-  })
-
-  it('should read a long run of whitespace and slashes in linear time', () => {
-    const value = `https://player.example.com/?a=${' '.repeat(100_000)}${'=x/'.repeat(30_000)}`
-    const start = performance.now()
-
-    repairCarrierQuery(value)
-
-    expect(performance.now() - start).toBeLessThan(1000)
   })
 })
 

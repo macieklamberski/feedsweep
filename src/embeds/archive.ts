@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOrSubdomainOf, parseUrl } from 'trousse'
+import { fixMalformedQuery, getPathSegments, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar, flashVars } from '../utils/dom.js'
 import {
@@ -7,7 +7,6 @@ import {
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
-  repairCarrierQuery,
 } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
@@ -35,7 +34,7 @@ type SegmentParts = {
 // an ampersand where the query should begin. Its player still served that spelling in 2023 and
 // answers 404 for it now, while `?playlist=1` answers 200.
 const parseArchiveUrl = (link: string): URL | undefined => {
-  return parseUrl(repairCarrierQuery(link), placeholderBaseUrl)
+  return parseUrl(fixMalformedQuery(link), placeholderBaseUrl)
 }
 
 const readSegmentParts = (url: URL | undefined): SegmentParts => {

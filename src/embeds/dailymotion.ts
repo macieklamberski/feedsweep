@@ -1,5 +1,6 @@
 import {
   decodeSegment,
+  fixMalformedQuery,
   getPathSegments,
   isPlainObject,
   type Nullish,
@@ -17,7 +18,6 @@ import {
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
-  repairCarrierQuery,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -86,7 +86,7 @@ const readId = (candidate: Nullish<string>): string | undefined => {
 // The Flash player wrote `/swf/{id}&colors=…`, the query glued onto the id, and transforms outside
 // the resolver factory read urls here too.
 const parseDailymotionUrl = (link: string): URL | undefined => {
-  return parseUrl(repairCarrierQuery(link), placeholderBaseUrl)
+  return parseUrl(fixMalformedQuery(link), placeholderBaseUrl)
 }
 
 const wallWords = ['videowall', 'videozap']
