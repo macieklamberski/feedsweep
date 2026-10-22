@@ -1862,6 +1862,40 @@ describeForEachParser('createUrlEmbedResolver', (parseHtml) => {
     expect(extract(value)).toEqual(expected)
   })
 
+  it('should ignore a path template its script never filled', () => {
+    const value = '<iframe src="https://x.test/embed/$1"></iframe>'
+
+    expect(extract(value)).toBeUndefined()
+  })
+
+  it('should ignore a query template its script never filled', () => {
+    const value = '<iframe src="https://x.test/player.html?vid=$1&autoplay=1"></iframe>'
+
+    expect(extract(value)).toBeUndefined()
+  })
+
+  it('should read an id that only opens with a dollar sign and digits', () => {
+    const value = '<iframe src="https://x.test/embed/$1993$0$3441"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc',
+      src: 'https://x.test/embed/$1993$0$3441',
+    }
+
+    expect(extract(value)).toEqual(expected)
+  })
+
+  it('should hand the resolver the whitespace in place of an ampersand as one', () => {
+    const value = '<iframe src="https://x.test/embed/abc?h=04acf91ce2 portrait=0"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc',
+      src: 'https://x.test/embed/abc?h=04acf91ce2&portrait=0',
+    }
+
+    expect(extract(value)).toEqual(expected)
+  })
+
   it('should hand the resolver a question mark inside a value as a separator', () => {
     const value = '<iframe src="https://x.test/embed/abc?list=PL1?autoplay=1"></iframe>'
     const expected: EmbedResolverResult = {

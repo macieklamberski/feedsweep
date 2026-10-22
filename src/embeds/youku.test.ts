@@ -125,6 +125,12 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore an embed template its script never filled', async () => {
+      const value = '<iframe src="https://player.youku.com/embed/$1"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', async () => {
       const value = '<iframe src="https://evil.test/embed/XODczMzU0NTAw"></iframe>'
 

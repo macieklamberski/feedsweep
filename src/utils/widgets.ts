@@ -1,5 +1,4 @@
 import {
-  fixMalformedQuery,
   isAnyOf,
   isHostOrSubdomainOf,
   type MaybePromise,
@@ -35,6 +34,7 @@ import {
   cleanUrl,
   collapseSlashRuns,
   parseUrlOnHosts,
+  repairCarrierQuery,
   resolveOrDropUrl,
   resolveOrKeepUrl,
 } from './urls.js'
@@ -244,6 +244,8 @@ export const setDimensions = (
   }
 }
 
+const unfilledTemplateRegex = /[/=]\$\d+(?=[/?&#]|$)/
+
 // An iframe's `title` is the one field a publisher's snippet states that the url does not carry.
 export const createUrlEmbedResolver = (
   hosts: Array<string>,
@@ -260,8 +262,14 @@ export const createUrlEmbedResolver = (
         return
       }
 
+      // A script that never filled its template, `embed/$1`, names no item, and its frame stays
+      // as written.
+      if (unfilledTemplateRegex.test(src)) {
+        return
+      }
+
       // Only a resolver reads the repaired url: a frame no resolver claims keeps the src as written.
-      return decideSize(element, extract(fixMalformedQuery(src), element), options.readCarrierSize)
+      return decideSize(element, extract(repairCarrierQuery(src), element), options.readCarrierSize)
     },
   }
 }

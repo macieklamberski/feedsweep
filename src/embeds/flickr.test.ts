@@ -393,14 +393,15 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
   })
 
   describe('the legacy slideshow iframe', () => {
-    it('should use a set id carrying a path slash as written', async () => {
-      const value =
-        '<iframe src="http://www.flickr.com/slideShow/index.gne?user_id=24006738@N07&amp;set_id=72157627734131040/"></iframe>'
+    it('should drop the slash a feed glued onto the set id', async () => {
+      const value = html`
+        <iframe src="http://www.flickr.com/slideShow/index.gne?group_id=&amp;user_id=24006738@N07&amp;set_id=72157627734131040/&amp;text="></iframe>
+      `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: '24006738@N07/72157627734131040/',
-        src: 'https://embedr.flickr.com/photosets/72157627734131040%2F?width=400&height=300',
-        url: 'https://www.flickr.com/photos/24006738@N07/sets/72157627734131040%2F',
+        id: '24006738@N07/72157627734131040',
+        src: 'https://embedr.flickr.com/photosets/72157627734131040?width=400&height=300',
+        url: 'https://www.flickr.com/photos/24006738@N07/sets/72157627734131040',
         width: 400,
         height: 300,
       }
