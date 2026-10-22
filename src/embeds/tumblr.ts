@@ -18,7 +18,7 @@ const tumblrHosts = ['tumblr.com']
 
 // The blog key is written bare on the older route and prefixed `t:` on the current one. Both
 // spellings address the same post, so the id keeps the bare one and `src` the current one.
-const blogKeyPrefixRegex = /^t:/
+const blogKeyPrefixRegex = /^t:/i
 
 const readPostEmbed = (href: string | undefined): EmbedResolverResult | undefined => {
   const parsed = parseUrlOnHosts(href, tumblrEmbedHosts)
