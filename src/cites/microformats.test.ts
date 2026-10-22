@@ -232,6 +232,39 @@ describeForEachParser('microformatsCiteResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should map a response class written in another case', async () => {
+      const value = html`
+        <span class="h-cite U-In-Reply-To">
+          <a class="u-url p-name" href="https://example.com/post">Page title</a>
+        </span>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'microformats',
+        url: 'https://example.com/post',
+        title: 'Page title',
+        kind: 'reply',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a citation whose classes are written in another case', async () => {
+      const value = html`
+        <span class="H-Cite">
+          <a class="U-Url P-Name" href="https://example.com/post">Page title</a>
+          by <span class="P-Author H-Card"><span class="P-Name">Author name</span></span>
+        </span>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'microformats',
+        url: 'https://example.com/post',
+        title: 'Page title',
+        author: 'Author name',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should map listen-of to the listen kind', async () => {
       const value = html`
         <span class="u-listen-of h-cite">
