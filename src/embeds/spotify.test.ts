@@ -70,6 +70,34 @@ describe('spotifyResolveEmbed', () => {
       expect(spotifyResolveEmbed(value)).toEqual(expected)
     })
 
+    const regionLocales: Array<string> = ['intl-pt-br', 'intl-zh-tw', 'intl-es-419']
+
+    it.each(regionLocales)('should resolve a page url localized with the region %s', (locale) => {
+      const value = `https://open.spotify.com/${locale}/track/4cOdK2wGLETKBW3PvgPWqT`
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'track/4cOdK2wGLETKBW3PvgPWqT',
+        src: 'https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT',
+        url: 'https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT',
+        height: 152,
+      }
+
+      expect(spotifyResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should resolve a localized page url in any case', () => {
+      const value = 'https://open.spotify.com/INTL-PT-BR/track/4cOdK2wGLETKBW3PvgPWqT'
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'track/4cOdK2wGLETKBW3PvgPWqT',
+        src: 'https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT',
+        url: 'https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT',
+        height: 152,
+      }
+
+      expect(spotifyResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should resolve the legacy uri form', () => {
       const value = 'https://embed.spotify.com/?uri=spotify:track:4cOdK2wGLETKBW3PvgPWqT'
       const expected: EmbedResolverResult = {
@@ -258,6 +286,12 @@ describe('spotifyResolveEmbed', () => {
 
     it('should return undefined for a route prefix that only starts with embed', () => {
       const value = 'https://open.spotify.com/embedded/track/4cOdK2wGLETKBW3PvgPWqT'
+
+      expect(spotifyResolveEmbed(value)).toBeUndefined()
+    })
+
+    it('should return undefined for a localized prefix with no locale', () => {
+      const value = 'https://open.spotify.com/intl-/track/4cOdK2wGLETKBW3PvgPWqT'
 
       expect(spotifyResolveEmbed(value)).toBeUndefined()
     })
