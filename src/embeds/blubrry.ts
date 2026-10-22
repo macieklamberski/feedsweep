@@ -46,20 +46,21 @@ export const extractBlubrryEmbed = (link: string): BlubrryPlayer | undefined => 
     return { kind: 'episode', id: segments[1] }
   }
 
-  // A player beside its media url often names the episode too, which `/id/{podcastId}/` plays.
-  const podcastId = getQueryParam(parsed.searchParams, 'podcast_id')
-
-  if (podcastId && digitsRegex.test(podcastId)) {
-    return { kind: 'episode', id: podcastId }
-  }
-
+  // A `podcast_id` beside a media url can name another episode: one feed writes the same id
+  // on ten players with ten different mp3s, so the media url wins.
   const mediaUrl = getQueryParam(parsed.searchParams, 'media_url')
 
-  if (!mediaUrl) {
+  if (mediaUrl) {
+    return { kind: 'media', id: mediaUrl }
+  }
+
+  const podcastId = getQueryParam(parsed.searchParams, 'podcast_id')
+
+  if (!podcastId || !digitsRegex.test(podcastId)) {
     return
   }
 
-  return { kind: 'media', id: mediaUrl }
+  return { kind: 'episode', id: podcastId }
 }
 
 // Blubrry's player iframe, by episode id or by media url, with no oEmbed to size it.
