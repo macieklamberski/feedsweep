@@ -114,7 +114,7 @@ describe('arcgisResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
         id: '9b6a2497b3d84aeb95633a58560025ee',
-        src: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497b3d84aeb95633a58560025ee&extent=-86.1328,-74.9594,180,81.6214',
+        src: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497b3d84aeb95633a58560025ee&extent=-86.1328%2C-74.9594%2C180%2C81.6214',
         url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497b3d84aeb95633a58560025ee',
         height: 500,
       }
@@ -396,6 +396,46 @@ describe('arcgisResolveEmbed', () => {
         id: 'not-an-item',
         src: 'https://experience.arcgis.com/experience/not-an-item',
         url: 'https://experience.arcgis.com/experience/not-an-item',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep an ampersand in the web map id inside the webmap parameter', () => {
+      const value = 'https://www.arcgis.com/apps/Embed/index.html?webmap=9b6a2497%26find%3Dx'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: '9b6a2497&find=x',
+        src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=9b6a2497%26find%3Dx',
+        url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497%26find%3Dx',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a hash in the OnePane box inside the extent parameter', () => {
+      const value =
+        'https://www.arcgis.com/home/webmap/templates/OnePane/basicviewer/embed.html?webmap=9b6a2497b3d84aeb95633a58560025ee&gcsextent=-86%2380'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: '9b6a2497b3d84aeb95633a58560025ee',
+        src: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497b3d84aeb95633a58560025ee&extent=-86%2380',
+        url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497b3d84aeb95633a58560025ee',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a hash in the app id inside the appid parameter', () => {
+      const value = 'https://www.arcgis.com/apps/instant/basic/index.html?appid=6b81ccb1%23x'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: '6b81ccb1#x',
+        src: 'https://www.arcgis.com/apps/instant/basic/index.html?appid=6b81ccb1%23x',
+        url: 'https://www.arcgis.com/apps/instant/basic/index.html?appid=6b81ccb1%23x',
         height: 500,
       }
 

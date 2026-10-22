@@ -2,7 +2,7 @@ import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'spreaker'
@@ -51,7 +51,7 @@ export const spreakerResolveEmbed: ResolveEmbed = (url, element) => {
   return {
     provider,
     id: `${embed.kind}/${embed.id}`,
-    src: `https://widget.spreaker.com/player?${embed.param}=${embed.id}`,
+    src: `https://widget.spreaker.com/player${composeQuery({ [embed.param]: embed.id })}`,
     url: `https://www.spreaker.com/${embed.kind}/${embed.id}`,
     height: playerHeight,
     title,

@@ -135,9 +135,24 @@ describeForEachParser('tencentEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'tencent',
         id: 'v03604lrvan/x',
-        src: 'https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan/x',
+        src: 'https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%2Fx',
         url: 'https://v.qq.com/x/page/v03604lrvan/x.html',
         thumbnail: 'https://puui.qpic.cn/qqvideo_ori/0/v03604lrvan/x_496_280/0',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep an ampersand in the id inside the vid parameter', async () => {
+      const value =
+        '<iframe src="https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%26autoplay%3D1"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'tencent',
+        id: 'v03604lrvan&autoplay=1',
+        src: 'https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%26autoplay%3D1',
+        url: 'https://v.qq.com/x/page/v03604lrvan&autoplay=1.html',
+        thumbnail: 'https://puui.qpic.cn/qqvideo_ori/0/v03604lrvan&autoplay=1_496_280/0',
         ratio: '16/9',
       }
 

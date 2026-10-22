@@ -1,5 +1,5 @@
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tencent'
@@ -49,7 +49,7 @@ const tencentResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider,
     id: videoId,
-    src: `https://v.qq.com/txp/iframe/player.html?vid=${videoId}`,
+    src: `https://v.qq.com/txp/iframe/player.html${composeQuery({ vid: videoId })}`,
     url: `https://v.qq.com/x/page/${videoId}.html`,
     // The poster the watch page shows, addressed by the id alone, and an invented id gets a 5 KB
     // png placeholder. `vv.video.qq.com/getinfo?vids={vid}&otype=json` answers key-free with the
