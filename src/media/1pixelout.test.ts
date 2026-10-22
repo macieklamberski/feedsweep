@@ -597,6 +597,32 @@ describeForEachParser('onePixelOutWidgetMediaResolver in any case', (parseHtml) 
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should read the mount id prefix in capitals on a div', async () => {
+    const value = html`
+      <div id="AudioPlayer_2">[audio player]</div>
+      <script>AudioPlayer.embed("AudioPlayer_2", {soundFile: "http://example.com/audio/episode.mp3"});</script>
+    `
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://example.com/audio/episode.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the Joomla mount id prefix in capitals', async () => {
+    const value = html`
+      <p id="OnePixelOutAudioPlayer_1">[audio player]</p>
+      <script>AudioPlayer.embed("OnePixelOutAudioPlayer_1", {soundFile: "http://example.com/audio/episode.mp3"});</script>
+    `
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://example.com/audio/episode.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should read the `soundFile` and `titles` option names in capitals', async () => {
     const value = html`
       <p id="audioplayer_1">[audio player]</p>

@@ -421,6 +421,23 @@ describeForEachParser('weeblyFlashMediaResolver in any case', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should read the player path in capitals on an object', async () => {
+    const value = html`
+      <object data="http://www.weebly.com/WEEBLY/APPS/AUDIOPLAYER2.SWF?user_id=4427146">
+        <param
+          name="FlashVars"
+          value="soundFile=http://www.example.com/uploads/knowing_yourself.mp3"
+        />
+      </object>
+    `
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://www.example.com/uploads/knowing_yourself.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should read the `soundFile` and `titles` flashvar names in capitals', async () => {
     const value =
       '<embed src="http://www.weebly.com/weebly/apps/audioPlayer2.swf?user_id=4427146" flashvars="SOUNDFILE=http://www.example.com/uploads/knowing_yourself.mp3&TITLES=Knowing%20Yourself">'

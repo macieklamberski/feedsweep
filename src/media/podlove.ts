@@ -73,7 +73,7 @@ export const podloveMediaResolver: MediaResolver = {
 
     const files = data.audio?.filter(
       (audio): audio is { url: string; mimeType: string } =>
-        audio.url !== undefined && audio.mimeType?.startsWith('audio/') === true,
+        audio.url !== undefined && audio.mimeType?.toLowerCase().startsWith('audio/') === true,
     )
     const file = files?.find((audio) => isAnyOf(audio.mimeType, preferredMimeTypes)) ?? files?.[0]
     const source = file?.url

@@ -125,4 +125,24 @@ describeForEachParser('odeoMediaResolver in any case', (parseHtml) => {
 
     expect(await extract(value)).toEqual(expected)
   })
+
+  it('should read the player route in capitals on an object', async () => {
+    const value = html`
+      <object
+        data="http://odeo.com/FLASH/audio_player_standard.swf"
+        type="application/x-shockwave-flash"
+      >
+        <param
+          name="FlashVars"
+          value="external_url=http://example.com/show/episode.mp3"
+        />
+      </object>
+    `
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://example.com/show/episode.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
 })

@@ -143,6 +143,26 @@ describeForEachParser('flashMp3PlayerMediaResolver in any case', (parseHtml) => 
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should read the player route in capitals on an object', async () => {
+    const value = html`
+      <object
+        data="http://flash-mp3-player.net/MEDIAS/player_mp3_maxi.swf"
+        type="application/x-shockwave-flash"
+      >
+        <param
+          name="FlashVars"
+          value="mp3=http://example.com/audio/track.mp3"
+        />
+      </object>
+    `
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://example.com/audio/track.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should read the `mp3` parameter name in capitals on the swf url', async () => {
     const value =
       '<embed src="http://flash-mp3-player.net/medias/player_mp3_multi.swf?MP3=http://example.com/audio/track.mp3">'

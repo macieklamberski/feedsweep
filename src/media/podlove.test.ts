@@ -611,3 +611,31 @@ describeForEachParser('podlove shapes the pipeline repairs first', (parseHtml) =
     expect(await convert(value)).not.toContain('<audio')
   })
 })
+
+describeForEachParser('podloveMediaResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, podloveMediaResolver)
+
+  it('should read the mime type in capitals', async () => {
+    const config = JSON.stringify([
+      { data: { audio: [{ url: 'https://example.com/e.mp3', mimeType: 'AUDIO/MPEG' }] } },
+    ])
+    const value = html`
+      <div
+        id="player-6a7b24b4e645d"
+        class="podlove-web-player"
+      ></div>
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          var player = document.getElementById("player-6a7b24b4e645d");
+          podlovePlayerCache.add(${config})
+        })
+      </script>
+    `
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'https://example.com/e.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

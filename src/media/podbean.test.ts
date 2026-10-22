@@ -216,6 +216,17 @@ describeForEachParser('podbeanFlashMediaResolver in any case', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should read the player route in capitals on an object', async () => {
+    const value =
+      '<object data="http://www.podbean.com/PODCAST-AUDIO-VIDEO-BLOG-PLAYER/mp3playerlightsmallv3.swf?audioPath=http://example.com/mf/play/xv83p8/Episode.mp3"></object>'
+    const expected: MediaResolverResult = {
+      tag: 'audio',
+      src: 'http://example.com/mf/play/xv83p8/Episode.mp3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should read the `audioPath` parameter name in capitals', async () => {
     const value =
       '<embed src="http://www.podbean.com/podcast-audio-video-blog-player/mp3playerlightsmallv3.swf?AUDIOPATH=http://example.com/mf/play/xv83p8/Episode.mp3">'
