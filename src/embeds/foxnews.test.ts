@@ -254,12 +254,19 @@ describeForEachParser('foxnewsIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('a value that is a dot segment', () => {
-    it('should return undefined for a video_id that is a dot segment', async () => {
+    it('should keep the player and drop the url for a video_id that is a dot segment', async () => {
       const value = html`
         <iframe src="https://video.foxnews.com/v/video-embed.html?video_id=.."></iframe>
       `
 
-      expect(await extract(value)).toBeUndefined()
+      const expected: EmbedResolverResult = {
+        provider: 'foxnews',
+        id: '..',
+        src: 'https://video.foxnews.com/v/video-embed.html?video_id=..',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

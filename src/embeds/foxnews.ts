@@ -35,19 +35,15 @@ const playerRatio = '16/9'
 
 // `video-embed.html` is what Fox names as the player in the video page's `twitter:player` and
 // `embedUrl`. Both players answer 404 for an unknown id.
-const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult | undefined => {
+const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult => {
   // The id comes out of the query decoded, and it goes into a path.
   const segment = encodePathSegment(id)
-
-  if (!segment) {
-    return
-  }
 
   return {
     provider: brand.provider,
     id,
     src: `https://${brand.playerHost}/v/video-embed.html${composeQuery({ video_id: id })}`,
-    url: `https://${brand.pageHost}/video/${segment}`,
+    url: segment ? `https://${brand.pageHost}/video/${segment}` : undefined,
     ratio: playerRatio,
   }
 }

@@ -976,7 +976,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a stripped_title that is a dot segment', async () => {
+    it('should keep the player and drop the url for a stripped_title that is a dot segment', async () => {
       const value = html`
         <div id="__ss_6435157">
           <object id="__sse6435157">
@@ -988,10 +988,17 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         </div>
       `
 
-      expect(await extract(value)).toBeUndefined()
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '6435157',
+        src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+        ratio: '595/485',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for a userName that is a dot segment', async () => {
+    it('should keep the player and drop the url for a userName that is a dot segment', async () => {
       const value = html`
         <div id="__ss_6435157">
           <object id="__sse6435157">
@@ -1003,7 +1010,14 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         </div>
       `
 
-      expect(await extract(value)).toBeUndefined()
+      const expected: EmbedResolverResult = {
+        provider: 'slideshare',
+        id: '6435157',
+        src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
+        ratio: '595/485',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should return undefined when no wrapper names the deck', async () => {

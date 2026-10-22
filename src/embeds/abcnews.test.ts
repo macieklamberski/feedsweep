@@ -168,10 +168,17 @@ describeForEachParser('abcnewsEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for an id that is a dot segment', async () => {
+    it('should keep the player and drop the url for an id that is a dot segment', async () => {
       const value = '<iframe src="https://abcnews.com/video/embed?id=.."></iframe>'
 
-      expect(await extract(value)).toBeUndefined()
+      const expected: EmbedResolverResult = {
+        provider: 'abcnews',
+        id: '..',
+        src: 'https://abcnews.com/video/embed?id=..',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should ignore a foreign host carrying the same path', async () => {

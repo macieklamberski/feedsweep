@@ -225,16 +225,12 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
     // The geo player's `video` comes out of the query decoded, and it goes into two paths.
     const segment = encodePathSegment(videoId)
 
-    if (!segment) {
-      return
-    }
-
     return {
       provider,
       id: videoId,
       src: composeEmbedUrl('video', videoId, readPlayerParams(url)),
-      url: `https://www.dailymotion.com/video/${segment}`,
-      thumbnail: `https://www.dailymotion.com/thumbnail/video/${segment}`,
+      url: segment ? `https://www.dailymotion.com/video/${segment}` : undefined,
+      thumbnail: segment ? `https://www.dailymotion.com/thumbnail/video/${segment}` : undefined,
       ratio: '16/9',
       title: attr(element, 'title'),
     }
@@ -246,10 +242,6 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
     // The `playlist` parameter comes out of the query decoded, and it goes into a path.
     const segment = encodePathSegment(playlistId)
 
-    if (!segment) {
-      return
-    }
-
     // The id is qualified because a playlist and a video share one id grammar, and what reaches
     // an enrichment pass is the provider and the id alone. No thumbnail comes with it:
     // `/thumbnail/playlist/{id}` answers 404, and the video endpoint answers about a video.
@@ -257,7 +249,7 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
       provider,
       id: `playlist/${playlistId}`,
       src: composeEmbedUrl('playlist', playlistId),
-      url: `https://www.dailymotion.com/playlist/${segment}`,
+      url: segment ? `https://www.dailymotion.com/playlist/${segment}` : undefined,
       ratio: '16/9',
       title: attr(element, 'title'),
     }

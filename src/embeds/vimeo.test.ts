@@ -816,10 +816,17 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should return undefined for a hash that is a dot segment', async () => {
+    it('should keep the player and drop the url for a hash that is a dot segment', async () => {
       const value = '<iframe src="https://player.vimeo.com/video/76979871?h=.."></iframe>'
 
-      expect(await extract(value)).toBeUndefined()
+      const expected: EmbedResolverResult = {
+        provider: 'vimeo',
+        id: '76979871:..',
+        src: 'https://player.vimeo.com/video/76979871?h=..',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
