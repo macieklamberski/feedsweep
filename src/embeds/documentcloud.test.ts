@@ -121,6 +121,13 @@ describeForEachParser('documentcloudEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a legacy note whose id is a dot segment', async () => {
+      const value =
+        '<iframe src="https://www.documentcloud.org/documents/2793355-BLS-Jobs-Release/annotations/...html"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the legacy viewer path', async () => {
       const value =
         '<iframe src="https://evil.test/documents/2702333-Appropriate-and-Responsible-Practices-for.html"></iframe>'

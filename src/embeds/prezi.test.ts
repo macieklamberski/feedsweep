@@ -388,6 +388,24 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should keep an element id holding slashes inside one path segment', async () => {
+      const value = html`
+        <embed
+          id="preziEmbed_../../x"
+          src="http://prezi.com/bin/preziloader.swf"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'prezi',
+        id: '..%2F..%2Fx',
+        src: 'https://prezi.com/p/..%2F..%2Fx/embed',
+        url: 'https://prezi.com/p/..%2F..%2Fx/',
+        ratio: '550/400',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should return undefined for a prezi_id that is a dot segment', async () => {
       const value = html`
         <embed

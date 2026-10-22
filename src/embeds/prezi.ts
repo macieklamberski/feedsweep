@@ -69,10 +69,9 @@ export const preziResolveEmbed: ResolveEmbed = (url, element) => {
 
   if (loaderPathRegex.test(parsed.pathname)) {
     const flashId = flashVar(element, 'prezi_id')
-    // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
-    const id = flashId
-      ? encodePathSegment(flashId)
-      : attr(element, 'id')?.match(elementIdRegex)?.[1]
+    const declaredId = flashId ? flashId : attr(element, 'id')?.match(elementIdRegex)?.[1]
+    // The flashvar and the element id come out decoded, and the id goes into a path.
+    const id = encodePathSegment(declaredId ?? '')
 
     if (!id) {
       return

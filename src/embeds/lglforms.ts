@@ -1,6 +1,6 @@
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { isDotSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'lglforms'
@@ -43,7 +43,8 @@ export const lglformsScriptEmbedResolver = createMarkupEmbedResolver(
     const loader = parseUrlOnHosts(attr(element, 'src'), lglformsHosts)
     const formKey = loader?.pathname.match(loaderPathRegex)?.[1]
 
-    if (!formKey) {
+    // `/form_engine/s/...js` leaves a `..` key, which the minted path resolves away.
+    if (!formKey || isDotSegment(formKey)) {
       return
     }
 

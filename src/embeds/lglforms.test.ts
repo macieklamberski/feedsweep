@@ -101,6 +101,12 @@ describeForEachParser('lglformsScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a loader whose key is a dot segment', async () => {
+      const value = '<script src="https://secure.lglforms.com/form_engine/s/...js"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', async () => {
       const value = html`
         <script

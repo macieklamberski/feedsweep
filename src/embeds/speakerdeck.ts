@@ -3,6 +3,7 @@ import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.j
 import { attr } from '../utils/dom.js'
 import {
   encodePathSegment,
+  isDotSegment,
   isFileName,
   parseUrlOnHosts,
   placeholderBaseUrl,
@@ -67,7 +68,8 @@ export const speakerdeckLegacyScriptEmbedResolver = createMarkupEmbedResolver(
     const url = parseUrlOnHosts(attr(element, 'src'), speakerdeckHosts)
     const deckId = url?.pathname.match(legacyScriptPathRegex)?.[1]
 
-    if (!deckId) {
+    // `/embed/...js` leaves a `..` id, which the minted path resolves away.
+    if (!deckId || isDotSegment(deckId)) {
       return
     }
 

@@ -4,6 +4,7 @@ import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   alphanumericRegex,
   encodePathSegment,
+  isDotSegment,
   parseUrlOnHosts,
   placeholderBaseUrl,
 } from '../utils/urls.js'
@@ -73,7 +74,8 @@ export const vidyardScriptEmbedResolver = createMarkupEmbedResolver(
     const parsed = parseUrlOnHosts(attr(element, 'src'), vidyardHosts)
     const uuid = parsed?.pathname.match(scriptPathRegex)?.[1]
 
-    if (!uuid) {
+    // `/...js` leaves a `..` uuid, which the minted page path resolves away.
+    if (!uuid || isDotSegment(uuid)) {
       return
     }
 

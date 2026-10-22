@@ -77,7 +77,7 @@ describeForEachParser('stravaPlaceholderEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use a malformed id as written, even if the player answers an error', async () => {
+    it('should keep an id holding slashes inside one path segment', async () => {
       const value = html`
         <div
           class="strava-embed-placeholder"
@@ -87,9 +87,9 @@ describeForEachParser('stravaPlaceholderEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'strava',
-        id: 'activity/../../route/1',
-        src: 'https://strava-embeds.com/activity/../../route/1',
-        url: 'https://www.strava.com/activities/../../route/1',
+        id: 'activity/..%2F..%2Froute%2F1',
+        src: 'https://strava-embeds.com/activity/..%2F..%2Froute%2F1',
+        url: 'https://www.strava.com/activities/..%2F..%2Froute%2F1',
         ratio: '300/472',
       }
 

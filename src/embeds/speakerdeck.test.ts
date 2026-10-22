@@ -250,6 +250,12 @@ describeForEachParser('speakerdeckLegacyScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a script whose deck id is a dot segment', async () => {
+      const value = '<script src="https://speakerdeck.com/embed/...js"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the script path', async () => {
       const value = html`
         <script src="https://evil.test/embed/4ee19eec04357e0050004017.js?speakerdeck.com/embed/"></script>
