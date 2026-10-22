@@ -284,15 +284,18 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
 
   // A group named by its alias has no player, and the owner beside it names another item.
   if (subject.groupId) {
-    if (!nsidRegex.test(subject.groupId)) {
+    // A query or flashvars group id comes out decoded, and it goes into a path.
+    const groupSegment = encodePathSegment(subject.groupId)
+
+    if (!groupSegment || !nsidRegex.test(subject.groupId)) {
       return
     }
 
     return {
       provider,
       id: `groups/${subject.groupId}`,
-      src: composeGroupPlayer(subject.groupId),
-      url: `https://www.flickr.com/groups/${subject.groupId}/`,
+      src: composeGroupPlayer(groupSegment),
+      url: `https://www.flickr.com/groups/${groupSegment}/`,
     }
   }
 

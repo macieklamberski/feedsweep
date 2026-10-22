@@ -172,7 +172,7 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should use a malformed id as written, even if the player answers an error', async () => {
+    it('should keep an id holding a slash inside one path segment', async () => {
       const value = html`
         <blockquote
           class="imgur-embed-pub"
@@ -181,16 +181,16 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'imgur',
-        id: '../evil',
-        src: 'https://imgur.com/../evil/embed',
-        url: 'https://imgur.com/../evil',
-        thumbnail: 'https://i.imgur.com/../evilm.jpg',
+        id: '..%2Fevil',
+        src: 'https://imgur.com/..%2Fevil/embed',
+        url: 'https://imgur.com/..%2Fevil',
+        thumbnail: 'https://i.imgur.com/..%2Fevilm.jpg',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed id carrying an encoded slash as written, even if the player answers an error', async () => {
+    it('should escape the percent sign of an id carrying an encoded slash', async () => {
       const value = html`
         <blockquote
           class="imgur-embed-pub"
@@ -199,10 +199,10 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'imgur',
-        id: 'pVa2%2FrXL',
-        src: 'https://imgur.com/pVa2%2FrXL/embed',
-        url: 'https://imgur.com/pVa2%2FrXL',
-        thumbnail: 'https://i.imgur.com/pVa2%2FrXLm.jpg',
+        id: 'pVa2%252FrXL',
+        src: 'https://imgur.com/pVa2%252FrXL/embed',
+        url: 'https://imgur.com/pVa2%252FrXL',
+        thumbnail: 'https://i.imgur.com/pVa2%252FrXLm.jpg',
       }
 
       expect(await extract(value)).toEqual(expected)

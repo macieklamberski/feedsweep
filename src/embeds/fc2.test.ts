@@ -248,7 +248,7 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed data-id as written beside a valid url, even if the player answers an error', async () => {
+    it('should keep a data-id holding a slash inside one path segment beside a valid url', async () => {
       const value = html`
         <script
           src="https://static.fc2.com/video/js/outerplayer.min.js"
@@ -258,16 +258,16 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'fc2',
-        id: '../20190922FrnqLhsk',
-        src: 'https://video.fc2.com/embed/player/../20190922FrnqLhsk/',
-        url: 'https://video.fc2.com/content/../20190922FrnqLhsk/',
+        id: '..%2F20190922FrnqLhsk',
+        src: 'https://video.fc2.com/embed/player/..%2F20190922FrnqLhsk/',
+        url: 'https://video.fc2.com/content/..%2F20190922FrnqLhsk/',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed data-id carrying a url separator as written, even if the player answers an error', async () => {
+    it('should keep a data-id carrying a url separator inside one path segment', async () => {
       const value = html`
         <script
           src="https://static.fc2.com/video/js/outerplayer.min.js"
@@ -277,9 +277,9 @@ describeForEachParser('fc2PlayerScriptEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'fc2',
-        id: '2019/0922FrnqLhsk',
-        src: 'https://video.fc2.com/embed/player/2019/0922FrnqLhsk/',
-        url: 'https://video.fc2.com/content/2019/0922FrnqLhsk/',
+        id: '2019%2F0922FrnqLhsk',
+        src: 'https://video.fc2.com/embed/player/2019%2F0922FrnqLhsk/',
+        url: 'https://video.fc2.com/content/2019%2F0922FrnqLhsk/',
         ratio: '16/9',
       }
 

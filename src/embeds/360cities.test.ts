@@ -174,6 +174,17 @@ describeForEachParser('threeSixtyCitiesEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a panorama whose slug is a dot segment', async () => {
+      const value = html`
+        <embed
+          src="http://www.360cities.net/javascripts/krpano/krpano.swf"
+          flashvars="pano=http://www.360cities.net/krpano/external_embed/...xml"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore the Flash viewer with nothing naming a panorama', async () => {
       const value = html`
         <embed

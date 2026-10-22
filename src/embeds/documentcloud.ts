@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { readObjectHeight } from '../utils/hints.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { isDotSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'documentcloud'
@@ -72,6 +72,12 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
     }
 
     const [, id, part, number] = partMatch
+
+    // The legacy note's `.../annotations/...html` leaves a `..` number, which the minted path
+    // resolves away.
+    if (isDotSegment(number)) {
+      return
+    }
 
     return {
       provider,

@@ -1,6 +1,6 @@
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { isDotSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = '360cities'
@@ -35,7 +35,8 @@ export const threeSixtyCitiesResolveEmbed: ResolveEmbed = (url, element) => {
     const pano = parseUrlOnHosts(flashVar(element, 'pano'), threeSixtyCitiesHosts)
     const slug = pano?.pathname.match(flashPanoPathRegex)?.[1]
 
-    if (!slug) {
+    // `.../external_embed/...xml` leaves a `..` slug, which the minted path resolves away.
+    if (!slug || isDotSegment(slug)) {
       return
     }
 

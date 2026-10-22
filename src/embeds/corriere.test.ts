@@ -62,6 +62,13 @@ describe('corriereResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a feed whose id is a dot segment', () => {
+      const value =
+        'https://video.corriere.it/widget/players/player_tv_video_iFrame.shtml?videoId=http://static2.video.corriereobjects.it/widget/content/video/rss/video_...rss'
+
+      expect(corriereResolveEmbed(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host carrying the same path', () => {
       const value = 'https://evil.test/video-embed/885087cc-33c7-11ea-bebf-10b7ce31a40c'
 

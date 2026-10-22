@@ -221,6 +221,17 @@ describeForEachParser('oneTwoThreeFormBuilderScriptEmbedResolver', (parseHtml) =
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a loader whose id is a dot segment', async () => {
+      const value = html`
+        <script
+          data-role="form"
+          src="https://form.123formbuilder.com/embed/...js"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore the lightbox loader, which opens the form from a text link', async () => {
       const value = html`
         <script

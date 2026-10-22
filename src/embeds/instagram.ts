@@ -171,7 +171,9 @@ export const instagramBlockquoteEmbedResolver = createMarkupEmbedResolver(
 export const instagramAmpEmbedResolver = createMarkupEmbedResolver(
   'amp-instagram[data-shortcode], amp-instagram[shortcode]',
   (element) => {
-    const shortcode = attr(element, 'data-shortcode') ?? attr(element, 'shortcode')
+    const declared = attr(element, 'data-shortcode') ?? attr(element, 'shortcode')
+    // The shortcode comes out of its attribute decoded, and it goes into a path.
+    const shortcode = encodePathSegment(declared ?? '')
 
     if (!shortcode) {
       return
@@ -230,9 +232,10 @@ export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
   'div.instagram-embed-wrap[data-attrs], div[data-component-name="InstagramToDOM"]',
   (element) => {
     const attributes = jsonAttr<SubstackPostAttributes>(element, 'data-attrs')
-    const shortcode = attributes?.instagram_id
+    // The payload's shortcode comes out decoded, and it goes into a path.
+    const shortcode = encodePathSegment(attributes?.instagram_id ?? '')
 
-    if (!shortcode) {
+    if (!attributes || !shortcode) {
       return
     }
 

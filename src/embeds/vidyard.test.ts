@@ -321,6 +321,12 @@ describeForEachParser('vidyardScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should return undefined for a script whose uuid is a dot segment', async () => {
+      const value = '<script src="https://play.vidyard.com/...js"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a foreign host naming the player host in its query', async () => {
       const value =
         '<script src="https://evil.test/Bx22B6hw1HabD7rqhnwTBw.js?from=play.vidyard.com/"></script>'

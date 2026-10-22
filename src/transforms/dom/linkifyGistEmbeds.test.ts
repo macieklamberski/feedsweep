@@ -31,6 +31,18 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should leave a gist script whose id is a dot segment alone', async () => {
+    const value = '<script src="https://gist.github.com/...js"></script>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a gist script whose owner is a dot segment alone', async () => {
+    const value = '<script src="https://gist.github.com/../6cad326836d38bd3a7ae.js"></script>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   // gist.github.com answers an uppercase id on the user-less route with a redirect to the gist.
   it('should link a user-less gist script whose id is uppercase', async () => {
     const value = '<script src="https://gist.github.com/6CAD326836D38BD3A7AE.js"></script>'

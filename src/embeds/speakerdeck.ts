@@ -4,6 +4,7 @@ import { attr } from '../utils/dom.js'
 import {
   composeQuery,
   encodePathSegment,
+  isDotSegment,
   isFileName,
   parseUrlOnHosts,
   placeholderBaseUrl,
@@ -68,7 +69,8 @@ export const speakerdeckLegacyScriptEmbedResolver = createMarkupEmbedResolver(
     const url = parseUrlOnHosts(attr(element, 'src'), speakerdeckHosts)
     const deckId = url?.pathname.match(legacyScriptPathRegex)?.[1]
 
-    if (!deckId) {
+    // `/embed/...js` leaves a `..` id, which the minted path resolves away.
+    if (!deckId || isDotSegment(deckId)) {
       return
     }
 

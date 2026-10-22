@@ -2,7 +2,7 @@ import { getPathSegments, isAnyOf, isHostOf, isPlainObject, parseUrl } from 'tro
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
@@ -86,7 +86,8 @@ type ImgurPost = {
 
 const parsePost = (value: string): ImgurPost | undefined => {
   const isAlbum = value.startsWith(albumPrefix)
-  const id = isAlbum ? value.slice(albumPrefix.length) : value
+  // The id comes out of its attribute decoded, and it goes into a path.
+  const id = encodePathSegment(isAlbum ? value.slice(albumPrefix.length) : value)
 
   if (id) {
     return { id, isAlbum }

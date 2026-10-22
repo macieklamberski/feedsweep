@@ -1,4 +1,4 @@
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { isDotSegment, parseUrlOnHosts } from '../utils/urls.js'
 
 const loaderPathRegex = /^\/a\/([^/]+)\.js$/
 const pagePathRegex = /^\/a\/([^/]+)$/
@@ -7,7 +7,14 @@ const pagePathRegex = /^\/a\/([^/]+)$/
 const renderPathRegex = /\/a\/([^/]+)\.(?:svg|png)/
 
 const readCastId = (url: string | undefined, regex: RegExp): string | undefined => {
-  return parseUrlOnHosts(url, 'asciinema.org')?.pathname.match(regex)?.[1]
+  const castId = parseUrlOnHosts(url, 'asciinema.org')?.pathname.match(regex)?.[1]
+
+  // `/a/...js` leaves a `..` id, which the minted path resolves away.
+  if (!castId || isDotSegment(castId)) {
+    return
+  }
+
+  return castId
 }
 
 export const extractLoaderCastId = (url: string | undefined): string | undefined => {

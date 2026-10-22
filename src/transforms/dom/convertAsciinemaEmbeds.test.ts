@@ -40,6 +40,12 @@ describeForEachParser('convertAsciinemaEmbeds', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should leave a loader whose cast id is a dot segment alone', async () => {
+      const value = '<script src="https://asciinema.org/a/...js"></script>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should leave a loader on a lookalike host alone', async () => {
       const value = '<script src="https://notasciinema.org/a/abc123.js"></script>'
 
