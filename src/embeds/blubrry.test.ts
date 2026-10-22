@@ -53,6 +53,69 @@ describe('extractBlubrryEmbed', () => {
     expect(extractBlubrryEmbed(value)).toEqual(expected)
   })
 
+  it('should read the show of a latest episode player', () => {
+    const value = 'https://player.blubrry.com/3954807/latest/'
+    const expected: BlubrryPlayer = { kind: 'latest', id: '3954807', position: '' }
+
+    expect(extractBlubrryEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a show named by its program keyword', () => {
+    const value = 'https://player.blubrry.com/the_posecon_podcast/latest/'
+    const expected: BlubrryPlayer = { kind: 'latest', id: 'the_posecon_podcast', position: '' }
+
+    expect(extractBlubrryEmbed(value)).toEqual(expected)
+  })
+
+  it('should read the show of a playlist with the episode it opens on', () => {
+    const value =
+      'https://player.blubrry.com/3739323/playlist/?episodes=5&scroll=0&selectedId=132994802'
+    const expected: BlubrryPlayer = {
+      kind: 'playlist',
+      id: '3739323',
+      position: '?selectedId=132994802',
+    }
+
+    expect(extractBlubrryEmbed(value)).toEqual(expected)
+  })
+
+  it('should read a show route word in any case', () => {
+    const value = 'https://player.blubrry.com/3954807/LATEST/'
+    const expected: BlubrryPlayer = { kind: 'latest', id: '3954807', position: '' }
+
+    expect(extractBlubrryEmbed(value)).toEqual(expected)
+  })
+
+  it('should return undefined for a show path with a word that names no player', () => {
+    const value = 'https://player.blubrry.com/3954807/archive/'
+
+    expect(extractBlubrryEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a show route below another segment', () => {
+    const value = 'https://player.blubrry.com/embed/3954807/latest/'
+
+    expect(extractBlubrryEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a show route followed by another segment', () => {
+    const value = 'https://player.blubrry.com/3954807/latest/extra/'
+
+    expect(extractBlubrryEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a program keyword that climbs to the parent path', () => {
+    const value = 'https://player.blubrry.com/..%2Fpricing/latest/'
+
+    expect(extractBlubrryEmbed(value)).toBeUndefined()
+  })
+
+  it('should return undefined for a program keyword holding an escaped slash', () => {
+    const value = 'https://player.blubrry.com/3954807%2Fpricing/latest/'
+
+    expect(extractBlubrryEmbed(value)).toBeUndefined()
+  })
+
   it('should return undefined for a blubrry url naming nothing', () => {
     const value = 'https://blubrry.com/pricing'
 
@@ -99,6 +162,67 @@ describe('blubrryResolveEmbed', () => {
       provider: 'blubrry',
       id: 'abc123x',
       src: 'https://player.blubrry.com/id/abc123x/',
+      height: 164,
+    }
+
+    expect(blubrryResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should key a latest episode player by the show, not an episode', () => {
+    const value = 'https://player.blubrry.com/3954807/latest/'
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: '3954807/latest',
+      src: 'https://player.blubrry.com/3954807/latest/',
+      height: 164,
+    }
+
+    expect(blubrryResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should write a show route word in the case the player serves', () => {
+    const value = 'https://player.blubrry.com/3954807/Latest/'
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: '3954807/latest',
+      src: 'https://player.blubrry.com/3954807/latest/',
+      height: 164,
+    }
+
+    expect(blubrryResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should state the playlist height for a playlist', () => {
+    const value = 'https://player.blubrry.com/3739323/playlist/'
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: '3739323/playlist',
+      src: 'https://player.blubrry.com/3739323/playlist/',
+      height: 568,
+    }
+
+    expect(blubrryResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep the episode a playlist opens on and drop a tracker', () => {
+    const value =
+      'https://player.blubrry.com/3739323/playlist/?utm_source=feed&selectedId=132994802'
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: '3739323/playlist',
+      src: 'https://player.blubrry.com/3739323/playlist/?selectedId=132994802',
+      height: 568,
+    }
+
+    expect(blubrryResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should not carry a playlist position onto a latest episode player', () => {
+    const value = 'https://player.blubrry.com/3954807/latest/?selectedId=132994802'
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: '3954807/latest',
+      src: 'https://player.blubrry.com/3954807/latest/',
       height: 164,
     }
 
@@ -166,6 +290,70 @@ describeForEachParser('blubrryEmbedResolver', (parseHtml) => {
         id: '19453169',
         src: 'https://player.blubrry.com/id/19453169/',
         height: 164,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should key a latest episode player by the show', async () => {
+      const value = html`
+        <iframe
+          src="https://player.blubrry.com/3954807/latest/#mode-Light&amp;border-000000&amp;progress-000000"
+          title="Blubrry Podcast Player"
+          scrolling="no"
+          width="100%"
+          height="165px;"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: '3954807/latest',
+        src: 'https://player.blubrry.com/3954807/latest/',
+        height: 164,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should key a latest episode player by the program keyword', async () => {
+      const value = html`
+        <iframe
+          src="https://player.blubrry.com/the_posecon_podcast/latest/"
+          title="Blubrry Podcast Player"
+          scrolling="no"
+          width="100%"
+          height="230px;"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'the_posecon_podcast/latest',
+        src: 'https://player.blubrry.com/the_posecon_podcast/latest/',
+        height: 164,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should key a playlist by the show and open it on the selected episode', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          src="https://player.blubrry.com/3739323/playlist/?episodes=5&#038;scroll=0&#038;selectedId=132994802#mode-Light&#038;border-000000&#038;progress-000000"
+          title="Blubrry Podcast Player"
+          scrolling="no"
+          width="100%"
+          height="415"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: '3739323/playlist',
+        src: 'https://player.blubrry.com/3739323/playlist/?selectedId=132994802',
+        height: 568,
       }
 
       expect(await extract(value)).toEqual(expected)
