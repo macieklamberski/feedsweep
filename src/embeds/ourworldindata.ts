@@ -62,7 +62,11 @@ const ourworldindataResolveEmbed: ResolveEmbed = (url) => {
 
   const isChart = kind === 'grapher'
   const query = filterUrlQuery(parsed, (name) => {
-    return !isAnyOf(name, displayParams) && !trackingParamRegex.test(name)
+    if (isAnyOf(name, displayParams) || trackingParamRegex.test(name)) {
+      return
+    }
+
+    return name
   })
   const src = `https://ourworldindata.org/${kind}/${slug}${query}`
 

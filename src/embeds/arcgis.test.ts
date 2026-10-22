@@ -690,7 +690,7 @@ describeForEachParser('arcgisIframeEmbedResolver in any case', (parseHtml) => {
     const expected = {
       provider: 'arcgis',
       id: '84a606bfb3d848c69ca61321f3ac2e9f',
-      src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=84a606bfb3d848c69ca61321f3ac2e9f&CENTER=-0.1985,51.5554&LEVEL=11',
+      src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=84a606bfb3d848c69ca61321f3ac2e9f&center=-0.1985,51.5554&level=11',
       url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=84a606bfb3d848c69ca61321f3ac2e9f',
       height: 500,
     }
@@ -704,7 +704,7 @@ describeForEachParser('arcgisIframeEmbedResolver in any case', (parseHtml) => {
     const expected = {
       provider: 'arcgis',
       id: '62bf87f7b2f64f15b48491d39242f4d7',
-      src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7&EXTENT=-123.0692,38.5233,-122.9947,38.5929',
+      src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7&extent=-123.0692,38.5233,-122.9947,38.5929',
       url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=62bf87f7b2f64f15b48491d39242f4d7',
       height: 500,
     }

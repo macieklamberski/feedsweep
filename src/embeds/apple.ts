@@ -21,7 +21,7 @@ const applePodcastsHosts = ['podcasts.apple.com']
 // The path is `/{storefront}/{kind}/{slug}/{id}`, with the storefront and the slug both
 // optional. A music id is numeric, a playlist or station id carries a two-letter prefix
 // (`pl.`, `ra.`) and a podcast id an `id` one.
-const podcastIdPrefixRegex = /^id/
+const podcastIdPrefixRegex = /^id/i
 
 // The player is fluid-width. The podcast show player fills any frame and floors at 180 at 320
 // wide, 360 at 640 and 422 at 1280, and the episode player floors at 160 at every width.

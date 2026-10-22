@@ -12,8 +12,12 @@ const formHeight = 600
 const shortLinkHost = 'forms.gle'
 
 // A form reads every `entry.{question}` pair off its own query as a prefilled answer.
-const isPrefillParam = (name: string): boolean => {
-  return name.toLowerCase().startsWith('entry.')
+const getPrefillParam = (name: string): string | undefined => {
+  if (!name.toLowerCase().startsWith('entry.')) {
+    return
+  }
+
+  return `entry.${name.slice('entry.'.length)}`
 }
 
 // A short code is resolved to a form id only by its redirect, so the short link is the frame.
@@ -65,7 +69,7 @@ export const googleformsResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const formPath = isPublished ? `e/${formId}` : formId
-  const prefill = filterUrlQuery(parsed, isPrefillParam).replace('?', '&')
+  const prefill = filterUrlQuery(parsed, getPrefillParam).replace('?', '&')
 
   return {
     provider,

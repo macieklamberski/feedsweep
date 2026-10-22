@@ -394,38 +394,56 @@ describe('dropUrlParams', () => {
 })
 
 describe('filterUrlQuery', () => {
-  const isKept = (name: string) => {
-    return name === 'file' || name.startsWith('pwc[')
+  const getKeptName = (name: string) => {
+    if (name.toLowerCase() === 'file') {
+      return 'file'
+    }
+
+    if (name.startsWith('pwc[')) {
+      return name
+    }
   }
 
   it('should keep only the pairs the predicate accepts, in the order written', () => {
     const value = new URL('https://example.com/e?utm_source=feed&file=a.ts&fbclid=abc')
 
-    expect(filterUrlQuery(value, isKept)).toBe('?file=a.ts')
+    expect(filterUrlQuery(value, getKeptName)).toBe('?file=a.ts')
   })
 
   it('should keep a repeated parameter once per pair', () => {
     const value = new URL('https://example.com/e?file=a.ts&file=b.ts')
 
-    expect(filterUrlQuery(value, isKept)).toBe('?file=a.ts&file=b.ts')
+    expect(filterUrlQuery(value, getKeptName)).toBe('?file=a.ts&file=b.ts')
   })
 
   it('should keep a bracketed name as written', () => {
     const value = new URL('https://example.com/e?pwc[size]=fit')
 
-    expect(filterUrlQuery(value, isKept)).toBe('?pwc[size]=fit')
+    expect(filterUrlQuery(value, getKeptName)).toBe('?pwc[size]=fit')
+  })
+
+  it('should write a name read in another case as the callback spells it', () => {
+    const value = new URL('https://example.com/e?FILE=a.ts')
+
+    expect(filterUrlQuery(value, getKeptName)).toBe('?file=a.ts')
+  })
+
+  it('should write a name with no value as the callback spells it', () => {
+    const value = new URL('https://example.com/e?FILE')
+
+    expect(filterUrlQuery(value, getKeptName)).toBe('?file')
   })
 
   it('should return an empty string when nothing is kept', () => {
     const value = new URL('https://example.com/e?utm_source=feed')
 
-    expect(filterUrlQuery(value, isKept)).toBe('')
+    expect(filterUrlQuery(value, getKeptName)).toBe('')
   })
 
   it('should return an empty string for a url with no query', () => {
     const value = new URL('https://example.com/e')
 
-    expect(filterUrlQuery(value, isKept)).toBe('')
+    expect(filterUrlQuery(value, getKeptName)).toBe('')
   })
 })
 

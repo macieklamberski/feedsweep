@@ -631,7 +631,7 @@ describeForEachParser('kalturaIframeEmbedResolver in any case', (parseHtml) => {
     const expected = {
       provider: 'kaltura',
       id: '2346171/0_bg4o7fhu',
-      src: 'https://cdnapisec.kaltura.com/p/2346171/sp/234617100/embedIframeJs/uiconf_id/42601131/partner_id/2346171?iframeembed=true&entry_id=0_bg4o7fhu&WID=1_z2u0xe5j',
+      src: 'https://cdnapisec.kaltura.com/p/2346171/sp/234617100/embedIframeJs/uiconf_id/42601131/partner_id/2346171?iframeembed=true&entry_id=0_bg4o7fhu&wid=1_z2u0xe5j',
       thumbnail: 'https://cdnapisec.kaltura.com/p/2346171/thumbnail/entry_id/0_bg4o7fhu/width/640',
       ratio: '16/9',
     }
@@ -645,7 +645,7 @@ describeForEachParser('kalturaIframeEmbedResolver in any case', (parseHtml) => {
     const expected = {
       provider: 'kaltura',
       id: '2503451/1_wyxnidl5',
-      src: 'https://cdnapisec.kaltura.com/p/2503451/embedPlaykitJs/uiconf_id/49754663?iframeembed=true&entry_id=1_wyxnidl5&KALTURASEEKFROM=95',
+      src: 'https://cdnapisec.kaltura.com/p/2503451/embedPlaykitJs/uiconf_id/49754663?iframeembed=true&entry_id=1_wyxnidl5&kalturaSeekFrom=95',
       thumbnail: 'https://cdnapisec.kaltura.com/p/2503451/thumbnail/entry_id/1_wyxnidl5/width/640',
       ratio: '16/9',
     }

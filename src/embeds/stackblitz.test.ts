@@ -81,12 +81,12 @@ describe('stackblitzResolveEmbed', () => {
       expect(stackblitzResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep an option spelled in another case, as the instance reads it', () => {
+    it('should write an option read in another case in its own case', () => {
       const value = 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&initialPath=%2Fabout'
       const expected: EmbedResolverResult = {
         provider: 'stackblitz',
         id: 'angular-ivy-snow',
-        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&initialPath=%2Fabout',
+        src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&initialpath=%2Fabout',
         url: 'https://stackblitz.com/edit/angular-ivy-snow',
         height: 500,
       }
@@ -515,6 +515,20 @@ describeForEachParser('stackblitzIframeEmbedResolver in any case', (parseHtml) =
       provider: 'stackblitz',
       id: 'angular-ivy-snow',
       src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1',
+      url: 'https://stackblitz.com/edit/angular-ivy-snow',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should write the `file` parameter name read in capitals in its own case', async () => {
+    const value =
+      '<iframe src="https://stackblitz.com/edit/angular-ivy-snow?FILE=src%2Fapp%2Fapp.component.ts"></iframe>'
+    const expected = {
+      provider: 'stackblitz',
+      id: 'angular-ivy-snow',
+      src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1&file=src%2Fapp%2Fapp.component.ts',
       url: 'https://stackblitz.com/edit/angular-ivy-snow',
       height: 500,
     }

@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getAnyOf, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { filterUrlQuery, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -26,8 +26,8 @@ const flashIdParams = ['id', 'emailPlaylist', 'twID']
 // `pwc[song_ids]` one song on it, and `pwc[included_songs]` whether the rest of the list comes too.
 const widgetParams = ['widget_id', 'pwc[song_ids]', 'pwc[included_songs]']
 
-const isWidgetParam = (name: string): boolean => {
-  return isAnyOf(name, widgetParams)
+const getWidgetParam = (name: string): string | undefined => {
+  return getAnyOf(name, widgetParams)
 }
 
 const composeSource = (id: string, query: string): string => {
@@ -76,7 +76,7 @@ export const reverbnationResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider,
     id,
-    src: composeSource(id, widget ? filterUrlQuery(parsed, isWidgetParam) : ''),
+    src: composeSource(id, widget ? filterUrlQuery(parsed, getWidgetParam) : ''),
     height: 265,
   }
 }

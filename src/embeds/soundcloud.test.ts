@@ -1230,4 +1230,17 @@ describeForEachParser('soundcloudEmbedResolver in any case', (parseHtml) => {
 
     expect(await extract(value)).toEqual(expected)
   })
+
+  it('should read the reference kind `playlists` in capitals', async () => {
+    const value =
+      '<iframe src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/PLAYLISTS/1234567"></iframe>'
+    const expected = {
+      provider: 'soundcloud',
+      src: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1234567',
+      id: 'playlists/1234567',
+      height: 450,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
 })

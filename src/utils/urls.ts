@@ -257,17 +257,32 @@ export const composeQuery = (params?: Record<string, string>): string => {
   return query ? `?${query}` : ''
 }
 
-// The publisher's query with only the parameters a player reads left in it. Each pair stays as
-// written, so a repeated name and a bracketed one such as `pwc[size]` reach the player unchanged.
-export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): string => {
-  const pairs = url.search
-    .slice(1)
-    .split('&')
-    .filter((pair) => {
-      const [name] = [...new URLSearchParams(pair).keys()]
+// The publisher's query with only the parameters a player reads. A kept pair is written under the
+// name `getKeptName` answers, the code's spelling, and a pair whose name comes back unchanged stays
+// as written, so a repeated name and a bracketed one such as `pwc[size]` pass unchanged.
+export const filterUrlQuery = (
+  url: URL,
+  getKeptName: (name: string) => string | undefined,
+): string => {
+  const pairs: Array<string> = []
 
-      return !!name && isKept(name)
-    })
+  for (const pair of url.search.slice(1).split('&')) {
+    const [name] = [...new URLSearchParams(pair).keys()]
+    const keptName = name ? getKeptName(name) : undefined
+
+    if (!keptName) {
+      continue
+    }
+
+    if (keptName === name) {
+      pairs.push(pair)
+      continue
+    }
+
+    const separator = pair.indexOf('=')
+
+    pairs.push(separator === -1 ? keptName : `${keptName}${pair.slice(separator)}`)
+  }
 
   return pairs.length > 0 ? `?${pairs.join('&')}` : ''
 }
@@ -284,7 +299,7 @@ export const dropUrlParams = (url: string, names: ReadonlyArray<string>): string
     return url
   }
 
-  parsed.search = filterUrlQuery(parsed, (name) => !isAnyOf(name, names))
+  parsed.search = filterUrlQuery(parsed, (name) => (isAnyOf(name, names) ? undefined : name))
 
   return parsed.href
 }

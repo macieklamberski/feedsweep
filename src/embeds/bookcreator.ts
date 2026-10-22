@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getAnyOf, getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { filterUrlQuery } from '../utils/urls.js'
@@ -29,7 +29,7 @@ const bookcreatorResolveEmbed: ResolveEmbed = (url, element) => {
   const id = `${userId}/${bookId}`
   // `nopreview` opens the book without the description card over it. The factory has already
   // parsed the url on the reader host, so it parses here too.
-  const query = filterUrlQuery(new URL(url), (name) => isAnyOf(name, 'nopreview'))
+  const query = filterUrlQuery(new URL(url), (name) => getAnyOf(name, ['nopreview']))
 
   return {
     provider,

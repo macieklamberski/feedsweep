@@ -14,7 +14,7 @@ const formmailerHosts = ['ssl.form-mailer.jp', 'pro.form-mailer.jp']
 // The form reads any field name off its query as a prefill, such as `タイトル[0]`, so the query
 // goes to the frame as the carrier sends it. `errorScroll` is the loader's own display setting.
 const composeEmbed = (form: URL, hash: string): EmbedResolverResult => {
-  const query = filterUrlQuery(form, (name) => !isAnyOf(name, 'errorScroll'))
+  const query = filterUrlQuery(form, (name) => (isAnyOf(name, 'errorScroll') ? undefined : name))
 
   return {
     provider,

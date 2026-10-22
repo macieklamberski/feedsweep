@@ -81,7 +81,7 @@ const composeClassicSource = (
   webMapId: string,
   positionParams: Array<string>,
 ): string => {
-  const position = filterUrlQuery(url, (name) => isAnyOf(name, positionParams))
+  const position = filterUrlQuery(url, (name) => getAnyOf(name, positionParams))
 
   return `https://www.arcgis.com${path}?webmap=${webMapId}${position.replace('?', '&')}`
 }
@@ -113,7 +113,7 @@ const composeWebMapSource = (url: URL, path: string, webMapId: string): string =
   }
 
   const src = `https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=${webMapId}`
-  const position = filterUrlQuery(url, (name) => isAnyOf(name, mapViewerPositionParams))
+  const position = filterUrlQuery(url, (name) => getAnyOf(name, mapViewerPositionParams))
 
   return `${src}${position.replace('?', '&')}`
 }
@@ -176,7 +176,7 @@ const readItem = (url: URL): Item | undefined => {
 
   if (isHostOf(url, storyMapsHosts) && storyRoute) {
     const page = `https://storymaps.arcgis.com/${storyRoute}/${itemId}`
-    const position = filterUrlQuery(url, (name) => isAnyOf(name, collectionPositionParams))
+    const position = filterUrlQuery(url, (name) => getAnyOf(name, collectionPositionParams))
 
     return { id: itemId, src: `${page}${position}`, url: page }
   }

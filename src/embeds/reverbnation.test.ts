@@ -423,7 +423,7 @@ describeForEachParser('reverbnationEmbedResolver in any case', (parseHtml) => {
     const expected = {
       provider: 'reverbnation',
       id: 'artist_1018382',
-      src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?WIDGET_ID=50',
+      src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=50',
       height: 265,
     }
 

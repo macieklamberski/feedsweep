@@ -329,4 +329,18 @@ describeForEachParser('googleformsEmbedResolver in any case', (parseHtml) => {
 
     expect(await extract(value)).toEqual(expected)
   })
+
+  it('should write the `entry.` prefix read in capitals in its own case', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform?ENTRY.553414390=SMA+Negeri+1"></iframe>'
+    const expected = {
+      provider: 'googleforms',
+      id: '1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg',
+      src: 'https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform?embedded=true&entry.553414390=SMA+Negeri+1',
+      url: 'https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform',
+      height: 600,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
 })

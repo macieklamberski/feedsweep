@@ -439,4 +439,21 @@ describeForEachParser('yumpuEmbedResolver in any case', (parseHtml) => {
 
     expect(await extract(value)).toEqual(expected)
   })
+
+  it('should read the `document` and `view` route words of the anchor in capitals', async () => {
+    const value = html`
+      <iframe src="https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE"></iframe>
+      <a href="https://www.yumpu.com/de/DOCUMENT/VIEW/71235096/sukultur-2026">SUKULTUR 2026</a>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'yumpu',
+      id: 'z4xYaRXnsDqwc2GE',
+      src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+      url: 'https://www.yumpu.com/de/DOCUMENT/VIEW/71235096/sukultur-2026',
+      ratio: '4/3',
+      title: 'SUKULTUR 2026',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
 })

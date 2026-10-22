@@ -1,4 +1,4 @@
-import { isAnyOf } from 'trousse'
+import { getAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
@@ -57,9 +57,8 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult 
   const host = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
   const query = composeQuery({ iframeembed: 'true', entry_id: entryId })
   const hasToken = getQueryParam(parsed.searchParams, tokenParam) !== undefined
-  const kept = filterUrlQuery(parsed, (name) =>
-    isAnyOf(name, [tokenParam, ...widgetParams, ...playbackParams]),
-  )
+  const keptParams = [tokenParam, ...widgetParams, ...playbackParams]
+  const kept = filterUrlQuery(parsed, (name) => getAnyOf(name, keptParams))
   const playback = kept.replace('?', '&')
   // The entry comes out of the query decoded, and it goes into a path.
   const entrySegment = encodePathSegment(entryId)

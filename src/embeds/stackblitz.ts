@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
+import { getAnyOf, getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { filterUrlQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
@@ -41,7 +41,7 @@ const parseTarget = (value: string | undefined): StackblitzTarget | undefined =>
     return
   }
 
-  const options = filterUrlQuery(parsed, (name) => isAnyOf(name, stackblitzEmbedParams))
+  const options = filterUrlQuery(parsed, (name) => getAnyOf(name, stackblitzEmbedParams))
 
   // `embed=1` is what the share dialog writes, and it opens the embed view at any width.
   return { id: second, query: `?embed=1${options.replace('?', '&')}` }
