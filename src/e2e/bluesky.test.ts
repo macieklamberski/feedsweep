@@ -148,6 +148,7 @@ describeForEachParser('Bluesky', (parseHtml) => {
         data-embed-id="did:plc:hhz4agnyzcrsvpnprxrbjrpa/3mhq7aeuwbg42"
         data-embed-src="https://embed.bsky.app/embed/did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mhq7aeuwbg42"
         data-embed-url="https://bsky.app/profile/did:plc:hhz4agnyzcrsvpnprxrbjrpa/post/3mhq7aeuwbg42"
+        data-embed-date="2026-03-23T13:49:11.249Z"
       ></div>
     `
 

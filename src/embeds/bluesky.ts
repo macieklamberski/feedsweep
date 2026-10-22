@@ -99,7 +99,10 @@ const readTidDate = (rkey: string): string | undefined => {
   return new Date(milliseconds).toISOString()
 }
 
-const composeEmbedResult = (post: BlueskyPost): EmbedResolverResult => {
+const composeEmbedResult = (
+  post: BlueskyPost,
+  fields: Partial<EmbedResolverResult> = {},
+): EmbedResolverResult => {
   return {
     provider,
     // A record key is unique only inside one repository, and every endpoint keys on the authority.
@@ -108,6 +111,9 @@ const composeEmbedResult = (post: BlueskyPost): EmbedResolverResult => {
     // The player takes a DID today and answers 400 to the handle form <bluesky-post> ships.
     src: `https://embed.bsky.app/embed/${post.authority}/${postCollection}/${post.rkey}`,
     url: `https://bsky.app/profile/${post.authority}/post/${post.rkey}`,
+    ...fields,
+    // A date the carrier states wins. One it leaves undefined still spreads, so it is read here.
+    date: fields.date ?? readTidDate(post.rkey),
   }
 }
 
@@ -211,7 +217,7 @@ const extractQuotedPost = (
     return
   }
 
-  return { ...composeEmbedResult(post), ...quoted.fields, date: readTidDate(post.rkey) }
+  return composeEmbedResult(post, quoted.fields)
 }
 
 // Bluesky's post blockquote, the fallback its embed script replaces and no reader runs.
@@ -255,7 +261,7 @@ export const blueskyIframeEmbedResolver = createUrlEmbedResolver(blueskyHosts, (
     return
   }
 
-  return { ...composeEmbedResult(post), ...readSubstackPost(element) }
+  return composeEmbedResult(post, readSubstackPost(element))
 })
 
 // A forum's s9e MediaEmbed helper iframe on s9e.github.io, naming the post in its url fragment.

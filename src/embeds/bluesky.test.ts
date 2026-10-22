@@ -788,6 +788,33 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should take the date from the record key when the payload states none', async () => {
+      const payload = jsonAttrValue({
+        authorHandle: 'author.example',
+        text: 'The wrapper leaves the timestamp out.',
+      })
+      const value = html`
+        <div
+          class="bluesky-wrap outer"
+          data-attrs="${payload}"
+          data-component-name="BlueskyCreateBlueskyEmbed"
+        >
+          <iframe src="https://embed.bsky.app/embed/did:plc:bhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mbq7aeuwbg42"></iframe>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:bhz4agnyzcrsvpnprxrbjrpa/3mbq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/did:plc:bhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mbq7aeuwbg42',
+        url: 'https://bsky.app/profile/did:plc:bhz4agnyzcrsvpnprxrbjrpa/post/3mbq7aeuwbg42',
+        description: 'The wrapper leaves the timestamp out.',
+        author: '@author.example',
+        date: '2026-01-06T05:18:01.482Z',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // A payload writing its media without a scheme still names Bluesky's own host.
     it('should keep a protocol-relative avatar and thumbnail', async () => {
       const payload = jsonAttrValue({
@@ -819,6 +846,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         description: 'The wrapper states its media without a scheme.',
         author: '@author.example',
         avatar: '//cdn.bsky.app/img/avatar/plain/did:plc:bhz4/bafkreiavatar@jpeg',
+        date: '2026-01-06T05:18:01.482Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -882,6 +910,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         author: '@author.example',
         avatar:
           'https://cdn.bsky.social/img/avatar/plain/did:plc:bhz4agnyzcrsvpnprxrbjrpa/bafkreiavatar@jpeg',
+        date: '2026-01-31T16:08:24.738Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -909,6 +938,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         src: 'https://embed.bsky.app/embed/did:plc:dhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mdq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:dhz4agnyzcrsvpnprxrbjrpa/post/3mdq7aeuwbg42',
         author: '@author.example',
+        date: '2026-01-31T16:08:24.738Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -933,6 +963,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:plc:ehz4agnyzcrsvpnprxrbjrpa/3meq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:plc:ehz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3meq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:ehz4agnyzcrsvpnprxrbjrpa/post/3meq7aeuwbg42',
+        date: '2026-02-13T09:33:36.365Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -955,6 +986,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:plc:fhz4agnyzcrsvpnprxrbjrpa/3mfq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:plc:fhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mfq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:fhz4agnyzcrsvpnprxrbjrpa/post/3mfq7aeuwbg42',
+        date: '2026-02-26T02:58:47.993Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -973,6 +1005,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:plc:z72i7hdynmk6r22z27h6tvur/3kq7aeuwbg42k',
         src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg42k',
         url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k',
+        date: '2024-04-15T21:48:40.950Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -987,6 +1020,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:plc:z72i7hdynmk6r22z27h6tvur/3kq7aeuwbg42k',
         src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg42k',
         url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k',
+        date: '2024-04-15T21:48:40.950Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1001,6 +1035,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:plc:z72i7hdynmk6r22z27h6tvur/3kq7aeuwbg42k',
         src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg42k',
         url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k',
+        date: '2024-04-15T21:48:40.950Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1016,6 +1051,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:web:didweb.watch/3m6p3vi6mlw2r',
         src: 'https://embed.bsky.app/embed/did:web:didweb.watch/app.bsky.feed.post/3m6p3vi6mlw2r',
         url: 'https://bsky.app/profile/did:web:didweb.watch/post/3m6p3vi6mlw2r',
+        date: '2025-11-28T14:30:00.000Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1029,6 +1065,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:web:localhost%3A2583/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:web:localhost%3A2583/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/did:web:localhost%3A2583/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1042,6 +1079,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:web:news-room.example/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:web:news-room.example/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/did:web:news-room.example/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1055,6 +1093,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'news2day.example/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/news2day.example/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/news2day.example/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1068,6 +1107,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'news-room.example/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/news-room.example/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/news-room.example/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1081,6 +1121,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'alice.team2.example/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/alice.team2.example/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/alice.team2.example/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1094,6 +1135,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'alice.news-room.example/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/alice.news-room.example/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/alice.news-room.example/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1125,6 +1167,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: '@newsroom.example/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/@newsroom.example/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/@newsroom.example/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1173,6 +1216,7 @@ describeForEachParser('blueskyS9eEmbedResolver', (parseHtml) => {
         id: 'did:plc:hhz4agnyzcrsvpnprxrbjrpa/3mhq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mhq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:hhz4agnyzcrsvpnprxrbjrpa/post/3mhq7aeuwbg42',
+        date: '2026-03-23T13:49:11.249Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1190,6 +1234,7 @@ describeForEachParser('blueskyS9eEmbedResolver', (parseHtml) => {
         id: 'did:plc:hhz4agnyzcrsvpnprxrbjrpa/3mhq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mhq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:hhz4agnyzcrsvpnprxrbjrpa/post/3mhq7aeuwbg42',
+        date: '2026-03-23T13:49:11.249Z',
       }
 
       expect(await extract(value)).toEqual(expected)
