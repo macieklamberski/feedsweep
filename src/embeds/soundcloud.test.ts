@@ -708,6 +708,41 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read the id up to its last digit when params are glued onto it', async () => {
+      const value = html`
+        <iframe src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1857599997color=%23ff5500auto_play=false"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        id: 'tracks/1857599997',
+        src: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1857599997',
+        height: 166,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the id from a player whose params are all glued with no separator', async () => {
+      const value = html`
+        <iframe
+          allow="autoplay"
+          frameborder="no"
+          height="300"
+          scrolling="no"
+          src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1857599997color=%23ff5500auto_play=falsehide_related=falseshow_comments=trueshow_user=trueshow_reposts=falseshow_teaser=truevisual=true"
+          width="100%"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        id: 'tracks/1857599997',
+        src: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1857599997',
+        height: 166,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('a widget carrying no reference the resolver can read', () => {
@@ -736,19 +771,6 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
         src: 'https://w.soundcloud.com/player/?amp;url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F293',
-        height: 166,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep a reference whose id runs on past its digits as written', async () => {
-      const value = html`
-        <iframe src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1857599997color=%23ff5500auto_play=false"></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'soundcloud',
-        src: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1857599997color%3D%23ff5500auto_play%3Dfalse',
         height: 166,
       }
 

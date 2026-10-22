@@ -9,8 +9,10 @@ const provider = 'soundcloud'
 // api.soundcloud.com/{kind}/{id}, the id optionally spelled as the URN soundcloud:{kind}:{id}.
 // The colons arrive percent-encoded because the whole reference is itself a query value. The
 // widget resolves an `api-v2` reference to the same track as an `api` one.
+// The id is read in the alphabet SoundCloud's API returns it in, digits, so it ends at the first
+// character outside them: `/tracks/1857599997color=%23ff5500` names track 1857599997.
 const referenceRegex =
-  /api(?:-v2)?\.soundcloud\.com\/(tracks|playlists|users)\/(?:soundcloud(?::|%3A)\w+(?::|%3A))?(\d+)(?=[/?#&]|$)/i
+  /api(?:-v2)?\.soundcloud\.com\/(tracks|playlists|users)\/(?:soundcloud(?::|%3A)\w+(?::|%3A))?(\d+)/i
 
 // The widget is the only part of SoundCloud that can be framed: the site itself answers
 // `x-frame-options: SAMEORIGIN`, so a carrier pointing straight at a track page shows nothing.
