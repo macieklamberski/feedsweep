@@ -449,6 +449,51 @@ describeForEachParser('YouTube', (parseHtml) => {
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
+
+  it('should keep the playlist of a Drupal oEmbed frame whose inner url escaped its ampersands', async () => {
+    const value = html`
+      <iframe
+        src="https://example.com/media/oembed?url=https%3A//www.youtube.com/watch%3Fv%3DUi57rCk2DfU%26amp%3Blist%3DPLIil3TfyMHXRz7CSs_lOmJopR5AOsWcNF%26amp%3Bindex%3D2&amp;max_width=0&amp;max_height=0"
+        width="200"
+        height="113"
+        class="media-oembed-content"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/Ui57rCk2DfU/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=Ui57rCk2DfU"
+        data-embed-id="Ui57rCk2DfU"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/Ui57rCk2DfU?list=PLIil3TfyMHXRz7CSs_lOmJopR5AOsWcNF&index=2"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should keep the start of a frame whose ampersand the feed escaped many times', async () => {
+    const value = html`
+      <iframe
+        src="https://www.youtube.com/embed/Ps2vLw21-gk?rel=0&amp;amp;amp;amp;start=13103"
+        width="560"
+        height="315"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/Ps2vLw21-gk/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=Ps2vLw21-gk"
+        data-embed-id="Ps2vLw21-gk"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/Ps2vLw21-gk?start=13103"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
 })
 
 // A WordPress video shortcode naming the watch page, which no browser plays.

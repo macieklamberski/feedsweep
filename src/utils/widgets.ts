@@ -34,6 +34,7 @@ import {
 import {
   cleanUrl,
   collapseSlashRuns,
+  foldEscapedAmpersands,
   parseUrlOnHosts,
   resolveOrDropUrl,
   resolveOrKeepUrl,
@@ -113,7 +114,7 @@ const readObjectUrl = (element: Element): string | undefined => {
 export const readCarrierUrl = (element: Element): string => {
   const url = element.localName === 'object' ? readObjectUrl(element) : element.getAttribute('src')
 
-  return collapseSlashRuns(url ?? '')
+  return collapseSlashRuns(foldEscapedAmpersands(url ?? ''))
 }
 
 type ResolverOptions = {

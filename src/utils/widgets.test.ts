@@ -1642,6 +1642,19 @@ describeForEachParser('readCarrierUrl', (parseHtml) => {
     expect(read(value)).toBe('https://player.example.com/p/662741/embed.js')
   })
 
+  it('should fold an ampersand the feed escaped twice', () => {
+    const value = '<iframe src="https://player.example.com/embed?id=abc&amp;amp;start=30"></iframe>'
+
+    expect(read(value)).toBe('https://player.example.com/embed?id=abc&start=30')
+  })
+
+  it('should fold an ampersand the feed escaped three times', () => {
+    const value =
+      '<iframe src="https://player.example.com/embed?id=abc&amp;amp;amp;start=30"></iframe>'
+
+    expect(read(value)).toBe('https://player.example.com/embed?id=abc&start=30')
+  })
+
   it('should keep a query glued onto the path as written', () => {
     const value = '<iframe src="https://player.example.com/embed/abc&autoplay=1"></iframe>'
 
