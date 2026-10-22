@@ -442,6 +442,19 @@ describe('arcgisResolveEmbed', () => {
       expect(arcgisResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep a hash in the web map id inside the Map Viewer webmap parameter', () => {
+      const value = 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=02b63130%23x'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: '02b63130#x',
+        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=02b63130%23x',
+        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=02b63130%23x',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should read the dashboard from an Operations Dashboard fragment with a query', () => {
       const value =
         'https://www.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6?mobile=false'
