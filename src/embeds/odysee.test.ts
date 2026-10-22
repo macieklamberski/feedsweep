@@ -175,6 +175,12 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a decoded claim after a channel that is a dot segment', async () => {
+      const value = '<iframe src="https://odysee.com/%24%2Fembed%2F%40channel%3A1%2F.."></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should keep a decoded claim holding a percent sign inside one path segment', async () => {
       const value = '<iframe src="https://odysee.com/%24%2Fembed%2Fwebb%2520talk%3A7"></iframe>'
       const expected: EmbedResolverResult = {

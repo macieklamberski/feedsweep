@@ -70,6 +70,17 @@ describeForEachParser('infogramWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should ignore a mount whose chart id is a dot segment', async () => {
+      const value = html`
+        <div
+          class="infogram-embed"
+          data-id=".."
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a mount naming an empty chart id', async () => {
       const value = html`
         <div
@@ -234,6 +245,17 @@ describeForEachParser('infogramScriptEmbedResolver', (parseHtml) => {
       const value = html`
         <script
           id="infogramimg_0_ff7b6712-fc9f-408c-be33-88bc114f32ab"
+          src="https://e.infogram.com/js/dist/embed.js"
+        ></script>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a script whose chart id is a dot segment', async () => {
+      const value = html`
+        <script
+          id="infogram_0_.."
           src="https://e.infogram.com/js/dist/embed.js"
         ></script>
       `

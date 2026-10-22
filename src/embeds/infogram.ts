@@ -83,9 +83,14 @@ export const infogramScriptEmbedResolver = createMarkupEmbedResolver(
     }
 
     const chartId = attr(element, 'id')?.match(scriptIdRegex)?.[1]
-    const path = chartId ? encodeChartId(chartId) : undefined
 
-    if (!chartId || !path) {
+    if (!chartId) {
+      return
+    }
+
+    const path = encodeChartId(chartId)
+
+    if (!path) {
       return
     }
 

@@ -98,9 +98,14 @@ const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
     flashVar(element, 'assetID') ??
     parsed.pathname.match(flashEmbedPathRegex)?.[1]
   const match = asset?.match(flashAssetRegex)
-  const id = match ? encodePathSegment(match[1]) : undefined
 
-  if (!match || !id) {
+  if (!match) {
+    return
+  }
+
+  const id = encodePathSegment(match[1])
+
+  if (!id) {
     return
   }
 

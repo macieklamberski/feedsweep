@@ -42,13 +42,7 @@ const readGistPath = (element: Element): string | undefined => {
   // <amp-gist> names the gist by id alone, with no owner. `gist.github.com/{id}` redirects to
   // the owned URL, so the bare id makes the same link the script form does.
   if (element.localName === 'amp-gist') {
-    const gistId = element.getAttribute('data-gistid')
-
-    if (!gistId) {
-      return
-    }
-
-    return encodeGistPath(gistId)
+    return encodeGistPath(element.getAttribute('data-gistid') ?? '')
   }
 
   if (element.matches(gistMountSelector)) {
