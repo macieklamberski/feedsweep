@@ -1,3 +1,4 @@
+import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { attr, isElement, isNonWhitespaceText, isWhitespaceText } from '../utils/dom.js'
 import {
@@ -68,7 +69,7 @@ export const facebookElementEmojiResolver: EmojiResolver = {
 }
 
 // The code Facebook's chat turned into each classic emoticon, by the class suffix it painted.
-const classicCodes: Record<string, string> = {
+const classicCodes = toMap({
   smile: ':)',
   frown: ':(',
   tongue: ':P',
@@ -97,9 +98,9 @@ const classicCodes: Record<string, string> = {
   putnam: ':putnam:',
   42: ':42:',
   poop: ':poop:',
-}
+})
 
-const classicNames = Object.keys(classicCodes)
+const classicNames = [...classicCodes.keys()]
 // Only Facebook's own names, since other widgets name classes like `emoticon_box` the same way.
 const classicClassRegex = new RegExp(`(?:^|\\s)emoticon_(${classicNames.join('|')})(?:\\s|$)`)
 const textClassSelector = 'span[class~="emoticon_text"]'
@@ -123,7 +124,7 @@ export const facebookClassicEmojiResolver: EmojiResolver = {
     }
 
     const title = attr(element, 'title')
-    const code = classicCodes[name]
+    const code = classicCodes.get(name)
     const text = element.textContent?.trim()
 
     if (text && text !== title && text !== code) {
@@ -257,7 +258,7 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
       return
     }
 
-    const code = classicCodes[name]
+    const code = classicCodes.get(name)
     const glyph = glyphFromShortcode(code)
 
     if (zeroSize) {

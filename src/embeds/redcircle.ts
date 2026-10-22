@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -14,11 +14,11 @@ const redcircleHosts = ['redcircle.com', 'api.podcache.net']
 const playerHeights = { episode: 170, show: 320 }
 
 // `embedded-show-webplayer` is the show player's real page: `embedded-show-player` answers 404.
-const routes = {
+const routes = toMap<'episode' | 'show'>({
   'embedded-player': 'episode',
   'embedded-show-player': 'show',
   'embedded-show-webplayer': 'show',
-} as const
+})
 
 // The episode player takes both ids: RedCircle addresses an episode under its show, so neither
 // uuid on its own rebuilds the endpoint.
@@ -26,7 +26,7 @@ const readSubject = (
   segments: Array<string>,
 ): { kind: 'episode' | 'show'; show: string; episode?: string } | undefined => {
   const [route, ...rest] = segments
-  const kind = route ? routes[route as keyof typeof routes] : undefined
+  const kind = route ? routes.get(route) : undefined
 
   if (!kind) {
     return
