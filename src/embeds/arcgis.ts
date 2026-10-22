@@ -6,10 +6,11 @@ import {
   isHostOf,
   isHostOrSubdomainOf,
   parseUrl,
+  trimObject,
 } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Item = {
@@ -82,9 +83,10 @@ const composeClassicSource = (
   webMapId: string,
   positionParams: Array<string>,
 ): string => {
+  const query = composeQuery({ webmap: webMapId })
   const position = filterUrlQuery(url, (name) => isAnyOf(name, positionParams))
 
-  return `https://www.arcgis.com${path}?webmap=${webMapId}${position.replace('?', '&')}`
+  return `https://www.arcgis.com${path}${query}${position.replace('?', '&')}`
 }
 
 // `configurableview` is what Map Viewer's iframe embed writes: the map without the viewer's
@@ -103,17 +105,14 @@ const composeWebMapSource = (url: URL, path: string, webMapId: string): string =
   // retired template moves to the classic embed viewer. Its `extent` is the same longitude and
   // latitude box OnePane wrote as `gcsextent`.
   if (path === onePanePath) {
-    const src = `https://www.arcgis.com${embedViewerPath}?webmap=${webMapId}`
     const extent = getQueryParam(url.searchParams, 'gcsextent')
+    const query = composeQuery(trimObject({ webmap: webMapId, extent }, Boolean))
 
-    if (!extent) {
-      return src
-    }
-
-    return `${src}&extent=${extent}`
+    return `https://www.arcgis.com${embedViewerPath}${query}`
   }
 
-  const src = `https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=${webMapId}`
+  const query = composeQuery({ configurableview: 'true', webmap: webMapId })
+  const src = `https://www.arcgis.com/apps/mapviewer/index.html${query}`
   const position = filterUrlQuery(url, (name) => isAnyOf(name, mapViewerPositionParams))
 
   return `${src}${position.replace('?', '&')}`
@@ -135,7 +134,7 @@ const readPortalItem = (url: URL): Item | undefined => {
     return {
       id: webMapId,
       src: composeWebMapSource(url, webMapPath, webMapId),
-      url: `https://www.arcgis.com${page}?webmap=${webMapId}`,
+      url: `https://www.arcgis.com${page}${composeQuery({ webmap: webMapId })}`,
     }
   }
 
@@ -148,7 +147,8 @@ const readPortalItem = (url: URL): Item | undefined => {
       return
     }
 
-    const src = `https://www.arcgis.com/apps/instant/${template}/index.html?appid=${appId}`
+    const query = composeQuery({ appid: appId })
+    const src = `https://www.arcgis.com/apps/instant/${template}/index.html${query}`
 
     return composeItem(appId, src)
   }
