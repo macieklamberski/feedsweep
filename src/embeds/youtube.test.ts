@@ -190,6 +190,14 @@ describe('readYoutubeEmbedSrc', () => {
 
       expect(readYoutubeEmbedSrc(value)).toBe(expected)
     })
+
+    // Constructed: the transforms reading urls here get no repair from the resolver factory.
+    it('should drop a slash closing a value in a glued Flash query', () => {
+      const value = 'http://www.youtube.com/v/dQw4w9WgXcQ&hl=en_US&start=30/'
+      const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ?start=30'
+
+      expect(readYoutubeEmbedSrc(value)).toBe(expected)
+    })
   })
 
   describe('sad paths', () => {

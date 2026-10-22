@@ -539,6 +539,26 @@ describeForEachParser('archiveAudioEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // Constructed: an `<audio>` gets no repair from the resolver factory.
+    it('should drop a slash closing a query value', async () => {
+      const value = html`
+        <audio
+          controls
+          src="https://archive.org/details/joh-18-mp-3?playlist=1/"
+        ></audio>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'archive',
+        id: 'joh-18-mp-3',
+        src: 'https://archive.org/embed/joh-18-mp-3?playlist=1',
+        url: 'https://archive.org/details/joh-18-mp-3',
+        thumbnail: 'https://archive.org/services/img/joh-18-mp-3',
+        height: 30,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The player takes `+` for a space, as the page does.
     it('should drop the counter WordPress appends and keep the file as written', async () => {
       const value = html`
