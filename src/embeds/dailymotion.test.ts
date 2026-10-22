@@ -538,6 +538,14 @@ describe('readDailymotionEmbedSrc', () => {
 
     expect(readDailymotionEmbedSrc(value)).toBe(expected)
   })
+
+  // Constructed: the transforms reading urls here get no repair from the resolver factory.
+  it('should drop a slash closing the video parameter', () => {
+    const value = 'https://geo.dailymotion.com/player.html?video=x7tgad0/'
+    const expected = 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0'
+
+    expect(readDailymotionEmbedSrc(value)).toBe(expected)
+  })
 })
 
 describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
