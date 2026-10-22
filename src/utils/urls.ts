@@ -237,13 +237,14 @@ export const isDotSegment = (value: string): boolean => {
 
 // A decoded value written into a url path stays one segment. Only the characters that would open
 // a new segment, a query or a fragment, a literal `%` and whitespace are escaped, so an `@`, `=` or
-// `:` the value holds reads as written. A dot segment is refused.
+// `:` the value holds reads as written. A url parser reads `\` as `/` in an http path, so it is
+// escaped too. A dot segment is refused.
 export const encodePathSegment = (value: string): string | undefined => {
   if (isDotSegment(value)) {
     return
   }
 
-  return value.replace(/[%/?#\s]/g, (character) => encodeURIComponent(character))
+  return value.replace(/[%/?#\\\s]/g, (character) => encodeURIComponent(character))
 }
 
 // The publisher's query with only the parameters a player reads left in it. Each pair stays as

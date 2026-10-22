@@ -263,6 +263,13 @@ describe('encodePathSegment', () => {
     expect(encodePathSegment(value)).toBe(expected)
   })
 
+  it('should escape a backslash, which a url parser reads as a slash', () => {
+    const value = '..\\..\\x'
+    const expected = '..%5C..%5Cx'
+
+    expect(encodePathSegment(value)).toBe(expected)
+  })
+
   it('should leave the characters a path segment may hold as written', () => {
     const value = '35408001@N04:urn=a&b'
 
