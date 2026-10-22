@@ -7,7 +7,10 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'yandexmaps'
 
 const yandexMapsHosts = ['api-maps.yandex.ru']
+// Each host serves the same widget in its own language, yandex.com in English, so a frame keeps
+// the host the publisher wrote. The script names no widget host and takes yandex.ru.
 const yandexMapsWidgetHosts = ['yandex.by', 'yandex.com', 'yandex.ru']
+const scriptWidgetHost = 'yandex.ru'
 
 const widgetPath = '/map-widget/v1/'
 // A short link the map's share dialog writes, `/map-widget/v1/-/{code}`. The code names the same
@@ -33,13 +36,16 @@ const composeStatic = (um: string): string => {
   return `https://api-maps.yandex.ru/services/constructor/1.0/static/${query}`
 }
 
-const composeWidget = (um: string): string => {
+const composeWidget = (host: string, um: string): string => {
   const query = composeQuery({ um, source: 'constructor' })
 
-  return `https://yandex.ru${widgetPath}${query}`
+  return `https://${host}${widgetPath}${query}`
 }
 
-const resolveConstructorMap = (query: URLSearchParams): EmbedResolverResult | undefined => {
+const resolveConstructorMap = (
+  host: string,
+  query: URLSearchParams,
+): EmbedResolverResult | undefined => {
   const constructorId = query.get('um')?.match(constructorIdRegex)?.[1] ?? query.get('sid')
 
   if (!constructorId) {
@@ -51,13 +57,14 @@ const resolveConstructorMap = (query: URLSearchParams): EmbedResolverResult | un
   return {
     provider,
     id: um,
-    src: composeWidget(um),
+    src: composeWidget(host, um),
     thumbnail: composeStatic(um),
     height: mapHeight,
   }
 }
 
 const resolveCoordinateMap = (
+  host: string,
   query: URLSearchParams,
   element: Element | undefined,
 ): EmbedResolverResult | undefined => {
@@ -71,7 +78,7 @@ const resolveCoordinateMap = (
 
   return {
     provider,
-    src: `https://yandex.ru${widgetPath}${position}`,
+    src: `https://${host}${widgetPath}${position}`,
     height: mapHeight,
     title: attr(element, 'title'),
   }
@@ -89,7 +96,7 @@ export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return resolveConstructorMap(url.searchParams)
+    return resolveConstructorMap(scriptWidgetHost, url.searchParams)
   },
 )
 
@@ -99,24 +106,29 @@ export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
   yandexMapsWidgetHosts,
   (url, element) => {
     const parsed = parseUrl(url)
-    const code = parsed?.pathname.match(shortLinkPathRegex)?.groups?.code
+
+    if (!parsed) {
+      return
+    }
+
+    const code = parsed.pathname.match(shortLinkPathRegex)?.groups?.code
 
     if (code) {
       return {
         provider,
         id: `-/${code}`,
-        src: `https://yandex.ru${widgetPath}-/${code}`,
+        src: `https://${parsed.hostname}${widgetPath}-/${code}`,
         height: mapHeight,
       }
     }
 
-    if (parsed?.pathname.toLowerCase() !== widgetPath) {
+    if (parsed.pathname.toLowerCase() !== widgetPath) {
       return
     }
 
     return (
-      resolveConstructorMap(parsed.searchParams) ??
-      resolveCoordinateMap(parsed.searchParams, element)
+      resolveConstructorMap(parsed.hostname, parsed.searchParams) ??
+      resolveCoordinateMap(parsed.hostname, parsed.searchParams, element)
     )
   },
 )
