@@ -386,6 +386,28 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep where a constructor frame opens', async () => {
+      const value = html`
+        <iframe
+          src="https://yandex.by/map-widget/v1/?from=mapframe&amp;ll=27.562149%2C53.939212&amp;mode=usermaps&amp;source=mapframe&amp;um=constructor%3A0242b1593be31838cd4117b8071e0f6d04082335598e31436a84d2e2a02ddd17&amp;utm_source=mapframe&amp;z=16"
+          width="560"
+          height="400"
+          frameborder="1"
+          allowfullscreen="true"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        id: 'constructor:0242b1593be31838cd4117b8071e0f6d04082335598e31436a84d2e2a02ddd17',
+        src: 'https://yandex.by/map-widget/v1/?um=constructor%3A0242b1593be31838cd4117b8071e0f6d04082335598e31436a84d2e2a02ddd17&source=constructor&ll=27.562149%2C53.939212&z=16',
+        thumbnail:
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A0242b1593be31838cd4117b8071e0f6d04082335598e31436a84d2e2a02ddd17&width=650&height=400',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should claim a short link frame', async () => {
       const value = html`
         <iframe

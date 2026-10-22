@@ -21,9 +21,9 @@ const shortLinkPathRegex = /^\/map-widget\/v1\/-\/(?<code>[^/]+)\/?$/i
 // names the constructor space, since `um` also carries `mymaps:` maps.
 const constructorIdRegex = /^constructor:(.+)/
 
-// A coordinate map names no item, only where the map opens: its centre `ll`, its zoom `z` and its
-// layer `l`. A frame naming anything more, such as an organisation's `oid` or a search `text`,
-// stays as written.
+// Where a map opens: its centre `ll`, its zoom `z` and its layer `l`. A coordinate map names
+// nothing more, so a frame naming more, such as an organisation's `oid` or a search `text`, stays
+// as written.
 const positionParams = ['ll', 'z', 'l']
 
 const mapHeight = 400
@@ -36,8 +36,8 @@ const composeStatic = (um: string): string => {
   return `https://api-maps.yandex.ru/services/constructor/1.0/static/${query}`
 }
 
-const composeWidget = (host: string, um: string): string => {
-  const query = composeQuery({ um, source: 'constructor' })
+const composeWidget = (host: string, um: string, position: Record<string, string>): string => {
+  const query = composeQuery({ um, source: 'constructor', ...position })
 
   return `https://${host}${widgetPath}${query}`
 }
@@ -45,6 +45,7 @@ const composeWidget = (host: string, um: string): string => {
 const resolveConstructorMap = (
   host: string,
   query: URLSearchParams,
+  position: Record<string, string>,
 ): EmbedResolverResult | undefined => {
   const constructorId = query.get('um')?.match(constructorIdRegex)?.[1] ?? query.get('sid')
 
@@ -57,7 +58,7 @@ const resolveConstructorMap = (
   return {
     provider,
     id: um,
-    src: composeWidget(host, um),
+    src: composeWidget(host, um, position),
     thumbnail: composeStatic(um),
     height: mapHeight,
   }
@@ -96,7 +97,7 @@ export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return resolveConstructorMap(scriptWidgetHost, url.searchParams)
+    return resolveConstructorMap(scriptWidgetHost, url.searchParams, {})
   },
 )
 
@@ -126,8 +127,10 @@ export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
       return
     }
 
+    const position = pickQueryParams(parsed.search, positionParams)
+
     return (
-      resolveConstructorMap(parsed.hostname, parsed.searchParams) ??
+      resolveConstructorMap(parsed.hostname, parsed.searchParams, position) ??
       resolveCoordinateMap(parsed.hostname, parsed.searchParams, element)
     )
   },
