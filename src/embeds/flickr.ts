@@ -212,6 +212,7 @@ const readPhotoPlayer = (parsed: URL): { src: string; photo: FlickrPhoto } | und
       photoId: player[2],
       secret: player[3],
     }
+
     return { src: composePagePhotoPlayer(photo), photo }
   }
 
