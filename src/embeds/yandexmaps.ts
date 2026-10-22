@@ -36,8 +36,8 @@ const composeStatic = (um: string): string => {
   return `https://api-maps.yandex.ru/services/constructor/1.0/static/${query}`
 }
 
-const composeWidget = (host: string, um: string, position: Record<string, string>): string => {
-  const query = composeQuery({ um, source: 'constructor', ...position })
+const composeWidget = (host: string, um: string, params: Record<string, string>): string => {
+  const query = composeQuery({ um, source: 'constructor', ...params })
 
   return `https://${host}${widgetPath}${query}`
 }
@@ -54,11 +54,14 @@ const resolveConstructorMap = (
   }
 
   const um = `constructor:${constructorId}`
+  // The interface language the publisher chose. The Constructor's own script writes it onto the
+  // widget it loads, which otherwise renders in its host's language.
+  const language = pickQueryParams(query.toString(), ['lang'])
 
   return {
     provider,
     id: um,
-    src: composeWidget(host, um, position),
+    src: composeWidget(host, um, { ...language, ...position }),
     thumbnail: composeStatic(um),
     height: mapHeight,
   }
