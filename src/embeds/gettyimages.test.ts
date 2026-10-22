@@ -107,6 +107,20 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should drop a query that carries no signature', async () => {
+      const value =
+        '<iframe src="https://embed.gettyimages.com/embed/1179214625?et=c6v3oJKLRHl-sP1_Ytjj1g&tld=co.uk"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'gettyimages',
+        id: '1179214625',
+        src: 'https://embed.gettyimages.com/embed/1179214625',
+        url: 'https://www.gettyimages.com/detail/1179214625',
+        ratio: '3/2',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should resolve an item id shorter than the ones Getty mints today', async () => {
       const value =
         '<iframe src="https://embed.gettyimages.com/embed/83621?et=cDxg5NFcRMx1XLFxZDgc0w&tld=com&sig=VHEk4Nmc0V832P7TTYFTGYLHOid_pXnO05LCJzLgVIY=&caption=true"></iframe>'
