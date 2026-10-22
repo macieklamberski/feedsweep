@@ -239,3 +239,19 @@ describeForEachParser('simplecast through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('simplecastEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, simplecastEmbedResolver)
+
+  it('should read the route word `e` in capitals', async () => {
+    const value = '<iframe src="https://simplecast.com/E/1234567?style=medium"></iframe>'
+    const expected = {
+      provider: 'simplecast',
+      id: '1234567',
+      src: 'https://simplecast.com/e/1234567',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

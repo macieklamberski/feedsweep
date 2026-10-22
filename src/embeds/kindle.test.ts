@@ -350,3 +350,35 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('kindleEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, kindleEmbedResolver)
+
+  it('should read the route words `kp` and `card` in capitals', async () => {
+    const value =
+      '<iframe src="https://read.amazon.com/KP/CARD?preview=inline&amp;linkCode=kpd&amp;ref_=k4w_oembed_dQVcnKwFnAcXcz&amp;asin=B08DGQCKF3&amp;tag=kpembed-20"></iframe>'
+    const expected = {
+      provider: 'kindle',
+      id: 'read.amazon.com/B08DGQCKF3',
+      src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
+      thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
+      height: 550,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `asin` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://read.amazon.com/kp/card?preview=inline&amp;linkCode=kpd&amp;ref_=k4w_oembed_dQVcnKwFnAcXcz&amp;ASIN=B08DGQCKF3&amp;tag=kpembed-20"></iframe>'
+    const expected = {
+      provider: 'kindle',
+      id: 'read.amazon.com/B08DGQCKF3',
+      src: 'https://read.amazon.com/kp/card?asin=B08DGQCKF3',
+      thumbnail: 'https://m.media-amazon.com/images/P/B08DGQCKF3.01._SCLZZZZZZZ_.jpg',
+      height: 550,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

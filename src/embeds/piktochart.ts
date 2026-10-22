@@ -12,7 +12,7 @@ const piktochartHosts = [
 ]
 
 // The uid is `{id}-{slug}`, and both halves select the item: a wrong slug answers 404.
-const embedPathRegex = /^\/embed\/([^/]+)\/?$/
+const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 
 // An infographic scales to the frame's width, so its height is the item's own length.
 const embedRatio = '1/2'

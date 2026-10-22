@@ -1176,3 +1176,58 @@ describeForEachParser('soundcloudEmbedResolver carrier title', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('soundcloudEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, soundcloudEmbedResolver)
+
+  it('should read the route word `stream` in capitals', async () => {
+    const value =
+      '<iframe src="https://feeds.soundcloud.com/STREAM/829184995-arizona-capitol-times-the-breakdown-the-breakdown-a-sine-die-surprise.mp3"></iframe>'
+    const expected = {
+      provider: 'soundcloud',
+      src: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/829184995',
+      id: 'tracks/829184995',
+      height: 166,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `sets` in capitals', async () => {
+    const value = '<iframe src="https://soundcloud.com/anjunadeep/SETS/edition"></iframe>'
+    const expected = {
+      provider: 'soundcloud',
+      src: 'https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/anjunadeep/SETS/edition',
+      url: 'https://soundcloud.com/anjunadeep/SETS/edition',
+      height: 450,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `url` and `secret_token` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://w.soundcloud.com/player/?URL=https%3A//api.soundcloud.com/tracks/42888746&amp;SECRET_TOKEN=s-zV49D"></iframe>'
+    const expected = {
+      provider: 'soundcloud',
+      src: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/42888746&secret_token=s-zV49D',
+      id: 'tracks/42888746',
+      height: 166,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `start_track` and `url` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://w.soundcloud.com/player/?auto_play=false&amp;buying=false&amp;liking=false&amp;download=false&amp;sharing=false&amp;show_artwork=true&amp;show_comments=false&amp;show_playcount=false&amp;show_user=true&amp;hide_related=true&amp;visual=false&amp;START_TRACK=0&amp;URL=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F2257128254"></iframe>'
+    const expected = {
+      provider: 'soundcloud',
+      src: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2257128254&start_track=0',
+      id: 'tracks/2257128254',
+      height: 166,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

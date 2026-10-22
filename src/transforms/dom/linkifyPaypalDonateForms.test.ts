@@ -394,3 +394,36 @@ describeForEachParser('linkifyPaypalDonateForms', (parseHtml) => {
     expect(twice).toEqualHtml(once)
   })
 })
+
+describeForEachParser('linkifyPaypalDonateForms in any case', (parseHtml) => {
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [linkifyPaypalDonateForms(baseContext)])
+  }
+
+  it('should link a donate form whose path is in capitals', async () => {
+    const value = html`
+      <form action="https://www.paypal.com/DONATE">
+        <input
+          name="hosted_button_id"
+          type="hidden"
+          value="2BXZQLFUKNZ3Y"
+        >
+        <input
+          type="image"
+          src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"
+          alt="Donate with PayPal button"
+        >
+      </form>
+    `
+    const expected = html`
+      <a href="https://www.paypal.com/donate/?hosted_button_id=2BXZQLFUKNZ3Y">
+        <img
+          alt="Donate with PayPal button"
+          src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"
+        >
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})

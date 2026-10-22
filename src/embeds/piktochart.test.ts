@@ -201,3 +201,21 @@ describeForEachParser('piktochart through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('piktochartIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, piktochartIframeEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://create.piktochart.com/EMBED/30289406-new-piktochart-copy"></iframe>'
+    const expected = {
+      provider: 'piktochart',
+      id: '30289406-new-piktochart-copy',
+      src: 'https://create.piktochart.com/embed/30289406-new-piktochart-copy',
+      url: 'https://create.piktochart.com/output/30289406-new-piktochart-copy',
+      ratio: '1/2',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

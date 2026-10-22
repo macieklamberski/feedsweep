@@ -1,6 +1,6 @@
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const podetizeHosts = ['player.podetize.com']
@@ -30,18 +30,18 @@ const composeEmbed = (id: string, isEpisodeMode: boolean): EmbedResolverResult =
 
 export const podetizeResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, podetizeHosts)
-  const id = parsed?.searchParams.get('id')
+  const id = getQueryParam(parsed?.searchParams, 'id')
 
   if (parsed?.pathname !== '/' || !id) {
     return
   }
 
-  return composeEmbed(id, parsed.searchParams.get('epmode') === 'true')
+  return composeEmbed(id, getQueryParam(parsed.searchParams, 'epmode') === 'true')
 }
 
 // Podetize's ShowCastR loader script mounts the player where it stands, and a reader strips it.
 export const podetizeScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="player.podetize.com/loadShowcasePlayer.js"][data]',
+  'script[src*="player.podetize.com/loadShowcasePlayer.js" i][data]',
   (element) => {
     const id = attr(element, 'data')
 

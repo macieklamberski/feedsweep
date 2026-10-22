@@ -1,6 +1,6 @@
-import { parseUrl } from 'trousse'
+import { isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, getQueryParam, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'voki'
@@ -8,7 +8,7 @@ const provider = 'voki'
 const flashHosts = ['vhss-a.oddcast.com', 'vhss-d.oddcast.com']
 const pickupHost = 'www.voki.com'
 
-const flashPlayerPathRegex = /^\/vhss_editors\/voki_player\.swf$/
+const flashPlayerPathRegex = /^\/vhss_editors\/voki_player\.swf$/i
 const pickupPathRegex = /^\/site\/pickup\/?$/i
 
 // The pickup page sizes the player to its window less 280 pixels of site chrome, so this frame
@@ -40,12 +40,12 @@ const vokiFlashResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // The scene url ends in `getvoki/chsm={chsm}&sc={sc}`, its `&` kept as `%26` inside `doc`.
-  const [route, scene] = parsed.searchParams.get('doc')?.split('/').slice(-2) ?? []
+  const [route, scene] = getQueryParam(parsed.searchParams, 'doc')?.split('/').slice(-2) ?? []
   const params = new URLSearchParams(scene)
-  const sc = params.get('sc')
-  const chsm = params.get('chsm')
+  const sc = getQueryParam(params, 'sc')
+  const chsm = getQueryParam(params, 'chsm')
 
-  if (route !== 'getvoki' || !sc || !chsm) {
+  if (!isAnyOf(route, 'getvoki') || !sc || !chsm) {
     return
   }
 
@@ -64,8 +64,8 @@ const vokiResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const sc = parsed.searchParams.get('scid')
-  const chsm = parsed.searchParams.get('chsm')
+  const sc = getQueryParam(parsed.searchParams, 'scid')
+  const chsm = getQueryParam(parsed.searchParams, 'chsm')
 
   if (!sc || !chsm) {
     return

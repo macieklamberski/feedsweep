@@ -9,15 +9,15 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `playerivoox_ee_`, `_ep_` and `_em_` are three generations of the legacy episode player, and
 // all of them name the episode by the same numeric id.
-const legacyPlayerRegex = /\/playerivoox_e[emp]_([^_/]+)_\d+\.html$/
+const legacyPlayerRegex = /\/playerivoox_e[emp]_([^_/]+)_\d+\.html$/i
 // Enumerated, not `e[a-z]`: `player_el_` answers 404 while `ej` and `ek` serve.
 // `player_ej_` is the current player and `player_ek_` the mini one.
-const episodePlayerRegex = /\/player_e[jk]_([^_/]+)(?:_\d+)?_(\d+)\.html$/
+const episodePlayerRegex = /\/player_e[jk]_([^_/]+)(?:_\d+)?_(\d+)\.html$/i
 
 // The show player, which carries every episode. Its id is the podcast's, a different id space
 // from an episode's, so it cannot share the episode kind.
 // The skin is a number, or `zp` on the current player.
-const showPlayerRegex = /\/player_es_podcast_([^_/]+)(?:_[^_/]+)?_(\d+)\.html$/
+const showPlayerRegex = /\/player_es_podcast_([^_/]+)(?:_[^_/]+)?_(\d+)\.html$/i
 
 const ivooxHosts = ['ivoox.com']
 

@@ -1,8 +1,8 @@
-import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
-import { composeQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, getQueryParam, isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codesandbox'
@@ -53,8 +53,8 @@ const parseTarget = (value: string | undefined): CodesandboxTarget | undefined =
   // `/embed/{slug}` is the embed renderer and `/s/{slug}` the legacy user url for the same sandbox.
   // `/p/sandbox/` and `/p/devbox/` are the DevBox-era routes, which take `?embed=1` on the page's
   // own address.
-  const isProject = first === 'p' && projectKinds.includes(second)
-  const isPlayer = playerRoutes.includes(first)
+  const isProject = isAnyOf(first, 'p') && isAnyOf(second, projectKinds)
+  const isPlayer = isAnyOf(first, playerRoutes)
   let slug: string | undefined
 
   if (isProject) {
@@ -77,14 +77,14 @@ const parseTarget = (value: string | undefined): CodesandboxTarget | undefined =
   // The file the editor opens on, spelled `file` on the DevBox-era routes and `module` on the
   // embed renderer. The rest of the query is the editor's look.
   if (isProject) {
-    const pagePath = `p/${second}/${slug}`
-    const file = parsed.searchParams.get('file') ?? undefined
+    const pagePath = `p/${second.toLowerCase()}/${slug}`
+    const file = getQueryParam(parsed.searchParams, 'file')
     const query = composeQuery(trimObject({ file, embed: '1' }, Boolean))
 
     return { slug, id, pagePath, src: `https://codesandbox.io/${pagePath}${query}` }
   }
 
-  const module = parsed.searchParams.get('module') ?? undefined
+  const module = getQueryParam(parsed.searchParams, 'module')
   const query = composeQuery(trimObject({ module }, Boolean))
 
   return { slug, id, pagePath: `s/${slug}`, src: `https://codesandbox.io/embed/${slug}${query}` }

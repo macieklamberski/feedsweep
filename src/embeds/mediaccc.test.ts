@@ -99,6 +99,19 @@ describe('mediacccResolveEmbed', () => {
 
       expect(mediacccResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the route words in another case and mint them in lowercase', () => {
+      const value = 'https://media.ccc.de/V/why2025-23-tic-80-byte-jam/OEMBED'
+      const expected = {
+        provider: 'mediaccc',
+        id: 'why2025-23-tic-80-byte-jam',
+        src: 'https://media.ccc.de/v/why2025-23-tic-80-byte-jam/oembed',
+        url: 'https://media.ccc.de/v/why2025-23-tic-80-byte-jam',
+        ratio: '16/9',
+      }
+
+      expect(mediacccResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -116,12 +129,6 @@ describe('mediacccResolveEmbed', () => {
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://media.ccc.de/v/why2025-23-tic-80-byte-jam/oembed/extra'
-
-      expect(mediacccResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the route words in another case, which the server answers with 404', () => {
-      const value = 'https://media.ccc.de/V/why2025-23-tic-80-byte-jam/OEMBED'
 
       expect(mediacccResolveEmbed(value)).toBeUndefined()
     })
@@ -228,5 +235,23 @@ describeForEachParser('mediaccc through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('mediacccEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mediacccEmbedResolver)
+
+  it('should read the route words `v` and `oembed` in capitals', async () => {
+    const value =
+      '<iframe src="https://media.ccc.de/V/38c3-going-long-sending-weird-signals-over-long-haul-optical-networks/OEMBED"></iframe>'
+    const expected = {
+      provider: 'mediaccc',
+      id: '38c3-going-long-sending-weird-signals-over-long-haul-optical-networks',
+      src: 'https://media.ccc.de/v/38c3-going-long-sending-weird-signals-over-long-haul-optical-networks/oembed',
+      url: 'https://media.ccc.de/v/38c3-going-long-sending-weird-signals-over-long-haul-optical-networks',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

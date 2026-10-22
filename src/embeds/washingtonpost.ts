@@ -7,8 +7,8 @@ const provider = 'washingtonpost'
 
 const washingtonpostHosts = ['washingtonpost.com']
 
-const embedPathRegex = /^\/video\/c\/embed\/([^/]+)\/?$/
-const inlinePathRegex = /\/([^/]+)_inline\.html$/
+const embedPathRegex = /^\/video\/c\/embed\/([^/]+)\/?$/i
+const inlinePathRegex = /\/([^/]+)_inline\.html$/i
 
 // The Washington Post video player. The 2012 inline player, `{id}_inline.html`, is rebuilt onto
 // the embed route when its id is a video uuid. The older `gJQA…` ids name no uuid.

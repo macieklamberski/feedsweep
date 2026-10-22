@@ -1,3 +1,4 @@
+import { isAnyOf } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { resolveEmojiElement } from '../utils/emojis.js'
@@ -14,7 +15,7 @@ export const gitlabEmojiResolver: EmojiResolver = {
 
     // A custom emoji has no glyph, only the picture in fallback-src. GitLab leaves the element
     // empty or wraps its own image of it, alt included.
-    if (fallbackSrc && attr(element, 'data-unicode-version') === 'custom') {
+    if (fallbackSrc && isAnyOf(attr(element, 'data-unicode-version'), 'custom')) {
       return { image: fallbackSrc, alt: shortcode }
     }
 

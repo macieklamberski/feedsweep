@@ -232,3 +232,49 @@ describeForEachParser('subsplash player through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('subsplashEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, subsplashEmbedResolver)
+
+  it('should read the route words `u`, `media`, `embed` and `d` in capitals', async () => {
+    const value =
+      '<iframe src="https://subsplash.com/U/pastorallenjackson/MEDIA/EMBED/D/67wnjbx?info=0&amp;logoWatermark=0&amp;shareable=0"></iframe>'
+    const expected = {
+      provider: 'subsplash',
+      id: '67wnjbx',
+      src: 'https://subsplash.com/u/pastorallenjackson/media/embed/d/67wnjbx',
+      url: 'https://subspla.sh/67wnjbx',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `embed` and `mi` in capitals', async () => {
+    const value =
+      '<iframe src="https://subsplash.com/+754a/EMBED/MI/+r58c2x5?audio&amp;info&amp;embeddable&amp;shareable&amp;logo_watermark"></iframe>'
+    const expected = {
+      provider: 'subsplash',
+      id: 'r58c2x5',
+      src: 'https://subsplash.com/+754a/embed/mi/+r58c2x5',
+      url: 'https://subspla.sh/r58c2x5',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `t` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://subsplash.com/u/cbcponca/media/embed/d/zrgcjnm?T=120&amp;utm_source=feed"></iframe>'
+    const expected = {
+      provider: 'subsplash',
+      id: 'zrgcjnm',
+      src: 'https://subsplash.com/u/cbcponca/media/embed/d/zrgcjnm?t=120',
+      url: 'https://subspla.sh/zrgcjnm',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

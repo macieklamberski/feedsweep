@@ -871,3 +871,52 @@ describeForEachParser('pixiv through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('pixivIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, pixivIframeEmbedResolver)
+
+  it('should read the route word `oembed_iframe.php` in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.pixiv.net/OEMBED_IFRAME.PHP?type=illust&amp;id=68454421"></iframe>'
+    const expected = {
+      provider: 'pixiv',
+      id: '68454421',
+      src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=68454421',
+      url: 'https://www.pixiv.net/artworks/68454421',
+      width: 600,
+      height: 315,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `embed_mk2.php` in capitals', async () => {
+    const value =
+      '<iframe src="http://embed.pixiv.net/EMBED_MK2.PHP?id=20876902_3eb1f86c6564f3f6b250710fc5f386e0&amp;size=small&amp;border=on&amp;done=null"></iframe>'
+    const expected = {
+      provider: 'pixiv',
+      id: '20876902',
+      src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=20876902',
+      url: 'https://www.pixiv.net/artworks/20876902',
+      width: 600,
+      height: 315,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `type` and `id` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.pixiv.net/oembed_iframe.php?TYPE=illust&amp;ID=68454421"></iframe>'
+    const expected = {
+      provider: 'pixiv',
+      id: '68454421',
+      src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=68454421',
+      url: 'https://www.pixiv.net/artworks/68454421',
+      width: 600,
+      height: 315,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

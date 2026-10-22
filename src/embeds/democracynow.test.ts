@@ -77,12 +77,6 @@ describe('democracynowResolveEmbed', () => {
       expect(democracynowResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for the route word in capitals, which the server answers 404', () => {
-      const value = 'https://www.democracynow.org/EMBED/show/2023/6/27'
-
-      expect(democracynowResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a kind the player does not serve', () => {
       const value =
         'https://www.democracynow.org/embed/clip/2014/10/22/in_un_speech_noam_chomsky_blasts'
@@ -144,6 +138,19 @@ describe('democracynowResolveEmbed', () => {
         id: 'show/2023/06/27',
         src: 'https://www.democracynow.org/embed/show/2023/06/27',
         url: 'https://www.democracynow.org/shows/2023/06/27',
+        ratio: '16/9',
+      }
+
+      expect(democracynowResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the route word in capitals and mint it in lowercase', () => {
+      const value = 'https://www.democracynow.org/EMBED/show/2023/6/27'
+      const expected = {
+        provider: 'democracynow',
+        id: 'show/2023/6/27',
+        src: 'https://www.democracynow.org/embed/show/2023/6/27',
+        url: 'https://www.democracynow.org/shows/2023/6/27',
         ratio: '16/9',
       }
 
@@ -357,5 +364,36 @@ describeForEachParser('democracynow player through the pipeline', (parseHtml) =>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('democracynowIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, democracynowIframeEmbedResolver)
+
+  it('should read the route words `embed` and `story` in capitals', async () => {
+    const value =
+      '<iframe src="http://www.democracynow.org/EMBED/STORY/2014/10/22/in_un_speech_noam_chomsky_blasts"></iframe>'
+    const expected = {
+      provider: 'democracynow',
+      id: 'story/2014/10/22/in_un_speech_noam_chomsky_blasts',
+      src: 'https://www.democracynow.org/embed/story/2014/10/22/in_un_speech_noam_chomsky_blasts',
+      url: 'https://www.democracynow.org/2014/10/22/in_un_speech_noam_chomsky_blasts',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `embed` and `show` in capitals', async () => {
+    const value = '<iframe src="https://www.democracynow.org/EMBED/SHOW/2023/6/27"></iframe>'
+    const expected = {
+      provider: 'democracynow',
+      id: 'show/2023/6/27',
+      src: 'https://www.democracynow.org/embed/show/2023/6/27',
+      url: 'https://www.democracynow.org/shows/2023/6/27',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

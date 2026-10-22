@@ -23,11 +23,11 @@ const readLayout = (options: Array<string>): string => {
   for (let index = 0; index < options.length; index += 2) {
     const value = options[index + 1]
 
-    if (options[index] === 'width') {
+    if (isAnyOf(options[index], 'width')) {
       width = value
     }
 
-    if (options[index] === 'height') {
+    if (isAnyOf(options[index], 'height')) {
       height = value
     }
   }
@@ -42,10 +42,10 @@ const readLayout = (options: Array<string>): string => {
 const readMaterial = (segments: Array<string>): Material | undefined => {
   const [route, ...rest] = segments
 
-  if (route === 'material') {
+  if (isAnyOf(route, 'material')) {
     const [kind, idWord, id, ...options] = rest
 
-    if (kind !== 'iframe' || idWord !== 'id' || !id) {
+    if (!isAnyOf(kind, 'iframe') || !isAnyOf(idWord, 'id') || !id) {
       return
     }
 
@@ -55,7 +55,7 @@ const readMaterial = (segments: Array<string>): Material | undefined => {
     }
   }
 
-  if ((isAnyOf(route, 'm') || route === 'classic') && rest.length === 1) {
+  if (isAnyOf(route, ['m', 'classic']) && rest.length === 1) {
     return {
       id: rest[0],
       layout: '',
@@ -65,7 +65,7 @@ const readMaterial = (segments: Array<string>): Material | undefined => {
 
 // GeoGebra's material iframe, `/material/iframe/id/{id}` with its options as `/{key}/{value}`
 // pairs, and the material page `/m/{id}` and the Classic app `/classic/{id}` framed instead.
-// The ids and every route word but `m` are case-sensitive.
+// The ids are case-sensitive.
 export const geogebraResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 

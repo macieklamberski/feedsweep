@@ -332,3 +332,19 @@ describe('readTumblrHeight', () => {
     expect(readTumblrHeight('tumblr-post:sizeChange')).toBeUndefined()
   })
 })
+
+describeForEachParser('tumblrIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, tumblrIframeEmbedResolver)
+
+  it('should read the route words `embed` and `post` in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.tumblr.com/EMBED/POST/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2?width=542&amp;language=en_US&amp;did=f089eab98efb5ed4e0ba7e0485e22c1e707fd8e8"></iframe>'
+    const expected = {
+      provider: 'tumblr',
+      id: '9NYQOutKOEXi4aopdzCr9A/144854447139',
+      src: 'https://embed.tumblr.com/embed/post/t:9NYQOutKOEXi4aopdzCr9A/144854447139/v2',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

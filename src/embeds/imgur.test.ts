@@ -659,3 +659,31 @@ describe('readImgurHeight', () => {
     expect(readImgurHeight('resize_imgur')).toBeUndefined()
   })
 })
+
+describeForEachParser('imgurIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, imgurIframeEmbedResolver)
+
+  it('should read the route word `a` in capitals', async () => {
+    const value = '<iframe src="https://imgur.com/A/16lVn5E/embed"></iframe>'
+    const expected = {
+      provider: 'imgur',
+      id: 'a/16lVn5E',
+      src: 'https://imgur.com/a/16lVn5E/embed',
+      url: 'https://imgur.com/a/16lVn5E',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `gallery` in capitals', async () => {
+    const value = '<iframe src="https://imgur.com/GALLERY/CajzWlF"></iframe>'
+    const expected = {
+      provider: 'imgur',
+      id: 'a/CajzWlF',
+      src: 'https://imgur.com/a/CajzWlF/embed',
+      url: 'https://imgur.com/a/CajzWlF',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

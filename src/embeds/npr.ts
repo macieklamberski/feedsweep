@@ -1,6 +1,6 @@
-import { getPathSegments, toMap } from 'trousse'
+import { getPathSegments, isAnyOf, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const nprHosts = ['www.npr.org']
@@ -36,7 +36,7 @@ const composeVideoEmbed = (storyId: string, mediaId: string): EmbedResolverResul
 const videoRoutes = toMap({
   'embedded-video': ['storyId', 'mediaId'],
   'player/embeddable/video/player.html': ['i', 'm'],
-  'templates/event/embeddedVideo.php': ['storyId', 'mediaId'],
+  'templates/event/embeddedvideo.php': ['storyId', 'mediaId'],
 })
 
 // NPR's story player, `npr.org/player/embed/{storyId}/{mediaId}`, and its video player,
@@ -49,20 +49,20 @@ export const nprResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const segments = getPathSegments(parsed)
-  const videoRoute = videoRoutes.get(segments.join('/'))
+  const videoRoute = videoRoutes.get(segments.join('/').toLowerCase())
 
   if (videoRoute) {
     const [storyName, mediaName] = videoRoute
 
     return composeVideoEmbed(
-      parsed.searchParams.get(storyName) ?? '',
-      parsed.searchParams.get(mediaName) ?? '',
+      getQueryParam(parsed.searchParams, storyName) ?? '',
+      getQueryParam(parsed.searchParams, mediaName) ?? '',
     )
   }
 
   const [player, embed, storyId, mediaId, ...rest] = segments
 
-  if (player !== 'player' || embed !== 'embed' || rest.length) {
+  if (!isAnyOf(player, 'player') || !isAnyOf(embed, 'embed') || rest.length) {
     return
   }
 
@@ -79,18 +79,18 @@ export const nprFlashResolveEmbed: ResolveEmbed = (url) => {
 
   const segments = getPathSegments(parsed)
 
-  if (segments.length !== 1 || segments[0] !== 'v2') {
+  if (segments.length !== 1 || !isAnyOf(segments[0], 'v2')) {
     return
   }
 
   // Some carriers join the query with `;`, so `m` would read `365995120;t=audio`.
   const params = new URLSearchParams(parsed.search.replaceAll(';', '&'))
 
-  const storyId = params.get('i') ?? ''
-  const mediaId = params.get('m') ?? ''
+  const storyId = getQueryParam(params, 'i') ?? ''
+  const mediaId = getQueryParam(params, 'm') ?? ''
 
   // A video pair plays on the video player only.
-  if (params.get('t') === 'video') {
+  if (isAnyOf(getQueryParam(params, 't'), 'video')) {
     return composeVideoEmbed(storyId, mediaId)
   }
 

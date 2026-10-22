@@ -690,3 +690,20 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('crowdsignalIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, crowdsignalIframeEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value = '<iframe src="https://poll.fm/17125374/EMBED"></iframe>'
+    const expected = {
+      provider: 'crowdsignal',
+      id: '17125374',
+      src: 'https://poll.fm/17125374/embed',
+      url: 'https://poll.fm/17125374',
+      height: 533,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

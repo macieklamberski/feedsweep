@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { digitsRegex, uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -6,6 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 // `embed.simplecast.com/{8hex}` and `simplecast.com/e/{numeric}` are legacy spellings of the
 // episode, and `play.simplecast.com/{uuid}` is the share host.
 const legacyIdRegex = /^[0-9a-f]{8}$/i
+const legacyRouteRegex = /^\/e\//i
 
 const simplecastHosts = ['simplecast.com']
 
@@ -16,7 +17,7 @@ export const extractSimplecastEpisode = (
   link: string,
 ): { id: string; isCurrent: boolean } | undefined => {
   const segments = getPathSegments(link)
-  const id = segments[0] === 'e' ? segments[1] : segments[0]
+  const id = isAnyOf(segments[0], 'e') ? segments[1] : segments[0]
 
   if (!id) {
     return
@@ -40,7 +41,7 @@ export const simplecastResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // The legacy query holds only display values, such as `style` and `color`.
-  const legacySource = `${parsed.origin}${parsed.pathname}`
+  const legacySource = `${parsed.origin}${parsed.pathname.replace(legacyRouteRegex, '/e/')}`
 
   return {
     provider: 'simplecast',

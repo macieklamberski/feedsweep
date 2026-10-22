@@ -337,3 +337,32 @@ describeForEachParser('transistorEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('transistorEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, transistorEmbedResolver)
+
+  it('should read the route words `e` and `latest` in capitals', async () => {
+    const value = '<iframe src="https://share.transistor.fm/E/megamaker/LATEST"></iframe>'
+    const expected = {
+      provider: 'transistor',
+      id: 'latest/megamaker',
+      src: 'https://share.transistor.fm/e/megamaker/latest',
+      height: 180,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `s` in capitals', async () => {
+    const value = '<iframe src="https://share.transistor.fm/S/668ca5be"></iframe>'
+    const expected = {
+      provider: 'transistor',
+      id: 'episode/668ca5be',
+      src: 'https://share.transistor.fm/e/668ca5be',
+      url: 'https://share.transistor.fm/s/668ca5be',
+      height: 180,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

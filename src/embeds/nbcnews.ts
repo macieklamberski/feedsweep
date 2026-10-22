@@ -17,13 +17,11 @@ const idPrefix = 'mmvo'
 
 // nbcnews.com/id/{digits} is the retired Flash player's own page id, a space every video route
 // 404s on, so a bare number names a video only under one of these routes. Each route mints onto
-// its own host, as the prefix followed by the digits. The embedded-video routes answer their route
-// words and the prefix in any case, while the offsite and widget routes serve lowercase only.
+// its own host, as the prefix followed by the digits.
 const nbcnewsRoutes = toMap({
   'news/embedded-video': {
     idRegex: embeddedVideoIdRegex,
     srcPrefix: 'https://www.nbcnews.com/news/embedded-video/mmvo',
-    isCaseInsensitive: true,
   },
   offsite: {
     idRegex: offsiteIdRegex,
@@ -32,7 +30,6 @@ const nbcnewsRoutes = toMap({
   'today/embedded-video': {
     idRegex: embeddedVideoIdRegex,
     srcPrefix: 'https://www.today.com/today/embedded-video/mmvo',
-    isCaseInsensitive: true,
   },
   'widget/video-embed': {
     srcPrefix: 'https://www.nbcnews.com/widget/video-embed/',
@@ -45,10 +42,6 @@ const nbcnewsResolveEmbed: ResolveEmbed = (url) => {
   const route = nbcnewsRoutes.get(routePath.toLowerCase())
 
   if (!route) {
-    return
-  }
-
-  if (!route.isCaseInsensitive && routePath !== routePath.toLowerCase()) {
     return
   }
 

@@ -757,3 +757,21 @@ describeForEachParser('redditIframeEmbedResolver carrier title', (parseHtml) => 
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('redditIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, redditIframeEmbedResolver)
+
+  it('should read the `r` and `comments` route words in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.reddit.com/R/Birdwatching/COMMENTS/1x9y8z7/"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'reddit',
+      id: 'r/Birdwatching/comments/1x9y8z7',
+      src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/',
+      url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/',
+      publisher: 'r/Birdwatching',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -163,3 +163,21 @@ describeForEachParser('namasha through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('namashaEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, namashaEmbedResolver)
+
+  it('should read the `t` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.namasha.com/embed/TR5Otj9Q?T=30&amp;autoplay=true&amp;utm_source=feed"></iframe>'
+    const expected = {
+      provider: 'namasha',
+      id: 'tr5otj9q',
+      src: 'https://www.namasha.com/embed/TR5Otj9Q?t=30',
+      url: 'https://www.namasha.com/v/TR5Otj9Q',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

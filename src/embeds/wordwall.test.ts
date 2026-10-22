@@ -289,3 +289,32 @@ describeForEachParser('wordwall through the pipeline', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('wordwallEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, wordwallEmbedResolver)
+
+  it('should read the route words `embed` and `play` in capitals', async () => {
+    const value = '<iframe src="https://www.wordwall.net/EMBED/PLAY/65121/614/434"></iframe>'
+    const expected = {
+      provider: 'wordwall',
+      id: 'play/65121/614/434',
+      src: 'https://wordwall.net/embed/play/65121/614/434',
+      ratio: '500/380',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `templateId` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://wordwall.net/embed/79f873e001b84886aba4cb63e7c9f6e4?themeId=1&amp;TEMPLATEID=3"></iframe>'
+    const expected = {
+      provider: 'wordwall',
+      id: '79f873e001b84886aba4cb63e7c9f6e4',
+      src: 'https://wordwall.net/embed/79f873e001b84886aba4cb63e7c9f6e4?templateId=3',
+      ratio: '500/380',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

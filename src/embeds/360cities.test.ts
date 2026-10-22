@@ -283,3 +283,21 @@ describeForEachParser('the Flash object the pipeline leaves as markup', (parseHt
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('threeSixtyCitiesEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, threeSixtyCitiesEmbedResolver)
+
+  it('should read the route word `embed_iframe` in capitals', async () => {
+    const value =
+      '<iframe src="http://www.360cities.net/EMBED_IFRAME/af-chapman-youth-hostel-ship-sweden"></iframe>'
+    const expected = {
+      provider: '360cities',
+      id: 'af-chapman-youth-hostel-ship-sweden',
+      src: 'https://www.360cities.net/embed_iframe/af-chapman-youth-hostel-ship-sweden',
+      url: 'https://www.360cities.net/image/af-chapman-youth-hostel-ship-sweden',
+      ratio: '425/315',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

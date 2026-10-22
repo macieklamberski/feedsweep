@@ -272,3 +272,21 @@ describeForEachParser('the office viewer on an http feed', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('officeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, officeEmbedResolver)
+
+  it('should read the `src` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://view.officeapps.live.com/op/embed.aspx?SRC=https%3A%2F%2Fsites.gatech.edu%2Fsga%2Ffiles%2F2021%2F12%2FOffering-Students-Flexibility-When-They-Are-Ill.docx"></iframe>'
+    const expected = {
+      provider: 'office',
+      src: 'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fsites.gatech.edu%2Fsga%2Ffiles%2F2021%2F12%2FOffering-Students-Flexibility-When-They-Are-Ill.docx',
+      url: 'https://sites.gatech.edu/sga/files/2021/12/Offering-Students-Flexibility-When-They-Are-Ill.docx',
+      ratio: '8/5',
+      title: 'Offering-Students-Flexibility-When-They-Are-Ill.docx',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

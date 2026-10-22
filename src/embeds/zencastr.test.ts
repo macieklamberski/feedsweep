@@ -254,3 +254,20 @@ describeForEachParser('zencastr through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('zencastrIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, zencastrIframeEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value = '<iframe src="https://zencastr.com/EMBED/cK98nMcr"></iframe>'
+    const expected = {
+      provider: 'zencastr',
+      id: 'cK98nMcr',
+      src: 'https://zencastr.com/embed/cK98nMcr',
+      url: 'https://zencastr.com/z/cK98nMcr',
+      ratio: '1/1',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

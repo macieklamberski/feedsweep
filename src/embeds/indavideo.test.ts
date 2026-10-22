@@ -312,3 +312,46 @@ describeForEachParser('indavideo through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('indavideoEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, indavideoEmbedResolver)
+
+  it('should read the route words `player` and `video` in capitals', async () => {
+    const value = '<iframe src="https://embed.indavideo.hu/PLAYER/VIDEO/c75c95c854/"></iframe>'
+    const expected = {
+      provider: 'indavideo',
+      id: 'c75c95c854',
+      src: 'https://indavideo.hu/player/video/c75c95c854/',
+      url: 'https://indavideo.hu/video/c75c95c854',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `player` and `vc_o.swf` in capitals', async () => {
+    const value = '<iframe src="http://files.indavideo.hu/PLAYER/VC_O.SWF?vID=06aceb75c8"></iframe>'
+    const expected = {
+      provider: 'indavideo',
+      id: '06aceb75c8',
+      src: 'https://indavideo.hu/player/video/06aceb75c8/',
+      url: 'https://indavideo.hu/video/06aceb75c8',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `vID` parameter name in capitals', async () => {
+    const value = '<iframe src="http://files.indavideo.hu/player/vc_o.swf?VID=06aceb75c8"></iframe>'
+    const expected = {
+      provider: 'indavideo',
+      id: '06aceb75c8',
+      src: 'https://indavideo.hu/player/video/06aceb75c8/',
+      url: 'https://indavideo.hu/video/06aceb75c8',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

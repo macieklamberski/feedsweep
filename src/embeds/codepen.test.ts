@@ -1323,11 +1323,18 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore an editor segment in capitals, which CodePen does not serve', async () => {
+    it('should read an editor segment in capitals and mint it in lowercase', async () => {
       const value =
         '<iframe src="https://codepen.io/EDITOR/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f2480"></iframe>'
+      const expected = {
+        provider: 'codepen',
+        id: '019dcdfc-1e41-77c8-afdf-810ebc6f2480',
+        src: 'https://codepen.io/editor/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f2480',
+        url: 'https://codepen.io/anon/pen/019dcdfc-1e41-77c8-afdf-810ebc6f2480',
+        height: 300,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should use a malformed slug as written, even if the player answers an error', async () => {
@@ -1809,5 +1816,69 @@ describeForEachParser('codepen through the pipeline', (parseHtml) => {
         enclosures,
       }),
     ).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('codepenIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, codepenIframeEmbedResolver)
+
+  it('should read the route words `team` and `embed` in capitals', async () => {
+    const value = '<iframe src="https://codepen.io/TEAM/keyframers/EMBED/XJpKqXm"></iframe>'
+    const expected = {
+      provider: 'codepen',
+      id: 'XJpKqXm',
+      src: 'https://codepen.io/team/keyframers/embed/XJpKqXm',
+      url: 'https://codepen.io/team/keyframers/pen/XJpKqXm',
+      thumbnail: 'https://shots.codepen.io/keyframers/pen/XJpKqXm-512.jpg',
+      height: 300,
+      author: '@keyframers',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `editor` and `embed` in capitals', async () => {
+    const value = '<iframe src="https://codepen.io/EDITOR/sturobson/EMBED/azpLzvW"></iframe>'
+    const expected = {
+      provider: 'codepen',
+      id: 'azpLzvW',
+      src: 'https://codepen.io/editor/sturobson/embed/azpLzvW',
+      url: 'https://codepen.io/sturobson/pen/azpLzvW',
+      height: 300,
+      author: '@sturobson',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `token` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://codepen.io/leaverou/embed/OJYzQjN?TOKEN=c8ec7595b68381e99d38441487db546f"></iframe>'
+    const expected = {
+      provider: 'codepen',
+      id: 'OJYzQjN',
+      src: 'https://codepen.io/leaverou/embed/OJYzQjN/c8ec7595b68381e99d38441487db546f',
+      url: 'https://codepen.io/leaverou/pen/OJYzQjN/c8ec7595b68381e99d38441487db546f',
+      thumbnail: 'https://shots.codepen.io/leaverou/pen/OJYzQjN-512.jpg',
+      height: 300,
+      author: '@leaverou',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `key` parameter name in capitals', async () => {
+    const value = '<iframe src="https://codepen.io/argyleink/embed/XJpKqXm?KEY=abc123XYZ"></iframe>'
+    const expected = {
+      provider: 'codepen',
+      id: 'XJpKqXm',
+      src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc123XYZ',
+      url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc123XYZ',
+      thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+      height: 300,
+      author: '@argyleink',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

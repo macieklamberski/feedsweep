@@ -111,6 +111,32 @@ describe('canvaResolveEmbed', () => {
 
       expect(canvaResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read an uppercase view route and mint it in lowercase', () => {
+      const value = 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/VIEW?embed'
+      const expected = {
+        provider: 'canva',
+        id: 'DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw',
+        src: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed',
+        url: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view',
+        ratio: '16/9',
+      }
+
+      expect(canvaResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read an uppercase design route and mint it in lowercase', () => {
+      const value = 'https://www.canva.com/DESIGN/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed'
+      const expected = {
+        provider: 'canva',
+        id: 'DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw',
+        src: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed',
+        url: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view',
+        ratio: '16/9',
+      }
+
+      expect(canvaResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -155,18 +181,6 @@ describe('canvaResolveEmbed', () => {
 
     it('should ignore a page below the view route', () => {
       const value = 'https://www.canva.com/design/DAHLowacSd4/view/comments'
-
-      expect(canvaResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an uppercase view route', () => {
-      const value = 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/VIEW?embed'
-
-      expect(canvaResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an uppercase design route', () => {
-      const value = 'https://www.canva.com/DESIGN/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed'
 
       expect(canvaResolveEmbed(value)).toBeUndefined()
     })
@@ -282,5 +296,37 @@ describeForEachParser('canva through the pipeline', (parseHtml) => {
     `
 
     expect(value).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('canvaIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, canvaIframeEmbedResolver)
+
+  it('should read the route words `design` and `view` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.canva.com/DESIGN/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/VIEW?embed"></iframe>'
+    const expected = {
+      provider: 'canva',
+      id: 'DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw',
+      src: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed',
+      url: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `design` and `watch` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.canva.com/DESIGN/DAG62mbEN8w/Qvs_ZzTGrVyXRpFtzi5plQ/WATCH?embed"></iframe>'
+    const expected = {
+      provider: 'canva',
+      id: 'DAG62mbEN8w/Qvs_ZzTGrVyXRpFtzi5plQ',
+      src: 'https://www.canva.com/design/DAG62mbEN8w/Qvs_ZzTGrVyXRpFtzi5plQ/watch?embed',
+      url: 'https://www.canva.com/design/DAG62mbEN8w/Qvs_ZzTGrVyXRpFtzi5plQ/watch',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

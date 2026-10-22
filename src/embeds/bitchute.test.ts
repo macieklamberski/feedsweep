@@ -151,3 +151,33 @@ describeForEachParser('bitchute through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('bitchuteEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, bitchuteEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value = '<iframe src="https://www.bitchute.com/EMBED/0fRr8eQ5hvv8/"></iframe>'
+    const expected = {
+      provider: 'bitchute',
+      id: '0fRr8eQ5hvv8',
+      src: 'https://www.bitchute.com/embed/0fRr8eQ5hvv8/',
+      url: 'https://www.bitchute.com/video/0fRr8eQ5hvv8/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `video` in capitals', async () => {
+    const value = '<iframe src="https://www.bitchute.com/VIDEO/0fRr8eQ5hvv8/"></iframe>'
+    const expected = {
+      provider: 'bitchute',
+      id: '0fRr8eQ5hvv8',
+      src: 'https://www.bitchute.com/embed/0fRr8eQ5hvv8/',
+      url: 'https://www.bitchute.com/video/0fRr8eQ5hvv8/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

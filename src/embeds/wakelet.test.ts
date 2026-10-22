@@ -136,3 +136,21 @@ describeForEachParser('wakelet snippets through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('wakeletEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, wakeletEmbedResolver)
+
+  it('should read the route word `wakes` in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.wakelet.com/WAKES/NrquVwf7yTprpa6g_e3Dw/list?border=1"></iframe>'
+    const expected = {
+      provider: 'wakelet',
+      id: 'NrquVwf7yTprpa6g_e3Dw',
+      src: 'https://embed.wakelet.com/wakes/NrquVwf7yTprpa6g_e3Dw/list',
+      url: 'https://wakelet.com/wake/NrquVwf7yTprpa6g_e3Dw',
+      height: 760,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

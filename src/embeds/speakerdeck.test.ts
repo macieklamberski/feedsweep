@@ -523,3 +523,44 @@ describeForEachParser('speakerdeck through the pipeline', (parseHtml) => {
     ).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('speakerdeckIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, speakerdeckIframeEmbedResolver)
+
+  it('should read the route word `player` in capitals', async () => {
+    const value = '<iframe src="https://speakerdeck.com/PLAYER/4f2b3c1d5e6a7b8c9d0e1f2a"></iframe>'
+    const expected = {
+      provider: 'speakerdeck',
+      id: '4f2b3c1d5e6a7b8c9d0e1f2a',
+      src: 'https://speakerdeck.com/player/4f2b3c1d5e6a7b8c9d0e1f2a',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value = '<iframe src="http://speakerdeck.com/EMBED/4ee19eec04357e0050004017.js"></iframe>'
+    const expected = {
+      provider: 'speakerdeck',
+      id: '4ee19eec04357e0050004017.js',
+      src: 'https://speakerdeck.com/player/4ee19eec04357e0050004017.js',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `slide` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0?SLIDE=21"></iframe>'
+    const expected = {
+      provider: 'speakerdeck',
+      id: '40746bbd65b944eb848e90ab1be552c0/21',
+      src: 'https://speakerdeck.com/player/40746bbd65b944eb848e90ab1be552c0?slide=21',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

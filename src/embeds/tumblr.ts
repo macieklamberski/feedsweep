@@ -1,4 +1,4 @@
-import { getPathSegments, isPlainObject } from 'trousse'
+import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -30,7 +30,7 @@ const readPostEmbed = (href: string | undefined): EmbedResolverResult | undefine
   const [route, kind, blogKey, postId = ''] = getPathSegments(parsed)
 
   // The digits tell a post id from a route word such as `v2` standing in its place.
-  if (route !== 'embed' || kind !== 'post' || !blogKey || !digitsRegex.test(postId)) {
+  if (!isAnyOf(route, 'embed') || !isAnyOf(kind, 'post') || !blogKey || !digitsRegex.test(postId)) {
     return
   }
 

@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { readObjectHeight } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -11,9 +11,9 @@ const legacyHosts = ['www.documentcloud.org']
 const documentcloudHosts = ['embed.documentcloud.org', ...legacyHosts]
 
 // s3.documentcloud.org serves the page image under the slug in the exact case the path spells it.
-const documentSegmentRegex = /^(\d+)-(.+?)(\.html)?$/
-const partPathRegex = /^\/documents\/(\d+)\/(annotations|pages)\/([^/]+)\/?$/
-const legacyNotePathRegex = /^\/documents\/(\d+)-[^/]+\/(annotations)\/([^/]+)\.html$/
+const documentSegmentRegex = /^(\d+)-(.+?)(\.html)?$/i
+const partPathRegex = /^\/documents\/(\d+)\/(annotations|pages)\/([^/]+)\/?$/i
+const legacyNotePathRegex = /^\/documents\/(\d+)-[^/]+\/(annotations)\/([^/]+)\.html$/i
 
 // The embed host renders every route as an embed, so the `embed=1` the dialog writes restates it.
 // See: https://github.com/MuckRock/documentcloud-frontend/blob/main/src/lib/utils/embed.ts.
@@ -32,7 +32,7 @@ export const composeLoaderViewerUrl = (url: string | undefined): string | undefi
   const [route, document = ''] = parsed ? getPathSegments(parsed).slice(-2) : []
   const hyphen = document.indexOf('-')
 
-  if (route !== 'documents' || hyphen === -1) {
+  if (!isAnyOf(route, 'documents') || hyphen === -1) {
     return
   }
 
@@ -56,7 +56,7 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
 
   // A project id lands in the documents id space, so without this route check
   // `projects/2345-jail-records` mints another document's page image.
-  if (route !== 'documents') {
+  if (!isAnyOf(route, 'documents')) {
     return
   }
 
@@ -71,7 +71,8 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
       return
     }
 
-    const [, id, part, number] = partMatch
+    const [, id, partWord, number] = partMatch
+    const part = partWord.toLowerCase()
 
     return {
       provider,

@@ -1,7 +1,12 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  encodePathSegment,
+  getQueryParam,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'fc2'
@@ -9,9 +14,9 @@ const videoHosts = ['video.fc2.com']
 
 // The content page is `/content/{id}/`, behind a two-character language on most snippets. The
 // adult site's `/a/content/` is refused, since the embed player cannot play it.
-const contentPageRegex = /^\/(?:[A-Za-z0-9_]{2}\/)?content\/([^/]+)\/?$/
+const contentPageRegex = /^\/(?:[A-Za-z0-9_]{2}\/)?content\/([^/]+)\/?$/i
 const embedPlayerRegex = /^\/embed\/player\/([^/]+)\/?$/i
-const flashPlayerRegex = /^\/flv2\.swf$/
+const flashPlayerRegex = /^\/flv2\.swf$/i
 
 // `/embed/player/{id}/` is the route `outerplayer.min.js` composes. The content page is not a
 // frame target.
@@ -44,7 +49,7 @@ const fc2FlashResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const videoId = parsed.searchParams.get('i')
+  const videoId = getQueryParam(parsed.searchParams, 'i')
 
   if (!videoId) {
     return
@@ -53,18 +58,18 @@ const fc2FlashResolveEmbed: ResolveEmbed = (url) => {
   // The id comes out of the query decoded, and it goes into a path.
   const contentId = encodePathSegment(videoId)
 
-  const duration = Number(parsed.searchParams.get('d'))
+  const duration = Number(getQueryParam(parsed.searchParams, 'd'))
 
   return {
     ...composeEmbed(contentId),
-    title: parsed.searchParams.get('tl') ?? undefined,
+    title: getQueryParam(parsed.searchParams, 'tl'),
     duration: duration > 0 ? duration : undefined,
   }
 }
 
 // FC2 Video's player loader, which writes the player client side and leaves nothing behind.
 export const fc2PlayerScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="static.fc2.com/video/js/outerplayer"]',
+  'script[src*="static.fc2.com/video/js/outerplayer" i]',
   (element) => {
     if (!parseUrlOnHosts(attr(element, 'src'), 'static.fc2.com')) {
       return
@@ -91,10 +96,10 @@ export const fc2PlayerScriptEmbedResolver = createMarkupEmbedResolver(
 
 // FC2's blog-side shim, which document.writes the loader above and states the id on its own url.
 export const fc2BlogScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="admin.blog.fc2.com/fc2video2.php"]',
+  'script[src*="admin.blog.fc2.com/fc2video2.php" i]',
   (element) => {
     const loader = parseUrlOnHosts(attr(element, 'src'), 'admin.blog.fc2.com')
-    const videoId = loader?.searchParams.get('id')
+    const videoId = getQueryParam(loader?.searchParams, 'id')
 
     if (!loader || !videoId) {
       return

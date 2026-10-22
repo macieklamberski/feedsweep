@@ -536,3 +536,19 @@ describeForEachParser('flourishIframeEmbedResolver carrier title', (parseHtml) =
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('flourishIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, flourishIframeEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value = '<iframe src="https://flo.uri.sh/visualisation/29541520/EMBED"></iframe>'
+    const expected = {
+      provider: 'flourish',
+      id: 'visualisation/29541520',
+      src: 'https://flo.uri.sh/visualisation/29541520/embed',
+      url: 'https://public.flourish.studio/visualisation/29541520/',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

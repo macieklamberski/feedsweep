@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl, toMap } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { hexRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -17,7 +17,8 @@ const playerHeights = toMap({ episodes: 190, channels: 390 })
 export const standfmResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
   const segments = parsed ? getPathSegments(parsed) : []
-  const [kind, id] = segments[0] === 'embed' ? segments.slice(1) : segments
+  const [route, id] = isAnyOf(segments[0], 'embed') ? segments.slice(1) : segments
+  const kind = route?.toLowerCase()
 
   // The hex alphabet keeps a route word such as `/episodes/new`, a live page, out of the id slot.
   if (!kind || !playerKindRegex.test(kind) || !id || !hexRegex.test(id)) {

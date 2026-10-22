@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
@@ -27,7 +27,7 @@ const extractAcastEmbed = (link: string): { show: string; episode?: string } | u
     return
   }
 
-  if (isPlayerHost && (segments[1] !== 'episodes' || !episode)) {
+  if (isPlayerHost && (!isAnyOf(segments[1], 'episodes') || !episode)) {
     return
   }
 

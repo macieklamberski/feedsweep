@@ -245,3 +245,32 @@ describeForEachParser('blubrryEmbedResolver carrier title', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('blubrryEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, blubrryEmbedResolver)
+
+  it('should read the route word `id` in capitals', async () => {
+    const value = '<iframe src="https://player.blubrry.com/ID/12345678/"></iframe>'
+    const expected = {
+      provider: 'blubrry',
+      id: '12345678',
+      src: 'https://player.blubrry.com/id/12345678/',
+      height: 164,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `media_url` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://player.blubrry.com/?MEDIA_URL=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3"></iframe>'
+    const expected = {
+      provider: 'blubrry',
+      id: 'https://media.blubrry.com/show/ep.mp3',
+      src: 'https://player.blubrry.com/?media_url=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3',
+      height: 164,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

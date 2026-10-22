@@ -11,8 +11,8 @@ const paypalHosts = ['paypal.com', 'www.paypal.com']
 const donateImageRegex = /donat/i
 
 const donateFormSelector = [
-  'form[action*="paypal.com/cgi-bin/webscr"]',
-  'form[action*="paypal.com/donate"]',
+  'form[action*="paypal.com/cgi-bin/webscr" i]',
+  'form[action*="paypal.com/donate" i]',
 ].join(', ')
 
 const readDonateButtonId = (form: Element, imageSrc: string): string | undefined => {
@@ -28,7 +28,10 @@ const readDonateButtonId = (form: Element, imageSrc: string): string | undefined
   // On `/cgi-bin/webscr` a hosted button is a donation, a sale, a cart or a subscription alike,
   // and the donate page renders "This organization's page is broken" for any but a donation.
 
-  if (!action.pathname.startsWith('/donate') && !donateImageRegex.test(imageFileName)) {
+  if (
+    !action.pathname.toLowerCase().startsWith('/donate') &&
+    !donateImageRegex.test(imageFileName)
+  ) {
     return
   }
 

@@ -4,6 +4,7 @@ import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import {
   composeQuery,
   digitsRegex,
+  getQueryParam,
   isFileName,
   pickQueryParams,
   placeholderBaseUrl,
@@ -33,7 +34,7 @@ export const extractMegaphoneEmbed = (
   }
 
   for (const [param, { kind, height }] of Object.entries(embedKinds)) {
-    const id = parsed.searchParams.get(param)
+    const id = getQueryParam(parsed.searchParams, param)
 
     if (!id) {
       continue

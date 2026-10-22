@@ -9,7 +9,7 @@ const provider = 'pinecast'
 const pinecastHosts = ['pinecast.com']
 
 // The host also serves the episode audio, under `/listen/{uuid}.mp3`.
-const playerPathRegex = /^\/player\/([^/]+)\/?$/
+const playerPathRegex = /^\/player\/([^/]+)\/?$/i
 
 // The player without a theme draws the minimal bar, which stays this tall at any width.
 const playerHeight = 60

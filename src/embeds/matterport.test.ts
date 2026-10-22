@@ -163,3 +163,36 @@ describeForEachParser('matterportEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('matterportEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, matterportEmbedResolver)
+
+  it('should read the route word `show` in capitals', async () => {
+    const value = '<iframe src="https://my.matterport.com/SHOW/?m=m3tgB1ogWSE"></iframe>'
+    const expected = {
+      provider: 'matterport',
+      id: 'm3tgB1ogWSE',
+      src: 'https://my.matterport.com/show/?m=m3tgB1ogWSE',
+      url: 'https://my.matterport.com/show/?m=m3tgB1ogWSE',
+      thumbnail: 'https://my.matterport.com/api/v2/player/models/m3tgB1ogWSE/thumb/',
+      ratio: '4/3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `m`, `ss` and `sr` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://my.matterport.com/show/?M=BcjnMUreh6A&amp;play=1&amp;qs=1&amp;brand=0&amp;SS=29&amp;SR=-.05,1.5&amp;utm_source=feed"></iframe>'
+    const expected = {
+      provider: 'matterport',
+      id: 'BcjnMUreh6A',
+      src: 'https://my.matterport.com/show/?m=BcjnMUreh6A&sr=-.05%2C1.5&ss=29',
+      url: 'https://my.matterport.com/show/?m=BcjnMUreh6A',
+      thumbnail: 'https://my.matterport.com/api/v2/player/models/BcjnMUreh6A/thumb/',
+      ratio: '4/3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

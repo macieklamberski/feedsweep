@@ -84,12 +84,6 @@ describe('abcotvResolveEmbed', () => {
       expect(abcotvResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for a pid under an uppercase name, which the player refuses', () => {
-      const value = 'https://abc7.com/video/embed/?PID=5740386'
-
-      expect(abcotvResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the clip page', () => {
       const value = 'https://abc7.com/videoClip/5740386/'
 
@@ -131,6 +125,19 @@ describe('abcotvResolveEmbed', () => {
         id: '5740386a',
         src: 'https://abc7.com/video/embed?pid=5740386a',
         url: 'https://abc7.com/videoClip/5740386a/',
+        ratio: '16/9',
+      }
+
+      expect(abcotvResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read a pid under an uppercase name', () => {
+      const value = 'https://abc7.com/video/embed/?PID=5740386'
+      const expected = {
+        provider: 'abcotv',
+        id: '5740386',
+        src: 'https://abc7.com/video/embed?pid=5740386',
+        url: 'https://abc7.com/videoClip/5740386/',
         ratio: '16/9',
       }
 
@@ -319,5 +326,22 @@ describeForEachParser('abcotv player through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('abcotvEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, abcotvEmbedResolver)
+
+  it('should read the `pid` parameter name in capitals', async () => {
+    const value = '<iframe src="https://abc7.com/video/embed/?PID=5740386"></iframe>'
+    const expected = {
+      provider: 'abcotv',
+      id: '5740386',
+      src: 'https://abc7.com/video/embed?pid=5740386',
+      url: 'https://abc7.com/videoClip/5740386/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

@@ -211,3 +211,20 @@ describeForEachParser('ultimedia urls the pipeline absolutises first', (parseHtm
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('ultimediaEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, ultimediaEmbedResolver)
+
+  it('should read the route words `deliver`, `generic`, `iframe`, `mdtk` and `src` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.ultimedia.com/DELIVER/GENERIC/IFRAME/MDTK/01357940/SRC/ml3ffr/zone/1/showtitle/1/"></iframe>'
+    const expected = {
+      provider: 'ultimedia',
+      id: '01357940/ml3ffr',
+      src: 'https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

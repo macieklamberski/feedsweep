@@ -249,3 +249,66 @@ describeForEachParser('ourworldindata through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('ourworldindataEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, ourworldindataEmbedResolver)
+
+  it('should read the route word `grapher` in capitals', async () => {
+    const value =
+      '<iframe src="https://ourworldindata.org/GRAPHER/fertilizer-use-per-hectare-of-cropland?tab=map"></iframe>'
+    const expected = {
+      provider: 'ourworldindata',
+      id: 'grapher/fertilizer-use-per-hectare-of-cropland',
+      src: 'https://ourworldindata.org/grapher/fertilizer-use-per-hectare-of-cropland?tab=map',
+      url: 'https://ourworldindata.org/grapher/fertilizer-use-per-hectare-of-cropland?tab=map',
+      thumbnail:
+        'https://ourworldindata.org/grapher/fertilizer-use-per-hectare-of-cropland.png?tab=map',
+      height: 600,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `explorers` in capitals', async () => {
+    const value =
+      '<iframe src="https://ourworldindata.org/EXPLORERS/coronavirus-data-explorer?zoomToSelection=true&amp;time=346..latest&amp;pickerSort=desc&amp;pickerMetric=population&amp;Metric=Vaccinations&amp;Interval=Cumulative&amp;Relative+to+Population=true&amp;Align+outbreaks=false&amp;country=USA~ISR~GBR~ARE~OWID_WRL~EuropeanUnion~CHL~CHE&amp;hideControls=true"></iframe>'
+    const expected = {
+      provider: 'ourworldindata',
+      id: 'explorers/coronavirus-data-explorer',
+      src: 'https://ourworldindata.org/explorers/coronavirus-data-explorer?time=346..latest&Metric=Vaccinations&Interval=Cumulative&Relative+to+Population=true&Align+outbreaks=false&country=USA~ISR~GBR~ARE~OWID_WRL~EuropeanUnion~CHL~CHE',
+      url: 'https://ourworldindata.org/explorers/coronavirus-data-explorer?time=346..latest&Metric=Vaccinations&Interval=Cumulative&Relative+to+Population=true&Align+outbreaks=false&country=USA~ISR~GBR~ARE~OWID_WRL~EuropeanUnion~CHL~CHE',
+      height: 696,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `zoomToSelection`, `pickerSort`, `pickerMetric` and `hideControls` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://ourworldindata.org/explorers/coronavirus-data-explorer?ZOOMTOSELECTION=true&amp;time=346..latest&amp;PICKERSORT=desc&amp;PICKERMETRIC=population&amp;Metric=Vaccinations&amp;Interval=Cumulative&amp;Relative+to+Population=true&amp;Align+outbreaks=false&amp;country=USA~ISR~GBR~ARE~OWID_WRL~EuropeanUnion~CHL~CHE&amp;HIDECONTROLS=true"></iframe>'
+    const expected = {
+      provider: 'ourworldindata',
+      id: 'explorers/coronavirus-data-explorer',
+      src: 'https://ourworldindata.org/explorers/coronavirus-data-explorer?time=346..latest&Metric=Vaccinations&Interval=Cumulative&Relative+to+Population=true&Align+outbreaks=false&country=USA~ISR~GBR~ARE~OWID_WRL~EuropeanUnion~CHL~CHE',
+      url: 'https://ourworldindata.org/explorers/coronavirus-data-explorer?time=346..latest&Metric=Vaccinations&Interval=Cumulative&Relative+to+Population=true&Align+outbreaks=false&country=USA~ISR~GBR~ARE~OWID_WRL~EuropeanUnion~CHL~CHE',
+      height: 696,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `utm_source` and `fbclid` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://ourworldindata.org/grapher/co2-by-source?UTM_SOURCE=newsletter&amp;time=1900..2017&amp;FBCLID=IwAR0abc"></iframe>'
+    const expected = {
+      provider: 'ourworldindata',
+      id: 'grapher/co2-by-source',
+      src: 'https://ourworldindata.org/grapher/co2-by-source?time=1900..2017',
+      url: 'https://ourworldindata.org/grapher/co2-by-source?time=1900..2017',
+      thumbnail: 'https://ourworldindata.org/grapher/co2-by-source.png?time=1900..2017',
+      height: 600,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

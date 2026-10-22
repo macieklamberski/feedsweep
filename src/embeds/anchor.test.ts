@@ -410,3 +410,32 @@ describeForEachParser('anchor through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('anchorEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, anchorEmbedResolver)
+
+  it('should read the route words `pod`, `profile` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://creators.spotify.com/POD/PROFILE/turpentine-productions/EMBED"></iframe>'
+    const expected = {
+      provider: 'anchor',
+      id: 'turpentine-productions',
+      src: 'https://creators.spotify.com/pod/profile/turpentine-productions/embed',
+      height: 100,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `embed` and `episodes` in capitals', async () => {
+    const value = '<iframe src="https://anchor.fm/myshow/EMBED/EPISODES/my-title-e123"></iframe>'
+    const expected = {
+      provider: 'anchor',
+      id: 'myshow/my-title-e123',
+      src: 'https://creators.spotify.com/pod/profile/myshow/embed/episodes/my-title-e123',
+      height: 100,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

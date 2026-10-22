@@ -176,3 +176,33 @@ describeForEachParser('cnbcIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toBeUndefined()
   })
 })
+
+describeForEachParser('cnbcIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, cnbcIframeEmbedResolver)
+
+  it('should read the route word `p` in capitals', async () => {
+    const value =
+      '<iframe src="https://player.cnbc.com/P/gZWlPC/cnbc_global?playertype=synd&amp;byGuid=7000344703"></iframe>'
+    const expected = {
+      provider: 'cnbc',
+      id: '7000344703',
+      src: 'https://player.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&byGuid=7000344703',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `byGuid` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://player.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&amp;BYGUID=7000344703"></iframe>'
+    const expected = {
+      provider: 'cnbc',
+      id: '7000344703',
+      src: 'https://player.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&byGuid=7000344703',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

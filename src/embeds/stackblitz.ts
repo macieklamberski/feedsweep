@@ -32,7 +32,7 @@ const parseTarget = (value: string | undefined): StackblitzTarget | undefined =>
   const [first, second] = getPathSegments(parsed)
 
   // /github/{owner}/{repo} renders, but its id is a key the oEmbed endpoint answers 404 on.
-  if ((first !== 'edit' && first !== 'run') || !second) {
+  if (!isAnyOf(first, ['edit', 'run']) || !second) {
     return
   }
 

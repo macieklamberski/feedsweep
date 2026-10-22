@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -27,7 +27,8 @@ type YandexMusicItem =
 // `playlist/{owner}/{kind}`, and ignores the color and layout segments the old share dialog wrote
 // after them.
 const readRoute = (route: Array<string>): YandexMusicItem | undefined => {
-  const [kind, first, second, third] = route
+  const [routeKind, first, second, third] = route
+  const kind = routeKind?.toLowerCase()
 
   if (kind === 'track' && first) {
     const [track, album] = first.split(':')
@@ -44,7 +45,7 @@ const readRoute = (route: Array<string>): YandexMusicItem | undefined => {
   }
 
   if (kind === 'album' && first) {
-    if (second === 'track' && third) {
+    if (isAnyOf(second, 'track') && third) {
       return {
         kind: 'track',
         track: third,
@@ -71,10 +72,10 @@ const readYandexMusicItem = (url: string): YandexMusicItem | undefined => {
   const [route, ...rest] = getPathSegments(url)
 
   // The retired Flash player, `/embed/{track}/track.swf`.
-  if (route === 'embed') {
+  if (isAnyOf(route, 'embed')) {
     const [track, file] = rest
 
-    if (!track || file !== 'track.swf') {
+    if (!track || !isAnyOf(file, 'track.swf')) {
       return
     }
 
@@ -84,7 +85,7 @@ const readYandexMusicItem = (url: string): YandexMusicItem | undefined => {
     }
   }
 
-  if (route !== 'iframe') {
+  if (!isAnyOf(route, 'iframe')) {
     return
   }
 

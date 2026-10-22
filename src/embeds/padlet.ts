@@ -3,8 +3,8 @@ import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const padletHosts = ['padlet.com']
-const embedPathRegex = /^\/embed\/([^/]+)\/?$/
-const previewPathRegex = /^\/padlets\/([^/]+)\/embeds\/preview_embed\/?$/
+const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
+const previewPathRegex = /^\/padlets\/([^/]+)\/embeds\/preview_embed\/?$/i
 
 // The share code sizes the board `height: 608px` at full width, and nearly every carrier
 // repeats that; the preview form sizes itself `height: 100%` and so states nothing usable.

@@ -433,3 +433,35 @@ describeForEachParser('rebuildPiktochartEmbeds in the pipeline', (parseHtml) => 
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('rebuildPiktochartEmbeds in any case', (parseHtml) => {
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [rebuildPiktochartEmbeds(baseContext)])
+  }
+
+  it('should drop a loading image whose path is in capitals', async () => {
+    const value = html`
+      <div
+        class="piktowrapper-embed"
+        data-uid="25180247-creatividad_pensamiento-critico"
+      >
+        <div class="pikto-canvas-wrap">
+          <div class="pikto-canvas">
+            <div class="embed-loading-overlay">
+              <img
+                alt="Loading..."
+                src="https://create.piktochart.com/LOADING.GIF"
+              />
+              <p>Loading...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <iframe src="https://create.piktochart.com/embed/25180247-creatividad_pensamiento-critico"></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})

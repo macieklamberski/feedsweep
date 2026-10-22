@@ -256,3 +256,20 @@ describeForEachParser('canalu player through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('canaluEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, canaluEmbedResolver)
+
+  it('should read the `t` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.canal-u.tv/chaines/univ-bordeaux/embed/150235?T=0"></iframe>'
+    const expected = {
+      provider: 'canalu',
+      id: '150235',
+      src: 'https://www.canal-u.tv/chaines/univ-bordeaux/embed/150235?t=0',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

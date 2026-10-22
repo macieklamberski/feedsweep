@@ -300,3 +300,29 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('convertDatawrapperEmbeds in any case', (parseHtml) => {
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [convertDatawrapperEmbeds(baseContext)])
+  }
+
+  it('should convert a chart whose host is in capitals', async () => {
+    const value = html`
+      <iframe
+        id="datawrapper-chart-bdqZJ"
+        src="https://DATAWRAPPER.DWCDN.NET/bdqZJ/2/"
+        title="Egg prices"
+      ></iframe>
+    `
+    const expected = html`
+      <a href="https://datawrapper.dwcdn.net/bdqZJ/">
+        <img
+          alt="Egg prices"
+          src="https://datawrapper.dwcdn.net/bdqZJ/full.png"
+        >
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})

@@ -220,3 +220,46 @@ describeForEachParser('acuityscheduling through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('acuityschedulingEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, acuityschedulingEmbedResolver)
+
+  it('should read the route word `schedule.php` in capitals', async () => {
+    const value =
+      '<iframe src="https://app.acuityscheduling.com/SCHEDULE.PHP?owner=14276092"></iframe>'
+    const expected = {
+      provider: 'acuityscheduling',
+      id: '14276092',
+      src: 'https://app.acuityscheduling.com/schedule.php?owner=14276092',
+      url: 'https://app.acuityscheduling.com/schedule.php?owner=14276092',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `owner` and `appointmentType` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://app.acuityscheduling.com/schedule.php?OWNER=19828685&amp;APPOINTMENTTYPE=28566466"></iframe>'
+    const expected = {
+      provider: 'acuityscheduling',
+      id: '19828685/28566466',
+      src: 'https://app.acuityscheduling.com/schedule.php?owner=19828685&appointmentType=28566466',
+      url: 'https://app.acuityscheduling.com/schedule.php?owner=19828685&appointmentType=28566466',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `owner` and `calendarID` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://app.acuityscheduling.com/schedule.php?OWNER=12493437&amp;CALENDARID=651411"></iframe>'
+    const expected = {
+      provider: 'acuityscheduling',
+      id: '12493437',
+      src: 'https://app.acuityscheduling.com/schedule.php?owner=12493437&calendarID=651411',
+      url: 'https://app.acuityscheduling.com/schedule.php?owner=12493437&calendarID=651411',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -2,7 +2,7 @@ import { decodeSegment, isHostOf, type Nullish, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar, flashVars, keepIfMatches } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, encodePathSegment, getQueryParam, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flickr'
@@ -15,14 +15,15 @@ const flashPlayerPathRegex = /^\/apps\/slideshow\//i
 const flashVideoPathRegex = /^\/apps\/video\/stewart\.swf$/i
 const legacyPlayerPathRegex = /^\/slideshow\/index\.gne$/i
 
-const setPathRegex = /^\/photos\/([^/]+)\/(?:sets|albums)\/(\d+)/
-const streamPathRegex = /^\/photos\/([^/]+)\/show\/?$/
-const groupPathRegex = /^\/groups\/(\d+@N\d\d)\/pool\/show\/?$/
-const groupPagePathRegex = /^\/groups\//
-const groupAliasPoolPathRegex = /^\/groups\/[^/]+\/pool\/show(?:\/with\/[^/]+)?\/?$/
+const setPathRegex = /^\/photos\/([^/]+)\/(?:sets|albums)\/(\d+)/i
+const streamPathRegex = /^\/photos\/([^/]+)\/show\/?$/i
+const groupPathRegex = /^\/groups\/([^/]+)\/pool\/show\/?$/i
+const groupNsidRegex = /^\d+@N\d\d$/
+const groupPagePathRegex = /^\/groups\//i
+const groupAliasPoolPathRegex = /^\/groups\/[^/]+\/pool\/show(?:\/with\/[^/]+)?\/?$/i
 // An owner of `_` names nobody: the player ignores it, and `/photos/_/{photoId}/` answers 404.
-const photoPathRegex = /^\/photos\/(?:_|([^/]+))\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/
-const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/
+const photoPathRegex = /^\/photos\/(?:_|([^/]+))\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/i
+const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/i
 
 // A group and a photostream each resolve by NSID and only by NSID: the player answers 200 for
 // `groups/{nsid}` and for `photostreams/{nsid}`, and 404 for a path alias in either position.
@@ -121,10 +122,10 @@ const readPageSubject = (page: string): FlickrSubject | undefined => {
     return { owner: decodePathValue(set[1]), setId: decodePathValue(set[2]) }
   }
 
-  const group = page.match(groupPathRegex)
+  const groupId = page.match(groupPathRegex)?.[1]
 
-  if (group) {
-    return { groupId: group[1] }
+  if (groupId && groupNsidRegex.test(groupId)) {
+    return { groupId }
   }
 
   const stream = page.match(streamPathRegex)
@@ -138,7 +139,7 @@ const readPageSubject = (page: string): FlickrSubject | undefined => {
 // bare `user_id` for the few snippets that carry nothing else.
 const readFlashSubject = (element: Nullish<Element>): FlickrSubject => {
   const config = new URLSearchParams(flashVars(element) ?? '')
-  const page = config.get('page_show_url') ?? ''
+  const page = getQueryParam(config, 'page_show_url') ?? ''
   const subject = readPageSubject(page)
 
   if (subject) {
@@ -149,7 +150,7 @@ const readFlashSubject = (element: Nullish<Element>): FlickrSubject => {
   // `group_id`, the spelling the group player takes. The player reads no start photo, so a
   // `with/{photoId}` start is dropped.
   if (groupAliasPoolPathRegex.test(page)) {
-    return { groupId: config.get('group_id') ?? undefined }
+    return { groupId: getQueryParam(config, 'group_id') }
   }
 
   // A page path under a group names a pool, and a `user_id` beside it names a member's
@@ -158,7 +159,7 @@ const readFlashSubject = (element: Nullish<Element>): FlickrSubject => {
     return {}
   }
 
-  return { owner: config.get('user_id') ?? undefined }
+  return { owner: getQueryParam(config, 'user_id') }
 }
 
 // The video swf names its photo in the flashvars and nothing else: no page path and no owner,
@@ -183,12 +184,12 @@ const trailingSlashesRegex = /\/+$/
 const readLegacySubject = (parsed: URL): FlickrSubject => {
   // Some feeds end the set id with the `/` of a path. A set id never holds one, so the trim
   // repairs what the feed did.
-  const setId = parsed.searchParams.get('set_id')?.replace(trailingSlashesRegex, '')
+  const setId = getQueryParam(parsed.searchParams, 'set_id')?.replace(trailingSlashesRegex, '')
 
   return {
     setId: setId || undefined,
-    owner: parsed.searchParams.get('user_id') ?? undefined,
-    groupId: parsed.searchParams.get('group_id') ?? undefined,
+    owner: getQueryParam(parsed.searchParams, 'user_id'),
+    groupId: getQueryParam(parsed.searchParams, 'group_id'),
   }
 }
 

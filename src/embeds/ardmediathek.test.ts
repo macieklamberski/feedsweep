@@ -201,3 +201,35 @@ describeForEachParser('ardmediathek enclosures through the pipeline', (parseHtml
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('ardmediathekEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, ardmediathekEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.ardmediathek.de/EMBED/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc"></iframe>'
+    const expected = {
+      provider: 'ardmediathek',
+      id: 'Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
+      src: 'https://www.ardmediathek.de/embed/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
+      url: 'https://www.ardmediathek.de/video/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `startTime` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.ardmediathek.de/embed/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc?STARTTIME=831.00"></iframe>'
+    const expected = {
+      provider: 'ardmediathek',
+      id: 'Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
+      src: 'https://www.ardmediathek.de/embed/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc?startTime=831.00',
+      url: 'https://www.ardmediathek.de/video/Y3JpZDovL3N3ci5kZS9hZXgvbzIzMjIwOTc',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

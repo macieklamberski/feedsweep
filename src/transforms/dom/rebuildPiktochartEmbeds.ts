@@ -1,3 +1,4 @@
+import { isAnyOf } from 'trousse'
 import { composePiktochartEmbedUrl } from '../../embeds/piktochart.js'
 import type { DomTransform } from '../../types.js'
 import { attr, isElement, isText } from '../../utils/dom.js'
@@ -10,7 +11,7 @@ const loaderWrappers = ['.embed-loading-overlay', '.pikto-canvas-wrap', '.pikto-
 const isLoadingGif = (element: Element): boolean => {
   const parsed = parseUrlOnHosts(attr(element, 'src'), 'piktochart.com')
 
-  return parsed?.pathname === '/loading.gif'
+  return isAnyOf(parsed?.pathname, '/loading.gif')
 }
 
 const isLoadingText = (element: Element): boolean => {

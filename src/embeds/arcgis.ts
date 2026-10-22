@@ -1,7 +1,14 @@
-import { getAnyOf, getPathSegments, isHostOf, isHostOrSubdomainOf, parseUrl } from 'trousse'
+import {
+  getAnyOf,
+  getPathSegments,
+  isAnyOf,
+  isHostOf,
+  isHostOrSubdomainOf,
+  parseUrl,
+} from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { filterUrlQuery, getQueryParam, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Item = {
@@ -46,8 +53,8 @@ const storyRoutes = ['stories', 'collections']
 // `item` opens that item of a collection.
 const collectionPositionParams = ['item']
 
-const instantPathRegex = /^\/apps\/instant\/([^/]+)\/index\.html$/
-const dashboardPathRegex = /^\/apps\/dashboards\/([^/]+)$/
+const instantPathRegex = /^\/apps\/instant\/([^/]+)\/index\.html$/i
+const dashboardPathRegex = /^\/apps\/dashboards\/([^/]+)$/i
 // The app shell names the dashboard in the fragment. The retired Operations Dashboard shell 301s
 // to the current one, which keeps the fragment.
 const dashboardShellPaths = ['/apps/dashboards/index.html', '/apps/opsdashboard/index.html']
@@ -61,7 +68,7 @@ const composeItem = (id: string, src: string): Item => {
 }
 
 const readDashboardId = (url: URL): string | undefined => {
-  if (dashboardShellPaths.includes(url.pathname)) {
+  if (isAnyOf(url.pathname, dashboardShellPaths)) {
     return url.hash.match(dashboardFragmentRegex)?.[1]
   }
 
@@ -70,32 +77,33 @@ const readDashboardId = (url: URL): string | undefined => {
 
 const composeClassicSource = (
   url: URL,
+  path: string,
   webMapId: string,
   positionParams: Array<string>,
 ): string => {
-  const position = filterUrlQuery(url, (name) => positionParams.includes(name))
+  const position = filterUrlQuery(url, (name) => isAnyOf(name, positionParams))
 
-  return `https://www.arcgis.com${url.pathname}?webmap=${webMapId}${position.replace('?', '&')}`
+  return `https://www.arcgis.com${path}?webmap=${webMapId}${position.replace('?', '&')}`
 }
 
 // `configurableview` is what Map Viewer's iframe embed writes: the map without the viewer's
 // title, panels and sign-in bar. It goes blank on the classic snippets' `extent`, a box with no
 // wkid, so a classic carrier stays on its own player, which Esri still serves.
-const composeWebMapSource = (url: URL, webMapId: string): string => {
-  if (url.pathname === classicEmbedPath) {
-    return composeClassicSource(url, webMapId, classicEmbedPositionParams)
+const composeWebMapSource = (url: URL, path: string, webMapId: string): string => {
+  if (path === classicEmbedPath) {
+    return composeClassicSource(url, path, webMapId, classicEmbedPositionParams)
   }
 
-  if (url.pathname === embedViewerPath) {
-    return composeClassicSource(url, webMapId, embedViewerPositionParams)
+  if (path === embedViewerPath) {
+    return composeClassicSource(url, path, webMapId, embedViewerPositionParams)
   }
 
   // Map Viewer refuses a web map saved before spec 2.0, which most OnePane maps are, so the
   // retired template moves to the classic embed viewer. Its `extent` is the same longitude and
   // latitude box OnePane wrote as `gcsextent`.
-  if (url.pathname === onePanePath) {
+  if (path === onePanePath) {
     const src = `https://www.arcgis.com${embedViewerPath}?webmap=${webMapId}`
-    const extent = url.searchParams.get('gcsextent')
+    const extent = getQueryParam(url.searchParams, 'gcsextent')
 
     if (!extent) {
       return src
@@ -105,25 +113,27 @@ const composeWebMapSource = (url: URL, webMapId: string): string => {
   }
 
   const src = `https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=${webMapId}`
-  const position = filterUrlQuery(url, (name) => mapViewerPositionParams.includes(name))
+  const position = filterUrlQuery(url, (name) => isAnyOf(name, mapViewerPositionParams))
 
   return `${src}${position.replace('?', '&')}`
 }
 
 const readPortalItem = (url: URL): Item | undefined => {
-  if (webMapPaths.includes(url.pathname)) {
-    const webMapId = url.searchParams.get('webmap')
+  const webMapPath = getAnyOf(url.pathname, webMapPaths)
+
+  if (webMapPath) {
+    const webMapId = getQueryParam(url.searchParams, 'webmap')
 
     if (!webMapId) {
       return
     }
 
     // Map Viewer refuses a web map saved before spec 2.0, which a classic carrier can hold.
-    const page = url.pathname === mapViewerPath ? mapViewerPath : embedViewerPath
+    const page = webMapPath === mapViewerPath ? mapViewerPath : embedViewerPath
 
     return {
       id: webMapId,
-      src: composeWebMapSource(url, webMapId),
+      src: composeWebMapSource(url, webMapPath, webMapId),
       url: `https://www.arcgis.com${page}?webmap=${webMapId}`,
     }
   }
@@ -131,7 +141,7 @@ const readPortalItem = (url: URL): Item | undefined => {
   const template = url.pathname.match(instantPathRegex)?.[1]
 
   if (template) {
-    const appId = url.searchParams.get('appid')
+    const appId = getQueryParam(url.searchParams, 'appid')
 
     if (!appId) {
       return
@@ -166,12 +176,12 @@ const readItem = (url: URL): Item | undefined => {
 
   if (isHostOf(url, storyMapsHosts) && storyRoute) {
     const page = `https://storymaps.arcgis.com/${storyRoute}/${itemId}`
-    const position = filterUrlQuery(url, (name) => collectionPositionParams.includes(name))
+    const position = filterUrlQuery(url, (name) => isAnyOf(name, collectionPositionParams))
 
     return { id: itemId, src: `${page}${position}`, url: page }
   }
 
-  if (isHostOf(url, experienceHosts) && route === 'experience') {
+  if (isHostOf(url, experienceHosts) && isAnyOf(route, 'experience')) {
     return composeItem(itemId, `https://experience.arcgis.com/experience/${itemId}`)
   }
 }

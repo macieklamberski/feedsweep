@@ -133,18 +133,6 @@ describe('geogebraResolveEmbed', () => {
       expect(geogebraResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore the material iframe route words in another case', () => {
-      const value = 'https://www.geogebra.org/material/IFRAME/id/yqZMrWXI'
-
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the Classic app route word in another case', () => {
-      const value = 'https://www.geogebra.org/CLASSIC/gjencrn6?embed'
-
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore the material route under a leading segment', () => {
       const value = 'https://www.geogebra.org/x/material/iframe/id/yqZMrWXI'
 
@@ -259,6 +247,32 @@ describe('geogebraResolveEmbed', () => {
 
       expect(geogebraResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the material iframe route words in another case', () => {
+      const value = 'https://www.geogebra.org/material/IFRAME/id/yqZMrWXI'
+      const expected = {
+        provider: 'geogebra',
+        id: 'yqZMrWXI',
+        src: 'https://www.geogebra.org/material/iframe/id/yqZMrWXI',
+        url: 'https://www.geogebra.org/m/yqZMrWXI',
+        ratio: '4/3',
+      }
+
+      expect(geogebraResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the Classic app route word in another case', () => {
+      const value = 'https://www.geogebra.org/CLASSIC/gjencrn6?embed'
+      const expected = {
+        provider: 'geogebra',
+        id: 'gjencrn6',
+        src: 'https://www.geogebra.org/material/iframe/id/gjencrn6',
+        url: 'https://www.geogebra.org/m/gjencrn6',
+        ratio: '4/3',
+      }
+
+      expect(geogebraResolveEmbed(value)).toEqual(expected)
+    })
   })
 })
 
@@ -355,5 +369,36 @@ describeForEachParser('geogebra through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('geogebraEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, geogebraEmbedResolver)
+
+  it('should read the route words `material`, `iframe`, `id`, `width` and `height` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.geogebra.org/MATERIAL/IFRAME/ID/yqZMrWXI/WIDTH/500/HEIGHT/400/border/eeeeee/rc/false/ai/false/sdz/false/smb/false/stb/false/stbh/true/ld/false/sri/false/at/auto"></iframe>'
+    const expected = {
+      provider: 'geogebra',
+      id: 'yqZMrWXI',
+      src: 'https://www.geogebra.org/material/iframe/id/yqZMrWXI/width/500/height/400',
+      url: 'https://www.geogebra.org/m/yqZMrWXI',
+      ratio: '4/3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `classic` in capitals', async () => {
+    const value = '<iframe src="https://www.geogebra.org/CLASSIC/gjencrn6?embed"></iframe>'
+    const expected = {
+      provider: 'geogebra',
+      id: 'gjencrn6',
+      src: 'https://www.geogebra.org/material/iframe/id/gjencrn6',
+      url: 'https://www.geogebra.org/m/gjencrn6',
+      ratio: '4/3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

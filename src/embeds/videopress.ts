@@ -1,7 +1,7 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { getQueryParam, parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'videopress'
@@ -35,7 +35,7 @@ const composeEmbed = (guid: string, query = ''): EmbedResolverResult => {
 const videopressResolveEmbed: ResolveEmbed = (url, element) => {
   const [route, guid] = getPathSegments(url)
 
-  if (route !== 'embed' && route !== 'v') {
+  if (!isAnyOf(route, ['embed', 'v'])) {
     return
   }
 
@@ -77,7 +77,7 @@ const videopressFlashResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   if (flashPlayerPathRegex.test(parsed.pathname)) {
-    const guid = flashVar(element, 'guid') ?? parsed.searchParams.get('guid')
+    const guid = flashVar(element, 'guid') ?? getQueryParam(parsed.searchParams, 'guid')
 
     if (!guid) {
       return

@@ -66,17 +66,23 @@ describe('videaResolveEmbed', () => {
 
       expect(videaResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the player route in another case and mint it in lowercase', () => {
+      const value = 'https://videa.hu/PLAYER?v=RJiqVlMkla4Ckqf3'
+      const expected = {
+        provider: 'videa',
+        id: 'rjiqvlmkla4ckqf3',
+        src: 'https://videa.hu/player?v=RJiqVlMkla4Ckqf3',
+        ratio: '16/9',
+      }
+
+      expect(videaResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
     it('should ignore the player with no video', () => {
       const value = 'https://videa.hu/player?start=120'
-
-      expect(videaResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the player route in another case, which the server answers with 404', () => {
-      const value = 'https://videa.hu/PLAYER?v=RJiqVlMkla4Ckqf3'
 
       expect(videaResolveEmbed(value)).toBeUndefined()
     })
@@ -226,5 +232,46 @@ describeForEachParser('videa through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('videaEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, videaEmbedResolver)
+
+  it('should read the route word `player` in capitals', async () => {
+    const value = '<iframe src="https://videa.hu/PLAYER?v=SHLXcKsORfejnD1a"></iframe>'
+    const expected = {
+      provider: 'videa',
+      id: 'shlxcksorfejnd1a',
+      src: 'https://videa.hu/player?v=SHLXcKsORfejnD1a',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `flvplayer.swf` in capitals', async () => {
+    const value = '<iframe src="http://videa.hu/FLVPLAYER.SWF?v=C6rvO1ZfIkfLILrI"></iframe>'
+    const expected = {
+      provider: 'videa',
+      id: 'c6rvo1zfikflilri',
+      src: 'https://videa.hu/player?v=C6rvO1ZfIkfLILrI',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `v` and `start` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://videa.hu/player?V=RJiqVlMkla4Ckqf3&amp;START=120&amp;autoplay=1&amp;utm_source=feed"></iframe>'
+    const expected = {
+      provider: 'videa',
+      id: 'rjiqvlmkla4ckqf3',
+      src: 'https://videa.hu/player?v=RJiqVlMkla4Ckqf3&start=120',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

@@ -431,3 +431,20 @@ describeForEachParser('podcloud through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('podcloudIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, podcloudIframeEmbedResolver)
+
+  it('should read the route words `podcast`, `episode` and `player` in capitals', async () => {
+    const value =
+      '<iframe src="https://podcloud.fr/PODCAST/danslajungledunumerique/EPISODE/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees/PLAYER"></iframe>'
+    const expected = {
+      provider: 'podcloud',
+      id: 'danslajungledunumerique/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees',
+      src: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees/player',
+      url: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -1,13 +1,14 @@
+import { isAnyOf } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'indavideo'
 
 const indavideoHosts = ['indavideo.hu']
 
-const playerPathRegex = /^\/player\/video\/([^/]+)\/?$/
+const playerPathRegex = /^\/player\/video\/([^/]+)\/?$/i
 
 // The retired Flash players, which name the video in a `vID` flashvar or query value.
 const flashPlayerPaths = [
@@ -23,11 +24,11 @@ const readVideoId = (url: URL, element?: Element): string | undefined => {
     return playerId
   }
 
-  if (!flashPlayerPaths.includes(url.pathname)) {
+  if (!isAnyOf(url.pathname, flashPlayerPaths)) {
     return
   }
 
-  return url.searchParams.get('vID') ?? flashVar(element, 'vID')
+  return getQueryParam(url.searchParams, 'vID') ?? flashVar(element, 'vID')
 }
 
 // An Indavideo player: the iframe on indavideo.hu or embed.indavideo.hu, or the retired Flash

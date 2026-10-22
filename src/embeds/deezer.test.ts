@@ -531,3 +531,62 @@ describeForEachParser('deezerEmbedResolver carrier title', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('deezerEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, deezerEmbedResolver)
+
+  it('should read the route words `widget` and `album` in capitals', async () => {
+    const value = '<iframe src="https://widget.deezer.com/WIDGET/light/ALBUM/75337"></iframe>'
+    const expected = {
+      provider: 'deezer',
+      id: 'album/75337',
+      src: 'https://widget.deezer.com/widget/dark/album/75337',
+      url: 'https://www.deezer.com/album/75337',
+      height: 300,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `plugins` and `player` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.deezer.com/PLUGINS/PLAYER?type=album&amp;id=75337%2F..%2F1&amp;app_id=1"></iframe>'
+    const expected = {
+      provider: 'deezer',
+      id: 'album/75337%2F..%2F1',
+      src: 'https://widget.deezer.com/widget/dark/album/75337%2F..%2F1',
+      url: 'https://www.deezer.com/album/75337%2F..%2F1',
+      height: 300,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `type` and `id` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://www.deezer.com/plugins/player?TYPE=album&amp;ID=75337%2F..%2F1&amp;app_id=1"></iframe>'
+    const expected = {
+      provider: 'deezer',
+      id: 'album/75337%2F..%2F1',
+      src: 'https://widget.deezer.com/widget/dark/album/75337%2F..%2F1',
+      url: 'https://www.deezer.com/album/75337%2F..%2F1',
+      height: 300,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `idSong` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.deezer.com/embedded/small-widget-v2.swf?IDSONG=293366&amp;colorBackground=0x009074&amp;autoplay=0"></iframe>'
+    const expected = {
+      provider: 'deezer',
+      id: 'track/293366',
+      src: 'https://widget.deezer.com/widget/dark/track/293366',
+      url: 'https://www.deezer.com/track/293366',
+      height: 150,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -69,12 +69,6 @@ describe('dailymailResolveEmbed', () => {
       expect(dailymailResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for the route in capitals, which the player answers 404', () => {
-      const value = 'https://www.dailymail.co.uk/EMBED/VIDEO/1763642.html'
-
-      expect(dailymailResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the id without its extension, which the player answers 404', () => {
       const value = 'https://www.dailymail.co.uk/embed/video/1763642'
 
@@ -90,6 +84,20 @@ describe('dailymailResolveEmbed', () => {
         id: '1763642a',
         src: 'https://www.dailymail.co.uk/embed/video/1763642a.html',
         url: 'https://www.dailymail.co.uk/video/video-1763642a.html',
+        ratio: '16/9',
+        ratioHeightOffset: 234,
+      }
+
+      expect(dailymailResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the route in capitals and mint it in lowercase', () => {
+      const value = 'https://www.dailymail.co.uk/EMBED/VIDEO/1763642.html'
+      const expected = {
+        provider: 'dailymail',
+        id: '1763642',
+        src: 'https://www.dailymail.co.uk/embed/video/1763642.html',
+        url: 'https://www.dailymail.co.uk/video/video-1763642.html',
         ratio: '16/9',
         ratioHeightOffset: 234,
       }
@@ -208,5 +216,23 @@ describeForEachParser('dailymail player through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('dailymailEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, dailymailEmbedResolver)
+
+  it('should read the route words `embed` and `video` in capitals', async () => {
+    const value = '<iframe src="https://www.dailymail.co.uk/EMBED/VIDEO/1763642.html"></iframe>'
+    const expected = {
+      provider: 'dailymail',
+      id: '1763642',
+      src: 'https://www.dailymail.co.uk/embed/video/1763642.html',
+      url: 'https://www.dailymail.co.uk/video/video-1763642.html',
+      ratio: '16/9',
+      ratioHeightOffset: 234,
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

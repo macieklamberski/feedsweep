@@ -1,6 +1,6 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { getQueryParam, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'radioradicale'
@@ -24,7 +24,10 @@ const composeEmbed = (id: string, query = ''): EmbedResolverResult => {
 // The Flowplayer configuration, `/scheda/embedcfg/{id}/{clip}`, that the Flash object names in its
 // `config` query. The clip picks a stretch of the recording whose seconds only that config holds.
 const readFlashId = (parsed: URL): string | undefined => {
-  const config = parseUrlOnHosts(parsed.searchParams.get('config') ?? '', radioradicaleHosts)
+  const config = parseUrlOnHosts(
+    getQueryParam(parsed.searchParams, 'config') ?? '',
+    radioradicaleHosts,
+  )
 
   if (!config) {
     return
@@ -32,7 +35,7 @@ const readFlashId = (parsed: URL): string | undefined => {
 
   const [scheda, embedcfg, id, , ...rest] = getPathSegments(config)
 
-  if (scheda !== 'scheda' || embedcfg !== 'embedcfg' || rest.length > 0) {
+  if (!isAnyOf(scheda, 'scheda') || !isAnyOf(embedcfg, 'embedcfg') || rest.length > 0) {
     return
   }
 
@@ -58,7 +61,7 @@ export const radioradicaleResolveEmbed: ResolveEmbed = (url) => {
 
   const [scheda, id, iframe, ...rest] = getPathSegments(parsed)
 
-  if (scheda !== 'scheda' || iframe !== 'iframe' || rest.length > 0) {
+  if (!isAnyOf(scheda, 'scheda') || !isAnyOf(iframe, 'iframe') || rest.length > 0) {
     return
   }
 

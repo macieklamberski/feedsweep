@@ -1,4 +1,4 @@
-import { decodeSegment, isPlainObject, parseUrl, toMap } from 'trousse'
+import { decodeSegment, isAnyOf, isPlainObject, parseUrl, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -17,16 +17,16 @@ const provider = 'instagram'
 const instagramHosts = ['instagram.com', 'instagr.am']
 
 // `audio` sits where a shortcode does, under `/reels/audio/{id}`, and names a sound, not a post.
-const nonShortcodeSegments = new Set(['audio'])
+const nonShortcodeSegments = ['audio']
 
 // Instagram's own routes sit where an account does: `share/p/{token}` carries a redirect
 // token, not a shortcode, and reading it as one mints a frame that cannot load. `explore`,
 // `accounts` and the other routes redirect `{route}/p/{code}` to the post, so they read as one.
-const sitePathSegments = new Set(['challenge', 'developer', 'share', 'stories'])
+const sitePathSegments = ['challenge', 'developer', 'share', 'stories']
 
 // The account names the poster, not the post, so it is matched and dropped.
 // `tv` is the retired IGTV route and `reels` the plural spelling of the reel.
-const postPathRegex = /^\/(?:([A-Za-z0-9_.]+)\/)?(p|reel|reels|tv)\/([^/]+)/
+const postPathRegex = /^\/(?:([A-Za-z0-9_.]+)\/)?(p|reel|reels|tv)\/([^/]+)/i
 
 type Post = { kind: string; shortcode: string }
 
@@ -43,15 +43,17 @@ const readPostUrl = (value: string | undefined): Post | undefined => {
     return
   }
 
-  if (match[1] && sitePathSegments.has(match[1])) {
+  if (match[1] && isAnyOf(match[1], sitePathSegments)) {
     return
   }
 
-  if (nonShortcodeSegments.has(match[3])) {
+  if (isAnyOf(match[3], nonShortcodeSegments)) {
     return
   }
 
-  return { kind: match[2] === 'reels' ? 'reel' : match[2], shortcode: match[3] }
+  const kind = match[2].toLowerCase()
+
+  return { kind: kind === 'reels' ? 'reel' : kind, shortcode: match[3] }
 }
 
 // The captioned frame renders the post's text under the picture, so which of the two a
@@ -264,7 +266,7 @@ export const instagramResolveEmbed: ResolveEmbed = (url) => {
 
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  return composeEmbed(post, parsed?.pathname.includes('/embed/captioned') === true)
+  return composeEmbed(post, parsed?.pathname.toLowerCase().includes('/embed/captioned') === true)
 }
 
 export const instagramIframeEmbedResolver = createUrlEmbedResolver(

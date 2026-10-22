@@ -81,18 +81,6 @@ describe('allocineResolveEmbed', () => {
       expect(allocineResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for the blog player in capitals, which the server answers 404', () => {
-      const value = 'https://www.allocine.fr/_VIDEO/IBLOGVISION.ASPX?cmedia=19546104'
-
-      expect(allocineResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for the id under an uppercase name, which the server answers 404', () => {
-      const value = 'https://www.allocine.fr/_video/iblogvision.aspx?CMEDIA=19546104'
-
-      expect(allocineResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a foreign host carrying the Flash player path', () => {
       const value = 'https://evil.test/blogvision/18823127'
 
@@ -113,12 +101,6 @@ describe('allocineResolveEmbed', () => {
 
     it('should return undefined for the Flash player with no id', () => {
       const value = 'https://www.allocine.fr/blogvision/'
-
-      expect(allocineResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for the Flash player in capitals, which the server answers 404', () => {
-      const value = 'https://www.allocine.fr/BLOGVISION/18823127'
 
       expect(allocineResolveEmbed(value)).toBeUndefined()
     })
@@ -167,6 +149,42 @@ describe('allocineResolveEmbed', () => {
         provider: 'allocine',
         id: '18823127a',
         src: 'https://player.allocine.fr/18823127a.html',
+        ratio: '16/9',
+      }
+
+      expect(allocineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the blog player in capitals', () => {
+      const value = 'https://www.allocine.fr/_VIDEO/IBLOGVISION.ASPX?cmedia=19546104'
+      const expected = {
+        provider: 'allocine',
+        id: '19546104',
+        src: 'https://player.allocine.fr/19546104.html',
+        ratio: '16/9',
+      }
+
+      expect(allocineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the id under an uppercase name', () => {
+      const value = 'https://www.allocine.fr/_video/iblogvision.aspx?CMEDIA=19546104'
+      const expected = {
+        provider: 'allocine',
+        id: '19546104',
+        src: 'https://player.allocine.fr/19546104.html',
+        ratio: '16/9',
+      }
+
+      expect(allocineResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the Flash player in capitals', () => {
+      const value = 'https://www.allocine.fr/BLOGVISION/18823127'
+      const expected = {
+        provider: 'allocine',
+        id: '18823127',
+        src: 'https://player.allocine.fr/18823127.html',
         ratio: '16/9',
       }
 
@@ -327,5 +345,47 @@ describeForEachParser('allocine player through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('allocineEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, allocineEmbedResolver)
+
+  it('should read the route word `iblogvision.aspx` in capitals', async () => {
+    const value =
+      '<iframe src="http://www.allocine.fr/_video/IBLOGVISION.ASPX?cmedia=19546104"></iframe>'
+    const expected = {
+      provider: 'allocine',
+      id: '19546104',
+      src: 'https://player.allocine.fr/19546104.html',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `blogvision` in capitals', async () => {
+    const value = '<iframe src="http://www.allocine.fr/BLOGVISION/18823127"></iframe>'
+    const expected = {
+      provider: 'allocine',
+      id: '18823127',
+      src: 'https://player.allocine.fr/18823127.html',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `cmedia` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="http://www.allocine.fr/_video/iblogvision.aspx?CMEDIA=19546104"></iframe>'
+    const expected = {
+      provider: 'allocine',
+      id: '19546104',
+      src: 'https://player.allocine.fr/19546104.html',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

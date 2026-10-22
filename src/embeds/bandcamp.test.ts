@@ -513,3 +513,45 @@ describeForEachParser('bandcampEmbedResolver carrier title', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('bandcampEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, bandcampEmbedResolver)
+
+  it('should read the `track` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://bandcamp.com/VideoEmbed?TRACK=1959185434&amp;bgcol=ffffff&amp;linkcol=7137dc"></iframe>'
+    const expected = {
+      provider: 'bandcamp',
+      id: 'track/1959185434',
+      src: 'https://bandcamp.com/VideoEmbed?track=1959185434',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `album` parameter name in capitals', async () => {
+    const value = '<iframe src="https://bandcamp.com/VideoEmbed?ALBUM=2545703459"></iframe>'
+    const expected = {
+      provider: 'bandcamp',
+      id: 'album/2545703459',
+      src: 'https://bandcamp.com/EmbeddedPlayer/album=2545703459/size=large/tracklist=false/artwork=small/',
+      height: 120,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `album`, `track` and `t` path keys in capitals', async () => {
+    const value =
+      '<iframe src="https://bandcamp.com/EmbeddedPlayer/ALBUM=1578579597/size=large/TRACK=1637967854/T=3/"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'bandcamp',
+      id: 'track/1637967854',
+      src: 'https://bandcamp.com/EmbeddedPlayer/album=1578579597/size=large/tracklist=false/artwork=small/track=1637967854/t=3/',
+      height: 120,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

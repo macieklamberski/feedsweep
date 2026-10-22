@@ -373,6 +373,12 @@ describeForEachParser('telegramIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined for the channel preview route in capitals', async () => {
+      const value = '<iframe src="https://t.me/S/1234"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should leave a forum topic post unresolved', async () => {
       const value = '<iframe src="https://t.me/tochkapress/45/111424?embed=1"></iframe>'
 

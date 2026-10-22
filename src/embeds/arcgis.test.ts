@@ -301,13 +301,6 @@ describe('arcgisResolveEmbed', () => {
       expect(arcgisResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a lowercase classic embed path, which answers 404', () => {
-      const value =
-        'https://www.arcgis.com/apps/embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7'
-
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a web map route that names no web map', () => {
       const value =
         'https://www.arcgis.com/apps/Embed/index.html?appid=62bf87f7b2f64f15b48491d39242f4d7'
@@ -410,6 +403,20 @@ describe('arcgisResolveEmbed', () => {
         id: 'bda7594740fd40299423467b48e9ecf6',
         src: 'https://www.arcgis.com/apps/dashboards/bda7594740fd40299423467b48e9ecf6',
         url: 'https://www.arcgis.com/apps/dashboards/bda7594740fd40299423467b48e9ecf6',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read a lowercase classic embed path and mint the portal spelling', () => {
+      const value =
+        'https://www.arcgis.com/apps/embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7'
+      const expected = {
+        provider: 'arcgis',
+        id: '62bf87f7b2f64f15b48491d39242f4d7',
+        src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7',
+        url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=62bf87f7b2f64f15b48491d39242f4d7',
         height: 500,
       }
 
@@ -643,5 +650,65 @@ describeForEachParser('arcgis through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('arcgisIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, arcgisIframeEmbedResolver)
+
+  it('should read the route words `home`, `webmap`, `templates`, `OnePane`, `basicviewer` and `embed.html` in capitals', async () => {
+    const value =
+      '<iframe src="http://www.arcgis.com/HOME/WEBMAP/TEMPLATES/ONEPANE/BASICVIEWER/EMBED.HTML?webmap=9b6a2497b3d84aeb95633a58560025ee&amp;gcsextent=-86.1328,-74.9594,180,81.6214&amp;displayslider=true&amp;displaylegend=true"></iframe>'
+    const expected = {
+      provider: 'arcgis',
+      id: '9b6a2497b3d84aeb95633a58560025ee',
+      src: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497b3d84aeb95633a58560025ee&extent=-86.1328,-74.9594,180,81.6214',
+      url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497b3d84aeb95633a58560025ee',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `apps`, `Embed` and `index.html` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.arcgis.com/APPS/EMBED/INDEX.HTML?webmap=62bf87f7b2f64f15b48491d39242f4d7&amp;extent=-123.0692,38.5233,-122.9947,38.5929"></iframe>'
+    const expected = {
+      provider: 'arcgis',
+      id: '62bf87f7b2f64f15b48491d39242f4d7',
+      src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7&extent=-123.0692,38.5233,-122.9947,38.5929',
+      url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=62bf87f7b2f64f15b48491d39242f4d7',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `webmap`, `center` and `level` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://www.arcgis.com/apps/Embed/index.html?WEBMAP=84a606bfb3d848c69ca61321f3ac2e9f&amp;CENTER=-0.1985,51.5554&amp;LEVEL=11&amp;zoom=true&amp;scale=true"></iframe>'
+    const expected = {
+      provider: 'arcgis',
+      id: '84a606bfb3d848c69ca61321f3ac2e9f',
+      src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=84a606bfb3d848c69ca61321f3ac2e9f&CENTER=-0.1985,51.5554&LEVEL=11',
+      url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=84a606bfb3d848c69ca61321f3ac2e9f',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `webmap` and `extent` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://www.arcgis.com/apps/Embed/index.html?WEBMAP=62bf87f7b2f64f15b48491d39242f4d7&amp;EXTENT=-123.0692,38.5233,-122.9947,38.5929"></iframe>'
+    const expected = {
+      provider: 'arcgis',
+      id: '62bf87f7b2f64f15b48491d39242f4d7',
+      src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7&EXTENT=-123.0692,38.5233,-122.9947,38.5929',
+      url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=62bf87f7b2f64f15b48491d39242f4d7',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

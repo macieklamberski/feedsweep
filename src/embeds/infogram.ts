@@ -2,7 +2,7 @@ import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { getQueryParam, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'infogram'
@@ -12,7 +12,7 @@ const chartIdRegex = /^(?:_\/)?[^/]+$/
 // A live chart's mount id ends in `?live`, which the loader appends to the frame url as written.
 const mountIdRegex = /^([^?]+)(?:\?(.*))?$/
 // The loader's script id, `infogram_{width}_{chart id}`.
-const scriptIdRegex = /^infogram_\d+_(.+)$/
+const scriptIdRegex = /^infogram_\d+_(.+)$/i
 
 const infogramHosts = [
   'e.infogram.com',
@@ -26,7 +26,7 @@ const composeInfogramEmbed = (
   query: string,
   title: string | undefined,
 ): EmbedResolverResult => {
-  const live = new URLSearchParams(query).has('live') ? '&live' : ''
+  const live = getQueryParam(new URLSearchParams(query), 'live') !== undefined ? '&live' : ''
 
   return {
     provider,
@@ -57,7 +57,7 @@ export const infogramWidgetEmbedResolver = createMarkupEmbedResolver(
 // The older snippet: a script whose id names the chart and which writes the frame beside itself
 // when it runs. A reader never runs it, so the chart is lost.
 export const infogramScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[id^="infogram_"]',
+  'script[id^="infogram_" i]',
   (element) => {
     if (!parseUrlOnHosts(attr(element, 'src'), infogramHosts)) {
       return

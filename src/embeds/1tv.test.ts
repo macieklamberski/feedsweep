@@ -321,3 +321,44 @@ describeForEachParser('1tv players through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('channelOneEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, channelOneEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value = '<iframe src="https://www.1tv.ru/EMBED/80103:12"></iframe>'
+    const expected = {
+      provider: '1tv',
+      id: '80103:12',
+      src: 'https://www.1tv.ru/embed/80103:12',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `newsvideo` in capitals', async () => {
+    const value = '<iframe src="http://www.1tv.ru/NEWSVIDEO/173017"></iframe>'
+    const expected = {
+      provider: '1tv',
+      id: '173017:1',
+      src: 'https://www.1tv.ru/embed/173017:1',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `t` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.1tv.ru/embed/147417:12?start=auto&amp;T=30&amp;utm_source=feed"></iframe>'
+    const expected = {
+      provider: '1tv',
+      id: '147417:12',
+      src: 'https://www.1tv.ru/embed/147417:12?t=30',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

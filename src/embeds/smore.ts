@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { FieldCleaner } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -18,7 +18,7 @@ export const smoreEmbedResolver = createUrlEmbedResolver(
     const segments = getPathSegments(url)
     const isLegacy = isHostOf(url, [legacyHost])
 
-    if (!isLegacy && segments[0] !== 'n') {
+    if (!isLegacy && !isAnyOf(segments[0], 'n')) {
       return
     }
 

@@ -102,20 +102,8 @@ describe('symbalooResolveEmbed', () => {
       expect(symbalooResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore the embed route in uppercase', () => {
-      const value = 'https://www.symbaloo.com/EMBED/tic-tacbasicos-edu'
-
-      expect(symbalooResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a trailing segment after a published webmix', () => {
       const value = 'https://www.symbaloo.com/embed/tic-tacbasicos-edu/extra'
-
-      expect(symbalooResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the shared route word in uppercase', () => {
-      const value = 'https://www.symbaloo.com/embed/SHARED/AAAAAtohsPUAA41_HDPALA=='
 
       expect(symbalooResolveEmbed(value)).toBeUndefined()
     })
@@ -167,6 +155,30 @@ describe('symbalooResolveEmbed', () => {
         id: 'tic-tacbasicos-edu',
         src: 'https://www.symbaloo.com/embed/tic-tacbasicos-edu',
         url: 'https://www.symbaloo.com/mix/tic-tacbasicos-edu',
+        height: 500,
+      }
+
+      expect(symbalooResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the embed route in uppercase', () => {
+      const value = 'https://www.symbaloo.com/EMBED/tic-tacbasicos-edu'
+      const expected = {
+        provider: 'symbaloo',
+        id: 'tic-tacbasicos-edu',
+        src: 'https://www.symbaloo.com/embed/tic-tacbasicos-edu',
+        url: 'https://www.symbaloo.com/mix/tic-tacbasicos-edu',
+        height: 500,
+      }
+
+      expect(symbalooResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the shared route word in uppercase', () => {
+      const value = 'https://www.symbaloo.com/embed/SHARED/AAAAAtohsPUAA41_HDPALA=='
+      const expected = {
+        provider: 'symbaloo',
+        src: 'https://www.symbaloo.com/embed/shared/AAAAAtohsPUAA41_HDPALA==',
         height: 500,
       }
 
@@ -267,5 +279,21 @@ describeForEachParser('symbaloo through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('symbalooEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, symbalooEmbedResolver)
+
+  it('should read the route words `embed` and `shared` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.symbaloo.com/EMBED/SHARED/AAAAAtohsPUAA41_HDPALA=="></iframe>'
+    const expected = {
+      provider: 'symbaloo',
+      src: 'https://www.symbaloo.com/embed/shared/AAAAAtohsPUAA41_HDPALA==',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

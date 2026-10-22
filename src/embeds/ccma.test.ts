@@ -502,3 +502,31 @@ describeForEachParser('ccma through the pipeline', (parseHtml) => {
     ).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('ccmaEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, ccmaEmbedResolver)
+
+  it('should read the route words `video`, `embed` and `super3` in capitals', async () => {
+    const value = '<iframe src="https://www.ccma.cat/VIDEO/EMBED/SUPER3/5787362/"></iframe>'
+    const expected = {
+      provider: 'ccma',
+      id: '5787362',
+      src: 'https://www.3cat.cat/video/embed/sx3/5787362/',
+      url: 'https://www.ccma.cat/video/5787362/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `audio` and `embed` in capitals', async () => {
+    const value = '<iframe src="http://www.ccma.cat/AUDIO/EMBED/859074"></iframe>'
+    const expected = {
+      provider: 'ccma',
+      id: 'audio/859074',
+      src: 'https://www.3cat.cat/3cat/audio/859074/embed/',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

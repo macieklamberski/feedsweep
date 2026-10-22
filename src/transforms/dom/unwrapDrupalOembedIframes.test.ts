@@ -243,3 +243,26 @@ describeForEachParser('unwrapDrupalOembedIframes through the pipeline', (parseHt
     ).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('unwrapDrupalOembedIframes in any case', (parseHtml) => {
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [unwrapDrupalOembedIframes(baseContext)])
+  }
+
+  it('should unwrap a proxy whose path and `url` name are in capitals', async () => {
+    const value = html`
+      <iframe
+        class="media-oembed-content"
+        src="https://www.example.com/MEDIA/OEMBED?URL=https%3A//www.youtube.com/watch%3Fv%3D2dEj10uaqAs&amp;max_width=0"
+      ></iframe>
+    `
+    const expected = html`
+      <iframe
+        class="media-oembed-content"
+        src="https://www.youtube.com/watch?v=2dEj10uaqAs"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})

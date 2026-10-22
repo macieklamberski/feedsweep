@@ -25,7 +25,7 @@ const liferayEmojiNames = toMap<EmojiGlyph>({
 // set passes to the smilies resolver, whose `/emoticons/` directory reads the shared names.
 export const liferayEmojiResolver: EmojiResolver = {
   kind: 'emoji',
-  selector: 'img[alt="emoticon"][src*="/emoticons/"]',
+  selector: 'img[alt="emoticon"][src*="/emoticons/" i]',
   extract: (element) => {
     const stem = getFileStem(element.getAttribute('src') ?? '').toLowerCase()
     // Every name here is drawn as Liferay's own face, so a known one is only marked.

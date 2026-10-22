@@ -190,3 +190,34 @@ describeForEachParser('imdb players through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('imdbEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, imdbEmbedResolver)
+
+  it('should read the route words `video`, `imdb` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="http://www.imdb.com/VIDEO/imdb/vi3012802841/IMDB/EMBED?autoplay=false&amp;width=480"></iframe>'
+    const expected = {
+      provider: 'imdb',
+      id: 'vi3012802841',
+      src: 'https://www.imdb.com/video/embed/vi3012802841/',
+      url: 'https://www.imdb.com/video/vi3012802841/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `videoembed` in capitals', async () => {
+    const value = '<iframe src="https://www.imdb.com/VIDEOEMBED/vi2742270233"></iframe>'
+    const expected = {
+      provider: 'imdb',
+      id: 'vi2742270233',
+      src: 'https://www.imdb.com/video/embed/vi2742270233/',
+      url: 'https://www.imdb.com/video/vi2742270233/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

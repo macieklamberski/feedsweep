@@ -454,3 +454,66 @@ describeForEachParser('videopressIframeEmbedResolver carrier title', (parseHtml)
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('videopressIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, videopressIframeEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://video.wordpress.com/EMBED/FLEAXUMB?cover=1&amp;preloadContent=metadata&amp;useAverageColor=1&amp;hd=0"></iframe>'
+    const expected = {
+      provider: 'videopress',
+      id: 'FLEAXUMB',
+      src: 'https://video.wordpress.com/embed/FLEAXUMB',
+      url: 'https://videopress.com/v/FLEAXUMB',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `v` in capitals', async () => {
+    const value = '<iframe src="https://videopress.com/V/FLEAXUMB"></iframe>'
+    const expected = {
+      provider: 'videopress',
+      id: 'FLEAXUMB',
+      src: 'https://video.wordpress.com/embed/FLEAXUMB',
+      url: 'https://videopress.com/v/FLEAXUMB',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `at` and `loop` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://videopress.com/embed/FLEAXUMB?AT=42&amp;LOOP=1&amp;muted=1"></iframe>'
+    const expected = {
+      provider: 'videopress',
+      id: 'FLEAXUMB',
+      src: 'https://video.wordpress.com/embed/FLEAXUMB?at=42&loop=1',
+      url: 'https://videopress.com/v/FLEAXUMB',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('videopressFlashEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, videopressFlashEmbedResolver)
+
+  it('should read the `guid` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="http://v0.wordpress.com/player.swf?v=1.03&amp;GUID=TxdSIdpO&amp;isDynamicSeeking=true"></iframe>'
+    const expected = {
+      provider: 'videopress',
+      id: 'TxdSIdpO',
+      src: 'https://video.wordpress.com/embed/TxdSIdpO',
+      url: 'https://videopress.com/v/TxdSIdpO',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

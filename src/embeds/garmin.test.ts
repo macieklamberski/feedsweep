@@ -145,3 +145,34 @@ describeForEachParser('garminEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('garminEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, garminEmbedResolver)
+
+  it('should read the route words `modern`, `activity` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://connect.garmin.com/MODERN/ACTIVITY/EMBED/1393315994"></iframe>'
+    const expected = {
+      provider: 'garmin',
+      id: '1393315994',
+      src: 'https://connect.garmin.com/embed/activity/1393315994',
+      url: 'https://connect.garmin.com/app/activity/1393315994',
+      height: 548,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `app`, `activity` and `embed` in capitals', async () => {
+    const value = '<iframe src="https://connect.garmin.com/APP/ACTIVITY/EMBED/1393315994"></iframe>'
+    const expected = {
+      provider: 'garmin',
+      id: '1393315994',
+      src: 'https://connect.garmin.com/embed/activity/1393315994',
+      url: 'https://connect.garmin.com/app/activity/1393315994',
+      height: 548,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

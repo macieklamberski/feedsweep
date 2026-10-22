@@ -118,12 +118,6 @@ describe('radioradicaleResolveEmbed', () => {
       expect(radioradicaleResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for the player word in capitals, which lands on the page', () => {
-      const value = 'https://www.radioradicale.it/scheda/542812/IFRAME'
-
-      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the Flash player configuration', () => {
       const value = 'http://www.radioradicale.it/scheda/embedcfg/401265/2838705'
 
@@ -180,6 +174,19 @@ describe('radioradicaleResolveEmbed', () => {
         id: '542812a',
         src: 'https://www.radioradicale.it/scheda/542812a/iframe',
         url: 'https://www.radioradicale.it/scheda/542812a',
+        ratio: '16/9',
+      }
+
+      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the player word in capitals and mint it in lowercase', () => {
+      const value = 'https://www.radioradicale.it/scheda/542812/IFRAME'
+      const expected = {
+        provider: 'radioradicale',
+        id: '542812',
+        src: 'https://www.radioradicale.it/scheda/542812/iframe',
+        url: 'https://www.radioradicale.it/scheda/542812',
         ratio: '16/9',
       }
 
@@ -304,5 +311,50 @@ describeForEachParser('radioradicale player through the pipeline', (parseHtml) =
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('radioradicaleEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, radioradicaleEmbedResolver)
+
+  it('should read the route words `scheda` and `iframe` in capitals', async () => {
+    const value = '<iframe src="https://www.radioradicale.it/SCHEDA/542812/IFRAME"></iframe>'
+    const expected = {
+      provider: 'radioradicale',
+      id: '542812',
+      src: 'https://www.radioradicale.it/scheda/542812/iframe',
+      url: 'https://www.radioradicale.it/scheda/542812',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `f`, `i`, `p`, `s` and `t` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://www.radioradicale.it/scheda/638609/iframe?F=1&amp;I=251937&amp;P=0&amp;S=120&amp;T=600"></iframe>'
+    const expected = {
+      provider: 'radioradicale',
+      id: '638609',
+      src: 'https://www.radioradicale.it/scheda/638609/iframe?f=1&i=251937&p=0&s=120&t=600',
+      url: 'https://www.radioradicale.it/scheda/638609',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `config` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?30207f&amp;CONFIG=http://www.radioradicale.it/scheda/embedcfg/401265/2838705"></iframe>'
+    const expected = {
+      provider: 'radioradicale',
+      id: '401265',
+      src: 'https://www.radioradicale.it/scheda/401265/iframe',
+      url: 'https://www.radioradicale.it/scheda/401265',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

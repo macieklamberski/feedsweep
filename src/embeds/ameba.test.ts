@@ -499,3 +499,56 @@ describeForEachParser('ameba through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('amebaReblogCardEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, amebaReblogCardEmbedResolver)
+
+  it('should read the route words `s`, `embed` and `reblog-card` in capitals', async () => {
+    const value =
+      '<iframe src="https://ameblo.jp/S/EMBED/REBLOG-CARD/ncbar/entry-12423195042.html?reblogAmebaId=clay-harb"></iframe>'
+    const expected = {
+      provider: 'ameba',
+      id: 'ncbar/entry-12423195042',
+      src: 'https://ameblo.jp/s/embed/reblog-card/ncbar/entry-12423195042.html',
+      url: 'https://ameblo.jp/ncbar/entry-12423195042.html',
+      height: 234,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('amebaImagePageEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, amebaImagePageEmbedResolver)
+
+  it('should read the route words `p` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://ameblo.jp/P/EMBED/sd-milk/image-12806733695-15295885078.html"></iframe>'
+    const expected = {
+      provider: 'ameba',
+      id: 'sd-milk/image-12806733695-15295885078',
+      src: 'https://ameblo.jp/p/embed/sd-milk/image-12806733695-15295885078.html',
+      url: 'https://ameblo.jp/sd-milk/image-12806733695-15295885078.html',
+      ratio: '360/416',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('amebaMoviePlayerEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, amebaMoviePlayerEmbedResolver)
+
+  it('should read the `v` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://static.blog-video.jp/?V=MCLP3ViBJRfW3clSWW5saxnjA5"></iframe>'
+    const expected = {
+      provider: 'ameba',
+      id: 'MCLP3ViBJRfW3clSWW5saxnjA5',
+      src: 'https://static.blog-video.jp/?v=MCLP3ViBJRfW3clSWW5saxnjA5',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

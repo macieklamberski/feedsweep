@@ -1,7 +1,7 @@
 import { isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, isEmptyElement } from '../utils/dom.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, getQueryParam, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'puzzleme'
@@ -12,7 +12,7 @@ const puzzlemeHosts = ['amuselabs.com', 'puzzleme.amuselabs.com', 'www.amuselabs
 
 // `/pmm/{kind}`, where the kind names the game. Any kind the server knows plays the puzzle the
 // id and set name, and one it does not know answers 404.
-const playerPathRegex = /^\/pmm\/([^/]+)$/
+const playerPathRegex = /^\/pmm\/([^/]+)$/i
 
 // The loader sizes its frame to 700 pixels, and the player lays the puzzle out to fit it.
 const playerHeight = 700
@@ -39,8 +39,8 @@ const puzzlemeResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const kind = parsed.pathname.match(playerPathRegex)?.[1]
-  const id = parsed.searchParams.get('id')
-  const set = parsed.searchParams.get('set')
+  const id = getQueryParam(parsed.searchParams, 'id')
+  const set = getQueryParam(parsed.searchParams, 'set')
 
   if (!kind || !id || !set) {
     return

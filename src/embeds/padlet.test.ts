@@ -163,3 +163,34 @@ describeForEachParser('padlet through the pipeline', (parseHtml) => {
     ).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('padletEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, padletEmbedResolver)
+
+  it('should read the route words `padlets`, `embeds` and `preview_embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://padlet.com/PADLETS/5r949isxqdhfcca7/EMBEDS/PREVIEW_EMBED"></iframe>'
+    const expected = {
+      provider: 'padlet',
+      id: '5r949isxqdhfcca7',
+      src: 'https://padlet.com/embed/5r949isxqdhfcca7',
+      thumbnail: 'https://padlet.net/social-previews/board/5r949isxqdhfcca7/opengraph.jpg',
+      height: 608,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value = '<iframe src="https://padlet.com/EMBED/228qqr1n7d19"></iframe>'
+    const expected = {
+      provider: 'padlet',
+      id: '228qqr1n7d19',
+      src: 'https://padlet.com/embed/228qqr1n7d19',
+      thumbnail: 'https://padlet.net/social-previews/board/228qqr1n7d19/opengraph.jpg',
+      height: 608,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

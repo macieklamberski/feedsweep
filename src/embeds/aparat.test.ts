@@ -231,3 +231,21 @@ describeForEachParser('the aparat facade the pipeline used to delete', (parseHtm
     expect(result).toContain('data-embed-ratio="16/9"')
   })
 })
+
+describeForEachParser('aparatIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, aparatIframeEmbedResolver)
+
+  it('should read the route words `video`, `embed`, `videohash`, `vt` and `frame` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.aparat.com/VIDEO/VIDEO/EMBED/VIDEOHASH/9o8zZ/VT/FRAME"></iframe>'
+    const expected = {
+      provider: 'aparat',
+      id: '9o8zZ',
+      src: 'https://www.aparat.com/video/video/embed/videohash/9o8zZ/vt/frame',
+      url: 'https://www.aparat.com/v/9o8zZ',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

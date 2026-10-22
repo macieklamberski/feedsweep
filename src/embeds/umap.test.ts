@@ -256,3 +256,20 @@ describeForEachParser('umap through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('umapEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, umapEmbedResolver)
+
+  it('should read the `map` route word in capitals', async () => {
+    const value = '<iframe src="https://umap.openstreetmap.fr/en/MAP/bandung_357466"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'umap',
+      id: 'umap.openstreetmap.fr/357466',
+      src: 'https://umap.openstreetmap.fr/en/map/bandung_357466',
+      url: 'https://umap.openstreetmap.fr/en/map/bandung_357466',
+      height: 300,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -267,3 +267,49 @@ describeForEachParser('corriere players through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('corriereEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, corriereEmbedResolver)
+
+  it('should read the route words `widget` and `players` in capitals', async () => {
+    const value =
+      '<iframe src="https://video.corriere.it/WIDGET/PLAYERS/player_tv_video_iFrame.shtml?width=398&amp;height=223&amp;videoId=http://static2.video.corriereobjects.it/widget/content/video/rss/video_184654.rss&amp;channelName=ZELIG&amp;advChannel=Zelig"></iframe>'
+    const expected = {
+      provider: 'corriere',
+      id: '184654',
+      src: 'https://video.corriere.it/video-embed/184654',
+      url: 'https://video.corriere.it/x/184654',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `video-embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://video.corriere.it/VIDEO-EMBED/885087cc-33c7-11ea-bebf-10b7ce31a40c?fbclid=IwAR0x&amp;playerType=embed&amp;tipo_video=embed_norcs"></iframe>'
+    const expected = {
+      provider: 'corriere',
+      id: '885087cc-33c7-11ea-bebf-10b7ce31a40c',
+      src: 'https://video.corriere.it/video-embed/885087cc-33c7-11ea-bebf-10b7ce31a40c',
+      url: 'https://video.corriere.it/x/885087cc-33c7-11ea-bebf-10b7ce31a40c',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `videoId` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://video.corriere.it/widget/players/player_tv_video_iFrame.shtml?width=398&amp;height=223&amp;VIDEOID=http://static2.video.corriereobjects.it/widget/content/video/rss/video_184654.rss&amp;channelName=ZELIG&amp;advChannel=Zelig"></iframe>'
+    const expected = {
+      provider: 'corriere',
+      id: '184654',
+      src: 'https://video.corriere.it/video-embed/184654',
+      url: 'https://video.corriere.it/x/184654',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

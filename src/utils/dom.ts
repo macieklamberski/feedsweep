@@ -1,6 +1,6 @@
 import { coerceNumber, isNonEmptyString, type Nullish, startsWithAnyOf } from 'trousse'
 import * as styles from './styles.js'
-import { isUrlShaped } from './urls.js'
+import { getQueryParam, isUrlShaped } from './urls.js'
 
 // Linkedom mis-types Node as `() => void` in facades.d.ts (WebReflection/linkedom#167).
 export const Node = { ELEMENT_NODE: 1, TEXT_NODE: 3, COMMENT_NODE: 8 } as const
@@ -159,7 +159,7 @@ export const flashVars = (element: Nullish<Element>): string | undefined => {
 
 // One named value out of that configuration, for a carrier that names a single thing.
 export const flashVar = (element: Nullish<Element>, name: string): string | undefined => {
-  return new URLSearchParams(flashVars(element)).get(name) ?? undefined
+  return getQueryParam(new URLSearchParams(flashVars(element)), name)
 }
 
 // Publishers spell a `<param>` name in every case, so `name` arrives lowercased.

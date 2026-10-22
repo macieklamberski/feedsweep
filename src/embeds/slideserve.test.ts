@@ -94,12 +94,6 @@ describeForEachParser('slideserveEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore the embed route in uppercase', async () => {
-      const value = '<iframe src="https://www.slideserve.com/EMBED/11734358"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore the embed route under a leading segment', async () => {
       const value = '<iframe src="https://www.slideserve.com/x/embed/11734358"></iframe>'
 
@@ -213,6 +207,18 @@ describeForEachParser('slideserveEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read the embed route in uppercase and mint it in lowercase', async () => {
+      const value = '<iframe src="https://www.slideserve.com/EMBED/11734358"></iframe>'
+      const expected = {
+        provider: 'slideserve',
+        id: '11734358',
+        src: 'https://www.slideserve.com/embed/11734358',
+        ratio: '300/271',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 })
 
@@ -245,5 +251,47 @@ describeForEachParser('slideserve through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('slideserveEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, slideserveEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value = '<iframe src="https://www.slideserve.com/EMBED/11734358"></iframe>'
+    const expected = {
+      provider: 'slideserve',
+      id: '11734358',
+      src: 'https://www.slideserve.com/embed/11734358',
+      ratio: '300/271',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `player.swf` in capitals', async () => {
+    const value =
+      '<iframe src="http://www.slideserve.com/PLAYER.SWF?moviePath=http://www.slideserve.com/video/12675.swf"></iframe>'
+    const expected = {
+      provider: 'slideserve',
+      id: '12675',
+      src: 'https://www.slideserve.com/embed/12675',
+      ratio: '300/271',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `moviePath` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="http://www.slideserve.com/player.swf?MOVIEPATH=http://www.slideserve.com/video/12675.swf"></iframe>'
+    const expected = {
+      provider: 'slideserve',
+      id: '12675',
+      src: 'https://www.slideserve.com/embed/12675',
+      ratio: '300/271',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

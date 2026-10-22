@@ -321,3 +321,36 @@ describeForEachParser('anyflip pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('anyflipEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, anyflipEmbedResolver)
+
+  it('should read the route words `mobile` and `index.html` in capitals', async () => {
+    const value = '<iframe src="https://online.anyflip.com/krqw/byjr/MOBILE/INDEX.HTML"></iframe>'
+    const expected = {
+      provider: 'anyflip',
+      id: 'krqw/byjr',
+      src: 'https://online.anyflip.com/krqw/byjr/index.html',
+      url: 'https://anyflip.com/krqw/byjr',
+      thumbnail: 'https://online.anyflip.com/krqw/byjr/files/shot.jpg',
+      ratio: '550/350',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `online.anyflip.com` and `index.html` in capitals', async () => {
+    const value =
+      '<iframe src="https://s3.amazonaws.com/ONLINE.ANYFLIP.COM/ffht/adhw/INDEX.HTML"></iframe>'
+    const expected = {
+      provider: 'anyflip',
+      id: 'ffht/adhw',
+      src: 'https://online.anyflip.com/ffht/adhw/index.html',
+      url: 'https://anyflip.com/ffht/adhw',
+      thumbnail: 'https://online.anyflip.com/ffht/adhw/files/shot.jpg',
+      ratio: '550/350',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

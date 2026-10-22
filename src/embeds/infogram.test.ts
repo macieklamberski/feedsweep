@@ -563,3 +563,20 @@ describeForEachParser('infogram charts through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('infogramIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, infogramIframeEmbedResolver)
+
+  it('should read the `live` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://e.infogram.com/1pzgr95gw37zqwu295dvlwz9q1c11rrl9kz?src=embed&amp;LIVE"></iframe>'
+    const expected = {
+      provider: 'infogram',
+      id: '1pzgr95gw37zqwu295dvlwz9q1c11rrl9kz',
+      src: 'https://e.infogram.com/1pzgr95gw37zqwu295dvlwz9q1c11rrl9kz?src=embed&live',
+      url: 'https://infogram.com/1pzgr95gw37zqwu295dvlwz9q1c11rrl9kz',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

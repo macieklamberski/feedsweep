@@ -973,3 +973,60 @@ describeForEachParser('vimeoMetasliderEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('vimeoEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, vimeoEmbedResolver)
+
+  it('should read the route words `event`, `embed` and `interaction` in capitals', async () => {
+    const value = '<iframe src="https://vimeo.com/EVENT/6084402/EMBED/INTERACTION"></iframe>'
+    const expected = {
+      provider: 'vimeo',
+      id: 'event/6084402',
+      src: 'https://vimeo.com/event/6084402/embed',
+      url: 'https://vimeo.com/event/6084402',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `videos` in capitals', async () => {
+    const value = '<iframe src="https://vimeo.com/groups/motion/VIDEOS/76979871"></iframe>'
+    const expected = {
+      provider: 'vimeo',
+      id: '76979871',
+      src: 'https://player.vimeo.com/video/76979871',
+      url: 'https://vimeo.com/76979871',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `h` and `t` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://player.vimeo.com/video/76979871?H=a52724358e&amp;T=30s"></iframe>'
+    const expected = {
+      provider: 'vimeo',
+      id: '76979871:a52724358e',
+      src: 'https://player.vimeo.com/video/76979871?h=a52724358e&t=30s',
+      url: 'https://vimeo.com/76979871/a52724358e',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `clip_id` parameter name in capitals', async () => {
+    const value = '<iframe src="http://vimeo.com/moogaloop.swf?CLIP_ID=76979871"></iframe>'
+    const expected = {
+      provider: 'vimeo',
+      id: '76979871',
+      src: 'https://player.vimeo.com/video/76979871',
+      url: 'https://vimeo.com/76979871',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -399,3 +399,49 @@ describeForEachParser('audiomack through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('audiomackEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, audiomackEmbedResolver)
+
+  it('should read the route words `embed` and `song` in capitals', async () => {
+    const value = '<iframe src="https://audiomack.com/EMBED/larrynorman/SONG/burn-2"></iframe>'
+    const expected = {
+      provider: 'audiomack',
+      id: 'larrynorman/song/burn-2',
+      src: 'https://audiomack.com/embed/larrynorman/song/burn-2',
+      url: 'https://audiomack.com/larrynorman/song/burn-2',
+      height: 252,
+      author: 'larrynorman',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `embed` and `album` in capitals', async () => {
+    const value = '<iframe src="https://audiomack.com/EMBED/chuuwee/ALBUM/cool-world"></iframe>'
+    const expected = {
+      provider: 'audiomack',
+      id: 'chuuwee/album/cool-world',
+      src: 'https://audiomack.com/embed/chuuwee/album/cool-world',
+      url: 'https://audiomack.com/chuuwee/album/cool-world',
+      height: 400,
+      author: 'chuuwee',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `key` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://audiomack.com/embed/song/mlgmusiz/new-year-new-glory?KEY=a1b2c3"></iframe>'
+    const expected = {
+      provider: 'audiomack',
+      id: 'mlgmusiz/song/new-year-new-glory',
+      src: 'https://audiomack.com/embed/mlgmusiz/song/new-year-new-glory?key=a1b2c3',
+      height: 252,
+      author: 'mlgmusiz',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

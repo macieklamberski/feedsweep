@@ -1,6 +1,12 @@
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { encodePathSegment, hexRegex, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import {
+  encodePathSegment,
+  getQueryParam,
+  hexRegex,
+  parseUrlOnHosts,
+  pickUrlParams,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rutube'
@@ -8,8 +14,8 @@ const provider = 'rutube'
 const rutubeHosts = ['rutube.ru']
 
 // The player reads its id off the last path segment, so `/play/embed/private/{id}` plays `{id}`.
-const embedPathRegex = /^\/(?:play\/embed(?:\/private)?|video\/embed|embed)\/([^/]+)\/?$/
-const playlistPathRegex = /^\/pl\/?$/
+const embedPathRegex = /^\/(?:play\/embed(?:\/private)?|video\/embed|embed)\/([^/]+)\/?$/i
+const playlistPathRegex = /^\/pl\/?$/i
 
 // `p` is the access key a private video will not play without.
 const rutubeEmbedParams = ['p', 't', 'stopTime']
@@ -25,7 +31,9 @@ const composeEmbed = (videoId: string, parsed: URL): EmbedResolverResult => {
     provider,
     id: videoId,
     src: `https://rutube.ru/play/embed/${segment}${pickUrlParams(parsed.href, rutubeEmbedParams)}`,
-    url: parsed.searchParams.get('p') ? undefined : `https://rutube.ru/video/${segment}/`,
+    url: getQueryParam(parsed.searchParams, 'p')
+      ? undefined
+      : `https://rutube.ru/video/${segment}/`,
     // The player fills its box, and Rutube's snippet and oEmbed size it 720 by 405.
     ratio: '16/9',
   }
@@ -41,7 +49,7 @@ export const rutubeResolveEmbed: ResolveEmbed = (url, element) => {
   // An id is a uuid with the dashes stripped, and the player still plays the all-digit ids the same
   // routes carried before.
   const videoId = playlistPathRegex.test(parsed.pathname)
-    ? parsed.searchParams.get('pl_video')
+    ? getQueryParam(parsed.searchParams, 'pl_video')
     : keepIfMatches(parsed.pathname.match(embedPathRegex)?.[1], hexRegex)
 
   if (!videoId) {

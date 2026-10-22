@@ -358,3 +358,63 @@ describeForEachParser('googleslides through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('googleslidesEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, googleslidesEmbedResolver)
+
+  it('should read the route words `a`, `presentation`, `d`, `e` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/A/redhat.com/PRESENTATION/D/E/2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231/EMBED?start=false&amp;loop=false&amp;delayms=3000"></iframe>'
+    const expected = {
+      provider: 'googleslides',
+      id: '2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231',
+      src: 'https://docs.google.com/presentation/d/e/2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231/embed',
+      url: 'https://docs.google.com/presentation/d/e/2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231/pub',
+      ratio: '480/299',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `presentation`, `d`, `e` and `pub` in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/PRESENTATION/D/E/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/PUB"></iframe>'
+    const expected = {
+      provider: 'googleslides',
+      id: '2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw',
+      src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed',
+      url: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/pub',
+      ratio: '480/299',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `slide` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed?SLIDE=id.p5"></iframe>'
+    const expected = {
+      provider: 'googleslides',
+      id: '2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw',
+      src: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed?slide=id.p5',
+      url: 'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/pub',
+      ratio: '480/299',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `id` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/presentation/embed?ID=1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk&amp;start=false&amp;loop=false&amp;delayms=3000"></iframe>'
+    const expected = {
+      provider: 'googleslides',
+      id: '1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk',
+      src: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/embed',
+      url: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/pub',
+      ratio: '480/299',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

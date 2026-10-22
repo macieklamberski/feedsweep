@@ -1,6 +1,6 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'traileraddict'
@@ -46,8 +46,8 @@ export const traileraddictResolveEmbed: ResolveEmbed = (url) => {
     return composeEmbed(id)
   }
 
-  if (parsed.pathname === playerPath) {
-    const id = parsed.searchParams.get('id')
+  if (isAnyOf(parsed.pathname, playerPath)) {
+    const id = getQueryParam(parsed.searchParams, 'id')
 
     if (!id) {
       return

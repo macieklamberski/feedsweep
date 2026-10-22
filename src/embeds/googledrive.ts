@@ -1,7 +1,7 @@
-import { decodeSegment, getPathSegments } from 'trousse'
+import { decodeSegment, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { composeQuery, getQueryParam, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'googledrive'
@@ -20,12 +20,12 @@ const readFileId = (
   url: string,
   isAudio?: boolean,
 ): string | undefined => {
-  if (segments[0] === 'file' && segments[1] === 'd') {
+  if (isAnyOf(segments[0], 'file') && isAnyOf(segments[1], 'd')) {
     return segments[2]
   }
 
-  if (isAudio && segments.length === 1 && segments[0] === 'open') {
-    return parseUrlOnHosts(url, 'drive.google.com')?.searchParams.get('id') ?? undefined
+  if (isAudio && segments.length === 1 && isAnyOf(segments[0], 'open')) {
+    return getQueryParam(parseUrlOnHosts(url, 'drive.google.com')?.searchParams, 'id')
   }
 }
 
@@ -39,7 +39,7 @@ const googledriveHosts = [
 export const getPathSegmentsWithoutWorkspace = (url: string | URL): Array<string> => {
   const pathSegments = getPathSegments(url)
 
-  return pathSegments[0] === 'a' ? pathSegments.slice(2) : pathSegments
+  return isAnyOf(pathSegments[0], 'a') ? pathSegments.slice(2) : pathSegments
 }
 
 // The thumbnail of a link-shared Drive file, by its file id.
@@ -51,7 +51,7 @@ export const composeDriveThumbnail = (fileId: string): string => {
 // `/drive/folders` or `/embeddedfolderview` is a listing, not a file, and stays unclaimed.
 export const googledriveResolveEmbed: ResolveEmbed = (url, element) => {
   const segments = getPathSegmentsWithoutWorkspace(url)
-  const isAudio = attr(element, 'type')?.startsWith('audio/')
+  const isAudio = attr(element, 'type')?.toLowerCase().startsWith('audio/')
   const fileId = readFileId(segments, url, isAudio)
 
   if (!fileId) {

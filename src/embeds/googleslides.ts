@@ -1,6 +1,12 @@
-import { parseUrl } from 'trousse'
+import { isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { composeQuery, encodePathSegment, pickQueryParams, pickUrlParams } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  getQueryParam,
+  pickQueryParams,
+  pickUrlParams,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
 
@@ -8,7 +14,7 @@ const provider = 'googleslides'
 
 // The page routes a deck frame names. `/export` serves the deck as a file, which stays an
 // enclosure.
-const deckRoutes = new Set(['edit', 'embed', 'preview', 'pub', 'pubembed'])
+const deckRoutes = ['edit', 'embed', 'preview', 'pub', 'pubembed']
 
 // `slide` is the start position. `loop` and `delayms` only shape auto-advance, which `start`
 // turns on, and starting playback is the reader's call.
@@ -30,12 +36,12 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
   const segments = getPathSegmentsWithoutWorkspace(url)
 
-  if (!parsed || segments[0] !== 'presentation') {
+  if (!parsed || !isAnyOf(segments[0], 'presentation')) {
     return
   }
 
-  if (segments[1] === 'embed') {
-    const fileId = parsed.searchParams.get('id')
+  if (isAnyOf(segments[1], 'embed')) {
+    const fileId = getQueryParam(parsed.searchParams, 'id')
 
     if (!fileId) {
       return
@@ -53,11 +59,11 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
     }
   }
 
-  if (segments[1] !== 'd') {
+  if (!isAnyOf(segments[1], 'd')) {
     return
   }
 
-  const isPublished = segments[2] === 'e'
+  const isPublished = isAnyOf(segments[2], 'e')
   const deckId = isPublished ? segments[3] : segments[2]
 
   if (!deckId) {
@@ -66,7 +72,7 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
 
   const route = segments[isPublished ? 4 : 3]
 
-  if (route !== undefined && !deckRoutes.has(route)) {
+  if (route !== undefined && !isAnyOf(route, deckRoutes)) {
     return
   }
 

@@ -223,3 +223,20 @@ describeForEachParser('podetize through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('podetizeIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, podetizeIframeEmbedResolver)
+
+  it('should read the `id` and `epmode` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://player.podetize.com/?ID=P8RHvvMsf&amp;EPMODE=true"></iframe>'
+    const expected = {
+      provider: 'podetize',
+      id: 'P8RHvvMsf',
+      src: 'https://player.podetize.com/?id=P8RHvvMsf&epmode=true',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -14,9 +14,9 @@ const gameRouteWords = [
   'juego', // es.educaplay.com
 ]
 
-const gamePathRegex = /^\/([^/]+)\/([^/-]+)-([^/]+)\.html$/
+const gamePathRegex = /^\/([^/]+)\/([^/-]+)-([^/]+)\.html$/i
 // The retired html5 player, `/{lang}/{resources}/{id}/html5/{slug}.htm`, which answers 404.
-const legacyPathRegex = /^\/[^/]+\/[^/]+\/([^/]+)\/html5\/([^/]+)\.htm$/
+const legacyPathRegex = /^\/[^/]+\/[^/]+\/([^/]+)\/html5\/([^/]+)\.htm$/i
 
 const gameHeight = 690
 
@@ -26,7 +26,7 @@ const readGame = (pathname: string): { id: string; slug: string } | undefined =>
   if (game) {
     const [, routeWord = '', id = '', slug = ''] = game
 
-    if (!gameRouteWords.includes(routeWord)) {
+    if (!isAnyOf(routeWord, gameRouteWords)) {
       return
     }
 

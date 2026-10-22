@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
@@ -20,7 +20,7 @@ const videoRatio = '16/9'
 export const extractOmnyClip = (link: string): string | undefined => {
   const segments = getPathSegments(link)
 
-  if (segments[0] !== 'shows' || segments[segments.length - 1] !== 'embed') {
+  if (!isAnyOf(segments[0], 'shows') || !isAnyOf(segments[segments.length - 1], 'embed')) {
     return
   }
 
@@ -51,7 +51,7 @@ export const omnyResolveEmbed: ResolveEmbed = (url, element) => {
   )
   // The player reads the value in any case.
   const isVideo = media?.toLowerCase() === 'video'
-  const isPlaylist = clip.includes('/playlists/')
+  const isPlaylist = clip.toLowerCase().includes('/playlists/')
   const query = composeQuery(trimObject({ media: isVideo ? media : undefined, t }))
   const title = attr(element, 'title')
 

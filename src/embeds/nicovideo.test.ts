@@ -388,3 +388,34 @@ describe('isNicovideoReady', () => {
     expect(isNicovideoReady('loadComplete')).toBe(false)
   })
 })
+
+describeForEachParser('nicovideoIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, nicovideoIframeEmbedResolver)
+
+  it('should read the route word `thumb_watch` in capitals', async () => {
+    const value = '<iframe src="https://ext.nicovideo.jp/THUMB_WATCH/sm9?w=490&amp;h=307"></iframe>'
+    const expected = {
+      provider: 'nicovideo',
+      id: 'sm9',
+      src: 'https://embed.nicovideo.jp/watch/sm9',
+      url: 'https://www.nicovideo.jp/watch/sm9',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `watch` in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.nicovideo.jp/WATCH/1576909203/script?w=640&amp;h=360"></iframe>'
+    const expected = {
+      provider: 'nicovideo',
+      id: '1576909203',
+      src: 'https://embed.nicovideo.jp/watch/1576909203',
+      url: 'https://www.nicovideo.jp/watch/1576909203',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

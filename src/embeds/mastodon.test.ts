@@ -490,3 +490,22 @@ describe('readMastodonHeight', () => {
     expect(readMastodonHeight({ type: 'ready' })).toBeUndefined()
   })
 })
+
+describeForEachParser('mastodonEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mastodonEmbedResolver)
+
+  it('should read the `embed` route word in capitals', async () => {
+    const value =
+      '<iframe src="https://mastodon.green/@pvonhellermannn/116798038528869495/EMBED"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'mastodon',
+      id: 'mastodon.green/116798038528869495',
+      src: 'https://mastodon.green/@pvonhellermannn/116798038528869495/embed',
+      url: 'https://mastodon.green/@pvonhellermannn/116798038528869495',
+      author: '@pvonhellermannn@mastodon.green',
+      publisher: 'mastodon.green',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

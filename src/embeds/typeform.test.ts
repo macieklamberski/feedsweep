@@ -394,3 +394,20 @@ describeForEachParser('typeformIframeEmbedResolver carrier title', (parseHtml) =
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('typeformIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, typeformIframeEmbedResolver)
+
+  it('should read the route word `to` in capitals', async () => {
+    const value = '<iframe src="https://form.typeform.com/TO/MTt3Pw7K"></iframe>'
+    const expected = {
+      provider: 'typeform',
+      id: 'MTt3Pw7K',
+      src: 'https://form.typeform.com/to/MTt3Pw7K',
+      url: 'https://form.typeform.com/to/MTt3Pw7K',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

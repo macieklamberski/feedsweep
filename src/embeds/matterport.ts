@@ -4,6 +4,7 @@ import { attr } from '../utils/dom.js'
 import {
   composeQuery,
   encodePathSegment,
+  getQueryParam,
   pickQueryParams,
   placeholderBaseUrl,
 } from '../utils/urls.js'
@@ -13,7 +14,7 @@ const provider = 'matterport'
 
 const matterportHosts = ['my.matterport.com']
 
-const showPathRegex = /^\/show\/?$/
+const showPathRegex = /^\/show\/?$/i
 
 // The start pose a shared location link writes, the keys the showcase reads to place the camera.
 const navigationParams = ['start', 'sm', 'sp', 'sq', 'sr', 'ss', 'sf', 'sz']
@@ -26,7 +27,7 @@ const matterportResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const id = parsed.searchParams.get('m')
+  const id = getQueryParam(parsed.searchParams, 'm')
 
   if (!id) {
     return

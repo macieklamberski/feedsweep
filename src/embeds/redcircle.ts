@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -25,7 +25,8 @@ const routes = {
 const readSubject = (
   segments: Array<string>,
 ): { kind: 'episode' | 'show'; show: string; episode?: string } | undefined => {
-  const [route, ...rest] = segments
+  const [routeWord, ...rest] = segments
+  const route = routeWord?.toLowerCase()
   const kind = route ? routes[route as keyof typeof routes] : undefined
 
   if (!kind) {
@@ -35,7 +36,7 @@ const readSubject = (
   // Only the webplayer spells the show id bare; the two loader paths put `sh` in front of it.
   const show = route === 'embedded-show-webplayer' ? rest[0] : rest[1]
 
-  if (!show || (route !== 'embedded-show-webplayer' && rest[0] !== 'sh')) {
+  if (!show || (route !== 'embedded-show-webplayer' && !isAnyOf(rest[0], 'sh'))) {
     return
   }
 
@@ -43,7 +44,7 @@ const readSubject = (
     return { kind, show }
   }
 
-  const episode = rest[2] === 'ep' ? rest[3] : undefined
+  const episode = isAnyOf(rest[2], 'ep') ? rest[3] : undefined
 
   if (!episode) {
     return
@@ -83,7 +84,7 @@ export const redcircleResolveEmbed: ResolveEmbed = (url) => {
 // The mount is div.redcirclePlayer-{episode}, and the player path on redcircle.com renders a blank
 // page for an invented episode.
 export const redcircleScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="podcache.net/embedded-"]',
+  'script[src*="podcache.net/embedded-" i]',
   (element) => {
     return redcircleResolveEmbed(attr(element, 'src') ?? '')
   },

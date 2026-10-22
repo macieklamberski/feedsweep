@@ -381,3 +381,20 @@ describeForEachParser('jotform through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('jotformIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, jotformIframeEmbedResolver)
+
+  it('should read the route word `form` in capitals', async () => {
+    const value = '<iframe src="https://form.jotform.com/FORM/260493476454061"></iframe>'
+    const expected = {
+      provider: 'jotform',
+      id: '260493476454061',
+      src: 'https://form.jotform.com/260493476454061',
+      url: 'https://form.jotform.com/260493476454061',
+      height: 539,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments } from 'trousse'
+import { decodeSegment, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -13,7 +13,7 @@ const brResolveEmbed: ResolveEmbed = (url) => {
   const [section, route, slot] = getPathSegments(url)
   const token = decodeSegment(slot)?.match(mediaTokenRegex)?.[0]
 
-  if (section !== 'mediathek' || route !== 'embed' || !token) {
+  if (!isAnyOf(section, 'mediathek') || !isAnyOf(route, 'embed') || !token) {
     return
   }
 

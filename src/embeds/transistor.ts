@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { isFileName } from '../utils/urls.js'
@@ -23,7 +23,7 @@ type Subject = { kind: keyof typeof playerHeights; id: string }
 
 export const extractTransistorEmbed = (link: string): Subject | undefined => {
   const segments = getPathSegments(link)
-  const kind = segments[0]
+  const kind = segments[0]?.toLowerCase()
   const subject = segments[1]
 
   // Transistor serves the episode audio on the player host, so a file name is an enclosure.
@@ -31,7 +31,7 @@ export const extractTransistorEmbed = (link: string): Subject | undefined => {
     return
   }
 
-  const mode = showModes.find((named) => named === segments[2])
+  const mode = showModes.find((named) => isAnyOf(segments[2], named))
 
   if (kind === 'e' && mode) {
     return { kind: mode, id: subject }

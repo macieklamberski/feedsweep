@@ -423,3 +423,64 @@ describeForEachParser('scribd through the pipeline', (parseHtml) => {
     expect(await convert(value, [])).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('scribdIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, scribdIframeEmbedResolver)
+
+  it('should read the route words `mobile` and `doc` in capitals', async () => {
+    const value = '<iframe src="https://www.scribd.com/MOBILE/DOC/173385168"></iframe>'
+    const expected = {
+      provider: 'scribd',
+      id: '173385168',
+      src: 'https://www.scribd.com/embeds/173385168/content',
+      url: 'https://www.scribd.com/document/173385168',
+      height: 600,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `embeds` in capitals', async () => {
+    const value = '<iframe src="https://www.scribd.com/EMBEDS/12%203/content"></iframe>'
+    const expected = {
+      provider: 'scribd',
+      id: '12 3',
+      src: 'https://www.scribd.com/embeds/12%203/content',
+      url: 'https://www.scribd.com/document/12%203',
+      height: 600,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `start_page` and `access_key` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://fr.scribd.com/embeds/488306777/content?START_PAGE=1&amp;view_mode=scroll&amp;ACCESS_KEY=key-ZJXG4sWak4icye8tCa8g"></iframe>'
+    const expected = {
+      provider: 'scribd',
+      id: '488306777',
+      src: 'https://www.scribd.com/embeds/488306777/content?access_key=key-ZJXG4sWak4icye8tCa8g&start_page=1',
+      height: 600,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('scribdFlashEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, scribdFlashEmbedResolver)
+
+  it('should read the `document_id` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="http://d1.scribdassets.com/ScribdViewer.swf?DOCUMENT_ID=108992419&amp;access_key=key-13davbc"></iframe>'
+    const expected = {
+      provider: 'scribd',
+      id: '108992419',
+      src: 'https://www.scribd.com/embeds/108992419/content',
+      url: 'https://www.scribd.com/document/108992419',
+      height: 600,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

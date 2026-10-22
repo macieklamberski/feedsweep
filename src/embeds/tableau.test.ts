@@ -615,3 +615,33 @@ describeForEachParser('tableau snippets through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('tableauIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, tableauIframeEmbedResolver)
+
+  it('should read the route word `views` in capitals', async () => {
+    const value =
+      '<iframe src="https://public.tableau.com/VIEWS/IndustrialDevelopmentSubsidies_11-15/Dashboard1?:embed=y&amp;:showVizHome=no"></iframe>'
+    const expected = {
+      provider: 'tableau',
+      id: 'IndustrialDevelopmentSubsidies_11-15',
+      src: 'https://public.tableau.com/views/IndustrialDevelopmentSubsidies_11-15/Dashboard1?:embed=y&:showVizHome=no',
+      url: 'https://public.tableau.com/views/IndustrialDevelopmentSubsidies_11-15/Dashboard1',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `profile` in capitals', async () => {
+    const value =
+      '<iframe src="https://public.tableau.com/PROFILE/vizimpact#!/vizhome/HackerTeamClients-locationstatus/Sheet1"></iframe>'
+    const expected = {
+      provider: 'tableau',
+      id: 'HackerTeamClients-locationstatus',
+      src: 'https://public.tableau.com/views/HackerTeamClients-locationstatus/Sheet1?:embed=y&:showVizHome=no',
+      url: 'https://public.tableau.com/views/HackerTeamClients-locationstatus/Sheet1',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

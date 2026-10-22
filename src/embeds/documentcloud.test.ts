@@ -433,3 +433,31 @@ describeForEachParser('documentcloud shapes the pipeline strips first', (parseHt
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('documentcloudEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, documentcloudEmbedResolver)
+
+  it('should read the route words `documents` and `pages` in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.documentcloud.org/DOCUMENTS/28200073/PAGES/1/?embed=1"></iframe>'
+    const expected = {
+      provider: 'documentcloud',
+      id: '28200073/pages/1',
+      src: 'https://embed.documentcloud.org/documents/28200073/pages/1/',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `documents` and `annotations` in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.documentcloud.org/DOCUMENTS/4104638/ANNOTATIONS/380631/?embed=1&amp;pdf=0&amp;onlyshoworg=0&amp;fullscreen=1&amp;embed=1"></iframe>'
+    const expected = {
+      provider: 'documentcloud',
+      id: '4104638/annotations/380631',
+      src: 'https://embed.documentcloud.org/documents/4104638/annotations/380631/',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

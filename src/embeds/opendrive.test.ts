@@ -71,6 +71,19 @@ describe('opendriveResolveEmbed', () => {
 
       expect(opendriveResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the route word in another case', () => {
+      const value = 'https://www.opendrive.com/PLAYER/NDZfOTg5NzkzOF9iYXhEWQ'
+      const expected = {
+        provider: 'opendrive',
+        id: 'NDZfOTg5NzkzOF9iYXhEWQ',
+        src: 'https://www.opendrive.com/player/NDZfOTg5NzkzOF9iYXhEWQ',
+        url: 'https://od.lk/f/NDZfOTg5NzkzOF9iYXhEWQ',
+        height: 25,
+      }
+
+      expect(opendriveResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -83,12 +96,6 @@ describe('opendriveResolveEmbed', () => {
     it('should ignore the download page', () => {
       const value =
         'https://www.opendrive.com/download/OTdfODE2MDkxODJfaFZ0d20?folder_id=OTdfNzA1NjM3NF9zOTJnOA'
-
-      expect(opendriveResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the route word in another case', () => {
-      const value = 'https://www.opendrive.com/PLAYER/NDZfOTg5NzkzOF9iYXhEWQ'
 
       expect(opendriveResolveEmbed(value)).toBeUndefined()
     })
@@ -219,5 +226,35 @@ describeForEachParser('opendrive through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('opendriveEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, opendriveEmbedResolver)
+
+  it('should read the route word `player` in capitals', async () => {
+    const value = '<iframe src="https://www.opendrive.com/PLAYER/NDZfOTg5NzkzOF9iYXhEWQ"></iframe>'
+    const expected = {
+      provider: 'opendrive',
+      id: 'NDZfOTg5NzkzOF9iYXhEWQ',
+      src: 'https://www.opendrive.com/player/NDZfOTg5NzkzOF9iYXhEWQ',
+      url: 'https://od.lk/f/NDZfOTg5NzkzOF9iYXhEWQ',
+      height: 25,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `listen` in capitals', async () => {
+    const value = '<iframe src="https://www.opendrive.com/LISTEN/NF8xMDAwNzE0MDdfM2dnQ20"></iframe>'
+    const expected = {
+      provider: 'opendrive',
+      id: 'NF8xMDAwNzE0MDdfM2dnQ20',
+      src: 'https://www.opendrive.com/player/NF8xMDAwNzE0MDdfM2dnQ20',
+      url: 'https://od.lk/f/NF8xMDAwNzE0MDdfM2dnQ20',
+      height: 25,
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

@@ -170,3 +170,31 @@ describe('readNotecomHeight', () => {
     expect(readNotecomHeight({ height: 234 })).toBeUndefined()
   })
 })
+
+describeForEachParser('notecomIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, notecomIframeEmbedResolver)
+
+  it('should read the route words `embed` and `notes` in capitals', async () => {
+    const value = '<iframe src="https://note.com/EMBED/NOTES/nf938ce640465"></iframe>'
+    const expected = {
+      provider: 'notecom',
+      id: 'nf938ce640465',
+      src: 'https://note.com/embed/notes/nf938ce640465',
+      url: 'https://note.com/notes/nf938ce640465',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `n` in capitals', async () => {
+    const value = '<iframe src="https://note.com/katayuma/N/nf938ce640465"></iframe>'
+    const expected = {
+      provider: 'notecom',
+      id: 'nf938ce640465',
+      src: 'https://note.com/embed/notes/nf938ce640465',
+      url: 'https://note.com/katayuma/N/nf938ce640465',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

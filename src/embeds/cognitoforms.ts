@@ -1,7 +1,7 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { getQueryParam, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cognitoforms'
@@ -9,7 +9,7 @@ const provider = 'cognitoforms'
 // `services.cognitoforms.com` is the older embed host, and still serves the same forms.
 const cognitoformsHosts = ['www.cognitoforms.com', 'services.cognitoforms.com']
 
-const seamlessPathRegex = /^\/f\/seamless\.js$/
+const seamlessPathRegex = /^\/f\/seamless\.js$/i
 // The loader's `Cognito.load` refuses any kind but `"forms"`, and mounts the form named by `id`.
 const loadCallRegex = /Cognito\.load\(\s*"forms"\s*,\s*\{\s*id\s*:\s*"([^"]+)"/
 
@@ -37,7 +37,7 @@ export const cognitoformsResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const [route, orgKey, pathNumber, ...rest] = getPathSegments(parsed)
-  const formNumber = pathNumber ?? parsed.searchParams.get('id')
+  const formNumber = pathNumber ?? getQueryParam(parsed.searchParams, 'id')
 
   if (!isAnyOf(route, 'f') || !orgKey || !formNumber || rest.length > 0) {
     return
@@ -50,7 +50,7 @@ export const cognitoformsResolveEmbed: ResolveEmbed = (url) => {
 // Cognito Forms' seamless embed, a script that renders the form into the page itself and that
 // the pipeline drops.
 export const cognitoformsScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="cognitoforms.com/f/seamless.js"][data-key][data-form]',
+  'script[src*="cognitoforms.com/f/seamless.js" i][data-key][data-form]',
   (element) => {
     const loader = parseUrlOnHosts(attr(element, 'src'), cognitoformsHosts)
     const orgKey = attr(element, 'data-key')

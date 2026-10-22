@@ -895,3 +895,63 @@ describeForEachParser('googlesheets through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('googlesheetsEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, googlesheetsEmbedResolver)
+
+  it('should read the route words `spreadsheets`, `u`, `d`, `e` and `pubhtml` in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/SPREADSHEETS/U/2/D/E/2PACX-1vSycY-A50zVwI1MTL21nGd-CbjRD3hg6jOeujz18Rcy26K07py-fwJsmSkTbn89Lc1yfdREFGEHX7V9/PUBHTML?gid=0&amp;single=true"></iframe>'
+    const expected = {
+      provider: 'googlesheets',
+      id: '2PACX-1vSycY-A50zVwI1MTL21nGd-CbjRD3hg6jOeujz18Rcy26K07py-fwJsmSkTbn89Lc1yfdREFGEHX7V9',
+      src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSycY-A50zVwI1MTL21nGd-CbjRD3hg6jOeujz18Rcy26K07py-fwJsmSkTbn89Lc1yfdREFGEHX7V9/pubhtml?gid=0&single=true',
+      url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSycY-A50zVwI1MTL21nGd-CbjRD3hg6jOeujz18Rcy26K07py-fwJsmSkTbn89Lc1yfdREFGEHX7V9/pubhtml',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `spreadsheets`, `d`, `pubhtml` and `sheet` in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/SPREADSHEETS/D/1U3GGl7tMh_RcurZevHcKkAmnLKy90MfNvid05MeWju0/PUBHTML/SHEET?gid=573553659"></iframe>'
+    const expected = {
+      provider: 'googlesheets',
+      id: '1U3GGl7tMh_RcurZevHcKkAmnLKy90MfNvid05MeWju0',
+      src: 'https://docs.google.com/spreadsheets/d/1U3GGl7tMh_RcurZevHcKkAmnLKy90MfNvid05MeWju0/pubhtml/sheet?gid=573553659',
+      url: 'https://docs.google.com/spreadsheets/d/1U3GGl7tMh_RcurZevHcKkAmnLKy90MfNvid05MeWju0/pubhtml',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `gid`, `single` and `range` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/spreadsheets/d/16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M/pubhtml?GID=1618494729&amp;SINGLE=true&amp;widget=true&amp;headers=false&amp;RANGE=a1:j"></iframe>'
+    const expected = {
+      provider: 'googlesheets',
+      id: '16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M',
+      src: 'https://docs.google.com/spreadsheets/d/16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M/pubhtml?gid=1618494729&single=true&range=a1%3Aj',
+      url: 'https://docs.google.com/spreadsheets/d/16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M/pubhtml',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `oid` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/spreadsheets/d/1s8zs0Ho1XvBGXspVh2mEOfiE06g-4J2BFip8rOdLVho/pubchart?OID=390769411"></iframe>'
+    const expected = {
+      provider: 'googlesheets',
+      id: '1s8zs0Ho1XvBGXspVh2mEOfiE06g-4J2BFip8rOdLVho',
+      src: 'https://docs.google.com/spreadsheets/d/1s8zs0Ho1XvBGXspVh2mEOfiE06g-4J2BFip8rOdLVho/pubchart?oid=390769411',
+      url: 'https://docs.google.com/spreadsheets/d/1s8zs0Ho1XvBGXspVh2mEOfiE06g-4J2BFip8rOdLVho/pubhtml',
+      height: 371,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

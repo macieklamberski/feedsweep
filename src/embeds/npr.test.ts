@@ -484,3 +484,63 @@ describeForEachParser('npr through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('nprIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, nprIframeEmbedResolver)
+
+  it('should read the route words `player`, `embeddable`, `video` and `player.html` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.npr.org/PLAYER/EMBEDDABLE/VIDEO/PLAYER.HTML?i=141331825&amp;m=141398010"></iframe>'
+    const expected = {
+      provider: 'npr',
+      id: 'video/141331825/141398010',
+      src: 'https://www.npr.org/embedded-video?storyId=141331825&mediaId=141398010',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `templates`, `event` and `embeddedVideo.php` in capitals', async () => {
+    const value =
+      '<iframe src="http://www.npr.org/TEMPLATES/EVENT/EMBEDDEDVIDEO.PHP?storyId=191047262&amp;mediaId=191050756"></iframe>'
+    const expected = {
+      provider: 'npr',
+      id: 'video/191047262/191050756',
+      src: 'https://www.npr.org/embedded-video?storyId=191047262&mediaId=191050756',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `storyId` and `mediaId` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://www.npr.org/embedded-video?STORYID=g-s1-74060&amp;MEDIAID=g-s1-74060-100&amp;jwMediaType=music"></iframe>'
+    const expected = {
+      provider: 'npr',
+      id: 'video/g-s1-74060/g-s1-74060-100',
+      src: 'https://www.npr.org/embedded-video?storyId=g-s1-74060&mediaId=g-s1-74060-100',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('nprFlashEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, nprFlashEmbedResolver)
+
+  it('should read the `i`, `m` and `t` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="http://www.npr.org/v2/?I=131050832&amp;M=131389645&amp;T=video"></iframe>'
+    const expected = {
+      provider: 'npr',
+      id: 'video/131050832/131389645',
+      src: 'https://www.npr.org/embedded-video?storyId=131050832&mediaId=131389645',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

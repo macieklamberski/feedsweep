@@ -156,3 +156,16 @@ describeForEachParser('wrapCargoGalleryImages in the pipeline', (parseHtml) => {
     expect(await convert(value)).toBe(expected)
   })
 })
+
+describeForEachParser('wrapCargoGalleryImages in any case', (parseHtml) => {
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [wrapCargoGalleryImages(baseContext)])
+  }
+
+  it('should wrap an image whose host is in capitals', async () => {
+    const value = '<img src="https://freight.CARGO.SITE/i/aaa/piece.jpg">'
+    const expected = '<figure><img src="https://freight.CARGO.SITE/i/aaa/piece.jpg"></figure>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})

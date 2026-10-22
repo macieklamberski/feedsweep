@@ -190,3 +190,23 @@ describeForEachParser('bookcreator through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('bookcreatorEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, bookcreatorEmbedResolver)
+
+  it('should read the `nopreview` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://read.bookcreator.com/AVx0VbpcUWWuFRIyhhhDg841RaB3/TmxA4xZCRciSwFQI32MCIw?NOPREVIEW"></iframe>'
+    const expected = {
+      provider: 'bookcreator',
+      id: 'AVx0VbpcUWWuFRIyhhhDg841RaB3/TmxA4xZCRciSwFQI32MCIw',
+      src: 'https://read.bookcreator.com/AVx0VbpcUWWuFRIyhhhDg841RaB3/TmxA4xZCRciSwFQI32MCIw?NOPREVIEW',
+      url: 'https://read.bookcreator.com/AVx0VbpcUWWuFRIyhhhDg841RaB3/TmxA4xZCRciSwFQI32MCIw',
+      thumbnail:
+        'https://assets.api.bookcreator.com/AVx0VbpcUWWuFRIyhhhDg841RaB3/books/TmxA4xZCRciSwFQI32MCIw/cover/share',
+      ratio: '900/675',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

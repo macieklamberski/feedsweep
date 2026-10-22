@@ -70,12 +70,6 @@ describe('abcnewsResolveEmbed', () => {
 
       expect(abcnewsResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should return undefined for an id under an uppercase name, which the player answers 404', () => {
-      const value = 'https://abcnews.com/video/embed?ID=39415146'
-
-      expect(abcnewsResolveEmbed(value)).toBeUndefined()
-    })
   })
 
   describe('edge cases', () => {
@@ -112,6 +106,19 @@ describe('abcnewsResolveEmbed', () => {
         id: '39415146a',
         src: 'https://abcnews.com/video/embed?id=39415146a',
         url: 'https://abcnews.com/video/39415146a',
+        ratio: '16/9',
+      }
+
+      expect(abcnewsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read an id under an uppercase name', () => {
+      const value = 'https://abcnews.com/video/embed?ID=39415146'
+      const expected = {
+        provider: 'abcnews',
+        id: '39415146',
+        src: 'https://abcnews.com/video/embed?id=39415146',
+        url: 'https://abcnews.com/video/39415146',
         ratio: '16/9',
       }
 
@@ -205,5 +212,22 @@ describeForEachParser('abcnews player through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('abcnewsEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, abcnewsEmbedResolver)
+
+  it('should read the `id` parameter name in capitals', async () => {
+    const value = '<iframe src="http://abcnews.go.com/video/embed?ID=39415146"></iframe>'
+    const expected = {
+      provider: 'abcnews',
+      id: '39415146',
+      src: 'https://abcnews.com/video/embed?id=39415146',
+      url: 'https://abcnews.com/video/39415146',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

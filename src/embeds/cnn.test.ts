@@ -425,3 +425,71 @@ describeForEachParser('cnnIframeEmbedResolver carrier title', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('cnnIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, cnnIframeEmbedResolver)
+
+  it('should read the route words `video`, `api` and `embed.html` in capitals', async () => {
+    const value =
+      '<iframe src="http://www.cnn.com/VIDEO/API/EMBED.HTML#/video/living/2014/01/11/ac-intv-fallon-neuroscientist-finds-psychopathy.cnn"></iframe>'
+    const expected = {
+      provider: 'cnn',
+      id: 'living/2014/01/11/ac-intv-fallon-neuroscientist-finds-psychopathy.cnn',
+      src: 'https://fave.api.cnn.io/v1/fav/?video=living%2F2014%2F01%2F11%2Fac-intv-fallon-neuroscientist-finds-psychopathy.cnn&customer=cnn&edition=domestic&env=prod',
+      url: 'https://www.cnn.com/videos/living/2014/01/11/ac-intv-fallon-neuroscientist-finds-psychopathy.cnn',
+      ratio: '16/9',
+      date: '2014-01-11',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `video` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://fave.api.cnn.io/v1/fav/?VIDEO=arts%2F2018%2F07%2F09%2Fspencer-tunick-nude-art-melbourne.cnn&amp;customer=cnn&amp;edition=domestic&amp;env=prod"></iframe>'
+    const expected = {
+      provider: 'cnn',
+      id: 'arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn',
+      src: 'https://fave.api.cnn.io/v1/fav/?video=arts%2F2018%2F07%2F09%2Fspencer-tunick-nude-art-melbourne.cnn&customer=cnn&edition=domestic&env=prod',
+      url: 'https://www.cnn.com/videos/arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn',
+      ratio: '16/9',
+      date: '2018-07-09',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `vid` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="http://edition.cnn.com/video/savp/evp/?loc=int&amp;VID=/video/business/2008/04/22/tucker.nau.nola.cnn"></iframe>'
+    const expected = {
+      provider: 'cnn',
+      id: 'business/2008/04/22/tucker.nau.nola.cnn',
+      src: 'https://fave.api.cnn.io/v1/fav/?video=business%2F2008%2F04%2F22%2Ftucker.nau.nola.cnn&customer=cnn&edition=domestic&env=prod',
+      url: 'https://www.cnn.com/videos/business/2008/04/22/tucker.nau.nola.cnn',
+      ratio: '16/9',
+      date: '2008-04-22',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('cnnFlashEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, cnnFlashEmbedResolver)
+
+  it('should read the route words `cnn`, `apps` and `cvp` in capitals', async () => {
+    const value =
+      '<iframe src="http://i.cdn.turner.com/CNN/.element/APPS/CVP/3.0/swf/cnn_416x234_embed.swf?context=embed_edition&amp;videoId=bestoftv/2011/05/31/exp.nr.cell.phone.carcinogen.cnn"></iframe>'
+    const expected = {
+      provider: 'cnn',
+      id: 'bestoftv/2011/05/31/exp.nr.cell.phone.carcinogen.cnn',
+      src: 'https://fave.api.cnn.io/v1/fav/?video=bestoftv%2F2011%2F05%2F31%2Fexp.nr.cell.phone.carcinogen.cnn&customer=cnn&edition=domestic&env=prod',
+      url: 'https://www.cnn.com/videos/bestoftv/2011/05/31/exp.nr.cell.phone.carcinogen.cnn',
+      ratio: '16/9',
+      date: '2011-05-31',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

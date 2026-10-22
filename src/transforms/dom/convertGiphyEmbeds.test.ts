@@ -180,3 +180,20 @@ describeForEachParser('convertGiphyEmbeds', (parseHtml) => {
     expect(twice).toEqualHtml(once)
   })
 })
+
+describeForEachParser('convertGiphyEmbeds in any case', (parseHtml) => {
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [convertGiphyEmbeds(baseContext)])
+  }
+
+  it('should convert a player whose `embed` route is in capitals', async () => {
+    const value = '<iframe src="https://giphy.com/EMBED/3o7TKMt1VVNkHV2PaE"></iframe>'
+    const expected = html`
+      <a href="https://giphy.com/gifs/3o7TKMt1VVNkHV2PaE">
+        <img src="https://media.giphy.com/media/3o7TKMt1VVNkHV2PaE/giphy.gif">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})

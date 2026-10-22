@@ -383,3 +383,44 @@ describeForEachParser('omny through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('omnyEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, omnyEmbedResolver)
+
+  it('should read the route words `shows`, `playlists` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://omny.fm/SHOWS/the-show/PLAYLISTS/highlights/EMBED"></iframe>'
+    const expected = {
+      provider: 'omny',
+      id: 'the-show/PLAYLISTS/highlights',
+      src: 'https://omny.fm/shows/the-show/PLAYLISTS/highlights/embed',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `media` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://omny.fm/shows/the-show/an-episode/embed?MEDIA=Video"></iframe>'
+    const expected = {
+      provider: 'omny',
+      id: 'the-show/an-episode',
+      src: 'https://omny.fm/shows/the-show/an-episode/embed?media=Video',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `t` parameter name in capitals', async () => {
+    const value = '<iframe src="https://omny.fm/shows/the-show/an-episode/embed?T=70m40s"></iframe>'
+    const expected = {
+      provider: 'omny',
+      id: 'the-show/an-episode',
+      src: 'https://omny.fm/shows/the-show/an-episode/embed?t=70m40s',
+      height: 180,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

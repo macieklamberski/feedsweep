@@ -207,6 +207,30 @@ describeForEachParser('mrcvideoFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the node id named in capitals', async () => {
+      const value = html`
+        <embed
+          wmode="opaque"
+          id="player1"
+          width="640"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://www.mrctv.org/jwplayer/player.swf"
+          flashvars="file=http://mrc-tv.s3.amazonaws.com/sites/default/files/videos/converted/117304.mp4&amp;image=http://mrc-tv.s3.amazonaws.com/sites/default/files/video_thumbs/117304/117304_0001.jpg&amp;dock=false&amp;controlbar=over&amp;skin=http://www.mrctv.org/jwplayer/skins/modieus/modieus.zip&amp;logo.file=http://www.mrctv.org/sites/all/themes/mrctv/images/watermark.png&amp;logo.link=http://www.mrctv.org&amp;logo.hide=false&amp;logo.over=0.9&amp;logo.out=0.5&amp;logo.timeout=10&amp;logo.margin=5&amp;logo.position=top-left&amp;plugins=yourlytics-1,sharing-2&amp;yourlytics.callback=http://www.mrctv.org/postback/remoteview?NODEID=116586&amp;sharing.link=http://www.mrctv.org/videos/bill-warner-islam-1400-years-fear-english-titles&amp;autostart=false"
+          allowfullscreen="false"
+          allowscriptaccess="never"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mrcvideo',
+        id: '116586',
+        src: 'https://mrcvideo.org/embed/116586',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read the node id out of the view callback when there is no sharing snippet', async () => {
       const value = html`
         <embed

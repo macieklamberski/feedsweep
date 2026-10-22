@@ -215,3 +215,57 @@ describeForEachParser('learningappsEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('learningappsEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, learningappsEmbedResolver)
+
+  it('should read the route word `watch` in capitals', async () => {
+    const value = '<iframe src="https://learningapps.org/WATCH?app=12554379"></iframe>'
+    const expected = {
+      provider: 'learningapps',
+      id: '12554379',
+      src: 'https://learningapps.org/watch?app=12554379',
+      height: 500,
+      thumbnail: 'https://learningapps.org/appicons/1/12554379.png',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `show` in capitals', async () => {
+    const value = '<iframe src="https://learningapps.org/SHOW?id=e1j0yk0c"></iframe>'
+    const expected = {
+      provider: 'learningapps',
+      id: 'e1j0yk0c',
+      src: 'https://learningapps.org/watch?app=e1j0yk0c',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `app` parameter name in capitals', async () => {
+    const value = '<iframe src="https://learningapps.org/watch?APP=12554379"></iframe>'
+    const expected = {
+      provider: 'learningapps',
+      id: '12554379',
+      src: 'https://learningapps.org/watch?app=12554379',
+      height: 500,
+      thumbnail: 'https://learningapps.org/appicons/1/12554379.png',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `id` parameter name in capitals', async () => {
+    const value = '<iframe src="https://learningapps.org/show?ID=e1j0yk0c"></iframe>'
+    const expected = {
+      provider: 'learningapps',
+      id: 'e1j0yk0c',
+      src: 'https://learningapps.org/watch?app=e1j0yk0c',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

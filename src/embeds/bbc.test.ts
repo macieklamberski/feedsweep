@@ -420,3 +420,32 @@ describeForEachParser('bbc through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('bbcIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, bbcIframeEmbedResolver)
+
+  it('should read the route words `news`, `av` and `embed` in capitals', async () => {
+    const value = '<iframe src="https://www.bbc.com/NEWS/AV/EMBED/p06sf6tr/46292361"></iframe>'
+    const expected = {
+      provider: 'bbc',
+      id: 'p06sf6tr',
+      src: 'https://www.bbc.com/news/av-embeds/46292361/vpid/p06sf6tr',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `news`, `av-embeds` and `vpid` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.bbc.com/NEWS/AV-EMBEDS/46292361/VPID/p06sf6tr"></iframe>'
+    const expected = {
+      provider: 'bbc',
+      id: 'p06sf6tr',
+      src: 'https://www.bbc.com/news/av-embeds/46292361/vpid/p06sf6tr',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

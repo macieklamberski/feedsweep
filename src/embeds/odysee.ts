@@ -1,4 +1,4 @@
-import { decodeSegment, parseUrl } from 'trousse'
+import { decodeSegment, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -20,7 +20,7 @@ const readClaimPath = (parsed: URL): string | undefined => {
 
   const [marker, route, ...segments] = pathname.split('/').filter(Boolean)
 
-  if (marker !== '$' || route !== 'embed') {
+  if (marker !== '$' || !isAnyOf(route, 'embed')) {
     return
   }
 

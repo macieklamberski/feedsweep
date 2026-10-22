@@ -561,3 +561,57 @@ describeForEachParser('audioboomIframeEmbedResolver carrier title', (parseHtml) 
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('audioboomIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, audioboomIframeEmbedResolver)
+
+  it('should read the route words `posts` and `v4` in capitals', async () => {
+    const value = '<iframe src="https://embeds.audioboom.com/POSTS/8292430/embed/V4"></iframe>'
+    const expected = {
+      provider: 'audioboom',
+      id: '8292430',
+      src: 'https://embeds.audioboom.com/posts/8292430/embed/v4',
+      height: 300,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `boos` in capitals', async () => {
+    const value = '<iframe src="https://audioboo.fm/BOOS/123456/embed"></iframe>'
+    const expected = {
+      provider: 'audioboom',
+      id: '123456',
+      src: 'https://embeds.audioboom.com/posts/123456/embed',
+      height: 95,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('audioboomFlashEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, audioboomFlashEmbedResolver)
+
+  it('should read the `.mp3` suffix of the flashvar in capitals', async () => {
+    const value = html`
+      <object
+        type="application/x-shockwave-flash"
+        data="http://boos.audioboo.fm/swf/fullsize_player.swf"
+      >
+        <param
+          value="mp3=http%3A%2F%2Faudioboo.fm%2Fboos%2F88571-andrew-s-tech-entrepreneur-silicon-valley.MP3"
+          name="FlashVars"
+        />
+      </object>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'audioboom',
+      id: '88571',
+      src: 'https://embeds.audioboom.com/posts/88571/embed',
+      height: 95,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

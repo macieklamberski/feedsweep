@@ -1140,3 +1140,20 @@ describeForEachParser('brightcoveIframeEmbedResolver carrier title', (parseHtml)
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('brightcoveIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, brightcoveIframeEmbedResolver)
+
+  it('should read the `videoId` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://players.brightcove.net/1660622131/default_default/index.html?VIDEOID=19521637001"></iframe>'
+    const expected = {
+      provider: 'brightcove',
+      id: '1660622131/19521637001',
+      src: 'https://players.brightcove.net/1660622131/default_default/index.html?videoId=19521637001',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

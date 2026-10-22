@@ -1,6 +1,6 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { pickUrlParams } from '../utils/urls.js'
+import { getQueryParam, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The store's purchase box is a fixed bar.
@@ -14,14 +14,14 @@ const widgetParams = ['t']
 export const steamResolveEmbed: ResolveEmbed = (url) => {
   const [route, appId, subId] = getPathSegments(url)
 
-  if (route !== 'widget' || !appId) {
+  if (!isAnyOf(route, 'widget') || !appId) {
     return
   }
 
   const widget = subId ? `${appId}/${subId}` : appId
   // The widget prints `t` in place of the game's own blurb, so it is the publisher's text.
   const parsed = parseUrl(url)
-  const description = parsed?.searchParams.get('t')?.trim() || undefined
+  const description = getQueryParam(parsed?.searchParams, 't')?.trim() || undefined
 
   return {
     provider: 'steam',

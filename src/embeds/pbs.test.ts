@@ -685,3 +685,46 @@ describeForEachParser('pbs through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('pbsIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, pbsIframeEmbedResolver)
+
+  it('should read the route words `widget` and `partnerplayer` in capitals', async () => {
+    const value =
+      '<iframe src="https://player.pbs.org/WIDGET/PARTNERPLAYER/2365866769/?start=0&amp;end=0&amp;chapterbar=false&amp;endscreen=false"></iframe>'
+    const expected = {
+      provider: 'pbs',
+      id: 'viralplayer/2365866769',
+      src: 'https://player.pbs.org/widget/partnerplayer/2365866769/?start=0&end=0',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `viralplayer` in capitals', async () => {
+    const value = '<iframe src="https://player.pbs.org/VIRALPLAYER/3005825044/"></iframe>'
+    const expected = {
+      provider: 'pbs',
+      id: 'viralplayer/3005825044',
+      src: 'https://player.pbs.org/viralplayer/3005825044/',
+      ratio: '16/9',
+      ratioHeightOffset: 40,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `start` and `end` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://player.pbs.org/widget/partnerplayer/2365866769/?START=0&amp;END=0&amp;chapterbar=false&amp;endscreen=false"></iframe>'
+    const expected = {
+      provider: 'pbs',
+      id: 'viralplayer/2365866769',
+      src: 'https://player.pbs.org/widget/partnerplayer/2365866769/?start=0&end=0',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -31,6 +31,19 @@ describe('airtableResolveEmbed', () => {
       expect(airtableResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should read the embed route in upper case', () => {
+      const value = 'https://airtable.com/EMBED/shrIBFxXbBGxNv8at'
+      const expected: EmbedResolverResult = {
+        provider: 'airtable',
+        id: 'shrIBFxXbBGxNv8at',
+        src: 'https://airtable.com/embed/shrIBFxXbBGxNv8at',
+        url: 'https://airtable.com/shrIBFxXbBGxNv8at',
+        height: 533,
+      }
+
+      expect(airtableResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should drop the colour, the view controls and a tracker', () => {
       const value =
         'https://airtable.com/embed/shrIBFxXbBGxNv8at?backgroundColor=red&viewControls=on&utm_source=feed'
@@ -74,10 +87,6 @@ describe('airtableResolveEmbed', () => {
 
     it('should ignore a route word that is not the embed route', () => {
       expect(airtableResolveEmbed('https://airtable.com/frame/shrIBFxXbBGxNv8at')).toBeUndefined()
-    })
-
-    it('should ignore the embed route in upper case, which the server answers 404', () => {
-      expect(airtableResolveEmbed('https://airtable.com/EMBED/shrIBFxXbBGxNv8at')).toBeUndefined()
     })
 
     it('should ignore the embed route below a leading segment', () => {
@@ -274,5 +283,23 @@ describe('readAirtableHeight', () => {
 
   it('should ignore a message that is not an object', () => {
     expect(readAirtableHeight('airtableEmbedContentDidResize')).toBeUndefined()
+  })
+})
+
+describeForEachParser('airtableEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, airtableEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://airtable.com/EMBED/appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT"></iframe>'
+    const expected = {
+      provider: 'airtable',
+      id: 'appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT',
+      src: 'https://airtable.com/embed/appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT',
+      url: 'https://airtable.com/appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT',
+      height: 533,
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

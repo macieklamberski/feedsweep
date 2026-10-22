@@ -36,6 +36,22 @@ describeForEachParser('discourseEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should read a name written in capitals as Discourse draws it', async () => {
+    const value = html`
+      <p>
+        <img
+          src="https://forum.example.com/images/emoji/twitter/DOG.png?v=12"
+          title=":dog:"
+          class="emoji"
+          alt=":dog:"
+        >
+      </p>
+    `
+    const expected = '<p>🐕</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should replace a name from the twemoji set as Discourse draws it', async () => {
     const value = html`
       <p>

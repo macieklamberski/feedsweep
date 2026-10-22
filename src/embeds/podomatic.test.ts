@@ -321,3 +321,46 @@ describeForEachParser('podomatic through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('podomaticEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, podomaticEmbedResolver)
+
+  it('should read the route words `embed`, `v2` and `podcast` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.podomatic.com/EMBED/V2/PODCAST/5476235?episode_id=11083318&amp;theme=light"></iframe>'
+    const expected = {
+      provider: 'podomatic',
+      id: 'episode/11083318',
+      src: 'https://podomatic.com/embed/v2/podcast/5476235?episode_id=11083318',
+      height: 205,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `embed` and `html5` in capitals', async () => {
+    const value =
+      '<iframe src="https://podomatic.com/EMBED/HTML5/episode/10076958?autoplay=false"></iframe>'
+    const expected = {
+      provider: 'podomatic',
+      id: 'episode/10076958',
+      src: 'https://podomatic.com/embed/html5/episode/10076958',
+      height: 208,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `episode_id` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.podomatic.com/embed/v2/podcast/5476235?EPISODE_ID=11083318&amp;theme=light"></iframe>'
+    const expected = {
+      provider: 'podomatic',
+      id: 'episode/11083318',
+      src: 'https://podomatic.com/embed/v2/podcast/5476235?episode_id=11083318',
+      height: 205,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

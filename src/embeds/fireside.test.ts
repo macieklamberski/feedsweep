@@ -302,3 +302,31 @@ describeForEachParser('fireside through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('firesideEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, firesideEmbedResolver)
+
+  it('should read the route words `player` and `v3` in capitals', async () => {
+    const value = '<iframe src="https://fireside.fm/PLAYER/V3/N8LaNbQY+MI2PkJ2g"></iframe>'
+    const expected = {
+      provider: 'fireside',
+      id: 'N8LaNbQY+MI2PkJ2g',
+      src: 'https://player.fireside.fm/v3/N8LaNbQY+MI2PkJ2g',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `s` in capitals', async () => {
+    const value = '<iframe src="https://fireside.fm/S/aHx_iT3N+3W9-AW7P/iframe"></iframe>'
+    const expected = {
+      provider: 'fireside',
+      id: 'aHx_iT3N+3W9-AW7P',
+      src: 'https://player.fireside.fm/v3/aHx_iT3N+3W9-AW7P',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

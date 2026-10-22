@@ -327,3 +327,40 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     expect(twice).toEqualHtml(once)
   })
 })
+
+describeForEachParser('rebuildWistiaEmbeds in any case', (parseHtml) => {
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [rebuildWistiaEmbeds(baseContext)])
+  }
+
+  it('should rebuild a loader whose path is in capitals', async () => {
+    const value = html`
+      <script
+        src="https://fast.wistia.com/EMBED/MEDIAS/u3gz5bka6b.jsonp"
+        async
+      ></script>
+    `
+    const expected = '<iframe src="https://fast.wistia.net/embed/iframe/u3gz5bka6b"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a loader beside a player whose host is in capitals', async () => {
+    const value = html`
+      <iframe src="https://fast.WISTIA.net/embed/iframe/u3gz5bka6b"></iframe>
+      <script
+        src="https://fast.wistia.com/embed/medias/u3gz5bka6b.jsonp"
+        async
+      ></script>
+    `
+    const expected = html`
+      <iframe src="https://fast.WISTIA.net/embed/iframe/u3gz5bka6b"></iframe>
+      <script
+        src="https://fast.wistia.com/embed/medias/u3gz5bka6b.jsonp"
+        async
+      ></script>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})

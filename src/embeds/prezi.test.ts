@@ -525,3 +525,33 @@ describeForEachParser('the Flash object other Flash readers could claim first', 
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('preziEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, preziEmbedResolver)
+
+  it('should read the route words `p` and `embed` in capitals', async () => {
+    const value = '<iframe src="https://prezi.com/P/n3rtkeyhvckt/EMBED"></iframe>'
+    const expected = {
+      provider: 'prezi',
+      id: 'n3rtkeyhvckt',
+      src: 'https://prezi.com/p/n3rtkeyhvckt/embed',
+      url: 'https://prezi.com/p/n3rtkeyhvckt/',
+      ratio: '550/400',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `view` and `embed` in capitals', async () => {
+    const value = '<iframe src="https://prezi.com/VIEW/AmsY8GrnVuyJbYDH8QXI/EMBED"></iframe>'
+    const expected = {
+      provider: 'prezi',
+      id: 'AmsY8GrnVuyJbYDH8QXI',
+      src: 'https://prezi.com/view/AmsY8GrnVuyJbYDH8QXI/embed',
+      url: 'https://prezi.com/view/AmsY8GrnVuyJbYDH8QXI/',
+      ratio: '550/400',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

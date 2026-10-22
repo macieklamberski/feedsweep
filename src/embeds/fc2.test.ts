@@ -841,3 +841,45 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('fc2FlashEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, fc2FlashEmbedResolver)
+
+  it('should read the `i`, `d` and `tl` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="http://video.fc2.com/flv2.swf?t=20140107100144&amp;I=20140101rnmrPW9W&amp;D=5774&amp;sj=34&amp;tk=T1RVMk1UZzJNVEE9&amp;lang=ja&amp;rel=1&amp;TL=%E3%82%AC%E3%82%AD%E3%81%AE%E4%BD%BF%E3%81%84%E3%81%98%E3%82%83%E3%81%82%E3%82%89%E3%81%B8%E3%82%93%E3%81%A7"></iframe>'
+    const expected = {
+      provider: 'fc2',
+      id: '20140101rnmrPW9W',
+      src: 'https://video.fc2.com/embed/player/20140101rnmrPW9W/',
+      url: 'https://video.fc2.com/content/20140101rnmrPW9W/',
+      ratio: '16/9',
+      title: 'ガキの使いじゃあらへんで',
+      duration: 5774,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('fc2PlayerScriptEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, fc2PlayerScriptEmbedResolver)
+
+  it('should read the `content` route word of the page url in capitals', async () => {
+    const value = html`
+      <script
+        src="http://static.fc2.com/video/js/outerplayer.min.js"
+        url="http://video.fc2.com/ja/CONTENT/20130822huqehDnu/"
+      ></script>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'fc2',
+      id: '20130822huqehDnu',
+      src: 'https://video.fc2.com/embed/player/20130822huqehDnu/',
+      url: 'https://video.fc2.com/content/20130822huqehDnu/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

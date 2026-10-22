@@ -506,3 +506,26 @@ describeForEachParser('convertAsciinemaEmbeds through the pipeline', (parseHtml)
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('convertAsciinemaEmbeds in any case', (parseHtml) => {
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [convertAsciinemaEmbeds(baseContext)])
+  }
+
+  it('should link a loader whose host is in capitals', async () => {
+    const value = html`
+      <script
+        id="asciicast-RfVtJfuoplCMZd50vESXbOAFR"
+        src="https://ASCIINEMA.ORG/a/RfVtJfuoplCMZd50vESXbOAFR.js"
+        async
+      ></script>
+    `
+    const expected = html`
+      <a href="https://asciinema.org/a/RfVtJfuoplCMZd50vESXbOAFR">
+        <img src="https://asciinema.org/a/RfVtJfuoplCMZd50vESXbOAFR.svg">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})

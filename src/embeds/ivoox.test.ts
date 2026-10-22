@@ -482,3 +482,19 @@ describeForEachParser('ivooxEmbedResolver carrier title', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('ivooxEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, ivooxEmbedResolver)
+
+  it('should read the player file name in capitals', async () => {
+    const value = '<iframe src="https://www.ivoox.com/PLAYER_EJ_80807760_6_1.HTML"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'ivoox',
+      id: '80807760',
+      src: 'https://www.ivoox.com/player_ej_80807760_6_1.html',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

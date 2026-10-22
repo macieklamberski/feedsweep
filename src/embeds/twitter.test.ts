@@ -1619,3 +1619,43 @@ describe('readTwitterHeight', () => {
     expect(readTwitterHeight(value)).toBeUndefined()
   })
 })
+
+describeForEachParser('twitterIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, twitterIframeEmbedResolver)
+
+  it('should read the route words `i`, `videos` and `tweet` in capitals', async () => {
+    const value = '<iframe src="https://twitter.com/I/VIDEOS/TWEET/123456789012345"></iframe>'
+    const expected = {
+      provider: 'twitter',
+      id: '123456789012345',
+      src: 'https://platform.twitter.com/embed/Tweet.html?id=123456789012345',
+      url: 'https://x.com/i/status/123456789012345',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `embed` and `Tweet.html` in capitals', async () => {
+    const value =
+      '<iframe src="https://platform.twitter.com/EMBED/TWEET.HTML?id=1468647038925500418"></iframe>'
+    const expected = {
+      provider: 'twitter',
+      id: '1468647038925500418',
+      src: 'https://platform.twitter.com/embed/Tweet.html?id=1468647038925500418',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `id` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://platform.twitter.com/embed/Tweet.html?ID=1468647038925500418"></iframe>'
+    const expected = {
+      provider: 'twitter',
+      id: '1468647038925500418',
+      src: 'https://platform.twitter.com/embed/Tweet.html?id=1468647038925500418',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

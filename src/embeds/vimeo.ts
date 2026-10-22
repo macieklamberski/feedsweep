@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
 import {
@@ -6,6 +6,7 @@ import {
   digitsRegex,
   encodePathSegment,
   flashFileRegex,
+  getQueryParam,
   hexRegex,
   parseUrlOnHosts,
   pickQueryParams,
@@ -33,12 +34,12 @@ const vimeoPageHosts = [
 // A showcase and an album are playlists, a channel and a group are listings, an event is a
 // livestream and an on-demand page is a store front, and each lives in its own id space: channel
 // 927 and video 927 are both live and belong to different people.
-const collectionPaths = new Set(['showcase', 'album', 'channels', 'groups', 'event', 'ondemand'])
+const collectionPaths = ['showcase', 'album', 'channels', 'groups', 'event', 'ondemand']
 
 // Vimeo's own pages sit where a video id does, and some carry a numeric id of their own:
 // `/users/{userId}` and `/manage/folders/{folderId}` both read as a video, and user 152184 is
 // also video 152184, which belongs to somebody else.
-const sitePathSegments = new Set([
+const sitePathSegments = [
   'about',
   'blog',
   'categories',
@@ -57,7 +58,7 @@ const sitePathSegments = new Set([
   'upgrade',
   'users',
   'watch',
-])
+]
 
 // `/ondemand/{name}/{id}` and `/channels/{name}/{id}` name the video in the third segment.
 const namedCollectionPaths = ['ondemand', 'channels']
@@ -65,22 +66,22 @@ const namedCollectionPaths = ['ondemand', 'channels']
 // An event names its videos under `/videos/`, but its bare and `/embed` forms are the common ones
 // and both would read as a video here.
 const readCollectionVideoId = (segments: Array<string>): string | undefined => {
-  if (showcasePaths.has(segments[0])) {
-    return segments[2] === 'video' ? segments[3] : undefined
+  if (isAnyOf(segments[0], showcasePaths)) {
+    return isAnyOf(segments[2], 'video') ? segments[3] : undefined
   }
 
-  if (segments[0] === 'groups') {
-    return segments[2] === 'videos' ? segments[3] : undefined
+  if (isAnyOf(segments[0], 'groups')) {
+    return isAnyOf(segments[2], 'videos') ? segments[3] : undefined
   }
 
-  if (namedCollectionPaths.includes(segments[0])) {
+  if (isAnyOf(segments[0], namedCollectionPaths)) {
     return segments.length === 3 ? segments[2] : undefined
   }
 }
 
 // `album` is what Vimeo called a showcase before renaming them in 2018, and
 // `vimeo.com/album/{id}/embed` 301s onto the showcase player.
-const showcasePaths = new Set(['showcase', 'album'])
+const showcasePaths = ['showcase', 'album']
 
 // `vimeo.com/showcase/{id}` resolves through Vimeo's keyless oEmbed to a title, an author and a
 // thumbnail.
@@ -98,7 +99,7 @@ const resolveShowcaseEmbed = (link: string): EmbedResolverResult | undefined => 
   const url = parseUrl(link, placeholderBaseUrl)
   const segments = url ? getPathSegments(url) : []
 
-  if (!showcasePaths.has(segments[0])) {
+  if (!isAnyOf(segments[0], showcasePaths)) {
     return
   }
 
@@ -119,7 +120,7 @@ const resolveEventEmbed = (
   const url = parseUrl(link, placeholderBaseUrl)
   const segments = url ? getPathSegments(url) : []
 
-  if (segments[0] !== 'event') {
+  if (!isAnyOf(segments[0], 'event')) {
     return
   }
 
@@ -129,12 +130,12 @@ const resolveEventEmbed = (
     return
   }
 
-  const tail = segments[2] === 'embed' ? segments.slice(3) : segments.slice(2)
+  const tail = isAnyOf(segments[2], 'embed') ? segments.slice(3) : segments.slice(2)
   const hash = keepIfMatches(tail[0], hexRegex)
   const layout = hash ? tail.slice(1) : tail
 
   // A chat embed or any other route under the event is not its player.
-  if (layout.length > 1 || (layout[0] && !eventLayoutSegments.includes(layout[0]))) {
+  if (layout.length > 1 || (layout[0] && !isAnyOf(layout[0], eventLayoutSegments))) {
     return
   }
 
@@ -166,22 +167,22 @@ const readReference = (link: string): VimeoReference | undefined => {
 
   // A `progressive_redirect` url is the video's own file. Its owner can limit the player to their
   // own site while the signed file plays anywhere.
-  if (segments[0] === 'progressive_redirect') {
+  if (isAnyOf(segments[0], 'progressive_redirect')) {
     return
   }
 
   // The Flash player carried no id in the path at all: moogaloop.swf?clip_id={id}.
-  const clipId = url.searchParams.get('clip_id')
+  const clipId = getQueryParam(url.searchParams, 'clip_id')
 
   if (clipId) {
     return { id: clipId }
   }
 
-  if (sitePathSegments.has(segments[0])) {
+  if (isAnyOf(segments[0], sitePathSegments)) {
     return
   }
 
-  if (collectionPaths.has(segments[0])) {
+  if (isAnyOf(segments[0], collectionPaths)) {
     const id = keepIfMatches(readCollectionVideoId(segments), digitsRegex)
 
     return id ? { id } : undefined
@@ -212,7 +213,7 @@ const readReference = (link: string): VimeoReference | undefined => {
 
   // A feed that lost the `&` before the next parameter leaves it after a space. A hash is hex and
   // never holds one, so the cut repairs what the feed did.
-  const queryHash = url.searchParams.get('h')?.split(whitespaceRegex)[0]
+  const queryHash = getQueryParam(url.searchParams, 'h')?.split(whitespaceRegex)[0]
 
   return {
     id,

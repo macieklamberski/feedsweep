@@ -257,3 +257,49 @@ describeForEachParser('arteEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('arteEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, arteEmbedResolver)
+
+  it('should read the route word `embeds` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.arte.tv/EMBEDS/fr/095172-005-A?autoplay=true&amp;mute=0"></iframe>'
+    const expected = {
+      provider: 'arte',
+      id: 'fr/095172-005-A',
+      src: 'https://www.arte.tv/embeds/fr/095172-005-A',
+      url: 'https://www.arte.tv/fr/videos/095172-005-A/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `player` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.arte.tv/PLAYER/v7/index.html?json_url=https%3A%2F%2Fapi.arte.tv%2Fapi%2Fplayer%2Fv2%2Fconfig%2Fde%2F115775-001-A&amp;lang=de"></iframe>'
+    const expected = {
+      provider: 'arte',
+      id: 'de/115775-001-A',
+      src: 'https://www.arte.tv/embeds/de/115775-001-A',
+      url: 'https://www.arte.tv/de/videos/115775-001-A/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `json_url` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.arte.tv/player/v7/index.html?JSON_URL=https%3A%2F%2Fapi.arte.tv%2Fapi%2Fplayer%2Fv2%2Fconfig%2Fde%2F115775-001-A&amp;lang=de"></iframe>'
+    const expected = {
+      provider: 'arte',
+      id: 'de/115775-001-A',
+      src: 'https://www.arte.tv/embeds/de/115775-001-A',
+      url: 'https://www.arte.tv/de/videos/115775-001-A/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -17,7 +17,8 @@ const embedKindRegex = /^[a-z]+$/
 
 export const extractCaptivateEmbed = (link: string): { kind: string; id: string } | undefined => {
   const segments = getPathSegments(link)
-  const [kind, id] = segments
+  const [route, id] = segments
+  const kind = route?.toLowerCase()
 
   // The segment count keeps a `media/{uuid}/{file}.mp3` enclosure out of a dead placeholder.
   if (segments.length !== 2 || !kind || !id || !embedKindRegex.test(kind) || !uuidRegex.test(id)) {

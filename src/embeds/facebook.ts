@@ -1,8 +1,15 @@
-import { coerceNumber, isHostOrSubdomainOf, type Nullish, parseUrl, trimObject } from 'trousse'
+import {
+  coerceNumber,
+  isAnyOf,
+  isHostOrSubdomainOf,
+  type Nullish,
+  parseUrl,
+  trimObject,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, flashVar, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -95,21 +102,21 @@ export const facebookAmpEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     const embedAs = attr(element, 'data-embed-as')
 
-    if (embedAs === 'comment') {
+    if (isAnyOf(embedAs, 'comment')) {
       return
     }
 
-    return extractEmbed(element, embedAs === 'video' ? 'video' : 'post')
+    return extractEmbed(element, isAnyOf(embedAs, 'video') ? 'video' : 'post')
   },
 )
 
 // `/plugins/post.php` or `/plugins/video.php`, with or without a Graph API version in front.
 // Older SDKs prefixed their Graph API version, and those urls still serve the same plugin.
-const pluginPathRegex = /^(?:\/v\d+(?:\.\d+)?)?\/plugins\/(?:post|video)\.php$/
+const pluginPathRegex = /^(?:\/v\d+(?:\.\d+)?)?\/plugins\/(?:post|video)\.php$/i
 // The pre-plugins video frame from old posts, naming its video in `video_id`.
-const legacyVideoPathRegex = /^\/video\/embed$/
+const legacyVideoPathRegex = /^\/video\/embed$/i
 // The Flash player from older posts, naming its video in the path. Facebook answers it with 400.
-const flashVideoPathRegex = /^\/v\/([^/]+)$/
+const flashVideoPathRegex = /^\/v\/([^/]+)$/i
 
 // Whole segments, not `\b`: `reel-big-fish` and `video.game.news` are page names.
 // A video, reel or watch path is the video player, and everything else Facebook frames is a post.
@@ -117,13 +124,13 @@ const videoPathRegex = /(?:^|\/)(?:videos?|reel|watch)(?:\/|$)/i
 
 // `/reel/{id}`, `/{page}/posts/{id}` or `/{page}/videos/{id}`.
 // `/{page}/posts/` and `/{page}/videos/` with nothing after them are the page's listing tabs.
-const contentPathRegex = /^\/(?:reel\/[^/]+|[^/]+\/(?:posts|videos)\/[^/]+)/
+const contentPathRegex = /^\/(?:reel\/[^/]+|[^/]+\/(?:posts|videos)\/[^/]+)/i
 
 // The bare `/watch` hub is Facebook's video front page, where every visitor sees something else.
-const watchPathRegex = /^\/watch\/?$/
+const watchPathRegex = /^\/watch\/?$/i
 
 const isWatchPage = (url: URL): boolean => {
-  return watchPathRegex.test(url.pathname) && Boolean(url.searchParams.get('v'))
+  return watchPathRegex.test(url.pathname) && Boolean(getQueryParam(url.searchParams, 'v'))
 }
 
 // A legacy player names only the video id, which the watch page plays.
@@ -143,7 +150,7 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
   }
 
   if (legacyVideoPathRegex.test(parsed.pathname)) {
-    const videoId = parsed.searchParams.get('video_id')
+    const videoId = getQueryParam(parsed.searchParams, 'video_id')
 
     if (!videoId) {
       return
@@ -171,7 +178,7 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const href = parsed.searchParams.get('href') ?? undefined
+  const href = getQueryParam(parsed.searchParams, 'href')
   const target = parseUrlOnHosts(href, facebookHosts)
 
   if (!href || !target) {
@@ -180,9 +187,9 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
 
   // The plugin is rebuilt around the href it names. The caption toggle, the size the dialog wrote,
   // the app id and a Graph API version in the path are the look.
-  const plugin = parsed.pathname.endsWith('/video.php') ? 'video' : 'post'
+  const plugin = parsed.pathname.toLowerCase().endsWith('/video.php') ? 'video' : 'post'
 
-  return composePluginEmbed(plugin, href, {}, parsed.searchParams.get('t') ?? undefined)
+  return composePluginEmbed(plugin, href, {}, getQueryParam(parsed.searchParams, 't'))
 }
 
 // Facebook's plugin iframe, or a pasted post, video or watch page, which x-frame-options blanks.
@@ -193,7 +200,7 @@ export const facebookIframeEmbedResolver = createUrlEmbedResolver(
 
 // The Flash player before `/v/`, `/swf/mvp.swf` on Facebook's static hosts, naming its video in
 // flashvars `video_id`. The share player names only a file and stays unresolved.
-const mvpPathRegex = /^\/swf\/mvp\.swf$/
+const mvpPathRegex = /^\/swf\/mvp\.swf$/i
 
 const facebookFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
@@ -220,9 +227,9 @@ export const facebookFlashEmbedResolver = createUrlEmbedResolver(
 // `{page}/videos/{id}`, `{page}/{id}`, a numeric id behind a kind letter or word such as `p{id}`
 // or `video{id}`, and a bare numeric id. Each spelling captures page, kind and id in that order.
 const s9eFragmentRegexes = [
-  /^([.\w]+)\/([prv])\w*\/(\w+)$/,
+  /^([.\w]+)\/([prv])\w*\/(\w+)$/i,
   /^([.\w]+)\/()(\w+)$/,
-  /^()([prv])(?:ideo|ost)?(\d+)$/,
+  /^()([prv])(?:ideo|ost)?(\d+)$/i,
   /^()()(\d+)$/,
 ]
 
@@ -231,7 +238,7 @@ const s9eFragmentRegexes = [
 const s9ePlaceholderPage = 'Bob'
 
 // `v` for a video and `r` for a reel play on the watch page. `p` and no kind are a post.
-const s9eWatchKindRegex = /[rv]/
+const s9eWatchKindRegex = /[rv]/i
 
 // A forum's s9e MediaEmbed helper frame, naming a post or a video in its url fragment.
 export const facebookS9eEmbedResolver = createMarkupEmbedResolver(

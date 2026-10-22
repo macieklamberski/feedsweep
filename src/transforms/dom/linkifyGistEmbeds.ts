@@ -3,8 +3,8 @@ import { attr, isElement, isSkippable, isText } from '../../utils/dom.js'
 import { absoluteUrlRegex } from '../../utils/urls.js'
 import { createLink } from '../../utils/widgets.js'
 
-const gistScriptRegex = /gist\.github\.com\/(?:([^/?"]+)\/)?([^/?"#]+)\.js/
-const jsonSuffixRegex = /\.json$/
+const gistScriptRegex = /gist\.github\.com\/(?:([^/?"]+)\/)?([^/?"#]+)\.js/i
+const jsonSuffixRegex = /\.json$/i
 const gistIdRegex = /^(?:\d+|[0-9a-f]{20}|[0-9a-f]{32})$/i
 const combiningMarkRegex = /[\u0300-\u036f]/g // Combining diacritical marks
 const fileAnchorSeparatorRegex = /[^a-z0-9_]+/g
@@ -20,7 +20,7 @@ const gistMountSelectors = [
 const gistMountSelector = gistMountSelectors.join(', ')
 
 const gistCarrierSelector = [
-  'script[src*="gist.github.com"]',
+  'script[src*="gist.github.com" i]',
   'amp-gist[data-gistid]',
   ...gistMountSelectors,
 ].join(', ')

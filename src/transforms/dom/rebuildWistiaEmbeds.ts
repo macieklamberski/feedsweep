@@ -24,8 +24,8 @@ const wistiaSelector = [
   'div.wistia_embed[id^="wistia_"]:not(.wistia_embed_initialized)',
   'div.wistia-video[id^="wistia_"]',
   'wistia-player[media-id]',
-  'script[src*="/embed/medias/"]',
-  'iframe[src*="wistia"]',
+  'script[src*="/embed/medias/" i]',
+  'iframe[src*="wistia" i]',
 ].join(', ')
 
 // Both carry the media id in the src path, which the platform module reads: the selector matches

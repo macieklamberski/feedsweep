@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -17,7 +17,7 @@ export const ispotResolveEmbed: ResolveEmbed = (url) => {
 
   const [route, id, ...rest] = getPathSegments(parsed)
 
-  if (route !== 'share' || !id || rest.length > 0) {
+  if (!isAnyOf(route, 'share') || !id || rest.length > 0) {
     return
   }
 

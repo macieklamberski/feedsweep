@@ -182,6 +182,24 @@ describeForEachParser('jwplayerScriptEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it('should resolve the script embed whose route is in capitals', async () => {
+    const value = html`
+      <script
+        type="application/javascript"
+        src="https://cdn.jwplayer.com/PLAYERS/H4GXr873-abc12345.js"
+      ></script>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'jwplayer',
+      id: 'H4GXr873',
+      src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should return undefined for a foreign host carrying the player path', async () => {
     const value = html`
       <script src="https://evil.test/players/H4GXr873-abc12345.js?jwplayer.com/players/"></script>
@@ -400,6 +418,50 @@ describeForEachParser('jwplayerLibraryEmbedResolver', (parseHtml) => {
       const value = html`
         <div id="jwppp-video-169721" class="jwplayer">Loading the player...</div>
         <script type="text/javascript" src="https://content.jwplatform.com/libraries/Aq9gyX5k.js"></script>
+        <script type="text/javascript">
+          var playerInstance_169721 = jwplayer( "jwppp-video-169721" );
+          playerInstance_169721.setup({
+            playlist: "https://cdn.jwplayer.com/v2/media/NEnylXdA",
+          })
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'NEnylXdA',
+        src: 'https://cdn.jwplayer.com/players/NEnylXdA.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/NEnylXdA/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the media id from a playlist route in capitals', async () => {
+      const value = html`
+        <div id="jwppp-video-169721" class="jwplayer">Loading the player...</div>
+        <script type="text/javascript" src="https://content.jwplatform.com/libraries/Aq9gyX5k.js"></script>
+        <script type="text/javascript">
+          var playerInstance_169721 = jwplayer( "jwppp-video-169721" );
+          playerInstance_169721.setup({
+            playlist: "https://cdn.jwplayer.com/V2/MEDIA/NEnylXdA",
+          })
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'NEnylXdA',
+        src: 'https://cdn.jwplayer.com/players/NEnylXdA.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/NEnylXdA/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the media id after a library whose path is in capitals', async () => {
+      const value = html`
+        <div id="jwppp-video-169721" class="jwplayer">Loading the player...</div>
+        <script type="text/javascript" src="https://content.jwplatform.com/LIBRARIES/Aq9gyX5k.js"></script>
         <script type="text/javascript">
           var playerInstance_169721 = jwplayer( "jwppp-video-169721" );
           playerInstance_169721.setup({

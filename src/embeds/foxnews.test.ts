@@ -281,3 +281,63 @@ describeForEachParser('foxnews through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('foxnewsIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, foxnewsIframeEmbedResolver)
+
+  it('should read the route words `v` and `embed.js` in capitals', async () => {
+    const value =
+      '<iframe src="https://video.foxnews.com/V/EMBED.JS?id=5406119088001&amp;w=466&amp;h=263"></iframe>'
+    const expected = {
+      provider: 'foxnews',
+      id: '5406119088001',
+      src: 'https://video.foxnews.com/v/video-embed.html?video_id=5406119088001',
+      url: 'https://www.foxnews.com/video/5406119088001',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `v` and `video-embed.html` in capitals', async () => {
+    const value =
+      '<iframe src="https://video.foxnews.com/V/VIDEO-EMBED.HTML?video_id=5406119088001"></iframe>'
+    const expected = {
+      provider: 'foxnews',
+      id: '5406119088001',
+      src: 'https://video.foxnews.com/v/video-embed.html?video_id=5406119088001',
+      url: 'https://www.foxnews.com/video/5406119088001',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `id` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://video.foxnews.com/v/embed.js?ID=5406119088001&amp;w=466&amp;h=263"></iframe>'
+    const expected = {
+      provider: 'foxnews',
+      id: '5406119088001',
+      src: 'https://video.foxnews.com/v/video-embed.html?video_id=5406119088001',
+      url: 'https://www.foxnews.com/video/5406119088001',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `video_id` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://video.foxnews.com/v/video-embed.html?VIDEO_ID=5406119088001"></iframe>'
+    const expected = {
+      provider: 'foxnews',
+      id: '5406119088001',
+      src: 'https://video.foxnews.com/v/video-embed.html?video_id=5406119088001',
+      url: 'https://www.foxnews.com/video/5406119088001',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -199,3 +199,20 @@ describeForEachParser('zeno through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('zenoEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, zenoEmbedResolver)
+
+  it('should read the route word `player` in capitals', async () => {
+    const value = '<iframe src="https://zeno.fm/PLAYER/halshack"></iframe>'
+    const expected = {
+      provider: 'zeno',
+      id: 'halshack',
+      src: 'https://zeno.fm/player/halshack',
+      url: 'https://zeno.fm/radio/halshack/',
+      height: 250,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

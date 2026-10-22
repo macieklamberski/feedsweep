@@ -231,3 +231,20 @@ describeForEachParser('tenor files through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('tenorIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, tenorIframeEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value = '<iframe src="https://tenor.com/EMBED/16892698"></iframe>'
+    const expected = {
+      provider: 'tenor',
+      id: '16892698',
+      src: 'https://tenor.com/embed/16892698',
+      url: 'https://tenor.com/view/16892698',
+      ratio: '1.33/1',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

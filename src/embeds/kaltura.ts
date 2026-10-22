@@ -1,11 +1,19 @@
+import { isAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, encodePathSegment, filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  filterUrlQuery,
+  getQueryParam,
+  parseUrlOnHosts,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'kaltura'
 
-const partnerPathRegex = /^\/p\/([^/]+)\//
+const partnerPathRegex = /^\/p\/([^/]+)\//i
+const partnerRouteRegex = /^\/p\//i
 
 const kalturaHost = 'kaltura.com'
 
@@ -38,7 +46,7 @@ type Entry = {
 const readEntry = (url: string | undefined): Entry | undefined => {
   const parsed = parseUrlOnHosts(url, kalturaHost)
   const partner = parsed?.pathname.match(partnerPathRegex)?.[1]
-  const entryId = parsed?.searchParams.get('entry_id')
+  const entryId = getQueryParam(parsed?.searchParams, 'entry_id')
 
   return parsed && partner && entryId ? { partner, entryId, parsed } : undefined
 }
@@ -48,10 +56,9 @@ const readEntry = (url: string | undefined): Entry | undefined => {
 const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult => {
   const host = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
   const query = composeQuery({ iframeembed: 'true', entry_id: entryId })
-  const hasToken = parsed.searchParams.has(tokenParam)
-  const kept = filterUrlQuery(
-    parsed,
-    (name) => name === tokenParam || widgetParams.includes(name) || playbackParams.includes(name),
+  const hasToken = getQueryParam(parsed.searchParams, tokenParam) !== undefined
+  const kept = filterUrlQuery(parsed, (name) =>
+    isAnyOf(name, [tokenParam, ...widgetParams, ...playbackParams]),
   )
   const playback = kept.replace('?', '&')
   // The entry comes out of the query decoded, and it goes into a path.
@@ -61,7 +68,7 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult 
     provider,
     // Title and metadata sit behind a session key.
     id: `${partner}/${entryId}`,
-    src: `https://${host}${parsed.pathname}${query}${playback}`,
+    src: `https://${host}${parsed.pathname.replace(partnerRouteRegex, '/p/')}${query}${playback}`,
     // The poster answers 200 `image/jpeg` for a real entry, 404 for an invented or a deleted one.
     thumbnail: hasToken
       ? undefined
@@ -88,11 +95,11 @@ export const kalturaIframeEmbedResolver = createUrlEmbedResolver([kalturaHost], 
 // Kaltura's auto-embed script, which writes the iframe into an empty div at load time. Feeds strip
 // the script, and the emptied div dies as an empty tag with the video.
 export const kalturaScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="kaltura.com/p/"]',
+  'script[src*="kaltura.com/p/" i]',
   (element) => {
     const entry = readEntry(attr(element, 'src'))
 
-    if (entry?.parsed.searchParams.get('autoembed') !== 'true') {
+    if (!entry || getQueryParam(entry.parsed.searchParams, 'autoembed') !== 'true') {
       return
     }
 

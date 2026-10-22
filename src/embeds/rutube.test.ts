@@ -370,3 +370,62 @@ describeForEachParser('rutube through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('rutubeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, rutubeEmbedResolver)
+
+  it('should read the route words `play`, `embed` and `private` in capitals', async () => {
+    const value =
+      '<iframe src="https://rutube.ru/PLAY/EMBED/PRIVATE/06292328a74e4db33e2214711f40d5b4?skinColor=00ff7a"></iframe>'
+    const expected = {
+      provider: 'rutube',
+      id: '06292328a74e4db33e2214711f40d5b4',
+      src: 'https://rutube.ru/play/embed/06292328a74e4db33e2214711f40d5b4',
+      url: 'https://rutube.ru/video/06292328a74e4db33e2214711f40d5b4/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `pl` in capitals', async () => {
+    const value =
+      '<iframe src="https://rutube.ru/PL/?pl_video=20a54e4a6f61441d808db45f823a7809%2Fadd"></iframe>'
+    const expected = {
+      provider: 'rutube',
+      id: '20a54e4a6f61441d808db45f823a7809/add',
+      src: 'https://rutube.ru/play/embed/20a54e4a6f61441d808db45f823a7809%2Fadd',
+      url: 'https://rutube.ru/video/20a54e4a6f61441d808db45f823a7809%2Fadd/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `p` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://rutube.ru/play/embed/08fa24c07c55aa24504f0ac93f7c2d01/?P=KKiFZe0ka-lmMTIbZyvWig"></iframe>'
+    const expected = {
+      provider: 'rutube',
+      id: '08fa24c07c55aa24504f0ac93f7c2d01',
+      src: 'https://rutube.ru/play/embed/08fa24c07c55aa24504f0ac93f7c2d01?p=KKiFZe0ka-lmMTIbZyvWig',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `t` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://rutube.ru/play/embed/c91d5d8847c7c5391a090fff38c86f34/?T=300"></iframe>'
+    const expected = {
+      provider: 'rutube',
+      id: 'c91d5d8847c7c5391a090fff38c86f34',
+      src: 'https://rutube.ru/play/embed/c91d5d8847c7c5391a090fff38c86f34?t=300',
+      url: 'https://rutube.ru/video/c91d5d8847c7c5391a090fff38c86f34/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

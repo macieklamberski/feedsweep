@@ -1404,6 +1404,13 @@ describeForEachParser('flashVar', (parseHtml) => {
     expect(flashVar(element, 'id')).toBe('2')
   })
 
+  it('should read a value whose name is written in another case', () => {
+    const document = parseHtml('<embed src="player.swf" flashvars="config=1&ID=2">')
+    const element = queryElement(document, 'embed')
+
+    expect(flashVar(element, 'id')).toBe('2')
+  })
+
   it('should return undefined when the config names something else', () => {
     const document = parseHtml('<embed src="player.swf" flashvars="config=1">')
     const element = queryElement(document, 'embed')

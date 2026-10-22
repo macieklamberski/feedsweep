@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -27,7 +27,7 @@ export const airtableResolveEmbed: ResolveEmbed = (url) => {
 
   const [route, ...ids] = getPathSegments(parsed)
 
-  if (route !== 'embed' || ids.length > 2) {
+  if (!isAnyOf(route, 'embed') || ids.length > 2) {
     return
   }
 

@@ -10,7 +10,7 @@ const provider = 'mediaccc'
 const mediacccHosts = ['media.ccc.de']
 
 // The server matches the route words and the slug in their case only.
-const playerPathRegex = /^\/v\/([^/]+)\/oembed\/?$/
+const playerPathRegex = /^\/v\/([^/]+)\/oembed\/?$/i
 
 // The player seeks to the `#t=` it reads from the hash. A WordPress auto-embed writes
 // `#?secret=` there.

@@ -37,10 +37,10 @@ describe('extractGeniallyViewId', () => {
     expect(extractGeniallyViewId(value)).toBe('59cc0e1689ef4914f441596a')
   })
 
-  it('should return undefined for a View/Index route spelled in mixed case', () => {
+  it('should read the View/Index route spelled in mixed case', () => {
     const value = 'https://www.genial.ly/View/index/59cc0e1689ef4914f441596a'
 
-    expect(extractGeniallyViewId(value)).toBeUndefined()
+    expect(extractGeniallyViewId(value)).toBe('59cc0e1689ef4914f441596a')
   })
 
   it('should return undefined for a View route with another second word', () => {
@@ -244,5 +244,22 @@ describeForEachParser('geniallyEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
+})
+
+describeForEachParser('geniallyEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, geniallyEmbedResolver)
+
+  it('should read the route words `View` and `Index` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.genial.ly/VIEW/INDEX/59cc0e1689ef4914f441596a"></iframe>'
+    const expected = {
+      provider: 'genially',
+      id: '59cc0e1689ef4914f441596a',
+      src: 'https://view.genially.com/59cc0e1689ef4914f441596a',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

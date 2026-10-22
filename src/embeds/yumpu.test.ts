@@ -412,3 +412,31 @@ describeForEachParser('yumpu through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('yumpuEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, yumpuEmbedResolver)
+
+  it('should read the `embed` and `view` route words in capitals', async () => {
+    const value = '<iframe src="https://www.yumpu.com/de/EMBED/VIEW/z4xYaRXnsDqwc2GE"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'yumpu',
+      id: 'z4xYaRXnsDqwc2GE',
+      src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+      ratio: '4/3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read a localeless `embed` route word in capitals', async () => {
+    const value = '<iframe src="https://www.yumpu.com/EMBED/view/z4xYaRXnsDqwc2GE"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'yumpu',
+      id: 'z4xYaRXnsDqwc2GE',
+      src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+      ratio: '4/3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

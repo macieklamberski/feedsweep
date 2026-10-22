@@ -70,6 +70,19 @@ describe('washingtonpostResolveEmbed', () => {
 
       expect(washingtonpostResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the route in capitals and mint it in lowercase', () => {
+      const value =
+        'https://www.washingtonpost.com/VIDEO/C/EMBED/6c688908-1e4f-4130-b5ca-e371afc1c78b'
+      const expected = {
+        provider: 'washingtonpost',
+        id: '6c688908-1e4f-4130-b5ca-e371afc1c78b',
+        src: 'https://www.washingtonpost.com/video/c/embed/6c688908-1e4f-4130-b5ca-e371afc1c78b',
+        ratio: '16/9',
+      }
+
+      expect(washingtonpostResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -89,13 +102,6 @@ describe('washingtonpostResolveEmbed', () => {
     it('should return undefined for a segment after the video', () => {
       const value =
         'https://www.washingtonpost.com/video/c/embed/6c688908-1e4f-4130-b5ca-e371afc1c78b/extra'
-
-      expect(washingtonpostResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for the route in capitals, which the server answers 404', () => {
-      const value =
-        'https://www.washingtonpost.com/VIDEO/C/EMBED/6c688908-1e4f-4130-b5ca-e371afc1c78b'
 
       expect(washingtonpostResolveEmbed(value)).toBeUndefined()
     })
@@ -215,5 +221,22 @@ describeForEachParser('washingtonpost through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('washingtonpostEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, washingtonpostEmbedResolver)
+
+  it('should read the route words `video`, `c` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.washingtonpost.com/VIDEO/C/EMBED/6c688908-1e4f-4130-b5ca-e371afc1c78b"></iframe>'
+    const expected = {
+      provider: 'washingtonpost',
+      id: '6c688908-1e4f-4130-b5ca-e371afc1c78b',
+      src: 'https://www.washingtonpost.com/video/c/embed/6c688908-1e4f-4130-b5ca-e371afc1c78b',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

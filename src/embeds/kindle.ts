@@ -1,7 +1,12 @@
 import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  getQueryParam,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   embedCarrierSelector,
@@ -12,7 +17,7 @@ import {
 // `read.amazon.co.uk`, `lesen.amazon.de` or `ler.amazon.com.br`.
 const readerHostRegex = /^[^.]+\.amazon\.(?:com|[a-z]{2}|com\.[a-z]{2}|co\.[a-z]{2})$/
 
-const cardPathRegex = /^\/kp\/card\/?$/
+const cardPathRegex = /^\/kp\/card\/?$/i
 
 // The Kindle preview card WordPress writes for an Amazon book, `read.amazon.com/kp/card?asin=…`.
 // The cover derives from the ASIN alone on Amazon's image host.
@@ -23,7 +28,7 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const asin = parsed.searchParams.get('asin')
+  const asin = getQueryParam(parsed.searchParams, 'asin')
 
   if (!asin) {
     return

@@ -2,7 +2,12 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { podigeeResolveEmbed, podigeeScriptEmbedResolver, readPodigeeHeight } from './podigee.js'
+import {
+  podigeeIframeEmbedResolver,
+  podigeeResolveEmbed,
+  podigeeScriptEmbedResolver,
+  readPodigeeHeight,
+} from './podigee.js'
 
 describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, podigeeScriptEmbedResolver)
@@ -308,5 +313,22 @@ describe('readPodigeeHeight', () => {
 
   it('should read nothing from a string that is not JSON', () => {
     expect(readPodigeeHeight('{"listenTo":"configurePlayer",')).toBeUndefined()
+  })
+})
+
+describeForEachParser('podigeeIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, podigeeIframeEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://cloudonaut.podigee.io/an-unnumbered-episode/EMBED"></iframe>'
+    const expected = {
+      provider: 'podigee',
+      id: 'cloudonaut/an-unnumbered-episode',
+      src: 'https://cloudonaut.podigee.io/an-unnumbered-episode/embed?context=external',
+      height: 145,
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

@@ -163,3 +163,21 @@ describeForEachParser('patronite widget through the pipeline', (parseHtml) => {
     expect(await convert(value, cleanUrlFn)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('patroniteEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, patroniteEmbedResolver)
+
+  it('should read the route word `widget` in capitals', async () => {
+    const value =
+      '<iframe src="https://patronite.pl/WIDGET/strajk/114344/small/FF3E3E/FEFFF8"></iframe>'
+    const expected = {
+      provider: 'patronite',
+      id: '114344',
+      src: 'https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8',
+      url: 'https://patronite.pl/strajk',
+      height: 306,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

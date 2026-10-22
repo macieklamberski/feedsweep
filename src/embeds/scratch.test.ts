@@ -181,3 +181,22 @@ describeForEachParser('scratchEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('scratchEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, scratchEmbedResolver)
+
+  it('should read the route words `projects` and `embed` in capitals', async () => {
+    const value = '<iframe src="https://scratch.mit.edu/PROJECTS/1308798589/EMBED"></iframe>'
+    const expected = {
+      provider: 'scratch',
+      id: '1308798589',
+      src: 'https://scratch.mit.edu/projects/1308798589/embed',
+      url: 'https://scratch.mit.edu/projects/1308798589/',
+      thumbnail: 'https://cdn2.scratch.mit.edu/get_image/project/1308798589_480x360.png',
+      width: 485,
+      height: 402,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

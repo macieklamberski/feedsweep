@@ -164,3 +164,33 @@ describeForEachParser('standfmEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toBeUndefined()
   })
 })
+
+describeForEachParser('standfmEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, standfmEmbedResolver)
+
+  it('should read the route words `embed` and `episodes` in capitals', async () => {
+    const value = '<iframe src="https://stand.fm/EMBED/EPISODES/6a8065825e9572e804f8a5cb"></iframe>'
+    const expected = {
+      provider: 'standfm',
+      id: 'episodes/6a8065825e9572e804f8a5cb',
+      src: 'https://stand.fm/embed/episodes/6a8065825e9572e804f8a5cb',
+      url: 'https://stand.fm/episodes/6a8065825e9572e804f8a5cb',
+      height: 190,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `channels` in capitals', async () => {
+    const value = '<iframe src="https://stand.fm/CHANNELS/645af1b90b5e6b2d87ce1dc9"></iframe>'
+    const expected = {
+      provider: 'standfm',
+      id: 'channels/645af1b90b5e6b2d87ce1dc9',
+      src: 'https://stand.fm/embed/channels/645af1b90b5e6b2d87ce1dc9',
+      url: 'https://stand.fm/channels/645af1b90b5e6b2d87ce1dc9',
+      height: 390,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

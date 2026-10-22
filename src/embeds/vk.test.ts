@@ -827,3 +827,49 @@ describeForEachParser('vk video pages through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(value)
   })
 })
+
+describeForEachParser('vkEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, vkEmbedResolver)
+
+  it('should read the route word `video_ext.php` in capitals', async () => {
+    const value =
+      '<iframe src="https://vkvideo.ru/VIDEO_EXT.PHP?oid=-214899652&amp;id=456246970&amp;hd=1"></iframe>'
+    const expected = {
+      provider: 'vk',
+      id: '-214899652_456246970',
+      src: 'https://vk.ru/video_ext.php?oid=-214899652&id=456246970',
+      url: 'https://vkvideo.ru/video-214899652_456246970',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `video_embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://vk.com/VIDEO_EMBED?oid=-206078025&amp;id=456239342"></iframe>'
+    const expected = {
+      provider: 'vk',
+      id: '-206078025_456239342',
+      src: 'https://vk.ru/video_ext.php?oid=-206078025&id=456239342',
+      url: 'https://vkvideo.ru/video-206078025_456239342',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `oid`, `id`, `hash` and `t` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://vkvideo.ru/video_ext.php?OID=-227210256&amp;ID=456239068&amp;HASH=84252005194333bb&amp;hd=2&amp;T=14s"></iframe>'
+    const expected = {
+      provider: 'vk',
+      id: '-227210256_456239068',
+      src: 'https://vk.ru/video_ext.php?oid=-227210256&id=456239068&hash=84252005194333bb&t=14s',
+      url: 'https://vkvideo.ru/video-227210256_456239068',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

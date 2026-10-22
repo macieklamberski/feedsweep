@@ -598,3 +598,20 @@ describeForEachParser('heyzine through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('heyzineEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, heyzineEmbedResolver)
+
+  it('should read the route word `flip-book` in capitals', async () => {
+    const value = '<iframe src="https://heyzine.com/FLIP-BOOK/4db16f598c.html"></iframe>'
+    const expected = {
+      provider: 'heyzine',
+      id: '4db16f598c',
+      src: 'https://heyzine.com/flip-book/4db16f598c.html',
+      url: 'https://heyzine.com/flip-book/4db16f598c.html',
+      ratio: '490/600',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

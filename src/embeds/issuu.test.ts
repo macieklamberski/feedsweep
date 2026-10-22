@@ -781,3 +781,50 @@ describeForEachParser('the Flash reader through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('issuuIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, issuuIframeEmbedResolver)
+
+  it('should read the route words `docs` and `s` in capitals', async () => {
+    const value =
+      '<iframe src="https://issuu.com/basilikimetatroulou/DOCS/xyz_9_1_final/S/12345"></iframe>'
+    const expected = {
+      provider: 'issuu',
+      id: 'basilikimetatroulou/xyz_9_1_final',
+      src: 'https://e.issuu.com/embed.html?u=basilikimetatroulou&d=xyz_9_1_final',
+      url: 'https://issuu.com/basilikimetatroulou/docs/xyz_9_1_final',
+      ratio: '5/3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `pageNumber`, `docName`, `username` and `loadingInfoText` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="http://static.issuu.com/webembed/viewers/style1/v1/IssuuViewer.swf?mode=embed&amp;layout=http%3A%2F%2Fskin.issuu.com%2Fv%2Flight%2Flayout.xml&amp;showFlipBtn=true&amp;PAGENUMBER=4&amp;documentId=100220001505-897e84d3e21746c6ab48365e90842fd8&amp;DOCNAME=budilnikxxiivek2_2010&amp;USERNAME=kopcheto&amp;LOADINGINFOTEXT=%D0%91%D1%83%D0%B4%D0%B8%D0%BB%D0%BD%D0%B8%D0%BA%20%D0%BD%D0%B0%20XXII%20%D0%B2%D0%B5%D0%BA%20%D0%B1%D1%80.2%202010%20%D0%B3%D0%BE%D0%B4%D0%B8%D0%BD%D0%B0&amp;et=1268599055661&amp;er=59"></iframe>'
+    const expected = {
+      provider: 'issuu',
+      id: 'kopcheto/budilnikxxiivek2_2010',
+      src: 'https://e.issuu.com/embed.html?u=kopcheto&d=budilnikxxiivek2_2010&p=4',
+      url: 'https://issuu.com/kopcheto/docs/budilnikxxiivek2_2010',
+      ratio: '5/3',
+      title: 'Будилник на XXII век бр.2 2010 година',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `u`, `d` and `p` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://e.issuu.com/embed.html?U=ecosistemaurbano&amp;D=paisaje_transversal&amp;P=12"></iframe>'
+    const expected = {
+      provider: 'issuu',
+      id: 'ecosistemaurbano/paisaje_transversal',
+      src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=paisaje_transversal&p=12',
+      url: 'https://issuu.com/ecosistemaurbano/docs/paisaje_transversal',
+      ratio: '5/3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

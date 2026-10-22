@@ -327,3 +327,35 @@ describeForEachParser('redcircle through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('redcircleIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, redcircleIframeEmbedResolver)
+
+  it('should read the route words `embedded-player`, `sh` and `ep` in capitals', async () => {
+    const value =
+      '<iframe src="https://redcircle.com/EMBEDDED-PLAYER/SH/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/EP/cb6cd735-0017-48dd-b387-ecc8a20818e5"></iframe>'
+    const expected = {
+      provider: 'redcircle',
+      id: 'episode/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/cb6cd735-0017-48dd-b387-ecc8a20818e5',
+      src: 'https://redcircle.com/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5',
+      url: 'https://redcircle.com/shows/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/episodes/cb6cd735-0017-48dd-b387-ecc8a20818e5',
+      height: 170,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `embedded-show-player` and `sh` in capitals', async () => {
+    const value =
+      '<iframe src="https://api.podcache.net/EMBEDDED-SHOW-PLAYER/SH/7bc4f231-9280-445a-a62b-b5727083ddca?theme=light"></iframe>'
+    const expected = {
+      provider: 'redcircle',
+      id: 'show/7bc4f231-9280-445a-a62b-b5727083ddca',
+      src: 'https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca',
+      url: 'https://redcircle.com/shows/7bc4f231-9280-445a-a62b-b5727083ddca',
+      height: 320,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

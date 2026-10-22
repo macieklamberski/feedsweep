@@ -382,3 +382,34 @@ describeForEachParser('thinglink shapes the pipeline repairs first', (parseHtml)
     expect(await convert(value)).toBe(value)
   })
 })
+
+describeForEachParser('thinglinkEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, thinglinkEmbedResolver)
+
+  it('should read the route words `view` and `scene` in capitals', async () => {
+    const value = '<iframe src="https://www.thinglink.com/VIEW/SCENE/1681632338456346625"></iframe>'
+    const expected = {
+      provider: 'thinglink',
+      id: '1681632338456346625',
+      src: 'https://www.thinglink.com/card/1681632338456346625',
+      url: 'https://www.thinglink.com/card/1681632338456346625',
+      ratio: '3/2',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `card` in capitals', async () => {
+    const value = '<iframe src="https://www.thinglink.com/CARD/853609259307368449"></iframe>'
+    const expected = {
+      provider: 'thinglink',
+      id: '853609259307368449',
+      src: 'https://www.thinglink.com/card/853609259307368449',
+      url: 'https://www.thinglink.com/card/853609259307368449',
+      thumbnail: 'https://cdn.thinglink.me/api/image/853609259307368449/1024/10/scaletowidth',
+      ratio: '3/2',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
@@ -22,7 +22,7 @@ const jotformHosts = [
   'www.jotform.com',
 ]
 
-const loaderPathRegex = /^\/jsform\/([^/]+)$/
+const loaderPathRegex = /^\/jsform\/([^/]+)$/i
 
 // The loader's starting box, which the iframe snippet also states. A card form starts at 640, and
 // nothing in the markup tells a card form from a classic one.
@@ -49,7 +49,7 @@ export const jotformResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const segments = getPathSegments(parsed)
-  const route = segments[0] === 'form' ? segments.slice(1) : segments
+  const route = isAnyOf(segments[0], 'form') ? segments.slice(1) : segments
   const formId = route[0]
 
   if (route.length !== 1 || !formId || !digitsRegex.test(formId)) {
@@ -63,7 +63,7 @@ export const jotformResolveEmbed: ResolveEmbed = (url) => {
 // body is the form renders empty. The launcher button on `static/feedback2.js` is not this: it
 // opens the form in an overlay, which is chrome and not the item's content.
 export const jotformScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="jotform"][src*="/jsform/"]',
+  'script[src*="jotform" i][src*="/jsform/" i]',
   (element) => {
     const loader = parseUrlOnHosts(attr(element, 'src'), jotformHosts)
     const formId = loader?.pathname.match(loaderPathRegex)?.[1]

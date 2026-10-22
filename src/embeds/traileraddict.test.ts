@@ -103,12 +103,6 @@ describe('traileraddictResolveEmbed', () => {
       expect(traileraddictResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for the current player in capitals, which the server answers 404', () => {
-      const value = 'https://traileraddict.com/IFRAME.PHP?id=13259'
-
-      expect(traileraddictResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the short host with no id', () => {
       const value = 'https://v.traileraddict.com/'
 
@@ -168,6 +162,19 @@ describe('traileraddictResolveEmbed', () => {
         id: '119230a',
         src: 'https://traileraddict.com/iframe.php?id=119230a',
         url: 'https://traileraddict.com/watch/119230a',
+        ratio: '16/9',
+      }
+
+      expect(traileraddictResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the current player in capitals and mint it in lowercase', () => {
+      const value = 'https://traileraddict.com/IFRAME.PHP?id=13259'
+      const expected = {
+        provider: 'traileraddict',
+        id: '13259',
+        src: 'https://traileraddict.com/iframe.php?id=13259',
+        url: 'https://traileraddict.com/watch/13259',
         ratio: '16/9',
       }
 
@@ -286,5 +293,35 @@ describeForEachParser('traileraddict player through the pipeline', (parseHtml) =
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('traileraddictEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, traileraddictEmbedResolver)
+
+  it('should read the route word `iframe.php` in capitals', async () => {
+    const value = '<iframe src="https://traileraddict.com/IFRAME.PHP?id=13259"></iframe>'
+    const expected = {
+      provider: 'traileraddict',
+      id: '13259',
+      src: 'https://traileraddict.com/iframe.php?id=13259',
+      url: 'https://traileraddict.com/watch/13259',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `id` parameter name in capitals', async () => {
+    const value = '<iframe src="https://traileraddict.com/iframe.php?ID=13259"></iframe>'
+    const expected = {
+      provider: 'traileraddict',
+      id: '13259',
+      src: 'https://traileraddict.com/iframe.php?id=13259',
+      url: 'https://traileraddict.com/watch/13259',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

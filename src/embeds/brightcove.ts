@@ -2,7 +2,12 @@ import type { Nullish } from 'trousse'
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, find, flashVars, keepIfMatches, paramValue, text } from '../utils/dom.js'
-import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  getQueryParam,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brightcove'
@@ -13,7 +18,7 @@ const playerRatio = '16/9'
 const brightcoveIdRegex = /^\d{5,}$/
 // A reference id is free text the publisher chose, named by Brightcove's own `ref:` prefix.
 const brightcoveVideoIdRegex = /^(?:\d{5,}|ref:.+)$/
-const accountScriptSelector = 'script[src*="players.brightcove.net"]'
+const accountScriptSelector = 'script[src*="players.brightcove.net" i]'
 const accountScriptRegex = /players\.brightcove\.net\/(\d+)\//
 
 // Some plugins leave the account out of `data-account` and only in the loader script's url.
@@ -151,7 +156,7 @@ export const brightcoveSkyEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-const federatedPathRegex = /\/services\/viewer\/federated_/
+const federatedPathRegex = /\/services\/viewer\/federated_/i
 
 // The account sits in the url as `publisherID` and the video id in `flashVars`. The federated
 // player id in the path is not a modern player id.
@@ -167,14 +172,14 @@ const brightcoveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   // `videoId` is the older spelling of `@videoPlayer`, and a few embeds put the flashVars set in
   // the url query.
   const videoId =
-    params?.get('@videoPlayer') ??
-    parsed.searchParams.get('@videoPlayer') ??
-    params?.get('videoId') ??
-    parsed.searchParams.get('videoId')
+    getQueryParam(params, '@videoPlayer') ??
+    getQueryParam(parsed.searchParams, '@videoPlayer') ??
+    getQueryParam(params, 'videoId') ??
+    getQueryParam(parsed.searchParams, 'videoId')
   const account =
-    parsed.searchParams.get('publisherID') ??
-    params?.get('publisherID') ??
-    readPlayerKeyAccount(params?.get('playerKey'))
+    getQueryParam(parsed.searchParams, 'publisherID') ??
+    getQueryParam(params, 'publisherID') ??
+    readPlayerKeyAccount(getQueryParam(params, 'playerKey'))
 
   if (!videoId || !account) {
     return
@@ -228,7 +233,7 @@ export const brightcoveResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const [account, player] = getPathSegments(parsed)
-  const videoId = parsed.searchParams.get('videoId')
+  const videoId = getQueryParam(parsed.searchParams, 'videoId')
 
   if (!account || !player || !videoId) {
     return

@@ -303,3 +303,46 @@ describeForEachParser('ausha through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('aushaEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, aushaEmbedResolver)
+
+  it('should read the route word `index.html` in capitals', async () => {
+    const value =
+      '<iframe src="https://player.ausha.co/INDEX.HTML?podcastId=b3GxmHMGPEaQ&amp;v=3"></iframe>'
+    const expected = {
+      provider: 'ausha',
+      id: 'podcast/b3GxmHMGPEaQ',
+      src: 'https://player.ausha.co/?podcastId=b3GxmHMGPEaQ&v=3',
+      height: 220,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `podcastId` and `t` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://player.ausha.co/?showId=4qgQzfO219p2&amp;PODCASTID=YK049s1DdWXX&amp;T=0&amp;v=3&amp;playerId=ausha-vZGt"></iframe>'
+    const expected = {
+      provider: 'ausha',
+      id: 'podcast/YK049s1DdWXX',
+      src: 'https://player.ausha.co/?podcastId=YK049s1DdWXX&v=3&t=0',
+      height: 220,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `showId` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://player.ausha.co/?SHOWID=4qgQzfO219p2&amp;multishow=false&amp;v=3"></iframe>'
+    const expected = {
+      provider: 'ausha',
+      id: 'show/4qgQzfO219p2',
+      src: 'https://player.ausha.co/?showId=4qgQzfO219p2&v=3',
+      height: 220,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

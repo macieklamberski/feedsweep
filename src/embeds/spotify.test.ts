@@ -837,3 +837,49 @@ describe('isSpotifyReady', () => {
     expect(isSpotifyReady(value)).toBe(false)
   })
 })
+
+describeForEachParser('spotifyEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, spotifyEmbedResolver)
+
+  it('should read the route words `embed`, `user` and `playlist` in capitals', async () => {
+    const value =
+      '<iframe src="https://open.spotify.com/EMBED/USER/ga8/PLAYLIST/2QyFr1UfIduAkWZI0A5fnC"></iframe>'
+    const expected = {
+      provider: 'spotify',
+      id: 'playlist/2QyFr1UfIduAkWZI0A5fnC',
+      src: 'https://open.spotify.com/embed/playlist/2QyFr1UfIduAkWZI0A5fnC',
+      url: 'https://open.spotify.com/playlist/2QyFr1UfIduAkWZI0A5fnC',
+      height: 352,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `embed-podcast` and `episode` in capitals', async () => {
+    const value =
+      '<iframe src="https://open.spotify.com/EMBED-PODCAST/EPISODE/3POP8fAw3I2qhiIWIJEUNr"></iframe>'
+    const expected = {
+      provider: 'spotify',
+      id: 'episode/3POP8fAw3I2qhiIWIJEUNr',
+      src: 'https://open.spotify.com/embed/episode/3POP8fAw3I2qhiIWIJEUNr',
+      url: 'https://open.spotify.com/episode/3POP8fAw3I2qhiIWIJEUNr',
+      height: 152,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `uri` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.spotify.com/?URI=spotify:track:4cOdK2wGLETKBW3PvgPWqT"></iframe>'
+    const expected = {
+      provider: 'spotify',
+      id: 'track/4cOdK2wGLETKBW3PvgPWqT',
+      src: 'https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT',
+      url: 'https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT',
+      height: 152,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

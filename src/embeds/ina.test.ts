@@ -375,3 +375,35 @@ describe('inaRenderHint', () => {
     expect(inaRenderHint).toEqual(expected)
   })
 })
+
+describeForEachParser('inaEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, inaEmbedResolver)
+
+  it('should read the route words `player` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="http://player.ina.fr/PLAYER/EMBED/I04224962/1/1b0bd203fbcd702f9bc9b10ac3d0fc21/460/259"></iframe>'
+    const expected = {
+      provider: 'ina',
+      id: 'I04224962',
+      src: 'https://player.ina.fr/embed/I04224962?pid=1&key=1b0bd203fbcd702f9bc9b10ac3d0fc21',
+      url: 'https://www.ina.fr/video/I04224962',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `video` and `ticket` in capitals', async () => {
+    const value =
+      '<iframe src="http://www.ina.fr/VIDEO/TICKET/CPC89000193/1019544/f6d4ef1e5d2a7f5359b350d693da3394"></iframe>'
+    const expected = {
+      provider: 'ina',
+      id: 'CPC89000193',
+      src: 'https://player.ina.fr/embed/CPC89000193?pid=1019544&key=f6d4ef1e5d2a7f5359b350d693da3394',
+      url: 'https://www.ina.fr/video/CPC89000193',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

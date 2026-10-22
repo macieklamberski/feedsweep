@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
@@ -30,7 +30,7 @@ export const tenorResolveEmbed: ResolveEmbed = (url) => {
 
   const [route, postId] = getPathSegments(parsed)
 
-  if (route !== 'embed') {
+  if (!isAnyOf(route, 'embed')) {
     return
   }
 
@@ -57,7 +57,7 @@ export const tenorWidgetEmbedResolver = createMarkupEmbedResolver(
     // search link, which names a query and not this GIF.
     return {
       ...composeEmbed(postId),
-      title: text(element, 'a[href*="tenor.com/view/"]'),
+      title: text(element, 'a[href*="tenor.com/view/" i]'),
     }
   },
 )

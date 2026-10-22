@@ -184,3 +184,31 @@ describeForEachParser('bloggerEmbedResolver carrier title', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('bloggerEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, bloggerEmbedResolver)
+
+  it('should read the route word `video.g` in capitals', async () => {
+    const value = '<iframe src="https://www.blogger.com/VIDEO.G?token=../../etc"></iframe>'
+    const expected = {
+      provider: 'blogger',
+      id: '../../etc',
+      src: 'https://www.blogger.com/video.g?token=..%2F..%2Fetc',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `token` parameter name in capitals', async () => {
+    const value = '<iframe src="https://www.blogger.com/video.g?TOKEN=../../etc"></iframe>'
+    const expected = {
+      provider: 'blogger',
+      id: '../../etc',
+      src: 'https://www.blogger.com/video.g?token=..%2F..%2Fetc',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

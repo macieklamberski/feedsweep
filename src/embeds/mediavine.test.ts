@@ -147,6 +147,19 @@ describeForEachParser('mediavineScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the loader whose route is in capitals', async () => {
+      const value =
+        '<script src="https://video.mediavine.com/VIDEOS/dx6ydyrbrjbbu2tncqzi9.js"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'mediavine',
+        id: 'dx6ydyrbrjbbu2tncqzi9',
+        src: 'https://embed.mediavine.com/videos/dx6ydyrbrjbbu2tncqzi9/iframe',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should state no shape when the script stands alone', async () => {
       const value =
         '<script src="https://video.mediavine.com/videos/dx6ydyrbrjbbu2tncqzi.js"></script>'

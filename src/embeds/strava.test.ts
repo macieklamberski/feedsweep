@@ -293,3 +293,47 @@ describeForEachParser('stravaIframeEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('stravaIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, stravaIframeEmbedResolver)
+
+  it('should read the route words `activities` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.strava.com/ACTIVITIES/my-morning-ride/EMBED/ca9c763ae38ff1185ef"></iframe>'
+    const expected = {
+      provider: 'strava',
+      id: 'activity/my-morning-ride',
+      src: 'https://strava-embeds.com/activity/my-morning-ride',
+      url: 'https://www.strava.com/activities/my-morning-ride',
+      ratio: '300/472',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `activity` in capitals', async () => {
+    const value = '<iframe src="https://strava-embeds.com/ACTIVITY/17975533403"></iframe>'
+    const expected = {
+      provider: 'strava',
+      id: 'activity/17975533403',
+      src: 'https://strava-embeds.com/activity/17975533403',
+      url: 'https://www.strava.com/activities/17975533403',
+      ratio: '300/472',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `token` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://strava-embeds.com/route/3498503191028593260?style=standard&amp;clubId=1495648&amp;fromEmbed=true&amp;TOKEN=Lk5027SO0Yu2iIF-TkH_hXz47g9Jr-mT7ANe6CTpqkA#ns=4adec2ed-0d75-4cbd-9819-cdc4fffd3395&amp;hostOrigin=https%3A%2F%2Fwww.nohobikeclub.org&amp;hostPath=%2Fnews%2F13640102%2FEditPost&amp;hostTitle=Northampton+Cycling+Club+-+Ride+Report%3A+SMR+06%2F06%2F2026&amp;mapHash=8.85/42.4478/-72.5277"></iframe>'
+    const expected = {
+      provider: 'strava',
+      id: 'route/3498503191028593260',
+      src: 'https://strava-embeds.com/route/3498503191028593260?token=Lk5027SO0Yu2iIF-TkH_hXz47g9Jr-mT7ANe6CTpqkA',
+      ratio: '300/531',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments } from 'trousse'
+import { decodeSegment, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
@@ -17,7 +17,7 @@ const playerPaths = [
 
 // The retired script loader names every part after a key, and carries the same three parts.
 const scriptPathRegex =
-  /^\/player\/embed\/w\/\d+\/h\/\d+\/id_notice\/([^/]+)\/id_utilisateur\/([^/]+)\/hash\/([^/]+)$/
+  /^\/player\/embed\/w\/\d+\/h\/\d+\/id_notice\/([^/]+)\/id_utilisateur\/([^/]+)\/hash\/([^/]+)$/i
 
 // The `embed` routes redirect onto this form and append an autoplay flag, which would start the
 // player when the page loads.
@@ -41,7 +41,7 @@ export const inaResolveEmbed: ResolveEmbed = (url) => {
   const segments = parsed ? getPathSegments(parsed) : []
   const [route, kind, id, playerId, key] = segments
 
-  if (!playerPaths.includes(`${route}/${kind}`) || !id || !playerId || !key) {
+  if (!isAnyOf(`${route}/${kind}`, playerPaths) || !id || !playerId || !key) {
     return
   }
 
@@ -52,7 +52,7 @@ export const inaEmbedResolver = createUrlEmbedResolver(inaHosts, inaResolveEmbed
 
 // INA's retired script loader, a carrier the iframe fallback cannot read.
 export const inaScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="ina.fr/player/embed/"]',
+  'script[src*="ina.fr/player/embed/" i]',
   (element) => {
     const match = parseUrlOnHosts(attr(element, 'src'), inaHosts)?.pathname.match(scriptPathRegex)
 

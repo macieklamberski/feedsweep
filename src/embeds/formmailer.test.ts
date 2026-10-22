@@ -293,3 +293,32 @@ describeForEachParser('formmailer through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('formmailerIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, formmailerIframeEmbedResolver)
+
+  it('should read the route word `fms` in capitals', async () => {
+    const value = '<iframe src="https://ssl.form-mailer.jp/FMS/6662b06a268383"></iframe>'
+    const expected = {
+      provider: 'formmailer',
+      id: '6662b06a268383',
+      src: 'https://ssl.form-mailer.jp/fms/6662b06a268383',
+      url: 'https://ssl.form-mailer.jp/fms/6662b06a268383',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `errorScroll` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://ssl.form-mailer.jp/fms/6662b06a268383?ERRORSCROLL=0"></iframe>'
+    const expected = {
+      provider: 'formmailer',
+      id: '6662b06a268383',
+      src: 'https://ssl.form-mailer.jp/fms/6662b06a268383',
+      url: 'https://ssl.form-mailer.jp/fms/6662b06a268383',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

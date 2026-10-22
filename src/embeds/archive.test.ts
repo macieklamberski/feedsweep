@@ -1502,3 +1502,64 @@ describeForEachParser('archiveIframeEmbedResolver carrier title', (parseHtml) =>
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('archiveIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, archiveIframeEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value = '<iframe src="https://archive.org/EMBED/gov.archives.arc.1257628"></iframe>'
+    const expected = {
+      provider: 'archive',
+      id: 'gov.archives.arc.1257628',
+      src: 'https://archive.org/embed/gov.archives.arc.1257628',
+      url: 'https://archive.org/details/gov.archives.arc.1257628',
+      thumbnail: 'https://archive.org/services/img/gov.archives.arc.1257628',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `details` in capitals', async () => {
+    const value = '<iframe src="https://archive.org/DETAILS/nasa_hubble"></iframe>'
+    const expected = {
+      provider: 'archive',
+      id: 'nasa_hubble',
+      src: 'https://archive.org/embed/nasa_hubble',
+      url: 'https://archive.org/details/nasa_hubble',
+      thumbnail: 'https://archive.org/services/img/nasa_hubble',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `playlist` and `start` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://archive.org/embed/some_album?PLAYLIST=1&amp;START=42"></iframe>'
+    const expected = {
+      provider: 'archive',
+      id: 'some_album',
+      src: 'https://archive.org/embed/some_album?playlist=1&start=42',
+      url: 'https://archive.org/details/some_album',
+      thumbnail: 'https://archive.org/services/img/some_album',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `start` and `end` parameter names in capitals', async () => {
+    const value = '<iframe src="https://archive.org/embed/commute?START=60&amp;END=90"></iframe>'
+    const expected = {
+      provider: 'archive',
+      id: 'commute',
+      src: 'https://archive.org/embed/commute?start=60&end=90',
+      url: 'https://archive.org/details/commute',
+      thumbnail: 'https://archive.org/services/img/commute',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

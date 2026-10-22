@@ -1982,3 +1982,20 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('slideshareIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, slideshareIframeEmbedResolver)
+
+  it('should read the route words `embed_code` and `key` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.slideshare.net/slideshow/EMBED_CODE/KEY/6PCWPGFw9SwsAYlongerkey"></iframe>'
+    const expected = {
+      provider: 'slideshare',
+      id: '6PCWPGFw9SwsAYlongerkey',
+      src: 'https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAYlongerkey',
+      ratio: '595/485',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

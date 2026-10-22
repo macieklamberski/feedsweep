@@ -1,7 +1,12 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  getQueryParam,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type FoxBrand = {
@@ -58,10 +63,11 @@ export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const brand = foxBrands.find((brand) => brand.playerHost === parsed.hostname)
-  const id = parsed.searchParams.get('video_id') ?? parsed.searchParams.get('id')
+  const id =
+    getQueryParam(parsed.searchParams, 'video_id') ?? getQueryParam(parsed.searchParams, 'id')
   const [route, page] = getPathSegments(parsed)
 
-  if (!brand || route !== 'v' || (page !== 'embed.js' && page !== 'video-embed.html')) {
+  if (!brand || !isAnyOf(route, 'v') || !isAnyOf(page, ['embed.js', 'video-embed.html'])) {
     return
   }
 
@@ -74,7 +80,7 @@ export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
 
 // Fox's old share snippet is an `embed.js` script tag whose loader is gone, so nothing plays.
 export const foxnewsScriptEmbedResolver = createMarkupEmbedResolver(
-  playerHosts.map((host) => `script[src*="${host}/v/embed.js"]`).join(', '),
+  playerHosts.map((host) => `script[src*="${host}/v/embed.js" i]`).join(', '),
   (element) => {
     return foxnewsResolveEmbed(attr(element, 'src') ?? '')
   },

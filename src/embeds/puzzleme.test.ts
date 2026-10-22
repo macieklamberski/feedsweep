@@ -316,3 +316,35 @@ describeForEachParser('puzzleme through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('puzzlemeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, puzzlemeEmbedResolver)
+
+  it('should read the route word `pmm` in capitals', async () => {
+    const value =
+      '<iframe src="https://amuselabs.com/PMM/crossword?id=e9f5e4db&amp;set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7&amp;embed=1"></iframe>'
+    const expected = {
+      provider: 'puzzleme',
+      id: '66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7/e9f5e4db',
+      src: 'https://puzzleme.amuselabs.com/pmm/crossword?id=e9f5e4db&set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7&embed=1',
+      url: 'https://puzzleme.amuselabs.com/pmm/crossword?id=e9f5e4db&set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7',
+      height: 700,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `id` and `set` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://amuselabs.com/pmm/crossword?ID=e9f5e4db&amp;SET=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7&amp;embed=1"></iframe>'
+    const expected = {
+      provider: 'puzzleme',
+      id: '66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7/e9f5e4db',
+      src: 'https://puzzleme.amuselabs.com/pmm/crossword?id=e9f5e4db&set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7&embed=1',
+      url: 'https://puzzleme.amuselabs.com/pmm/crossword?id=e9f5e4db&set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7',
+      height: 700,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

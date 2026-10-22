@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import { parseUrlOnHosts } from '../utils/urls.js'
 
 const gofundmeHosts = ['gofundme.com']
@@ -9,7 +9,7 @@ export const composeGofundmeWidgetUrl = (url: string | undefined): string | unde
   const parsed = parseUrlOnHosts(url, gofundmeHosts)
   const [route, slug] = parsed ? getPathSegments(parsed) : []
 
-  if (route !== 'f' || !slug) {
+  if (!isAnyOf(route, 'f') || !slug) {
     return
   }
 

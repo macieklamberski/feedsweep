@@ -477,3 +477,62 @@ describeForEachParser('codesandbox through the pipeline', (parseHtml) => {
     ).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('codesandboxIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, codesandboxIframeEmbedResolver)
+
+  it('should read the route words `p` and `devbox` in capitals', async () => {
+    const value =
+      '<iframe src="https://codesandbox.io/P/DEVBOX/optimistic-nova-544ck6?embed=1"></iframe>'
+    const expected = {
+      provider: 'codesandbox',
+      id: '544ck6',
+      src: 'https://codesandbox.io/p/devbox/optimistic-nova-544ck6?embed=1',
+      url: 'https://codesandbox.io/p/devbox/optimistic-nova-544ck6',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value = '<iframe src="https://codesandbox.io/EMBED/83wzkj"></iframe>'
+    const expected = {
+      provider: 'codesandbox',
+      id: '83wzkj',
+      src: 'https://codesandbox.io/embed/83wzkj',
+      url: 'https://codesandbox.io/s/83wzkj',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `module` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://codesandbox.io/embed/NkB6R6O2L?MODULE=wRo98&amp;autoresize=1&amp;hidenavigation=1"></iframe>'
+    const expected = {
+      provider: 'codesandbox',
+      id: 'NkB6R6O2L',
+      src: 'https://codesandbox.io/embed/NkB6R6O2L?module=wRo98',
+      url: 'https://codesandbox.io/s/NkB6R6O2L',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `file` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://codesandbox.io/p/sandbox/wizardly-wildflower-nrhln8?FILE=%2Fsrc%2Findex.js&amp;embed=1&amp;theme=dark"></iframe>'
+    const expected = {
+      provider: 'codesandbox',
+      id: 'nrhln8',
+      src: 'https://codesandbox.io/p/sandbox/wizardly-wildflower-nrhln8?file=%2Fsrc%2Findex.js&embed=1',
+      url: 'https://codesandbox.io/p/sandbox/wizardly-wildflower-nrhln8',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

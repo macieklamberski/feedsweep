@@ -932,3 +932,64 @@ describeForEachParser('mailruEmbedResolver carrier title', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('mailruEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mailruEmbedResolver)
+
+  it('should read the route words `video` and `embed` in capitals', async () => {
+    const value = '<iframe src="https://my.mail.ru/VIDEO/EMBED/253943806846567285"></iframe>'
+    const expected = {
+      provider: 'mailru',
+      id: '253943806846567285',
+      src: 'https://my.mail.ru/video/embed/253943806846567285',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `r` and `video2` in capitals', async () => {
+    const value =
+      '<iframe src="http://img.mail.ru/R/VIDEO2/uvpv3.swf?2&amp;movieSrc=mail/anizm.com/4418/4427&amp;autoplay=0"></iframe>'
+    const expected = {
+      provider: 'mailru',
+      id: 'mail/anizm.com/4418/4427',
+      src: 'https://my.mail.ru/mail/anizm.com/video/embed/4418/4427',
+      url: 'https://my.mail.ru/mail/anizm.com/video/4418/4427.html',
+      ratio: '16/9',
+      author: 'anizm.com',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `movieSrc` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="http://img.mail.ru/r/video2/uvpv3.swf?2&amp;MOVIESRC=mail/anizm.com/4418/4427&amp;autoplay=0"></iframe>'
+    const expected = {
+      provider: 'mailru',
+      id: 'mail/anizm.com/4418/4427',
+      src: 'https://my.mail.ru/mail/anizm.com/video/embed/4418/4427',
+      url: 'https://my.mail.ru/mail/anizm.com/video/4418/4427.html',
+      ratio: '16/9',
+      author: 'anizm.com',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `par` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="http://img.mail.ru/r/video2/player_v2.swf?PAR=http://content.video.mail.ru/mail/gsavinich/10/$44$0$143"></iframe>'
+    const expected = {
+      provider: 'mailru',
+      id: 'mail/gsavinich/10/44',
+      src: 'https://my.mail.ru/mail/gsavinich/video/embed/10/44',
+      url: 'https://my.mail.ru/mail/gsavinich/video/10/44.html',
+      ratio: '16/9',
+      author: 'gsavinich',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

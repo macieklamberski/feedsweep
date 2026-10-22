@@ -227,3 +227,46 @@ describeForEachParser('podbean through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('podbeanEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, podbeanEmbedResolver)
+
+  it('should read the route words `media` and `player` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.podbean.com/MEDIA/PLAYER/yx4hr-f3d1e1?from=pb6admin&amp;download=1"></iframe>'
+    const expected = {
+      provider: 'podbean',
+      id: 'yx4hr-f3d1e1',
+      src: 'https://www.podbean.com/player-v2/?i=yx4hr-f3d1e1',
+      height: 150,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `player-v2` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.podbean.com/PLAYER-V2/?i=wyvke-1aefb6c-pb&amp;share=1&amp;fonts=Arial"></iframe>'
+    const expected = {
+      provider: 'podbean',
+      id: 'wyvke-1aefb6c-pb',
+      src: 'https://www.podbean.com/player-v2/?i=wyvke-1aefb6c-pb',
+      height: 150,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `i` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.podbean.com/player-v2/?I=wyvke-1aefb6c-pb&amp;share=1&amp;fonts=Arial"></iframe>'
+    const expected = {
+      provider: 'podbean',
+      id: 'wyvke-1aefb6c-pb',
+      src: 'https://www.podbean.com/player-v2/?i=wyvke-1aefb6c-pb',
+      height: 150,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

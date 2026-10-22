@@ -4,6 +4,7 @@ import { readPixels } from '../utils/hints.js'
 import {
   composeQuery,
   encodePathSegment,
+  getQueryParam,
   pickQueryParams,
   placeholderBaseUrl,
 } from '../utils/urls.js'
@@ -41,7 +42,7 @@ const initCallRegex = /VK\.init\(\s*\{[^}]*?\bapiId\s*:\s*(?<app>\d+)/
 
 // A video's own page, `/video{owner}_{video}`, which plays on the player with the same ids. The
 // signed owner tells it from `/videos{owner}`, `/video_ext.php` and `/video_embed`.
-const videoPageRegex = /^\/video(?<owner>-?\d+)_(?<video>[^/]+)$/
+const videoPageRegex = /^\/video(?<owner>-?\d+)_(?<video>[^/]+)$/i
 
 // The widget frame opens its message channel only when its `window.name` is `fXD` and a
 // five-character key, and it starts every message with that key.
@@ -57,9 +58,9 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const page = parsed.pathname.match(videoPageRegex)?.groups
-  const player = players.get(page ? '/video_ext.php' : parsed.pathname)
-  const ownerId = page?.owner ?? parsed.searchParams.get('oid') ?? ''
-  const videoId = page?.video ?? parsed.searchParams.get('id') ?? ''
+  const player = players.get(page ? '/video_ext.php' : parsed.pathname.toLowerCase())
+  const ownerId = page?.owner ?? getQueryParam(parsed.searchParams, 'oid') ?? ''
+  const videoId = page?.video ?? getQueryParam(parsed.searchParams, 'id') ?? ''
 
   if (!player || !ownerId || !videoId) {
     return

@@ -495,3 +495,52 @@ describeForEachParser('the download files the player hosts also serve', (parseHt
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('cloudflarestreamIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, cloudflarestreamIframeEmbedResolver)
+
+  it('should read the route word `iframe` in capitals', async () => {
+    const value =
+      '<iframe src="https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/IFRAME?controls=false&amp;muted=true&amp;preload=metadata&amp;loop=true&amp;autoplay=true&amp;poster=https%3A%2F%2Fcustomer-qz3v4c7e4vfly110.cloudflarestream.com%2Fbeb50392b3f14f49b01fb75b20d4cef7%2Fthumbnails%2Fthumbnail.jpg%3Fheight%3D600"></iframe>'
+    const expected = {
+      provider: 'cloudflarestream',
+      id: 'beb50392b3f14f49b01fb75b20d4cef7',
+      src: 'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/iframe?loop=true',
+      thumbnail:
+        'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/thumbnails/thumbnail.jpg?height=600',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `loop` and `poster` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/iframe?controls=false&amp;muted=true&amp;preload=metadata&amp;LOOP=true&amp;autoplay=true&amp;POSTER=https%3A%2F%2Fcustomer-qz3v4c7e4vfly110.cloudflarestream.com%2Fbeb50392b3f14f49b01fb75b20d4cef7%2Fthumbnails%2Fthumbnail.jpg%3Fheight%3D600"></iframe>'
+    const expected = {
+      provider: 'cloudflarestream',
+      id: 'beb50392b3f14f49b01fb75b20d4cef7',
+      src: 'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/iframe?loop=true',
+      thumbnail:
+        'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/beb50392b3f14f49b01fb75b20d4cef7/thumbnails/thumbnail.jpg?height=600',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `startTime` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://customer-qz3v4c7e4vfly110.cloudflarestream.com/12d9fb47f8bf1560187d3b57c26816f1/iframe?preload=metadata&amp;STARTTIME=90"></iframe>'
+    const expected = {
+      provider: 'cloudflarestream',
+      id: '12d9fb47f8bf1560187d3b57c26816f1',
+      src: 'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/12d9fb47f8bf1560187d3b57c26816f1/iframe?startTime=90',
+      thumbnail:
+        'https://customer-qz3v4c7e4vfly110.cloudflarestream.com/12d9fb47f8bf1560187d3b57c26816f1/thumbnails/thumbnail.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

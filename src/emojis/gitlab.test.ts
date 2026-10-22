@@ -79,6 +79,30 @@ describeForEachParser('gitlabEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should read the custom version written in another case', async () => {
+      const value = html`
+        <p>
+          <gl-emoji
+            title="partyparrot"
+            data-name="partyparrot"
+            data-fallback-src="https://example.com/uploads/-/system/custom_emoji/1/partyparrot.gif"
+            data-unicode-version="Custom"
+          ></gl-emoji>
+        </p>
+      `
+      const expected = html`
+        <p>
+          <img
+            src="https://example.com/uploads/-/system/custom_emoji/1/partyparrot.gif"
+            alt=":partyparrot:"
+            data-emoji=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should replace the image GitLab wraps with a marked image of fallback-src', async () => {
       const value = html`
         <p>

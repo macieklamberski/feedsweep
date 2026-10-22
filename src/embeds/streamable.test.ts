@@ -102,6 +102,19 @@ describe('streamableResolveEmbed', () => {
 
       expect(streamableResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read a route word in another case and mint it in lowercase', () => {
+      const value = 'https://streamable.com/E/qun2ij'
+      const expected = {
+        provider: 'streamable',
+        id: 'qun2ij',
+        src: 'https://streamable.com/e/qun2ij',
+        url: 'https://streamable.com/qun2ij',
+        ratio: '16/9',
+      }
+
+      expect(streamableResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -113,12 +126,6 @@ describe('streamableResolveEmbed', () => {
 
     it('should ignore a file host of the platform', () => {
       const value = 'https://cdn-cf-east.streamable.com/qun2ij'
-
-      expect(streamableResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a route word in another case, which the server does not serve', () => {
-      const value = 'https://streamable.com/E/qun2ij'
 
       expect(streamableResolveEmbed(value)).toBeUndefined()
     })
@@ -607,5 +614,49 @@ describe('streamableRenderHint', () => {
     const expected: EmbedRenderHint = { provider: 'streamable', autoplayParams: { autoplay: '1' } }
 
     expect(streamableRenderHint).toEqual(expected)
+  })
+})
+
+describeForEachParser('streamableIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, streamableIframeEmbedResolver)
+
+  it('should read the route word `e` in capitals', async () => {
+    const value = '<iframe src="https://streamable.com/E/qun2ij"></iframe>'
+    const expected = {
+      provider: 'streamable',
+      id: 'qun2ij',
+      src: 'https://streamable.com/e/qun2ij',
+      url: 'https://streamable.com/qun2ij',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `o` in capitals', async () => {
+    const value = '<iframe src="https://streamable.com/O/0qn9bq#?secret=Rc7Ozk2Zaa"></iframe>'
+    const expected = {
+      provider: 'streamable',
+      id: '0qn9bq',
+      src: 'https://streamable.com/e/0qn9bq',
+      url: 'https://streamable.com/0qn9bq',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `loop` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://streamable.com/e/p2jw4u?LOOP=0&amp;utm_source=feed"></iframe>'
+    const expected = {
+      provider: 'streamable',
+      id: 'p2jw4u',
+      src: 'https://streamable.com/e/p2jw4u?loop=0',
+      url: 'https://streamable.com/p2jw4u',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

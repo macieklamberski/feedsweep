@@ -293,6 +293,26 @@ describeForEachParser('vidyardScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should build the placeholder from a loader on the host in capitals', async () => {
+      const value = html`
+        <script
+          id="vidyard_embed_code_Bx22B6hw1HabD7rqhnwTBw"
+          type="text/javascript"
+          src="https://PLAY.VIDYARD.COM/Bx22B6hw1HabD7rqhnwTBw.js?v=3.1.1&amp;type=inline"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vidyard',
+        id: 'Bx22B6hw1HabD7rqhnwTBw',
+        src: 'https://play.vidyard.com/Bx22B6hw1HabD7rqhnwTBw.html',
+        url: 'https://share.vidyard.com/watch/Bx22B6hw1HabD7rqhnwTBw',
+        thumbnail: 'https://play.vidyard.com/Bx22B6hw1HabD7rqhnwTBw.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should state the player ratio over the box the loader query states', async () => {
       const value = html`
         <script
@@ -443,5 +463,41 @@ describeForEachParser('vidyard shapes the pipeline repairs first', (parseHtml) =
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('vidyardIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, vidyardIframeEmbedResolver)
+
+  it('should read the `.html` suffix in capitals', async () => {
+    const value = '<iframe src="https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.HTML"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'vidyard',
+      id: 'gdoa8386mue3jppdkpZc9A',
+      src: 'https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.html',
+      url: 'https://share.vidyard.com/watch/gdoa8386mue3jppdkpZc9A',
+      thumbnail: 'https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('vidyardScriptEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, vidyardScriptEmbedResolver)
+
+  it('should read the `.js` suffix in capitals', async () => {
+    const value = '<script src="https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.JS"></script>'
+    const expected: EmbedResolverResult = {
+      provider: 'vidyard',
+      id: 'gdoa8386mue3jppdkpZc9A',
+      src: 'https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.html',
+      url: 'https://share.vidyard.com/watch/gdoa8386mue3jppdkpZc9A',
+      thumbnail: 'https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

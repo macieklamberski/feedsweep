@@ -1662,3 +1662,32 @@ describe('readInstagramHeight', () => {
     expect(readInstagramHeight(mounted)).toBeUndefined()
   })
 })
+
+describeForEachParser('instagramIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, instagramIframeEmbedResolver)
+
+  it('should read the route words `p`, `embed` and `captioned` in capitals', async () => {
+    const value = '<iframe src="https://www.instagram.com/P/CaUsPbUquKV/EMBED/CAPTIONED/"></iframe>'
+    const expected = {
+      provider: 'instagram',
+      id: 'p/CaUsPbUquKV',
+      src: 'https://www.instagram.com/p/CaUsPbUquKV/embed/captioned/',
+      url: 'https://www.instagram.com/p/CaUsPbUquKV/',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `reel` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.instagram.com/REEL/DMMWPU6PCU8/?utm_source=ig_embed&amp;utm_campaign=loading"></iframe>'
+    const expected = {
+      provider: 'instagram',
+      id: 'reel/DMMWPU6PCU8',
+      src: 'https://www.instagram.com/reel/DMMWPU6PCU8/embed/',
+      url: 'https://www.instagram.com/reel/DMMWPU6PCU8/',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

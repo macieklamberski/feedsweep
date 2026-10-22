@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -21,13 +21,13 @@ export const symbalooResolveEmbed: ResolveEmbed = (url) => {
 
   const [route, name, token, ...rest] = getPathSegments(parsed)
 
-  if (route !== 'embed' || !name || rest.length > 0) {
+  if (!isAnyOf(route, 'embed') || !name || rest.length > 0) {
     return
   }
 
   // A two-segment `/embed/shared` is the webmix whose slug is `shared`.
   if (token) {
-    if (name !== 'shared') {
+    if (!isAnyOf(name, 'shared')) {
       return
     }
 

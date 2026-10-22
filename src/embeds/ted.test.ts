@@ -384,3 +384,20 @@ describeForEachParser('ted through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('tedEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, tedEmbedResolver)
+
+  it('should read the route words `talks` and `lang` in capitals', async () => {
+    const value = '<iframe src="https://embed.ted.com/TALKS/LANG/ja/ethan_zuckerman.html"></iframe>'
+    const expected = {
+      provider: 'ted',
+      id: 'ethan_zuckerman',
+      src: 'https://embed.ted.com/embed/ethan_zuckerman',
+      url: 'https://www.ted.com/talks/ethan_zuckerman',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

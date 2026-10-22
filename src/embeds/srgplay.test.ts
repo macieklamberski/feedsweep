@@ -358,3 +358,63 @@ describeForEachParser('srgplay through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('srgplayEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, srgplayEmbedResolver)
+
+  it('should read the route words `player`, `tv` and `videoembed` in capitals', async () => {
+    const value =
+      '<iframe src="http://www.srf.ch/PLAYER/TV/tagesschau--vom-19-07-2013/VIDEOEMBED/g20-will-steuerschlupfloecher-stopfen?id=620986d4-4b67-4c35-9be7-e80ef4baa706&amp;mode=embed"></iframe>'
+    const expected = {
+      provider: 'srgplay',
+      id: 'urn:srf:video:620986d4-4b67-4c35-9be7-e80ef4baa706',
+      src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3A620986d4-4b67-4c35-9be7-e80ef4baa706',
+      url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3A620986d4-4b67-4c35-9be7-e80ef4baa706',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `p` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://tp.srgssr.ch/P/srf/EMBED?urn=urn:srf:video:cfb39f35-b1f7-4937-a806-68bea0e611d3&amp;start="></iframe>'
+    const expected = {
+      provider: 'srgplay',
+      id: 'urn:srf:video:cfb39f35-b1f7-4937-a806-68bea0e611d3',
+      src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3Acfb39f35-b1f7-4937-a806-68bea0e611d3',
+      url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3Acfb39f35-b1f7-4937-a806-68bea0e611d3',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `urn` and `subdivisions` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://www.rts.ch/play/embed?URN=urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c&amp;SUBDIVISIONS=false"></iframe>'
+    const expected = {
+      provider: 'srgplay',
+      id: 'urn:rts:video:a15ce9d3-7446-3deb-a710-70bddfd5239c',
+      src: 'https://www.rts.ch/play/embed?urn=urn%3Arts%3Avideo%3Aa15ce9d3-7446-3deb-a710-70bddfd5239c&subdivisions=false',
+      url: 'https://www.rts.ch/play/tv/-/video/-?urn=urn%3Arts%3Avideo%3Aa15ce9d3-7446-3deb-a710-70bddfd5239c',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `id` and `startTime` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://www.srf.ch/play/tv/popupvideoplayer?ID=09c4a927-c156-46b7-8f53-c6a6302bfd88&amp;STARTTIME=22.597"></iframe>'
+    const expected = {
+      provider: 'srgplay',
+      id: 'urn:srf:video:09c4a927-c156-46b7-8f53-c6a6302bfd88',
+      src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3A09c4a927-c156-46b7-8f53-c6a6302bfd88&startTime=22.597',
+      url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3A09c4a927-c156-46b7-8f53-c6a6302bfd88',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

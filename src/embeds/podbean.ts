@@ -2,7 +2,7 @@ import { decodeSegment, getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { composeQuery, isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, getQueryParam, isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podbean'
@@ -31,7 +31,7 @@ export const extractPodbeanId = (link: string): string | undefined => {
   // `/media/player/{id}` is the legacy form, `/player-v2/?i={id}` the current one.
   // /media/player/{id} 301s to /player-v2/?i={id}-pb for a real id and 404s an invented one, while
   // the v2 player answers 200 to any id.
-  if (segments[0] === 'media' && segments[1] === 'player') {
+  if (isAnyOf(segments[0], 'media') && isAnyOf(segments[1], 'player')) {
     const id = segments[2]
 
     if (segments.length !== 3 || !id || isAnyOf(id, legacyRouteWords)) {
@@ -42,8 +42,8 @@ export const extractPodbeanId = (link: string): string | undefined => {
     return decodeSegment(id) ?? id
   }
 
-  if (segments[0] === 'player-v2') {
-    return parsed.searchParams.get('i') ?? undefined
+  if (isAnyOf(segments[0], 'player-v2')) {
+    return getQueryParam(parsed.searchParams, 'i')
   }
 }
 

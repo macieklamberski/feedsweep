@@ -233,3 +233,21 @@ describeForEachParser('buzzsprout through the pipeline', (parseHtml) => {
     expect(await convert(enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('buzzsproutIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, buzzsproutIframeEmbedResolver)
+
+  it('should read the route word `episodes` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.buzzsprout.com/1735722/EPISODES/8166676-mahler-symphony?client_source=small_player&amp;iframe=true"></iframe>'
+    const expected = {
+      provider: 'buzzsprout',
+      id: '1735722/8166676',
+      src: 'https://www.buzzsprout.com/1735722/8166676?iframe=true',
+      url: 'https://www.buzzsprout.com/1735722/8166676',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

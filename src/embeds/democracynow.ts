@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -31,13 +31,13 @@ export const democracynowResolveEmbed: ResolveEmbed = (url) => {
 
   const [embed, kind, year, month, day, slug, ...rest] = getPathSegments(parsed)
 
-  if (embed !== 'embed' || !day || rest.length > 0) {
+  if (!isAnyOf(embed, 'embed') || !day || rest.length > 0) {
     return
   }
 
   const date = `${year}/${month}/${day}`
 
-  if (kind === 'story') {
+  if (isAnyOf(kind, 'story')) {
     if (!slug) {
       return
     }
@@ -49,11 +49,11 @@ export const democracynowResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  if (kind === 'show') {
+  if (isAnyOf(kind, 'show')) {
     return composeEmbed(`show/${date}`, `shows/${date}`)
   }
 
-  if (kind === 'headlines') {
+  if (isAnyOf(kind, 'headlines')) {
     return composeEmbed(`headlines/${date}`, `${date}/headlines`)
   }
 }
@@ -66,7 +66,7 @@ export const democracynowIframeEmbedResolver = createUrlEmbedResolver(
 // Democracy Now!'s retired v2 loader script, `/embed_show_v2/{width}/{y}/{m}/{d}/story/{slug}`,
 // which answers 404.
 export const democracynowScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="democracynow.org/embed_show_v2"]',
+  'script[src*="democracynow.org/embed_show_v2" i]',
   (element) => {
     const parsed = parseUrlOnHosts(attr(element, 'src'), democracynowHosts)
 
@@ -76,13 +76,13 @@ export const democracynowScriptEmbedResolver = createMarkupEmbedResolver(
 
     const [loader, , year, month, day, kind, item, ...rest] = getPathSegments(parsed)
 
-    if (loader !== 'embed_show_v2' || !item || rest.length > 0) {
+    if (!isAnyOf(loader, 'embed_show_v2') || !item || rest.length > 0) {
       return
     }
 
     const date = `${year}/${month}/${day}`
 
-    if (kind === 'story') {
+    if (isAnyOf(kind, 'story')) {
       return composeEmbed(`story/${date}/${item}`, `${date}/${item}`)
     }
   },

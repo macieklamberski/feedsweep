@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
@@ -18,7 +18,7 @@ const playerHeight = 128
 // Libsyn spells its player options as path segments, not a query string:
 // `/embed/episode/id/{id}/height/{px}/theme/{name}/thumbnail/{yes|no}/…`.
 const readPathOption = (segments: Array<string>, name: string): string | undefined => {
-  const index = segments.indexOf(name)
+  const index = segments.findIndex((segment) => isAnyOf(segment, name))
 
   return index >= 0 ? segments[index + 1] : undefined
 }
@@ -34,7 +34,7 @@ export const extractLibsynEmbed = (link: string): { kind: string; id: string } |
 
   const segments = getPathSegments(parsed)
 
-  if (segments[0] !== 'embed' || !embedKinds.includes(segments[1] ?? '')) {
+  if (!isAnyOf(segments[0], 'embed') || !isAnyOf(segments[1], embedKinds)) {
     return
   }
 
@@ -45,7 +45,7 @@ export const extractLibsynEmbed = (link: string): { kind: string; id: string } |
   }
 
   return {
-    kind: segments[1] as string,
+    kind: (segments[1] as string).toLowerCase(),
     id,
   }
 }

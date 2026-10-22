@@ -173,3 +173,20 @@ describeForEachParser('captivate through the pipeline', (parseHtml) => {
     ).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('captivateEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, captivateEmbedResolver)
+
+  it('should read the kind in capitals and write it in lowercase', async () => {
+    const value =
+      '<iframe src="https://player.captivate.fm/EPISODE/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'captivate',
+      id: 'episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6',
+      src: 'https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

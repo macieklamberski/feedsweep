@@ -1,4 +1,4 @@
-import { getPathSegments, isPlainObject } from 'trousse'
+import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -16,7 +16,7 @@ const postRegex = /^([A-Za-z0-9_]+)\/(\d+)$/
 
 // The t.me routes that take a numeric second segment and name no post: `c/{id}` is a private
 // channel and `s/{channel}` the channel preview.
-const reservedRoutes = new Set(['c', 's'])
+const reservedRoutes = ['c', 's']
 
 // The third apex Telegram has always answered on, serving the identical widget: probed live, a
 // real post answers 200 there.
@@ -37,7 +37,7 @@ const composePost = (channel: string, messageId: string): EmbedResolverResult =>
 const readPost = (value: string | undefined): EmbedResolverResult | undefined => {
   const match = postRegex.exec(value ?? '')
 
-  if (!match?.[1] || !match[2] || reservedRoutes.has(match[1])) {
+  if (!match?.[1] || !match[2] || isAnyOf(match[1], reservedRoutes)) {
     return
   }
 

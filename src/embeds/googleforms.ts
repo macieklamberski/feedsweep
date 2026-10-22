@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { filterUrlQuery } from '../utils/urls.js'
@@ -13,7 +13,7 @@ const shortLinkHost = 'forms.gle'
 
 // A form reads every `entry.{question}` pair off its own query as a prefilled answer.
 const isPrefillParam = (name: string): boolean => {
-  return name.startsWith('entry.')
+  return name.toLowerCase().startsWith('entry.')
 }
 
 // A short code is resolved to a form id only by its redirect, so the short link is the frame.
@@ -50,17 +50,17 @@ export const googleformsResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const segments = getPathSegmentsWithoutWorkspace(parsed)
-  const formSegments = segments[1] === 'u' ? segments.slice(3) : segments.slice(1)
+  const formSegments = isAnyOf(segments[1], 'u') ? segments.slice(3) : segments.slice(1)
 
-  if (segments[0] !== 'forms' || formSegments[0] !== 'd') {
+  if (!isAnyOf(segments[0], 'forms') || !isAnyOf(formSegments[0], 'd')) {
     return
   }
 
-  const isPublished = formSegments[1] === 'e'
+  const isPublished = isAnyOf(formSegments[1], 'e')
   const formId = formSegments[isPublished ? 2 : 1]
   const routeIndex = isPublished ? 3 : 2
 
-  if (formSegments[routeIndex] !== 'viewform' || formSegments.length > routeIndex + 1) {
+  if (!isAnyOf(formSegments[routeIndex], 'viewform') || formSegments.length > routeIndex + 1) {
     return
   }
 

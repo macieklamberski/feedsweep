@@ -234,3 +234,49 @@ describeForEachParser('youku through the pipeline', (parseHtml) => {
     ).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('youkuEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, youkuEmbedResolver)
+
+  it('should read the route words `player.php`, `sid` and `v.swf` in capitals', async () => {
+    const value =
+      '<iframe src="http://player.youku.com/PLAYER.PHP/SID/XODczMzU0NTAw/V.SWF"></iframe>'
+    const expected = {
+      provider: 'youku',
+      id: 'XODczMzU0NTAw',
+      src: 'https://player.youku.com/embed/XODczMzU0NTAw',
+      url: 'https://v.youku.com/v_show/id_XODczMzU0NTAw.html',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `v` and `swf` in capitals', async () => {
+    const value =
+      '<iframe src="http://static.youku.com/v1.0.0080/V/SWF/qplayer.swf?VideoIDS=MTE4Mzc2NTcy"></iframe>'
+    const expected = {
+      provider: 'youku',
+      id: 'MTE4Mzc2NTcy',
+      src: 'https://player.youku.com/embed/MTE4Mzc2NTcy',
+      url: 'https://v.youku.com/v_show/id_MTE4Mzc2NTcy.html',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `VideoIDS` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="http://static.youku.com/v1.0.0080/v/swf/qplayer.swf?VIDEOIDS=MTE4Mzc2NTcy"></iframe>'
+    const expected = {
+      provider: 'youku',
+      id: 'MTE4Mzc2NTcy',
+      src: 'https://player.youku.com/embed/MTE4Mzc2NTcy',
+      url: 'https://v.youku.com/v_show/id_MTE4Mzc2NTcy.html',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

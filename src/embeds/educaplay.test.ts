@@ -130,12 +130,6 @@ describeForEachParser('educaplayEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a game route spelled in uppercase', async () => {
-      const value = '<iframe src="https://es.educaplay.com/JUEGO/5225243-profissoes.html"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a game path under another segment', async () => {
       const value =
         '<iframe src="https://www.educaplay.com/x/game/5225243-profissoes.html"></iframe>'
@@ -212,6 +206,19 @@ describeForEachParser('educaplayEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read a game route spelled in uppercase', async () => {
+      const value = '<iframe src="https://es.educaplay.com/JUEGO/5225243-profissoes.html"></iframe>'
+      const expected = {
+        provider: 'educaplay',
+        id: '5225243',
+        src: 'https://www.educaplay.com/game/5225243-profissoes.html',
+        url: 'https://www.educaplay.com/learning-resources/5225243-profissoes.html',
+        height: 690,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('the retired html5 player', () => {
@@ -282,5 +289,36 @@ describeForEachParser('educaplay through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('educaplayEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, educaplayEmbedResolver)
+
+  it('should read the route word `game` in capitals', async () => {
+    const value = '<iframe src="https://www.educaplay.com/GAME/5225243-profissoes.html"></iframe>'
+    const expected = {
+      provider: 'educaplay',
+      id: '5225243',
+      src: 'https://www.educaplay.com/game/5225243-profissoes.html',
+      url: 'https://www.educaplay.com/learning-resources/5225243-profissoes.html',
+      height: 690,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `juego` in capitals', async () => {
+    const value =
+      '<iframe src="https://es.educaplay.com/JUEGO/22109018-elementos_que_usamos_en_la_playa.html"></iframe>'
+    const expected = {
+      provider: 'educaplay',
+      id: '22109018',
+      src: 'https://www.educaplay.com/game/22109018-elementos_que_usamos_en_la_playa.html',
+      url: 'https://www.educaplay.com/learning-resources/22109018-elementos_que_usamos_en_la_playa.html',
+      height: 690,
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

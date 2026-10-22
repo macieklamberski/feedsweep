@@ -1,9 +1,10 @@
-import { getPathSegments, isHostOf, type Nullish, toMap } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, type Nullish, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
 import {
   absoluteUrlRegex,
   encodePathSegment,
+  getQueryParam,
   parseUrlOnHosts,
   pickUrlParams,
 } from '../utils/urls.js'
@@ -54,7 +55,7 @@ const idSpaces = toMap({
 // The route word of a portal url in the Flash player's `video` flashvar, against the player route
 // that serves the id after it.
 const flashPortalRoutes = toMap({
-  videoPlayerInfo: 'viralplayer',
+  videoplayerinfo: 'viralplayer',
   videoinfo: 'partnerplayer',
 })
 
@@ -93,16 +94,19 @@ const composeEmbed = (
 const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | undefined => {
   const params = new URLSearchParams(flashVars(element))
 
-  if (!flashPlayerPaths.includes(url.pathname) || params.get('player') !== 'viral') {
+  if (
+    !isAnyOf(url.pathname, flashPlayerPaths) ||
+    !isAnyOf(getQueryParam(params, 'player'), 'viral')
+  ) {
     return
   }
 
-  const video = params.get('video')
+  const video = getQueryParam(params, 'video')
 
   // A station portal's url holds the numeric id or the partner slug after its route word.
   if (video && absoluteUrlRegex.test(video)) {
     const [portalRoute = '', videoId] = getPathSegments(video)
-    const route = flashPortalRoutes.get(portalRoute)
+    const route = flashPortalRoutes.get(portalRoute.toLowerCase())
 
     return route ? composeEmbed(route, videoId) : undefined
   }
@@ -124,7 +128,7 @@ export const pbsResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const segments = getPathSegments(parsed)
-  const route = segments.slice(0, -1).join('/')
+  const route = segments.slice(0, -1).join('/').toLowerCase()
 
   // The retired host served the viral route alone.
   if (isHostOf(parsed, legacyPlayerHost) && route !== 'viralplayer') {

@@ -1,6 +1,6 @@
 import { isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'allocine'
@@ -8,9 +8,9 @@ const provider = 'allocine'
 const allocineHosts = ['allocine.fr']
 
 // The server matches every route in its own case only.
-const blogPlayerPathRegex = /^\/_video\/iblogvision\.aspx$/
-const flashPlayerPathRegex = /^\/blogvision\/([^/]+)$/
-const playerPathRegex = /^\/([^/]+)\.html$/
+const blogPlayerPathRegex = /^\/_video\/iblogvision\.aspx$/i
+const flashPlayerPathRegex = /^\/blogvision\/([^/]+)$/i
+const playerPathRegex = /^\/([^/]+)\.html$/i
 
 // Every route names the trailer by the same `cmedia` id, in the path or in the query.
 const readCmedia = (parsed: URL): string | null | undefined => {
@@ -19,7 +19,7 @@ const readCmedia = (parsed: URL): string | null | undefined => {
   }
 
   if (blogPlayerPathRegex.test(parsed.pathname)) {
-    return parsed.searchParams.get('cmedia')
+    return getQueryParam(parsed.searchParams, 'cmedia')
   }
 
   return parsed.pathname.match(flashPlayerPathRegex)?.[1]

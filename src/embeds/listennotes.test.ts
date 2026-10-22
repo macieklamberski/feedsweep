@@ -167,13 +167,6 @@ describe('listennotesResolveEmbed', () => {
       expect(listennotesResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for a route word in another case, which the server answers 404', () => {
-      const value =
-        'https://www.listennotes.com/PODCASTS/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/embed/'
-
-      expect(listennotesResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a leading segment that is not a locale', () => {
       const value =
         'https://www.listennotes.com/abc/podcasts/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/embed/'
@@ -300,6 +293,20 @@ describe('listennotesResolveEmbed', () => {
         id: 'episode/ZZZZZZZZZZZ',
         src: 'https://www.listennotes.com/podcasts/x/y-ZZZZZZZZZZZ/embed/',
         url: 'https://www.listennotes.com/podcasts/x/y-ZZZZZZZZZZZ/',
+        height: 180,
+      }
+
+      expect(listennotesResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read a route word in another case and mint it in lowercase', () => {
+      const value =
+        'https://www.listennotes.com/PODCASTS/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/embed/'
+      const expected = {
+        provider: 'listennotes',
+        id: 'episode/XGD3Cq8pn9j',
+        src: 'https://www.listennotes.com/podcasts/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/embed/',
+        url: 'https://www.listennotes.com/podcasts/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/',
         height: 180,
       }
 
@@ -436,5 +443,51 @@ describeForEachParser('listennotes through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('listennotesEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, listennotesEmbedResolver)
+
+  it('should read the route words `fr`, `podcasts` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.listennotes.com/FR/PODCASTS/le-bulleur/le-bulleur-pr%C3%A9sente-l7X8Jt3oiZ1/EMBED/"></iframe>'
+    const expected = {
+      provider: 'listennotes',
+      id: 'episode/l7X8Jt3oiZ1',
+      src: 'https://www.listennotes.com/podcasts/le-bulleur/le-bulleur-pr%C3%A9sente-l7X8Jt3oiZ1/embed/',
+      url: 'https://www.listennotes.com/podcasts/le-bulleur/le-bulleur-pr%C3%A9sente-l7X8Jt3oiZ1/',
+      height: 180,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `zh-hant`, `embedded` and `e` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.listennotes.com/ZH-HANT/EMBEDDED/E/77b8e0f907f945a29a64f0ef7c43c822/"></iframe>'
+    const expected = {
+      provider: 'listennotes',
+      id: 'episode/77b8e0f907f945a29a64f0ef7c43c822',
+      src: 'https://www.listennotes.com/embedded/e/77b8e0f907f945a29a64f0ef7c43c822/',
+      url: 'https://www.listennotes.com/e/77b8e0f907f945a29a64f0ef7c43c822/',
+      height: 180,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `t` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.listennotes.com/podcasts/the-brighton-parkast/jj-allaire-open-source-JyKXirZS4nc/embed/?T=60&amp;ref=paradoxpairs.com"></iframe>'
+    const expected = {
+      provider: 'listennotes',
+      id: 'episode/JyKXirZS4nc',
+      src: 'https://www.listennotes.com/podcasts/the-brighton-parkast/jj-allaire-open-source-JyKXirZS4nc/embed/?t=60',
+      url: 'https://www.listennotes.com/podcasts/the-brighton-parkast/jj-allaire-open-source-JyKXirZS4nc/',
+      height: 180,
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

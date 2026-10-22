@@ -27,6 +27,23 @@ describeForEachParser('rebuildGofundmeEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should rebuild the widget from a campaign route in capitals', async () => {
+      const value = html`
+        <div
+          class="gfm-embed"
+          data-url="https://www.gofundme.com/F/save-the-hall/widget/large"
+        ></div>
+      `
+      const expected = html`
+        <iframe
+          src="https://www.gofundme.com/f/save-the-hall/widget/large"
+          height="560"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should drop the query the share dialog writes', async () => {
       const value = html`
         <div

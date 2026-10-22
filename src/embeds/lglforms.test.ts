@@ -209,3 +209,21 @@ describeForEachParser('lglforms through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('lglformsIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, lglformsIframeEmbedResolver)
+
+  it('should read the route words `form_engine` and `s` in capitals', async () => {
+    const value =
+      '<iframe src="https://secure.lglforms.com/FORM_ENGINE/S/F55Z_RZ2NPkjQX0XoghR5A"></iframe>'
+    const expected = {
+      provider: 'lglforms',
+      id: 'F55Z_RZ2NPkjQX0XoghR5A',
+      src: 'https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A',
+      url: 'https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A',
+      height: 600,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

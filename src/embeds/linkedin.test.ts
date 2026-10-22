@@ -249,3 +249,21 @@ describeForEachParser('linkedinEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('linkedinEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, linkedinEmbedResolver)
+
+  it('should read the route words `embed`, `feed` and `update` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.linkedin.com/EMBED/FEED/UPDATE/urn:li:share:6626097641602281472"></iframe>'
+    const expected = {
+      provider: 'linkedin',
+      id: 'urn:li:share:6626097641602281472',
+      src: 'https://www.linkedin.com/embed/feed/update/urn:li:share:6626097641602281472',
+      url: 'https://www.linkedin.com/feed/update/urn:li:share:6626097641602281472',
+      height: 800,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

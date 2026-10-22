@@ -1,12 +1,12 @@
-import { getPathSegments, isHostOf } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVars } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ted'
 
-const htmlSuffixRegex = /\.html$/
+const htmlSuffixRegex = /\.html$/i
 
 const tedHosts = ['ted.com']
 // Exact: `video.ted.com` and `download.ted.com` serve the talks' files under the same `/talks/`
@@ -23,11 +23,11 @@ export const extractTedTalk = (link: string): string | undefined => {
 
   const segments = getPathSegments(link)
 
-  if (segments[0] !== 'talks') {
+  if (!isAnyOf(segments[0], 'talks')) {
     return
   }
 
-  return (segments[1] === 'lang' ? segments[3] : segments[1])?.replace(htmlSuffixRegex, '')
+  return (isAnyOf(segments[1], 'lang') ? segments[3] : segments[1])?.replace(htmlSuffixRegex, '')
 }
 
 // The Flash player's url is the same file for every talk, so the carrier names nothing on its
@@ -48,7 +48,7 @@ const readFlashTalk = (
   }
 
   const config = new URLSearchParams(flashVars(element) ?? '')
-  const slug = config.get('adKeys')?.match(adKeysTalkRegex)?.[1]
+  const slug = getQueryParam(config, 'adKeys')?.match(adKeysTalkRegex)?.[1]
 
   if (!slug) {
     return
@@ -56,7 +56,7 @@ const readFlashTalk = (
 
   // The snippet states its own poster in `su`, on `images.ted.com`, and those files still serve
   // with no signature and no expiry.
-  const poster = config.get('su') ?? undefined
+  const poster = getQueryParam(config, 'su')
 
   // The slug comes out of the flashvars decoded, and it goes into a path beside the raw spelling.
   return {

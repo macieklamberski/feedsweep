@@ -441,3 +441,64 @@ describeForEachParser('ridewithgps shapes the pipeline repairs first', (parseHtm
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('ridewithgpsEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, ridewithgpsEmbedResolver)
+
+  it('should read the route words `routes` and `embed` in capitals', async () => {
+    const value = '<iframe src="https://ridewithgps.com/ROUTES/10953871/EMBED"></iframe>'
+    const expected = {
+      provider: 'ridewithgps',
+      id: 'route/10953871',
+      src: 'https://ridewithgps.com/embeds?type=route&id=10953871',
+      url: 'https://ridewithgps.com/routes/10953871',
+      thumbnail: 'https://ridewithgps.com/routes/10953871/thumb.png',
+      height: 700,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `embeds` in capitals', async () => {
+    const value =
+      '<iframe src="https://ridewithgps.com/EMBEDS?type=route&amp;id=55848524&amp;metricUnits=true&amp;sampleGraph=true"></iframe>'
+    const expected = {
+      provider: 'ridewithgps',
+      id: 'route/55848524',
+      src: 'https://ridewithgps.com/embeds?type=route&id=55848524',
+      url: 'https://ridewithgps.com/routes/55848524',
+      thumbnail: 'https://ridewithgps.com/routes/55848524/thumb.png',
+      height: 700,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `type`, `id`, `title` and `privacyCode` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://ridewithgps.com/embeds?TYPE=route&amp;ID=34497677&amp;TITLE=Loop&amp;PRIVACYCODE=Kq7WdN2hPzVmT4rY"></iframe>'
+    const expected = {
+      provider: 'ridewithgps',
+      id: 'route/34497677',
+      src: 'https://ridewithgps.com/embeds?type=route&id=34497677&privacyCode=Kq7WdN2hPzVmT4rY',
+      height: 700,
+      title: 'Loop',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `type` and `eventId` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://ridewithgps.com/embeds?TYPE=event&amp;EVENTID=215602&amp;sampleGraph=true"></iframe>'
+    const expected = {
+      provider: 'ridewithgps',
+      id: 'event/215602',
+      src: 'https://ridewithgps.com/embeds?type=event&eventId=215602',
+      url: 'https://ridewithgps.com/events/215602',
+      height: 700,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

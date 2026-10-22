@@ -1429,3 +1429,31 @@ describeForEachParser('tiktokMetasliderEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('tiktokIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, tiktokIframeEmbedResolver)
+
+  it('should read the route words `embed` and `v2` in capitals', async () => {
+    const value = '<iframe src="https://www.tiktok.com/EMBED/V2/7001234567890123456"></iframe>'
+    const expected = {
+      provider: 'tiktok',
+      id: '7001234567890123456',
+      src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
+      height: 738,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `player` and `v1` in capitals', async () => {
+    const value = '<iframe src="https://www.tiktok.com/PLAYER/V1/7633882165272513815"></iframe>'
+    const expected = {
+      provider: 'tiktok',
+      id: '7633882165272513815',
+      src: 'https://www.tiktok.com/embed/v2/7633882165272513815',
+      height: 738,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

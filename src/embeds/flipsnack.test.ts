@@ -177,13 +177,6 @@ describeForEachParser('flipsnackEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a widget route spelled in uppercase', async () => {
-      const value =
-        '<iframe src="https://cdn.flipsnack.com/Widget/v2/Widget.html?hash=fxn3qutra"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a widget with no item hash', async () => {
       const value = '<iframe src="https://cdn.flipsnack.com/widget/v2/widget.html"></iframe>'
 
@@ -218,6 +211,19 @@ describeForEachParser('flipsnackEmbedResolver', (parseHtml) => {
         provider: 'flipsnack',
         id: 'FXN3QUTRA',
         src: 'https://cdn.flipsnack.com/widget/v2/widget.html?hash=FXN3QUTRA',
+        height: 480,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a widget route spelled in uppercase', async () => {
+      const value =
+        '<iframe src="https://cdn.flipsnack.com/Widget/v2/Widget.html?hash=fxn3qutra"></iframe>'
+      const expected = {
+        provider: 'flipsnack',
+        id: 'fxn3qutra',
+        src: 'https://cdn.flipsnack.com/widget/v2/widget.html?hash=fxn3qutra',
         height: 480,
       }
 
@@ -265,5 +271,48 @@ describeForEachParser('flipsnack through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('flipsnackEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, flipsnackEmbedResolver)
+
+  it('should read the route words `widget`, `v2` and `widget.html` in capitals', async () => {
+    const value =
+      '<iframe src="https://cdn.flipsnack.com/WIDGET/V2/WIDGET.HTML?hash=fxn3qutra"></iframe>'
+    const expected = {
+      provider: 'flipsnack',
+      id: 'fxn3qutra',
+      src: 'https://cdn.flipsnack.com/widget/v2/widget.html?hash=fxn3qutra',
+      height: 480,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `iframe` and `embed.html` in capitals', async () => {
+    const value =
+      '<iframe src="http://files.flipsnack.com/IFRAME/EMBED.HTML?hash=fu8a6imu&amp;wmode=window&amp;bgcolor=EEEEEE&amp;t=1336216266"></iframe>'
+    const expected = {
+      provider: 'flipsnack',
+      id: 'fu8a6imu',
+      src: 'https://cdn.flipsnack.com/widget/v2/widget.html?hash=fu8a6imu',
+      height: 480,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `hash` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://cdn.flipsnack.com/widget/v2/widget.html?HASH=fxn3qutra"></iframe>'
+    const expected = {
+      provider: 'flipsnack',
+      id: 'fxn3qutra',
+      src: 'https://cdn.flipsnack.com/widget/v2/widget.html?hash=fxn3qutra',
+      height: 480,
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

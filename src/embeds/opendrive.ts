@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -24,7 +24,7 @@ export const opendriveResolveEmbed: ResolveEmbed = (url) => {
 
   const [route, fileId, ...rest] = getPathSegments(parsed)
 
-  if (!fileId || rest.length > 0 || !playerRoutes.includes(route ?? '')) {
+  if (!fileId || rest.length > 0 || !isAnyOf(route, playerRoutes)) {
     return
   }
 

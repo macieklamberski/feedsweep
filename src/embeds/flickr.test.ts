@@ -1422,3 +1422,63 @@ describeForEachParser('flickrEmbedResolver carrier title', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('flickrEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, flickrEmbedResolver)
+
+  it('should read the album page path in capitals', async () => {
+    const value = html`
+      <embed
+        type="application/x-shockwave-flash"
+        src="http://www.flickr.com/apps/slideshow/show.swf?v=67348"
+        flashvars="&offsite=true&amp;lang=en-us&page_show_url=%2FPHOTOS%2Fyotchan%2FSETS%2F72157615334609433%2FSHOW%2F&set_id=72157615334609433&jump_to="
+      >
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'flickr',
+      id: 'yotchan/72157615334609433',
+      src: 'https://embedr.flickr.com/photosets/72157615334609433?width=400&height=300',
+      url: 'https://www.flickr.com/photos/yotchan/sets/72157615334609433',
+      author: 'yotchan',
+      width: 400,
+      height: 300,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the photo player route words in capitals', async () => {
+    const value =
+      '<iframe src="https://www.flickr.com/PHOTOS/strictly.kev/15753890338/PLAYER/"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'flickr',
+      id: 'photos/strictly.kev/15753890338',
+      src: 'https://www.flickr.com/photos/strictly.kev/15753890338/player/',
+      url: 'https://www.flickr.com/photos/strictly.kev/15753890338/',
+      author: 'strictly.kev',
+      ratio: '4/3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the group pool page path in capitals', async () => {
+    const value = html`
+      <embed
+        type="application/x-shockwave-flash"
+        src="http://www.flickr.com/apps/slideshow/show.swf?v=109615"
+        flashvars="offsite=true&amp;lang=en-us&amp;page_show_url=%2FGROUPS%2F866523%40N20%2FPOOL%2FSHOW%2F&amp;jump_to="
+      >
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'flickr',
+      id: 'groups/866523@N20',
+      src: 'https://embedr.flickr.com/groups/866523@N20?width=400&height=300',
+      url: 'https://www.flickr.com/groups/866523@N20/',
+      width: 400,
+      height: 300,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

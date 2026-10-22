@@ -265,3 +265,35 @@ describeForEachParser('gettyimages enclosures', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('gettyImagesEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, gettyImagesEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.gettyimages.com/EMBED/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&amp;tld=com&amp;sig=OOM9B40x%3D"></iframe>'
+    const expected = {
+      provider: 'gettyimages',
+      id: '491183014',
+      src: 'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&sig=OOM9B40x%3D',
+      url: 'https://www.gettyimages.com/detail/491183014',
+      ratio: '3/2',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `sig` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&amp;tld=com&amp;SIG=OOM9B40x%3D"></iframe>'
+    const expected = {
+      provider: 'gettyimages',
+      id: '491183014',
+      src: 'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&SIG=OOM9B40x%3D',
+      url: 'https://www.gettyimages.com/detail/491183014',
+      ratio: '3/2',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

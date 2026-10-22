@@ -2,7 +2,7 @@ import { isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { getQueryParam, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mailru'
@@ -14,20 +14,20 @@ const mailruHosts = ['my.mail.ru', 'api.video.mail.ru', 'img.mail.ru', 'imgsmail
 // The asset hosts also serve images, so only their `/r` Flash route is read.
 const flashHosts = ['img.mail.ru', 'imgsmail.ru']
 
-const numericPathRegex = /^\/video\/embed\/([^/]+)\/?$/
+const numericPathRegex = /^\/video\/embed\/([^/]+)\/?$/i
 // api.video.mail.ru/videos/embed/{type}/{user}/{album}/{n}.html is dead, and the same path on
 // videoapi.my.mail.ru 301s to my.mail.ru/{type}/{user}/video/embed/{album}/{n}.
-const legacyPathRegex = /^\/videos\/embed\/(.+)\.html$/
-const modernPathRegex = /^\/([^/]+)\/([^/]+)\/video\/embed\/([^/]+)\/([^/]+)\/?$/
+const legacyPathRegex = /^\/videos\/embed\/(.+)\.html$/i
+const modernPathRegex = /^\/([^/]+)\/([^/]+)\/video\/embed\/([^/]+)\/([^/]+)\/?$/i
 // {type}/{user}/{album}/{counter}.
 const subjectRegex = /^([^/]+)\/([^/]+)\/([^/]+)\/([^/]+)$/
-const flashPlayerPathRegex = /^\/r\/video2?\/\w+\.swf$/
+const flashPlayerPathRegex = /^\/r\/video2?\/\w+\.swf$/i
 // The older Flash players took `par={host}/{type}/{user}/{album}/${counter}$0${duration}`.
 const flashParPathRegex = /^\/([^/]+\/[^/]+\/[^/]+)\/\$([^$/]+)\$[^/]*$/
 const leadingSlashRegex = /^\//
 // The span's preview, `pic?url=https://my.mail.ru/+/video/url/{shard}/{videoId}`, names the numeric
 // id the my.mail.ru iframe of the same video carries.
-const previewVideoIdRegex = /^\/\+\/video\/url\/[^/]+\/([^/]+)$/
+const previewVideoIdRegex = /^\/\+\/video\/url\/[^/]+\/([^/]+)$/i
 
 const composeNumeric = (videoId: string): EmbedResolverResult => {
   return {
@@ -71,13 +71,16 @@ const resolveTarget = (url: string, element?: Element): EmbedResolverResult | un
       return
     }
 
-    const movieSrc = parsed.searchParams.get('movieSrc') ?? flashVar(element, 'movieSrc')
+    const movieSrc = getQueryParam(parsed.searchParams, 'movieSrc') ?? flashVar(element, 'movieSrc')
 
     if (movieSrc) {
       return composeSubject(movieSrc)
     }
 
-    const parPath = parseUrl(parsed.searchParams.get('par') ?? '', placeholderBaseUrl)?.pathname
+    const parPath = parseUrl(
+      getQueryParam(parsed.searchParams, 'par') ?? '',
+      placeholderBaseUrl,
+    )?.pathname
     const par = parPath?.match(flashParPathRegex)
 
     return par ? composeSubject(`${par[1]}/${par[2]}`) : undefined
@@ -101,7 +104,10 @@ const resolveTarget = (url: string, element?: Element): EmbedResolverResult | un
 }
 
 const readPreviewVideoId = (thumbnail: string | undefined): string | undefined => {
-  const previewUrl = parseUrl(thumbnail ?? '', placeholderBaseUrl)?.searchParams.get('url')
+  const previewUrl = getQueryParam(
+    parseUrl(thumbnail ?? '', placeholderBaseUrl)?.searchParams,
+    'url',
+  )
 
   return parseUrl(previewUrl ?? '', placeholderBaseUrl)?.pathname.match(previewVideoIdRegex)?.[1]
 }

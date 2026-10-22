@@ -1110,3 +1110,65 @@ describe('dailymotionRenderHint', () => {
     expect(dailymotionRenderHint.isReady?.('apiready')).toBe(false)
   })
 })
+
+describeForEachParser('dailymotionEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, dailymotionEmbedResolver)
+
+  it('should read the route words `embed` and `video` in capitals', async () => {
+    const value = '<iframe src="https://www.dailymotion.com/EMBED/VIDEO/x7tgad0"></iframe>'
+    const expected = {
+      provider: 'dailymotion',
+      id: 'x7tgad0',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0',
+      url: 'https://www.dailymotion.com/video/x7tgad0',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `widget` and `jukebox` in capitals', async () => {
+    const value =
+      '<iframe src="http://www.dailymotion.com/WIDGET/JUKEBOX?list[]=/vids/x2gjl2t&amp;skin=default&amp;autoplay=0&amp;logo=0&amp;no_tabs=1&amp;syndication=220372"></iframe>'
+    const expected = {
+      provider: 'dailymotion',
+      id: 'x2gjl2t',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x2gjl2t',
+      url: 'https://www.dailymotion.com/video/x2gjl2t',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x2gjl2t',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `video`, `startTime` and `playlist` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://geo.dailymotion.com/player/xe1o3.html?VIDEO=xak3lrq&amp;STARTTIME=0&amp;PLAYLIST=x6zqmk"></iframe>'
+    const expected = {
+      provider: 'dailymotion',
+      id: 'xak3lrq',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=xak3lrq&playlist=x6zqmk&startTime=0',
+      url: 'https://www.dailymotion.com/video/xak3lrq',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/xak3lrq',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `start` parameter name in capitals', async () => {
+    const value = '<iframe src="https://www.dailymotion.com/embed/video/x8abcde?START=42"></iframe>'
+    const expected = {
+      provider: 'dailymotion',
+      id: 'x8abcde',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x8abcde&startTime=42',
+      url: 'https://www.dailymotion.com/video/x8abcde',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x8abcde',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

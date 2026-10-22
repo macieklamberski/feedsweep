@@ -199,3 +199,49 @@ describeForEachParser('nytimesIframeEmbedResolver carrier title', (parseHtml) =>
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('nytimesIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, nytimesIframeEmbedResolver)
+
+  it('should read the route words `video`, `players`, `offsite` and `index.html` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.nytimes.com/VIDEO/PLAYERS/OFFSITE/INDEX.HTML?videoId=100000004460561"></iframe>'
+    const expected = {
+      provider: 'nytimes',
+      id: '100000004460561',
+      src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=100000004460561',
+      ratio: '16/9',
+      ratioHeightOffset: 71,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `bcvideo`, `iframe` and `embed.html` in capitals', async () => {
+    const value =
+      '<iframe src="http://graphics8.nytimes.com/BCVIDEO/1.0/IFRAME/EMBED.HTML?videoId=1247464583973&amp;playerType=embed"></iframe>'
+    const expected = {
+      provider: 'nytimes',
+      id: '1247464583973',
+      src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=1247464583973',
+      ratio: '16/9',
+      ratioHeightOffset: 71,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `videoId` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.nytimes.com/video/players/offsite/index.html?VIDEOID=100000004460561"></iframe>'
+    const expected = {
+      provider: 'nytimes',
+      id: '100000004460561',
+      src: 'https://www.nytimes.com/video/players/offsite/index.html?videoId=100000004460561',
+      ratio: '16/9',
+      ratioHeightOffset: 71,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

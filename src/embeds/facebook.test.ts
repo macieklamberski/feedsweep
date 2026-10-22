@@ -1374,3 +1374,60 @@ describeForEachParser('facebook through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('facebookIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, facebookIframeEmbedResolver)
+
+  it('should read the route words `plugins` and `post.php` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.facebook.com/PLUGINS/POST.PHP?href=https%3A%2F%2Fwww.facebook.com%2FBlowflyOfficial%2Fposts%2F10153426898243990%3A0"></iframe>'
+    const expected = {
+      provider: 'facebook',
+      id: 'https://www.facebook.com/BlowflyOfficial/posts/10153426898243990:0',
+      src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FBlowflyOfficial%2Fposts%2F10153426898243990%3A0',
+      url: 'https://www.facebook.com/BlowflyOfficial/posts/10153426898243990:0',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `video` and `embed` in capitals', async () => {
+    const value = '<iframe src="https://www.facebook.com/VIDEO/EMBED?video_id=123456"></iframe>'
+    const expected = {
+      provider: 'facebook',
+      id: '123456',
+      src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D123456',
+      url: 'https://www.facebook.com/watch/?v=123456',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `href` and `t` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://www.facebook.com/plugins/video.php?height=314&amp;HREF=https%3A%2F%2Fwww.facebook.com%2Fdale.ghent%2Fvideos%2F1547460739144960%2F&amp;show_text=false&amp;width=560&amp;T=1"></iframe>'
+    const expected = {
+      provider: 'facebook',
+      id: 'https://www.facebook.com/dale.ghent/videos/1547460739144960/',
+      src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fdale.ghent%2Fvideos%2F1547460739144960%2F&t=1',
+      url: 'https://www.facebook.com/dale.ghent/videos/1547460739144960/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `video_id` parameter name in capitals', async () => {
+    const value = '<iframe src="https://www.facebook.com/video/embed?VIDEO_ID=123456"></iframe>'
+    const expected = {
+      provider: 'facebook',
+      id: '123456',
+      src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D123456',
+      url: 'https://www.facebook.com/watch/?v=123456',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

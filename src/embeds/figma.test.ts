@@ -288,3 +288,63 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('figmaEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, figmaEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.figma.com/EMBED?embed_host=share&amp;url=https%3A%2F%2Fwww.figma.com%2Ffile%2FUBVMSTz7mhvYogjfdeKcIB%2FRed_System_Color-0725%3Fnode-id%3D0%253A2"></iframe>'
+    const expected = {
+      provider: 'figma',
+      id: 'design/UBVMSTz7mhvYogjfdeKcIB',
+      src: 'https://embed.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0%3A2&embed-host=share',
+      url: 'https://www.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0%3A2',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `file` in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.figma.com/FILE/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0%3A2&amp;embed-host=share"></iframe>'
+    const expected = {
+      provider: 'figma',
+      id: 'design/UBVMSTz7mhvYogjfdeKcIB',
+      src: 'https://embed.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0%3A2&embed-host=share',
+      url: 'https://www.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0%3A2',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `node-id` and `page-id` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?NODE-ID=4-144&amp;PAGE-ID=0%3A1&amp;embed-host=share"></iframe>'
+    const expected = {
+      provider: 'figma',
+      id: 'proto/LBH1O9AxQLxp0ixZBd1Pxk',
+      src: 'https://embed.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0%3A1&embed-host=share',
+      url: 'https://www.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0%3A1',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `url` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.figma.com/embed?embed_host=share&amp;URL=https%3A%2F%2Fwww.figma.com%2Ffile%2FUBVMSTz7mhvYogjfdeKcIB%2FRed_System_Color-0725%3Fnode-id%3D0%253A2"></iframe>'
+    const expected = {
+      provider: 'figma',
+      id: 'design/UBVMSTz7mhvYogjfdeKcIB',
+      src: 'https://embed.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0%3A2&embed-host=share',
+      url: 'https://www.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0%3A2',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

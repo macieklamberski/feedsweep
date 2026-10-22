@@ -66,6 +66,28 @@ describeForEachParser('liferayEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should mark an emoticon under a directory named in capitals', async () => {
+    const value = html`
+      <p>
+        <img
+          alt="emoticon"
+          src="https://example.com/html/themes/classic/images/EMOTICONS/big_grin.gif"
+        >
+      </p>
+    `
+    const expected = html`
+      <p>
+        <img
+          data-emoji=""
+          alt="emoticon"
+          src="https://example.com/html/themes/classic/images/EMOTICONS/big_grin.gif"
+        >
+      </p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should mark a smile.gif without the emoticon alt through the forum names', async () => {
     const value = html`
       <p>

@@ -1,7 +1,7 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pastebin'
@@ -21,7 +21,7 @@ const readPasteId = (url: string | undefined): string | undefined => {
 
   const [route, pasteId, ...rest] = getPathSegments(parsed)
 
-  if (!route || !embedRoutes.includes(route) || rest.length) {
+  if (!route || !isAnyOf(route, embedRoutes) || rest.length) {
     return
   }
 
@@ -29,7 +29,7 @@ const readPasteId = (url: string | undefined): string | undefined => {
     return pasteId
   }
 
-  const queryId = parsed.searchParams.get('i')
+  const queryId = getQueryParam(parsed.searchParams, 'i')
 
   if (!queryId) {
     return
@@ -63,7 +63,7 @@ export const pastebinIframeEmbedResolver = createUrlEmbedResolver(
 
 // The same paste as a script that writes its markup inline, which a reader never runs.
 export const pastebinScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="pastebin.com/embed_js"]',
+  'script[src*="pastebin.com/embed_js" i]',
   (element) => {
     return pastebinResolveEmbed(attr(element, 'src') ?? '')
   },

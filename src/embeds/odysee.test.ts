@@ -350,3 +350,22 @@ describeForEachParser('odysee through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('odyseeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, odyseeEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://odysee.com/$/EMBED/@corbettreport:0/webb-repersoning:7?r=J5ihtDQcPiJPQjEXGJApJU1nEbzqhToy"></iframe>'
+    const expected = {
+      provider: 'odysee',
+      id: '@corbettreport:0/webb-repersoning:7',
+      src: 'https://odysee.com/$/embed/@corbettreport:0/webb-repersoning:7',
+      url: 'https://odysee.com/@corbettreport:0/webb-repersoning:7',
+      ratio: '16/9',
+      author: '@corbettreport',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

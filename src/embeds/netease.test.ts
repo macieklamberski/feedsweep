@@ -300,3 +300,63 @@ describeForEachParser('netease shapes the pipeline settles first', (parseHtml) =
     })
   })
 })
+
+describeForEachParser('neteaseEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, neteaseEmbedResolver)
+
+  it('should read the route words `outchain` and `player` in capitals', async () => {
+    const value =
+      '<iframe src="https://music.163.com/OUTCHAIN/PLAYER?type=2&amp;id=1392990601&amp;auto=1&amp;height=66"></iframe>'
+    const expected = {
+      provider: 'netease',
+      id: 'song/1392990601',
+      src: 'https://music.163.com/outchain/player?type=2&id=1392990601',
+      url: 'https://music.163.com/song?id=1392990601',
+      height: 250,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `style` and `swf` in capitals', async () => {
+    const value =
+      '<iframe src="https://music.163.com/STYLE/SWF/widget.swf?sid=409872507&amp;type=2&amp;auto=0&amp;width=320&amp;height=66"></iframe>'
+    const expected = {
+      provider: 'netease',
+      id: 'song/409872507',
+      src: 'https://music.163.com/outchain/player?type=2&id=409872507',
+      url: 'https://music.163.com/song?id=409872507',
+      height: 250,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `type` and `id` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://music.163.com/outchain/player?TYPE=2&amp;ID=1392990601&amp;auto=1&amp;height=66"></iframe>'
+    const expected = {
+      provider: 'netease',
+      id: 'song/1392990601',
+      src: 'https://music.163.com/outchain/player?type=2&id=1392990601',
+      url: 'https://music.163.com/song?id=1392990601',
+      height: 250,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `sid` and `type` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://music.163.com/style/swf/widget.swf?SID=409872507&amp;TYPE=2&amp;auto=0&amp;width=320&amp;height=66"></iframe>'
+    const expected = {
+      provider: 'netease',
+      id: 'song/409872507',
+      src: 'https://music.163.com/outchain/player?type=2&id=409872507',
+      url: 'https://music.163.com/song?id=409872507',
+      height: 250,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

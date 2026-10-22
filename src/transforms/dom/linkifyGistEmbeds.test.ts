@@ -622,3 +622,18 @@ describeForEachParser('gist carriers the pipeline would otherwise delete', (pars
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('linkifyGistEmbeds in any case', (parseHtml) => {
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [linkifyGistEmbeds(baseContext)])
+  }
+
+  it('should link a loader whose host and suffix are in capitals', async () => {
+    const value = '<script src="https://GIST.GITHUB.COM/octocat/6cad326836d38bd3a7ae.JS"></script>'
+    const expected = html`
+      <a href="https://gist.github.com/octocat/6cad326836d38bd3a7ae">https://gist.github.com/octocat/6cad326836d38bd3a7ae</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})

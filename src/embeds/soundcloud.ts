@@ -1,7 +1,7 @@
-import { getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, isAnyOf, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, text } from '../utils/dom.js'
-import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { getQueryParam, isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'soundcloud'
@@ -39,7 +39,7 @@ const readQueryToken = (
   params: URLSearchParams | undefined,
   inner: Nullish<string>,
 ): string | undefined => {
-  const token = params?.get('secret_token')
+  const token = getQueryParam(params, 'secret_token')
 
   if (token) {
     return token
@@ -49,12 +49,12 @@ const readQueryToken = (
     return
   }
 
-  return parseUrl(inner, placeholderBaseUrl)?.searchParams.get('secret_token') ?? undefined
+  return getQueryParam(parseUrl(inner, placeholderBaseUrl)?.searchParams, 'secret_token')
 }
 
 // spotlight and groups answer 410, but the platform still holds them and no track takes the slug.
 // These second segments are the user's own tabs, and each answers with the profile.
-const userCollectionSegments = new Set([
+const userCollectionSegments = [
   'albums',
   'comments',
   'favorites',
@@ -66,16 +66,16 @@ const userCollectionSegments = new Set([
   'reposts',
   'spotlight',
   'tracks',
-])
+]
 
 // `feeds.soundcloud.com/stream/{trackId}-{slug}.mp3` is the episode audio, and it is named after
 // the track it belongs to, so an enclosure carrying it still names a player.
-const streamPathRegex = /^\/stream\/(\d+)-/
+const streamPathRegex = /^\/stream\/(\d+)-/i
 
 // SoundCloud keeps these first segments for its own sections, so none of them can be a permalink:
 // `soundcloud.com/tags/{tag}` names no track. A word that reads like a section is not one either,
 // since `soundcloud.com/library` is somebody's account.
-const sitePathSegments = new Set([
+const sitePathSegments = [
   'charts',
   'discover',
   'feed',
@@ -92,7 +92,7 @@ const sitePathSegments = new Set([
   'tags',
   'upload',
   'you',
-])
+]
 
 // A page url names its kind by shape: one segment is the user, `sets` marks a playlist, and a
 // second segment is otherwise the track.
@@ -103,7 +103,7 @@ const readPageKind = (segments: Array<string>): string | undefined => {
     return
   }
 
-  if (sitePathSegments.has(segments[0] ?? '')) {
+  if (isAnyOf(segments[0], sitePathSegments)) {
     return
   }
 
@@ -111,12 +111,12 @@ const readPageKind = (segments: Array<string>): string | undefined => {
     return 'users'
   }
 
-  if (segments[1] === 'sets') {
+  if (isAnyOf(segments[1], 'sets')) {
     return 'playlists'
   }
 
   if (segments.length === 2) {
-    return userCollectionSegments.has(segments[1]) ? 'users' : 'tracks'
+    return isAnyOf(segments[1], userCollectionSegments) ? 'users' : 'tracks'
   }
 }
 
@@ -200,17 +200,18 @@ const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
   // unparseable case left to guard here.
   const parsed = parseUrl(url, placeholderBaseUrl)
   const params = parsed?.searchParams
-  const inner = params?.get('url')
+  const inner = getQueryParam(params, 'url')
   const reference = inner?.match(referenceRegex)
+  const referenceKind = reference?.[1].toLowerCase()
   const streamTrackId = parsed?.pathname.match(streamPathRegex)?.[1]
   const queryToken = readQueryToken(params, inner)
-  const startTrack = params?.get('start_track') ?? undefined
+  const startTrack = getQueryParam(params, 'start_track')
   const result: EmbedResolverResult = { provider, src: url }
 
   if (reference) {
-    result.id = `${reference[1]}/${reference[2]}`
+    result.id = `${referenceKind}/${reference[2]}`
     result.src = composeWidgetUrl(
-      `https://api.soundcloud.com/${reference[1]}/${reference[2]}`,
+      `https://api.soundcloud.com/${referenceKind}/${reference[2]}`,
       queryToken,
       startTrack,
     )
@@ -258,7 +259,7 @@ const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
   // A kind the carrier does not name, such as a share link's, gets the single-track bar, which
   // the classic player draws for a list too.
   result.height =
-    classicPlayerHeights[reference?.[1] ?? (streamTrackId && 'tracks') ?? pageKind ?? ''] ??
+    classicPlayerHeights[referenceKind ?? (streamTrackId && 'tracks') ?? pageKind ?? ''] ??
     classicPlayerHeights.tracks
 
   const title = attr(element, 'title')

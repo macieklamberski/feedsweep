@@ -1,20 +1,20 @@
 import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, getQueryParam, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const amebaHosts = ['static.blog-video.jp']
 const amebloHosts = ['ameblo.jp']
 
-const reblogCardPathRegex = /^\/s\/embed\/reblog-card\/([^/]+)\/entry-([^/]+)\.html$/
-const imagePagePathRegex = /^\/p\/embed\/([^/]+\/image-[^/]+)\.html$/
+const reblogCardPathRegex = /^\/s\/embed\/reblog-card\/([^/]+)\/entry-([^/]+)\.html$/i
+const imagePagePathRegex = /^\/p\/embed\/([^/]+\/image-[^/]+)\.html$/i
 
 // Ameba's movie player, `static.blog-video.jp/?v={id}`, for a video uploaded into a blog post.
 // The id is the whole key the platform's own endpoint takes. Its thumbnails are pathed by the
 // blog's own user id, which the carrier does not name, so no poster is minted.
 export const amebaResolveEmbed: ResolveEmbed = (url) => {
-  const videoId = parseUrl(url, placeholderBaseUrl)?.searchParams.get('v')
+  const videoId = getQueryParam(parseUrl(url, placeholderBaseUrl)?.searchParams, 'v')
 
   if (!videoId) {
     return

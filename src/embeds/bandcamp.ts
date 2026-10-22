@@ -7,17 +7,18 @@ const provider = 'bandcamp'
 import {
   composeQuery,
   encodePathSegment,
+  getQueryParam,
   parseUrlOnHosts,
   placeholderBaseUrl,
 } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // A release is either an album or a single track.
-const releaseRegex = /^(album|track)=([^/]+)$/
+const releaseRegex = /^(album|track)=([^/]+)$/i
 // An exclusive embed names its tracks with a signature. One track is the track the player plays.
-const signedTrackRegex = /^tracks=([^/,]+)$/
+const signedTrackRegex = /^tracks=([^/,]+)$/i
 // The track number an album player opens on: `album=2182110545/t=38/` plays track 38.
-const startTrackRegex = /^t=[^/]+$/
+const startTrackRegex = /^t=([^/]+)$/i
 // The large player with small artwork and no tracklist, spelled as the embed dialog writes it. It
 // lays out as a strip 120 tall that fits its controls to any width.
 const playerLayout = 'size=large/tracklist=false/artwork=small/'
@@ -49,7 +50,7 @@ const readReleases = (link: string): Array<[string, string]> => {
 
     // A path value is decoded, like a query one, so the player url encodes it once.
     if (match) {
-      claim(match[1], decodeSegment(match[2]) ?? match[2])
+      claim(match[1].toLowerCase(), decodeSegment(match[2]) ?? match[2])
     }
 
     const signed = segment.match(signedTrackRegex)
@@ -60,7 +61,7 @@ const readReleases = (link: string): Array<[string, string]> => {
   }
 
   for (const kind of releaseKinds) {
-    const id = parsed.searchParams.get(kind)
+    const id = getQueryParam(parsed.searchParams, kind)
 
     if (id) {
       claim(kind, id)
@@ -109,8 +110,9 @@ const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
   // The video player names a track and only a track: `VideoEmbed?album={id}` answers 404. A video
   // carrier whose only release is an album falls back to the audio player, which does serve it.
   const isVideo = videoPathRegex.test(parsed.pathname) && kind === 'track'
-  const startTrack = getPathSegments(parsed).find((segment) => startTrackRegex.test(segment))
-  const start = startTrack ? `${startTrack}/` : ''
+  const startSegment = getPathSegments(parsed).find((segment) => startTrackRegex.test(segment))
+  const startTrack = startSegment?.match(startTrackRegex)?.[1]
+  const start = startTrack ? `t=${startTrack}/` : ''
   // A query id comes out decoded, and it goes into a path.
   const segments = new Map(releases.map(([named, value]) => [named, encodePathSegment(value)]))
   const albumId = segments.get('album')

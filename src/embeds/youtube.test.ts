@@ -1528,3 +1528,71 @@ describeForEachParser('youtubeMetasliderEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('youtubeFc2EmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, youtubeFc2EmbedResolver)
+
+  it('should read the route words `misc`, `blog`, `view` and `ext_youtube_player.html` in capitals', async () => {
+    const value =
+      '<iframe src="https://static.fc2.com/MISC/BLOG/VIEW/EXT_YOUTUBE_PLAYER.HTML?autoplay=1&amp;id=WpKmsv98HlI&amp;width=560&amp;height=315&amp;title=Fun%20day%20for%20Longers"></iframe>'
+    const expected = {
+      provider: 'youtube',
+      id: 'WpKmsv98HlI',
+      src: 'https://www.youtube.com/embed/WpKmsv98HlI',
+      url: 'https://www.youtube.com/watch?v=WpKmsv98HlI',
+      thumbnail: 'https://i.ytimg.com/vi/WpKmsv98HlI/hqdefault.jpg',
+      ratio: '16/9',
+      title: 'Fun day for Longers',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('youtubeIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, youtubeIframeEmbedResolver)
+
+  it('should read the route words `embed` and `shorts` in capitals', async () => {
+    const value = '<iframe src="https://www.youtube.com/EMBED/SHORTS/dQw4w9WgXcQ"></iframe>'
+    const expected = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `v` and `list` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://www.youtube.com/watch?V=dQw4w9WgXcQ&amp;LIST=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf"></iframe>'
+    const expected = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `clip` and `clipt` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?CLIP=Ug1x&amp;CLIPT=EIDh"></iframe>'
+    const expected = {
+      provider: 'youtube',
+      id: 'dQw4w9WgXcQ',
+      src: 'https://www.youtube.com/embed/dQw4w9WgXcQ?clip=Ug1x&clipt=EIDh',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

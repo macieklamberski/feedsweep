@@ -65,12 +65,6 @@ describe('dvidsResolveEmbed', () => {
       expect(dvidsResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for the route in capitals, which the server answers 404', () => {
-      const value = 'https://www.dvidshub.net/VIDEO/EMBED/549765'
-
-      expect(dvidsResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the video page', () => {
       const value =
         'https://www.dvidshub.net/video/549765/102nd-intelligence-wing-airmen-provide-disaster-relief'
@@ -106,6 +100,19 @@ describe('dvidsResolveEmbed', () => {
         id: '549765a',
         src: 'https://www.dvidshub.net/video/embed/549765a',
         url: 'https://www.dvidshub.net/video/549765a',
+        ratio: '16/9',
+      }
+
+      expect(dvidsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the route in capitals and mint it in lowercase', () => {
+      const value = 'https://www.dvidshub.net/VIDEO/EMBED/549765'
+      const expected = {
+        provider: 'dvids',
+        id: '549765',
+        src: 'https://www.dvidshub.net/video/embed/549765',
+        url: 'https://www.dvidshub.net/video/549765',
         ratio: '16/9',
       }
 
@@ -180,5 +187,22 @@ describeForEachParser('dvids player through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('dvidsEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, dvidsEmbedResolver)
+
+  it('should read the route words `video` and `embed` in capitals', async () => {
+    const value = '<iframe src="https://www.dvidshub.net/VIDEO/EMBED/549765"></iframe>'
+    const expected = {
+      provider: 'dvids',
+      id: '549765',
+      src: 'https://www.dvidshub.net/video/embed/549765',
+      url: 'https://www.dvidshub.net/video/549765',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

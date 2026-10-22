@@ -1,6 +1,6 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, digitsRegex } from '../utils/urls.js'
+import { composeQuery, digitsRegex, getQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const learningappsHosts = ['learningapps.org']
@@ -15,12 +15,14 @@ export const learningappsResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
   const [route] = parsed ? getPathSegments(parsed) : []
 
-  if (!parsed || !route || !exerciseRoutes.includes(route)) {
+  if (!parsed || !route || !isAnyOf(route, exerciseRoutes)) {
     return
   }
 
-  const param = exerciseParams.find((name) => parsed.searchParams.has(name))
-  const appId = param ? parsed.searchParams.get(param) : undefined
+  const param = exerciseParams.find(
+    (name) => getQueryParam(parsed.searchParams, name) !== undefined,
+  )
+  const appId = param ? getQueryParam(parsed.searchParams, param) : undefined
 
   if (!appId) {
     return

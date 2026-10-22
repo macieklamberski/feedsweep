@@ -492,3 +492,33 @@ describeForEachParser('stackblitz shapes the pipeline repairs first', (parseHtml
     expect(result).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('stackblitzIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, stackblitzIframeEmbedResolver)
+
+  it('should read the route word `edit` in capitals', async () => {
+    const value = '<iframe src="https://stackblitz.com/EDIT/angular-ivy-snow"></iframe>'
+    const expected = {
+      provider: 'stackblitz',
+      id: 'angular-ivy-snow',
+      src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1',
+      url: 'https://stackblitz.com/edit/angular-ivy-snow',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `run` in capitals', async () => {
+    const value = '<iframe src="https://stackblitz.com/RUN/angular-ivy-snow"></iframe>'
+    const expected = {
+      provider: 'stackblitz',
+      id: 'angular-ivy-snow',
+      src: 'https://stackblitz.com/edit/angular-ivy-snow?embed=1',
+      url: 'https://stackblitz.com/edit/angular-ivy-snow',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

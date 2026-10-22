@@ -11,7 +11,7 @@ const provider = 'strawpoll'
 const strawpollHosts = ['strawpoll.com']
 
 // The route words are case-sensitive, and so is the id.
-const embedPathRegex = /^\/embed\/(?:polls\/)?([^/]+)\/?$/
+const embedPathRegex = /^\/embed\/(?:polls\/)?([^/]+)\/?$/i
 
 const mountIdPrefix = 'strawpoll_'
 

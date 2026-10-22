@@ -103,6 +103,18 @@ describe('condenastResolveEmbed', () => {
 
       expect(condenastResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the route in capitals and mint it in lowercase', () => {
+      const value = 'https://player.cnevids.com/IFRAME/VIDEO/5ce439aa34e7941264b4701c'
+      const expected = {
+        provider: 'condenast',
+        id: '5ce439aa34e7941264b4701c',
+        src: 'https://player.cnevids.com/iframe/video/5ce439aa34e7941264b4701c',
+        ratio: '16/9',
+      }
+
+      expect(condenastResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -134,12 +146,6 @@ describe('condenastResolveEmbed', () => {
     it('should return undefined for a segment after the oldest frame', () => {
       const value =
         'https://player.cnevids.com/embed/54627cfc61646d2fc1030000/52f2ad0169702d21a5080000/extra'
-
-      expect(condenastResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for the route in capitals, which the server answers 404', () => {
-      const value = 'https://player.cnevids.com/IFRAME/VIDEO/5ce439aa34e7941264b4701c'
 
       expect(condenastResolveEmbed(value)).toBeUndefined()
     })
@@ -288,5 +294,35 @@ describeForEachParser('condenast through the pipeline', (parseHtml) => {
     }
 
     expect(await placeholder(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('condenastIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, condenastIframeEmbedResolver)
+
+  it('should read the route words `iframe` and `video` in capitals', async () => {
+    const value =
+      '<iframe src="https://player.cnevids.com/IFRAME/VIDEO/5be1fd3d8c1abc6e6400000f"></iframe>'
+    const expected = {
+      provider: 'condenast',
+      id: '5be1fd3d8c1abc6e6400000f',
+      src: 'https://player.cnevids.com/iframe/video/5be1fd3d8c1abc6e6400000f',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value =
+      '<iframe src="http://player.cnevids.com/EMBED/54627cfc61646d2fc1030000/52f2ad0169702d21a5080000"></iframe>'
+    const expected = {
+      provider: 'condenast',
+      id: '54627cfc61646d2fc1030000',
+      src: 'https://player.cnevids.com/iframe/video/54627cfc61646d2fc1030000',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

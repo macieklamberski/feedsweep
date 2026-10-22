@@ -7,12 +7,12 @@ const guardianHosts = ['embed.theguardian.com']
 // `/embed/video/{section}/video/{yyyy}/{mon}/{dd}/{slug}`.
 // The video's page is the same path on `www`, and a real path answers 200 where a fabricated
 // slug 404s.
-const playerPathRegex = /^\/embed\/video\/([^/]+\/video\/[^/]+\/[^/]+\/[^/]+\/[^/]+)$/
+const playerPathRegex = /^\/embed\/video\/([^/]+\/video\/[^/]+\/[^/]+\/[^/]+\/[^/]+)$/i
 
 // The path dates the video, and the month is the three-letter English abbreviation on every
 // edition. A path states a day and not a moment, so `date` carries the calendar day alone, and
 // a name outside the twelve months leaves it unstated.
-const pathDateRegex = /^[a-z0-9-]+\/video\/(\d{4})\/([a-z]{3})\/(0[1-9]|[12]\d|3[01])\//
+const pathDateRegex = /^[a-z0-9-]+\/video\/(\d{4})\/([a-z]{3})\/(0[1-9]|[12]\d|3[01])\//i
 const monthNumbers: Record<string, string | undefined> = {
   jan: '01',
   feb: '02',
@@ -35,7 +35,7 @@ const readDate = (path: string): string | undefined => {
     return
   }
 
-  const month = monthNumbers[parts[2]]
+  const month = monthNumbers[parts[2].toLowerCase()]
 
   return month ? `${parts[1]}-${month}-${parts[3]}` : undefined
 }

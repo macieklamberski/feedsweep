@@ -506,3 +506,37 @@ describeForEachParser('yandexmaps through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('yandexMapsIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, yandexMapsIframeEmbedResolver)
+
+  it('should read the route words `map-widget` and `v1` in capitals', async () => {
+    const value =
+      '<iframe src="https://yandex.ru/MAP-WIDGET/V1/?um=constructor%3A669755b2ef0f5d7045582d539cdbb5a036d042af257453807f832e99a561f2f6&amp;source=constructor"></iframe>'
+    const expected = {
+      provider: 'yandexmaps',
+      id: 'constructor:669755b2ef0f5d7045582d539cdbb5a036d042af257453807f832e99a561f2f6',
+      src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A669755b2ef0f5d7045582d539cdbb5a036d042af257453807f832e99a561f2f6&source=constructor',
+      thumbnail:
+        'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A669755b2ef0f5d7045582d539cdbb5a036d042af257453807f832e99a561f2f6&width=650&height=400',
+      height: 400,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `um` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://yandex.ru/map-widget/v1/?UM=constructor%3A669755b2ef0f5d7045582d539cdbb5a036d042af257453807f832e99a561f2f6&amp;source=constructor"></iframe>'
+    const expected = {
+      provider: 'yandexmaps',
+      id: 'constructor:669755b2ef0f5d7045582d539cdbb5a036d042af257453807f832e99a561f2f6',
+      src: 'https://yandex.ru/map-widget/v1/?um=constructor%3A669755b2ef0f5d7045582d539cdbb5a036d042af257453807f832e99a561f2f6&source=constructor',
+      thumbnail:
+        'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A669755b2ef0f5d7045582d539cdbb5a036d042af257453807f832e99a561f2f6&width=650&height=400',
+      height: 400,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

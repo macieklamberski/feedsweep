@@ -695,3 +695,53 @@ describeForEachParser('rtve through the pipeline', (parseHtml) => {
     ).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('rtveIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, rtveIframeEmbedResolver)
+
+  it('should read the route words `drmn`, `embed` and `video` in capitals', async () => {
+    const value = '<iframe src="https://www.rtve.es/DRMN/EMBED/VIDEO/2474214"></iframe>'
+    const expected = {
+      provider: 'rtve',
+      id: 'video/2474214',
+      src: 'https://www.rtve.es/drmn/embed/video/2474214/',
+      url: 'https://www.rtve.es/v/2474214/',
+      ratio: '16/9',
+      thumbnail: 'https://img.rtve.es/v/2474214/',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `drmn`, `embed` and `audio` in capitals', async () => {
+    const value = '<iframe src="https://secure-embed.rtve.es/DRMN/EMBED/AUDIO/1925451/"></iframe>'
+    const expected = {
+      provider: 'rtve',
+      id: 'audio/1925451',
+      src: 'https://www.rtve.es/drmn/embed/audio/1925451/',
+      url: 'https://www.rtve.es/a/1925451/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('rtveFlashEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, rtveFlashEmbedResolver)
+
+  it('should read the `assetID` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="http://www.rtve.es/swf/v2/RTVEPlayer.swf?ASSETID=309749_es_videos&amp;location=embed"></iframe>'
+    const expected = {
+      provider: 'rtve',
+      id: 'video/309749',
+      src: 'https://www.rtve.es/drmn/embed/video/309749/',
+      url: 'https://www.rtve.es/v/309749/',
+      ratio: '16/9',
+      thumbnail: 'https://img.rtve.es/v/309749/',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -85,3 +85,20 @@ describeForEachParser('figshareEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('figshareEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, figshareEmbedResolver)
+
+  it('should read the route words `articles` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://widgets.figshare.com/ARTICLES/21109066/EMBED?show_title=1"></iframe>'
+    const expected = {
+      provider: 'figshare',
+      id: '21109066',
+      src: 'https://widgets.figshare.com/articles/21109066/embed',
+      ratio: '568/351',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

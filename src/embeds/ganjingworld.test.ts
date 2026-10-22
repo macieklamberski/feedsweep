@@ -271,3 +271,21 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('ganjingworldEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, ganjingworldEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.ganjingworld.com/EMBED/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
+    const expected = {
+      provider: 'ganjingworld',
+      id: '1fv8993v57oI3UiHioRJzFV1L1cq1c',
+      src: 'https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c',
+      url: 'https://www.ganjingworld.com/video/1fv8993v57oI3UiHioRJzFV1L1cq1c',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

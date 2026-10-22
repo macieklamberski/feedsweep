@@ -15,7 +15,7 @@ export type MastodonStatus = {
 
 // A full handle, /@user@origin/{id}, 302s to a page served x-frame-options: DENY.
 // A status id is a snowflake, 18 digits since the release that first shipped the embed endpoint.
-const statusPathRegex = /^\/@([\w.-]+)\/(\d{6,})(?:\/embed)?\/?$/
+const statusPathRegex = /^\/@([\w.-]+)\/(\d{6,})(?:\/embed)?\/?$/i
 
 // Any host filing posts under an author and a long number takes this shape, Medium among them.
 export const parseMastodonStatus = (link: string): MastodonStatus | undefined => {
@@ -58,7 +58,7 @@ export const mastodonEmbedResolver = createMarkupEmbedResolver(
   // The status iframe is matched by its src, with or without the mastodon-embed class.
   // aside.mastodon-embed is a hand-typed quote carrying the post's body text, and
   // div.mastodon-embed only wraps the iframe.
-  'iframe[src$="/embed"], iframe[src$="/embed/"], blockquote.mastodon-embed',
+  'iframe[src$="/embed" i], iframe[src$="/embed/" i], blockquote.mastodon-embed',
   (element) => {
     const status = [
       attr(element, 'src'),

@@ -727,3 +727,66 @@ describeForEachParser('appleToolsEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('appleToolsEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, appleToolsEmbedResolver)
+
+  it('should read the route words `embed`, `v1` and `album` in capitals', async () => {
+    const value =
+      '<iframe src="https://tools.applemusic.com/EMBED/V1/ALBUM/1195107058?country=us"></iframe>'
+    const expected = {
+      provider: 'applemusic',
+      id: 'album/1195107058',
+      src: 'https://embed.music.apple.com/us/album/1195107058',
+      url: 'https://music.apple.com/us/album/1195107058',
+      height: 450,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `country` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://tools.applemusic.com/embed/v1/album/1195107058?COUNTRY=us"></iframe>'
+    const expected = {
+      provider: 'applemusic',
+      id: 'album/1195107058',
+      src: 'https://embed.music.apple.com/us/album/1195107058',
+      url: 'https://music.apple.com/us/album/1195107058',
+      height: 450,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('appleEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, appleEmbedResolver)
+
+  it('should read the route word `song` in capitals', async () => {
+    const value = '<iframe src="https://embed.music.apple.com/us/SONG/beat-it/1440857797"></iframe>'
+    const expected = {
+      provider: 'applemusic',
+      id: 'song/1440857797',
+      src: 'https://embed.music.apple.com/us/song/beat-it/1440857797',
+      url: 'https://music.apple.com/us/song/beat-it/1440857797',
+      height: 175,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `i` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.music.apple.com/us/album/thriller/1440857781?I=1440857785"></iframe>'
+    const expected = {
+      provider: 'applemusic',
+      id: 'album/1440857785',
+      src: 'https://embed.music.apple.com/us/album/thriller/1440857781?i=1440857785',
+      url: 'https://music.apple.com/us/album/thriller/1440857781?i=1440857785',
+      height: 175,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

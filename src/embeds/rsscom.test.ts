@@ -230,3 +230,20 @@ describe('rsscomRenderHint', () => {
     expect(rsscomRenderHint.readHeight?.(value)).toBe(198)
   })
 })
+
+describeForEachParser('rsscomEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, rsscomEmbedResolver)
+
+  it('should read the `time` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://player.rss.com/thecosafashow/2909608?theme=color&amp;v=2&amp;TIME=90"></iframe>'
+    const expected = {
+      provider: 'rsscom',
+      id: 'thecosafashow/2909608',
+      src: 'https://player.rss.com/thecosafashow/2909608?v=2&time=90',
+      url: 'https://rss.com/podcasts/thecosafashow/2909608/',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

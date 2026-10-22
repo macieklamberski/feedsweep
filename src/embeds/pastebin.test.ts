@@ -245,3 +245,46 @@ describeForEachParser('pastebin through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('pastebinIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, pastebinIframeEmbedResolver)
+
+  it('should read the route word `embed_iframe` in capitals', async () => {
+    const value = '<iframe src="https://pastebin.com/EMBED_IFRAME/jFp3Y1wP"></iframe>'
+    const expected = {
+      provider: 'pastebin',
+      id: 'jFp3Y1wP',
+      src: 'https://pastebin.com/embed_iframe/jFp3Y1wP',
+      url: 'https://pastebin.com/jFp3Y1wP',
+      height: 150,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `embed_iframe.php` in capitals', async () => {
+    const value = '<iframe src="https://pastebin.com/EMBED_IFRAME.PHP?i=FzCyksKn"></iframe>'
+    const expected = {
+      provider: 'pastebin',
+      id: 'FzCyksKn',
+      src: 'https://pastebin.com/embed_iframe/FzCyksKn',
+      url: 'https://pastebin.com/FzCyksKn',
+      height: 150,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `i` parameter name in capitals', async () => {
+    const value = '<iframe src="https://pastebin.com/embed_iframe.php?I=FzCyksKn"></iframe>'
+    const expected = {
+      provider: 'pastebin',
+      id: 'FzCyksKn',
+      src: 'https://pastebin.com/embed_iframe/FzCyksKn',
+      url: 'https://pastebin.com/FzCyksKn',
+      height: 150,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

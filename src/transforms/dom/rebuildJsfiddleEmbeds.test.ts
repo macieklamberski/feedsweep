@@ -23,6 +23,19 @@ describeForEachParser('rebuildJsfiddleEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should rebuild a loader whose embed route is in capitals', async () => {
+      const value = html`
+        <script
+          async=""
+          src="https://jsfiddle.net/josedvq/kjfgpm8u/2/EMBED/html,css,result/dark/"
+        ></script>
+      `
+      const expected =
+        '<iframe src="https://jsfiddle.net/josedvq/kjfgpm8u/2/" height="400"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should rebuild a loader naming an author and a slug', async () => {
       const value =
         '<script async src="//jsfiddle.net/learnwithnakamura/qg0dvu2o/embed/html/dark/"></script>'

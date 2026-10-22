@@ -156,3 +156,33 @@ describeForEachParser('helloasso widget through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('helloassoEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, helloassoEmbedResolver)
+
+  it('should read the route words `associations` and `widget-bouton` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.helloasso.com/ASSOCIATIONS/cine-club-du-quartier/formulaires/1/WIDGET-BOUTON"></iframe>'
+    const expected = {
+      provider: 'helloasso',
+      id: 'cine-club-du-quartier/formulaires/1',
+      src: 'https://www.helloasso.com/associations/cine-club-du-quartier/formulaires/1/widget',
+      url: 'https://www.helloasso.com/associations/cine-club-du-quartier/formulaires/1',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `associations` and `widget` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.helloasso.com/ASSOCIATIONS/cine-club-du-quartier/formulaires/1/WIDGET"></iframe>'
+    const expected = {
+      provider: 'helloasso',
+      id: 'cine-club-du-quartier/formulaires/1',
+      src: 'https://www.helloasso.com/associations/cine-club-du-quartier/formulaires/1/widget',
+      url: 'https://www.helloasso.com/associations/cine-club-du-quartier/formulaires/1',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

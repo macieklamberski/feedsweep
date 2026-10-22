@@ -356,3 +356,20 @@ describeForEachParser('calameoEmbedResolver through the pipeline', (parseHtml) =
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('calameoEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, calameoEmbedResolver)
+
+  it('should read the `bkcode` parameter name in capitals', async () => {
+    const value = '<iframe src="https://v.calameo.com/?BKCODE=0077756511c9c6e552299"></iframe>'
+    const expected = {
+      provider: 'calameo',
+      id: '0077756511c9c6e552299',
+      src: 'https://v.calameo.com/?bkcode=0077756511c9c6e552299',
+      url: 'https://www.calameo.com/books/0077756511c9c6e552299',
+      ratio: '300/194',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -1,7 +1,7 @@
-import { getPathSegments, toMap } from 'trousse'
+import { getPathSegments, isAnyOf, toMap } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'deezer'
@@ -39,7 +39,7 @@ const localeRegex = /^[a-z]{2}$/
 // The Flash players, all three of which name a track through `idSong`, and the fourth which
 // names a playlist through `path`. Same id spaces as today's: `idSong=293366` is still a track
 // and `path=11969917` still a playlist.
-const trackSwfRegex = /^(?:small-widget(?:-v2)?|singlePlayer)\.swf$/
+const trackSwfRegex = /^(?:small-widget(?:-v2)?|singlePlayer)\.swf$/i
 
 type Resource = { type: string; id: string }
 
@@ -47,17 +47,17 @@ const readResource = (url: URL): Resource | undefined => {
   const segments = getPathSegments(url)
   const route = localeRegex.test(segments[0] ?? '') ? segments.slice(1) : segments
   // A query value comes out decoded, and the id goes into a path beside the raw path spellings.
-  const query = (name: string) => encodePathSegment(url.searchParams.get(name) ?? '')
+  const query = (name: string) => encodePathSegment(getQueryParam(url.searchParams, name) ?? '')
 
   // The current widget, `widget.deezer.com/widget/{theme}/{type}/{id}`.
-  if (route[0] === 'widget') {
-    return { type: route[2] ?? '', id: route[3] ?? '' }
+  if (isAnyOf(route[0], 'widget')) {
+    return { type: (route[2] ?? '').toLowerCase(), id: route[3] ?? '' }
   }
 
   // The classic plugin player, `deezer.com/plugins/player?type={type}&id={id}`. It redirects to
   // the current widget, which is minted here directly.
-  if (route[0] === 'plugins' && route[1] === 'player') {
-    return { type: pluginTypes.get(query('type')) ?? '', id: query('id') }
+  if (isAnyOf(route[0], 'plugins') && isAnyOf(route[1], 'player')) {
+    return { type: pluginTypes.get(query('type').toLowerCase()) ?? '', id: query('id') }
   }
 
   // `deezer.com/embedded/{player}.swf?idSong={id}` and its `swf/singlePlayer.swf` twin.
@@ -67,7 +67,10 @@ const readResource = (url: URL): Resource | undefined => {
 
   // `deezer.com/embedded/widget.swf?path={id}` and `deezer.com/embed/player?pid={id}`, the two
   // spellings of the Flash-era playlist player.
-  if (route[1] === 'widget.swf' || (route[0] === 'embed' && route[1] === 'player')) {
+  if (
+    isAnyOf(route[1], 'widget.swf') ||
+    (isAnyOf(route[0], 'embed') && isAnyOf(route[1], 'player'))
+  ) {
     return { type: 'playlist', id: query('path') || query('pid') }
   }
 }

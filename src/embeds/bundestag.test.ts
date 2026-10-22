@@ -210,3 +210,63 @@ describeForEachParser('bundestag players through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('bundestagIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, bundestagIframeEmbedResolver)
+
+  it('should read the route words `player`, `macros`, `bttv`, `hls` and `player.js` in capitals', async () => {
+    const value =
+      '<iframe src="https://webtv.bundestag.de/PLAYER/MACROS/BTTV/HLS/PLAYER.JS?content=7197510&amp;phi=default"></iframe>'
+    const expected = {
+      provider: 'bundestag',
+      id: '7197510',
+      src: 'https://webtv.bundestag.de/pservices/player/embed/nokey?e=bt-od&ep=69&a=144277506&c=7197510',
+      url: 'https://dbtg.tv/cvid/7197510',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `pservices`, `player`, `embed` and `nokey` in capitals', async () => {
+    const value =
+      '<iframe src="https://webtv.bundestag.de/PSERVICES/PLAYER/EMBED/NOKEY?e=bt-od&amp;ep=69&amp;a=144277506&amp;c=7657467&amp;t=https%3A%2F%2Fdbtg.tv%2Fcvid%2F7657467"></iframe>'
+    const expected = {
+      provider: 'bundestag',
+      id: '7657467',
+      src: 'https://webtv.bundestag.de/pservices/player/embed/nokey?e=bt-od&ep=69&a=144277506&c=7657467',
+      url: 'https://dbtg.tv/cvid/7657467',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `c` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://webtv.bundestag.de/pservices/player/embed/nokey?e=bt-od&amp;ep=69&amp;a=144277506&amp;C=7657467&amp;t=https%3A%2F%2Fdbtg.tv%2Fcvid%2F7657467"></iframe>'
+    const expected = {
+      provider: 'bundestag',
+      id: '7657467',
+      src: 'https://webtv.bundestag.de/pservices/player/embed/nokey?e=bt-od&ep=69&a=144277506&c=7657467',
+      url: 'https://dbtg.tv/cvid/7657467',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `content` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://webtv.bundestag.de/player/macros/bttv/hls/player.js?CONTENT=7197510&amp;phi=default"></iframe>'
+    const expected = {
+      provider: 'bundestag',
+      id: '7197510',
+      src: 'https://webtv.bundestag.de/pservices/player/embed/nokey?e=bt-od&ep=69&a=144277506&c=7197510',
+      url: 'https://dbtg.tv/cvid/7197510',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

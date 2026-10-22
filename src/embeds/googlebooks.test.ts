@@ -380,3 +380,58 @@ describeForEachParser('googlebooks enclosures', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('googlebooksEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, googlebooksEmbedResolver)
+
+  it('should read the route word `books` in capitals', async () => {
+    const value =
+      '<iframe src="https://books.google.com/BOOKS?id=Fp1ct-bKYdcC&amp;lpg=PA433&amp;pg=PA433&amp;output=embed"></iframe>'
+    const expected = {
+      provider: 'googlebooks',
+      id: 'Fp1ct-bKYdcC',
+      src: 'https://books.google.com/books?id=Fp1ct-bKYdcC&pg=PA433&output=embed',
+      url: 'https://books.google.com/books?id=Fp1ct-bKYdcC&pg=PA433',
+      thumbnail:
+        'https://books.google.com/books/content?id=Fp1ct-bKYdcC&printsec=frontcover&img=1&zoom=1',
+      width: 500,
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `id`, `pg`, `dq` and `vq` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://books.google.com/books?ID=ELieXMxR1h4C&amp;PG=PP1&amp;DQ=Weber%2C+S.+%282004%29%2C+The+Success+of+Open+Source%2C&amp;VQ=antirival&amp;output=embed"></iframe>'
+    const expected = {
+      provider: 'googlebooks',
+      id: 'ELieXMxR1h4C',
+      src: 'https://books.google.com/books?id=ELieXMxR1h4C&pg=PP1&dq=Weber%2C+S.+%282004%29%2C+The+Success+of+Open+Source%2C&vq=antirival&output=embed',
+      url: 'https://books.google.com/books?id=ELieXMxR1h4C&pg=PP1',
+      thumbnail:
+        'https://books.google.com/books/content?id=ELieXMxR1h4C&printsec=frontcover&img=1&zoom=1',
+      width: 500,
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `id`, `pg` and `q` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://books.google.com/books?ID=IpNDAQAAMAAJ&amp;PG=PA4&amp;Q=Loyalsock&amp;output=embed"></iframe>'
+    const expected = {
+      provider: 'googlebooks',
+      id: 'IpNDAQAAMAAJ',
+      src: 'https://books.google.com/books?id=IpNDAQAAMAAJ&pg=PA4&q=Loyalsock&output=embed',
+      url: 'https://books.google.com/books?id=IpNDAQAAMAAJ&pg=PA4',
+      thumbnail:
+        'https://books.google.com/books/content?id=IpNDAQAAMAAJ&printsec=frontcover&img=1&zoom=1',
+      width: 500,
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

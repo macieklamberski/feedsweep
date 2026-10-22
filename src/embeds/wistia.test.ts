@@ -343,3 +343,31 @@ describeForEachParser('wistia enclosures through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('wistiaEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, wistiaEmbedResolver)
+
+  it('should read the route words `embed` and `iframe` in capitals', async () => {
+    const value = '<iframe src="https://fast.wistia.net/EMBED/IFRAME/2fg072pftb"></iframe>'
+    const expected = {
+      provider: 'wistia',
+      id: '2fg072pftb',
+      src: 'https://fast.wistia.net/embed/iframe/2fg072pftb',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `embed` and `medias` in capitals', async () => {
+    const value = '<iframe src="https://fast.wistia.com/EMBED/MEDIAS/0inlutl9au.jsonp"></iframe>'
+    const expected = {
+      provider: 'wistia',
+      id: '0inlutl9au',
+      src: 'https://fast.wistia.net/embed/iframe/0inlutl9au',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

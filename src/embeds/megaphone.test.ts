@@ -312,3 +312,33 @@ describeForEachParser('megaphone through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('megaphoneEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, megaphoneEmbedResolver)
+
+  it('should read the `e` and `start` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://playlist.megaphone.fm/?E=FOXM4466927623&amp;START=4580&amp;utm_source=newsletter"></iframe>'
+    const expected = {
+      provider: 'megaphone',
+      id: 'episode/FOXM4466927623',
+      src: 'https://playlist.megaphone.fm/?e=FOXM4466927623&start=4580',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `p` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://playlist.megaphone.fm/?P=NSM7546490835&amp;light=true"></iframe>'
+    const expected = {
+      provider: 'megaphone',
+      id: 'playlist/NSM7546490835',
+      src: 'https://playlist.megaphone.fm/?p=NSM7546490835',
+      height: 482,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

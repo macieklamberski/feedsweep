@@ -1,4 +1,4 @@
-import { isHttpUrl, parseUrl } from 'trousse'
+import { isAnyOf, isHttpUrl, parseUrl } from 'trousse'
 import { attr } from '../utils/dom.js'
 import { pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
@@ -8,7 +8,7 @@ const provider = 'umap'
 // A map page, `/{lang}/map/{slug}_{id}`, under the interface language uMap prefixes every page
 // with. The shape is the whole guard, since uMap runs on many instances and there is no host to
 // key on: loosened, it claims any site's `/map/` page.
-const mapPathRegex = /^\/([a-z]{2,3}(?:-[a-z]+)?)\/map\/([^/]+)_(\d+)$/
+const mapPathRegex = /^\/([a-z]{2,3}(?:-[a-z]+)?)\/([^/]+)\/([^/]+)_(\d+)$/
 
 // The layers shown and the feature opened on load. The rest of the query sets the map's controls
 // and panels, which are the reader's to choose.
@@ -18,7 +18,7 @@ const mapHeight = 300
 
 // A uMap map framed from any instance. The hash, `#{zoom}/{lat}/{lng}`, is the view the map opens
 // on, so it travels with the src.
-export const umapEmbedResolver = createMarkupEmbedResolver('iframe[src*="/map/"]', (element) => {
+export const umapEmbedResolver = createMarkupEmbedResolver('iframe[src*="/map/" i]', (element) => {
   const link = readCarrierUrl(element)
   const url = parseUrl(link)
 
@@ -29,11 +29,11 @@ export const umapEmbedResolver = createMarkupEmbedResolver('iframe[src*="/map/"]
 
   const match = mapPathRegex.exec(url.pathname)
 
-  if (!match) {
+  if (!match || !isAnyOf(match[2], 'map')) {
     return
   }
 
-  const [, lang, slug, mapId] = match
+  const [, lang, , slug, mapId] = match
   // Every instance 301s `http:` to `https:`, and an https page blocks an `http:` frame.
   const page = `https://${url.host}/${lang}/map/${slug}_${mapId}`
 

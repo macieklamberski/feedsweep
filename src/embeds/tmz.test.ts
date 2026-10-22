@@ -171,3 +171,35 @@ describeForEachParser('tmz player through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('tmzEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, tmzEmbedResolver)
+
+  it('should read the route word `videos` in capitals', async () => {
+    const value =
+      '<iframe src="https://share.tmz.com/VIDEOS/2021-12-13-121321-danny-carey-1322198/"></iframe>'
+    const expected = {
+      provider: 'tmz',
+      id: '2021-12-13-121321-danny-carey-1322198',
+      src: 'https://share.tmz.com/videos/2021-12-13-121321-danny-carey-1322198/',
+      url: 'https://www.tmz.com/watch/2021-12-13-121321-danny-carey-1322198/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `watch` in capitals', async () => {
+    const value =
+      '<iframe src="https://share.tmz.com/WATCH/2024-07-12-071224-travis-kelce-1862808-319/"></iframe>'
+    const expected = {
+      provider: 'tmz',
+      id: '2024-07-12-071224-travis-kelce-1862808-319',
+      src: 'https://share.tmz.com/videos/2024-07-12-071224-travis-kelce-1862808-319/',
+      url: 'https://www.tmz.com/watch/2024-07-12-071224-travis-kelce-1862808-319/',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

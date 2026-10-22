@@ -298,3 +298,35 @@ describeForEachParser('googleforms through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('googleformsEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, googleformsEmbedResolver)
+
+  it('should read the route words `forms`, `u`, `d`, `e` and `viewform` in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/FORMS/U/0/D/E/1FAIpQLSc9Bh47TQpW0PDuM-5NcoQjgDp_T2wV8xrX7SsXTLGMQwUdqA/VIEWFORM?embedded=true"></iframe>'
+    const expected = {
+      provider: 'googleforms',
+      id: '1FAIpQLSc9Bh47TQpW0PDuM-5NcoQjgDp_T2wV8xrX7SsXTLGMQwUdqA',
+      src: 'https://docs.google.com/forms/d/e/1FAIpQLSc9Bh47TQpW0PDuM-5NcoQjgDp_T2wV8xrX7SsXTLGMQwUdqA/viewform?embedded=true',
+      url: 'https://docs.google.com/forms/d/e/1FAIpQLSc9Bh47TQpW0PDuM-5NcoQjgDp_T2wV8xrX7SsXTLGMQwUdqA/viewform',
+      height: 600,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `a`, `forms`, `d`, `e` and `viewform` in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/A/ncps-k12.org/FORMS/D/E/1FAIpQLScUhhDYrYWJvD3byNVXHufauKYWXEeBp6U29PVGoSElSXBLrQ/VIEWFORM?embedded=true"></iframe>'
+    const expected = {
+      provider: 'googleforms',
+      id: '1FAIpQLScUhhDYrYWJvD3byNVXHufauKYWXEeBp6U29PVGoSElSXBLrQ',
+      src: 'https://docs.google.com/forms/d/e/1FAIpQLScUhhDYrYWJvD3byNVXHufauKYWXEeBp6U29PVGoSElSXBLrQ/viewform?embedded=true',
+      url: 'https://docs.google.com/forms/d/e/1FAIpQLScUhhDYrYWJvD3byNVXHufauKYWXEeBp6U29PVGoSElSXBLrQ/viewform',
+      height: 600,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

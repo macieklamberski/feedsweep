@@ -295,3 +295,33 @@ describeForEachParser('the glomex element the pipeline used to pass through', (p
     expect(await convert(value)).not.toContain('glomex-player.js')
   })
 })
+
+describeForEachParser('glomexIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, glomexIframeEmbedResolver)
+
+  it('should read the route words `integration` and `integration.html` in capitals', async () => {
+    const value =
+      '<iframe src="https://player.glomex.com/INTEGRATION/1/INTEGRATION.HTML?integrationId=40599x1hkkig7d8l&amp;playlistId=v-debyi9cki6k1"></iframe>'
+    const expected = {
+      provider: 'glomex',
+      id: '40599x1hkkig7d8l/v-debyi9cki6k1',
+      src: 'https://player.glomex.com/integration/1/integration.html?integrationId=40599x1hkkig7d8l&playlistId=v-debyi9cki6k1',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `integrationId` and `playlistId` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://player.glomex.com/integration/1/integration.html?INTEGRATIONID=40599x1hkkig7d8l&amp;PLAYLISTID=v-debyi9cki6k1"></iframe>'
+    const expected = {
+      provider: 'glomex',
+      id: '40599x1hkkig7d8l/v-debyi9cki6k1',
+      src: 'https://player.glomex.com/integration/1/integration.html?integrationId=40599x1hkkig7d8l&playlistId=v-debyi9cki6k1',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

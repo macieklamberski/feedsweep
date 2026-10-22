@@ -138,3 +138,21 @@ describeForEachParser('tuneinEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('tuneinEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, tuneinEmbedResolver)
+
+  it('should read the route words `embed` and `player` in capitals', async () => {
+    const value = '<iframe src="http://tunein.com/EMBED/PLAYER/s285269/"></iframe>'
+    const expected = {
+      provider: 'tunein',
+      id: 's285269',
+      src: 'https://tunein.com/embed/player/s285269/',
+      url: 'https://tunein.com/radio/s285269/',
+      thumbnail: 'https://cdn-radiotime-logos.tunein.com/s285269d.png',
+      height: 100,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

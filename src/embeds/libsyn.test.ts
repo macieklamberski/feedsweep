@@ -296,3 +296,33 @@ describeForEachParser('libsynEmbedResolver carrier title', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('libsynEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, libsynEmbedResolver)
+
+  it('should read the route words `embed`, `episode` and `id` in capitals', async () => {
+    const value =
+      '<iframe src="https://html5-player.libsyn.com/EMBED/EPISODE/ID/5508311/height/90/width/700/theme/custom/"></iframe>'
+    const expected = {
+      provider: 'libsyn',
+      id: 'episode/5508311',
+      src: 'https://play.libsyn.com/embed/episode/id/5508311/',
+      height: 128,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `embed`, `destination` and `id` in capitals', async () => {
+    const value =
+      '<iframe src="https://play.libsyn.com/EMBED/DESTINATION/ID/12345/height/200/"></iframe>'
+    const expected = {
+      provider: 'libsyn',
+      id: 'destination/12345',
+      src: 'https://play.libsyn.com/embed/destination/id/12345/',
+      height: 128,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

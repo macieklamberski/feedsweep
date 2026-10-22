@@ -539,3 +539,35 @@ describeForEachParser('drive file pages in a media element', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('googledriveEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, googledriveEmbedResolver)
+
+  it('should read the route words `a`, `file` and `d` in capitals', async () => {
+    const value =
+      '<iframe src="https://drive.google.com/A/example.com/FILE/D/0B9tSCABkwqlyRzNlZGNaZ0hIYU0/preview"></iframe>'
+    const expected = {
+      provider: 'googledrive',
+      id: '0B9tSCABkwqlyRzNlZGNaZ0hIYU0',
+      src: 'https://drive.google.com/file/d/0B9tSCABkwqlyRzNlZGNaZ0hIYU0/preview',
+      url: 'https://drive.google.com/file/d/0B9tSCABkwqlyRzNlZGNaZ0hIYU0/view',
+      thumbnail: 'https://drive.google.com/thumbnail?id=0B9tSCABkwqlyRzNlZGNaZ0hIYU0&sz=w640',
+      ratio: '4/3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `resourcekey` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://drive.google.com/file/d/0Bzq4uXIf8dNTVS1wQl9sME5FcFE/preview?RESOURCEKEY=0-aeSGEHR1GEcB98yGmsP_XA"></iframe>'
+    const expected = {
+      provider: 'googledrive',
+      id: '0Bzq4uXIf8dNTVS1wQl9sME5FcFE',
+      src: 'https://drive.google.com/file/d/0Bzq4uXIf8dNTVS1wQl9sME5FcFE/preview?resourcekey=0-aeSGEHR1GEcB98yGmsP_XA',
+      ratio: '4/3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

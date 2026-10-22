@@ -1,8 +1,9 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import {
   alphanumericRegex,
   composeQuery,
+  getQueryParam,
   pickQueryParams,
   placeholderBaseUrl,
 } from '../utils/urls.js'
@@ -32,7 +33,8 @@ const catalogueKind = 'community'
 // A figma url names a file as `{kind}/{key}/{name}` and nothing else.
 const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
   const segments = getPathSegments(url)
-  const [kind, key, name] = segments
+  const [route, key, name] = segments
+  const kind = route?.toLowerCase()
 
   if (segments.length !== 3 || !kind || !key || !name) {
     return
@@ -69,9 +71,9 @@ const resolveEmbed: ResolveEmbed = (url) => {
 
   const segments = getPathSegments(parsed)
 
-  if (segments.length === 1 && segments[0] === 'embed') {
+  if (segments.length === 1 && isAnyOf(segments[0], 'embed')) {
     // The wrapper frames whatever its `url` names, so a value off figma is refused and never minted.
-    const wrapped = parseUrl(parsed.searchParams.get('url') ?? '', placeholderBaseUrl)
+    const wrapped = parseUrl(getQueryParam(parsed.searchParams, 'url') ?? '', placeholderBaseUrl)
 
     if (!wrapped || !isHostOf(wrapped, figmaFileHosts)) {
       return

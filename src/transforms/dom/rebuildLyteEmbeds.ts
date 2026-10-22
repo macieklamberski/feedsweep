@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import { composeEmbedUrl, extractVideoId, isVideoId } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import {
@@ -9,7 +9,7 @@ import {
   isText,
   isWhitespaceText,
 } from '../../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
+import { getQueryParam, parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 // In a feed the plugin writes no facade. It writes the thumbnail linked to the post, with
@@ -26,8 +26,8 @@ const readThumbnailVideoId = (src: string): string | undefined => {
     return
   }
 
-  const cachedUrl = url.pathname.endsWith('/lyteCache.php')
-    ? url.searchParams.get('origThumbUrl')
+  const cachedUrl = url.pathname.toLowerCase().endsWith('/lytecache.php')
+    ? getQueryParam(url.searchParams, 'origThumbUrl')
     : undefined
 
   if (cachedUrl) {
@@ -40,7 +40,7 @@ const readThumbnailVideoId = (src: string): string | undefined => {
 
   const [route, videoId] = getPathSegments(url)
 
-  if (route === 'vi' && videoId && isVideoId(videoId)) {
+  if (isAnyOf(route, 'vi') && videoId && isVideoId(videoId)) {
     return videoId
   }
 }

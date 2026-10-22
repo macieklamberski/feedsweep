@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, isHostOrSubdomainOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
@@ -23,7 +23,7 @@ const flipBookIdRegex = /^([0-9a-f]{10})(?:\.html)?$/i
 // A custom slug is served without `.html`, and only some are served with it too.
 const htmlExtensionRegex = /\.html$/i
 // The viewer opens on the page a `#page/{n}` fragment names, framed or not.
-const pageFragmentRegex = /^#page\/[^/]+$/
+const pageFragmentRegex = /^#page\/[^/]+$/i
 
 const readFlipBook = (name: string): FlipBook | undefined => {
   const flipBookId = name.match(flipBookIdRegex)?.[1]
@@ -93,7 +93,7 @@ export const heyzineResolveEmbed: ResolveEmbed = (url, element) => {
   const [route, name = '', ...rest] = getPathSegments(parsed)
   const flipBook = readFlipBook(name)
 
-  if (route !== 'flip-book' || !flipBook || rest.length) {
+  if (!isAnyOf(route, 'flip-book') || !flipBook || rest.length) {
     return
   }
 

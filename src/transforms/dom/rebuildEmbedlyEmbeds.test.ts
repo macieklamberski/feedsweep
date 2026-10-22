@@ -362,3 +362,25 @@ describeForEachParser('rebuildEmbedlyEmbeds', (parseHtml) => {
     expect(twice).toEqualHtml(once)
   })
 })
+
+describeForEachParser('rebuildEmbedlyEmbeds in any case', (parseHtml) => {
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [rebuildEmbedlyEmbeds(baseContext)])
+  }
+
+  it('should read the player path and the `src` and `image` names in capitals', async () => {
+    const value = html`
+      <iframe
+        src="https://cdn.embedly.com/widgets/MEDIA.HTML?SRC=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ&amp;IMAGE=https%3A%2F%2Fi.ytimg.com%2Fvi%2FdQw4w9WgXcQ%2Fhqdefault.jpg"
+      ></iframe>
+    `
+    const expected = html`
+      <iframe
+        data-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})

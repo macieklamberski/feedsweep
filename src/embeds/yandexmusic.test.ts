@@ -419,3 +419,34 @@ describeForEachParser('yandex music shapes the pipeline repairs first', (parseHt
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('yandexMusicEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, yandexMusicEmbedResolver)
+
+  it('should read the route words `iframe`, `album` and `track` in capitals', async () => {
+    const value =
+      '<iframe src="https://music.yandex.ru/IFRAME/ALBUM/6965469/TRACK/152405368"></iframe>'
+    const expected = {
+      provider: 'yandexmusic',
+      id: 'track/152405368',
+      src: 'https://music.yandex.ru/iframe/album/6965469/track/152405368',
+      url: 'https://music.yandex.ru/album/6965469/track/152405368',
+      height: 244,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `embed` and `track.swf` in capitals', async () => {
+    const value = '<iframe src="http://music.yandex.ru/EMBED/18992685/TRACK.SWF"></iframe>'
+    const expected = {
+      provider: 'yandexmusic',
+      id: 'track/18992685',
+      src: 'https://music.yandex.ru/iframe/track/18992685',
+      url: 'https://music.yandex.ru/track/18992685',
+      height: 244,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

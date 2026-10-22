@@ -2,6 +2,7 @@ import {
   decodeSegment,
   fixMalformedQuery,
   getPathSegments,
+  isAnyOf,
   isPlainObject,
   type Nullish,
   parseUrl,
@@ -15,6 +16,8 @@ const provider = 'dailymotion'
 import {
   composeQuery,
   encodePathSegment,
+  getQueryParam,
+  getQueryParams,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
@@ -33,7 +36,7 @@ const dailymotionHosts = [
 ]
 
 // The Flash player shipped `/swf/{id}` and `/swf/video/{id}`, which stacks two route words.
-const pathWords = new Set(['embed', 'video', 'swf'])
+const pathWords = ['embed', 'video', 'swf']
 
 // `/embed/{locale}/video/{id}` serves the player and redirects to
 // `geo.dailymotion.com/player.html?video={id}`. Two letters tell a locale from an account handle,
@@ -42,7 +45,7 @@ const localeRegex = /^[a-z]{2}$/
 
 // Kinds Dailymotion's embed route serves besides a video: each reaches the player with an empty
 // `video=` or redirects to a page, so the segment names a listing or a landing page.
-const nonVideoWords = new Set([
+const nonVideoWords = [
   'playlist',
   'user',
   'channel',
@@ -54,10 +57,10 @@ const nonVideoWords = new Set([
   'feed',
   'videos',
   'live',
-])
+]
 
 const isRouteWord = (segment: string): boolean => {
-  return pathWords.has(segment) || nonVideoWords.has(segment)
+  return isAnyOf(segment, pathWords) || isAnyOf(segment, nonVideoWords)
 }
 
 const skipRouteWords = (segments: Array<string>): number => {
@@ -65,7 +68,7 @@ const skipRouteWords = (segments: Array<string>): number => {
 
   while (
     index < segments.length &&
-    (pathWords.has(segments[index]) ||
+    (isAnyOf(segments[index], pathWords) ||
       (localeRegex.test(segments[index]) && isRouteWord(segments[index + 1])))
   ) {
     index++
@@ -98,17 +101,17 @@ const playableWords = ['vids', 'playlist']
 const readWidgetEntry = (url: URL): Array<string> => {
   const segments = getPathSegments(url)
 
-  if (segments[0] === 'widget' && segments[1] === 'jukebox') {
+  if (isAnyOf(segments[0], 'widget') && isAnyOf(segments[1], 'jukebox')) {
     // A jukebox can list a user or a group beside a playlist, and only a video or a playlist maps
     // onto a player.
-    const entries = url.searchParams.getAll('list[]').map((entry) => {
+    const entries = getQueryParams(url.searchParams, 'list[]').map((entry) => {
       return entry.split('/').filter(Boolean)
     })
 
-    return entries.find(([kind]) => playableWords.includes(kind)) ?? []
+    return entries.find(([kind]) => isAnyOf(kind, playableWords)) ?? []
   }
 
-  if (wallWords.includes(segments[0])) {
+  if (isAnyOf(segments[0], wallWords)) {
     return segments.slice(1)
   }
 
@@ -127,12 +130,14 @@ const extractDailymotionPlaylistId = (link: string): string | undefined => {
   const segments = getPathSegments(url)
   const marker = skipRouteWords(segments)
 
-  const pathId = segments[marker] === 'playlist' ? segments[marker + 1] : undefined
+  const pathId = isAnyOf(segments[marker], 'playlist') ? segments[marker + 1] : undefined
   // The path id is decoded here, like the query one, so the url and the player encode it once.
-  const candidate = pathId ? (decodeSegment(pathId) ?? pathId) : url.searchParams.get('playlist')
+  const candidate = pathId
+    ? (decodeSegment(pathId) ?? pathId)
+    : getQueryParam(url.searchParams, 'playlist')
   const [kind, widgetId] = readWidgetEntry(url)
 
-  return [candidate, kind === 'playlist' ? widgetId : undefined].map(readId).find(Boolean)
+  return [candidate, isAnyOf(kind, 'playlist') ? widgetId : undefined].map(readId).find(Boolean)
 }
 
 const readPathId = (url: URL, segments: Array<string>): string | undefined => {
@@ -148,7 +153,7 @@ const readPathId = (url: URL, segments: Array<string>): string | undefined => {
   // `/about` is five legal id characters.
   const candidate = index > 0 ? segments[index] : undefined
 
-  if (!candidate || nonVideoWords.has(candidate)) {
+  if (!candidate || isAnyOf(candidate, nonVideoWords)) {
     return
   }
 
@@ -165,10 +170,10 @@ export const extractDailymotionId = (link: string): string | undefined => {
 
   const [kind, widgetIds] = readWidgetEntry(url)
   // The jukebox joins its videos with `+`, which the query decodes to a space.
-  const widgetId = kind === 'vids' ? widgetIds?.split(' ')[0] : undefined
+  const widgetId = isAnyOf(kind, 'vids') ? widgetIds?.split(' ')[0] : undefined
 
   // A path naming no video still leaves the geo player's `video` parameter to be read.
-  return [readPathId(url, getPathSegments(url)), url.searchParams.get('video'), widgetId]
+  return [readPathId(url, getPathSegments(url)), getQueryParam(url.searchParams, 'video'), widgetId]
     .map(readId)
     .find(Boolean)
 }
@@ -255,7 +260,7 @@ export const dailymotionEmbedResolver = createUrlEmbedResolver(
 )
 
 // The Library Script under `/libs/player/` takes no item from its tag.
-const playerScriptPathRegex = /^\/player\/[^/]+\.js$/
+const playerScriptPathRegex = /^\/player\/[^/]+\.js$/i
 // Dailymotion writes the duration in seconds alone.
 const durationRegex = /^P(\d+)S$/
 
@@ -285,7 +290,7 @@ const readSnippetFields = (
 // Dailymotion's Player Embed Script, `geo.dailymotion.com/player/{playerId}.js` naming the item in
 // `data-video` or `data-playlist`, which renders nothing until it runs.
 export const dailymotionScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="dailymotion.com/"][data-video], script[src*="dailymotion.com/"][data-playlist]',
+  'script[src*="dailymotion.com/" i][data-video], script[src*="dailymotion.com/" i][data-playlist]',
   (element) => {
     const loader = parseUrlOnHosts(attr(element, 'src'), dailymotionHosts)
 

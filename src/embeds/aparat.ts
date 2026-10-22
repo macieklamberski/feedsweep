@@ -4,8 +4,8 @@ import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const aparatHosts = ['aparat.com']
-const scriptPathRegex = /^\/embed\/([^/]+)$/
-const framePathRegex = /^\/video\/video\/embed\/videohash\/([^/]+)(?:\/vt\/frame)?\/?$/
+const scriptPathRegex = /^\/embed\/([^/]+)$/i
+const framePathRegex = /^\/video\/video\/embed\/videohash\/([^/]+)(?:\/vt\/frame)?\/?$/i
 
 // `aparat.com/etc/api/video/videohash/{hash}` answers with the title, the uploader, the duration
 // and a poster, with no key. The poster's asset url is signed with a `secret=` parameter.
@@ -39,7 +39,7 @@ export const aparatIframeEmbedResolver: EmbedResolver = createUrlEmbedResolver(
 // Aparat's WordPress-style facade: a script inside an empty div that never runs in a reader.
 // Its src is `aparat.com/embed/{hash}`, usually with no companion iframe anywhere in the item.
 export const aparatScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="aparat.com/embed/"]',
+  'script[src*="aparat.com/embed/" i]',
   (element) => {
     // The selector guarantees the host substring is in the src, so only the host and the path
     // shape can reject here. The `data[rnddiv]` and `data[responsive]` query the facade carries

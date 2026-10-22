@@ -155,3 +155,28 @@ describeForEachParser('rebuildExternalVideoEmbeds through the pipeline', (parseH
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('rebuildExternalVideoEmbeds in any case', (parseHtml) => {
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [rebuildExternalVideoEmbeds(baseContext)])
+  }
+
+  it('should rebuild a player whose loader path is in capitals', async () => {
+    const value = html`
+      <div>
+        <script type="text/javascript">extVideoConfig = {"width":"480","height":"320","url":"http://www.youtube.com/watch?feature=youtube_gdata&v=yoOT0NiydEA"};</script>
+        <script
+          type="text/javascript"
+          src="https://blog.seesaa.jp/CONTENTS/JS/EXTERNAL_VIDEO.JS"
+        ></script>
+      </div>
+    `
+    const expected = html`
+      <div>
+        <iframe src="https://www.youtube.com/embed/yoOT0NiydEA"></iframe>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})

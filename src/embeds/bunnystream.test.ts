@@ -258,3 +258,62 @@ describeForEachParser('bunnystream through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('bunnystreamEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, bunnystreamEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://iframe.mediadelivery.net/EMBED/490164/808903b8-30ff-49df-b389-1f2baeef0ea7?autoplay=false&amp;loop=false&amp;muted=false&amp;preload=true&amp;responsive=true"></iframe>'
+    const expected = {
+      provider: 'bunnystream',
+      id: '490164/808903b8-30ff-49df-b389-1f2baeef0ea7',
+      src: 'https://player.mediadelivery.net/embed/490164/808903b8-30ff-49df-b389-1f2baeef0ea7?autoplay=false',
+      url: 'https://player.mediadelivery.net/play/490164/808903b8-30ff-49df-b389-1f2baeef0ea7',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `play` in capitals', async () => {
+    const value =
+      '<iframe src="https://player.mediadelivery.net/PLAY/490164/808903b8-30ff-49df-b389-1f2baeef0ea7"></iframe>'
+    const expected = {
+      provider: 'bunnystream',
+      id: '490164/808903b8-30ff-49df-b389-1f2baeef0ea7',
+      src: 'https://player.mediadelivery.net/embed/490164/808903b8-30ff-49df-b389-1f2baeef0ea7?autoplay=false',
+      url: 'https://player.mediadelivery.net/play/490164/808903b8-30ff-49df-b389-1f2baeef0ea7',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `token` and `expires` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://player.mediadelivery.net/embed/759/eb1c4f77-0cda-46be-b47d-1118ad7c2ffe?TOKEN=5a5de480db5d14ed30717a3e849c7148a998fa42b0c267774756558e2de99eee&amp;EXPIRES=1456761770"></iframe>'
+    const expected = {
+      provider: 'bunnystream',
+      id: '759/eb1c4f77-0cda-46be-b47d-1118ad7c2ffe',
+      src: 'https://player.mediadelivery.net/embed/759/eb1c4f77-0cda-46be-b47d-1118ad7c2ffe?autoplay=false&token=5a5de480db5d14ed30717a3e849c7148a998fa42b0c267774756558e2de99eee&expires=1456761770',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `t` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://player.mediadelivery.net/embed/490164/808903b8-30ff-49df-b389-1f2baeef0ea7?T=1m30s&amp;autoplay=false"></iframe>'
+    const expected = {
+      provider: 'bunnystream',
+      id: '490164/808903b8-30ff-49df-b389-1f2baeef0ea7',
+      src: 'https://player.mediadelivery.net/embed/490164/808903b8-30ff-49df-b389-1f2baeef0ea7?autoplay=false&t=1m30s',
+      url: 'https://player.mediadelivery.net/play/490164/808903b8-30ff-49df-b389-1f2baeef0ea7',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -1187,3 +1187,33 @@ describeForEachParser('blueskyPostElementEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('blueskyIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, blueskyIframeEmbedResolver)
+
+  it('should read the route words `profile` and `post` in capitals', async () => {
+    const value =
+      '<iframe src="https://bsky.app/PROFILE/did:plc:z72i7hdynmk6r22z27h6tvur/POST/3kq7aeuwbg42k?ref_src=embed"></iframe>'
+    const expected = {
+      provider: 'bluesky',
+      id: 'did:plc:z72i7hdynmk6r22z27h6tvur/3kq7aeuwbg42k',
+      src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg42k',
+      url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `embed` and `app.bsky.feed.post` in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.bsky.app/EMBED/did:plc:z72i7hdynmk6r22z27h6tvur/APP.BSKY.FEED.POST/3kq7aeuwbg42k"></iframe>'
+    const expected = {
+      provider: 'bluesky',
+      id: 'did:plc:z72i7hdynmk6r22z27h6tvur/3kq7aeuwbg42k',
+      src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg42k',
+      url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

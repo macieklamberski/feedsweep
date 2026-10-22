@@ -170,3 +170,33 @@ describeForEachParser('megatvEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('megatvEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, megatvEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value = '<iframe src="https://www.megatv.com/EMBED/?p=2020687366"></iframe>'
+    const expected = {
+      provider: 'megatv',
+      id: '2020687366',
+      src: 'https://www.megatv.com/embed/?p=2020687366',
+      url: 'https://www.megatv.com/?p=687366',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `p` parameter name in capitals', async () => {
+    const value = '<iframe src="https://www.megatv.com/embed/?P=2020687366"></iframe>'
+    const expected = {
+      provider: 'megatv',
+      id: '2020687366',
+      src: 'https://www.megatv.com/embed/?p=2020687366',
+      url: 'https://www.megatv.com/?p=687366',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

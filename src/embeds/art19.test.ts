@@ -74,6 +74,20 @@ describe('art19ResolveEmbed', () => {
 
       expect(art19ResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the route words in another case and mint them in lowercase', () => {
+      const value =
+        'https://art19.com/SHOWS/broadcast-dialogue/EPISODES/949de556-7d25-406a-8a27-9823364183bd/EMBED'
+      const expected = {
+        provider: 'art19',
+        id: 'broadcast-dialogue/949de556-7d25-406a-8a27-9823364183bd',
+        src: 'https://art19.com/shows/broadcast-dialogue/episodes/949de556-7d25-406a-8a27-9823364183bd/embed',
+        url: 'https://art19.com/shows/broadcast-dialogue/episodes/949de556-7d25-406a-8a27-9823364183bd',
+        height: 200,
+      }
+
+      expect(art19ResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -92,13 +106,6 @@ describe('art19ResolveEmbed', () => {
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://art19.com/shows/broadcast-dialogue/embed/extra'
-
-      expect(art19ResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the route words in another case, which the server answers with 404', () => {
-      const value =
-        'https://art19.com/SHOWS/broadcast-dialogue/EPISODES/949de556-7d25-406a-8a27-9823364183bd/EMBED'
 
       expect(art19ResolveEmbed(value)).toBeUndefined()
     })
@@ -218,5 +225,23 @@ describeForEachParser('art19 through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('art19EmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, art19EmbedResolver)
+
+  it('should read the route words `shows`, `episodes` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://art19.com/SHOWS/broadcast-dialogue/EPISODES/949de556-7d25-406a-8a27-9823364183bd/EMBED"></iframe>'
+    const expected = {
+      provider: 'art19',
+      id: 'broadcast-dialogue/949de556-7d25-406a-8a27-9823364183bd',
+      src: 'https://art19.com/shows/broadcast-dialogue/episodes/949de556-7d25-406a-8a27-9823364183bd/embed',
+      url: 'https://art19.com/shows/broadcast-dialogue/episodes/949de556-7d25-406a-8a27-9823364183bd',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

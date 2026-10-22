@@ -387,3 +387,59 @@ describeForEachParser('reverbnation through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('reverbnationEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, reverbnationEmbedResolver)
+
+  it('should read the route words `widget_code` and `html_widget` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.reverbnation.com/WIDGET_CODE/HTML_WIDGET/artist_1018382?widget_id=50&amp;pwc[design]=default&amp;pwc[size]=fit"></iframe>'
+    const expected = {
+      provider: 'reverbnation',
+      id: 'artist_1018382',
+      src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?widget_id=50',
+      height: 265,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `widgets` and `swf` in capitals', async () => {
+    const value =
+      '<iframe src="http://cache.reverbnation.com/WIDGETS/SWF/40/pro_widget.swf?id=artist_1354004&amp;posted_by=&amp;skin_id=PWAS1006&amp;background_color=000000&amp;auto_play=false"></iframe>'
+    const expected = {
+      provider: 'reverbnation',
+      id: 'artist_1354004',
+      src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1354004',
+      height: 265,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `widget_id` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.reverbnation.com/widget_code/html_widget/artist_1018382?WIDGET_ID=50&amp;pwc[design]=default&amp;pwc[size]=fit"></iframe>'
+    const expected = {
+      provider: 'reverbnation',
+      id: 'artist_1018382',
+      src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1018382?WIDGET_ID=50',
+      height: 265,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `id` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="http://cache.reverbnation.com/widgets/swf/40/pro_widget.swf?ID=artist_1354004&amp;posted_by=&amp;skin_id=PWAS1006&amp;background_color=000000&amp;auto_play=false"></iframe>'
+    const expected = {
+      provider: 'reverbnation',
+      id: 'artist_1354004',
+      src: 'https://www.reverbnation.com/widget_code/html_widget/artist_1354004',
+      height: 265,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

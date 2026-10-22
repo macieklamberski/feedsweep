@@ -48,6 +48,18 @@ describe('oneTwoThreeFormBuilderResolveEmbed', () => {
       expect(oneTwoThreeFormBuilderResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should rebuild the older iframe snippet named in capitals', () => {
+      const value = 'https://www.123formbuilder.com/MY-CONTACT-FORM-4733692.html'
+      const expected: EmbedResolverResult = {
+        provider: '123formbuilder',
+        id: '4733692',
+        src: 'https://form.123formbuilder.com/4733692',
+        url: 'https://form.123formbuilder.com/4733692',
+      }
+
+      expect(oneTwoThreeFormBuilderResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should rebuild the older iframe snippet that names the account', () => {
       const value = 'http://www.123contactform.com/my-contact-form-a6441661074-783097.html'
       const expected: EmbedResolverResult = {
@@ -128,6 +140,46 @@ describeForEachParser('oneTwoThreeFormBuilderScriptEmbedResolver', (parseHtml) =
           type="text/javascript"
           defer
           src="https://form.123formbuilder.com/embed/4743251.js"
+          data-role="form"
+          data-default-width="650px"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: '123formbuilder',
+        id: '4743251',
+        src: 'https://form.123formbuilder.com/4743251',
+        url: 'https://form.123formbuilder.com/4743251',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should build the form from a loader whose role is in another case', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          defer
+          src="https://form.123formbuilder.com/embed/4743251.js"
+          data-role="Form"
+          data-default-width="650px"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: '123formbuilder',
+        id: '4743251',
+        src: 'https://form.123formbuilder.com/4743251',
+        url: 'https://form.123formbuilder.com/4743251',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should build the form from a loader whose path is in capitals', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          defer
+          src="https://form.123formbuilder.com/EMBED/4743251.js"
           data-role="form"
           data-default-width="650px"
         ></script>

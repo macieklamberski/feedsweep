@@ -404,3 +404,29 @@ describeForEachParser('rebuildLyteEmbeds', (parseHtml) => {
     expect(twice).toEqualHtml(once)
   })
 })
+
+describeForEachParser('rebuildLyteEmbeds in any case', (parseHtml) => {
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [rebuildLyteEmbeds(baseContext)])
+  }
+
+  it('should rebuild a cached thumbnail whose script, parameter and route are in capitals', async () => {
+    const value = html`
+      <figure class="wp-block-embed-youtube wp-block-embed">
+        <a href="https://example.com/post/">
+          <img
+            src="https://example.com/wp-content/plugins/wp-youtube-lyte/LYTECACHE.PHP?ORIGTHUMBURL=https%3A%2F%2Fi.ytimg.com%2FVI%2FOEkcwVBWh-4%2Fhqdefault.jpg"
+            alt="YouTube Video"
+          >
+        </a>
+      </figure>
+    `
+    const expected = html`
+      <figure class="wp-block-embed-youtube wp-block-embed">
+        <iframe src="https://www.youtube.com/embed/OEkcwVBWh-4"></iframe>
+      </figure>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})

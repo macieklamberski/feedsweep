@@ -70,12 +70,6 @@ describe('strawpollResolveEmbed', () => {
       expect(strawpollResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore the embed route in uppercase', () => {
-      const value = 'https://strawpoll.com/EMBED/e7ZJaM1BPg3'
-
-      expect(strawpollResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore the poll page, which refuses framing', () => {
       const value = 'https://strawpoll.com/e7ZJaM1BPg3'
 
@@ -112,6 +106,19 @@ describe('strawpollResolveEmbed', () => {
     it('should drop a query the frame does not need', () => {
       const value = 'https://strawpoll.com/embed/e7ZJaM1BPg3?utm_source=feed'
       const expected: EmbedResolverResult = {
+        provider: 'strawpoll',
+        id: 'e7ZJaM1BPg3',
+        src: 'https://strawpoll.com/embed/e7ZJaM1BPg3',
+        url: 'https://strawpoll.com/e7ZJaM1BPg3',
+        thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/e7ZJaM1BPg3-c.png',
+      }
+
+      expect(strawpollResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the embed route in uppercase', () => {
+      const value = 'https://strawpoll.com/EMBED/e7ZJaM1BPg3'
+      const expected = {
         provider: 'strawpoll',
         id: 'e7ZJaM1BPg3',
         src: 'https://strawpoll.com/embed/e7ZJaM1BPg3',
@@ -528,5 +535,22 @@ describeForEachParser('strawpoll snippets through the pipeline', (parseHtml) => 
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('strawpollIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, strawpollIframeEmbedResolver)
+
+  it('should read the route words `embed` and `polls` in capitals', async () => {
+    const value = '<iframe src="https://strawpoll.com/EMBED/POLLS/XOgONJpzrn3"></iframe>'
+    const expected = {
+      provider: 'strawpoll',
+      id: 'XOgONJpzrn3',
+      src: 'https://strawpoll.com/embed/XOgONJpzrn3',
+      url: 'https://strawpoll.com/XOgONJpzrn3',
+      thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/XOgONJpzrn3-c.png',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

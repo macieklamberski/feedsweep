@@ -4,6 +4,7 @@ import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   absoluteUrlRegex,
   encodePathSegment,
+  getQueryParam,
   parseUrlOnHosts,
   pickUrlParams,
   placeholderBaseUrl,
@@ -25,7 +26,7 @@ const deliveryPlayerHost = 'iframe.videodelivery.net'
 // The image is served from the bare host.
 const deliveryThumbnailHost = 'videodelivery.net'
 
-const playerPathRegex = /^\/([^/]+)\/iframe\/?$/
+const playerPathRegex = /^\/([^/]+)\/iframe\/?$/i
 const deliveryPathRegex = /^\/([^/]+)\/?$/
 
 // The start position and whether the video repeats, the playback parameters the player reads.
@@ -62,7 +63,7 @@ export const cloudflarestreamResolveEmbed: ResolveEmbed = (url) => {
   const playerPath = isDelivery ? `/${videoId}` : `/${videoId}/iframe`
   const thumbnailHost = isDelivery ? deliveryThumbnailHost : parsed.hostname
   // A relative `poster` would resolve against the feed, not the player, so it is not read.
-  const poster = keepIfMatches(parsed.searchParams.get('poster'), absoluteUrlRegex)
+  const poster = keepIfMatches(getQueryParam(parsed.searchParams, 'poster'), absoluteUrlRegex)
 
   return {
     provider,
@@ -83,11 +84,11 @@ export const cloudflarestreamIframeEmbedResolver = createUrlEmbedResolver(
 // Cloudflare Stream's loader script, which writes the player into an empty sibling div. A reader
 // runs no script, so the video is only in the loader's own `?video=`.
 export const cloudflarestreamScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="videodelivery.net/embed/"], script[src*="cloudflarestream.com/embed/"]',
+  'script[src*="videodelivery.net/embed/" i], script[src*="cloudflarestream.com/embed/" i]',
   (element) => {
     // The selector matches a substring any host can carry, so the host is checked here.
     const parsed = parseUrlOnHosts(attr(element, 'src'), cloudflarestreamHosts)
-    const videoId = parsed?.searchParams.get('video')
+    const videoId = getQueryParam(parsed?.searchParams, 'video')
 
     if (!videoId) {
       return

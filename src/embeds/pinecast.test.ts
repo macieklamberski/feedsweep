@@ -235,3 +235,20 @@ describeForEachParser('pinecast through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('pinecastEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, pinecastEmbedResolver)
+
+  it('should read the route word `player` in capitals', async () => {
+    const value =
+      '<iframe src="https://pinecast.com/PLAYER/fd8fd547-b572-4ff7-ae71-b8c944b7a471"></iframe>'
+    const expected = {
+      provider: 'pinecast',
+      id: 'fd8fd547-b572-4ff7-ae71-b8c944b7a471',
+      src: 'https://pinecast.com/player/fd8fd547-b572-4ff7-ae71-b8c944b7a471',
+      height: 60,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

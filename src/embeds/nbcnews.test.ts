@@ -164,20 +164,32 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse uppercase widget route words the platform does not serve', async () => {
+    it('should read uppercase widget route words and mint them in lowercase', async () => {
       const value = html`
         <iframe src="https://www.nbcnews.com/WIDGET/VIDEO-EMBED/265460805743"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'nbcnews',
+        id: 'mmvo265460805743',
+        src: 'https://www.nbcnews.com/widget/video-embed/265460805743',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse an uppercase offsite route word the platform does not serve', async () => {
+    it('should read an uppercase offsite route word and mint the lowercase route', async () => {
       const value = html`
         <iframe src="https://www.today.com/OFFSITE/yard-pong-games-1244547139528"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'nbcnews',
+        id: 'mmvo1244547139528',
+        src: 'https://www.today.com/embedded-video/mmvo1244547139528',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should refuse a bare number on the embedded-video route', async () => {
@@ -274,5 +286,34 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+describeForEachParser('nbcnewsEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, nbcnewsEmbedResolver)
+
+  it('should read the route words `widget` and `video-embed` in capitals', async () => {
+    const value = '<iframe src="http://www.nbcnews.com/WIDGET/VIDEO-EMBED/713265731534"></iframe>'
+    const expected = {
+      provider: 'nbcnews',
+      id: 'mmvo713265731534',
+      src: 'https://www.nbcnews.com/widget/video-embed/713265731534',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route word `offsite` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.today.com/OFFSITE/jumbo-jumper-yard-pong-games-and-accessories-for-outdoor-fun-1244547139528"></iframe>'
+    const expected = {
+      provider: 'nbcnews',
+      id: 'mmvo1244547139528',
+      src: 'https://www.today.com/embedded-video/mmvo1244547139528',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })

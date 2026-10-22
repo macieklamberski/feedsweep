@@ -192,3 +192,34 @@ describe('readDonorboxHeight', () => {
     expect(readDonorboxHeight('dbox')).toBeUndefined()
   })
 })
+
+describeForEachParser('donorboxEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, donorboxEmbedResolver)
+
+  it('should read the route word `embed` in capitals', async () => {
+    const value = '<iframe src="https://donorbox.org/EMBED/donation-form-248"></iframe>'
+    const expected = {
+      provider: 'donorbox',
+      id: 'donation-form-248',
+      src: 'https://donorbox.org/embed/donation-form-248',
+      url: 'https://donorbox.org/donation-form-248',
+      height: 900,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `amount` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://donorbox.org/embed/donation-form-248?default_interval=m&amp;AMOUNT=25"></iframe>'
+    const expected = {
+      provider: 'donorbox',
+      id: 'donation-form-248',
+      src: 'https://donorbox.org/embed/donation-form-248?amount=25',
+      url: 'https://donorbox.org/donation-form-248',
+      height: 900,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

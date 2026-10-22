@@ -361,3 +361,22 @@ describeForEachParser('mixcloud through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('mixcloudEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mixcloudEmbedResolver)
+
+  it('should read the `feed` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.mixcloud.com/widget/iframe/?FEED=%2Fphotogmusic%2Fno-filter-may-28-2018-hour-one%2F"></iframe>'
+    const expected = {
+      provider: 'mixcloud',
+      id: 'photogmusic/no-filter-may-28-2018-hour-one',
+      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter-may-28-2018-hour-one%2F',
+      url: 'https://www.mixcloud.com/photogmusic/no-filter-may-28-2018-hour-one/',
+      height: 120,
+      author: 'photogmusic',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

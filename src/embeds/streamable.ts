@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
@@ -10,14 +10,14 @@ const provider = 'streamable'
 const streamableHosts = ['streamable.com', 'www.streamable.com']
 
 // The embed `/e/{id}` and the frame the oEmbed answer writes, `/o/{id}`.
-const embedRoutes = new Set(['e', 'o'])
+const embedRoutes = ['e', 'o']
 
 // The player loops unless `loop=0` turns it off.
 const streamableEmbedParams = ['loop']
 
 const playerRatio = '16/9'
 
-// The server matches route words and ids only as written. The share route `/s/{id}/{token}`
+// The server matches ids only as written. The share route `/s/{id}/{token}`
 // plays the id whatever the token holds.
 const readVideoId = (segments: Array<string>): string | undefined => {
   const [route, id] = segments
@@ -26,11 +26,11 @@ const readVideoId = (segments: Array<string>): string | undefined => {
     return route
   }
 
-  if (embedRoutes.has(route) && segments.length === 2) {
+  if (isAnyOf(route, embedRoutes) && segments.length === 2) {
     return id
   }
 
-  if (route === 's' && segments.length === 3) {
+  if (isAnyOf(route, 's') && segments.length === 3) {
     return id
   }
 }
@@ -48,7 +48,7 @@ export const streamableResolveEmbed: ResolveEmbed = (url, element) => {
   const segments = getPathSegments(parsed)
   const title = attr(element, 'title')
 
-  if (segments[0] === 'm' && segments.length === 2) {
+  if (isAnyOf(segments[0], 'm') && segments.length === 2) {
     return {
       provider,
       id: `m/${segments[1]}`,
@@ -94,7 +94,7 @@ export const streamableMlbEmbedResolver = createMarkupEmbedResolver(
     // The clip's page is `/video/{slug}`, or `/{team}/video/{slug}` on a club's site.
     const segments = getPathSegments(parsed)
 
-    if (segments.length > 3 || segments.at(-2) !== 'video') {
+    if (segments.length > 3 || !isAnyOf(segments.at(-2), 'video')) {
       return
     }
 

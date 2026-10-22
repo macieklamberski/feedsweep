@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -19,7 +19,7 @@ export const zenoResolveEmbed: ResolveEmbed = (url, element) => {
 
   const [route, slug] = getPathSegments(parsed)
 
-  if (route !== 'player' || !slug) {
+  if (!isAnyOf(route, 'player') || !slug) {
     return
   }
 

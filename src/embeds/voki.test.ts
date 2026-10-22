@@ -290,3 +290,53 @@ describeForEachParser('voki shapes the pipeline repairs first', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('vokiFlashEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, vokiFlashEmbedResolver)
+
+  it('should read the route words `vhss_editors` and `voki_player.swf` in capitals', async () => {
+    const value =
+      '<iframe src="http://vhss-d.oddcast.com/VHSS_EDITORS/VOKI_PLAYER.SWF?doc=http%3A%2F%2Fvhss-d.oddcast.com%2Fphp%2Fvhss_editors%2Fgetvoki%2Fchsm=631cce3b6b1bb63568035e9ad179caee%26sc=7715476"></iframe>'
+    const expected = {
+      provider: 'voki',
+      id: '7715476/631cce3b6b1bb63568035e9ad179caee',
+      src: 'https://www.voki.com/site/pickup?scid=7715476&chsm=631cce3b6b1bb63568035e9ad179caee',
+      url: 'https://www.voki.com/site/pickup?scid=7715476&chsm=631cce3b6b1bb63568035e9ad179caee',
+      height: 547,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `doc` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="http://vhss-d.oddcast.com/vhss_editors/voki_player.swf?DOC=http%3A%2F%2Fvhss-d.oddcast.com%2Fphp%2Fvhss_editors%2Fgetvoki%2Fchsm=631cce3b6b1bb63568035e9ad179caee%26sc=7715476"></iframe>'
+    const expected = {
+      provider: 'voki',
+      id: '7715476/631cce3b6b1bb63568035e9ad179caee',
+      src: 'https://www.voki.com/site/pickup?scid=7715476&chsm=631cce3b6b1bb63568035e9ad179caee',
+      url: 'https://www.voki.com/site/pickup?scid=7715476&chsm=631cce3b6b1bb63568035e9ad179caee',
+      height: 547,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('vokiIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, vokiIframeEmbedResolver)
+
+  it('should read the `scid` and `chsm` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://www.voki.com/site/pickup?SCID=7715476&amp;CHSM=631cce3b6b1bb63568035e9ad179caee"></iframe>'
+    const expected = {
+      provider: 'voki',
+      id: '7715476/631cce3b6b1bb63568035e9ad179caee',
+      src: 'https://www.voki.com/site/pickup?scid=7715476&chsm=631cce3b6b1bb63568035e9ad179caee',
+      url: 'https://www.voki.com/site/pickup?scid=7715476&chsm=631cce3b6b1bb63568035e9ad179caee',
+      height: 547,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

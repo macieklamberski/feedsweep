@@ -531,3 +531,35 @@ describeForEachParser('cognitoforms through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('cognitoformsIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, cognitoformsIframeEmbedResolver)
+
+  it('should read the `id` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://services.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA?ID=2"></iframe>'
+    const expected = {
+      provider: 'cognitoforms',
+      id: 'udBVZe3Z5EWT79cmnukmOA/2',
+      src: 'https://www.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA/2',
+      url: 'https://www.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA/2',
+      height: 600,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `entry` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48?ENTRY=%7B%22Name%22%3A%22Jane%22%7D&amp;utm_source=post"></iframe>'
+    const expected = {
+      provider: 'cognitoforms',
+      id: 'yExCAh1c_E2nq69zMpV9RA/48',
+      src: 'https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48?entry=%7B%22Name%22%3A%22Jane%22%7D',
+      url: 'https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48',
+      height: 600,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

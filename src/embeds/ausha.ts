@@ -1,7 +1,7 @@
-import { getPathSegments, trimObject } from 'trousse'
+import { getPathSegments, isAnyOf, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ausha'
@@ -26,14 +26,14 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
   // Both hosts serve their player from the root, spelled either bare or as `index.html`.
   if (
     !playerHosts.includes(parsed.hostname) ||
-    (segments.length > 0 && segments[0] !== 'index.html')
+    (segments.length > 0 && !isAnyOf(segments[0], 'index.html'))
   ) {
     return
   }
 
   // An episode and its show are often named together, and the episode is the finer of the two.
-  const podcast = parsed.searchParams.get('podcastId') ?? ''
-  const show = parsed.searchParams.get('showId') ?? ''
+  const podcast = getQueryParam(parsed.searchParams, 'podcastId') ?? ''
+  const show = getQueryParam(parsed.searchParams, 'showId') ?? ''
   const named = [
     ['podcast', podcast],
     ['show', show],
@@ -46,7 +46,7 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
   const [kind, id] = named
 
   // The spelling Ausha's share dialog writes, with the start position the frame names.
-  const start = parsed.searchParams.get('t') ?? undefined
+  const start = getQueryParam(parsed.searchParams, 't')
   const query = composeQuery(trimObject({ [`${kind}Id`]: id, v: '3', t: start }, Boolean))
 
   return {

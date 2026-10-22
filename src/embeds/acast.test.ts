@@ -233,3 +233,20 @@ describeForEachParser('acastEmbedResolver carrier title', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 })
+
+describeForEachParser('acastEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, acastEmbedResolver)
+
+  it('should read the route word `episodes` in capitals', async () => {
+    const value =
+      '<iframe src="https://player.acast.com/5cd07163ad694b18367aeb03/EPISODES/homebrew-6?theme=default&amp;cover=1&amp;latest=1"></iframe>'
+    const expected = {
+      provider: 'acast',
+      id: '5cd07163ad694b18367aeb03/homebrew-6',
+      src: 'https://embed.acast.com/5cd07163ad694b18367aeb03/homebrew-6',
+      height: 190,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

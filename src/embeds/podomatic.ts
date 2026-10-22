@@ -1,6 +1,6 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, getQueryParam, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const podomaticHost = 'podomatic.com'
@@ -18,13 +18,13 @@ type Player = { kind: string; id: string; src: string; height: number }
 const readPlayer = (url: URL): Player | undefined => {
   const segments = getPathSegments(url)
 
-  if (segments[0] !== 'embed') {
+  if (!isAnyOf(segments[0], 'embed')) {
     return
   }
 
   // `embed/html5/{episode|podcast}/{id}`. Any other kind answers 404.
-  if (segments[1] === 'html5' && segments[2]) {
-    const kind = segments[2]
+  if (isAnyOf(segments[1], 'html5') && segments[2]) {
+    const kind = segments[2].toLowerCase()
     const id = segments[3] ?? ''
 
     return {
@@ -37,14 +37,14 @@ const readPlayer = (url: URL): Player | undefined => {
 
   // embed/v2/podcast/{podcast}?episode_id={episode} is the snippet Podomatic hands out today, and
   // its episode_id is the id the html5 route takes in its path.
-  if (segments[1] === 'v2' && segments[2] === 'podcast') {
+  if (isAnyOf(segments[1], 'v2') && isAnyOf(segments[2], 'podcast')) {
     const podcast = segments[3]
 
     if (!podcast) {
       return
     }
 
-    const episode = url.searchParams.get('episode_id') ?? ''
+    const episode = getQueryParam(url.searchParams, 'episode_id') ?? ''
     const named = episode ? composeQuery({ episode_id: episode }) : ''
 
     return {

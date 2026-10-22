@@ -163,3 +163,20 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
     })
   })
 })
+
+describeForEachParser('brEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, brEmbedResolver)
+
+  it('should read the route words `mediathek` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://www.br.de/MEDIATHEK/EMBED/av:5dc03b7808e85c001af059a0"></iframe>'
+    const expected = {
+      provider: 'br',
+      id: 'av:5dc03b7808e85c001af059a0',
+      src: 'https://www.br.de/mediathek/embed/av:5dc03b7808e85c001af059a0',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

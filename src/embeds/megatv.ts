@@ -1,6 +1,6 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, getQueryParam, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const megatvHosts = ['megatv.com']
@@ -13,11 +13,11 @@ const prefixedPostIdRegex = /^2020(\d{6,})$/
 const megatvResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  if (!parsed || getPathSegments(parsed).join('/') !== 'embed') {
+  if (!parsed || !isAnyOf(getPathSegments(parsed).join('/'), 'embed')) {
     return
   }
 
-  const id = parsed.searchParams.get('p')
+  const id = getQueryParam(parsed.searchParams, 'p')
 
   if (!id) {
     return

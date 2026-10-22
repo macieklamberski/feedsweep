@@ -344,3 +344,37 @@ describeForEachParser('zohoworkdrive through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('zohoworkdriveEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, zohoworkdriveEmbedResolver)
+
+  it('should read the route words `external` and `embed` in capitals', async () => {
+    const value =
+      '<iframe src="https://workdrive.zohopublic.com/EXTERNAL/0f61d112fbf1cac326130a3a1e186a3d2f519307b5d9a8abf4cc8a85a0c3a35a/EMBED"></iframe>'
+    const expected = {
+      provider: 'zohoworkdrive',
+      id: 'external/0f61d112fbf1cac326130a3a1e186a3d2f519307b5d9a8abf4cc8a85a0c3a35a',
+      src: 'https://workdrive.zohoexternal.com/external/0f61d112fbf1cac326130a3a1e186a3d2f519307b5d9a8abf4cc8a85a0c3a35a',
+      url: 'https://workdrive.zohoexternal.com/external/0f61d112fbf1cac326130a3a1e186a3d2f519307b5d9a8abf4cc8a85a0c3a35a',
+      ratio: '4/3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `loop` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://workdrive.zoho.com/embed/nyn890d57781aad364bac82edd53e2a1d6b36?LOOP=true&amp;autoplay=true&amp;toolbar=false&amp;appearance=light&amp;themecolor=green"></iframe>'
+    const expected = {
+      provider: 'zohoworkdrive',
+      id: 'embed/nyn890d57781aad364bac82edd53e2a1d6b36',
+      src: 'https://workdrive.zohoexternal.com/embed/nyn890d57781aad364bac82edd53e2a1d6b36?loop=true',
+      url: 'https://workdrive.zohoexternal.com/embed/nyn890d57781aad364bac82edd53e2a1d6b36',
+      thumbnail:
+        'https://previewengine.zohoexternal.com/thumbnail/WD/nyn890d57781aad364bac82edd53e2a1d6b36?size=l',
+      ratio: '4/3',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

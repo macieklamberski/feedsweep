@@ -204,3 +204,37 @@ describeForEachParser('guardianEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toBeUndefined()
   })
 })
+
+describeForEachParser('guardianEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, guardianEmbedResolver)
+
+  it('should read the route words `embed`, `video` and `jun` in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.theguardian.com/EMBED/VIDEO/society/VIDEO/2015/JUN/18/superbugs-la-mrsa-pigs-antibiotics-video"></iframe>'
+    const expected = {
+      provider: 'guardian',
+      id: 'society/VIDEO/2015/JUN/18/superbugs-la-mrsa-pigs-antibiotics-video',
+      src: 'https://embed.theguardian.com/embed/video/society/VIDEO/2015/JUN/18/superbugs-la-mrsa-pigs-antibiotics-video',
+      url: 'https://www.theguardian.com/society/VIDEO/2015/JUN/18/superbugs-la-mrsa-pigs-antibiotics-video',
+      ratio: '16/9',
+      date: '2015-06-18',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `embed`, `video` and `oct` in capitals', async () => {
+    const value =
+      '<iframe src="https://embed.theguardian.com/EMBED/VIDEO/world/VIDEO/2015/OCT/08/ashton-carter-nato-syria-video"></iframe>'
+    const expected = {
+      provider: 'guardian',
+      id: 'world/VIDEO/2015/OCT/08/ashton-carter-nato-syria-video',
+      src: 'https://embed.theguardian.com/embed/video/world/VIDEO/2015/OCT/08/ashton-carter-nato-syria-video',
+      url: 'https://www.theguardian.com/world/VIDEO/2015/OCT/08/ashton-carter-nato-syria-video',
+      ratio: '16/9',
+      date: '2015-10-08',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

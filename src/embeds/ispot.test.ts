@@ -178,3 +178,20 @@ describeForEachParser('ispot player through the pipeline', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('ispotEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, ispotEmbedResolver)
+
+  it('should read the route word `share` in capitals', async () => {
+    const value = '<iframe src="https://www.ispot.tv/SHARE/IoLU"></iframe>'
+    const expected = {
+      provider: 'ispot',
+      id: 'IoLU',
+      src: 'https://www.ispot.tv/share/IoLU',
+      thumbnail: 'https://images-cdn.ispot.tv/ad/IoLU/default-large.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

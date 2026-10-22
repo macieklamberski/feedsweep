@@ -384,3 +384,48 @@ describeForEachParser('spreaker through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('spreakerIframeEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, spreakerIframeEmbedResolver)
+
+  it('should read the route word `player` in capitals', async () => {
+    const value =
+      '<iframe src="https://widget.spreaker.com/PLAYER?episode_id=52842990&amp;theme=dark&amp;playlist=false"></iframe>'
+    const expected = {
+      provider: 'spreaker',
+      id: 'episode/52842990',
+      src: 'https://widget.spreaker.com/player?episode_id=52842990',
+      url: 'https://www.spreaker.com/episode/52842990',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `episode_id` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://widget.spreaker.com/player?EPISODE_ID=52842990&amp;theme=dark&amp;playlist=false"></iframe>'
+    const expected = {
+      provider: 'spreaker',
+      id: 'episode/52842990',
+      src: 'https://widget.spreaker.com/player?episode_id=52842990',
+      url: 'https://www.spreaker.com/episode/52842990',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `show_id` parameter name in capitals', async () => {
+    const value = '<iframe src="https://widget.spreaker.com/player?SHOW_ID=1234567"></iframe>'
+    const expected = {
+      provider: 'spreaker',
+      id: 'show/1234567',
+      src: 'https://widget.spreaker.com/player?show_id=1234567',
+      url: 'https://www.spreaker.com/show/1234567',
+      height: 200,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -498,3 +498,67 @@ describeForEachParser('googledocs through the pipeline', (parseHtml) => {
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('googledocsEmbedResolver in any case', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, googledocsEmbedResolver)
+
+  it('should read the route words `document`, `d`, `e` and `pub` in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/DOCUMENT/D/E/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/PUB?embedded=true"></iframe>'
+    const expected = {
+      provider: 'googledocs',
+      id: '2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN',
+      src: 'https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub?embedded=true',
+      url: 'https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the route words `document`, `d` and `preview` in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/DOCUMENT/D/1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI/PREVIEW"></iframe>'
+    const expected = {
+      provider: 'googledocs',
+      id: '1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI',
+      src: 'https://docs.google.com/document/d/1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI/preview',
+      url: 'https://docs.google.com/document/d/1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI/edit',
+      thumbnail:
+        'https://drive.google.com/thumbnail?id=1GIR49vBdsNekn4YIIAi1AvC84yirCwdoqBgqA8UKPWI&sz=w640',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `embedded` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub?EMBEDDED=true"></iframe>'
+    const expected = {
+      provider: 'googledocs',
+      id: '2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN',
+      src: 'https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub?embedded=true',
+      url: 'https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the `tab` parameter name in capitals', async () => {
+    const value =
+      '<iframe src="https://docs.google.com/document/d/1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY/edit?TAB=t.0"></iframe>'
+    const expected = {
+      provider: 'googledocs',
+      id: '1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY',
+      src: 'https://docs.google.com/document/d/1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY/preview?tab=t.0',
+      url: 'https://docs.google.com/document/d/1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY/edit',
+      thumbnail:
+        'https://drive.google.com/thumbnail?id=1aAzhE23-epH5l5wPnB1-hcQrhQCkYMbZtx55nEbCnMY&sz=w640',
+      height: 500,
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})

@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -40,7 +40,12 @@ export const subsplashResolveEmbed: ResolveEmbed = (url) => {
   if (segments.length === 6) {
     const [user, org, media, embed, d, id] = segments
 
-    if (user !== 'u' || media !== 'media' || embed !== 'embed' || d !== 'd') {
+    if (
+      !isAnyOf(user, 'u') ||
+      !isAnyOf(media, 'media') ||
+      !isAnyOf(embed, 'embed') ||
+      !isAnyOf(d, 'd')
+    ) {
       return
     }
 
@@ -52,7 +57,7 @@ export const subsplashResolveEmbed: ResolveEmbed = (url) => {
   if (segments.length === 4) {
     const [app, embed, mi, id] = segments
 
-    if (!app.startsWith('+') || embed !== 'embed' || mi !== 'mi') {
+    if (!app.startsWith('+') || !isAnyOf(embed, 'embed') || !isAnyOf(mi, 'mi')) {
       return
     }
 

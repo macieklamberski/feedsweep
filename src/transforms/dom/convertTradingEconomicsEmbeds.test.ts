@@ -279,3 +279,23 @@ describeForEachParser('trading economics charts through the pipeline', (parseHtm
     expect(await convert(value)).toEqualHtml(expected)
   })
 })
+
+describeForEachParser('convertTradingEconomicsEmbeds in any case', (parseHtml) => {
+  const transform = (value: string) => {
+    return applyDomTransforms(parseHtml(value), [convertTradingEconomicsEmbeds(baseContext)])
+  }
+
+  it('should read the `s`, `w` and `h` parameter names in capitals', async () => {
+    const value =
+      '<iframe src="https://tradingeconomics.com/embed/?S=usareninf&amp;H=300&amp;W=600"></iframe>'
+    const expected = html`
+      <img
+        height="300"
+        width="600"
+        src="https://tradingeconomics.com/charts/embed.png?S=usareninf&H=300&W=600"
+      >
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+})
