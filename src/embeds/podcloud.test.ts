@@ -447,4 +447,16 @@ describeForEachParser('podcloudIframeEmbedResolver in any case', (parseHtml) => 
 
     expect(await extract(value)).toEqual(expected)
   })
+
+  it('should write the option names `guid` and `playlist` from the code and keep their values', async () => {
+    const value =
+      '<iframe src="https://podcloud.fr/podcast/oxymut/player/GUID:6404F24035F425550919C39B;PLAYLIST:5e1f0c2a8b3d4e0011223344-5e1f0c2a8b3d4e0055667788"></iframe>'
+    const expected = {
+      provider: 'podcloud',
+      id: 'playlist:5e1f0c2a8b3d4e0011223344-5e1f0c2a8b3d4e0055667788',
+      src: 'https://podcloud.fr/podcast/oxymut/player/guid:6404F24035F425550919C39B/playlist:5e1f0c2a8b3d4e0011223344-5e1f0c2a8b3d4e0055667788',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
 })

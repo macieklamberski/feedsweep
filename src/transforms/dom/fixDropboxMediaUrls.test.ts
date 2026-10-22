@@ -125,9 +125,18 @@ describeForEachParser('fixDropboxMediaUrls in any case', (parseHtml) => {
     return applyDomTransforms(parseHtml(value), [fixDropboxMediaUrls(baseContext)])
   }
 
-  it('should fix a share link whose `s` route is in capitals', async () => {
+  it('should write the `s` route from the code when the share link spells it in capitals', async () => {
     const value = '<audio src="https://www.dropbox.com/S/3xkzmaf5ws3142v/01.wav?dl=1"></audio>'
-    const expected = '<audio src="https://www.dropbox.com/S/3xkzmaf5ws3142v/01.wav?raw=1"></audio>'
+    const expected = '<audio src="https://www.dropbox.com/s/3xkzmaf5ws3142v/01.wav?raw=1"></audio>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should write the `scl/fi` route from the code and keep the token and file as written', async () => {
+    const value =
+      '<audio src="https://www.dropbox.com/SCL/FI/cw5wkz/Marcha.mp3?rlkey=ts97wmy3xk&amp;dl=0"></audio>'
+    const expected =
+      '<audio src="https://www.dropbox.com/scl/fi/cw5wkz/Marcha.mp3?rlkey=ts97wmy3xk&amp;raw=1"></audio>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })

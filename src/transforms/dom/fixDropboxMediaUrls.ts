@@ -16,6 +16,8 @@ export const fixDropboxMediaUrls: DomTransform = () => (document) => {
       continue
     }
 
+    // Dropbox answers 404 to `/S/`, so the route is written from the code.
+    url.pathname = url.pathname.replace(sharePathRegex, (route) => route.toLowerCase())
     url.searchParams.delete('dl')
     url.searchParams.set('raw', '1')
 
