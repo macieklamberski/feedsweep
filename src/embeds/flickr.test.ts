@@ -393,9 +393,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
   })
 
   describe('the legacy slideshow iframe', () => {
-    it('should use a set id carrying a path slash as written', async () => {
-      const value =
-        '<iframe src="http://www.flickr.com/slideShow/index.gne?user_id=24006738@N07&amp;set_id=72157627734131040/"></iframe>'
+    it('should drop the slash a feed glued onto the set id', async () => {
+      const value = html`
+        <iframe src="http://www.flickr.com/slideShow/index.gne?group_id=&amp;user_id=24006738@N07&amp;set_id=72157627734131040/&amp;text="></iframe>
+      `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157627734131040',
