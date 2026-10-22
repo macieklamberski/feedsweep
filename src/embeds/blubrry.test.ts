@@ -25,20 +25,25 @@ describe('extractBlubrryEmbed', () => {
     expect(extractBlubrryEmbed(value)).toEqual(expected)
   })
 
-  it('should read the episode id a media url player names beside its file', () => {
+  it('should read the media url over the podcast id beside it', () => {
     const value =
       'https://player.blubrry.com/?podcast_id=154118283&media_url=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3&modern=1'
+    const expected: BlubrryPlayer = { kind: 'media', id: 'https://media.blubrry.com/show/ep.mp3' }
+
+    expect(extractBlubrryEmbed(value)).toEqual(expected)
+  })
+
+  it('should read the episode id of a player naming no media url', () => {
+    const value = 'https://player.blubrry.com/?podcast_id=154118283&modern=1'
     const expected: BlubrryPlayer = { kind: 'episode', id: '154118283' }
 
     expect(extractBlubrryEmbed(value)).toEqual(expected)
   })
 
-  it('should read the media url when the episode id beside it is not digits', () => {
-    const value =
-      'https://player.blubrry.com/?podcast_id=..%2Fpricing&media_url=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3'
-    const expected: BlubrryPlayer = { kind: 'media', id: 'https://media.blubrry.com/show/ep.mp3' }
+  it('should return undefined for a podcast id that is not digits', () => {
+    const value = 'https://player.blubrry.com/?podcast_id=..%2Fpricing&modern=1'
 
-    expect(extractBlubrryEmbed(value)).toEqual(expected)
+    expect(extractBlubrryEmbed(value)).toBeUndefined()
   })
 
   it('should read an episode id that is not digits by its route', () => {
@@ -128,10 +133,30 @@ describeForEachParser('blubrryEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should key a media url player naming its episode by the episode', async () => {
+    it('should key a player naming a media url and a podcast id by the media url', async () => {
       const value = html`
         <iframe
-          src="https://player.blubrry.com/?podcast_id=154118283&amp;media_url=https%3A%2F%2Fmedia.blubrry.com%2Fjustflyperformancepodcast%2Fcontent.blubrry.com%2Fjustflyperformancepodcast%2F521_Joe_Pedulla.mp3&amp;modern=1"
+          src="https://player.blubrry.com/?podcast_id=132906693&amp;media_url=https%3A%2F%2Fmedia.blubrry.com%2Fthe_shaman_podcast%2Fcontent.blubrry.com%2Fthe_shaman_podcast%2F04_May_2026.mp3&amp;modern=1#mode-Light&amp;border-000000&amp;progress-000000"
+          scrolling="no"
+          width="100%"
+          height="165"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'https://media.blubrry.com/the_shaman_podcast/content.blubrry.com/the_shaman_podcast/04_May_2026.mp3',
+        src: 'https://player.blubrry.com/?media_url=https%3A%2F%2Fmedia.blubrry.com%2Fthe_shaman_podcast%2Fcontent.blubrry.com%2Fthe_shaman_podcast%2F04_May_2026.mp3',
+        height: 164,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should key a player naming only a podcast id by the episode', async () => {
+      const value = html`
+        <iframe
+          src="https://player.blubrry.com/?podcast_id=154118283&amp;modern=1"
           width="100%"
           height="165"
         ></iframe>
