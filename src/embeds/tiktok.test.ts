@@ -734,6 +734,18 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should ignore a data-unique-id that is a dot segment', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          data-unique-id=".."
+          data-embed-type="creator"
+        ></blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a data-video-id that is a dot segment', async () => {
       const value = '<blockquote class="tiktok-embed" data-video-id=".."></blockquote>'
 

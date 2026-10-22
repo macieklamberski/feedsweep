@@ -102,11 +102,17 @@ const profilePathRegex = /^\/@([^/]+)\/?$/
 // The account a blockquote names, from `data-unique-id` where the creator widget declares it,
 // otherwise from the profile anchor, the only source the half-encoded shape keeps. The attribute
 // comes out decoded, and the anchor's path is already a segment.
-const readHandle = (element: Element): { handle: string; segment?: string } | undefined => {
+const readHandle = (element: Element): { handle: string; segment: string } | undefined => {
   const declared = attr(element, 'data-unique-id')
 
   if (declared) {
-    return { handle: declared, segment: encodePathSegment(declared) }
+    const segment = encodePathSegment(declared)
+
+    if (!segment) {
+      return
+    }
+
+    return { handle: declared, segment }
   }
 
   for (const anchor of element.querySelectorAll('a[href]')) {
@@ -123,11 +129,13 @@ const readHandle = (element: Element): { handle: string; segment?: string } | un
 }
 
 const resolveAccount = (element: Element): EmbedResolverResult | undefined => {
-  const { handle, segment } = readHandle(element) ?? {}
+  const account = readHandle(element)
 
-  if (!handle || !segment) {
+  if (!account) {
     return
   }
+
+  const { handle, segment } = account
 
   const cite = attr(element, 'cite')
   const isCitedProfile = Boolean(cite && parseUrlOnHosts(cite, tiktokHosts))
@@ -200,7 +208,7 @@ export const tiktokMetasliderEmbedResolver = createMarkupEmbedResolver(
     // The id comes out of its attribute decoded, and it goes into a path.
     const segment = videoId ? encodePathSegment(videoId) : undefined
 
-    if (!videoId || !segment) {
+    if (!segment) {
       return
     }
 

@@ -49,7 +49,7 @@ export const canvaWidgetEmbedResolver = createMarkupEmbedResolver(
     // The id comes out of its attribute decoded, and it goes into a path.
     const segment = id ? encodePathSegment(id) : undefined
 
-    if (!id || !segment) {
+    if (!segment) {
       return
     }
 

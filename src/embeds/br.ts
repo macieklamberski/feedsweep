@@ -16,7 +16,7 @@ const brResolveEmbed: ResolveEmbed = (url) => {
   // The token is read decoded, and it goes back into the path.
   const segment = token ? encodePathSegment(token) : undefined
 
-  if (section !== 'mediathek' || route !== 'embed' || !token || !segment) {
+  if (section !== 'mediathek' || route !== 'embed' || !segment) {
     return
   }
 

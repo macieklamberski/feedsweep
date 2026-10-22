@@ -172,6 +172,18 @@ describeForEachParser('formmailerWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a hash that is a dot segment', async () => {
+      const value = html`
+        <div
+          class="formmailer-embed"
+          data-form-hash=".."
+          data-form-host="pro.form-mailer.jp"
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should keep a hash holding slashes inside one path segment', async () => {
       const value = html`
         <div
