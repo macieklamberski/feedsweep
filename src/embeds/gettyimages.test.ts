@@ -208,7 +208,7 @@ describeForEachParser('gettyImagesEmbedResolver', (parseHtml) => {
   })
 })
 
-// Only the pipeline repairs the doubled `&amp;amp;` the resolver reads as `amp;` pairs.
+// readCarrierUrl folds the doubled `&amp;amp;` before the resolver reads the query.
 describeForEachParser('gettyimages doubly escaped src', (parseHtml) => {
   it('should keep the signed query', async () => {
     const value = html`

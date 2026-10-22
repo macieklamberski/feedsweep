@@ -697,6 +697,26 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should find the key behind an ampersand the feed escaped three times', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-href="https://codepen.io/argyleink/pen/XJpKqXm?editors=1010&amp;amp;amp;key=abc123XYZ"
+        ></p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc123XYZ',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc123XYZ',
+        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        height: 300,
+        author: '@argyleink',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The url in `data-href` is the player's own, and the height in its query is the carrier's,
     // which shallow handling does not read.
     it('should state the default height over the height the url names', async () => {

@@ -261,7 +261,8 @@ export const createUrlEmbedResolver = (
         return
       }
 
-      // Only a resolver reads the repaired url: a frame no resolver claims keeps the src as written.
+      // Only a resolver reads the glued-query repair. Every frame, claimed or not, reads the
+      // ampersands readCarrierUrl folded.
       return decideSize(element, extract(fixMalformedQuery(src), element), options.readCarrierSize)
     },
   }
