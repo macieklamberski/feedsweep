@@ -235,6 +235,7 @@ describeForEachParser('markTimestamps', (parseHtml) => {
     'iframe',
     'noembed',
     'noframes',
+    'noscript',
     'script',
     'textarea',
     'title',

@@ -8,7 +8,7 @@ import {
   rawTextElements,
 } from '../../utils/dom.js'
 
-const timestampIgnoreTags = new Set(['a', 'pre', 'code', 'kbd', 'samp', 'var'])
+const timestampIgnoreTags = new Set(['a', 'pre', 'code', 'kbd', 'samp', 'var', 'noscript'])
 const tableCellTags = ['td', 'th']
 
 // MM:SS or HH:MM:SS, with the seconds always two digits.
