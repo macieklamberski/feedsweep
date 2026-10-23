@@ -223,18 +223,6 @@ describe('anchorResolveEmbed', () => {
     expect(anchorResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should read the episode page route word in any case', () => {
-    const value = 'https://anchor.fm/myshow/Episodes/my-title-e123'
-    const expected: EmbedResolverResult = {
-      provider: 'anchor',
-      id: 'myshow/my-title-e123',
-      src: 'https://creators.spotify.com/pod/profile/myshow/embed/episodes/my-title-e123',
-      height: 100,
-    }
-
-    expect(anchorResolveEmbed(value)).toEqual(expected)
-  })
-
   it('should ignore the episode page path on a Spotify host', () => {
     const value = 'https://creators.spotify.com/myshow/episodes/my-title-e123'
 

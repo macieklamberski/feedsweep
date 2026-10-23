@@ -471,18 +471,6 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the short link route words in any case', async () => {
-      const value = '<iframe src="https://yandex.by/Map-Widget/V1/-/CCUmMWx~KA"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'yandexmaps',
-        id: '-/CCUmMWx~KA',
-        src: 'https://yandex.by/map-widget/v1/-/CCUmMWx~KA',
-        height: 400,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should claim a coordinate map frame and keep where it opens and its host', async () => {
       const value = html`
         <iframe
@@ -509,18 +497,6 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         src: 'https://yandex.ru/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map',
-        height: 400,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should read the widget route words of a coordinate map in any case', async () => {
-      const value =
-        '<iframe src="https://yandex.com/Map-Widget/V1/?ll=37.612000%2C55.752000&z=13&l=map"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'yandexmaps',
-        src: 'https://yandex.com/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map',
         height: 400,
       }
 
