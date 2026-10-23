@@ -25,7 +25,7 @@ describe('steamResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'steam',
         id: '249610',
-        src: 'https://store.steampowered.com/widget/249610/30245/?t=Top-down%2C+2.5D+action+that+combines+elements+of+old-school+shooters+like+Star-Control+and+action-RPGs+like+Diablo+with+an+evolving+weapons+system%2C+32-player+dedicated+servers%2C+coop%2C+and+PVP.',
+        src: 'https://store.steampowered.com/widget/249610/30245/?t=Top-down,%202.5D%20action%20that%20combines%20elements%20of%20old-school%20shooters%20like%20Star-Control%20and%20action-RPGs%20like%20Diablo%20with%20an%20evolving%20weapons%20system,%2032-player%20dedicated%20servers,%20coop,%20and%20PVP.',
         url: 'https://store.steampowered.com/app/249610/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/249610/header.jpg',
         height: 190,
@@ -42,7 +42,7 @@ describe('steamResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'steam',
         id: '249610',
-        src: 'https://store.steampowered.com/widget/249610/30245/?t=Top-down%2C+2.5D+action+that+combines+elements+of+old-school+shooters+like+Star-Control+and+action-RPGs+like+Diablo+with+an+evolving+weapons+system%2C+32-player+dedicated+servers%2C+coop%2C+and+PVP.',
+        src: 'https://store.steampowered.com/widget/249610/30245/?t=Top-down,%202.5D%20action%20that%20combines%20elements%20of%20old-school%20shooters%20like%20Star-Control%20and%20action-RPGs%20like%20Diablo%20with%20an%20evolving%20weapons%20system,%2032-player%20dedicated%20servers,%20coop,%20and%20PVP.',
         url: 'https://store.steampowered.com/app/249610/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/249610/header.jpg',
         height: 190,
@@ -59,7 +59,7 @@ describe('steamResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'steam',
         id: '249610',
-        src: 'https://store.steampowered.com/widget/249610/30245/?t=Top-down%2C+2.5D+action+that+combines+elements+of+old-school+shooters+like+Star-Control+and+action-RPGs+like+Diablo+with+an+evolving+weapons+system%2C+32-player+dedicated+servers%2C+coop%2C+and+PVP.',
+        src: 'https://store.steampowered.com/widget/249610/30245/?t=Top-down,%202.5D%20action%20that%20combines%20elements%20of%20old-school%20shooters%20like%20Star-Control%20and%20action-RPGs%20like%20Diablo%20with%20an%20evolving%20weapons%20system,%2032-player%20dedicated%20servers,%20coop,%20and%20PVP.',
         url: 'https://store.steampowered.com/app/249610/',
         thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/249610/header.jpg',
         height: 190,

@@ -169,7 +169,7 @@ describe('kalturaResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'kaltura',
         id: '520801/1_w0bwzism/../../x',
-        src: 'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bwzism%2F..%2F..%2Fx',
+        src: 'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bwzism/../../x',
         thumbnail:
           'https://cdnapisec.kaltura.com/p/520801/thumbnail/entry_id/1_w0bwzism%2F..%2F..%2Fx/width/640',
         ratio: '16/9',

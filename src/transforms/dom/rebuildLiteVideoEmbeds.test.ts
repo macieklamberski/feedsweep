@@ -82,7 +82,7 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
       ></lite-youtube>
     `
     const expected =
-      '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=10%26autoplay%3D1"></iframe>'
+      '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=10%26autoplay=1"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })

@@ -265,9 +265,30 @@ describe('composeQuery', () => {
     expect(composeQuery(value)).toBe(expected)
   })
 
-  it('should encode a value that needs it', () => {
+  it('should keep a plus sign and a slash in a value as written', () => {
     const value = { clipt: 'a+b/c' }
-    const expected = '?clipt=a%2Bb%2Fc'
+    const expected = '?clipt=a+b/c'
+
+    expect(composeQuery(value)).toBe(expected)
+  })
+
+  it('should keep a percent sign, an at sign and a non-ASCII character as written', () => {
+    const value = { user_id: '17367418@N03', q: '50%25', title: 'zürich' }
+    const expected = '?user_id=17367418@N03&q=50%25&title=zürich'
+
+    expect(composeQuery(value)).toBe(expected)
+  })
+
+  it('should escape an ampersand, a hash and whitespace in a value', () => {
+    const value = { vid: 'a&b=1#c d\te' }
+    const expected = '?vid=a%26b=1%23c%20d%09e'
+
+    expect(composeQuery(value)).toBe(expected)
+  })
+
+  it('should escape an ampersand, a hash and whitespace in a name', () => {
+    const value = { 'a&b#c d': '1' }
+    const expected = '?a%26b%23c%20d=1'
 
     expect(composeQuery(value)).toBe(expected)
   })
@@ -385,9 +406,9 @@ describe('pickUrlParams', () => {
     expect(pickUrlParams('//example.com/e/x?start=90', ['start'])).toBe('')
   })
 
-  it('should encode a value that needs it', () => {
+  it('should write a decoded plus sign and slash back bare', () => {
     const value = 'https://example.com/e/x?clipt=a%2Bb%2Fc'
-    const expected = '?clipt=a%2Bb%2Fc'
+    const expected = '?clipt=a+b/c'
 
     expect(pickUrlParams(value, ['clipt'])).toBe(expected)
   })

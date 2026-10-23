@@ -148,7 +148,7 @@ describe('foxnewsResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'foxnews',
         id: '5406119088001/../x',
-        src: 'https://video.foxnews.com/v/video-embed.html?video_id=5406119088001%2F..%2Fx',
+        src: 'https://video.foxnews.com/v/video-embed.html?video_id=5406119088001/../x',
         url: 'https://www.foxnews.com/video/5406119088001%2F..%2Fx',
         ratio: '16/9',
       }

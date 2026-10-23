@@ -36,7 +36,7 @@ describe('amebaResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'ameba',
         id: 'MCLP3ViB&autoplay=1',
-        src: 'https://static.blog-video.jp/?v=MCLP3ViB%26autoplay%3D1',
+        src: 'https://static.blog-video.jp/?v=MCLP3ViB%26autoplay=1',
         ratio: '16/9',
       }
 

@@ -99,7 +99,7 @@ describeForEachParser('umapEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'umap',
         id: 'umap.openstreetmap.fr/760715',
-        src: 'https://umap.openstreetmap.fr/fr/map/sceaux-parcours-pedagogique-srav-savoir-rouler-a-v_760715?datalayers=08eb5610-a785-4b17-b4d5-c31baa8a2a38%2C1f323303-bd3c-4e91-8ab7-0a9bdd0fee82&feature=depart',
+        src: 'https://umap.openstreetmap.fr/fr/map/sceaux-parcours-pedagogique-srav-savoir-rouler-a-v_760715?datalayers=08eb5610-a785-4b17-b4d5-c31baa8a2a38,1f323303-bd3c-4e91-8ab7-0a9bdd0fee82&feature=depart',
         url: 'https://umap.openstreetmap.fr/fr/map/sceaux-parcours-pedagogique-srav-savoir-rouler-a-v_760715',
         height: 300,
       }
