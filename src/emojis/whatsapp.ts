@@ -3,7 +3,6 @@ import { getFileStem, glyphFromCodepoints, isEmojiShaped } from '../utils/emojis
 import { bgImage } from '../utils/styles.js'
 
 const paintedPath = 'web.whatsapp.com/emoji/'
-// length: extracts the four- or five-digit codepoint glyphFromCodepoints reads
 const paddingRegex = /^0+(?=[0-9a-f]{4})/
 
 // WhatsApp Web pads each codepoint in a file's name to six digits, as in `0025aa_00fe0f.png`.

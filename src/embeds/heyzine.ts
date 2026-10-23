@@ -17,8 +17,8 @@ const heyzineHosts = ['heyzine.com', 'www.heyzine.com', 'cdn.heyzine.com']
 // book can live on its custom domain alone, so the mint keeps the host.
 const customDomainHosts = ['aflip.in', 'hflip.co']
 
-// The embed id, with or without the `.html` the snippet writes. The viewer reads it in any case.
-// length: keeps a custom slug out, which is served without `.html`
+// The embed id is ten hexadecimal characters, with or without the `.html` the snippet writes.
+// The viewer answers the id in either case.
 const flipBookIdRegex = /^([0-9a-f]{10})(?:\.html)?$/i
 // A custom slug is served without `.html`, and only some are served with it too.
 const htmlExtensionRegex = /\.html$/i

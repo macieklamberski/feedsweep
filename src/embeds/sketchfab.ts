@@ -6,12 +6,12 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'sketchfab'
 
-// A model uid also ends the slugged page url, `/3d-models/{slug}-{uid}`, which is how a pasted
-// page link is read.
-// length: keeps listing words such as `popular` out of the bare `/models/{x}` slot
+// A model uid is 32 hex characters, and it also ends the slugged page url
+// (`/3d-models/{slug}-{uid}`), which is how a pasted page link is read. The shape tells a uid from
+// the listing words that share the bare page route, such as `/models/popular`.
 const safeUidRegex = /^[0-9a-f]{32}$/i
-// Older models end the slug in a 26-character uid in letters of both cases.
-// length: extracts the uid from the end of the slug
+// The lengths tell the uid from the slug words before it. Older models end the slug in a
+// 26-character uid in letters of both cases.
 const sluggedUidRegex = /(?<uid>[0-9a-f]{32}|[0-9a-z]{26})$/i
 
 const sketchfabHosts = ['sketchfab.com']

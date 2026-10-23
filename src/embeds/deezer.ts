@@ -32,8 +32,8 @@ const pluginTypes = toMap({
   tracks: 'track',
 })
 
-// A locale in front of the route is the site's own prefix, not part of the route.
-// length: keeps a route word such as `widget` or `plugins` out of the locale slot
+// A locale in front of the route is the site's own prefix, not part of the route. Two letters tell
+// it from a route word such as `widget` or `plugins`, which opens the path in the same slot.
 const localeRegex = /^[a-z]{2}$/
 
 // The Flash players, all three of which name a track through `idSong`, and the fourth which

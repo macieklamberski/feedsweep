@@ -16,7 +16,6 @@ const elementIdRegex = /^prezi(?:Embed)?_(.+)/
 const shareTokenLength = 20
 
 const composePageUrl = (id: string): string => {
-  // length: keeps a classic id out of the /view/ route
   if (id.length === shareTokenLength) {
     return `https://prezi.com/view/${id}/`
   }

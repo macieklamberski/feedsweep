@@ -4,7 +4,8 @@ import { attr, keepIfMatches } from '../utils/dom.js'
 import { hexRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// length: keeps a main-site page such as `genially.com/de`, whose name is hex too, out
+// The view id is a dashless 24-character hex id. On the main site the length tells it from a page
+// such as `genially.com/de`, whose name is hex too.
 const safeViewIdRegex = /^[0-9a-f]{24}$/i
 
 const geniallyHosts = ['genially.com', 'genial.ly']

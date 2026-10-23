@@ -27,7 +27,6 @@ const externalPathRegex = /^\/external\/([^/]+)(?:\/embed)?$/
 const playbackParams = ['loop']
 
 // A link id is 64 hex digits, which the server reads in any case.
-// length: keeps any other link id shape, never probed for case, out of the case fold in the key
 const linkIdRegex = /^[0-9a-f]{64}$/i
 
 // The dialog marks a video's frame with `zpvideo`, and a document's with `zpiframe` or `embedcon`.

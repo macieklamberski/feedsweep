@@ -50,7 +50,7 @@ export const wordpressElementEmojiResolver: EmojiResolver = {
     const title = attr(element, 'title')
     const text = element.textContent?.trim() ?? ''
 
-    // length: keeps prose out, so only a code or a word is read
+    // A code or a word, never prose.
     if (text.length > 20 || element.firstElementChild) {
       return
     }

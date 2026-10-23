@@ -3,9 +3,7 @@ import { attr } from '../utils/dom.js'
 import { getFileStem, glyphFromUtf8Hex, isEmojiShaped, resolveEmojiImage } from '../utils/emojis.js'
 
 const keycapStemRegex = /^[0-9]e283a3$/i
-// length: keeps a stem that is not whole four-digit UTF-16 units out
 const utf16HexRegex = /^(?:[0-9a-f]{4})+$/i
-// length: extracts each four-digit UTF-16 unit
 const utf16UnitRegex = /.{4}/g
 // Both sets serve the same file at double density under a `_2x` suffix.
 const retinaSuffixRegex = /_2x$/i

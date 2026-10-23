@@ -21,11 +21,11 @@ const podcastHeight = 600
 const clipHeight = 300
 const playlistHeight = 600
 
-// A locale such as `fr` or `zh-hant` can open the path, ahead of the route word.
-// length: keeps a route word such as `podcasts` or `podcast-clips` out of the locale slot
+// A locale such as `fr` or `zh-hant` can open the path, ahead of the route word. Two letters tell
+// it from a route word such as `podcasts` or `podcast-clips`, which opens the path in its place.
 const localeRegex = /^[a-z]{2}(?:-[a-z]+)?$/
-// The slug is free text the server ignores, and the id can hold a hyphen of its own.
-// length: extracts the 11-character short id from the end of a slugged segment
+// The short id is the last 11 characters of a slugged segment, after a hyphen. The slug is free
+// text the server ignores, and the id can hold a hyphen of its own.
 const shortIdRegex = /-([^/]{11})$/
 
 type Slugged = {

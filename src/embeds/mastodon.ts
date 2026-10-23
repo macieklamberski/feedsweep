@@ -14,7 +14,7 @@ export type MastodonStatus = {
 }
 
 // A full handle, /@user@origin/{id}, 302s to a page served x-frame-options: DENY.
-// length: keeps brunch.co.kr/@{user}/{n} posts out of the Discourse cite path
+// A status id is a snowflake, 18 digits since the release that first shipped the embed endpoint.
 const statusPathRegex = /^\/@([\w.-]+)\/(\d{6,})(?:\/embed)?\/?$/
 
 // Any host filing posts under an author and a long number takes this shape, Medium among them.

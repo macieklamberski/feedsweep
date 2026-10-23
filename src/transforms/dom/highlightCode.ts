@@ -144,10 +144,10 @@ export const detectLanguage = (pre: Element | null, code: Element | null): strin
     }
   }
 
+  // A two-letter token like go, js or md is as often a CSS utility class as a language.
   // Older or hand-rolled templates name the language as a standalone class, like class="haskell".
   for (const element of candidates) {
     const tokens = element?.className.split(whitespaceRegex) ?? []
-    // length: keeps a two-letter CSS utility class such as go, js or md out
     const language = tokens.find((token) => token.length >= 3 && isSupportedLanguage(token))
 
     if (language) {

@@ -7,8 +7,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 // `bbc.co.uk` 301s every player route onto `bbc.com`.
 const bbcHosts = ['bbc.com', 'bbc.co.uk']
 
-// A programme id: eight letters and digits with at least one digit, read where no route fixes it.
-// length: keeps the World Service article id and the route words `articles` and `index` out
+// A programme id: eight letters and digits with at least one digit. Where no route fixes its slot,
+// the shape keeps `articles` and the playlist route word `index` out.
 const pidRegex = /^[a-z](?=[0-9a-z]*\d)[0-9a-z]{7}$/
 const pidCharactersRegex = /^[0-9a-z]+$/
 const playlistPathRegex = /\/playlist\/([^/.]+)/

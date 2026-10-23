@@ -10,7 +10,6 @@ import {
 
 // Each store serves the card on its own reader host, `{verb}.amazon.{store tld}`, such as
 // `read.amazon.co.uk`, `lesen.amazon.de` or `ler.amazon.com.br`.
-// length: keeps an Amazon host that is not a store's country domain out
 const readerHostRegex = /^[^.]+\.amazon\.(?:com|[a-z]{2}|com\.[a-z]{2}|co\.[a-z]{2})$/
 
 const cardPathRegex = /^\/kp\/card\/?$/

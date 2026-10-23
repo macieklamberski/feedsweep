@@ -1,8 +1,8 @@
 import { parseUrl } from 'trousse'
 
 // WMaker's Flash player addresses a video by a sha1 that appears nowhere else in the document, so
-// the carrier's own id mints nothing, and the article id in the item permalink mints the embed.
-// length: keeps another site's `/v/` Flash object out
+// the carrier's own id mints nothing. The article id does address the modern embed route, and the
+// item permalink is the one place it is written.
 const flashPathRegex = /\/v\/[0-9a-f]{40}\/?(?:[?#]|$)/i
 // WMaker writes every article url as {slug}_a{id}.html.
 const articleIdRegex = /_a(\d+)\.html?(?:[?#]|$)/i

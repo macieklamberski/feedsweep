@@ -6,8 +6,8 @@ import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
 const provider = 'umap'
 
 // A map page, `/{lang}/map/{slug}_{id}`, under the interface language uMap prefixes every page
-// with. uMap runs on many instances, so there is no host to key on.
-// length: keeps another site's `/{segment}/map/{slug}_{id}` page out
+// with. The shape is the whole guard, since uMap runs on many instances and there is no host to
+// key on: loosened, it claims any site's `/map/` page.
 const mapPathRegex = /^\/([a-z]{2,3}(?:-[a-z]+)?)\/map\/([^/]+)_(\d+)$/
 
 // The layers shown and the feature opened on load. The rest of the query sets the map's controls

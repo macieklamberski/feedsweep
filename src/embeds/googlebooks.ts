@@ -6,7 +6,6 @@ const provider = 'googlebooks'
 
 // Google serves the viewer from every country domain it runs, books.google.de and
 // books.google.co.uk alike, and the volume id is the same on all of them.
-// length: keeps a host under another domain, such as `books.google.example.com`, out
 const viewerHostRegex = /^books\.google\.[a-z]{2,3}(?:\.[a-z]{2})?$/
 
 // The host Google's embed code writes. It redirects each reader to their own country domain.

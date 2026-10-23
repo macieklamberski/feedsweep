@@ -409,7 +409,6 @@ const boardEmojiNames = toMap<EmojiGlyph>({
 // write them, or an ASCII face.
 const colonCodeRegex = /^:[^\s:]+:$/
 const bracketCodeRegex = /^(?:\([\w -]+\)|\[[\w -]+\])$/
-// length: keeps alt text longer than a typed face out
 const asciiEmoticonRegex = /^[>O]?[:;=8][-'^o]?[()[\]DPpOo*|\\/$@3Xx]{1,3}$/
 
 // Forum smilie images, which render oversized without the site's CSS. An engine with names or
