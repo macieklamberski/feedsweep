@@ -1,7 +1,7 @@
+import { encodePathSegment } from 'trousse'
 import { composeEmbedUrl, readSrcMediaId } from '../../embeds/wistia.js'
 import type { DomTransform } from '../../types.js'
 import { attr, parseRatio } from '../../utils/dom.js'
-import { encodePathSegment } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 // Pulls the hashed id out of the `wistia_async_{id}` class the facade carries, up to the end of

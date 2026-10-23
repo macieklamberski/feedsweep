@@ -1,8 +1,8 @@
-import { getPathSegments, isAnyOf, type Nullish } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, type Nullish } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find, isBlockElement, isBr, isElement, jsonAttr, text } from '../utils/dom.js'
 import { readObjectHeight } from '../utils/hints.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'bluesky'

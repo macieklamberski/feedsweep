@@ -1,8 +1,15 @@
-import { decodeSegment, getQueryParam, isHostOf, type Nullish, parseUrl } from 'trousse'
+import {
+  decodeSegment,
+  encodePathSegment,
+  getQueryParam,
+  isHostOf,
+  type Nullish,
+  parseUrl,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar, flashVars, keepIfMatches } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flickr'

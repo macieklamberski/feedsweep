@@ -1,6 +1,5 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { encodePathSegment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'yandexmusic'

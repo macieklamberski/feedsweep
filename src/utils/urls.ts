@@ -228,13 +228,6 @@ export const pickQueryParams = (
   return picked
 }
 
-// A decoded value written into a url path stays one segment. Only the characters that would open
-// a new segment, a query or a fragment, and whitespace are escaped, so an `@`, `=`, `:` or `%` the
-// value holds reads as written. A url parser reads `\` as `/` in an http path, so it is escaped too.
-export const encodePathSegment = (value: string): string => {
-  return value.replace(/[/?#\\\s]/g, (character) => encodeURIComponent(character))
-}
-
 // The publisher's query with only the parameters a player reads left in it. Each pair stays as
 // written, so a repeated name and a bracketed one such as `pwc[size]` reach the player unchanged.
 export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): string => {

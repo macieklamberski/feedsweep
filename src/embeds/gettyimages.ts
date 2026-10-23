@@ -1,6 +1,6 @@
-import { composeQuery, trimObject } from 'trousse'
+import { composeQuery, encodePathSegment, trimObject } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.

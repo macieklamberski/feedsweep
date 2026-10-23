@@ -1,6 +1,7 @@
 import {
   composeQuery,
   decodeSegment,
+  encodePathSegment,
   fixMalformedQuery,
   getPathSegments,
   getQueryParam,
@@ -10,12 +11,7 @@ import {
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import {
-  encodePathSegment,
-  parseUrlOnHosts,
-  pickQueryParams,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { parseUrlOnHosts, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'youtube'

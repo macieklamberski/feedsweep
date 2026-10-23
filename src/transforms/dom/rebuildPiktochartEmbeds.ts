@@ -1,8 +1,8 @@
-import { isAnyOf } from 'trousse'
+import { encodePathSegment, isAnyOf } from 'trousse'
 import { composePiktochartEmbedUrl } from '../../embeds/piktochart.js'
 import type { DomTransform } from '../../types.js'
 import { attr, isElement, isText } from '../../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../../utils/urls.js'
+import { parseUrlOnHosts } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 const loadingTextRegex = /^Loading(?:\.\.\.|…)$/

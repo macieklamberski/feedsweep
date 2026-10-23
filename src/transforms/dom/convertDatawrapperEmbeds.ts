@@ -1,6 +1,6 @@
+import { encodePathSegment } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
-import { encodePathSegment } from '../../utils/urls.js'
 import { createLinkedImage } from '../../utils/widgets.js'
 
 const chartIdRegex = /datawrapper\.dwcdn\.net\/([^/?#]+)/i

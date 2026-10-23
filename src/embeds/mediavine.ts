@@ -1,6 +1,6 @@
-import { decodeSegment } from 'trousse'
+import { decodeSegment, encodePathSegment } from 'trousse'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
 const playerRatio = '16/9'

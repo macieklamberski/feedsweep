@@ -1,6 +1,6 @@
+import { encodePathSegment } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { jsonAttr } from '../utils/dom.js'
-import { encodePathSegment } from '../utils/urls.js'
 
 // Following the redirect stores a signed url that expires.
 // The endpoint resolves the id anonymously and redirects at play time to a signed mp4 or mp3.

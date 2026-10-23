@@ -1,7 +1,7 @@
-import { composeQuery, getQueryParam, parseUrl } from 'trousse'
+import { composeQuery, encodePathSegment, getQueryParam, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'matterport'

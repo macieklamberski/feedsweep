@@ -4,7 +4,6 @@ import { baseContext } from '../tests.js'
 import {
   cleanUrl,
   dropUrlParams,
-  encodePathSegment,
   filterUrlQuery,
   parseUrlOnHosts,
   pickQueryParams,
@@ -245,49 +244,6 @@ describe('pickQueryParams', () => {
     const expected = { start: '10' }
 
     expect(pickQueryParams(value, ['start'])).toEqual(expected)
-  })
-})
-
-describe('encodePathSegment', () => {
-  it('should escape the characters that would open a segment, a query or a fragment', () => {
-    const value = '123/../x?autoplay=1#t'
-    const expected = '123%2F..%2Fx%3Fautoplay=1%23t'
-
-    expect(encodePathSegment(value)).toBe(expected)
-  })
-
-  it('should escape whitespace', () => {
-    const value = 'off\tnow later'
-    const expected = 'off%09now%20later'
-
-    expect(encodePathSegment(value)).toBe(expected)
-  })
-
-  it('should escape a backslash, which a url parser reads as a slash', () => {
-    const value = '..\\..\\x'
-    const expected = '..%5C..%5Cx'
-
-    expect(encodePathSegment(value)).toBe(expected)
-  })
-
-  it('should leave the characters a path segment may hold as written', () => {
-    const value = '35408001@N04:urn=a&b'
-
-    expect(encodePathSegment(value)).toBe(value)
-  })
-
-  it('should leave an already percent-encoded value as written', () => {
-    const value = 'caf%C3%A9'
-
-    expect(encodePathSegment(value)).toBe(value)
-  })
-
-  it('should leave a whole value of two dots as written', () => {
-    expect(encodePathSegment('..')).toBe('..')
-  })
-
-  it('should leave a whole value of one dot as written', () => {
-    expect(encodePathSegment('.')).toBe('.')
   })
 })
 

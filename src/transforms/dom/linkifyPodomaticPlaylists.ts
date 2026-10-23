@@ -1,7 +1,7 @@
-import { getSubdomain } from 'trousse'
+import { encodePathSegment, getSubdomain } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { flashVar } from '../../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../../utils/urls.js'
+import { parseUrlOnHosts } from '../../utils/urls.js'
 import { createLink, readCarrierUrl } from '../../utils/widgets.js'
 
 const podomaticHost = 'podomatic.com'

@@ -1,7 +1,7 @@
-import { getQueryParam } from 'trousse'
+import { encodePathSegment, getQueryParam } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'youku'

@@ -1,5 +1,6 @@
 import {
   composeQuery,
+  encodePathSegment,
   getAnyOf,
   getPathSegments,
   getQueryParam,
@@ -11,7 +12,6 @@ import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.j
 import { attr, text } from '../utils/dom.js'
 import {
   alphanumericRegex,
-  encodePathSegment,
   foldEscapedAmpersands,
   isFileName,
   parseUrlOnHosts,

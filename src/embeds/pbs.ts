@@ -1,12 +1,15 @@
-import { getPathSegments, getQueryParam, isAnyOf, isHostOf, type Nullish, toMap } from 'trousse'
+import {
+  encodePathSegment,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  isHostOf,
+  type Nullish,
+  toMap,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
-import {
-  absoluteUrlRegex,
-  encodePathSegment,
-  parseUrlOnHosts,
-  pickUrlParams,
-} from '../utils/urls.js'
+import { absoluteUrlRegex, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pbs'

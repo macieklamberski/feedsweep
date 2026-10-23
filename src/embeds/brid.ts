@@ -1,7 +1,6 @@
-import { decodeSegment } from 'trousse'
+import { decodeSegment, encodePathSegment } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { findConfigScript } from '../utils/dom.js'
-import { encodePathSegment } from '../utils/urls.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brid'

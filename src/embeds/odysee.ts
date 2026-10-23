@@ -1,6 +1,6 @@
-import { decodeSegment, isAnyOf, parseUrl } from 'trousse'
+import { decodeSegment, encodePathSegment, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // lbry.tv and open.lbry.com redirect every url to odysee.com with the path kept.

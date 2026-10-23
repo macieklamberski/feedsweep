@@ -1,8 +1,8 @@
-import { getPathSegments, isAnyOf, startsWithAnyOf } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, startsWithAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podcloud'

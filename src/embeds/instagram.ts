@@ -1,8 +1,16 @@
-import { decodeSegment, includesAnyOf, isAnyOf, isPlainObject, parseUrl, toMap } from 'trousse'
+import {
+  decodeSegment,
+  encodePathSegment,
+  includesAnyOf,
+  isAnyOf,
+  isPlainObject,
+  parseUrl,
+  toMap,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import {
   atUsername,
   bareHandleRegex,

@@ -1,7 +1,7 @@
+import { encodePathSegment } from 'trousse'
 import { composeEmbedUrl } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import { attr, parsePixelSize } from '../../utils/dom.js'
-import { encodePathSegment } from '../../utils/urls.js'
 import { createIframe, setDimensions } from '../../utils/widgets.js'
 
 // data-youtube-id and data-youtube name the platform on their own. data-video_id, data-id and

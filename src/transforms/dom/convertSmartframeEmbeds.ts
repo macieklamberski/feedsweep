@@ -1,6 +1,6 @@
+import { encodePathSegment } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
-import { encodePathSegment } from '../../utils/urls.js'
 import { createImage } from '../../utils/widgets.js'
 
 // A SmartFrame picture shipped as a childless <smartframe-embed> that renders nothing unupgraded.

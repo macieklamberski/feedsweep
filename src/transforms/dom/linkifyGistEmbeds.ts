@@ -1,6 +1,7 @@
+import { encodePathSegment } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, isElement, isSkippable, isText } from '../../utils/dom.js'
-import { absoluteUrlRegex, encodePathSegment } from '../../utils/urls.js'
+import { absoluteUrlRegex } from '../../utils/urls.js'
 import { createLink } from '../../utils/widgets.js'
 
 const gistScriptRegex = /gist\.github\.com\/(?:([^/?"]+)\/)?([^/?"#]+)\.js/i

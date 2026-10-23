@@ -1,7 +1,7 @@
+import { encodePathSegment } from 'trousse'
 import { composeEmbedUrl } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
-import { encodePathSegment } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 // WP Rocket swaps a YouTube iframe for a preview div that rebuilds it with JS on click.

@@ -1,6 +1,7 @@
 import {
   composeQuery,
   decodeSegment,
+  encodePathSegment,
   getPathSegments,
   getQueryParam,
   type Nullish,
@@ -11,7 +12,7 @@ import { attr, text } from '../utils/dom.js'
 
 const provider = 'bandcamp'
 
-import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // A release is either an album or a single track.

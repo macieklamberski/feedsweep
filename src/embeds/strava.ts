@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, toMap } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, pickUrlParams } from '../utils/urls.js'
+import { pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'strava'
