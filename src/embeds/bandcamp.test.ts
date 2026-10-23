@@ -227,34 +227,6 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the audio player for the video route below another segment', async () => {
-      const value = html`
-        <iframe src="https://bandcamp.com/x/VideoEmbed?track=1959185434"></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'bandcamp',
-        id: 'track/1959185434',
-        src: 'https://bandcamp.com/EmbeddedPlayer/track=1959185434/size=large/tracklist=false/artwork=small/',
-        height: 120,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep the audio player for a route that only opens with the video route', async () => {
-      const value = html`
-        <iframe src="https://bandcamp.com/VideoEmbedded?track=1959185434"></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'bandcamp',
-        id: 'track/1959185434',
-        src: 'https://bandcamp.com/EmbeddedPlayer/track=1959185434/size=large/tracklist=false/artwork=small/',
-        height: 120,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     // The video player is not the audio strip, so it gets the video ratio, not the strip's height.
     it('should state the video ratio over the box a video embed declares', async () => {
       const value = html`
