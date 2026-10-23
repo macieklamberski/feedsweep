@@ -503,6 +503,19 @@ describeForEachParser('arcgisWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the web map a Maps SDK map element names', async () => {
+      const value = '<arcgis-map item-id="d865e8a38ca446798f2a1da1dc9aba5f"></arcgis-map>'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: 'd865e8a38ca446798f2a1da1dc9aba5f',
+        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=d865e8a38ca446798f2a1da1dc9aba5f',
+        url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=d865e8a38ca446798f2a1da1dc9aba5f',
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should open an element with no start position at the saved view of the map', async () => {
       const value = html`
         <arcgis-embedded-map
@@ -552,6 +565,19 @@ describeForEachParser('arcgisWidgetEmbedResolver', (parseHtml) => {
           portal-url="https://svt.maps.arcgis.com"
         ></arcgis-embedded-map>
       `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a Maps SDK map that names no item', async () => {
+      const value =
+        '<arcgis-map basemap="topo-vector" center="-118.24,34.05" zoom="12"></arcgis-map>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a Maps SDK scene, which the Map Viewer cannot draw', async () => {
+      const value = '<arcgis-scene item-id="e64cfad70d6c4b7cb8432a5d211577ab"></arcgis-scene>'
 
       expect(await extract(value)).toBeUndefined()
     })

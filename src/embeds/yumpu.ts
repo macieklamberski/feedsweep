@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, isElement, isWhitespaceText, keepIfMatches, text } from '../utils/dom.js'
 import { localeWordRegex, placeholderBaseUrl } from '../utils/urls.js'
@@ -36,6 +36,20 @@ const readCompanion = (element: Element | undefined): Partial<EmbedResolverResul
   return { url: href, title: attr(anchor, 'title') ?? text(anchor) }
 }
 
+// The player, `embed/view/{hash}`, and the older `document/embed/{hash}`, which YUMPU redirects
+// onto it.
+const readHash = (segments: Array<string>): string | undefined => {
+  const [route, kind, hash] = segments
+
+  if (isAnyOf(route, 'embed') && isAnyOf(kind, 'view')) {
+    return hash
+  }
+
+  if (isAnyOf(route, 'document') && isAnyOf(kind, 'embed')) {
+    return hash
+  }
+}
+
 const yumpuResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url)
 
@@ -44,12 +58,12 @@ const yumpuResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const segments = getPathSegments(parsed)
-  const isLocaleless = segments[0] === 'embed'
+  const isLocaleless = isAnyOf(segments[0], 'embed')
   // YUMPU redirects an embed path with no locale prefix to `/en/`.
   const locale = isLocaleless ? 'en' : keepIfMatches(segments[0], localeWordRegex)
-  const [embed, view, hash] = isLocaleless ? segments : segments.slice(1)
+  const hash = readHash(isLocaleless ? segments : segments.slice(1))
 
-  if (!locale || embed !== 'embed' || view !== 'view' || !hash) {
+  if (!locale || !hash) {
     return
   }
 

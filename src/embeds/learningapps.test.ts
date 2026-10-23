@@ -11,6 +11,7 @@ describe('learningappsResolveEmbed', () => {
         provider: 'learningapps',
         id: '12554379',
         src: 'https://learningapps.org/watch?app=12554379',
+        url: 'https://learningapps.org/12554379',
         thumbnail: 'https://learningapps.org/appicons/1/12554379.png',
         height: 500,
       }
@@ -48,6 +49,7 @@ describe('learningappsResolveEmbed', () => {
         provider: 'learningapps',
         id: '12554379',
         src: 'https://learningapps.org/watch?app=12554379',
+        url: 'https://learningapps.org/12554379',
         thumbnail: 'https://learningapps.org/appicons/1/12554379.png',
         height: 500,
       }
@@ -149,6 +151,7 @@ describe('learningappsResolveEmbed', () => {
         provider: 'learningapps',
         id: '12554379',
         src: 'https://learningapps.org/watch?app=12554379',
+        url: 'https://learningapps.org/12554379',
         thumbnail: 'https://learningapps.org/appicons/1/12554379.png',
         height: 500,
       }

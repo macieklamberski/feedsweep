@@ -5,6 +5,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const padletHosts = ['padlet.com']
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/
 const previewPathRegex = /^\/padlets\/([^/]+)\/embeds\/preview_embed\/?$/
+// The board page, `/{user}/{slug}-{id}`, refuses framing. Its id follows the slug's last hyphen.
+const boardPathRegex = /^\/[^/]+\/[^/]*-([^/-]+)\/?$/
 
 // The share code sizes the board `height: 608px` at full width, and nearly every carrier
 // repeats that; the preview form sizes itself `height: 100%` and so states nothing usable.
@@ -13,7 +15,9 @@ const boardHeight = 608
 const padletResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, padletHosts)
   const boardId =
-    parsed?.pathname.match(embedPathRegex)?.[1] ?? parsed?.pathname.match(previewPathRegex)?.[1]
+    parsed?.pathname.match(embedPathRegex)?.[1] ??
+    parsed?.pathname.match(previewPathRegex)?.[1] ??
+    parsed?.pathname.match(boardPathRegex)?.[1]
 
   if (!boardId) {
     return
@@ -37,5 +41,6 @@ const padletResolveEmbed: ResolveEmbed = (url) => {
   }
 }
 
-// The padlet.com/embed/{board} iframe, and its preview form, which sizes itself height: 100%.
+// The padlet.com/embed/{board} iframe, its preview form, which sizes itself height: 100%, and the
+// board page, rebuilt onto the embed.
 export const padletEmbedResolver = createUrlEmbedResolver(padletHosts, padletResolveEmbed)

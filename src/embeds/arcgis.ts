@@ -198,10 +198,11 @@ export const arcgisResolveEmbed: ResolveEmbed = (url, element) => {
 
 export const arcgisIframeEmbedResolver = createUrlEmbedResolver(arcgisHosts, arcgisResolveEmbed)
 
-// The Embeddable Components map, a custom element the `js.arcgis.com` loader builds into a map,
-// so it renders nothing once the loader is stripped. Its `center` is longitude first.
+// The Embeddable Components map and the Maps SDK map, custom elements the `js.arcgis.com` loader
+// builds into a map, so they render nothing once the loader is stripped. `center` is longitude
+// first.
 export const arcgisWidgetEmbedResolver = createMarkupEmbedResolver(
-  'arcgis-embedded-map',
+  'arcgis-embedded-map, arcgis-map[item-id]',
   (element) => {
     const itemId = attr(element, 'item-id')
     const url = parseUrl(mapViewerPath, attr(element, 'portal-url') ?? defaultPortalUrl)

@@ -190,6 +190,20 @@ describe('audiomackResolveEmbed', () => {
   })
 
   describe('Variant #2: the retired players, which the route word alone types', () => {
+    it('should read embed2 as a song', () => {
+      const value = 'http://www.audiomack.com/embed2/knightstalker/defcon-2?btn=ff8a00&bg=34342e'
+      const expected: EmbedResolverResult = {
+        provider: 'audiomack',
+        id: 'knightstalker/song/defcon-2',
+        src: 'https://audiomack.com/embed/knightstalker/song/defcon-2',
+        url: 'https://audiomack.com/knightstalker/song/defcon-2',
+        height: 252,
+        author: 'knightstalker',
+      }
+
+      expect(audiomackResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should read embed3 as a song', () => {
       const value = 'http://www.audiomack.com/embed3/hhs1987/pound-cake-freestyle-2?c1=fc881e'
       const expected: EmbedResolverResult = {

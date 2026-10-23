@@ -149,8 +149,48 @@ describeForEachParser('peertubeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a playlist watch page, which names no single video', async () => {
-      const value = '<iframe src="https://tube.funfacts.de/w/p/rJqTfUEXmJVn8xWfyjGMLN"></iframe>'
+    it('should ignore a playlist id holding a character the alphabet excludes', async () => {
+      const value = '<iframe src="https://tube.funfacts.de/w/p/rJqTfUEXmJVn8xWfyjGML0"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('playlists', () => {
+    it('should read the playlist player and keep the video it opens on', async () => {
+      const value = html`
+        <iframe
+          src="https://video.mateuaguilo.com/video-playlists/embed/b3b96ff7-8791-4815-a2a5-54091b6da326?playlistPosition=2&warningTitle=0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'peertube',
+        id: 'playlist/b3b96ff7-8791-4815-a2a5-54091b6da326',
+        src: 'https://video.mateuaguilo.com/video-playlists/embed/b3b96ff7-8791-4815-a2a5-54091b6da326?playlistPosition=2',
+        url: 'https://video.mateuaguilo.com/w/p/b3b96ff7-8791-4815-a2a5-54091b6da326',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild a playlist watch page onto the playlist player', async () => {
+      const value = html`
+        <iframe src="https://video.mateuaguilo.com/w/p/b3b96ff7-8791-4815-a2a5-54091b6da326"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'peertube',
+        id: 'playlist/b3b96ff7-8791-4815-a2a5-54091b6da326',
+        src: 'https://video.mateuaguilo.com/video-playlists/embed/b3b96ff7-8791-4815-a2a5-54091b6da326',
+        url: 'https://video.mateuaguilo.com/w/p/b3b96ff7-8791-4815-a2a5-54091b6da326',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore a playlist path naming no id', async () => {
+      const value = '<iframe src="https://video.mateuaguilo.com/video-playlists/embed/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

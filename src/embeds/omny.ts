@@ -59,6 +59,7 @@ export const omnyResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id: clip,
     src: `https://omny.fm/shows/${clip}/embed${query}`,
+    thumbnail: isPlaylist ? undefined : `https://omny.fm/shows/${clip}/image.jpg`,
     height: isVideo || isPlaylist ? undefined : audioHeight,
     ratio: isVideo && !isPlaylist ? videoRatio : undefined,
     title,

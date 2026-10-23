@@ -14,6 +14,8 @@ const provider = 'megaphone'
 
 const megaphoneHosts = ['megaphone.fm']
 
+const legacyPlayerPathRegex = /^\/(?<id>[A-Z]+\d+)\/?$/
+
 const embedKinds = {
   // Both players are fixed in height whatever their width: the episode player draws 200 and the
   // playlist 481 at 640 wide and wider.
@@ -46,6 +48,19 @@ export const extractMegaphoneEmbed = (
 
     return { param, kind, id, height }
   }
+
+  // The legacy episode player names the episode in its path, `player.megaphone.fm/{id}`.
+  if (parsed.hostname !== 'player.megaphone.fm') {
+    return
+  }
+
+  const legacyId = parsed.pathname.match(legacyPlayerPathRegex)?.groups?.id
+
+  if (!legacyId) {
+    return
+  }
+
+  return { param: 'e', ...embedKinds.e, id: legacyId }
 }
 
 // No metadata and no thumbnail without an api key, so the height is the substance here, and

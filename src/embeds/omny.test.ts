@@ -100,6 +100,22 @@ describe('omnyResolveEmbed', () => {
       provider: 'omny',
       id: 'the-show/an-episode',
       src: 'https://omny.fm/shows/the-show/an-episode/embed',
+      thumbnail: 'https://omny.fm/shows/the-show/an-episode/image.jpg',
+      height: 180,
+    }
+
+    expect(omnyResolveEmbed(value)).toEqual(expected)
+  })
+
+  it("should compose the clip's poster from its path", () => {
+    const value =
+      'https://omny.fm/shows/duncan-garner-editor-in-chief/empowering-children-and-tackling-inequality-with-c/embed'
+    const expected: EmbedResolverResult = {
+      provider: 'omny',
+      id: 'duncan-garner-editor-in-chief/empowering-children-and-tackling-inequality-with-c',
+      src: 'https://omny.fm/shows/duncan-garner-editor-in-chief/empowering-children-and-tackling-inequality-with-c/embed',
+      thumbnail:
+        'https://omny.fm/shows/duncan-garner-editor-in-chief/empowering-children-and-tackling-inequality-with-c/image.jpg',
       height: 180,
     }
 
@@ -112,6 +128,7 @@ describe('omnyResolveEmbed', () => {
       provider: 'omny',
       id: 'the-show/an-episode',
       src: 'https://omny.fm/shows/the-show/an-episode/embed?media=Video',
+      thumbnail: 'https://omny.fm/shows/the-show/an-episode/image.jpg',
       ratio: '16/9',
     }
 
@@ -124,6 +141,7 @@ describe('omnyResolveEmbed', () => {
       provider: 'omny',
       id: 'the-show/an-episode',
       src: 'https://omny.fm/shows/the-show/an-episode/embed?media=video',
+      thumbnail: 'https://omny.fm/shows/the-show/an-episode/image.jpg',
       ratio: '16/9',
     }
 
@@ -136,6 +154,7 @@ describe('omnyResolveEmbed', () => {
       provider: 'omny',
       id: 'the-show/an-episode',
       src: 'https://omny.fm/shows/the-show/an-episode/embed',
+      thumbnail: 'https://omny.fm/shows/the-show/an-episode/image.jpg',
       height: 180,
     }
 
@@ -160,6 +179,7 @@ describe('omnyResolveEmbed', () => {
       provider: 'omny',
       id: 'the-show/playlists',
       src: 'https://omny.fm/shows/the-show/playlists/embed',
+      thumbnail: 'https://omny.fm/shows/the-show/playlists/image.jpg',
       height: 180,
     }
 
@@ -172,6 +192,7 @@ describe('omnyResolveEmbed', () => {
       provider: 'omny',
       id: 'the-show/an-episode',
       src: 'https://omny.fm/shows/the-show/an-episode/embed?t=70m40s',
+      thumbnail: 'https://omny.fm/shows/the-show/an-episode/image.jpg',
       height: 180,
     }
 
@@ -187,6 +208,7 @@ describe('omnyResolveEmbed', () => {
       provider: 'omny',
       id: 'the-show/an-episode',
       src: 'https://omny.fm/shows/the-show/an-episode/embed',
+      thumbnail: 'https://omny.fm/shows/the-show/an-episode/image.jpg',
       height: 180,
     }
 
@@ -211,6 +233,7 @@ describeForEachParser('omnyEmbedResolver', (parseHtml) => {
         provider: 'omny',
         id: 'the-show/an-episode',
         src: 'https://omny.fm/shows/the-show/an-episode/embed',
+        thumbnail: 'https://omny.fm/shows/the-show/an-episode/image.jpg',
         height: 180,
       }
 
@@ -229,6 +252,7 @@ describeForEachParser('omnyEmbedResolver', (parseHtml) => {
         provider: 'omny',
         id: 'the-show/an-episode',
         src: 'https://omny.fm/shows/the-show/an-episode/embed',
+        thumbnail: 'https://omny.fm/shows/the-show/an-episode/image.jpg',
         height: 180,
         title: 'S5E10 Christmas Waltz',
       }
@@ -272,6 +296,8 @@ describeForEachParser('omnyEmbedResolver', (parseHtml) => {
         provider: 'omny',
         id: 'the-shift/chris-parry-ceo-of-equity-guru-talks-to-us-about-a',
         src: 'https://omny.fm/shows/the-shift/chris-parry-ceo-of-equity-guru-talks-to-us-about-a/embed?t=41m45s',
+        thumbnail:
+          'https://omny.fm/shows/the-shift/chris-parry-ceo-of-equity-guru-talks-to-us-about-a/image.jpg',
         height: 180,
       }
 
@@ -294,6 +320,8 @@ describeForEachParser('omnyEmbedResolver', (parseHtml) => {
         provider: 'omny',
         id: 'cjad-800/mulcair-what-was-going-on-with-bernard-drainville',
         src: 'https://omny.fm/shows/cjad-800/mulcair-what-was-going-on-with-bernard-drainville/embed',
+        thumbnail:
+          'https://omny.fm/shows/cjad-800/mulcair-what-was-going-on-with-bernard-drainville/image.jpg',
         height: 180,
         title: 'Mulcair: what was going on with Bernard Drainville?',
       }
@@ -327,6 +355,7 @@ describeForEachParser('omnyEmbedResolver', (parseHtml) => {
         provider: 'omny',
         id: 'the-show/an-episode',
         src: 'https://omny.fm/shows/the-show/an-episode/embed',
+        thumbnail: 'https://omny.fm/shows/the-show/an-episode/image.jpg',
         height: 180,
       }
 
@@ -357,6 +386,7 @@ describeForEachParser('omny through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
+        data-embed-thumbnail="https://omny.fm/shows/the-show/an-episode/image.jpg"
         data-embed-src="https://omny.fm/shows/the-show/an-episode/embed"
         data-embed-provider="omny"
         data-embed-id="the-show/an-episode"

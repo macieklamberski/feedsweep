@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
@@ -12,22 +12,19 @@ const acastHosts = ['embed.acast.com', 'player.acast.com']
 // Acast's share code writes `height="190px"` and its pages state `twitter:player:height` 190.
 const playerHeight = 190
 
-// The three spellings all redirect to `embed.acast.com/{show}/{episode}`: the current embed code
+// The spellings all redirect to `embed.acast.com/{show}/{episode}`: the current embed code
 // `embed.acast.com/$/{show}/{episode}`, the same path without the `$`, and the older
-// `player.acast.com/{show}/episodes/{episode}`. A show alone is the playlist player.
+// `player.acast.com/{show}/episodes/{episode}`, with or without `episodes`. A show alone is the
+// playlist player.
 const extractAcastEmbed = (link: string): { show: string; episode?: string } | undefined => {
   const parsed = parseUrl(link, placeholderBaseUrl)
   const allSegments = parsed ? getPathSegments(parsed) : []
   const segments = allSegments[0] === '$' ? allSegments.slice(1) : allSegments
   const isPlayerHost = parsed?.hostname === 'player.acast.com'
-  const show = segments[0]
-  const episode = isPlayerHost ? segments[2] : segments[1]
+  const isEpisodesRoute = isPlayerHost && isAnyOf(segments[1], 'episodes')
+  const [show, episode] = isEpisodesRoute ? [segments[0], segments[2]] : segments
 
   if (!show) {
-    return
-  }
-
-  if (isPlayerHost && (segments[1] !== 'episodes' || !episode)) {
     return
   }
 

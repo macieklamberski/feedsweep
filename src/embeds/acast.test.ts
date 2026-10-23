@@ -138,21 +138,35 @@ describeForEachParser('acastEmbedResolver', (parseHtml) => {
     })
   })
 
-  describe('deliberate non-resolutions', () => {
-    it('should return undefined for the player host without an episodes segment', async () => {
+  describe('the player host without an episodes segment', () => {
+    it('should read the episode the player host names after the show', async () => {
       const value = html`
         <iframe src="https://player.acast.com/5cd07163ad694b18367aeb03/homebrew-6"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'acast',
+        id: '5cd07163ad694b18367aeb03/homebrew-6',
+        src: 'https://embed.acast.com/5cd07163ad694b18367aeb03/homebrew-6',
+        height: 190,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for the player host naming a show alone', async () => {
+    it('should read the player host naming a show alone as the playlist player', async () => {
       const value = '<iframe src="https://player.acast.com/5cd07163ad694b18367aeb03"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'acast',
+        id: '5cd07163ad694b18367aeb03',
+        src: 'https://embed.acast.com/5cd07163ad694b18367aeb03',
+        height: 190,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
+  })
 
+  describe('deliberate non-resolutions', () => {
     it('should return undefined for a bare dollar prefix', async () => {
       const value = '<iframe src="https://embed.acast.com/$/"></iframe>'
 

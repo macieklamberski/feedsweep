@@ -1,16 +1,47 @@
 import { parseUrl, trimObject } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
 import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const viewerRatio = '300/194'
+const libraryRowHeight = 185
+const libraryPathRegex = /^\/library\/?$/i
+
+// The account library widget, `v.calameo.com/library/?type=account&id={account}&rows={rows}`,
+// draws its shelves 185 pixels a row at its default thumbnail size. It reads `rows` with
+// `parseInt`, and a count below one fills the frame, which at that height is one row.
+const resolveLibrary = (url: URL): EmbedResolverResult | undefined => {
+  const accountId = url.searchParams.get('id')
+
+  if (url.searchParams.get('type') !== 'account' || !accountId) {
+    return
+  }
+
+  const rows = url.searchParams.get('rows') ?? undefined
+  const rowCount = Number.parseInt(rows ?? '', 10)
+  const query = composeQuery(trimObject({ type: 'account', id: accountId, rows }, Boolean))
+
+  return {
+    provider: 'calameo',
+    id: `library/account/${accountId}`,
+    src: `https://v.calameo.com/library/${query}`,
+    url: `https://www.calameo.com/accounts/${encodePathSegment(accountId)}`,
+    height: libraryRowHeight * (rowCount > 0 ? rowCount : 1),
+  }
+}
 
 // Calaméo's viewer, `v.calameo.com/?bkcode={code}`, and the retired Flash players before it,
 // `cviewer.swf` and `cmini.swf`, take the same code in the same query parameter, or in the
 // player's flashvars when the `<embed src>` names a bare `cmini.swf`.
 export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
-  const urlParams = parseUrl(url, placeholderBaseUrl)?.searchParams
+  const parsedUrl = parseUrl(url, placeholderBaseUrl)
+
+  if (parsedUrl && libraryPathRegex.test(parsedUrl.pathname)) {
+    return resolveLibrary(parsedUrl)
+  }
+
+  const urlParams = parsedUrl?.searchParams
   const params = urlParams?.has('bkcode') ? urlParams : new URLSearchParams(flashVars(element))
   const code = params.get('bkcode')
 

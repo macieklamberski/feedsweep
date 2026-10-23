@@ -9,8 +9,8 @@ const exerciseRoutes = ['watch', 'show']
 const exerciseParams = ['app', 'v', 'id']
 
 // LearningApps's exercise player, `learningapps.org/watch?app={id}`, and its `show` route and `v`
-// and `id` spellings. A numeric id also names its icon. An alphanumeric one keys its icon by an
-// internal number the url does not carry.
+// and `id` spellings. A numeric id also names its page and its icon. An alphanumeric one keys
+// both by an internal number the url does not carry.
 export const learningappsResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
   const [route] = parsed ? getPathSegments(parsed) : []
@@ -40,9 +40,16 @@ export const learningappsResolveEmbed: ResolveEmbed = (url) => {
     height: 500,
   }
 
-  return isNumericAppId
-    ? { ...result, thumbnail: `https://learningapps.org/appicons/1/${appId}.png` }
-    : result
+  if (!isNumericAppId) {
+    return result
+  }
+
+  // The exercise page, which only a numeric id addresses: an alphanumeric one redirects away.
+  return {
+    ...result,
+    url: `https://learningapps.org/${appId}`,
+    thumbnail: `https://learningapps.org/appicons/1/${appId}.png`,
+  }
 }
 
 export const learningappsEmbedResolver = createUrlEmbedResolver(

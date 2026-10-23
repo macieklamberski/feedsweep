@@ -15,6 +15,7 @@ const audiomackHeights = toMap({
 
 // The retired players 404 today, and the route word is the only place they record the kind.
 const retiredRoutes = toMap({
+  embed2: 'song',
   embed3: 'song',
   'embed3-album': 'album',
   embed4: 'song',
@@ -32,7 +33,7 @@ const readTrack = (url: URL): Track | undefined => {
   const segments = getPathSegments(url)
   const [route, second, third, fourth] = segments
 
-  // The retired players, `embed3/{artist}/{slug}` and its four siblings.
+  // The retired players, `embed3/{artist}/{slug}` and its five siblings.
   const retired = retiredRoutes.get(route ?? '')
 
   if (retired && second && third) {

@@ -1,19 +1,30 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'yandexmaps'
 
 const yandexMapsHosts = ['api-maps.yandex.ru']
-const yandexMapsWidgetHosts = ['yandex.ru']
+// Each host serves the same widget in its own language, yandex.com in English, so a frame keeps
+// the host the publisher wrote. The script names no widget host and takes yandex.ru.
+const yandexMapsWidgetHosts = ['yandex.by', 'yandex.com', 'yandex.ru']
+const scriptWidgetHost = 'yandex.ru'
 
 const widgetPath = '/map-widget/v1/'
+// A short link the map's share dialog writes, `/map-widget/v1/-/{code}`. The code names the same
+// map on every regional host.
+const shortLinkPathRegex = /^\/map-widget\/v1\/-\/(?<code>[^/]+)\/?$/i
 
 // The Constructor's own script loads the older `sid={id}` as `um=constructor:{id}`. The prefix
 // names the constructor space, since `um` also carries `mymaps:` maps.
 const constructorIdRegex = /^constructor:(.+)/
+
+// Where a map opens: its centre `ll`, its zoom `z` and its layer `l`. A coordinate map names
+// nothing more, so a frame naming more, such as an organisation's `oid` or a search `text`, stays
+// as written.
+const positionParams = ['ll', 'z', 'l']
 
 const mapHeight = 400
 
@@ -25,13 +36,17 @@ const composeStatic = (um: string): string => {
   return `https://api-maps.yandex.ru/services/constructor/1.0/static/${query}`
 }
 
-const composeWidget = (um: string): string => {
-  const query = composeQuery({ um, source: 'constructor' })
+const composeWidget = (host: string, um: string, params: Record<string, string>): string => {
+  const query = composeQuery({ um, source: 'constructor', ...params })
 
-  return `https://yandex.ru${widgetPath}${query}`
+  return `https://${host}${widgetPath}${query}`
 }
 
-const resolveConstructorMap = (query: URLSearchParams): EmbedResolverResult | undefined => {
+const resolveConstructorMap = (
+  host: string,
+  query: URLSearchParams,
+  position: Record<string, string>,
+): EmbedResolverResult | undefined => {
   const constructorId = query.get('um')?.match(constructorIdRegex)?.[1] ?? query.get('sid')
 
   if (!constructorId) {
@@ -39,13 +54,37 @@ const resolveConstructorMap = (query: URLSearchParams): EmbedResolverResult | un
   }
 
   const um = `constructor:${constructorId}`
+  // The interface language the publisher chose. The Constructor's own script writes it onto the
+  // widget it loads, which otherwise renders in its host's language.
+  const language = pickQueryParams(query.toString(), ['lang'])
 
   return {
     provider,
     id: um,
-    src: composeWidget(um),
+    src: composeWidget(host, um, { ...language, ...position }),
     thumbnail: composeStatic(um),
     height: mapHeight,
+  }
+}
+
+const resolveCoordinateMap = (
+  host: string,
+  query: URLSearchParams,
+  element: Element | undefined,
+): EmbedResolverResult | undefined => {
+  const names = [...query.keys()]
+
+  if (!query.has('ll') || !names.every((name) => positionParams.includes(name))) {
+    return
+  }
+
+  const position = composeQuery(pickQueryParams(query.toString(), positionParams))
+
+  return {
+    provider,
+    src: `https://${host}${widgetPath}${position}`,
+    height: mapHeight,
+    title: attr(element, 'title'),
   }
 }
 
@@ -61,20 +100,41 @@ export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return resolveConstructorMap(url.searchParams)
+    return resolveConstructorMap(scriptWidgetHost, url.searchParams, {})
   },
 )
 
-// The frame the Constructor's iframe snippet writes, which names the map by `um` alone.
+// The frame the Constructor's iframe snippet writes, which names the map by `um` alone, the frame
+// of a short link, and a coordinate map's frame.
 export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
   yandexMapsWidgetHosts,
-  (url) => {
+  (url, element) => {
     const parsed = parseUrl(url)
 
-    if (parsed?.pathname !== widgetPath) {
+    if (!parsed) {
       return
     }
 
-    return resolveConstructorMap(parsed.searchParams)
+    const code = parsed.pathname.match(shortLinkPathRegex)?.groups?.code
+
+    if (code) {
+      return {
+        provider,
+        id: `-/${code}`,
+        src: `https://${parsed.hostname}${widgetPath}-/${code}`,
+        height: mapHeight,
+      }
+    }
+
+    if (parsed.pathname.toLowerCase() !== widgetPath) {
+      return
+    }
+
+    const position = pickQueryParams(parsed.search, positionParams)
+
+    return (
+      resolveConstructorMap(parsed.hostname, parsed.searchParams, position) ??
+      resolveCoordinateMap(parsed.hostname, parsed.searchParams, element)
+    )
   },
 )
