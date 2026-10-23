@@ -1,5 +1,4 @@
 import {
-  fixMalformedQuery,
   isAnyOf,
   isHostOrSubdomainOf,
   type MaybePromise,
@@ -35,6 +34,7 @@ import {
   cleanUrl,
   collapseSlashRuns,
   parseUrlOnHosts,
+  repairCarrierUrl,
   resolveOrDropUrl,
   resolveOrKeepUrl,
 } from './urls.js'
@@ -260,8 +260,7 @@ export const createUrlEmbedResolver = (
         return
       }
 
-      // Only a resolver reads the repaired url: a frame no resolver claims keeps the src as written.
-      return decideSize(element, extract(fixMalformedQuery(src), element), options.readCarrierSize)
+      return decideSize(element, extract(repairCarrierUrl(src), element), options.readCarrierSize)
     },
   }
 }

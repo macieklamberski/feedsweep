@@ -16,6 +16,8 @@ import {
 const videoUrls = [
   'https://www.dailymotion.com/video/x7tgad0',
   'https://dai.ly/x7tgad0',
+  // Whitespace around a value is trimmed.
+  'https://www.dailymotion.com/video/x7tgad0%20',
   'https://www.dailymotion.com/embed/video/x7tgad0',
   // A page builder keeps the url inside a JSON payload that no url pass rewrites, so the
   // protocol-relative spelling arrives exactly as the publisher wrote it.

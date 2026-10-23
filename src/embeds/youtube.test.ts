@@ -27,6 +27,8 @@ const watchOffsetCases: Array<[string, string]> = [
 const videoUrls = [
   'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   'https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf',
+  // Whitespace around a value is trimmed.
+  'https://www.youtube.com/watch?v=dQw4w9WgXcQ%20',
   // The path spelling of the watch page.
   'https://www.youtube.com/watch/dQw4w9WgXcQ',
   'https://www.youtube.com/watch?vi=dQw4w9WgXcQ',
