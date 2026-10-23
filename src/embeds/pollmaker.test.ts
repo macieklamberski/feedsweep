@@ -320,6 +320,42 @@ describeForEachParser('pollmakerFormEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should strip whitespace after the poll id in the form action', async () => {
+      const value = html`
+        <div id="qp_main51229">
+          <div><div>Who will win the NFC North?</div></div>
+          <form
+            action="http://www.poll-maker.com/results51229xe38A54C7-3%20"
+            id="qp_form51229"
+            method="post"
+            target="_blank"
+          >
+            <div>
+              <span>
+                <input
+                  name="qp_v51229"
+                  type="radio"
+                  value="1"
+                />The Green Bay Packers</span>
+            </div>
+          </form>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pollmaker',
+        id: '51229xe38A54C7-3',
+        src: 'https://poll-maker.com/frame51229xe38A54C7-3',
+        url: 'https://poll-maker.com/poll51229xe38A54C7-3',
+        height: 372,
+        title: 'Who will win the NFC North?',
+        description: 'The Green Bay Packers',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('poll maker snippets the pipeline replaces', (parseHtml) => {

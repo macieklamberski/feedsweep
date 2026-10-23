@@ -358,6 +358,27 @@ describeForEachParser('spreakerAnchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
   })
+
+  describe('edge cases', () => {
+    it('should strip whitespace after the episode id in data-resource', async () => {
+      const value = html`
+        <a
+          class="spreaker-player"
+          href="https://www.spreaker.com/episode/42"
+          data-resource="episode_id=42%20"
+        >Listen to "An episode" on Spreaker.</a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'spreaker',
+        id: 'episode/42',
+        src: 'https://widget.spreaker.com/player?episode_id=42',
+        url: 'https://www.spreaker.com/episode/42',
+        height: 200,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 // `api.spreaker.com` is a subdomain of the host the url resolver claims and every episode's

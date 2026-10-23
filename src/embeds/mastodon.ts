@@ -2,6 +2,7 @@ import { isHttpUrl, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
+import { repairCarrierUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mastodon'
@@ -19,7 +20,7 @@ const statusPathRegex = /^\/@([\w.-]+)\/(\d{6,})(?:\/embed)?\/?$/
 
 // Any host filing posts under an author and a long number takes this shape, Medium among them.
 export const parseMastodonStatus = (link: string): MastodonStatus | undefined => {
-  const parsed = parseUrl(link)
+  const parsed = parseUrl(repairCarrierUrl(link))
 
   // A javascript: url parses with a matching pathname, and its origin is the string null.
   if (!parsed || !isHttpUrl(parsed)) {

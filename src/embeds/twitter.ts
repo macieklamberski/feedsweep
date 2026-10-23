@@ -2,7 +2,7 @@ import { isHostOrSubdomainOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, placeholderBaseUrl, repairCarrierUrl } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
@@ -56,7 +56,7 @@ const bylineRegex = /^[—–-]\s*(.*?)\s*\(@[a-zA-Z0-9_]*\)\s*$/
 type Status = { handle: string; id: string }
 
 const readStatusUrl = (value: string | undefined): Status | undefined => {
-  const parsed = parseUrl(value ?? '', placeholderBaseUrl)
+  const parsed = parseUrl(repairCarrierUrl(value ?? ''), placeholderBaseUrl)
 
   if (!parsed || !isTweetUrl(parsed)) {
     return
@@ -89,7 +89,8 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
 
   // The frame has to be the platform's own: `id` is an ordinary parameter name, so any other
   // iframe a publisher nested in the quote would otherwise name the tweet.
-  const frame = parseUrl(attr(find(element, 'iframe[src]'), 'src') ?? '', placeholderBaseUrl)
+  const frameSrc = repairCarrierUrl(attr(find(element, 'iframe[src]'), 'src') ?? '')
+  const frame = parseUrl(frameSrc, placeholderBaseUrl)
   const framed = frame && isTweetUrl(frame) ? frame.searchParams.get('id') : undefined
   const declared =
     attr(element, 'data-twitter-tweet-id') ??

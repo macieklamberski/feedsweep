@@ -2,7 +2,7 @@ import { coerceNumber, isHostOrSubdomainOf, type Nullish, parseUrl, trimObject }
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, flashVar, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, repairCarrierUrl } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -64,7 +64,7 @@ const extractEmbed = (
   plugin: string,
   attribute = 'data-href',
 ): EmbedResolverResult | undefined => {
-  const href = attr(element, attribute)
+  const href = repairCarrierUrl(attr(element, attribute) ?? '')
 
   if (!href || !parseUrlOnHosts(href, facebookHosts)) {
     return
@@ -257,7 +257,7 @@ export const facebookS9eEmbedResolver = createMarkupEmbedResolver(
 export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(
   fallbackSelector,
   (element) => {
-    const cite = attr(element, 'cite')
+    const cite = repairCarrierUrl(attr(element, 'cite') ?? '')
     const parsed = parseUrlOnHosts(cite, facebookHosts)
 
     if (!cite || !parsed) {

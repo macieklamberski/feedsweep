@@ -1,7 +1,7 @@
 import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { isFileName, placeholderBaseUrl, repairCarrierUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mixcloud'
@@ -66,7 +66,7 @@ const readShowUrl = (link: string): Show | undefined => {
   // The feed parameter holds a path in the newer embeds and a whole url in the Flash
   // mixcloudLoader.swf one.
   const feed = parsed?.searchParams.get('feed')
-  const source = feed ? parseUrl(feed, placeholderBaseUrl) : parsed
+  const source = feed ? parseUrl(repairCarrierUrl(feed), placeholderBaseUrl) : parsed
 
   // Mixcloud serves the show audio and the artwork from subdomains of mixcloud.com.
   // A file path has a show's two segments, so a claimed enclosure would lose its element.

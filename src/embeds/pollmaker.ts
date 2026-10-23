@@ -1,7 +1,7 @@
 import { isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { placeholderBaseUrl, repairCarrierUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pollmaker'
@@ -73,7 +73,7 @@ export const pollmakerFormEmbedResolver = createMarkupEmbedResolver(
     }
 
     const form = element.querySelector(`#qp_form${pollNumber}[action]`)
-    const pollId = readPollId(attr(form, 'action') ?? '')
+    const pollId = readPollId(repairCarrierUrl(attr(form, 'action') ?? ''))
 
     if (!form || !pollId) {
       return

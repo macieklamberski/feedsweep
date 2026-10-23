@@ -234,6 +234,23 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should strip whitespace after the slug in the anchor', async () => {
+      const value = html`
+        <iframe src="https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE"></iframe>
+        <a href="https://www.yumpu.com/de/document/view/71235096/sukultur-2026%20">SUKULTUR 2026</a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'yumpu',
+        id: 'z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+        url: 'https://www.yumpu.com/de/document/view/71235096/sukultur-2026',
+        ratio: '4/3',
+        title: 'SUKULTUR 2026',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore an anchor that prose separates from the iframe', async () => {
       const value = html`
         <iframe src="https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE"></iframe>

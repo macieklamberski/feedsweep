@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find } from '../utils/dom.js'
-import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickUrlParams, placeholderBaseUrl, repairCarrierUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'streamable'
@@ -85,7 +85,8 @@ export const streamableIframeEmbedResolver = createUrlEmbedResolver(
 export const streamableMlbEmbedResolver = createMarkupEmbedResolver(
   'div.mlb\\.com-embed, div.mlb-com-embed',
   (element) => {
-    const parsed = parseUrl(attr(find(element, 'a[href]'), 'href') ?? '', placeholderBaseUrl)
+    const href = repairCarrierUrl(attr(find(element, 'a[href]'), 'href') ?? '')
+    const parsed = parseUrl(href, placeholderBaseUrl)
 
     if (!parsed || !isHostOf(parsed, 'www.mlb.com')) {
       return
@@ -107,7 +108,7 @@ export const streamableMlbEmbedResolver = createMarkupEmbedResolver(
 export const streamableWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.streamable-embed',
   (element) => {
-    return streamableResolveEmbed(attr(find(element, 'a[href]'), 'href') ?? '')
+    return streamableResolveEmbed(repairCarrierUrl(attr(find(element, 'a[href]'), 'href') ?? ''))
   },
 )
 

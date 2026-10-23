@@ -21,6 +21,14 @@ describe('extractMixcloudShow', () => {
     expect(extractMixcloudShow(value)).toBe(expected)
   })
 
+  it('should strip whitespace after the show in a feed parameter holding a whole url', () => {
+    const value =
+      'http://www.mixcloud.com/media/swf/player/mixcloudLoader.swf?feed=http%3A%2F%2Fwww.mixcloud.com%2Ffrederik%2Foct-2011-exclusive-set%2520%2F'
+    const expected = 'frederik/oct-2011-exclusive-set'
+
+    expect(extractMixcloudShow(value)).toBe(expected)
+  })
+
   it('should read the widget on its own host', () => {
     const value =
       'https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&light=1&feed=%2Fdjgavinboyd%2Fsoul-has-no-tempo%2F'

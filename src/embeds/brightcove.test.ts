@@ -560,6 +560,21 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should strip whitespace after the account in the loader script url', async () => {
+      const value = html`
+        <video-js data-video-id="6098765432"></video-js>
+        <script src="https://players.brightcove.net/1234567890%20/default_default/index.min.js"></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '1234567890/6098765432',
+        src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=6098765432',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // Neither attribute is checked the way the two ids are, and unescaped the player id picks
     // the account: `../../999999/stolen` climbs out of the segment it was written into.
     it('should use a malformed player id as written, even if the player answers an error', async () => {

@@ -947,6 +947,21 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should strip whitespace after the slug in data-href', async () => {
+      const value = html`<p class="codepen" data-href="https://codepen.io/argyleink/pen/XJpKqXm%20"></p>`
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        height: 300,
+        author: '@argyleink',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The share dialog writes the handle with its `@` and the url path carries both spellings.
     it('should strip the at sign from the stated handle', async () => {
       const value = html`

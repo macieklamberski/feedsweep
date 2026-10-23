@@ -2,7 +2,7 @@ import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { placeholderBaseUrl, repairCarrierUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'spreaker'
@@ -75,7 +75,7 @@ export const spreakerAnchorEmbedResolver = createMarkupEmbedResolver(
     // own href can name the show while the resource names an episode.
     const resource = attr(element, 'data-resource')
     const result = resource
-      ? spreakerResolveEmbed(`https://widget.spreaker.com/player?${resource}`)
+      ? spreakerResolveEmbed(repairCarrierUrl(`https://widget.spreaker.com/player?${resource}`))
       : undefined
 
     if (!result) {

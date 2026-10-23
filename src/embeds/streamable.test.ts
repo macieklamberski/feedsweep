@@ -424,6 +424,24 @@ describeForEachParser('streamableMlbEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should strip whitespace after the clip slug in the link', async () => {
+      const value = html`
+        <div class="mlb.com-embed">
+          <a href="https://www.mlb.com/video/josh-rojas-homers-8-on-a-fly-ball-to-left-field%20">View Link</a>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'streamable',
+        id: 'm/josh-rojas-homers-8-on-a-fly-ball-to-left-field',
+        src: 'https://streamable.com/m/josh-rojas-homers-8-on-a-fly-ball-to-left-field',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('streamableWidgetEmbedResolver', (parseHtml) => {
@@ -471,6 +489,25 @@ describeForEachParser('streamableWidgetEmbedResolver', (parseHtml) => {
       const value = '<div class="streamable-embed"></div>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should strip whitespace after the video id in the link', async () => {
+      const value = html`
+        <div class="streamable-embed">
+          <a href="https://streamable.com/0891o%20">View Link</a>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'streamable',
+        id: '0891o',
+        src: 'https://streamable.com/e/0891o',
+        url: 'https://streamable.com/0891o',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

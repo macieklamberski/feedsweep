@@ -207,6 +207,26 @@ describeForEachParser('foxnewsScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should strip whitespace after the video id in the loader url', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="https://video.foxnews.com/v/embed.js?id=5406119088001%20&#038;w=466&#038;h=263"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'foxnews',
+        id: '5406119088001',
+        src: 'https://video.foxnews.com/v/video-embed.html?video_id=5406119088001',
+        url: 'https://www.foxnews.com/video/5406119088001',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('foxnewsIframeEmbedResolver', (parseHtml) => {

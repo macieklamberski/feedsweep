@@ -237,6 +237,20 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should strip whitespace after the post id in the data-href', async () => {
+      const value = html`<div class="fb-post" data-href="https://www.facebook.com/PageName/posts/123%20"></div>`
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/PageName/posts/123',
+        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
+        url: 'https://www.facebook.com/PageName/posts/123',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('facebookXfbmlEmbedResolver', (parseHtml) => {
@@ -427,6 +441,29 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
       `
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should strip whitespace after the video id in the cite url', async () => {
+      const value = html`
+        <blockquote
+          cite="https://www.facebook.com/PageName/videos/123%20/"
+          class="fb-xfbml-parse-ignore"
+        >
+          <p>A video caption.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/PageName/videos/123/',
+        src: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F',
+        url: 'https://www.facebook.com/PageName/videos/123/',
+        ratio: '16/9',
+        description: 'A video caption.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

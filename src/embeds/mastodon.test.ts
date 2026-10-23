@@ -130,6 +130,20 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should strip whitespace after the status id in the player url', async () => {
+      const value = html`<iframe src="https://mastodon.social/@Gargron/116535232552529093%20/embed"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'mastodon',
+        id: 'mastodon.social/116535232552529093',
+        src: 'https://mastodon.social/@Gargron/116535232552529093/embed',
+        url: 'https://mastodon.social/@Gargron/116535232552529093',
+        author: '@Gargron@mastodon.social',
+        publisher: 'mastodon.social',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The class sits on both the wrapper and the iframe. Only the iframe is selected, so the
     // status is emitted once.
     it('should resolve the inner iframe rather than the wrapper', async () => {

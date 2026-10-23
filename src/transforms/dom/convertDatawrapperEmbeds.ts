@@ -1,5 +1,6 @@
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
+import { repairCarrierUrl } from '../../utils/urls.js'
 import { createLinkedImage } from '../../utils/widgets.js'
 
 const chartIdRegex = /datawrapper\.dwcdn\.net\/([^/?#]+)/
@@ -10,7 +11,7 @@ const visWrapperIdRegex = /^datawrapper-vis-(.+)$/
 const resizeScriptRegex = /datawrapper-height|window\.datawrapper/
 
 const getChartId = (url: string | null | undefined): string | undefined => {
-  return url?.match(chartIdRegex)?.[1]
+  return repairCarrierUrl(url ?? '').match(chartIdRegex)?.[1]
 }
 
 // Datawrapper publishes a static PNG of every chart at dwcdn.net/<id>/full.png and names that

@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, isElement, isWhitespaceText, keepIfMatches, text } from '../utils/dom.js'
-import { localeWordRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { localeWordRegex, placeholderBaseUrl, repairCarrierUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'yumpu'
@@ -24,8 +24,8 @@ const readCompanion = (element: Element | undefined): Partial<EmbedResolverResul
   }
 
   const anchor = isElement(node) ? node : undefined
-  const href = attr(anchor, 'href')
-  const page = parseUrl(href ?? '', placeholderBaseUrl)
+  const href = repairCarrierUrl(attr(anchor, 'href') ?? '')
+  const page = parseUrl(href, placeholderBaseUrl)
 
   if (!page || !isHostOf(page, yumpuHosts) || !documentPathRegex.test(page.pathname)) {
     return

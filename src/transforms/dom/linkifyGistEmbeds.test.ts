@@ -20,6 +20,17 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should strip whitespace after the user in the script url', async () => {
+    const value = html`<script src="https://gist.github.com/octocat%20/6cad326836d38bd3a7ae.js"></script>`
+    const expected = html`
+      <a
+        href="https://gist.github.com/octocat/6cad326836d38bd3a7ae"
+      >https://gist.github.com/octocat/6cad326836d38bd3a7ae</a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should handle a user-less gist url', async () => {
     const value = '<script src="https://gist.github.com/6cad326836d38bd3a7ae.js"></script>'
     const expected = html`

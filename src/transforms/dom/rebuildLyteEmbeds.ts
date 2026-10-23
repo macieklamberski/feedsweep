@@ -9,7 +9,7 @@ import {
   isText,
   isWhitespaceText,
 } from '../../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl, repairCarrierUrl } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 // In a feed the plugin writes no facade. It writes the thumbnail linked to the post, with
@@ -20,7 +20,7 @@ const feedThumbnailSelector = 'a:has(> img[alt="YouTube Video"])'
 // The thumbnail is `i.ytimg.com/vi/{id}/hqdefault.jpg`, or that url in the `origThumbUrl` param of
 // the plugin's own `lyteCache.php` when it serves thumbnails locally.
 const readThumbnailVideoId = (src: string): string | undefined => {
-  const url = parseUrl(src, placeholderBaseUrl)
+  const url = parseUrl(repairCarrierUrl(src), placeholderBaseUrl)
 
   if (!url) {
     return

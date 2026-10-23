@@ -1,6 +1,6 @@
 import type { DomTransform } from '../../types.js'
 import { attr, isElement, isSkippable, isText } from '../../utils/dom.js'
-import { absoluteUrlRegex } from '../../utils/urls.js'
+import { absoluteUrlRegex, repairCarrierUrl } from '../../utils/urls.js'
 import { createLink } from '../../utils/widgets.js'
 
 const gistScriptRegex = /gist\.github\.com\/(?:([^/?"]+)\/)?([^/?"#]+)\.js/
@@ -56,7 +56,7 @@ const readGistPath = (element: Element): string | undefined => {
     return gist
   }
 
-  const match = element.getAttribute('src')?.match(gistScriptRegex)
+  const match = repairCarrierUrl(element.getAttribute('src') ?? '').match(gistScriptRegex)
 
   if (!match) {
     return

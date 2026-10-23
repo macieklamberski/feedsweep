@@ -348,6 +348,46 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('edge cases', () => {
+    it('should strip whitespace after the handle in the anchor', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p lang="en" dir="ltr">Tweet text here.</p>
+          <p>
+            &mdash; Display Name (@user)
+            <a href="https://twitter.com/user%20/status/123456789012345">May 12, 2020</a>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+        url: statusUrl,
+        description: 'Tweet text here.',
+        author: 'Display Name',
+        date: 'May 12, 2020',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should strip whitespace after the id in the player it already built', async () => {
+      const value = html`
+        <div class="twitter-tweet twitter-tweet-rendered">
+          <iframe src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345%20"></iframe>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   // One block per shape the corpus survey found, so a shape nobody handles is visible here as
   // a missing block. Variants #1, #3 and #4 arrive in a form the resolver cannot read on its
   // own and are asserted after the pipeline instead, in the last group of this file.

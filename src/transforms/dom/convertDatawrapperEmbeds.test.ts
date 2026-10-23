@@ -50,6 +50,17 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should strip whitespace after the chart id in the iframe url', async () => {
+    const value = '<iframe src="https://datawrapper.dwcdn.net/t4fiQ%20/3/"></iframe>'
+    const expected = html`
+      <a href="https://datawrapper.dwcdn.net/t4fiQ/">
+        <img src="https://datawrapper.dwcdn.net/t4fiQ/full.png">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should use a malformed chart id as written, even if the url answers an error', async () => {
     const value = '<iframe src="https://datawrapper.dwcdn.net/ab_cd/1/"></iframe>'
     const expected = html`

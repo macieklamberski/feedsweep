@@ -189,6 +189,19 @@ describeForEachParser('jwplayerScriptEmbedResolver', (parseHtml) => {
 
     expect(await extract(value)).toBeUndefined()
   })
+
+  it('should strip whitespace before the media id in the script url', async () => {
+    const value = html`<script src="https://cdn.jwplayer.com/players/%20H4GXr873-abc12345.js"></script>`
+    const expected: EmbedResolverResult = {
+      provider: 'jwplayer',
+      id: 'H4GXr873',
+      src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
 })
 
 describeForEachParser('jwplayerAmpEmbedResolver', (parseHtml) => {

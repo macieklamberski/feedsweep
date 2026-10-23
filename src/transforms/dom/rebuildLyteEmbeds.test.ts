@@ -152,6 +152,18 @@ describeForEachParser('rebuildLyteEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should strip whitespace after the video id in the thumbnail url', async () => {
+    const value = html`
+      <p><a href="https://example.com/post/"><img
+            src="https://i.ytimg.com/vi/OUn89XOsJG0%20/hqdefault.jpg"
+            alt="YouTube Video"
+          ></a></p>
+    `
+    const expected = '<p><iframe src="https://www.youtube.com/embed/OUn89XOsJG0"></iframe></p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should keep the text the author wrote after the label', async () => {
     const value = html`
       <p><a href="https://example.com/post/"><img
