@@ -19,9 +19,11 @@ export const washingtonpostResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const id =
+  // The player takes only a lowercase uuid and answers 400 "Invalid UUID" for one in capitals.
+  const id = (
     parsed.pathname.match(embedPathRegex)?.[1] ??
     keepIfMatches(parsed.pathname.match(inlinePathRegex)?.[1], uuidRegex)
+  )?.toLowerCase()
 
   if (!id) {
     return

@@ -45,13 +45,26 @@ describe('washingtonpostResolveEmbed', () => {
       expect(washingtonpostResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should pass an id through as written', () => {
+    it('should lowercase a uuid in capitals on the embed route', () => {
       const value =
         'https://www.washingtonpost.com/video/c/embed/6C688908-1E4F-4130-B5CA-E371AFC1C78B'
       const expected: EmbedResolverResult = {
         provider: 'washingtonpost',
-        id: '6C688908-1E4F-4130-B5CA-E371AFC1C78B',
-        src: 'https://www.washingtonpost.com/video/c/embed/6C688908-1E4F-4130-B5CA-E371AFC1C78B',
+        id: '6c688908-1e4f-4130-b5ca-e371afc1c78b',
+        src: 'https://www.washingtonpost.com/video/c/embed/6c688908-1e4f-4130-b5ca-e371afc1c78b',
+        ratio: '16/9',
+      }
+
+      expect(washingtonpostResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should lowercase a uuid in capitals on the inline player', () => {
+      const value =
+        'http://www.washingtonpost.com/opinions/dana-milbank-political-sketch-an-oasis-at-the-dnc/2012/09/05/609CBC68-F753-11E1-8253-3F495AE70650_inline.html'
+      const expected: EmbedResolverResult = {
+        provider: 'washingtonpost',
+        id: '609cbc68-f753-11e1-8253-3f495ae70650',
+        src: 'https://www.washingtonpost.com/video/c/embed/609cbc68-f753-11e1-8253-3f495ae70650',
         ratio: '16/9',
       }
 
