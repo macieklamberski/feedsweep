@@ -376,11 +376,11 @@ describe('arcgisResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
-    it('should fold the item id into the key and keep it as written in the player', () => {
+    it('should keep the case of the item id in the key and the player', () => {
       const value = 'https://storymaps.arcgis.com/stories/EC8A4B675CAC476380DF910304A47547'
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
-        id: 'ec8a4b675cac476380df910304a47547',
+        id: 'EC8A4B675CAC476380DF910304A47547',
         src: 'https://storymaps.arcgis.com/stories/EC8A4B675CAC476380DF910304A47547',
         url: 'https://storymaps.arcgis.com/stories/EC8A4B675CAC476380DF910304A47547',
         height: 500,

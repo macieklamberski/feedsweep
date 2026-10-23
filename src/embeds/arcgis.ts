@@ -188,7 +188,7 @@ export const arcgisResolveEmbed: ResolveEmbed = (url, element) => {
 
   return {
     provider,
-    id: item.id.toLowerCase(),
+    id: item.id,
     src: item.src,
     url: item.url,
     height: snippetHeight,

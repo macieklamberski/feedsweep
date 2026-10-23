@@ -22,7 +22,7 @@ export const namashaResolveEmbed: ResolveEmbed = (url, element) => {
 
   return {
     provider,
-    id: id.toLowerCase(),
+    id,
     src: `https://www.namasha.com/embed/${id}${pickUrlParams(parsed.href, ['t'])}`,
     url: `https://www.namasha.com/v/${id}`,
     ratio: '16/9',

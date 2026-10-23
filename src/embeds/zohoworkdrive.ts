@@ -26,9 +26,6 @@ const externalPathRegex = /^\/external\/([^/]+)(?:\/embed)?$/
 // The only playback setting the dialog writes besides autoplay.
 const playbackParams = ['loop']
 
-// A link id is 64 hex digits, which the server reads in any case.
-const linkIdRegex = /^[0-9a-f]{64}$/i
-
 // The dialog marks a video's frame with `zpvideo`, and a document's with `zpiframe` or `embedcon`.
 // The video player fills the frame, and a document page scrolls under a 64px header.
 const readRatio = (element: Element | undefined): string => {
@@ -68,7 +65,7 @@ export const zohoworkdriveResolveEmbed: ResolveEmbed = (url, element) => {
 
   return {
     provider,
-    id: `external/${linkIdRegex.test(linkId) ? linkId.toLowerCase() : linkId}`,
+    id: `external/${linkId}`,
     src: page,
     url: page,
     ratio: readRatio(element),

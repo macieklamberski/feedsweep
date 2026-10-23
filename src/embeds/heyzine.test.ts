@@ -45,11 +45,11 @@ describe('heyzineResolveEmbed', () => {
       expect(heyzineResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should lowercase the key of an uppercase id and keep its case in the url', () => {
+    it('should keep the case of an uppercase id in the key and the url', () => {
       const value = 'https://heyzine.com/flip-book/4DB16F598C.html'
       const expected: EmbedResolverResult = {
         provider: 'heyzine',
-        id: '4db16f598c',
+        id: '4DB16F598C',
         src: 'https://heyzine.com/flip-book/4DB16F598C.html',
         url: 'https://heyzine.com/flip-book/4DB16F598C.html',
         ratio: '490/600',
@@ -58,11 +58,11 @@ describe('heyzineResolveEmbed', () => {
       expect(heyzineResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should lowercase the key of a custom slug and keep its case in the url', () => {
+    it('should keep the case of a custom slug in the key and the url', () => {
       const value = 'https://heyzine.com/flip-book/ThroughThePrism'
       const expected: EmbedResolverResult = {
         provider: 'heyzine',
-        id: 'throughtheprism',
+        id: 'ThroughThePrism',
         src: 'https://heyzine.com/flip-book/ThroughThePrism',
         url: 'https://heyzine.com/flip-book/ThroughThePrism',
         ratio: '490/600',
@@ -178,7 +178,7 @@ describe('heyzineResolveEmbed', () => {
       const value = 'https://heyzine.com/flip-book/Brochure2026'
       const expected: EmbedResolverResult = {
         provider: 'heyzine',
-        id: 'brochure2026',
+        id: 'Brochure2026',
         src: 'https://heyzine.com/flip-book/Brochure2026',
         url: 'https://heyzine.com/flip-book/Brochure2026',
         ratio: '490/600',
@@ -204,7 +204,7 @@ describe('heyzineResolveEmbed', () => {
       const value = 'https://heyzine.com/flip-book/Through%2FThePrism'
       const expected: EmbedResolverResult = {
         provider: 'heyzine',
-        id: 'through%2ftheprism',
+        id: 'Through%2FThePrism',
         src: 'https://heyzine.com/flip-book/Through%2FThePrism',
         url: 'https://heyzine.com/flip-book/Through%2FThePrism',
         ratio: '490/600',
@@ -297,7 +297,7 @@ describe('heyzineResolveEmbed', () => {
       const value = 'https://draftcraft.hflip.co/IFFInity-January-2026'
       const expected: EmbedResolverResult = {
         provider: 'heyzine',
-        id: 'iffinity-january-2026',
+        id: 'IFFInity-January-2026',
         src: 'https://draftcraft.hflip.co/IFFInity-January-2026',
         url: 'https://draftcraft.hflip.co/IFFInity-January-2026',
         ratio: '490/600',
@@ -422,7 +422,7 @@ describeForEachParser('heyzineEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'heyzine',
-        id: 'throughtheprism',
+        id: 'ThroughThePrism',
         src: 'https://heyzine.com/flip-book/ThroughThePrism',
         url: 'https://heyzine.com/flip-book/ThroughThePrism',
         ratio: '490/600',
@@ -466,7 +466,7 @@ describeForEachParser('heyzineEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'heyzine',
-        id: 'iffinity-january-2026',
+        id: 'IFFInity-January-2026',
         src: 'https://draftcraft.hflip.co/IFFInity-January-2026',
         url: 'https://draftcraft.hflip.co/IFFInity-January-2026',
         ratio: '490/600',
@@ -536,7 +536,7 @@ describeForEachParser('heyzineEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'heyzine',
-        id: 'awdf_malawi_impact_story',
+        id: 'AWDF_Malawi_Impact_Story',
         src: 'https://heyzine.com/flip-book/AWDF_Malawi_Impact_Story',
         url: 'https://heyzine.com/flip-book/AWDF_Malawi_Impact_Story',
         ratio: '490/600',
