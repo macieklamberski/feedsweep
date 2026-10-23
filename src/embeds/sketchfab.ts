@@ -16,8 +16,6 @@ const sluggedUidRegex = /(?<uid>[0-9a-f]{32}|[0-9a-z]{26})$/i
 
 const sketchfabHosts = ['sketchfab.com']
 
-const retiredRoutes = ['embed', 'show']
-
 const readModelUid = (parsed: URL): string | undefined => {
   const [route, second, third] = getPathSegments(parsed)
 
@@ -27,7 +25,7 @@ const readModelUid = (parsed: URL): string | undefined => {
 
   // The viewer is `/models/{uid}/embed`, which the retired `/embed/{uid}` and `/show/{uid}`
   // redirect to.
-  if ((isAnyOf(route, 'models') && isAnyOf(third, 'embed')) || isAnyOf(route, retiredRoutes)) {
+  if ((isAnyOf(route, 'models') && isAnyOf(third, 'embed')) || isAnyOf(route, ['embed', 'show'])) {
     // Older models carry a 26-character uid in letters of both cases, which the viewer still plays.
     return keepIfMatches(second, alphanumericRegex)
   }
