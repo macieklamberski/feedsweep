@@ -2,7 +2,7 @@ import { getQueryParam } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { readCarrierUrl } from '../utils/widgets.js'
+import { readRepairedCarrierUrl } from '../utils/widgets.js'
 
 const flashMp3PlayerHosts = ['flash-mp3-player.net']
 
@@ -13,7 +13,7 @@ export const flashMp3PlayerMediaResolver: MediaResolver = {
   selector:
     'embed[src*="flash-mp3-player.net/medias/" i], object[data*="flash-mp3-player.net/medias/" i]',
   extract: (element) => {
-    const parsed = parseUrlOnHosts(readCarrierUrl(element), flashMp3PlayerHosts)
+    const parsed = parseUrlOnHosts(readRepairedCarrierUrl(element), flashMp3PlayerHosts)
 
     if (!parsed) {
       return

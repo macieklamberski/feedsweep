@@ -1,6 +1,6 @@
 import { composeQuery, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
-import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, readRepairedCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'googlebooks'
 
@@ -26,7 +26,7 @@ const snippetSize = { width: 500, height: 500 }
 export const googlebooksEmbedResolver = createMarkupEmbedResolver(
   'iframe[src*="books.google." i]',
   (element) => {
-    const parsed = parseUrl(readCarrierUrl(element), placeholderBaseUrl)
+    const parsed = parseUrl(readRepairedCarrierUrl(element), placeholderBaseUrl)
 
     if (!parsed || !viewerHostRegex.test(parsed.hostname)) {
       return
