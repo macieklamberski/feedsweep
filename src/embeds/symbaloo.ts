@@ -11,7 +11,7 @@ const symbalooHosts = ['symbaloo.com', 'www.symbaloo.com', 'edu.symbaloo.com']
 const webmixHeight = 500
 
 // Symbaloo's embedded webmix, `/embed/{slug}` for a published webmix and `/embed/shared/{token}`
-// for one shared by link. The route words and the token are case-sensitive, the slug is not.
+// for one shared by link. The route words are case-sensitive, the slug is not.
 export const symbalooResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
