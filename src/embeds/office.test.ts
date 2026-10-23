@@ -67,7 +67,7 @@ describe('officeResolveEmbed', () => {
         'https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fwww.sba.gov%2Fsites%2Fdefault%2Ffiles%2F2025-05%2FSOP%252050%252010%25208%2520Technical%2520Updates%2520effective%25206.1.2025.docx&wdOrigin=BROWSELINK&utm_source=smallbusinessapproval.com&utm_medium=newsletter&utm_campaign=sba-loan-requirements-2025-guide'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https://www.sba.gov/sites/default/files/2025-05/SOP%2050%2010%208%20Technical%20Updates%20effective%206.1.2025.docx',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https://www.sba.gov/sites/default/files/2025-05/SOP%252050%252010%25208%2520Technical%2520Updates%2520effective%25206.1.2025.docx',
         url: 'https://www.sba.gov/sites/default/files/2025-05/SOP%2050%2010%208%20Technical%20Updates%20effective%206.1.2025.docx',
         ratio: '8/5',
         title: 'SOP 50 10 8 Technical Updates effective 6.1.2025.docx',
@@ -174,7 +174,7 @@ describe('officeResolveEmbed', () => {
         'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fexample.com%2FQ3%2520report.xlsx'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https://example.com/Q3%20report.xlsx',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https://example.com/Q3%2520report.xlsx',
         url: 'https://example.com/Q3%20report.xlsx',
         ratio: '8/5',
         title: 'Q3 report.xlsx',
@@ -188,7 +188,7 @@ describe('officeResolveEmbed', () => {
         'https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fexample.com%2F100%25.xlsx'
       const expected: EmbedResolverResult = {
         provider: 'office',
-        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https://example.com/100%.xlsx',
+        src: 'https://view.officeapps.live.com/op/embed.aspx?src=https://example.com/100%25.xlsx',
         url: 'https://example.com/100%.xlsx',
         ratio: '8/5',
         title: '100%.xlsx',

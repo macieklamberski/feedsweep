@@ -357,12 +357,12 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should carry a stray percent sign in the path id as written', async () => {
+    it('should escape a stray percent sign in the path id in the query only', async () => {
       const value = '<iframe src="https://ridewithgps.com/routes/10953871%zz/embed"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
         id: 'route/10953871%zz',
-        src: 'https://ridewithgps.com/embeds?type=route&id=10953871%zz',
+        src: 'https://ridewithgps.com/embeds?type=route&id=10953871%25zz',
         url: 'https://ridewithgps.com/routes/10953871%zz',
         thumbnail: 'https://ridewithgps.com/routes/10953871%zz/thumb.png',
         height: 700,

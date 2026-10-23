@@ -265,16 +265,23 @@ describe('composeQuery', () => {
     expect(composeQuery(value)).toBe(expected)
   })
 
-  it('should keep a plus sign and a slash in a value as written', () => {
-    const value = { clipt: 'a+b/c' }
-    const expected = '?clipt=a+b/c'
+  it('should keep a slash, an at sign and a non-ASCII character as written', () => {
+    const value = { clipt: 'a/b', user_id: '17367418@N03', title: 'zürich' }
+    const expected = '?clipt=a/b&user_id=17367418@N03&title=zürich'
 
     expect(composeQuery(value)).toBe(expected)
   })
 
-  it('should keep a percent sign, an at sign and a non-ASCII character as written', () => {
-    const value = { user_id: '17367418@N03', q: '50%25', title: 'zürich' }
-    const expected = '?user_id=17367418@N03&q=50%25&title=zürich'
+  it('should escape a percent sign in a value, so a decoded escape is not decoded twice', () => {
+    const value = { media_url: 'https://example.com/a%2Cb.mp3' }
+    const expected = '?media_url=https://example.com/a%252Cb.mp3'
+
+    expect(composeQuery(value)).toBe(expected)
+  })
+
+  it('should escape a plus sign in a value, so it is not read back as a space', () => {
+    const value = { clipt: 'a+b' }
+    const expected = '?clipt=a%2Bb'
 
     expect(composeQuery(value)).toBe(expected)
   })
@@ -286,9 +293,9 @@ describe('composeQuery', () => {
     expect(composeQuery(value)).toBe(expected)
   })
 
-  it('should escape an ampersand, a hash and whitespace in a name', () => {
-    const value = { 'a&b#c d': '1' }
-    const expected = '?a%26b%23c%20d=1'
+  it('should escape an ampersand, a hash, a percent sign, a plus sign and whitespace in a name', () => {
+    const value = { 'a&b#c d%e+f': '1' }
+    const expected = '?a%26b%23c%20d%25e%2Bf=1'
 
     expect(composeQuery(value)).toBe(expected)
   })
@@ -406,9 +413,9 @@ describe('pickUrlParams', () => {
     expect(pickUrlParams('//example.com/e/x?start=90', ['start'])).toBe('')
   })
 
-  it('should write a decoded plus sign and slash back bare', () => {
+  it('should escape a decoded plus sign and write a decoded slash back bare', () => {
     const value = 'https://example.com/e/x?clipt=a%2Bb%2Fc'
-    const expected = '?clipt=a+b/c'
+    const expected = '?clipt=a%2Bb/c'
 
     expect(pickUrlParams(value, ['clipt'])).toBe(expected)
   })

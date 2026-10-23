@@ -232,11 +232,12 @@ export const encodePathSegment = (value: string): string => {
 }
 
 // The other half of `pickQueryParams`: the pairs it returns, back into a query ready to append.
-// Only the characters that would end a pair or the query, and whitespace, are escaped, so a `%`
-// or `@` the value holds stays as written. Nothing to carry over gives an empty string.
+// Query readers hand back a decoded value, so a `%` or `+` it holds is escaped again, along with
+// what would end a pair or the query and whitespace. An `@` stays as written. Nothing to carry
+// over gives an empty string.
 export const composeQuery = (params?: Record<string, string>): string => {
   const escapePart = (part: string) => {
-    return part.replace(/[&#\s]/g, (character) => encodeURIComponent(character))
+    return part.replace(/[&#%+\s]/g, (character) => encodeURIComponent(character))
   }
   const pairs = Object.entries(params ?? {}).map(([name, value]) => {
     return `${escapePart(name)}=${escapePart(value)}`

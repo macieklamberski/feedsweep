@@ -1129,7 +1129,7 @@ describe('facebookResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'facebook',
       id: 'https://www.facebook.com/watch/?v=%20',
-      src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=%20',
+      src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=%2520',
       url: 'https://www.facebook.com/watch/?v=%20',
       ratio: '16/9',
     }

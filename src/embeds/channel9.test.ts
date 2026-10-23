@@ -123,7 +123,7 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'going+deep/inside-windows-8',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=going+deep&ep=inside-windows-8',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=going%2Bdeep&ep=inside-windows-8',
         ratio: '16/9',
       }
 
