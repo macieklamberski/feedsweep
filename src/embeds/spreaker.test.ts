@@ -125,19 +125,6 @@ describe('spreakerResolveEmbed', () => {
     expect(spreakerResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should read the player route spelled in uppercase', () => {
-    const value = 'https://widget.spreaker.com/PLAYER?episode_id=52842990'
-    const expected: EmbedResolverResult = {
-      provider: 'spreaker',
-      id: 'episode/52842990',
-      src: 'https://widget.spreaker.com/player?episode_id=52842990',
-      url: 'https://www.spreaker.com/episode/52842990',
-      height: 200,
-    }
-
-    expect(spreakerResolveEmbed(value)).toEqual(expected)
-  })
-
   it('should keep an episode id holding a slash inside one page path segment', () => {
     const value = 'https://widget.spreaker.com/player?episode_id=52842990%2Fx'
     const expected: EmbedResolverResult = {

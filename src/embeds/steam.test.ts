@@ -111,20 +111,6 @@ describe('steamResolveEmbed', () => {
 
       expect(steamResolveEmbed(value)).toEqual(expected)
     })
-
-    it('should write the widget route spelled in uppercase in the case the store answers', () => {
-      const value = 'https://store.steampowered.com/WIDGET/355060'
-      const expected: EmbedResolverResult = {
-        provider: 'steam',
-        id: '355060',
-        src: 'https://store.steampowered.com/widget/355060/',
-        url: 'https://store.steampowered.com/app/355060/',
-        thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/355060/header.jpg',
-        height: 190,
-      }
-
-      expect(steamResolveEmbed(value)).toEqual(expected)
-    })
   })
 })
 

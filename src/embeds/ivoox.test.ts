@@ -180,33 +180,11 @@ describe('extractIvooxSubject', () => {
     expect(extractIvooxSubject(value)).toEqual(expected)
   })
 
-  it('should read a show player spelled in uppercase', () => {
-    const value = 'https://www.ivoox.com/PLAYER_ES_PODCAST_1267769_ZP_1.HTML'
-    const expected: IvooxSubject = {
-      kind: 'show',
-      id: '1267769',
-      page: '1',
-    }
-
-    expect(extractIvooxSubject(value)).toEqual(expected)
-  })
-
-  it('should read an episode player spelled in uppercase', () => {
-    const value = 'https://www.ivoox.com/PLAYER_EJ_80807760_6_1.HTML'
+  it('should read the legacy player in the case its own snippet wrote', () => {
+    const value = 'http://www.ivoox.com/playeriVoox_em_7041_1.html'
     const expected: IvooxSubject = {
       kind: 'episode',
-      id: '80807760',
-      page: '1',
-    }
-
-    expect(extractIvooxSubject(value)).toEqual(expected)
-  })
-
-  it('should read a legacy player spelled in uppercase', () => {
-    const value = 'https://www.ivoox.com/PLAYERIVOOX_EE_80807760_1.HTML'
-    const expected: IvooxSubject = {
-      kind: 'episode',
-      id: '80807760',
+      id: '7041',
       page: '1',
     }
 

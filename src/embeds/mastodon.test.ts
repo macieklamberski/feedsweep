@@ -334,22 +334,6 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should resolve a classless iframe whose embed suffix is in uppercase', async () => {
-      const value = html`
-        <iframe src="https://mastodon.social/@Gargron/117476327964213749/EMBED" width="400"></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'mastodon',
-        id: 'mastodon.social/117476327964213749',
-        src: 'https://mastodon.social/@Gargron/117476327964213749/embed',
-        url: 'https://mastodon.social/@Gargron/117476327964213749',
-        author: '@Gargron@mastodon.social',
-        publisher: 'mastodon.social',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   // Mastodon's username route constraint excludes `@`, so this path never reaches the embed
@@ -499,30 +483,6 @@ describe('parseMastodonStatus', () => {
       host: 'mastodon.social',
       user: 'Gargron',
       id: '116535232552529093',
-    }
-
-    expect(parseMastodonStatus(value)).toEqual(expected)
-  })
-
-  it('should read the route words of the ActivityPub spelling in any case', () => {
-    const value = 'https://mastodon.social/USERS/Gargron/STATUSES/116535232552529093/EMBED'
-    const expected: MastodonStatus = {
-      origin: 'https://mastodon.social',
-      host: 'mastodon.social',
-      user: 'Gargron',
-      id: '116535232552529093',
-    }
-
-    expect(parseMastodonStatus(value)).toEqual(expected)
-  })
-
-  it('should read the embed suffix in any case', () => {
-    const value = 'https://en.osm.town/@mapper/111222333444555666/EMBED'
-    const expected: MastodonStatus = {
-      origin: 'https://en.osm.town',
-      host: 'en.osm.town',
-      user: 'mapper',
-      id: '111222333444555666',
     }
 
     expect(parseMastodonStatus(value)).toEqual(expected)

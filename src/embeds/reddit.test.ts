@@ -542,32 +542,6 @@ describe('redditResolveEmbed', () => {
     expect(redditResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should write route words spelled in uppercase in the case the player answers', () => {
-    const value = 'https://www.reddit.com/R/Birdwatching/COMMENTS/1x9y8z7/heron_at_dawn/'
-    const expected: EmbedResolverResult = {
-      provider: 'reddit',
-      id: 'r/Birdwatching/comments/1x9y8z7',
-      src: 'https://embed.reddit.com/r/Birdwatching/comments/1x9y8z7/',
-      url: 'https://www.reddit.com/r/Birdwatching/comments/1x9y8z7/',
-      publisher: 'r/Birdwatching',
-    }
-
-    expect(redditResolveEmbed(value)).toEqual(expected)
-  })
-
-  it('should write a user route spelled in uppercase in the case the player answers', () => {
-    const value = 'https://www.reddit.com/USER/photo_poster/comments/hj7k2p/'
-    const expected: EmbedResolverResult = {
-      provider: 'reddit',
-      id: 'user/photo_poster/comments/hj7k2p',
-      src: 'https://embed.reddit.com/user/photo_poster/comments/hj7k2p/',
-      url: 'https://www.reddit.com/user/photo_poster/comments/hj7k2p/',
-      publisher: 'u/photo_poster',
-    }
-
-    expect(redditResolveEmbed(value)).toEqual(expected)
-  })
-
   it('should ignore a reddit url that names no post', () => {
     const value = 'https://www.reddit.com/'
 

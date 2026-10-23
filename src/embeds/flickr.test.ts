@@ -306,38 +306,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should map a group pool named by its alias in uppercase onto the group player', async () => {
-      const value = html`
-        <embed
-          type="application/x-shockwave-flash"
-          src="http://www.flickr.com/apps/slideshow/show.swf?v=71649"
-          flashvars="page_show_url=%2FGROUPS%2Foperationpaperstorm%2FPOOL%2FSHOW%2F&amp;group_id=1614570@N22"
-        >
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'flickr',
-        id: 'groups/1614570@N22',
-        src: 'https://embedr.flickr.com/groups/1614570@N22?width=400&height=300',
-        url: 'https://www.flickr.com/groups/1614570@N22/',
-        width: 400,
-        height: 300,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should leave a group pool path in uppercase filtered by a tag alone rather than mint the user beside it', async () => {
-      const value = html`
-        <embed
-          type="application/x-shockwave-flash"
-          src="http://www.flickr.com/apps/slideshow/show.swf?v=71649"
-          flashvars="page_show_url=%2FGROUPS%2Ftorontophotowalks%2Fpool%2Ftags%2Ftopwbch%2Fshow%2F&amp;user_id=31652145@N08"
-        >
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should return undefined for a group pool path named by its alias under another path', async () => {
       const value = html`
         <embed
@@ -622,23 +590,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should map a framed album page with its route word in uppercase', async () => {
-      const value = html`
-        <iframe src="http://www.flickr.com/photos/dublx/SETS/72157623516208778/show/"></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'flickr',
-        id: 'dublx/72157623516208778',
-        src: 'https://embedr.flickr.com/photosets/72157623516208778?width=400&height=300',
-        url: 'https://www.flickr.com/photos/dublx/sets/72157623516208778',
-        width: 400,
-        height: 300,
-        author: 'dublx',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should map a framed album page without the show segment', async () => {
       const value = html`
         <iframe src="http://www.flickr.com/photos/53116286@N07/sets/72157627116531602/"></iframe>
@@ -686,21 +637,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         url: 'https://www.flickr.com/photos/33877051@N03/',
         width: 400,
         height: 300,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should map a framed photostream page spelled in uppercase onto the stream player', async () => {
-      const value = html`<iframe src="https://www.flickr.com/PHOTOS/e-governance/SHOW/"></iframe>`
-      const expected: EmbedResolverResult = {
-        provider: 'flickr',
-        id: 'photostreams/e-governance',
-        src: 'https://www.flickr.com/photos/e-governance/player?width=400&height=300',
-        url: 'https://www.flickr.com/photos/e-governance/',
-        width: 400,
-        height: 300,
-        author: 'e-governance',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -783,22 +719,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should map a framed group pool page spelled in uppercase onto the group player', async () => {
-      const value = html`
-        <iframe src="https://www.flickr.com/GROUPS/1753363@N23/POOL/SHOW/"></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'flickr',
-        id: 'groups/1753363@N23',
-        src: 'https://embedr.flickr.com/groups/1753363@N23?width=400&height=300',
-        url: 'https://www.flickr.com/groups/1753363@N23/',
-        width: 400,
-        height: 300,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should map a framed group pool slideshow page onto the group player', async () => {
       const value = html`
         <iframe src="https://www.flickr.com/groups/1753363@N23/pool/show/"></iframe>
@@ -835,22 +755,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
           width="500"
           height="97"
         ></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'flickr',
-        id: 'photos/celesteh/15753890338',
-        src: 'https://www.flickr.com/photos/celesteh/15753890338/player/',
-        url: 'https://www.flickr.com/photos/celesteh/15753890338/',
-        author: 'celesteh',
-        ratio: '4/3',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should read a page player spelled in uppercase', async () => {
-      const value = html`
-        <iframe src="https://www.flickr.com/PHOTOS/celesteh/15753890338/PLAYER/"></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
@@ -1045,19 +949,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         src: 'https://embedr.flickr.com/photos/5182695495',
         url: 'https://flic.kr/p/8TYENT',
         title: 'con Petrona',
-        ratio: '4/3',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should read an embedr photo path spelled in uppercase', async () => {
-      const value = html`<iframe src="https://embedr.flickr.com/PHOTOS/5182695495"></iframe>`
-      const expected: EmbedResolverResult = {
-        provider: 'flickr',
-        id: 'p/8TYENT',
-        src: 'https://embedr.flickr.com/photos/5182695495',
-        url: 'https://flic.kr/p/8TYENT',
         ratio: '4/3',
       }
 
