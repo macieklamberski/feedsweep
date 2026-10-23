@@ -2,7 +2,7 @@ import { parseUrl } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { audioFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
-import { readCarrierUrl } from '../utils/widgets.js'
+import { readRepairedCarrierUrl } from '../utils/widgets.js'
 
 const libsynMediaHosts = ['media.libsyn.com']
 
@@ -12,7 +12,7 @@ export const libsynMediaResolver: MediaResolver = {
   kind: 'media',
   selector: 'embed[src*="/_static/play/player-licensed.swf"]',
   extract: (element) => {
-    if (!parseUrlOnHosts(readCarrierUrl(element), libsynMediaHosts)) {
+    if (!parseUrlOnHosts(readRepairedCarrierUrl(element), libsynMediaHosts)) {
       return
     }
 

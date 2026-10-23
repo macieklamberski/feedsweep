@@ -172,6 +172,24 @@ describeForEachParser('calameoEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should strip the whitespace around the code in the flashvars', async () => {
+      const value = html`
+        <embed
+          src="http://v.calameo.com/2.0/cmini.swf"
+          flashvars="bkcode=000108536974e8b083351 &amp;page=1"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'calameo',
+        id: '000108536974e8b083351',
+        src: 'https://v.calameo.com/?bkcode=000108536974e8b083351&page=1',
+        url: 'https://www.calameo.com/books/000108536974e8b083351',
+        ratio: '300/194',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read the Flash viewer object at the platform size', async () => {
       const value = html`
         <object

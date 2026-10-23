@@ -9,6 +9,7 @@ import {
   parseUrlOnHosts,
   pickQueryParams,
   pickUrlParams,
+  repairCarrierUrl,
   resolveOrDropUrl,
   resolveOrKeepUrl,
 } from './urls.js'
@@ -32,6 +33,18 @@ describe('parseUrlOnHosts', () => {
     const value = '//platform.example/watch/123'
 
     expect(parseUrlOnHosts(value, hosts)?.hostname).toBe('platform.example')
+  })
+
+  it('should trim whitespace around a query value', () => {
+    const value = 'https://platform.example/watch?v=123 &t=10'
+
+    expect(parseUrlOnHosts(value, hosts)?.searchParams.get('v')).toBe('123')
+  })
+
+  it('should trim whitespace around a path segment', () => {
+    const value = 'https://platform.example/watch/123%20'
+
+    expect(parseUrlOnHosts(value, hosts)?.pathname).toBe('/watch/123')
   })
 
   it('should return undefined for a url on another host', () => {
@@ -217,6 +230,36 @@ describe('pickQueryParams', () => {
     const expected = { start: '10' }
 
     expect(pickQueryParams(value, ['start'])).toEqual(expected)
+  })
+
+  it('should trim whitespace around a value', () => {
+    const value = 'start=90%20&list=PLabc'
+    const expected = { start: '90' }
+
+    expect(pickQueryParams(value, ['start'])).toEqual(expected)
+  })
+})
+
+describe('repairCarrierUrl', () => {
+  it('should open a query glued onto the path', () => {
+    const value = 'https://platform.example/v/abc123&hl=en'
+    const expected = 'https://platform.example/v/abc123?hl=en'
+
+    expect(repairCarrierUrl(value)).toBe(expected)
+  })
+
+  it('should trim whitespace around a query value', () => {
+    const value = 'https://platform.example/show?user=123@N03 &tags='
+    const expected = 'https://platform.example/show?user=123@N03&tags='
+
+    expect(repairCarrierUrl(value)).toBe(expected)
+  })
+
+  it('should trim whitespace around a value the glued query opened', () => {
+    const value = 'https://platform.example/v/abc123%20&hl=en'
+    const expected = 'https://platform.example/v/abc123?hl=en'
+
+    expect(repairCarrierUrl(value)).toBe(expected)
   })
 })
 

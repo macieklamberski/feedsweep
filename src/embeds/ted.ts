@@ -1,6 +1,6 @@
 import { getPathSegments, isHostOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr, flashVars } from '../utils/dom.js'
+import { attr, flashVars, parseFlashVars } from '../utils/dom.js'
 import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -47,7 +47,7 @@ const readFlashTalk = (
     return
   }
 
-  const config = new URLSearchParams(flashVars(element) ?? '')
+  const config = parseFlashVars(flashVars(element))
   const slug = config.get('adKeys')?.match(adKeysTalkRegex)?.[1]
 
   if (!slug) {

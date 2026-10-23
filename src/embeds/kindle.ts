@@ -5,7 +5,7 @@ import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/ur
 import {
   createMarkupEmbedResolver,
   embedCarrierSelector,
-  readCarrierUrl,
+  readRepairedCarrierUrl,
 } from '../utils/widgets.js'
 
 // Each store serves the card on its own reader host, `{verb}.amazon.{store tld}`, such as
@@ -44,5 +44,5 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
 }
 
 export const kindleEmbedResolver = createMarkupEmbedResolver(embedCarrierSelector, (element) => {
-  return kindleResolveEmbed(readCarrierUrl(element), element)
+  return kindleResolveEmbed(readRepairedCarrierUrl(element), element)
 })

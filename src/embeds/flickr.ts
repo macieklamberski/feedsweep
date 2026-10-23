@@ -1,6 +1,6 @@
 import { decodeSegment, isHostOf, type Nullish, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, flashVar, flashVars, keepIfMatches } from '../utils/dom.js'
+import { attr, flashVar, flashVars, keepIfMatches, parseFlashVars } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -137,7 +137,7 @@ const readPageSubject = (page: string): FlickrSubject | undefined => {
 // The swf carrier names its subject in the flashvars beside it: the page path first, and the
 // bare `user_id` for the few snippets that carry nothing else.
 const readFlashSubject = (element: Nullish<Element>): FlickrSubject => {
-  const config = new URLSearchParams(flashVars(element) ?? '')
+  const config = parseFlashVars(flashVars(element))
   const page = config.get('page_show_url') ?? ''
   const subject = readPageSubject(page)
 

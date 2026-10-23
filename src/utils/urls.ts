@@ -1,11 +1,13 @@
 import {
   audioExtensions,
   documentExtensions,
+  fixMalformedQuery,
   flashExtensions,
   imageExtensions,
   isHostOrSubdomainOf,
   normalizeUrl,
   parseUrl,
+  trimUrlValues,
   videoExtensions,
 } from 'trousse'
 import type { AssetType, ResolveUrlFn, TransformContext, UrlRole } from '../types.js'
@@ -169,6 +171,12 @@ export const collapseSlashRuns = (url: string): string => {
   return normalizeUrl(url, { collapseSlashes: true })
 }
 
+// The class repairs every resolver reads a carrier url through: a query glued onto the path, and
+// whitespace around a path segment or a query value. A frame no resolver claims keeps its src.
+export const repairCarrierUrl = (url: string): string => {
+  return trimUrlValues(fixMalformedQuery(url))
+}
+
 // A real, loadable src, not empty and not the `about:blank` lazy placeholder.
 export const isUsableSrc = (src: string | null): src is string => {
   const trimmed = src?.trim()
@@ -186,7 +194,7 @@ export const parseUrlOnHosts = (
   url: string | undefined,
   hosts: string | ReadonlyArray<string>,
 ): URL | undefined => {
-  const parsed = url ? parseUrl(url, placeholderBaseUrl) : undefined
+  const parsed = url ? parseUrl(trimUrlValues(url), placeholderBaseUrl) : undefined
 
   if (parsed && isHostOrSubdomainOf(parsed, hosts)) {
     return parsed
@@ -204,7 +212,7 @@ export const pickQueryParams = (
   const picked: Record<string, string> = {}
 
   for (const name of names) {
-    const value = parsed.get(name)
+    const value = parsed.get(name)?.trim()
 
     if (value) {
       picked[name] = value

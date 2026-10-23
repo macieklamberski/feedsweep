@@ -192,6 +192,26 @@ describeForEachParser('tedEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should strip the whitespace around the poster the flashvars name', async () => {
+      const value = html`
+        <embed
+          src="http://video.ted.com/assets/player/swf/EmbedPlayer.swf"
+          flashvars="su=http://images.ted.com/images/ted/tedindex/embed-posters/BreneBrown-2010X.embed_thumbnail.jpg &adKeys=talk=brene_brown_on_vulnerability;year=2010"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'ted',
+        id: 'brene_brown_on_vulnerability',
+        src: 'https://embed.ted.com/embed/brene_brown_on_vulnerability',
+        url: 'https://www.ted.com/talks/brene_brown_on_vulnerability',
+        thumbnail:
+          'http://images.ted.com/images/ted/tedindex/embed-posters/BreneBrown-2010X.embed_thumbnail.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should use a malformed talk key as written, even if the url answers an error', async () => {
       const value = html`
         <embed

@@ -1,8 +1,8 @@
 import { parseUrl } from 'trousse'
 import type { MediaResolver, MediaResolverResult } from '../types.js'
-import { flashVars } from '../utils/dom.js'
+import { flashVars, parseFlashVars } from '../utils/dom.js'
 import { flashFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
-import { readCarrierUrl } from '../utils/widgets.js'
+import { readRepairedCarrierUrl } from '../utils/widgets.js'
 
 // Weebly's own copy has a resolver of its own, later in the list.
 const weeblyHost = 'weebly.com'
@@ -52,7 +52,7 @@ export const onePixelOutFlashMediaResolver: MediaResolver = {
   kind: 'media',
   selector: 'object[data*=".swf" i], embed[src*=".swf" i]',
   extract: (element) => {
-    const carrierUrl = readCarrierUrl(element)
+    const carrierUrl = readRepairedCarrierUrl(element)
     const player = parseUrl(carrierUrl, placeholderBaseUrl)
 
     if (!player || !flashFileRegex.test(player.pathname)) {
@@ -64,7 +64,7 @@ export const onePixelOutFlashMediaResolver: MediaResolver = {
     }
 
     // A feed that escapes the markup twice leaves `&amp;` between the flashvars.
-    const config = new URLSearchParams(flashVars(element)?.replaceAll('&amp;', '&'))
+    const config = parseFlashVars(flashVars(element)?.replaceAll('&amp;', '&'))
     const soundFile = config.get('soundFile') ?? player.searchParams.get('soundFile')
 
     return composeAudio(soundFile ?? undefined, config.get('titles') ?? undefined)

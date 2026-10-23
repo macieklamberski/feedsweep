@@ -1,6 +1,6 @@
 import { getPathSegments, isHostOf, type Nullish, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { flashVars } from '../utils/dom.js'
+import { flashVars, parseFlashVars } from '../utils/dom.js'
 import {
   absoluteUrlRegex,
   encodePathSegment,
@@ -91,7 +91,7 @@ const composeEmbed = (
 // serves or as a station portal's url.
 // Every carrier writes `player=viral`, so no other player is known to map onto it.
 const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | undefined => {
-  const params = new URLSearchParams(flashVars(element))
+  const params = parseFlashVars(flashVars(element))
 
   if (!flashPlayerPaths.includes(url.pathname) || params.get('player') !== 'viral') {
     return

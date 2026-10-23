@@ -18,6 +18,7 @@ import {
   isPercentageSized,
   keepIfMatches,
   paramValue,
+  parseFlashVars,
   parsePixelSize,
   parseRatio,
   removeWithEmptyWrappers,
@@ -1413,6 +1414,40 @@ describeForEachParser('flashVar', (parseHtml) => {
 
   it('should return undefined for a nullish element', () => {
     expect(flashVar(undefined, 'id')).toBeUndefined()
+  })
+
+  it('should strip the whitespace around the value', () => {
+    const document = parseHtml('<embed src="player.swf" flashvars="config=1&id= 17216">')
+    const element = queryElement(document, 'embed')
+
+    expect(flashVar(element, 'id')).toBe('17216')
+  })
+})
+
+describe('parseFlashVars', () => {
+  it('should read every pair of the query', () => {
+    const expected = { config: '1', id: '2' }
+
+    expect(Object.fromEntries(parseFlashVars('config=1&id=2'))).toEqual(expected)
+  })
+
+  it('should strip the whitespace around each value', () => {
+    const value = parseFlashVars('id= 17216&file=https://example.com/episode.mp3 ')
+    const expected = { id: '17216', file: 'https://example.com/episode.mp3' }
+
+    expect(Object.fromEntries(value)).toEqual(expected)
+  })
+
+  it('should strip an encoded space around a value', () => {
+    expect(parseFlashVars('id=%2017216+').get('id')).toBe('17216')
+  })
+
+  it('should keep the whitespace inside a value', () => {
+    expect(parseFlashVars('title=Two%20words').get('title')).toBe('Two words')
+  })
+
+  it('should return no pairs for a missing query', () => {
+    expect([...parseFlashVars(undefined)]).toEqual([])
   })
 })
 
