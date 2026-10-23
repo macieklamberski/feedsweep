@@ -167,6 +167,28 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should strip the whitespace around an owner named only in user_id', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://www.flickr.com/apps/slideshow/show.swf?v=109615"
+          flashvars="offsite=true&amp;user_id=17367418@N03 &amp;jump_to="
+          width="400"
+          height="300"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photostreams/17367418@N03',
+        src: 'https://embedr.flickr.com/photostreams/17367418@N03?width=400&height=300',
+        url: 'https://www.flickr.com/photos/17367418@N03/',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should map a group pool page path onto the group player', async () => {
       const value = html`
         <embed

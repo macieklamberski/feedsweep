@@ -1,7 +1,7 @@
 import type { Nullish } from 'trousse'
 import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr, find, flashVars, keepIfMatches, paramValue, text } from '../utils/dom.js'
+import { attr, find, flashVars, keepIfMatches, paramValue, parseFlashVars, text } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -162,8 +162,7 @@ const brightcoveFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const config = flashVars(element)
-  const params = config ? new URLSearchParams(config) : undefined
+  const params = parseFlashVars(flashVars(element))
   // `videoId` is the older spelling of `@videoPlayer`, and a few embeds put the flashVars set in
   // the url query.
   const videoId =

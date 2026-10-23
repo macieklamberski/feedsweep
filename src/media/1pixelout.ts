@@ -1,6 +1,6 @@
 import { getQueryParam, parseUrl } from 'trousse'
 import type { MediaResolver, MediaResolverResult } from '../types.js'
-import { flashVars } from '../utils/dom.js'
+import { flashVars, parseFlashVars } from '../utils/dom.js'
 import {
   flashFileRegex,
   foldEscapedAmpersands,
@@ -69,7 +69,7 @@ export const onePixelOutFlashMediaResolver: MediaResolver = {
     }
 
     // A feed that escapes the markup twice leaves `&amp;` between the flashvars.
-    const config = new URLSearchParams(foldEscapedAmpersands(flashVars(element) ?? ''))
+    const config = parseFlashVars(foldEscapedAmpersands(flashVars(element) ?? ''))
     const soundFile =
       getQueryParam(config, 'soundFile') ?? getQueryParam(player.searchParams, 'soundFile')
 

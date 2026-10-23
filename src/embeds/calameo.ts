@@ -7,7 +7,7 @@ import {
   trimObject,
 } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, flashVars } from '../utils/dom.js'
+import { attr, flashVars, parseFlashVars } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -52,7 +52,7 @@ export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
   const params =
     urlParams && getQueryParam(urlParams, 'bkcode') !== undefined
       ? urlParams
-      : new URLSearchParams(flashVars(element))
+      : parseFlashVars(flashVars(element))
   const code = getQueryParam(params, 'bkcode')
 
   if (!code) {

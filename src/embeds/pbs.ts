@@ -9,7 +9,7 @@ import {
   toMap,
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { flashVars } from '../utils/dom.js'
+import { flashVars, parseFlashVars } from '../utils/dom.js'
 import { absoluteUrlRegex, parseUrlOnHosts, pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -97,7 +97,7 @@ const composeEmbed = (
 // player reads them from its query.
 // Every carrier writes `player=viral`, so no other player is known to map onto it.
 const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | undefined => {
-  const params = new URLSearchParams(flashVars(element))
+  const params = parseFlashVars(flashVars(element))
 
   if (
     !isAnyOf(url.pathname, flashPlayerPaths) ||

@@ -516,6 +516,24 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should strip the whitespace around the document the flashvars name', async () => {
+      const value = html`
+        <embed
+          flashvars="mode=embed&amp;docName=linescatalogue &amp;username=HughMcEwen"
+          src="http://static.issuu.com/webembed/viewers/style1/v1/IssuuViewer.swf"
+        ></embed>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: 'HughMcEwen/linescatalogue',
+        src: 'https://e.issuu.com/embed.html?u=HughMcEwen&d=linescatalogue',
+        url: 'https://issuu.com/HughMcEwen/docs/linescatalogue',
+        ratio: '5/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read the flashvars param of an object carrier', async () => {
       const value = html`
         <object

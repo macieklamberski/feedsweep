@@ -12,7 +12,7 @@ import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.j
 
 const provider = 'issuu'
 
-import { attr, flashVars } from '../utils/dom.js'
+import { attr, flashVars, parseFlashVars } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -108,7 +108,7 @@ const readFlashDocument = (parsed: URL, element?: Element): EmbedResolverResult 
   const settings =
     getQueryParam(parsed.searchParams, 'docName') !== undefined
       ? parsed.searchParams
-      : new URLSearchParams(flashVars(element))
+      : parseFlashVars(flashVars(element))
   const embed = composeDocumentEmbed(
     getQueryParam(settings, 'username') ?? getQueryParam(settings, 'documentUsername'),
     getQueryParam(settings, 'docName') ?? getQueryParam(settings, 'documentName'),

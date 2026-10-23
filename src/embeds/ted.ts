@@ -1,6 +1,6 @@
 import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr, flashVars, keepIfMatches } from '../utils/dom.js'
+import { attr, flashVars, keepIfMatches, parseFlashVars } from '../utils/dom.js'
 import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -47,7 +47,7 @@ const readFlashTalk = (
     return
   }
 
-  const config = new URLSearchParams(flashVars(element) ?? '')
+  const config = parseFlashVars(flashVars(element))
   // Older snippets carry no adKeys and name the talk only by its number in `ti`, which the
   // embed player redirects to the talk's slug.
   const slug =
