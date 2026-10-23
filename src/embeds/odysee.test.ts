@@ -166,6 +166,19 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should use a malformed claim as written, even if the player answers an error', async () => {
+      const value = '<iframe src="https://odysee.com/%24%2Fembed%2F.."></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'odysee',
+        id: '..',
+        src: 'https://odysee.com/$/embed/..',
+        url: 'https://odysee.com/..',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('edge cases', () => {

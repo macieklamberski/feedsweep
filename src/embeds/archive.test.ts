@@ -937,6 +937,25 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should use a malformed config identifier as written, even if the player answers an error', async () => {
+      const value = html`
+        <embed
+          src="http://www.archive.org/flow/flowplayer.commercial-3.2.1.swf"
+          flashvars='config={"playlist":[{"url":"http://www.archive.org/download/../clip.mp4"}]}'
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'archive',
+        id: '..',
+        src: 'https://archive.org/embed/..',
+        url: 'https://archive.org/details/..',
+        thumbnail: 'https://archive.org/services/img/..',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // A base url on its own names the download endpoint rather than any item under it.
     it('should ignore a config whose only download url names no item', async () => {
       const value = html`

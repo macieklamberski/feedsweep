@@ -304,6 +304,21 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should use a malformed publisher name as written, even if the player answers an error', async () => {
+      const value = html`
+        <iframe src="https://e.issuu.com/embed.html?u=..&d=paisaje_transversal"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'issuu',
+        id: '../paisaje_transversal',
+        src: 'https://e.issuu.com/embed.html?u=..&d=paisaje_transversal',
+        url: 'https://issuu.com/../docs/paisaje_transversal',
+        ratio: '5/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should return undefined for a query missing the publisher', async () => {
       const value = html`
         <iframe src="https://e.issuu.com/embed.html?d=paisaje_transversal"></iframe>

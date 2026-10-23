@@ -313,6 +313,20 @@ describe('mailruResolveEmbed', () => {
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
 
+    it('should use a malformed movieSrc as written, even if the player answers an error', () => {
+      const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/../../885&autoplay=0'
+      const expected: EmbedResolverResult = {
+        provider: 'mailru',
+        id: 'mail/../../885',
+        src: 'https://my.mail.ru/mail/../video/embed/../885',
+        url: 'https://my.mail.ru/mail/../video/../885.html',
+        ratio: '16/9',
+        author: '..',
+      }
+
+      expect(mailruResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should keep a movieSrc counter holding a query separator inside its path segment', () => {
       const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/anizm.com/4418/4427%3Fx'
       const expected: EmbedResolverResult = {

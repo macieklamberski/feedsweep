@@ -1177,6 +1177,26 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should use a malformed owner of a traversal segment as written, even if the url answers an error', async () => {
+      const value = html`
+        <embed
+          src="https://www.flickr.com/apps/slideshow/show.swf"
+          flashvars="page_show_url=%2Fphotos%2F..%2Fsets%2F72157624341%2Fshow%2F"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: '../72157624341',
+        src: 'https://embedr.flickr.com/photosets/72157624341?width=400&height=300',
+        url: 'https://www.flickr.com/photos/../sets/72157624341',
+        width: 400,
+        height: 300,
+        author: '..',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // Only the slideshow swf and the video swf are read. Any other app under `/apps/` names no
     // subject this module can address.
     it('should return undefined for a flickr app that is neither player', async () => {
