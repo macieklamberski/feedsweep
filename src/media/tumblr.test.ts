@@ -79,4 +79,21 @@ describeForEachParser('tumblrMediaResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should strip whitespace after the audio_file value', async () => {
+      const value = html`
+        <iframe
+          class="tumblr_audio_player tumblr_audio_player_83372210021"
+          src="https://example.com/post/83372210021/audio_player_iframe/example/tumblr_abc?audio_file=https%3A%2F%2Fexample.org%2Ftumblr_abc.mp3%20"
+        ></iframe>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'https://example.org/tumblr_abc.mp3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })

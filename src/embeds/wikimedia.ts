@@ -7,7 +7,7 @@ import {
   placeholderBaseUrl,
   videoFileRegex,
 } from '../utils/urls.js'
-import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, readRepairedCarrierUrl } from '../utils/widgets.js'
 
 const extensionRegex = /\.[^.]+$/
 const underscoreRegex = /_/g
@@ -50,7 +50,7 @@ const composePlayerUrl = (url: string, fileName: string): string => {
 export const wikimediaEmbedResolver: EmbedResolver = createMarkupEmbedResolver(
   'iframe',
   (element): EmbedResolverResult | undefined => {
-    const source = readCarrierUrl(element)
+    const source = readRepairedCarrierUrl(element)
 
     if (!source || !isMediaWikiFilePage(source) || !videoFileRegex.test(source)) {
       return

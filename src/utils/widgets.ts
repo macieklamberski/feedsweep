@@ -116,6 +116,12 @@ export const readCarrierUrl = (element: Element): string => {
   return collapseSlashRuns(url ?? '')
 }
 
+// The carrier url a resolver reads, with the class repairs applied. A frame no resolver claims
+// keeps the url `readCarrierUrl` gives.
+export const readRepairedCarrierUrl = (element: Element): string => {
+  return repairCarrierUrl(readCarrierUrl(element))
+}
+
 type ResolverOptions = {
   // Deep handling only: the carrier's declared box replaces the resolver's size. Pass it on a
   // carrier the publisher sized for the player that loads, never on a retired tool's or dead
