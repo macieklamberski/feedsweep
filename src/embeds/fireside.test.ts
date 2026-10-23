@@ -12,11 +12,10 @@ describe('extractFiresideToken', () => {
     expect(extractFiresideToken(value)).toEqual(expected)
   })
 
-  it('should read a token whose plus arrived percent-encoded', () => {
+  it('should return undefined for a token whose plus arrived percent-encoded', () => {
     const value = 'https://fireside.fm/player/v2/o5sVQfzy%2BKzqauAdJ'
-    const expected = { version: 'v2', token: 'o5sVQfzy+KzqauAdJ' }
 
-    expect(extractFiresideToken(value)).toEqual(expected)
+    expect(extractFiresideToken(value)).toBeUndefined()
   })
 
   // The player host omits the `player` segment, and it is what the platform's embed code writes.
@@ -96,14 +95,14 @@ describe('extractFiresideToken', () => {
 
   it('should use a malformed token opening with an encoded slash as written, even if the player answers an error', () => {
     const value = 'https://player.fireside.fm/v3/x%2FN8LaNbQY+MI2PkJ2g'
-    const expected = { version: 'v3', token: 'x/N8LaNbQY+MI2PkJ2g' }
+    const expected = { version: 'v3', token: 'x%2FN8LaNbQY+MI2PkJ2g' }
 
     expect(extractFiresideToken(value)).toEqual(expected)
   })
 
   it('should use a malformed token closing with an encoded slash as written, even if the player answers an error', () => {
     const value = 'https://player.fireside.fm/v3/N8LaNbQY+MI2PkJ2g%2Fx'
-    const expected = { version: 'v3', token: 'N8LaNbQY+MI2PkJ2g/x' }
+    const expected = { version: 'v3', token: 'N8LaNbQY+MI2PkJ2g%2Fx' }
 
     expect(extractFiresideToken(value)).toEqual(expected)
   })

@@ -13,10 +13,10 @@ const podigeeHosts = ['podigee.io']
 // open with a number.
 const showHostRegex = /^(?!www\.)[a-z0-9-]+\.podigee\.io$/i
 
-// An episode is always numbered, which separates it from the two other paths a show serves:
-// `/feed` and the show root. Every episode segment carries the number and neither of the other
-// two does. A url already ending in `/embed` names the player outright and needs no such guess.
-const safeEpisodeRegex = /^\d+-/
+// An episode is numbered, behind a letter on a trailer such as `t97-`, which separates it from
+// the two other paths a show serves: `/feed` and the show root. A url already ending in `/embed`
+// names the player outright and needs no such guess.
+const safeEpisodeRegex = /^[a-z]?\d+-/
 
 // Fluid in width and fixed in height: 145 at 400 and 900 pixels wide (2026-09-05), matching
 // the 144.8 the player reports once rendered.

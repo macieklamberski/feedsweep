@@ -167,6 +167,18 @@ describe('podigeeResolveEmbed', () => {
     expect(podigeeResolveEmbed(value)).toBeUndefined()
   })
 
+  it('should read a trailer numbered behind a letter', () => {
+    const value = 'https://redfield.podigee.io/t97-trailer-das-ist-der-redfield-podcast'
+    const expected: EmbedResolverResult = {
+      provider: 'podigee',
+      id: 'redfield/t97-trailer-das-ist-der-redfield-podcast',
+      src: 'https://redfield.podigee.io/t97-trailer-das-ist-der-redfield-podcast/embed?context=external',
+      height: 145,
+    }
+
+    expect(podigeeResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for an unnumbered episode with a number inside its slug', () => {
     const value = 'https://cloudonaut.podigee.io/season-2-trailer'
 

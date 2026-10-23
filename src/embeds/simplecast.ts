@@ -1,12 +1,10 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { digitsRegex, uuidRegex } from '../utils/urls.js'
+import { hexRegex, uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// `embed.simplecast.com/{8hex}` and `simplecast.com/e/{numeric}` are legacy spellings of the
+// `embed.simplecast.com/{hex}` and `simplecast.com/e/{numeric}` are legacy spellings of the
 // episode, and `play.simplecast.com/{uuid}` is the share host.
-const legacyIdRegex = /^[0-9a-f]{8}$/i
-
 const simplecastHosts = ['simplecast.com']
 
 // The one height every iframe states.
@@ -26,7 +24,7 @@ export const extractSimplecastEpisode = (
     return { id, isCurrent: true }
   }
 
-  if (legacyIdRegex.test(id) || digitsRegex.test(id)) {
+  if (hexRegex.test(id)) {
     return { id, isCurrent: false }
   }
 }

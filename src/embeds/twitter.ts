@@ -36,7 +36,8 @@ const isTweetUrl = (url: URL): boolean => {
   return isKnownHost || nitterHostRegex.test(url.hostname)
 }
 
-// `/{handle}/status/{id}`, with the plural `statuses` form from the earliest era.
+// `/{handle}/status/{id}`, with the plural `statuses` form from the earliest era. The id is its
+// digit run: feeds cut the query into it, as in `{id}_src=twsrc%5Etfw`, and the tweet still plays.
 const statusPathRegex = /^\/([a-zA-Z0-9_]+)\/status(?:es)?\/(\d+)/
 
 // The paths that name a status and carry no handle: the web client's permalink, the 2015-2017

@@ -10,7 +10,7 @@ const provider = 'yumpu'
 // the bare host and its `www.` spelling name a document.
 const yumpuHosts = ['yumpu.com', 'www.yumpu.com']
 
-const documentPathRegex = /^\/[a-z]{2}\/document\/view\/\d+(?:\/|$)/
+const documentPathRegex = /^\/[a-z]+\/document\/view\/\d+(?:\/|$)/
 
 // The snippet can ship an empty anchor right after the iframe, naming the document page and its
 // title. The page sits in a numeric id space the embed hash does not join to offline, so the
