@@ -607,12 +607,20 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for an album page whose set id runs on past its digits', async () => {
+    it('should read the set id as its digit run when the path runs on past it', async () => {
       const value = html`
         <iframe src="http://www.flickr.com/photos/53116286@N07/sets/72157627116531602x/"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: '53116286@N07/72157627116531602',
+        src: 'https://embedr.flickr.com/photosets/72157627116531602?width=400&height=300',
+        url: 'https://www.flickr.com/photos/53116286@N07/sets/72157627116531602',
+        width: 400,
+        height: 300,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should map a framed album player onto the album player', async () => {
