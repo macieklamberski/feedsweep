@@ -18,8 +18,7 @@ describe('extractBlubrryEmbed', () => {
   })
 
   it('should read a media url', () => {
-    const value =
-      'https://player.blubrry.com/?media_url=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3'
+    const value = 'https://player.blubrry.com/?media_url=https://media.blubrry.com/show/ep.mp3'
     const expected: BlubrryPlayer = { kind: 'media', id: 'https://media.blubrry.com/show/ep.mp3' }
 
     expect(extractBlubrryEmbed(value)).toEqual(expected)
@@ -60,12 +59,11 @@ describe('blubrryResolveEmbed', () => {
 
   // The raw file stays inside the player url: form fidelity keeps a provider's player an embed.
   it('should keep a media url as a player rather than a native audio element', () => {
-    const value =
-      'https://player.blubrry.com/?media_url=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3'
+    const value = 'https://player.blubrry.com/?media_url=https://media.blubrry.com/show/ep.mp3'
     const expected: EmbedResolverResult = {
       provider: 'blubrry',
       id: 'https://media.blubrry.com/show/ep.mp3',
-      src: 'https://player.blubrry.com/?media_url=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3',
+      src: 'https://player.blubrry.com/?media_url=https://media.blubrry.com/show/ep.mp3',
       height: 164,
     }
 

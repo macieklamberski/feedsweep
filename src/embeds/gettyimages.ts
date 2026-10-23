@@ -1,5 +1,5 @@
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.
@@ -83,11 +83,11 @@ export const readWidgetConfig = (source: string): WidgetConfig | undefined => {
 // The signature is bound to the item: a config's own url answers 200, and the same url carrying
 // another specimen's signature 400. Signatures do not appear to expire.
 export const composeWidgetEmbedUrl = (config: WidgetConfig): string => {
-  const query = new URLSearchParams({
+  const query = composeQuery({
     et: config.et,
     tld: config.tld,
     sig: config.sig,
   })
 
-  return `https://embed.gettyimages.com/embed/${config.items}?${query}`
+  return `https://embed.gettyimages.com/embed/${config.items}${query}`
 }

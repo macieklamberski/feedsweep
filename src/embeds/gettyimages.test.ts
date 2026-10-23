@@ -82,7 +82,7 @@ describe('composeWidgetEmbedUrl', () => {
         tld: 'com',
       }
       const expected =
-        'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&sig=OOM9B40x%3D'
+        'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&sig=OOM9B40x='
 
       expect(composeWidgetEmbedUrl(value)).toBe(expected)
     })

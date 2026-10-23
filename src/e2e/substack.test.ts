@@ -1012,7 +1012,7 @@ describeForEachParser('Substack', (parseHtml) => {
       <div
         data-embed-provider="soundcloud"
         data-embed-id="tracks/123456789"
-        data-embed-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/123456789&start_track=0"
+        data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/123456789&start_track=0"
         data-embed-url="https://soundcloud.com/exampleradio/mix-4"
         data-embed-thumbnail="https://i1.sndcdn.com/artworks-abc-t500x500.jpg"
         data-embed-height="166"

@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
-import { placeholderBaseUrl } from '../../utils/urls.js'
+import { composeQuery, placeholderBaseUrl } from '../../utils/urls.js'
 
 // Listed exactly: a www.sandbox.paypal.com form is a test button that takes no real payment.
 const paypalHosts = ['paypal.com', 'www.paypal.com']
@@ -52,8 +52,7 @@ export const linkifyPaypalDonateForms: DomTransform = () => (document) => {
       continue
     }
 
-    const url = new URL('https://www.paypal.com/donate/')
-    url.searchParams.set('hosted_button_id', buttonId)
+    const url = `https://www.paypal.com/donate/${composeQuery({ hosted_button_id: buttonId })}`
 
     const button = document.createElement('img')
     button.setAttribute('src', imageSrc)
@@ -65,7 +64,7 @@ export const linkifyPaypalDonateForms: DomTransform = () => (document) => {
     }
 
     const link = document.createElement('a')
-    link.setAttribute('href', url.toString())
+    link.setAttribute('href', url)
     link.append(button)
     image?.replaceWith(link)
 

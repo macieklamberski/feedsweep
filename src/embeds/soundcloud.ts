@@ -1,7 +1,7 @@
 import { getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, text } from '../utils/dom.js'
-import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'soundcloud'
@@ -17,21 +17,12 @@ const referenceRegex =
 // The widget takes a page url in place of a reference, which is what makes the repair possible.
 const widgetPlayerUrl = 'https://w.soundcloud.com/player/'
 
-// The spelling SoundCloud's own share snippet writes: the item's url with its colon escaped and its
-// slashes kept, then a private item's `secret_token` and a list's `start_track`. The colours, the
-// tabs, the visual layout and autoplay are the publisher's look and are left out.
+// The item's url, then a private item's `secret_token` and a list's `start_track`. The colours,
+// the tabs, the visual layout and autoplay are the publisher's look and are left out.
 const composeWidgetUrl = (target: string, secretToken?: string, startTrack?: string): string => {
-  const pairs = [`url=${encodeURIComponent(target).replaceAll('%2F', '/')}`]
+  const params = trimObject({ url: target, secret_token: secretToken, start_track: startTrack })
 
-  if (secretToken) {
-    pairs.push(`secret_token=${encodeURIComponent(secretToken)}`)
-  }
-
-  if (startTrack) {
-    pairs.push(`start_track=${encodeURIComponent(startTrack)}`)
-  }
-
-  return `${widgetPlayerUrl}?${pairs.join('&')}`
+  return `${widgetPlayerUrl}${composeQuery(params)}`
 }
 
 // A private item's token sits beside `url=` or inside the url it names.

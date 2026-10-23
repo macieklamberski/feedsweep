@@ -2143,7 +2143,7 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
         data-embed-url="https://soundcloud.com/forss/flickermood"
         data-embed-id="tracks/293"
         data-embed-provider="soundcloud"
-        data-embed-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/293"
+        data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/293"
       ></div>
     `
 

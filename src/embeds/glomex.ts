@@ -1,6 +1,7 @@
+import { trimObject } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const glomexHosts = ['player.glomex.com']
@@ -9,16 +10,12 @@ const playerPathRegex = /^\/integration\/[^/]+\/(?:integration|iframe-player)\.h
 // The url glomex's own loader builds from a `<glomex-player>` element. The host answers the same
 // shell for any id, so no id can be checked by fetching it.
 const composeEmbed = (integrationId: string, playlistId?: string): EmbedResolverResult => {
-  const query = new URLSearchParams({ integrationId })
-
-  if (playlistId) {
-    query.set('playlistId', playlistId)
-  }
+  const query = composeQuery(trimObject({ integrationId, playlistId }))
 
   return {
     provider: 'glomex',
     id: playlistId ? `${integrationId}/${playlistId}` : integrationId,
-    src: `https://player.glomex.com/integration/1/integration.html?${query}`,
+    src: `https://player.glomex.com/integration/1/integration.html${query}`,
     // The player fills whatever box it is given, and the integration config defaults to 16:9.
     ratio: '16/9',
   }
