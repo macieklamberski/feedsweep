@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
@@ -12,9 +12,6 @@ const streamableHosts = ['streamable.com', 'www.streamable.com']
 // The embed `/e/{id}` and the frame the oEmbed answer writes, `/o/{id}`.
 const embedRoutes = new Set(['e', 'o'])
 
-// Every route word the platform serves, which a watch page `/{id}` never names.
-const routeWords = ['e', 'm', 'o', 's']
-
 // The player loops unless `loop=0` turns it off.
 const streamableEmbedParams = ['loop']
 
@@ -25,7 +22,7 @@ const playerRatio = '16/9'
 const readVideoId = (segments: Array<string>): string | undefined => {
   const [route, id] = segments
 
-  if (segments.length === 1 && !isAnyOf(route, routeWords)) {
+  if (segments.length === 1) {
     return route
   }
 

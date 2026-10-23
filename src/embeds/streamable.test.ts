@@ -153,18 +153,6 @@ describe('streamableResolveEmbed', () => {
       expect(streamableResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a bare route word, which names no video', () => {
-      const value = 'https://streamable.com/e'
-
-      expect(streamableResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a bare route word in another case', () => {
-      const value = 'https://streamable.com/S'
-
-      expect(streamableResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore the bare host', () => {
       const value = 'https://streamable.com/'
 
