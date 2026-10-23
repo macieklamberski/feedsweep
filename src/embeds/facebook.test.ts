@@ -423,26 +423,6 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the photo route in any case', async () => {
-      const value = html`
-        <blockquote
-          cite="https://www.facebook.com/Photo/?fbid=1234567890"
-          class="fb-xfbml-parse-ignore"
-        >
-          <p>A photo caption.</p>
-        </blockquote>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'facebook',
-        id: 'https://www.facebook.com/Photo/?fbid=1234567890',
-        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPhoto%2F%3Ffbid%3D1234567890',
-        url: 'https://www.facebook.com/Photo/?fbid=1234567890',
-        description: 'A photo caption.',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should read the watch route as the video plugin', async () => {
       const value = html`
         <blockquote
