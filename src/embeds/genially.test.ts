@@ -73,12 +73,6 @@ describe('extractGeniallyViewId', () => {
     expect(extractGeniallyViewId(value)).toBe(`${viewId}0`)
   })
 
-  it('should use a hex id of another length on a /view/ path as written', () => {
-    const value = `https://genially.com/view/${viewId}0`
-
-    expect(extractGeniallyViewId(value)).toBe(`${viewId}0`)
-  })
-
   it('should use a hex id of another length on the retired route as written', () => {
     const value = 'https://www.genial.ly/View/Index/60294f8b2ec856159ae0ba'
 

@@ -1,4 +1,4 @@
-import { getAnyOf, getPathSegments, isAnyOf, isPlainObject, toMap } from 'trousse'
+import { getPathSegments, isAnyOf, isPlainObject, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -15,7 +15,6 @@ const spotifyHeights = toMap({
   playlist: 352,
   artist: 352,
 })
-const spotifyTypes = Array.from(spotifyHeights.keys())
 
 // `embed` opens a player path, `embed-podcast` its older podcast-only twin, `intl-{lang}` a
 // localized page path. Whatever follows the id (`/video` on a video podcast) is decorative.
@@ -100,10 +99,9 @@ export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
   const pair =
     readPathPair(parsed) ??
     (legacy ? [legacy[1], legacy[2]] : readPathPair(parseUrlOnHosts(uri, spotifyHosts)))
-  const type = getAnyOf(pair?.[0], spotifyTypes)
-  const id = pair?.[1]
+  const [type, id] = pair ?? []
 
-  if (!type || !id) {
+  if (!type || !id || !spotifyHeights.has(type)) {
     return
   }
 

@@ -24,12 +24,9 @@ export const extractGeniallyViewId = (link: string): string | undefined => {
     return keepIfMatches(segments[0], hexRegex)
   }
 
-  // The `view` route fixes the id's position, so no site page can sit there.
-  if (segments[0] === 'view') {
-    return keepIfMatches(segments[1], hexRegex)
-  }
+  const viewId = segments[0] === 'view' ? segments[1] : segments[0]
 
-  return keepIfMatches(segments[0], safeViewIdRegex)
+  return keepIfMatches(viewId, safeViewIdRegex)
 }
 
 // Genially's presentation iframe, on the retired `view.genial.ly` host as often as the current one,
