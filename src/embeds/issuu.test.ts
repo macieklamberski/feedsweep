@@ -71,7 +71,7 @@ describeForEachParser('issuuWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'issuu',
         id: 'pub/do/c',
-        src: 'https://e.issuu.com/embed.html?u=pub&d=do%2Fc',
+        src: 'https://e.issuu.com/embed.html?u=pub&d=do/c',
         url: 'https://issuu.com/pub/docs/do%2Fc',
         ratio: '5/3',
       }
@@ -334,7 +334,7 @@ describeForEachParser('issuuIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'issuu',
         id: 'ecosistemaurbano/../../evil',
-        src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=..%2F..%2Fevil',
+        src: 'https://e.issuu.com/embed.html?u=ecosistemaurbano&d=../../evil',
         url: 'https://issuu.com/ecosistemaurbano/docs/..%2F..%2Fevil',
         ratio: '5/3',
       }

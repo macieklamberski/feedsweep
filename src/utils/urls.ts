@@ -222,12 +222,17 @@ export const encodePathSegment = (value: string): string => {
 }
 
 // The other half of `pickQueryParams`: the pairs it returns, back into a query ready to append.
-// A resolver that has nothing to carry over gets an empty string, so its src stays bare rather
-// than ending on a lone `?`.
+// Only the characters that would end a pair or the query, and whitespace, are escaped, so a `%`
+// or `@` the value holds stays as written. Nothing to carry over gives an empty string.
 export const composeQuery = (params?: Record<string, string>): string => {
-  const query = new URLSearchParams(params).toString()
+  const escapePart = (part: string) => {
+    return part.replace(/[&#\s]/g, (character) => encodeURIComponent(character))
+  }
+  const pairs = Object.entries(params ?? {}).map(([name, value]) => {
+    return `${escapePart(name)}=${escapePart(value)}`
+  })
 
-  return query ? `?${query}` : ''
+  return pairs.length > 0 ? `?${pairs.join('&')}` : ''
 }
 
 // The publisher's query with only the parameters a player reads left in it. Each pair stays as

@@ -235,7 +235,7 @@ describe('codesandboxResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'codesandbox',
         id: 'nrhln8',
-        src: 'https://codesandbox.io/p/sandbox/wizardly-wildflower-nrhln8?file=%2Fsrc%2Findex.js&embed=1',
+        src: 'https://codesandbox.io/p/sandbox/wizardly-wildflower-nrhln8?file=/src/index.js&embed=1',
         url: 'https://codesandbox.io/p/sandbox/wizardly-wildflower-nrhln8',
         height: 500,
       }

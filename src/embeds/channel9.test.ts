@@ -123,7 +123,7 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'going+deep/inside-windows-8',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=going%2Bdeep&ep=inside-windows-8',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=going+deep&ep=inside-windows-8',
         ratio: '16/9',
       }
 
@@ -183,7 +183,7 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'events/build-2017/t6064&ev=stolen',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?ev=build-2017&session=t6064%26ev%3Dstolen',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?ev=build-2017&session=t6064%26ev=stolen',
         ratio: '16/9',
       }
 

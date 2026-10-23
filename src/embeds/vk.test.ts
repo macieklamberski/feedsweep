@@ -162,7 +162,7 @@ describe('vkResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'vk',
         id: '../1_2',
-        src: 'https://vk.ru/video_ext.php?oid=..%2F1&id=2',
+        src: 'https://vk.ru/video_ext.php?oid=../1&id=2',
         url: 'https://vkvideo.ru/video..%2F1_2',
         ratio: '16/9',
       }
@@ -175,7 +175,7 @@ describe('vkResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'vk',
         id: '-1_../2',
-        src: 'https://vk.ru/video_ext.php?oid=-1&id=..%2F2',
+        src: 'https://vk.ru/video_ext.php?oid=-1&id=../2',
         url: 'https://vkvideo.ru/video-1_..%2F2',
         ratio: '16/9',
       }

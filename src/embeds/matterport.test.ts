@@ -97,7 +97,7 @@ describeForEachParser('matterportEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'matterport',
         id: 'BcjnMUreh6A',
-        src: 'https://my.matterport.com/show/?m=BcjnMUreh6A&sr=-.05%2C1.5&ss=29',
+        src: 'https://my.matterport.com/show/?m=BcjnMUreh6A&sr=-.05,1.5&ss=29',
         url: 'https://my.matterport.com/show/?m=BcjnMUreh6A',
         thumbnail: 'https://my.matterport.com/api/v2/player/models/BcjnMUreh6A/thumb/',
         ratio: '4/3',
@@ -153,8 +153,8 @@ describeForEachParser('matterportEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'matterport',
         id: '../thumb',
-        src: 'https://my.matterport.com/show/?m=..%2Fthumb',
-        url: 'https://my.matterport.com/show/?m=..%2Fthumb',
+        src: 'https://my.matterport.com/show/?m=../thumb',
+        url: 'https://my.matterport.com/show/?m=../thumb',
         thumbnail: 'https://my.matterport.com/api/v2/player/models/..%2Fthumb/thumb/',
         ratio: '4/3',
       }

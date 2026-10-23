@@ -1459,8 +1459,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc%26autoplay%3D1',
-        url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc%26autoplay%3D1',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc%26autoplay=1',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc%26autoplay=1',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
         height: 300,
         author: '@argyleink',

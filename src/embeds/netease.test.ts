@@ -110,8 +110,8 @@ describe('neteaseResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'netease',
         id: 'song/../../evil',
-        src: 'https://music.163.com/outchain/player?type=2&id=..%2F..%2Fevil',
-        url: 'https://music.163.com/song?id=..%2F..%2Fevil',
+        src: 'https://music.163.com/outchain/player?type=2&id=../../evil',
+        url: 'https://music.163.com/song?id=../../evil',
         height: 250,
       }
 

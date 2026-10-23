@@ -47,7 +47,7 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlebooks',
         id: 'pXG-Mw4cxa0C',
-        src: 'https://books.google.com/books?id=pXG-Mw4cxa0C&pg=PA52&dq=scientology+short+stock&output=embed',
+        src: 'https://books.google.com/books?id=pXG-Mw4cxa0C&pg=PA52&dq=scientology%20short%20stock&output=embed',
         url: 'https://books.google.com/books?id=pXG-Mw4cxa0C&pg=PA52',
         thumbnail:
           'https://books.google.com/books/content?id=pXG-Mw4cxa0C&printsec=frontcover&img=1&zoom=1',
@@ -129,7 +129,7 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlebooks',
         id: 'IpNDAQAAMAAJ',
-        src: 'https://books.google.com/books?id=IpNDAQAAMAAJ&pg=PA4&dq=Loyalsock+Boom+Company&output=embed',
+        src: 'https://books.google.com/books?id=IpNDAQAAMAAJ&pg=PA4&dq=Loyalsock%20Boom%20Company&output=embed',
         url: 'https://books.google.com/books?id=IpNDAQAAMAAJ&pg=PA4',
         thumbnail:
           'https://books.google.com/books/content?id=IpNDAQAAMAAJ&printsec=frontcover&img=1&zoom=1',
@@ -147,7 +147,7 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlebooks',
         id: 'ELieXMxR1h4C',
-        src: 'https://books.google.com/books?id=ELieXMxR1h4C&pg=PP1&dq=Weber%2C+S.+%282004%29%2C+The+Success+of+Open+Source%2C&vq=antirival&output=embed',
+        src: 'https://books.google.com/books?id=ELieXMxR1h4C&pg=PP1&dq=Weber,%20S.%20(2004),%20The%20Success%20of%20Open%20Source,&vq=antirival&output=embed',
         url: 'https://books.google.com/books?id=ELieXMxR1h4C&pg=PP1',
         thumbnail:
           'https://books.google.com/books/content?id=ELieXMxR1h4C&printsec=frontcover&img=1&zoom=1',
@@ -226,10 +226,10 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlebooks',
         id: '3bm6g7DHDjAC/stolen',
-        src: 'https://books.google.com/books?id=3bm6g7DHDjAC%2Fstolen&output=embed',
-        url: 'https://books.google.com/books?id=3bm6g7DHDjAC%2Fstolen',
+        src: 'https://books.google.com/books?id=3bm6g7DHDjAC/stolen&output=embed',
+        url: 'https://books.google.com/books?id=3bm6g7DHDjAC/stolen',
         thumbnail:
-          'https://books.google.com/books/content?id=3bm6g7DHDjAC%2Fstolen&printsec=frontcover&img=1&zoom=1',
+          'https://books.google.com/books/content?id=3bm6g7DHDjAC/stolen&printsec=frontcover&img=1&zoom=1',
         width: 500,
         height: 500,
       }

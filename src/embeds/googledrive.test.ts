@@ -106,7 +106,7 @@ describe('googledriveResolveEmbed', () => {
         id: '1UVR7Liw%2F..%2Fother',
         src: 'https://drive.google.com/file/d/1UVR7Liw%2F..%2Fother/preview',
         url: 'https://drive.google.com/file/d/1UVR7Liw%2F..%2Fother/view',
-        thumbnail: 'https://drive.google.com/thumbnail?id=1UVR7Liw%2F..%2Fother&sz=w640',
+        thumbnail: 'https://drive.google.com/thumbnail?id=1UVR7Liw/../other&sz=w640',
         ratio: '4/3',
       }
 
@@ -120,7 +120,7 @@ describe('googledriveResolveEmbed', () => {
         id: '1UVR7Liw&sz=w1',
         src: 'https://drive.google.com/file/d/1UVR7Liw&sz=w1/preview',
         url: 'https://drive.google.com/file/d/1UVR7Liw&sz=w1/view',
-        thumbnail: 'https://drive.google.com/thumbnail?id=1UVR7Liw%26sz%3Dw1&sz=w640',
+        thumbnail: 'https://drive.google.com/thumbnail?id=1UVR7Liw%26sz=w1&sz=w640',
         ratio: '4/3',
       }
 

@@ -40,7 +40,7 @@ describe('googlesheetsResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '2PACX-1vTkvnj4-XYq1a5yilaz2lZ1huzi7tsxQXnjZUwhC1mqo5XFBwkJPwtjqJakL0uy2n8xptrmMEtJZQXr',
-        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTkvnj4-XYq1a5yilaz2lZ1huzi7tsxQXnjZUwhC1mqo5XFBwkJPwtjqJakL0uy2n8xptrmMEtJZQXr/pubhtml?gid=393389165&range=A30%3AI34',
+        src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTkvnj4-XYq1a5yilaz2lZ1huzi7tsxQXnjZUwhC1mqo5XFBwkJPwtjqJakL0uy2n8xptrmMEtJZQXr/pubhtml?gid=393389165&range=A30:I34',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTkvnj4-XYq1a5yilaz2lZ1huzi7tsxQXnjZUwhC1mqo5XFBwkJPwtjqJakL0uy2n8xptrmMEtJZQXr/pubhtml',
         height: 500,
       }
@@ -364,7 +364,7 @@ describe('googlesheetsResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'googlesheets',
         id: '16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M',
-        src: 'https://docs.google.com/spreadsheets/d/16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M/pubhtml?gid=1618494729&single=true&range=a1%3Aj',
+        src: 'https://docs.google.com/spreadsheets/d/16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M/pubhtml?gid=1618494729&single=true&range=a1:j',
         url: 'https://docs.google.com/spreadsheets/d/16a7PMTGa9WtCz7InV8beA229cJv1XMROpMbIrygJJ-M/pubhtml',
         height: 500,
       }

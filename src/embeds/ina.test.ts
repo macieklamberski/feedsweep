@@ -139,7 +139,7 @@ describe('inaResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'ina',
         id: 'I04224962',
-        src: 'https://player.ina.fr/embed/I04224962?pid=1%26autoplay%3D1&key=1b0bd203fbcd702f9bc9b10ac3d0fc21',
+        src: 'https://player.ina.fr/embed/I04224962?pid=1%26autoplay=1&key=1b0bd203fbcd702f9bc9b10ac3d0fc21',
         url: 'https://www.ina.fr/video/I04224962',
         ratio: '16/9',
       }
@@ -153,7 +153,7 @@ describe('inaResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'ina',
         id: 'I04224962',
-        src: 'https://player.ina.fr/embed/I04224962?pid=1&key=1b0bd203fbcd702f9bc9b10ac3d0fc21%260%3D1',
+        src: 'https://player.ina.fr/embed/I04224962?pid=1&key=1b0bd203fbcd702f9bc9b10ac3d0fc21%260=1',
         url: 'https://www.ina.fr/video/I04224962',
         ratio: '16/9',
       }
@@ -330,7 +330,7 @@ describeForEachParser('inaScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ina',
         id: 'I00017198',
-        src: 'https://player.ina.fr/embed/I00017198?pid=935300%26autoplay%3D1&key=b048361c1bcc0386715136cebd84f8f1',
+        src: 'https://player.ina.fr/embed/I00017198?pid=935300%26autoplay=1&key=b048361c1bcc0386715136cebd84f8f1',
         url: 'https://www.ina.fr/video/I00017198',
         ratio: '16/9',
       }
@@ -344,7 +344,7 @@ describeForEachParser('inaScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ina',
         id: 'I00017198',
-        src: 'https://player.ina.fr/embed/I00017198?pid=935300&key=b048%2F361c',
+        src: 'https://player.ina.fr/embed/I00017198?pid=935300&key=b048/361c',
         url: 'https://www.ina.fr/video/I00017198',
         ratio: '16/9',
       }
@@ -358,7 +358,7 @@ describeForEachParser('inaScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ina',
         id: 'I00017198',
-        src: 'https://player.ina.fr/embed/I00017198?pid=935300&key=b048361c1bcc0386715136cebd84f8f1%260%3D1',
+        src: 'https://player.ina.fr/embed/I00017198?pid=935300&key=b048361c1bcc0386715136cebd84f8f1%260=1',
         url: 'https://www.ina.fr/video/I00017198',
         ratio: '16/9',
       }

@@ -36,7 +36,7 @@ describe('canaluResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'canalu',
         id: '177362',
-        src: 'https://www.canal-u.tv/chaines/ut2j/embed/177362?t=0width%3D100%25',
+        src: 'https://www.canal-u.tv/chaines/ut2j/embed/177362?t=0width=100%',
         ratio: '16/9',
       }
 
@@ -234,7 +234,7 @@ describeForEachParser('canalu player through the pipeline', (parseHtml) => {
         data-embed-ratio="16/9"
         data-embed-id="177362"
         data-embed-provider="canalu"
-        data-embed-src="https://www.canal-u.tv/chaines/ut2j/embed/177362?t=0width%3D100%25"
+        data-embed-src="https://www.canal-u.tv/chaines/ut2j/embed/177362?t=0width=100%"
       ></div>
     `
 

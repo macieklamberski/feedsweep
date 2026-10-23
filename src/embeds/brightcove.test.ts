@@ -107,7 +107,7 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '1660622131/ref:my-video',
-        src: 'https://players.brightcove.net/1660622131/default_default/index.html?videoId=ref%3Amy-video',
+        src: 'https://players.brightcove.net/1660622131/default_default/index.html?videoId=ref:my-video',
         ratio: '16/9',
       }
 
@@ -310,7 +310,7 @@ describe('brightcoveResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '1234567890/ref:my-video',
-        src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=ref%3Amy-video',
+        src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=ref:my-video',
         ratio: '16/9',
       }
 
@@ -487,7 +487,7 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '1234567890/ref:6098765432',
-        src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=ref%3A6098765432',
+        src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=ref:6098765432',
         ratio: '16/9',
       }
 
@@ -504,7 +504,7 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '1234567890/ref:Spring launch/2024 #1',
-        src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=ref%3ASpring+launch%2F2024+%231',
+        src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=ref:Spring%20launch/2024%20%231',
         ratio: '16/9',
       }
 
@@ -760,7 +760,7 @@ describeForEachParser('brightcoveSkyEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '6058004172001/ref:QzMThsajE6ZPSBF0Puv1kQthTGUq21ZI',
-        src: 'https://players.brightcove.net/6058004172001/RC9PQUaJ6_default/index.html?videoId=ref%3AQzMThsajE6ZPSBF0Puv1kQthTGUq21ZI',
+        src: 'https://players.brightcove.net/6058004172001/RC9PQUaJ6_default/index.html?videoId=ref:QzMThsajE6ZPSBF0Puv1kQthTGUq21ZI',
         thumbnail: 'https://images.example.com/20/07/768x432/quarantine_5052935.jpg',
         ratio: '16/9',
         title: "July 2020: 'Chief medical officer was concerned about Spain'",
@@ -790,7 +790,7 @@ describeForEachParser('brightcoveSkyEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '6057984924001/ref:cea463a6-2379-461a-87e4-3487b6240e8c',
-        src: 'https://players.brightcove.net/6057984924001/DESF5xFjJ_default/index.html?videoId=ref%3Acea463a6-2379-461a-87e4-3487b6240e8c',
+        src: 'https://players.brightcove.net/6057984924001/DESF5xFjJ_default/index.html?videoId=ref:cea463a6-2379-461a-87e4-3487b6240e8c',
         ratio: '16/9',
         title: "Sky Sports News' Geraint Hughes explains what England will experience at altitude.",
       }
@@ -819,7 +819,7 @@ describeForEachParser('brightcoveSkyEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '6058004172001/ref:5da0547e-7367-4623-9993-e7e9e2340378',
-        src: 'https://players.brightcove.net/6058004172001/FeuO55X2f_default/index.html?videoId=ref%3A5da0547e-7367-4623-9993-e7e9e2340378',
+        src: 'https://players.brightcove.net/6058004172001/FeuO55X2f_default/index.html?videoId=ref:5da0547e-7367-4623-9993-e7e9e2340378',
         ratio: '16/9',
       }
 
@@ -858,7 +858,7 @@ describeForEachParser('brightcoveSkyEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '6058004172001/ref:5da0547e-7367-4623-9993-e7e9e2340378',
-        src: 'https://players.brightcove.net/6058004172001/FeuO55X2f_default/index.html?videoId=ref%3A5da0547e-7367-4623-9993-e7e9e2340378',
+        src: 'https://players.brightcove.net/6058004172001/FeuO55X2f_default/index.html?videoId=ref:5da0547e-7367-4623-9993-e7e9e2340378',
         thumbnail: 'https://images.example.com/25/08/768x432/review_6986192.jpg',
         ratio: '16/9',
         title: 'Post Office Scandal: DWP review',
@@ -973,7 +973,7 @@ describeForEachParser('brightcove sky widget through the pipeline', (parseHtml) 
         data-embed-thumbnail="https://images.example.com/21/01/768x432/transport_5238009.jpg"
         data-embed-id="6058004172001/ref:953c249f-651b-474a-a8b5-30546a0a8ae9"
         data-embed-provider="brightcove"
-        data-embed-src="https://players.brightcove.net/6058004172001/RC9PQUaJ6_default/index.html?videoId=ref%3A953c249f-651b-474a-a8b5-30546a0a8ae9"
+        data-embed-src="https://players.brightcove.net/6058004172001/RC9PQUaJ6_default/index.html?videoId=ref:953c249f-651b-474a-a8b5-30546a0a8ae9"
       ></div>
     `
 
@@ -1083,7 +1083,7 @@ describeForEachParser('brightcoveExperienceEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '1265527910001/ref:my-video',
-        src: 'https://players.brightcove.net/1265527910001/default_default/index.html?videoId=ref%3Amy-video',
+        src: 'https://players.brightcove.net/1265527910001/default_default/index.html?videoId=ref:my-video',
         ratio: '16/9',
       }
 

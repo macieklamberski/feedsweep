@@ -141,7 +141,7 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '../other',
-        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=..%2Fother',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=../other',
         width: 600,
         height: 315,
       }
@@ -161,7 +161,7 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '45958594_2a40&size=large',
-        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594_2a40%26size%3Dlarge',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594_2a40%26size=large',
         width: 600,
         height: 315,
       }
@@ -186,7 +186,7 @@ describeForEachParser('pixivScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '45958594"]',
-        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594%22%5D',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=45958594"]',
         width: 600,
         height: 315,
       }
@@ -685,7 +685,7 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
         id: '149288339/../x',
-        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=149288339%2F..%2Fx',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=149288339/../x',
         width: 600,
         height: 315,
       }

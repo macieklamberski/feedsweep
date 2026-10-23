@@ -566,8 +566,8 @@ describe('youtubeResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'youtube',
       id: 'playlist/PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf&index=2',
-      src: 'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index%3D2',
-      url: 'https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index%3D2',
+      src: 'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index=2',
+      url: 'https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index=2',
       ratio: '16/9',
     }
 
@@ -580,7 +580,7 @@ describe('youtubeResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'youtube',
       id: 'channel/UCuAXFkgsw1L7xaCfnd5JJOw&autoplay=1',
-      src: 'https://www.youtube.com/embed/live_stream?channel=UCuAXFkgsw1L7xaCfnd5JJOw%26autoplay%3D1',
+      src: 'https://www.youtube.com/embed/live_stream?channel=UCuAXFkgsw1L7xaCfnd5JJOw%26autoplay=1',
       url: 'https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw&autoplay=1',
       ratio: '16/9',
     }
@@ -593,7 +593,7 @@ describe('youtubeResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'youtube',
       id: 'user/SomeUser/../x',
-      src: 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser%2F..%2Fx',
+      src: 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser/../x',
       url: 'https://www.youtube.com/user/SomeUser%2F..%2Fx',
       ratio: '16/9',
     }
@@ -640,8 +640,8 @@ describe('youtubeResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'youtube',
         id: 'playlist/PL7BE4DDAC0A0D/3',
-        src: 'https://www.youtube.com/embed/videoseries?list=PL7BE4DDAC0A0D%2F3',
-        url: 'https://www.youtube.com/playlist?list=PL7BE4DDAC0A0D%2F3',
+        src: 'https://www.youtube.com/embed/videoseries?list=PL7BE4DDAC0A0D/3',
+        url: 'https://www.youtube.com/playlist?list=PL7BE4DDAC0A0D/3',
         ratio: '16/9',
       }
 
@@ -794,7 +794,7 @@ describe('composeEmbedUrl', () => {
   // keeps it that way, so a feed cannot smuggle `autoplay` in through a list id.
   it('should encode a separator inside a value instead of starting a new param', () => {
     const value = 'videoseries'
-    const expected = 'https://www.youtube.com/embed/videoseries?list=PL1%26autoplay%3D1'
+    const expected = 'https://www.youtube.com/embed/videoseries?list=PL1%26autoplay=1'
 
     expect(composeEmbedUrl(value, { list: 'PL1&autoplay=1' })).toBe(expected)
   })
@@ -1169,7 +1169,7 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
         provider: 'youtube',
         id: '../../evil',
         src: 'https://www.youtube.com/embed/../../evil',
-        url: 'https://www.youtube.com/watch?v=..%2F..%2Fevil',
+        url: 'https://www.youtube.com/watch?v=../../evil',
         thumbnail: 'https://i.ytimg.com/vi/../../evil/hqdefault.jpg',
         ratio: '16/9',
       }
@@ -1182,7 +1182,7 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'youtube',
         id: 'channel/../../evil',
-        src: 'https://www.youtube.com/embed/live_stream?channel=..%2F..%2Fevil',
+        src: 'https://www.youtube.com/embed/live_stream?channel=../../evil',
         url: 'https://www.youtube.com/channel/../../evil',
         ratio: '16/9',
       }

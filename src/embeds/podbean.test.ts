@@ -102,7 +102,7 @@ describe('podbeanResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'podbean',
       id: 'wyvke&x=1-1aefb6c-pb',
-      src: 'https://www.podbean.com/player-v2/?i=wyvke%26x%3D1-1aefb6c-pb',
+      src: 'https://www.podbean.com/player-v2/?i=wyvke%26x=1-1aefb6c-pb',
       height: 150,
     }
 

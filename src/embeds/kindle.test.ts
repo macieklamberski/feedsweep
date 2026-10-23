@@ -169,7 +169,7 @@ describe('kindleResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'kindle',
         id: 'read.amazon.com/../embed',
-        src: 'https://read.amazon.com/kp/card?asin=..%2Fembed',
+        src: 'https://read.amazon.com/kp/card?asin=../embed',
         thumbnail: 'https://m.media-amazon.com/images/P/..%2Fembed.01._SCLZZZZZZZ_.jpg',
         height: 550,
       }
