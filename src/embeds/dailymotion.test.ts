@@ -345,6 +345,19 @@ describe('dailymotionResolveEmbed', () => {
     expect(dailymotionResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should lowercase an uppercase playlist id', () => {
+    const value = 'https://www.dailymotion.com/embed/playlist/X6ZQMK'
+    const expected: EmbedResolverResult = {
+      provider: 'dailymotion',
+      id: 'playlist/x6zqmk',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x6zqmk',
+      url: 'https://www.dailymotion.com/playlist/x6zqmk',
+      ratio: '16/9',
+    }
+
+    expect(dailymotionResolveEmbed(value)).toEqual(expected)
+  })
+
   // The word only names a playlist where the route prefix ends. Scanning the whole path for it
   // read this search page, whose query is the word itself, as the playlist `videos`, which
   // `api.dailymotion.com/playlist/videos` answers 404 for.

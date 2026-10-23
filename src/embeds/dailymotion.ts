@@ -132,7 +132,12 @@ const extractDailymotionPlaylistId = (link: string): string | undefined => {
   const candidate = pathId ? (decodeSegment(pathId) ?? pathId) : url.searchParams.get('playlist')
   const [kind, widgetId] = readWidgetEntry(url)
 
-  return [candidate, kind === 'playlist' ? widgetId : undefined].map(readId).find(Boolean)
+  const playlistId = [candidate, kind === 'playlist' ? widgetId : undefined]
+    .map(readId)
+    .find(Boolean)
+
+  // The player, the api and the feed refuse a playlist id in uppercase.
+  return playlistId?.toLowerCase()
 }
 
 const readPathId = (url: URL, segments: Array<string>): string | undefined => {
