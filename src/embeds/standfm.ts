@@ -13,8 +13,7 @@ const playerHeights = toMap({ episodes: 190, channels: 390 })
 export const standfmResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
   const segments = parsed ? getPathSegments(parsed) : []
-  const [rawKind, id] = isAnyOf(segments[0], 'embed') ? segments.slice(1) : segments
-  const kind = rawKind?.toLowerCase()
+  const [kind, id] = isAnyOf(segments[0], 'embed') ? segments.slice(1) : segments
 
   // The hex alphabet keeps a route word such as `/episodes/new`, a live page, out of the id slot.
   if (!kind || !lettersRegex.test(kind) || !id || !hexRegex.test(id)) {

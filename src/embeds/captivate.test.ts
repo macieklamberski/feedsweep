@@ -32,13 +32,6 @@ describe('extractCaptivateEmbed', () => {
     expect(extractCaptivateEmbed(value)).toEqual(expected)
   })
 
-  it('should read a kind written in uppercase as the lowercase route word', () => {
-    const value = 'https://player.captivate.fm/EPISODE/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6'
-    const expected = { kind: 'episode', id: 'db5bc483-785d-4c8c-9f7b-c0ff2fab72e6' }
-
-    expect(extractCaptivateEmbed(value)).toEqual(expected)
-  })
-
   it('should return undefined for an id that is not a uuid', () => {
     const value = 'https://player.captivate.fm/episode/12345'
 

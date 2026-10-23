@@ -221,19 +221,6 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should rebuild a kind written in uppercase onto the lowercase route word', async () => {
-      const value =
-        '<iframe src="https://embed.figma.com/PROTO/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?embed-host=share"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'figma',
-        id: 'proto/LBH1O9AxQLxp0ixZBd1Pxk',
-        src: 'https://embed.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?embed-host=share',
-        url: 'https://www.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
     it('should refuse a route word that is not a kind', async () => {
       const value =
         '<iframe src="https://embed.figma.com/best-practices/0txckPBPI1OqFNEa9VaKLP/TacTik"></iframe>'

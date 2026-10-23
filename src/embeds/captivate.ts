@@ -14,8 +14,7 @@ const showHeight = 600
 
 export const extractCaptivateEmbed = (link: string): { kind: string; id: string } | undefined => {
   const segments = getPathSegments(link)
-  const [route, id] = segments
-  const kind = route?.toLowerCase()
+  const [kind, id] = segments
 
   // The segment count keeps a `media/{uuid}/{file}.mp3` enclosure out of a dead placeholder. The kind
   // is a shape, so a kind added later still resolves.

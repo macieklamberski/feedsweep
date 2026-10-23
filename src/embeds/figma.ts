@@ -29,8 +29,7 @@ const catalogueKind = 'community'
 // A figma url names a file as `{kind}/{key}/{name}` and nothing else.
 const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
   const segments = getPathSegments(url)
-  const [rawKind, key, name] = segments
-  const kind = rawKind?.toLowerCase()
+  const [kind, key, name] = segments
 
   if (segments.length !== 3 || !kind || !key || !name) {
     return
