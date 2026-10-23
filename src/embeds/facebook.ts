@@ -25,9 +25,6 @@ const provider = 'facebook'
 // Posts live on the apex and on `web.`, `m.` and `business.` alike.
 const facebookHosts = ['facebook.com', 'fb.watch']
 
-// A page named by its numeric id, `profile.php?id={id}`, has no username.
-const profileRoute = 'profile.php'
-
 // The page's own username, `facebook.com/{username}/`.
 const readPageUsername = (anchor: Nullish<Element>): string | undefined => {
   const page = parseUrlOnHosts(attr(anchor, 'href'), facebookHosts)
@@ -38,7 +35,8 @@ const readPageUsername = (anchor: Nullish<Element>): string | undefined => {
 
   const segments = getPathSegments(page)
 
-  if (segments.length !== 1 || isAnyOf(segments[0], profileRoute)) {
+  // A page named by its numeric id, `profile.php?id={id}`, has no username.
+  if (segments.length !== 1 || isAnyOf(segments[0], 'profile.php')) {
     return
   }
 

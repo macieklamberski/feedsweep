@@ -163,9 +163,6 @@ const readFallbackAnchors = (element: Element | undefined): Array<Element> => {
   return Array.from(container.querySelectorAll('a[href]'))
 }
 
-const titleRoutes = ['album', 'track']
-const artistRoute = 'artist'
-
 const readAnchorRoute = (anchor: Element): string => {
   const parsed = parseUrlOnHosts(attr(anchor, 'href'), yandexMusicHosts)
 
@@ -178,8 +175,8 @@ const readAnchorRoute = (anchor: Element): string => {
 
 const readFallback = (element: Element | undefined): Partial<EmbedResolverResult> => {
   const anchors = readFallbackAnchors(element)
-  const title = anchors.find((anchor) => isAnyOf(readAnchorRoute(anchor), titleRoutes))
-  const artist = anchors.find((anchor) => isAnyOf(readAnchorRoute(anchor), artistRoute))
+  const title = anchors.find((anchor) => isAnyOf(readAnchorRoute(anchor), ['album', 'track']))
+  const artist = anchors.find((anchor) => isAnyOf(readAnchorRoute(anchor), 'artist'))
 
   return {
     title: text(title),
