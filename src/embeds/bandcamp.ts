@@ -9,6 +9,7 @@ import {
   encodePathSegment,
   parseUrlOnHosts,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -60,7 +61,7 @@ const readReleases = (link: string): Array<[string, string]> => {
   }
 
   for (const kind of releaseKinds) {
-    const id = parsed.searchParams.get(kind)
+    const id = readQueryParam(parsed.search, kind)
 
     if (id) {
       claim(kind, id)
@@ -111,7 +112,6 @@ const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
   const isVideo = videoPathRegex.test(parsed.pathname) && kind === 'track'
   const startTrack = getPathSegments(parsed).find((segment) => startTrackRegex.test(segment))
   const start = startTrack ? `${startTrack}/` : ''
-  // A query id comes out decoded, and it goes into a path.
   const segments = new Map(releases.map(([named, value]) => [named, encodePathSegment(value)]))
   const albumId = segments.get('album')
   const trackId = segments.get('track')

@@ -87,7 +87,7 @@ describe('bloggerResolveEmbed', () => {
       const value = 'https://www.blogger.com/video.g?token=AD6v%26x'
       const expected: EmbedResolverResult = {
         provider: 'blogger',
-        id: 'AD6v&x',
+        id: 'AD6v%26x',
         src: 'https://www.blogger.com/video.g?token=AD6v%26x',
         ratio: '16/9',
       }

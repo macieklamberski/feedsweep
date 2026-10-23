@@ -1,7 +1,7 @@
 import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, placeholderBaseUrl, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mrcvideo'
@@ -57,7 +57,7 @@ const readSharingId = (element: Element | undefined): string | undefined => {
 const readCallbackId = (element: Element | undefined): string | undefined => {
   const parsed = parseOnHosts(flashVar(element, 'yourlytics.callback'))
 
-  return parsed?.searchParams.get('nodeid') ?? undefined
+  return readQueryParam(parsed?.search, 'nodeid') ?? undefined
 }
 
 const mrcvideoResolveEmbed: ResolveEmbed = (url) => {

@@ -1,7 +1,7 @@
 import { trimObject } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const glomexHosts = ['player.glomex.com']
@@ -39,8 +39,8 @@ const glomexResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const integrationId = parsed.searchParams.get('integrationId') ?? undefined
-  const playlistId = parsed.searchParams.get('playlistId') ?? undefined
+  const integrationId = readQueryParam(parsed.search, 'integrationId') ?? undefined
+  const playlistId = readQueryParam(parsed.search, 'playlistId') ?? undefined
 
   return readEmbed(integrationId, playlistId)
 }

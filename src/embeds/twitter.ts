@@ -2,7 +2,7 @@ import { isHostOrSubdomainOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, placeholderBaseUrl, readQueryParam } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
@@ -90,7 +90,7 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
   // The frame has to be the platform's own: `id` is an ordinary parameter name, so any other
   // iframe a publisher nested in the quote would otherwise name the tweet.
   const frame = parseUrl(attr(find(element, 'iframe[src]'), 'src') ?? '', placeholderBaseUrl)
-  const framed = frame && isTweetUrl(frame) ? frame.searchParams.get('id') : undefined
+  const framed = frame && isTweetUrl(frame) ? readQueryParam(frame.search, 'id') : undefined
   const declared =
     attr(element, 'data-twitter-tweet-id') ??
     attr(element, 'data-tweet-id') ??
@@ -246,7 +246,8 @@ const playerPaths = new Set(['/embed/Tweet.html', '/embed/index.html'])
 // or `X Post`.
 export const twitterResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
-  const id = parsed && playerPaths.has(parsed.pathname) ? parsed.searchParams.get('id') : undefined
+  const id =
+    parsed && playerPaths.has(parsed.pathname) ? readQueryParam(parsed.search, 'id') : undefined
 
   if (id) {
     return composeEmbed({ handle: '', id }, {})

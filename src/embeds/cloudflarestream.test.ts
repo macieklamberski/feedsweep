@@ -382,10 +382,10 @@ describeForEachParser('cloudflarestreamScriptEmbedResolver', (parseHtml) => {
         '<script src="https://embed.videodelivery.net/embed/r4xu.fla9.latest.js?video=..%2F..%2F35d8788a685e8cd8db81e6f3e2269e2a"></script>'
       const expected: EmbedResolverResult = {
         provider: 'cloudflarestream',
-        id: '../../35d8788a685e8cd8db81e6f3e2269e2a',
-        src: 'https://iframe.videodelivery.net/..%2F..%2F35d8788a685e8cd8db81e6f3e2269e2a',
+        id: '..%2F..%2F35d8788a685e8cd8db81e6f3e2269e2a',
+        src: 'https://iframe.videodelivery.net/..%252F..%252F35d8788a685e8cd8db81e6f3e2269e2a',
         thumbnail:
-          'https://videodelivery.net/..%2F..%2F35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg',
+          'https://videodelivery.net/..%252F..%252F35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg',
         ratio: '16/9',
       }
 

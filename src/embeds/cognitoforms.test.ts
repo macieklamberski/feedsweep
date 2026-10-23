@@ -43,7 +43,7 @@ describe('cognitoformsResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'cognitoforms',
         id: 'yExCAh1c_E2nq69zMpV9RA/48',
-        src: 'https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48?entry={"Name":"Jane"}',
+        src: 'https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48?entry=%7B%22Name%22%3A%22Jane%22%7D',
         url: 'https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48',
         height: 600,
       }

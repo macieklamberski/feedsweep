@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const cnbcHosts = ['player.cnbc.com']
@@ -15,7 +15,7 @@ const playerRatio = '16/9'
 export const cnbcResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, cnbcHosts)
   const [route, account, player, extra] = parsed ? getPathSegments(parsed) : []
-  const guid = parsed?.searchParams.get('byGuid')
+  const guid = readQueryParam(parsed?.search, 'byGuid')
 
   if (route !== 'p' || !player || extra) {
     return

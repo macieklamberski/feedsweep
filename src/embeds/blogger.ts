@@ -1,7 +1,7 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery } from '../utils/urls.js'
+import { composeQuery, readQueryParam } from '../utils/urls.js'
 
 const provider = 'blogger'
 
@@ -16,7 +16,7 @@ export const extractBloggerToken = (link: string): string | undefined => {
     return
   }
 
-  return parsed.searchParams.get('token') || undefined
+  return readQueryParam(parsed.search, 'token')
 }
 
 // Blogger's own hosted video: an iframe on blogger.com/video.g with no poster and no page to open.

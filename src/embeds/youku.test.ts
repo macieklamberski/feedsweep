@@ -103,9 +103,9 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
         '<embed src="http://static.youku.com/v1.0.0080/v/swf/qplayer.swf?VideoIDS=XMTI%2FNDk==">'
       const expected: EmbedResolverResult = {
         provider: 'youku',
-        id: 'XMTI%2FNDk==',
-        src: 'https://player.youku.com/embed/XMTI%2FNDk==',
-        url: 'https://v.youku.com/v_show/id_XMTI%2FNDk==.html',
+        id: 'XMTI%252FNDk==',
+        src: 'https://player.youku.com/embed/XMTI%252FNDk==',
+        url: 'https://v.youku.com/v_show/id_XMTI%252FNDk==.html',
         ratio: '16/9',
       }
 

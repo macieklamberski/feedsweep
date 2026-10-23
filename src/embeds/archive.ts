@@ -4,9 +4,11 @@ import { attr, flashVar, flashVars } from '../utils/dom.js'
 import {
   audioFileRegex,
   composeQuery,
+  decodeQueryValue,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
@@ -188,8 +190,11 @@ const namesAudioFile = (config: string): boolean => {
 
 // The XSPF player loads `audio/xspf-maker.php?identifier={identifier}`, a playlist of the item.
 const readXspfPlayer = (player: URL): EmbedResolverResult | undefined => {
-  const playlist = parseUrlOnHosts(player.searchParams.get('playlist_url') ?? '', archiveHosts)
-  const identifier = playlist?.searchParams.get('identifier')
+  const playlist = parseUrlOnHosts(
+    decodeQueryValue(readQueryParam(player.search, 'playlist_url')) ?? '',
+    archiveHosts,
+  )
+  const identifier = readQueryParam(playlist?.search, 'identifier')
 
   if (!identifier) {
     return
@@ -230,7 +235,7 @@ const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   // The config arrives as the `flashVars` attribute or, on the older player, as a `config` query.
-  const config = flashVars(element) ?? parsed.searchParams.get('config')
+  const config = flashVars(element) ?? decodeQueryValue(readQueryParam(parsed.search, 'config'))
   const identifier = config?.match(downloadIdentifierRegex)?.[1]
 
   if (!identifier || !config) {

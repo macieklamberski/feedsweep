@@ -1,7 +1,7 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pastebin'
@@ -29,13 +29,12 @@ const readPasteId = (url: string | undefined): string | undefined => {
     return pasteId
   }
 
-  const queryId = parsed.searchParams.get('i')
+  const queryId = readQueryParam(parsed.search, 'i')
 
   if (!queryId) {
     return
   }
 
-  // The query id comes out decoded, and it goes into a path beside the raw path spelling.
   return encodePathSegment(queryId)
 }
 

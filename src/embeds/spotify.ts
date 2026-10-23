@@ -1,7 +1,7 @@
 import { getPathSegments, isPlainObject, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { decodeQueryValue, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The player is fluid-width and fixed-height: a compact bar for a single item, a taller box for
@@ -91,7 +91,7 @@ export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
   // The `uri` parameter also carries an open.spotify.com url, in every spelling the carrier's own
   // path has: the `intl-{lang}` prefix, an `/embed/` prefix and the `user/{handle}/playlist/{id}`
   // ownership form.
-  const uri = parsed.searchParams.get('uri') ?? undefined
+  const uri = decodeQueryValue(readQueryParam(parsed.search, 'uri')) ?? undefined
   const legacy = uri?.match(legacyUriRegex)
   // The type and id are taken as a pair from whichever source names both, never one from each:
   // a path stating a type and no id would otherwise take its id from the parameter and mint one

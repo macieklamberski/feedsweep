@@ -345,7 +345,7 @@ describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {
         provider: 'slideshare',
         id: '6435157',
         src: 'https://www.slideshare.net/slideshow/embed_code/6435157',
-        url: 'https://www.slideshare.net/..%2F..%2Fadmin/business-quotes-for-2011',
+        url: 'https://www.slideshare.net/..%252F..%252Fadmin/business-quotes-for-2011',
         ratio: '595/485',
       }
 

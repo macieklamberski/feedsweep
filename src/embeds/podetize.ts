@@ -1,7 +1,7 @@
 import { trimObject } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const podetizeHosts = ['player.podetize.com']
@@ -27,13 +27,13 @@ const composeEmbed = (id: string, isEpisodeMode: boolean): EmbedResolverResult =
 
 export const podetizeResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, podetizeHosts)
-  const id = parsed?.searchParams.get('id')
+  const id = readQueryParam(parsed?.search, 'id')
 
   if (parsed?.pathname !== '/' || !id) {
     return
   }
 
-  return composeEmbed(id, parsed.searchParams.get('epmode') === 'true')
+  return composeEmbed(id, readQueryParam(parsed.search, 'epmode') === 'true')
 }
 
 // Podetize's ShowCastR loader script mounts the player where it stands, and a reader strips it.

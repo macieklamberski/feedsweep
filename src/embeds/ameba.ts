@@ -1,7 +1,7 @@
 import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, placeholderBaseUrl, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const amebaHosts = ['static.blog-video.jp']
@@ -14,7 +14,7 @@ const imagePagePathRegex = /^\/p\/embed\/([^/]+\/image-[^/]+)\.html$/
 // The id is the whole key the platform's own endpoint takes. Its thumbnails are pathed by the
 // blog's own user id, which the carrier does not name, so no poster is minted.
 export const amebaResolveEmbed: ResolveEmbed = (url) => {
-  const videoId = parseUrl(url, placeholderBaseUrl)?.searchParams.get('v')
+  const videoId = readQueryParam(parseUrl(url, placeholderBaseUrl)?.search, 'v')
 
   if (!videoId) {
     return

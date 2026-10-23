@@ -134,10 +134,10 @@ describeForEachParser('tencentEmbedResolver', (parseHtml) => {
         '<iframe src="https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%2Fx"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'tencent',
-        id: 'v03604lrvan/x',
-        src: 'https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan/x',
-        url: 'https://v.qq.com/x/page/v03604lrvan/x.html',
-        thumbnail: 'https://puui.qpic.cn/qqvideo_ori/0/v03604lrvan/x_496_280/0',
+        id: 'v03604lrvan%2Fx',
+        src: 'https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%2Fx',
+        url: 'https://v.qq.com/x/page/v03604lrvan%2Fx.html',
+        thumbnail: 'https://puui.qpic.cn/qqvideo_ori/0/v03604lrvan%2Fx_496_280/0',
         ratio: '16/9',
       }
 
@@ -149,10 +149,10 @@ describeForEachParser('tencentEmbedResolver', (parseHtml) => {
         '<iframe src="https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%26autoplay%3D1"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'tencent',
-        id: 'v03604lrvan&autoplay=1',
-        src: 'https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%26autoplay=1',
-        url: 'https://v.qq.com/x/page/v03604lrvan&autoplay=1.html',
-        thumbnail: 'https://puui.qpic.cn/qqvideo_ori/0/v03604lrvan&autoplay=1_496_280/0',
+        id: 'v03604lrvan%26autoplay%3D1',
+        src: 'https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%26autoplay%3D1',
+        url: 'https://v.qq.com/x/page/v03604lrvan%26autoplay%3D1.html',
+        thumbnail: 'https://puui.qpic.cn/qqvideo_ori/0/v03604lrvan%26autoplay%3D1_496_280/0',
         ratio: '16/9',
       }
 

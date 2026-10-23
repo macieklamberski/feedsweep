@@ -2,7 +2,7 @@ import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
-import { composeQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, isFileName, placeholderBaseUrl, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codesandbox'
@@ -78,13 +78,13 @@ const parseTarget = (value: string | undefined): CodesandboxTarget | undefined =
   // embed renderer. The rest of the query is the editor's look.
   if (isProject) {
     const pagePath = `p/${second}/${slug}`
-    const file = parsed.searchParams.get('file') ?? undefined
+    const file = readQueryParam(parsed.search, 'file') ?? undefined
     const query = composeQuery(trimObject({ file, embed: '1' }, Boolean))
 
     return { slug, id, pagePath, src: `https://codesandbox.io/${pagePath}${query}` }
   }
 
-  const module = parsed.searchParams.get('module') ?? undefined
+  const module = readQueryParam(parsed.search, 'module') ?? undefined
   const query = composeQuery(trimObject({ module }, Boolean))
 
   return { slug, id, pagePath: `s/${slug}`, src: `https://codesandbox.io/embed/${slug}${query}` }

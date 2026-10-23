@@ -147,7 +147,7 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'googlebooks',
         id: 'ELieXMxR1h4C',
-        src: 'https://books.google.com/books?id=ELieXMxR1h4C&pg=PP1&dq=Weber,%20S.%20(2004),%20The%20Success%20of%20Open%20Source,&vq=antirival&output=embed',
+        src: 'https://books.google.com/books?id=ELieXMxR1h4C&pg=PP1&dq=Weber%2C%20S.%20(2004)%2C%20The%20Success%20of%20Open%20Source%2C&vq=antirival&output=embed',
         url: 'https://books.google.com/books?id=ELieXMxR1h4C&pg=PP1',
         thumbnail:
           'https://books.google.com/books/content?id=ELieXMxR1h4C&printsec=frontcover&img=1&zoom=1',
@@ -225,11 +225,11 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'googlebooks',
-        id: '3bm6g7DHDjAC/stolen',
-        src: 'https://books.google.com/books?id=3bm6g7DHDjAC/stolen&output=embed',
-        url: 'https://books.google.com/books?id=3bm6g7DHDjAC/stolen',
+        id: '3bm6g7DHDjAC%2Fstolen',
+        src: 'https://books.google.com/books?id=3bm6g7DHDjAC%2Fstolen&output=embed',
+        url: 'https://books.google.com/books?id=3bm6g7DHDjAC%2Fstolen',
         thumbnail:
-          'https://books.google.com/books/content?id=3bm6g7DHDjAC/stolen&printsec=frontcover&img=1&zoom=1',
+          'https://books.google.com/books/content?id=3bm6g7DHDjAC%2Fstolen&printsec=frontcover&img=1&zoom=1',
         width: 500,
         height: 500,
       }

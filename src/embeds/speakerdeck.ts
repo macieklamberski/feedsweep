@@ -1,7 +1,13 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  isFileName,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'speakerdeck'
@@ -78,7 +84,7 @@ export const speakerdeckResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const slide = parseUrl(url, placeholderBaseUrl)?.searchParams.get('slide') ?? undefined
+  const slide = readQueryParam(parseUrl(url, placeholderBaseUrl)?.search, 'slide') ?? undefined
 
   return composeEmbed(deckId, { slide, title: attr(element, 'title') })
 }

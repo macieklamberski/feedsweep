@@ -1,6 +1,12 @@
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, encodePathSegment, filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  filterUrlQuery,
+  parseUrlOnHosts,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'kaltura'
@@ -38,7 +44,7 @@ type Entry = {
 const readEntry = (url: string | undefined): Entry | undefined => {
   const parsed = parseUrlOnHosts(url, kalturaHost)
   const partner = parsed?.pathname.match(partnerPathRegex)?.[1]
-  const entryId = parsed?.searchParams.get('entry_id')
+  const entryId = readQueryParam(parsed?.search, 'entry_id')
 
   return parsed && partner && entryId ? { partner, entryId, parsed } : undefined
 }
@@ -54,7 +60,6 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult 
     (name) => name === tokenParam || widgetParams.includes(name) || playbackParams.includes(name),
   )
   const playback = kept.replace('?', '&')
-  // The entry comes out of the query decoded, and it goes into a path.
   const entrySegment = encodePathSegment(entryId)
 
   return {
@@ -92,7 +97,7 @@ export const kalturaScriptEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     const entry = readEntry(attr(element, 'src'))
 
-    if (entry?.parsed.searchParams.get('autoembed') !== 'true') {
+    if (!entry || readQueryParam(entry.parsed.search, 'autoembed') !== 'true') {
       return
     }
 

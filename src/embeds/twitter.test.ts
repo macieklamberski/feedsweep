@@ -1478,7 +1478,7 @@ describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'twitter',
-        id: '123&lang=en',
+        id: '123%26lang=en',
         src: 'https://platform.twitter.com/embed/Tweet.html?id=123%26lang=en',
       }
 

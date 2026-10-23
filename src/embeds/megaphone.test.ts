@@ -180,8 +180,8 @@ describe('megaphoneResolveEmbed', () => {
     const value = 'https://playlist.megaphone.fm/?e=AUDD4761726018%26autoplay%3D1'
     const expected: EmbedResolverResult = {
       provider: 'megaphone',
-      id: 'episode/AUDD4761726018&autoplay=1',
-      src: 'https://playlist.megaphone.fm/?e=AUDD4761726018%26autoplay=1',
+      id: 'episode/AUDD4761726018%26autoplay%3D1',
+      src: 'https://playlist.megaphone.fm/?e=AUDD4761726018%26autoplay%3D1',
       height: 200,
     }
 
@@ -192,8 +192,8 @@ describe('megaphoneResolveEmbed', () => {
     const value = 'https://playlist.megaphone.fm/?p=NSM7546490835%26light%3Dtrue'
     const expected: EmbedResolverResult = {
       provider: 'megaphone',
-      id: 'playlist/NSM7546490835&light=true',
-      src: 'https://playlist.megaphone.fm/?p=NSM7546490835%26light=true',
+      id: 'playlist/NSM7546490835%26light%3Dtrue',
+      src: 'https://playlist.megaphone.fm/?p=NSM7546490835%26light%3Dtrue',
       height: 482,
     }
 

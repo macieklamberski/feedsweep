@@ -1,6 +1,13 @@
 import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { absoluteUrlRegex, composeQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  absoluteUrlRegex,
+  composeQuery,
+  decodeQueryValue,
+  isFileName,
+  placeholderBaseUrl,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'office'
@@ -26,9 +33,10 @@ const readFileName = (documentUrl: string): string | undefined => {
 // as the `src` query parameter.
 export const officeResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
-  const documentUrl = parsed?.searchParams.get('src')
+  const source = readQueryParam(parsed?.search, 'src')
+  const documentUrl = decodeQueryValue(source)
 
-  if (!parsed || !documentUrl || !viewerPathRegex.test(parsed.pathname)) {
+  if (!parsed || !source || !documentUrl || !viewerPathRegex.test(parsed.pathname)) {
     return
   }
 
@@ -40,7 +48,7 @@ export const officeResolveEmbed: ResolveEmbed = (url) => {
   // No id: the document url addresses no Microsoft endpoint, so there is no enrichment key.
   return {
     provider,
-    src: `https://view.officeapps.live.com/op/embed.aspx${composeQuery({ src: documentUrl })}`,
+    src: `https://view.officeapps.live.com/op/embed.aspx${composeQuery({ src: source })}`,
     url: documentUrl,
     ratio: '8/5',
     title: readFileName(documentUrl),

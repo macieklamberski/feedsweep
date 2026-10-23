@@ -1,5 +1,5 @@
 import type { ResolveEmbed } from '../types.js'
-import { composeQuery, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'abcnews'
@@ -20,7 +20,7 @@ export const abcnewsResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const id = parsed.searchParams.get('id')
+  const id = readQueryParam(parsed.search, 'id')
 
   if (!id) {
     return

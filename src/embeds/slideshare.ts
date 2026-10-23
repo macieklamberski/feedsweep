@@ -6,6 +6,7 @@ import {
   isFileName,
   parseUrlOnHosts,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -325,8 +326,8 @@ const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
   // The swf query names the deck's owner and slug, which compose the same page the wrapper
   // links to. It is the fallback for a snippet that kept the player and dropped the wrapper's
   // anchor.
-  const account = parsed.searchParams.get('userName')
-  const slug = parsed.searchParams.get('stripped_title')
+  const account = readQueryParam(parsed.search, 'userName')
+  const slug = readQueryParam(parsed.search, 'stripped_title')
   // Both come out of the query decoded, and each goes into a path segment of its own.
   const composed =
     account && slug

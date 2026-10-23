@@ -197,8 +197,8 @@ describe('nprResolveEmbed', () => {
       const value = 'https://www.npr.org/embedded-video?storyId=141331825&mediaId=141398010%26x%3D1'
       const expected: EmbedResolverResult = {
         provider: 'npr',
-        id: 'video/141331825/141398010&x=1',
-        src: 'https://www.npr.org/embedded-video?storyId=141331825&mediaId=141398010%26x=1',
+        id: 'video/141331825/141398010%26x%3D1',
+        src: 'https://www.npr.org/embedded-video?storyId=141331825&mediaId=141398010%26x%3D1',
         ratio: '16/9',
       }
 

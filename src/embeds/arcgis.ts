@@ -8,7 +8,7 @@ import {
 } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, filterUrlQuery, placeholderBaseUrl, readQueryParam } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Item = {
@@ -102,7 +102,7 @@ const composeWebMapSource = (url: URL, webMapId: string): string => {
   // retired template moves to the classic embed viewer. Its `extent` is the same longitude and
   // latitude box OnePane wrote as `gcsextent`.
   if (url.pathname === onePanePath) {
-    const extent = url.searchParams.get('gcsextent') ?? undefined
+    const extent = readQueryParam(url.search, 'gcsextent') ?? undefined
     const query = composeQuery(trimObject({ webmap: webMapId, extent }, Boolean))
 
     return `https://www.arcgis.com${embedViewerPath}${query}`
@@ -117,7 +117,7 @@ const composeWebMapSource = (url: URL, webMapId: string): string => {
 
 const readPortalItem = (url: URL): Item | undefined => {
   if (webMapPaths.includes(url.pathname)) {
-    const webMapId = url.searchParams.get('webmap')
+    const webMapId = readQueryParam(url.search, 'webmap')
 
     if (!webMapId) {
       return
@@ -136,7 +136,7 @@ const readPortalItem = (url: URL): Item | undefined => {
   const template = url.pathname.match(instantPathRegex)?.[1]
 
   if (template) {
-    const appId = url.searchParams.get('appid')
+    const appId = readQueryParam(url.search, 'appid')
 
     if (!appId) {
       return

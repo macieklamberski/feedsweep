@@ -6,6 +6,7 @@ import {
   encodePathSegment,
   pickQueryParams,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -58,8 +59,8 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
 
   const page = parsed.pathname.match(videoPageRegex)?.groups
   const player = players.get(page ? '/video_ext.php' : parsed.pathname)
-  const ownerId = page?.owner ?? parsed.searchParams.get('oid') ?? ''
-  const videoId = page?.video ?? parsed.searchParams.get('id') ?? ''
+  const ownerId = page?.owner ?? readQueryParam(parsed.search, 'oid') ?? ''
+  const videoId = page?.video ?? readQueryParam(parsed.search, 'id') ?? ''
 
   if (!player || !ownerId || !videoId) {
     return

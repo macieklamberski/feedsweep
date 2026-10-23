@@ -158,9 +158,9 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         '<iframe src="https://tp.srgssr.ch/p/srf/embed?urn=urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
-        id: 'urn:srf:video:abc&autoplay=1',
-        src: 'https://www.srf.ch/play/embed?urn=urn:srf:video:abc%26autoplay=1',
-        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn:srf:video:abc%26autoplay=1',
+        id: 'urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1',
+        src: 'https://www.srf.ch/play/embed?urn=urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1',
+        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn%3Asrf%3Avideo%3Aabc%26autoplay%3D1',
         ratio: '16/9',
       }
 
@@ -172,9 +172,9 @@ describeForEachParser('srgplayEmbedResolver', (parseHtml) => {
         '<iframe src="https://www.srf.ch/play/tv/popupvideoplayer?id=abc%26autoplay%3D1"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'srgplay',
-        id: 'urn:srf:video:abc&autoplay=1',
-        src: 'https://www.srf.ch/play/embed?urn=urn:srf:video:abc%26autoplay=1',
-        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn:srf:video:abc%26autoplay=1',
+        id: 'urn:srf:video:abc%26autoplay%3D1',
+        src: 'https://www.srf.ch/play/embed?urn=urn:srf:video:abc%26autoplay%3D1',
+        url: 'https://www.srf.ch/play/tv/-/video/-?urn=urn:srf:video:abc%26autoplay%3D1',
         ratio: '16/9',
       }
 

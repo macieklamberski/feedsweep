@@ -111,9 +111,9 @@ describe('spreakerResolveEmbed', () => {
     const value = 'https://widget.spreaker.com/player?episode_id=57436547%26show_id%3D1433865'
     const expected: EmbedResolverResult = {
       provider: 'spreaker',
-      id: 'episode/57436547&show_id=1433865',
-      src: 'https://widget.spreaker.com/player?episode_id=57436547%26show_id=1433865',
-      url: 'https://www.spreaker.com/episode/57436547&show_id=1433865',
+      id: 'episode/57436547%26show_id%3D1433865',
+      src: 'https://widget.spreaker.com/player?episode_id=57436547%26show_id%3D1433865',
+      url: 'https://www.spreaker.com/episode/57436547%26show_id%3D1433865',
       height: 200,
     }
 

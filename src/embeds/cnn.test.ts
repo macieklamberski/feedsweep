@@ -119,9 +119,9 @@ describe('cnnResolveEmbed', () => {
         'https://fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick%26env%3Ddev.cnn'
       const expected: EmbedResolverResult = {
         provider: 'cnn',
-        id: 'arts/2018/07/09/spencer-tunick&env=dev.cnn',
-        src: 'https://fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick%26env=dev.cnn&customer=cnn&edition=domestic&env=prod',
-        url: 'https://www.cnn.com/videos/arts/2018/07/09/spencer-tunick&env=dev.cnn',
+        id: 'arts/2018/07/09/spencer-tunick%26env%3Ddev.cnn',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick%26env%3Ddev.cnn&customer=cnn&edition=domestic&env=prod',
+        url: 'https://www.cnn.com/videos/arts/2018/07/09/spencer-tunick%26env%3Ddev.cnn',
         ratio: '16/9',
         date: '2018-07-09',
       }

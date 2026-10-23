@@ -1,6 +1,6 @@
 import type { DomTransform } from '../../types.js'
 import { attr, getElementDimensions, parsePixelSize } from '../../utils/dom.js'
-import { parseUrlOnHosts } from '../../utils/urls.js'
+import { decodeQueryValue, parseUrlOnHosts, readQueryParam } from '../../utils/urls.js'
 import { createImage, createLinkedImage } from '../../utils/widgets.js'
 
 const hosts = ['tradingeconomics.com', 'd3fy651gv2fhd3.cloudfront.net']
@@ -12,7 +12,7 @@ export const convertTradingEconomicsEmbeds: DomTransform = () => (document) => {
   for (const iframe of document.querySelectorAll('iframe')) {
     const url = parseUrlOnHosts(attr(iframe, 'src'), hosts)
 
-    if (!url || !embedPathRegex.test(url.pathname) || !url.searchParams.get('s')) {
+    if (!url || !embedPathRegex.test(url.pathname) || !readQueryParam(url.search, 's')) {
       continue
     }
 
@@ -20,13 +20,13 @@ export const convertTradingEconomicsEmbeds: DomTransform = () => (document) => {
     // `&%23038;` between query pairs, which hides `h`, `w` and `ref` from Trading Economics.
     url.search = url.search.replaceAll('&%23038;', '&')
 
-    const ref = url.searchParams.get('ref')
+    const ref = decodeQueryValue(readQueryParam(url.search, 'ref'))
     const dimensions = getElementDimensions(iframe)
 
     const fields = {
       src: `https://tradingeconomics.com/charts/embed.png${url.search}`,
-      width: dimensions.width ?? parsePixelSize(url.searchParams.get('w')),
-      height: dimensions.height ?? parsePixelSize(url.searchParams.get('h')),
+      width: dimensions.width ?? parsePixelSize(readQueryParam(url.search, 'w')),
+      height: dimensions.height ?? parsePixelSize(readQueryParam(url.search, 'h')),
     }
 
     // `ref` is the path of the indicator's page. Without it the frame links only the home

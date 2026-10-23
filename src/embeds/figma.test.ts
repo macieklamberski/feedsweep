@@ -13,8 +13,8 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'figma',
         id: 'design/UBVMSTz7mhvYogjfdeKcIB',
-        src: 'https://embed.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0:2&embed-host=share',
-        url: 'https://www.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0:2',
+        src: 'https://embed.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0%3A2&embed-host=share',
+        url: 'https://www.figma.com/file/UBVMSTz7mhvYogjfdeKcIB/Red_System_Color-0725?node-id=0%3A2',
         ratio: '16/9',
       }
 
@@ -52,8 +52,8 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'figma',
         id: 'proto/LBH1O9AxQLxp0ixZBd1Pxk',
-        src: 'https://embed.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0:1&embed-host=share',
-        url: 'https://www.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0:1',
+        src: 'https://embed.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0%3A1&embed-host=share',
+        url: 'https://www.figma.com/proto/LBH1O9AxQLxp0ixZBd1Pxk/Untitled?node-id=4-144&page-id=0%3A1',
         ratio: '16/9',
       }
 
@@ -99,8 +99,8 @@ describeForEachParser('figmaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'figma',
         id: 'proto/zMOWWSHAvmHWuk5UqiOchl',
-        src: 'https://embed.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&starting-point-node-id=1:754&embed-host=share',
-        url: 'https://www.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&starting-point-node-id=1:754',
+        src: 'https://embed.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&starting-point-node-id=1%3A754&embed-host=share',
+        url: 'https://www.figma.com/proto/zMOWWSHAvmHWuk5UqiOchl/Kelpwatch.org?node-id=1-754&starting-point-node-id=1%3A754',
         ratio: '16/9',
       }
 

@@ -222,10 +222,10 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
         '<iframe src="https://ridewithgps.com/embeds?type=route&id=1%2F..%2F9"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
-        id: 'route/1%2F..%2F9',
-        src: 'https://ridewithgps.com/embeds?type=route&id=1/../9',
-        url: 'https://ridewithgps.com/routes/1%2F..%2F9',
-        thumbnail: 'https://ridewithgps.com/routes/1%2F..%2F9/thumb.png',
+        id: 'route/1%252F..%252F9',
+        src: 'https://ridewithgps.com/embeds?type=route&id=1%2F..%2F9',
+        url: 'https://ridewithgps.com/routes/1%252F..%252F9',
+        thumbnail: 'https://ridewithgps.com/routes/1%252F..%252F9/thumb.png',
         height: 700,
       }
 

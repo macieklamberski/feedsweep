@@ -21,6 +21,7 @@ export const placeholderBaseUrl = 'https://example.com'
 const urlShapeRegex = /[:/.]/
 const queryOrHashRegex = /[?#]/
 const pathSlashRunRegex = /^https?:\/\/[^/?#]+[^?#]*\/\//i
+const leadingQuestionMarkRegex = /^\?/
 
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
@@ -193,6 +194,35 @@ export const parseUrlOnHosts = (
   }
 }
 
+// A value `readQueryParam` returned, decoded the way `URLSearchParams` decodes it, for a check or a
+// lookup that compares it with a decoded word or parses it as a url.
+export const decodeQueryValue = (value: string | undefined): string | undefined => {
+  if (value === undefined) {
+    return
+  }
+
+  return new URLSearchParams(`v=${value}`).get('v') ?? undefined
+}
+
+// The first value named `name` in a query, as the carrier wrote it, so a `%2C` the feed encoded
+// reaches a composed query encoded once. The name is matched decoded. An empty value reads as none.
+export const readQueryParam = (query: string | undefined, name: string): string | undefined => {
+  for (const pair of (query ?? '').replace(leadingQuestionMarkRegex, '').split('&')) {
+    const separatorIndex = pair.indexOf('=')
+    const key = separatorIndex < 0 ? pair : pair.slice(0, separatorIndex)
+
+    if (decodeQueryValue(key) !== name) {
+      continue
+    }
+
+    if (separatorIndex < 0 || separatorIndex === pair.length - 1) {
+      return
+    }
+
+    return pair.slice(separatorIndex + 1)
+  }
+}
+
 // The same pick as `pickUrlParams`, for a query that arrives on its own, not on a url, which is
 // how a facade states its player options (`lite-youtube`'s `params`). Returns the pairs instead
 // of a string, so a caller can override one from a dedicated attribute before building.
@@ -200,11 +230,10 @@ export const pickQueryParams = (
   query: string,
   names: ReadonlyArray<string>,
 ): Record<string, string> => {
-  const parsed = new URLSearchParams(query)
   const picked: Record<string, string> = {}
 
   for (const name of names) {
-    const value = parsed.get(name)
+    const value = readQueryParam(query, name)
 
     if (value) {
       picked[name] = value

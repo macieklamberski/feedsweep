@@ -1,6 +1,6 @@
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, isFileName, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'youku'
@@ -26,9 +26,8 @@ const readVideoId = (url: string): string | undefined => {
   const parsed = parseUrlOnHosts(url, youkuHosts)
 
   if (parsed?.hostname === 'static.youku.com') {
-    const videoIds = parsed.searchParams.get('VideoIDS')
+    const videoIds = readQueryParam(parsed.search, 'VideoIDS')
 
-    // The query value comes out decoded, and it goes into the player path.
     return staticFlashPathRegex.test(parsed.pathname) && videoIds
       ? encodePathSegment(videoIds)
       : undefined

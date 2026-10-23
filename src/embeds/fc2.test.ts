@@ -529,9 +529,9 @@ describeForEachParser('fc2BlogScriptEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'fc2',
-        id: '2023%2F0116',
-        src: 'https://video.fc2.com/embed/player/2023%2F0116/',
-        url: 'https://video.fc2.com/content/2023%2F0116/',
+        id: '2023%252F0116',
+        src: 'https://video.fc2.com/embed/player/2023%252F0116/',
+        url: 'https://video.fc2.com/content/2023%252F0116/',
         ratio: '16/9',
       }
 
@@ -797,9 +797,9 @@ describeForEachParser('fc2FlashEmbedResolver', (parseHtml) => {
       const value = '<embed src="http://video.fc2.com/flv2.swf?i=2012%2F0101QN5FVkv4" />'
       const expected: EmbedResolverResult = {
         provider: 'fc2',
-        id: '2012%2F0101QN5FVkv4',
-        src: 'https://video.fc2.com/embed/player/2012%2F0101QN5FVkv4/',
-        url: 'https://video.fc2.com/content/2012%2F0101QN5FVkv4/',
+        id: '2012%252F0101QN5FVkv4',
+        src: 'https://video.fc2.com/embed/player/2012%252F0101QN5FVkv4/',
+        url: 'https://video.fc2.com/content/2012%252F0101QN5FVkv4/',
         ratio: '16/9',
       }
 

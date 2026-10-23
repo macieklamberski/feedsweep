@@ -371,7 +371,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
   })
 
   describe('set ids in a path', () => {
-    it('should keep a decoded set id in one path segment', async () => {
+    it('should keep an encoded set id in one path segment', async () => {
       const value = html`
         <iframe
           src="http://www.flickr.com/slideShow/index.gne?user_id=35408001@N04&amp;set_id=123%2F..%2F..%2Fphotos%2Fx"
@@ -381,9 +381,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: '35408001@N04/123/../../photos/x',
-        src: 'https://embedr.flickr.com/photosets/123%2F..%2F..%2Fphotos%2Fx?width=400&height=300',
-        url: 'https://www.flickr.com/photos/35408001@N04/sets/123%2F..%2F..%2Fphotos%2Fx',
+        id: '35408001@N04/123%2F..%2F..%2Fphotos%2Fx',
+        src: 'https://embedr.flickr.com/photosets/123%252F..%252F..%252Fphotos%252Fx?width=400&height=300',
+        url: 'https://www.flickr.com/photos/35408001@N04/sets/123%252F..%252F..%252Fphotos%252Fx',
         width: 400,
         height: 300,
       }
@@ -554,9 +554,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photostreams/17367418@N03 ',
-        src: 'https://embedr.flickr.com/photostreams/17367418@N03%20?width=400&height=300',
-        url: 'https://www.flickr.com/photos/17367418@N03%20/',
+        id: 'photostreams/17367418@N03%20',
+        src: 'https://embedr.flickr.com/photostreams/17367418@N03%2520?width=400&height=300',
+        url: 'https://www.flickr.com/photos/17367418@N03%2520/',
         width: 400,
         height: 300,
       }
@@ -1313,12 +1313,12 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         '<iframe src="https://www.flickr.com/slideShow/index.gne?user_id=%2Fbees"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photostreams//bees',
-        src: 'https://www.flickr.com/photos/%2Fbees/player?width=400&height=300',
-        url: 'https://www.flickr.com/photos/%2Fbees/',
+        id: 'photostreams/%2Fbees',
+        src: 'https://www.flickr.com/photos/%252Fbees/player?width=400&height=300',
+        url: 'https://www.flickr.com/photos/%252Fbees/',
         width: 400,
         height: 300,
-        author: '/bees',
+        author: '%2Fbees',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1329,12 +1329,12 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         '<iframe src="https://www.flickr.com/slideShow/index.gne?user_id=bees%2F..%2Fx"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photostreams/bees/../x',
-        src: 'https://www.flickr.com/photos/bees%2F..%2Fx/player?width=400&height=300',
-        url: 'https://www.flickr.com/photos/bees%2F..%2Fx/',
+        id: 'photostreams/bees%2F..%2Fx',
+        src: 'https://www.flickr.com/photos/bees%252F..%252Fx/player?width=400&height=300',
+        url: 'https://www.flickr.com/photos/bees%252F..%252Fx/',
         width: 400,
         height: 300,
-        author: 'bees/../x',
+        author: 'bees%2F..%2Fx',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1345,9 +1345,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         '<iframe src="https://www.flickr.com/slideShow/index.gne?group_id=..%2F797770@N21"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'groups/../797770@N21',
-        src: 'https://embedr.flickr.com/groups/../797770@N21?width=400&height=300',
-        url: 'https://www.flickr.com/groups/../797770@N21/',
+        id: 'groups/..%2F797770@N21',
+        src: 'https://embedr.flickr.com/groups/..%2F797770@N21?width=400&height=300',
+        url: 'https://www.flickr.com/groups/..%2F797770@N21/',
         width: 400,
         height: 300,
       }
@@ -1360,9 +1360,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         '<iframe src="https://www.flickr.com/slideShow/index.gne?group_id=797770@N21%2F.."></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'groups/797770@N21/..',
-        src: 'https://embedr.flickr.com/groups/797770@N21/..?width=400&height=300',
-        url: 'https://www.flickr.com/groups/797770@N21/../',
+        id: 'groups/797770@N21%2F..',
+        src: 'https://embedr.flickr.com/groups/797770@N21%2F..?width=400&height=300',
+        url: 'https://www.flickr.com/groups/797770@N21%2F../',
         width: 400,
         height: 300,
       }

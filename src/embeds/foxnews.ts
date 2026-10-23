@@ -1,7 +1,12 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  placeholderBaseUrl,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type FoxBrand = {
@@ -41,7 +46,6 @@ const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult => {
     provider: brand.provider,
     id,
     src: `https://${brand.playerHost}/v/video-embed.html${composeQuery({ video_id: id })}`,
-    // The id comes out of the query decoded, and it goes into a path.
     url: `https://${brand.pageHost}/video/${encodePathSegment(id)}`,
     ratio: playerRatio,
   }
@@ -58,7 +62,7 @@ export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const brand = foxBrands.find((brand) => brand.playerHost === parsed.hostname)
-  const id = parsed.searchParams.get('video_id') ?? parsed.searchParams.get('id')
+  const id = readQueryParam(parsed.search, 'video_id') ?? readQueryParam(parsed.search, 'id')
   const [route, page] = getPathSegments(parsed)
 
   if (!brand || route !== 'v' || (page !== 'embed.js' && page !== 'video-embed.html')) {

@@ -163,15 +163,15 @@ describe('kalturaResolveEmbed', () => {
       expect(kalturaResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep a decoded entry id carrying a separator in one thumbnail path segment', () => {
+    it('should keep an encoded entry id carrying a separator in one thumbnail path segment', () => {
       const value =
         'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bwzism%2F..%2F..%2Fx'
       const expected: EmbedResolverResult = {
         provider: 'kaltura',
-        id: '520801/1_w0bwzism/../../x',
-        src: 'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bwzism/../../x',
+        id: '520801/1_w0bwzism%2F..%2F..%2Fx',
+        src: 'https://cdnapisec.kaltura.com/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bwzism%2F..%2F..%2Fx',
         thumbnail:
-          'https://cdnapisec.kaltura.com/p/520801/thumbnail/entry_id/1_w0bwzism%2F..%2F..%2Fx/width/640',
+          'https://cdnapisec.kaltura.com/p/520801/thumbnail/entry_id/1_w0bwzism%252F..%252F..%252Fx/width/640',
         ratio: '16/9',
       }
 

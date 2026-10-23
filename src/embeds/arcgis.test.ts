@@ -406,9 +406,9 @@ describe('arcgisResolveEmbed', () => {
       const value = 'https://www.arcgis.com/apps/Embed/index.html?webmap=9b6a2497%26find%3Dx'
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
-        id: '9b6a2497&find=x',
-        src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=9b6a2497%26find=x',
-        url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497%26find=x',
+        id: '9b6a2497%26find%3dx',
+        src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=9b6a2497%26find%3Dx',
+        url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=9b6a2497%26find%3Dx',
         height: 500,
       }
 
@@ -433,7 +433,7 @@ describe('arcgisResolveEmbed', () => {
       const value = 'https://www.arcgis.com/apps/instant/basic/index.html?appid=6b81ccb1%23x'
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
-        id: '6b81ccb1#x',
+        id: '6b81ccb1%23x',
         src: 'https://www.arcgis.com/apps/instant/basic/index.html?appid=6b81ccb1%23x',
         url: 'https://www.arcgis.com/apps/instant/basic/index.html?appid=6b81ccb1%23x',
         height: 500,
@@ -446,7 +446,7 @@ describe('arcgisResolveEmbed', () => {
       const value = 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=02b63130%23x'
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
-        id: '02b63130#x',
+        id: '02b63130%23x',
         src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=02b63130%23x',
         url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=02b63130%23x',
         height: 500,

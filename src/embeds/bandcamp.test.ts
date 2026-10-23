@@ -439,14 +439,14 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should keep a decoded query id carrying a separator in one path segment', async () => {
+    it('should keep an encoded query id carrying a separator in one path segment', async () => {
       const value = html`
         <iframe src="https://bandcamp.com/EmbeddedPlayer/?album=123%2F..%2Fx"></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'bandcamp',
-        id: 'album/123/../x',
-        src: 'https://bandcamp.com/EmbeddedPlayer/album=123%2F..%2Fx/size=large/tracklist=false/artwork=small/',
+        id: 'album/123%2F..%2Fx',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=123%252F..%252Fx/size=large/tracklist=false/artwork=small/',
         height: 120,
       }
 

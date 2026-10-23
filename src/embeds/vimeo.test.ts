@@ -154,9 +154,9 @@ describe('extractVimeoId', () => {
 })
 
 describe('readVimeoEmbedSrc', () => {
-  it('should keep a decoded clip_id carrying a query in one path segment', () => {
+  it('should keep an encoded clip_id carrying a query in one path segment', () => {
     const value = 'http://vimeo.com/moogaloop.swf?clip_id=123%3Fautoplay%3D1%26muted%3D1'
-    const expected = 'https://player.vimeo.com/video/123%3Fautoplay=1&muted=1'
+    const expected = 'https://player.vimeo.com/video/123%253Fautoplay%253D1%2526muted%253D1'
 
     expect(readVimeoEmbedSrc(value)).toEqual(expected)
   })

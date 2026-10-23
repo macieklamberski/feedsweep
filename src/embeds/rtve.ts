@@ -1,7 +1,12 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  decodeQueryValue,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rtve'
@@ -81,8 +86,10 @@ const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   // The FLVPlayer names its asset only in the nielsen beacon, assetID::{id},title::{title}, and
   // says the asset is audio only through its config file.
   if (flvPlayerPathRegex.test(parsed.pathname)) {
-    const config = parsed.searchParams.get('config') ?? flashVar(element, 'config')
-    const nielsen = parsed.searchParams.get('nielsen') ?? flashVar(element, 'nielsen')
+    const config =
+      decodeQueryValue(readQueryParam(parsed.search, 'config')) ?? flashVar(element, 'config')
+    const nielsen =
+      decodeQueryValue(readQueryParam(parsed.search, 'nielsen')) ?? flashVar(element, 'nielsen')
     const id = nielsen?.match(nielsenAssetRegex)?.[1]
 
     if (!config || !audioConfigRegex.test(config) || !id) {
@@ -93,7 +100,7 @@ const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const asset =
-    parsed.searchParams.get('assetID') ??
+    readQueryParam(parsed.search, 'assetID') ??
     flashVar(element, 'assetID') ??
     parsed.pathname.match(flashEmbedPathRegex)?.[1]
   const match = asset?.match(flashAssetRegex)

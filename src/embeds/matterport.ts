@@ -6,6 +6,7 @@ import {
   encodePathSegment,
   pickQueryParams,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -26,7 +27,7 @@ const matterportResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const id = parsed.searchParams.get('m')
+  const id = readQueryParam(parsed.search, 'm')
 
   if (!id) {
     return

@@ -1,7 +1,7 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams, readQueryParam } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cognitoforms'
@@ -37,7 +37,7 @@ export const cognitoformsResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const [route, orgKey, pathNumber, ...rest] = getPathSegments(parsed)
-  const formNumber = pathNumber ?? parsed.searchParams.get('id')
+  const formNumber = pathNumber ?? readQueryParam(parsed.search, 'id')
 
   if (!isAnyOf(route, 'f') || !orgKey || !formNumber || rest.length > 0) {
     return

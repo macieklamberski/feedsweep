@@ -3,6 +3,7 @@ import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed }
 import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
 import {
   composeQuery,
+  decodeQueryValue,
   digitsRegex,
   encodePathSegment,
   flashFileRegex,
@@ -10,6 +11,7 @@ import {
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -171,7 +173,7 @@ const readReference = (link: string): VimeoReference | undefined => {
   }
 
   // The Flash player carried no id in the path at all: moogaloop.swf?clip_id={id}.
-  const clipId = url.searchParams.get('clip_id')
+  const clipId = readQueryParam(url.search, 'clip_id')
 
   if (clipId) {
     return { id: clipId }
@@ -212,7 +214,7 @@ const readReference = (link: string): VimeoReference | undefined => {
 
   // A feed that lost the `&` before the next parameter leaves it after a space. A hash is hex and
   // never holds one, so the cut repairs what the feed did.
-  const queryHash = url.searchParams.get('h')?.split(whitespaceRegex)[0]
+  const queryHash = decodeQueryValue(readQueryParam(url.search, 'h'))?.split(whitespaceRegex)[0]
 
   return {
     id,
@@ -280,7 +282,6 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const { id: videoId, hash } = reference
-  // A `clip_id` comes out of the query decoded, and it goes into a path.
   const segment = encodePathSegment(videoId)
   const title = element ? attr(element, 'title') : undefined
   const params = {

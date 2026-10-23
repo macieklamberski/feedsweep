@@ -18,6 +18,7 @@ import {
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -129,7 +130,9 @@ const extractDailymotionPlaylistId = (link: string): string | undefined => {
 
   const pathId = segments[marker] === 'playlist' ? segments[marker + 1] : undefined
   // The path id is decoded here, like the query one, so the url and the player encode it once.
-  const candidate = pathId ? (decodeSegment(pathId) ?? pathId) : url.searchParams.get('playlist')
+  const candidate = pathId
+    ? (decodeSegment(pathId) ?? pathId)
+    : readQueryParam(url.search, 'playlist')
   const [kind, widgetId] = readWidgetEntry(url)
 
   return [candidate, kind === 'playlist' ? widgetId : undefined].map(readId).find(Boolean)
@@ -168,7 +171,7 @@ export const extractDailymotionId = (link: string): string | undefined => {
   const widgetId = kind === 'vids' ? widgetIds?.split(' ')[0] : undefined
 
   // A path naming no video still leaves the geo player's `video` parameter to be read.
-  return [readPathId(url, getPathSegments(url)), url.searchParams.get('video'), widgetId]
+  return [readPathId(url, getPathSegments(url)), readQueryParam(url.search, 'video'), widgetId]
     .map(readId)
     .find(Boolean)
 }
@@ -216,7 +219,6 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
   const videoId = extractDailymotionId(url)
 
   if (videoId) {
-    // The geo player's `video` comes out of the query decoded, and it goes into two paths.
     const segment = encodePathSegment(videoId)
 
     return {
@@ -240,7 +242,6 @@ export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
       provider,
       id: `playlist/${playlistId}`,
       src: composeEmbedUrl('playlist', playlistId),
-      // The `playlist` parameter comes out of the query decoded, and it goes into a path.
       url: `https://www.dailymotion.com/playlist/${encodePathSegment(playlistId)}`,
       ratio: '16/9',
       title: attr(element, 'title'),

@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const podomaticHost = 'podomatic.com'
@@ -44,7 +44,7 @@ const readPlayer = (url: URL): Player | undefined => {
       return
     }
 
-    const episode = url.searchParams.get('episode_id') ?? ''
+    const episode = readQueryParam(url.search, 'episode_id') ?? ''
     const named = episode ? composeQuery({ episode_id: episode }) : ''
 
     return {

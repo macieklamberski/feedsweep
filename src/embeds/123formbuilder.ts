@@ -2,7 +2,7 @@ import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl, readQueryParam } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = '123formbuilder'
@@ -50,7 +50,10 @@ export const oneTwoThreeFormBuilderScriptEmbedResolver = createMarkupEmbedResolv
 
     // The loader writes nothing without `data-role="form"`, and `?type=lightbox` opens the form
     // in an overlay from a text link, which is chrome.
-    if (attr(element, 'data-role') !== 'form' || loader.searchParams.get('type') === 'lightbox') {
+    if (
+      attr(element, 'data-role') !== 'form' ||
+      readQueryParam(loader.search, 'type') === 'lightbox'
+    ) {
       return
     }
 

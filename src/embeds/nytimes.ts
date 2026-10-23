@@ -3,7 +3,7 @@ import { attr } from '../utils/dom.js'
 
 const provider = 'nytimes'
 
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `static01.nyt.com` is the static host, which 301s the player onto `www.nytimes.com`.
@@ -24,7 +24,7 @@ const footerHeight = 71
 // id answers 200 with the same 695 byte shell and renders "Video Data Failed to Load".
 export const nytimesResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, nytimesHosts)
-  const id = parsed?.searchParams.get('videoId')
+  const id = readQueryParam(parsed?.search, 'videoId')
 
   if (parsed?.pathname !== playerPath && parsed?.pathname !== legacyPlayerPath) {
     return

@@ -4,7 +4,13 @@ import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.j
 const provider = 'issuu'
 
 import { attr, flashVars } from '../utils/dom.js'
-import { composeQuery, encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  isFileName,
+  parseUrlOnHosts,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const issuuHosts = ['issuu.com']
@@ -143,9 +149,9 @@ const issuuResolveEmbed: ResolveEmbed = (url, element) => {
   const embed =
     composeConfigEmbed(parsed.hash.replace('#', '')) ??
     composeDocumentEmbed(
-      parsed.searchParams.get('u') ?? undefined,
-      parsed.searchParams.get('d') ?? undefined,
-      parsed.searchParams.get('p') ?? undefined,
+      readQueryParam(parsed.search, 'u') ?? undefined,
+      readQueryParam(parsed.search, 'd') ?? undefined,
+      readQueryParam(parsed.search, 'p') ?? undefined,
     )
 
   return embed && { ...embed, title }

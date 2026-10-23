@@ -1,7 +1,13 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  decodeQueryValue,
+  encodePathSegment,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'fc2'
@@ -44,20 +50,19 @@ const fc2FlashResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const videoId = parsed.searchParams.get('i')
+  const videoId = readQueryParam(parsed.search, 'i')
 
   if (!videoId) {
     return
   }
 
-  // The id comes out of the query decoded, and it goes into a path.
   const contentId = encodePathSegment(videoId)
 
-  const duration = Number(parsed.searchParams.get('d'))
+  const duration = Number(readQueryParam(parsed.search, 'd'))
 
   return {
     ...composeEmbed(contentId),
-    title: parsed.searchParams.get('tl') ?? undefined,
+    title: decodeQueryValue(readQueryParam(parsed.search, 'tl')) ?? undefined,
     duration: duration > 0 ? duration : undefined,
   }
 }
@@ -94,13 +99,12 @@ export const fc2BlogScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="admin.blog.fc2.com/fc2video2.php"]',
   (element) => {
     const loader = parseUrlOnHosts(attr(element, 'src'), 'admin.blog.fc2.com')
-    const videoId = loader?.searchParams.get('id')
+    const videoId = readQueryParam(loader?.search, 'id')
 
     if (!loader || !videoId) {
       return
     }
 
-    // The id comes out of the query decoded, and it goes into a path.
     const contentId = encodePathSegment(videoId)
 
     return composeEmbed(contentId)

@@ -2,7 +2,7 @@ import { decodeSegment, getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { composeQuery, isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, isMediaFile, placeholderBaseUrl, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podbean'
@@ -43,7 +43,7 @@ export const extractPodbeanId = (link: string): string | undefined => {
   }
 
   if (segments[0] === 'player-v2') {
-    return parsed.searchParams.get('i') ?? undefined
+    return readQueryParam(parsed.search, 'i') ?? undefined
   }
 }
 

@@ -3,8 +3,10 @@ import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import {
   alphanumericRegex,
   composeQuery,
+  decodeQueryValue,
   pickQueryParams,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -71,7 +73,10 @@ const resolveEmbed: ResolveEmbed = (url) => {
 
   if (segments.length === 1 && segments[0] === 'embed') {
     // The wrapper frames whatever its `url` names, so a value off figma is refused and never minted.
-    const wrapped = parseUrl(parsed.searchParams.get('url') ?? '', placeholderBaseUrl)
+    const wrapped = parseUrl(
+      decodeQueryValue(readQueryParam(parsed.search, 'url')) ?? '',
+      placeholderBaseUrl,
+    )
 
     if (!wrapped || !isHostOf(wrapped, figmaFileHosts)) {
       return

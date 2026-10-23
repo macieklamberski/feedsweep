@@ -1,7 +1,7 @@
 import { getPathSegments, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ausha'
@@ -32,8 +32,8 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // An episode and its show are often named together, and the episode is the finer of the two.
-  const podcast = parsed.searchParams.get('podcastId') ?? ''
-  const show = parsed.searchParams.get('showId') ?? ''
+  const podcast = readQueryParam(parsed.search, 'podcastId') ?? ''
+  const show = readQueryParam(parsed.search, 'showId') ?? ''
   const named = [
     ['podcast', podcast],
     ['show', show],
@@ -46,7 +46,7 @@ export const aushaResolveEmbed: ResolveEmbed = (url) => {
   const [kind, id] = named
 
   // The spelling Ausha's share dialog writes, with the start position the frame names.
-  const start = parsed.searchParams.get('t') ?? undefined
+  const start = readQueryParam(parsed.search, 't') ?? undefined
   const query = composeQuery(trimObject({ [`${kind}Id`]: id, v: '3', t: start }, Boolean))
 
   return {

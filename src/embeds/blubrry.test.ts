@@ -70,6 +70,19 @@ describe('blubrryResolveEmbed', () => {
     expect(blubrryResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should keep a media url the feed encoded twice as written', () => {
+    const value =
+      'https://player.blubrry.com/?media_url=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3%3Fcat%3DIAB1%252CIAB2'
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: 'https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3%3Fcat%3DIAB1%252CIAB2',
+      src: 'https://player.blubrry.com/?media_url=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3%3Fcat%3DIAB1%252CIAB2',
+      height: 164,
+    }
+
+    expect(blubrryResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should use an episode id that is not digits as written, even if the player answers an error', () => {
     const value = 'https://player.blubrry.com/id/abc123x/'
     const expected: EmbedResolverResult = {

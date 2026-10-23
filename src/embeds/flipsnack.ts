@@ -1,7 +1,7 @@
 import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery } from '../utils/urls.js'
+import { composeQuery, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flipsnack'
@@ -27,7 +27,7 @@ const decodePlayerHash = (hash: string): string | undefined => {
 }
 
 const readItemHash = (parsed: URL): string | undefined => {
-  const hash = parsed.searchParams.get('hash') ?? ''
+  const hash = readQueryParam(parsed.search, 'hash') ?? ''
 
   if (parsed.hostname === playerHost) {
     if (parsed.pathname !== '/') {

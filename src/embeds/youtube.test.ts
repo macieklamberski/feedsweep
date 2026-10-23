@@ -565,9 +565,9 @@ describe('youtubeResolveEmbed', () => {
       'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index%3D2'
     const expected: EmbedResolverResult = {
       provider: 'youtube',
-      id: 'playlist/PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf&index=2',
-      src: 'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index=2',
-      url: 'https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index=2',
+      id: 'playlist/PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index%3D2',
+      src: 'https://www.youtube.com/embed/videoseries?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index%3D2',
+      url: 'https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf%26index%3D2',
       ratio: '16/9',
     }
 
@@ -579,22 +579,22 @@ describe('youtubeResolveEmbed', () => {
       'https://www.youtube.com/embed/live_stream?channel=UCuAXFkgsw1L7xaCfnd5JJOw%26autoplay%3D1'
     const expected: EmbedResolverResult = {
       provider: 'youtube',
-      id: 'channel/UCuAXFkgsw1L7xaCfnd5JJOw&autoplay=1',
-      src: 'https://www.youtube.com/embed/live_stream?channel=UCuAXFkgsw1L7xaCfnd5JJOw%26autoplay=1',
-      url: 'https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw&autoplay=1',
+      id: 'channel/UCuAXFkgsw1L7xaCfnd5JJOw%26autoplay%3D1',
+      src: 'https://www.youtube.com/embed/live_stream?channel=UCuAXFkgsw1L7xaCfnd5JJOw%26autoplay%3D1',
+      url: 'https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw%2526autoplay%253D1',
       ratio: '16/9',
     }
 
     expect(youtubeResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should keep a decoded uploads username carrying a separator in one path segment', () => {
+  it('should keep an encoded uploads username carrying a separator in one path segment', () => {
     const value = 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser%2F..%2Fx'
     const expected: EmbedResolverResult = {
       provider: 'youtube',
-      id: 'user/SomeUser/../x',
-      src: 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser/../x',
-      url: 'https://www.youtube.com/user/SomeUser%2F..%2Fx',
+      id: 'user/SomeUser%2F..%2Fx',
+      src: 'https://www.youtube.com/embed?listType=user_uploads&list=SomeUser%2F..%2Fx',
+      url: 'https://www.youtube.com/user/SomeUser%252F..%252Fx',
       ratio: '16/9',
     }
 

@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const cspanHosts = ['c-span.org']
@@ -30,8 +30,7 @@ export const cspanResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const params = new URLSearchParams(pickQueryParams(parsed.search, ['start']))
-  const query = params.size ? `&${params}` : ''
+  const query = composeQuery(pickQueryParams(parsed.search, ['start'])).replace('?', '&')
 
   return {
     provider: 'cspan',

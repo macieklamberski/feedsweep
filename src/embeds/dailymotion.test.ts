@@ -376,27 +376,27 @@ describe('dailymotionResolveEmbed', () => {
     expect(dailymotionResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should keep a decoded video id carrying a separator in one path segment', () => {
+  it('should keep an encoded video id carrying a separator in one path segment', () => {
     const value = 'https://geo.dailymotion.com/player.html?video=x7tgad0%2F..%2Fx'
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
-      id: 'x7tgad0/../x',
-      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0/../x',
-      url: 'https://www.dailymotion.com/video/x7tgad0%2F..%2Fx',
-      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0%2F..%2Fx',
+      id: 'x7tgad0%2F..%2Fx',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?video=x7tgad0%2F..%2Fx',
+      url: 'https://www.dailymotion.com/video/x7tgad0%252F..%252Fx',
+      thumbnail: 'https://www.dailymotion.com/thumbnail/video/x7tgad0%252F..%252Fx',
       ratio: '16/9',
     }
 
     expect(dailymotionResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should keep a decoded playlist id carrying a separator in one path segment', () => {
+  it('should keep an encoded playlist id carrying a separator in one path segment', () => {
     const value = 'https://geo.dailymotion.com/player.html?playlist=x6zqmk%2F..%2Fx'
     const expected: EmbedResolverResult = {
       provider: 'dailymotion',
-      id: 'playlist/x6zqmk/../x',
-      src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x6zqmk/../x',
-      url: 'https://www.dailymotion.com/playlist/x6zqmk%2F..%2Fx',
+      id: 'playlist/x6zqmk%2F..%2Fx',
+      src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x6zqmk%2F..%2Fx',
+      url: 'https://www.dailymotion.com/playlist/x6zqmk%252F..%252Fx',
       ratio: '16/9',
     }
 

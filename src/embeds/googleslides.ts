@@ -1,6 +1,12 @@
 import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { composeQuery, encodePathSegment, pickQueryParams, pickUrlParams } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  pickQueryParams,
+  pickUrlParams,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
 
@@ -35,13 +41,12 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
   }
 
   if (segments[1] === 'embed') {
-    const fileId = parsed.searchParams.get('id')
+    const fileId = readQueryParam(parsed.search, 'id')
 
     if (!fileId) {
       return
     }
 
-    // The file id comes out of the query decoded, and it goes into a path.
     const deckPath = encodePathSegment(fileId)
 
     return {

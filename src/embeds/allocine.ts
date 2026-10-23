@@ -1,6 +1,6 @@
 import { isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'allocine'
@@ -19,7 +19,7 @@ const readCmedia = (parsed: URL): string | null | undefined => {
   }
 
   if (blogPlayerPathRegex.test(parsed.pathname)) {
-    return parsed.searchParams.get('cmedia')
+    return readQueryParam(parsed.search, 'cmedia')
   }
 
   return parsed.pathname.match(flashPlayerPathRegex)?.[1]

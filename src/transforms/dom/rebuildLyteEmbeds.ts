@@ -9,7 +9,12 @@ import {
   isText,
   isWhitespaceText,
 } from '../../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
+import {
+  decodeQueryValue,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+  readQueryParam,
+} from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 // In a feed the plugin writes no facade. It writes the thumbnail linked to the post, with
@@ -27,7 +32,7 @@ const readThumbnailVideoId = (src: string): string | undefined => {
   }
 
   const cachedUrl = url.pathname.endsWith('/lyteCache.php')
-    ? url.searchParams.get('origThumbUrl')
+    ? decodeQueryValue(readQueryParam(url.search, 'origThumbUrl'))
     : undefined
 
   if (cachedUrl) {

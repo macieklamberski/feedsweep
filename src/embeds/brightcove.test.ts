@@ -68,7 +68,7 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a decoded publisher id carrying a separator in one path segment', async () => {
+    it('should keep an encoded publisher id carrying a separator in one path segment', async () => {
       const value = html`
         <embed
           src="http://c.brightcove.com/services/viewer/federated_f9/1951?isVid=1&publisherID=1660%2F..%2F..%2F999"
@@ -77,8 +77,8 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
-        id: '1660/../../999/1952',
-        src: 'https://players.brightcove.net/1660%2F..%2F..%2F999/default_default/index.html?videoId=1952',
+        id: '1660%2F..%2F..%2F999/1952',
+        src: 'https://players.brightcove.net/1660%252F..%252F..%252F999/default_default/index.html?videoId=1952',
         ratio: '16/9',
       }
 

@@ -97,8 +97,8 @@ describe('learningappsResolveEmbed', () => {
       const value = 'https://learningapps.org/watch?app=abc%26v%3D1'
       const expected: EmbedResolverResult = {
         provider: 'learningapps',
-        id: 'abc&v=1',
-        src: 'https://learningapps.org/watch?app=abc%26v=1',
+        id: 'abc%26v%3D1',
+        src: 'https://learningapps.org/watch?app=abc%26v%3D1',
         height: 500,
       }
 

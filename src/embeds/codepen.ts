@@ -7,6 +7,7 @@ import {
   encodePathSegment,
   isFileName,
   placeholderBaseUrl,
+  readQueryParam,
   uuidRegex,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -100,8 +101,7 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   }
 
   const user = readUser(rawUser)
-  const queryToken = parsed.searchParams.get('token')
-  // A query token comes out decoded, and it goes into a path beside the raw path spelling.
+  const queryToken = readQueryParam(parsed.search, 'token')
   const token = pathToken ?? (queryToken ? encodePathSegment(queryToken) : undefined)
 
   return {
@@ -110,7 +110,7 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
     user,
     ownerPath: user && (isTeam ? `team/${user}` : user),
     playerOwner: isTeam ? `team/${rawUser}` : rawUser,
-    key: parsed.searchParams.get('key') ?? undefined,
+    key: readQueryParam(parsed.search, 'key') ?? undefined,
     token,
     isEditor: allSegments[0] === 'editor',
   }

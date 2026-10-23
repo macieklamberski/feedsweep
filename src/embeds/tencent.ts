@@ -1,5 +1,5 @@
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { composeQuery, isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, isFileName, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tencent'
@@ -28,7 +28,7 @@ const readVideoId = (url: string): string | undefined => {
     return
   }
 
-  const videoId = parsed.searchParams.get('vid')
+  const videoId = readQueryParam(parsed.search, 'vid')
 
   // Tencent serves video on the player host, so a file name in vid is an enclosure.
   if (!videoId || isFileName(videoId) || nonVideoWords.has(videoId)) {

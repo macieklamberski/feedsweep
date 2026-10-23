@@ -1,6 +1,6 @@
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'acuityscheduling'
@@ -19,7 +19,7 @@ const sizingMessageRegex = /^sizing:(\d+)$/
 // `/schedule/{hash}` path that only the server can derive from the owner.
 export const acuityschedulingResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, acuityschedulingHosts)
-  const owner = parsed?.searchParams.get('owner')
+  const owner = readQueryParam(parsed?.search, 'owner')
 
   if (parsed?.pathname !== '/schedule.php' || !owner) {
     return
@@ -27,7 +27,7 @@ export const acuityschedulingResolveEmbed: ResolveEmbed = (url) => {
 
   // The embed code repeats `owner`, and the first one is kept.
   const query = pickUrlParams(parsed.href, schedulerParams)
-  const appointmentType = parsed.searchParams.get('appointmentType')
+  const appointmentType = readQueryParam(parsed.search, 'appointmentType')
 
   return {
     provider,

@@ -1,7 +1,7 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'deezer'
@@ -46,8 +46,7 @@ type Resource = { type: string; id: string }
 const readResource = (url: URL): Resource | undefined => {
   const segments = getPathSegments(url)
   const route = localeRegex.test(segments[0] ?? '') ? segments.slice(1) : segments
-  // A query value comes out decoded, and the id goes into a path beside the raw path spellings.
-  const query = (name: string) => encodePathSegment(url.searchParams.get(name) ?? '')
+  const query = (name: string) => encodePathSegment(readQueryParam(url.search, name) ?? '')
 
   // The current widget, `widget.deezer.com/widget/{theme}/{type}/{id}`.
   if (route[0] === 'widget') {

@@ -1,6 +1,6 @@
 import { getPathSegments, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const nprHosts = ['www.npr.org']
@@ -55,8 +55,8 @@ export const nprResolveEmbed: ResolveEmbed = (url) => {
     const [storyName, mediaName] = videoRoute
 
     return composeVideoEmbed(
-      parsed.searchParams.get(storyName) ?? '',
-      parsed.searchParams.get(mediaName) ?? '',
+      readQueryParam(parsed.search, storyName) ?? '',
+      readQueryParam(parsed.search, mediaName) ?? '',
     )
   }
 

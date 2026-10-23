@@ -767,7 +767,7 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a decoded query token carrying a separator in one path segment', async () => {
+    it('should keep an encoded query token carrying a separator in one path segment', async () => {
       const value = html`
         <p
           class="codepen"
@@ -777,8 +777,8 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'OJYzQjN',
-        src: 'https://codepen.io/leaverou/embed/OJYzQjN/c8ec7595%2F..%2Fx',
-        url: 'https://codepen.io/leaverou/pen/OJYzQjN/c8ec7595%2F..%2Fx',
+        src: 'https://codepen.io/leaverou/embed/OJYzQjN/c8ec7595%252F..%252Fx',
+        url: 'https://codepen.io/leaverou/pen/OJYzQjN/c8ec7595%252F..%252Fx',
         thumbnail: 'https://shots.codepen.io/leaverou/pen/OJYzQjN-512.jpg',
         height: 300,
         author: '@leaverou',
@@ -1459,8 +1459,8 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'codepen',
         id: 'XJpKqXm',
-        src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc%26autoplay=1',
-        url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc%26autoplay=1',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm?key=abc%26autoplay%3D1',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm?key=abc%26autoplay%3D1',
         thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
         height: 300,
         author: '@argyleink',

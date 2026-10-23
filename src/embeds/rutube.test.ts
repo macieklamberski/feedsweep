@@ -173,9 +173,9 @@ describe('rutubeResolveEmbed', () => {
       const value = 'https://rutube.ru/pl/?pl_video=20a54e4a6f61441d808db45f823a7809%2Fadd'
       const expected: EmbedResolverResult = {
         provider: 'rutube',
-        id: '20a54e4a6f61441d808db45f823a7809/add',
-        src: 'https://rutube.ru/play/embed/20a54e4a6f61441d808db45f823a7809%2Fadd',
-        url: 'https://rutube.ru/video/20a54e4a6f61441d808db45f823a7809%2Fadd/',
+        id: '20a54e4a6f61441d808db45f823a7809%2Fadd',
+        src: 'https://rutube.ru/play/embed/20a54e4a6f61441d808db45f823a7809%252Fadd',
+        url: 'https://rutube.ru/video/20a54e4a6f61441d808db45f823a7809%252Fadd/',
         ratio: '16/9',
       }
 

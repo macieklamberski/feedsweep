@@ -1,6 +1,12 @@
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { encodePathSegment, hexRegex, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import {
+  encodePathSegment,
+  hexRegex,
+  parseUrlOnHosts,
+  pickUrlParams,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rutube'
@@ -15,7 +21,6 @@ const playlistPathRegex = /^\/pl\/?$/
 const rutubeEmbedParams = ['p', 't', 'stopTime']
 
 const composeEmbed = (videoId: string, parsed: URL): EmbedResolverResult => {
-  // A playlist's `pl_video` comes out of the query decoded, and it goes into a path.
   const segment = encodePathSegment(videoId)
 
   // rutube.ru/api/video/{id}/ answers key-free with the title, author, duration and a poster, 200
@@ -25,7 +30,7 @@ const composeEmbed = (videoId: string, parsed: URL): EmbedResolverResult => {
     provider,
     id: videoId,
     src: `https://rutube.ru/play/embed/${segment}${pickUrlParams(parsed.href, rutubeEmbedParams)}`,
-    url: parsed.searchParams.get('p') ? undefined : `https://rutube.ru/video/${segment}/`,
+    url: readQueryParam(parsed.search, 'p') ? undefined : `https://rutube.ru/video/${segment}/`,
     // The player fills its box, and Rutube's snippet and oEmbed size it 720 by 405.
     ratio: '16/9',
   }
@@ -41,7 +46,7 @@ export const rutubeResolveEmbed: ResolveEmbed = (url, element) => {
   // An id is a uuid with the dashes stripped, and the player still plays the all-digit ids the same
   // routes carried before.
   const videoId = playlistPathRegex.test(parsed.pathname)
-    ? parsed.searchParams.get('pl_video')
+    ? readQueryParam(parsed.search, 'pl_video')
     : keepIfMatches(parsed.pathname.match(embedPathRegex)?.[1], hexRegex)
 
   if (!videoId) {

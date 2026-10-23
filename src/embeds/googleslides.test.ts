@@ -241,9 +241,9 @@ describe('googleslidesResolveEmbed', () => {
         'https://docs.google.com/presentation/embed?id=1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx'
       const expected: EmbedResolverResult = {
         provider: 'googleslides',
-        id: '1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk/x',
-        src: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx/embed',
-        url: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx/pub',
+        id: '1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%2Fx',
+        src: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%252Fx/embed',
+        url: 'https://docs.google.com/presentation/d/1iIAxMLjeBLU436Mgy2owelpY9m8ZhwUd3u_2iVB27Kk%252Fx/pub',
         ratio: '480/299',
       }
 

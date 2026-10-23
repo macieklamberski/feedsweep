@@ -2,7 +2,12 @@ import { decodeSegment, isHostOf, type Nullish, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar, flashVars, keepIfMatches } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  digitsRegex,
+  encodePathSegment,
+  placeholderBaseUrl,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flickr'
@@ -183,12 +188,12 @@ const trailingSlashesRegex = /\/+$/
 const readLegacySubject = (parsed: URL): FlickrSubject => {
   // Some feeds end the set id with the `/` of a path. A set id never holds one, so the trim
   // repairs what the feed did.
-  const setId = parsed.searchParams.get('set_id')?.replace(trailingSlashesRegex, '')
+  const setId = readQueryParam(parsed.search, 'set_id')?.replace(trailingSlashesRegex, '')
 
   return {
     setId: setId || undefined,
-    owner: parsed.searchParams.get('user_id') ?? undefined,
-    groupId: parsed.searchParams.get('group_id') ?? undefined,
+    owner: readQueryParam(parsed.search, 'user_id') ?? undefined,
+    groupId: readQueryParam(parsed.search, 'group_id') ?? undefined,
   }
 }
 

@@ -1,7 +1,12 @@
 import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  encodePathSegment,
+  placeholderBaseUrl,
+  readQueryParam,
+} from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   embedCarrierSelector,
@@ -23,7 +28,7 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const asin = parsed.searchParams.get('asin')
+  const asin = readQueryParam(parsed.search, 'asin')
 
   if (!asin) {
     return
@@ -35,7 +40,6 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
     provider: 'kindle',
     id: `${parsed.hostname}/${asin}`,
     src: `https://${parsed.hostname}/kp/card${composeQuery({ asin })}`,
-    // The ASIN comes out of the query decoded, and it goes into a path.
     thumbnail: `https://m.media-amazon.com/images/P/${encodePathSegment(asin)}.01._SCLZZZZZZZ_.jpg`,
     height: 550,
     // The oEmbed writes the book's name here, never a player label.

@@ -7,6 +7,7 @@ import {
   isFileName,
   pickQueryParams,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -33,7 +34,7 @@ export const extractMegaphoneEmbed = (
   }
 
   for (const [param, { kind, height }] of Object.entries(embedKinds)) {
-    const id = parsed.searchParams.get(param)
+    const id = readQueryParam(parsed.search, param)
 
     if (!id) {
       continue

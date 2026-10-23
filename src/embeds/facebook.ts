@@ -2,7 +2,7 @@ import { coerceNumber, isHostOrSubdomainOf, type Nullish, parseUrl, trimObject }
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, flashVar, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, decodeQueryValue, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -123,7 +123,7 @@ const contentPathRegex = /^\/(?:reel\/[^/]+|[^/]+\/(?:posts|videos)\/[^/]+)/
 const watchPathRegex = /^\/watch\/?$/
 
 const isWatchPage = (url: URL): boolean => {
-  return watchPathRegex.test(url.pathname) && Boolean(url.searchParams.get('v'))
+  return watchPathRegex.test(url.pathname) && Boolean(readQueryParam(url.search, 'v'))
 }
 
 // A legacy player names only the video id, which the watch page plays.
@@ -143,7 +143,7 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
   }
 
   if (legacyVideoPathRegex.test(parsed.pathname)) {
-    const videoId = parsed.searchParams.get('video_id')
+    const videoId = readQueryParam(parsed.search, 'video_id')
 
     if (!videoId) {
       return
@@ -171,7 +171,7 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const href = parsed.searchParams.get('href') ?? undefined
+  const href = decodeQueryValue(readQueryParam(parsed.search, 'href')) ?? undefined
   const target = parseUrlOnHosts(href, facebookHosts)
 
   if (!href || !target) {
@@ -182,7 +182,7 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
   // the app id and a Graph API version in the path are the look.
   const plugin = parsed.pathname.endsWith('/video.php') ? 'video' : 'post'
 
-  return composePluginEmbed(plugin, href, {}, parsed.searchParams.get('t') ?? undefined)
+  return composePluginEmbed(plugin, href, {}, readQueryParam(parsed.search, 't') ?? undefined)
 }
 
 // Facebook's plugin iframe, or a pasted post, video or watch page, which x-frame-options blanks.

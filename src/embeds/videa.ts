@@ -1,7 +1,7 @@
 import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, pickQueryParams, placeholderBaseUrl, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'videa'
@@ -21,7 +21,7 @@ export const videaResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const id = parsed.searchParams.get('v')
+  const id = readQueryParam(parsed.search, 'v')
 
   if (!id) {
     return

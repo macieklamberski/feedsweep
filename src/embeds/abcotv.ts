@@ -1,6 +1,6 @@
 import { stripWww } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { composeQuery, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'abcotv'
@@ -29,7 +29,7 @@ export const abcotvResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const pid = parsed.searchParams.get('pid')
+  const pid = readQueryParam(parsed.search, 'pid')
 
   if (!pid) {
     return

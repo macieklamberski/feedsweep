@@ -1,7 +1,7 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The regional `video.corrieredelmezzogiorno.corriere.it` keeps its own videos, which
@@ -70,7 +70,7 @@ export const corriereResolveEmbed: ResolveEmbed = (url, element) => {
       return
     }
 
-    return readFeedVideo(parsed.searchParams.get('videoId') ?? undefined)
+    return readFeedVideo(readQueryParam(parsed.search, 'videoId') ?? undefined)
   }
 
   if (segments.length === 2) {

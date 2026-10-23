@@ -1,7 +1,7 @@
 import { getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { decodeQueryValue, placeholderBaseUrl, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'slideserve'
@@ -43,7 +43,7 @@ const readFlashId = (parsed: URL): string | undefined => {
     return
   }
 
-  const movie = parseOnHosts(parsed.searchParams.get('moviePath'))
+  const movie = parseOnHosts(decodeQueryValue(readQueryParam(parsed.search, 'moviePath')))
 
   return movie?.pathname.match(movieFileRegex)?.[1]
 }

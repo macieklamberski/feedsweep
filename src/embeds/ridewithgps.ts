@@ -2,9 +2,11 @@ import { decodeSegment, getPathSegments, parseUrl, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import {
   composeQuery,
+  decodeQueryValue,
   encodePathSegment,
   pickQueryParams,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -81,28 +83,28 @@ const composePrivateEmbed = (
 
 // `ridewithgps.com/embeds?type={route|trip|event}`, the id in the parameter its kind names.
 const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
-  const kind = parsed.searchParams.get('type') ?? ''
+  const kind = readQueryParam(parsed.search, 'type') ?? ''
   const shape = embedKinds.get(kind)
 
   if (parsed.pathname !== '/embeds' || !shape) {
     return
   }
 
-  const id = parsed.searchParams.get(shape.idParam)
+  const id = readQueryParam(parsed.search, shape.idParam)
 
   if (!id) {
     return
   }
 
   // `title` is the heading the player draws over the map in place of the route's own name.
-  const { title, ...playerParams } = pickQueryParams(parsed.search, embedParams)
+  const { title: heading, ...playerParams } = pickQueryParams(parsed.search, embedParams)
+  const title = decodeQueryValue(heading)
   const src = composeSource(kind, shape, id, playerParams)
 
   if (playerParams.privacyCode) {
     return composePrivateEmbed(kind, id, src, title)
   }
 
-  // The id comes out of the query decoded, and the page goes into a path beside the raw spelling.
   return composeEmbed(kind, shape, encodePathSegment(id), src, title)
 }
 

@@ -684,8 +684,8 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
         '<iframe src="https://embed.pixiv.net/fixed.php?id=149288339%2F..%2Fx"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'pixiv',
-        id: '149288339/../x',
-        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=149288339/../x',
+        id: '149288339%2F..%2Fx',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=149288339%2F..%2Fx',
         width: 600,
         height: 315,
       }

@@ -3,10 +3,12 @@ import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   absoluteUrlRegex,
+  decodeQueryValue,
   encodePathSegment,
   parseUrlOnHosts,
   pickUrlParams,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -62,7 +64,10 @@ export const cloudflarestreamResolveEmbed: ResolveEmbed = (url) => {
   const playerPath = isDelivery ? `/${videoId}` : `/${videoId}/iframe`
   const thumbnailHost = isDelivery ? deliveryThumbnailHost : parsed.hostname
   // A relative `poster` would resolve against the feed, not the player, so it is not read.
-  const poster = keepIfMatches(parsed.searchParams.get('poster'), absoluteUrlRegex)
+  const poster = keepIfMatches(
+    decodeQueryValue(readQueryParam(parsed.search, 'poster')),
+    absoluteUrlRegex,
+  )
 
   return {
     provider,
@@ -87,13 +92,12 @@ export const cloudflarestreamScriptEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     // The selector matches a substring any host can carry, so the host is checked here.
     const parsed = parseUrlOnHosts(attr(element, 'src'), cloudflarestreamHosts)
-    const videoId = parsed?.searchParams.get('video')
+    const videoId = readQueryParam(parsed?.search, 'video')
 
     if (!videoId) {
       return
     }
 
-    // The loader's `video` comes out of its query decoded, and it goes into a path.
     const segment = encodePathSegment(videoId)
 
     // The loader names no account, so the video is rebuilt on the shared host, which holds it

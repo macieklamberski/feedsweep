@@ -6,6 +6,7 @@ import {
   parseUrlOnHosts,
   pickUrlParams,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -61,7 +62,7 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
 
   const isPodcast = isHostOrSubdomainOf(parsed, applePodcastsHosts)
   const host = isPodcast ? 'podcasts.apple.com' : 'music.apple.com'
-  const trackId = parsed.searchParams.get('i') || undefined
+  const trackId = readQueryParam(parsed.search, 'i')
   const id = trackId ?? pathId.replace(podcastIdPrefixRegex, '')
   const query = trackId ? pickUrlParams(url, ['i']) : ''
 
@@ -155,7 +156,7 @@ export const appleToolsEmbedResolver = createUrlEmbedResolver(appleToolsHosts, (
 
   const [, kind, pathId] = match
 
-  const country = parsed?.searchParams.get('country')?.toLowerCase()
+  const country = readQueryParam(parsed?.search, 'country')?.toLowerCase()
   const storefront = country ? encodePathSegment(country) : undefined
   const modernUrl = `https://music.apple.com/${storefront ? `${storefront}/` : ''}${kind}/${pathId}`
 

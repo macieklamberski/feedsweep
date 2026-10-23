@@ -1,7 +1,13 @@
 import { getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, text } from '../utils/dom.js'
-import { composeQuery, isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  isFileName,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'soundcloud'
@@ -40,7 +46,7 @@ const readQueryToken = (
     return
   }
 
-  return parseUrl(inner, placeholderBaseUrl)?.searchParams.get('secret_token') ?? undefined
+  return readQueryParam(parseUrl(inner, placeholderBaseUrl)?.search, 'secret_token') ?? undefined
 }
 
 // spotlight and groups answer 410, but the platform still holds them and no track takes the slug.

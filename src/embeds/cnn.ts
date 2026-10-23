@@ -1,7 +1,7 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, placeholderBaseUrl, readQueryParam } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cnn'
@@ -56,7 +56,7 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (parsed?.pathname === '/v1/fav/') {
-    return resolveVideoId(parsed.searchParams.get('video'))
+    return resolveVideoId(readQueryParam(parsed.search, 'video'))
   }
 
   if (parsed?.pathname === '/video/api/embed.html') {
@@ -64,7 +64,7 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   }
 
   if (parsed?.pathname === '/video/savp/evp/') {
-    return resolveVideoId(parsed.searchParams.get('vid'))
+    return resolveVideoId(readQueryParam(parsed.search, 'vid'))
   }
 }
 
@@ -97,7 +97,7 @@ export const cnnFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  return resolveVideoId(parsed.searchParams.get('videoId') ?? flashVar(element, 'videoId'))
+  return resolveVideoId(readQueryParam(parsed.search, 'videoId') ?? flashVar(element, 'videoId'))
 }
 
 // CNN's Flash player swf as an <embed> or an <object>, which no browser runs today.
@@ -109,6 +109,6 @@ export const cnnScriptEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     const parsed = parseUrlOnHosts(attr(element, 'src'), cdnHosts)
 
-    return resolveVideoId(parsed?.searchParams.get('vid'))
+    return resolveVideoId(readQueryParam(parsed?.search, 'vid'))
   },
 )

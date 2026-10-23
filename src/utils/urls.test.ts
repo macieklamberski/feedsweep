@@ -3,12 +3,14 @@ import { baseContext } from '../tests.js'
 import {
   cleanUrl,
   composeQuery,
+  decodeQueryValue,
   dropUrlParams,
   encodePathSegment,
   filterUrlQuery,
   parseUrlOnHosts,
   pickQueryParams,
   pickUrlParams,
+  readQueryParam,
   resolveOrDropUrl,
   resolveOrKeepUrl,
 } from './urls.js'
@@ -203,11 +205,9 @@ describe('pickQueryParams', () => {
     expect(pickQueryParams('start=', ['start'])).toEqual({})
   })
 
-  // The query arrives from an attribute, so it may carry the punctuation a url would have
-  // percent-encoded; `URLSearchParams` decodes it the same way either way.
-  it('should decode a value that arrived encoded', () => {
+  it('should keep a value that arrived encoded as written', () => {
     const value = 'clipt=a%2Bb%2Fc'
-    const expected = { clipt: 'a+b/c' }
+    const expected = { clipt: 'a%2Bb%2Fc' }
 
     expect(pickQueryParams(value, ['clipt'])).toEqual(expected)
   })
@@ -406,10 +406,72 @@ describe('pickUrlParams', () => {
     expect(pickUrlParams('//example.com/e/x?start=90', ['start'])).toBe('')
   })
 
-  it('should write a decoded plus sign and slash back bare', () => {
+  it('should write an encoded plus sign and slash back encoded', () => {
     const value = 'https://example.com/e/x?clipt=a%2Bb%2Fc'
-    const expected = '?clipt=a+b/c'
+    const expected = '?clipt=a%2Bb%2Fc'
 
     expect(pickUrlParams(value, ['clipt'])).toBe(expected)
+  })
+
+  it('should write an encoded percent sign back encoded', () => {
+    const value = 'https://example.com/e/x?media_url=https%3A%2F%2Fexample.com%2Fa%252Cb.mp3'
+    const expected = '?media_url=https%3A%2F%2Fexample.com%2Fa%252Cb.mp3'
+
+    expect(pickUrlParams(value, ['media_url'])).toBe(expected)
+  })
+})
+
+describe('readQueryParam', () => {
+  it('should return the value as written', () => {
+    const value = '?media_url=https%3A%2F%2Fexample.com%2Fa%252Cb.mp3&modern=1'
+    const expected = 'https%3A%2F%2Fexample.com%2Fa%252Cb.mp3'
+
+    expect(readQueryParam(value, 'media_url')).toBe(expected)
+  })
+
+  it('should keep a plus sign as written', () => {
+    expect(readQueryParam('q=a+b', 'q')).toBe('a+b')
+  })
+
+  it('should match a name the query encoded', () => {
+    expect(readQueryParam('?%40videoPlayer=123', '@videoPlayer')).toBe('123')
+  })
+
+  it('should take the first of a repeated parameter', () => {
+    expect(readQueryParam('start=10&start=90', 'start')).toBe('10')
+  })
+
+  it('should skip one leading question mark only', () => {
+    expect(readQueryParam('??list=PLabc', 'list')).toBeUndefined()
+  })
+
+  it('should keep an equals sign inside the value', () => {
+    expect(readQueryParam('?token=abc==', 'token')).toBe('abc==')
+  })
+
+  it('should return undefined for an empty value', () => {
+    expect(readQueryParam('?start=&list=PLabc', 'start')).toBeUndefined()
+  })
+
+  it('should return undefined for a name with no value', () => {
+    expect(readQueryParam('?start&list=PLabc', 'start')).toBeUndefined()
+  })
+
+  it('should return undefined for a missing parameter', () => {
+    expect(readQueryParam('?list=PLabc', 'start')).toBeUndefined()
+  })
+
+  it('should return undefined for no query', () => {
+    expect(readQueryParam(undefined, 'start')).toBeUndefined()
+  })
+})
+
+describe('decodeQueryValue', () => {
+  it('should decode percent escapes and a plus sign', () => {
+    expect(decodeQueryValue('https%3A%2F%2Fexample.com%2Fa+b')).toBe('https://example.com/a b')
+  })
+
+  it('should return undefined for no value', () => {
+    expect(decodeQueryValue(undefined)).toBeUndefined()
   })
 })

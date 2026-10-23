@@ -1,6 +1,12 @@
 import { isHostOrSubdomainOf, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import {
+  composeQuery,
+  decodeQueryValue,
+  parseUrlOnHosts,
+  pickQueryParams,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'srgplay'
@@ -38,17 +44,18 @@ const readBusinessUnit = (parsed: URL): string | undefined => {
   }
 }
 
-const composeEmbed = (urn: string | null, search: string): EmbedResolverResult | undefined => {
-  const unit = urn?.match(urnUnitRegex)?.[1]
+const composeEmbed = (urn: string | undefined, search: string): EmbedResolverResult | undefined => {
+  const decodedUrn = decodeQueryValue(urn)
+  const unit = decodedUrn?.match(urnUnitRegex)?.[1]
   const host = unit && playerHosts.get(unit)
 
-  if (!urn || !host) {
+  if (!urn || !decodedUrn || !host) {
     return
   }
 
   // `/play/tv/-/video/-` redirects onto the slugged page and answers 404 for a urn naming nothing.
   // The route spells the medium, so an audio urn needs one this platform has not been measured on.
-  const page = urn.includes(':video:')
+  const page = decodedUrn.includes(':video:')
     ? `https://www.${host}/play/tv/-/video/-${composeQuery({ urn })}`
     : undefined
   const query = composeQuery({ urn, ...pickQueryParams(search, srgplayEmbedParams) })
@@ -72,7 +79,7 @@ const srgplayResolveEmbed: ResolveEmbed = (url) => {
   }
 
   if (urnPlayerPathRegex.test(parsed.pathname)) {
-    return composeEmbed(parsed.searchParams.get('urn'), parsed.search)
+    return composeEmbed(readQueryParam(parsed.search, 'urn'), parsed.search)
   }
 
   const isRetired = retiredPlayerPathRegex.test(parsed.pathname)
@@ -81,7 +88,7 @@ const srgplayResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const mediaId = parsed.searchParams.get('id')
+  const mediaId = readQueryParam(parsed.search, 'id')
 
   if (!mediaId) {
     return

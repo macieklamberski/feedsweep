@@ -1,7 +1,7 @@
 import { decodeSegment, getPathSegments } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { composeQuery, parseUrlOnHosts, pickUrlParams, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'googledrive'
@@ -25,7 +25,7 @@ const readFileId = (
   }
 
   if (isAudio && segments.length === 1 && segments[0] === 'open') {
-    return parseUrlOnHosts(url, 'drive.google.com')?.searchParams.get('id') ?? undefined
+    return readQueryParam(parseUrlOnHosts(url, 'drive.google.com')?.search, 'id') ?? undefined
   }
 }
 

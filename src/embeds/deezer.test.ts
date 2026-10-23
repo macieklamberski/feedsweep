@@ -86,13 +86,13 @@ describe('deezerResolveEmbed', () => {
       expect(deezerResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep a decoded plugin id carrying a separator in one path segment', () => {
+    it('should keep an encoded plugin id carrying a separator in one path segment', () => {
       const value = 'https://www.deezer.com/plugins/player?type=album&id=75337%2F..%2F1&app_id=1'
       const expected: EmbedResolverResult = {
         provider: 'deezer',
-        id: 'album/75337%2F..%2F1',
-        src: 'https://widget.deezer.com/widget/dark/album/75337%2F..%2F1',
-        url: 'https://www.deezer.com/album/75337%2F..%2F1',
+        id: 'album/75337%252F..%252F1',
+        src: 'https://widget.deezer.com/widget/dark/album/75337%252F..%252F1',
+        url: 'https://www.deezer.com/album/75337%252F..%252F1',
         height: 300,
       }
 

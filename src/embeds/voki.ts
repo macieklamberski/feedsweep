@@ -1,6 +1,11 @@
 import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  decodeQueryValue,
+  placeholderBaseUrl,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'voki'
@@ -40,7 +45,8 @@ const vokiFlashResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // The scene url ends in `getvoki/chsm={chsm}&sc={sc}`, its `&` kept as `%26` inside `doc`.
-  const [route, scene] = parsed.searchParams.get('doc')?.split('/').slice(-2) ?? []
+  const [route, scene] =
+    decodeQueryValue(readQueryParam(parsed.search, 'doc'))?.split('/').slice(-2) ?? []
   const params = new URLSearchParams(scene)
   const sc = params.get('sc')
   const chsm = params.get('chsm')
@@ -64,8 +70,8 @@ const vokiResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const sc = parsed.searchParams.get('scid')
-  const chsm = parsed.searchParams.get('chsm')
+  const sc = readQueryParam(parsed.search, 'scid')
+  const chsm = readQueryParam(parsed.search, 'chsm')
 
   if (!sc || !chsm) {
     return

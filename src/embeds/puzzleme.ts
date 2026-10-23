@@ -1,7 +1,7 @@
 import { isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, isEmptyElement } from '../utils/dom.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, placeholderBaseUrl, readQueryParam } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'puzzleme'
@@ -39,8 +39,8 @@ const puzzlemeResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const kind = parsed.pathname.match(playerPathRegex)?.[1]
-  const id = parsed.searchParams.get('id')
-  const set = parsed.searchParams.get('set')
+  const id = readQueryParam(parsed.search, 'id')
+  const set = readQueryParam(parsed.search, 'set')
 
   if (!kind || !id || !set) {
     return

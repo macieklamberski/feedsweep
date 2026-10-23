@@ -1,7 +1,12 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  decodeQueryValue,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'arte'
@@ -25,7 +30,10 @@ const readProgram = (language: string | undefined, id: string | undefined): Prog
 // {lang}/{id}`, which names the program. Older `json_url`s pointed at ARTE Concert's own player
 // and at a `papi` guide feed, both gone with no program id to carry over.
 const readLegacyProgram = (parsed: URL): Program | undefined => {
-  const config = parseUrlOnHosts(parsed.searchParams.get('json_url') ?? '', ['api.arte.tv'])
+  const config = parseUrlOnHosts(
+    decodeQueryValue(readQueryParam(parsed.search, 'json_url')) ?? '',
+    ['api.arte.tv'],
+  )
 
   if (!config) {
     return

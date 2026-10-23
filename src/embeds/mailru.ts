@@ -2,7 +2,12 @@ import { isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  decodeQueryValue,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+  readQueryParam,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mailru'
@@ -71,13 +76,17 @@ const resolveTarget = (url: string, element?: Element): EmbedResolverResult | un
       return
     }
 
-    const movieSrc = parsed.searchParams.get('movieSrc') ?? flashVar(element, 'movieSrc')
+    const movieSrc =
+      decodeQueryValue(readQueryParam(parsed.search, 'movieSrc')) ?? flashVar(element, 'movieSrc')
 
     if (movieSrc) {
       return composeSubject(movieSrc)
     }
 
-    const parPath = parseUrl(parsed.searchParams.get('par') ?? '', placeholderBaseUrl)?.pathname
+    const parPath = parseUrl(
+      decodeQueryValue(readQueryParam(parsed.search, 'par')) ?? '',
+      placeholderBaseUrl,
+    )?.pathname
     const par = parPath?.match(flashParPathRegex)
 
     return par ? composeSubject(`${par[1]}/${par[2]}`) : undefined
@@ -101,7 +110,9 @@ const resolveTarget = (url: string, element?: Element): EmbedResolverResult | un
 }
 
 const readPreviewVideoId = (thumbnail: string | undefined): string | undefined => {
-  const previewUrl = parseUrl(thumbnail ?? '', placeholderBaseUrl)?.searchParams.get('url')
+  const previewUrl = decodeQueryValue(
+    readQueryParam(parseUrl(thumbnail ?? '', placeholderBaseUrl)?.search, 'url'),
+  )
 
   return parseUrl(previewUrl ?? '', placeholderBaseUrl)?.pathname.match(previewVideoIdRegex)?.[1]
 }

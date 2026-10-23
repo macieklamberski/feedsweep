@@ -1,6 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { filterUrlQuery, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'reverbnation'
@@ -47,7 +47,7 @@ const readFlashId = (url: URL): string | undefined => {
   }
 
   for (const name of flashIdParams) {
-    const id = url.searchParams.get(name)
+    const id = readQueryParam(url.search, name)
 
     if (id) {
       return id

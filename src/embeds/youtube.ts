@@ -3,10 +3,12 @@ import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed }
 import { attr } from '../utils/dom.js'
 import {
   composeQuery,
+  decodeQueryValue,
   encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -15,8 +17,7 @@ const provider = 'youtube'
 const safeVideoIdRegex = /^[a-zA-Z0-9_-]{11}$/
 
 // Steam feeds leak a bbcode quote into the src as /embed/"{id}, and the video drops without it.
-// The quote reaches the id as a literal `"` from a param or percent-encoded `%22` from a path
-// segment.
+// The quote reaches the id as a literal `"` or percent-encoded as `%22`.
 const strayLeadingQuoteRegex = /^(?:%22|")/
 
 // `videoseries` and `live_stream` are YouTube embed path words, and each is eleven legal id
@@ -103,7 +104,7 @@ export const extractVideoId = (link: string): string | undefined => {
 
   const candidates = [
     readPathId(url),
-    ...queryIdParams.map((param) => url.searchParams.get(param)),
+    ...queryIdParams.map((param) => readQueryParam(url.search, param)),
     url.hash.match(hashbangIdRegex)?.[1],
     url.hash.match(gridFragmentIdRegex)?.[1],
   ]
@@ -206,7 +207,6 @@ const composeUploadsEmbed = (user: string): EmbedResolverResult => {
     provider,
     id: `user/${user}`,
     src: `https://www.youtube.com/embed${composeQuery({ listType: 'user_uploads', list: user })}`,
-    // The username comes out of the query decoded, and it goes into a path.
     url: `https://www.youtube.com/user/${encodePathSegment(user)}`,
     ratio: playerRatio,
   }
@@ -227,7 +227,7 @@ const composeVideoEmbed = (
 }
 
 // `segment` is the channel as the page path takes it: AMP's attribute goes in as written, and a
-// query value comes out decoded, so its caller encodes it.
+// query value is escaped by its caller.
 const composeChannelEmbed = (channel: string, segment = channel): EmbedResolverResult => {
   return {
     provider,
@@ -242,9 +242,9 @@ const resolveCollectionEmbed = (
   parsed: URL,
   segments: Array<string>,
 ): EmbedResolverResult | undefined => {
-  const listType = parsed.searchParams.get('listType')
-  const list = parsed.searchParams.get('list')
-  const channel = parsed.searchParams.get('channel')
+  const listType = readQueryParam(parsed.search, 'listType')
+  const list = readQueryParam(parsed.search, 'list')
+  const channel = readQueryParam(parsed.search, 'channel')
 
   if (segments[1] === 'live_stream') {
     return channel ? composeChannelEmbed(channel, encodePathSegment(channel)) : undefined
@@ -282,7 +282,7 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   // The playlist page refuses framing, so a frame of it shows nothing, and its `list` is the id
   // the playlist player takes.
   if (segments[0] === 'playlist') {
-    const list = parsed?.searchParams.get('list')
+    const list = readQueryParam(parsed?.search, 'list')
 
     if (!list) {
       return
@@ -329,13 +329,13 @@ export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
     }
 
     // FC2's iframe snippet also carries the id as `data-id`, which the shell never reads.
-    const videoId = [parsed.searchParams.get('id'), attr(element, 'data-id')].find(Boolean)
+    const videoId = [readQueryParam(parsed.search, 'id'), attr(element, 'data-id')].find(Boolean)
 
     if (!videoId) {
       return
     }
 
-    const title = parsed.searchParams.get('title')
+    const title = decodeQueryValue(readQueryParam(parsed.search, 'title'))
 
     return {
       ...composeVideoEmbed(videoId),

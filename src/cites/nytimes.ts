@@ -2,7 +2,12 @@ import { parseUrl } from 'trousse'
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr } from '../utils/dom.js'
-import { absoluteUrlRegex, parseUrlOnHosts } from '../utils/urls.js'
+import {
+  absoluteUrlRegex,
+  decodeQueryValue,
+  parseUrlOnHosts,
+  readQueryParam,
+} from '../utils/urls.js'
 
 const cardHost = 'nytimes.com'
 const cardPath = '/svc/oembed/html/'
@@ -21,7 +26,7 @@ export const nytimesCiteResolver: CiteResolver = {
       return
     }
 
-    const article = card.searchParams.get('url') || undefined
+    const article = decodeQueryValue(readQueryParam(card.search, 'url'))
     let url = article
 
     // A bare path names a page on nytimes.com, the host of the card itself, not on the feed's host.

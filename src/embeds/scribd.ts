@@ -7,6 +7,7 @@ import {
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
+  readQueryParam,
 } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -83,7 +84,7 @@ export const scribdFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const document = parsed.searchParams.get('document_id') ?? flashVar(element, 'document_id')
+  const document = readQueryParam(parsed.search, 'document_id') ?? flashVar(element, 'document_id')
 
   if (!document) {
     return

@@ -1,7 +1,7 @@
 import { getPathSegments } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { paramValue } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { decodeQueryValue, parseUrlOnHosts, readQueryParam } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
 const podbeanHosts = ['podbean.com']
@@ -30,7 +30,7 @@ export const podbeanFlashMediaResolver: MediaResolver = {
       return
     }
 
-    const src = player.searchParams.get('audioPath')
+    const src = decodeQueryValue(readQueryParam(player.search, 'audioPath'))
 
     if (!src) {
       return

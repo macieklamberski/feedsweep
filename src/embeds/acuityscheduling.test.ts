@@ -53,7 +53,7 @@ describe('acuityschedulingResolveEmbed', () => {
         'https://app.acuityscheduling.com/schedule.php?owner=13689466&appointmentType=category:Campfire%20Mini%20Sessions'
       const expected: EmbedResolverResult = {
         provider: 'acuityscheduling',
-        id: '13689466/category:Campfire Mini Sessions',
+        id: '13689466/category:Campfire%20Mini%20Sessions',
         src: 'https://app.acuityscheduling.com/schedule.php?owner=13689466&appointmentType=category:Campfire%20Mini%20Sessions',
         url: 'https://app.acuityscheduling.com/schedule.php?owner=13689466&appointmentType=category:Campfire%20Mini%20Sessions',
       }
