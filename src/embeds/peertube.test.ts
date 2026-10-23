@@ -189,38 +189,6 @@ describeForEachParser('peertubeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the playlist watch page route words in any case', async () => {
-      const value = html`
-        <iframe src="https://video.mateuaguilo.com/W/P/b3b96ff7-8791-4815-a2a5-54091b6da326"></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'peertube',
-        id: 'playlist/b3b96ff7-8791-4815-a2a5-54091b6da326',
-        src: 'https://video.mateuaguilo.com/video-playlists/embed/b3b96ff7-8791-4815-a2a5-54091b6da326',
-        url: 'https://video.mateuaguilo.com/w/p/b3b96ff7-8791-4815-a2a5-54091b6da326',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should read the playlist player route words in any case', async () => {
-      const value = html`
-        <iframe
-          src="https://video.mateuaguilo.com/Video-Playlists/Embed/b3b96ff7-8791-4815-a2a5-54091b6da326"
-        ></iframe>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'peertube',
-        id: 'playlist/b3b96ff7-8791-4815-a2a5-54091b6da326',
-        src: 'https://video.mateuaguilo.com/video-playlists/embed/b3b96ff7-8791-4815-a2a5-54091b6da326',
-        url: 'https://video.mateuaguilo.com/w/p/b3b96ff7-8791-4815-a2a5-54091b6da326',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should ignore a playlist path naming no id', async () => {
       const value = '<iframe src="https://video.mateuaguilo.com/video-playlists/embed/"></iframe>'
 

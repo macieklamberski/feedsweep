@@ -8,30 +8,17 @@ const viewerRatio = '300/194'
 const libraryRowHeight = 185
 const libraryPathRegex = /^\/library\/?$/i
 
-// The viewer and the library widget read every query name in any case.
-const lowercaseNames = (params: URLSearchParams): URLSearchParams => {
-  const namedParams = new URLSearchParams()
-
-  for (const [name, value] of params) {
-    namedParams.append(name.toLowerCase(), value)
-  }
-
-  return namedParams
-}
-
 // The account library widget, `v.calameo.com/library/?type=account&id={account}&rows={rows}`,
 // draws its shelves 185 pixels a row at its default thumbnail size. It reads `rows` with
 // `parseInt`, and a count below one fills the frame, which at that height is one row.
 const resolveLibrary = (url: URL): EmbedResolverResult | undefined => {
-  const params = lowercaseNames(url.searchParams)
-  const accountId = params.get('id')
+  const accountId = url.searchParams.get('id')
 
-  // The widget answers "Unknown type" to `ACCOUNT`.
-  if (params.get('type')?.toLowerCase() !== 'account' || !accountId) {
+  if (url.searchParams.get('type') !== 'account' || !accountId) {
     return
   }
 
-  const rows = params.get('rows') ?? undefined
+  const rows = url.searchParams.get('rows') ?? undefined
   const rowCount = Number.parseInt(rows ?? '', 10)
   const query = composeQuery(trimObject({ type: 'account', id: accountId, rows }, Boolean))
 
@@ -62,8 +49,14 @@ export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  // The Flash players wrote a private publication's token as `AuthID`.
-  const namedParams = lowercaseNames(params)
+  // The viewer reads every name in any case, and the Flash players wrote a private publication's
+  // token as `AuthID`.
+  const namedParams = new URLSearchParams()
+
+  for (const [name, value] of params) {
+    namedParams.append(name.toLowerCase(), value)
+  }
+
   const authId = namedParams.get('authid') ?? undefined
   // The page the viewer opens on.
   const page = namedParams.get('page') ?? undefined

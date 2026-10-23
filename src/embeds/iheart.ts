@@ -39,12 +39,11 @@ export const iheartResolveEmbed: ResolveEmbed = (url, element) => {
   const station = pathname.match(stationPathRegex)?.groups
 
   if (station?.kind && station.id) {
-    const kind = station.kind.toLowerCase()
-    const page = `https://www.iheart.com/${kind}/${station.id}/`
+    const page = `https://www.iheart.com/${station.kind}/${station.id}/`
 
     return {
       provider,
-      id: `${kind}/${station.id}`,
+      id: `${station.kind}/${station.id}`,
       src: `${page}?embed=true`,
       url: page,
       height: playerHeights.station,

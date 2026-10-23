@@ -6,7 +6,6 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `bbc.co.uk` 301s every player route onto `bbc.com`.
 const bbcHosts = ['bbc.com', 'bbc.co.uk']
-const bbcImageHosts = ['bbcimg.co.uk']
 
 // A programme id: eight letters and digits with at least one digit. Where no route fixes its slot,
 // the shape keeps `articles` and the playlist route word `index` out.
@@ -63,11 +62,9 @@ const readNewsFlash = (element: Element | undefined): EmbedResolverResult | unde
     return
   }
 
-  const holdingImage = flashVar(element, 'holdingImage')
-
   return {
     ...composeNewsEmbed(article, pid),
-    thumbnail: parseUrlOnHosts(holdingImage, bbcImageHosts) ? holdingImage : undefined,
+    thumbnail: flashVar(element, 'holdingImage'),
   }
 }
 

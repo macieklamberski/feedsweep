@@ -113,19 +113,6 @@ describe('iheartResolveEmbed', () => {
 
       expect(iheartResolveEmbed(value)).toEqual(expected)
     })
-
-    it('should write a station route word read in another case in the server case', () => {
-      const value = 'https://www.iheart.com/Live/pride-radio-3949/?embed=true'
-      const expected: EmbedResolverResult = {
-        provider: 'iheart',
-        id: 'live/3949',
-        src: 'https://www.iheart.com/live/3949/?embed=true',
-        url: 'https://www.iheart.com/live/3949/',
-        height: 200,
-      }
-
-      expect(iheartResolveEmbed(value)).toEqual(expected)
-    })
   })
 
   describe('sad paths', () => {

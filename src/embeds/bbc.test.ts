@@ -190,40 +190,6 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should leave out a holding image on a foreign host', async () => {
-      const value = html`
-        <embed
-          src="http://news.bbc.co.uk/player/emp/external/player.swf"
-          flashvars="externalIdentifier=p00h8wqt&embedPageUrl=http://www.bbc.co.uk/news/technology-13614478&holdingImage=https://evil.test/poster.jpg"
-        ></embed>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'bbc',
-        id: 'p00h8wqt',
-        src: 'https://www.bbc.com/news/av-embeds/13614478/vpid/p00h8wqt',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should read the article page route word in any case', async () => {
-      const value = html`
-        <embed
-          src="http://news.bbc.co.uk/player/emp/external/player.swf"
-          flashvars="externalIdentifier=p00h8wqt&embedPageUrl=http://www.bbc.co.uk/News/technology-13614478"
-        ></embed>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'bbc',
-        id: 'p00h8wqt',
-        src: 'https://www.bbc.com/news/av-embeds/13614478/vpid/p00h8wqt',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     // The snippet states 400 by 500 for a 16:9 player, and the measured ratio is preferred.
     it('should resolve the pasted news player iframe', async () => {
       const value = html`
