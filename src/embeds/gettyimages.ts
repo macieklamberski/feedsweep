@@ -12,7 +12,7 @@ type WidgetConfig = {
   items: string
   et: string
   sig: string
-  tld: string
+  tld?: string
 }
 
 // Getty signs the query up to `sig` in the order written: a pair dropped or moved before it
@@ -76,18 +76,22 @@ export const readWidgetConfig = (source: string): WidgetConfig | undefined => {
     items,
     et,
     sig,
-    tld: readConfigValue(source, 'tld') ?? 'com',
+    tld: readConfigValue(source, 'tld'),
   }
 }
 
 // The signature is bound to the item: a config's own url answers 200, and the same url carrying
 // another specimen's signature 400. Signatures do not appear to expire.
 export const composeWidgetEmbedUrl = (config: WidgetConfig): string => {
-  const query = new URLSearchParams({
-    et: config.et,
-    tld: config.tld,
-    sig: config.sig,
-  })
+  const query = new URLSearchParams({ et: config.et })
+
+  // The signature covers `tld` only when the config wrote it: a `tld` added to a url signed
+  // without one answers "Incorrect or invalid URL".
+  if (config.tld) {
+    query.set('tld', config.tld)
+  }
+
+  query.set('sig', config.sig)
 
   return `https://embed.gettyimages.com/embed/${config.items}?${query}`
 }

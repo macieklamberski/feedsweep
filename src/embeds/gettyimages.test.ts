@@ -20,13 +20,12 @@ describe('readWidgetConfig', () => {
       expect(readWidgetConfig(value)).toEqual(expected)
     })
 
-    it('should fall back to the com domain when none is stated', () => {
+    it('should leave the domain unset when none is stated', () => {
       const value = `gie.widgets.load({id:'abc',sig:'def=',w:'480px',h:'320px',items:'123456789'})`
       const expected = {
         items: '123456789',
         et: 'abc',
         sig: 'def=',
-        tld: 'com',
       }
 
       expect(readWidgetConfig(value)).toEqual(expected)
@@ -64,7 +63,6 @@ describe('readWidgetConfig', () => {
         items: 'not-an-id',
         et: 'abc',
         sig: 'def=',
-        tld: 'com',
       }
 
       expect(readWidgetConfig(value)).toEqual(expected)
@@ -83,6 +81,18 @@ describe('composeWidgetEmbedUrl', () => {
       }
       const expected =
         'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&sig=OOM9B40x%3D'
+
+      expect(composeWidgetEmbedUrl(value)).toBe(expected)
+    })
+
+    it('should leave the domain out when the config has none, which the signature does not cover', () => {
+      const value = {
+        items: '52941277',
+        et: 'O4y9JTw-Sfx-xS1g8rcemg',
+        sig: 'fm662LcjhNR8CxuM7wLJezgkjAkdEGOGXPDPYc-P3nk=',
+      }
+      const expected =
+        'https://embed.gettyimages.com/embed/52941277?et=O4y9JTw-Sfx-xS1g8rcemg&sig=fm662LcjhNR8CxuM7wLJezgkjAkdEGOGXPDPYc-P3nk%3D'
 
       expect(composeWidgetEmbedUrl(value)).toBe(expected)
     })
