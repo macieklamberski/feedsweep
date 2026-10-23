@@ -2,7 +2,6 @@ import {
   composeQuery,
   decodeSegment,
   encodePathSegment,
-  fixMalformedQuery,
   getPathSegments,
   getQueryParam,
   isAnyOf,
@@ -11,7 +10,12 @@ import {
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  parseUrlOnHosts,
+  pickQueryParams,
+  placeholderBaseUrl,
+  repairCarrierUrl,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'youtube'
@@ -95,7 +99,7 @@ const readPathId = (url: URL): string | undefined => {
 // The Flash player wrote `/v/{id}&hl=en_US&fs=1`, the query glued onto the id, and transforms
 // outside the resolver factory read urls here too.
 const parseYoutubeUrl = (link: string): URL | undefined => {
-  return parseUrl(fixMalformedQuery(link), placeholderBaseUrl)
+  return parseUrl(repairCarrierUrl(link), placeholderBaseUrl)
 }
 
 export const extractVideoId = (link: string): string | undefined => {

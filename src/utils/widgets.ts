@@ -1,5 +1,4 @@
 import {
-  fixMalformedQuery,
   isAnyOf,
   isHostOrSubdomainOf,
   type MaybePromise,
@@ -37,6 +36,7 @@ import {
   foldEscapedAmpersands,
   parseUrlOnHosts,
   prepareUrl,
+  repairCarrierUrl,
   resolveOrDropUrl,
   resolveOrKeepUrl,
 } from './urls.js'
@@ -270,9 +270,9 @@ export const createUrlEmbedResolver = (
         return
       }
 
-      // Only a resolver reads the glued-query repair. Every frame, claimed or not, reads the
-      // ampersands readCarrierUrl folded.
-      return decideSize(element, extract(fixMalformedQuery(src), element), options.readCarrierSize)
+      // Only a resolver reads the glued-query and whitespace repairs. Every frame, claimed or not,
+      // reads the ampersands readCarrierUrl folded.
+      return decideSize(element, extract(repairCarrierUrl(src), element), options.readCarrierSize)
     },
   }
 }
