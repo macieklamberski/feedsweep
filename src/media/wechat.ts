@@ -1,6 +1,6 @@
+import { composeQuery } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery } from '../utils/urls.js'
 
 // res.wx.qq.com serves the file for the id with no key, no Referer and no user agent.
 const composeSourceUrl = (mediaId: string): string => {

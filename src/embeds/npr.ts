@@ -1,6 +1,6 @@
-import { getPathSegments, getQueryParam, isAnyOf, toMap } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const nprHosts = ['www.npr.org']

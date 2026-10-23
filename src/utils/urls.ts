@@ -1,5 +1,6 @@
 import {
   audioExtensions,
+  composeQuery,
   documentExtensions,
   flashExtensions,
   getQueryParam,
@@ -229,21 +230,6 @@ export const pickQueryParams = (
 // `:` the value holds reads as written.
 export const encodePathSegment = (value: string): string => {
   return value.replace(/[%/?#\s]/g, (character) => encodeURIComponent(character))
-}
-
-// The other half of `pickQueryParams`: the pairs it returns, back into a query ready to append.
-// Query readers hand back a decoded value, so a `%` or `+` it holds is escaped again, along with
-// what would end a pair or the query and whitespace. An `@` stays as written. Nothing to carry
-// over gives an empty string.
-export const composeQuery = (params?: Record<string, string>): string => {
-  const escapePart = (part: string) => {
-    return part.replace(/[&#%+\s]/g, (character) => encodeURIComponent(character))
-  }
-  const pairs = Object.entries(params ?? {}).map(([name, value]) => {
-    return `${escapePart(name)}=${escapePart(value)}`
-  })
-
-  return pairs.length > 0 ? `?${pairs.join('&')}` : ''
 }
 
 // The publisher's query with only the parameters a player reads left in it. Each pair stays as

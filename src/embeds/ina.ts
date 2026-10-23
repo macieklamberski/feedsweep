@@ -1,7 +1,7 @@
-import { decodeSegment, getPathSegments, isAnyOf } from 'trousse'
+import { composeQuery, decodeSegment, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ina'

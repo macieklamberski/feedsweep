@@ -1,8 +1,14 @@
-import { decodeSegment, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
+import {
+  composeQuery,
+  decodeSegment,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  parseUrl,
+} from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import {
-  composeQuery,
   encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,

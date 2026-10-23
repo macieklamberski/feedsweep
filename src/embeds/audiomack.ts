@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, toMap } from 'trousse'
+import { composeQuery, getPathSegments, isAnyOf, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const audiomackHost = 'audiomack.com'

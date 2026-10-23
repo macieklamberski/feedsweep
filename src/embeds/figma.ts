@@ -1,11 +1,6 @@
-import { getPathSegments, getQueryParam, isAnyOf, isHostOf, parseUrl } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import {
-  alphanumericRegex,
-  composeQuery,
-  pickQueryParams,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { alphanumericRegex, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const figmaHost = 'figma.com'

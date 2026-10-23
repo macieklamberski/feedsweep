@@ -1,5 +1,5 @@
-import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
+import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'googlebooks'

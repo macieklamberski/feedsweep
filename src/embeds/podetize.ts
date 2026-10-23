@@ -1,7 +1,7 @@
-import { getQueryParam, isAnyOf, trimObject } from 'trousse'
+import { composeQuery, getQueryParam, isAnyOf, trimObject } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const podetizeHosts = ['player.podetize.com']

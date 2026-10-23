@@ -1,7 +1,6 @@
-import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
+import { composeQuery, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flipsnack'

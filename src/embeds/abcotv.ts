@@ -1,6 +1,6 @@
-import { stripWww } from 'trousse'
+import { composeQuery, stripWww } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { composeQuery, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'abcotv'

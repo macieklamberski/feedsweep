@@ -1,7 +1,7 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { composeQuery, getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
-import { composeQuery, placeholderBaseUrl } from '../../utils/urls.js'
+import { placeholderBaseUrl } from '../../utils/urls.js'
 
 // Listed exactly: a www.sandbox.paypal.com form is a test button that takes no real payment.
 const paypalHosts = ['paypal.com', 'www.paypal.com']

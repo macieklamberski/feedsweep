@@ -1,6 +1,6 @@
-import { decodeSegment, getPathSegments, getQueryParam, parseUrl } from 'trousse'
+import { composeQuery, decodeSegment, getPathSegments, getQueryParam, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { absoluteUrlRegex, composeQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { absoluteUrlRegex, isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'office'

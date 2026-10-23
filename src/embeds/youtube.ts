@@ -1,4 +1,5 @@
 import {
+  composeQuery,
   decodeSegment,
   fixMalformedQuery,
   getPathSegments,
@@ -9,7 +10,6 @@ import {
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
-  composeQuery,
   encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,

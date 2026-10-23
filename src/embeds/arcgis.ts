@@ -1,4 +1,5 @@
 import {
+  composeQuery,
   getAnyOf,
   getPathSegments,
   getQueryParam,
@@ -10,7 +11,7 @@ import {
 } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Item = {

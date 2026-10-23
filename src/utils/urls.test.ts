@@ -2,7 +2,6 @@ import { describe, expect, it } from 'bun:test'
 import { baseContext } from '../tests.js'
 import {
   cleanUrl,
-  composeQuery,
   dropUrlParams,
   encodePathSegment,
   filterUrlQuery,
@@ -239,75 +238,6 @@ describe('encodePathSegment', () => {
     const value = '35408001@N04:urn=a&b'
 
     expect(encodePathSegment(value)).toBe(value)
-  })
-})
-
-describe('composeQuery', () => {
-  it('should return an empty string for an empty record', () => {
-    expect(composeQuery({})).toBe('')
-  })
-
-  it('should return an empty string when nothing is passed', () => {
-    expect(composeQuery()).toBe('')
-  })
-
-  it('should prefix a single parameter with a question mark', () => {
-    const value = { start: '90' }
-    const expected = '?start=90'
-
-    expect(composeQuery(value)).toBe(expected)
-  })
-
-  it('should join several parameters in the order given', () => {
-    const value = { start: '90', list: 'PLabc', index: '4' }
-    const expected = '?start=90&list=PLabc&index=4'
-
-    expect(composeQuery(value)).toBe(expected)
-  })
-
-  it('should keep a slash, an at sign and a non-ASCII character as written', () => {
-    const value = { clipt: 'a/b', user_id: '17367418@N03', title: 'zürich' }
-    const expected = '?clipt=a/b&user_id=17367418@N03&title=zürich'
-
-    expect(composeQuery(value)).toBe(expected)
-  })
-
-  it('should escape a percent sign in a value, so a decoded escape is not decoded twice', () => {
-    const value = { media_url: 'https://example.com/a%2Cb.mp3' }
-    const expected = '?media_url=https://example.com/a%252Cb.mp3'
-
-    expect(composeQuery(value)).toBe(expected)
-  })
-
-  it('should escape a plus sign in a value, so it is not read back as a space', () => {
-    const value = { clipt: 'a+b' }
-    const expected = '?clipt=a%2Bb'
-
-    expect(composeQuery(value)).toBe(expected)
-  })
-
-  it('should escape an ampersand, a hash and whitespace in a value', () => {
-    const value = { vid: 'a&b=1#c d\te' }
-    const expected = '?vid=a%26b=1%23c%20d%09e'
-
-    expect(composeQuery(value)).toBe(expected)
-  })
-
-  it('should escape an ampersand, a hash, a percent sign, a plus sign and whitespace in a name', () => {
-    const value = { 'a&b#c d%e+f': '1' }
-    const expected = '?a%26b%23c%20d%25e%2Bf=1'
-
-    expect(composeQuery(value)).toBe(expected)
-  })
-
-  // `pickQueryParams` drops an empty value, so this only arrives from a caller that built the
-  // record itself. The pair is still stated, since the platform's player may read the parameter's
-  // presence rather than its value.
-  it('should state a parameter whose value is empty', () => {
-    const value = { theme: '' }
-    const expected = '?theme='
-
-    expect(composeQuery(value)).toBe(expected)
   })
 })
 

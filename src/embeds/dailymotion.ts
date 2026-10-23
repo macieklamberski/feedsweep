@@ -1,4 +1,5 @@
 import {
+  composeQuery,
   decodeSegment,
   fixMalformedQuery,
   getPathSegments,
@@ -16,7 +17,6 @@ import { attr, find } from '../utils/dom.js'
 const provider = 'dailymotion'
 
 import {
-  composeQuery,
   encodePathSegment,
   parseUrlOnHosts,
   pickQueryParams,

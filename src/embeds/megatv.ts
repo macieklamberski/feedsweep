@@ -1,6 +1,6 @@
-import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const megatvHosts = ['megatv.com']

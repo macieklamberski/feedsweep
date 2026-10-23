@@ -1,15 +1,17 @@
-import { decodeSegment, getPathSegments, getQueryParam, type Nullish, parseUrl } from 'trousse'
+import {
+  composeQuery,
+  decodeSegment,
+  getPathSegments,
+  getQueryParam,
+  type Nullish,
+  parseUrl,
+} from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 
 const provider = 'bandcamp'
 
-import {
-  composeQuery,
-  encodePathSegment,
-  parseUrlOnHosts,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // A release is either an album or a single track.

@@ -1,6 +1,5 @@
-import { decodeSegment, getPathSegments, isAnyOf } from 'trousse'
+import { composeQuery, decodeSegment, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { composeQuery } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'channel9'

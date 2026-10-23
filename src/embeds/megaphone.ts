@@ -1,13 +1,7 @@
-import { getQueryParam, parseUrl } from 'trousse'
+import { composeQuery, getQueryParam, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import {
-  composeQuery,
-  digitsRegex,
-  isFileName,
-  pickQueryParams,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { digitsRegex, isFileName, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'megaphone'

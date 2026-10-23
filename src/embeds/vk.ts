@@ -1,12 +1,15 @@
-import { getQueryParam, isPlainObject, isPresent, parseUrl, toMap, trimObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { readPixels } from '../utils/hints.js'
 import {
   composeQuery,
-  encodePathSegment,
-  pickQueryParams,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+  getQueryParam,
+  isPlainObject,
+  isPresent,
+  parseUrl,
+  toMap,
+  trimObject,
+} from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { readPixels } from '../utils/hints.js'
+import { encodePathSegment, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'vk'
