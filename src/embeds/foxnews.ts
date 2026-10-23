@@ -1,11 +1,8 @@
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
 import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
-import {
-  createMarkupEmbedResolver,
-  createUrlEmbedResolver,
-  readRepairedCarrierUrl,
-} from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type FoxBrand = {
   provider: string
@@ -79,7 +76,7 @@ export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
 export const foxnewsScriptEmbedResolver = createMarkupEmbedResolver(
   playerHosts.map((host) => `script[src*="${host}/v/embed.js"]`).join(', '),
   (element) => {
-    return foxnewsResolveEmbed(readRepairedCarrierUrl(element))
+    return foxnewsResolveEmbed(attr(element, 'src') ?? '')
   },
 )
 

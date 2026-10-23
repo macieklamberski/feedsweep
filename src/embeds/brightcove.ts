@@ -10,12 +10,7 @@ import {
   parseFlashVars,
   text,
 } from '../utils/dom.js'
-import {
-  composeQuery,
-  encodePathSegment,
-  placeholderBaseUrl,
-  repairCarrierUrl,
-} from '../utils/urls.js'
+import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brightcove'
@@ -39,7 +34,7 @@ const readPlayerAccount = (element: Element): string | undefined => {
 
   const loader = element.ownerDocument.querySelector(accountScriptSelector)
 
-  return repairCarrierUrl(attr(loader, 'src') ?? '').match(accountScriptRegex)?.[1]
+  return attr(loader, 'src')?.match(accountScriptRegex)?.[1]
 }
 
 // The account is in the `playerKey`: its middle comma-separated segment is the id as big-endian

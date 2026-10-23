@@ -7,7 +7,6 @@ import {
   encodePathSegment,
   isFileName,
   placeholderBaseUrl,
-  repairCarrierUrl,
   uuidRegex,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -71,8 +70,7 @@ const readUser = (value: string | undefined): string | undefined => {
 
 const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   // A twice-encoded feed leaves a literal `&amp;` that hides the `key` parameter after it.
-  const url = repairCarrierUrl(value?.replaceAll('&amp;', '&') ?? '')
-  const parsed = parseUrl(url, placeholderBaseUrl)
+  const parsed = parseUrl(value?.replaceAll('&amp;', '&') ?? '', placeholderBaseUrl)
 
   if (!parsed || !isHostOf(parsed, codepenHosts)) {
     return
