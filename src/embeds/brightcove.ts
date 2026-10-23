@@ -1,7 +1,15 @@
 import type { Nullish } from 'trousse'
 import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr, find, flashVars, keepIfMatches, paramValue, text } from '../utils/dom.js'
+import {
+  attr,
+  find,
+  flashVars,
+  keepIfMatches,
+  paramValue,
+  parseFlashVars,
+  text,
+} from '../utils/dom.js'
 import {
   composeQuery,
   encodePathSegment,
@@ -167,19 +175,18 @@ const brightcoveFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const config = flashVars(element)
-  const params = config ? new URLSearchParams(config) : undefined
+  const params = parseFlashVars(flashVars(element))
   // `videoId` is the older spelling of `@videoPlayer`, and a few embeds put the flashVars set in
   // the url query.
   const videoId =
-    params?.get('@videoPlayer') ??
+    params.get('@videoPlayer') ??
     parsed.searchParams.get('@videoPlayer') ??
-    params?.get('videoId') ??
+    params.get('videoId') ??
     parsed.searchParams.get('videoId')
   const account =
     parsed.searchParams.get('publisherID') ??
-    params?.get('publisherID') ??
-    readPlayerKeyAccount(params?.get('playerKey'))
+    params.get('publisherID') ??
+    readPlayerKeyAccount(params.get('playerKey'))
 
   if (!videoId || !account) {
     return

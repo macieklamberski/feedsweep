@@ -56,6 +56,21 @@ describeForEachParser('onePixelOutFlashMediaResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should strip the whitespace around the file a flashvars attribute names', async () => {
+      const value = html`
+        <embed
+          flashvars="soundFile= http://example.com/Trancemix_389.mp3"
+          src="http://example.com/player.swf"
+        >
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'http://example.com/Trancemix_389.mp3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should play the file the swf url query names', async () => {
       const value = html`
         <object

@@ -248,6 +248,22 @@ describeForEachParser('weeblyFlashMediaResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should strip the whitespace around the title the configuration names', async () => {
+      const value = html`
+        <embed
+          src="http://www.weebly.com/weebly/apps/audioPlayer2.swf?user_id=4427146"
+          flashvars="soundFile=http://www.example.com/uploads/4/4/2/7/4427146/knowing_yourself.mp3&amp;titles= Knowing%20Yourself"
+        />
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'http://www.example.com/uploads/4/4/2/7/4427146/knowing_yourself.mp3',
+        title: 'Knowing Yourself',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

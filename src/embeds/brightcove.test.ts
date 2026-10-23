@@ -34,6 +34,25 @@ describeForEachParser('brightcoveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should strip the whitespace around the video id in flashVars', async () => {
+      const value = html`
+        <embed
+          src="http://c.brightcove.com/services/viewer/federated_f9/19517958001?isVid=1&publisherID=1660622131"
+          flashVars="@videoPlayer=19521637001 &playerID=19517958001&domain=embed&"
+          width="300"
+          height="250"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '1660622131/19521637001',
+        src: 'https://players.brightcove.net/1660622131/default_default/index.html?videoId=19521637001',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read a short account and video id off a federated player', async () => {
       const value = html`
         <embed

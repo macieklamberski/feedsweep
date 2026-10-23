@@ -1,6 +1,6 @@
 import { parseUrl } from 'trousse'
 import type { MediaResolver, MediaResolverResult } from '../types.js'
-import { flashVars } from '../utils/dom.js'
+import { flashVars, parseFlashVars } from '../utils/dom.js'
 import { flashFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { readRepairedCarrierUrl } from '../utils/widgets.js'
 
@@ -64,7 +64,7 @@ export const onePixelOutFlashMediaResolver: MediaResolver = {
     }
 
     // A feed that escapes the markup twice leaves `&amp;` between the flashvars.
-    const config = new URLSearchParams(flashVars(element)?.replaceAll('&amp;', '&'))
+    const config = parseFlashVars(flashVars(element)?.replaceAll('&amp;', '&'))
     const soundFile = config.get('soundFile') ?? player.searchParams.get('soundFile')
 
     return composeAudio(soundFile ?? undefined, config.get('titles') ?? undefined)

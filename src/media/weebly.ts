@@ -1,5 +1,5 @@
 import type { MediaResolver } from '../types.js'
-import { flashVars } from '../utils/dom.js'
+import { flashVars, parseFlashVars } from '../utils/dom.js'
 import { audioFileRegex, imageFileRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { readRepairedCarrierUrl } from '../utils/widgets.js'
 
@@ -65,7 +65,7 @@ export const weeblyFlashMediaResolver: MediaResolver = {
       return
     }
 
-    const config = new URLSearchParams(flashVars(element) ?? '')
+    const config = parseFlashVars(flashVars(element))
     const src = config.get('soundFile')
 
     if (!src || !audioFileRegex.test(src)) {

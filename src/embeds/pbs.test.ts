@@ -491,6 +491,24 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should strip the whitespace around the video id in the flashvars', async () => {
+      const value = html`
+        <embed
+          src="http://www-tc.pbs.org/s3/pbs.videoportal-prod.cdn/media/swf/PBSPlayer.swf"
+          flashvars="video=2245886699 &player=viral"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2245886699',
+        src: 'https://player.pbs.org/viralplayer/2245886699/',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should repair the Flash player on the CDN host onto the viral player', async () => {
       const value = html`
         <object
