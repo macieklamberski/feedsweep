@@ -98,6 +98,19 @@ describe('spotifyResolveEmbed', () => {
       expect(spotifyResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should read the route prefix in any case and write it lowercase', () => {
+      const value = 'https://open.spotify.com/EMBED/track/5DEk5hrbWGOGAC8F6Yofvi'
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'track/5DEk5hrbWGOGAC8F6Yofvi',
+        src: 'https://open.spotify.com/embed/track/5DEk5hrbWGOGAC8F6Yofvi',
+        url: 'https://open.spotify.com/track/5DEk5hrbWGOGAC8F6Yofvi',
+        height: 152,
+      }
+
+      expect(spotifyResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should resolve the legacy uri form', () => {
       const value = 'https://embed.spotify.com/?uri=spotify:track:4cOdK2wGLETKBW3PvgPWqT'
       const expected: EmbedResolverResult = {
