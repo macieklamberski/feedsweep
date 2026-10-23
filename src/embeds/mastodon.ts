@@ -14,7 +14,7 @@ export type MastodonStatus = {
 }
 
 // A full handle, /@user@origin/{id}, 302s to a page served x-frame-options: DENY.
-// length: keeps brunch.co.kr/@{user}/{n} posts out of the Discourse cite path
+// Six or more digits keep brunch.co.kr/@{user}/{n} posts out of the Discourse cite path.
 const statusPathRegex = /^\/@([\w.-]+)\/(\d{6,})(?:\/embed)?\/?$/
 
 // Any host filing posts under an author and a number takes this shape, brunch.co.kr among them.
