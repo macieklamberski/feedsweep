@@ -29,7 +29,7 @@ describeForEachParser('rebuildGettyImagesEmbeds', (parseHtml) => {
     it('should replace the script in place when no anchor carries the token', async () => {
       const value = `<script>gie.widgets.load({id:'abc',sig:'def=',w:'480px',h:'320px',items:'123456789'})</script>`
       const expected =
-        '<iframe src="https://embed.gettyimages.com/embed/123456789?et=abc&amp;tld=com&amp;sig=def%3D"></iframe>'
+        '<iframe src="https://embed.gettyimages.com/embed/123456789?et=abc&amp;sig=def%3D"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -44,7 +44,7 @@ describeForEachParser('rebuildGettyImagesEmbeds', (parseHtml) => {
       `
       const expected = html`
         <a id="tokenA" class="gie-single" href="http://www.gettyimages.com/detail/111111111">One</a>
-        <iframe src="https://embed.gettyimages.com/embed/222222222?et=tokenB&amp;tld=com&amp;sig=sigB%3D"></iframe>
+        <iframe src="https://embed.gettyimages.com/embed/222222222?et=tokenB&amp;sig=sigB%3D"></iframe>
       `
 
       expect(await transform(value)).toEqualHtml(expected)
