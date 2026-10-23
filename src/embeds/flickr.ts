@@ -22,7 +22,8 @@ const flashPlayerPathRegex = /^\/apps\/slideshow\//i
 const flashVideoPathRegex = /^\/apps\/video\/stewart\.swf$/i
 const legacyPlayerPathRegex = /^\/slideshow\/index\.gne$/i
 
-const setPathRegex = /^\/photos\/([^/]+)\/(?:sets|albums)\/(\d+)(?:\/|$)/i
+// The set id is its digit run, so a link a feed cut into still names the set.
+const setPathRegex = /^\/photos\/([^/]+)\/(?:sets|albums)\/(\d+)/i
 const streamPathRegex = /^\/photos\/([^/]+)\/show\/?$/i
 const groupPathRegex = /^\/groups\/([^/]+)\/pool\/show\/?$/i
 const groupPagePathRegex = /^\/groups\//i
