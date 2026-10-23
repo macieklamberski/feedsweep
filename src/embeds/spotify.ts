@@ -16,11 +16,9 @@ const spotifyHeights = toMap({
   artist: 352,
 })
 
-// `embed` opens a player path, `embed-podcast` its older podcast-only twin, `intl-{locale}` a
+// `embed` opens a player path, `embed-podcast` its older podcast-only twin, `intl-{lang}` a
 // localized page path. Whatever follows the id (`/video` on a video podcast) is decorative.
-// Spotify redirects every `intl-` prefix, region tails such as `intl-pt-br` included, to the
-// bare page.
-const pathPrefixRegex = /^(?:embed|embed-podcast|intl-.+)$/i
+const pathPrefixRegex = /^(?:embed|embed-podcast|intl-[a-z]{2})$/i
 // spotify:{type}:{id}, or the owned playlist form spotify:user:{handle}:playlist:{id}.
 // The pre-2017 snippet framed `embed.spotify.com/?uri=spotify:{type}:{id}`, and that host still
 // serves a player.
@@ -91,7 +89,7 @@ export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   // The `uri` parameter also carries an open.spotify.com url, in every spelling the carrier's own
-  // path has: the `intl-{locale}` prefix, an `/embed/` prefix and the `user/{handle}/playlist/{id}`
+  // path has: the `intl-{lang}` prefix, an `/embed/` prefix and the `user/{handle}/playlist/{id}`
   // ownership form.
   const uri = parsed.searchParams.get('uri') ?? undefined
   const legacy = uri?.match(legacyUriRegex)
